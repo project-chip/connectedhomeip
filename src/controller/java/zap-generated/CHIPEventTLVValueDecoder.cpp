@@ -8897,21 +8897,21 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        value_videoStreamIDCtorSignature.c_str(),
                                                                        jnivalue_videoStreamID, value_videoStreamID);
 
-            jobject value_streamType;
-            if (!cppValue.streamType.HasValue())
+            jobject value_streamUsage;
+            if (!cppValue.streamUsage.HasValue())
             {
-                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_streamType);
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_streamUsage);
             }
             else
             {
-                jobject value_streamTypeInsideOptional;
-                std::string value_streamTypeInsideOptionalClassName     = "java/lang/Integer";
-                std::string value_streamTypeInsideOptionalCtorSignature = "(I)V";
-                jint jnivalue_streamTypeInsideOptional                  = static_cast<jint>(cppValue.streamType.Value());
+                jobject value_streamUsageInsideOptional;
+                std::string value_streamUsageInsideOptionalClassName     = "java/lang/Integer";
+                std::string value_streamUsageInsideOptionalCtorSignature = "(I)V";
+                jint jnivalue_streamUsageInsideOptional                  = static_cast<jint>(cppValue.streamUsage.Value());
                 chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                    value_streamTypeInsideOptionalClassName.c_str(), value_streamTypeInsideOptionalCtorSignature.c_str(),
-                    jnivalue_streamTypeInsideOptional, value_streamTypeInsideOptional);
-                chip::JniReferences::GetInstance().CreateOptional(value_streamTypeInsideOptional, value_streamType);
+                    value_streamUsageInsideOptionalClassName.c_str(), value_streamUsageInsideOptionalCtorSignature.c_str(),
+                    jnivalue_streamUsageInsideOptional, value_streamUsageInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_streamUsageInsideOptional, value_streamUsage);
             }
 
             jobject value_videoCodec;
@@ -9165,7 +9165,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jobject value =
-                env->NewObject(videoStreamChangedStructClass, videoStreamChangedStructCtor, value_videoStreamID, value_streamType,
+                env->NewObject(videoStreamChangedStructClass, videoStreamChangedStructCtor, value_videoStreamID, value_streamUsage,
                                value_videoCodec, value_minFrameRate, value_maxFrameRate, value_minResolution, value_maxResolution,
                                value_minBitRate, value_maxBitRate, value_minFragmentLen, value_maxFragmentLen);
 
@@ -9186,21 +9186,21 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        value_audioStreamIDCtorSignature.c_str(),
                                                                        jnivalue_audioStreamID, value_audioStreamID);
 
-            jobject value_streamType;
-            if (!cppValue.streamType.HasValue())
+            jobject value_streamUsage;
+            if (!cppValue.streamUsage.HasValue())
             {
-                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_streamType);
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_streamUsage);
             }
             else
             {
-                jobject value_streamTypeInsideOptional;
-                std::string value_streamTypeInsideOptionalClassName     = "java/lang/Integer";
-                std::string value_streamTypeInsideOptionalCtorSignature = "(I)V";
-                jint jnivalue_streamTypeInsideOptional                  = static_cast<jint>(cppValue.streamType.Value());
+                jobject value_streamUsageInsideOptional;
+                std::string value_streamUsageInsideOptionalClassName     = "java/lang/Integer";
+                std::string value_streamUsageInsideOptionalCtorSignature = "(I)V";
+                jint jnivalue_streamUsageInsideOptional                  = static_cast<jint>(cppValue.streamUsage.Value());
                 chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                    value_streamTypeInsideOptionalClassName.c_str(), value_streamTypeInsideOptionalCtorSignature.c_str(),
-                    jnivalue_streamTypeInsideOptional, value_streamTypeInsideOptional);
-                chip::JniReferences::GetInstance().CreateOptional(value_streamTypeInsideOptional, value_streamType);
+                    value_streamUsageInsideOptionalClassName.c_str(), value_streamUsageInsideOptionalCtorSignature.c_str(),
+                    jnivalue_streamUsageInsideOptional, value_streamUsageInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_streamUsageInsideOptional, value_streamUsage);
             }
 
             jobject value_audioCodec;
@@ -9312,7 +9312,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jobject value =
-                env->NewObject(audioStreamChangedStructClass, audioStreamChangedStructCtor, value_audioStreamID, value_streamType,
+                env->NewObject(audioStreamChangedStructClass, audioStreamChangedStructCtor, value_audioStreamID, value_streamUsage,
                                value_audioCodec, value_channelCount, value_sampleRate, value_bitRate, value_bitDepth);
 
             return value;
@@ -9538,6 +9538,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             return value;
         }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::CameraAvSettingsUserLevelManagement::Id: {
+        using namespace app::Clusters::CameraAvSettingsUserLevelManagement;
+        switch (aPath.mEventId)
+        {
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;

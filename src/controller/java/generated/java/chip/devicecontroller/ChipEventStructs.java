@@ -6814,7 +6814,7 @@ public static class ZoneManagementClusterZoneStoppedEvent {
 }
 public static class CameraAvStreamManagementClusterVideoStreamChangedEvent {
   public Integer videoStreamID;
-  public Optional<Integer> streamType;
+  public Optional<Integer> streamUsage;
   public Optional<Integer> videoCodec;
   public Optional<Integer> minFrameRate;
   public Optional<Integer> maxFrameRate;
@@ -6825,7 +6825,7 @@ public static class CameraAvStreamManagementClusterVideoStreamChangedEvent {
   public Optional<Integer> minFragmentLen;
   public Optional<Integer> maxFragmentLen;
   private static final long VIDEO_STREAM_ID_ID = 0L;
-  private static final long STREAM_TYPE_ID = 1L;
+  private static final long STREAM_USAGE_ID = 1L;
   private static final long VIDEO_CODEC_ID = 2L;
   private static final long MIN_FRAME_RATE_ID = 3L;
   private static final long MAX_FRAME_RATE_ID = 4L;
@@ -6838,7 +6838,7 @@ public static class CameraAvStreamManagementClusterVideoStreamChangedEvent {
 
   public CameraAvStreamManagementClusterVideoStreamChangedEvent(
     Integer videoStreamID,
-    Optional<Integer> streamType,
+    Optional<Integer> streamUsage,
     Optional<Integer> videoCodec,
     Optional<Integer> minFrameRate,
     Optional<Integer> maxFrameRate,
@@ -6850,7 +6850,7 @@ public static class CameraAvStreamManagementClusterVideoStreamChangedEvent {
     Optional<Integer> maxFragmentLen
   ) {
     this.videoStreamID = videoStreamID;
-    this.streamType = streamType;
+    this.streamUsage = streamUsage;
     this.videoCodec = videoCodec;
     this.minFrameRate = minFrameRate;
     this.maxFrameRate = maxFrameRate;
@@ -6865,7 +6865,7 @@ public static class CameraAvStreamManagementClusterVideoStreamChangedEvent {
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(VIDEO_STREAM_ID_ID, new UIntType(videoStreamID)));
-    values.add(new StructElement(STREAM_TYPE_ID, streamType.<BaseTLVType>map((nonOptionalstreamType) -> new UIntType(nonOptionalstreamType)).orElse(new EmptyType())));
+    values.add(new StructElement(STREAM_USAGE_ID, streamUsage.<BaseTLVType>map((nonOptionalstreamUsage) -> new UIntType(nonOptionalstreamUsage)).orElse(new EmptyType())));
     values.add(new StructElement(VIDEO_CODEC_ID, videoCodec.<BaseTLVType>map((nonOptionalvideoCodec) -> new UIntType(nonOptionalvideoCodec)).orElse(new EmptyType())));
     values.add(new StructElement(MIN_FRAME_RATE_ID, minFrameRate.<BaseTLVType>map((nonOptionalminFrameRate) -> new UIntType(nonOptionalminFrameRate)).orElse(new EmptyType())));
     values.add(new StructElement(MAX_FRAME_RATE_ID, maxFrameRate.<BaseTLVType>map((nonOptionalmaxFrameRate) -> new UIntType(nonOptionalmaxFrameRate)).orElse(new EmptyType())));
@@ -6884,7 +6884,7 @@ public static class CameraAvStreamManagementClusterVideoStreamChangedEvent {
       return null;
     }
     Integer videoStreamID = null;
-    Optional<Integer> streamType = Optional.empty();
+    Optional<Integer> streamUsage = Optional.empty();
     Optional<Integer> videoCodec = Optional.empty();
     Optional<Integer> minFrameRate = Optional.empty();
     Optional<Integer> maxFrameRate = Optional.empty();
@@ -6900,10 +6900,10 @@ public static class CameraAvStreamManagementClusterVideoStreamChangedEvent {
           UIntType castingValue = element.value(UIntType.class);
           videoStreamID = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == STREAM_TYPE_ID) {
+      } else if (element.contextTagNum() == STREAM_USAGE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          streamType = Optional.of(castingValue.value(Integer.class));
+          streamUsage = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == VIDEO_CODEC_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -6954,7 +6954,7 @@ public static class CameraAvStreamManagementClusterVideoStreamChangedEvent {
     }
     return new CameraAvStreamManagementClusterVideoStreamChangedEvent(
       videoStreamID,
-      streamType,
+      streamUsage,
       videoCodec,
       minFrameRate,
       maxFrameRate,
@@ -6974,8 +6974,8 @@ public static class CameraAvStreamManagementClusterVideoStreamChangedEvent {
     output.append("\tvideoStreamID: ");
     output.append(videoStreamID);
     output.append("\n");
-    output.append("\tstreamType: ");
-    output.append(streamType);
+    output.append("\tstreamUsage: ");
+    output.append(streamUsage);
     output.append("\n");
     output.append("\tvideoCodec: ");
     output.append(videoCodec);
@@ -7010,14 +7010,14 @@ public static class CameraAvStreamManagementClusterVideoStreamChangedEvent {
 }
 public static class CameraAvStreamManagementClusterAudioStreamChangedEvent {
   public Integer audioStreamID;
-  public Optional<Integer> streamType;
+  public Optional<Integer> streamUsage;
   public Optional<Integer> audioCodec;
   public Optional<Integer> channelCount;
   public Optional<Long> sampleRate;
   public Optional<Long> bitRate;
   public Optional<Integer> bitDepth;
   private static final long AUDIO_STREAM_ID_ID = 0L;
-  private static final long STREAM_TYPE_ID = 1L;
+  private static final long STREAM_USAGE_ID = 1L;
   private static final long AUDIO_CODEC_ID = 2L;
   private static final long CHANNEL_COUNT_ID = 3L;
   private static final long SAMPLE_RATE_ID = 4L;
@@ -7026,7 +7026,7 @@ public static class CameraAvStreamManagementClusterAudioStreamChangedEvent {
 
   public CameraAvStreamManagementClusterAudioStreamChangedEvent(
     Integer audioStreamID,
-    Optional<Integer> streamType,
+    Optional<Integer> streamUsage,
     Optional<Integer> audioCodec,
     Optional<Integer> channelCount,
     Optional<Long> sampleRate,
@@ -7034,7 +7034,7 @@ public static class CameraAvStreamManagementClusterAudioStreamChangedEvent {
     Optional<Integer> bitDepth
   ) {
     this.audioStreamID = audioStreamID;
-    this.streamType = streamType;
+    this.streamUsage = streamUsage;
     this.audioCodec = audioCodec;
     this.channelCount = channelCount;
     this.sampleRate = sampleRate;
@@ -7045,7 +7045,7 @@ public static class CameraAvStreamManagementClusterAudioStreamChangedEvent {
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(AUDIO_STREAM_ID_ID, new UIntType(audioStreamID)));
-    values.add(new StructElement(STREAM_TYPE_ID, streamType.<BaseTLVType>map((nonOptionalstreamType) -> new UIntType(nonOptionalstreamType)).orElse(new EmptyType())));
+    values.add(new StructElement(STREAM_USAGE_ID, streamUsage.<BaseTLVType>map((nonOptionalstreamUsage) -> new UIntType(nonOptionalstreamUsage)).orElse(new EmptyType())));
     values.add(new StructElement(AUDIO_CODEC_ID, audioCodec.<BaseTLVType>map((nonOptionalaudioCodec) -> new UIntType(nonOptionalaudioCodec)).orElse(new EmptyType())));
     values.add(new StructElement(CHANNEL_COUNT_ID, channelCount.<BaseTLVType>map((nonOptionalchannelCount) -> new UIntType(nonOptionalchannelCount)).orElse(new EmptyType())));
     values.add(new StructElement(SAMPLE_RATE_ID, sampleRate.<BaseTLVType>map((nonOptionalsampleRate) -> new UIntType(nonOptionalsampleRate)).orElse(new EmptyType())));
@@ -7060,7 +7060,7 @@ public static class CameraAvStreamManagementClusterAudioStreamChangedEvent {
       return null;
     }
     Integer audioStreamID = null;
-    Optional<Integer> streamType = Optional.empty();
+    Optional<Integer> streamUsage = Optional.empty();
     Optional<Integer> audioCodec = Optional.empty();
     Optional<Integer> channelCount = Optional.empty();
     Optional<Long> sampleRate = Optional.empty();
@@ -7072,10 +7072,10 @@ public static class CameraAvStreamManagementClusterAudioStreamChangedEvent {
           UIntType castingValue = element.value(UIntType.class);
           audioStreamID = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == STREAM_TYPE_ID) {
+      } else if (element.contextTagNum() == STREAM_USAGE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          streamType = Optional.of(castingValue.value(Integer.class));
+          streamUsage = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == AUDIO_CODEC_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -7106,7 +7106,7 @@ public static class CameraAvStreamManagementClusterAudioStreamChangedEvent {
     }
     return new CameraAvStreamManagementClusterAudioStreamChangedEvent(
       audioStreamID,
-      streamType,
+      streamUsage,
       audioCodec,
       channelCount,
       sampleRate,
@@ -7122,8 +7122,8 @@ public static class CameraAvStreamManagementClusterAudioStreamChangedEvent {
     output.append("\taudioStreamID: ");
     output.append(audioStreamID);
     output.append("\n");
-    output.append("\tstreamType: ");
-    output.append(streamType);
+    output.append("\tstreamUsage: ");
+    output.append(streamUsage);
     output.append("\n");
     output.append("\taudioCodec: ");
     output.append(audioCodec);

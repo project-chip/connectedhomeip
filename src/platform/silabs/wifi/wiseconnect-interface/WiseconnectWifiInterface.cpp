@@ -16,7 +16,7 @@
 
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/silabs/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.h>
+#include <platform/silabs/wifi/wiseconnect-interface/WiseconnectWifiInterface.h>
 
 extern WfxRsi_t wfx_rsi;
 
@@ -48,6 +48,37 @@ CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, chip::MutableByteSpan & a
 #endif
 
     return CopySpanToMutableSpan(byteSpan, address);
+}
+
+CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback)
+{
+    VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!wfx_rsi.dev_state.Has(WifiState::kScanStarted), CHIP_ERROR_IN_PROGRESS);
+
+    // SSID Max Length that is supported by the Wi-Fi SDK is 32
+    VerifyOrReturnError(ssid.size() <= WFX_MAX_SSID_LENGTH, CHIP_ERROR_INVALID_STRING_LENGTH);
+
+    if (ssid.empty()) // Scan all networks
+    {
+        wfx_rsi.scan_ssid_length = 0;
+        wfx_rsi.scan_ssid        = nullptr;
+    }
+    else // Scan specific SSID
+    {
+        wfx_rsi.scan_ssid_length = ssid.size();
+        wfx_rsi.scan_ssid        = reinterpret_cast<uint8_t *>(chip::Platform::MemoryAlloc(wfx_rsi.scan_ssid_length));
+        VerifyOrReturnError(wfx_rsi.scan_ssid != nullptr, CHIP_ERROR_NO_MEMORY);
+
+        chip::MutableByteSpan scanSsidSpan(wfx_rsi.scan_ssid, wfx_rsi.scan_ssid_length);
+        chip::CopySpanToMutableSpan(ssid, scanSsidSpan);
+    }
+    wfx_rsi.scan_cb = callback;
+
+    // TODO: We should be calling the start function directly instead of doing it asynchronously
+    WifiPlatformEvent event = WifiPlatformEvent::kScan;
+    sl_matter_wifi_post_event(event);
+
+    return CHIP_NO_ERROR;
 }
 
 /*********************************************************************
@@ -302,33 +333,6 @@ int32_t wfx_reset_counts(void)
     return wfx_rsi_reset_count();
 }
 
-#ifdef SL_WFX_CONFIG_SCAN
-/*******************************************************************************
- * @fn   bool wfx_start_scan(char *ssid, void (*callback)(wfx_wifi_scan_result_t *))
- * @brief
- *       called fuction when driver start scaning
- * @param[in]  ssid:
- * @return returns ture if successful,
- *          false otherwise
- *******************************************************************************/
-bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
-{
-    // check if already in progress
-    VerifyOrReturnError(wfx_rsi.scan_cb != nullptr, false);
-    wfx_rsi.scan_cb = callback;
-
-    VerifyOrReturnError(ssid != nullptr, false);
-    wfx_rsi.scan_ssid_length = strnlen(ssid, std::min<size_t>(sizeof(ssid), WFX_MAX_SSID_LENGTH));
-    wfx_rsi.scan_ssid        = reinterpret_cast<char *>(chip::Platform::MemoryAlloc(wfx_rsi.scan_ssid_length));
-    VerifyOrReturnError(wfx_rsi.scan_ssid != nullptr, false);
-    chip::Platform::CopyString(wfx_rsi.scan_ssid, wfx_rsi.scan_ssid_length, ssid);
-
-    WifiPlatformEvent event = WifiPlatformEvent::kScan;
-    sl_matter_wifi_post_event(event);
-
-    return true;
-}
-
 /***************************************************************************
  * @fn   void wfx_cancel_scan(void)
  * @brief
@@ -342,4 +346,3 @@ void wfx_cancel_scan(void)
     /* Not possible */
     ChipLogError(DeviceLayer, "cannot cancel scan");
 }
-#endif /* SL_WFX_CONFIG_SCAN */

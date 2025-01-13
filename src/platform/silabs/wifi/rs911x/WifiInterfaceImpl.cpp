@@ -23,10 +23,10 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
+#include <platform/silabs/wifi/WifiInterface.h>
 #include <platform/silabs/wifi/lwip-support/dhcp_client.h>
 #include <platform/silabs/wifi/lwip-support/ethernetif.h>
-#include <platform/silabs/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.h>
+#include <platform/silabs/wifi/wiseconnect-interface/WiseconnectWifiInterface.h>
 
 extern "C" {
 #include "rsi_bootup_config.h"
@@ -677,68 +677,61 @@ void ProcessEvent(WifiPlatformEvent event)
         // TODO: Currently unimplemented
         break;
     case WifiPlatformEvent::kScan: {
-#ifdef SL_WFX_CONFIG_SCAN
         rsi_rsp_scan_t scan_rsp = { 0 };
-        memset(&scan_rsp, 0, sizeof(scan_rsp));
-        int32_t status = rsi_wlan_bgscan_profile(1, &scan_rsp, sizeof(scan_rsp));
+        int32_t status          = rsi_wlan_bgscan_profile(1, &scan_rsp, sizeof(scan_rsp));
 
-        if (status != RSI_SUCCESS)
+        VerifyOrReturn(status == RSI_SUCCESS, ChipLogError(DeviceLayer, "rsi_wlan_bgscan_profile failed: %ld", status));
+        VerifyOrReturn(wfx_rsi.scan_cb != nullptr, ChipLogError(DeviceLayer, "wfx_rsi.scan_cb is nullptr"));
+
+        uint8_t nbreOfScannedNetworks = scan_rsp.scan_count[0];
+        for (int i = 0; i < nbreOfScannedNetworks; i++)
         {
-            ChipLogError(DeviceLayer, "rsi_wlan_bgscan failed: %ld ", status);
-            return;
-        }
+            rsi_scan_info_t scan      = scan_rsp.scan_info[i];
+            wfx_wifi_scan_result_t ap = { 0 };
 
-        if (wfx_rsi.scan_cb == NULL)
-        {
-            ChipLogError(DeviceLayer, "wfx_rsi.scan_cb is NULL");
-            return;
-        }
+            ap.ssid_length = strnlen(reinterpret_cast<char *>(scan.ssid), WFX_MAX_SSID_LENGTH);
 
-        rsi_scan_info_t * scan;
-        wfx_wifi_scan_result_t ap;
+            chip::ByteSpan scannedSsid(scan.ssid, ap.ssid_length);
+            chip::MutableByteSpan outputSsid(ap.ssid, WFX_MAX_SSID_LENGTH);
+            chip::CopySpanToMutableSpan(scannedSsid, outputSsid);
 
-        for (int x = 0; x < scan_rsp.scan_count[0]; x++)
-        {
-            scan = &scan_rsp.scan_info[x];
-            // clear structure and calculate size of SSID
-            memset(&ap, 0, sizeof(ap));
-            ap.ssid_length =
-                strnlen(reinterpret_cast<char *>(scan->ssid), std::min<size_t>(sizeof(scan->ssid), WFX_MAX_SSID_LENGTH));
-            chip::Platform::CopyString(ap.ssid, ap.ssid_length, reinterpret_cast<char *>(scan->ssid));
-
-            // check if the scanned ssid is the one we are looking for
-            if (wfx_rsi.scan_ssid_length != 0 && strncmp(wfx_rsi.scan_ssid, ap.ssid, WFX_MAX_SSID_LENGTH) != 0)
+            // Check if the scanned ssid is the requested Ssid
+            chip::ByteSpan requestedSsid(wfx_rsi.scan_ssid, wfx_rsi.scan_ssid_length);
+            if (!requestedSsid.empty() && !requestedSsid.data_equal(scannedSsid))
             {
-                continue; // we found the targeted ssid.
-            }
-            // TODO: convert security mode from RSI to WFX
-            ap.security = static_cast<wfx_sec_t>(scan->security_mode);
-            ap.rssi     = (-1) * scan->rssi_val;
-
-            configASSERT(sizeof(ap.bssid) == kWifiMacAddressLength);
-            configASSERT(sizeof(scan->bssid) == kWifiMacAddressLength);
-            memcpy(ap.bssid, scan->bssid, kWifiMacAddressLength);
-            (*wfx_rsi.scan_cb)(&ap);
-
-            // no ssid filter set, return all results
-            if (wfx_rsi.scan_ssid_length == 0)
-            {
+                // Scanned SSID entry does not match the requested SSID. Continue to the next.
                 continue;
             }
 
-            break;
+            // TODO: convert security mode from RSI to WFX
+            ap.security = static_cast<wfx_sec_t>(scan.security_mode);
+            ap.rssi     = (-1) * scan.rssi_val;
+
+            configASSERT(sizeof(ap.bssid) == kWifiMacAddressLength);
+            configASSERT(sizeof(scan.bssid) == kWifiMacAddressLength);
+
+            chip::MutableByteSpan bssidSpan(ap.bssid, kWifiMacAddressLength);
+            chip::ByteSpan scanBssidSpan(scan.bssid, kWifiMacAddressLength);
+            chip::CopySpanToMutableSpan(scanBssidSpan, bssidSpan);
+
+            wfx_rsi.scan_cb(&ap);
+
+            // If we reach this and the requestedSsid is not empty, it means we found the requested SSID and we can exit
+            if (!requestedSsid.empty())
+            {
+                break;
+            }
         }
+        // Notify the stack that we have finishes scanning for Networks
+        wfx_rsi.scan_cb(nullptr);
 
-        /* Terminate with end of scan which is no ap sent back */
-        (*wfx_rsi.scan_cb)((wfx_wifi_scan_result_t *) NULL);
+        // Clean up
         wfx_rsi.scan_cb = nullptr;
-
         if (wfx_rsi.scan_ssid)
         {
             chip::Platform::MemoryFree(wfx_rsi.scan_ssid);
             wfx_rsi.scan_ssid = NULL;
         }
-#endif /* SL_WFX_CONFIG_SCAN */
     }
     break;
     case WifiPlatformEvent::kStationStartJoin: {
