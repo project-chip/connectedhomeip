@@ -185,6 +185,8 @@ tests:
           2.4GHz band."
       PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_PAF
       verification: |
+         WIFI - PAF feature is out of scope for V1.4
+
           [Configuration command to be filled by NXP]
 
           Configure the AP to the PAF working channel and connect TH to AP
@@ -244,7 +246,6 @@ tests:
           vendor-unique means or by commissioning the DUT onto the Matter
           network and opening a commissioning window. The DUT is sending
           mandatory Commissionable Node Discovery service records over DNS-SD."
-      PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_SOFTAP
       verification: |
           ./chip-all-clusters-app
           ...

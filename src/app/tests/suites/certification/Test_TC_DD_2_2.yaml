@@ -204,9 +204,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 4b: DUT must find TH and provide onboarding data for
-          validation.Pass Criteria: DUT is able to report the Onboarding payload
-          as set on TH"
+          "Step 4b: DUT starts Wi-Fi scan of all 2.4 GHz Wi-Fi channels allowed per its operational regulatory domain (channels 1, 6, and 11 are preferred)"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
           Out of Scope : SoftAP commissioning currently not supported 
