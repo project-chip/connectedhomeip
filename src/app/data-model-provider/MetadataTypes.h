@@ -16,8 +16,6 @@
  */
 #pragma once
 
-#include "app/data-model-provider/MetadataList.h"
-#include "lib/support/Span.h"
 #include <cstdint>
 #include <optional>
 
@@ -27,10 +25,12 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/data-model-provider/MetadataList.h>
 #include <app/data-model/List.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/BitMask.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace app {
@@ -52,24 +52,14 @@ enum class EndpointCompositionPattern : uint8_t
     kFullFamily = 0x2,
 };
 
-struct EndpointInfo
+struct EndpointEntry
 {
+    EndpointId id;
+
     // kInvalidEndpointId if there is no explicit parent endpoint (which means the parent is endpoint 0,
     // for endpoints other than endpoint 0).
     EndpointId parentId;
     EndpointCompositionPattern compositionPattern;
-
-    explicit EndpointInfo(EndpointId parent) : parentId(parent), compositionPattern(EndpointCompositionPattern::kFullFamily) {}
-    EndpointInfo(EndpointId parent, EndpointCompositionPattern pattern) : parentId(parent), compositionPattern(pattern) {}
-};
-
-struct EndpointEntry
-{
-    EndpointId id;
-    EndpointInfo info;
-
-    bool IsValid() const { return id != kInvalidEndpointId; }
-    static const EndpointEntry kInvalid;
 };
 
 enum class ClusterQualityFlags : uint32_t
@@ -176,12 +166,6 @@ class ProviderMetadataTree
 public:
     virtual ~ProviderMetadataTree() = default;
 
-    // This iteration will list all the endpoints in the data model
-    virtual EndpointEntry FirstEndpoint()                              = 0;
-    virtual EndpointEntry NextEndpoint(EndpointId before)              = 0;
-    virtual std::optional<EndpointInfo> GetEndpointInfo(EndpointId id) = 0;
-    virtual bool EndpointExists(EndpointId id);
-
     // This iteration will list all server clusters on a given endpoint
     virtual ClusterEntry FirstServerCluster(EndpointId endpoint)                              = 0;
     virtual ClusterEntry NextServerCluster(const ConcreteClusterPath & before)                = 0;
@@ -205,6 +189,7 @@ public:
 
     using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
 
+    virtual MetadataList<EndpointEntry> Endpoints()                                               = 0;
     virtual MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath & path)           = 0;
     virtual MetadataList<AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) = 0;
     virtual MetadataList<SemanticTag> SemanticTags(EndpointId endpointId)                         = 0;

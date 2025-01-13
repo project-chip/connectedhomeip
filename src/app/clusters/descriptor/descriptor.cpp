@@ -33,6 +33,8 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "descriptor.h"
+#include "lib/core/CHIPError.h"
+#include "lib/core/DataModelTypes.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -41,6 +43,31 @@ using namespace chip::app::Clusters::Descriptor;
 using namespace chip::app::Clusters::Descriptor::Attributes;
 
 namespace {
+
+/// Figures out if `childId` is a descendant of `parentId` given some specific endpoint entries
+bool IsDescendantOf(EndpointId childId, const EndpointId parentId, Span<const DataModel::EndpointEntry> allEndpoints)
+{
+    // NOTE: this is not very efficient, however most compositions should be of small depth
+    while (childId != kInvalidEndpointId)
+    {
+        // find the requested value in the array to get it's parent
+        for (auto & ep : allEndpoints)
+        {
+            if (ep.id != childId)
+            {
+                continue;
+            }
+
+            if (ep.parentId == parentId)
+            {
+                return true;
+            }
+            childId = ep.parentId; // see if parent is a descendant
+        }
+    }
+
+    return false;
+}
 
 class DescriptorAttrAccess : public AttributeAccessInterface
 {
@@ -86,69 +113,68 @@ CHIP_ERROR DescriptorAttrAccess::ReadTagListAttribute(EndpointId endpoint, Attri
 
 CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    auto endpointInfo = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetEndpointInfo(endpoint);
+    auto endpoints = InteractionModelEngine::GetInstance()->GetDataModelProvider()->Endpoints();
+    // auto endpointInfo = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetEndpointInfo(endpoint);
     if (endpoint == 0x00)
     {
-        err = aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-            auto endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstEndpoint();
-            while (endpointEntry.IsValid())
+        return aEncoder.EncodeList([&endpoints](const auto & encoder) -> CHIP_ERROR {
+            for (auto ep : endpoints.GetSpanValidForLifetime())
             {
-                if (endpointEntry.id != 0)
+                if (ep.id == 0)
                 {
-                    ReturnErrorOnFailure(encoder.Encode(endpointEntry.id));
+                    continue;
                 }
-                endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextEndpoint(endpointEntry.id);
-            }
-            return CHIP_NO_ERROR;
-        });
-    }
-    else if (endpointInfo.has_value() && endpointInfo->compositionPattern == DataModel::EndpointCompositionPattern::kFullFamily)
-    {
-        err = aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
-            auto endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstEndpoint();
-            while (endpointEntry.IsValid())
-            {
-                EndpointId parentEndpointId = endpointEntry.info.parentId;
-                while (parentEndpointId != chip::kInvalidEndpointId)
-                {
-                    if (parentEndpointId == endpoint)
-                    {
-                        ReturnErrorOnFailure(encoder.Encode(endpointEntry.id));
-                        break;
-                    }
-                    auto parentEndpointInfo =
-                        InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetEndpointInfo(parentEndpointId);
-                    if (!parentEndpointInfo.has_value())
-                    {
-                        break;
-                    }
-                    parentEndpointId = parentEndpointInfo->parentId;
-                }
-                endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextEndpoint(endpointEntry.id);
-            }
-
-            return CHIP_NO_ERROR;
-        });
-    }
-    else if (endpointInfo.has_value() && endpointInfo->compositionPattern == DataModel::EndpointCompositionPattern::kTree)
-    {
-        err = aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
-            auto endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstEndpoint();
-            while (endpointEntry.IsValid())
-            {
-                if (endpointEntry.info.parentId == endpoint)
-                {
-                    ReturnErrorOnFailure(encoder.Encode(endpointEntry.id));
-                }
-                endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextEndpoint(endpointEntry.id);
+                ReturnErrorOnFailure(encoder.Encode(ep.id));
             }
             return CHIP_NO_ERROR;
         });
     }
 
-    return err;
+    // fint the given endpoint
+    unsigned idx = 0;
+    while (idx < endpoints.size())
+    {
+        if (endpoints[idx].id == endpoint)
+        {
+            break;
+        }
+    }
+    if (idx >= endpoints.size())
+    {
+        // not found
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    auto & endpointInfo = endpoints[idx];
+
+    if (endpointInfo.compositionPattern == DataModel::EndpointCompositionPattern::kFullFamily)
+    {
+        // endodes ALL endpoints that have the specified endpoint as a descendant
+        return aEncoder.EncodeList([&endpoints, endpoint](const auto & encoder) -> CHIP_ERROR {
+            for (auto ep : endpoints.GetSpanValidForLifetime())
+            {
+                if (IsDescendantOf(ep.id, endpoint, endpoints.GetSpanValidForLifetime()))
+                {
+                    ReturnErrorOnFailure(encoder.Encode(ep.id));
+                }
+            }
+            return CHIP_NO_ERROR;
+        });
+    }
+
+    // ASSERT we know all composition types and this should be tree:
+    // assert(endpointInfo.compositionPattern == DataModel::EndpointCompositionPattern::kTree)
+    return aEncoder.EncodeList([&endpoints, endpoint](const auto & encoder) -> CHIP_ERROR {
+        for (auto ep : endpoints.GetSpanValidForLifetime())
+        {
+            if (ep.parentId != endpoint)
+            {
+                continue;
+            }
+            ReturnErrorOnFailure(encoder.Encode(ep.id));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
@@ -239,6 +265,7 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     }
     return CHIP_NO_ERROR;
 }
+
 } // anonymous namespace
 
 void MatterDescriptorPluginServerInitCallback()

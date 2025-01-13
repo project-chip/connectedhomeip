@@ -17,6 +17,8 @@
 #include <app/AttributePathExpandIterator.h>
 
 #include <app/GlobalAttributes.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 
 #include <optional>
@@ -25,6 +27,24 @@ using namespace chip::app::DataModel;
 
 namespace chip {
 namespace app {
+
+AttributePathExpandIterator::AttributePathExpandIterator(DataModel::Provider * dataModel, Position & position) :
+    mDataModelProvider(dataModel), mPosition(position)
+{
+    mEndpoints = dataModel->Endpoints();
+
+    // Position on the correct endpoint ...
+    if (mPosition.mOutputPath.mEndpointId != kInvalidEndpointId)
+    {
+        for (mEndpointIndex = 0; mEndpointIndex < mEndpoints.size(); mEndpointIndex++)
+        {
+            if (mEndpoints[mEndpointIndex].id == mPosition.mOutputPath.mEndpointId)
+            {
+                break;
+            }
+        }
+    }
+}
 
 bool AttributePathExpandIterator::AdvanceOutputPath()
 {
@@ -209,24 +229,29 @@ std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()
     return entry.IsValid() ? std::make_optional(entry.path.mClusterId) : std::nullopt;
 }
 
-std::optional<ClusterId> AttributePathExpandIterator::NextEndpointId()
+std::optional<EndpointId> AttributePathExpandIterator::NextEndpointId()
 {
     if (mPosition.mOutputPath.mEndpointId == kInvalidEndpointId)
     {
-        if (mPosition.mAttributePath->mValue.HasWildcardEndpointId())
+        if (!mPosition.mAttributePath->mValue.HasWildcardEndpointId())
         {
-            EndpointEntry ep = mDataModelProvider->FirstEndpoint();
-            return (ep.id != kInvalidEndpointId) ? std::make_optional(ep.id) : std::nullopt;
+            return mPosition.mAttributePath->mValue.mEndpointId;
         }
 
-        return mPosition.mAttributePath->mValue.mEndpointId;
+        // start from the beginning
+        mEndpointIndex = 0;
     }
-
-    // Expand endpoints only if it is a wildcard on the endpoint specifically.
-    VerifyOrReturnValue(mPosition.mAttributePath->mValue.HasWildcardEndpointId(), std::nullopt);
-
-    EndpointEntry ep = mDataModelProvider->NextEndpoint(mPosition.mOutputPath.mEndpointId);
-    return (ep.id != kInvalidEndpointId) ? std::make_optional(ep.id) : std::nullopt;
+    else
+    {
+        // Expand endpoints only if it is a wildcard on the endpoint specifically.
+        VerifyOrReturnValue(mPosition.mAttributePath->mValue.HasWildcardEndpointId(), std::nullopt);
+        mEndpointIndex++;
+    }
+    if (mEndpointIndex < mEndpoints.size())
+    {
+        return mEndpoints[mEndpointIndex].id;
+    }
+    return std::nullopt;
 }
 
 } // namespace app

@@ -477,19 +477,9 @@ std::optional<ActionReturnStatus> CustomDataModel::Invoke(const InvokeRequest & 
     return std::nullopt; // handler status is set by the dispatch
 }
 
-DataModel::EndpointEntry CustomDataModel::FirstEndpoint()
+DataModel::MetadataList<DataModel::EndpointEntry> CustomDataModel::Endpoints()
 {
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstEndpoint();
-}
-
-DataModel::EndpointEntry CustomDataModel::NextEndpoint(EndpointId before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextEndpoint(before);
-}
-
-std::optional<DataModel::EndpointInfo> CustomDataModel::GetEndpointInfo(EndpointId endpoint)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetEndpointInfo(endpoint);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->Endpoints();
 }
 
 DataModel::MetadataList<DataModel::DeviceTypeEntry> CustomDataModel::DeviceTypes(EndpointId endpointId)

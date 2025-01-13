@@ -17,11 +17,15 @@
  */
 #pragma once
 
+#include "app/data-model-provider/MetadataList.h"
+#include "app/data-model-provider/MetadataTypes.h"
+#include "lib/support/Span.h"
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/Provider.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/LinkedList.h>
+#include <limits>
 
 namespace chip {
 namespace app {
@@ -96,9 +100,7 @@ public:
         ConcreteAttributePath mOutputPath;
     };
 
-    AttributePathExpandIterator(DataModel::Provider * dataModel, Position & position) :
-        mDataModelProvider(dataModel), mPosition(position)
-    {}
+    AttributePathExpandIterator(DataModel::Provider * dataModel, Position & position);
 
     // This class may not be copied. A new one should be created when needed and they
     // should not overlap.
@@ -113,8 +115,13 @@ public:
     bool Next(ConcreteAttributePath & path);
 
 private:
+    static constexpr size_t kInvalidIndex = std::numeric_limits<size_t>::max();
+
     DataModel::Provider * mDataModelProvider;
     Position & mPosition;
+
+    DataModel::MetadataList<DataModel::EndpointEntry> mEndpoints; // all endpoints
+    size_t mEndpointIndex = kInvalidIndex;
 
     /// Move to the next endpoint/cluster/attribute triplet that is valid given
     /// the current mOutputPath and mpAttributePath.
@@ -140,7 +147,7 @@ private:
     /// Will start from the beginning if current mOutputPath.mEndpointId is kInvalidEndpointId
     ///
     /// Respects path expansion/values in mpAttributePath
-    std::optional<ClusterId> NextEndpointId();
+    std::optional<EndpointId> NextEndpointId();
 
     /// Checks if the given attributeId is valid for the current mOutputPath(endpoint/cluster)
     ///

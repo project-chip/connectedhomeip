@@ -149,19 +149,9 @@ std::optional<ActionReturnStatus> TestImCustomDataModel::Invoke(const InvokeRequ
     return std::make_optional<ActionReturnStatus>(CHIP_ERROR_NOT_IMPLEMENTED);
 }
 
-DataModel::EndpointEntry TestImCustomDataModel::FirstEndpoint()
+DataModel::MetadataList<DataModel::EndpointEntry> TestImCustomDataModel::Endpoints()
 {
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstEndpoint();
-}
-
-DataModel::EndpointEntry TestImCustomDataModel::NextEndpoint(EndpointId before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextEndpoint(before);
-}
-
-std::optional<DataModel::EndpointInfo> TestImCustomDataModel::GetEndpointInfo(EndpointId endpoint)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetEndpointInfo(endpoint);
+    return CodegenDataModelProviderInstance(nullptr /* delegate */)->Endpoints();
 }
 
 DataModel::MetadataList<DataModel::Provider::SemanticTag> TestImCustomDataModel::SemanticTags(EndpointId endpointId)

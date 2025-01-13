@@ -14,6 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/core/ErrorStr.h"
+#include <cstdint>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -364,44 +366,6 @@ DataModel::DeviceTypeEntry DeviceTypeEntryFromEmber(const EmberAfDeviceType & ot
 
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
 
-std::optional<DataModel::EndpointInfo> GetEndpointInfoAtIndex(uint16_t endpointIndex)
-{
-    VerifyOrReturnValue(emberAfEndpointIndexIsEnabled(endpointIndex), std::nullopt);
-    EndpointId parent = emberAfParentEndpointFromIndex(endpointIndex);
-    if (GetCompositionForEndpointIndex(endpointIndex) == EndpointComposition::kFullFamily)
-    {
-        return DataModel::EndpointInfo(parent, DataModel::EndpointCompositionPattern::kFullFamily);
-    }
-    if (GetCompositionForEndpointIndex(endpointIndex) == EndpointComposition::kTree)
-    {
-        return DataModel::EndpointInfo(parent, DataModel::EndpointCompositionPattern::kTree);
-    }
-    return std::nullopt;
-}
-
-DataModel::EndpointEntry FirstEndpointEntry(unsigned start_index, uint16_t & found_index)
-{
-    // find the first enabled index after the start index
-    const uint16_t lastEndpointIndex = emberAfEndpointCount();
-    for (uint16_t endpoint_idx = static_cast<uint16_t>(start_index); endpoint_idx < lastEndpointIndex; endpoint_idx++)
-    {
-        if (emberAfEndpointIndexIsEnabled(endpoint_idx))
-        {
-            found_index                            = endpoint_idx;
-            DataModel::EndpointEntry endpointEntry = DataModel::EndpointEntry::kInvalid;
-            endpointEntry.id                       = emberAfEndpointFromIndex(endpoint_idx);
-            auto endpointInfo                      = GetEndpointInfoAtIndex(endpoint_idx);
-            // The endpoint info should have value as this endpoint should be valid at this time
-            VerifyOrDie(endpointInfo.has_value());
-            endpointEntry.info = endpointInfo.value();
-            return endpointEntry;
-        }
-    }
-
-    // No enabled endpoint found. Give up
-    return DataModel::EndpointEntry::kInvalid;
-}
-
 DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 
 } // namespace
@@ -527,24 +491,55 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
     return std::nullopt;
 }
 
-bool CodegenDataModelProvider::EndpointExists(EndpointId endpoint)
+DataModel::MetadataList<DataModel::EndpointEntry> CodegenDataModelProvider::Endpoints()
 {
-    return (emberAfIndexFromEndpoint(endpoint) != kEmberInvalidEndpointIndex);
-}
+    DataModel::MetadataList<DataModel::EndpointEntry> result;
 
-std::optional<DataModel::EndpointInfo> CodegenDataModelProvider::GetEndpointInfo(EndpointId endpoint)
-{
-    std::optional<unsigned> endpoint_idx = TryFindEndpointIndex(endpoint);
-    if (endpoint_idx.has_value())
+    const uint16_t endpointCount = emberAfEndpointCount();
+
+    // allocate the max as some endpoints may be disabled
+    CHIP_ERROR err = result.reserve(endpointCount);
+    if (err != CHIP_NO_ERROR)
     {
-        return GetEndpointInfoAtIndex(static_cast<uint16_t>(*endpoint_idx));
+#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+        ChipLogError(AppServer, "Failed to allocate space for endpoints: %" CHIP_ERROR_FORMAT, err.Format());
+#endif
+        return {};
     }
-    return std::nullopt;
-}
 
-DataModel::EndpointEntry CodegenDataModelProvider::FirstEndpoint()
-{
-    return FirstEndpointEntry(0, mEndpointIterationHint);
+    for (uint16_t endpointIndex = 0; endpointIndex < endpointCount; endpointIndex++)
+    {
+        if (!emberAfEndpointIndexIsEnabled(endpointIndex))
+        {
+            continue;
+        }
+
+        DataModel::EndpointEntry entry;
+        entry.id       = emberAfEndpointFromIndex(endpointIndex);
+        entry.parentId = emberAfParentEndpointFromIndex(endpointIndex);
+
+        switch (GetCompositionForEndpointIndex(endpointIndex))
+        {
+        case EndpointComposition::kFullFamily:
+            entry.compositionPattern = DataModel::EndpointCompositionPattern::kFullFamily;
+            break;
+        case EndpointComposition::kTree:
+        default:
+            entry.compositionPattern = DataModel::EndpointCompositionPattern::kTree;
+            break;
+        }
+
+        err = result.Append(entry);
+        if (err != CHIP_NO_ERROR)
+        {
+#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+            ChipLogError(AppServer, "Failed to append endpoint data: %" CHIP_ERROR_FORMAT, err.Format());
+#endif
+            break;
+        }
+    }
+
+    return result;
 }
 
 std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointId id) const
@@ -565,16 +560,6 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointI
     }
 
     return std::make_optional<unsigned>(idx);
-}
-
-DataModel::EndpointEntry CodegenDataModelProvider::NextEndpoint(EndpointId before)
-{
-    std::optional<unsigned> before_idx = TryFindEndpointIndex(before);
-    if (!before_idx.has_value())
-    {
-        return DataModel::EndpointEntry::kInvalid;
-    }
-    return FirstEndpointEntry(*before_idx + 1, mEndpointIterationHint);
 }
 
 DataModel::ClusterEntry CodegenDataModelProvider::FirstServerCluster(EndpointId endpointId)

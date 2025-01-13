@@ -18,7 +18,6 @@
 #pragma once
 
 #include <algorithm>
-#include <stddef.h>
 #include <type_traits>
 
 #include <lib/core/CHIPError.h>
@@ -36,7 +35,7 @@ class MetadataList
 public:
     using SpanType = Span<const T>;
 
-    MetadataList() {}
+    MetadataList()                                       = default;
     MetadataList(const MetadataList &)                   = delete;
     MetadataList & operator=(const MetadataList & other) = delete;
 
@@ -68,10 +67,8 @@ public:
         {
             return Span<const T>{ mBackingStorage.Get(), mSize }[index];
         }
-        else
-        {
-            return mSpan[index];
-        }
+
+        return mSpan[index];
     }
 
     template <size_t N>

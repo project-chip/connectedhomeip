@@ -54,7 +54,16 @@ Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eve
 {
     if (!model->GetServerClusterInfo(eventPath).has_value())
     {
-        return model->EndpointExists(eventPath.mEndpointId) ? Status::UnsupportedCluster : Status::UnsupportedEndpoint;
+        auto endpoints = model->Endpoints();
+        for (auto & ep : endpoints.GetSpanValidForLifetime())
+        {
+            if (ep.id == eventPath.mEndpointId)
+            {
+                return Status::UnsupportedCluster;
+            }
+        }
+
+        return Status::UnsupportedEndpoint;
     }
 
     return Status::Success;

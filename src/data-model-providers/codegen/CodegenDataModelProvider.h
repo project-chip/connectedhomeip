@@ -104,11 +104,7 @@ public:
     DataModel::MetadataList<DataModel::AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) override;
     DataModel::MetadataList<SemanticTag> SemanticTags(EndpointId endpointId) override;
     DataModel::MetadataList<DataModel::DeviceTypeEntry> DeviceTypes(EndpointId endpointId) override;
-
-    DataModel::EndpointEntry FirstEndpoint() override;
-    DataModel::EndpointEntry NextEndpoint(EndpointId before) override;
-    std::optional<DataModel::EndpointInfo> GetEndpointInfo(EndpointId endpoint) override;
-    bool EndpointExists(EndpointId endpoint) override;
+    DataModel::MetadataList<DataModel::EndpointEntry> Endpoints() override;
 
     DataModel::ClusterEntry FirstServerCluster(EndpointId endpoint) override;
     DataModel::ClusterEntry NextServerCluster(const ConcreteClusterPath & before) override;
