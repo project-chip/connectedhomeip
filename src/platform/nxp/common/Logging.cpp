@@ -34,7 +34,7 @@
 namespace chip {
 namespace Logging {
 namespace Platform {
-#if ( configSUPPORT_STATIC_ALLOCATION == 1 )
+#if (configSUPPORT_STATIC_ALLOCATION == 1)
 StaticSemaphore_t xLoggingSemaphoreBuffer;
 #endif
 
@@ -44,7 +44,7 @@ StaticSemaphore_t xLoggingSemaphoreBuffer;
  */
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
-#if ( configSUPPORT_STATIC_ALLOCATION == 1 )
+#if (configSUPPORT_STATIC_ALLOCATION == 1)
     static SemaphoreHandle_t xLoggingSemaphore = xSemaphoreCreateMutexStatic(&xLoggingSemaphoreBuffer);
 #else
     static SemaphoreHandle_t xLoggingSemaphore = xSemaphoreCreateMutex();
