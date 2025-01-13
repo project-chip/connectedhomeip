@@ -196,6 +196,8 @@ tests:
           in 5GHz band if it is in ETSI regulatory domains."
       PICS: MCORE.COM.WIFI && !MCORE.COM.BLE && MCORE.DD.DISCOVERY_PAF
       verification: |
+          WIFI - PAF feature is out of scope for V1.4
+
           [Configuration command to be filled by NXP]
 
           Configure the AP to the PAF working channel and connect TH to AP
@@ -204,6 +206,8 @@ tests:
     - label: "Step 9: DUT begins sending Wi-Fi PAF Publish messages."
       PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_PAF
       verification: |
+         WIFI - PAF feature is out of scope for V1.4
+
           [Verification command to be filled by NXP]
 
           * 2.4g:
@@ -217,18 +221,22 @@ tests:
     - label: "Step 10: TH scans and finds the DUT SSID"
       PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope
-          SoftAP commissioning not currently supported on TH=chip-tool
+         Out of Scope : SoftAP commissioning is currently not supported.
       disabled: true
 
     - label:
-          "Step 11: TTH scans and finds the DUT SSID TH sends to DUT a 1st power
+          "Step 11: TH scans and finds the DUT SSID TH sends to DUT a 1st power
           cycle command (or reset manually) TH sends to DUT a 2nd power cycle
           command (or reset manually)"
       PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope
-          SoftAP commissioning not currently supported on TH=chip-tool
+         Out of Scope : SoftAP commissioning is currently not supported.
+      disabled: true
+   
+    - label: "Step 12: TH scans and finds the DUT SSID"
+      PICS: MCORE.COM.WIFI && MCORE.DD.IE
+      verification: |
+          Out of Scope : SoftAP commissioning is currently not supported.
       disabled: true
 
     - label:
