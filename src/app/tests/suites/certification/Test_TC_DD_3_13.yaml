@@ -125,7 +125,8 @@ tests:
           [1657235087918] [31502:16832693] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
           [1657235087918] [31502:16832693] CHIP: [TOO] Device commissioning completed with success
       disabled: true
-- label:
+
+    - label:
           "Step 2a: Custom Commissioning Flow: Use a Commissionee with a QR code
           that has the Custom Flow field set to 2 and supports Wi-Fi PAF for its
           Discovery Capability. Commissionee is NOT in commissioning mode.
@@ -167,7 +168,6 @@ tests:
           CHIP:SPL: Discovery Bitmask: 0x08 (Wi-Fi PAF)
           CHIP:SPL: Long discriminator: 3840 (0xf00)
           CHIP:SPL: Passcode: 20202021
-
       disabled: true
 
     - label:

@@ -221,7 +221,7 @@ tests:
       verification: |
           Out of Scope : SoftAP commissioning currently not supported 
       disabled: true
-     - label:
+    - label:
           "Step 5c: DUT must find TH and provide onboarding data for
           validation.Pass Criteria: DUT is able to report the Onboarding payload
           as set on TH"

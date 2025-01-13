@@ -61,7 +61,7 @@ tests:
 
     - label: "Step 1: Locate and scan/read the Commissionees QR code using DUT"
       verification: |
-           Locate the Commissionee’s QR code and scan/read it using the DUT. Ensure the DUT successfully scans/reads the QR code. 
+         Locate the Commissionee’s QR code and scan/read it using the DUT. Ensure the DUT successfully scans/reads the QR code. 
          Execute the following command on the TH:
  
          ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 2 --capabilities 4 --discriminator 3840 --passcode 20202021
@@ -143,7 +143,8 @@ tests:
           [1657235905214] [31706:16841970] CHIP: [CTL] Discovered device to be commissioned over DNS-SD
           [1657235906071] [31706:16841969] CHIP: [TOO] Device commissioning completed with success      
       disabled: true
- - label:
+   
+   - label:
           "Step 4a: Using the QR code from Step 1, ensure the TH’s Discovery
           Capability bit string is NOT set to Wi-Fi PAF for discovery (i.e. set
           to OnNetwork discovery capability)"
@@ -257,8 +258,7 @@ tests:
           Scan the QR code generated in the previous step using the DUT, ensuring that the DUT commissioner does not 
           react successfully to scanning the QR code, and the DUT terminates the commissioning process in a manner specific to the DUT manufacturer's instructions.
           Verify on the DUT (Chip-tool):
-
-           ./chip-tool pairing code 1 AB:-24J029Q00KA0648G00
+          ./chip-tool pairing code 1 AB:-24J029Q00KA0648G00
           [1657236169984] [31732:16844455] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:50: CHIP Error 0x00000013: Integrity check failed
 
           No applicable TH Logs
