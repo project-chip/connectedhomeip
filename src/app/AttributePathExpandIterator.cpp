@@ -30,21 +30,7 @@ namespace app {
 
 AttributePathExpandIterator::AttributePathExpandIterator(DataModel::Provider * dataModel, Position & position) :
     mDataModelProvider(dataModel), mPosition(position)
-{
-    mEndpoints = dataModel->Endpoints();
-
-    // Position on the correct endpoint ...
-    if (mPosition.mOutputPath.mEndpointId != kInvalidEndpointId)
-    {
-        for (mEndpointIndex = 0; mEndpointIndex < mEndpoints.size(); mEndpointIndex++)
-        {
-            if (mEndpoints[mEndpointIndex].id == mPosition.mOutputPath.mEndpointId)
-            {
-                break;
-            }
-        }
-    }
-}
+{}
 
 bool AttributePathExpandIterator::AdvanceOutputPath()
 {
@@ -231,6 +217,22 @@ std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()
 
 std::optional<EndpointId> AttributePathExpandIterator::NextEndpointId()
 {
+    if (mEndpointIndex == kInvalidIndex)
+    {
+        // index is missing, have to start a new iteration
+        mEndpoints = mDataModelProvider->Endpoints();
+
+        if (mPosition.mOutputPath.mEndpointId != kInvalidEndpointId)
+        {
+            // Position on the correct endpoint if we have a start point
+            mEndpointIndex = 0;
+            while ((mEndpointIndex < mEndpoints.size()) && (mEndpoints[mEndpointIndex].id != mPosition.mOutputPath.mEndpointId))
+            {
+                mEndpointIndex++;
+            }
+        }
+    }
+
     if (mPosition.mOutputPath.mEndpointId == kInvalidEndpointId)
     {
         if (!mPosition.mAttributePath->mValue.HasWildcardEndpointId())
@@ -247,11 +249,10 @@ std::optional<EndpointId> AttributePathExpandIterator::NextEndpointId()
         VerifyOrReturnValue(mPosition.mAttributePath->mValue.HasWildcardEndpointId(), std::nullopt);
         mEndpointIndex++;
     }
-    if (mEndpointIndex < mEndpoints.size())
-    {
-        return mEndpoints[mEndpointIndex].id;
-    }
-    return std::nullopt;
+
+    VerifyOrReturnValue(mEndpointIndex < mEndpoints.size(), std::nullopt);
+
+    return mEndpoints[mEndpointIndex].id;
 }
 
 } // namespace app
