@@ -386,7 +386,7 @@ CHIP_ERROR ResolveAsync(chip::Dnssd::ResolveContext * rCtx)
     {
         char iface[IF_NAMESIZE + 1] = "";
         VerifyOrReturnValue(if_indextoname(rCtx->mInterfaceId, iface) != nullptr, CHIP_ERROR_POSIX(errno),
-                     ChipLogError(DeviceLayer, "if_indextoname() failed: %s", strerror(errno)));
+                            ChipLogError(DeviceLayer, "if_indextoname() failed: %s", strerror(errno)));
         ret = dnssd_create_remote_service(rCtx->mType, rCtx->mName, iface, &rCtx->mServiceHandle);
     }
 
