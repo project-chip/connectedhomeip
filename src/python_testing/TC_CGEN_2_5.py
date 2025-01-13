@@ -101,8 +101,8 @@ class TC_CGEN_2_5(MatterBaseTest):
             nodeid=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(
-                TCVersion=self.pixit['CGEN']['TCRevision'],
-                TCUserResponse=self.pixit['CGEN']['RequiredTCAcknowledgements']),
+                TCVersion=self.matter_test_config.tc_version_to_simulate,
+                TCUserResponse=self.matter_test_config.tc_user_response_to_simulate),
             timedRequestTimeoutMs=1000)
         asserts.assert_equal(response.errorCode,
                              Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
