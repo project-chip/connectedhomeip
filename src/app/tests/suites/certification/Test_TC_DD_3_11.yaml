@@ -133,7 +133,7 @@ tests:
           [1719392550.248883][1563:1563] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
           [1719392550.248892][1563:1563] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0M3810KA0648G00
           [1719392550.248911][1563:1563] CHIP:SVR: Manual pairing code: [34970112332]
-     disabled: true
+      disabled: true
    
     - label:
           "Step 2b: Scan the QR code from the previous step using the DUT."
@@ -164,6 +164,7 @@ tests:
 
           $ sudo ./chip-tool pairing code-wifi 1 n_m_2g nxp12345 
           MT:-24J0M3810KA0648G00
+
     - label:
           "Step 3a: Standard Commissioning Flow: Use a Commissionee with a QR
           code that has the Custom Flow field set to 0, supports IP Network for
@@ -251,6 +252,5 @@ tests:
           process using SoftAP"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
     verification: |
-         Out of Scope : SoftAP commissioning not currently supported 
-       
+         Out of Scope : SoftAP commissioning not currently supported       
       disabled: true

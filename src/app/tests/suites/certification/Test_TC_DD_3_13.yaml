@@ -144,10 +144,9 @@ tests:
       disabled: true
 
     - label: "Step 2b: Scan the QR code from the previous step using the DUT."
-       PICS: MCORE.DD.SCAN_QR_CODE
-       verification: |
+      PICS: MCORE.DD.SCAN_QR_CODE
+      verification: |
           WIFI - PAF feature is out of scope for V1.4
-
           [Verification command to be filled by NXP]
       disabled: true
 
