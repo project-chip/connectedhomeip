@@ -40,27 +40,6 @@ from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_bod
 from mobly import asserts
 
 
-class SecurityTypeEnum(Enum):
-    kUnspecified = 0x00
-    kNone = 0x01
-    kWep = 0x02
-    kWpa = 0x03
-    kWpa2 = 0x04
-    kWpa3 = 0x05
-    kUnknownEnumValue = 6
-
-
-class WiFiVersionEnum(Enum):
-    kA = 0x00,
-    kB = 0x01,
-    kG = 0x02,
-    kN = 0x03,
-    kAc = 0x04,
-    kAx = 0x05,
-    kAh = 0x06,
-    kUnknownEnumValue = 7
-
-
 class TC_DGWIFI_2_1(MatterBaseTest):
     """
     [TC-DGWIFI-2.1] Wi-Fi Network Diagnostics Cluster - Attribute Read Verification
@@ -80,9 +59,6 @@ class TC_DGWIFI_2_1(MatterBaseTest):
 
         Returns True if it is valid, False otherwise.
         """
-        if bssid is None:
-            return True
-
         if isinstance(bssid, bytes):
             # For raw bytes, we expect exactly 6 bytes for a MAC address
             return len(bssid) == 6
@@ -110,9 +86,15 @@ class TC_DGWIFI_2_1(MatterBaseTest):
         return False
 
     def assert_valid_bssid(self, value, field_name):
-        """Asserts that the value is a valid BSSID string (e.g., "00:11:22:33:44:55") or None."""
-        asserts.assert_true(value is None or self.is_valid_bssid(value),
-                            f"{field_name} should be a valid BSSID string (e.g., '00:11:22:33:44:55') or None.")
+        """Asserts that the value is a valid BSSID (MAC address), None, or NullValue."""
+        if isinstance(value, Nullable):
+            if value == NullValue:
+                return
+            value = value.Value
+
+        if value is not None:
+            asserts.assert_true(self.is_valid_bssid(value),
+                                f"{field_name} should be a valid BSSID string (e.g., '00:11:22:33:44:55') or None/NullValue.")        
 
     def assert_valid_uint64(self, value, field_name):
         """Asserts that the value is a valid uint64 or None (if attribute can return NULL)."""
@@ -184,13 +166,7 @@ class TC_DGWIFI_2_1(MatterBaseTest):
         self.step(2)
         bssid = await self.read_dgwifi_attribute_expect_success(endpoint=endpoint, attribute=attributes.Bssid)
         # If the interface is not configured or not operational, a None might be returned
-        if bssid is not None:
-            asserts.assert_true(isinstance(bssid, Nullable),
-                                "BSSID must be of type 'Nullable' when not None.")
-
-            if bssid is not NullValue:
-                bssid_value = bssid.Value
-                self.assert_valid_bssid(bssid_value, "BSSID")
+        self.assert_valid_bssid(bssid, "BSSID")
 
         #
         # STEP 3: TH reads SecurityType attribute
@@ -210,15 +186,15 @@ class TC_DGWIFI_2_1(MatterBaseTest):
 
                 # Check if the security_type is a valid SecurityTypeEnum member
                 self.assert_true(
-                    security_type_value in [item.value for item in SecurityTypeEnum],
+                    security_type_value in [item.value for item in Clusters.Objects.WiFiNetworkDiagnostics.Enums.SecurityTypeEnum],
                     f"SecurityType {security_type_value} is not a valid SecurityTypeEnum value"
                 )
 
                 # Additional check that it's not kUnknownEnumValue:
                 self.assert_true(
-                    security_type_value != SecurityTypeEnum.kUnknownEnumValue.value,
+                    security_type_value != Clusters.Objects.WiFiNetworkDiagnostics.Enums.SecurityTypeEnum.kUnknownEnumValue.value,
                     f"SecurityType should not be kUnknownEnumValue "
-                    f"({SecurityTypeEnum.kUnknownEnumValue.value})"
+                    f"({Clusters.Objects.WiFiNetworkDiagnostics.Enums.SecurityTypeEnum.kUnknownEnumValue.value})"
                 )
 
         #
@@ -236,12 +212,12 @@ class TC_DGWIFI_2_1(MatterBaseTest):
                 self.assert_valid_uint8(wifi_version_value, "WiFiVersion")
 
                 # Check if the wifi_version is a valid WiFiVersionEnum member
-                self.assert_true(wifi_version_value in [item.value for item in WiFiVersionEnum],
+                self.assert_true(wifi_version_value in [item.value for item in Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum],
                                  f"WiFiVersion {wifi_version_value} is not a valid WiFiVersionEnum value")
 
                 # Additional check that it's not kUnknownEnumValue:
-                self.assert_true(wifi_version_value != WiFiVersionEnum.kUnknownEnumValue.value,
-                                 f"WiFiVersion should not be kUnknownEnumValue ({WiFiVersionEnum.kUnknownEnumValue.value})")
+                self.assert_true(wifi_version_value != Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum.kUnknownEnumValue.value,
+                                 f"WiFiVersion should not be kUnknownEnumValue ({Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum.kUnknownEnumValue.value})")
 
         #
         # STEP 5: TH reads ChannelNumber attribute
