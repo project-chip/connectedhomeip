@@ -23,9 +23,9 @@
  *          event functions that are suitable for use on all platforms.
  */
 /* this file behaves like a config.h, comes first */
+#include <platform/PlatformManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <system/PlatformLockSupport.h>
-#include <platform/PlatformManager.h>
 
 namespace chip {
 namespace System {

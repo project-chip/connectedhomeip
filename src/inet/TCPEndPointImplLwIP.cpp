@@ -810,7 +810,7 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
         if (err == CHIP_NO_ERROR)
         {
             TCPEndPoint * connectEndPoint = nullptr;
-            err = lSystemLayer.RunWithMatterContextLock(
+            err                           = lSystemLayer.RunWithMatterContextLock(
                 [&listenEP, &connectEndPoint]() { return listenEP->GetEndPointManager().NewEndPoint(&connectEndPoint); });
             conEP = static_cast<TCPEndPointImplLwIP *>(connectEndPoint);
         }
