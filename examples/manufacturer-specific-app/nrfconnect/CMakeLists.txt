@@ -57,7 +57,7 @@ target_sources(app PRIVATE
 
 # add on manufacturer specific cluster
 target_sources(app PRIVATE
-               manufacturer-specific/clusters/sample-manufacturer-specific-server.cpp
+               manufacturer-specific/clusters/sample-external-manufacturer-specific-server.cpp
                manufacturer-specific/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
                manufacturer-specific/zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
 )
