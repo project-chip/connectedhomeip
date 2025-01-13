@@ -227,17 +227,12 @@ if (wifi_soc != true) {  # CCP board
       } else {
         # additional files needed for ftd lib
         sources += [
-          #"${openthread_root}/examples/platforms/utils/link_metrics.cpp",
-          #"${openthread_root}/examples/platforms/utils/link_metrics.h",
           "${openthread_root}/src/core/api/link_api.cpp",
           "${openthread_root}/src/core/mac/mac.cpp",
           "${openthread_root}/src/core/mac/mac_frame.cpp",
           "${openthread_root}/src/core/mac/sub_mac.cpp",
           "${openthread_root}/src/core/mac/sub_mac_csl_receiver.cpp",
           "${openthread_root}/src/core/thread/mle.cpp",
-
-          # Temporary file until the files in the SI SDK is fixed
-          #"${sdk_support_root}/protocol/openthread/platform-abstraction/efr32/radio.c",
         ]
       }
 
