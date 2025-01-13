@@ -259,7 +259,7 @@ template("efr32_sdk") {
       ]
 
       libs += [
-        "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
+        # "${efr32_sdk_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
         "${sdk_support_root}/protocol/openthread/libs/libsl_openthread_efr32mg2x_gcc.a",
       ]
 
@@ -778,8 +778,8 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_retarget.c",
       "${efr32_sdk_root}/platform/service/memory_manager/src/sli_memory_manager_common.c",
       "${efr32_sdk_root}/platform/service/mpu/src/sl_mpu.c",
-      "${efr32_sdk_root}/platform/service/power_manager/src/sl_power_manager.c",
-      "${efr32_sdk_root}/platform/service/power_manager/src/sl_power_manager_debug.c",
+      "${efr32_sdk_root}/platform/service/power_manager/src/sleep_loop/sl_power_manager.c",
+      "${efr32_sdk_root}/platform/service/power_manager/src/sleep_loop/sl_power_manager_debug.c",
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_rtcc.c",
       "${efr32_sdk_root}/platform/service/system/src/sl_system_init.c",
@@ -1070,7 +1070,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/service/clock_manager/src/sl_clock_manager_init_hal_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dcdc_s2.c",
         "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager_hal_s2.c",
-        "${efr32_sdk_root}/platform/service/power_manager/src/sl_power_manager_hal_s2.c",
+        "${efr32_sdk_root}/platform/service/power_manager/src/sleep_loop/sl_power_manager_hal_s2.c",
         "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_sysrtc.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
