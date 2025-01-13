@@ -26,7 +26,6 @@
 #pragma once
 
 // TODO(#32628): Remove the CHIPCore.h header when the esp32 build is correctly fixed
-#include "app/data-model-provider/MetadataTypes.h"
 #include <lib/core/CHIPCore.h>
 
 #include <access/AccessControl.h>
@@ -50,6 +49,7 @@
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
