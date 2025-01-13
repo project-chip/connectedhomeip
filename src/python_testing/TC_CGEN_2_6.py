@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,12 +16,23 @@
 #
 
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${TERMS_AND_CONDITIONS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --KVS kvs1 --tc-min-required-version 1 --tc-required-acknowledgements 1
-# test-runner-run/run1/script-args: --in-test-commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00 --trace-to json:log
+# test-runner-runs:
+#   run1:
+#       app: ${TERMS_AND_CONDITIONS_APP}
+#       app-args: >
+#           --KVS kvs1
+#           --tc-min-required-version 1
+#           --tc-required-acknowledgements 1
+#           --custom-flow 2
+#           --capabilities 6
+#       script-args:
+#           --in-test-commissioning-method on-network
+#           --tc-version-to-simulate 1
+#           --tc-user-response-to-simulate 1
+#           --qr-code MT:-24J0AFN00KA0648G00
+#           --trace-to json:log
+#       factoryreset: True
+#       quiet: True
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
@@ -33,33 +44,41 @@ from mobly import asserts
 
 class TC_CGEN_2_6(MatterBaseTest):
     def desc_TC_CGEN_2_6(self) -> str:
-        return "[TC-CGEN-2.6] Verification For CommissioningComplete no terms accepted when required [DUT as Server]"
+        return "[TC-CGEN-2.6] Verification for CommissioningComplete no terms accepted when required [DUT as Server]"
 
     def steps_TC_CGEN_2_6(self) -> list[TestStep]:
         return [
-            TestStep(1,  "TH starts commissioning the DUT. It performs all commissioning steps from ArmFailSafe to CommissioningComplete, except for TC configuration with SetTCAcknowledgements.", is_commissioning=False),
+            TestStep(1, "TH starts commissioning the DUT. It performs all commissioning steps from 'Device discovery and establish commissioning channel' to 'Security setup using CASE', except for TC configuration with SetTCAcknowledgements."),
+            TestStep(2, "TH sends CommissioningComplete to DUT and verifies error response."),
         ]
 
     @async_test_body
     async def test_TC_CGEN_2_6(self):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
 
-        # Don't set TCs for the next commissioning and skip CommissioningComplete so we can manually call CommissioningComplete in order to check the response error code
+        # Step 1: Commission device without setting TC acknowledgements
+        self.step(1)
+        # Don't set TCs for the next commissioning and skip CommissioningComplete
+        # so we can manually call CommissioningComplete to check the response error code
         commissioner.SetTCRequired(False)
         commissioner.SetSkipCommissioningComplete(True)
         self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
-
-        self.step(1)
         await self.commission_devices()
+
+        # Step 2: Send CommissioningComplete and verify error response
+        self.step(2)
         response: Clusters.GeneralCommissioning.Commands.CommissioningCompleteResponse = await commissioner.SendCommand(
             nodeid=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.CommissioningComplete(),
             timedRequestTimeoutMs=1000)
 
-        # Verify that DUT sends CommissioningCompleteResponse Command to TH With ErrorCode as 'TCAcknowledgementsNotReceived'(6).
+        # Verify that DUT sends CommissioningCompleteResponse Command to TH
+        # With ErrorCode as 'TCAcknowledgementsNotReceived'(6)
         asserts.assert_equal(
-            response.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kTCAcknowledgementsNotReceived, 'Incorrect error code')
+            response.errorCode,
+            Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kTCAcknowledgementsNotReceived,
+            'Expected TCAcknowledgementsNotReceived error code')
 
 
 if __name__ == "__main__":

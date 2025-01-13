@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2024-2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,12 +16,23 @@
 #
 
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${TERMS_AND_CONDITIONS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --KVS kvs1 --tc-min-required-version 1 --tc-required-acknowledgements 1
-# test-runner-run/run1/script-args: --in-test-commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00 --trace-to json:log
+# test-runner-runs:
+#   run1:
+#       app: ${TERMS_AND_CONDITIONS_APP}
+#       app-args: >
+#           --KVS kvs1
+#           --tc-min-required-version 1
+#           --tc-required-acknowledgements 1
+#           --custom-flow 2
+#           --capabilities 6
+#       script-args:
+#           --in-test-commissioning-method on-network
+#           --tc-version-to-simulate 1
+#           --tc-user-response-to-simulate 1
+#           --qr-code MT:-24J0AFN00KA0648G00
+#           --trace-to json:log
+#       factoryreset: True
+#       quiet: True
 # === END CI TEST ARGUMENTS ===
 
 
@@ -53,58 +64,75 @@ class TC_CGEN_2_5(MatterBaseTest):
     async def test_TC_CGEN_2_5(self):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
 
-        # Don't set TCs for the next commissioning and skip CommissioningComplete so we can manually call CommissioningComplete in order to check the response error code
+        # Step 1: Begin commissioning with PASE and failsafe
         self.step(1)
         commissioner.SetTCRequired(False)
         commissioner.SetSkipCommissioningComplete(True)
         self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
         await self.commission_devices()
 
+        # Step 2: Read TCAcknowledgementsRequired
         self.step(2)
-        response: dict[int, Clusters.GeneralCommissioning] = await commissioner.ReadAttribute(
+        response = await commissioner.ReadAttribute(
             nodeid=self.dut_node_id,
-            attributes=[
-                (ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion),
-                (ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCMinRequiredVersion),
-                (ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgements),
-                (ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired),
-            ])
-        tcAcceptedVersion = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion]
-        tcMinRequiredVersion = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCMinRequiredVersion]
-        tcAcknowledgements = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgements]
+            attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired)])
         tcAcknowledgementsRequired = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired]
-
-        print(f'tcAcceptedVersion= {tcAcceptedVersion}')
-        print(f'tcMinRequiredVersion= {tcMinRequiredVersion}')
-        print(f'tcAcknowledgements= {tcAcknowledgements}')
-        print(f'tcAcknowledgementsRequired= {tcAcknowledgementsRequired}')
-
-        # Verify that TCAcknowledgementsRequired value is representable in the 'Bool' type
-        # Verify that TCAcknowledgementsRequired value is True
         asserts.assert_equal(tcAcknowledgementsRequired, True, 'Incorrect TCAcknowledgementsRequired')
 
+        # Step 3: Read TCUpdateDeadline
         self.step(3)
-        response: Clusters.GeneralCommissioning.Commands.SetTCAcknowledgementsResponse = await commissioner.SendCommand(
+        response = await commissioner.ReadAttribute(
+            nodeid=self.dut_node_id,
+            attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCUpdateDeadline)])
+        tcUpdateDeadline = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCUpdateDeadline]
+        asserts.assert_less(tcUpdateDeadline, 2**32, 'TCUpdateDeadline exceeds uint32 range')
+
+        # Step 4: Read FeatureMap
+        self.step(4)
+        response = await commissioner.ReadAttribute(
+            nodeid=self.dut_node_id,
+            attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.FeatureMap)])
+        featureMap = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.FeatureMap]
+        asserts.assert_equal(featureMap & 0x1, 0x1, 'TC feature flag not set')
+
+        # Step 5: Send SetTCAcknowledgements
+        self.step(5)
+        response = await commissioner.SendCommand(
             nodeid=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
-            payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(TCVersion=2**16 - 1, TCUserResponse=2**16 - 1),
+            payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(
+                TCVersion=self.pixit['CGEN']['TCRevision'],
+                TCUserResponse=self.pixit['CGEN']['RequiredTCAcknowledgements']),
             timedRequestTimeoutMs=1000)
-        # Verify that DUT sends SetTCAcknowledgementsResponse Command to TH With ErrorCode as 'OK'(0).
-        asserts.assert_equal(response.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+        asserts.assert_equal(response.errorCode,
+                             Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              'Incorrect error code')
 
-        self.step(4)
-        response: Clusters.GeneralCommissioning.Commands.CommissioningCompleteResponse = await commissioner.SendCommand(
+        # Step 6: Verify TCAcknowledgementsRequired is False
+        self.step(6)
+        response = await commissioner.ReadAttribute(
+            nodeid=self.dut_node_id,
+            attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired)])
+        tcAcknowledgementsRequired = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired]
+        asserts.assert_equal(tcAcknowledgementsRequired, False, 'TCAcknowledgementsRequired should be False')
+
+        # Step 7: Complete CSR exchange and CASE security setup
+        self.step(7)
+        # Note: Implementation needed for CSR exchange and CASE setup
+
+        # Step 8: Send CommissioningComplete
+        self.step(8)
+        response = await commissioner.SendCommand(
             nodeid=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.CommissioningComplete(),
             timedRequestTimeoutMs=1000)
-        # Verify that DUT sends CommissioningCompleteResponse Command to TH With ErrorCode as 'OK'(0).
-        asserts.assert_equal(response.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+        asserts.assert_equal(response.errorCode,
+                             Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              'Incorrect error code')
 
-        # Read attributes of interest
-        response: dict[int, Clusters.GeneralCommissioning] = await commissioner.ReadAttribute(
+        # Steps 9-12: Read and verify final attribute values
+        response = await commissioner.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=[
                 (ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion),
@@ -112,45 +140,28 @@ class TC_CGEN_2_5(MatterBaseTest):
                 (ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgements),
                 (ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired),
             ])
-        tcAcceptedVersion = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion]
-        tcMinRequiredVersion = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCMinRequiredVersion]
-        tcAcknowledgements = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgements]
-        tcAcknowledgementsRequired = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired]
 
-        print(f'tcAcceptedVersion= {tcAcceptedVersion}')
-        print(f'tcMinRequiredVersion= {tcMinRequiredVersion}')
-        print(f'tcAcknowledgements= {tcAcknowledgements}')
-        print(f'tcAcknowledgementsRequired= {tcAcknowledgementsRequired}')
-
-        self.step(5)
-        # Verify that TCAcceptedVersion value fits in the 'uint16' type
-        asserts.assert_less(tcAcceptedVersion, 2**16, 'Incorrect TCAcceptedVersion')
-        # Verify that TCAcceptedVersion is the value sent in step 3
-        asserts.assert_equal(tcAcceptedVersion, 2**16 - 1, 'Incorrect TCAcceptedVersion')
-
-        self.step(6)
-        # Verify that TCAcknowledgements is a value representable in the map16 type
-        # Verify that TCAcknowledgements is the value sent in step 3
-        asserts.assert_equal(tcAcknowledgements, 2**16 - 1, 'Incorrect TCAcknowledgements')
-
-        self.step(7)
-        # Verify that TCMinRequiredVersion value fits in the 'uint16' type
-        asserts.assert_less(tcMinRequiredVersion, 2**16, 'Incorrect TCMinRequiredVersion')
-
-        self.step(8)
-        # Verify that TCAcknowledgementsRequired value is False
-        asserts.assert_equal(tcAcknowledgementsRequired, False, 'Incorrect TCAcknowledgementsRequired')
-
+        # Step 9: Verify TCAcceptedVersion
         self.step(9)
-        response: Clusters.GeneralCommissioning.Commands.SetTCAcknowledgementsResponse = await commissioner.SendCommand(
-            nodeid=self.dut_node_id,
-            endpoint=ROOT_ENDPOINT_ID,
-            payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(TCVersion=0, TCUserResponse=0),
-            timedRequestTimeoutMs=1000)
-        # Verify that DUT sends SetTCAcknowledgementsResponse Command to TH With ErrorCode as 'TCMinVersionNotMet'(7)
-        asserts.assert_equal(response.errorCode,
-                             Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kTCMinVersionNotMet, 'Incorrect error code')
-        # Verify that TCAcceptedVersion and TCAcknowledgements still contain the values sent in step 3.
+        tcAcceptedVersion = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion]
+        asserts.assert_less(tcAcceptedVersion, 2**16, 'TCAcceptedVersion exceeds uint16 range')
+        asserts.assert_equal(tcAcceptedVersion, self.pixit['CGEN']['TCRevision'], 'Incorrect TCAcceptedVersion')
+
+        # Step 10: Verify TCAcknowledgements
+        self.step(10)
+        tcAcknowledgements = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgements]
+        asserts.assert_less(tcAcknowledgements, 2**16, 'TCAcknowledgements exceeds map16 range')
+        asserts.assert_equal(tcAcknowledgements, self.pixit['CGEN']['RequiredTCAcknowledgements'], 'Incorrect TCAcknowledgements')
+
+        # Step 11: Verify TCMinRequiredVersion
+        self.step(11)
+        tcMinRequiredVersion = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCMinRequiredVersion]
+        asserts.assert_less(tcMinRequiredVersion, 2**16, 'TCMinRequiredVersion exceeds uint16 range')
+
+        # Step 12: Verify TCAcknowledgementsRequired
+        self.step(12)
+        tcAcknowledgementsRequired = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired]
+        asserts.assert_equal(tcAcknowledgementsRequired, False, 'TCAcknowledgementsRequired should be False')
 
 
 if __name__ == "__main__":

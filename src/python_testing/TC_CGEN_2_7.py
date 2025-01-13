@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,12 +16,23 @@
 #
 
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${TERMS_AND_CONDITIONS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --KVS kvs1 --tc-min-required-version 1 --tc-required-acknowledgements 1
-# test-runner-run/run1/script-args: --in-test-commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00 --trace-to json:log
+# test-runner-runs:
+#   run1:
+#       app: ${TERMS_AND_CONDITIONS_APP}
+#       app-args: >
+#           --KVS kvs1
+#           --tc-min-required-version 1
+#           --tc-required-acknowledgements 1
+#           --custom-flow 2
+#           --capabilities 6
+#       script-args:
+#           --in-test-commissioning-method on-network
+#           --tc-version-to-simulate 1
+#           --tc-user-response-to-simulate 1
+#           --qr-code MT:-24J0AFN00KA0648G00
+#           --trace-to json:log
+#       factoryreset: True
+#       quiet: True
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
@@ -33,48 +44,103 @@ from mobly import asserts
 
 class TC_CGEN_2_7(MatterBaseTest):
     def desc_TC_CGEN_2_7(self) -> str:
-        return "[TC-CGEN-2.7] Verification For CommissioningComplete when SetTCAcknowledgements provides invalid terms [DUT as Server]"
+        return "[TC-CGEN-2.7] Verification for CommissioningComplete when SetTCAcknowledgements provides invalid terms [DUT as Server]"
 
     def steps_TC_CGEN_2_7(self) -> list[TestStep]:
         return [
-            TestStep(1,  "TH starts commissioning the DUT. It performs all commissioning steps from ArmFailSafe, except SetTCAcknowledgements and CommissioningComplete.", is_commissioning=False),
-            TestStep(2,  "TH sends SetTCAcknowledgements to DUT with the following values:\nTCVersion: Greater than or equal to TCMinRequiredVersion on DUT\nTCUserResponse: 0"),
-            TestStep(3,  "TH sends CommissioningComplete to DUT."),
+            TestStep(1, "TH begins commissioning the DUT and performs the following steps in order:\n"
+                     "* Security setup using PASE\n"
+                     "* Setup fail-safe timer, with ExpiryLengthSeconds field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb value as 1\n"
+                     "* Configure information- UTC time, regulatory, etc."),
+            TestStep(2, "TH reads TCMinRequiredVersion attribute."),
+            TestStep(3, "TH sends SetTCAcknowledgements with TCVersion=minVersion and TCUserResponse=0"),
+            TestStep(4, "TH continues commissioning with the DUT and performs the steps from 'Operation CSR exchange' through 'Security setup using CASE'"),
+            TestStep(5, "TH sends CommissioningComplete to DUT."),
+            TestStep(6, "TH sends SetTCAcknowledgements with valid TC values"),
+            TestStep(7, "TH sends CommissioningComplete to DUT.")
         ]
 
     @async_test_body
     async def test_TC_CGEN_2_7(self):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
 
-        # Don't set TCs for the next commissioning and skip CommissioningComplete so we can manually call CommissioningComplete in order to check the response error code
+        # Step 1: Begin commissioning with PASE and failsafe
+        self.step(1)
         commissioner.SetTCRequired(False)
         commissioner.SetSkipCommissioningComplete(True)
         self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
-
-        self.step(1)
         await self.commission_devices()
 
+        # Step 2: Read TCMinRequiredVersion
         self.step(2)
-        response: Clusters.GeneralCommissioning.Commands.SetTCAcknowledgementsResponse = await commissioner.SendCommand(
+        response = await commissioner.ReadAttribute(
+            nodeid=self.dut_node_id,
+            attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCMinRequiredVersion)])
+        min_version = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCMinRequiredVersion]
+
+        # Step 3: Send SetTCAcknowledgements with invalid response
+        self.step(3)
+        response = await commissioner.SendCommand(
             nodeid=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
-            payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(TCVersion=2**16 - 1, TCUserResponse=0),
+            payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(
+                TCVersion=min_version,
+                TCUserResponse=0),
             timedRequestTimeoutMs=1000)
 
-        # Verify that DUT sends SetTCAcknowledgementsResponse Command to TH With ErrorCode as 'RequiredTCNotAccepted'(5).
+        # Verify error code is RequiredTCNotAccepted
         asserts.assert_equal(
-            response.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kRequiredTCNotAccepted, 'Incorrect error code')
+            response.errorCode,
+            Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kRequiredTCNotAccepted,
+            'Expected RequiredTCNotAccepted error code')
 
-        self.step(3)
-        response: Clusters.GeneralCommissioning.Commands.CommissioningCompleteResponse = await commissioner.SendCommand(
+        # Step 4: Continue with CSR and CASE setup
+        self.step(4)
+        # Note: CSR and CASE setup is handled by the commissioning process
+
+        # Step 5: Send CommissioningComplete and verify it fails
+        self.step(5)
+        response = await commissioner.SendCommand(
             nodeid=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.CommissioningComplete(),
             timedRequestTimeoutMs=1000)
 
-        # Verify that DUT sends CommissioningCompleteResponse Command to TH With ErrorCode as 'TCAcknowledgementsNotReceived'(6).
+        # Verify error code is TCAcknowledgementsNotReceived
         asserts.assert_equal(
-            response.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kTCAcknowledgementsNotReceived, 'Incorrect error code')
+            response.errorCode,
+            Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kTCAcknowledgementsNotReceived,
+            'Expected TCAcknowledgementsNotReceived error code')
+
+        # Step 6: Send SetTCAcknowledgements with valid values
+        self.step(6)
+        response = await commissioner.SendCommand(
+            nodeid=self.dut_node_id,
+            endpoint=ROOT_ENDPOINT_ID,
+            payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(
+                TCVersion=self.pixit['CGEN']['TCRevision'],
+                TCUserResponse=self.pixit['CGEN']['RequiredTCAcknowledgements']),
+            timedRequestTimeoutMs=1000)
+
+        # Verify error code is OK
+        asserts.assert_equal(
+            response.errorCode,
+            Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+            'Expected OK response for valid TC acknowledgements')
+
+        # Step 7: Send CommissioningComplete and verify success
+        self.step(7)
+        response = await commissioner.SendCommand(
+            nodeid=self.dut_node_id,
+            endpoint=ROOT_ENDPOINT_ID,
+            payload=Clusters.GeneralCommissioning.Commands.CommissioningComplete(),
+            timedRequestTimeoutMs=1000)
+
+        # Verify error code is OK
+        asserts.assert_equal(
+            response.errorCode,
+            Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+            'Expected OK response for CommissioningComplete')
 
 
 if __name__ == "__main__":
