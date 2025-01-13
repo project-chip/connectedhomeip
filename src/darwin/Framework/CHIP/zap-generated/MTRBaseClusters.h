@@ -14786,7 +14786,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Cluster Push AV Stream Transport
  *
- *
+ * This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRBaseClusterPushAVStreamTransport : MTRGenericBaseCluster

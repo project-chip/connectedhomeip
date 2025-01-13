@@ -149,7 +149,7 @@ Git: 1.4-534-g3214b3502
     <name>Push AV Stream Transport</name>
     <code>0x0555</code>
     <define>PUSH_AV_STREAM_TRANSPORT_CLUSTER</define>
-    <description/>
+    <description>This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports.</description>
     <client init="false" tick="false">true</client>
     <features>
       <feature bit="0" code="PERZONESENS" name="PerZoneSensitivity" summary="Supports a sensitivity value per Zone">

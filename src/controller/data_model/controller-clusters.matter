@@ -10139,7 +10139,7 @@ provisional cluster WebRTCTransportRequestor = 1364 {
   command End(EndRequest): DefaultSuccess = 4;
 }
 
-/**  */
+/** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
 cluster PushAvStreamTransport = 1365 {
   revision 1;
 
