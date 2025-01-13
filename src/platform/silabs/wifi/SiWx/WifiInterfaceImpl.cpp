@@ -39,8 +39,8 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
-#include <platform/silabs/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.h>
+#include <platform/silabs/wifi/WifiInterface.h>
+#include <platform/silabs/wifi/wiseconnect-interface/WiseconnectWifiInterface.h>
 
 extern "C" {
 #include "sl_si91x_driver.h"

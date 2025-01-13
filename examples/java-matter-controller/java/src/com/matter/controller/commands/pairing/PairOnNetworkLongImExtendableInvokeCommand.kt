@@ -28,6 +28,7 @@ import com.matter.controller.commands.common.CredentialsIssuer
 import java.util.logging.Level
 import java.util.logging.Logger
 import kotlin.UShort
+import matter.jsontlv.fromJsonString
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.TlvWriter
@@ -134,18 +135,19 @@ class PairOnNetworkLongImExtendableInvokeCommand(
         null
       )
 
-    val tlvWriter2 = TlvWriter()
-    tlvWriter2.startStructure(AnonymousTag)
-    tlvWriter2.put(ContextSpecificTag(0), number)
-    tlvWriter2.put(ContextSpecificTag(1), number)
-    tlvWriter2.endStructure()
+    val json2 = """
+      {
+        "0:UINT" : 1,
+        "1:UINT" : 1
+      }
+      """
 
     val element2: InvokeElement =
       InvokeElement.newInstance(
         /* endpointId= */ 1,
         CLUSTER_ID_TEST,
         TEST_ADD_ARGUMENT_COMMAND,
-        tlvWriter2.getEncoded(),
+        TlvWriter().fromJsonString(json2),
         null
       )
 

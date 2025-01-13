@@ -15,7 +15,7 @@
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidProfile
 from builders.asr import ASRApp, ASRBoard, ASRBuilder
-from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
+from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder, BouffalolabThreadType
 from builders.cc32xx import cc32xxApp, cc32xxBuilder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
@@ -692,40 +692,46 @@ def BuildBouffalolabTarget():
     # Boards
     target.AppendFixedTargets([
         TargetPart('BL602DK',
-                   board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
+                   board=BouffalolabBoard.BL602DK, module_type="BL602"),
+        TargetPart('BL616DK', board=BouffalolabBoard.BL616DK, module_type="BL616"),
         TargetPart('BL704LDK', board=BouffalolabBoard.BL704LDK, module_type="BL704L"),
         TargetPart('BL706DK',
                    board=BouffalolabBoard.BL706DK, module_type="BL706C-22"),
         TargetPart('BL602-NIGHT-LIGHT',
-                   board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
+                   board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602", enable_resetCnt=True),
         TargetPart('BL706-NIGHT-LIGHT',
-                   board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22"),
+                   board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22", enable_resetCnt=True),
         TargetPart('BL602-IoT-Matter-V1',
                    board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
         TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit,
                    module_type="BL706C-22"),
     ])
 
-    # Apps
     target.AppendFixedTargets([
         TargetPart('light', app=BouffalolabApp.LIGHT),
     ])
 
-    target.AppendModifier('ethernet', enable_ethernet=True)
-    target.AppendModifier('wifi', enable_wifi=True)
-    target.AppendModifier('thread', enable_thread=True)
-    target.AppendModifier('easyflash', enable_easyflash=True)
-    target.AppendModifier('littlefs', enable_littlefs=True)
+    target.AppendFixedTargets([
+        TargetPart('ethernet', enable_ethernet=True),
+        TargetPart('wifi', enable_wifi=True),
+        TargetPart('thread', enable_thread_type=BouffalolabThreadType.THREAD_FTD),
+        TargetPart('thread-ftd', enable_thread_type=BouffalolabThreadType.THREAD_FTD),
+        TargetPart('thread-mtd', enable_thread_type=BouffalolabThreadType.THREAD_MTD),
+    ])
+
+    target.AppendFixedTargets([
+        TargetPart('easyflash', enable_easyflash=True),
+        TargetPart('littlefs', enable_littlefs=True),
+    ])
+
     target.AppendModifier('shell', enable_shell=True)
     target.AppendModifier('mfd', enable_mfd=True)
     target.AppendModifier('rotating_device_id', enable_rotating_device_id=True)
-    target.AppendModifier('rpc', enable_rpcs=True)
-    target.AppendModifier('cdc', enable_cdc=True)
-    target.AppendModifier('mot', use_matter_openthread=True)
-    target.AppendModifier('resetCnt', enable_resetCnt=True)
+    target.AppendModifier('rpc', enable_rpcs=True, baudrate=115200).OnlyIfRe('-(bl602dk|bl704ldk|bl706dk)')
+    target.AppendModifier('cdc', enable_cdc=True).OnlyIfRe('-(bl706dk)')
+    target.AppendModifier('mot', use_matter_openthread=True).OnlyIfRe('-(thread)')
     target.AppendModifier('memmonitor', enable_heap_monitoring=True)
-    target.AppendModifier('115200', baudrate=115200)
-    target.AppendModifier('fp', enable_frame_ptr=True)
+    target.AppendModifier('coredump', enable_debug_coredump=True)
 
     return target
 
@@ -772,6 +778,7 @@ def BuildTelinkTarget():
         TargetPart('tlsr9258a', board=TelinkBoard.TLSR9258A),
         TargetPart('tlsr9258a_retention', board=TelinkBoard.TLSR9258A_RETENTION),
         TargetPart('tl3218x', board=TelinkBoard.TL3218X),
+        TargetPart('tl7218x', board=TelinkBoard.TL7218X),
     ])
 
     target.AppendFixedTargets([
