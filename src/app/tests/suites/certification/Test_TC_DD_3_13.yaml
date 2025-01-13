@@ -204,7 +204,7 @@ tests:
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           Scan the QR code generated in the previous step using the DUT. Verify that the QR code is scanned successfully.
-         The chip-tool does not support physically scanning QR codes.
+          The chip-tool does not support physically scanning QR codes.
       disabled: true
 
     - label: "Step 3c: DUT parses QR code."
@@ -262,7 +262,7 @@ tests:
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           Out of Scope : SoftAP commissioning currently not supported 
-         Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
+          Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
       disabled: true
 
     - label: "Step 4c: DUT parses QR code."
