@@ -24,7 +24,6 @@ config("includes") {
 }
 
 source_set("attribute-type") {
-  # sources = [ "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attribute-type.h" ]
   sources = [ "${chip_project_app_common_include_dir}/app-common/zap-generated/attribute-type.h" ]
 
   public_configs = [ ":includes" ]
@@ -32,10 +31,6 @@ source_set("attribute-type") {
 
 source_set("ids") {
   sources = [
-    # "${chip_root}/zzz_generated/app-common/app-common/zap-generated/ids/Attributes.h",
-    # "${chip_root}/zzz_generated/app-common/app-common/zap-generated/ids/Clusters.h",
-    # "${chip_root}/zzz_generated/app-common/app-common/zap-generated/ids/Commands.h",
-    # "${chip_root}/zzz_generated/app-common/app-common/zap-generated/ids/Events.h",
     "${chip_project_app_common_include_dir}/app-common/zap-generated/ids/Attributes.h",
     "${chip_project_app_common_include_dir}/app-common/zap-generated/ids/Clusters.h",
     "${chip_project_app_common_include_dir}/app-common/zap-generated/ids/Commands.h",
@@ -51,8 +46,6 @@ static_library("cluster-objects") {
   output_name = "libClusterObjects"
 
   sources = [
-    # "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp",
-    # "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-objects.h",
     "${chip_project_app_common_include_dir}/app-common/zap-generated/cluster-objects.cpp",
     "${chip_project_app_common_include_dir}/app-common/zap-generated/cluster-objects.h",
   ]
@@ -73,8 +66,6 @@ static_library("cluster-objects") {
 
 source_set("enums") {
   sources = [
-    # "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums-check.h",
-    # "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums.h",
     "${chip_project_app_common_include_dir}/app-common/zap-generated/cluster-enums-check.h",
     "${chip_project_app_common_include_dir}/app-common/zap-generated/cluster-enums.h",
     "CompatEnumNames.h",
