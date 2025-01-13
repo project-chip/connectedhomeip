@@ -144,8 +144,8 @@ tests:
       disabled: true
 
     - label: "Step 2b: Scan the QR code from the previous step using the DUT."
-      PICS: MCORE.DD.SCAN_QR_CODE
-      verification: |
+       PICS: MCORE.DD.SCAN_QR_CODE
+       verification: |
           WIFI - PAF feature is out of scope for V1.4
 
           [Verification command to be filled by NXP]
@@ -179,7 +179,7 @@ tests:
       PICS: MCORE.DD.DISCOVERY_PAF
       verification: |
           WIFI - PAF feature is out of scope for V1.4
-         [Verification command to be filled by NXP]
+          [Verification command to be filled by NXP]
           $ sudo ./chip-tool pairing code-wifi 1 n_m_2g nxp12345 MT:-24J0EZA10KA0648G00
       disabled: true
 
@@ -214,7 +214,7 @@ tests:
           1. Parse the payload of the TH commissionee
 
           Verify on the DUT (Chip-tool):
-           ./chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
+          ./chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
           [1660352541112] [20246:11812333] CHIP: [SPL] Parsing base38Representation: MT:-24J029Q00KA0648G00
           [1660352541113] [20246:11812333] CHIP: [SPL] Version:       0
           [1660352541113] [20246:11812333] CHIP: [SPL] VendorID:      65521
@@ -243,7 +243,7 @@ tests:
           [1657235198.977943][370963:370963] CHIP:DIS: Updating services using commissioning mode 0
 
           Verify on the DUT (Chip-tool):
-           ./chip-tool pairing code 1  MT:-24J029Q00KA0648G00
+          ./chip-tool pairing code 1  MT:-24J029Q00KA0648G00
           [1657235198856] [31506:16834043] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
           [1657235198856] [31506:16834043] CHIP: [TOO] Device commissioning completed with success
       disabled: true

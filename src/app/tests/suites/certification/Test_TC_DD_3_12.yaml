@@ -179,9 +179,9 @@ tests:
           documentation."
       PICS: MCORE.DD.DISCOVERY_IP
       verification: |
-         Use a Commissionee with a QR code that has the Custom Flow field set to 1, supports
+          Use a Commissionee with a QR code that has the Custom Flow field set to 1, supports
           IP Network for its Discovery Capability, and is already on the same IP network as the DUT
-           commissioner. Ensure the Version bit string follows the current Matter specification documentation.
+          commissioner. Ensure the Version bit string follows the current Matter specification documentation.
 
           ./chip-all-clusters-app --custom-flow 1 --capabilities 4
           On the TH (All-Clusters App), verify that the user has a QR code available to pass into the DUT
@@ -195,7 +195,7 @@ tests:
       verification: |
           Scan the QR code generated in the previous step using the DUT. Verify that the QR code is 
           scanned successfully.
-         The chip-tool does not support physically scanning QR codes.
+          The chip-tool does not support physically scanning QR codes.
       disabled: true
 
     - label: "Step 3c: DUT parses QR code."
@@ -204,7 +204,7 @@ tests:
           1. Parse the payload of the TH commissionee
 
           Verify on the DUT (CHIP-TOOL):
-           ./chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
+          ./chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
 
           2. Verify that TH logs do not show the commissionee being commissioned by the DUT.
       disabled: true
