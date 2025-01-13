@@ -248,8 +248,6 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
 
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
             uint8_t maxRouterId = otThreadGetMaxRouterId(otInst);
-            CHIP_ERROR chipErr  = CHIP_ERROR_INCORRECT_STATE;
-
             for (uint8_t i = 0; i <= maxRouterId; i++)
             {
                 if (otThreadGetRouterInfo(otInst, i, &routerInfo) == OT_ERROR_NONE)
@@ -268,11 +266,10 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
                     routeTable.linkEstablished = routerInfo.mLinkEstablished;
 
                     ReturnErrorOnFailure(aEncoder.Encode(routeTable));
-                    chipErr = CHIP_NO_ERROR;
                 }
             }
-
-            return chipErr;
+            // Returning empty list with no error in case thread network is not up
+            return CHIP_NO_ERROR;
 
 #else // OPENTHREAD_MTD
             otError otErr = otThreadGetParentInfo(otInst, &routerInfo);
