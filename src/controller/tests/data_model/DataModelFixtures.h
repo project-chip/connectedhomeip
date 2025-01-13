@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "data-model-providers/codegen/CodegenDataModelProvider.h"
 #include <app/CommandHandler.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/util/mock/Constants.h>
@@ -108,7 +109,7 @@ extern CommandHandler::Handle gAsyncCommandHandle;
 /// TODO items for above:
 ///      - once IM only supports DataModel
 ///      - break ember-overrides in this h/cpp file
-class CustomDataModel : public DataModel::Provider
+class CustomDataModel : public CodegenDataModelProvider
 {
 public:
     static CustomDataModel & Instance();
@@ -121,23 +122,6 @@ public:
                                                  AttributeValueDecoder & decoder) override;
     std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request,
                                                         chip::TLV::TLVReader & input_arguments, CommandHandler * handler) override;
-
-    DataModel::MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath & path) override;
-    DataModel::MetadataList<DataModel::AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) override;
-    DataModel::MetadataList<SemanticTag> SemanticTags(EndpointId endpointId) override;
-    DataModel::MetadataList<DataModel::DeviceTypeEntry> DeviceTypes(EndpointId endpointId) override;
-    DataModel::MetadataList<DataModel::EndpointEntry> Endpoints() override;
-
-    DataModel::ClusterEntry FirstServerCluster(EndpointId endpoint) override;
-    DataModel::ClusterEntry NextServerCluster(const ConcreteClusterPath & before) override;
-    std::optional<DataModel::ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) override;
-    ConcreteClusterPath FirstClientCluster(EndpointId endpoint) override;
-    ConcreteClusterPath NextClientCluster(const ConcreteClusterPath & before) override;
-    DataModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
-    DataModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
-    std::optional<DataModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;
-
-    void Temporary_ReportAttributeChanged(const AttributePathParams & path) override {}
 };
 
 } // namespace DataModelTests
