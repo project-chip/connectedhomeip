@@ -148,7 +148,7 @@ tests:
       verification: |
           WIFI - PAF feature is out of scope for V1.4
 
-         [Verification command to be filled by NXP]
+          [Verification command to be filled by NXP]
       disabled: true
 
     - label: "Step 2c: DUT parses QR code."

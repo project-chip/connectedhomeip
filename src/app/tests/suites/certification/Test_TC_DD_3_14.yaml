@@ -106,7 +106,7 @@ tests:
           Observe the following error in the DUT logs:
           Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
 
-         No applicable logs will be generated on the TH (All-cluster-app), as the commissioning process does not proceed.
+          No applicable logs will be generated on the TH (All-cluster-app), as the commissioning process does not proceed.
       disabled: true
 
     - label:
