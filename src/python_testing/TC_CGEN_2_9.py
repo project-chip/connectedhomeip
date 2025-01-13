@@ -16,7 +16,6 @@
 #
 
 # === BEGIN CI TEST ARGUMENTS ===
-# === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
 #       app: ${TERMS_AND_CONDITIONS_APP}

@@ -35,8 +35,6 @@
 #       quiet: True
 # === END CI TEST ARGUMENTS ===
 
-from typing import List
-
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.commissioning import ROOT_ENDPOINT_ID
