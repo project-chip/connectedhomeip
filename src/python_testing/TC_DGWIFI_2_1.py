@@ -32,8 +32,6 @@
 # === END CI TEST ARGUMENTS ===
 #
 
-from enum import Enum
-
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
