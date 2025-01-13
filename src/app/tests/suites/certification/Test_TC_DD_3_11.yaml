@@ -251,6 +251,6 @@ tests:
           needed for the Commissioner/Commissionee to complete the commissioning
           process using SoftAP"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
-    verification: |
+      verification: |
         Out of Scope : SoftAP commissioning not currently supported       
       disabled: true

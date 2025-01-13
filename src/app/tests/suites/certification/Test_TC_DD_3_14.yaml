@@ -144,7 +144,7 @@ tests:
           [1657235906071] [31706:16841969] CHIP: [TOO] Device commissioning completed with success      
       disabled: true
    
-   - label:
+    - label:
           "Step 4a: Using the QR code from Step 1, ensure the TH’s Discovery
           Capability bit string is NOT set to Wi-Fi PAF for discovery (i.e. set
           to OnNetwork discovery capability)"
