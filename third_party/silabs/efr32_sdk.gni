@@ -1026,6 +1026,13 @@ template("efr32_sdk") {
       ]
     }
 
+    if (use_thread_coap_lib) {
+      sources += [
+        "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_driver_wrappers.h",
+        "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_pake.c",
+      ]
+    }
+
     if (use_wf200) {
       sources += [
         "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/bus/sl_wfx_bus.c",
