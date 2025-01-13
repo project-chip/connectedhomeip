@@ -191,19 +191,19 @@ else
                     echo "--wifi requires rs9116 or SiWx917 or wf200"
                     exit 1
                 fi
+                
                 if [ "$2" = "rs9116" ]; then
                     optArgs+="use_rs9116=true "
-                    NCP_DIR_SUFFIX="/"$2
                 elif [ "$2" = "SiWx917" ]; then
                     optArgs+="use_SiWx917=true "
-                    NCP_DIR_SUFFIX="/"$2
                 elif [ "$2" = "wf200" ]; then
                     optArgs+="use_wf200=true "
-                    NCP_DIR_SUFFIX="/"$2
                 else
                     echo "Wifi usage: --wifi rs9116|SiWx917|wf200"
                     exit 1
                 fi
+
+                NCP_DIR_SUFFIX="/"$2
                 USE_WIFI=true
                 optArgs+="chip_device_platform =\"efr32\" chip_crypto_keystore=\"psa\""
                 shift
