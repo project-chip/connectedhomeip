@@ -162,7 +162,7 @@
 | CommissionerControl                                                 | 0x0751 |
 | UnitTesting                                                         | 0xFFF1FC05|
 | FaultInjection                                                      | 0xFFF1FC06|
-| SampleManufacturerSpecificCluster                                   | 0xFFF1FC20|
+| SampleManufacturerSpecific                                          | 0xFFF1FC20|
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
@@ -16372,7 +16372,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster SampleManufacturerSpecificCluster                           | 0xFFF1FC20 |
+| Cluster SampleManufacturerSpecific                                  | 0xFFF1FC20 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Ping                                                              |   0x00 |
@@ -16393,18 +16393,18 @@ private:
 /*
  * Command Ping
  */
-class SampleManufacturerSpecificClusterPing : public ClusterCommand
+class SampleManufacturerSpecificPing : public ClusterCommand
 {
 public:
-    SampleManufacturerSpecificClusterPing(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("ping", credsIssuerConfig)
+    SampleManufacturerSpecificPing(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("ping", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::SampleManufacturerSpecificCluster::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::SampleManufacturerSpecificCluster::Commands::Ping::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::SampleManufacturerSpecific::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::SampleManufacturerSpecific::Commands::Ping::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -16413,8 +16413,8 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::SampleManufacturerSpecificCluster::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::SampleManufacturerSpecificCluster::Commands::Ping::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::SampleManufacturerSpecific::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::SampleManufacturerSpecific::Commands::Ping::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -16423,16 +16423,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::SampleManufacturerSpecificCluster::Commands::Ping::Type mRequest;
+    chip::app::Clusters::SampleManufacturerSpecific::Commands::Ping::Type mRequest;
 };
 
 /*
  * Command AddArguments
  */
-class SampleManufacturerSpecificClusterAddArguments : public ClusterCommand
+class SampleManufacturerSpecificAddArguments : public ClusterCommand
 {
 public:
-    SampleManufacturerSpecificClusterAddArguments(CredentialIssuerCommands * credsIssuerConfig) :
+    SampleManufacturerSpecificAddArguments(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("add-arguments", credsIssuerConfig)
     {
         AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
@@ -16442,8 +16442,8 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::SampleManufacturerSpecificCluster::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::SampleManufacturerSpecificCluster::Commands::AddArguments::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::SampleManufacturerSpecific::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::SampleManufacturerSpecific::Commands::AddArguments::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -16452,8 +16452,8 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::SampleManufacturerSpecificCluster::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::SampleManufacturerSpecificCluster::Commands::AddArguments::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::SampleManufacturerSpecific::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::SampleManufacturerSpecific::Commands::AddArguments::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -16462,7 +16462,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::SampleManufacturerSpecificCluster::Commands::AddArguments::Type mRequest;
+    chip::app::Clusters::SampleManufacturerSpecific::Commands::AddArguments::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -28221,19 +28221,19 @@ void registerClusterFaultInjection(Commands & commands, CredentialIssuerCommands
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
-void registerClusterSampleManufacturerSpecificCluster(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterSampleManufacturerSpecific(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::SampleManufacturerSpecificCluster;
+    using namespace chip::app::Clusters::SampleManufacturerSpecific;
 
-    const char * clusterName = "SampleManufacturerSpecificCluster";
+    const char * clusterName = "SampleManufacturerSpecific";
 
     commands_list clusterCommands = {
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                            //
-        make_unique<SampleManufacturerSpecificClusterPing>(credsIssuerConfig),         //
-        make_unique<SampleManufacturerSpecificClusterAddArguments>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                     //
+        make_unique<SampleManufacturerSpecificPing>(credsIssuerConfig),         //
+        make_unique<SampleManufacturerSpecificAddArguments>(credsIssuerConfig), //
         //
         // Attributes
         //
@@ -28428,5 +28428,5 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterCommissionerControl(commands, credsIssuerConfig);
     registerClusterUnitTesting(commands, credsIssuerConfig);
     registerClusterFaultInjection(commands, credsIssuerConfig);
-    registerClusterSampleManufacturerSpecificCluster(commands, credsIssuerConfig);
+    registerClusterSampleManufacturerSpecific(commands, credsIssuerConfig);
 }

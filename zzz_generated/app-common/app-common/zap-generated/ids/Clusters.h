@@ -406,9 +406,9 @@ static constexpr ClusterId Id = 0xFFF1FC05;
 namespace FaultInjection {
 static constexpr ClusterId Id = 0xFFF1FC06;
 } // namespace FaultInjection
-namespace SampleManufacturerSpecificCluster {
+namespace SampleManufacturerSpecific {
 static constexpr ClusterId Id = 0xFFF1FC20;
-} // namespace SampleManufacturerSpecificCluster
+} // namespace SampleManufacturerSpecific
 
 } // namespace Clusters
 } // namespace app

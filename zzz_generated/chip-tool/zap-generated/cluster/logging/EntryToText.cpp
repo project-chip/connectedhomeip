@@ -279,8 +279,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "UnitTesting";
     case chip::app::Clusters::FaultInjection::Id:
         return "FaultInjection";
-    case chip::app::Clusters::SampleManufacturerSpecificCluster::Id:
-        return "SampleManufacturerSpecificCluster";
+    case chip::app::Clusters::SampleManufacturerSpecific::Id:
+        return "SampleManufacturerSpecific";
     default:
         return "Unknown";
     }
@@ -4615,20 +4615,20 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
-    case chip::app::Clusters::SampleManufacturerSpecificCluster::Id: {
+    case chip::app::Clusters::SampleManufacturerSpecific::Id: {
         switch (id)
         {
-        case chip::app::Clusters::SampleManufacturerSpecificCluster::Attributes::FlipFlop::Id:
+        case chip::app::Clusters::SampleManufacturerSpecific::Attributes::FlipFlop::Id:
             return "FlipFlop";
-        case chip::app::Clusters::SampleManufacturerSpecificCluster::Attributes::GeneratedCommandList::Id:
+        case chip::app::Clusters::SampleManufacturerSpecific::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
-        case chip::app::Clusters::SampleManufacturerSpecificCluster::Attributes::AcceptedCommandList::Id:
+        case chip::app::Clusters::SampleManufacturerSpecific::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::SampleManufacturerSpecificCluster::Attributes::AttributeList::Id:
+        case chip::app::Clusters::SampleManufacturerSpecific::Attributes::AttributeList::Id:
             return "AttributeList";
-        case chip::app::Clusters::SampleManufacturerSpecificCluster::Attributes::FeatureMap::Id:
+        case chip::app::Clusters::SampleManufacturerSpecific::Attributes::FeatureMap::Id:
             return "FeatureMap";
-        case chip::app::Clusters::SampleManufacturerSpecificCluster::Attributes::ClusterRevision::Id:
+        case chip::app::Clusters::SampleManufacturerSpecific::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -5864,12 +5864,12 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
-    case chip::app::Clusters::SampleManufacturerSpecificCluster::Id: {
+    case chip::app::Clusters::SampleManufacturerSpecific::Id: {
         switch (id)
         {
-        case chip::app::Clusters::SampleManufacturerSpecificCluster::Commands::Ping::Id:
+        case chip::app::Clusters::SampleManufacturerSpecific::Commands::Ping::Id:
             return "Ping";
-        case chip::app::Clusters::SampleManufacturerSpecificCluster::Commands::AddArguments::Id:
+        case chip::app::Clusters::SampleManufacturerSpecific::Commands::AddArguments::Id:
             return "AddArguments";
         default:
             return "Unknown";
@@ -6389,10 +6389,10 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "Unknown";
         }
     }
-    case chip::app::Clusters::SampleManufacturerSpecificCluster::Id: {
+    case chip::app::Clusters::SampleManufacturerSpecific::Id: {
         switch (id)
         {
-        case chip::app::Clusters::SampleManufacturerSpecificCluster::Commands::AddArgumentsResponse::Id:
+        case chip::app::Clusters::SampleManufacturerSpecific::Commands::AddArgumentsResponse::Id:
             return "AddArgumentsResponse";
         default:
             return "Unknown";

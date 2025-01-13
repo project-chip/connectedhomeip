@@ -34485,7 +34485,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace FaultInjection
-namespace SampleManufacturerSpecificCluster {
+namespace SampleManufacturerSpecific {
 
 namespace Commands {
 namespace Ping {
@@ -34649,7 +34649,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace PingCountEvent.
 } // namespace Events
 
-} // namespace SampleManufacturerSpecificCluster
+} // namespace SampleManufacturerSpecific
 
 } // namespace Clusters
 
@@ -35373,7 +35373,7 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
-    case Clusters::SampleManufacturerSpecificCluster::Id: {
+    case Clusters::SampleManufacturerSpecific::Id: {
         switch (aCommand)
         {
         default:

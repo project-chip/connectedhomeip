@@ -5735,7 +5735,7 @@ enum class FaultType : uint8_t
 };
 } // namespace FaultInjection
 
-namespace SampleManufacturerSpecificCluster {} // namespace SampleManufacturerSpecificCluster
+namespace SampleManufacturerSpecific {} // namespace SampleManufacturerSpecific
 
 } // namespace Clusters
 } // namespace app

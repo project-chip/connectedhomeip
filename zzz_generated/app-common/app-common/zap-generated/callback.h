@@ -671,7 +671,7 @@ void emberAfFaultInjectionClusterInitCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfSampleManufacturerSpecificClusterClusterInitCallback(chip::EndpointId endpoint);
+void emberAfSampleManufacturerSpecificClusterInitCallback(chip::EndpointId endpoint);
 
 // Cluster Server/Client Init Functions
 
@@ -5583,29 +5583,28 @@ MatterFaultInjectionClusterServerPreAttributeChangedCallback(const chip::app::Co
 void emberAfFaultInjectionClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
-// Sample Manufacturer-specific cluster Cluster
+// Sample Manufacturer-Specific Cluster
 //
 
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfSampleManufacturerSpecificClusterClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfSampleManufacturerSpecificClusterServerInitCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being shutdown
  */
-void MatterSampleManufacturerSpecificClusterClusterServerShutdownCallback(chip::EndpointId endpoint);
+void MatterSampleManufacturerSpecificClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfSampleManufacturerSpecificClusterClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfSampleManufacturerSpecificClusterClientInitCallback(chip::EndpointId endpoint);
 
 /**
  * @param attributePath Concrete attribute path that changed
  */
-void MatterSampleManufacturerSpecificClusterClusterServerAttributeChangedCallback(
-    const chip::app::ConcreteAttributePath & attributePath);
+void MatterSampleManufacturerSpecificClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /**
  * @param attributePath Concrete attribute path to be changed
@@ -5613,13 +5612,13 @@ void MatterSampleManufacturerSpecificClusterClusterServerAttributeChangedCallbac
  * @param size          Attribute size
  * @param value         Attribute value
  */
-chip::Protocols::InteractionModel::Status MatterSampleManufacturerSpecificClusterClusterServerPreAttributeChangedCallback(
+chip::Protocols::InteractionModel::Status MatterSampleManufacturerSpecificClusterServerPreAttributeChangedCallback(
     const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /**
  * @param endpoint  Endpoint that is being served
  */
-void emberAfSampleManufacturerSpecificClusterClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfSampleManufacturerSpecificClusterServerTickCallback(chip::EndpointId endpoint);
 
 // Cluster Commands Callback
 
@@ -7137,14 +7136,14 @@ bool emberAfFaultInjectionClusterFailRandomlyAtFaultCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::FaultInjection::Commands::FailRandomlyAtFault::DecodableType & commandData);
 /**
- * @brief Sample Manufacturer-specific cluster Cluster Ping Command callback (from client)
+ * @brief Sample Manufacturer-Specific Cluster Ping Command callback (from client)
  */
-bool emberAfSampleManufacturerSpecificClusterClusterPingCallback(
+bool emberAfSampleManufacturerSpecificClusterPingCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::SampleManufacturerSpecificCluster::Commands::Ping::DecodableType & commandData);
+    const chip::app::Clusters::SampleManufacturerSpecific::Commands::Ping::DecodableType & commandData);
 /**
- * @brief Sample Manufacturer-specific cluster Cluster AddArguments Command callback (from client)
+ * @brief Sample Manufacturer-Specific Cluster AddArguments Command callback (from client)
  */
-bool emberAfSampleManufacturerSpecificClusterClusterAddArgumentsCallback(
+bool emberAfSampleManufacturerSpecificClusterAddArgumentsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::SampleManufacturerSpecificCluster::Commands::AddArguments::DecodableType & commandData);
+    const chip::app::Clusters::SampleManufacturerSpecific::Commands::AddArguments::DecodableType & commandData);

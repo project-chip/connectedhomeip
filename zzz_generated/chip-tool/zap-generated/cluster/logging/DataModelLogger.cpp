@@ -9144,7 +9144,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const SampleManufacturerSpecificCluster::Events::PingCountEvent::DecodableType & value)
+                                     const SampleManufacturerSpecific::Events::PingCountEvent::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -10093,7 +10093,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const SampleManufacturerSpecificCluster::Commands::AddArgumentsResponse::DecodableType & value)
+                                     const SampleManufacturerSpecific::Commands::AddArgumentsResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("returnValue", indent + 1, value.returnValue));
@@ -19592,35 +19592,35 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case SampleManufacturerSpecificCluster::Id: {
+    case SampleManufacturerSpecific::Id: {
         switch (path.mAttributeId)
         {
-        case SampleManufacturerSpecificCluster::Attributes::FlipFlop::Id: {
+        case SampleManufacturerSpecific::Attributes::FlipFlop::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FlipFlop", 1, value);
         }
-        case SampleManufacturerSpecificCluster::Attributes::GeneratedCommandList::Id: {
+        case SampleManufacturerSpecific::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, SampleManufacturerSpecificCluster::Id);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, SampleManufacturerSpecific::Id);
         }
-        case SampleManufacturerSpecificCluster::Attributes::AcceptedCommandList::Id: {
+        case SampleManufacturerSpecific::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, SampleManufacturerSpecificCluster::Id);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, SampleManufacturerSpecific::Id);
         }
-        case SampleManufacturerSpecificCluster::Attributes::AttributeList::Id: {
+        case SampleManufacturerSpecific::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogAttributeId("AttributeList", 1, value, SampleManufacturerSpecificCluster::Id);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, SampleManufacturerSpecific::Id);
         }
-        case SampleManufacturerSpecificCluster::Attributes::FeatureMap::Id: {
+        case SampleManufacturerSpecific::Attributes::FeatureMap::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
-        case SampleManufacturerSpecificCluster::Attributes::ClusterRevision::Id: {
+        case SampleManufacturerSpecific::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -20387,11 +20387,11 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         }
         break;
     }
-    case SampleManufacturerSpecificCluster::Id: {
+    case SampleManufacturerSpecific::Id: {
         switch (path.mCommandId)
         {
-        case SampleManufacturerSpecificCluster::Commands::AddArgumentsResponse::Id: {
-            SampleManufacturerSpecificCluster::Commands::AddArgumentsResponse::DecodableType value;
+        case SampleManufacturerSpecific::Commands::AddArgumentsResponse::Id: {
+            SampleManufacturerSpecific::Commands::AddArgumentsResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AddArgumentsResponse", 1, value);
         }
@@ -21272,11 +21272,11 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         }
         break;
     }
-    case SampleManufacturerSpecificCluster::Id: {
+    case SampleManufacturerSpecific::Id: {
         switch (header.mPath.mEventId)
         {
-        case SampleManufacturerSpecificCluster::Events::PingCountEvent::Id: {
-            chip::app::Clusters::SampleManufacturerSpecificCluster::Events::PingCountEvent::DecodableType value;
+        case SampleManufacturerSpecific::Events::PingCountEvent::Id: {
+            chip::app::Clusters::SampleManufacturerSpecific::Events::PingCountEvent::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PingCountEvent", 1, value);
         }

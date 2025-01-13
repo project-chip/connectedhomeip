@@ -14199,8 +14199,8 @@ class ChipClusters:
             },
         },
     }
-    _SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER_CLUSTER_INFO = {
-        "clusterName": "SampleManufacturerSpecificCluster",
+    _SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER_INFO = {
+        "clusterName": "SampleManufacturerSpecific",
         "clusterId": 0xFFF1FC20,
         "commands": {
             0x00000000: {
@@ -14387,7 +14387,7 @@ class ChipClusters:
         0x00000751: _COMMISSIONER_CONTROL_CLUSTER_INFO,
         0xFFF1FC05: _UNIT_TESTING_CLUSTER_INFO,
         0xFFF1FC06: _FAULT_INJECTION_CLUSTER_INFO,
-        0xFFF1FC20: _SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER_CLUSTER_INFO,
+        0xFFF1FC20: _SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER_INFO,
     }
 
     _CLUSTER_NAME_DICT = {
@@ -14518,7 +14518,7 @@ class ChipClusters:
         "CommissionerControl": _COMMISSIONER_CONTROL_CLUSTER_INFO,
         "UnitTesting": _UNIT_TESTING_CLUSTER_INFO,
         "FaultInjection": _FAULT_INJECTION_CLUSTER_INFO,
-        "SampleManufacturerSpecificCluster": _SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER_CLUSTER_INFO,
+        "SampleManufacturerSpecific": _SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER_INFO,
     }
 
     def __init__(self, chipstack):

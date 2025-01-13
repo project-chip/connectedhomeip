@@ -22778,16 +22778,16 @@ using chip::System::Clock::Timeout;
 }
 @end
 
-@implementation MTRClusterSampleManufacturerSpecificCluster
+@implementation MTRClusterSampleManufacturerSpecific
 
 - (void)pingWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     [self pingWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
-- (void)pingWithParams:(MTRSampleManufacturerSpecificClusterClusterPingParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)pingWithParams:(MTRSampleManufacturerSpecificClusterPingParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
-        params = [[MTRSampleManufacturerSpecificClusterClusterPingParams
+        params = [[MTRSampleManufacturerSpecificClusterPingParams
             alloc] init];
     }
 
@@ -22797,7 +22797,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = SampleManufacturerSpecificCluster::Commands::Ping::Type;
+    using RequestType = SampleManufacturerSpecific::Commands::Ping::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -22811,10 +22811,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)addArgumentsWithParams:(MTRSampleManufacturerSpecificClusterClusterAddArgumentsParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRSampleManufacturerSpecificClusterClusterAddArgumentsResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)addArgumentsWithParams:(MTRSampleManufacturerSpecificClusterAddArgumentsParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRSampleManufacturerSpecificClusterAddArgumentsResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
-        params = [[MTRSampleManufacturerSpecificClusterClusterAddArgumentsParams
+        params = [[MTRSampleManufacturerSpecificClusterAddArgumentsParams
             alloc] init];
     }
 
@@ -22824,7 +22824,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = SampleManufacturerSpecificCluster::Commands::AddArguments::Type;
+    using RequestType = SampleManufacturerSpecific::Commands::AddArguments::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -22833,14 +22833,14 @@ using chip::System::Clock::Timeout;
                              expectedValueInterval:expectedValueIntervalMs
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:MTRSampleManufacturerSpecificClusterClusterAddArgumentsResponseParams.class
+                                     responseClass:MTRSampleManufacturerSpecificClusterAddArgumentsResponseParams.class
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeFlipFlopWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSampleManufacturerSpecificClusterID) attributeID:@(MTRAttributeIDTypeClusterSampleManufacturerSpecificClusterAttributeFlipFlopID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSampleManufacturerSpecificID) attributeID:@(MTRAttributeIDTypeClusterSampleManufacturerSpecificAttributeFlipFlopID) params:params];
 }
 
 - (void)writeAttributeFlipFlopWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
@@ -22851,32 +22851,32 @@ using chip::System::Clock::Timeout;
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSampleManufacturerSpecificClusterID) attributeID:@(MTRAttributeIDTypeClusterSampleManufacturerSpecificClusterAttributeFlipFlopID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSampleManufacturerSpecificID) attributeID:@(MTRAttributeIDTypeClusterSampleManufacturerSpecificAttributeFlipFlopID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSampleManufacturerSpecificClusterID) attributeID:@(MTRAttributeIDTypeClusterSampleManufacturerSpecificClusterAttributeGeneratedCommandListID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSampleManufacturerSpecificID) attributeID:@(MTRAttributeIDTypeClusterSampleManufacturerSpecificAttributeGeneratedCommandListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSampleManufacturerSpecificClusterID) attributeID:@(MTRAttributeIDTypeClusterSampleManufacturerSpecificClusterAttributeAcceptedCommandListID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSampleManufacturerSpecificID) attributeID:@(MTRAttributeIDTypeClusterSampleManufacturerSpecificAttributeAcceptedCommandListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSampleManufacturerSpecificClusterID) attributeID:@(MTRAttributeIDTypeClusterSampleManufacturerSpecificClusterAttributeAttributeListID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSampleManufacturerSpecificID) attributeID:@(MTRAttributeIDTypeClusterSampleManufacturerSpecificAttributeAttributeListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSampleManufacturerSpecificClusterID) attributeID:@(MTRAttributeIDTypeClusterSampleManufacturerSpecificClusterAttributeFeatureMapID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSampleManufacturerSpecificID) attributeID:@(MTRAttributeIDTypeClusterSampleManufacturerSpecificAttributeFeatureMapID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSampleManufacturerSpecificClusterID) attributeID:@(MTRAttributeIDTypeClusterSampleManufacturerSpecificClusterAttributeClusterRevisionID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSampleManufacturerSpecificID) attributeID:@(MTRAttributeIDTypeClusterSampleManufacturerSpecificAttributeClusterRevisionID) params:params];
 }
 
 @end

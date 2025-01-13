@@ -5538,29 +5538,29 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("unitTesting", writeUnitTestingInteractionInfo);
     Map<String, InteractionInfo> writeFaultInjectionInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("faultInjection", writeFaultInjectionInteractionInfo);
-    Map<String, InteractionInfo> writeSampleManufacturerSpecificClusterInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeSampleManufacturerSpecificClusterFlipFlopCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo sampleManufacturerSpecificClusterflipFlopCommandParameterInfo =
+    Map<String, InteractionInfo> writeSampleManufacturerSpecificInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeSampleManufacturerSpecificFlipFlopCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo sampleManufacturerSpecificflipFlopCommandParameterInfo =
         new CommandParameterInfo(
             "value", 
             Boolean.class, 
             Boolean.class 
         );
-    writeSampleManufacturerSpecificClusterFlipFlopCommandParams.put(
+    writeSampleManufacturerSpecificFlipFlopCommandParams.put(
         "value",
-        sampleManufacturerSpecificClusterflipFlopCommandParameterInfo
+        sampleManufacturerSpecificflipFlopCommandParameterInfo
     );
-    InteractionInfo writeSampleManufacturerSpecificClusterFlipFlopAttributeInteractionInfo = new InteractionInfo(
+    InteractionInfo writeSampleManufacturerSpecificFlipFlopAttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.SampleManufacturerSpecificClusterCluster) cluster).writeFlipFlopAttribute(
+        ((ChipClusters.SampleManufacturerSpecificCluster) cluster).writeFlipFlopAttribute(
           (DefaultClusterCallback) callback,
           (Boolean) commandArguments.get("value")
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeSampleManufacturerSpecificClusterFlipFlopCommandParams
+      writeSampleManufacturerSpecificFlipFlopCommandParams
     );
-    writeSampleManufacturerSpecificClusterInteractionInfo.put("writeFlipFlopAttribute", writeSampleManufacturerSpecificClusterFlipFlopAttributeInteractionInfo);
-    writeAttributeMap.put("sampleManufacturerSpecificCluster", writeSampleManufacturerSpecificClusterInteractionInfo);return writeAttributeMap;
+    writeSampleManufacturerSpecificInteractionInfo.put("writeFlipFlopAttribute", writeSampleManufacturerSpecificFlipFlopAttributeInteractionInfo);
+    writeAttributeMap.put("sampleManufacturerSpecific", writeSampleManufacturerSpecificInteractionInfo);return writeAttributeMap;
   }
 }

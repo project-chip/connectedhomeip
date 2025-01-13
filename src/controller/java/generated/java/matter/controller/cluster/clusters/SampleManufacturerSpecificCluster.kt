@@ -43,7 +43,7 @@ import matter.tlv.ContextSpecificTag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class SampleManufacturerSpecificClusterCluster(
+class SampleManufacturerSpecificCluster(
   private val controller: MatterController,
   private val endpointId: UShort,
 ) {
@@ -828,7 +828,7 @@ class SampleManufacturerSpecificClusterCluster(
   }
 
   companion object {
-    private val logger = Logger.getLogger(SampleManufacturerSpecificClusterCluster::class.java.name)
+    private val logger = Logger.getLogger(SampleManufacturerSpecificCluster::class.java.name)
     const val CLUSTER_ID: UInt = 4294048800u
   }
 }

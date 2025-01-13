@@ -14473,7 +14473,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRSampleManufacturerSpecificClusterClusterPingParams : NSObject <NSCopying>
+@interface MTRSampleManufacturerSpecificClusterPingParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -14501,12 +14501,12 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRSampleManufacturerSpecificClusterClusterAddArgumentsResponseParams : NSObject <NSCopying>
+@interface MTRSampleManufacturerSpecificClusterAddArgumentsResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull returnValue MTR_PROVISIONALLY_AVAILABLE;
 
 /**
- * Initialize an MTRSampleManufacturerSpecificClusterClusterAddArgumentsResponseParams with a response-value dictionary
+ * Initialize an MTRSampleManufacturerSpecificClusterAddArgumentsResponseParams with a response-value dictionary
  * of the sort that MTRDeviceResponseHandler would receive.
  *
  * Will return nil and hand out an error if the response-value dictionary is not
@@ -14520,7 +14520,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRSampleManufacturerSpecificClusterClusterAddArgumentsParams : NSObject <NSCopying>
+@interface MTRSampleManufacturerSpecificClusterAddArgumentsParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull arg1 MTR_PROVISIONALLY_AVAILABLE;
 

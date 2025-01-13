@@ -206,7 +206,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeEcosystemInformationID MTR_PROVISIONALLY_AVAILABLE = 0x00000750,
     MTRClusterIDTypeCommissionerControlID MTR_PROVISIONALLY_AVAILABLE = 0x00000751,
     MTRClusterIDTypeUnitTestingID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0xFFF1FC05,
-    MTRClusterIDTypeSampleManufacturerSpecificClusterID MTR_PROVISIONALLY_AVAILABLE = 0xFFF1FC20,
+    MTRClusterIDTypeSampleManufacturerSpecificID MTR_PROVISIONALLY_AVAILABLE = 0xFFF1FC20,
 
     MTRClusterBarrierControlID MTR_DEPRECATED("Please use MTRClusterIDTypeBarrierControlID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x00000103,
     MTRClusterIDTypeBarrierControlID MTR_DEPRECATED("The BarrierControl cluster will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000103,
@@ -5093,13 +5093,13 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterUnitTestingAttributeClusterRevisionID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
     MTRAttributeIDTypeClusterUnitTestingAttributeMeiInt8uID MTR_PROVISIONALLY_AVAILABLE = 0xFFF24F01,
 
-    // Cluster SampleManufacturerSpecificCluster attributes
-    MTRAttributeIDTypeClusterSampleManufacturerSpecificClusterAttributeFlipFlopID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterSampleManufacturerSpecificClusterAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterSampleManufacturerSpecificClusterAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterSampleManufacturerSpecificClusterAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterSampleManufacturerSpecificClusterAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterSampleManufacturerSpecificClusterAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+    // Cluster SampleManufacturerSpecific attributes
+    MTRAttributeIDTypeClusterSampleManufacturerSpecificAttributeFlipFlopID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterSampleManufacturerSpecificAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterSampleManufacturerSpecificAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterSampleManufacturerSpecificAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterSampleManufacturerSpecificAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterSampleManufacturerSpecificAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster BarrierControl deprecated attribute names
     MTRClusterBarrierControlAttributeBarrierMovingStateID
@@ -7108,10 +7108,10 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterUnitTestingCommandTestDifferentVendorMeiRequestID MTR_PROVISIONALLY_AVAILABLE = 0xFFF200AA,
     MTRCommandIDTypeClusterUnitTestingCommandTestDifferentVendorMeiResponseID MTR_PROVISIONALLY_AVAILABLE = 0xFFF200BB,
 
-    // Cluster SampleManufacturerSpecificCluster commands
-    MTRCommandIDTypeClusterSampleManufacturerSpecificClusterCommandPingID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterSampleManufacturerSpecificClusterCommandAddArgumentsResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterSampleManufacturerSpecificClusterCommandAddArgumentsID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    // Cluster SampleManufacturerSpecific commands
+    MTRCommandIDTypeClusterSampleManufacturerSpecificCommandPingID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterSampleManufacturerSpecificCommandAddArgumentsResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterSampleManufacturerSpecificCommandAddArgumentsID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
 
     // Cluster BarrierControl deprecated command id names
     MTRClusterBarrierControlCommandBarrierControlGoToPercentID
@@ -7560,8 +7560,8 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterUnitTestingEventTestFabricScopedEventID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000002,
     MTREventIDTypeClusterUnitTestingEventTestDifferentVendorMeiEventID MTR_PROVISIONALLY_AVAILABLE = 0xFFF200EE,
 
-    // Cluster SampleManufacturerSpecificCluster events
-    MTREventIDTypeClusterSampleManufacturerSpecificClusterEventPingCountEventID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    // Cluster SampleManufacturerSpecific events
+    MTREventIDTypeClusterSampleManufacturerSpecificEventPingCountEventID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
 };
 
