@@ -17,14 +17,14 @@
  */
 #pragma once
 
-#include "app/data-model-provider/MetadataList.h"
-#include "app/data-model-provider/MetadataTypes.h"
-#include "lib/support/Span.h"
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/data-model-provider/MetadataList.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/LinkedList.h>
+#include <lib/support/Span.h>
 #include <limits>
 
 namespace chip {
