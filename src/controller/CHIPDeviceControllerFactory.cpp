@@ -167,8 +167,15 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(stateParams.transportMgr->Init(Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv6)
                                                             .SetListenPort(params.listenPort)
-#if INET_CONFIG_ENABLE_IPV4
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                                             ,
+                                                        Transport::TcpListenParameters(stateParams.tcpEndPointManager)
+                                                            .SetAddressType(IPAddressType::kIPv6)
+                                                            .SetListenPort(params.listenPort)
+                                                            .SetServerListenEnabled(false) // Initialize as a TCP Client
+#endif
+#if INET_CONFIG_ENABLE_IPV4
+                                                        ,
                                                         Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv4)
                                                             .SetListenPort(params.listenPort)
@@ -176,12 +183,6 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #if CONFIG_NETWORK_LAYER_BLE
                                                             ,
                                                         Transport::BleListenParameters(stateParams.bleLayer)
-#endif
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-                                                            ,
-                                                        Transport::TcpListenParameters(stateParams.tcpEndPointManager)
-                                                            .SetAddressType(IPAddressType::kIPv6)
-                                                            .SetListenPort(params.listenPort)
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
                                                             ,

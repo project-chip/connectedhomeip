@@ -12773,6 +12773,156 @@ class ChipClusters:
             },
         },
     }
+    _CAMERA_AV_SETTINGS_USER_LEVEL_MANAGEMENT_CLUSTER_INFO = {
+        "clusterName": "CameraAvSettingsUserLevelManagement",
+        "clusterId": 0x00000552,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "MPTZSetPosition",
+                "args": {
+                    "pan": "int",
+                    "tilt": "int",
+                    "zoom": "int",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "MPTZRelativeMove",
+                "args": {
+                    "panDelta": "int",
+                    "tiltDelta": "int",
+                    "zoomDelta": "int",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "MPTZMoveToPreset",
+                "args": {
+                    "presetID": "int",
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "MPTZSavePreset",
+                "args": {
+                    "presetID": "int",
+                    "name": "str",
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "MPTZRemovePreset",
+                "args": {
+                    "presetID": "int",
+                },
+            },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "DPTZSetViewport",
+                "args": {
+                    "videoStreamID": "int",
+                    "viewport": "ViewportStruct",
+                },
+            },
+            0x00000006: {
+                "commandId": 0x00000006,
+                "commandName": "DPTZRelativeMove",
+                "args": {
+                    "videoStreamID": "int",
+                    "deltaX": "int",
+                    "deltaY": "int",
+                    "zoomDelta": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "MPTZPosition",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "MaxPresets",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "MPTZPresets",
+                "attributeId": 0x00000002,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "DPTZRelativeMove",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "ZoomMax",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "TiltMin",
+                "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "TiltMax",
+                "attributeId": 0x00000006,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "PanMin",
+                "attributeId": 0x00000007,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "PanMax",
+                "attributeId": 0x00000008,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _WEB_RTC_TRANSPORT_PROVIDER_CLUSTER_INFO = {
         "clusterName": "WebRTCTransportProvider",
         "clusterId": 0x00000553,
@@ -14229,6 +14379,7 @@ class ChipClusters:
         0x00000510: _CONTENT_APP_OBSERVER_CLUSTER_INFO,
         0x00000550: _ZONE_MANAGEMENT_CLUSTER_INFO,
         0x00000551: _CAMERA_AV_STREAM_MANAGEMENT_CLUSTER_INFO,
+        0x00000552: _CAMERA_AV_SETTINGS_USER_LEVEL_MANAGEMENT_CLUSTER_INFO,
         0x00000553: _WEB_RTC_TRANSPORT_PROVIDER_CLUSTER_INFO,
         0x00000554: _WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER_INFO,
         0x00000556: _CHIME_CLUSTER_INFO,
@@ -14359,6 +14510,7 @@ class ChipClusters:
         "ContentAppObserver": _CONTENT_APP_OBSERVER_CLUSTER_INFO,
         "ZoneManagement": _ZONE_MANAGEMENT_CLUSTER_INFO,
         "CameraAvStreamManagement": _CAMERA_AV_STREAM_MANAGEMENT_CLUSTER_INFO,
+        "CameraAvSettingsUserLevelManagement": _CAMERA_AV_SETTINGS_USER_LEVEL_MANAGEMENT_CLUSTER_INFO,
         "WebRTCTransportProvider": _WEB_RTC_TRANSPORT_PROVIDER_CLUSTER_INFO,
         "WebRTCTransportRequestor": _WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER_INFO,
         "Chime": _CHIME_CLUSTER_INFO,
