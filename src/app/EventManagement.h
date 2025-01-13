@@ -228,11 +228,13 @@ public:
      *
      * @param[in] apEventReporter       Event reporter to be notified when events are generated.
      *
+     * @return CHIP_ERROR               CHIP Error Code
+     *
      */
-    void Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
-              const LogStorageResources * const apLogStorageResources,
-              MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
-              System::Clock::Milliseconds64 aMonotonicStartupTime, EventReporter * apEventReporter = nullptr);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
+                    CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources,
+                    MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
+                    System::Clock::Milliseconds64 aMonotonicStartupTime, EventReporter * apEventReporter);
 
     static EventManagement & GetInstance();
 

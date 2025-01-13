@@ -198,13 +198,13 @@ to open the pull request for details or open additional issue in GitHub)
 Ensure that there is sufficient detail in issue summaries to make the content of
 the PR clear:
 
--   a `TLDR` of the change content. This is a judgement call on details,
+-   a `TLDR` of the change content. This is a judgment call on details,
     generally you should include a what was changed and why. The change is
     trivial/short, this can be very short (i.e. "fixed typos" is perfectly
     acceptable, however if changing 100-1000s of line, the areas of changes
     should be explained)
 -   If a crash/error is fixed, explain the root cause and if the fix is not
-    obvious (again, judgement call), explain why the given approach was taken.
+    obvious (again, judgment call), explain why the given approach was taken.
 -   Help the reviewer out with any notable information (specific platform
     issues, extra thoughts or requests for feedback or gotchas on tricky code,
     followup work or PR dependencies)
@@ -230,7 +230,7 @@ out of convenience.
     updated to cover functionality" or "existing tests already cover this" (make
     sure they do. Integration tests often only cover happy paths).
 
-    Add any notes on not covered things. It is a judgement call on how much can
+    Add any notes on not covered things. It is a judgment call on how much can
     be covered as 100% sounds great however not always possible.
 
 -   Manual testing

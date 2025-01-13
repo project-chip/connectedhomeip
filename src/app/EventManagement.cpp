@@ -80,26 +80,20 @@ struct CopyAndAdjustDeltaTimeContext
     EventLoadOutContext * mpContext = nullptr;
 };
 
-void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
-                           CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources,
-                           MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
-                           System::Clock::Milliseconds64 aMonotonicStartupTime, EventReporter * apEventReporter)
+CHIP_ERROR EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
+                                 CircularEventBuffer * apCircularEventBuffer,
+                                 const LogStorageResources * const apLogStorageResources,
+                                 MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
+                                 System::Clock::Milliseconds64 aMonotonicStartupTime, EventReporter * apEventReporter)
 {
+    VerifyOrReturnError(apEventReporter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aNumBuffers != 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mState == EventManagementStates::Shutdown, CHIP_ERROR_INCORRECT_STATE);
+
     CircularEventBuffer * current = nullptr;
     CircularEventBuffer * prev    = nullptr;
     CircularEventBuffer * next    = nullptr;
 
-    if (aNumBuffers == 0)
-    {
-        ChipLogError(EventLogging, "Invalid aNumBuffers");
-        return;
-    }
-
-    if (mState != EventManagementStates::Shutdown)
-    {
-        ChipLogError(EventLogging, "Invalid EventManagement State");
-        return;
-    }
     mpExchangeMgr = apExchangeManager;
 
     for (uint32_t bufferIndex = 0; bufferIndex < aNumBuffers; bufferIndex++)
@@ -125,15 +119,9 @@ void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint3
 
     mMonotonicStartupTime = aMonotonicStartupTime;
 
-    // TODO(#36890): Should remove using the global instance and rely only on passed in variable.
-    if (apEventReporter == nullptr)
-    {
-        mpEventReporter = &InteractionModelEngine::GetInstance()->GetReportingEngine();
-    }
-    else
-    {
-        mpEventReporter = apEventReporter;
-    }
+    mpEventReporter = apEventReporter;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR EventManagement::CopyToNextBuffer(CircularEventBuffer * apEventBuffer)
@@ -355,7 +343,7 @@ void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExcha
 {
 
     sInstance.Init(apExchangeManager, aNumBuffers, apCircularEventBuffer, apLogStorageResources, apEventNumberCounter,
-                   aMonotonicStartupTime);
+                   aMonotonicStartupTime, &InteractionModelEngine::GetInstance()->GetReportingEngine());
 }
 
 /**
