@@ -109,7 +109,6 @@ CHIP_ERROR DescriptorAttrAccess::ReadTagListAttribute(EndpointId endpoint, Attri
 CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     auto endpoints = InteractionModelEngine::GetInstance()->GetDataModelProvider()->Endpoints();
-    // auto endpointInfo = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetEndpointInfo(endpoint);
     if (endpoint == 0x00)
     {
         return aEncoder.EncodeList([&endpoints](const auto & encoder) -> CHIP_ERROR {
@@ -125,7 +124,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
         });
     }
 
-    // fint the given endpoint
+    // find the given endpoint
     unsigned idx = 0;
     while (idx < endpoints.size())
     {
@@ -133,6 +132,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
         {
             break;
         }
+        idx++;
     }
     if (idx >= endpoints.size())
     {
