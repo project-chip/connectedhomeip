@@ -63,6 +63,8 @@ class TC_CGEN_2_5(MatterBaseTest):
     @async_test_body
     async def test_TC_CGEN_2_5(self):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
+        tc_version_to_simulate: int = self.matter_test_config.tc_version_to_simulate
+        tc_user_response_to_simulate: int = self.matter_test_config.tc_user_response_to_simulate
 
         # Step 1: Begin commissioning with PASE and failsafe
         self.step(1)
@@ -76,8 +78,8 @@ class TC_CGEN_2_5(MatterBaseTest):
         response = await commissioner.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired)])
-        tcAcknowledgementsRequired = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired]
-        asserts.assert_equal(tcAcknowledgementsRequired, True, 'Incorrect TCAcknowledgementsRequired')
+        tc_acknowledgements_required = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired]
+        asserts.assert_equal(tc_acknowledgements_required, True, 'Incorrect TCAcknowledgementsRequired')
 
         # Step 3: Read TCUpdateDeadline
         self.step(3)
@@ -101,8 +103,8 @@ class TC_CGEN_2_5(MatterBaseTest):
             nodeid=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(
-                TCVersion=self.matter_test_config.tc_version_to_simulate,
-                TCUserResponse=self.matter_test_config.tc_user_response_to_simulate),
+                TCVersion=tc_version_to_simulate,
+                TCUserResponse=tc_user_response_to_simulate),
             timedRequestTimeoutMs=1000)
         asserts.assert_equal(response.errorCode,
                              Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
@@ -113,8 +115,8 @@ class TC_CGEN_2_5(MatterBaseTest):
         response = await commissioner.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired)])
-        tcAcknowledgementsRequired = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired]
-        asserts.assert_equal(tcAcknowledgementsRequired, False, 'TCAcknowledgementsRequired should be False')
+        tc_acknowledgements_required = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired]
+        asserts.assert_equal(tc_acknowledgements_required, False, 'TCAcknowledgementsRequired should be False')
 
         # Step 7: Complete CSR exchange and CASE security setup
         self.step(7)
@@ -145,13 +147,13 @@ class TC_CGEN_2_5(MatterBaseTest):
         self.step(9)
         tcAcceptedVersion = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion]
         asserts.assert_less(tcAcceptedVersion, 2**16, 'TCAcceptedVersion exceeds uint16 range')
-        asserts.assert_equal(tcAcceptedVersion, self.pixit['CGEN']['TCRevision'], 'Incorrect TCAcceptedVersion')
+        asserts.assert_equal(tcAcceptedVersion, tc_version_to_simulate, 'Incorrect TCAcceptedVersion')
 
         # Step 10: Verify TCAcknowledgements
         self.step(10)
         tcAcknowledgements = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgements]
         asserts.assert_less(tcAcknowledgements, 2**16, 'TCAcknowledgements exceeds map16 range')
-        asserts.assert_equal(tcAcknowledgements, self.pixit['CGEN']['RequiredTCAcknowledgements'], 'Incorrect TCAcknowledgements')
+        asserts.assert_equal(tcAcknowledgements, tc_user_response_to_simulate, 'Incorrect TCAcknowledgements')
 
         # Step 11: Verify TCMinRequiredVersion
         self.step(11)
@@ -160,8 +162,8 @@ class TC_CGEN_2_5(MatterBaseTest):
 
         # Step 12: Verify TCAcknowledgementsRequired
         self.step(12)
-        tcAcknowledgementsRequired = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired]
-        asserts.assert_equal(tcAcknowledgementsRequired, False, 'TCAcknowledgementsRequired should be False')
+        tc_acknowledgements_required = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired]
+        asserts.assert_equal(tc_acknowledgements_required, False, 'TCAcknowledgementsRequired should be False')
 
 
 if __name__ == "__main__":
