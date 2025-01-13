@@ -132,6 +132,13 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ChipLogError(Controller, "Warning: Device Controller Factory should be with a CHIP Device Layer...");
 #endif // CONFIG_DEVICE_LAYER
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    auto tcpListenParams = Transport::TcpListenParameters(stateParams.tcpEndPointManager)
+                               .SetAddressType(IPAddressType::kIPv6)
+                               .SetListenPort(params.listenPort)
+                               .SetServerListenEnabled(false); // Initialize as a TCP Client
+#endif
+
     if (params.dataModelProvider == nullptr)
     {
         ChipLogError(AppServer, "Device Controller Factory requires a `dataModelProvider` value.");
@@ -179,10 +186,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #endif
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                                             ,
-                                                        Transport::TcpListenParameters(stateParams.tcpEndPointManager)
-                                                            .SetAddressType(IPAddressType::kIPv6)
-                                                            .SetListenPort(params.listenPort)
-                                                            .SetServerListenEnabled(false) // Initialize as a TCP Client
+                                                        tcpListenParams
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
                                                         ,
@@ -286,8 +290,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         //
         app::DnssdServer::Instance().SetFabricTable(stateParams.fabricTable);
 
-        // Disable the TCP Server based on the TCPListenParameters setting in TransportMgr Init.
-        app::DnssdServer::Instance().SetTCPServerEnabled(false);
+        // Disable the TCP Server based on the TCPListenParameters setting.
+        app::DnssdServer::Instance().SetTCPServerEnabled(tcpListenParams.IsServerListenEnabled());
     }
 
     stateParams.sessionSetupPool = Platform::New<DeviceControllerSystemStateParams::SessionSetupPool>();
