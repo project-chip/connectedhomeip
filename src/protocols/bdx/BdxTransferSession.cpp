@@ -917,6 +917,11 @@ bool TransferSession::IsTransferLengthDefinite() const
 
 const char * TransferSession::OutputEvent::ToString(OutputEventType outputEventType)
 {
+    return TypeToString(outputEventType);
+}
+
+const char * TransferSession::OutputEvent::TypeToString(OutputEventType outputEventType)
+{
     switch (outputEventType)
     {
     case OutputEventType::kNone:

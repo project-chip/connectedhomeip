@@ -4,6 +4,7 @@
 #import "MTRCommandPayloads_Internal.h"
 #import "MTRCommandPayloadExtensions_Internal.h"
 #import "MTRBaseDevice_Internal.h"
+#import "MTRDefines_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "NSStringSpanConversion.h"

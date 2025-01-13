@@ -73,7 +73,7 @@ class TC_FAN_3_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_FAN_3_1(self):
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.get_endpoint(default=1)
 
         self.print_step(1, "Commissioning, already done")
 

@@ -19,22 +19,86 @@
 #include <app/GlobalAttributes.h>
 #include <lib/support/CodeUtils.h>
 
+#include <optional>
+
 using namespace chip::app::DataModel;
 
 namespace chip {
 namespace app {
 
-AttributePathExpandIterator::AttributePathExpandIterator(DataModel::Provider * provider,
-                                                         SingleLinkedListNode<AttributePathParams> * attributePath) :
-    mDataModelProvider(provider),
-    mpAttributePath(attributePath), mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
-
+bool AttributePathExpandIterator::AdvanceOutputPath()
 {
-    mOutputPath.mExpanded = true; // this is reset in 'next' if needed
+    /// Output path invariants
+    ///    - kInvalid* constants are used to define "no value available (yet)" and
+    ///      iteration loop will fill the first value when such a value is seen (fixed for non-wildcard
+    ///      or iteration-based in case of wildcards).
+    ///    - Iteration of the output path is done in order: first endpoint, then cluster, then attribute.
+    /// Processing works like:
+    ///    - Initial state is kInvalidEndpointId/kInvalidClusterId/kInvalidAttributeId
+    ///    - First loop pass fills-in endpointID, followed by clusterID, followed by attributeID
+    ///    - Whenever one level is done iterating (there is no "next") the following
+    ///      "higher path component" is updated:
+    ///         - once a valid path exists, try to advance attributeID
+    ///         - if attributeID fails to advance, try to advance clusterID (and restart attributeID)
+    ///         - if clusterID fails to advance, try to advance endpointID (and restart clusterID)
+    ///         - if endpointID fails to advance, iteration is done
+    while (true)
+    {
+        if (mPosition.mOutputPath.mClusterId != kInvalidClusterId)
+        {
+            std::optional<AttributeId> nextAttribute = NextAttributeId();
+            if (nextAttribute.has_value())
+            {
+                mPosition.mOutputPath.mAttributeId = *nextAttribute;
+                mPosition.mOutputPath.mExpanded    = mPosition.mAttributePath->mValue.IsWildcardPath();
+                return true;
+            }
+        }
 
-    // Make the iterator ready to emit the first valid path in the list.
-    // TODO: the bool return value here is completely unchecked
-    Next();
+        // no valid attribute, try to advance the cluster, see if a suitable one exists
+        if (mPosition.mOutputPath.mEndpointId != kInvalidEndpointId)
+        {
+            std::optional<ClusterId> nextCluster = NextClusterId();
+            if (nextCluster.has_value())
+            {
+                // A new cluster ID is to be processed. This sets the cluster ID to the new value and
+                // ALSO resets the attribute ID to "invalid", to trigger an attribute set/expansion from
+                // the beginning.
+                mPosition.mOutputPath.mClusterId   = *nextCluster;
+                mPosition.mOutputPath.mAttributeId = kInvalidAttributeId;
+                continue;
+            }
+        }
+
+        // No valid cluster, try advance the endpoint, see if a suitable one exists.
+        std::optional<EndpointId> nextEndpoint = NextEndpointId();
+        if (nextEndpoint.has_value())
+        {
+            // A new endpoint ID is to be processed. This sets the endpoint ID to the new value and
+            // ALSO resets the cluster ID to "invalid", to trigger a cluster set/expansion from
+            // the beginning.
+            mPosition.mOutputPath.mEndpointId = *nextEndpoint;
+            mPosition.mOutputPath.mClusterId  = kInvalidClusterId;
+            continue;
+        }
+        return false;
+    }
+}
+
+bool AttributePathExpandIterator::Next(ConcreteAttributePath & path)
+{
+    while (mPosition.mAttributePath != nullptr)
+    {
+        if (AdvanceOutputPath())
+        {
+            path = mPosition.mOutputPath;
+            return true;
+        }
+        mPosition.mAttributePath = mPosition.mAttributePath->mpNext;
+        mPosition.mOutputPath    = ConcreteReadAttributePath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId);
+    }
+
+    return false;
 }
 
 bool AttributePathExpandIterator::IsValidAttributeId(AttributeId attributeId)
@@ -49,40 +113,43 @@ bool AttributePathExpandIterator::IsValidAttributeId(AttributeId attributeId)
         break;
     }
 
-    const ConcreteAttributePath attributePath(mOutputPath.mEndpointId, mOutputPath.mClusterId, attributeId);
+    const ConcreteAttributePath attributePath(mPosition.mOutputPath.mEndpointId, mPosition.mOutputPath.mClusterId, attributeId);
     return mDataModelProvider->GetAttributeInfo(attributePath).has_value();
 }
 
 std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
 {
-    if (mOutputPath.mAttributeId == kInvalidAttributeId)
+    if (mPosition.mOutputPath.mAttributeId == kInvalidAttributeId)
     {
-        if (mpAttributePath->mValue.HasWildcardAttributeId())
+        if (mPosition.mAttributePath->mValue.HasWildcardAttributeId())
         {
-            AttributeEntry entry = mDataModelProvider->FirstAttribute(mOutputPath);
+            AttributeEntry entry = mDataModelProvider->FirstAttribute(mPosition.mOutputPath);
             return entry.IsValid()                                         //
                 ? entry.path.mAttributeId                                  //
                 : Clusters::Globals::Attributes::GeneratedCommandList::Id; //
         }
 
-        // We allow fixed attribute IDs if and only if they are valid:
-        //    - they may be GLOBAL attributes OR
-        //    - they are valid attributes for this cluster
-        if (IsValidAttributeId(mpAttributePath->mValue.mAttributeId))
+        // At this point, the attributeID is NOT a wildcard (i.e. it is fixed).
+        //
+        // For wildcard expansion, we validate that this is a valid attribute for the given
+        // cluster on the given endpoint. If not a wildcard expansion, return it as-is.
+        if (mPosition.mAttributePath->mValue.IsWildcardPath())
         {
-            return mpAttributePath->mValue.mAttributeId;
+            if (!IsValidAttributeId(mPosition.mAttributePath->mValue.mAttributeId))
+            {
+                return std::nullopt;
+            }
         }
-
-        return std::nullopt;
+        return mPosition.mAttributePath->mValue.mAttributeId;
     }
 
-    // advance the existing attribute id if it can be advanced
-    VerifyOrReturnValue(mpAttributePath->mValue.HasWildcardAttributeId(), std::nullopt);
+    // Advance the existing attribute id if it can be advanced.
+    VerifyOrReturnValue(mPosition.mAttributePath->mValue.HasWildcardAttributeId(), std::nullopt);
 
     // Ensure (including ordering) that GlobalAttributesNotInMetadata is reported as needed
     for (unsigned i = 0; i < ArraySize(GlobalAttributesNotInMetadata); i++)
     {
-        if (GlobalAttributesNotInMetadata[i] != mOutputPath.mAttributeId)
+        if (GlobalAttributesNotInMetadata[i] != mPosition.mOutputPath.mAttributeId)
         {
             continue;
         }
@@ -93,11 +160,12 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
             return GlobalAttributesNotInMetadata[nextAttributeIndex];
         }
 
-        // reached the end of global attributes
+        // Reached the end of global attributes. Since global attributes are
+        // reported last, finishing global attributes means everything completed.
         return std::nullopt;
     }
 
-    AttributeEntry entry = mDataModelProvider->NextAttribute(mOutputPath);
+    AttributeEntry entry = mDataModelProvider->NextAttribute(mPosition.mOutputPath);
     if (entry.IsValid())
     {
         return entry.path.mAttributeId;
@@ -111,129 +179,54 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
 std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()
 {
 
-    if (mOutputPath.mClusterId == kInvalidClusterId)
+    if (mPosition.mOutputPath.mClusterId == kInvalidClusterId)
     {
-        if (mpAttributePath->mValue.HasWildcardClusterId())
+        if (mPosition.mAttributePath->mValue.HasWildcardClusterId())
         {
-            ClusterEntry entry = mDataModelProvider->FirstCluster(mOutputPath.mEndpointId);
+            ClusterEntry entry = mDataModelProvider->FirstServerCluster(mPosition.mOutputPath.mEndpointId);
             return entry.IsValid() ? std::make_optional(entry.path.mClusterId) : std::nullopt;
         }
 
-        // only return a cluster if it is valid
-        const ConcreteClusterPath clusterPath(mOutputPath.mEndpointId, mpAttributePath->mValue.mClusterId);
-        if (!mDataModelProvider->GetClusterInfo(clusterPath).has_value())
+        // At this point, the clusterID is NOT a wildcard (i.e. is fixed).
+        //
+        // For wildcard expansion, we validate that this is a valid cluster for the endpoint.
+        // If non-wildcard expansion, we return as-is.
+        if (mPosition.mAttributePath->mValue.IsWildcardPath())
         {
-            return std::nullopt;
+            const ConcreteClusterPath clusterPath(mPosition.mOutputPath.mEndpointId, mPosition.mAttributePath->mValue.mClusterId);
+            if (!mDataModelProvider->GetServerClusterInfo(clusterPath).has_value())
+            {
+                return std::nullopt;
+            }
         }
 
-        return mpAttributePath->mValue.mClusterId;
+        return mPosition.mAttributePath->mValue.mClusterId;
     }
 
-    VerifyOrReturnValue(mpAttributePath->mValue.HasWildcardClusterId(), std::nullopt);
+    VerifyOrReturnValue(mPosition.mAttributePath->mValue.HasWildcardClusterId(), std::nullopt);
 
-    ClusterEntry entry = mDataModelProvider->NextCluster(mOutputPath);
+    ClusterEntry entry = mDataModelProvider->NextServerCluster(mPosition.mOutputPath);
     return entry.IsValid() ? std::make_optional(entry.path.mClusterId) : std::nullopt;
 }
 
 std::optional<ClusterId> AttributePathExpandIterator::NextEndpointId()
 {
-    if (mOutputPath.mEndpointId == kInvalidEndpointId)
+    if (mPosition.mOutputPath.mEndpointId == kInvalidEndpointId)
     {
-        if (mpAttributePath->mValue.HasWildcardEndpointId())
+        if (mPosition.mAttributePath->mValue.HasWildcardEndpointId())
         {
-            EndpointId id = mDataModelProvider->FirstEndpoint();
-            return (id != kInvalidEndpointId) ? std::make_optional(id) : std::nullopt;
+            EndpointEntry ep = mDataModelProvider->FirstEndpoint();
+            return (ep.id != kInvalidEndpointId) ? std::make_optional(ep.id) : std::nullopt;
         }
 
-        return mpAttributePath->mValue.mEndpointId;
+        return mPosition.mAttributePath->mValue.mEndpointId;
     }
 
-    VerifyOrReturnValue(mpAttributePath->mValue.HasWildcardEndpointId(), std::nullopt);
+    // Expand endpoints only if it is a wildcard on the endpoint specifically.
+    VerifyOrReturnValue(mPosition.mAttributePath->mValue.HasWildcardEndpointId(), std::nullopt);
 
-    EndpointId id = mDataModelProvider->NextEndpoint(mOutputPath.mEndpointId);
-    return (id != kInvalidEndpointId) ? std::make_optional(id) : std::nullopt;
-}
-
-void AttributePathExpandIterator::ResetCurrentCluster()
-{
-    // If this is a null iterator, or the attribute id of current cluster info is not a wildcard attribute id, then this function
-    // will do nothing, since we won't be expanding the wildcard attribute ids under a cluster.
-    VerifyOrReturn(mpAttributePath != nullptr && mpAttributePath->mValue.HasWildcardAttributeId());
-
-    // Reset path expansion to ask for the first attribute of the current cluster
-    mOutputPath.mAttributeId = kInvalidAttributeId;
-    mOutputPath.mExpanded    = true; // we know this is a wildcard attribute
-    Next();
-}
-
-bool AttributePathExpandIterator::AdvanceOutputPath()
-{
-    if (!mpAttributePath->mValue.IsWildcardPath())
-    {
-        if (mOutputPath.mEndpointId != kInvalidEndpointId)
-        {
-            return false; // cannot expand non-wildcard path
-        }
-
-        mOutputPath.mEndpointId  = mpAttributePath->mValue.mEndpointId;
-        mOutputPath.mClusterId   = mpAttributePath->mValue.mClusterId;
-        mOutputPath.mAttributeId = mpAttributePath->mValue.mAttributeId;
-        mOutputPath.mExpanded    = false;
-        return true;
-    }
-
-    while (true)
-    {
-        if (mOutputPath.mClusterId != kInvalidClusterId)
-        {
-
-            std::optional<AttributeId> nextAttribute = NextAttributeId();
-            if (nextAttribute.has_value())
-            {
-                mOutputPath.mAttributeId = *nextAttribute;
-                return true;
-            }
-        }
-
-        // no valid attribute, try to advance the cluster, see if a suitable one exists
-        if (mOutputPath.mEndpointId != kInvalidEndpointId)
-        {
-            std::optional<ClusterId> nextCluster = NextClusterId();
-            if (nextCluster.has_value())
-            {
-                mOutputPath.mClusterId   = *nextCluster;
-                mOutputPath.mAttributeId = kInvalidAttributeId; // restarts attributes
-                continue;
-            }
-        }
-
-        // no valid cluster, try advance the endpoint, see if a suitable on exists
-        std::optional<EndpointId> nextEndpoint = NextEndpointId();
-        if (nextEndpoint.has_value())
-        {
-            mOutputPath.mEndpointId = *nextEndpoint;
-            mOutputPath.mClusterId  = kInvalidClusterId; // restarts clusters
-            continue;
-        }
-        return false;
-    }
-}
-
-bool AttributePathExpandIterator::Next()
-{
-    while (mpAttributePath != nullptr)
-    {
-        if (AdvanceOutputPath())
-        {
-            return true;
-        }
-        mpAttributePath       = mpAttributePath->mpNext;
-        mOutputPath           = ConcreteReadAttributePath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId);
-        mOutputPath.mExpanded = true; // this is reset to false on advancement if needed
-    }
-
-    mOutputPath = ConcreteReadAttributePath();
-    return false;
+    EndpointEntry ep = mDataModelProvider->NextEndpoint(mPosition.mOutputPath.mEndpointId);
+    return (ep.id != kInvalidEndpointId) ? std::make_optional(ep.id) : std::nullopt;
 }
 
 } // namespace app

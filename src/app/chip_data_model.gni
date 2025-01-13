@@ -15,8 +15,8 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_codegen.gni")
-import("${chip_root}/src/app/codegen-data-model-provider/model.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/data-model-providers/codegen/model.gni")
 import("${chip_root}/src/platform/python.gni")
 
 _app_root = get_path_info(".", "abspath")
@@ -235,6 +235,10 @@ template("chip_data_model") {
       deps = []
     }
 
+    if (!defined(public_deps)) {
+      public_deps = []
+    }
+
     if (!defined(cflags)) {
       cflags = []
     }
@@ -269,9 +273,12 @@ template("chip_data_model") {
       } else if (cluster == "application-launcher-server") {
         sources += [
           "${_app_root}/app-platform/ContentApp.cpp",
+          "${_app_root}/app-platform/ContentApp.h",
           "${_app_root}/app-platform/ContentAppPlatform.cpp",
+          "${_app_root}/app-platform/ContentAppPlatform.h",
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
         ]
+        deps += [ "${chip_root}/src/controller" ]
       } else if (cluster == "ota-requestor") {
         sources += [
           # TODO - align name of folder ?
@@ -288,6 +295,10 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/OTATestEventTriggerHandler.cpp",
           "${_app_root}/clusters/${cluster}/OTATestEventTriggerHandler.h",
         ]
+
+        # TODO: DefaultOTARequestor depends on controller, however the cluster server itself does not.
+        # Maybe DefaultOTARequestor and related code should have its own source set.
+        deps += [ "${chip_root}/src/controller:interactions" ]
       } else if (cluster == "bindings") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
@@ -446,25 +457,28 @@ template("chip_data_model") {
       }
     }
 
-    if (!defined(public_deps)) {
-      public_deps = []
-    }
+    deps += [ "${chip_root}/src/app:attribute-persistence" ]
 
     public_deps += [
       ":${_data_model_name}_codegen",
       ":${_data_model_name}_zapgen",
       "${chip_root}/src/access",
       "${chip_root}/src/app",
+      "${chip_root}/src/app:attribute-persistence",
       "${chip_root}/src/app/cluster-building-blocks",
       "${chip_root}/src/app/common:attribute-type",
       "${chip_root}/src/app/common:cluster-objects",
       "${chip_root}/src/app/common:enums",
+      "${chip_root}/src/app/server",
       "${chip_root}/src/app/util:types",
       "${chip_root}/src/app/util/persistence",
-      "${chip_root}/src/controller",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",
       "${chip_root}/src/protocols/secure_channel",
+
+      # TODO: Embedded example apps currently build with chip_build_controller = false, and so get a libCHIP without controller support,
+      # but nevertheless expect to have access to some of the "controller" code to implement bindings and related functionality.
+      "${chip_root}/src/controller:interactions",
     ]
     public_deps += codegen_data_model_PUBLIC_DEPS
 

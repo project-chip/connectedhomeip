@@ -46,6 +46,7 @@ void RemoveBridgeCommand::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR err)
                      ChipLogValueX64(deviceId), err.Format());
     }
 
+    admin::PairingManager::Instance().ResetForNextCommand();
     CommandRegistry::Instance().ResetActiveCommand();
 }
 
@@ -66,7 +67,7 @@ CHIP_ERROR RemoveBridgeCommand::RunCommand()
 
     admin::PairingManager::Instance().SetPairingDelegate(this);
 
-    return admin::DeviceManager::Instance().UnpairRemoteFabricBridge();
+    return admin::PairingManager::Instance().UnpairDevice(bridgeNodeId);
 }
 
 } // namespace commands

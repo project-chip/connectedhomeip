@@ -122,6 +122,7 @@ public:
 
     bool SubjectHasActiveSubscription(FabricIndex aFabricIndex, NodeId subject) { return mHasActiveSubscription; };
     bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subject) { return mHasPersistedSubscription; };
+    bool FabricHasAtLeastOneActiveSubscription(FabricIndex aFabricIndex) { return false; };
 
 private:
     bool mHasActiveSubscription    = false;

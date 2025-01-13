@@ -16,7 +16,10 @@
  */
 
 #include "FabricAdmin.h"
+
 #include <AppMain.h>
+#include <CommissionerMain.h>
+#include <app/server/Server.h>
 #include <bridge/include/FabricBridge.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 
@@ -34,15 +37,6 @@ FabricAdmin FabricAdmin::sInstance;
 app::DefaultICDClientStorage FabricAdmin::sICDClientStorage;
 app::CheckInHandler FabricAdmin::sCheckInHandler;
 
-FabricAdmin & FabricAdmin::Instance()
-{
-    if (!sInstance.mInitialized)
-    {
-        VerifyOrDie(sInstance.Init() == CHIP_NO_ERROR);
-    }
-    return sInstance;
-}
-
 CHIP_ERROR FabricAdmin::Init()
 {
     IcdManager::Instance().SetDelegate(&sInstance);
@@ -52,10 +46,11 @@ CHIP_ERROR FabricAdmin::Init()
     auto engine = chip::app::InteractionModelEngine::GetInstance();
     VerifyOrReturnError(engine != nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnLogErrorOnFailure(IcdManager::Instance().Init(&sICDClientStorage, engine));
-    ReturnLogErrorOnFailure(sCheckInHandler.Init(Controller::DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
-                                                 &sICDClientStorage, &IcdManager::Instance(), engine));
 
-    mInitialized = true;
+    ReturnLogErrorOnFailure(sCheckInHandler.Init(&chip::Server::GetInstance().GetExchangeManager(), &sICDClientStorage,
+                                                 &IcdManager::Instance(), engine));
+
+    ReturnLogErrorOnFailure(PairingManager::Instance().Init(GetDeviceCommissioner()));
 
     return CHIP_NO_ERROR;
 }
@@ -115,7 +110,13 @@ FabricAdmin::CommissionRemoteBridge(Controller::CommissioningWindowPasscodeParam
         usleep(kCommissionPrepareTimeMs * 1000);
 
         PairingManager::Instance().SetPairingDelegate(this);
-        DeviceManager::Instance().PairRemoteDevice(mNodeId, code.c_str());
+        err = PairingManager::Instance().PairDeviceWithCode(mNodeId, code.c_str());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified,
+                         "Failed to commission remote bridge device: Node ID " ChipLogFormatX64 " with error: %" CHIP_ERROR_FORMAT,
+                         ChipLogValueX64(mNodeId), err.Format());
+        }
     }
     else
     {

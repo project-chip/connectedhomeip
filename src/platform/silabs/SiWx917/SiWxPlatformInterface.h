@@ -19,6 +19,12 @@
 
 #include <app/icd/server/ICDServerConfig.h>
 
+namespace {
+#ifdef ENABLE_CHIP_SHELL
+bool ps_requirement_added = false;
+#endif // ENABLE_CHIP_SHELL
+} // namespace
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -27,6 +33,7 @@ extern "C" {
 #include "sl_si91x_button.h"
 #include "sl_si91x_button_pin_config.h"
 #include "sl_si91x_driver_gpio.h"
+#include "sl_si91x_power_manager.h"
 
 /**
  * @brief      invoked when button press event is received when in sleep

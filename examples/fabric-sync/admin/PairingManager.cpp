@@ -572,8 +572,10 @@ void PairingManager::InitPairingCommand()
     mDeviceIsICD = false;
 }
 
-CHIP_ERROR PairingManager::PairDeviceWithCode(NodeId nodeId, const char * payload)
+CHIP_ERROR PairingManager::PairDeviceWithCode(NodeId nodeId, const char * payload, bool icdRegistration)
 {
+    mICDRegistration.SetValue(icdRegistration);
+
     if (payload == nullptr || strlen(payload) > kMaxManualCodeLength + 1)
     {
         ChipLogError(NotSpecified, "PairDeviceWithCode failed: Invalid pairing payload");
@@ -636,6 +638,12 @@ CHIP_ERROR PairingManager::PairDevice(chip::NodeId nodeId, uint32_t setupPINCode
 
 CHIP_ERROR PairingManager::UnpairDevice(NodeId nodeId)
 {
+    if (nodeId == kUndefinedNodeId)
+    {
+        ChipLogError(NotSpecified, "node ID is undefined; cannot unpair device.");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     return DeviceLayer::SystemLayer().ScheduleLambda([nodeId]() {
         PairingManager & self = PairingManager::Instance();
 
@@ -655,6 +663,37 @@ CHIP_ERROR PairingManager::UnpairDevice(NodeId nodeId)
             ChipLogError(NotSpecified, "Failed to unpair device, error: %s", ErrorStr(err));
         }
     });
+}
+
+void PairingManager::ResetForNextCommand()
+{
+    mCommissioningWindowDelegate = nullptr;
+    mPairingDelegate             = nullptr;
+    mNodeId                      = chip::kUndefinedNodeId;
+    mVerifier                    = chip::ByteSpan();
+    mSalt                        = chip::ByteSpan();
+    mDiscriminator               = 0;
+    mSetupPINCode                = 0;
+    mDeviceIsICD                 = false;
+
+    memset(mRandomGeneratedICDSymmetricKey, 0, sizeof(mRandomGeneratedICDSymmetricKey));
+    memset(mVerifierBuffer, 0, sizeof(mVerifierBuffer));
+    memset(mSaltBuffer, 0, sizeof(mSaltBuffer));
+    memset(mRemoteIpAddr, 0, sizeof(mRemoteIpAddr));
+    memset(mOnboardingPayload, 0, sizeof(mOnboardingPayload));
+
+    mICDRegistration.ClearValue();
+    mICDCheckInNodeId.ClearValue();
+    mICDClientType.ClearValue();
+    mICDSymmetricKey.ClearValue();
+    mICDMonitoredSubject.ClearValue();
+    mICDStayActiveDurationMsec.ClearValue();
+
+    mWindowOpener.reset();
+    mOnOpenCommissioningWindowCallback.Cancel();
+    mOnOpenCommissioningWindowVerifierCallback.Cancel();
+    mCurrentFabricRemover.reset();
+    mCurrentFabricRemoveCallback.Cancel();
 }
 
 } // namespace admin

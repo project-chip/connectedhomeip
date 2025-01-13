@@ -126,11 +126,13 @@ public:
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apFabricTable    A pointer to the FabricTable object.
      *  @param[in]    apCASESessionMgr An optional pointer to a CASESessionManager (used for re-subscriptions).
+     *  @parma[in]    eventManagement  An optional pointer to a EventManagement. If null, the global instance will be used.
      *
      */
     CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
                     reporting::ReportScheduler * reportScheduler, CASESessionManager * apCASESessionMgr = nullptr,
-                    SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr);
+                    SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr,
+                    EventManagement * eventManagement                             = nullptr);
 
     void Shutdown();
 
@@ -315,6 +317,8 @@ public:
 
     bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subjectID) override;
 
+    bool FabricHasAtLeastOneActiveSubscription(FabricIndex aFabricIndex) override;
+
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     /**
      * @brief Function decrements the number of subscriptions to resume counter - mNumOfSubscriptionsToResume.
@@ -404,10 +408,7 @@ public:
     }
 #endif
 
-    // Temporarily NOT const because the data model provider will be auto-set
-    // to codegen on first usage. This behaviour will be changed once each
-    // application must explicitly set the data model provider.
-    DataModel::Provider * GetDataModelProvider();
+    DataModel::Provider * GetDataModelProvider() const;
 
     // MUST NOT be used while the interaction model engine is running as interaction
     // model functionality (e.g. active reads/writes/subscriptions) rely on data model

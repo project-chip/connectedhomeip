@@ -26,7 +26,6 @@
 extern "C" {
 #endif
 #include <sparkfun_sgp40.h>
-#include <sparkfun_sgp40_i2c.h>
 }
 #include "sl_i2cspm_instances.h"
 #endif // USE_SPARKFUN_AIR_QUALITY_SENSOR

@@ -449,6 +449,14 @@ using namespace chip::Tracing::DarwinFramework;
     for (MTRDevice * device in devices) {
         [device invalidate];
     }
+
+    // Since MTRDevice invalidate may issue asynchronous writes to storage, perform a
+    // block synchronously on the storage delegate queue so the async write operations
+    // get to run, in case the API client tears down the storage backend afterwards.
+    [self.controllerDataStore synchronouslyPerformBlock:^{
+        MTR_LOG("%@ Finished flushing data write operations", self);
+    }];
+
     [self stopBrowseForCommissionables];
 
     [_factory controllerShuttingDown:self];
@@ -1619,12 +1627,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)operationalInstanceAdded:(NSNumber *)nodeID
 {
-    // Don't use deviceForNodeID here, because we don't want to create the
-    // device if it does not already exist.
-    os_unfair_lock_lock(self.deviceMapLock);
-    MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:nodeID];
-    os_unfair_lock_unlock(self.deviceMapLock);
-
+    // If we don't have an existing MTRDevice for this node ID, that's fine;
+    // nothing to do.
+    MTRDevice * device = [self _deviceForNodeID:nodeID createIfNeeded:NO];
     if (device == nil) {
         return;
     }

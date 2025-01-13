@@ -44,7 +44,7 @@ extern "C" {
 #endif // (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #endif // WF200_WIFI
 
-#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
+#include <platform/silabs/wifi/WifiInterface.h>
 #ifdef WF200_WIFI
 #include "sl_wfx.h"
 #endif
@@ -88,16 +88,8 @@ static void low_level_init(struct netif * netif)
     netif->hwaddr_len = ETH_HWADDR_LEN;
 
     /* Set netif MAC hardware address */
-    sl_wfx_mac_address_t mac_addr;
-
-    wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &mac_addr);
-
-    netif->hwaddr[0] = mac_addr.octet[0];
-    netif->hwaddr[1] = mac_addr.octet[1];
-    netif->hwaddr[2] = mac_addr.octet[2];
-    netif->hwaddr[3] = mac_addr.octet[3];
-    netif->hwaddr[4] = mac_addr.octet[4];
-    netif->hwaddr[5] = mac_addr.octet[5];
+    chip::MutableByteSpan byteSpan(netif->hwaddr, ETH_HWADDR_LEN);
+    GetMacAddress(SL_WFX_STA_INTERFACE, byteSpan);
 
     /* Set netif maximum transfer unit */
     netif->mtu = 1500;
@@ -140,7 +132,7 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
     if (!(ip6_addr_ispreferred(netif_ip6_addr_state(netif, 0))) && (memcmp(netif->hwaddr, src_mac, netif->hwaddr_len) == 0) &&
         (memcmp(netif->hwaddr, dst_mac, netif->hwaddr_len) != 0))
     {
-#ifdef WIFI_DEBUG_ENABLED
+#if WIFI_DEBUG_ENABLED
         ChipLogProgress(DeviceLayer,
                         "lwip_input: DROP, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x",
 
@@ -163,7 +155,7 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
             memcpy((uint8_t *) q->payload, (uint8_t *) b + bufferoffset, q->len);
             bufferoffset += q->len;
         }
-#ifdef WIFI_DEBUG_ENABLED
+#if WIFI_DEBUG_ENABLED
         ChipLogProgress(DeviceLayer,
                         "lwip_input: ACCEPT %ld, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x",
                         bufferoffset,
@@ -255,7 +247,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     int i  = 0;
     result = SL_STATUS_FAIL;
 
-#ifdef WIFI_DEBUG_ENABLED
+#if WIFI_DEBUG_ENABLED
     ChipLogProgress(DeviceLayer, "WF200: Out %d", (int) framelength);
 #endif
 
@@ -302,7 +294,7 @@ void sl_wfx_host_received_frame_callback(sl_wfx_received_ind_t * rx_buffer)
             len    = rx_buffer->body.frame_length;
             buffer = (uint8_t *) &(rx_buffer->body.frame[rx_buffer->body.frame_padding]);
 
-#ifdef WIFI_DEBUG_ENABLED
+#if WIFI_DEBUG_ENABLED
             ChipLogProgress(DeviceLayer, "WF200: In %d", (int) len);
 #endif
 
@@ -310,14 +302,14 @@ void sl_wfx_host_received_frame_callback(sl_wfx_received_ind_t * rx_buffer)
         }
         else
         {
-#ifdef WIFI_DEBUG_ENABLED
+#if WIFI_DEBUG_ENABLED
             ChipLogProgress(DeviceLayer, "WF200: NO-INTF");
 #endif
         }
     }
     else
     {
-#ifdef WIFI_DEBUG_ENABLED
+#if WIFI_DEBUG_ENABLED
         ChipLogProgress(DeviceLayer, "WF200: Invalid frame IN");
 #endif
     }
@@ -354,7 +346,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     struct pbuf * q;
     uint16_t framelength = 0;
     uint16_t datalength  = 0;
-#ifdef WIFI_DEBUG_ENABLED
+#if WIFI_DEBUG_ENABLED
     ChipLogProgress(DeviceLayer, "LWIP : low_level_output");
 #endif
     if (xSemaphoreTake(ethout_sem, portMAX_DELAY) != pdTRUE)
@@ -370,7 +362,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     {
         framelength = LWIP_FRAME_ALIGNMENT;
     }
-#ifdef WIFI_DEBUG_ENABLED
+#if WIFI_DEBUG_ENABLED
     ChipLogProgress(DeviceLayer, "EN-RSI: Output");
 #endif
     if ((netif->flags & (NETIF_FLAG_LINK_UP | NETIF_FLAG_UP)) != (NETIF_FLAG_LINK_UP | NETIF_FLAG_UP))
@@ -387,7 +379,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
         return ERR_IF;
     }
 
-#ifdef WIFI_DEBUG_ENABLED
+#if WIFI_DEBUG_ENABLED
     uint8_t * b = (uint8_t *) p->payload;
     ChipLogProgress(DeviceLayer, "EN-RSI: Out [%02x:%02x:%02x:%02x:%02x:%02x][%02x:%02x:%02x:%02x:%02x:%02x]type=%02x%02x", b[0],
                     b[1], b[2], b[3], b[4], b[5], b[6], b[7], b[8], b[9], b[10], b[11], b[12], b[13]);
@@ -403,7 +395,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
         /* Add junk data to the end for frame alignment if framelength is less than 60 */
         wfx_rsi_pkt_add_data(packet, (uint8_t *) (p->payload), LWIP_FRAME_ALIGNMENT - datalength, datalength);
     }
-#ifdef WIFI_DEBUG_ENABLED
+#if WIFI_DEBUG_ENABLED
     ChipLogProgress(DeviceLayer, "EN-RSI: Sending %d", framelength);
 #endif
 
@@ -417,7 +409,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
         return ERR_IF;
     }
 
-#ifdef WIFI_DEBUG_ENABLED
+#if WIFI_DEBUG_ENABLED
     ChipLogProgress(DeviceLayer, "EN-RSI:Xmit %d", framelength);
 #endif
     xSemaphoreGive(ethout_sem);
