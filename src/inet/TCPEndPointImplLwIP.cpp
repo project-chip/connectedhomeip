@@ -39,6 +39,11 @@
 
 static_assert(LWIP_VERSION_MAJOR > 1, "CHIP requires LwIP 2.0 or later");
 
+static_assert(!CHIP_SYSTEM_CONFIG_NO_LOCKING,
+              "CHIP_SYSTEM_CONFIG_NO_LOCKING not supported along with using LwIP for TCP, because handling incoming connection "
+              "attempts needs to be done synchronously in LwIP, but part of the work for it needs to happen in the Matter context. "
+              " If support for this configuration is needed, this part needs to be figured out.");
+
 namespace chip {
 namespace Inet {
 
@@ -805,14 +810,8 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
         if (err == CHIP_NO_ERROR)
         {
             TCPEndPoint * connectEndPoint = nullptr;
-#if CHIP_SYSTEM_CONFIG_NO_LOCKING
-            // TODO This should be in Matter context but we cannot use SystemLayer.ScheduleLambda() here as the allocated endpoint
-            // will be used in the following.
-            err = listenEP->GetEndPointManager().NewEndPoint(&connectEndPoint);
-#else
             err = lSystemLayer.RunWithMatterContextLock(
                 [&listenEP, &connectEndPoint]() { return listenEP->GetEndPointManager().NewEndPoint(&connectEndPoint); });
-#endif
             conEP = static_cast<TCPEndPointImplLwIP *>(connectEndPoint);
         }
 

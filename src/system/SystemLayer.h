@@ -227,7 +227,7 @@ public:
      *
      * CRITICAL: The function should be non-blocking to avoid dead lock.
      *
-     * @param[in] nonBlockingFunc The non-blocking function to be called with Matter stack lock
+     * @param[in] nonBlockingFunc The non-blocking function to be called with Matter stack lock held.
      *
      * @retval The return value of the non-blocking function
      */
