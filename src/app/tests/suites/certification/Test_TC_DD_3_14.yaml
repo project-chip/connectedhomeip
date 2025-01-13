@@ -138,7 +138,7 @@ tests:
 
           Confirm that the DUT discovers the TH device over the OnNetwork capability (and not BLE).
 
-         Check the logs on the DUT to verify that the commissioning process is proceeding over OnNetwork. The expected log should reflect discovery via DNS-SD (Domain Name System Service Discovery) rather than BLE and After successful discovery, the commissioning process should proceed, and you should see a success message confirming that the device was successfully commissioned over OnNetwork.
+          Check the logs on the DUT to verify that the commissioning process is proceeding over OnNetwork. The expected log should reflect discovery via DNS-SD (Domain Name System Service Discovery) rather than BLE and After successful discovery, the commissioning process should proceed, and you should see a success message confirming that the device was successfully commissioned over OnNetwork.
 
           [1657235905214] [31706:16841970] CHIP: [CTL] Discovered device to be commissioned over DNS-SD
           [1657235906071] [31706:16841969] CHIP: [TOO] Device commissioning completed with success      

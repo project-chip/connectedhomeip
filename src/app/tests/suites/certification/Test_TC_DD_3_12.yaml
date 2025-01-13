@@ -167,7 +167,7 @@ tests:
       PICS: MCORE.DD.DISCOVERY_PAF
       verification: |
           WIFI - PAF feature is out of scope for V1.4
-         [Verification command to be filled by NXP]
+          [Verification command to be filled by NXP]
           $ sudo ./chip-tool pairing code-wifi 1 n_m_2g nxp12345 MT:-24J0IJ910KA0648G00
       disabled: true
 
