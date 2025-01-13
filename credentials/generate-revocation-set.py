@@ -226,12 +226,13 @@ def generate_revocation_set_from_crl(crl_file: x509.CertificateRevocationList,
 
     for revoked_cert in crl_file:
         try:
-            revoked_cert_issuer = revoked_cert.extensions.get_extension_for_oid(
-                x509.CRLEntryExtensionOID.CERTIFICATE_ISSUER).value.get_values_for_type(x509.DirectoryName).value
+            cert_issuer_entry_ext = revoked_cert.extensions.get_extension_for_oid(x509.CRLEntryExtensionOID.CERTIFICATE_ISSUER)
+            revoked_cert_issuer = cert_issuer_entry_ext.value.get_values_for_type(x509.DirectoryName)[0].public_bytes()
+            revoked_cert_issuer_b64 = base64.b64encode(revoked_cert_issuer).decode('utf-8')
 
-            if revoked_cert_issuer is not None:
+            if revoked_cert_issuer_b64 is not None:
                 # check if this really are the same thing
-                if revoked_cert_issuer != certificate_authority_name_b64:
+                if revoked_cert_issuer_b64 != certificate_authority_name_b64:
                     logging.warning("CRL Issuer is not CRL File Issuer, continue...")
                     continue
         except Exception:
@@ -440,7 +441,11 @@ class DCLDClient:
         return response["pkiRevocationDistributionPointsByIssuerSubjectKeyID"]["points"]
 
 
-@click.command()
+@click.group()
+def cli():
+    pass
+
+@cli.command('from-dcl')
 @click.help_option('-h', '--help')
 @optgroup.group('Input data sources', cls=RequiredMutuallyExclusiveOptionGroup)
 @optgroup.option('--use-main-net-dcld', type=str, default='', metavar='PATH', help="Location of `dcld` binary, to use `dcld` for mirroring MainNet.")
@@ -453,8 +458,8 @@ class DCLDClient:
 @optgroup.option('--log-level', default='INFO', show_default=True, type=click.Choice(__LOG_LEVELS__.keys(),
                                                                                      case_sensitive=False), callback=lambda c, p, v: __LOG_LEVELS__[v],
                  help='Determines the verbosity of script output')
-def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool, use_test_net_http: bool, output: str, log_level: str):
-    """Tool to construct revocation set from DCL"""
+def from_dcl(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_http, output, log_level):
+    """Generate revocation set from DCL"""
     logging.basicConfig(
         level=log_level,
         format='%(asctime)s %(name)s %(levelname)-7s %(message)s',
@@ -576,9 +581,26 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
     with open(output, 'w+') as outfile:
         json.dump(revocation_set, outfile, indent=4)
 
+@cli.command('from-crl')
+@click.option('--crl', required=True, type=click.File('rb'), help='Path to the CRL file')
+@click.option('--crl-signer', required=True, type=click.File('rb'), help='Path to the signer certificate')
+@click.option('--delegator', type=click.File('rb'), help='Path to the delegator certificate (optional)')
+@click.option('--paa', type=click.File('rb'), help='Path to the PAA certificate (optional)')
+@click.option('--output', default='revocation_set.json', type=click.File('w'), help='Output filename (default: revocation_set.json)')
+@click.option('--is-paa', default=False, is_flag=True, help='Indicates if the CRL issuer is the PAA')
+def from_crl(crl, crl_signer, delegator, paa, output, is_paa):
+    """Generate revocation set from a single CRL file"""
+    crl = x509.load_pem_x509_crl(crl.read())
+    crl_signer = x509.load_pem_x509_certificate(crl_signer.read())
+    delegator = x509.load_pem_x509_certificate(delegator.read()) if delegator else None
+    paa = x509.load_pem_x509_certificate(paa.read()) if paa else None
+
+    ca_name_b64, ca_akid_hex = get_certificate_authority_details(crl_signer, delegator, paa, is_paa)
+    revocation_set = generate_revocation_set_from_crl(crl, crl_signer, ca_name_b64, ca_akid_hex, delegator)
+    output.write(json.dumps([revocation_set], indent=4))
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
-        main.main(['--help'])
+        cli.main(['--help'])
     else:
-        main()
+        cli()
