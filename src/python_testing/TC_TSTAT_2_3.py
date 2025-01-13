@@ -52,7 +52,7 @@ logger = logging.getLogger(__name__)
 cluster = Clusters.Thermostat
 
 
-class TC_TSTAT_4_2(MatterBaseTest):
+class TC_TSTAT_2_3(MatterBaseTest):
 
     def check_atomic_response(self, response: object, expected_status: Status = Status.Success,
                               expected_overall_status: Status = Status.Success,
@@ -201,15 +201,15 @@ class TC_TSTAT_4_2(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
-    def desc_TC_TSTAT_4_2(self) -> str:
+    def desc_TC_TSTAT_2_3(self) -> str:
         """Returns a description of this test"""
-        return "3.2.4 [TC-TSTAT-4-2] Preset write and command attributes test case with server as DUT"
+        return "3.2.4 [TC-TSTAT-2-3] Test cases to read/write attributes and invoke commands for Preset feature with server as DUT"
 
-    def pics_TC_TSTAT_4_2(self):
+    def pics_TC_TSTAT_2_3(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
         return ["TSTAT.S"]
 
-    def steps_TC_TSTAT_4_2(self) -> list[TestStep]:
+    def steps_TC_TSTAT_2_3(self) -> list[TestStep]:
         steps = [
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
@@ -252,7 +252,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
         return steps
 
     @ async_test_body
-    async def test_TC_TSTAT_4_2(self):
+    async def test_TC_TSTAT_2_3(self):
         endpoint = self.get_endpoint()
 
         self.step("1")
