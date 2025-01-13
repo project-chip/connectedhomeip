@@ -256,7 +256,7 @@ bool WiFiPAFLayer::OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::Pac
 {
     WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(&RxInfo));
     VerifyOrReturnError(endPoint != nullptr, false, ChipLogDetail(WiFiPAF, "No endpoint for received indication"));
-
+    RxInfo.role    = endPoint->mSessionInfo.role;
     CHIP_ERROR err = endPoint->Receive(std::move(msg));
     VerifyOrReturnError(err == CHIP_NO_ERROR, false,
                         ChipLogError(WiFiPAF, "Receive failed, err = %" CHIP_ERROR_FORMAT, err.Format()));
