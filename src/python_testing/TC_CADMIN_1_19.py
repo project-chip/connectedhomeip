@@ -124,7 +124,7 @@ class TC_CADMIN_1_19(MatterBaseTest):
 
         self.step(5)
         # TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster
-        current_fabrics = await self.read_single_attribute_check_success(dev_ctrl=self.th1, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.SupportedFabrics)
+        current_fabrics = await self.read_single_attribute_check_success(dev_ctrl=self.th1, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.CommissionedFabrics)
         asserts.assert_equal(current_fabrics, max_fabrics, "Expected number of fabrics not correct")
 
         self.step(6)
