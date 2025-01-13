@@ -193,13 +193,13 @@ else
                 fi
                 if [ "$2" = "rs9116" ]; then
                     optArgs+="use_rs9116=true "
-                    NCP_DIR_SUFFIX="/rs9116"
+                    NCP_DIR_SUFFIX="/"$2
                 elif [ "$2" = "SiWx917" ]; then
                     optArgs+="use_SiWx917=true "
-                    NCP_DIR_SUFFIX="/SiWx917"
+                    NCP_DIR_SUFFIX="/"$2
                 elif [ "$2" = "wf200" ]; then
                     optArgs+="use_wf200=true "
-                    NCP_DIR_SUFFIX="/wf200"
+                    NCP_DIR_SUFFIX="/"$2
                 else
                     echo "Wifi usage: --wifi rs9116|SiWx917|wf200"
                     exit 1
