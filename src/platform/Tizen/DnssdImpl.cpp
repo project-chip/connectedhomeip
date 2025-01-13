@@ -374,8 +374,6 @@ CHIP_ERROR ResolveAsync(chip::Dnssd::ResolveContext * rCtx)
 {
     int ret;
 
-    assertChipStackLockedByCurrentThread();
-
     ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
 
     if (rCtx->mInterfaceId == 0)
