@@ -214,6 +214,11 @@ void WiFiPAFEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, CHIP_ERROR 
     // Ensure transmit queue is empty and set to NULL.
     mSendQueue = nullptr;
 
+    // Clear the session information
+    ChipLogProgress(WiFiPAF, "Shutdown PAF session (%u, %u)", mSessionInfo.id, mSessionInfo.role);
+    mWiFiPafLayer->mWiFiPAFTransport->WiFiPAFCloseSession(mSessionInfo);
+    memset(&mSessionInfo, 0, sizeof(mSessionInfo));
+
     // Fire application's close callback if we haven't already, and it's not suppressed.
     if (oldState != kState_Closing && (flags & kWiFiPAFCloseFlag_SuppressCallback) == 0)
     {
