@@ -84,12 +84,12 @@ CHIP_ERROR FetchAcceptedCommands(const ConcreteClusterPath & path, const EmberAf
 
         if (err == CHIP_NO_ERROR)
         {
-            typedef struct
+            using EnumerationData = struct
             {
                 ConcreteCommandPath commandPath;
                 DataModel::MetadataList<DataModel::AcceptedCommandEntry> acceptedCommandList;
                 CHIP_ERROR processingError;
-            } EnumerationData;
+            };
 
             EnumerationData enumerationData;
             enumerationData.commandPath     = ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId);
@@ -170,11 +170,11 @@ CHIP_ERROR FetchGeneratedCommands(const ConcreteClusterPath & path, const EmberA
         {
             ReturnErrorOnFailure(result.reserve(commandCount));
 
-            typedef struct
+            using EnumerationData = struct
             {
                 DataModel::MetadataList<CommandId> generatedCommandList;
                 CHIP_ERROR processingError;
-            } EnumerationData;
+            };
             EnumerationData enumerationData;
             enumerationData.processingError = CHIP_NO_ERROR;
 
