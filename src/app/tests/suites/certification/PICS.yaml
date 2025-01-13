@@ -6498,10 +6498,13 @@ PICS:
     - label: "Does the device implement the NumberOfSchedules attribute?"
       id: TSTAT.S.A004b
 
-    - label: "Does the device implement the NumberOfScheduleTransitions attribute?"
+    - label:
+          "Does the device implement the NumberOfScheduleTransitions attribute?"
       id: TSTAT.S.A004c
 
-    - label: "Does the device implement the NumberOfScheduleTransitionPerDay attribute?"
+    - label:
+          "Does the device implement the NumberOfScheduleTransitionPerDay
+          attribute?"
       id: TSTAT.S.A004d
 
     - label: "Does the device implement the ActivePresetHandle attribute?"

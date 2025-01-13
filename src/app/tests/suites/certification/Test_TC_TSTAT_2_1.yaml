@@ -763,7 +763,9 @@ tests:
           constraints:
               type: int8u
 
-    - label: "Step 56: TH reads the NumberOfScheduleTransitions attribute from the DUT"
+    - label:
+          "Step 56: TH reads the NumberOfScheduleTransitions attribute from the
+          DUT"
       PICS: TSTAT.S.F07 && TSTAT.S.A004c
       command: "readAttribute"
       attribute: "NumberOfScheduleTransitions"
@@ -771,7 +773,9 @@ tests:
           constraints:
               type: int8u
 
-    - label: "Step 57: TH reads the NumberOfScheduleTransitionPerDay attribute from the DUT"
+    - label:
+          "Step 57: TH reads the NumberOfScheduleTransitionPerDay attribute from
+          the DUT"
       PICS: TSTAT.S.F07 && TSTAT.S.A004d
       command: "readAttribute"
       attribute: "NumberOfScheduleTransitionPerDay"
@@ -811,7 +815,9 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 62: TH reads the SetpointHoldExpiryTimestamp attribute from the DUT"
+    - label:
+          "Step 62: TH reads the SetpointHoldExpiryTimestamp attribute from the
+          DUT"
       PICS: TSTAT.S.A0052
       command: "readAttribute"
       attribute: "SetpointHoldExpiryTimestamp"
