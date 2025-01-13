@@ -191,7 +191,7 @@ else
                     echo "--wifi requires rs9116 or SiWx917 or wf200"
                     exit 1
                 fi
-                
+
                 if [ "$2" = "rs9116" ]; then
                     optArgs+="use_rs9116=true "
                 elif [ "$2" = "SiWx917" ]; then
