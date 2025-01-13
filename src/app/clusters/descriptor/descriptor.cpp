@@ -15,10 +15,7 @@
  *    limitations under the License.
  */
 
-/****************************************************************************
- * @file
- * @brief Implementation for the Descriptor Server Cluster
- ***************************************************************************/
+#include "descriptor.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -31,10 +28,8 @@
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-
-#include "descriptor.h"
-#include "lib/core/CHIPError.h"
-#include "lib/core/DataModelTypes.h"
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 
 using namespace chip;
 using namespace chip::app;
