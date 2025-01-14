@@ -1022,7 +1022,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverClientClusters)
     // mock endpoint 1 has 2 mock client clusters: 3 and 4
     auto clientClusters = model.ClientClusters(kMockEndpoint1);
 
-    const ClusterId kExpectedClusters1[] = { MockClusterId(3),  MockClusterId(4)};
+    const ClusterId kExpectedClusters1[] = { MockClusterId(3), MockClusterId(4) };
     ASSERT_TRUE(clientClusters.GetSpanValidForLifetime().data_equal(Span<const ClusterId>(kExpectedClusters1)));
 
     // mock endpoint 2 has 1 mock client clusters: 3(has server side at the same time) and 4
