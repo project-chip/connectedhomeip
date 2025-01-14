@@ -55,7 +55,6 @@ declare_args() {
   module_type = "BL704L"
   baudrate = 2000000
 
-  config_cache_size = 8192
   enable_psram = true
 }
 
@@ -69,7 +68,7 @@ bl_iot_sdk("sdk") {
     "${chip_root}/src/platform/bouffalolab/common",
   ]
 
-  freertos_config = "${examples_plat_dir}/bl702l/FreeRTOSConfig.h"
+  freertos_config = "${example_dir}/bl702l/FreeRTOSConfig.h"
 
   defines = [
     "INCLUDE_xSemaphoreGetMutexHolder=1",
@@ -123,7 +122,7 @@ bouffalolab_executable("lighting_app") {
   }
 
   if ("BL704LDK" == board) {
-    defines += [ "XT_ZB6_DevKit" ]
+    defines += [ "BL704LDK" ]
   }
 
   sources = [
@@ -256,7 +255,7 @@ bouffalolab_executable("lighting_app") {
 
   if (enable_psram) {
     defines += [ "CFG_USE_PSRAM=1" ]
-    ldscript = "${examples_plat_dir}/bl702l/ldscripts/psram_flash_rom.ld"
+    ldscript = "${examples_plat_dir}/bl702l/ldscripts/psram_flash.ld"
   } else {
     ldscript = "${examples_plat_dir}/bl702l/ldscripts/flash_rom.ld"
   }
@@ -272,7 +271,6 @@ bouffalolab_executable("lighting_app") {
   if (chip_print_memory_usage) {
     ldflags += [
       "-Wl,--print-memory-usage",
-      "-Wl,--defsym=__CACHE_SIZE=${config_cache_size}",
       "-fstack-usage",
     ]
   }

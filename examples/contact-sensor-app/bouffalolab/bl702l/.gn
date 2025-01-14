@@ -12,23 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
-import("${chip_root}/config/standalone/args.gni")
-import("${chip_root}/src/platform/bouffalolab/BL702L/args.gni")
+import("//build_overrides/build.gni")
 
-bl_iot_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+# The location of the build configuration file.
+buildconfig = "${build_root}/config/BUILDCONFIG.gn"
 
-pw_log_BACKEND = "${chip_root}/src/pw_backends/log"
-pw_assert_BACKEND = "${chip_root}/src/pw_backends/assert"
-pw_rpc_CONFIG = "$dir_pw_rpc:disable_global_mutex"
+# CHIP uses angle bracket includes.
+check_system_includes = true
 
-chip_detail_logging = false
+default_args = {
+  target_cpu = "riscv"
+  target_os = "freertos"
 
-# use -Os instead of -Og
-is_debug = false
-
-pw_build_LINK_DEPS = [
-  "$dir_pw_assert:impl",
-  "$dir_pw_log:impl",
-]
+  import("//args.gni")
+}
