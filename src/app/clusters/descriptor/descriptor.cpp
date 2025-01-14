@@ -205,12 +205,10 @@ CHIP_ERROR DescriptorAttrAccess::ReadClientServerAttribute(EndpointId endpoint, 
         }
         else
         {
-            ConcreteClusterPath clusterPath =
-                InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstClientCluster(endpoint);
-            while (clusterPath.HasValidIds())
+            auto clusters = InteractionModelEngine::GetInstance()->GetDataModelProvider()->ClientClusters(endpoint);
+            for (auto & id : clusters.GetSpanValidForLifetime())
             {
-                ReturnErrorOnFailure(encoder.Encode(clusterPath.mClusterId));
-                clusterPath = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextClientCluster(clusterPath);
+                ReturnErrorOnFailure(encoder.Encode(id));
             }
         }
 

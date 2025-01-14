@@ -1016,53 +1016,20 @@ TEST_F(TestCodegenModelViaMocks, IterateOverClientClusters)
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
-    EXPECT_FALSE(model.FirstClientCluster(kEndpointIdThatIsMissing).HasValidIds());
-    EXPECT_FALSE(model.FirstClientCluster(kInvalidEndpointId).HasValidIds());
-    EXPECT_FALSE(model.NextClientCluster(ConcreteClusterPath(kInvalidEndpointId, 123)).HasValidIds());
-    EXPECT_FALSE(model.NextClientCluster(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).HasValidIds());
-    EXPECT_FALSE(model.NextClientCluster(ConcreteClusterPath(kMockEndpoint1, 981u)).HasValidIds());
+    EXPECT_TRUE(model.ClientClusters(kEndpointIdThatIsMissing).empty());
+    EXPECT_TRUE(model.ClientClusters(kInvalidEndpointId).empty());
 
     // mock endpoint 1 has 2 mock client clusters: 3 and 4
-    ConcreteClusterPath path = model.FirstClientCluster(kMockEndpoint1);
-    ASSERT_TRUE(path.HasValidIds());
-    EXPECT_EQ(path.mEndpointId, kMockEndpoint1);
-    EXPECT_EQ(path.mClusterId, MockClusterId(3));
+    auto clientClusters = model.ClientClusters(kMockEndpoint1);
 
-    path = model.NextClientCluster(path);
-    ASSERT_TRUE(path.HasValidIds());
-    EXPECT_EQ(path.mEndpointId, kMockEndpoint1);
-    EXPECT_EQ(path.mClusterId, MockClusterId(4));
-
-    path = model.NextClientCluster(path);
-    EXPECT_FALSE(path.HasValidIds());
+    const ClusterId kExpectedClusters1[] = { MockClusterId(3),  MockClusterId(4)};
+    ASSERT_TRUE(clientClusters.GetSpanValidForLifetime().data_equal(Span<const ClusterId>(kExpectedClusters1)));
 
     // mock endpoint 2 has 1 mock client clusters: 3(has server side at the same time) and 4
-    path = model.FirstClientCluster(kMockEndpoint2);
-    for (uint16_t clusterId = 3; clusterId <= 4; clusterId++)
-    {
-        ASSERT_TRUE(path.HasValidIds());
-        EXPECT_EQ(path.mEndpointId, kMockEndpoint2);
-        EXPECT_EQ(path.mClusterId, MockClusterId(clusterId));
-        path = model.NextClientCluster(path);
-    }
-    EXPECT_FALSE(path.HasValidIds());
+    clientClusters = model.ClientClusters(kMockEndpoint2);
 
-    // repeat calls should work
-    for (int i = 0; i < 10; i++)
-    {
-        path = model.FirstClientCluster(kMockEndpoint1);
-        ASSERT_TRUE(path.HasValidIds());
-        EXPECT_EQ(path.mEndpointId, kMockEndpoint1);
-        EXPECT_EQ(path.mClusterId, MockClusterId(3));
-    }
-
-    for (int i = 0; i < 10; i++)
-    {
-        ConcreteClusterPath nextPath = model.NextClientCluster(path);
-        ASSERT_TRUE(nextPath.HasValidIds());
-        EXPECT_EQ(nextPath.mEndpointId, kMockEndpoint1);
-        EXPECT_EQ(nextPath.mClusterId, MockClusterId(4));
-    }
+    const ClusterId kExpectedClusters2[] = { MockClusterId(3), MockClusterId(4) };
+    ASSERT_TRUE(clientClusters.GetSpanValidForLifetime().data_equal(Span<const ClusterId>(kExpectedClusters2)));
 }
 
 TEST_F(TestCodegenModelViaMocks, IterateOverAttributes)

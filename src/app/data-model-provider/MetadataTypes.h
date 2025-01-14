@@ -171,12 +171,6 @@ public:
     virtual ClusterEntry NextServerCluster(const ConcreteClusterPath & before)                = 0;
     virtual std::optional<ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) = 0;
 
-    // This iteration will list all client clusters on a given endpoint
-    // As the client cluster is only a client without any attributes/commands,
-    // these functions only return the cluster path.
-    virtual ConcreteClusterPath FirstClientCluster(EndpointId endpoint)               = 0;
-    virtual ConcreteClusterPath NextClientCluster(const ConcreteClusterPath & before) = 0;
-
     // Attribute iteration and accessors provide cluster-level access over
     // attributes
     virtual AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster)                = 0;
@@ -194,7 +188,7 @@ public:
     virtual MetadataList<AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) = 0;
     virtual MetadataList<SemanticTag> SemanticTags(EndpointId endpointId)                         = 0;
     virtual MetadataList<DeviceTypeEntry> DeviceTypes(EndpointId endpointId)                      = 0;
-    virtual MetadataList<ClusterId> ClientClusters(EndpointId endpointId) = 0;
+    virtual MetadataList<ClusterId> ClientClusters(EndpointId endpointId)                         = 0;
 
     /// Workaround function to report attribute change.
     ///

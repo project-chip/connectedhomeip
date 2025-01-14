@@ -297,23 +297,6 @@ DataModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, const Emb
     return DataModel::ClusterEntry::kInvalid;
 }
 
-ClusterId FirstClientClusterId(const EmberAfEndpointType * endpoint, unsigned start_index, unsigned & found_index)
-{
-    for (unsigned cluster_idx = start_index; cluster_idx < endpoint->clusterCount; cluster_idx++)
-    {
-        const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
-        if (!cluster.IsClient())
-        {
-            continue;
-        }
-
-        found_index = cluster_idx;
-        return cluster.clusterId;
-    }
-
-    return kInvalidClusterId;
-}
-
 /// Load the attribute information into the specified destination
 ///
 /// `info` is assumed to be default-constructed/clear (i.e. this sets flags, but does not reset them).
@@ -675,7 +658,7 @@ DataModel::MetadataList<ClusterId> CodegenDataModelProvider::ClientClusters(Endp
 
     for (const EmberAfCluster * cluster = begin; cluster != end; cluster++)
     {
-        if (cluster->IsClient())
+        if (!cluster->IsClient())
         {
             continue;
         }
@@ -691,35 +674,6 @@ DataModel::MetadataList<ClusterId> CodegenDataModelProvider::ClientClusters(Endp
     }
 
     return result;
-}
-
-ConcreteClusterPath CodegenDataModelProvider::FirstClientCluster(EndpointId endpointId)
-{
-    const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);
-    VerifyOrReturnValue(endpoint != nullptr, ConcreteClusterPath(endpointId, kInvalidClusterId));
-    VerifyOrReturnValue(endpoint->clusterCount > 0, ConcreteClusterPath(endpointId, kInvalidClusterId));
-    VerifyOrReturnValue(endpoint->cluster != nullptr, ConcreteClusterPath(endpointId, kInvalidClusterId));
-
-    return ConcreteClusterPath(endpointId, FirstClientClusterId(endpoint, 0, mClientClusterIterationHint));
-}
-
-ConcreteClusterPath CodegenDataModelProvider::NextClientCluster(const ConcreteClusterPath & before)
-{
-    // TODO: This search still seems slow (ember will loop). Should use index hints as long
-    //       as ember API supports it
-    const EmberAfEndpointType * endpoint = emberAfFindEndpointType(before.mEndpointId);
-
-    VerifyOrReturnValue(endpoint != nullptr, ConcreteClusterPath(before.mEndpointId, kInvalidClusterId));
-    VerifyOrReturnValue(endpoint->clusterCount > 0, ConcreteClusterPath(before.mEndpointId, kInvalidClusterId));
-    VerifyOrReturnValue(endpoint->cluster != nullptr, ConcreteClusterPath(before.mEndpointId, kInvalidClusterId));
-
-    std::optional<unsigned> cluster_idx = TryFindClusterIndex(endpoint, before.mClusterId, ClusterSide::kClient);
-    if (!cluster_idx.has_value())
-    {
-        return ConcreteClusterPath(before.mEndpointId, kInvalidClusterId);
-    }
-
-    return ConcreteClusterPath(before.mEndpointId, FirstClientClusterId(endpoint, *cluster_idx + 1, mClientClusterIterationHint));
 }
 
 DataModel::AttributeEntry CodegenDataModelProvider::FirstAttribute(const ConcreteClusterPath & path)
