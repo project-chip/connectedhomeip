@@ -52,7 +52,8 @@ class TC_G_2_2(MatterBaseTest):
         return [TestStep(1, "Comissioning, already done", is_commissioning=True),
                 TestStep(2, "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT on EP0 using a key that is pre-installed on the TH. GroupKeySet fields are as follows:"),
                 TestStep(3, "TH writes the GroupKeyMap attribute in the GroupKeyManagement cluster on EP0 with maxgroups entries binding GroupId(0x0001 to (maxgroups)) with GroupKeySetID 1"),
-                TestStep(4, "TH cleans up the groups by sending the RemoveAllGroups command to the DUT")]
+                TestStep(4, "TH cleans up the groups by sending the RemoveAllGroups command to the DUT"),
+                TestStep(5, "TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the following fields: ")]
 
     @async_test_body
     async def test_TC_G_2_2(self):
@@ -90,8 +91,11 @@ class TC_G_2_2(MatterBaseTest):
         cmd = Clusters.Groups.Commands.RemoveAllGroups()
         print("matter_test_config: ", self.matter_test_config.endpoint)
         await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.RemoveAllGroups())
-        #await asyncio.sleep(20)
-        #print("RemoveAllGroups step: ", resp)
+
+        self.step(5)
+        cmd = Clusters.Groups.Commands.AddGroup(kGroup1, "Gp1")
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroup1, "Gp1"))
+        asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0001 failed")
 
 if __name__ == "__main__":
     default_matter_test_main()
