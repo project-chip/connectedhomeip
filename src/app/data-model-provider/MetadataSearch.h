@@ -17,6 +17,7 @@
  */
 #pragma once
 
+#include "app/ConcreteAttributePath.h"
 #include "app/ConcreteClusterPath.h"
 #include "lib/core/DataModelTypes.h"
 #include "lib/support/CodeUtils.h"
@@ -50,9 +51,8 @@ public:
 
         auto serverClustersSpan = mClusterEntries.GetSpanValidForLifetime();
 
-        auto pos =
-            std::find_if(serverClustersSpan.begin(), serverClustersSpan.end(),
-                         [&path](const DataModel::ServerClusterEntry & cluster) { return cluster.clusterId == path.mClusterId; });
+        auto pos = std::find_if(serverClustersSpan.begin(), serverClustersSpan.end(),
+                                [&path](const ServerClusterEntry & cluster) { return cluster.clusterId == path.mClusterId; });
         VerifyOrReturnValue(pos != serverClustersSpan.end(), std::nullopt);
 
         return *pos;
@@ -62,6 +62,39 @@ private:
     ProviderMetadataTree * mProvider;
     EndpointId mEndpointId = kInvalidEndpointId;
     MetadataList<ServerClusterEntry> mClusterEntries;
+};
+
+/// Helps search for a specific server attribute in the given
+/// metadata provider.
+///
+/// Facilitates the very common operation of "find a cluster with a given ID".
+class AttributeFinder
+{
+public:
+    AttributeFinder(ProviderMetadataTree * provider) : mProvider(provider), mClusterPath(kInvalidEndpointId, kInvalidClusterId) {}
+
+    std::optional<AttributeEntry2> Find(const ConcreteAttributePath & path)
+    {
+        VerifyOrReturnValue(mProvider != nullptr, std::nullopt);
+
+        if (mClusterPath != path)
+        {
+            mAttributes = mProvider->Attributes(path);
+        }
+
+        auto serverClustersSpan = mAttributes.GetSpanValidForLifetime();
+
+        auto pos = std::find_if(serverClustersSpan.begin(), serverClustersSpan.end(),
+                                [&path](const AttributeEntry2 & attr) { return attr.attributeId == path.mAttributeId; });
+        VerifyOrReturnValue(pos != serverClustersSpan.end(), std::nullopt);
+
+        return *pos;
+    }
+
+private:
+    ProviderMetadataTree * mProvider;
+    ConcreteClusterPath mClusterPath;
+    MetadataList<AttributeEntry2> mAttributes;
 };
 
 /// Helps search for a specific server endpoint in the given
@@ -83,7 +116,7 @@ public:
     {
         auto span = mEndpoints.GetSpanValidForLifetime();
         auto pos  = std::find_if(span.begin(), span.end(),
-                                 [&endpointId](const DataModel::EndpointEntry & endpoint) { return endpoint.id == endpointId; });
+                                 [&endpointId](const EndpointEntry & endpoint) { return endpoint.id == endpointId; });
 
         VerifyOrReturnValue(pos != span.end(), std::nullopt);
 

@@ -14,6 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/ConcreteAttributePath.h"
+#include "app/util/attribute-metadata.h"
 #include <cstdint>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
@@ -279,6 +281,35 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
     entry.path = ConcreteAttributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
     LoadAttributeInfo(entry.path, attribute, &entry.info);
 
+    return entry;
+}
+
+DataModel::AttributeEntry2 AttributeEntry2From(const ConcreteClusterPath & clusterPath, const EmberAfAttributeMetadata & attribute)
+{
+    DataModel::AttributeEntry2 entry;
+
+    const ConcreteAttributePath attributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
+
+    entry.attributeId   = attribute.attributeId;
+    entry.readPrivilege = RequiredPrivilege::ForReadAttribute(attributePath);
+    if (!attribute.IsReadOnly())
+    {
+        entry.writePrivilege = RequiredPrivilege::ForWriteAttribute(attributePath);
+    }
+
+    entry.flags.Set(DataModel::AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));
+    entry.flags.Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite());
+
+    // NOTE: we do NOT provide additional info for:
+    //    - IsExternal/IsSingleton/IsAutomaticallyPersisted is not used by IM handling
+    //    - IsSingleton spec defines it for CLUSTERS where as we have it for ATTRIBUTES
+    //    - Several specification flags are not available (reportable, quieter reporting,
+    //      fixed, source attribution)
+
+    // TODO: Set additional flags:
+    // entry.flags.Set(DataModel::AttributeQualityFlags::kFabricScoped)
+    // entry.flags.Set(DataModel::AttributeQualityFlags::kFabricSensitive)
+    // entry.flags.Set(DataModel::AttributeQualityFlags::kChangesOmitted)
     return entry;
 }
 
@@ -572,6 +603,42 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindClusterIndex(const Embe
     }
 
     return std::nullopt;
+}
+
+DataModel::MetadataList<DataModel::AttributeEntry2> CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path)
+{
+    const EmberAfCluster * cluster = FindServerCluster(path);
+
+    DataModel::MetadataList<DataModel::AttributeEntry2> result;
+
+    VerifyOrReturnValue(cluster != nullptr, result);
+    VerifyOrReturnValue(cluster->attributeCount > 0, result);
+    VerifyOrReturnValue(cluster->attributes != nullptr, result);
+
+    CHIP_ERROR err = result.reserve(cluster->attributeCount);
+    if (err != CHIP_NO_ERROR)
+    {
+#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+        ChipLogError(AppServer, "Failed to reserve space for attributes: %" CHIP_ERROR_FORMAT, err.Format());
+#endif
+        return {};
+    }
+
+    Span<const EmberAfAttributeMetadata> attributeSpan(cluster->attributes, cluster->attributeCount);
+
+    for (auto & attribute : attributeSpan)
+    {
+        err = result.Append(AttributeEntry2From(path, attribute));
+        if (err != CHIP_NO_ERROR)
+        {
+#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+            ChipLogError(AppServer, "Failed to append attribute id: %" CHIP_ERROR_FORMAT, err.Format());
+#endif
+            break;
+        }
+    }
+
+    return result;
 }
 
 DataModel::MetadataList<ClusterId> CodegenDataModelProvider::ClientClusters(EndpointId endpointId)

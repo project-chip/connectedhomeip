@@ -122,6 +122,18 @@ struct AttributeEntry
     static const AttributeEntry kInvalid;
 };
 
+struct AttributeEntry2
+{
+    AttributeId attributeId;
+    BitFlags<AttributeQualityFlags> flags;
+
+    // read/write access will be missing if read/write is NOT allowed
+    //
+    // NOTE: this should be compacted for size
+    std::optional<Access::Privilege> readPrivilege;  // generally defaults to View if readable
+    std::optional<Access::Privilege> writePrivilege; // generally defaults to Operate if writable
+};
+
 // Bitmask values for different Command qualities.
 enum class CommandQualityFlags : uint32_t
 {
@@ -191,6 +203,7 @@ public:
     virtual MetadataList<ClusterId> ClientClusters(EndpointId endpointId)          = 0;
     virtual MetadataList<ServerClusterEntry> ServerClusters(EndpointId endpointId) = 0;
 
+    virtual MetadataList<AttributeEntry2> Attributes(const ConcreteClusterPath & path)             = 0;
     virtual MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath & path)           = 0;
     virtual MetadataList<AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) = 0;
 

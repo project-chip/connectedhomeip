@@ -107,6 +107,7 @@ public:
     DataModel::MetadataList<DataModel::EndpointEntry> Endpoints() override;
     DataModel::MetadataList<ClusterId> ClientClusters(EndpointId endpointId) override;
     DataModel::MetadataList<DataModel::ServerClusterEntry> ServerClusters(EndpointId endpointId) override;
+    DataModel::MetadataList<DataModel::AttributeEntry2> Attributes(const ConcreteClusterPath & path) override;
 
     DataModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
     DataModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
