@@ -40,6 +40,7 @@ from chip.exceptions import ChipStackError
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, CustomCommissioningParameters
 from mobly import asserts
 
+
 class TC_CADMIN_1_19(MatterBaseTest):
     def generate_unique_random_value(self, value):
         while True:
@@ -59,25 +60,25 @@ class TC_CADMIN_1_19(MatterBaseTest):
             TestStep(3, "TH_CR1 reads the SupportedFabrics attribute from the Node Operational Credentials cluster. Save max_fabrics",
                      "Verify that max_fabrics is larger than initial_number_of_fabrics. If not, instruct the tester to remove one non-test-harness fabric and re-start the test."),
             TestStep(4, "Repeat the following steps (5a and 5b) max_fabrics - initial_number_of_fabrics times"),
-            TestStep("4a", 
-                    "TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration", 
-                    "{resDutSuccess}"),
+            TestStep("4a",
+                     "TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration",
+                     "{resDutSuccess}"),
             TestStep("4b", "TH creates a controller on a new fabric and commissions DUT_CE using that controller",
-                     "Commissioning is successful"), 
-            TestStep("4c", 
-                    "The controller reads the CurrentFabricIndex from the Node Operational Credentials cluster. Save all fabrics in a list as fabric_idxs.", 
-                    "{resDutSuccess}"),
-            TestStep("4d", 
-                    "Shutdown the fabrics created during test step 4b from TH only so that it does not fill up the fabric table"),
+                     "Commissioning is successful"),
+            TestStep("4c",
+                     "The controller reads the CurrentFabricIndex from the Node Operational Credentials cluster. Save all fabrics in a list as fabric_idxs.",
+                     "{resDutSuccess}"),
+            TestStep("4d",
+                     "Shutdown the fabrics created during test step 4b from TH only so that it does not fill up the fabric table"),
             TestStep(5, "TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.",
                      "Verify this is equal to max_fabrics"),
-            TestStep(6, 
-                    "TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration", 
-                    "{resDutSuccess}"),
+            TestStep(6,
+                     "TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration",
+                     "{resDutSuccess}"),
             TestStep(7, "TH creates a controller on a new fabric and commissions DUT_CE using that controller",
                      "Verify DUT_CE responds with NOCResponse with a StatusCode field value of TableFull(5)"),
             TestStep(8, "TH_CR1 sends the RemoveFabric command in to DUT_CE to remove fabrics saved on device using fabric_idxs",
-                    "{resDutSuccess}"),
+                     "{resDutSuccess}"),
             TestStep(9, "TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.",
                      "Verify this is equal to initial_number_of_fabrics."),
         ]
@@ -170,6 +171,7 @@ class TC_CADMIN_1_19(MatterBaseTest):
         # TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.
         current_fabrics = await self.read_single_attribute_check_success(dev_ctrl=self.th1, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.CommissionedFabrics)
         asserts.assert_equal(current_fabrics, initial_number_of_fabrics, "Expected number of fabrics not correct")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
