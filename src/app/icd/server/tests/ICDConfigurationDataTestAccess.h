@@ -39,10 +39,7 @@ public:
         return mData->SetModeDurations(activeModeDuration, idleModeDuration);
     }
 
-    void SetFeatureMap(uint32_t featureMap)
-    {
-        mData->SetFeatureMap(featureMap);
-    }
+    void SetFeatureMap(uint32_t featureMap) { mData->SetFeatureMap(featureMap); }
 
 private:
     ICDConfigurationData * mData = nullptr;
