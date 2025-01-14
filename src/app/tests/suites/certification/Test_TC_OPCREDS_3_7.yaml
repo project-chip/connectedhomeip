@@ -93,7 +93,7 @@ tests:
                 saveAs: NOCSRElements
               - name: "AttestationSignature"
                 saveAs: attestationSignature
-      
+
     - label:
           "Step 4: TH2 generates the NOC, the Root CA Certificate and ICAC
           using the CSR elements from Step 3.
@@ -139,7 +139,7 @@ tests:
               - name: "RootCACertificate"
                 value: Root_CA_Certificate_TH2
 
-    - label: 
+    - label:
           "Step 6: Retrieve the commissioner node ID from TH2"
       identity: "beta"
       cluster: "CommissionerCommands"
