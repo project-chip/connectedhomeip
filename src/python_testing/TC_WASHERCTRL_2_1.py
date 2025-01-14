@@ -107,7 +107,7 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
         asserts.assert_true(0 <= spin_speed_current <= (numSpinSpeeds - 1), "SpinSpeedCurrent outside valid range")
 
         self.step(4)
-        for requested_speed in range(0, numSpinSpeeds - 1):
+        for requested_speed in range(0, numSpinSpeeds):
             # Write a valid SpinSpeedCurrent value
             result = await self.write_single_attribute(attribute_value=Clusters.LaundryWasherControls.Attributes.SpinSpeedCurrent(requested_speed),
                                                        endpoint_id=endpoint)
