@@ -221,6 +221,9 @@ protected:
 
     struct ParsedSigma1 : Sigma1Param
     {
+        // Backed by: Sigma1 PacketBuffer passed to the method HandleSigma1()
+        // Lifetime: Valid for the lifetime of the tlvReader, which takes ownership of the Sigma1 PacketBuffer in the HandleSigma1()
+        // method.
         ByteSpan initiatorEphPubKey;
         bool initiatorSessionParamStructPresent = false;
         SessionParameters initiatorSessionParams;
@@ -239,20 +242,30 @@ protected:
     };
     struct ParsedSigma2
     {
+        // Below ByteSpans are Backed by: Sigma2 PacketBuffer passed to the method HandleSigma2()
+        // Lifetime: Valid for the lifetime of the tlvReader, which takes ownership of the Sigma2 PacketBuffer in the HandleSigma2()
+        // method.
         ByteSpan responderRandom;
-        uint16_t responderSessionId;
         ByteSpan responderEphPubKey;
+
         Platform::ScopedMemoryBufferWithSize<uint8_t> msgR2Encrypted;
-        bool responderSessionParamStructPresent = false;
+        // Below ByteSpans are Backed by: msgR2Encrypted buffer
+        // Lifetime: Valid as long as msgR2Encrypted is not released
+        MutableByteSpan msgR2EncryptedPayload;
+        ByteSpan msgR2Mic;
         SessionParameters responderSessionParams;
+        uint16_t responderSessionId;
+        bool responderSessionParamStructPresent = false;
     };
 
     struct ParsedSigma2TBEData
     {
+        // Below ByteSpans are Backed by: msgR2Encrypted Buffer, member of ParsedSigma2 struct
+        // Lifetime: Valid for the lifetime of the instance of ParsedSigma2 that contains the msgR2Encrypted Buffer.
         ByteSpan responderNOC;
         ByteSpan responderICAC;
-        Crypto::P256ECDSASignature tbsData2Signature;
         ByteSpan resumptionId;
+        Crypto::P256ECDSASignature tbsData2Signature;
     };
 
     struct EncodeSigma2ResumeInputs
@@ -266,10 +279,13 @@ protected:
 
     struct ParsedSigma2Resume
     {
+        // Below ByteSpans are Backed by: Sigma2Resume PacketBuffer passed to the method HandleSigma2Resume()
+        // Lifetime: Valid for the lifetime of the tlvReader, which takes ownership of the Sigma2Resume PacketBuffer in the
+        // HandleSigma2Resume() method.
         ByteSpan resumptionId;
         ByteSpan sigma2ResumeMIC;
-        uint16_t responderSessionId;
         SessionParameters responderSessionParams;
+        uint16_t responderSessionId;
         bool responderSessionParamStructPresent = false;
     };
 
@@ -301,6 +317,8 @@ protected:
         chip::Platform::ScopedMemoryBuffer<uint8_t> msgR3Signed;
         size_t msgR3SignedLen;
 
+        // Below ByteSpans are Backed by: msgR3Encrypted Buffer, local to the HandleSigma3a() method,
+        // The Spans are later modified to point to the msgR3Signed member of this struct.
         ByteSpan initiatorNOC;
         ByteSpan initiatorICAC;
 
@@ -348,10 +366,40 @@ protected:
      */
     static CHIP_ERROR ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma1 & parsedMessage);
 
-    static CHIP_ERROR ParseSigma2(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma2 & parsedMessage);
+    /**
+     * Parse a Sigma2 message.  This function will return success only if the
+     * message passes schema checks.
+     *
+     * @param tlvReader a reference to the TLVReader that has ownership of the Sigma2 PacketBuffer.
+     * @param outParsedSigma2   a reference to ParsedSigma2. All members of parsedMessage will stay valid as long as tlvReader is
+     *                          valid.
+     *
+     * @note Calls to this function must always be made with a newly created and fresh ParsedSigma2 parameter.
+     **/
+    static CHIP_ERROR ParseSigma2(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma2 & outParsedSigma2);
 
-    static CHIP_ERROR ParseSigma2TBEData(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma2TBEData & parsedMessage);
+    /**
+     * Parse a decrypted TBEData2Encrypted message. This function will return success only if the message passes schema checks.
+     *
+     * @param tlvReader a reference to the TLVReader that points to the decrypted TBEData2Encrypted buffer (i.e.
+     *                  msgR2Encrypted member of ParsedSigma2 struct)
+     * @param outParsedSigma2TBEData a reference to ParsedSigma2TBEData. All members of parsedMessage will stay valid as long
+     *                               as the msgR2Encrypted member of ParsedSigma2 is valid
+     *
+     * @note Calls to this function must always be made with a newly created and fresh ParsedSigma2TBEData parameter.
+     **/
+    static CHIP_ERROR ParseSigma2TBEData(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma2TBEData & outParsedSigma2TBEData);
 
+    /**
+     * Parse a Sigma2Resume message.  This function will return success only if the
+     * message passes schema checks.
+     *
+     * @param tlvReader a reference to the TLVReader that has ownership of the Sigma2Resume PacketBuffer.
+     * @param outParsedSigma2Resume a reference to ParsedSigma2Resume. All members of parsedMessage will stay valid as long
+     *                              as tlvReader is valid.
+     *
+     * @note Calls to this function must always be made with a newly created and fresh ParsedSigma2Resume parameter.
+     **/
     static CHIP_ERROR ParseSigma2Resume(TLV::ContiguousBufferTLVReader & tlvReader, ParsedSigma2Resume & outParsedSigma2Resume);
 
     /**
@@ -380,9 +428,37 @@ protected:
      **/
     static CHIP_ERROR EncodeSigma2Resume(System::PacketBufferHandle & outMsg, EncodeSigma2ResumeInputs & inParam);
 
+    /**
+     * Parse a Sigma3 message.  This function will return success only if the
+     * message passes schema checks.
+     *
+     * @param tlvReader a reference to the TLVReader that has ownership of the Sigma3 PacketBuffer.
+     *
+     * @param outMsgR3Encrypted The encrypted3 (TBEData3Encrypted) TLV element. This will be a buffer that is owned by the caller
+     *                          but is allocated and initialised within ParseSigma3. Calls to this function must always be made with
+     *                          a newly created and fresh outMsgR3Encrypted
+     *
+     * @param outMsgR3EncryptedPayload  reference to a span that will be set to point to the payload of outMsgR3Encrypted within
+     *                                  ParseSigma3. Calls to this function must always be made with a newly created and fresh
+     *                                  outMsgR3Mic
+     *
+     * @param outMsgR3Mic      reference to a span that will be set to point to the MIC of outMsgR3Encrypted within ParseSigma3.
+     *                         Calls to this function must always be made with a newly created and fresh outMsgR3Mic
+     *
+     * @note all out parameters will be valid as long the Buffer outMsgR3Encrypted is valid.
+     **/
     static CHIP_ERROR ParseSigma3(TLV::ContiguousBufferTLVReader & tlvReader,
-                                  Platform::ScopedMemoryBufferWithSize<uint8_t> & msgR3Encrypted);
+                                  Platform::ScopedMemoryBufferWithSize<uint8_t> & outMsgR3Encrypted,
+                                  MutableByteSpan & outMsgR3EncryptedPayload, ByteSpan & outMsgR3Mic);
 
+    /**
+     * Parse a decrypted TBEData3Encrypted message.  This function will return success only if the
+     * message passes schema checks.
+     *
+     * @param tlvReader a reference to the TLVReader that  points to the decrypted TBEData3Encrypted buffer.
+     * @param data      a reference to HandleSigma3Data.
+     *
+     **/
     static CHIP_ERROR ParseSigma3TBEData(TLV::ContiguousBufferTLVReader & tlvReader, HandleSigma3Data & data);
 
 private:

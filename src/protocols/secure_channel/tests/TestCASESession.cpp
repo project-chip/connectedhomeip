@@ -776,7 +776,7 @@ static CHIP_ERROR EncodeSigma1Helper(MutableByteSpan & buf)
 #define TestSigma1Parsing(mem, bufferSize, params)                                                                                 \
     do                                                                                                                             \
     {                                                                                                                              \
-        MutableByteSpan buf(mem.Get(), bufferSize);                                                                                \
+        MutableByteSpan buf((mem).Get(), (bufferSize));                                                                            \
         EXPECT_EQ(EncodeSigma1Helper<params>(buf), CHIP_NO_ERROR);                                                                 \
                                                                                                                                    \
         TLV::ContiguousBufferTLVReader reader;                                                                                     \
@@ -1048,6 +1048,10 @@ struct Sigma2Params
     static constexpr uint8_t kEncrypted2Tag            = 4;
     static constexpr uint8_t kFutureProofTlvElementTag = 11;
 
+    static constexpr uint8_t kTestValueResponderRandom    = 1;
+    static constexpr uint8_t kTestValueResponderEphPubKey = 2;
+    static constexpr uint8_t kTestValueEncrypted2         = 3;
+
     static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ContextTag(num); }
 
     static constexpr bool kIncludeFutureProofTlvElement = false;
@@ -1067,17 +1071,17 @@ static CHIP_ERROR EncodeSigma2Helper(MutableByteSpan & buf)
 
     TLVType containerType;
     ReturnErrorOnFailure(writer.StartContainer(AnonymousTag(), kTLVType_Structure, containerType));
-    uint8_t responderRandom[Params::kResponderRandomLen] = { 1 };
+
+    uint8_t responderRandom[Params::kResponderRandomLen] = { Params::kTestValueResponderRandom };
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kResponderRandomTag), ByteSpan(responderRandom)));
 
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kResponderSessionIdTag), Params::kResponderSessionId));
 
-    uint8_t responderEphPubKey[Params::kResponderEphPubKeyLen] = { 2 };
+    uint8_t responderEphPubKey[Params::kResponderEphPubKeyLen] = { Params::kTestValueResponderEphPubKey };
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kResponderEphPubKeyTag), ByteSpan(responderEphPubKey)));
 
-    uint8_t encrypted2[Params::kEncrypted2Len] = { 3 };
+    uint8_t encrypted2[Params::kEncrypted2Len] = { Params::kTestValueEncrypted2 };
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kEncrypted2Tag), ByteSpan(encrypted2)));
-
     // Future-proofing: Ensure that TLV elements being added to the specification in the future are properly handled.
     if constexpr (Params::kIncludeFutureProofTlvElement)
     {
@@ -1097,7 +1101,7 @@ static CHIP_ERROR EncodeSigma2Helper(MutableByteSpan & buf)
 #define TestSigma2Parsing(mem, bufferSize, params)                                                                                 \
     do                                                                                                                             \
     {                                                                                                                              \
-        MutableByteSpan buf(mem.Get(), bufferSize);                                                                                \
+        MutableByteSpan buf((mem).Get(), (bufferSize));                                                                            \
         EXPECT_EQ(EncodeSigma2Helper<params>(buf), CHIP_NO_ERROR);                                                                 \
                                                                                                                                    \
         TLV::ContiguousBufferTLVReader reader;                                                                                     \
@@ -1107,7 +1111,16 @@ static CHIP_ERROR EncodeSigma2Helper(MutableByteSpan & buf)
         EXPECT_EQ(CASESessionAccess::ParseSigma2(reader, parsedSigma2) == CHIP_NO_ERROR, params::kExpectSuccess);                  \
         if (params::kExpectSuccess)                                                                                                \
         {                                                                                                                          \
-            /* Add other verification tests here as desired */                                                                     \
+                                                                                                                                   \
+            uint8_t expectedRandom[params::kResponderRandomLen]    = { params::kTestValueResponderRandom };                        \
+            uint8_t expectedEphKey[params::kResponderEphPubKeyLen] = { params::kTestValueResponderEphPubKey };                     \
+            uint8_t expectedEncrypted2[params::kEncrypted2Len]     = { params::kTestValueEncrypted2 };                             \
+                                                                                                                                   \
+            EXPECT_TRUE(parsedSigma2.responderRandom.data_equal(ByteSpan(expectedRandom)));                                        \
+            EXPECT_EQ(parsedSigma2.responderSessionId, params::kResponderSessionId);                                               \
+            EXPECT_TRUE(parsedSigma2.responderEphPubKey.data_equal(ByteSpan(expectedEphKey)));                                     \
+            EXPECT_TRUE(ByteSpan(parsedSigma2.msgR2Encrypted.Get(), parsedSigma2.msgR2Encrypted.AllocatedSize())                   \
+                            .data_equal(ByteSpan(expectedEncrypted2)));                                                            \
         }                                                                                                                          \
     } while (0)
 
@@ -1175,7 +1188,6 @@ struct Sigma2FutureProofTlvElementNoStructEnd : public BadSigma2ParamsBase
     static constexpr bool kIncludeStructEnd             = false;
 };
 
-// TODO: Consider making this test (and similar ones) to Value-Parameterized tests once pw_unit_test:light starts supporting them
 TEST_F(TestCASESession, Sigma2ParsingTest)
 {
     // 1280 bytes must be enough by definition.
@@ -1326,6 +1338,9 @@ struct Sigma2ResumeParams
     static constexpr uint8_t kResponderSessionIdTag    = 3;
     static constexpr uint8_t kFutureProofTlvElementTag = 11;
 
+    static constexpr uint8_t kTestValueResumptionId    = 1;
+    static constexpr uint8_t kTestValueSigma2ResumeMIC = 2;
+
     static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ContextTag(num); }
 
     static constexpr bool kIncludeFutureProofTlvElement = false;
@@ -1346,10 +1361,10 @@ static CHIP_ERROR EncodeSigma2ResumeHelper(MutableByteSpan & buf)
     TLVType containerType;
     ReturnErrorOnFailure(writer.StartContainer(AnonymousTag(), kTLVType_Structure, containerType));
 
-    uint8_t resumptionID[Params::kResumptionIdLen] = { 1 };
-    ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kResumptionIdTag), ByteSpan(resumptionID)));
+    uint8_t resumptionId[Params::kResumptionIdLen] = { Params::kTestValueResumptionId };
+    ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kResumptionIdTag), ByteSpan(resumptionId)));
 
-    uint8_t sigma2ResumeMIC[Params::kSigma2ResumeMICLen] = { 2 };
+    uint8_t sigma2ResumeMIC[Params::kSigma2ResumeMICLen] = { Params::kTestValueSigma2ResumeMIC };
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kSigma2ResumeMICTag), ByteSpan(sigma2ResumeMIC)));
 
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kResponderSessionIdTag), Params::kResponderSessionId));
@@ -1369,11 +1384,10 @@ static CHIP_ERROR EncodeSigma2ResumeHelper(MutableByteSpan & buf)
     return CHIP_NO_ERROR;
 }
 
-// A macro, so we can tell which test failed based on line number.
 #define TestSigma2ResumeParsing(mem, bufferSize, params)                                                                           \
     do                                                                                                                             \
     {                                                                                                                              \
-        MutableByteSpan buf(mem.Get(), bufferSize);                                                                                \
+        MutableByteSpan buf((mem).Get(), (bufferSize));                                                                            \
         EXPECT_EQ(EncodeSigma2ResumeHelper<params>(buf), CHIP_NO_ERROR);                                                           \
                                                                                                                                    \
         TLV::ContiguousBufferTLVReader reader;                                                                                     \
@@ -1383,7 +1397,12 @@ static CHIP_ERROR EncodeSigma2ResumeHelper(MutableByteSpan & buf)
         EXPECT_EQ(CASESessionAccess::ParseSigma2Resume(reader, parsedSigma2Resume) == CHIP_NO_ERROR, params::kExpectSuccess);      \
         if (params::kExpectSuccess)                                                                                                \
         {                                                                                                                          \
-            /* Add other verification tests here as desired */                                                                     \
+            uint8_t expectedResumptionId[params::kResumptionIdLen]       = { params::kTestValueResumptionId };                     \
+            uint8_t expectedSigma2ResumeMIC[params::kSigma2ResumeMICLen] = { params::kTestValueSigma2ResumeMIC };                  \
+                                                                                                                                   \
+            EXPECT_TRUE(parsedSigma2Resume.resumptionId.data_equal(ByteSpan(expectedResumptionId)));                               \
+            EXPECT_TRUE(parsedSigma2Resume.sigma2ResumeMIC.data_equal(ByteSpan(expectedSigma2ResumeMIC)));                         \
+            EXPECT_EQ(parsedSigma2Resume.responderSessionId, params::kResponderSessionId);                                         \
         }                                                                                                                          \
     } while (0)
 
@@ -1822,6 +1841,11 @@ struct Sigma2TBEDataParams
     static constexpr uint8_t kResumptionIdTag          = 4;
     static constexpr uint8_t kFutureProofTlvElementTag = 11;
 
+    static constexpr uint8_t kTestValueResponderNOC  = 1;
+    static constexpr uint8_t kTestValueResponderICAC = 2;
+    static constexpr uint8_t kTestValueSignature     = 3;
+    static constexpr uint8_t kTestValueResumptionId  = 4;
+
     static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ContextTag(num); }
 
     static constexpr bool kIncludeFutureProofTlvElement = false;
@@ -1841,16 +1865,16 @@ static CHIP_ERROR EncodeSigma2TBEDataHelper(MutableByteSpan & buf)
 
     TLVType containerType;
     ReturnErrorOnFailure(writer.StartContainer(AnonymousTag(), kTLVType_Structure, containerType));
-    uint8_t responderNOC[Params::kResponderNOCLen] = { 1 };
+    uint8_t responderNOC[Params::kResponderNOCLen] = { Params::kTestValueResponderNOC };
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kResponderNOCTag), ByteSpan(responderNOC)));
 
-    uint8_t responderICAC[Params::kResponderICACLen] = { 13 };
+    uint8_t responderICAC[Params::kResponderICACLen] = { Params::kTestValueResponderICAC };
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kResponderICACTag), ByteSpan(responderICAC)));
 
-    uint8_t signature[Params::kSignatureLen] = { 17 };
+    uint8_t signature[Params::kSignatureLen] = { Params::kTestValueSignature };
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kSignatureTag), ByteSpan(signature)));
 
-    uint8_t resumptionId[Params::kResumptionIdLen] = { 22 };
+    uint8_t resumptionId[Params::kResumptionIdLen] = { Params::kTestValueResumptionId };
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kResumptionIdTag), ByteSpan(resumptionId)));
 
     // Future-proofing: Ensure that TLV elements being added to the specification in the future are properly handled.
@@ -1872,7 +1896,7 @@ static CHIP_ERROR EncodeSigma2TBEDataHelper(MutableByteSpan & buf)
 #define TestSigma2TBEParsing(mem, bufferSize, params)                                                                              \
     do                                                                                                                             \
     {                                                                                                                              \
-        MutableByteSpan buf(mem.Get(), bufferSize);                                                                                \
+        MutableByteSpan buf((mem).Get(), (bufferSize));                                                                            \
         EXPECT_EQ(EncodeSigma2TBEDataHelper<params>(buf), CHIP_NO_ERROR);                                                          \
                                                                                                                                    \
         TLV::ContiguousBufferTLVReader reader;                                                                                     \
@@ -1882,7 +1906,16 @@ static CHIP_ERROR EncodeSigma2TBEDataHelper(MutableByteSpan & buf)
         EXPECT_EQ(CASESessionAccess::ParseSigma2TBEData(reader, parsedSigma2TBEData) == CHIP_NO_ERROR, params::kExpectSuccess);    \
         if (params::kExpectSuccess)                                                                                                \
         {                                                                                                                          \
-            /* Add other verification tests here as desired */                                                                     \
+            uint8_t expectedNOC[params::kResponderNOCLen]          = { params::kTestValueResponderNOC };                           \
+            uint8_t expectedICAC[params::kResponderICACLen]        = { params::kTestValueResponderICAC };                          \
+            uint8_t expectedSignature[params::kSignatureLen]       = { params::kTestValueSignature };                              \
+            uint8_t expectedResumptionId[params::kResumptionIdLen] = { params::kTestValueResumptionId };                           \
+                                                                                                                                   \
+            EXPECT_TRUE(parsedSigma2TBEData.responderNOC.data_equal(ByteSpan(expectedNOC)));                                       \
+            EXPECT_TRUE(parsedSigma2TBEData.responderICAC.data_equal(ByteSpan(expectedICAC)));                                     \
+            EXPECT_TRUE(ByteSpan(parsedSigma2TBEData.tbsData2Signature.Bytes(), parsedSigma2TBEData.tbsData2Signature.Length())    \
+                            .data_equal(ByteSpan(expectedSignature)));                                                             \
+            EXPECT_TRUE(parsedSigma2TBEData.resumptionId.data_equal(ByteSpan(expectedResumptionId)));                              \
         }                                                                                                                          \
     } while (0)
 
@@ -1980,6 +2013,8 @@ struct Sigma3Params
     static constexpr uint8_t kEncrypted3Tag            = 1;
     static constexpr uint8_t kFutureProofTlvElementTag = 7;
 
+    static constexpr uint8_t kTestValueEncrypted3 = { 1 };
+
     static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ContextTag(num); }
 
     static constexpr bool kIncludeFutureProofTlvElement = false;
@@ -1999,7 +2034,7 @@ static CHIP_ERROR EncodeSigma3Helper(MutableByteSpan & buf)
     TLVType containerType;
     ReturnErrorOnFailure(writer.StartContainer(AnonymousTag(), kTLVType_Structure, containerType));
 
-    uint8_t encrypted3[Params::kEncrypted3Len] = { 3 };
+    uint8_t encrypted3[Params::kEncrypted3Len] = { Params::kTestValueEncrypted3 };
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kEncrypted3Tag), ByteSpan(encrypted3)));
 
     // Future-proofing: Ensure that TLV elements being added to the specification in the future are properly handled.
@@ -2021,17 +2056,21 @@ static CHIP_ERROR EncodeSigma3Helper(MutableByteSpan & buf)
 #define TestSigma3Parsing(mem, bufferSize, params)                                                                                 \
     do                                                                                                                             \
     {                                                                                                                              \
-        MutableByteSpan buf(mem.Get(), bufferSize);                                                                                \
+        MutableByteSpan buf((mem).Get(), (bufferSize));                                                                            \
         EXPECT_EQ(EncodeSigma3Helper<params>(buf), CHIP_NO_ERROR);                                                                 \
                                                                                                                                    \
         TLV::ContiguousBufferTLVReader reader;                                                                                     \
         reader.Init(buf);                                                                                                          \
         Platform::ScopedMemoryBufferWithSize<uint8_t> msgR3Encrypted;                                                              \
+        MutableByteSpan msgR3EncryptedPayload;                                                                                     \
+        ByteSpan msgR3Mic;                                                                                                         \
                                                                                                                                    \
-        EXPECT_EQ(CASESessionAccess::ParseSigma3(reader, msgR3Encrypted) == CHIP_NO_ERROR, params::kExpectSuccess);                \
+        EXPECT_EQ(CASESessionAccess::ParseSigma3(reader, msgR3Encrypted, msgR3EncryptedPayload, msgR3Mic) == CHIP_NO_ERROR,        \
+                  params::kExpectSuccess);                                                                                         \
         if (params::kExpectSuccess)                                                                                                \
         {                                                                                                                          \
-            /* Add other verification tests here as desired */                                                                     \
+            uint8_t expectedEncrypted3[params::kEncrypted3Len] = { params::kTestValueEncrypted3 };                                 \
+            EXPECT_TRUE(ByteSpan(msgR3Encrypted.Get(), msgR3Encrypted.AllocatedSize()).data_equal(ByteSpan(expectedEncrypted3)));  \
         }                                                                                                                          \
     } while (0)
 
@@ -2070,7 +2109,6 @@ struct Sigma3FutureProofTlvElementNoStructEnd : public BadSigma3ParamsBase
     static constexpr bool kIncludeStructEnd             = false;
 };
 
-// TODO: Consider making this test (and similar ones) to Value-Parameterized tests once pw_unit_test:light starts supporting them
 TEST_F(TestCASESession, Sigma3ParsingTest)
 {
     // 1280 bytes must be enough by definition.
@@ -2101,6 +2139,10 @@ struct Sigma3TBEDataParams
     static constexpr uint8_t kSignatureTag             = 3;
     static constexpr uint8_t kFutureProofTlvElementTag = 11;
 
+    static constexpr uint8_t kTestValueInitiatorNOC  = 1;
+    static constexpr uint8_t kTestValueInitiatorICAC = 2;
+    static constexpr uint8_t kTestValueSignature     = 3;
+
     static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ContextTag(num); }
 
     static constexpr bool kIncludeFutureProofTlvElement = false;
@@ -2119,13 +2161,14 @@ static CHIP_ERROR EncodeSigma3TBEDataHelper(MutableByteSpan & buf)
 
     TLVType containerType;
     ReturnErrorOnFailure(writer.StartContainer(AnonymousTag(), kTLVType_Structure, containerType));
-    uint8_t initiatorNOC[Params::kInitiatorNOCLen] = { 1 };
+
+    uint8_t initiatorNOC[Params::kInitiatorNOCLen] = { Params::kTestValueInitiatorNOC };
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kInitiatorNOCTag), ByteSpan(initiatorNOC)));
 
-    uint8_t initiatorICAC[Params::kInitiatorICACLen] = { 13 };
+    uint8_t initiatorICAC[Params::kInitiatorICACLen] = { Params::kTestValueInitiatorICAC };
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kInitiatorICACTag), ByteSpan(initiatorICAC)));
 
-    uint8_t signature[Params::kSignatureLen] = { 17 };
+    uint8_t signature[Params::kSignatureLen] = { Params::kTestValueSignature };
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::kSignatureTag), ByteSpan(signature)));
 
     // Future-proofing: Ensure that TLV elements being added to the specification in the future are properly handled.
@@ -2143,11 +2186,10 @@ static CHIP_ERROR EncodeSigma3TBEDataHelper(MutableByteSpan & buf)
     return CHIP_NO_ERROR;
 }
 
-// A macro, so we can tell which test failed based on line number.
 #define TestSigma3TBEParsing(mem, bufferSize, params)                                                                              \
     do                                                                                                                             \
     {                                                                                                                              \
-        MutableByteSpan buf(mem.Get(), bufferSize);                                                                                \
+        MutableByteSpan buf((mem).Get(), (bufferSize));                                                                            \
         EXPECT_EQ(EncodeSigma3TBEDataHelper<params>(buf), CHIP_NO_ERROR);                                                          \
                                                                                                                                    \
         TLV::ContiguousBufferTLVReader reader;                                                                                     \
@@ -2157,7 +2199,14 @@ static CHIP_ERROR EncodeSigma3TBEDataHelper(MutableByteSpan & buf)
         EXPECT_EQ(CASESessionAccess::ParseSigma3TBEData(reader, handleSigma3Data) == CHIP_NO_ERROR, params::kExpectSuccess);       \
         if (params::kExpectSuccess)                                                                                                \
         {                                                                                                                          \
-            /* Add other verification tests here as desired */                                                                     \
+            uint8_t expectedNOC[params::kInitiatorNOCLen]    = { params::kTestValueInitiatorNOC };                                 \
+            uint8_t expectedICAC[params::kInitiatorICACLen]  = { params::kTestValueInitiatorICAC };                                \
+            uint8_t expectedSignature[params::kSignatureLen] = { params::kTestValueSignature };                                    \
+                                                                                                                                   \
+            EXPECT_TRUE(handleSigma3Data.initiatorNOC.data_equal(ByteSpan(expectedNOC)));                                          \
+            EXPECT_TRUE(handleSigma3Data.initiatorICAC.data_equal(ByteSpan(expectedICAC)));                                        \
+            EXPECT_TRUE(ByteSpan(handleSigma3Data.tbsData3Signature.Bytes(), handleSigma3Data.tbsData3Signature.Length())          \
+                            .data_equal(ByteSpan(expectedSignature)));                                                             \
         }                                                                                                                          \
     } while (0)
 
