@@ -111,13 +111,19 @@ TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(ByteSpan enableKey)
     return triggerDelegate;
 }
 
-class GeneralDiagosticsAttrAccess : public AttributeAccessInterface
+class GeneralDiagosticsGlobalInstance : public AttributeAccessInterface,
+                                        public CommandHandlerInterface,
+                                        public DeviceLayer::ConnectivityManagerDelegate
 {
 public:
     // Register for the GeneralDiagnostics cluster on all endpoints.
-    GeneralDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralDiagnostics::Id) {}
+    GeneralDiagosticsGlobalInstance() :
+        AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralDiagnostics::Id),
+        CommandHandlerInterface(Optional<EndpointId>::Missing(), GeneralDiagnostics::Id)
+    {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    void InvokeCommand(HandlerContext & handlerContext) override;
 
 private:
     template <typename T>
@@ -127,81 +133,21 @@ private:
     CHIP_ERROR ReadListIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &), AttributeValueEncoder & aEncoder);
 
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
+
+    void HandleTestEventTrigger(HandlerContext & ctx, const Commands::TestEventTrigger::DecodableType & commandData);
+    void HandleTimeSnapshot(HandlerContext & ctx, const Commands::TimeSnapshot::DecodableType & commandData);
+    void HandlePayloadTestRequest(HandlerContext & ctx, const Commands::PayloadTestRequest::DecodableType & commandData);
+
+    // Gets called when any network interface on the Node is updated.
+    void OnNetworkInfoChanged() override
+    {
+        ChipLogDetail(Zcl, "GeneralDiagnosticsDelegate: OnNetworkInfoChanged");
+
+        ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::NetworkInterfaces::Id);
+    }
 };
 
-template <typename T>
-CHIP_ERROR GeneralDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &),
-                                                        AttributeValueEncoder & aEncoder)
-{
-    T data;
-    CHIP_ERROR err = (GetDiagnosticDataProvider().*getter)(data);
-    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-    {
-        data = {};
-    }
-    else if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
-
-    return aEncoder.Encode(data);
-}
-
-template <typename T>
-CHIP_ERROR GeneralDiagosticsAttrAccess::ReadListIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &),
-                                                            AttributeValueEncoder & aEncoder)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    T faultList;
-
-    if ((GetDiagnosticDataProvider().*getter)(faultList) == CHIP_NO_ERROR)
-    {
-        err = aEncoder.EncodeList([&faultList](const auto & encoder) -> CHIP_ERROR {
-            for (auto fault : faultList)
-            {
-                ReturnErrorOnFailure(encoder.Encode(fault));
-            }
-
-            return CHIP_NO_ERROR;
-        });
-    }
-    else
-    {
-        err = aEncoder.EncodeEmptyList();
-    }
-
-    return err;
-}
-
-CHIP_ERROR GeneralDiagosticsAttrAccess::ReadNetworkInterfaces(AttributeValueEncoder & aEncoder)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    DeviceLayer::NetworkInterface * netifs;
-
-    if (DeviceLayer::GetDiagnosticDataProvider().GetNetworkInterfaces(&netifs) == CHIP_NO_ERROR)
-    {
-        err = aEncoder.EncodeList([&netifs](const auto & encoder) -> CHIP_ERROR {
-            for (DeviceLayer::NetworkInterface * ifp = netifs; ifp != nullptr; ifp = ifp->Next)
-            {
-                ReturnErrorOnFailure(encoder.Encode(*ifp));
-            }
-
-            return CHIP_NO_ERROR;
-        });
-
-        DeviceLayer::GetDiagnosticDataProvider().ReleaseNetworkInterfaces(netifs);
-    }
-    else
-    {
-        err = aEncoder.EncodeEmptyList();
-    }
-
-    return err;
-}
-
-GeneralDiagosticsAttrAccess gAttrAccess;
-
-CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR GeneralDiagosticsGlobalInstance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != GeneralDiagnostics::Id)
     {
@@ -263,23 +209,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
     return CHIP_NO_ERROR;
 }
 
-class GeneralDiagnosticsCommandHandler : public CommandHandlerInterface
-{
-public:
-    // Register for the GeneralDiagnostics cluster on all endpoints.
-    GeneralDiagnosticsCommandHandler() : CommandHandlerInterface(Optional<EndpointId>::Missing(), GeneralDiagnostics::Id) {}
-
-    void InvokeCommand(HandlerContext & handlerContext) override;
-
-private:
-    void HandleTestEventTrigger(HandlerContext & ctx, const Commands::TestEventTrigger::DecodableType & commandData);
-    void HandleTimeSnapshot(HandlerContext & ctx, const Commands::TimeSnapshot::DecodableType & commandData);
-    void HandlePayloadTestRequest(HandlerContext & ctx, const Commands::PayloadTestRequest::DecodableType & commandData);
-};
-
-GeneralDiagnosticsCommandHandler gCommandHandler;
-
-void GeneralDiagnosticsCommandHandler::InvokeCommand(HandlerContext & handlerContext)
+void GeneralDiagosticsGlobalInstance::InvokeCommand(HandlerContext & handlerContext)
 {
     switch (handlerContext.mRequestPath.mCommandId)
     {
@@ -300,8 +230,78 @@ void GeneralDiagnosticsCommandHandler::InvokeCommand(HandlerContext & handlerCon
     }
 }
 
-void GeneralDiagnosticsCommandHandler::HandleTestEventTrigger(HandlerContext & ctx,
-                                                              const Commands::TestEventTrigger::DecodableType & commandData)
+template <typename T>
+CHIP_ERROR GeneralDiagosticsGlobalInstance::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &),
+                                                            AttributeValueEncoder & aEncoder)
+{
+    T data;
+    CHIP_ERROR err = (GetDiagnosticDataProvider().*getter)(data);
+    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    {
+        data = {};
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+
+    return aEncoder.Encode(data);
+}
+
+template <typename T>
+CHIP_ERROR GeneralDiagosticsGlobalInstance::ReadListIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &),
+                                                                AttributeValueEncoder & aEncoder)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    T faultList;
+
+    if ((GetDiagnosticDataProvider().*getter)(faultList) == CHIP_NO_ERROR)
+    {
+        err = aEncoder.EncodeList([&faultList](const auto & encoder) -> CHIP_ERROR {
+            for (auto fault : faultList)
+            {
+                ReturnErrorOnFailure(encoder.Encode(fault));
+            }
+
+            return CHIP_NO_ERROR;
+        });
+    }
+    else
+    {
+        err = aEncoder.EncodeEmptyList();
+    }
+
+    return err;
+}
+
+CHIP_ERROR GeneralDiagosticsGlobalInstance::ReadNetworkInterfaces(AttributeValueEncoder & aEncoder)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    DeviceLayer::NetworkInterface * netifs;
+
+    if (DeviceLayer::GetDiagnosticDataProvider().GetNetworkInterfaces(&netifs) == CHIP_NO_ERROR)
+    {
+        err = aEncoder.EncodeList([&netifs](const auto & encoder) -> CHIP_ERROR {
+            for (DeviceLayer::NetworkInterface * ifp = netifs; ifp != nullptr; ifp = ifp->Next)
+            {
+                ReturnErrorOnFailure(encoder.Encode(*ifp));
+            }
+
+            return CHIP_NO_ERROR;
+        });
+
+        DeviceLayer::GetDiagnosticDataProvider().ReleaseNetworkInterfaces(netifs);
+    }
+    else
+    {
+        err = aEncoder.EncodeEmptyList();
+    }
+
+    return err;
+}
+
+void GeneralDiagosticsGlobalInstance::HandleTestEventTrigger(HandlerContext & ctx,
+                                                             const Commands::TestEventTrigger::DecodableType & commandData)
 {
     auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
     if (triggerDelegate == nullptr)
@@ -317,8 +317,8 @@ void GeneralDiagnosticsCommandHandler::HandleTestEventTrigger(HandlerContext & c
                                   (handleEventTriggerResult != CHIP_NO_ERROR) ? Status::InvalidCommand : Status::Success);
 }
 
-void GeneralDiagnosticsCommandHandler::HandleTimeSnapshot(HandlerContext & ctx,
-                                                          const Commands::TimeSnapshot::DecodableType & commandData)
+void GeneralDiagosticsGlobalInstance::HandleTimeSnapshot(HandlerContext & ctx,
+                                                         const Commands::TimeSnapshot::DecodableType & commandData)
 {
     ChipLogError(Zcl, "Received TimeSnapshot command!");
 
@@ -349,8 +349,8 @@ void GeneralDiagnosticsCommandHandler::HandleTimeSnapshot(HandlerContext & ctx,
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-void GeneralDiagnosticsCommandHandler::HandlePayloadTestRequest(HandlerContext & ctx,
-                                                                const Commands::PayloadTestRequest::DecodableType & commandData)
+void GeneralDiagosticsGlobalInstance::HandlePayloadTestRequest(HandlerContext & ctx,
+                                                               const Commands::PayloadTestRequest::DecodableType & commandData)
 {
     // Max allowed is 2048.
     if (commandData.count > 2048)
@@ -384,18 +384,7 @@ void GeneralDiagnosticsCommandHandler::HandlePayloadTestRequest(HandlerContext &
     }
 }
 
-class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelegate
-{
-    // Gets called when any network interface on the Node is updated.
-    void OnNetworkInfoChanged() override
-    {
-        ChipLogDetail(Zcl, "GeneralDiagnosticsDelegate: OnNetworkInfoChanged");
-
-        ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::NetworkInterfaces::Id);
-    }
-};
-
-GeneralDiagnosticsDelegate gDiagnosticDelegate;
+GeneralDiagosticsGlobalInstance gGeneralDiagosticsInstance;
 
 } // anonymous namespace
 
@@ -523,10 +512,10 @@ void MatterGeneralDiagnosticsPluginServerInitCallback()
 {
     BootReasonEnum bootReason;
 
-    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
-    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gCommandHandler);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gGeneralDiagosticsInstance);
+    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gGeneralDiagosticsInstance);
 
-    ConnectivityMgr().SetDelegate(&gDiagnosticDelegate);
+    ConnectivityMgr().SetDelegate(&gGeneralDiagosticsInstance);
 
     if (GetDiagnosticDataProvider().GetBootReason(bootReason) == CHIP_NO_ERROR)
     {
