@@ -36,7 +36,6 @@ jobs:
         working-directory: matter
         run: |
           python3 -m venv venv
-          venv/bin/pip3 install -U pip
           venv/bin/pip3 install -r docs/requirements.txt
       - name: Build documentation
         working-directory: matter/docs
