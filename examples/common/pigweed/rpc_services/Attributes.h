@@ -27,6 +27,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataSearch.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/util/attribute-storage.h>
@@ -221,7 +222,9 @@ private:
         request.operationFlags.Set(app::DataModel::OperationFlags::kInternal);
         request.subjectDescriptor = &subjectDescriptor;
 
-        std::optional<app::DataModel::ClusterInfo> info = provider->GetServerClusterInfo(path);
+        app::DataModel::ServerClusterFinder serverClusterFinder(provider);
+        auto info = serverClusterFinder.Find(path);
+
         if (!info.has_value())
         {
             return ::pw::Status::NotFound();

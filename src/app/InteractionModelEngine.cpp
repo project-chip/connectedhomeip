@@ -25,6 +25,7 @@
 
 #include "InteractionModelEngine.h"
 
+#include <algorithm>
 #include <cinttypes>
 
 #include <access/AccessRestrictionProvider.h>
@@ -33,9 +34,11 @@
 #include <access/SubjectDescriptor.h>
 #include <app/AppConfig.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/EventPathParams.h>
 #include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataSearch.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/util/IMClusterCommandHandler.h>
@@ -89,14 +92,14 @@ bool MayHaveAccessibleEventPathForEndpoint(DataModel::Provider * aProvider, Endp
                                                                aSubjectDescriptor);
     }
 
-    DataModel::ClusterEntry clusterEntry = aProvider->FirstServerCluster(aEventPath.mEndpointId);
-    while (clusterEntry.IsValid())
+    auto serverClusters = aProvider->ServerClusters(aEventPath.mEndpointId);
+    for (auto & cluster : serverClusters.GetSpanValidForLifetime())
     {
-        if (MayHaveAccessibleEventPathForEndpointAndCluster(clusterEntry.path, aEventPath, aSubjectDescriptor))
+        if (MayHaveAccessibleEventPathForEndpointAndCluster(ConcreteClusterPath(aEventPath.mEndpointId, cluster.clusterId),
+                                                            aEventPath, aSubjectDescriptor))
         {
             return true;
         }
-        clusterEntry = aProvider->NextServerCluster(clusterEntry.path);
     }
 
     return false;
@@ -1564,7 +1567,8 @@ CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(SingleLinkedListNo
 
 bool InteractionModelEngine::IsExistentAttributePath(const ConcreteAttributePath & path)
 {
-    return GetDataModelProvider()->GetAttributeInfo(path).has_value();
+    DataModel::AttributeFinder finder(mDataModelProvider);
+    return finder.Find(path).has_value();
 }
 
 void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(SingleLinkedListNode<AttributePathParams> *& aAttributePaths)
@@ -1797,19 +1801,20 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
         }
     }
 
-    // We failed, figure out why ...
-    //
-    if (provider->GetServerClusterInfo(aCommandPath).has_value())
     {
-        return Protocols::InteractionModel::Status::UnsupportedCommand; // cluster exists, so command is invalid
+        DataModel::ServerClusterFinder finder(provider);
+        if (finder.Find(aCommandPath).has_value())
+        {
+            // cluster exists, so command is invalid
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
+        }
     }
 
     // At this point either cluster or endpoint does not exist. If we find the endpoint, then the cluster
     // is invalid
-    auto endpoints = provider->Endpoints();
-    for (auto & ep : endpoints.GetSpanValidForLifetime())
     {
-        if (ep.id == aCommandPath.mEndpointId)
+        DataModel::EndpointFinder finder(provider);
+        if (finder.Find(aCommandPath.mEndpointId))
         {
             // endpoint exists, so cluster is invalid
             return Protocols::InteractionModel::Status::UnsupportedCluster;

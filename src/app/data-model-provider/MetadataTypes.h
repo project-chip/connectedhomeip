@@ -67,6 +67,13 @@ enum class ClusterQualityFlags : uint32_t
     kDiagnosticsData = 0x0001, // `K` quality, may be filtered out in subscriptions
 };
 
+struct ServerClusterEntry
+{
+    ClusterId clusterId;
+    DataVersion dataVersion; // current cluster data version,
+    BitFlags<ClusterQualityFlags> flags;
+};
+
 struct ClusterInfo
 {
     DataVersion dataVersion; // current cluster data version,
@@ -75,16 +82,6 @@ struct ClusterInfo
     /// Constructor that marks data version as mandatory
     /// for this structure.
     ClusterInfo(DataVersion version) : dataVersion(version) {}
-};
-
-struct ClusterEntry
-{
-    ConcreteClusterPath path;
-    ClusterInfo info;
-
-    bool IsValid() const { return path.HasValidIds(); }
-
-    static const ClusterEntry kInvalid;
 };
 
 enum class AttributeQualityFlags : uint32_t
@@ -96,23 +93,16 @@ enum class AttributeQualityFlags : uint32_t
     kTimed           = 0x0040, // `T` quality on attributes (writes require timed interactions)
 };
 
-struct AttributeInfo
+struct AttributeEntry2
 {
+    AttributeId attributeId;
     BitFlags<AttributeQualityFlags> flags;
 
     // read/write access will be missing if read/write is NOT allowed
+    //
+    // NOTE: this should be compacted for size
     std::optional<Access::Privilege> readPrivilege;  // generally defaults to View if readable
     std::optional<Access::Privilege> writePrivilege; // generally defaults to Operate if writable
-};
-
-struct AttributeEntry
-{
-    ConcreteAttributePath path;
-    AttributeInfo info;
-
-    bool IsValid() const { return path.HasValidIds(); }
-
-    static const AttributeEntry kInvalid;
 };
 
 // Bitmask values for different Command qualities.
@@ -166,34 +156,18 @@ class ProviderMetadataTree
 public:
     virtual ~ProviderMetadataTree() = default;
 
-    // This iteration will list all server clusters on a given endpoint
-    virtual ClusterEntry FirstServerCluster(EndpointId endpoint)                              = 0;
-    virtual ClusterEntry NextServerCluster(const ConcreteClusterPath & before)                = 0;
-    virtual std::optional<ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) = 0;
-
-    // This iteration will list all client clusters on a given endpoint
-    // As the client cluster is only a client without any attributes/commands,
-    // these functions only return the cluster path.
-    virtual ConcreteClusterPath FirstClientCluster(EndpointId endpoint)               = 0;
-    virtual ConcreteClusterPath NextClientCluster(const ConcreteClusterPath & before) = 0;
-
-    // Attribute iteration and accessors provide cluster-level access over
-    // attributes
-    virtual AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster)                = 0;
-    virtual AttributeEntry NextAttribute(const ConcreteAttributePath & before)                = 0;
-    virtual std::optional<AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) = 0;
-
-    /// List metadata capabilties
-    ///
-    ///  TODO: convert ALL items above to the new format
-
     using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
 
-    virtual MetadataList<EndpointEntry> Endpoints()                                               = 0;
+    virtual MetadataList<EndpointEntry> Endpoints() = 0;
+
+    virtual MetadataList<SemanticTag> SemanticTags(EndpointId endpointId)          = 0;
+    virtual MetadataList<DeviceTypeEntry> DeviceTypes(EndpointId endpointId)       = 0;
+    virtual MetadataList<ClusterId> ClientClusters(EndpointId endpointId)          = 0;
+    virtual MetadataList<ServerClusterEntry> ServerClusters(EndpointId endpointId) = 0;
+
+    virtual MetadataList<AttributeEntry2> Attributes(const ConcreteClusterPath & path)            = 0;
     virtual MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath & path)           = 0;
     virtual MetadataList<AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) = 0;
-    virtual MetadataList<SemanticTag> SemanticTags(EndpointId endpointId)                         = 0;
-    virtual MetadataList<DeviceTypeEntry> DeviceTypes(EndpointId endpointId)                      = 0;
 
     /// Workaround function to report attribute change.
     ///

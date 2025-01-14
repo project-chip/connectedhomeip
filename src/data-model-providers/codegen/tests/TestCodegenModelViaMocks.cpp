@@ -14,8 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "gtest/gtest.h"
+#include "app/data-model-provider/MetadataSearch.h"
 #include <pw_unit_test/framework.h>
 
 #include <data-model-providers/codegen/tests/EmberInvokeOverride.h>
@@ -930,85 +929,35 @@ TEST_F(TestCodegenModelViaMocks, IterateOverServerClusters)
 
     chip::Test::ResetVersion();
 
-    EXPECT_FALSE(model.FirstServerCluster(kEndpointIdThatIsMissing).path.HasValidIds());
-    EXPECT_FALSE(model.FirstServerCluster(kInvalidEndpointId).path.HasValidIds());
-    EXPECT_FALSE(model.NextServerCluster(ConcreteClusterPath(kInvalidEndpointId, 123)).path.HasValidIds());
-    EXPECT_FALSE(model.NextServerCluster(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).path.HasValidIds());
-    EXPECT_FALSE(model.NextServerCluster(ConcreteClusterPath(kMockEndpoint1, 981u)).path.HasValidIds());
+    EXPECT_TRUE(model.ServerClusters(kEndpointIdThatIsMissing).empty());
+    EXPECT_TRUE(model.ServerClusters(kInvalidEndpointId).empty());
 
     // mock endpoint 1 has 2 mock clusters: 1 and 2
-    ClusterEntry entry = model.FirstServerCluster(kMockEndpoint1);
-    ASSERT_TRUE(entry.path.HasValidIds());
-    EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint1);
-    EXPECT_EQ(entry.path.mClusterId, MockClusterId(1));
-    EXPECT_EQ(entry.info.dataVersion, 0u);
-    EXPECT_EQ(entry.info.flags.Raw(), 0u);
+    auto serverClusters = model.ServerClusters(kMockEndpoint1);
+    ASSERT_EQ(serverClusters.size(), 2u);
+
+    EXPECT_EQ(serverClusters[0].clusterId, MockClusterId(1));
+    EXPECT_EQ(serverClusters[0].dataVersion, 0u);
+    EXPECT_EQ(serverClusters[0].flags.Raw(), 0u);
+
+    EXPECT_EQ(serverClusters[1].clusterId, MockClusterId(2));
+    EXPECT_EQ(serverClusters[1].dataVersion, 0u);
+    EXPECT_EQ(serverClusters[1].flags.Raw(), 0u);
 
     chip::Test::BumpVersion();
 
-    entry = model.NextServerCluster(entry.path);
-    ASSERT_TRUE(entry.path.HasValidIds());
-    EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint1);
-    EXPECT_EQ(entry.path.mClusterId, MockClusterId(2));
-    EXPECT_EQ(entry.info.dataVersion, 1u);
-    EXPECT_EQ(entry.info.flags.Raw(), 0u);
-
-    entry = model.NextServerCluster(entry.path);
-    EXPECT_FALSE(entry.path.HasValidIds());
+    serverClusters = model.ServerClusters(kMockEndpoint1);
+    ASSERT_EQ(serverClusters.size(), 2u);
+    EXPECT_EQ(serverClusters[0].dataVersion, 1u);
+    EXPECT_EQ(serverClusters[1].dataVersion, 1u);
 
     // mock endpoint 3 has 4 mock clusters: 1 through 4
-    entry = model.FirstServerCluster(kMockEndpoint3);
-    for (uint16_t clusterId = 1; clusterId <= 4; clusterId++)
-    {
-        ASSERT_TRUE(entry.path.HasValidIds());
-        EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint3);
-        EXPECT_EQ(entry.path.mClusterId, MockClusterId(clusterId));
-        entry = model.NextServerCluster(entry.path);
-    }
-    EXPECT_FALSE(entry.path.HasValidIds());
-
-    // repeat calls should work
-    for (int i = 0; i < 10; i++)
-    {
-        entry = model.FirstServerCluster(kMockEndpoint1);
-        ASSERT_TRUE(entry.path.HasValidIds());
-        EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint1);
-        EXPECT_EQ(entry.path.mClusterId, MockClusterId(1));
-    }
-
-    for (int i = 0; i < 10; i++)
-    {
-        ClusterEntry nextEntry = model.NextServerCluster(entry.path);
-        ASSERT_TRUE(nextEntry.path.HasValidIds());
-        EXPECT_EQ(nextEntry.path.mEndpointId, kMockEndpoint1);
-        EXPECT_EQ(nextEntry.path.mClusterId, MockClusterId(2));
-    }
-}
-
-TEST_F(TestCodegenModelViaMocks, GetServerClusterInfo)
-{
-
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-
-    chip::Test::ResetVersion();
-
-    ASSERT_FALSE(model.GetServerClusterInfo(ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId)).has_value());
-    ASSERT_FALSE(model.GetServerClusterInfo(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1))).has_value());
-    ASSERT_FALSE(model.GetServerClusterInfo(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).has_value());
-    ASSERT_FALSE(model.GetServerClusterInfo(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10))).has_value());
-
-    // now get the value
-    std::optional<ClusterInfo> info = model.GetServerClusterInfo(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
-    ASSERT_TRUE(info.has_value());
-    EXPECT_EQ(info->dataVersion, 0u); // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(info->flags.Raw(), 0u); // NOLINT(bugprone-unchecked-optional-access)
-
-    chip::Test::BumpVersion();
-    info = model.GetServerClusterInfo(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
-    ASSERT_TRUE(info.has_value());
-    EXPECT_EQ(info->dataVersion, 1u); // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(info->flags.Raw(), 0u); // NOLINT(bugprone-unchecked-optional-access)
+    serverClusters = model.ServerClusters(kMockEndpoint3);
+    ASSERT_EQ(serverClusters.size(), 4u);
+    EXPECT_EQ(serverClusters[0].clusterId, MockClusterId(1));
+    EXPECT_EQ(serverClusters[1].clusterId, MockClusterId(2));
+    EXPECT_EQ(serverClusters[2].clusterId, MockClusterId(3));
+    EXPECT_EQ(serverClusters[3].clusterId, MockClusterId(4));
 }
 
 TEST_F(TestCodegenModelViaMocks, IterateOverClientClusters)
@@ -1016,53 +965,20 @@ TEST_F(TestCodegenModelViaMocks, IterateOverClientClusters)
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
-    EXPECT_FALSE(model.FirstClientCluster(kEndpointIdThatIsMissing).HasValidIds());
-    EXPECT_FALSE(model.FirstClientCluster(kInvalidEndpointId).HasValidIds());
-    EXPECT_FALSE(model.NextClientCluster(ConcreteClusterPath(kInvalidEndpointId, 123)).HasValidIds());
-    EXPECT_FALSE(model.NextClientCluster(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).HasValidIds());
-    EXPECT_FALSE(model.NextClientCluster(ConcreteClusterPath(kMockEndpoint1, 981u)).HasValidIds());
+    EXPECT_TRUE(model.ClientClusters(kEndpointIdThatIsMissing).empty());
+    EXPECT_TRUE(model.ClientClusters(kInvalidEndpointId).empty());
 
     // mock endpoint 1 has 2 mock client clusters: 3 and 4
-    ConcreteClusterPath path = model.FirstClientCluster(kMockEndpoint1);
-    ASSERT_TRUE(path.HasValidIds());
-    EXPECT_EQ(path.mEndpointId, kMockEndpoint1);
-    EXPECT_EQ(path.mClusterId, MockClusterId(3));
+    auto clientClusters = model.ClientClusters(kMockEndpoint1);
 
-    path = model.NextClientCluster(path);
-    ASSERT_TRUE(path.HasValidIds());
-    EXPECT_EQ(path.mEndpointId, kMockEndpoint1);
-    EXPECT_EQ(path.mClusterId, MockClusterId(4));
-
-    path = model.NextClientCluster(path);
-    EXPECT_FALSE(path.HasValidIds());
+    const ClusterId kExpectedClusters1[] = { MockClusterId(3), MockClusterId(4) };
+    ASSERT_TRUE(clientClusters.GetSpanValidForLifetime().data_equal(Span<const ClusterId>(kExpectedClusters1)));
 
     // mock endpoint 2 has 1 mock client clusters: 3(has server side at the same time) and 4
-    path = model.FirstClientCluster(kMockEndpoint2);
-    for (uint16_t clusterId = 3; clusterId <= 4; clusterId++)
-    {
-        ASSERT_TRUE(path.HasValidIds());
-        EXPECT_EQ(path.mEndpointId, kMockEndpoint2);
-        EXPECT_EQ(path.mClusterId, MockClusterId(clusterId));
-        path = model.NextClientCluster(path);
-    }
-    EXPECT_FALSE(path.HasValidIds());
+    clientClusters = model.ClientClusters(kMockEndpoint2);
 
-    // repeat calls should work
-    for (int i = 0; i < 10; i++)
-    {
-        path = model.FirstClientCluster(kMockEndpoint1);
-        ASSERT_TRUE(path.HasValidIds());
-        EXPECT_EQ(path.mEndpointId, kMockEndpoint1);
-        EXPECT_EQ(path.mClusterId, MockClusterId(3));
-    }
-
-    for (int i = 0; i < 10; i++)
-    {
-        ConcreteClusterPath nextPath = model.NextClientCluster(path);
-        ASSERT_TRUE(nextPath.HasValidIds());
-        EXPECT_EQ(nextPath.mEndpointId, kMockEndpoint1);
-        EXPECT_EQ(nextPath.mClusterId, MockClusterId(4));
-    }
+    const ClusterId kExpectedClusters2[] = { MockClusterId(3), MockClusterId(4) };
+    ASSERT_TRUE(clientClusters.GetSpanValidForLifetime().data_equal(Span<const ClusterId>(kExpectedClusters2)));
 }
 
 TEST_F(TestCodegenModelViaMocks, IterateOverAttributes)
@@ -1071,89 +987,46 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAttributes)
     CodegenDataModelProviderWithContext model;
 
     // invalid paths should return in "no more data"
-    ASSERT_FALSE(model.FirstAttribute(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).path.HasValidIds());
-    ASSERT_FALSE(model.FirstAttribute(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1))).path.HasValidIds());
-    ASSERT_FALSE(model.FirstAttribute(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10))).path.HasValidIds());
-    ASSERT_FALSE(model.FirstAttribute(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).path.HasValidIds());
-
-    ASSERT_FALSE(model.NextAttribute(ConcreteAttributePath(kEndpointIdThatIsMissing, MockClusterId(1), 1u)).path.HasValidIds());
-    ASSERT_FALSE(model.NextAttribute(ConcreteAttributePath(kInvalidEndpointId, MockClusterId(1), 1u)).path.HasValidIds());
-    ASSERT_FALSE(model.NextAttribute(ConcreteAttributePath(kMockEndpoint1, MockClusterId(10), 1u)).path.HasValidIds());
-    ASSERT_FALSE(model.NextAttribute(ConcreteAttributePath(kMockEndpoint1, kInvalidClusterId, 1u)).path.HasValidIds());
-    ASSERT_FALSE(model.NextAttribute(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), 987u)).path.HasValidIds());
+    ASSERT_TRUE(model.Attributes(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).empty());
+    ASSERT_TRUE(model.Attributes(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1))).empty());
+    ASSERT_TRUE(model.Attributes(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10))).empty());
+    ASSERT_TRUE(model.Attributes(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).empty());
 
     // should be able to iterate over valid paths
-    AttributeEntry entry = model.FirstAttribute(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
-    ASSERT_TRUE(entry.path.HasValidIds());
-    ASSERT_EQ(entry.path.mEndpointId, kMockEndpoint2);
-    ASSERT_EQ(entry.path.mClusterId, MockClusterId(2));
-    ASSERT_EQ(entry.path.mAttributeId, ClusterRevision::Id);
-    ASSERT_FALSE(entry.info.flags.Has(AttributeQualityFlags::kListAttribute));
+    auto attributes = model.Attributes(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
+    ASSERT_EQ(attributes.size(), 4u);
 
-    entry = model.NextAttribute(entry.path);
-    ASSERT_TRUE(entry.path.HasValidIds());
-    ASSERT_EQ(entry.path.mEndpointId, kMockEndpoint2);
-    ASSERT_EQ(entry.path.mClusterId, MockClusterId(2));
-    ASSERT_EQ(entry.path.mAttributeId, FeatureMap::Id);
-    ASSERT_FALSE(entry.info.flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_EQ(attributes[0].attributeId, ClusterRevision::Id);
+    ASSERT_FALSE(attributes[0].flags.Has(AttributeQualityFlags::kListAttribute));
 
-    entry = model.NextAttribute(entry.path);
-    ASSERT_TRUE(entry.path.HasValidIds());
-    ASSERT_EQ(entry.path.mEndpointId, kMockEndpoint2);
-    ASSERT_EQ(entry.path.mClusterId, MockClusterId(2));
-    ASSERT_EQ(entry.path.mAttributeId, MockAttributeId(1));
-    ASSERT_FALSE(entry.info.flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_EQ(attributes[1].attributeId, FeatureMap::Id);
+    ASSERT_FALSE(attributes[1].flags.Has(AttributeQualityFlags::kListAttribute));
 
-    entry = model.NextAttribute(entry.path);
-    ASSERT_TRUE(entry.path.HasValidIds());
-    ASSERT_EQ(entry.path.mEndpointId, kMockEndpoint2);
-    ASSERT_EQ(entry.path.mClusterId, MockClusterId(2));
-    ASSERT_EQ(entry.path.mAttributeId, MockAttributeId(2));
-    ASSERT_TRUE(entry.info.flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_EQ(attributes[2].attributeId, MockAttributeId(1));
+    ASSERT_FALSE(attributes[2].flags.Has(AttributeQualityFlags::kListAttribute));
 
-    entry = model.NextAttribute(entry.path);
-    ASSERT_FALSE(entry.path.HasValidIds());
-
-    // repeated calls should work
-    for (int i = 0; i < 10; i++)
-    {
-        entry = model.FirstAttribute(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
-        ASSERT_TRUE(entry.path.HasValidIds());
-        ASSERT_EQ(entry.path.mEndpointId, kMockEndpoint2);
-        ASSERT_EQ(entry.path.mClusterId, MockClusterId(2));
-        ASSERT_EQ(entry.path.mAttributeId, ClusterRevision::Id);
-        ASSERT_FALSE(entry.info.flags.Has(AttributeQualityFlags::kListAttribute));
-    }
-
-    for (int i = 0; i < 10; i++)
-    {
-        entry = model.NextAttribute(ConcreteAttributePath(kMockEndpoint2, MockClusterId(2), MockAttributeId(1)));
-        ASSERT_TRUE(entry.path.HasValidIds());
-        ASSERT_EQ(entry.path.mEndpointId, kMockEndpoint2);
-        ASSERT_EQ(entry.path.mClusterId, MockClusterId(2));
-        ASSERT_EQ(entry.path.mAttributeId, MockAttributeId(2));
-        ASSERT_TRUE(entry.info.flags.Has(AttributeQualityFlags::kListAttribute));
-    }
+    ASSERT_EQ(attributes[3].attributeId, MockAttributeId(2));
+    ASSERT_TRUE(attributes[3].flags.Has(AttributeQualityFlags::kListAttribute));
 }
 
-TEST_F(TestCodegenModelViaMocks, GetAttributeInfo)
+TEST_F(TestCodegenModelViaMocks, FindAttribute)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
+    AttributeFinder finder(&model);
+
     // various non-existent or invalid paths should return no info data
-    ASSERT_FALSE(
-        model.GetAttributeInfo(ConcreteAttributePath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)).has_value());
-    ASSERT_FALSE(model.GetAttributeInfo(ConcreteAttributePath(kInvalidEndpointId, kInvalidClusterId, FeatureMap::Id)).has_value());
-    ASSERT_FALSE(model.GetAttributeInfo(ConcreteAttributePath(kInvalidEndpointId, MockClusterId(1), FeatureMap::Id)).has_value());
-    ASSERT_FALSE(model.GetAttributeInfo(ConcreteAttributePath(kMockEndpoint1, kInvalidClusterId, FeatureMap::Id)).has_value());
-    ASSERT_FALSE(model.GetAttributeInfo(ConcreteAttributePath(kMockEndpoint1, MockClusterId(10), FeatureMap::Id)).has_value());
-    ASSERT_FALSE(model.GetAttributeInfo(ConcreteAttributePath(kMockEndpoint1, MockClusterId(10), kInvalidAttributeId)).has_value());
-    ASSERT_FALSE(model.GetAttributeInfo(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10))).has_value());
+    ASSERT_FALSE(finder.Find(ConcreteAttributePath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)).has_value());
+    ASSERT_FALSE(finder.Find(ConcreteAttributePath(kInvalidEndpointId, kInvalidClusterId, FeatureMap::Id)).has_value());
+    ASSERT_FALSE(finder.Find(ConcreteAttributePath(kInvalidEndpointId, MockClusterId(1), FeatureMap::Id)).has_value());
+    ASSERT_FALSE(finder.Find(ConcreteAttributePath(kMockEndpoint1, kInvalidClusterId, FeatureMap::Id)).has_value());
+    ASSERT_FALSE(finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(10), FeatureMap::Id)).has_value());
+    ASSERT_FALSE(finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(10), kInvalidAttributeId)).has_value());
+    ASSERT_FALSE(finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10))).has_value());
 
     // valid info
-    std::optional<AttributeInfo> info =
-        model.GetAttributeInfo(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), FeatureMap::Id));
+    std::optional<AttributeEntry2> info = finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), FeatureMap::Id));
     ASSERT_TRUE(info.has_value());
     EXPECT_FALSE(info->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
 
@@ -1161,14 +1034,14 @@ TEST_F(TestCodegenModelViaMocks, GetAttributeInfo)
     EXPECT_EQ(info->readPrivilege, chip::Access::Privilege::kAdminister);  // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(info->writePrivilege, chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
 
-    info = model.GetAttributeInfo(ConcreteAttributePath(kMockEndpoint2, MockClusterId(2), MockAttributeId(2)));
+    info = finder.Find(ConcreteAttributePath(kMockEndpoint2, MockClusterId(2), MockAttributeId(2)));
     ASSERT_TRUE(info.has_value());
     EXPECT_TRUE(info->flags.Has(AttributeQualityFlags::kListAttribute));   // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(info->readPrivilege, chip::Access::Privilege::kAdminister);  // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(info->writePrivilege, chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
 
     // test a read-only attribute, which will not have a write privilege
-    info = model.GetAttributeInfo(ConcreteAttributePath(kMockEndpoint3, MockClusterId(3), kReadOnlyAttributeId));
+    info = finder.Find(ConcreteAttributePath(kMockEndpoint3, MockClusterId(3), kReadOnlyAttributeId));
     ASSERT_TRUE(info.has_value());
     EXPECT_FALSE(info->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(info->readPrivilege, chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
@@ -1181,13 +1054,14 @@ TEST_F(TestCodegenModelViaMocks, GlobalAttributeInfo)
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
-    std::optional<AttributeInfo> info = model.GetAttributeInfo(
+    AttributeFinder finder(&model);
+
+    std::optional<AttributeEntry2> info = finder.Find(
         ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id));
 
     ASSERT_FALSE(info.has_value());
 
-    info = model.GetAttributeInfo(
-        ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id));
+    info = finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id));
     ASSERT_FALSE(info.has_value());
 }
 
