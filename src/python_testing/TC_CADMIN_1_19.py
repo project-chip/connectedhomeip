@@ -40,6 +40,7 @@ from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_bo
                                          default_matter_test_main)
 from mobly import asserts
 
+
 class TC_CADMIN_1_19(MatterBaseTest):
     def generate_unique_random_value(self, value):
         while True:
