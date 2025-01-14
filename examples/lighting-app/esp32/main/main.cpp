@@ -210,9 +210,10 @@ extern "C" void app_main()
 #endif
 
     SetDeviceAttestationCredentialsProvider(get_dac_provider());
-    ESPOpenThreadInit();
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+
+    ESPOpenThreadInit();
 
     error = GetAppTask().StartAppTask();
     if (error != CHIP_NO_ERROR)
