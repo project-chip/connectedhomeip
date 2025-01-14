@@ -58,7 +58,7 @@ uint32_t ConfigurationManagerImpl::mTotalOperationalHours = 0;
 
 void ConfigurationManagerImpl::TotalOperationalHoursTimerCallback(TimerHandle_t timer)
 {
-    (void)ConfigurationMgrImpl().StoreTotalOperationalHours(++mTotalOperationalHours);
+    (void) ConfigurationMgrImpl().StoreTotalOperationalHours(++mTotalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::Init()
