@@ -29,7 +29,7 @@ using namespace chip::app::Clusters::SampleExternalManufacturerSpecific::Attribu
 void MatterSampleExternalManufacturerSpecificPluginServerInitCallback()
 {
     ChipLogProgress(Zcl, "Sample Manufacturer Specific Init. Ep %d, Total Ep %u",
-                    MATTER_DM_SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER_SERVER_ENDPOINT_COUNT,
+                    MATTER_DM_SAMPLE_EXTERNAL_MANUFACTURER_SPECIFIC_CLUSTER_SERVER_ENDPOINT_COUNT,
                     static_cast<uint16_t>(kNumSupportedEndpoints));
     ReturnOnFailure(
         CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&SampleExternalManufacturerSpecificServer::Instance()));
