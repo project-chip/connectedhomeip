@@ -159,6 +159,7 @@ __all__ = [
     "ContentAppObserver",
     "ZoneManagement",
     "CameraAvStreamManagement",
+    "CameraAvSettingsUserLevelManagement",
     "WebRTCTransportProvider",
     "WebRTCTransportRequestor",
     "Chime",
@@ -46226,6 +46227,458 @@ class CameraAvStreamManagement(Cluster):
             minResolution: typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct] = None
             maxResolution: typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct] = None
             quality: typing.Optional[uint] = None
+
+
+@dataclass
+class CameraAvSettingsUserLevelManagement(Cluster):
+    id: typing.ClassVar[int] = 0x00000552
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="MPTZPosition", Tag=0x00000000, Type=typing.Optional[CameraAvSettingsUserLevelManagement.Structs.MPTZStruct]),
+                ClusterObjectFieldDescriptor(Label="maxPresets", Tag=0x00000001, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="MPTZPresets", Tag=0x00000002, Type=typing.Optional[typing.List[CameraAvSettingsUserLevelManagement.Structs.MPTZPresetStruct]]),
+                ClusterObjectFieldDescriptor(Label="DPTZRelativeMove", Tag=0x00000003, Type=typing.Optional[typing.List[uint]]),
+                ClusterObjectFieldDescriptor(Label="zoomMax", Tag=0x00000004, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="tiltMin", Tag=0x00000005, Type=typing.Optional[int]),
+                ClusterObjectFieldDescriptor(Label="tiltMax", Tag=0x00000006, Type=typing.Optional[int]),
+                ClusterObjectFieldDescriptor(Label="panMin", Tag=0x00000007, Type=typing.Optional[int]),
+                ClusterObjectFieldDescriptor(Label="panMax", Tag=0x00000008, Type=typing.Optional[int]),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    MPTZPosition: typing.Optional[CameraAvSettingsUserLevelManagement.Structs.MPTZStruct] = None
+    maxPresets: typing.Optional[uint] = None
+    MPTZPresets: typing.Optional[typing.List[CameraAvSettingsUserLevelManagement.Structs.MPTZPresetStruct]] = None
+    DPTZRelativeMove: typing.Optional[typing.List[uint]] = None
+    zoomMax: typing.Optional[uint] = None
+    tiltMin: typing.Optional[int] = None
+    tiltMax: typing.Optional[int] = None
+    panMin: typing.Optional[int] = None
+    panMax: typing.Optional[int] = None
+    generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
+    acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
+    attributeList: typing.List[uint] = field(default_factory=lambda: [])
+    featureMap: uint = 0
+    clusterRevision: uint = 0
+
+    class Bitmaps:
+        class Feature(IntFlag):
+            kDigitalPTZ = 0x1
+            kMechanicalPan = 0x2
+            kMechanicalTilt = 0x4
+            kMechanicalZoom = 0x8
+            kMechanicalPresets = 0x10
+
+    class Structs:
+        @dataclass
+        class MPTZStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="pan", Tag=0, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="tilt", Tag=1, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="zoom", Tag=2, Type=typing.Optional[uint]),
+                    ])
+
+            pan: 'typing.Optional[int]' = None
+            tilt: 'typing.Optional[int]' = None
+            zoom: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class MPTZPresetStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="presetID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(Label="settings", Tag=2, Type=CameraAvSettingsUserLevelManagement.Structs.MPTZStruct),
+                    ])
+
+            presetID: 'uint' = 0
+            name: 'str' = ""
+            settings: 'CameraAvSettingsUserLevelManagement.Structs.MPTZStruct' = field(default_factory=lambda: CameraAvSettingsUserLevelManagement.Structs.MPTZStruct())
+
+        @dataclass
+        class ViewportStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="x1", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="y1", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="x2", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="y2", Tag=3, Type=uint),
+                    ])
+
+            x1: 'uint' = 0
+            y1: 'uint' = 0
+            x2: 'uint' = 0
+            y2: 'uint' = 0
+
+    class Commands:
+        @dataclass
+        class MPTZSetPosition(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000552
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="pan", Tag=0, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="tilt", Tag=1, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="zoom", Tag=2, Type=typing.Optional[uint]),
+                    ])
+
+            pan: typing.Optional[int] = None
+            tilt: typing.Optional[int] = None
+            zoom: typing.Optional[uint] = None
+
+        @dataclass
+        class MPTZRelativeMove(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000552
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="panDelta", Tag=0, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="tiltDelta", Tag=1, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="zoomDelta", Tag=2, Type=typing.Optional[int]),
+                    ])
+
+            panDelta: typing.Optional[int] = None
+            tiltDelta: typing.Optional[int] = None
+            zoomDelta: typing.Optional[int] = None
+
+        @dataclass
+        class MPTZMoveToPreset(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000552
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="presetID", Tag=0, Type=uint),
+                    ])
+
+            presetID: uint = 0
+
+        @dataclass
+        class MPTZSavePreset(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000552
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="presetID", Tag=0, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=str),
+                    ])
+
+            presetID: typing.Optional[uint] = None
+            name: str = ""
+
+        @dataclass
+        class MPTZRemovePreset(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000552
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="presetID", Tag=0, Type=uint),
+                    ])
+
+            presetID: uint = 0
+
+        @dataclass
+        class DPTZSetViewport(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000552
+            command_id: typing.ClassVar[int] = 0x00000005
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="viewport", Tag=1, Type=CameraAvSettingsUserLevelManagement.Structs.ViewportStruct),
+                    ])
+
+            videoStreamID: uint = 0
+            viewport: CameraAvSettingsUserLevelManagement.Structs.ViewportStruct = field(default_factory=lambda: CameraAvSettingsUserLevelManagement.Structs.ViewportStruct())
+
+        @dataclass
+        class DPTZRelativeMove(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000552
+            command_id: typing.ClassVar[int] = 0x00000006
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="deltaX", Tag=1, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="deltaY", Tag=2, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="zoomDelta", Tag=3, Type=typing.Optional[int]),
+                    ])
+
+            videoStreamID: uint = 0
+            deltaX: typing.Optional[int] = None
+            deltaY: typing.Optional[int] = None
+            zoomDelta: typing.Optional[int] = None
+
+    class Attributes:
+        @dataclass
+        class MPTZPosition(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000552
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvSettingsUserLevelManagement.Structs.MPTZStruct])
+
+            value: typing.Optional[CameraAvSettingsUserLevelManagement.Structs.MPTZStruct] = None
+
+        @dataclass
+        class MaxPresets(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000552
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
+
+        @dataclass
+        class MPTZPresets(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000552
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvSettingsUserLevelManagement.Structs.MPTZPresetStruct]])
+
+            value: typing.Optional[typing.List[CameraAvSettingsUserLevelManagement.Structs.MPTZPresetStruct]] = None
+
+        @dataclass
+        class DPTZRelativeMove(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000552
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[uint]])
+
+            value: typing.Optional[typing.List[uint]] = None
+
+        @dataclass
+        class ZoomMax(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000552
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
+
+        @dataclass
+        class TiltMin(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000552
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[int])
+
+            value: typing.Optional[int] = None
+
+        @dataclass
+        class TiltMax(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000552
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[int])
+
+            value: typing.Optional[int] = None
+
+        @dataclass
+        class PanMin(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000552
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[int])
+
+            value: typing.Optional[int] = None
+
+        @dataclass
+        class PanMax(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000552
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000008
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[int])
+
+            value: typing.Optional[int] = None
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000552
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000552
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000552
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000552
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000552
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
 
 
 @dataclass

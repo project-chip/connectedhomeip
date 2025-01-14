@@ -65,10 +65,10 @@ bool AttributePathExpandIterator::AdvanceOutputPath()
     ///    - kInvalid* constants are used to define "no value available (yet)" and
     ///      iteration loop will fill the first value when such a value is seen (fixed for non-wildcard
     ///      or iteration-based in case of wildcards).
-    ///    - Iteration of the output path is done in breadth-first order: first endpoint, then cluster, then attribute.
+    ///    - Iteration of the output path is done in order: first endpoint, then cluster, then attribute.
     /// Processing works like:
     ///    - Initial state is kInvalidEndpointId/kInvalidClusterId/kInvalidAttributeId
-    ///    - First loop pass fills-in endointID, followed by clusterID, followed by attributeID
+    ///    - First loop pass fills-in endpointID, followed by clusterID, followed by attributeID
     ///    - Whenever one level is done iterating (there is no "next") the following
     ///      "higher path component" is updated:
     ///         - once a valid path exists, try to advance attributeID
@@ -103,7 +103,7 @@ bool AttributePathExpandIterator::AdvanceOutputPath()
             }
         }
 
-        // No valid cluster, try advance the endpoint, see if a suitable on exists.
+        // No valid cluster, try advance the endpoint, see if a suitable one exists.
         std::optional<EndpointId> nextEndpoint = NextEndpointId();
         if (nextEndpoint.has_value())
         {
@@ -142,7 +142,12 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
         {
             mAttributeIterator = mDataModelProvider->GetAttributes(mPosition.mOutputPath);
         }
-        else
+
+        // At this point, the attributeID is NOT a wildcard (i.e. it is fixed).
+        //
+        // For wildcard expansion, we validate that this is a valid attribute for the given
+        // cluster on the given endpoint. If not a wildcard expansion, return it as-is.
+        if (mPosition.mAttributePath->mValue.IsWildcardPath())
         {
             // At this point, the attributeID is NOT a wildcard (i.e. it is fixed)
             //

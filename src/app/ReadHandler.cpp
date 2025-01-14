@@ -880,7 +880,8 @@ void ReadHandler::AttributePathIsDirty(DataModel::Provider * apDataModel, const 
         // If we're currently in the middle of generating reports for a given cluster and that in turn is marked dirty, let's reset
         // our iterator to point back to the beginning of that cluster. This ensures that the receiver will get a coherent view of
         // the state of the cluster as present on the server
-        mAttributePathExpandPosition.IterateFromTheStartOfTheCurrentCluster();
+        mAttributePathExpandPosition.IterateFromTheStartOfTheCurrentClusterIfAttributeWildcard();
+
         mAttributeEncoderState.Reset();
     }
 
