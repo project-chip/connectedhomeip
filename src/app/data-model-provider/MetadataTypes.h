@@ -194,6 +194,7 @@ public:
     virtual MetadataList<AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) = 0;
     virtual MetadataList<SemanticTag> SemanticTags(EndpointId endpointId)                         = 0;
     virtual MetadataList<DeviceTypeEntry> DeviceTypes(EndpointId endpointId)                      = 0;
+    virtual MetadataList<ClusterId> ClientClusters(EndpointId endpointId) = 0;
 
     /// Workaround function to report attribute change.
     ///

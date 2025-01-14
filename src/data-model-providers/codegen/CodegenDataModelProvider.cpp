@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "lib/core/ErrorStr.h"
 #include <cstdint>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
@@ -647,6 +646,51 @@ std::optional<DataModel::ClusterInfo> CodegenDataModelProvider::GetServerCluster
     }
 
     return std::make_optional(std::get<DataModel::ClusterInfo>(info));
+}
+
+DataModel::MetadataList<ClusterId> CodegenDataModelProvider::ClientClusters(EndpointId endpointId)
+{
+    const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);
+
+    DataModel::MetadataList<ClusterId> result;
+
+    VerifyOrReturnValue(endpoint != nullptr, result);
+    VerifyOrReturnValue(endpoint->clusterCount > 0, result);
+    VerifyOrReturnValue(endpoint->cluster != nullptr, result);
+
+    const EmberAfCluster * begin = endpoint->cluster;
+    const EmberAfCluster * end   = endpoint->cluster + endpoint->clusterCount;
+
+    const size_t clientClusterCount =
+        static_cast<size_t>(std::count_if(begin, end, [](const EmberAfCluster & cluster) { return cluster.IsClient(); }));
+
+    CHIP_ERROR err = result.reserve(clientClusterCount);
+    if (err != CHIP_NO_ERROR)
+    {
+#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+        ChipLogError(AppServer, "Failed to reserve space for client clusters: %" CHIP_ERROR_FORMAT, err.Format());
+#endif
+        return {};
+    }
+
+    for (const EmberAfCluster * cluster = begin; cluster != end; cluster++)
+    {
+        if (cluster->IsClient())
+        {
+            continue;
+        }
+
+        err = result.Append(cluster->clusterId);
+        if (err != CHIP_NO_ERROR)
+        {
+#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+            ChipLogError(AppServer, "Failed to append client cluster id: %" CHIP_ERROR_FORMAT, err.Format());
+#endif
+            break;
+        }
+    }
+
+    return result;
 }
 
 ConcreteClusterPath CodegenDataModelProvider::FirstClientCluster(EndpointId endpointId)

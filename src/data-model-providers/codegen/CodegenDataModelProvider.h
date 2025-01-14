@@ -105,6 +105,7 @@ public:
     DataModel::MetadataList<SemanticTag> SemanticTags(EndpointId endpointId) override;
     DataModel::MetadataList<DataModel::DeviceTypeEntry> DeviceTypes(EndpointId endpointId) override;
     DataModel::MetadataList<DataModel::EndpointEntry> Endpoints() override;
+    DataModel::MetadataList<ClusterId> ClientClusters(EndpointId endpointId) override;
 
     DataModel::ClusterEntry FirstServerCluster(EndpointId endpoint) override;
     DataModel::ClusterEntry NextServerCluster(const ConcreteClusterPath & before) override;
