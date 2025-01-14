@@ -24,8 +24,6 @@
  */
 
 #include "InteractionModelEngine.h"
-#include "app/ConcreteClusterPath.h"
-#include "app/data-model-provider/MetadataSearch.h"
 
 #include <algorithm>
 #include <cinttypes>
@@ -36,9 +34,11 @@
 #include <access/SubjectDescriptor.h>
 #include <app/AppConfig.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/EventPathParams.h>
 #include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataSearch.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/util/IMClusterCommandHandler.h>
