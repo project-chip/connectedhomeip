@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include "app/data-model-provider/MetadataSearch.h"
 #include "attributes_service/attributes_service.rpc.pb.h"
 #include "pigweed/rpc_services/internal/StatusUtils.h"
 
@@ -28,6 +27,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataSearch.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/util/attribute-storage.h>
