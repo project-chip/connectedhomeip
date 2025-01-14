@@ -1098,62 +1098,6 @@ cluster GeneralDiagnostics = 51 {
   command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
-/** This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
-Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
-Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
-cluster Switch = 59 {
-  revision 2;
-
-  bitmap Feature : bitmap32 {
-    kLatchingSwitch = 0x1;
-    kMomentarySwitch = 0x2;
-    kMomentarySwitchRelease = 0x4;
-    kMomentarySwitchLongPress = 0x8;
-    kMomentarySwitchMultiPress = 0x10;
-    kActionSwitch = 0x20;
-  }
-
-  info event SwitchLatched = 0 {
-    int8u newPosition = 0;
-  }
-
-  info event InitialPress = 1 {
-    int8u newPosition = 0;
-  }
-
-  info event LongPress = 2 {
-    int8u newPosition = 0;
-  }
-
-  info event ShortRelease = 3 {
-    int8u previousPosition = 0;
-  }
-
-  info event LongRelease = 4 {
-    int8u previousPosition = 0;
-  }
-
-  info event MultiPressOngoing = 5 {
-    int8u newPosition = 0;
-    int8u currentNumberOfPressesCounted = 1;
-  }
-
-  info event MultiPressComplete = 6 {
-    int8u previousPosition = 0;
-    int8u totalNumberOfPressesCounted = 1;
-  }
-
-  readonly attribute int8u numberOfPositions = 0;
-  readonly attribute int8u currentPosition = 1;
-  readonly attribute optional int8u multiPressMax = 2;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1; // NOTE: Default/not specifically set
@@ -1576,7 +1520,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_onoffpluginunit = 266, version 3;
+  device type ma_onofflight = 256, version 1;
 
 
   server cluster Identify {
@@ -1630,28 +1574,6 @@ endpoint 1 {
     handle command OffWithEffect;
     handle command OnWithRecallGlobalScene;
     handle command OnWithTimedOff;
-  }
-
-  server cluster Descriptor {
-    callback attribute deviceTypeList;
-    callback attribute serverList;
-    callback attribute clientList;
-    callback attribute partsList;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    callback attribute featureMap;
-    callback attribute clusterRevision;
-  }
-
-  server cluster Switch {
-    ram      attribute numberOfPositions default = 2;
-    ram      attribute currentPosition;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
   }
 }
 
