@@ -23,7 +23,6 @@
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/util/af-types.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <optional>
 
 namespace chip {
 namespace app {
@@ -150,8 +149,8 @@ public:
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
-    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder,
-                                                 std::optional<bool> markDirty = std::nullopt) override;
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override;
     std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
                                                         CommandHandler * handler) override;
 

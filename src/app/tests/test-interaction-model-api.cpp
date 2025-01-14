@@ -124,8 +124,7 @@ ActionReturnStatus TestImCustomDataModel::ReadAttribute(const ReadAttributeReque
     return err;
 }
 
-ActionReturnStatus TestImCustomDataModel::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder,
-                                                         std::optional<bool> markDirty)
+ActionReturnStatus TestImCustomDataModel::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
     if (request.path.mDataVersion.HasValue() && request.path.mDataVersion.Value() == Test::kRejectedDataVersion)
     {

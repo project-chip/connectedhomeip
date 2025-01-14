@@ -789,12 +789,12 @@ void TestEmberScalarTypeWrite(const typename NumericAttributeTraits<T>::WorkingT
     // non-nullable test with markDirty set to false
     {
         WriteOperation test(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZclType));
-        test.SetSubjectDescriptor(kAdminSubjectDescriptor);
+        test.SetSubjectDescriptor(kAdminSubjectDescriptor).SetMarkDirty(std::make_optional(false));
 
         AttributeValueDecoder decoder = test.DecoderFor(value);
 
         // write should succeed
-        ASSERT_TRUE(model.WriteAttribute(test.GetRequest(), decoder, std::make_optional(false)).IsSuccess());
+        ASSERT_TRUE(model.WriteAttribute(test.GetRequest(), decoder).IsSuccess());
 
         // Validate data after write
         chip::ByteSpan writtenData = Test::GetEmberBuffer();

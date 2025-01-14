@@ -90,8 +90,7 @@ std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteDataAttribute
 } // namespace
 
 DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                       AttributeValueDecoder & decoder,
-                                                                       std::optional<bool> markDirty)
+                                                                       AttributeValueDecoder & decoder)
 {
     ChipLogDetail(DataManagement, "Writing attribute: Cluster=" ChipLogFormatMEI " Endpoint=0x%x AttributeId=" ChipLogFormatMEI,
                   ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId));
@@ -215,7 +214,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     std::optional<CHIP_ERROR> aai_result = TryWriteViaAccessInterface(request.path, aai, decoder);
     if (aai_result.has_value())
     {
-        if ((*aai_result == CHIP_NO_ERROR) && markDirty.value_or(true))
+        if ((*aai_result == CHIP_NO_ERROR) && request.markDirty.value_or(true))
         {
             // TODO: this is awkward since it provides AAI no control over this, specifically
             //       AAI may not want to increase versions for some attributes that are Q
@@ -242,9 +241,9 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 
     dataInput.SetChangeListener(&change_listener);
     // TODO: dataInput.SetMarkDirty() should be according to `ChangesOmited`
-    if (markDirty.has_value())
+    if (request.markDirty.has_value())
     {
-        dataInput.SetMarkDirty(markDirty.value() ? MarkAttributeDirty::kYes : MarkAttributeDirty::kNo);
+        dataInput.SetMarkDirty(request.markDirty.value() ? MarkAttributeDirty::kYes : MarkAttributeDirty::kNo);
     }
 
     if (request.operationFlags.Has(DataModel::OperationFlags::kInternal))

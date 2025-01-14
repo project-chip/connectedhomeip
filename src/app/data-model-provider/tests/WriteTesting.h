@@ -90,6 +90,12 @@ public:
         return *this;
     }
 
+    WriteOperation & SetMarkDirty(std::optional<bool> markDirty)
+    {
+        mRequest.markDirty = markDirty;
+        return *this;
+    }
+
     const DataModel::WriteAttributeRequest & GetRequest() const { return mRequest; }
 
     template <typename T>
