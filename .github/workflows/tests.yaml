@@ -198,6 +198,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/time-format-localization-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/time-synchronization-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/timer-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/tls-certificate-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/user-label-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/unit-localization-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/wake-on-lan-cluster.xml \

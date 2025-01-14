@@ -105,6 +105,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/thread-network-directory-clus
 load "../src/app/zap-templates/zcl/data-model/chip/time-format-localization-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/time-synchronization-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/timer-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/tls-certificate-management-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/unit-localization-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/user-label-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/wake-on-lan-cluster.xml";
