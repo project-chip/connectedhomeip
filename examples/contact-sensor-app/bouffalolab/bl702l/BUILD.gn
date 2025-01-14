@@ -16,7 +16,7 @@ import("//build_overrides/bouffalolab_iot_sdk.gni")
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${bouffalolab_iot_sdk_build_root}/bl702/bl_iot_sdk.gni")
+import("${bouffalolab_iot_sdk_build_root}/bl702l/bl_iot_sdk.gni")
 import("${bouffalolab_iot_sdk_build_root}/common/bouffalolab_executable.gni")
 import("${build_root}/config/defaults.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
@@ -32,7 +32,7 @@ if (chip_enable_pw_rpc) {
 
 assert(current_os == "freertos")
 
-example_dir = "${chip_root}/examples/lighting-app/bouffalolab"
+example_dir = "${chip_root}/examples/contact-sensor-app/bouffalolab"
 examples_plat_dir = "${chip_root}/examples/platform/bouffalolab"
 
 declare_args() {
@@ -46,31 +46,27 @@ declare_args() {
   ota_auto_reboot_delay_seconds = 5
 
   enable_heap_monitoring = false
-  enable_reset_counter = false
 
   setupPinCode = 20202021
   setupDiscriminator = 3840
 
-  board = "XT-ZB6-DevKit"
-  module_type = "BL706C-22"
+  board = "BL704L-EVB"
+  module_type = "BL704L"
   baudrate = 2000000
 
-  enable_cdc_module = false
   enable_psram = true
 }
 
 bl_iot_sdk("sdk") {
   include_dirs = [
-    "${example_dir}/bl702",
-    "${example_dir}/bl702/include",
+    "${example_dir}/bl702l",
+    "${example_dir}/bl702l/include",
     "${examples_plat_dir}",
-    "${examples_plat_dir}/common/iot_sdk",
-    "${examples_plat_dir}/common/route_hook",
-    "${chip_root}/src/platform/bouffalolab/BL702",
+    "${chip_root}/src/platform/bouffalolab/BL702L",
     "${chip_root}/src/platform/bouffalolab/common",
   ]
 
-  freertos_config = "${example_dir}/bl702/FreeRTOSConfig.h"
+  freertos_config = "${example_dir}/bl702l/FreeRTOSConfig.h"
 
   defines = [
     "INCLUDE_xSemaphoreGetMutexHolder=1",
@@ -85,48 +81,26 @@ bl_iot_sdk("sdk") {
   if (chip_enable_pw_rpc) {
     include_dirs += [ "${examples_plat_dir}/common/rpc" ]
     defines += [ "DISABLE_PRINT=1" ]
-  } else {
-    if (chip_build_libshell) {
-      include_dirs += [ "${examples_plat_dir}/common/plat" ]
-    }
+  } else if (chip_build_libshell) {
+    include_dirs += [ "${examples_plat_dir}/common/plat" ]
   }
 
-  if (chip_enable_wifi || chip_enable_ethernet) {
-    include_dirs += [ "${examples_plat_dir}/bl702/lwipopts" ]
+  if (chip_enable_openthread) {
+    defines += [ "OPENTHREAD_CONFIG_PLATFORM_XTAL_ACCURACY=40" ]
   }
 
-  defines += [ "CHIP_DEVICE_CONFIG_ENABLE_ETHERNET=${chip_enable_ethernet}" ]
-  if (chip_enable_ethernet) {
-    defines += [ "CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE=48" ]
-  }
-
-  if (enable_psram) {
-    defines += [ "CFG_USE_PSRAM=1" ]
-  }
-
-  if ("BL706C-22" == module_type) {
-    defines += [ "CFG_PSRAM_DUAL_BANK=1" ]
-  }
-
-  if (defined(enable_cdc_module) && enable_cdc_module) {
-    defines += [ "CFG_USB_CDC_ENABLE" ]
-  }
+  assert(enable_psram == true, "BL702L must have psram for this application")
+  defines += [ "CFG_USE_PSRAM=1" ]
 }
 
-chip_data_model("bouffalolab-lighting") {
-  if (chip_enable_openthread) {
-    zap_file = "${example_dir}/data_model/lighting-app-thread.zap"
-  } else if (chip_enable_wifi) {
-    zap_file = "${example_dir}/data_model/lighting-app-wifi.zap"
-  } else {
-    zap_file = "${example_dir}/data_model/lighting-app-ethernet.zap"
-  }
+chip_data_model("bouffalolab_contact_sensor") {
+  zap_file = "${example_dir}/data_model/contact-sensor-app.zap"
   is_server = true
 }
 
-bouffalolab_executable("lighting_app") {
-  output_name = "chip-bl702-lighting-example.out"
-  bl_plat_name = "bl702"
+bouffalolab_executable("contact_sensor_app") {
+  output_name = "chip-bl702l-contact-sensor-example.out"
+  bl_plat_name = "bl702l"
 
   defines = [
     "APP_TASK_STACK_SIZE=2048",
@@ -140,31 +114,32 @@ bouffalolab_executable("lighting_app") {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1" ]
   }
 
-  if (false == enable_reset_counter) {
-    defines += [ "BOOT_PIN_RESET=31" ]
+  if ("BL704LDK" == board) {
+    defines += [ "XT_ZB6_DevKit" ]
   }
 
-  if ("XT-ZB6-DevKit" == board) {
-    defines += [ "XT_ZB6_DevKit" ]
-  } else if ("BL706-NIGHT-LIGHT" == board) {
-    defines += [ "BL706_NIGHT_LIGHT" ]
-  }
+  include_dirs = [
+    "${chip_root}/src/platform/bouffalolab/BL702L",
+    "${example_dir}/common",
+    "${example_dir}/bl702l",
+    "${examples_plat_dir}/common/plat",
+    "${examples_plat_dir}/common/iot_sdk",
+  ]
 
   sources = [
+    "${example_dir}/bl702l/app_pds.cpp",
     "${example_dir}/common/AppTask.cpp",
     "${example_dir}/common/ZclCallbacks.cpp",
     "${examples_plat_dir}/common/iot_sdk/aos_task.c",
-    "${examples_plat_dir}/common/iot_sdk/demo_pwm.c",
     "${examples_plat_dir}/common/iot_sdk/platform_port.cpp",
     "${examples_plat_dir}/common/iot_sdk/uart.cpp",
-    "${examples_plat_dir}/common/plat/LEDWidget.cpp",
     "${examples_plat_dir}/common/plat/OTAConfig.cpp",
     "${examples_plat_dir}/common/plat/main.cpp",
     "${examples_plat_dir}/common/plat/platform.cpp",
   ]
 
   deps = [
-    ":bouffalolab-lighting",
+    ":bouffalolab_contact_sensor",
     ":sdk",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
@@ -172,53 +147,18 @@ bouffalolab_executable("lighting_app") {
     "${chip_root}/src/setup_payload",
   ]
 
-  include_dirs = [
-    "${chip_root}/src/platform/bouffalolab/BL702",
-    "${example_dir}/common",
-    "${example_dir}/bl702",
-    "${examples_plat_dir}/common/plat",
-    "${examples_plat_dir}/common/iot_sdk",
-  ]
-
-  if (chip_enable_wifi || chip_enable_ethernet) {
-    include_dirs += [ "${examples_plat_dir}/bl702/lwipopts" ]
-  }
-
-  if (defined(enable_cdc_module) && enable_cdc_module) {
-    defines += [ "CFG_USB_CDC_ENABLE" ]
-  }
-
-  if (chip_enable_wifi || chip_enable_ethernet) {
-    include_dirs += [ "${examples_plat_dir}/common/route_hook" ]
-
-    if (chip_enable_wifi) {
-      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_WIFI" ]
-    }
-
-    sources += [
-      "${examples_plat_dir}/common/route_hook/bl_route_hook.c",
-      "${examples_plat_dir}/common/route_hook/bl_route_table.c",
-    ]
-  }
-
   if (chip_enable_openthread) {
     deps += [
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
     ]
 
-    if (chip_openthread_ftd) {
-      defines += [ "CHIP_DEVICE_CONFIG_THREAD_FTD=1" ]
-      deps += [
-        "${openthread_root}:libopenthread-cli-ftd",
-        "${openthread_root}:libopenthread-ftd",
-      ]
-    } else {
-      defines += [ "CHIP_DEVICE_CONFIG_THREAD_FTD=0" ]
-      deps += [
-        "${openthread_root}:libopenthread-cli-mtd",
-        "${openthread_root}:libopenthread-mtd",
-      ]
+    assert(chip_openthread_ftd == false,
+           "Only Thread MTD support on contact sensor application.")
+    defines += [ "CHIP_DEVICE_CONFIG_THREAD_FTD=0" ]
+    deps += [ "${openthread_root}:libopenthread-mtd" ]
+    if (chip_build_libshell) {
+      deps += [ "${openthread_root}:libopenthread-cli-mtd" ]
     }
   }
 
@@ -291,12 +231,9 @@ bouffalolab_executable("lighting_app") {
     sources += [ "${examples_plat_dir}/common/plat/MemMonitoring.cpp" ]
   }
 
-  if (enable_psram) {
-    defines += [ "CFG_USE_PSRAM=1" ]
-    ldscript = "${examples_plat_dir}/bl702/ldscripts/psram_flash.ld"
-  } else {
-    ldscript = "${examples_plat_dir}/bl702/ldscripts/flash.ld"
-  }
+  assert(enable_psram == true, "BL702L must have psram for this application")
+  defines += [ "CFG_USE_PSRAM=1" ]
+  ldscript = "${examples_plat_dir}/bl702l/ldscripts/psram_flash.ld"
 
   inputs = [ ldscript ]
 
@@ -316,10 +253,10 @@ bouffalolab_executable("lighting_app") {
   output_dir = root_out_dir
 }
 
-group("bl702") {
-  deps = [ ":lighting_app" ]
+group("bl702l") {
+  deps = [ ":contact_sensor_app" ]
 }
 
 group("default") {
-  deps = [ ":bl702" ]
+  deps = [ ":bl702l" ]
 }

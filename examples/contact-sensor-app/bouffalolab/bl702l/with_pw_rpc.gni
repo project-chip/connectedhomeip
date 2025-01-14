@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,23 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# add this gni as import in your build args to use pigweed in the example
+# 'import("//with_pw_rpc.gni")'
+
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
-import("${chip_root}/config/standalone/args.gni")
-import("${chip_root}/src/platform/bouffalolab/BL702L/args.gni")
+import("${chip_root}/config/bouffalolab/common/lib/pw_rpc/pw_rpc.gni")
+import("${chip_root}/examples/platform/bouffalolab/bl702l/args.gni")
 
-bl_iot_sdk_target = get_label_info(":sdk", "label_no_toolchain")
-
-pw_log_BACKEND = "${chip_root}/src/pw_backends/log"
-pw_assert_BACKEND = "${chip_root}/src/pw_backends/assert"
-pw_rpc_CONFIG = "$dir_pw_rpc:disable_global_mutex"
-
-chip_detail_logging = false
-
-# use -Os instead of -Og
-is_debug = false
-
-pw_build_LINK_DEPS = [
-  "$dir_pw_assert:impl",
-  "$dir_pw_log:impl",
-]
+chip_enable_pw_rpc = true
+chip_build_pw_trace_lib = false
+#pw_trace_BACKEND = "$dir_pw_trace_tokenized"

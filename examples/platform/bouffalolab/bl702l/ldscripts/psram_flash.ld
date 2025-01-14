@@ -2,29 +2,32 @@ OUTPUT_ARCH( "riscv" )
 
 ENTRY( bl702_start )
 
-__EM_SIZE = DEFINED(ble_controller_init) ? (DEFINED(em_16k_init) ? 16K : 8K) : 0K;
+__EM_SIZE = DEFINED(btble_controller_init) ? 8K : 0K;
 __CACHE_SIZE = 16K;
 __stack_size = DEFINED(__stack_size) ? __stack_size : 2K;
-__sha_ocram_size = DEFINED(__sha_ocram_size) ? __sha_ocram_size : 128;
 
 MEMORY
 {
   flash  (rxai!w) : ORIGIN = 0x23000000, LENGTH = (2M)
-  tcm_ocram (wxa) : ORIGIN = 0x42010000 + __CACHE_SIZE, LENGTH = (64K - __CACHE_SIZE + 64K - __EM_SIZE - __stack_size - __sha_ocram_size)
-  sys_stack (wxa) : ORIGIN = 0x42030000 - __EM_SIZE - __stack_size - __sha_ocram_size, LENGTH = __stack_size
-  sha_ocram (wxa) : ORIGIN = 0x42030000 - __EM_SIZE - __sha_ocram_size, LENGTH = __sha_ocram_size
+  tcm_ocram (wxa) : ORIGIN = 0x4201C000 + __CACHE_SIZE, LENGTH = (16K - __CACHE_SIZE + 80K - __EM_SIZE - __stack_size)
+  sys_stack (wxa) : ORIGIN = 0x42034000 - __EM_SIZE - __stack_size, LENGTH = __stack_size
   hbnram    (wxa) : ORIGIN = 0x40010000, LENGTH = (4K)
   psram     (wxa) : ORIGIN = 0x26000000, LENGTH = (2M)
-  bugkill   (rxai!w) : ORIGIN = 0xD0000000, LENGTH = 16M
 }
 
 SECTIONS
 {
-  BOOT2_PT_ADDR = 0x4202DC00;
-
   .init :
   {
     KEEP (*(SORT_NONE(.init)))
+  } >flash
+
+  .ver :
+  {
+    . = ORIGIN(flash) + 0xC00;
+    LONG(0x42464c42); /* BLFB */
+    LONG(0x46524556); /* VERF */
+    KEEP(*(.blverinf))
   } >flash
 
   .text :
@@ -35,32 +38,12 @@ SECTIONS
     *(.gnu.linkonce.t.*)
   } >flash
 
-  .bugkiller_command :
-  {
-    PROVIDE( __bugkiller_command_start = ADDR(.bugkiller_command) );
-    PROVIDE( __bugkiller_command_end = ADDR(.bugkiller_command) + SIZEOF(.bugkiller_command) );
-    KEEP (*(.static_bugkiller_command))
-  } > bugkill
-
-  .bugkiller  :
-  {
-    KEEP (*(.bugkiller_code))
-    KEEP (*bugkiller*.o(.rodata* .text* .data* .sdata* .sbss*))
-  } > bugkill
-
   .rodata :
   {
     *(.rdata)
     *(.rodata .rodata.*)
     *(.sdata2.*)
     *(.gcc_except_table.*)
-
-    /* camera driver */
-    . = ALIGN(4);
-    _bl_driver_camera_start = .;
-    KEEP(*(.camera_desc))
-    *(.camera_desc)
-    _bl_driver_camera_end = .;
 
     /* static cli cmds */
     . = ALIGN(4);
@@ -122,27 +105,6 @@ SECTIONS
     PROVIDE( _hbn_run = ADDR(.hbn) );
     PROVIDE( _hbn_run_end = ADDR(.hbn) + SIZEOF(.hbn) );
 
-    /* put bl702_rf_private.o in hbnram to avoid ocram conflict during rf calibration */
-    *libbl702_rf.a:bl702_rf_private.o(.retention .retention_noinit)
-    *libbl702_rf.a:bl702_rf_private.o(.sdata.* .srodata.* .sbss.* .bss.* COMMON)
-    PROVIDE ( _rf_data_end = . );
-
-    /* tcm code that should be retentive after hbn wakeup */
-    *libbl702_std.a:bl702_romapi.o(.tcm_code.* .sclock_rlt_code.*)
-    *libbl702_std.a:bl702_aon.o(.tcm_code.* .sclock_rlt_code.*)
-    *libbl702_std.a:bl702_glb.o(.tcm_code.* .sclock_rlt_code.*)
-    *libbl702_std.a:bl702_hbn.o(.tcm_code.* .sclock_rlt_code.*)
-    PROVIDE ( _hbn_restore_tcm_run_end = . );
-
-    /* data that should be retentive after hbn wakeup */
-    *liblmac154.a:*(.sdata.* .srodata.* .sbss.* .bss.* COMMON)
-    *libbl702_std.a:*(.sdata.* .srodata.* .sbss.* .bss.* COMMON)
-    *libhosal.a:bl_gpio.o(.sdata.* .srodata.* .sbss.* .bss.* COMMON)
-    *libhosal.a:hosal_gpio.o(.sdata.* .srodata.* .sbss.* .bss.* COMMON)
-    *libhosal.a:bl_uart.o(.sdata.* .srodata.* .sbss.* .bss.* COMMON)
-    *libhosal.a:hosal_uart.o(.sdata.* .srodata.* .sbss.* .bss.* COMMON)
-    PROVIDE ( _hbn_restore_data_run_end = . );
-
     *(.hbn_code.*)
     *(.hbn_data)
     *(.retention)
@@ -184,10 +146,10 @@ SECTIONS
     . = ALIGN(8);
     /*always put freertos under global_pointer with the following order. No change!*/
     PROVIDE( __global_pointer$ = . + 0x7F0 );
-    KEEP(*libbl702_freertos.a:*(.sdata.*))
-    KEEP(*libbl702_freertos.a:*(.sbss.*))
-    KEEP(*libbl702_freertos.a:*(.bss.*))
-    KEEP(*libbl702_freertos.a:*(COMMON))
+    KEEP(*libbl702l_freertos.a:*(.sdata.*))
+    KEEP(*libbl702l_freertos.a:*(.sbss.*))
+    KEEP(*libbl702l_freertos.a:*(.bss.*))
+    KEEP(*libbl702l_freertos.a:*(COMMON))
     *(.sdata .sdata.*)
     *(.gnu.linkonce.s.*)
 
@@ -219,11 +181,7 @@ SECTIONS
     PROVIDE ( __boot2_flashCfg_start = . );
     *(.bss.boot2_flashCfg)
     PROVIDE ( __boot2_flashCfg_end = . );
-  } >tcm_ocram
-
-  . = ALIGN(4);
-  PROVIDE( _heap2_start = .);
-  PROVIDE( _heap2_size = ADDR(.stack) - _heap2_start );
+  } >hbnram
 
   .bss_psram (NOLOAD) :
   {
@@ -249,7 +207,7 @@ SECTIONS
     KEEP(*libopenthread-ftd.a:*(.bss.*))
     KEEP(*libopenthread-mtd.a:*(.sbss.*))
     KEEP(*libopenthread-mtd.a:*(.bss.*))
-    
+
     . = ALIGN(16);
     KEEP(*src/app/clusters/*/bouffalolab*.cpp.o(.sbss.*))
     KEEP(*src/app/clusters/*/bouffalolab*.cpp.o(.bss.*))
@@ -269,18 +227,7 @@ SECTIONS
     . = ALIGN(16);
     KEEP(*sdk_lwip.*.c.o(.sbss.*))
     KEEP(*sdk_lwip.*.c.o(.bss.*))
-
-    . = ALIGN(16);
-    KEEP(*sdk_lwip.*.c.o(.sbss.*))
-    KEEP(*sdk_lwip.*.c.o(.bss.*))
-
-    . = ALIGN(16);
-    KEEP(*libopenthread_br.a:*(.sbss.*))
-    KEEP(*libopenthread_br.a:*(.bss.*))
-    
-    . = ALIGN(16);
-    KEEP(*third_party/tcplp*.c.o(.bss.*))
-    KEEP(*third_party/tcplp*.c.o(.bss.*))
+    KEEP(*lwip.*.c.o(.bss.*))
 
     . = ALIGN(16);
     KEEP(*stack_main.o(.bss.*))
@@ -288,11 +235,7 @@ SECTIONS
     . = ALIGN(16);
     *(.wifi_ram*)
     PROVIDE ( __psram_bss_init_end = . );
-  } >psram
-
-  . = ALIGN(8);
-  PROVIDE( _heap3_start = .);
-  PROVIDE( _heap3_size = ORIGIN(psram) + LENGTH(psram) - _heap3_start );
+  } > psram
 
   .bss (NOLOAD) :
   {
@@ -304,6 +247,11 @@ SECTIONS
     *(.bss .bss.*)
     *(.gnu.linkonce.b.*)
     *(COMMON)
+  } >tcm_ocram
+
+  .sha_ocram (NOLOAD) :
+  {
+    *(.sha_ocram*)
   } >tcm_ocram
 
   . = ALIGN(8);
@@ -321,11 +269,6 @@ SECTIONS
     __freertos_irq_stack_top = .;
   } >sys_stack
 
-  .sha_ocram (NOLOAD) :
-  {
-    *(.sha_ocram*)
-  } >sha_ocram
-
   .psram (NOLOAD) :
   {
     . = ALIGN(16);
@@ -339,10 +282,6 @@ SECTIONS
   PROVIDE( _heap3_start = . );
   PROVIDE( _heap3_size = ORIGIN(psram) + LENGTH(psram) - _heap3_start );
 
-
-  /* camera driver */
-  PROVIDE( _ld_bl_driver_camera_start = _bl_driver_camera_start );
-  PROVIDE( _ld_bl_driver_camera_end   = _bl_driver_camera_end );
 
   /* cli */
   PROVIDE( _ld_bl_static_cli_cmds_start = _bl_static_cli_cmds_start );
@@ -365,17 +304,15 @@ SECTIONS
   PROVIDE( _ld_ram_addr2 = ORIGIN(hbnram) );
   PROVIDE( _ld_ram_size3 = SIZEOF(.stack) );
   PROVIDE( _ld_ram_addr3 = ADDR(.stack) );
-  PROVIDE( _ld_ram_sha_size = LENGTH(sha_ocram) );
-  PROVIDE( _ld_ram_sha_addr = ORIGIN(sha_ocram) );
   PROVIDE( _ld_psram_size = LENGTH(psram) );
   PROVIDE( _ld_psram_addr = ORIGIN(psram) );
-
-  /* BOOT2 parameter */
-  PROVIDE( __boot2_pt_addr_src = BOOT2_PT_ADDR );
 
   /* EM size */
   PROVIDE( __LD_CONFIG_EM_SEL = __EM_SIZE );
 
   /* BLE_CORE_REG size */
-  PROVIDE( __LD_BLE_CORE_REG_SIZE = __EM_SIZE ? 0xA4 : 0 );
+  PROVIDE( __LD_BLE_CORE_REG_SIZE = __EM_SIZE ? 0x214 : 0 );
+
+  /* rom driver */
+  INCLUDE ../../third_party/bouffalolab/repo/components/platform/soc/bl702l/bl702l/evb/ld/romdriver.ld
 }
