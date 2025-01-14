@@ -28,7 +28,7 @@ using namespace chip::app::Clusters::SampleExternalManufacturerSpecific::Attribu
 
 void MatterSampleExternalManufacturerSpecificPluginServerInitCallback()
 {
-    ChipLogProgress(Zcl, "Sample MEI Init. Ep %d, Total Ep %u", MATTER_DM_SAMPLE_EXTERNAL_MEI_CLUSTER_SERVER_ENDPOINT_COUNT,
+    ChipLogProgress(Zcl, "Sample Manufacturer Specific Init. Ep %d, Total Ep %u", MATTER_DM_SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER_SERVER_ENDPOINT_COUNT,
                     static_cast<uint16_t>(kNumSupportedEndpoints));
     ReturnOnFailure(
         CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&SampleExternalManufacturerSpecificServer::Instance()));
@@ -38,7 +38,7 @@ void MatterSampleExternalManufacturerSpecificPluginServerInitCallback()
 
 void emberAfSampleExternalManufacturerSpecificClusterServerInitCallback(chip::EndpointId endpoint)
 {
-    ChipLogProgress(Zcl, "Creating Sample MEI cluster, Ep %d", endpoint);
+    ChipLogProgress(Zcl, "Creating Sample Manufacturer Specific cluster, Ep %d", endpoint);
     SampleExternalManufacturerSpecificServer::Instance().RegisterEndpoint(endpoint);
 }
 
@@ -46,7 +46,7 @@ void MatterSampleExternalManufacturerSpecificClusterServerShutdownCallback(chip:
 {
     // There's currently no whole-cluster shutdown callback. That would trigger
     // call to `Shutdown`. Thus ep-based shutdown calls `UnregisterEndpoint`
-    ChipLogProgress(Zcl, "Shutting down Sample MEI cluster, Ep %d", endpoint);
+    ChipLogProgress(Zcl, "Shutting down Sample Manufacturer Specific cluster, Ep %d", endpoint);
     SampleExternalManufacturerSpecificServer::Instance().UnregisterEndpoint(endpoint);
 }
 
