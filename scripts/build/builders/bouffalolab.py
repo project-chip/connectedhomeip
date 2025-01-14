@@ -28,6 +28,8 @@ class BouffalolabApp(Enum):
     def ExampleName(self):
         if self == BouffalolabApp.LIGHT:
             return 'lighting-app'
+        elif self == BouffalolabApp.CONTACT:
+            return 'contact-sensor-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -35,7 +37,7 @@ class BouffalolabApp(Enum):
         if self == BouffalolabApp.LIGHT:
             return ('chip-%s-lighting-example' % chip_name)
         elif self == BouffalolabApp.CONTACT:
-            return ('chip-%s-contact-example' % chip_name)
+            return ('chip-%s-contact-sensor-example' % chip_name)
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -100,6 +102,7 @@ class BouffalolabBuilder(GnBuilder):
                  use_matter_openthread: bool = False,
                  enable_easyflash: bool = False,
                  enable_littlefs: bool = False,
+                 enable_pds: bool = False,
                  enable_debug_coredump: bool = False,
                  ):
 
@@ -236,6 +239,9 @@ class BouffalolabBuilder(GnBuilder):
 
         if enable_mfd:
             self.argsOpt.append("chip_enable_factory_data=true")
+
+        if enable_pds:
+            self.argsOpt.append("enable_pds=true")
 
         self.argsOpt.append(f"enable_heap_monitoring={str(enable_heap_monitoring).lower()}")
         if enable_debug_coredump:
