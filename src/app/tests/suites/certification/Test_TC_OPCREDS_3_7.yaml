@@ -139,7 +139,6 @@ tests:
               - name: "RootCACertificate"
                 value: Root_CA_Certificate_TH2
 
-      # verification: "Verify the commissioner node ID is retrieved from TH2 and saved as Commissioner_Node_Id_TH2"
     - label: 
           "Step 6: Retrieve the commissioner node ID from TH2"
       identity: "beta"
