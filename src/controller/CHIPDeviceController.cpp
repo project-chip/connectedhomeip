@@ -3179,17 +3179,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kConfigureTCAcknowledgments: {
         ChipLogProgress(Controller, "Setting Terms and Conditions");
 
-        if (!params.GetRequireTermsAndConditionsAcknowledgement())
+        if (!params.GetTermsAndConditionsAcknowledgement().HasValue())
         {
             ChipLogProgress(Controller, "Setting Terms and Conditions: Skipped");
             CommissioningStageComplete(CHIP_NO_ERROR);
-            return;
-        }
-
-        if (!params.GetTermsAndConditionsAcknowledgement().HasValue())
-        {
-            ChipLogError(Controller, "No acknowledgements provided");
-            CommissioningStageComplete(CHIP_ERROR_INCORRECT_STATE);
             return;
         }
 

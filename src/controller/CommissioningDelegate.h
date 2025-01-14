@@ -175,8 +175,6 @@ public:
     // The country code to be used for the node, if set.
     Optional<CharSpan> GetCountryCode() const { return mCountryCode; }
 
-    bool GetRequireTermsAndConditionsAcknowledgement() const { return mRequireTermsAndConditionsAcknowledgement; }
-
     Optional<TermsAndConditionsAcknowledgement> GetTermsAndConditionsAcknowledgement() const
     {
         return mTermsAndConditionsAcknowledgement;
@@ -351,12 +349,6 @@ public:
     CommissioningParameters & SetCountryCode(CharSpan countryCode)
     {
         mCountryCode.SetValue(countryCode);
-        return *this;
-    }
-
-    CommissioningParameters & SetRequireTermsAndConditionsAcknowledgement(bool requireTermsAndConditionsAcknowledgement)
-    {
-        mRequireTermsAndConditionsAcknowledgement = requireTermsAndConditionsAcknowledgement;
         return *this;
     }
 
@@ -671,7 +663,6 @@ private:
     Optional<uint32_t> mICDStayActiveDurationMsec;
     ICDRegistrationStrategy mICDRegistrationStrategy = ICDRegistrationStrategy::kIgnore;
     bool mCheckForMatchingFabric                     = false;
-    bool mRequireTermsAndConditionsAcknowledgement   = false;
 };
 
 struct RequestedCertificate
