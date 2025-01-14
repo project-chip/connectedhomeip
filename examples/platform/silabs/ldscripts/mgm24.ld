@@ -206,6 +206,8 @@ SECTIONS
     KEEP(*(SORT(.fini_array.*)))
     KEEP(*(.fini_array))
     PROVIDE_HIDDEN (__fini_array_end = .);
+    . = ALIGN(4);
+    *(SEGGER_RTT)
 
     . = ALIGN(4);
     /* All data end */
