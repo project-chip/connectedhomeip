@@ -53,7 +53,10 @@ class TC_G_2_2(MatterBaseTest):
                 TestStep(2, "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT on EP0 using a key that is pre-installed on the TH. GroupKeySet fields are as follows:"),
                 TestStep(3, "TH writes the GroupKeyMap attribute in the GroupKeyManagement cluster on EP0 with maxgroups entries binding GroupId(0x0001 to (maxgroups)) with GroupKeySetID 1"),
                 TestStep(4, "TH cleans up the groups by sending the RemoveAllGroups command to the DUT"),
-                TestStep(5, "TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the following fields: ")]
+                TestStep(5, "TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the following fields: "),
+                TestStep(6, "TH reads GroupTable attribute from the GroupKeyManagement cluster from DUT on EP0: GroupId as 1"),
+                TestStep(7, "Verify that the GroupTable contains an entry with the GroupName as Gp1"),
+                TestStep(8, "TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the following fields: ")]
 
     @async_test_body
     async def test_TC_G_2_2(self):
@@ -75,14 +78,14 @@ class TC_G_2_2(MatterBaseTest):
 
         cmd = Clusters.GroupKeyManagement.Commands.KeySetWrite(groupKey)
         resp = await self.send_single_cmd(dev_ctrl=th1, node_id=self.dut_node_id, cmd=cmd)
-        #await th1.SendCommand(self.dut_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(groupKey))
+        # await th1.SendCommand(self.dut_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(groupKey))
 
         self.step(3)
-        kGroup1 = 0x0001
+        kGroupId1 = 0x0001
         groupKeyMapStruct: List[Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct] = []
 
         groupKeyMapStruct.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
-            groupId=kGroup1,
+            groupId=kGroupId1,
             groupKeySetID=kGroupKeySetID))
         resp = await th1.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(groupKeyMapStruct))])
         asserts.assert_equal(resp[0].Status, Status.Success, "GroupKeyMap attribute write failed")
@@ -93,9 +96,26 @@ class TC_G_2_2(MatterBaseTest):
         await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.RemoveAllGroups())
 
         self.step(5)
-        cmd = Clusters.Groups.Commands.AddGroup(kGroup1, "Gp1")
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroup1, "Gp1"))
+        kGroupName = "Gp1"
+        cmd = Clusters.Groups.Commands.AddGroup(kGroupId1, kGroupName)
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId1, kGroupName))
+        print("AddGroup1: ", result)
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0001 failed")
+
+        self.step(6)
+        groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
+            dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
+        asserts.assert_equal(groupTableList[0].groupId, kGroupId1, "Found groupId does not match written value")
+
+        self.step(7)
+        asserts.assert_equal(groupTableList[0].groupName, kGroupName, "Found groupName does not match written value")
+
+        self.step(8)
+        kGroupId2 = 0x0002
+        kGroupName2 = "Gp2"
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId2, kGroupName2))
+        asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0002 failed")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
