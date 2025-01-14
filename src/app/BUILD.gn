@@ -207,6 +207,7 @@ static_library("interaction-model") {
   ]
 
   deps = [
+    ":path-expansion",
     "${chip_root}/src/app:events",
     "${chip_root}/src/app:global-attributes",
   ]
@@ -406,6 +407,21 @@ source_set("storage-wrapper") {
   ]
 }
 
+source_set("path-expansion") {
+  sources = [
+    "AttributePathExpandIterator.cpp",
+    "AttributePathExpandIterator.h",
+  ]
+
+  public_deps = [
+    ":global-attributes",
+    ":paths",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
 source_set("attribute-persistence") {
   sources = [
     "DefaultSafeAttributePersistenceProvider.h",
@@ -429,9 +445,6 @@ static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
-    "AttributePathExpandIterator.cpp",
-    "AttributePathExpandIterator.h",
-    "AttributePathExpandIterator.h",
     "ChunkedWriteCallback.cpp",
     "ChunkedWriteCallback.h",
     "CommandResponseHelper.h",
@@ -464,6 +477,7 @@ static_library("app") {
     ":event-reporter",
     ":global-attributes",
     ":interaction-model",
+    ":path-expansion",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
