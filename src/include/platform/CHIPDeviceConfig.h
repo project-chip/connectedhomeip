@@ -447,6 +447,60 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF 0
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_MIN_ADVERTISING_TIMEOUT_SECS
+ *
+ * The min amount of time (in seconds) after which the chip platform will stop PAF advertisement
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_MIN_ADVERTISING_TIMEOUT_SECS
+#define CHIP_DEVICE_CONFIG_WIFIPAF_MIN_ADVERTISING_TIMEOUT_SECS (3 * 60)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT_SECS
+ *
+ * The max amount of time (in seconds) after which the chip platform will stop PAF advertisement
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT_SECS
+#define CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT_SECS (15 * 60)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS
+ *
+ * The max amount of time (in seconds) the chip controller will discovery Wi-Fi PAF
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS
+#define CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS (15 * 60)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL
+ *
+ * The default channel of Wi-Fi PAF in 2.4G band (channel#6)
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL
+#define CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL 2437
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_5G_LOW_DEFAUTL_CHNL
+ *
+ * The default channel of Wi-Fi PAF in 5G lower band (channel#44)
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_5G_LOW_DEFAUTL_CHNL
+#define CHIP_DEVICE_CONFIG_WIFIPAF_5G_LOW_DEFAUTL_CHNL 5220
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_5G_HI_DEFAUTL_CHNL
+ *
+ * The default channel of Wi-Fi PAF in 5G upper band (channel#149)
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_5G_UP_DEFAUTL_CHNL
+#define CHIP_DEVICE_CONFIG_WIFIPAF_5G_UP_DEFAUTL_CHNL 5745
+#endif
+
 // -------------------- WiFi AP Configuration --------------------
 
 /**

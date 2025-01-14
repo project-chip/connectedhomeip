@@ -370,6 +370,40 @@ public:
     }
 };
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+/*
+    Get the freq_list from args.
+    Format:
+        "freq_list=[freq#1],[freq#2]...[freq#n]"
+            [freq#1] - [freq#n]: frequence number, separated by ','
+*/
+static uint16_t WiFiPAFGet_FreqList(const char * args, std::unique_ptr<uint16_t[]> & freq_list)
+{
+    const char hdstr[] = "freq_list=";
+    std::vector<uint16_t> freq_vect;
+    const std::string argstrn(args);
+    auto pos = argstrn.find(hdstr);
+    if (pos == std::string::npos)
+    {
+        return 0;
+    }
+    std::string nums = argstrn.substr(pos + strlen(hdstr));
+    std::stringstream ss(nums);
+    std::string item;
+    while (std::getline(ss, item, ','))
+    {
+        freq_vect.push_back(std::stoi(item));
+    }
+    uint16_t freq_size = freq_vect.size();
+    freq_list          = std::make_unique<uint16_t[]>(freq_size);
+    for (int i = 0; i < freq_size; i++)
+    {
+        freq_list.get()[i] = freq_vect[i];
+    }
+    return freq_size;
+}
+#endif
+
 int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
                      const Optional<EndpointId> secondaryNetworkCommissioningEndpoint)
 {
@@ -497,16 +531,17 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    ChipLogProgress(NotSpecified, "WiFi-PAF: initialzing");
-    if (LinuxDeviceOptions::GetInstance().mWiFi)
+    if (LinuxDeviceOptions::GetInstance().mWiFi && LinuxDeviceOptions::GetInstance().mWiFiPAF)
     {
+        ChipLogProgress(NotSpecified, "WiFi-PAF: initialzing");
         if (EnsureWiFiIsStarted())
         {
             ChipLogProgress(NotSpecified, "Wi-Fi Management started");
             DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
-            args.enable  = LinuxDeviceOptions::GetInstance().mWiFiPAF;
-            args.ExtCmds = LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds;
-            DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(args);
+
+            args.enable        = LinuxDeviceOptions::GetInstance().mWiFiPAF;
+            args.freq_list_len = WiFiPAFGet_FreqList(LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds, args.freq_list);
+            DeviceLayer::ConnectivityMgr().WiFiPAFPublish(args);
         }
     }
 #endif
