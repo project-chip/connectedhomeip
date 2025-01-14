@@ -316,6 +316,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         #     asserts.assert_equal(returned_clusters, server_list)
 
         # TODO: Make this check centralized (move to its own method)
+
         # for endpoint in read_request.tlvAttributes:
         #     for cluster in read_request.tlvAttributes[endpoint]:
         #         returned_attrs = sorted([x for x in read_request.tlvAttributes[endpoint][cluster].keys()])
@@ -324,6 +325,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         #                             if x != Clusters.UnitTesting.Attributes.WriteOnlyInt8u.attribute_id])
         #         asserts.assert_equal(returned_attrs, attr_list,
         #                              f"Mismatch for {cluster} ({ClusterObjects.ALL_CLUSTERS[cluster]}) at endpoint {endpoint}")
+        self.verify_read_request(read_request)
 
         # Step 6
         # TH sends the Read Request Message to the DUT to read a global attribute from all clusters at all Endpoints
