@@ -78,14 +78,12 @@ CHIP_ERROR TCPBase::Init(TcpListenParameters & params)
 
     mEndpointType = params.GetAddressType();
 
-    mIsServerListenEnabled = params.IsServerListenEnabled();
-
     // Primary socket endpoint created to help get EndPointManager handle for creating multiple
     // connection endpoints at runtime.
     err = params.GetEndPointManager()->NewEndPoint(&mListenSocket);
     SuccessOrExit(err);
 
-    if (mIsServerListenEnabled)
+    if (params.IsServerListenEnabled())
     {
         err = mListenSocket->Bind(params.GetAddressType(), Inet::IPAddress::Any, params.GetListenPort(),
                                   params.GetInterfaceId().IsPresent());
@@ -675,11 +673,6 @@ void TCPBase::TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool sho
     {
         CloseConnectionInternal(conn, CHIP_NO_ERROR, SuppressCallback::Yes);
     }
-}
-
-bool TCPBase::IsServerListenEnabled()
-{
-    return mIsServerListenEnabled;
 }
 
 bool TCPBase::HasActiveConnections() const
