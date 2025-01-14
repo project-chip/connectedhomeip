@@ -138,16 +138,7 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
 {
     if (mPosition.mOutputPath.mAttributeId == kInvalidAttributeId)
     {
-        if (mPosition.mAttributePath->mValue.HasWildcardAttributeId())
-        {
-            mAttributeIterator = mDataModelProvider->GetAttributes(mPosition.mOutputPath);
-        }
-
-        // At this point, the attributeID is NOT a wildcard (i.e. it is fixed).
-        //
-        // For wildcard expansion, we validate that this is a valid attribute for the given
-        // cluster on the given endpoint. If not a wildcard expansion, return it as-is.
-        if (mPosition.mAttributePath->mValue.IsWildcardPath())
+        if (!mPosition.mAttributePath->mValue.HasWildcardAttributeId())
         {
             // At this point, the attributeID is NOT a wildcard (i.e. it is fixed)
             //
@@ -165,6 +156,8 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
             }
             return mPosition.mAttributePath->mValue.mAttributeId;
         }
+
+        mAttributeIterator = mDataModelProvider->GetAttributes(mPosition.mOutputPath);
     }
 
     // Advance the existing attribute id if it can be advanced.
