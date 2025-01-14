@@ -95,9 +95,9 @@ tests:
                 saveAs: attestationSignature
 
     - label:
-          "Step 4: TH2 generates the NOC, the Root CA Certificate and ICAC
-          using the CSR elements from Step 3.
-          Save ICAC as Intermediate_Certificate_TH2. Save NOC as
+          "Step 4: TH2 generates the NOC, the Root CA Certificate and ICAC using
+          the CSR elements from Step 3. Save ICAC as
+          Intermediate_Certificate_TH2. Save NOC as
           Node_Operational_Certificate_TH2. Save IPK as IPK_TH2. Extract the
           RCAC public key and save as Root_Public_Key_TH2."
       identity: "beta"
@@ -130,7 +130,8 @@ tests:
                 saveAs: Root_CA_Certificate_TH2
 
     - label:
-          "Step 5.1: TH1 sends TH2 root certificate to DUT in the AddTrustedRootCertificate chain."
+          "Step 5.1: TH1 sends TH2 root certificate to DUT in the
+          AddTrustedRootCertificate chain."
       identity: "alpha"
       command: "AddTrustedRootCertificate"
       cluster: "Operational Credentials"
@@ -139,8 +140,7 @@ tests:
               - name: "RootCACertificate"
                 value: Root_CA_Certificate_TH2
 
-    - label:
-          "Step 6: Retrieve the commissioner node ID from TH2"
+    - label: "Step 6: Retrieve the commissioner node ID from TH2"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "GetCommissionerNodeId"
