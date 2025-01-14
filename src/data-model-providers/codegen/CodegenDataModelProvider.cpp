@@ -219,6 +219,32 @@ CHIP_ERROR FetchGeneratedCommands(const ConcreteClusterPath & path, const EmberA
     return CHIP_NO_ERROR;
 }
 
+DataModel::ServerClusterEntry ServerClusterEntryFrom(EndpointId endpointId, const EmberAfCluster & cluster)
+{
+    DataModel::ServerClusterEntry entry;
+
+    entry.clusterId = cluster.clusterId;
+
+    DataVersion * versionPtr = emberAfDataVersionStorage(ConcreteClusterPath(endpointId, cluster.clusterId));
+    if (versionPtr == nullptr)
+    {
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+        ChipLogError(AppServer, "Failed to get data version for %d/" ChipLogFormatMEI, static_cast<int>(endpointId),
+                     ChipLogValueMEI(cluster.clusterId));
+#endif
+        entry.dataVersion = 0;
+    }
+    else
+    {
+        entry.dataVersion = *versionPtr;
+    }
+
+    // TODO: set entry flags:
+    //   entry.flags.Set(ClusterQualityFlags::kDiagnosticsData)
+
+    return entry;
+}
+
 /// Load the cluster information into the specified destination
 std::variant<CHIP_ERROR, DataModel::ClusterInfo> LoadClusterInfo(const ConcreteClusterPath & path, const EmberAfCluster & cluster)
 {
@@ -542,6 +568,51 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointI
     }
 
     return std::make_optional<unsigned>(idx);
+}
+
+DataModel::MetadataList<DataModel::ServerClusterEntry> CodegenDataModelProvider::ServerClusters(EndpointId endpointId)
+{
+    const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);
+
+    DataModel::MetadataList<DataModel::ServerClusterEntry> result;
+
+    VerifyOrReturnValue(endpoint != nullptr, result);
+    VerifyOrReturnValue(endpoint->clusterCount > 0, result);
+    VerifyOrReturnValue(endpoint->cluster != nullptr, result);
+
+    const EmberAfCluster * begin = endpoint->cluster;
+    const EmberAfCluster * end   = endpoint->cluster + endpoint->clusterCount;
+
+    const size_t serverClusterCount =
+        static_cast<size_t>(std::count_if(begin, end, [](const EmberAfCluster & cluster) { return cluster.IsServer(); }));
+
+    CHIP_ERROR err = result.reserve(serverClusterCount);
+    if (err != CHIP_NO_ERROR)
+    {
+#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+        ChipLogError(AppServer, "Failed to reserve space for client clusters: %" CHIP_ERROR_FORMAT, err.Format());
+#endif
+        return {};
+    }
+
+    for (const EmberAfCluster * cluster = begin; cluster != end; cluster++)
+    {
+        if (!cluster->IsServer())
+        {
+            continue;
+        }
+
+        err = result.Append(ServerClusterEntryFrom(endpointId, *cluster));
+        if (err != CHIP_NO_ERROR)
+        {
+#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+            ChipLogError(AppServer, "Failed to append client cluster id: %" CHIP_ERROR_FORMAT, err.Format());
+#endif
+            break;
+        }
+    }
+
+    return result;
 }
 
 DataModel::ClusterEntry CodegenDataModelProvider::FirstServerCluster(EndpointId endpointId)

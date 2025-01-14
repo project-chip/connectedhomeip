@@ -67,6 +67,13 @@ enum class ClusterQualityFlags : uint32_t
     kDiagnosticsData = 0x0001, // `K` quality, may be filtered out in subscriptions
 };
 
+struct ServerClusterEntry
+{
+    ClusterId clusterId;
+    DataVersion dataVersion; // current cluster data version,
+    BitFlags<ClusterQualityFlags> flags;
+};
+
 struct ClusterInfo
 {
     DataVersion dataVersion; // current cluster data version,
@@ -180,15 +187,17 @@ public:
     /// List metadata capabilties
     ///
     ///  TODO: convert ALL items above to the new format
-
     using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
 
-    virtual MetadataList<EndpointEntry> Endpoints()                                               = 0;
+    virtual MetadataList<EndpointEntry> Endpoints() = 0;
+
+    virtual MetadataList<SemanticTag> SemanticTags(EndpointId endpointId)          = 0;
+    virtual MetadataList<DeviceTypeEntry> DeviceTypes(EndpointId endpointId)       = 0;
+    virtual MetadataList<ClusterId> ClientClusters(EndpointId endpointId)          = 0;
+    virtual MetadataList<ServerClusterEntry> ServerClusters(EndpointId endpointId) = 0;
+
     virtual MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath & path)           = 0;
     virtual MetadataList<AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) = 0;
-    virtual MetadataList<SemanticTag> SemanticTags(EndpointId endpointId)                         = 0;
-    virtual MetadataList<DeviceTypeEntry> DeviceTypes(EndpointId endpointId)                      = 0;
-    virtual MetadataList<ClusterId> ClientClusters(EndpointId endpointId)                         = 0;
 
     /// Workaround function to report attribute change.
     ///

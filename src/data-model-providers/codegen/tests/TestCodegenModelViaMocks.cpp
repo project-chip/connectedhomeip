@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <pw_unit_test/framework.h>
 
@@ -930,59 +931,35 @@ TEST_F(TestCodegenModelViaMocks, IterateOverServerClusters)
 
     chip::Test::ResetVersion();
 
-    EXPECT_FALSE(model.FirstServerCluster(kEndpointIdThatIsMissing).path.HasValidIds());
-    EXPECT_FALSE(model.FirstServerCluster(kInvalidEndpointId).path.HasValidIds());
-    EXPECT_FALSE(model.NextServerCluster(ConcreteClusterPath(kInvalidEndpointId, 123)).path.HasValidIds());
-    EXPECT_FALSE(model.NextServerCluster(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).path.HasValidIds());
-    EXPECT_FALSE(model.NextServerCluster(ConcreteClusterPath(kMockEndpoint1, 981u)).path.HasValidIds());
+    EXPECT_TRUE(model.ServerClusters(kEndpointIdThatIsMissing).empty());
+    EXPECT_TRUE(model.ServerClusters(kInvalidEndpointId).empty());
 
     // mock endpoint 1 has 2 mock clusters: 1 and 2
-    ClusterEntry entry = model.FirstServerCluster(kMockEndpoint1);
-    ASSERT_TRUE(entry.path.HasValidIds());
-    EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint1);
-    EXPECT_EQ(entry.path.mClusterId, MockClusterId(1));
-    EXPECT_EQ(entry.info.dataVersion, 0u);
-    EXPECT_EQ(entry.info.flags.Raw(), 0u);
+    auto serverClusters = model.ServerClusters(kMockEndpoint1);
+    ASSERT_EQ(serverClusters.size(), 2u);
+
+    EXPECT_EQ(serverClusters[0].clusterId, MockClusterId(1));
+    EXPECT_EQ(serverClusters[0].dataVersion, 0u);
+    EXPECT_EQ(serverClusters[0].flags.Raw(), 0u);
+
+    EXPECT_EQ(serverClusters[1].clusterId, MockClusterId(2));
+    EXPECT_EQ(serverClusters[1].dataVersion, 0u);
+    EXPECT_EQ(serverClusters[1].flags.Raw(), 0u);
 
     chip::Test::BumpVersion();
 
-    entry = model.NextServerCluster(entry.path);
-    ASSERT_TRUE(entry.path.HasValidIds());
-    EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint1);
-    EXPECT_EQ(entry.path.mClusterId, MockClusterId(2));
-    EXPECT_EQ(entry.info.dataVersion, 1u);
-    EXPECT_EQ(entry.info.flags.Raw(), 0u);
-
-    entry = model.NextServerCluster(entry.path);
-    EXPECT_FALSE(entry.path.HasValidIds());
+    serverClusters = model.ServerClusters(kMockEndpoint1);
+    ASSERT_EQ(serverClusters.size(), 2u);
+    EXPECT_EQ(serverClusters[0].dataVersion, 1u);
+    EXPECT_EQ(serverClusters[1].dataVersion, 1u);
 
     // mock endpoint 3 has 4 mock clusters: 1 through 4
-    entry = model.FirstServerCluster(kMockEndpoint3);
-    for (uint16_t clusterId = 1; clusterId <= 4; clusterId++)
-    {
-        ASSERT_TRUE(entry.path.HasValidIds());
-        EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint3);
-        EXPECT_EQ(entry.path.mClusterId, MockClusterId(clusterId));
-        entry = model.NextServerCluster(entry.path);
-    }
-    EXPECT_FALSE(entry.path.HasValidIds());
-
-    // repeat calls should work
-    for (int i = 0; i < 10; i++)
-    {
-        entry = model.FirstServerCluster(kMockEndpoint1);
-        ASSERT_TRUE(entry.path.HasValidIds());
-        EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint1);
-        EXPECT_EQ(entry.path.mClusterId, MockClusterId(1));
-    }
-
-    for (int i = 0; i < 10; i++)
-    {
-        ClusterEntry nextEntry = model.NextServerCluster(entry.path);
-        ASSERT_TRUE(nextEntry.path.HasValidIds());
-        EXPECT_EQ(nextEntry.path.mEndpointId, kMockEndpoint1);
-        EXPECT_EQ(nextEntry.path.mClusterId, MockClusterId(2));
-    }
+    serverClusters = model.ServerClusters(kMockEndpoint3);
+    ASSERT_EQ(serverClusters.size(), 4u);
+    EXPECT_EQ(serverClusters[0].clusterId, MockClusterId(1));
+    EXPECT_EQ(serverClusters[1].clusterId, MockClusterId(2));
+    EXPECT_EQ(serverClusters[2].clusterId, MockClusterId(3));
+    EXPECT_EQ(serverClusters[3].clusterId, MockClusterId(4));
 }
 
 TEST_F(TestCodegenModelViaMocks, GetServerClusterInfo)
