@@ -203,7 +203,7 @@ public:
     virtual MetadataList<ClusterId> ClientClusters(EndpointId endpointId)          = 0;
     virtual MetadataList<ServerClusterEntry> ServerClusters(EndpointId endpointId) = 0;
 
-    virtual MetadataList<AttributeEntry2> Attributes(const ConcreteClusterPath & path)             = 0;
+    virtual MetadataList<AttributeEntry2> Attributes(const ConcreteClusterPath & path)            = 0;
     virtual MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath & path)           = 0;
     virtual MetadataList<AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) = 0;
 
