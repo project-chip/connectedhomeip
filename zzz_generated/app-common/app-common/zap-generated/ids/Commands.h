@@ -2047,6 +2047,76 @@ static constexpr CommandId Id = 0x00000002;
 } // namespace Commands
 } // namespace CommissionerControl
 
+namespace TlsCertificateManagement {
+namespace Commands {
+
+namespace ProvisionRootCertificate {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ProvisionRootCertificate
+
+namespace ProvisionRootCertificateResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ProvisionRootCertificateResponse
+
+namespace FindRootCertificate {
+static constexpr CommandId Id = 0x00000002;
+} // namespace FindRootCertificate
+
+namespace FindRootCertificateResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace FindRootCertificateResponse
+
+namespace LookupRootCertificate {
+static constexpr CommandId Id = 0x00000004;
+} // namespace LookupRootCertificate
+
+namespace LookupRootCertificateResponse {
+static constexpr CommandId Id = 0x00000005;
+} // namespace LookupRootCertificateResponse
+
+namespace RemoveRootCertificate {
+static constexpr CommandId Id = 0x00000006;
+} // namespace RemoveRootCertificate
+
+namespace TLSClientCSR {
+static constexpr CommandId Id = 0x00000007;
+} // namespace TLSClientCSR
+
+namespace TLSClientCSRResponse {
+static constexpr CommandId Id = 0x00000008;
+} // namespace TLSClientCSRResponse
+
+namespace ProvisionClientCertificate {
+static constexpr CommandId Id = 0x00000009;
+} // namespace ProvisionClientCertificate
+
+namespace ProvisionClientCertificateResponse {
+static constexpr CommandId Id = 0x0000000A;
+} // namespace ProvisionClientCertificateResponse
+
+namespace FindClientCertificate {
+static constexpr CommandId Id = 0x0000000B;
+} // namespace FindClientCertificate
+
+namespace FindClientCertificateResponse {
+static constexpr CommandId Id = 0x0000000C;
+} // namespace FindClientCertificateResponse
+
+namespace LookupClientCertificate {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace LookupClientCertificate
+
+namespace LookupClientCertificateResponse {
+static constexpr CommandId Id = 0x0000000E;
+} // namespace LookupClientCertificateResponse
+
+namespace RemoveClientCertificate {
+static constexpr CommandId Id = 0x0000000F;
+} // namespace RemoveClientCertificate
+
+} // namespace Commands
+} // namespace TlsCertificateManagement
+
 namespace UnitTesting {
 namespace Commands {
 

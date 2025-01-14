@@ -161,6 +161,7 @@
 | Chime                                                               | 0x0556 |
 | EcosystemInformation                                                | 0x0750 |
 | CommissionerControl                                                 | 0x0751 |
+| TlsCertificateManagement                                            | 0x0801 |
 | UnitTesting                                                         | 0xFFF1FC05|
 | FaultInjection                                                      | 0xFFF1FC06|
 | SampleMei                                                           | 0xFFF1FC20|
@@ -15326,6 +15327,383 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster TlsCertificateManagement                                    | 0x0801 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ProvisionRootCertificate                                          |   0x00 |
+| * FindRootCertificate                                               |   0x02 |
+| * LookupRootCertificate                                             |   0x04 |
+| * RemoveRootCertificate                                             |   0x06 |
+| * TLSClientCSR                                                      |   0x07 |
+| * ProvisionClientCertificate                                        |   0x09 |
+| * FindClientCertificate                                             |   0x0B |
+| * LookupClientCertificate                                           |   0x0D |
+| * RemoveClientCertificate                                           |   0x0F |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MaxRootCertificates                                               | 0x0000 |
+| * CurrentRootCertificates                                           | 0x0001 |
+| * MaxClientCertificates                                             | 0x0002 |
+| * CurrentClientCertificates                                         | 0x0003 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ProvisionRootCertificate
+ */
+class TlsCertificateManagementProvisionRootCertificate : public ClusterCommand
+{
+public:
+    TlsCertificateManagementProvisionRootCertificate(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("provision-root-certificate", credsIssuerConfig)
+    {
+        AddArgument("Certificate", &mRequest.certificate);
+        AddArgument("Caid", 0, UINT16_MAX, &mRequest.caid);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificate::Type mRequest;
+};
+
+/*
+ * Command FindRootCertificate
+ */
+class TlsCertificateManagementFindRootCertificate : public ClusterCommand
+{
+public:
+    TlsCertificateManagementFindRootCertificate(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("find-root-certificate", credsIssuerConfig)
+    {
+        AddArgument("Caid", 0, UINT16_MAX, &mRequest.caid);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::FindRootCertificate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::FindRootCertificate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TlsCertificateManagement::Commands::FindRootCertificate::Type mRequest;
+};
+
+/*
+ * Command LookupRootCertificate
+ */
+class TlsCertificateManagementLookupRootCertificate : public ClusterCommand
+{
+public:
+    TlsCertificateManagementLookupRootCertificate(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("lookup-root-certificate", credsIssuerConfig)
+    {
+        AddArgument("Fingerprint", &mRequest.fingerprint);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::LookupRootCertificate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::LookupRootCertificate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TlsCertificateManagement::Commands::LookupRootCertificate::Type mRequest;
+};
+
+/*
+ * Command RemoveRootCertificate
+ */
+class TlsCertificateManagementRemoveRootCertificate : public ClusterCommand
+{
+public:
+    TlsCertificateManagementRemoveRootCertificate(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("remove-root-certificate", credsIssuerConfig)
+    {
+        AddArgument("Caid", 0, UINT16_MAX, &mRequest.caid);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Type mRequest;
+};
+
+/*
+ * Command TLSClientCSR
+ */
+class TlsCertificateManagementTLSClientCSR : public ClusterCommand
+{
+public:
+    TlsCertificateManagementTLSClientCSR(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("tlsclient-csr", credsIssuerConfig)
+    {
+        AddArgument("Nonce", &mRequest.nonce);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Type mRequest;
+};
+
+/*
+ * Command ProvisionClientCertificate
+ */
+class TlsCertificateManagementProvisionClientCertificate : public ClusterCommand
+{
+public:
+    TlsCertificateManagementProvisionClientCertificate(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("provision-client-certificate", credsIssuerConfig),
+        mComplex_ClientCertificateDetails(&mRequest.clientCertificateDetails)
+    {
+        AddArgument("Ccdid", 0, UINT16_MAX, &mRequest.ccdid);
+        AddArgument("ClientCertificateDetails", &mComplex_ClientCertificateDetails);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
+        constexpr chip::CommandId commandId =
+            chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
+        constexpr chip::CommandId commandId =
+            chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::Type>
+        mComplex_ClientCertificateDetails;
+};
+
+/*
+ * Command FindClientCertificate
+ */
+class TlsCertificateManagementFindClientCertificate : public ClusterCommand
+{
+public:
+    TlsCertificateManagementFindClientCertificate(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("find-client-certificate", credsIssuerConfig)
+    {
+        AddArgument("Ccdid", 0, UINT16_MAX, &mRequest.ccdid);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificate::Type mRequest;
+};
+
+/*
+ * Command LookupClientCertificate
+ */
+class TlsCertificateManagementLookupClientCertificate : public ClusterCommand
+{
+public:
+    TlsCertificateManagementLookupClientCertificate(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("lookup-client-certificate", credsIssuerConfig)
+    {
+        AddArgument("Fingerprint", &mRequest.fingerprint);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificate::Type mRequest;
+};
+
+/*
+ * Command RemoveClientCertificate
+ */
+class TlsCertificateManagementRemoveClientCertificate : public ClusterCommand
+{
+public:
+    TlsCertificateManagementRemoveClientCertificate(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("remove-client-certificate", credsIssuerConfig)
+    {
+        AddArgument("Ccdid", 0, UINT16_MAX, &mRequest.ccdid);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::RemoveClientCertificate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::RemoveClientCertificate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TlsCertificateManagement::Commands::RemoveClientCertificate::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster UnitTesting                                                 | 0xFFF1FC05 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -28031,6 +28409,82 @@ void registerClusterCommissionerControl(Commands & commands, CredentialIssuerCom
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterTlsCertificateManagement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::TlsCertificateManagement;
+
+    const char * clusterName = "TlsCertificateManagement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                                 //
+        make_unique<TlsCertificateManagementProvisionRootCertificate>(credsIssuerConfig),   //
+        make_unique<TlsCertificateManagementFindRootCertificate>(credsIssuerConfig),        //
+        make_unique<TlsCertificateManagementLookupRootCertificate>(credsIssuerConfig),      //
+        make_unique<TlsCertificateManagementRemoveRootCertificate>(credsIssuerConfig),      //
+        make_unique<TlsCertificateManagementTLSClientCSR>(credsIssuerConfig),               //
+        make_unique<TlsCertificateManagementProvisionClientCertificate>(credsIssuerConfig), //
+        make_unique<TlsCertificateManagementFindClientCertificate>(credsIssuerConfig),      //
+        make_unique<TlsCertificateManagementLookupClientCertificate>(credsIssuerConfig),    //
+        make_unique<TlsCertificateManagementRemoveClientCertificate>(credsIssuerConfig),    //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                       //
+        make_unique<ReadAttribute>(Id, "max-root-certificates", Attributes::MaxRootCertificates::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "current-root-certificates", Attributes::CurrentRootCertificates::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "max-client-certificates", Attributes::MaxClientCertificates::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "current-client-certificates", Attributes::CurrentClientCertificates::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<uint8_t>>(Id, "max-root-certificates", 0, UINT8_MAX, Attributes::MaxRootCertificates::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "current-root-certificates", 0, UINT8_MAX, Attributes::CurrentRootCertificates::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "max-client-certificates", 0, UINT8_MAX, Attributes::MaxClientCertificates::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "current-client-certificates", 0, UINT8_MAX,
+                                             Attributes::CurrentClientCertificates::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                              //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                               //
+        make_unique<SubscribeAttribute>(Id, "max-root-certificates", Attributes::MaxRootCertificates::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "current-root-certificates", Attributes::CurrentRootCertificates::Id,
+                                        credsIssuerConfig),                                                                       //
+        make_unique<SubscribeAttribute>(Id, "max-client-certificates", Attributes::MaxClientCertificates::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "current-client-certificates", Attributes::CurrentClientCertificates::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::UnitTesting;
@@ -28766,6 +29220,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterChime(commands, credsIssuerConfig);
     registerClusterEcosystemInformation(commands, credsIssuerConfig);
     registerClusterCommissionerControl(commands, credsIssuerConfig);
+    registerClusterTlsCertificateManagement(commands, credsIssuerConfig);
     registerClusterUnitTesting(commands, credsIssuerConfig);
     registerClusterFaultInjection(commands, credsIssuerConfig);
     registerClusterSampleMei(commands, credsIssuerConfig);

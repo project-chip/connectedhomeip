@@ -10280,6 +10280,69 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRTLSCertificateManagementClusterTLSCertStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _caid = @(0);
+
+        _certificate = [NSData data];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRTLSCertificateManagementClusterTLSCertStruct alloc] init];
+
+    other.caid = self.caid;
+    other.certificate = self.certificate;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: caid:%@; certificate:%@; >", NSStringFromClass([self class]), _caid, [_certificate base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRTLSCertificateManagementClusterTLSClientCertificateDetailStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _ccdid = @(0);
+
+        _clientCertificate = [NSData data];
+
+        _intermediateCertificates = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRTLSCertificateManagementClusterTLSClientCertificateDetailStruct alloc] init];
+
+    other.ccdid = self.ccdid;
+    other.clientCertificate = self.clientCertificate;
+    other.intermediateCertificates = self.intermediateCertificates;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ccdid:%@; clientCertificate:%@; intermediateCertificates:%@; >", NSStringFromClass([self class]), _ccdid, [_clientCertificate base64EncodedStringWithOptions:0], _intermediateCertificates];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRUnitTestingClusterSimpleStruct
 - (instancetype)init
 {

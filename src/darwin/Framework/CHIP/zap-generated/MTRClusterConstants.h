@@ -206,6 +206,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeChimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000556,
     MTRClusterIDTypeEcosystemInformationID MTR_PROVISIONALLY_AVAILABLE = 0x00000750,
     MTRClusterIDTypeCommissionerControlID MTR_PROVISIONALLY_AVAILABLE = 0x00000751,
+    MTRClusterIDTypeTLSCertificateManagementID MTR_PROVISIONALLY_AVAILABLE = 0x00000801,
     MTRClusterIDTypeUnitTestingID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0xFFF1FC05,
     MTRClusterIDTypeSampleMEIID MTR_PROVISIONALLY_AVAILABLE = 0xFFF1FC20,
 
@@ -4745,6 +4746,17 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterCommissionerControlAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterCommissionerControlAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
+    // Cluster TLSCertificateManagement attributes
+    MTRAttributeIDTypeClusterTLSCertificateManagementAttributeMaxRootCertificatesID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterTLSCertificateManagementAttributeCurrentRootCertificatesID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterTLSCertificateManagementAttributeMaxClientCertificatesID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterTLSCertificateManagementAttributeCurrentClientCertificatesID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterTLSCertificateManagementAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterTLSCertificateManagementAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterTLSCertificateManagementAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterTLSCertificateManagementAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterTLSCertificateManagementAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
     // Cluster TestCluster deprecated attribute names
     MTRClusterTestClusterAttributeBooleanID
         MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeBooleanID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -6979,6 +6991,24 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterCommissionerControlCommandRequestCommissioningApprovalID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterCommissionerControlCommandCommissionNodeID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRCommandIDTypeClusterCommissionerControlCommandReverseOpenCommissioningWindowID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+
+    // Cluster TLSCertificateManagement commands
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandProvisionRootCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandProvisionRootCertificateResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandFindRootCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandFindRootCertificateResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandLookupRootCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandLookupRootCertificateResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandRemoveRootCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandTLSClientCSRID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandTLSClientCSRResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandProvisionClientCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandProvisionClientCertificateResponseID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandFindClientCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandFindClientCertificateResponseID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandLookupClientCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000D,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandLookupClientCertificateResponseID MTR_PROVISIONALLY_AVAILABLE = 0x0000000E,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandRemoveClientCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000F,
 
     // Cluster TestCluster deprecated command id names
     MTRClusterTestClusterCommandTestID
