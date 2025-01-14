@@ -445,6 +445,7 @@ class DCLDClient:
 def cli():
     pass
 
+
 @cli.command('from-dcl')
 @click.help_option('-h', '--help')
 @optgroup.group('Input data sources', cls=RequiredMutuallyExclusiveOptionGroup)
@@ -581,6 +582,7 @@ def from_dcl(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_n
     with open(output, 'w+') as outfile:
         json.dump(revocation_set, outfile, indent=4)
 
+
 @cli.command('from-crl')
 @click.option('--crl', required=True, type=click.File('rb'), help='Path to the CRL file')
 @click.option('--crl-signer', required=True, type=click.File('rb'), help='Path to the signer certificate')
@@ -598,6 +600,7 @@ def from_crl(crl, crl_signer, delegator, paa, output, is_paa):
     ca_name_b64, ca_akid_hex = get_certificate_authority_details(crl_signer, delegator, paa, is_paa)
     revocation_set = generate_revocation_set_from_crl(crl, crl_signer, ca_name_b64, ca_akid_hex, delegator)
     output.write(json.dumps([revocation_set], indent=4))
+
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
