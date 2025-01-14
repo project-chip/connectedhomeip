@@ -173,11 +173,6 @@ class ProviderMetadataTree
 public:
     virtual ~ProviderMetadataTree() = default;
 
-    // This iteration will list all server clusters on a given endpoint
-    virtual ClusterEntry FirstServerCluster(EndpointId endpoint)                              = 0;
-    virtual ClusterEntry NextServerCluster(const ConcreteClusterPath & before)                = 0;
-    virtual std::optional<ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) = 0;
-
     // Attribute iteration and accessors provide cluster-level access over
     // attributes
     virtual AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster)                = 0;

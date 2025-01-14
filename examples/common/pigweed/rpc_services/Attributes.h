@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "app/data-model-provider/MetadataSearch.h"
 #include "attributes_service/attributes_service.rpc.pb.h"
 #include "pigweed/rpc_services/internal/StatusUtils.h"
 
@@ -221,7 +222,9 @@ private:
         request.operationFlags.Set(app::DataModel::OperationFlags::kInternal);
         request.subjectDescriptor = &subjectDescriptor;
 
-        std::optional<app::DataModel::ClusterInfo> info = provider->GetServerClusterInfo(path);
+        app::DataModel::ServerClusterFinder serverClusterFinder(provider);
+        auto info = serverClusterFinder.Find(path);
+
         if (!info.has_value())
         {
             return ::pw::Status::NotFound();

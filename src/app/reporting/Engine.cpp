@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "app/data-model-provider/MetadataSearch.h"
 #include <access/AccessRestrictionProvider.h>
 #include <access/Privilege.h>
 #include <app/AppConfig.h>
@@ -52,21 +53,16 @@ using Protocols::InteractionModel::Status;
 
 Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eventPath)
 {
-    if (!model->GetServerClusterInfo(eventPath).has_value())
     {
-        auto endpoints = model->Endpoints();
-        for (auto & ep : endpoints.GetSpanValidForLifetime())
+        DataModel::ServerClusterFinder serverClusterFinder(model);
+        if (serverClusterFinder.Find(eventPath).has_value())
         {
-            if (ep.id == eventPath.mEndpointId)
-            {
-                return Status::UnsupportedCluster;
-            }
+            return Status::Success;
         }
-
-        return Status::UnsupportedEndpoint;
     }
 
-    return Status::Success;
+    DataModel::EndpointFinder endpointFinder(model);
+    return endpointFinder.Find(eventPath.mEndpointId).has_value() ? Status::UnsupportedCluster : Status::UnsupportedEndpoint;
 }
 
 /// Returns the status of ACL validation.
@@ -157,8 +153,10 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     readRequest.subjectDescriptor = &subjectDescriptor;
     readRequest.path              = path;
 
+    DataModel::ServerClusterFinder serverClusterFinder(dataModel);
+
     DataVersion version = 0;
-    if (std::optional<DataModel::ClusterInfo> clusterInfo = dataModel->GetServerClusterInfo(path); clusterInfo.has_value())
+    if (auto clusterInfo = serverClusterFinder.Find(path); clusterInfo.has_value())
     {
         version = clusterInfo->dataVersion;
     }
@@ -218,13 +216,10 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
 
 bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const ConcreteClusterPath & path, DataVersion dataVersion)
 {
-    std::optional<DataModel::ClusterInfo> info = dataModel->GetServerClusterInfo(path);
-    if (!info.has_value())
-    {
-        return false;
-    }
+    DataModel::ServerClusterFinder serverClusterFinder(dataModel);
+    auto info = serverClusterFinder.Find(path);
 
-    return (info->dataVersion == dataVersion);
+    return info.has_value() && (info->dataVersion == dataVersion);
 }
 
 } // namespace

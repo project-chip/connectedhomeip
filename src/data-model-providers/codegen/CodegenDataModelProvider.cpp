@@ -245,84 +245,6 @@ DataModel::ServerClusterEntry ServerClusterEntryFrom(EndpointId endpointId, cons
     return entry;
 }
 
-/// Load the cluster information into the specified destination
-std::variant<CHIP_ERROR, DataModel::ClusterInfo> LoadClusterInfo(const ConcreteClusterPath & path, const EmberAfCluster & cluster)
-{
-    DataVersion * versionPtr = emberAfDataVersionStorage(path);
-    if (versionPtr == nullptr)
-    {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        ChipLogError(AppServer, "Failed to get data version for %d/" ChipLogFormatMEI, static_cast<int>(path.mEndpointId),
-                     ChipLogValueMEI(cluster.clusterId));
-#endif
-        return CHIP_ERROR_NOT_FOUND;
-    }
-
-    DataModel::ClusterInfo info(*versionPtr);
-    // TODO: set entry flags:
-    //   info->flags.Set(ClusterQualityFlags::kDiagnosticsData)
-    return info;
-}
-
-/// Converts a EmberAfCluster into a ClusterEntry
-std::variant<CHIP_ERROR, DataModel::ClusterEntry> ClusterEntryFrom(EndpointId endpointId, const EmberAfCluster & cluster)
-{
-    ConcreteClusterPath clusterPath(endpointId, cluster.clusterId);
-    auto info = LoadClusterInfo(clusterPath, cluster);
-
-    if (CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&info))
-    {
-        return *err;
-    }
-
-    if (DataModel::ClusterInfo * infoValue = std::get_if<DataModel::ClusterInfo>(&info))
-    {
-        return DataModel::ClusterEntry{
-            .path = clusterPath,
-            .info = *infoValue,
-        };
-    }
-    return CHIP_ERROR_INCORRECT_STATE;
-}
-
-/// Finds the first server cluster entry for the given endpoint data starting at [start_index]
-///
-/// Returns an invalid entry if no more server clusters are found
-DataModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, const EmberAfEndpointType * endpoint, unsigned start_index,
-                                                unsigned & found_index)
-{
-    for (unsigned cluster_idx = start_index; cluster_idx < endpoint->clusterCount; cluster_idx++)
-    {
-        const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
-        if (!cluster.IsServer())
-        {
-            continue;
-        }
-
-        found_index = cluster_idx;
-        auto entry  = ClusterEntryFrom(endpointId, cluster);
-
-        if (DataModel::ClusterEntry * entryValue = std::get_if<DataModel::ClusterEntry>(&entry))
-        {
-            return *entryValue;
-        }
-
-#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        if (CHIP_ERROR * errValue = std::get_if<CHIP_ERROR>(&entry))
-        {
-            ChipLogError(AppServer, "Failed to load cluster entry: %" CHIP_ERROR_FORMAT, errValue->Format());
-        }
-        else
-        {
-            // Should NOT be possible: entryFrom has only 2 variants
-            ChipLogError(AppServer, "Failed to load cluster entry, UNKNOWN entry return type");
-        }
-#endif
-    }
-
-    return DataModel::ClusterEntry::kInvalid;
-}
-
 /// Load the attribute information into the specified destination
 ///
 /// `info` is assumed to be default-constructed/clear (i.e. this sets flags, but does not reset them).
@@ -615,16 +537,6 @@ DataModel::MetadataList<DataModel::ServerClusterEntry> CodegenDataModelProvider:
     return result;
 }
 
-DataModel::ClusterEntry CodegenDataModelProvider::FirstServerCluster(EndpointId endpointId)
-{
-    const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);
-    VerifyOrReturnValue(endpoint != nullptr, DataModel::ClusterEntry::kInvalid);
-    VerifyOrReturnValue(endpoint->clusterCount > 0, DataModel::ClusterEntry::kInvalid);
-    VerifyOrReturnValue(endpoint->cluster != nullptr, DataModel::ClusterEntry::kInvalid);
-
-    return FirstServerClusterEntry(endpointId, endpoint, 0, mServerClusterIterationHint);
-}
-
 std::optional<unsigned> CodegenDataModelProvider::TryFindClusterIndex(const EmberAfEndpointType * endpoint, ClusterId id,
                                                                       ClusterSide side) const
 {
@@ -660,46 +572,6 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindClusterIndex(const Embe
     }
 
     return std::nullopt;
-}
-
-DataModel::ClusterEntry CodegenDataModelProvider::NextServerCluster(const ConcreteClusterPath & before)
-{
-    // TODO: This search still seems slow (ember will loop). Should use index hints as long
-    //       as ember API supports it
-    const EmberAfEndpointType * endpoint = emberAfFindEndpointType(before.mEndpointId);
-
-    VerifyOrReturnValue(endpoint != nullptr, DataModel::ClusterEntry::kInvalid);
-    VerifyOrReturnValue(endpoint->clusterCount > 0, DataModel::ClusterEntry::kInvalid);
-    VerifyOrReturnValue(endpoint->cluster != nullptr, DataModel::ClusterEntry::kInvalid);
-
-    std::optional<unsigned> cluster_idx = TryFindClusterIndex(endpoint, before.mClusterId, ClusterSide::kServer);
-    if (!cluster_idx.has_value())
-    {
-        return DataModel::ClusterEntry::kInvalid;
-    }
-
-    return FirstServerClusterEntry(before.mEndpointId, endpoint, *cluster_idx + 1, mServerClusterIterationHint);
-}
-
-std::optional<DataModel::ClusterInfo> CodegenDataModelProvider::GetServerClusterInfo(const ConcreteClusterPath & path)
-{
-    const EmberAfCluster * cluster = FindServerCluster(path);
-
-    VerifyOrReturnValue(cluster != nullptr, std::nullopt);
-
-    auto info = LoadClusterInfo(path, *cluster);
-
-    if (CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&info))
-    {
-#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        ChipLogError(AppServer, "Failed to load cluster info: %" CHIP_ERROR_FORMAT, err->Format());
-#else
-        (void) err->Format();
-#endif
-        return std::nullopt;
-    }
-
-    return std::make_optional(std::get<DataModel::ClusterInfo>(info));
 }
 
 DataModel::MetadataList<ClusterId> CodegenDataModelProvider::ClientClusters(EndpointId endpointId)

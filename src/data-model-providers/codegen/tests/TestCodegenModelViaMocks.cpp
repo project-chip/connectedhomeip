@@ -14,9 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include <pw_unit_test/framework.h>
 
 #include <data-model-providers/codegen/tests/EmberInvokeOverride.h>
@@ -960,32 +957,6 @@ TEST_F(TestCodegenModelViaMocks, IterateOverServerClusters)
     EXPECT_EQ(serverClusters[1].clusterId, MockClusterId(2));
     EXPECT_EQ(serverClusters[2].clusterId, MockClusterId(3));
     EXPECT_EQ(serverClusters[3].clusterId, MockClusterId(4));
-}
-
-TEST_F(TestCodegenModelViaMocks, GetServerClusterInfo)
-{
-
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-
-    chip::Test::ResetVersion();
-
-    ASSERT_FALSE(model.GetServerClusterInfo(ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId)).has_value());
-    ASSERT_FALSE(model.GetServerClusterInfo(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1))).has_value());
-    ASSERT_FALSE(model.GetServerClusterInfo(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).has_value());
-    ASSERT_FALSE(model.GetServerClusterInfo(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10))).has_value());
-
-    // now get the value
-    std::optional<ClusterInfo> info = model.GetServerClusterInfo(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
-    ASSERT_TRUE(info.has_value());
-    EXPECT_EQ(info->dataVersion, 0u); // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(info->flags.Raw(), 0u); // NOLINT(bugprone-unchecked-optional-access)
-
-    chip::Test::BumpVersion();
-    info = model.GetServerClusterInfo(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
-    ASSERT_TRUE(info.has_value());
-    EXPECT_EQ(info->dataVersion, 1u); // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(info->flags.Raw(), 0u); // NOLINT(bugprone-unchecked-optional-access)
 }
 
 TEST_F(TestCodegenModelViaMocks, IterateOverClientClusters)

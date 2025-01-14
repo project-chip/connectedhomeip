@@ -196,11 +196,10 @@ CHIP_ERROR DescriptorAttrAccess::ReadClientServerAttribute(EndpointId endpoint, 
     CHIP_ERROR err = aEncoder.EncodeList([&endpoint, server](const auto & encoder) -> CHIP_ERROR {
         if (server)
         {
-            auto clusterEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstServerCluster(endpoint);
-            while (clusterEntry.IsValid())
+            auto clusters = InteractionModelEngine::GetInstance()->GetDataModelProvider()->ServerClusters(endpoint);
+            for (auto & cluster : clusters.GetSpanValidForLifetime())
             {
-                ReturnErrorOnFailure(encoder.Encode(clusterEntry.path.mClusterId));
-                clusterEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextServerCluster(clusterEntry.path);
+                ReturnErrorOnFailure(encoder.Encode(cluster.clusterId));
             }
         }
         else
