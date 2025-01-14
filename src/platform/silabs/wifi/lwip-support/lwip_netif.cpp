@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
+#include <platform/silabs/wifi/WifiInterface.h>
 
 #include "dhcp_client.h"
 #include "ethernetif.h"
