@@ -107,9 +107,6 @@ class TC_CADMIN_1_19(MatterBaseTest):
                                "max fabrics must be greater than initial fabrics, please remove one non-test-harness fabric and try test again")
 
         self.step(4)
-        fids_ca_dir = {}
-        fids_fa_dir = {}
-        fids = {}
         fabric_idxs = []
         for fid in range(0, max_fabrics - initial_number_of_fabrics):
             # Make sure that current test step is 5, resets here after each loop
@@ -119,19 +116,19 @@ class TC_CADMIN_1_19(MatterBaseTest):
             params = await self.open_commissioning_window(dev_ctrl=self.th1, timeout=self.max_window_duration, node_id=self.dut_node_id)
 
             self.step("4b")
-            fids_ca_dir[fid] = self.certificate_authority_manager.NewCertificateAuthority(caIndex=fid)
-            fids_fa_dir[fid] = fids_ca_dir[fid].NewFabricAdmin(vendorId=0xFFF1, fabricId=fid + 1)
-            fids[fid] = fids_fa_dir[fid].NewController(nodeId=fid + 1)
+            fids_ca = self.certificate_authority_manager.NewCertificateAuthority(caIndex=fid)
+            fids_fa = fids_ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=fid + 1)
+            fids = fids_fa.NewController(nodeId=fid + 1)
 
-            await fids[fid].CommissionOnNetwork(
+            await fids.CommissionOnNetwork(
                 nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator)
 
             self.step("4c")
-            fabric_idxs.append(await self.read_single_attribute_check_success(dev_ctrl=fids[fid], endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.CurrentFabricIndex))
+            fabric_idxs.append(await self.read_single_attribute_check_success(dev_ctrl=fids, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.CurrentFabricIndex))
 
             self.step("4d")
-            fids[fid].Shutdown()
+            fids.Shutdown()
 
         self.step(5)
         # TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster
@@ -144,12 +141,11 @@ class TC_CADMIN_1_19(MatterBaseTest):
         self.step(7)
         # TH creates a controller on a new fabric and attempts to commission DUT_CE using that controller
         next_fabric = current_fabrics + 1
-        fids_ca_dir[next_fabric] = self.certificate_authority_manager.NewCertificateAuthority()
-        fids_fa_dir[next_fabric] = fids_ca_dir[current_fabrics +
-                                               1].NewFabricAdmin(vendorId=0xFFF1, fabricId=next_fabric)
+        fids_ca2 = self.certificate_authority_manager.NewCertificateAuthority(caIndex=next_fabric)
+        fids_fa2 = fids_ca2.NewFabricAdmin(vendorId=0xFFF1, fabricId=next_fabric)
         try:
-            fids[next_fabric] = fids_fa_dir[next_fabric].NewController(nodeId=next_fabric)
-            await fids[next_fabric].CommissionOnNetwork(
+            fids2 = fids_fa2.NewController(nodeId=next_fabric)
+            await fids2.CommissionOnNetwork(
                 nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator)
 
