@@ -4783,7 +4783,10 @@
           - Deprecated global attribute names
   provisional:
       clusters:
+          # PulseWidthModulation is not in the Matter specification.
           - PulseWidthModulation
+          # TimeSynchronization provisional until spec and SDK are aligned.
+          # See https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/10707
           - TimeSynchronization
 
 - release: "FD8D09B4-6CF7-4EBA-BD4F-7EDE872E3098"
@@ -7469,7 +7472,7 @@
                   - Wpa3Personal
   provisional:
       clusters:
-          ## Not ready to be public API yet.
+          # SDK example, not part of the specification.
           - SampleMEI
       attributes:
           Scenes:
@@ -8175,18 +8178,17 @@
                   - WaterMarks
   provisional:
       clusters:
-          # Targeting Spring 2024 Matter release
+          # DemandResponseLoadControl not finalized as of Fall 2024 Matter release.
           - DemandResponseLoadControl
-          - BooleanStateConfiguration
-          - ValveConfigurationAndControl
+          # Timer does not seem to exist in the Matter specification.
           - Timer
-          - LaundryDryerControls
+          # Targeting Spring 2024 Matter release
           - EnergyEVSE
           - ContentControl
           - ContentAppObserver
-          - DeviceEnergyManagement
-          - ElectricalEnergyMeasurement
+          # Energy Preference is provisional in the Fall 2024 Matter release.
           - EnergyPreference
+          # Scenes Management is provisional in the Fall 2024 Matter release.
           - ScenesManagement
       attributes:
           NetworkCommissioning:
@@ -8842,15 +8844,6 @@
                   - minMeasuredValue
                   - maxMeasuredValue
                   - accuracyRanges
-              MeasurementAccuracyRangeStruct:
-                  - rangeMin
-                  - rangeMax
-                  - percentMax
-                  - percentMin
-                  - percentTypical
-                  - fixedMax
-                  - fixedMin
-                  - fixedTypical
           ElectricalPowerMeasurement:
               MeasurementRangeStruct:
                   - measurementType
@@ -9499,21 +9492,9 @@
       clusters:
           # Targeting Spring 2024 Matter release
           - EnergyEVSEMode
-          - DeviceEnergyManagementMode
           - Messages
           - PowerTopology
       attributes:
-          DoorLock:
-              # Aliro is not ready yet.
-              - AliroReaderVerificationKey
-              - AliroReaderGroupIdentifier
-              - AliroReaderGroupSubIdentifier
-              - AliroExpeditedTransactionSupportedProtocolVersions
-              - AliroGroupResolvingKey
-              - AliroSupportedBLEUWBProtocolVersions
-              - AliroBLEAdvertisingVersion
-              - NumberOfAliroCredentialIssuerKeysSupported
-              - NumberOfAliroEndpointKeysSupported
           Thermostat:
               # Targeting Spring 2024 Matter release
               - PresetTypes
@@ -9533,10 +9514,6 @@
               # for now just start doing that for new additions to it.
               - MeiInt8u
       commands:
-          DoorLock:
-              # Aliro is not ready yet.
-              - SetAliroReaderConfig
-              - ClearAliroReaderConfig
           Thermostat:
               # Targeting Spring 2024 Matter release
               - SetActiveScheduleRequest
@@ -9571,21 +9548,6 @@
           Thermostat:
               # Targeting Spring 2024 Matter release
               - PresetScenarioEnum
-      enum values:
-          DoorLock:
-              CredentialTypeEnum:
-                  # Aliro is not ready yet.
-                  - AliroCredentialIssuerKey
-                  - AliroEvictableEndpointKey
-                  - AliroNonEvictableEndpointKey
-              LockDataTypeEnum:
-                  # Aliro is not ready yet.
-                  - AliroCredentialIssuerKey
-                  - AliroEvictableEndpointKey
-                  - AliroNonEvictableEndpointKey
-              OperationSourceEnum:
-                  # Aliro is not ready yet.
-                  - Aliro
       bitmaps:
           Thermostat:
               # Targeting Spring 2024 Matter release
@@ -9596,11 +9558,6 @@
               # Targeting Spring 2024 Matter release
               - Feature
       bitmap values:
-          DoorLock:
-              Feature:
-                  # Aliro is not ready yet.
-                  - AliroProvisioning
-                  - AliroBLEUWB
           Thermostat:
               Feature:
                   # Targeting Spring 2024 Matter release
@@ -9874,44 +9831,6 @@
                   - RequiredTCNotAccepted
                   - TCAcknowledgementsNotReceived
                   - TCMinVersionNotMet
-          RVCCleanMode:
-              # Not clear whether these will stay in the XML
-              ModeTag:
-                  - Auto
-                  - Quick
-                  - Quiet
-                  - LowNoise
-                  - LowEnergy
-                  - Min
-                  - Max
-                  - Night
-                  - Day
-                  - Vacation
-          RVCOperationalState:
-              # Not clear whether these will stay in the XML
-              ErrorStateEnum:
-                  - NoError
-                  - UnableToStartOrResume
-                  - UnableToCompleteOperation
-                  - CommandInvalidInState
-              OperationalStateEnum:
-                  - Stopped
-                  - Running
-                  - Paused
-                  - Error
-          RVCRunMode:
-              # Not clear whether these will stay in the XML
-              ModeTag:
-                  - Auto
-                  - Quick
-                  - Quiet
-                  - LowNoise
-                  - LowEnergy
-                  - Vacation
-                  - Min
-                  - Max
-                  - Night
-                  - Day
       bitmaps:
           AccessControl:
               # Targeting 1.4
@@ -10016,9 +9935,12 @@
       tvOS: "18.4"
   introduced:
       clusters:
+          - DeviceEnergyManagement
+          - DeviceEnergyManagementMode
           - DishwasherAlarm
           - DishwasherMode
           - ICDManagement
+          - LaundryDryerControls
           - LaundryWasherControls
           - LaundryWasherMode
           - MicrowaveOvenControl
@@ -10029,6 +9951,28 @@
           - RefrigeratorAndTemperatureControlledCabinetMode
           - TemperatureControl
       attributes:
+          DeviceEnergyManagement:
+              - ESAType
+              - ESACanGenerate
+              - ESAState
+              - AbsMinPower
+              - AbsMaxPower
+              - PowerAdjustmentCapability
+              - Forecast
+              - OptOutState
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          DeviceEnergyManagementMode:
+              - SupportedModes
+              - CurrentMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
           DishwasherAlarm:
               - Mask
               - Latch
@@ -10047,6 +9991,16 @@
               - AttributeList
               - FeatureMap
               - ClusterRevision
+          DoorLock:
+              - AliroReaderVerificationKey
+              - AliroReaderGroupIdentifier
+              - AliroReaderGroupSubIdentifier
+              - AliroExpeditedTransactionSupportedProtocolVersions
+              - AliroGroupResolvingKey
+              - AliroSupportedBLEUWBProtocolVersions
+              - AliroBLEAdvertisingVersion
+              - NumberOfAliroCredentialIssuerKeysSupported
+              - NumberOfAliroEndpointKeysSupported
           ICDManagement:
               - IdleModeDuration
               - ActiveModeDuration
@@ -10058,6 +10012,14 @@
               - UserActiveModeTriggerInstruction
               - OperatingMode
               - MaximumCheckInBackOff
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          LaundryDryerControls:
+              - SupportedDrynessLevels
+              - SelectedDrynessLevel
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
@@ -10153,6 +10115,18 @@
               - FeatureMap
               - ClusterRevision
       commands:
+          DeviceEnergyManagement:
+              - PowerAdjustRequest
+              - CancelPowerAdjustRequest
+              - StartTimeAdjustRequest
+              - PauseRequest
+              - ResumeRequest
+              - ModifyForecastRequest
+              - RequestConstraintBasedForecast
+              - CancelRequest
+          DeviceEnergyManagementMode:
+              - ChangeToMode
+              - ChangeToModeResponse
           DishwasherAlarm:
               - Reset
               - ModifyEnabledAlarms
@@ -10161,6 +10135,8 @@
               - ChangeToModeResponse
           DoorLock:
               - UnboltDoor
+              - SetAliroReaderConfig
+              - ClearAliroReaderConfig
           ICDManagement:
               - RegisterClient
               - RegisterClientResponse
@@ -10188,6 +10164,30 @@
           TemperatureControl:
               - SetTemperature
       command fields:
+          DeviceEnergyManagement:
+              PowerAdjustRequest:
+                  - power
+                  - duration
+                  - cause
+              StartTimeAdjustRequest:
+                  - requestedStartTime
+                  - cause
+              PauseRequest:
+                  - duration
+                  - cause
+              ModifyForecastRequest:
+                  - forecastID
+                  - slotAdjustments
+                  - cause
+              RequestConstraintBasedForecast:
+                  - constraints
+                  - cause
+          DeviceEnergyManagementMode:
+              ChangeToMode:
+                  - newMode
+              ChangeToModeResponse:
+                  - status
+                  - statusText
           DishwasherAlarm:
               Reset:
                   - alarms
@@ -10202,6 +10202,11 @@
           DoorLock:
               UnboltDoor:
                   - pinCode
+              SetAliroReaderConfig:
+                  - signingKey
+                  - verificationKey
+                  - groupIdentifier
+                  - groupResolvingKey
           ICDManagement:
               RegisterClient:
                   - checkInNodeID
@@ -10253,9 +10258,22 @@
                   - targetTemperature
                   - targetTemperatureLevel
       structs:
+          DeviceEnergyManagement:
+              - CostStruct
+              - PowerAdjustStruct
+              - PowerAdjustCapabilityStruct
+              - ForecastStruct
+              - SlotStruct
+              - SlotAdjustmentStruct
+              - ConstraintsStruct
+          DeviceEnergyManagementMode:
+              - ModeOptionStruct
+              - ModeTagStruct
           DishwasherMode:
               - ModeOptionStruct
               - ModeTagStruct
+          ElectricalEnergyMeasurement:
+              - MeasurementAccuracyRangeStruct
           ICDManagement:
               - MonitoringRegistrationStruct
           LaundryWasherMode:
@@ -10274,6 +10292,67 @@
               - ModeOptionStruct
               - ModeTagStruct
       struct fields:
+          DeviceEnergyManagement:
+              CostStruct:
+                  - costType
+                  - value
+                  - decimalPoints
+                  - currency
+              PowerAdjustStruct:
+                  - minPower
+                  - maxPower
+                  - minDuration
+                  - maxDuration
+              PowerAdjustCapabilityStruct:
+                  - powerAdjustCapability
+                  - cause
+              ForecastStruct:
+                  - forecastID
+                  - activeSlotNumber
+                  - startTime
+                  - endTime
+                  - earliestStartTime
+                  - latestEndTime
+                  - isPausable
+                  - slots
+                  - forecastUpdateReason
+              SlotStruct:
+                  - minDuration
+                  - maxDuration
+                  - defaultDuration
+                  - elapsedSlotTime
+                  - remainingSlotTime
+                  - slotIsPausable
+                  - minPauseDuration
+                  - maxPauseDuration
+                  - manufacturerESAState
+                  - nominalPower
+                  - minPower
+                  - maxPower
+                  - nominalEnergy
+                  - costs
+                  - minPowerAdjustment
+                  - maxPowerAdjustment
+                  - minDurationAdjustment
+                  - maxDurationAdjustment
+              SlotAdjustmentStruct:
+                  - slotIndex
+                  - nominalPower
+                  - duration
+              ConstraintsStruct:
+                  - startTime
+                  - duration
+                  - nominalPower
+                  - maximumEnergy
+                  - loadControl
+          DeviceEnergyManagementMode:
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - modeTags
+              ModeTagStruct:
+                  - mfgCode
+                  - value
           DishwasherMode:
               ModeOptionStruct:
                   - label
@@ -10282,6 +10361,16 @@
               ModeTagStruct:
                   - mfgCode
                   - value
+          ElectricalEnergyMeasurement:
+              MeasurementAccuracyRangeStruct:
+                  - rangeMin
+                  - rangeMax
+                  - percentMax
+                  - percentMin
+                  - percentTypical
+                  - fixedMax
+                  - fixedMin
+                  - fixedTypical
           ICDManagement:
               MonitoringRegistrationStruct:
                   - checkInNodeID
@@ -10329,6 +10418,11 @@
                   - mfgCode
                   - value
       events:
+          DeviceEnergyManagement:
+              - PowerAdjustStart
+              - PowerAdjustEnd
+              - Paused
+              - Resumed
           DishwasherAlarm:
               - Notify
           OvenCavityOperationalState:
@@ -10337,6 +10431,13 @@
           RefrigeratorAlarm:
               - Notify
       event fields:
+          DeviceEnergyManagement:
+              PowerAdjustEnd:
+                  - cause
+                  - duration
+                  - energyUse
+              Resumed:
+                  - cause
           DishwasherAlarm:
               Notify:
                   - active
@@ -10357,8 +10458,21 @@
                   - state
                   - mask
       enums:
+          DeviceEnergyManagement:
+              - CostTypeEnum
+              - ESATypeEnum
+              - ESAStateEnum
+              - OptOutStateEnum
+              - CauseEnum
+              - AdjustmentCauseEnum
+              - ForecastUpdateReasonEnum
+              - PowerAdjustReasonEnum
+          DeviceEnergyManagementMode:
+              - ModeTag
           DishwasherMode:
               - ModeTag
+          ElectricalEnergyMeasurement:
+              - MeasurementTypeEnum
           ICDManagement:
               - ClientTypeEnum
               - OperatingModeEnum
@@ -10366,15 +10480,96 @@
               - ModeTag
           OvenMode:
               - ModeTag
+          LaundryDryerControls:
+              - DrynessLevelEnum
           LaundryWasherControls:
               - NumberOfRinsesEnum
           LaundryWasherMode:
               - ModeTag
+          OvenCavityOperationalState:
+              - ErrorStateEnum
+              - OperationalStateEnum
           RefrigeratorAndTemperatureControlledCabinetMode:
               - ModeTag
       enum values:
+          DeviceEnergyManagement:
+              CostTypeEnum:
+                  - Financial
+                  - GHGEmissions
+                  - Comfort
+                  - Temperature
+              ESATypeEnum:
+                  - EVSE
+                  - SpaceHeating
+                  - WaterHeating
+                  - SpaceCooling
+                  - SpaceHeatingCooling
+                  - BatteryStorage
+                  - SolarPV
+                  - FridgeFreezer
+                  - WashingMachine
+                  - Dishwasher
+                  - Cooking
+                  - HomeWaterPump
+                  - IrrigationWaterPump
+                  - PoolPump
+                  - Other
+              ESAStateEnum:
+                  - Offline
+                  - Online
+                  - Fault
+                  - PowerAdjustActive
+                  - Paused
+              OptOutStateEnum:
+                  - NoOptOut
+                  - LocalOptOut
+                  - GridOptOut
+                  - OptOut
+              CauseEnum:
+                  - NormalCompletion
+                  - Offline
+                  - Fault
+                  - UserOptOut
+                  - Cancelled
+              AdjustmentCauseEnum:
+                  - LocalOptimization
+                  - GridOptimization
+              ForecastUpdateReasonEnum:
+                  - InternalOptimization
+                  - LocalOptimization
+                  - GridOptimization
+              PowerAdjustReasonEnum:
+                  - NoAdjustment
+                  - LocalOptimizationAdjustment
+                  - GridOptimizationAdjustment
+          DeviceEnergyManagementMode:
+              ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  - NoOptimization
+                  - DeviceOptimization
+                  - LocalOptimization
+                  - GridOptimization
           DishwasherMode:
               ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
                   - Normal
                   - Heavy
                   - Light
@@ -10385,6 +10580,33 @@
                   - Eurocylinder
               LockOperationTypeEnum:
                   - Unlatch
+              CredentialTypeEnum:
+                  - AliroCredentialIssuerKey
+                  - AliroEvictableEndpointKey
+                  - AliroNonEvictableEndpointKey
+              LockDataTypeEnum:
+                  - AliroCredentialIssuerKey
+                  - AliroEvictableEndpointKey
+                  - AliroNonEvictableEndpointKey
+              OperationSourceEnum:
+                  - Aliro
+          ElectricalEnergyMeasurement:
+              MeasurementTypeEnum:
+                  - Unspecified
+                  - Voltage
+                  - ActiveCurrent
+                  - ReactiveCurrent
+                  - ApparentCurrent
+                  - ActivePower
+                  - ReactivePower
+                  - ApparentPower
+                  - RMSVoltage
+                  - RMSCurrent
+                  - RMSPower
+                  - Frequency
+                  - PowerFactor
+                  - NeutralCurrent
+                  - ElectricalEnergy
           ICDManagement:
               ClientTypeEnum:
                   - Permanent
@@ -10392,6 +10614,12 @@
               OperatingModeEnum:
                   - SIT
                   - LIT
+          LaundryDryerControls:
+              DrynessLevelEnum:
+                  - Low
+                  - Normal
+                  - Extra
+                  - Max
           LaundryWasherControls:
               NumberOfRinsesEnum:
                   - None
@@ -10400,16 +10628,57 @@
                   - Max
           LaundryWasherMode:
               ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
                   - Normal
                   - Delicate
                   - Heavy
                   - Whites
           MicrowaveOvenMode:
               ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
                   - Normal
                   - Defrost
+          OvenCavityOperationalState:
+              ErrorStateEnum:
+                  - NoError
+                  - UnableToStartOrResume
+                  - UnableToCompleteOperation
+                  - CommandInvalidInState
+              OperationalStateEnum:
+                  - Stopped
+                  - Running
+                  - Paused
+                  - Error
           OvenMode:
               ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
                   - Bake
                   - Convection
                   - Grill
@@ -10422,12 +10691,57 @@
                   - Steam
           RefrigeratorAndTemperatureControlledCabinetMode:
               ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
                   - RapidCool
                   - RapidFreeze
+          RVCCleanMode:
+              ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  - Vacation
+          RVCOperationalState:
+              ErrorStateEnum:
+                  - NoError
+                  - UnableToStartOrResume
+                  - UnableToCompleteOperation
+                  - CommandInvalidInState
+              OperationalStateEnum:
+                  - Stopped
+                  - Running
+                  - Paused
+                  - Error
           RVCRunMode:
               ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
                   - Mapping
       bitmaps:
+          DeviceEnergyManagement:
+              - Feature
           DishwasherAlarm:
               - AlarmBitmap
               - Feature
@@ -10443,6 +10757,15 @@
           TemperatureControl:
               - Feature
       bitmap values:
+          DeviceEnergyManagement:
+              Feature:
+                  - PowerAdjustment
+                  - PowerForecastReporting
+                  - StateForecastReporting
+                  - StartTimeAdjustment
+                  - Pausable
+                  - ForecastAdjustment
+                  - ConstraintBasedAdjustment
           DishwasherAlarm:
               AlarmBitmap:
                   - DoorError
@@ -10451,6 +10774,8 @@
           DoorLock:
               Feature:
                   - Unbolt
+                  - AliroProvisioning
+                  - AliroBLEUWB
           ICDManagement:
               UserActiveModeTriggerBitmap:
                   - PowerCycle
@@ -10503,77 +10828,6 @@
               SetCookingParameters:
                   # wattSettingIndex is provisional because WATTS is provisional in Matter 1.4
                   - wattSettingIndex
-      enums:
-          OvenCavityOperationalState:
-              # Not clear whether these will stay in the XML
-              - ErrorStateEnum
-              - OperationalStateEnum
-      enum values:
-          DishwasherMode:
-              # Not clear whether these will stay in the XML
-              ModeTag:
-                  - Auto
-                  - Quick
-                  - Quiet
-                  - LowNoise
-                  - LowEnergy
-                  - Vacation
-                  - Min
-                  - Max
-                  - Night
-                  - Day
-          LaundryWasherMode:
-              # Not clear whether these will stay in the XML
-              ModeTag:
-                  - Auto
-                  - Quick
-                  - Quiet
-                  - LowNoise
-                  - LowEnergy
-                  - Vacation
-                  - Min
-                  - Max
-                  - Night
-                  - Day
-          MicrowaveOvenMode:
-              # Not clear whether these will stay in the XML
-              ModeTag:
-                  - Auto
-                  - Quick
-                  - Quiet
-                  - LowNoise
-                  - LowEnergy
-                  - Vacation
-                  - Min
-                  - Max
-                  - Night
-                  - Day
-          OvenMode:
-              # Not clear whether these will stay in the XML
-              ModeTag:
-                  - Auto
-                  - Quick
-                  - Quiet
-                  - LowNoise
-                  - LowEnergy
-                  - Vacation
-                  - Min
-                  - Max
-                  - Night
-                  - Day
-          RefrigeratorAndTemperatureControlledCabinetMode:
-              # Not clear whether these will stay in the XML
-              ModeTag:
-                  - Auto
-                  - Quick
-                  - Quiet
-                  - LowNoise
-                  - LowEnergy
-                  - Vacation
-                  - Min
-                  - Max
-                  - Night
-                  - Day
       bitmap values:
           DishwasherAlarm:
               AlarmBitmap:
@@ -10616,6 +10870,10 @@
               - Pause
               - Resume
       bitmaps:
+          DeviceEnergyManagementMode:
+              # The one bit in this bitmap is marked X in the spec, but we can't have
+              # an empty bitmap.
+              - Feature
           DishwasherMode:
               # The one bit in this bitmap is marked X in the spec, but we can't have
               # an empty bitmap.

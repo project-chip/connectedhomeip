@@ -577,7 +577,6 @@ template("efr32_sdk") {
           "EXP_BOARD=1",
           "CHIP_917",
           "SLI_SI917=1",
-          "SL_WFX_CONFIG_SCAN=1",
           "CHIP_9117",
           "SL_WIFI_COMPONENT_INCLUDED",
         ]

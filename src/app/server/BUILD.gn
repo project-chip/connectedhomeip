@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,22 @@ config("server_config") {
   if (chip_app_use_echo) {
     defines += [ "CHIP_APP_USE_ECHO" ]
   }
+}
+
+source_set("terms_and_conditions") {
+  sources = [
+    "DefaultTermsAndConditionsProvider.cpp",
+    "DefaultTermsAndConditionsProvider.h",
+    "TermsAndConditionsManager.cpp",
+    "TermsAndConditionsManager.h",
+    "TermsAndConditionsProvider.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/protocols",
+  ]
 }
 
 static_library("server") {
@@ -68,6 +84,10 @@ static_library("server") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
+
+  if (chip_terms_and_conditions_required) {
+    public_deps += [ ":terms_and_conditions" ]
+  }
 
   # TODO: Server.cpp uses TestGroupData.h. Unsure why test code would be in such a central place
   #       This dependency is split since it should probably be removed (or naming should

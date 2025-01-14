@@ -104,6 +104,22 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
 
     [_results addObject:snapshot];
 
+    XCTAssertLessThanOrEqual(_results.count, kExpectedDiscoveredDevicesCount);
+
+    __auto_type instanceName = device.instanceName;
+    __auto_type vendorId = device.vendorID;
+    __auto_type productId = device.productID;
+    __auto_type discriminator = device.discriminator;
+    __auto_type commissioningMode = device.commissioningMode;
+
+    XCTAssertEqual(instanceName.length, 16); // The  instance name is random, so just ensure the len is right.
+    XCTAssertEqualObjects(vendorId, @(kTestVendorId));
+    XCTAssertTrue([kTestProductIds containsObject:productId]);
+    XCTAssertTrue([kTestDiscriminators containsObject:discriminator]);
+    XCTAssertEqual(commissioningMode, YES);
+
+    NSLog(@"Found device %@", snapshot);
+
     if (_results.count == kExpectedDiscoveredDevicesCount) {
         // Do some sanity checking on our results and removedResults to make
         // sure we really only saw the relevant set of things.
@@ -123,39 +139,17 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
             [self.expectation fulfill];
         }
     }
-
-    XCTAssertLessThanOrEqual(_results.count, kExpectedDiscoveredDevicesCount);
-
-    __auto_type instanceName = device.instanceName;
-    __auto_type vendorId = device.vendorID;
-    __auto_type productId = device.productID;
-    __auto_type discriminator = device.discriminator;
-    __auto_type commissioningMode = device.commissioningMode;
-
-    XCTAssertEqual(instanceName.length, 16); // The  instance name is random, so just ensure the len is right.
-    XCTAssertEqualObjects(vendorId, @(kTestVendorId));
-    XCTAssertTrue([kTestProductIds containsObject:productId]);
-    XCTAssertTrue([kTestDiscriminators containsObject:discriminator]);
-    XCTAssertEqual(commissioningMode, YES);
-
-    NSLog(@"Found Device (%@) with discriminator: %@ (vendor: %@, product: %@)", instanceName, discriminator, vendorId, productId);
 }
 
 - (void)controller:(MTRDeviceController *)controller didRemoveCommissionableDevice:(MTRCommissionableBrowserResult *)device
 {
-    __auto_type instanceName = device.instanceName;
-    __auto_type vendorId = device.vendorID;
-    __auto_type productId = device.productID;
-    __auto_type discriminator = device.discriminator;
-
-    NSLog(
-        @"Removed Device (%@) with discriminator: %@ (vendor: %@, product: %@)", instanceName, discriminator, vendorId, productId);
-
     __auto_type * snapshot = ResultSnapshot(device);
-    XCTAssertTrue([_results containsObject:snapshot], @"Removed device %@ is not something we found before", snapshot);
+    XCTAssertTrue([_results containsObject:snapshot], @"Removed device %@ is not something we found before: %@", snapshot, _results);
 
     [_removedResults addObject:snapshot];
     [_results removeObject:snapshot];
+
+    NSLog(@"Removed device %@", snapshot);
 }
 @end
 

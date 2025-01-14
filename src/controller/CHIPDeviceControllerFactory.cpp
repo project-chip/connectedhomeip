@@ -167,8 +167,15 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(stateParams.transportMgr->Init(Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv6)
                                                             .SetListenPort(params.listenPort)
-#if INET_CONFIG_ENABLE_IPV4
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                                             ,
+                                                        Transport::TcpListenParameters(stateParams.tcpEndPointManager)
+                                                            .SetAddressType(IPAddressType::kIPv6)
+                                                            .SetListenPort(params.listenPort)
+                                                            .SetServerListenEnabled(false) // Initialize as a TCP Client
+#endif
+#if INET_CONFIG_ENABLE_IPV4
+                                                        ,
                                                         Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv4)
                                                             .SetListenPort(params.listenPort)
@@ -176,12 +183,6 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #if CONFIG_NETWORK_LAYER_BLE
                                                             ,
                                                         Transport::BleListenParameters(stateParams.bleLayer)
-#endif
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-                                                            ,
-                                                        Transport::TcpListenParameters(stateParams.tcpEndPointManager)
-                                                            .SetAddressType(IPAddressType::kIPv6)
-                                                            .SetListenPort(params.listenPort)
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
                                                             ,
@@ -252,15 +253,9 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     chip::app::InteractionModelEngine * interactionModelEngine = chip::app::InteractionModelEngine::GetInstance();
 
-    // Note placement of this BEFORE `InitDataModelHandler` since InitDataModelHandler may
-    // rely on ember (does emberAfInit() and configure which may load data from NVM).
-    //
-    // Expected forward path is that we will move move and more things inside datamodel
-    // provider (e.g. storage settings) so we want datamodelprovider available before
-    // `InitDataModelHandler`.
+    // Initialize the data model now that everything cluster implementations might
+    // depend on is initalized.
     interactionModelEngine->SetDataModelProvider(params.dataModelProvider);
-
-    InitDataModelHandler();
 
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));
 

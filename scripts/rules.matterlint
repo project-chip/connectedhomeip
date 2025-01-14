@@ -14,6 +14,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/binding-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/boolean-state-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/actions-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/bridged-device-basic-information.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/camera-av-settings-user-level-management-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/camera-av-stream-management-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/channel-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/chime-cluster.xml";
