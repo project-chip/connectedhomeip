@@ -139,8 +139,8 @@ enum class ProductIdentifierTypeEnum : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for StreamTypeEnum
-enum class StreamTypeEnum : uint8_t
+// Enum for StreamUsageEnum
+enum class StreamUsageEnum : uint8_t
 {
     kInternal  = 0x00,
     kRecording = 0x01,
@@ -5555,7 +5555,7 @@ enum class ImageCodecEnum : uint8_t
     kUnknownEnumValue = 1,
 };
 
-using StreamTypeEnum = Clusters::detail::StreamTypeEnum;
+using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
 
 // Enum for TriStateAutoEnum
 enum class TriStateAutoEnum : uint8_t
@@ -5612,9 +5612,22 @@ enum class Feature : uint32_t
 };
 } // namespace CameraAvStreamManagement
 
+namespace CameraAvSettingsUserLevelManagement {
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kDigitalPTZ        = 0x1,
+    kMechanicalPan     = 0x2,
+    kMechanicalTilt    = 0x4,
+    kMechanicalZoom    = 0x8,
+    kMechanicalPresets = 0x10,
+};
+} // namespace CameraAvSettingsUserLevelManagement
+
 namespace WebRTCTransportProvider {
 
-using StreamTypeEnum = Clusters::detail::StreamTypeEnum;
+using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
 
 using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
 
@@ -5623,7 +5636,7 @@ using WebRTCMetadataOptions = Clusters::detail::WebRTCMetadataOptions;
 
 namespace WebRTCTransportRequestor {
 
-using StreamTypeEnum = Clusters::detail::StreamTypeEnum;
+using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
 
 using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
 
@@ -5724,7 +5737,7 @@ enum class FaultType : uint8_t
 
 namespace SampleManufacturerSpecific {} // namespace SampleManufacturerSpecific
 
-namespace SampleExternalManufacturerSpecific {} // namespace SampleExternalManufacturerSpecific
+namespace SampleExternalManufacturerSpecificCluster {} // namespace SampleExternalManufacturerSpecificCluster
 
 } // namespace Clusters
 } // namespace app

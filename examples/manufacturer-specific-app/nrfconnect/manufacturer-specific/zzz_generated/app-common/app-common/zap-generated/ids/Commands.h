@@ -1891,6 +1891,40 @@ static constexpr CommandId Id = 0x0000000C;
 } // namespace Commands
 } // namespace CameraAvStreamManagement
 
+namespace CameraAvSettingsUserLevelManagement {
+namespace Commands {
+
+namespace MPTZSetPosition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace MPTZSetPosition
+
+namespace MPTZRelativeMove {
+static constexpr CommandId Id = 0x00000001;
+} // namespace MPTZRelativeMove
+
+namespace MPTZMoveToPreset {
+static constexpr CommandId Id = 0x00000002;
+} // namespace MPTZMoveToPreset
+
+namespace MPTZSavePreset {
+static constexpr CommandId Id = 0x00000003;
+} // namespace MPTZSavePreset
+
+namespace MPTZRemovePreset {
+static constexpr CommandId Id = 0x00000004;
+} // namespace MPTZRemovePreset
+
+namespace DPTZSetViewport {
+static constexpr CommandId Id = 0x00000005;
+} // namespace DPTZSetViewport
+
+namespace DPTZRelativeMove {
+static constexpr CommandId Id = 0x00000006;
+} // namespace DPTZRelativeMove
+
+} // namespace Commands
+} // namespace CameraAvSettingsUserLevelManagement
+
 namespace WebRTCTransportProvider {
 namespace Commands {
 
@@ -2185,7 +2219,7 @@ static constexpr CommandId Id = 0x00000002;
 } // namespace Commands
 } // namespace SampleManufacturerSpecific
 
-namespace SampleExternalManufacturerSpecific {
+namespace SampleExternalManufacturerSpecificCluster {
 namespace Commands {
 
 namespace Ping {
@@ -2201,7 +2235,7 @@ static constexpr CommandId Id = 0x00000002;
 } // namespace AddArguments
 
 } // namespace Commands
-} // namespace SampleExternalManufacturerSpecific
+} // namespace SampleExternalManufacturerSpecificCluster
 
 } // namespace Clusters
 } // namespace app

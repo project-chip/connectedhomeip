@@ -631,6 +631,11 @@ void emberAfCameraAvStreamManagementClusterInitCallback(chip::EndpointId endpoin
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfWebRTCTransportProviderClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -671,7 +676,7 @@ void emberAfSampleManufacturerSpecificClusterInitCallback(chip::EndpointId endpo
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfSampleExternalMeiClusterInitCallback(chip::EndpointId endpoint);
+void emberAfSampleExternalManufacturerSpecificClusterClusterInitCallback(chip::EndpointId endpoint);
 
 // Cluster Server/Client Init Functions
 
@@ -5275,6 +5280,45 @@ chip::Protocols::InteractionModel::Status MatterCameraAvStreamManagementClusterS
 void emberAfCameraAvStreamManagementClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Camera AV Settings User Level Management Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfCameraAvSettingsUserLevelManagementClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterCameraAvSettingsUserLevelManagementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfCameraAvSettingsUserLevelManagementClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterCameraAvSettingsUserLevelManagementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterCameraAvSettingsUserLevelManagementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfCameraAvSettingsUserLevelManagementClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // WebRTC Transport Provider Cluster
 //
 
@@ -5544,7 +5588,7 @@ MatterFaultInjectionClusterServerPreAttributeChangedCallback(const chip::app::Co
 void emberAfFaultInjectionClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
-// Sample MEI Cluster
+// Sample Manufacturer-Specific Cluster
 //
 
 /**
@@ -5582,28 +5626,29 @@ chip::Protocols::InteractionModel::Status MatterSampleManufacturerSpecificCluste
 void emberAfSampleManufacturerSpecificClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
-// Sample External MEI Cluster
+// Sample External manufacturer-specific cluster Cluster
 //
 
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfSampleExternalMeiClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfSampleExternalManufacturerSpecificClusterClusterServerInitCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being shutdown
  */
-void MatterSampleExternalMeiClusterServerShutdownCallback(chip::EndpointId endpoint);
+void MatterSampleExternalManufacturerSpecificClusterClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfSampleExternalMeiClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfSampleExternalManufacturerSpecificClusterClusterClientInitCallback(chip::EndpointId endpoint);
 
 /**
  * @param attributePath Concrete attribute path that changed
  */
-void MatterSampleExternalMeiClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterSampleExternalManufacturerSpecificClusterClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /**
  * @param attributePath Concrete attribute path to be changed
@@ -5611,14 +5656,13 @@ void MatterSampleExternalMeiClusterServerAttributeChangedCallback(const chip::ap
  * @param size          Attribute size
  * @param value         Attribute value
  */
-chip::Protocols::InteractionModel::Status
-MatterSampleExternalMeiClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                                EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterSampleExternalManufacturerSpecificClusterClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /**
  * @param endpoint  Endpoint that is being served
  */
-void emberAfSampleExternalMeiClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfSampleExternalManufacturerSpecificClusterClusterServerTickCallback(chip::EndpointId endpoint);
 
 // Cluster Commands Callback
 
@@ -6896,6 +6940,48 @@ bool emberAfCameraAvStreamManagementClusterCaptureSnapshotCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshot::DecodableType & commandData);
 /**
+ * @brief Camera AV Settings User Level Management Cluster MPTZSetPosition Command callback (from client)
+ */
+bool emberAfCameraAvSettingsUserLevelManagementClusterMPTZSetPositionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::DecodableType & commandData);
+/**
+ * @brief Camera AV Settings User Level Management Cluster MPTZRelativeMove Command callback (from client)
+ */
+bool emberAfCameraAvSettingsUserLevelManagementClusterMPTZRelativeMoveCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::DecodableType & commandData);
+/**
+ * @brief Camera AV Settings User Level Management Cluster MPTZMoveToPreset Command callback (from client)
+ */
+bool emberAfCameraAvSettingsUserLevelManagementClusterMPTZMoveToPresetCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::DecodableType & commandData);
+/**
+ * @brief Camera AV Settings User Level Management Cluster MPTZSavePreset Command callback (from client)
+ */
+bool emberAfCameraAvSettingsUserLevelManagementClusterMPTZSavePresetCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::DecodableType & commandData);
+/**
+ * @brief Camera AV Settings User Level Management Cluster MPTZRemovePreset Command callback (from client)
+ */
+bool emberAfCameraAvSettingsUserLevelManagementClusterMPTZRemovePresetCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::DecodableType & commandData);
+/**
+ * @brief Camera AV Settings User Level Management Cluster DPTZSetViewport Command callback (from client)
+ */
+bool emberAfCameraAvSettingsUserLevelManagementClusterDPTZSetViewportCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::DecodableType & commandData);
+/**
+ * @brief Camera AV Settings User Level Management Cluster DPTZRelativeMove Command callback (from client)
+ */
+bool emberAfCameraAvSettingsUserLevelManagementClusterDPTZRelativeMoveCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::DecodableType & commandData);
+/**
  * @brief WebRTC Transport Provider Cluster SolicitOffer Command callback (from client)
  */
 bool emberAfWebRTCTransportProviderClusterSolicitOfferCallback(
@@ -7124,14 +7210,26 @@ bool emberAfFaultInjectionClusterFailRandomlyAtFaultCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::FaultInjection::Commands::FailRandomlyAtFault::DecodableType & commandData);
 /**
- * @brief Sample External MEI Cluster Ping Command callback (from client)
+ * @brief Sample Manufacturer-Specific Cluster Ping Command callback (from client)
  */
-bool emberAfSampleExternalMeiClusterPingCallback(
+bool emberAfSampleManufacturerSpecificClusterPingCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::SampleExternalMei::Commands::Ping::DecodableType & commandData);
+    const chip::app::Clusters::SampleManufacturerSpecific::Commands::Ping::DecodableType & commandData);
 /**
- * @brief Sample External MEI Cluster AddArguments Command callback (from client)
+ * @brief Sample Manufacturer-Specific Cluster AddArguments Command callback (from client)
  */
-bool emberAfSampleExternalMeiClusterAddArgumentsCallback(
+bool emberAfSampleManufacturerSpecificClusterAddArgumentsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::SampleExternalMei::Commands::AddArguments::DecodableType & commandData);
+    const chip::app::Clusters::SampleManufacturerSpecific::Commands::AddArguments::DecodableType & commandData);
+/**
+ * @brief Sample External manufacturer-specific cluster Cluster Ping Command callback (from client)
+ */
+bool emberAfSampleExternalManufacturerSpecificClusterClusterPingCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::SampleExternalManufacturerSpecificCluster::Commands::Ping::DecodableType & commandData);
+/**
+ * @brief Sample External manufacturer-specific cluster Cluster AddArguments Command callback (from client)
+ */
+bool emberAfSampleExternalManufacturerSpecificClusterClusterAddArgumentsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::SampleExternalManufacturerSpecificCluster::Commands::AddArguments::DecodableType & commandData);

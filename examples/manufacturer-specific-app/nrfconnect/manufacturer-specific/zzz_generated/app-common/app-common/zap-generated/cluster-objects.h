@@ -359,7 +359,7 @@ enum class Fields : uint8_t
     kId              = 1,
     kPeerNodeID      = 2,
     kPeerFabricIndex = 3,
-    kStreamType      = 4,
+    kStreamUsage     = 4,
     kVideoStreamID   = 5,
     kAudioStreamID   = 6,
     kMetadataOptions = 7,
@@ -371,7 +371,7 @@ public:
     uint16_t id                       = static_cast<uint16_t>(0);
     chip::NodeId peerNodeID           = static_cast<chip::NodeId>(0);
     chip::FabricIndex peerFabricIndex = static_cast<chip::FabricIndex>(0);
-    StreamTypeEnum streamType         = static_cast<StreamTypeEnum>(0);
+    StreamUsageEnum streamUsage       = static_cast<StreamUsageEnum>(0);
     DataModel::Nullable<uint16_t> videoStreamID;
     DataModel::Nullable<uint16_t> audioStreamID;
     chip::BitMask<WebRTCMetadataOptions> metadataOptions = static_cast<chip::BitMask<WebRTCMetadataOptions>>(0);
@@ -20361,9 +20361,9 @@ namespace HarmonicCurrents {
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::Nullable<chip::app::DataModel::List<
-        const chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type>>;
+                    const chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type>>;
     using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>>;
+           chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>>;
     using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
         chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>> &;
 
@@ -20376,9 +20376,9 @@ namespace HarmonicPhases {
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::Nullable<chip::app::DataModel::List<
-        const chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type>>;
+                    const chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type>>;
     using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>>;
+           chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>>;
     using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
         chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>> &;
 
@@ -40955,7 +40955,7 @@ namespace VideoStreamStruct {
 enum class Fields : uint8_t
 {
     kVideoStreamID    = 0,
-    kStreamType       = 1,
+    kStreamUsage      = 1,
     kVideoCodec       = 2,
     kMinFrameRate     = 3,
     kMaxFrameRate     = 4,
@@ -40973,11 +40973,11 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    uint16_t videoStreamID    = static_cast<uint16_t>(0);
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
-    VideoCodecEnum videoCodec = static_cast<VideoCodecEnum>(0);
-    uint16_t minFrameRate     = static_cast<uint16_t>(0);
-    uint16_t maxFrameRate     = static_cast<uint16_t>(0);
+    uint16_t videoStreamID      = static_cast<uint16_t>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    VideoCodecEnum videoCodec   = static_cast<VideoCodecEnum>(0);
+    uint16_t minFrameRate       = static_cast<uint16_t>(0);
+    uint16_t maxFrameRate       = static_cast<uint16_t>(0);
     Structs::VideoResolutionStruct::Type minResolution;
     Structs::VideoResolutionStruct::Type maxResolution;
     uint32_t minBitRate     = static_cast<uint32_t>(0);
@@ -41123,7 +41123,7 @@ namespace AudioStreamStruct {
 enum class Fields : uint8_t
 {
     kAudioStreamID  = 0,
-    kStreamType     = 1,
+    kStreamUsage    = 1,
     kAudioCodec     = 2,
     kChannelCount   = 3,
     kSampleRate     = 4,
@@ -41135,14 +41135,14 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    uint16_t audioStreamID    = static_cast<uint16_t>(0);
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
-    AudioCodecEnum audioCodec = static_cast<AudioCodecEnum>(0);
-    uint8_t channelCount      = static_cast<uint8_t>(0);
-    uint32_t sampleRate       = static_cast<uint32_t>(0);
-    uint32_t bitRate          = static_cast<uint32_t>(0);
-    uint8_t bitDepth          = static_cast<uint8_t>(0);
-    uint8_t referenceCount    = static_cast<uint8_t>(0);
+    uint16_t audioStreamID      = static_cast<uint16_t>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    AudioCodecEnum audioCodec   = static_cast<AudioCodecEnum>(0);
+    uint8_t channelCount        = static_cast<uint8_t>(0);
+    uint32_t sampleRate         = static_cast<uint32_t>(0);
+    uint32_t bitRate            = static_cast<uint32_t>(0);
+    uint8_t bitDepth            = static_cast<uint8_t>(0);
+    uint8_t referenceCount      = static_cast<uint8_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -41260,7 +41260,7 @@ namespace Commands {
 namespace AudioStreamAllocate {
 enum class Fields : uint8_t
 {
-    kStreamType   = 0,
+    kStreamUsage  = 0,
     kAudioCodec   = 1,
     kChannelCount = 2,
     kSampleRate   = 3,
@@ -41275,12 +41275,12 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AudioStreamAllocate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
-    AudioCodecEnum audioCodec = static_cast<AudioCodecEnum>(0);
-    uint8_t channelCount      = static_cast<uint8_t>(0);
-    uint32_t sampleRate       = static_cast<uint32_t>(0);
-    uint32_t bitRate          = static_cast<uint32_t>(0);
-    uint8_t bitDepth          = static_cast<uint8_t>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    AudioCodecEnum audioCodec   = static_cast<AudioCodecEnum>(0);
+    uint8_t channelCount        = static_cast<uint8_t>(0);
+    uint32_t sampleRate         = static_cast<uint32_t>(0);
+    uint32_t bitRate            = static_cast<uint32_t>(0);
+    uint8_t bitDepth            = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -41295,12 +41295,12 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AudioStreamAllocate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
-    AudioCodecEnum audioCodec = static_cast<AudioCodecEnum>(0);
-    uint8_t channelCount      = static_cast<uint8_t>(0);
-    uint32_t sampleRate       = static_cast<uint32_t>(0);
-    uint32_t bitRate          = static_cast<uint32_t>(0);
-    uint8_t bitDepth          = static_cast<uint8_t>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    AudioCodecEnum audioCodec   = static_cast<AudioCodecEnum>(0);
+    uint8_t channelCount        = static_cast<uint8_t>(0);
+    uint32_t sampleRate         = static_cast<uint32_t>(0);
+    uint32_t bitRate            = static_cast<uint32_t>(0);
+    uint8_t bitDepth            = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AudioStreamAllocate
@@ -41371,7 +41371,7 @@ public:
 namespace VideoStreamAllocate {
 enum class Fields : uint8_t
 {
-    kStreamType       = 0,
+    kStreamUsage      = 0,
     kVideoCodec       = 1,
     kMinFrameRate     = 2,
     kMaxFrameRate     = 3,
@@ -41392,10 +41392,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::VideoStreamAllocate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
-    VideoCodecEnum videoCodec = static_cast<VideoCodecEnum>(0);
-    uint16_t minFrameRate     = static_cast<uint16_t>(0);
-    uint16_t maxFrameRate     = static_cast<uint16_t>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    VideoCodecEnum videoCodec   = static_cast<VideoCodecEnum>(0);
+    uint16_t minFrameRate       = static_cast<uint16_t>(0);
+    uint16_t maxFrameRate       = static_cast<uint16_t>(0);
     Structs::VideoResolutionStruct::Type minResolution;
     Structs::VideoResolutionStruct::Type maxResolution;
     uint32_t minBitRate     = static_cast<uint32_t>(0);
@@ -41418,10 +41418,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::VideoStreamAllocate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
-    VideoCodecEnum videoCodec = static_cast<VideoCodecEnum>(0);
-    uint16_t minFrameRate     = static_cast<uint16_t>(0);
-    uint16_t maxFrameRate     = static_cast<uint16_t>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    VideoCodecEnum videoCodec   = static_cast<VideoCodecEnum>(0);
+    uint16_t minFrameRate       = static_cast<uint16_t>(0);
+    uint16_t maxFrameRate       = static_cast<uint16_t>(0);
     Structs::VideoResolutionStruct::DecodableType minResolution;
     Structs::VideoResolutionStruct::DecodableType maxResolution;
     uint32_t minBitRate     = static_cast<uint32_t>(0);
@@ -41469,9 +41469,8 @@ namespace VideoStreamModify {
 enum class Fields : uint8_t
 {
     kVideoStreamID    = 0,
-    kResolution       = 1,
-    kWatermarkEnabled = 2,
-    kOSDEnabled       = 3,
+    kWatermarkEnabled = 1,
+    kOSDEnabled       = 2,
 };
 
 struct Type
@@ -41482,7 +41481,6 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
-    Optional<Structs::VideoResolutionStruct::Type> resolution;
     Optional<bool> watermarkEnabled;
     Optional<bool> OSDEnabled;
 
@@ -41500,7 +41498,6 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
-    Optional<Structs::VideoResolutionStruct::DecodableType> resolution;
     Optional<bool> watermarkEnabled;
     Optional<bool> OSDEnabled;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -41662,7 +41659,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetStreamPriorities::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
-    DataModel::List<const StreamTypeEnum> streamPriorities;
+    DataModel::List<const StreamUsageEnum> streamPriorities;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -41677,7 +41674,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetStreamPriorities::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
-    DataModel::DecodableList<StreamTypeEnum> streamPriorities;
+    DataModel::DecodableList<StreamUsageEnum> streamPriorities;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetStreamPriorities
@@ -41700,7 +41697,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::CameraAvStreamManagement::Commands::CaptureSnapshotResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -41990,10 +41987,10 @@ struct TypeInfo
 namespace RankedVideoStreamPrioritiesList {
 struct TypeInfo
 {
-    using Type          = chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::StreamTypeEnum>;
-    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamTypeEnum>;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamTypeEnum> &;
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RankedVideoStreamPrioritiesList::Id; }
@@ -42364,7 +42361,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 enum class Fields : uint8_t
 {
     kVideoStreamID  = 0,
-    kStreamType     = 1,
+    kStreamUsage    = 1,
     kVideoCodec     = 2,
     kMinFrameRate   = 3,
     kMaxFrameRate   = 4,
@@ -42385,7 +42382,7 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
-    Optional<StreamTypeEnum> streamType;
+    Optional<StreamUsageEnum> streamUsage;
     Optional<VideoCodecEnum> videoCodec;
     Optional<uint16_t> minFrameRate;
     Optional<uint16_t> maxFrameRate;
@@ -42407,7 +42404,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
-    Optional<StreamTypeEnum> streamType;
+    Optional<StreamUsageEnum> streamUsage;
     Optional<VideoCodecEnum> videoCodec;
     Optional<uint16_t> minFrameRate;
     Optional<uint16_t> maxFrameRate;
@@ -42427,7 +42424,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 enum class Fields : uint8_t
 {
     kAudioStreamID = 0,
-    kStreamType    = 1,
+    kStreamUsage   = 1,
     kAudioCodec    = 2,
     kChannelCount  = 3,
     kSampleRate    = 4,
@@ -42444,7 +42441,7 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     uint16_t audioStreamID = static_cast<uint16_t>(0);
-    Optional<StreamTypeEnum> streamType;
+    Optional<StreamUsageEnum> streamUsage;
     Optional<AudioCodecEnum> audioCodec;
     Optional<uint8_t> channelCount;
     Optional<uint32_t> sampleRate;
@@ -42462,7 +42459,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
 
     uint16_t audioStreamID = static_cast<uint16_t>(0);
-    Optional<StreamTypeEnum> streamType;
+    Optional<StreamUsageEnum> streamUsage;
     Optional<AudioCodecEnum> audioCodec;
     Optional<uint8_t> channelCount;
     Optional<uint32_t> sampleRate;
@@ -42525,6 +42522,525 @@ public:
 } // namespace SnapshotStreamChanged
 } // namespace Events
 } // namespace CameraAvStreamManagement
+namespace CameraAvSettingsUserLevelManagement {
+namespace Structs {
+namespace MPTZStruct {
+enum class Fields : uint8_t
+{
+    kPan  = 0,
+    kTilt = 1,
+    kZoom = 2,
+};
+
+struct Type
+{
+public:
+    Optional<int16_t> pan;
+    Optional<int16_t> tilt;
+    Optional<uint8_t> zoom;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace MPTZStruct
+namespace MPTZPresetStruct {
+enum class Fields : uint8_t
+{
+    kPresetID = 0,
+    kName     = 1,
+    kSettings = 2,
+};
+
+struct Type
+{
+public:
+    uint8_t presetID = static_cast<uint8_t>(0);
+    chip::CharSpan name;
+    Structs::MPTZStruct::Type settings;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace MPTZPresetStruct
+namespace ViewportStruct = Clusters::detail::Structs::ViewportStruct;
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace MPTZSetPosition {
+struct Type;
+struct DecodableType;
+} // namespace MPTZSetPosition
+
+namespace MPTZRelativeMove {
+struct Type;
+struct DecodableType;
+} // namespace MPTZRelativeMove
+
+namespace MPTZMoveToPreset {
+struct Type;
+struct DecodableType;
+} // namespace MPTZMoveToPreset
+
+namespace MPTZSavePreset {
+struct Type;
+struct DecodableType;
+} // namespace MPTZSavePreset
+
+namespace MPTZRemovePreset {
+struct Type;
+struct DecodableType;
+} // namespace MPTZRemovePreset
+
+namespace DPTZSetViewport {
+struct Type;
+struct DecodableType;
+} // namespace DPTZSetViewport
+
+namespace DPTZRelativeMove {
+struct Type;
+struct DecodableType;
+} // namespace DPTZRelativeMove
+
+} // namespace Commands
+
+namespace Commands {
+namespace MPTZSetPosition {
+enum class Fields : uint8_t
+{
+    kPan  = 0,
+    kTilt = 1,
+    kZoom = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::MPTZSetPosition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+
+    Optional<int16_t> pan;
+    Optional<int16_t> tilt;
+    Optional<uint8_t> zoom;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::MPTZSetPosition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+
+    Optional<int16_t> pan;
+    Optional<int16_t> tilt;
+    Optional<uint8_t> zoom;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MPTZSetPosition
+namespace MPTZRelativeMove {
+enum class Fields : uint8_t
+{
+    kPanDelta  = 0,
+    kTiltDelta = 1,
+    kZoomDelta = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::MPTZRelativeMove::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+
+    Optional<int16_t> panDelta;
+    Optional<int16_t> tiltDelta;
+    Optional<int8_t> zoomDelta;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::MPTZRelativeMove::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+
+    Optional<int16_t> panDelta;
+    Optional<int16_t> tiltDelta;
+    Optional<int8_t> zoomDelta;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MPTZRelativeMove
+namespace MPTZMoveToPreset {
+enum class Fields : uint8_t
+{
+    kPresetID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::MPTZMoveToPreset::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+
+    uint8_t presetID = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::MPTZMoveToPreset::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+
+    uint8_t presetID = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MPTZMoveToPreset
+namespace MPTZSavePreset {
+enum class Fields : uint8_t
+{
+    kPresetID = 0,
+    kName     = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::MPTZSavePreset::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+
+    Optional<uint8_t> presetID;
+    chip::CharSpan name;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::MPTZSavePreset::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+
+    Optional<uint8_t> presetID;
+    chip::CharSpan name;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MPTZSavePreset
+namespace MPTZRemovePreset {
+enum class Fields : uint8_t
+{
+    kPresetID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::MPTZRemovePreset::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+
+    uint8_t presetID = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::MPTZRemovePreset::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+
+    uint8_t presetID = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MPTZRemovePreset
+namespace DPTZSetViewport {
+enum class Fields : uint8_t
+{
+    kVideoStreamID = 0,
+    kViewport      = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::DPTZSetViewport::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+
+    uint16_t videoStreamID = static_cast<uint16_t>(0);
+    Structs::ViewportStruct::Type viewport;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::DPTZSetViewport::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+
+    uint16_t videoStreamID = static_cast<uint16_t>(0);
+    Structs::ViewportStruct::DecodableType viewport;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace DPTZSetViewport
+namespace DPTZRelativeMove {
+enum class Fields : uint8_t
+{
+    kVideoStreamID = 0,
+    kDeltaX        = 1,
+    kDeltaY        = 2,
+    kZoomDelta     = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::DPTZRelativeMove::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+
+    uint16_t videoStreamID = static_cast<uint16_t>(0);
+    Optional<int16_t> deltaX;
+    Optional<int16_t> deltaY;
+    Optional<int8_t> zoomDelta;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::DPTZRelativeMove::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+
+    uint16_t videoStreamID = static_cast<uint16_t>(0);
+    Optional<int16_t> deltaX;
+    Optional<int16_t> deltaY;
+    Optional<int8_t> zoomDelta;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace DPTZRelativeMove
+} // namespace Commands
+
+namespace Attributes {
+
+namespace MPTZPosition {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type;
+    using DecodableType    = chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::DecodableType &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MPTZPosition::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MPTZPosition
+namespace MaxPresets {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxPresets::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxPresets
+namespace MPTZPresets {
+struct TypeInfo
+{
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZPresetStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZPresetStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZPresetStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MPTZPresets::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MPTZPresets
+namespace DPTZRelativeMove {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const uint16_t>;
+    using DecodableType    = chip::app::DataModel::DecodableList<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<uint16_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DPTZRelativeMove::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DPTZRelativeMove
+namespace ZoomMax {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ZoomMax::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ZoomMax
+namespace TiltMin {
+struct TypeInfo
+{
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TiltMin::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TiltMin
+namespace TiltMax {
+struct TypeInfo
+{
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TiltMax::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TiltMax
+namespace PanMin {
+struct TypeInfo
+{
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PanMin::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PanMin
+namespace PanMax {
+struct TypeInfo
+{
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PanMax::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PanMax
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MPTZPosition::TypeInfo::DecodableType MPTZPosition;
+        Attributes::MaxPresets::TypeInfo::DecodableType maxPresets = static_cast<uint8_t>(0);
+        Attributes::MPTZPresets::TypeInfo::DecodableType MPTZPresets;
+        Attributes::DPTZRelativeMove::TypeInfo::DecodableType DPTZRelativeMove;
+        Attributes::ZoomMax::TypeInfo::DecodableType zoomMax = static_cast<uint8_t>(0);
+        Attributes::TiltMin::TypeInfo::DecodableType tiltMin = static_cast<int16_t>(0);
+        Attributes::TiltMax::TypeInfo::DecodableType tiltMax = static_cast<int16_t>(0);
+        Attributes::PanMin::TypeInfo::DecodableType panMin   = static_cast<int16_t>(0);
+        Attributes::PanMax::TypeInfo::DecodableType panMax   = static_cast<int16_t>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace CameraAvSettingsUserLevelManagement
 namespace WebRTCTransportProvider {
 namespace Structs {
 namespace ICEServerStruct     = Clusters::detail::Structs::ICEServerStruct;
@@ -42575,7 +43091,7 @@ namespace Commands {
 namespace SolicitOffer {
 enum class Fields : uint8_t
 {
-    kStreamType         = 0,
+    kStreamUsage        = 0,
     kVideoStreamID      = 1,
     kAudioStreamID      = 2,
     kICEServers         = 3,
@@ -42590,7 +43106,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SolicitOffer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::List<const Structs::ICEServerStruct::Type>> ICEServers;
@@ -42610,7 +43126,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SolicitOffer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::DecodableList<Structs::ICEServerStruct::DecodableType>> ICEServers;
@@ -42665,7 +43181,7 @@ enum class Fields : uint8_t
 {
     kWebRTCSessionID    = 0,
     kSdp                = 1,
-    kStreamType         = 2,
+    kStreamUsage        = 2,
     kVideoStreamID      = 3,
     kAudioStreamID      = 4,
     kICEServers         = 5,
@@ -42682,7 +43198,7 @@ public:
 
     DataModel::Nullable<uint16_t> webRTCSessionID;
     chip::CharSpan sdp;
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::List<const Structs::ICEServerStruct::Type>> ICEServers;
@@ -42704,7 +43220,7 @@ public:
 
     DataModel::Nullable<uint16_t> webRTCSessionID;
     chip::CharSpan sdp;
-    StreamTypeEnum streamType = static_cast<StreamTypeEnum>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::DecodableList<Structs::ICEServerStruct::DecodableType>> ICEServers;
@@ -47536,7 +48052,7 @@ public:
 } // namespace PingCountEvent
 } // namespace Events
 } // namespace SampleManufacturerSpecific
-namespace SampleExternalManufacturerSpecific {
+namespace SampleExternalManufacturerSpecificCluster {
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -47569,7 +48085,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Ping::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecificCluster::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -47582,7 +48098,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::Ping::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecificCluster::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -47598,7 +48114,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddArgumentsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecificCluster::Id; }
 
     uint8_t returnValue = static_cast<uint8_t>(0);
 
@@ -47613,7 +48129,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::AddArgumentsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecificCluster::Id; }
 
     uint8_t returnValue = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -47631,14 +48147,14 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddArguments::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecificCluster::Id; }
 
     uint8_t arg1 = static_cast<uint8_t>(0);
     uint8_t arg2 = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = Clusters::SampleExternalManufacturerSpecific::Commands::AddArgumentsResponse::DecodableType;
+    using ResponseType = Clusters::SampleExternalManufacturerSpecificCluster::Commands::AddArgumentsResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -47647,7 +48163,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::AddArguments::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecificCluster::Id; }
 
     uint8_t arg1 = static_cast<uint8_t>(0);
     uint8_t arg2 = static_cast<uint8_t>(0);
@@ -47665,7 +48181,7 @@ struct TypeInfo
     using DecodableType    = bool;
     using DecodableArgType = bool;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecificCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FlipFlop::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -47673,31 +48189,31 @@ struct TypeInfo
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecificCluster::Id; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecificCluster::Id; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecificCluster::Id; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
 struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecificCluster::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
 struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecificCluster::Id; }
 };
 } // namespace ClusterRevision
 
@@ -47705,7 +48221,7 @@ struct TypeInfo
 {
     struct DecodableType
     {
-        static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
+        static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecificCluster::Id; }
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
@@ -47732,7 +48248,7 @@ struct Type
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::PingCountEvent::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecificCluster::Id; }
     static constexpr bool kIsFabricScoped = false;
 
     uint32_t count = static_cast<uint32_t>(0);
@@ -47745,7 +48261,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::PingCountEvent::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecific::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleExternalManufacturerSpecificCluster::Id; }
 
     uint32_t count = static_cast<uint32_t>(0);
 
@@ -47753,7 +48269,7 @@ public:
 };
 } // namespace PingCountEvent
 } // namespace Events
-} // namespace SampleExternalManufacturerSpecific
+} // namespace SampleExternalManufacturerSpecificCluster
 
 } // namespace Clusters
 

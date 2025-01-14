@@ -382,6 +382,9 @@ static constexpr ClusterId Id = 0x00000550;
 namespace CameraAvStreamManagement {
 static constexpr ClusterId Id = 0x00000551;
 } // namespace CameraAvStreamManagement
+namespace CameraAvSettingsUserLevelManagement {
+static constexpr ClusterId Id = 0x00000552;
+} // namespace CameraAvSettingsUserLevelManagement
 namespace WebRTCTransportProvider {
 static constexpr ClusterId Id = 0x00000553;
 } // namespace WebRTCTransportProvider
@@ -406,9 +409,9 @@ static constexpr ClusterId Id = 0xFFF1FC06;
 namespace SampleManufacturerSpecific {
 static constexpr ClusterId Id = 0xFFF1FC20;
 } // namespace SampleManufacturerSpecific
-namespace SampleExternalManufacturerSpecific {
+namespace SampleExternalManufacturerSpecificCluster {
 static constexpr ClusterId Id = 0xFFF1FC21;
-} // namespace SampleExternalManufacturerSpecific
+} // namespace SampleExternalManufacturerSpecificCluster
 
 } // namespace Clusters
 } // namespace app
