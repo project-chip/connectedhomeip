@@ -50,8 +50,6 @@ public:
 
     void TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = 0);
 
-    bool IsServerListenEnabled();
-
     void HandleConnectionReceived(Transport::ActiveTCPConnectionState * conn) override;
 
     void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr) override;
