@@ -92,7 +92,7 @@ public:
     // ===== Members that define the public interface of the ThreadStackManager
 
     CHIP_ERROR InitThreadStack();
-    void DeinitThreadStack();
+    void ShutdownThreadStack();
     void ProcessThreadActivity();
     CHIP_ERROR StartThreadTask();
     void StopThreadStack();
@@ -243,9 +243,9 @@ inline CHIP_ERROR ThreadStackManager::InitThreadStack()
     return static_cast<ImplClass *>(this)->_InitThreadStack();
 }
 
-inline void ThreadStackManager::DeinitThreadStack()
+inline void ThreadStackManager::ShutdownThreadStack()
 {
-    static_cast<ImplClass *>(this)->_DeinitThreadStack();
+    static_cast<ImplClass *>(this)->_ShutdownThreadStack();
 }
 
 inline void ThreadStackManager::ProcessThreadActivity()

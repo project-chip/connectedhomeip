@@ -60,7 +60,7 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
     return err;
 }
 
-void ThreadStackManagerImpl::_DeinitThreadStack()
+void ThreadStackManagerImpl::_ShutdownThreadStack()
 {
     openthread_deinit_stack();
 }
