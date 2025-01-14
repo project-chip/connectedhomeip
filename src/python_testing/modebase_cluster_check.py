@@ -113,7 +113,7 @@ class ModeBaseClusterChecks:
             at_least_one_common_or_derived = False
             for tag in mode_option_struct.modeTags:
                 # Value should not larger than 16bits
-                if tag.value > MAX_MODE_TAG or tag.value < 0:
+                if not (0 <= tag.value <= MAX_MODE_TAG):
                     asserts.fail("Tag should not be larger than 16bits.")
 
                 # Check if is tag is common, derived or mfg.
