@@ -36,55 +36,8 @@
 
 #define CHIP_UART_PORT 0
 #define CHIP_UART_RX_BUFFSIZE 256
-
-#ifdef BL706_NIGHT_LIGHT
-
-#define LED_B_PIN_PORT 2
-#define LED_B_PIN 12
-
-#define LED_R_PIN_PORT 0
-#define LED_R_PIN 10
-
-#define LED_G_PIN_PORT 1
-#define LED_G_PIN 16
-
-#define MAX_PWM_CHANNEL 3
-
-#elif defined(XT_ZB6_DevKit)
-
-// #define LED_B_PIN_PORT 3
-// #define LED_B_PIN 18
-
-// #define LED_R_PIN_PORT 4
-// #define LED_R_PIN 19
-
-// #define LED_G_PIN_PORT 0
-// #define LED_G_PIN 20
-
-#define LED_PIN_PORT 3
-#define LED_PIN 18
-
-#define MAX_PWM_CHANNEL 1
-
-#elif defined(BL704LDK)
-#define LED_PIN_PORT 1
-#define LED_PIN 18
-
-#define MAX_PWM_CHANNEL 1
-#else
-
-#define LED_PIN_PORT 2
-#define LED_PIN 22
-
-#define MAX_PWM_CHANNEL 1
-
-#endif
-
-#define SPI_WIFI_MISO_PIN 4
-#define SPI_WIFI_MOSI_PIN 5
-#define SPI_WIFI_CLK_PIN 3
-#define SPI_WIFI_CS_PIN 6
-#define SPI_WIFI_IRQ_PIN 10
-
 #define CHIP_UART_PIN_RX 15
 #define CHIP_UART_PIN_TX 14
+
+#define CHIP_CONTACT_PIN 20
+#define CHIP_RESET_PIN 16
