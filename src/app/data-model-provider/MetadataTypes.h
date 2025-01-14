@@ -84,16 +84,6 @@ struct ClusterInfo
     ClusterInfo(DataVersion version) : dataVersion(version) {}
 };
 
-struct ClusterEntry
-{
-    ConcreteClusterPath path;
-    ClusterInfo info;
-
-    bool IsValid() const { return path.HasValidIds(); }
-
-    static const ClusterEntry kInvalid;
-};
-
 enum class AttributeQualityFlags : uint32_t
 {
     kListAttribute   = 0x0004, // This attribute is a list attribute
@@ -101,25 +91,6 @@ enum class AttributeQualityFlags : uint32_t
     kFabricSensitive = 0x0010, // 'S' quality on attributes
     kChangesOmitted  = 0x0020, // `C` quality on attributes
     kTimed           = 0x0040, // `T` quality on attributes (writes require timed interactions)
-};
-
-struct AttributeInfo
-{
-    BitFlags<AttributeQualityFlags> flags;
-
-    // read/write access will be missing if read/write is NOT allowed
-    std::optional<Access::Privilege> readPrivilege;  // generally defaults to View if readable
-    std::optional<Access::Privilege> writePrivilege; // generally defaults to Operate if writable
-};
-
-struct AttributeEntry
-{
-    ConcreteAttributePath path;
-    AttributeInfo info;
-
-    bool IsValid() const { return path.HasValidIds(); }
-
-    static const AttributeEntry kInvalid;
 };
 
 struct AttributeEntry2
@@ -185,15 +156,6 @@ class ProviderMetadataTree
 public:
     virtual ~ProviderMetadataTree() = default;
 
-    // Attribute iteration and accessors provide cluster-level access over
-    // attributes
-    virtual AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster)                = 0;
-    virtual AttributeEntry NextAttribute(const ConcreteAttributePath & before)                = 0;
-    virtual std::optional<AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) = 0;
-
-    /// List metadata capabilties
-    ///
-    ///  TODO: convert ALL items above to the new format
     using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
 
     virtual MetadataList<EndpointEntry> Endpoints() = 0;

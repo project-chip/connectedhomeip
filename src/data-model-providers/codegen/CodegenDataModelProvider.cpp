@@ -247,43 +247,6 @@ DataModel::ServerClusterEntry ServerClusterEntryFrom(EndpointId endpointId, cons
     return entry;
 }
 
-/// Load the attribute information into the specified destination
-///
-/// `info` is assumed to be default-constructed/clear (i.e. this sets flags, but does not reset them).
-void LoadAttributeInfo(const ConcreteAttributePath & path, const EmberAfAttributeMetadata & attribute,
-                       DataModel::AttributeInfo * info)
-{
-    info->readPrivilege = RequiredPrivilege::ForReadAttribute(path);
-    if (!attribute.IsReadOnly())
-    {
-        info->writePrivilege = RequiredPrivilege::ForWriteAttribute(path);
-    }
-
-    info->flags.Set(DataModel::AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));
-    info->flags.Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite());
-
-    // NOTE: we do NOT provide additional info for:
-    //    - IsExternal/IsSingleton/IsAutomaticallyPersisted is not used by IM handling
-    //    - IsSingleton spec defines it for CLUSTERS where as we have it for ATTRIBUTES
-    //    - Several specification flags are not available (reportable, quieter reporting,
-    //      fixed, source attribution)
-
-    // TODO: Set additional flags:
-    // info->flags.Set(DataModel::AttributeQualityFlags::kFabricScoped)
-    // info->flags.Set(DataModel::AttributeQualityFlags::kFabricSensitive)
-    // info->flags.Set(DataModel::AttributeQualityFlags::kChangesOmitted)
-}
-
-DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & clusterPath, const EmberAfAttributeMetadata & attribute)
-{
-    DataModel::AttributeEntry entry;
-
-    entry.path = ConcreteAttributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
-    LoadAttributeInfo(entry.path, attribute, &entry.info);
-
-    return entry;
-}
-
 DataModel::AttributeEntry2 AttributeEntry2From(const ConcreteClusterPath & clusterPath, const EmberAfAttributeMetadata & attribute)
 {
     DataModel::AttributeEntry2 entry;
@@ -360,72 +323,6 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
     InitDataModelForTesting();
 
     return CHIP_NO_ERROR;
-}
-
-std::optional<CommandId> CodegenDataModelProvider::EmberCommandListIterator::First(const CommandId * list)
-{
-    VerifyOrReturnValue(list != nullptr, std::nullopt);
-    mCurrentList = mCurrentHint = list;
-
-    VerifyOrReturnValue(*mCurrentList != kInvalidCommandId, std::nullopt);
-    return *mCurrentList;
-}
-
-std::optional<CommandId> CodegenDataModelProvider::EmberCommandListIterator::Next(const CommandId * list, CommandId previousId)
-{
-    VerifyOrReturnValue(list != nullptr, std::nullopt);
-    VerifyOrReturnValue(previousId != kInvalidCommandId, std::nullopt);
-
-    if (mCurrentList != list)
-    {
-        // invalidate the hint if switching lists...
-        mCurrentHint = nullptr;
-        mCurrentList = list;
-    }
-
-    if ((mCurrentHint == nullptr) || (*mCurrentHint != previousId))
-    {
-        // we did not find a usable hint. Search from the to set the hint
-        mCurrentHint = mCurrentList;
-        while ((*mCurrentHint != kInvalidCommandId) && (*mCurrentHint != previousId))
-        {
-            mCurrentHint++;
-        }
-    }
-
-    VerifyOrReturnValue(*mCurrentHint == previousId, std::nullopt);
-
-    // hint is valid and can be used immediately
-    mCurrentHint++; // this is the next value
-    return (*mCurrentHint == kInvalidCommandId) ? std::nullopt : std::make_optional(*mCurrentHint);
-}
-
-bool CodegenDataModelProvider::EmberCommandListIterator::Exists(const CommandId * list, CommandId toCheck)
-{
-    VerifyOrReturnValue(list != nullptr, false);
-    VerifyOrReturnValue(toCheck != kInvalidCommandId, false);
-
-    if (mCurrentList != list)
-    {
-        // invalidate the hint if switching lists...
-        mCurrentHint = nullptr;
-        mCurrentList = list;
-    }
-
-    // maybe already positioned correctly
-    if ((mCurrentHint != nullptr) && (*mCurrentHint == toCheck))
-    {
-        return true;
-    }
-
-    // move and try to find it
-    mCurrentHint = mCurrentList;
-    while ((*mCurrentHint != kInvalidCommandId) && (*mCurrentHint != toCheck))
-    {
-        mCurrentHint++;
-    }
-
-    return (*mCurrentHint == toCheck);
 }
 
 std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(const DataModel::InvokeRequest & request,
@@ -568,43 +465,6 @@ DataModel::MetadataList<DataModel::ServerClusterEntry> CodegenDataModelProvider:
     return result;
 }
 
-std::optional<unsigned> CodegenDataModelProvider::TryFindClusterIndex(const EmberAfEndpointType * endpoint, ClusterId id,
-                                                                      ClusterSide side) const
-{
-    const unsigned clusterCount = endpoint->clusterCount;
-    unsigned hint               = side == ClusterSide::kServer ? mServerClusterIterationHint : mClientClusterIterationHint;
-
-    if (hint < clusterCount)
-    {
-        const EmberAfCluster & cluster = endpoint->cluster[hint];
-        if (((side == ClusterSide::kServer) && cluster.IsServer()) || ((side == ClusterSide::kClient) && cluster.IsClient()))
-        {
-            if (cluster.clusterId == id)
-            {
-                return std::make_optional(hint);
-            }
-        }
-    }
-
-    // linear search, this may be slow
-    // does NOT use emberAfClusterIndex to not iterate over endpoints as we have
-    // already found the correct endpoint
-    for (unsigned cluster_idx = 0; cluster_idx < clusterCount; cluster_idx++)
-    {
-        const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
-        if (((side == ClusterSide::kServer) && !cluster.IsServer()) || ((side == ClusterSide::kClient) && !cluster.IsClient()))
-        {
-            continue;
-        }
-        if (cluster.clusterId == id)
-        {
-            return std::make_optional(cluster_idx);
-        }
-    }
-
-    return std::nullopt;
-}
-
 DataModel::MetadataList<DataModel::AttributeEntry2> CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path)
 {
     const EmberAfCluster * cluster = FindServerCluster(path);
@@ -686,41 +546,6 @@ DataModel::MetadataList<ClusterId> CodegenDataModelProvider::ClientClusters(Endp
     return result;
 }
 
-DataModel::AttributeEntry CodegenDataModelProvider::FirstAttribute(const ConcreteClusterPath & path)
-{
-    const EmberAfCluster * cluster = FindServerCluster(path);
-
-    VerifyOrReturnValue(cluster != nullptr, DataModel::AttributeEntry::kInvalid);
-    VerifyOrReturnValue(cluster->attributeCount > 0, DataModel::AttributeEntry::kInvalid);
-    VerifyOrReturnValue(cluster->attributes != nullptr, DataModel::AttributeEntry::kInvalid);
-
-    mAttributeIterationHint = 0;
-    return AttributeEntryFrom(path, cluster->attributes[0]);
-}
-
-std::optional<unsigned> CodegenDataModelProvider::TryFindAttributeIndex(const EmberAfCluster * cluster, AttributeId id) const
-{
-    const unsigned attributeCount = cluster->attributeCount;
-
-    // attempt to find this based on the embedded hint
-    if ((mAttributeIterationHint < attributeCount) && (cluster->attributes[mAttributeIterationHint].attributeId == id))
-    {
-        return std::make_optional(mAttributeIterationHint);
-    }
-
-    // linear search is required. This may be slow
-    for (unsigned attribute_idx = 0; attribute_idx < attributeCount; attribute_idx++)
-    {
-
-        if (cluster->attributes[attribute_idx].attributeId == id)
-        {
-            return std::make_optional(attribute_idx);
-        }
-    }
-
-    return std::nullopt;
-}
-
 const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const ConcreteClusterPath & path)
 {
     if (mPreviouslyFoundCluster.has_value() && (mPreviouslyFoundCluster->path == path) &&
@@ -737,51 +562,6 @@ const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const Concret
         mEmberMetadataStructureGeneration = emberAfMetadataStructureGeneration();
     }
     return cluster;
-}
-
-DataModel::AttributeEntry CodegenDataModelProvider::NextAttribute(const ConcreteAttributePath & before)
-{
-    const EmberAfCluster * cluster = FindServerCluster(before);
-    VerifyOrReturnValue(cluster != nullptr, DataModel::AttributeEntry::kInvalid);
-    VerifyOrReturnValue(cluster->attributeCount > 0, DataModel::AttributeEntry::kInvalid);
-    VerifyOrReturnValue(cluster->attributes != nullptr, DataModel::AttributeEntry::kInvalid);
-
-    // find the given attribute in the list and then return the next one
-    std::optional<unsigned> attribute_idx = TryFindAttributeIndex(cluster, before.mAttributeId);
-    if (!attribute_idx.has_value())
-    {
-        return DataModel::AttributeEntry::kInvalid;
-    }
-
-    unsigned next_idx = *attribute_idx + 1;
-    if (next_idx < cluster->attributeCount)
-    {
-        mAttributeIterationHint = next_idx;
-        return AttributeEntryFrom(before, cluster->attributes[next_idx]);
-    }
-
-    // iteration complete
-    return DataModel::AttributeEntry::kInvalid;
-}
-
-std::optional<DataModel::AttributeInfo> CodegenDataModelProvider::GetAttributeInfo(const ConcreteAttributePath & path)
-{
-    const EmberAfCluster * cluster = FindServerCluster(path);
-
-    VerifyOrReturnValue(cluster != nullptr, std::nullopt);
-    VerifyOrReturnValue(cluster->attributeCount > 0, std::nullopt);
-    VerifyOrReturnValue(cluster->attributes != nullptr, std::nullopt);
-
-    std::optional<unsigned> attribute_idx = TryFindAttributeIndex(cluster, path.mAttributeId);
-
-    if (!attribute_idx.has_value())
-    {
-        return std::nullopt;
-    }
-
-    DataModel::AttributeInfo info;
-    LoadAttributeInfo(path, cluster->attributes[*attribute_idx], &info);
-    return std::make_optional(info);
 }
 
 DataModel::MetadataList<DataModel::AcceptedCommandEntry>

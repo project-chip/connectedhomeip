@@ -126,6 +126,9 @@ private:
     DataModel::MetadataList<DataModel::ServerClusterEntry> mClusters; // all clustesr ON THE CURRENT endpoint
     size_t mClusterIndex = kInvalidIndex;
 
+    DataModel::MetadataList<DataModel::AttributeEntry2> mAttributes; // all clustesr ON THE CURRENT cluster
+    size_t mAttributeIndex = kInvalidIndex;
+
     /// Move to the next endpoint/cluster/attribute triplet that is valid given
     /// the current mOutputPath and mpAttributePath.
     ///

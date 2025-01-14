@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "app/data-model-provider/MetadataSearch.h"
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeValueDecoder.h>
@@ -110,7 +111,9 @@ std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePat
         return std::nullopt;
     }
 
-    auto info = mDataModelProvider->GetAttributeInfo(path);
+    DataModel::AttributeFinder finder(mDataModelProvider);
+    std::optional<DataModel::AttributeEntry2> info = finder.Find(path);
+
     if (!info.has_value())
     {
         return std::nullopt;

@@ -41,44 +41,10 @@ namespace app {
 /// however they would share the exact same underlying data and storage).
 class CodegenDataModelProvider : public DataModel::Provider
 {
-private:
-    /// Ember commands are stored as a `CommandId *` pointer that is either null (i.e. no commands)
-    /// or is terminated with 0xFFFF_FFFF aka kInvalidCommandId
-    ///
-    /// Since iterator implementations in the data model use Next(before_path) calls, iterating
-    /// such lists from the beginning would be very inefficient as O(n^2).
-    ///
-    /// This class maintains a cached position inside such iteration, such that `Next` calls
-    /// can be faster.
-    class EmberCommandListIterator
-    {
-    private:
-        const CommandId * mCurrentList = nullptr;
-        const CommandId * mCurrentHint = nullptr; // Invariant: mCurrentHint is INSIDE mCurrentList
-    public:
-        EmberCommandListIterator() = default;
-
-        /// Returns the first command in the given list (or nullopt if list is null or starts with 0xFFFFFFF)
-        std::optional<CommandId> First(const CommandId * list);
-
-        /// Returns the command after `previousId` in the given list
-        std::optional<CommandId> Next(const CommandId * list, CommandId previousId);
-
-        /// Checks if the given command id exists in the given list
-        bool Exists(const CommandId * list, CommandId toCheck);
-
-        void Reset() { mCurrentList = mCurrentHint = nullptr; }
-    };
-
 public:
     /// clears out internal caching. Especially useful in unit tests,
     /// where path caching does not really apply (the same path may result in different outcomes)
-    void Reset()
-    {
-        mAcceptedCommandsIterator.Reset();
-        mGeneratedCommandsIterator.Reset();
-        mPreviouslyFoundCluster = std::nullopt;
-    }
+    void Reset() { mPreviouslyFoundCluster = std::nullopt; }
 
     void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate) { mPersistentStorageDelegate = delegate; }
     PersistentStorageDelegate * GetPersistentStorageDelegate() { return mPersistentStorageDelegate; }
@@ -109,10 +75,6 @@ public:
     DataModel::MetadataList<DataModel::ServerClusterEntry> ServerClusters(EndpointId endpointId) override;
     DataModel::MetadataList<DataModel::AttributeEntry2> Attributes(const ConcreteClusterPath & path) override;
 
-    DataModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
-    DataModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
-    std::optional<DataModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;
-
     void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
 
 protected:
@@ -124,14 +86,7 @@ protected:
 private:
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
-    uint16_t mEndpointIterationHint      = 0;
-    unsigned mServerClusterIterationHint = 0;
-    unsigned mClientClusterIterationHint = 0;
-    unsigned mAttributeIterationHint     = 0;
-    unsigned mDeviceTypeIterationHint    = 0;
-    unsigned mSemanticTagIterationHint   = 0;
-    EmberCommandListIterator mAcceptedCommandsIterator;
-    EmberCommandListIterator mGeneratedCommandsIterator;
+    uint16_t mEndpointIterationHint = 0;
 
     // represents a remembered cluster reference that has been found as
     // looking for clusters is very common (for every attribute iteration)
@@ -159,12 +114,6 @@ private:
     ///
     /// Effectively the same as `emberAfFindServerCluster` except with some caching capabilities
     const EmberAfCluster * FindServerCluster(const ConcreteClusterPath & path);
-
-    /// Find the index of the given attribute id
-    std::optional<unsigned> TryFindAttributeIndex(const EmberAfCluster * cluster, AttributeId id) const;
-
-    /// Find the index of the given cluster id
-    std::optional<unsigned> TryFindClusterIndex(const EmberAfEndpointType * endpoint, ClusterId id, ClusterSide clusterSide) const;
 
     /// Find the index of the given endpoint id
     std::optional<unsigned> TryFindEndpointIndex(EndpointId id) const;
