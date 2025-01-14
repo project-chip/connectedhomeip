@@ -129,7 +129,6 @@ tests:
               - name: "RCAC"
                 saveAs: Root_CA_Certificate_TH2
 
-      # verification: "Verify that the AddTrustedRootCertificate comand is sent and completes"
     - label:
           "Step 5.1: TH1 sends TH2 root certificate to DUT in the AddTrustedRootCertificate chain."
       identity: "alpha"
