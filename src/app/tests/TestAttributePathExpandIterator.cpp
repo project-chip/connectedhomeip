@@ -105,47 +105,27 @@ TEST(TestAttributePathExpandIterator, TestAllWildcard)
         { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::AttributeList::Id },
     };
 
-    {
-        size_t index = 0;
+    size_t index = 0;
 
-        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+    auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+
+    while (true)
+    {
+        // re-create the iterator
         app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
-        while (iter.Next(path))
+        if (!iter.Next(path))
         {
-            ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
-                          ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-            EXPECT_LT(index, ArraySize(paths));
-            EXPECT_EQ(paths[index], path);
-            index++;
+            break;
         }
-        EXPECT_EQ(index, ArraySize(paths));
+
+        ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
+                      ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
+        EXPECT_LT(index, ArraySize(paths));
+        EXPECT_EQ(paths[index], path);
+        index++;
     }
-
-    // identical test, but re-using position and re-creating iterators
-    {
-        size_t index = 0;
-
-        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
-
-        while (true)
-        {
-            // re-create the iterator
-            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
-
-            if (!iter.Next(path))
-            {
-                break;
-            }
-
-            ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
-                          ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-            EXPECT_LT(index, ArraySize(paths));
-            EXPECT_EQ(paths[index], path);
-            index++;
-        }
-        EXPECT_EQ(index, ArraySize(paths));
-    }
+    EXPECT_EQ(index, ArraySize(paths));
 }
 
 TEST(TestAttributePathExpandIterator, TestWildcardEndpoint)
@@ -159,45 +139,25 @@ TEST(TestAttributePathExpandIterator, TestWildcardEndpoint)
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
     };
 
-    {
-        size_t index = 0;
+    size_t index = 0;
 
-        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+    auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+    while (true)
+    {
+        // re-create the iterator
         app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
-        while (iter.Next(path))
+        if (!iter.Next(path))
         {
-            ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
-                          ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-            EXPECT_LT(index, ArraySize(paths));
-            EXPECT_EQ(paths[index], path);
-            index++;
+            break;
         }
-        EXPECT_EQ(index, ArraySize(paths));
+        ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
+                      ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
+        EXPECT_LT(index, ArraySize(paths));
+        EXPECT_EQ(paths[index], path);
+        index++;
     }
-
-    // identical test, but re-using position and re-creating iterators
-    {
-        size_t index = 0;
-
-        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
-        while (true)
-        {
-            // re-create the iterator
-            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
-
-            if (!iter.Next(path))
-            {
-                break;
-            }
-            ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
-                          ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-            EXPECT_LT(index, ArraySize(paths));
-            EXPECT_EQ(paths[index], path);
-            index++;
-        }
-        EXPECT_EQ(index, ArraySize(paths));
-    }
+    EXPECT_EQ(index, ArraySize(paths));
 }
 
 TEST(TestAttributePathExpandIterator, TestWildcardCluster)
@@ -214,45 +174,25 @@ TEST(TestAttributePathExpandIterator, TestWildcardCluster)
         { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::ClusterRevision::Id },
     };
 
-    {
-        size_t index = 0;
+    size_t index = 0;
 
-        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+    auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+    while (true)
+    {
+        // re-create the iterator
         app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
-        while (iter.Next(path))
+        if (!iter.Next(path))
         {
-            ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
-                          ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-            EXPECT_LT(index, ArraySize(paths));
-            EXPECT_EQ(paths[index], path);
-            index++;
+            break;
         }
-        EXPECT_EQ(index, ArraySize(paths));
+        ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
+                      ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
+        EXPECT_LT(index, ArraySize(paths));
+        EXPECT_EQ(paths[index], path);
+        index++;
     }
-
-    // identical test, but re-using position and re-creating iterators
-    {
-        size_t index = 0;
-
-        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
-        while (true)
-        {
-            // re-create the iterator
-            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
-
-            if (!iter.Next(path))
-            {
-                break;
-            }
-            ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
-                          ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-            EXPECT_LT(index, ArraySize(paths));
-            EXPECT_EQ(paths[index], path);
-            index++;
-        }
-        EXPECT_EQ(index, ArraySize(paths));
-    }
+    EXPECT_EQ(index, ArraySize(paths));
 }
 
 TEST(TestAttributePathExpandIterator, TestWildcardClusterGlobalAttributeNotInMetadata)
@@ -269,45 +209,26 @@ TEST(TestAttributePathExpandIterator, TestWildcardClusterGlobalAttributeNotInMet
         { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::AttributeList::Id },
     };
 
-    {
-        size_t index = 0;
+    size_t index = 0;
 
-        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+    auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+
+    while (true)
+    {
+        // re-create the iterator
         app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
-        while (iter.Next(path))
+        if (!iter.Next(path))
         {
-            ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
-                          ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-            EXPECT_LT(index, ArraySize(paths));
-            EXPECT_EQ(paths[index], path);
-            index++;
+            break;
         }
-        EXPECT_EQ(index, ArraySize(paths));
+        ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
+                      ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
+        EXPECT_LT(index, ArraySize(paths));
+        EXPECT_EQ(paths[index], path);
+        index++;
     }
-    // identical test, but re-using position and re-creating iterators
-    {
-        size_t index = 0;
-
-        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
-
-        while (true)
-        {
-            // re-create the iterator
-            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
-
-            if (!iter.Next(path))
-            {
-                break;
-            }
-            ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
-                          ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-            EXPECT_LT(index, ArraySize(paths));
-            EXPECT_EQ(paths[index], path);
-            index++;
-        }
-        EXPECT_EQ(index, ArraySize(paths));
-    }
+    EXPECT_EQ(index, ArraySize(paths));
 }
 
 TEST(TestAttributePathExpandIterator, TestWildcardAttribute)
@@ -328,45 +249,26 @@ TEST(TestAttributePathExpandIterator, TestWildcardAttribute)
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::AttributeList::Id },
     };
 
-    {
-        size_t index = 0;
+    size_t index = 0;
 
-        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+    auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+
+    while (true)
+    {
+        // re-create the iterator
         app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
-        while (iter.Next(path))
+        if (!iter.Next(path))
         {
-            ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
-                          ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-            EXPECT_LT(index, ArraySize(paths));
-            EXPECT_EQ(paths[index], path);
-            index++;
+            break;
         }
-        EXPECT_EQ(index, ArraySize(paths));
+        ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
+                      ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
+        EXPECT_LT(index, ArraySize(paths));
+        EXPECT_EQ(paths[index], path);
+        index++;
     }
-    // identical test, but re-using position and re-creating iterators
-    {
-        size_t index = 0;
-
-        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
-
-        while (true)
-        {
-            // re-create the iterator
-            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
-
-            if (!iter.Next(path))
-            {
-                break;
-            }
-            ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
-                          ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-            EXPECT_LT(index, ArraySize(paths));
-            EXPECT_EQ(paths[index], path);
-            index++;
-        }
-        EXPECT_EQ(index, ArraySize(paths));
-    }
+    EXPECT_EQ(index, ArraySize(paths));
 }
 
 TEST(TestAttributePathExpandIterator, TestNoWildcard)
@@ -381,45 +283,25 @@ TEST(TestAttributePathExpandIterator, TestNoWildcard)
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
     };
 
-    {
-        size_t index = 0;
+    size_t index = 0;
 
-        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+    auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+    while (true)
+    {
+        // re-create the iterator
         app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
 
-        while (iter.Next(path))
+        if (!iter.Next(path))
         {
-            ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
-                          ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-            EXPECT_LT(index, ArraySize(paths));
-            EXPECT_EQ(paths[index], path);
-            index++;
+            break;
         }
-        EXPECT_EQ(index, ArraySize(paths));
+        ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
+                      ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
+        EXPECT_LT(index, ArraySize(paths));
+        EXPECT_EQ(paths[index], path);
+        index++;
     }
-
-    // identical test, but re-using position and re-creating iterators
-    {
-        size_t index = 0;
-
-        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
-        while (true)
-        {
-            // re-create the iterator
-            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
-
-            if (!iter.Next(path))
-            {
-                break;
-            }
-            ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
-                          ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-            EXPECT_LT(index, ArraySize(paths));
-            EXPECT_EQ(paths[index], path);
-            index++;
-        }
-        EXPECT_EQ(index, ArraySize(paths));
-    }
+    EXPECT_EQ(index, ArraySize(paths));
 }
 
 TEST(TestAttributePathExpandIterator, TestFixedPathExpansion)
@@ -586,6 +468,7 @@ TEST(TestAttributePathExpandIterator, TestMultipleClusInfo)
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
     };
 
+    // Test that a one-shot iterate through all works
     {
         size_t index = 0;
 
@@ -602,7 +485,9 @@ TEST(TestAttributePathExpandIterator, TestMultipleClusInfo)
         }
         EXPECT_EQ(index, ArraySize(paths));
     }
-    // identical test, but re-using position and re-creating iterators
+
+    // identical test, however this checks that position re-use works
+    // the same as a one-shot iteration.
     {
         size_t index = 0;
 
