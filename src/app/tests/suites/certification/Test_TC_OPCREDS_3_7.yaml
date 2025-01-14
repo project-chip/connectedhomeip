@@ -118,7 +118,6 @@ tests:
               - name: "IPK"
                 saveAs: IPK_TH2
 
-      # verification: "Verify that the commissioner root certificate is retrieved from TH2 and saved as Root_CA_Certificate_TH2"
     - label:
           "StepN 5: Retrieve the the commissioner root certificate from TH2.
           Save RCAC as Root_CA_Certificate_TH2"
