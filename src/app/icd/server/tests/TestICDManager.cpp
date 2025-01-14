@@ -262,7 +262,7 @@ TEST_F(TestICDManager, TestICDModeDurationsWith0ActiveModeDurationWithoutActiveS
     ICDConfigurationDataTestAccess privateIcdConfigData(&icdConfigData);
 
     // Set FeatureMap - Configures CIP, UAT and LITS to 1
-    mICDManager.SetTestFeatureMapValue(0x07);
+    privateIcdConfigData.SetFeatureMap(0x07);
 
     // Set that there are no matching subscriptions
     mSubInfoProvider.SetHasActiveSubscription(false);
@@ -342,7 +342,7 @@ TEST_F(TestICDManager, TestICDModeDurationsWith0ActiveModeDurationWithActiveSub)
     ICDConfigurationDataTestAccess privateIcdConfigData(&icdConfigData);
 
     // Set FeatureMap - Configures CIP, UAT and LITS to 1
-    mICDManager.SetTestFeatureMapValue(0x07);
+    privateIcdConfigData.SetFeatureMap(0x07);
 
     // Set that there are not matching subscriptions
     mSubInfoProvider.SetHasActiveSubscription(true);
@@ -480,10 +480,10 @@ TEST_F(TestICDManager, TestICDMRegisterUnregisterEvents)
 {
     typedef ICDListener::ICDManagementEvents ICDMEvent;
     ICDNotifier notifier = ICDNotifier::GetInstance();
+    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
 
-    // Set FeatureMap
-    // Configures CIP, UAT and LITS to 1
-    mICDManager.SetTestFeatureMapValue(0x07);
+    // Set FeatureMap - Configures CIP, UAT and LITS to 1
+    privateIcdConfigData.SetFeatureMap(0x07);
 
     // Check ICDManager starts in SIT mode if no entries are present
     EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDMode(), ICDConfigurationData::ICDMode::SIT);
@@ -704,10 +704,10 @@ TEST_F(TestICDManager, TestICDMDSLS)
 {
     typedef ICDListener::ICDManagementEvents ICDMEvent;
     ICDNotifier notifier = ICDNotifier::GetInstance();
+    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
 
-    // Set FeatureMap
-    // Configures CIP, UAT, LITS and DSLS to 1
-    mICDManager.SetTestFeatureMapValue(0x0F);
+    // Set FeatureMap - Configures CIP, UAT, LITS and DSLS to 1
+    privateIcdConfigData.SetFeatureMap(0x0F);
 
     // Check ICDManager starts in SIT mode if no entries are present
     EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDMode(), ICDConfigurationData::ICDMode::SIT);
@@ -988,9 +988,10 @@ TEST_F(TestICDManager, TestICDStateObserverOnEnterActiveMode)
 TEST_F(TestICDManager, TestICDStateObserverOnICDModeChange)
 {
     typedef ICDListener::ICDManagementEvents ICDMEvent;
+    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
 
     // Set FeatureMap - Configures CIP, UAT and LITS to 1
-    mICDManager.SetTestFeatureMapValue(0x07);
+    privateIcdConfigData.SetFeatureMap(0x07);
 
     // Since we don't have a registration, we stay in SIT mode. No changes
     EXPECT_FALSE(mICDStateObserver.mOnICDModeChangeCalled);
@@ -1034,8 +1035,10 @@ TEST_F(TestICDManager, TestICDStateObserverOnICDModeChange)
 
 TEST_F(TestICDManager, TestICDStateObserverOnICDModeChangeOnInit)
 {
+    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
+
     // Set FeatureMap - Configures CIP, UAT and LITS to 1
-    mICDManager.SetTestFeatureMapValue(0x07);
+    privateIcdConfigData.SetFeatureMap(0x07);
 
     ICDMonitoringTable table(testStorage, kTestFabricIndex1, kMaxTestClients, &(mKeystore));
 

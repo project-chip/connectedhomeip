@@ -2021,7 +2021,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0000;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 }
