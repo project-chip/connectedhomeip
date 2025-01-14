@@ -98,4 +98,4 @@
 #endif // CONFIG_OPENTHREAD_ENABLED
 
 void ESPOpenThreadInit();
-void ESPOpenThreadDeinit();
+void ESPOpenThreadShutdown();

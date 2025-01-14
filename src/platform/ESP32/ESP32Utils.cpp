@@ -370,7 +370,7 @@ CHIP_ERROR ESP32Utils::InitWiFiStack(void)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ESP32Utils::DeinitWiFiStack(void)
+CHIP_ERROR ESP32Utils::ShutdownWiFiStack(void)
 {
     esp_err_t err = esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent);
     if (err != ESP_OK)
