@@ -66,6 +66,20 @@ class Test_TC_FLABEL_2_1(MatterBaseTest):
         )
         asserts.assert_true(isinstance(initial_labels, list), "LabelList should be a list type")
 
+        # Verify each label in the list meets the requirements
+        for label_struct in initial_labels:
+            # Verify label field
+            asserts.assert_true(isinstance(label_struct.label, str),
+                                "Label field must be a string")
+            asserts.assert_true(len(label_struct.label.encode('utf-8')) <= 16,
+                                f"Label '{label_struct.label}' exceeds 16 bytes")
+
+            # Verify value field
+            asserts.assert_true(isinstance(label_struct.value, str),
+                                "Value field must be a string")
+            asserts.assert_true(len(label_struct.value.encode('utf-8')) <= 16,
+                                f"Value '{label_struct.value}' exceeds 16 bytes")
+
         # Step 3: Attempt to write LabelList (should fail)
         self.step(3)
         test_label = Clusters.Objects.FixedLabel.Attributes.LabelList(
