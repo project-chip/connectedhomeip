@@ -63,3 +63,14 @@
 {{/if}}
 
 {{/all_user_clusters}}
+
+/**** Cluster Commands Flag ****/
+{{#all_user_clusters_with_incoming_commands}}
+  {{#if (isServer clusterSide)}}
+    //  {{asUpperCamelCase clusterName}} Cluster Commands  
+    {{#all_incoming_commands_for_cluster clusterName clusterSide}}
+#define {{as_delimited_macro clusterName}}_ENABLE_{{as_delimited_macro commandName}} 1
+    {{/all_incoming_commands_for_cluster}}
+
+  {{/if}}
+{{/all_user_clusters_with_incoming_commands}}

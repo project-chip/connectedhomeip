@@ -38,6 +38,7 @@
 #include <lib/support/ScopedBuffer.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <zap-generated/gen_config.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -136,7 +137,10 @@ private:
 
     void HandleTestEventTrigger(HandlerContext & ctx, const Commands::TestEventTrigger::DecodableType & commandData);
     void HandleTimeSnapshot(HandlerContext & ctx, const Commands::TimeSnapshot::DecodableType & commandData);
+
+#ifdef GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST
     void HandlePayloadTestRequest(HandlerContext & ctx, const Commands::PayloadTestRequest::DecodableType & commandData);
+#endif
 
     // Gets called when any network interface on the Node is updated.
     void OnNetworkInfoChanged() override
@@ -223,10 +227,12 @@ void GeneralDiagosticsGlobalInstance::InvokeCommand(HandlerContext & handlerCont
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleTimeSnapshot(ctx, commandData); });
         break;
 
+#ifdef GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST
     case Commands::PayloadTestRequest::Id:
         CommandHandlerInterface::HandleCommand<Commands::PayloadTestRequest::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandlePayloadTestRequest(ctx, commandData); });
         break;
+#endif
     }
 }
 
@@ -349,6 +355,7 @@ void GeneralDiagosticsGlobalInstance::HandleTimeSnapshot(HandlerContext & ctx,
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
+#ifdef GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST
 void GeneralDiagosticsGlobalInstance::HandlePayloadTestRequest(HandlerContext & ctx,
                                                                const Commands::PayloadTestRequest::DecodableType & commandData)
 {
@@ -383,6 +390,7 @@ void GeneralDiagosticsGlobalInstance::HandlePayloadTestRequest(HandlerContext & 
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
     }
 }
+#endif // GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST
 
 GeneralDiagosticsGlobalInstance gGeneralDiagosticsInstance;
 
