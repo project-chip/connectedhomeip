@@ -64,7 +64,8 @@ private:
 
     // Methods to handle the various commands this cluster may receive.
     void OpenCommissioningWindow(HandlerContext & context, const Commands::OpenCommissioningWindow::DecodableType & commandData);
-    void OpenBasicCommissioningWindow(HandlerContext & context, const Commands::OpenBasicCommissioningWindow::DecodableType & commandData);
+    void OpenBasicCommissioningWindow(HandlerContext & context,
+                                      const Commands::OpenBasicCommissioningWindow::DecodableType & commandData);
     void RevokeCommissioning(HandlerContext & context, const Commands::RevokeCommissioning::DecodableType & commandData);
 };
 
