@@ -591,9 +591,6 @@ class SubscriptionTransaction:
                 self._readTransaction._pReadClient))
         self._isDone = True
 
-    def __del__(self):
-        self.Shutdown()
-
     def __repr__(self):
         return f'<Subscription (Id={self._subscriptionId})>'
 
@@ -638,7 +635,7 @@ def _BuildEventIndex():
                         if inspect.isclass(event):
                             base_classes = inspect.getmro(event)
 
-                            # Only match on classes that extend the ClusterEventescriptor class
+                            # Only match on classes that extend the ClusterEvent class
                             matched = [
                                 value for value in base_classes if 'ClusterEvent' in str(value)]
                             if (matched == []):
