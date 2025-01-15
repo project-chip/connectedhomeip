@@ -448,6 +448,7 @@ class SubscriptionTransaction:
             SubscriptionTransaction], None]] = None
         self._onResubscriptionSucceededCb_isAsync = False
         self._onResubscriptionAttemptedCb_isAsync = False
+        builtins.chipStack.RegisterSubscription(self)
 
     def GetAttributes(self):
         ''' Returns the attribute value cache tracking the latest state on the publisher.
@@ -578,12 +579,13 @@ class SubscriptionTransaction:
         return self._subscriptionId
 
     def Shutdown(self):
-        if (self._isDone):
+        if self._isDone:
             LOGGER.warning(
                 "Subscription 0x%08x was already terminated previously!", self.subscriptionId)
             return
 
         handle = chip.native.GetLibraryHandle()
+        builtins.chipStack.UnregisterSubscription(self)
         builtins.chipStack.Call(
             lambda: handle.pychip_ReadClient_ShutdownSubscription(
                 self._readTransaction._pReadClient))
@@ -779,7 +781,7 @@ class AsyncReadTransaction:
         pass
 
     def _handleReportEnd(self):
-        if (self._subscription_handler is not None):
+        if self._subscription_handler is not None:
             for change in self._changedPathSet:
                 try:
                     attribute_path = TypedAttributePath(Path=change)

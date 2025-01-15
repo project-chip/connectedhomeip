@@ -149,11 +149,10 @@ class ChipStack(object):
         self._chipDLLPath = None
         self.devMgr = None
         self._enableServerInteractions = enableServerInteractions
+        self._subscriptions = {}
 
-        #
         # Locate and load the chip shared library.
-        # This also implictly does a minimal stack initialization (i.e call MemoryInit).
-        #
+        # This also implicitly does a minimal stack initialization (i.e call MemoryInit).
         self._loadLib()
 
         @_ChipThreadTaskRunnerFunct
@@ -162,10 +161,8 @@ class ChipStack(object):
 
         self.cbHandleChipThreadRun = HandleChipThreadRun
 
-        #
         # Storage has to be initialized BEFORE initializing the stack, since the latter
         # requires a PersistentStorageDelegate to be provided to DeviceControllerFactory.
-        #
         self._persistentStorage = PersistentStorage(persistentStoragePath)
 
         # Initialize the chip stack.
@@ -187,23 +184,28 @@ class ChipStack(object):
     def enableServerInteractions(self):
         return self._enableServerInteractions
 
+    def RegisterSubscription(self, subscription: ClusterAttribute.SubscriptionTransaction):
+        self._subscriptions[subscription.subscriptionId] = subscription
+
+    def UnregisterSubscription(self, subscription: ClusterAttribute.SubscriptionTransaction):
+        del self._subscriptions[subscription.subscriptionId]
+
     def Shutdown(self):
-        #
+
+        # Shutdown all subscriptions before shutting down the stack.
+        for subscription in tuple(self._subscriptions.values()):
+            subscription.Shutdown()
+
         # Terminate Matter thread and shutdown the stack.
-        #
         self._ChipStackLib.pychip_DeviceController_StackShutdown()
 
-        #
         # We only shutdown the persistent storage layer AFTER we've shut down the stack,
         # since there is a possibility of interactions with the storage layer during shutdown.
-        #
         self._persistentStorage.Shutdown()
         self._persistentStorage = None
 
-        #
         # Stack init happens in native, but shutdown happens here unfortunately.
         # #20437 tracks consolidating these.
-        #
         self._ChipStackLib.pychip_CommonStackShutdown()
         self.completeEvent = None
         self._ChipStackLib = None
