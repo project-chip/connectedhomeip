@@ -30,11 +30,15 @@ std::optional<ServerClusterEntry> ServerClusterFinder::Find(const ConcreteCluste
 
     auto serverClustersSpan = mClusterEntries.GetSpanValidForLifetime();
 
-    auto pos = std::find_if(serverClustersSpan.begin(), serverClustersSpan.end(),
-                            [&path](const ServerClusterEntry & cluster) { return cluster.clusterId == path.mClusterId; });
-    VerifyOrReturnValue(pos != serverClustersSpan.end(), std::nullopt);
+    for (auto & clusterEntry : serverClustersSpan)
+    {
+        if (clusterEntry.clusterId == path.mClusterId)
+        {
+            return clusterEntry;
+        }
+    }
 
-    return *pos;
+    return std::nullopt;
 }
 
 std::optional<AttributeEntry> AttributeFinder::Find(const ConcreteAttributePath & path)
