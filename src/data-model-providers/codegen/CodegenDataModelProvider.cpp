@@ -707,12 +707,12 @@ CodegenDataModelProvider::GetGeneratedCommands(ConcreteClusterPath clusterPath)
 
         if (err == CHIP_NO_ERROR)
         {
-            typedef struct
+            using FetchData = struct
             {
                 Platform::ScopedMemoryBuffer<CommandId> commands;
                 size_t index;
                 size_t maxSize;
-            } FetchData;
+            };
 
             FetchData data;
             data.index   = 0;
@@ -788,12 +788,12 @@ CodegenDataModelProvider::GetAcceptedCommands(ConcreteClusterPath clusterPath)
 
         if (err == CHIP_NO_ERROR)
         {
-            typedef struct
+            using FetchData = struct
             {
                 Platform::ScopedMemoryBuffer<CommandId> commands;
                 size_t index;
                 size_t maxSize;
-            } FetchData;
+            };
 
             FetchData data;
             data.index   = 0;
