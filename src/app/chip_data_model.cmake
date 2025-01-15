@@ -67,10 +67,12 @@ endfunction()
 # EXTERNAL_CLUSTERS Clusters with external implementations. The default implementations
 # will not be used nor required for these clusters.
 # Format: MY_CUSTOM_CLUSTER'.
+# TEMPLATES_JSON Use external templates.json (because of out-of-tree manufacturer
+# specific clusters, which need to be configured via an out-of-tree config-data.yaml)
 #
 function(chip_configure_data_model APP_TARGET)
     set(SCOPE PRIVATE)
-    cmake_parse_arguments(ARG "" "SCOPE;ZAP_FILE;IDL" "EXTERNAL_CLUSTERS;EXTERNAL_APP_COMMON" ${ARGN})
+    cmake_parse_arguments(ARG "" "SCOPE;ZAP_FILE;IDL;TEMPLATES_JSON" "EXTERNAL_CLUSTERS;EXTERNAL_APP_COMMON" ${ARGN})
 
     if(ARG_SCOPE)
         set(SCOPE ${ARG_SCOPE})
@@ -136,6 +138,7 @@ function(chip_configure_data_model APP_TARGET)
     chip_zapgen(${APP_TARGET}-zapgen
         INPUT "${ARG_ZAP_FILE}"
         GENERATOR "app-templates"
+        TEMPLATES_JSON ${ARG_TEMPLATES_JSON}
         OUTPUTS
         "zap-generated/access.h"
         "zap-generated/endpoint_config.h"
