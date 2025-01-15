@@ -113,16 +113,17 @@ class TC_CreateNewController(MatterBaseTest):
         self.th1 = self.default_controller
 
         self.step(2)
-        self.th2 = self.certificate_authority_manager.create_new_controller(fabricId=self.th1.fabricId + 1, CaList = 1, nodeid = 2)
+        self.th2 = self.certificate_authority_manager.create_new_controller(fabricId=self.th1.fabricId + 1, CaList=1, nodeid=2)
 
         self.step(3)
         self.th2.Shutdown()
 
         self.step(4)
-        self.th3 = self.certificate_authority_manager.create_new_controller(CaList = 0, new_fabric = False, nodeid = 2)
+        self.th3 = self.certificate_authority_manager.create_new_controller(CaList=0, new_fabric=False, nodeid=2)
 
         self.step(5)
         self.th3.Shutdown()
+
 
 if __name__ == "__main__":
     default_matter_test_main()

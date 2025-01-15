@@ -1681,6 +1681,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             logging.info("========= EOF on STDIN =========")
             return None
 
+
 def generate_mobly_test_config(matter_test_config: MatterTestConfig):
     test_run_config = TestRunConfig()
     # We use a default name. We don't use Mobly YAML configs, so that we can be

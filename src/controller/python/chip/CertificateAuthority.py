@@ -323,7 +323,7 @@ class CertificateAuthorityManager:
             new_cert_auth = self.NewCertificateAuthority()
             new_fabric_admin = new_cert_auth.NewFabricAdmin(vendorId=vendorid, fabricId=fabricId)
             return new_fabric_admin.NewController(nodeId=nodeid)
-            
+
         else:
             """
             Create new controller on an already established fabric
