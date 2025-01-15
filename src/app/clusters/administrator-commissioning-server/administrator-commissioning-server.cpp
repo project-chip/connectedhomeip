@@ -27,7 +27,6 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/administrator-commissioning-server/administrator-commissioning-server.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
