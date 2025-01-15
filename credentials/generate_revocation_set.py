@@ -20,10 +20,10 @@
 # Usage:
 #     python ./credentials/generate-revocation-set.py --help
 
-import os
 import base64
 import json
 import logging
+import os
 import subprocess
 import sys
 import unittest
