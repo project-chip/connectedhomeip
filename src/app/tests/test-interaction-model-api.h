@@ -19,7 +19,6 @@
 /// test-interaction-model-api was created to consolidate and centralize stub functions that are used by the Interaction Model
 /// during unit-testing.
 
-#include "data-model-providers/codegen/CodegenDataModelProvider.h"
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/WriteHandler.h>
@@ -27,6 +26,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 /**
  * Helper macro we can use to pretend we got a reply from the server in cases
