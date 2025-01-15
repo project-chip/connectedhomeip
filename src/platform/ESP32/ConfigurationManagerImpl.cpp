@@ -58,6 +58,8 @@ uint32_t ConfigurationManagerImpl::mTotalOperationalHours = 0;
 
 void ConfigurationManagerImpl::TotalOperationalHoursTimerCallback(TimerHandle_t timer)
 {
+    // This function is called from the FreeRTOS timer task. Since the task stack is limited,
+    // we avoid logging error messages here to prevent stack overflows.
     (void) ConfigurationMgrImpl().StoreTotalOperationalHours(++mTotalOperationalHours);
 }
 
@@ -176,6 +178,9 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     }
 
     {
+        // The total-operational-hours is critical information. It intentionally uses the FreeRTOS timer
+        // to increment the value, this ensures it is not affected by PostEvent failures.
+
         // Start a timer which reloads every one hour and bumps the total operational hours
         TickType_t reloadPeriod   = (1000 * 60 * 60) / portTICK_PERIOD_MS;
         TimerHandle_t timerHandle = xTimerCreate("tOpHrs", reloadPeriod, pdPASS, nullptr, TotalOperationalHoursTimerCallback);
