@@ -24,9 +24,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-/**
- * @brief wifi-diagnostics-server class
- */
 class WiFiDiagnosticsServer : public DeviceLayer::WiFiDiagnosticsDelegate
 {
 public:
