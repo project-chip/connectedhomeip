@@ -48,26 +48,29 @@ using namespace chip::Protocols;
 using namespace chip::Crypto;
 using chip::Protocols::InteractionModel::Status;
 
-namespace {
-
-AdministratorCommissioningServer gAdministratorCommissioningServer(kRootEndpoint);
-
-} // namespace
-
-class AdministratorCommissioningAttrAccess : public AttributeAccessInterface
+class AdministratorCommissioningServer : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
-    // Register for the OperationalCredentials cluster on all endpoints.
-    AdministratorCommissioningAttrAccess() :
-        AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::AdministratorCommissioning::Id)
+    // Register for the AdministratorCommissioning cluster on all endpoints.
+    AdministratorCommissioningServer() :
+        AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::AdministratorCommissioning::Id),
+        CommandHandlerInterface(Optional<EndpointId>::Missing(), Clusters::AdministratorCommissioning::Id)
     {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+private:
+    void InvokeCommand(HandlerContext & context) override;
+
+    // Methods to handle the various commands this cluster may receive.
+    void OpenCommissioningWindow(HandlerContext & context, const Commands::OpenCommissioningWindow::DecodableType & commandData);
+    void OpenBasicCommissioningWindow(HandlerContext & context, const Commands::OpenBasicCommissioningWindow::DecodableType & commandData);
+    void RevokeCommissioning(HandlerContext & context, const Commands::RevokeCommissioning::DecodableType & commandData);
 };
 
-AdministratorCommissioningAttrAccess gAdminCommissioningAttrAccess;
+AdministratorCommissioningServer gAdminCommissioningServer;
 
-CHIP_ERROR AdministratorCommissioningAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR AdministratorCommissioningServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == Clusters::AdministratorCommissioning::Id);
 
@@ -215,32 +218,8 @@ bool HandleRevokeCommissioningCommand(app::CommandHandler * commandObj, const ap
 void MatterAdministratorCommissioningPluginServerInitCallback()
 {
     ChipLogProgress(Zcl, "Initiating Admin Commissioning cluster.");
-    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gAdministratorCommissioningServer);
-    AttributeAccessInterfaceRegistry::Instance().Register(&gAdminCommissioningAttrAccess);
-}
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace AdministratorCommissioning {
-
-AdministratorCommissioningServer::AdministratorCommissioningServer(EndpointId endpointId) :
-    CommandHandlerInterface(MakeOptional(endpointId), Id)
-{}
-
-AdministratorCommissioningServer::~AdministratorCommissioningServer()
-{
-    Shutdown();
-}
-
-CHIP_ERROR AdministratorCommissioningServer::Init()
-{
-    return CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
-}
-
-CHIP_ERROR AdministratorCommissioningServer::Shutdown()
-{
-    return CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gAdminCommissioningServer);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAdminCommissioningServer);
 }
 
 void AdministratorCommissioningServer::InvokeCommand(HandlerContext & context)
@@ -289,8 +268,3 @@ void AdministratorCommissioningServer::RevokeCommissioning(CommandHandlerInterfa
         context.SetCommandNotHandled();
     }
 }
-
-} // namespace AdministratorCommissioning
-} // namespace Clusters
-} // namespace app
-} // namespace chip
