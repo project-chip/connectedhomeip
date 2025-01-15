@@ -37,6 +37,11 @@ GenericMetadataList & GenericMetadataList::operator=(GenericMetadataList && othe
         // Generic metadata lists should not be used directly except for same-sized data
         VerifyOrDie(this->mElementSize == other.mElementSize);
 
+        if (mAllocated && (mBuffer != nullptr))
+        {
+            chip::Platform::MemoryFree(mBuffer);
+        }
+
         this->mAllocated    = other.mAllocated;
         this->mBuffer       = other.mBuffer;
         this->mElementCount = other.mElementCount;
