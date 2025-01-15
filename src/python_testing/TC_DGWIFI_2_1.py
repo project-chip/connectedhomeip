@@ -73,15 +73,7 @@ class TC_DGWIFI_2_1(MatterBaseTest):
             return False
         if value < 0:
             return False
-        if max_size == 64 and value <= 0xFFFFFFFFFFFFFFFF:
-            return True
-        if max_size == 32 and value <= 0xFFFFFFFF:
-            return True
-        if max_size == 16 and value <= 0xFFFF:
-            return True
-        if max_size == 8 and value <= 0xFF:
-            return True
-        return False
+        return value < 2**max_size
 
     def assert_valid_bssid(self, value, field_name):
         """Asserts that the value is a valid BSSID (MAC address), None, or NullValue."""
