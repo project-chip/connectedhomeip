@@ -719,10 +719,12 @@ CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
 }
 #endif // OTA_ENCRYPTION_ENABLE
 
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 
 } // namespace Provision
 

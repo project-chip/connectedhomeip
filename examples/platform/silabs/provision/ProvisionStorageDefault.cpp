@@ -70,14 +70,29 @@ CHIP_ERROR ErasePage(uint32_t addr)
     return chip::DeviceLayer::Silabs::GetPlatform().FlashErasePage(addr);
 }
 
-CHIP_ERROR WritePage(uint32_t addr, const uint8_t * data, size_t size)
-{
-    return chip::DeviceLayer::Silabs::GetPlatform().FlashWritePage(addr, data, size);
-}
-
 size_t RoundNearest(size_t n, size_t multiple)
 {
     return (n % multiple) > 0 ? n + (multiple - n % multiple) : n;
+}
+
+/**
+ * Writes "size" bytes to the flash page. The data is padded with 0xff
+ * up to the nearest 32-bit boundary. The "max" argument is used to ensure
+ * that the padding won't exceed the limits of the buffer.
+ */
+CHIP_ERROR WritePage(uint32_t addr, const uint8_t * data, size_t size, size_t max)
+{
+    // The flash driver fails if the size is not a multiple of 4 (32-bits)
+    size_t size_32 = RoundNearest(size, 4);
+    // If the input data is smaller than the 32-bit size, pad the buffer with "0xff"
+    if (size_32 != size)
+    {
+        uint8_t * p = (uint8_t *) data;
+        VerifyOrReturnError(size_32 <= max, CHIP_ERROR_BUFFER_TOO_SMALL);
+        memset(p + size, 0xff, size_32 - size);
+        size = size_32;
+    }
+    return chip::DeviceLayer::Silabs::GetPlatform().FlashWritePage(addr, data, size);
 }
 
 CHIP_ERROR WriteFile(Storage & store, SilabsConfig::Key offset_key, SilabsConfig::Key size_key, const ByteSpan & value)
@@ -89,17 +104,7 @@ CHIP_ERROR WriteFile(Storage & store, SilabsConfig::Key offset_key, SilabsConfig
         ReturnErrorOnFailure(ErasePage(base_addr));
     }
 
-    memcpy(Storage::aux_buffer, value.data(), value.size());
-    if (value.size() < Storage::kArgumentSizeMax)
-    {
-        memset(Storage::aux_buffer + value.size(), 0xff, Storage::kArgumentSizeMax - value.size());
-    }
-
-    ChipLogProgress(DeviceLayer, "WriteFile, addr:0x%06x+%03u, size:%u", (unsigned) base_addr, (unsigned) sCredentialsOffset,
-                    (unsigned) value.size());
-    // ChipLogByteSpan(DeviceLayer, ByteSpan(value.data(), value.size() < kDebugLength ? value.size() : kDebugLength));
-
-    ReturnErrorOnFailure(WritePage(base_addr + sCredentialsOffset, Storage::aux_buffer, Storage::kArgumentSizeMax));
+    ReturnErrorOnFailure(WritePage(base_addr + sCredentialsOffset, value.data(), value.size(), store.GetBufferSize()));
 
     // Store file offset
     ReturnErrorOnFailure(SilabsConfig::WriteConfigValue(offset_key, (uint32_t) sCredentialsOffset));
@@ -119,7 +124,6 @@ CHIP_ERROR ReadFileByOffset(Storage & store, const char * description, uint32_t 
     ByteSpan span(address, size);
     ChipLogProgress(DeviceLayer, "%s, addr:0x%06x+%03u, size:%u", description, (unsigned) base_addr, (unsigned) offset,
                     (unsigned) size);
-    // ChipLogByteSpan(DeviceLayer, ByteSpan(span.data(), span.size() < kDebugLength ? span.size() : kDebugLength));
     return CopySpanToMutableSpan(span, value);
 }
 
@@ -662,12 +666,7 @@ CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
 }
 #endif // OTA_ENCRYPTION_ENABLE
 
-/**
- * @brief Reads the test event trigger key from NVM. If the key isn't present, returns default value if defined.
- *
- * @param[out] keySpan output buffer. Must be at least large enough for 16 bytes (ken length)
- * @return CHIP_ERROR
- */
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 {
     constexpr size_t kEnableKeyLength = 16; // Expected byte size of the EnableKey
@@ -679,7 +678,7 @@ CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
     err = SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_Test_Event_Trigger_Key, keySpan.data(), kEnableKeyLength,
                                            keyLength);
 #ifndef NDEBUG
-#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
 
@@ -692,12 +691,13 @@ CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
         }
         err = CHIP_NO_ERROR;
     }
-#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY
 #endif // NDEBUG
 
     keySpan.reduce_size(kEnableKeyLength);
     return err;
 }
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 
 } // namespace Provision
 

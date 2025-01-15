@@ -13,8 +13,11 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/efr32_sdk.gni")
-import("${silabs_sdk_build_root}/silabs_board.gni")
+
+declare_args() {
+  # Self-provision enabled
+  use_provision_channel = false
+}
 
 config("provision-config") {
   include_dirs = [ "." ]
@@ -33,6 +36,7 @@ source_set("provision-headers") {
     "ProvisionManager.h",
     "ProvisionProtocol.h",
     "ProvisionStorage.h",
+    "ProvisionedDataProvider.h",
   ]
   public_configs = [ ":provision-config" ]
 }
