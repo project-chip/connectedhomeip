@@ -67,14 +67,30 @@ public:
         // overrides that save flash: no need to care about the extra const
         // Without this, we have a usage of:
         //   chip::ChipError chip::app::AttributeValueEncoder::EncodeListItem<unsigned long const&>
-        // that uses 162 bytes of flash on ARM32 (at least on QPG)
+        // Overall we tend to have very similar code expand (from nm):
+        //    chip::ChipError chip::app::AttributeValueEncoder::Encode<unsigned char>(unsigned char&&)
+        //    chip::ChipError chip::app::AttributeValueEncoder::Encode<unsigned char&>(unsigned char&)
+        //    chip::ChipError chip::app::AttributeValueEncoder::Encode<unsigned char const&>(unsigned char const&)
+        //    chip::ChipError chip::app::AttributeValueEncoder::Encode<unsigned short const&>(unsigned short const&)
+        //    chip::ChipError chip::app::AttributeValueEncoder::Encode<unsigned long&>(unsigned long&)
+        //    chip::ChipError chip::app::AttributeValueEncoder::Encode<unsigned short&>(unsigned short&)
+        //    chip::ChipError chip::app::AttributeValueEncoder::Encode<unsigned long long&>(unsigned long long&)
+        //    chip::ChipError chip::app::AttributeValueEncoder::Encode<unsigned short>(unsigned short&&)
+        //    chip::ChipError chip::app::AttributeValueEncoder::Encode<unsigned long long>(unsigned long long&&)
+        // that we try to reduce
         //
         // TODO:
         //   - we should figure where the extra const override is used
         //   - we should try to avoid having such footguns. This list template-explosion seems
         //     dangerous for flash.
+        inline CHIP_ERROR Encode(uint64_t const & aArg) const { return Encode((uint32_t) aArg); }
+        inline CHIP_ERROR Encode(uint64_t & aArg) const { return Encode((uint32_t) aArg); }
         inline CHIP_ERROR Encode(uint32_t const & aArg) const { return Encode((uint32_t) aArg); }
         inline CHIP_ERROR Encode(uint32_t & aArg) const { return Encode((uint32_t) aArg); }
+        inline CHIP_ERROR Encode(uint16_t const & aArg) const { return Encode((uint32_t) aArg); }
+        inline CHIP_ERROR Encode(uint16_t & aArg) const { return Encode((uint32_t) aArg); }
+        inline CHIP_ERROR Encode(uint8_t const & aArg) const { return Encode((uint32_t) aArg); }
+        inline CHIP_ERROR Encode(uint8_t & aArg) const { return Encode((uint32_t) aArg); }
 
     private:
         AttributeValueEncoder & mAttributeValueEncoder;
