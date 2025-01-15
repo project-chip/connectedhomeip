@@ -241,11 +241,20 @@ std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()
             if (mPosition.mAttributePath->mValue.IsWildcardPath())
             {
                 const ClusterId clusterId = mPosition.mAttributePath->mValue.mClusterId;
-                auto span                 = mClusters.GetSpanValidForLifetime();
 
-                auto pos = std::find_if(span.begin(), span.end(),
-                                        [&clusterId](const ServerClusterEntry & entry) { return entry.clusterId == clusterId; });
-                if (pos == span.end())
+                auto span = mClusters.GetSpanValidForLifetime();
+
+                bool found = false;
+                for (auto & entry : span)
+                {
+                    if (entry.clusterId == clusterId)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
                 {
                     return std::nullopt;
                 }
