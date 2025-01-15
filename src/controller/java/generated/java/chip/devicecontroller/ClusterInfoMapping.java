@@ -20899,6 +20899,160 @@ public class ClusterInfoMapping {
     }
   }
 
+
+  public static class DelegatedPushAvStreamTransportClusterAllocatePushTransportResponseCallback implements ChipClusters.PushAvStreamTransportCluster.AllocatePushTransportResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer connectionID, ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct transportOptions, Integer transportStatus) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo connectionIDResponseValue = new CommandResponseInfo("connectionID", "Integer");
+      responseValues.put(connectionIDResponseValue, connectionID);
+      // transportOptions: Struct TransportOptionsStruct
+      // Conversion from this type to Java is not properly implemented yet
+      CommandResponseInfo transportStatusResponseValue = new CommandResponseInfo("transportStatus", "Integer");
+      responseValues.put(transportStatusResponseValue, transportStatus);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedPushAvStreamTransportClusterFindTransportResponseCallback implements ChipClusters.PushAvStreamTransportCluster.FindTransportResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ArrayList<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> streamConfigurations) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      // streamConfigurations: TransportConfigurationStruct
+      // Conversion from this type to Java is not properly implemented yet
+
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedPushAvStreamTransportClusterCurrentConnectionsAttributeCallback implements ChipClusters.PushAvStreamTransportCluster.CurrentConnectionsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPushAvStreamTransportClusterGeneratedCommandListAttributeCallback implements ChipClusters.PushAvStreamTransportCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPushAvStreamTransportClusterAcceptedCommandListAttributeCallback implements ChipClusters.PushAvStreamTransportCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPushAvStreamTransportClusterEventListAttributeCallback implements ChipClusters.PushAvStreamTransportCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPushAvStreamTransportClusterAttributeListAttributeCallback implements ChipClusters.PushAvStreamTransportCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedChimeClusterInstalledChimeSoundsAttributeCallback implements ChipClusters.ChimeCluster.InstalledChimeSoundsAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -23360,6 +23514,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.WebRTCTransportRequestorCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("webRTCTransportRequestor", webRTCTransportRequestorClusterInfo);
 
+    ClusterInfo pushAvStreamTransportClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.PushAvStreamTransportCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("pushAvStreamTransport", pushAvStreamTransportClusterInfo);
+
     ClusterInfo chimeClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.ChimeCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("chime", chimeClusterInfo);
@@ -23510,6 +23668,7 @@ public class ClusterInfoMapping {
     destination.get("cameraAvSettingsUserLevelManagement").combineCommands(source.get("cameraAvSettingsUserLevelManagement"));
     destination.get("webRTCTransportProvider").combineCommands(source.get("webRTCTransportProvider"));
     destination.get("webRTCTransportRequestor").combineCommands(source.get("webRTCTransportRequestor"));
+    destination.get("pushAvStreamTransport").combineCommands(source.get("pushAvStreamTransport"));
     destination.get("chime").combineCommands(source.get("chime"));
     destination.get("ecosystemInformation").combineCommands(source.get("ecosystemInformation"));
     destination.get("commissionerControl").combineCommands(source.get("commissionerControl"));
@@ -30476,6 +30635,128 @@ public class ClusterInfoMapping {
     webRTCTransportRequestorClusterInteractionInfoMap.put("end", webRTCTransportRequestorendInteractionInfo);
 
     commandMap.put("webRTCTransportRequestor", webRTCTransportRequestorClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> pushAvStreamTransportClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportallocatePushTransportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo pushAvStreamTransportallocatePushTransportInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+          .allocatePushTransport((ChipClusters.PushAvStreamTransportCluster.AllocatePushTransportResponseCallback) callback
+           , (ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct)
+             commandArguments.get("transportOptions")
+
+            );
+        },
+        () -> new DelegatedPushAvStreamTransportClusterAllocatePushTransportResponseCallback(),
+        pushAvStreamTransportallocatePushTransportCommandParams
+      );
+    pushAvStreamTransportClusterInteractionInfoMap.put("allocatePushTransport", pushAvStreamTransportallocatePushTransportInteractionInfo);
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportdeallocatePushTransportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo pushAvStreamTransportdeallocatePushTransportconnectionIDCommandParameterInfo = new CommandParameterInfo("connectionID", Integer.class, Integer.class);
+    pushAvStreamTransportdeallocatePushTransportCommandParams.put("connectionID",pushAvStreamTransportdeallocatePushTransportconnectionIDCommandParameterInfo);
+    InteractionInfo pushAvStreamTransportdeallocatePushTransportInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+        .deallocatePushTransport((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("connectionID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        pushAvStreamTransportdeallocatePushTransportCommandParams
+    );
+    pushAvStreamTransportClusterInteractionInfoMap.put("deallocatePushTransport", pushAvStreamTransportdeallocatePushTransportInteractionInfo);
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportmodifyPushTransportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo pushAvStreamTransportmodifyPushTransportconnectionIDCommandParameterInfo = new CommandParameterInfo("connectionID", Integer.class, Integer.class);
+    pushAvStreamTransportmodifyPushTransportCommandParams.put("connectionID",pushAvStreamTransportmodifyPushTransportconnectionIDCommandParameterInfo);
+
+    InteractionInfo pushAvStreamTransportmodifyPushTransportInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+        .modifyPushTransport((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("connectionID")
+        , (ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct)
+        commandArguments.get("transportOptions")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        pushAvStreamTransportmodifyPushTransportCommandParams
+    );
+    pushAvStreamTransportClusterInteractionInfoMap.put("modifyPushTransport", pushAvStreamTransportmodifyPushTransportInteractionInfo);
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportsetTransportStatusCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo pushAvStreamTransportsetTransportStatusconnectionIDCommandParameterInfo = new CommandParameterInfo("connectionID", Integer.class, Integer.class);
+    pushAvStreamTransportsetTransportStatusCommandParams.put("connectionID",pushAvStreamTransportsetTransportStatusconnectionIDCommandParameterInfo);
+
+    CommandParameterInfo pushAvStreamTransportsetTransportStatustransportStatusCommandParameterInfo = new CommandParameterInfo("transportStatus", Integer.class, Integer.class);
+    pushAvStreamTransportsetTransportStatusCommandParams.put("transportStatus",pushAvStreamTransportsetTransportStatustransportStatusCommandParameterInfo);
+    InteractionInfo pushAvStreamTransportsetTransportStatusInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+        .setTransportStatus((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("connectionID")
+        , (Integer)
+        commandArguments.get("transportStatus")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        pushAvStreamTransportsetTransportStatusCommandParams
+    );
+    pushAvStreamTransportClusterInteractionInfoMap.put("setTransportStatus", pushAvStreamTransportsetTransportStatusInteractionInfo);
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportmanuallyTriggerTransportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo pushAvStreamTransportmanuallyTriggerTransportconnectionIDCommandParameterInfo = new CommandParameterInfo("connectionID", Integer.class, Integer.class);
+    pushAvStreamTransportmanuallyTriggerTransportCommandParams.put("connectionID",pushAvStreamTransportmanuallyTriggerTransportconnectionIDCommandParameterInfo);
+
+    CommandParameterInfo pushAvStreamTransportmanuallyTriggerTransportactivationReasonCommandParameterInfo = new CommandParameterInfo("activationReason", Integer.class, Integer.class);
+    pushAvStreamTransportmanuallyTriggerTransportCommandParams.put("activationReason",pushAvStreamTransportmanuallyTriggerTransportactivationReasonCommandParameterInfo);
+
+    InteractionInfo pushAvStreamTransportmanuallyTriggerTransportInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+        .manuallyTriggerTransport((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("connectionID")
+        , (Integer)
+        commandArguments.get("activationReason")
+        , (Optional<ChipStructs.PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct>)
+        commandArguments.get("timeControl")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        pushAvStreamTransportmanuallyTriggerTransportCommandParams
+    );
+    pushAvStreamTransportClusterInteractionInfoMap.put("manuallyTriggerTransport", pushAvStreamTransportmanuallyTriggerTransportInteractionInfo);
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportfindTransportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo pushAvStreamTransportfindTransportconnectionIDCommandParameterInfo = new CommandParameterInfo("connectionID", Optional.class, Integer.class);
+    pushAvStreamTransportfindTransportCommandParams.put("connectionID",pushAvStreamTransportfindTransportconnectionIDCommandParameterInfo);
+    InteractionInfo pushAvStreamTransportfindTransportInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+          .findTransport((ChipClusters.PushAvStreamTransportCluster.FindTransportResponseCallback) callback
+           , (Optional<Integer>)
+             commandArguments.get("connectionID")
+
+            );
+        },
+        () -> new DelegatedPushAvStreamTransportClusterFindTransportResponseCallback(),
+        pushAvStreamTransportfindTransportCommandParams
+      );
+    pushAvStreamTransportClusterInteractionInfoMap.put("findTransport", pushAvStreamTransportfindTransportInteractionInfo);
+
+    commandMap.put("pushAvStreamTransport", pushAvStreamTransportClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> chimeClusterInteractionInfoMap = new LinkedHashMap<>();
 
