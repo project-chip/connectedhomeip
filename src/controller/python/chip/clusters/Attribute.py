@@ -556,7 +556,7 @@ class SubscriptionTransaction:
 
     def SetErrorCallback(self, callback: Callable[[int, SubscriptionTransaction], None]):
         '''
-        Sets the callback function in case a subscription error occured,
+        Sets the callback function in case a subscription error occurred,
         accepts a Callable accepts an error code and the cached data.
         '''
         if callback is not None:
@@ -766,7 +766,7 @@ class AsyncReadTransaction:
     def handleResubscriptionAttempted(self, terminationCause: PyChipError, nextResubscribeIntervalMsec: int):
         if not self._subscription_handler:
             return
-        if (self._subscription_handler._onResubscriptionAttemptedCb_isAsync):
+        if self._subscription_handler._onResubscriptionAttemptedCb_isAsync:
             self._event_loop.create_task(self._subscription_handler._onResubscriptionAttemptedCb(
                 self._subscription_handler, terminationCause.code, nextResubscribeIntervalMsec))
         else:

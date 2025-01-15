@@ -184,10 +184,10 @@ class ChipStack(object):
         return self._enableServerInteractions
 
     def RegisterSubscription(self, subscription: ClusterAttribute.SubscriptionTransaction):
-        self._subscriptions[subscription.subscriptionId] = subscription
+        self._subscriptions[id(subscription)] = subscription
 
     def UnregisterSubscription(self, subscription: ClusterAttribute.SubscriptionTransaction):
-        del self._subscriptions[subscription.subscriptionId]
+        del self._subscriptions[id(subscription)]
 
     def Shutdown(self):
 
