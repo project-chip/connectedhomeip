@@ -62,7 +62,8 @@ CHIP_ERROR GenericMetadataList::reserve(size_t numElements)
 {
     VerifyOrReturnError(!mIsImmutable, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mElementCount == 0, CHIP_ERROR_INCORRECT_STATE);
-    if (mBuffer != nullptr)
+
+    if ((mBuffer != nullptr) && mAllocated)
     {
         chip::Platform::MemoryFree(mBuffer);
     }
