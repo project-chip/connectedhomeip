@@ -24,7 +24,6 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 
-#include <algorithm>
 #include <optional>
 
 namespace chip {

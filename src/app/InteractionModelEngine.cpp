@@ -25,7 +25,6 @@
 
 #include "InteractionModelEngine.h"
 
-#include <algorithm>
 #include <cinttypes>
 
 #include <access/AccessRestrictionProvider.h>
