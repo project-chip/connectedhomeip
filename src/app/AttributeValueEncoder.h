@@ -64,6 +64,17 @@ public:
             return mAttributeValueEncoder.EncodeListItem(std::forward<T>(aArg));
         }
 
+        // overrides that save flash: no need to care about the extra const
+        // Without this, we have a usage of:
+        //   chip::ChipError chip::app::AttributeValueEncoder::EncodeListItem<unsigned long const&>
+        // that uses 162 bytes of flash on ARM32 (at least on QPG)
+        //
+        // TODO:
+        //   - we should figure where the extra const override is used
+        //   - we should try to avoid having such footguns. This list template-explosion seems
+        //     dangerous for flash.
+        CHIP_ERROR Encode(uint32_t const & aArg) const { return Encode((uint32_t &) aArg); }
+
     private:
         AttributeValueEncoder & mAttributeValueEncoder;
     };
