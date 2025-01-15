@@ -138,6 +138,7 @@ Generally regenerate using one of:
 |       1366 |      0x556 | Chime                                                   |
 |       1872 |      0x750 | EcosystemInformation                                    |
 |       1873 |      0x751 | CommissionerControl                                     |
+|       2049 |      0x801 | TlsCertificateManagement                                |
 | 4294048773 | 0xFFF1FC05 | UnitTesting                                             |
 | 4294048774 | 0xFFF1FC06 | FaultInjection                                          |
 | 4294048800 | 0xFFF1FC20 | SampleMei                                               |

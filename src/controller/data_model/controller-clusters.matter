@@ -10441,6 +10441,121 @@ cluster CommissionerControl = 1873 {
   command access(invoke: manage) CommissionNode(CommissionNodeRequest): ReverseOpenCommissioningWindow = 1;
 }
 
+/** This Cluster is used to manage TLS Client Certificates and to provision
+      TLS endpoints with enough information to facilitate subsequent connection. */
+provisional cluster TlsCertificateManagement = 2049 {
+  revision 1;
+
+  struct TLSCertStruct {
+    int16u caid = 0;
+    long_octet_string<3000> certificate = 1;
+  }
+
+  struct TLSClientCertificateDetailStruct {
+    int16u ccdid = 0;
+    long_octet_string<3000> clientCertificate = 1;
+    octet_string intermediateCertificates[] = 2;
+  }
+
+  readonly attribute int8u maxRootCertificates = 0;
+  readonly attribute int8u currentRootCertificates = 1;
+  readonly attribute int8u maxClientCertificates = 2;
+  readonly attribute int8u currentClientCertificates = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ProvisionRootCertificateRequest {
+    long_octet_string<3000> certificate = 0;
+    nullable int16u caid = 1;
+  }
+
+  response struct ProvisionRootCertificateResponse = 1 {
+    int16u caid = 0;
+  }
+
+  request struct FindRootCertificateRequest {
+    nullable int16u caid = 0;
+  }
+
+  response struct FindRootCertificateResponse = 3 {
+    TLSCertStruct certificateDetails[] = 0;
+  }
+
+  request struct LookupRootCertificateRequest {
+    octet_string<64> fingerprint = 0;
+  }
+
+  response struct LookupRootCertificateResponse = 5 {
+    int16u caid = 0;
+  }
+
+  request struct RemoveRootCertificateRequest {
+    int16u caid = 0;
+  }
+
+  request struct TLSClientCSRRequest {
+    octet_string nonce = 0;
+  }
+
+  response struct TLSClientCSRResponse = 8 {
+    int16u ccdid = 0;
+    octet_string csr = 1;
+    octet_string nonce = 2;
+  }
+
+  request struct ProvisionClientCertificateRequest {
+    int16u ccdid = 0;
+    TLSClientCertificateDetailStruct clientCertificateDetails = 1;
+  }
+
+  response struct ProvisionClientCertificateResponse = 10 {
+    int16u ccdid = 0;
+  }
+
+  request struct FindClientCertificateRequest {
+    int16u ccdid = 0;
+  }
+
+  response struct FindClientCertificateResponse = 12 {
+    TLSClientCertificateDetailStruct certificateDetails[] = 0;
+  }
+
+  request struct LookupClientCertificateRequest {
+    octet_string<64> fingerprint = 0;
+  }
+
+  response struct LookupClientCertificateResponse = 14 {
+    int16u ccdid = 0;
+  }
+
+  request struct RemoveClientCertificateRequest {
+    int16u ccdid = 0;
+  }
+
+  /** This command SHALL provision the provided certificate for the passed in CAID. */
+  command access(invoke: administer) ProvisionRootCertificate(ProvisionRootCertificateRequest): ProvisionRootCertificateResponse = 0;
+  /** This command SHALL return the TLSCertStruct for the passed in CAID. */
+  command FindRootCertificate(FindRootCertificateRequest): FindRootCertificateResponse = 2;
+  /** This command SHALL return the CAID for the passed in fingerprint. */
+  command LookupRootCertificate(LookupRootCertificateRequest): LookupRootCertificateResponse = 4;
+  /** This command SHALL be generated to request the server removes the certificate provisioned to the provided Certificate Authority ID. */
+  command access(invoke: administer) RemoveRootCertificate(RemoveRootCertificateRequest): DefaultSuccess = 6;
+  /** This command SHALL be generated to request the Node generates a Certificate Signing Request. */
+  command access(invoke: administer) TLSClientCSR(TLSClientCSRRequest): TLSClientCSRResponse = 7;
+  /** This command SHALL be generated to request the Node provisions the provided Client Certificate Details. */
+  command access(invoke: administer) ProvisionClientCertificate(ProvisionClientCertificateRequest): ProvisionClientCertificateResponse = 9;
+  /** This command SHALL return the TLSClientCertificateDetailStruct for the passed in CCDID. */
+  command FindClientCertificate(FindClientCertificateRequest): FindClientCertificateResponse = 11;
+  /** This command SHALL return the CCDID for the passed in Fingerprint. */
+  command LookupClientCertificate(LookupClientCertificateRequest): LookupClientCertificateResponse = 13;
+  /** This command SHALL be generated to request the Node removes the certificate provisioned to the provided Client Certificate Details ID. */
+  command access(invoke: administer) RemoveClientCertificate(RemoveClientCertificateRequest): DefaultSuccess = 15;
+}
+
 /** The Test Cluster is meant to validate the generated code */
 internal cluster UnitTesting = 4294048773 {
   revision 1; // NOTE: Default/not specifically set
