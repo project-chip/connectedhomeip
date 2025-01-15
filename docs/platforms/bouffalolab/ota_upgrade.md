@@ -1,9 +1,11 @@
 # Build OTA image
 
-Take build target `bouffalolab-bl602dk-light-wifi-littlefs` as example to introduce OTA image building.
+Take build target `bouffalolab-bl602dk-light-wifi-littlefs` as example to
+introduce OTA image building.
 
-After example compiled, a python script `chip-bl602-lighting-example.flash.py` will be
-generated out under `./out/bouffalolab-bl602dk-light-wifi-littlefs/` and is used to download image to `Bouffalo Lab` SoC.
+After example compiled, a python script `chip-bl602-lighting-example.flash.py`
+will be generated out under `./out/bouffalolab-bl602dk-light-wifi-littlefs/` and
+is used to download image to `Bouffalo Lab` SoC.
 
 Type following command to generated OTA images:
 
@@ -16,14 +18,16 @@ Please find `./src/app/ota_image_tool.py` for information on `vendor id`,
 
 Here is an example command to generate an OTA image,
 
-> Please change `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION` and `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING`in
-> CHIPProjectConfig.h under example folder before to build a test OTA image.
+> Please change `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION` and
+> `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING`in CHIPProjectConfig.h
+> under example folder before to build a test OTA image.
 
 ```shell
 ./out/bouffalolab-bl602dk-light-wifi-littlefs/chip-bl602-lighting-example.flash.py --build-ota --vendor-id 0xFFF1 --product-id 0x8005 --version 10 --version-str "1.0" --digest-algorithm sha256
 ```
 
-OTA images will generated under `out/bouffalolab-bl602dk-light-wifi-littlefs/ota_images`:
+OTA images will generated under
+`out/bouffalolab-bl602dk-light-wifi-littlefs/ota_images`:
 
 > BL702 and BL702L have same OTA image format with BL602
 
@@ -45,7 +49,12 @@ with Wi-Fi and `littlefs` supported as example:
 
 ## Test OTA software upgrade with chip-tool and ota-provider-app
 
-Please follow [chip_tool_guide](../../development_controllers/chip-tool/chip_tool_guide.md) and [chip-tool guide](../../../examples/chip-tool/README.md) for chip-tool build and usage and follow [ota-provider-app guide](../../../examples/ota-provider-app/linux/README.md) for ota-provider-app build and usage.
+Please follow
+[chip_tool_guide](../../development_controllers/chip-tool/chip_tool_guide.md)
+and [chip-tool guide](../../../examples/chip-tool/README.md) for chip-tool build
+and usage and follow
+[ota-provider-app guide](../../../examples/ota-provider-app/linux/README.md) for
+ota-provider-app build and usage.
 
 ### Start ota-provider-app
 
@@ -64,32 +73,36 @@ Please follow [chip_tool_guide](../../development_controllers/chip-tool/chip_too
 
 ### Start ota software upgrade
 
-- BLE commission with node id assigned
+-   BLE commission with node id assigned
 
-  -   Wi-Fi
+    -   Wi-Fi
 
     ```shell
     ./out/linux-x64-chip-tool/chip-tool pairing ble-wifi <device_node_id> <wifi_ssid> <wifi_passwd> 20202021 3840
     ```
 
-  - Thread
+    -   Thread
+
+        ```shell
+        ./out/linux-x64-chip-tool/chip-tool pairing ble-thread <device_node_id> hex:<thread_operational_dataset> 20202021 3840
+        ```
+
+    -   Ethernet
+        ```
+        ./out/linux-x64-chip-tool/chip-tool pairing onnetwork <device_node_id> 20202021
+        ```
+
+-   Start OTA software upgrade process
 
     ```shell
-    ./out/linux-x64-chip-tool/chip-tool pairing ble-thread <device_node_id> hex:<thread_operational_dataset> 20202021 3840
+    ./out/linux-x64-chip-tool/chip-tool otasoftwareupdaterequestor announce-otaprovider <ota_provider_node_id> 0 0 0 <device_node_id> 0
     ```
-  - Ethernet
-      ```
-      ./out/linux-x64-chip-tool/chip-tool pairing onnetwork <device_node_id> 20202021
-      ```
 
-- Start OTA software upgrade process
-  ```shell
-  ./out/linux-x64-chip-tool/chip-tool otasoftwareupdaterequestor announce-otaprovider <ota_provider_node_id> 0 0 0 <device_node_id> 0
-  ```
-  
-- After the OTA software upgrade completes, the device will reboot automatically. Once rebooted, execute the following commands to verify if the new firmware is applied:
+-   After the OTA software upgrade completes, the device will reboot
+    automatically. Once rebooted, execute the following commands to verify if
+    the new firmware is applied:
 
-  ```
-  ./out/linux-x64-chip-tool/chip-tool basicinformation read software-version <device_node_id> 0
-  ./out/linux-x64-chip-tool/chip-tool basicinformation read software-version-string <device_node_id> 0
-  ```
+    ```
+    ./out/linux-x64-chip-tool/chip-tool basicinformation read software-version <device_node_id> 0
+    ./out/linux-x64-chip-tool/chip-tool basicinformation read software-version-string <device_node_id> 0
+    ```

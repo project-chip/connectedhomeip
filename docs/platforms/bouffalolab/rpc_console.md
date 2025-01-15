@@ -2,28 +2,29 @@
 
 ## Build image
 
-- BL602DK
+-   `BL602DK`
 
-  ```shell
-  ./scripts/build/build_examples.py --target bouffalolab-bl602dk-light-wifi-littlefs-rpc build
-  ```
+    ```shell
+    ./scripts/build/build_examples.py --target bouffalolab-bl602dk-light-wifi-littlefs-rpc build
+    ```
 
-- BL704LDK
+-   `BL704LDK`
 
-  ```shell
-  ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-light-thread-littlefs-rpc build
-  ```
+    ```shell
+    ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-light-thread-littlefs-rpc build
+    ```
 
-- BL706DK
+-   `BL706DK`
 
-  ```shell
-  ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-thread-littlefs-rpc build
-  ```
+    ```shell
+    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-thread-littlefs-rpc build
+    ```
 
 ## Run RPC Console
 
--   Build chip-console following this [guide](../../common/pigweed/rpc_console/README.md)
-    
+-   Build chip-console following this
+    [guide](../../common/pigweed/rpc_console/README.md)
+
 -   Start the console
 
     ```

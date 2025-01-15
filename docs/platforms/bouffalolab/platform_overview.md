@@ -3,7 +3,7 @@
 -   BL602
 
     BL602/BL604 is combo chip-set for Wi-Fi 4 and BLE 5.0.
-    
+
 -   BL61X
 
     BL61X is combo chip-set for Wi-Fi 6, Classic Bluetooth, Bluetooth low energy
@@ -47,7 +47,6 @@
     > Please contact `Bouffalo Lab` for supports on OTBR and Matter ZigBee
     > Bridge application
 
-
 # Current supported
 
 -   Current supported boards:
@@ -70,7 +69,7 @@
     -   `BL706-NIGHT-LIGHT`
 
 -   Supported examples:
-    
-    - [Lighting app](../../../examples/lighting-app/bouffalolab/README.md)
 
-    - [Contact sensor app](../../../examples/contact-sensor-app/bouffalolab/README.md)
+    -   [Lighting app](../../../examples/lighting-app/bouffalolab/README.md)
+
+    -   [Contact sensor app](../../../examples/contact-sensor-app/bouffalolab/README.md)
