@@ -150,91 +150,97 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
     async def print_read_attributes_step(self, step_num: int, step_msg: str, attr_path):
         self.print_step(step_num, step_msg)
-        read_request = await self.verify_attributes(attr_path)
-        return read_request
+        return await self.verify_attributes(attr_path)
 
     async def verify_attributes(self, attr_path: ClusterObject):
-
         read_request = await self.read_attribute_request(attr_path)
+
         if isinstance(attr_path[0], tuple):
-            if len(attr_path[0]) == 0 and isinstance(attr_path[0], tuple):
-
-                # NOTE: This is checked in its entirety in IDM-10.1
-
-                parts_list_a = read_request.tlvAttributes[0][Clusters.Descriptor.id][Clusters.Descriptor.Attributes.PartsList.attribute_id]
-                parts_list_b = self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
-                asserts.assert_equal(parts_list_a, parts_list_b, "Parts list is not the expected value")
-
-                for endpoint in read_request.tlvAttributes:
-                    returned_clusters = sorted(list(read_request.tlvAttributes[endpoint].keys()))
-                    server_list = sorted(read_request.attributes[endpoint]
-                                         [Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
-                    asserts.assert_equal(returned_clusters, server_list)
-                self.verify_read_request(read_request)
-
-            # Has an endpoint, e.g. [(0, Clusters.Descriptor)]
-            elif len(attr_path[0]) == 2 and isinstance(attr_path[0][0], int) and isinstance(attr_path[0][1], type):
-                (endpoint, cluster_obj) = attr_path[0]
-                cluster_ids = list(read_request.tlvAttributes[endpoint].keys())
-                if hasattr(cluster_obj, 'cluster_id'):  # cluster_obj is an Attribute
-                    attribute = cluster_obj
-                    cluster = ClusterObjects.ALL_CLUSTERS[cluster_obj.cluster_id]
-                    attribute_ids = list(read_request.tlvAttributes[endpoint][cluster_obj.cluster_id].keys())
-                    asserts.assert_equal({cluster_obj.cluster_id}, read_request.tlvAttributes[endpoint].keys(
-                    ), f"Cluster not in output: {cluster_obj.cluster_id}")
-                    asserts.assert_equal(attribute_ids, [cluster_obj.attribute_id])
-                    asserts.assert_equal(cluster_ids, [cluster_obj.cluster_id])
-                    server_list_attribute_ids = (read_request.tlvAttributes[endpoint][cluster_obj.cluster_id]
-                                                 [cluster.Attributes.ServerList.attribute_id])
-                else:
-                    attribute_ids = list(read_request.tlvAttributes[endpoint][cluster_obj.id].keys())
-                    returned_attributes = read_request.tlvAttributes[endpoint][cluster_obj.id][cluster_obj.Attributes.AttributeList.attribute_id]
-                    asserts.assert_equal({cluster_obj.id}, read_request.tlvAttributes[endpoint].keys(
-                    ), f"Cluster not in output: {cluster_obj.id}")
-                    server_list_attribute_ids = (read_request.tlvAttributes[endpoint][cluster_obj.id]
-                                                 [Clusters.Descriptor.Attributes.ServerList.attribute_id])
-
-                asserts.assert_equal({endpoint}, read_request.tlvAttributes.keys(), f"Endpoint {endpoint} not in output")
-                asserts.assert_equal(server_list_attribute_ids, sorted([x.id for x in self.endpoints[endpoint]]))
-
+            return await self._verify_attributes_with_tuple(attr_path, read_request)
         elif isinstance(attr_path, list):
-            if isinstance(attr_path[0], type):  # E.g. [Clusters.Descriptor]
+            return await self._verify_attributes_with_list(attr_path, read_request)
 
-                cluster_obj = attr_path[0]
-                if hasattr(cluster_obj, 'cluster_id'):  # cluster_obj is an Attribute
-                    pass
-                else:
-                    for endpoint in read_request.tlvAttributes:
-                        cluster_ids = list(read_request.tlvAttributes[endpoint].keys())
-                        attribute_ids = list(read_request.tlvAttributes[endpoint][cluster_obj.id].keys())
-                        asserts.assert_in(cluster_obj.id, cluster_ids)
-
-                        returned_attributes = read_request.tlvAttributes[endpoint][cluster_obj.id][cluster_obj.Attributes.AttributeList.attribute_id]
-
-                        asserts.assert_equal(sorted(attribute_ids), sorted(returned_attributes),
-                                             "Expected attribute list doesn't match")
-            elif isinstance(attr_path[0], AttributePath):
-                if hasattr(attr_path[0], 'EndpointId') and attr_path[0] is not None:
-                    endpoint = attr_path[0].EndpointId
-                    if endpoint is None:
-                        endpoint_list = list(self.endpoints.keys())
-                    else:  # One endpoint
-                        endpoint_list = [endpoint]
-
-                    for endpoint in endpoint_list:
-                        asserts.assert_in(Clusters.Descriptor.id,
-                                          read_request.tlvAttributes[endpoint].keys(), "Descriptor cluster not in output")
-                        asserts.assert_in(Clusters.Descriptor.Attributes.AttributeList.attribute_id,
-                                          read_request.tlvAttributes[endpoint][Clusters.Descriptor.id], "AttributeList not in output")
-
-                else:
-                    asserts.assert_in(Clusters.Descriptor.id,
-                                      read_request.tlvAttributes[0].keys(), "Descriptor cluster not in output")
-                    asserts.assert_in(Clusters.Descriptor.Attributes.AttributeList.attribute_id,
-                                      read_request.tlvAttributes[Clusters.Descriptor.id], "AttributeList not in output")
-        # TODO: Make sure this works for all steps
-        # self.verify_read_request(read_request)
         return read_request
+
+    async def _verify_attributes_with_tuple(self, attr_path, read_request):
+        if len(attr_path[0]) == 0:
+            # NOTE: This is checked in its entirety in IDM-10.1
+            return await self._verify_empty_tuple(attr_path, read_request)
+
+        if len(attr_path[0]) == 2:
+            return await self._verify_non_empty_tuple(attr_path, read_request)
+
+    async def _verify_empty_tuple(self, attr_path, read_request):
+        # Parts list validation
+        parts_list_a = read_request.tlvAttributes[0][Clusters.Descriptor.id][Clusters.Descriptor.Attributes.PartsList.attribute_id]
+        parts_list_b = self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+        asserts.assert_equal(parts_list_a, parts_list_b, "Parts list is not the expected value")
+
+        # Server list validation
+        for endpoint in read_request.tlvAttributes:
+            returned_clusters = sorted(list(read_request.tlvAttributes[endpoint].keys()))
+            server_list = sorted(read_request.attributes[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
+            asserts.assert_equal(returned_clusters, server_list)
+
+        self.verify_read_request(read_request)
+
+    async def _verify_non_empty_tuple(self, attr_path, read_request):
+        endpoint, cluster_obj = attr_path[0]
+        cluster_ids = list(read_request.tlvAttributes[endpoint].keys())
+
+        if hasattr(cluster_obj, 'cluster_id'):  # cluster_obj is an Attribute
+            return await self._verify_attribute_cluster(read_request, endpoint, cluster_obj)
+
+        return await self._verify_cluster_without_attribute(read_request, endpoint, cluster_obj)
+
+    async def _verify_attribute_cluster(self, read_request, endpoint, cluster_obj):
+        cluster = ClusterObjects.ALL_CLUSTERS[cluster_obj.cluster_id]
+        attribute_ids = list(read_request.tlvAttributes[endpoint][cluster_obj.cluster_id].keys())
+
+        asserts.assert_equal({cluster_obj.cluster_id}, read_request.tlvAttributes[endpoint].keys(),
+                             f"Cluster not in output: {cluster_obj.cluster_id}")
+        asserts.assert_equal(attribute_ids, [cluster_obj.attribute_id])
+        asserts.assert_equal([cluster_obj.cluster_id], list(read_request.tlvAttributes[endpoint].keys()))
+
+        server_list_attribute_ids = (read_request.tlvAttributes[endpoint][cluster_obj.cluster_id]
+                                     [cluster.Attributes.ServerList.attribute_id])
+        asserts.assert_equal(server_list_attribute_ids, sorted([x.id for x in self.endpoints[endpoint]]))
+
+    async def _verify_cluster_without_attribute(self, read_request, endpoint, cluster_obj):
+        cluster_ids = list(read_request.tlvAttributes[endpoint].keys())
+        asserts.assert_in(cluster_obj.id, cluster_ids)
+
+        server_list_attribute_ids = (read_request.tlvAttributes[endpoint][cluster_obj.id]
+                                     [Clusters.Descriptor.Attributes.ServerList.attribute_id])
+        asserts.assert_equal(server_list_attribute_ids, sorted([x.id for x in self.endpoints[endpoint]]))
+
+    async def _verify_attributes_with_list(self, attr_path, read_request):
+        if isinstance(attr_path[0], type):  # E.g. [Clusters.Descriptor]
+            return await self._verify_cluster_list(attr_path, read_request)
+
+        if isinstance(attr_path[0], AttributePath):
+            return await self._verify_attribute_path_list(attr_path, read_request)
+
+    async def _verify_attribute_path_list(self, attr_path, read_request):
+        endpoint = attr_path[0].EndpointId
+        endpoint_list = [endpoint] if endpoint is not None else list(self.endpoints.keys())
+
+        for endpoint in endpoint_list:
+            asserts.assert_in(Clusters.Descriptor.id, read_request.tlvAttributes[endpoint].keys(), "Descriptor cluster not in output")
+            asserts.assert_in(Clusters.Descriptor.Attributes.AttributeList.attribute_id,
+                              read_request.tlvAttributes[endpoint][Clusters.Descriptor.id], "AttributeList not in output")
+
+    async def _verify_cluster_list(self, attr_path, read_request):
+        cluster_obj = attr_path[0]
+        if hasattr(cluster_obj, 'cluster_id'):  # cluster_obj is an Attribute
+            return
+        for endpoint in read_request.tlvAttributes:
+            cluster_ids = list(read_request.tlvAttributes[endpoint].keys())
+            asserts.assert_in(cluster_obj.id, cluster_ids)
+
+            returned_attributes = read_request.tlvAttributes[endpoint][cluster_obj.id][cluster_obj.Attributes.AttributeList.attribute_id]
+            asserts.assert_equal(sorted(returned_attributes), sorted(read_request.tlvAttributes[endpoint][cluster_obj.id].keys()),
+                                 "Expected attribute list doesn't match")
 
     def verify_read_request(self, read_request):
         for endpoint in read_request.tlvAttributes:
@@ -265,8 +271,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # TH sends the Read Request Message to the DUT to read one attribute on a given cluster and endpoint.
         # AttributePath = [[Endpoint = Specific Endpoint, Cluster = Specific ClusterID, Attribute = Specific Attribute]]
         # On receipt of this message, DUT should send a report data action with the attribute value to the DUT
-
-        # self.print_step(1, "Send Request Message to read one attribute on a given cluster and endpoint")
 
         read_request = await self.print_read_attributes_step(1, "Send Request Message to read one attribute on a given cluster and endpoint", [(0, Clusters.Descriptor.Attributes.ServerList)])
 
@@ -301,42 +305,14 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # TH sends the Read Request Message to the DUT to read all attributes from all clusters on all Endpoints
         ### AttributePath = [[]]
         # On receipt of this message, DUT should send a report data action with the attribute value from all the clusters to the DUT.
-        # self.print_step(5, "Send Request Message to read all attributes from all clusters on all endpoints")
-
-        read_request = await self.print_read_attributes_step(5, "Send Request Message to read all attributes from all clusters on all endpoints", [()])
-
         # NOTE: This is checked in its entirety in IDM-10.1
-        # parts_list_a = read_request.tlvAttributes[0][Clusters.Descriptor.id][Clusters.Descriptor.Attributes.PartsList.attribute_id]
-        # parts_list_b = self.endpoints[0][Clusters.Descriptor.id][Clusters.Descriptor.Attributes.PartsList.attribute_id]
-        # asserts.assert_equal(parts_list_a, parts_list_b, "Parts list is not the expected value")
-
-        # for endpoint in read_request.tlvAttributes:
-        #     returned_clusters = sorted([x.id for x in read_request.tlvAttributes[endpoint]])
-        #     server_list = sorted(read_request.attributes[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
-        #     asserts.assert_equal(returned_clusters, server_list)
-
-        # TODO: Make this check centralized (move to its own method)
-
-        # for endpoint in read_request.tlvAttributes:
-        #     for cluster in read_request.tlvAttributes[endpoint]:
-        #         returned_attrs = sorted([x for x in read_request.tlvAttributes[endpoint][cluster].keys()])
-        #         attr_list = sorted([x for x in read_request.tlvAttributes[endpoint][cluster]
-        #                             [ClusterObjects.ALL_CLUSTERS[cluster].Attributes.AttributeList.attribute_id]
-        #                             if x != Clusters.UnitTesting.Attributes.WriteOnlyInt8u.attribute_id])
-        #         asserts.assert_equal(returned_attrs, attr_list,
-        #                              f"Mismatch for {cluster} ({ClusterObjects.ALL_CLUSTERS[cluster]}) at endpoint {endpoint}")
-        self.verify_read_request(read_request)
+        read_request = await self.print_read_attributes_step(5, "Send Request Message to read all attributes from all clusters on all endpoints", [()])
 
         # Step 6
         # TH sends the Read Request Message to the DUT to read a global attribute from all clusters at all Endpoints
         # AttributePath = [[Attribute = Specific Global Attribute]]
         # On receipt of this message, DUT should send a report data action with the attribute value from all the clusters to the DUT.
-        # attribute_path = AttributePath(
-        #     EndpointId=None,
-        #     ClusterId=None,
-        #     AttributeId=global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID)
 
-        # read_request = await self.print_read_attributes_step(6, "Send Request Message to read one global attribute from all clusters on all endpoints", attribute_path)
         self.print_step(6, "Send Request Message to read one global attribute from all clusters on all endpoints")
 
         attribute_path = AttributePath(
@@ -345,26 +321,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             AttributeId=global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID)
 
         read_request = await self.print_read_attributes_step(6, "Send Request Message to read one global attribute from all clusters on all endpoints", [attribute_path])
-
-        # for endpoint in read_request.tlvAttributes:
-        #     cluster_list = read_request.tlvAttributes[endpoint]
-        #     for cluster in cluster_list:
-        #         asserts.assert_equal(list(read_request.tlvAttributes[endpoint][cluster]),
-        #                              [global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID])
-        #         asserts.assert_true(
-        #             set([int(x) for x in global_attribute_ids.GlobalAttributeIds]).issubset(
-        #                 set(read_request.tlvAttributes[endpoint][cluster][global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID])),
-        #             "Missing global attributes in output")
-        # import pdb;pdb.set_trace()
-        # for endpoint in read_request.tlvAttributes:
-        #     for cluster in read_request.tlvAttributes[endpoint]:
-        #         returned_attrs = sorted([x for x in read_request.tlvAttributes[endpoint][cluster].keys()])
-        #         attr_list = sorted([x for x in read_request.tlvAttributes[endpoint][cluster]
-        #                             [ClusterObjects.ALL_CLUSTERS[cluster].Attributes.AttributeList.attribute_id]
-        #                             if x != Clusters.UnitTesting.Attributes.WriteOnlyInt8u.attribute_id])
-        #         asserts.assert_equal(returned_attrs, attr_list,
-        #                                 f"Mismatch for {cluster} ({ClusterObjects.ALL_CLUSTERS[cluster]}) at endpoint {endpoint}")
-        # self.verify_read_request(read_request)
 
         # Step 7
         # TH sends the Read Request Message to the DUT to read all attributes from a cluster at all Endpoints
