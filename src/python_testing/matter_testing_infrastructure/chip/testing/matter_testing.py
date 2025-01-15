@@ -1156,17 +1156,14 @@ class MatterBaseTest(base_test.BaseTestClass):
                 self.step(1)
 
     def teardown_class(self):
-        """Final teardown after all tests: log all problems"""
-        if len(self.problems) == 0:
-            return
-
-        logging.info("###########################################################")
-        logging.info("Problems found:")
-        logging.info("===============")
-        for problem in self.problems:
-            logging.info(str(problem))
-        logging.info("###########################################################")
-
+        """Final teardown after all tests: log all problems."""
+        if len(self.problems) > 0:
+            logging.info("###########################################################")
+            logging.info("Problems found:")
+            logging.info("===============")
+            for problem in self.problems:
+                logging.info(str(problem))
+            logging.info("###########################################################")
         super().teardown_class()
 
     def check_pics(self, pics_key: str) -> bool:
