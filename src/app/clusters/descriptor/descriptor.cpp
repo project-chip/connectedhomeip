@@ -112,7 +112,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
     if (endpoint == 0x00)
     {
         return aEncoder.EncodeList([&endpoints](const auto & encoder) -> CHIP_ERROR {
-            for (auto ep : endpoints.GetSpanValidForLifetime())
+            for (auto & ep : endpoints.GetSpanValidForLifetime())
             {
                 if (ep.id == 0)
                 {
@@ -146,7 +146,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
     {
         // endodes ALL endpoints that have the specified endpoint as a descendant
         return aEncoder.EncodeList([&endpoints, endpoint](const auto & encoder) -> CHIP_ERROR {
-            for (auto ep : endpoints.GetSpanValidForLifetime())
+            for (auto & ep : endpoints.GetSpanValidForLifetime())
             {
                 if (IsDescendantOf(ep.id, endpoint, endpoints.GetSpanValidForLifetime()))
                 {
@@ -160,7 +160,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
     // ASSERT we know all composition types and this should be tree:
     // assert(endpointInfo.compositionPattern == DataModel::EndpointCompositionPattern::kTree)
     return aEncoder.EncodeList([&endpoints, endpoint](const auto & encoder) -> CHIP_ERROR {
-        for (auto ep : endpoints.GetSpanValidForLifetime())
+        for (auto & ep : endpoints.GetSpanValidForLifetime())
         {
             if (ep.parentId != endpoint)
             {

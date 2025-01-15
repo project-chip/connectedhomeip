@@ -116,7 +116,7 @@ bool MayHaveAccessibleEventPath(DataModel::Provider * aProvider, const EventPath
     }
 
     auto endpoints = aProvider->Endpoints();
-    for (DataModel::EndpointEntry ep : endpoints.GetSpanValidForLifetime())
+    for (const DataModel::EndpointEntry & ep : endpoints.GetSpanValidForLifetime())
     {
         if (MayHaveAccessibleEventPathForEndpoint(aProvider, ep.id, aEventPath, subjectDescriptor))
         {
@@ -1792,7 +1792,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
     auto provider = GetDataModelProvider();
 
     DataModel::MetadataList<DataModel::AcceptedCommandEntry> acceptedCommands = provider->AcceptedCommands(aCommandPath);
-    for (auto existing : acceptedCommands.GetSpanValidForLifetime())
+    for (auto & existing : acceptedCommands.GetSpanValidForLifetime())
     {
         if (existing.commandId == aCommandPath.mCommandId)
         {
