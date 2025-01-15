@@ -292,7 +292,7 @@ CHIP_ERROR TLVWriter::PutString(Tag tag, const char * buf)
 {
     if (buf == nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
-    else if (mMaxLen == 0)
+    if (mMaxLen == 0)
         return CHIP_ERROR_INCORRECT_STATE;
 
     // Calculate length with a hard limit to prevent unbounded reads.
@@ -309,8 +309,7 @@ CHIP_ERROR TLVWriter::PutString(Tag tag, const char * buf)
     // Null terminator was not found within the allocated space.
     if (stringLen == mMaxLen)
         return CHIP_ERROR_BUFFER_TOO_SMALL;
-    else
-        return PutString(tag, buf, stringLen);
+    return PutString(tag, buf, stringLen);
 }
 
 CHIP_ERROR TLVWriter::PutString(Tag tag, const char * buf, uint32_t len)
