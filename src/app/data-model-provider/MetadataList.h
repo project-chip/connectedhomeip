@@ -18,80 +18,97 @@
 #pragma once
 
 #include <algorithm>
-#include <type_traits>
-
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
+#include <type_traits>
 
 namespace chip {
 namespace app {
 namespace DataModel {
 
+// essentially a `void *` untyped metadata list base,
+// so that actual functionality does not template-explode
+class GenericMetadataList
+{
+public:
+    GenericMetadataList(size_t elementSize) : mElementSize(elementSize) {}
+    ~GenericMetadataList();
+
+    GenericMetadataList(const GenericMetadataList &)                   = delete;
+    GenericMetadataList & operator=(const GenericMetadataList & other) = delete;
+
+    GenericMetadataList(GenericMetadataList && other) { *this = std::move(other); }
+
+    GenericMetadataList & operator=(GenericMetadataList && other);
+    const void * operator[](size_t index) const;
+
+    CHIP_ERROR reserve(size_t numElements);
+    void Invalidate();
+
+    size_t elementCount() const { return mElementCount; }
+    size_t capacity() const { return mCapacity; }
+    bool empty() const { return mElementCount == 0; }
+
+protected:
+    /// Copy over the data from the given buffer
+    CHIP_ERROR CopyExistingBuffer(const void * buffer, size_t elements);
+
+    /// use existing buffer AS IS
+    void AquireExistingBuffer(const void * buffer, size_t elements);
+
+    CHIP_ERROR AppendRaw(const void * buffer);
+    const void * RawBuffer() const { return mBuffer; }
+
+    /// Marks a list as immutable and immutability is aquired
+    /// during const access (so this is const)
+    void SetImmutable() const { mIsImmutable = true; }
+
+private:
+    bool mAllocated = false;
+
+    // buffer may point to both allocated or re-used (e.g. from const arrays) buffers.
+    // buffer is assumed allocated if mAllocated is true.
+    uint8_t * mBuffer = nullptr;
+    size_t mElementSize;
+    size_t mElementCount = 0;
+    size_t mCapacity     = 0;
+
+    // Set to true as soon as a span is obtained, since more writes may invalidate the span.
+    mutable bool mIsImmutable = false;
+};
+
 template <typename T>
-class MetadataList
+class MetadataList : public GenericMetadataList
 {
 public:
     using SpanType = Span<const T>;
 
-    MetadataList()                                       = default;
+    MetadataList() : GenericMetadataList(sizeof(T)) {}
     MetadataList(const MetadataList &)                   = delete;
     MetadataList & operator=(const MetadataList & other) = delete;
 
-    MetadataList(MetadataList && other) { *this = std::move(other); }
+    MetadataList(MetadataList && other) : GenericMetadataList(sizeof(T)) { *this = std::move(other); }
 
     MetadataList & operator=(MetadataList && other)
     {
-        if (this != &other)
-        {
-            this->mBackingStorage.Free();
-
-            this->mBackingStorage = std::move(other.mBackingStorage);
-            this->mSize           = other.mSize;
-            this->mIsImmutable    = other.mIsImmutable;
-            this->mSpan           = other.mSpan;
-
-            other.mIsImmutable = true;
-            other.mSize        = 0;
-            other.mSpan        = Span<T>{};
-        }
+        *((GenericMetadataList *) this) = std::move(other);
         return *this;
     }
 
-    const T & operator[](size_t index)
-    {
-        VerifyOrDie((mSize > 0) && (index < mSize));
-
-        if (this->mBackingStorage)
-        {
-            return Span<const T>{ mBackingStorage.Get(), mSize }[index];
-        }
-
-        return mSpan[index];
-    }
+    const T & operator[](size_t index) { return *static_cast<const T *>(GenericMetadataList::operator[](index)); }
 
     template <size_t N>
     static MetadataList FromArray(const std::array<T, N> & arr)
     {
         MetadataList<T> list;
 
-        if (list.reserve(N) != CHIP_NO_ERROR)
+        if (list.CopyExistingBuffer(arr.data(), arr.size()) != CHIP_NO_ERROR)
         {
             list.Invalidate();
-            return list;
         }
 
-        for (const auto & item : arr)
-        {
-            if (list.Append(item) != CHIP_NO_ERROR)
-            {
-                list.Invalidate();
-                return list;
-            }
-        }
-
-        list.mIsImmutable = true;
         return list;
     }
 
@@ -99,76 +116,26 @@ public:
     static MetadataList FromConstArray(const std::array<const T, N> & arr)
     {
         MetadataList<T> list;
-        list.mSpan        = Span<const T>{ arr.data(), arr.size() };
-        list.mSize        = arr.size();
-        list.mIsImmutable = true;
-
+        list.AquireExistingBuffer(arr.data(), arr.size());
         return list;
     }
 
     static MetadataList FromConstSpan(const Span<const T> & span)
     {
         MetadataList<T> list;
-        list.mSpan        = span;
-        list.mSize        = span.size();
-        list.mIsImmutable = true;
-
+        list.AquireExistingBuffer(span.data(), span.size());
         return list;
     }
 
-    CHIP_ERROR reserve(size_t numElements)
-    {
-        VerifyOrReturnError(!mIsImmutable, CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(mSize == 0, CHIP_ERROR_INCORRECT_STATE);
-        if (!mBackingStorage.Calloc(numElements))
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-
-        return CHIP_NO_ERROR;
-    }
-
-    size_t size() const { return mSize; }
-
-    bool empty() const { return size() == 0u; }
-
-    size_t capacity() const { return std::max(mSize, mBackingStorage.AllocatedSize()); }
-
-    void Invalidate()
-    {
-        mBackingStorage.Free();
-        mSize        = 0;
-        mIsImmutable = true;
-    }
+    size_t size() const { return elementCount(); }
 
     Span<const T> GetSpanValidForLifetime() const
     {
-        static_assert(std::is_same<SpanType, Span<const T>>::value, "SpanType must remain Span<const T>");
-        if (mBackingStorage)
-        {
-            mSpan = Span<const T>{ mBackingStorage.Get(), mSize };
-        }
-
-        mIsImmutable = true;
-        return mSpan;
+        SetImmutable();
+        return Span<const T>(static_cast<const T *>(RawBuffer()), elementCount());
     }
 
-    CHIP_ERROR Append(const T & value)
-    {
-        VerifyOrReturnError(!mIsImmutable, CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(mSize < mBackingStorage.AllocatedSize(), CHIP_ERROR_NO_MEMORY);
-
-        mBackingStorage[mSize++] = value;
-        return CHIP_NO_ERROR;
-    }
-
-protected:
-    chip::Platform::ScopedMemoryBufferWithSize<T> mBackingStorage;
-    mutable Span<const T> mSpan;
-    size_t mSize = 0;
-
-    // Set to true as soon as a span is obtained, since more writes may invalidate the span.
-    mutable bool mIsImmutable = false;
+    CHIP_ERROR Append(const T & value) { return AppendRaw(&value); }
 };
 
 } // namespace DataModel
