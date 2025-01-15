@@ -710,6 +710,7 @@ def BuildBouffalolabTarget():
 
     target.AppendFixedTargets([
         TargetPart('light', app=BouffalolabApp.LIGHT),
+        TargetPart('contact-sensor', app=BouffalolabApp.CONTACT, enable_pds=True).OnlyIfRe('-(bl704l)'),
     ])
 
     target.AppendFixedTargets([
