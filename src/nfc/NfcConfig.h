@@ -34,5 +34,4 @@
 
 #include <system/SystemConfig.h>
 
-
 #include <lib/core/CHIPConfig.h>

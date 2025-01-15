@@ -43,27 +43,25 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-namespace {
-
-} // namespace
+namespace {} // namespace
 
 NFCCommissioningManagerImpl NFCCommissioningManagerImpl::sInstance;
 
-#define APDU_HEADER_SIZE_IN_BYTES   7
-#define APDU_LE_SIZE_IN_BYTES       3
+#define APDU_HEADER_SIZE_IN_BYTES 7
+#define APDU_LE_SIZE_IN_BYTES 3
 
-#define TYPE4_SIMPLE_APDU_MAX_TX_SIZE 245   // NB: 245 is the optimum size to get the biggest TX chunks and thus the max throughput
-#define TYPE4_SIMPLE_APDU_MAX_RX_SIZE 250   // NB: 250 is the optimum size to get the biggest RX chunks and thus the max throughput
+#define TYPE4_SIMPLE_APDU_MAX_TX_SIZE 245 // NB: 245 is the optimum size to get the biggest TX chunks and thus the max throughput
+#define TYPE4_SIMPLE_APDU_MAX_RX_SIZE 250 // NB: 250 is the optimum size to get the biggest RX chunks and thus the max throughput
 
 static SCARDHANDLE hCard;
 static SCARD_IO_REQUEST pioSendPci;
 
-#define CHECK(f, rv) \
- if (SCARD_S_SUCCESS != rv) \
- { \
-  ChipLogError(DeviceLayer, "%s : %s\n", f, pcsc_stringify_error(rv) ); \
-  return CHIP_ERROR_INTERNAL; \
- }
+#define CHECK(f, rv)                                                                                                               \
+    if (SCARD_S_SUCCESS != rv)                                                                                                     \
+    {                                                                                                                              \
+        ChipLogError(DeviceLayer, "%s : %s\n", f, pcsc_stringify_error(rv));                                                       \
+        return CHIP_ERROR_INTERNAL;                                                                                                \
+    }
 
 // ===== start impl of NFCCommissioningManager internal interface, ref NFCCommissioningManager.h
 
@@ -84,45 +82,45 @@ CHIP_ERROR NFCCommissioningManagerImpl::_Init()
     CHECK("SCardListReaders", rv)
 
     mszReaders = (LPTSTR) calloc(dwReaders, sizeof(char));
-    rv = SCardListReaders(hContext, NULL, mszReaders, &dwReaders);
+    rv         = SCardListReaders(hContext, NULL, mszReaders, &dwReaders);
     CHECK("SCardListReaders", rv)
 
     ChipLogProgress(DeviceLayer, "reader name: %s\n", mszReaders);
 
     rv = SCardConnect(hContext, mszReaders, SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, &hCard, &dwActiveProtocol);
-    switch(rv)
+    switch (rv)
     {
-        case SCARD_S_SUCCESS:
-            ChipLogProgress(DeviceLayer, "hCard 0x" ChipLogFormatX64, ChipLogValueX64(hCard));
+    case SCARD_S_SUCCESS:
+        ChipLogProgress(DeviceLayer, "hCard 0x" ChipLogFormatX64, ChipLogValueX64(hCard));
 
-            switch(dwActiveProtocol)
-            {
-            case SCARD_PROTOCOL_T0:
-                ChipLogProgress(DeviceLayer, "SCARD_PROTOCOL_T0");
-                pioSendPci = *SCARD_PCI_T0;
-                break;
-
-            case SCARD_PROTOCOL_T1:
-                ChipLogProgress(DeviceLayer, "SCARD_PROTOCOL_T1");
-                pioSendPci = *SCARD_PCI_T1;
-                break;
-            }
-
-            SelectMatterApplet();
-            result = CHIP_NO_ERROR;
+        switch (dwActiveProtocol)
+        {
+        case SCARD_PROTOCOL_T0:
+            ChipLogProgress(DeviceLayer, "SCARD_PROTOCOL_T0");
+            pioSendPci = *SCARD_PCI_T0;
             break;
 
-        case SCARD_E_NO_SMARTCARD:
-            ChipLogProgress(DeviceLayer, "No NFC Tag detected");
-            hCard = 0;
-            result = CHIP_NO_ERROR;
+        case SCARD_PROTOCOL_T1:
+            ChipLogProgress(DeviceLayer, "SCARD_PROTOCOL_T1");
+            pioSendPci = *SCARD_PCI_T1;
             break;
+        }
 
-        default:
-            // An error happened
-            ChipLogError(DeviceLayer, "SCardConnect failed with error 0x" ChipLogFormatX64, ChipLogValueX64(rv));
-            result = CHIP_ERROR_INTERNAL;
-            break;
+        SelectMatterApplet();
+        result = CHIP_NO_ERROR;
+        break;
+
+    case SCARD_E_NO_SMARTCARD:
+        ChipLogProgress(DeviceLayer, "No NFC Tag detected");
+        hCard  = 0;
+        result = CHIP_NO_ERROR;
+        break;
+
+    default:
+        // An error happened
+        ChipLogError(DeviceLayer, "SCardConnect failed with error 0x" ChipLogFormatX64, ChipLogValueX64(rv));
+        result = CHIP_ERROR_INTERNAL;
+        break;
     }
 
     return result;
@@ -140,21 +138,15 @@ CHIP_ERROR NFCCommissioningManagerImpl::SelectMatterApplet(void)
 {
     ChipLogProgress(DeviceLayer, "NFCCommissioningManagerImpl::SelectMatterApplet()");
 
-    VerifyOrReturnLogError(hCard!=0, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(hCard != 0, CHIP_ERROR_INCORRECT_STATE);
 
     BYTE dataReceived[10];
-    DWORD receivedLength = sizeof(dataReceived);
-    BYTE select_matter_applet[] = { 0x00, 0xA4, 0x04, 0x00, 0x08,
-                                    0xA0, 0x00, 0x00, 0x07, 0x08, 0x02, 0x00, 0x12,     // AID
+    DWORD receivedLength        = sizeof(dataReceived);
+    BYTE select_matter_applet[] = { 0x00, 0xA4, 0x04, 0x00, 0x08, 0xA0, 0x00, 0x00, 0x07, 0x08, 0x02, 0x00, 0x12, // AID
                                     0x00 };
 
-    LONG result = SCardTransmit( hCard,
-                        &pioSendPci,
-                        select_matter_applet,
-                        sizeof(select_matter_applet),
-                        NULL,
-                        dataReceived,
-                        &receivedLength);
+    LONG result =
+        SCardTransmit(hCard, &pioSendPci, select_matter_applet, sizeof(select_matter_applet), NULL, dataReceived, &receivedLength);
     ChipLogProgress(DeviceLayer, "SCardTransmit result: 0x" ChipLogFormatX64, ChipLogValueX64(result));
 
     return CHIP_NO_ERROR;
@@ -164,7 +156,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(System::PacketBufferHandle 
 {
     ChipLogProgress(DeviceLayer, "NFCCommissioningManagerImpl::SendToNfcTag()");
 
-    VerifyOrReturnLogError(hCard!=0, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(hCard != 0, CHIP_ERROR_INCORRECT_STATE);
 
     mDataToSendLength = (uint32_t) msgBuf->DataLength();
     VerifyOrReturnLogError(mDataToSendLength <= sizeof(mDataToSend), CHIP_ERROR_INTERNAL);
@@ -193,28 +185,32 @@ void NFCCommissioningManagerImpl::SendChainedAPDUs(intptr_t arg)
 void NFCCommissioningManagerImpl::SendChainedAPDUs(void)
 {
     CHIP_ERROR res;
-    uint32_t totalLength = mDataToSendLength;
+    uint32_t totalLength         = mDataToSendLength;
     uint32_t nbrOfBytesRemaining = mDataToSendLength;
-    uint8_t *pNextDataToSend = mDataToSend;
+    uint8_t * pNextDataToSend    = mDataToSend;
 
-    while(nbrOfBytesRemaining > 0) {
+    while (nbrOfBytesRemaining > 0)
+    {
 
         // Size of the next APDU
         uint32_t nbrOfBytesToSend = MIN(nbrOfBytesRemaining, TYPE4_SIMPLE_APDU_MAX_TX_SIZE);
 
         bool isLastBlock = (nbrOfBytesToSend == nbrOfBytesRemaining);
 
-        mAPDUResponseLength = sizeof(mAPDURxBuffer); // Initialized with with mAPDURxBuffer size to indicate to the low level driver the capacity of the RX buffer
+        mAPDUResponseLength = sizeof(mAPDURxBuffer); // Initialized with with mAPDURxBuffer size to indicate to the low level driver
+                                                     // the capacity of the RX buffer
         res = SendTransportAPDU(pNextDataToSend, nbrOfBytesToSend, isLastBlock, totalLength, mAPDURxBuffer, &mAPDUResponseLength);
-        if ((res != CHIP_NO_ERROR) || (mAPDUResponseLength < 2)) {
+        if ((res != CHIP_NO_ERROR) || (mAPDUResponseLength < 2))
+        {
             ProcessError("Invalid NFC Type4 response");
             return;
         }
 
-        uint8_t sw1 = mAPDURxBuffer[mAPDUResponseLength-2];
-        uint8_t sw2 = mAPDURxBuffer[mAPDUResponseLength-1];
+        uint8_t sw1 = mAPDURxBuffer[mAPDUResponseLength - 2];
+        uint8_t sw2 = mAPDURxBuffer[mAPDUResponseLength - 1];
 
-        if (isLastBlock) {
+        if (isLastBlock)
+        {
             // The last block has been sent.
             // The possible response are:
             //   SW1=0x90 SW2=0x00 if the transmission was successful and the recipient has
@@ -222,21 +218,28 @@ void NFCCommissioningManagerImpl::SendChainedAPDUs(void)
             //   SW1=0x61 SW2=0xXX if the transmission was successful and the recipient has
             //     transmitted the first part of a chained response (SW2 indicates the size of
             //     the data in the next block).
-            if ( ((sw1 == ((uint8_t) 0x90)) && (sw2 == 0x00)) ||
-                  (sw1 == ((uint8_t) 0x61)) ) {
-                  // Response will be processed outside of the while loop
-            } else {
+            if (((sw1 == ((uint8_t) 0x90)) && (sw2 == 0x00)) || (sw1 == ((uint8_t) 0x61)))
+            {
+                // Response will be processed outside of the while loop
+            }
+            else
+            {
                 // Any others values are an error
                 PrintSw1Sw2(sw1, sw2);
                 ProcessError("Error during chained APDUs");
                 return;
             }
-        } else {
+        }
+        else
+        {
             // This is an intermediate block so the only valid response is 0x90 0x00
-            if ((sw1 == ((uint8_t) 0x90)) && (sw2 == 0x00)) {
+            if ((sw1 == ((uint8_t) 0x90)) && (sw2 == 0x00))
+            {
                 // The command was successfully sent
                 // Continue with the next block
-            } else {
+            }
+            else
+            {
                 PrintSw1Sw2(sw1, sw2);
                 ProcessError("Error during chained APDUs");
                 return;
@@ -248,7 +251,8 @@ void NFCCommissioningManagerImpl::SendChainedAPDUs(void)
         pNextDataToSend += nbrOfBytesToSend;
     }
 
-    if (nbrOfBytesRemaining != 0) {
+    if (nbrOfBytesRemaining != 0)
+    {
         ProcessError("Error during APDUs transmission!");
         return;
     }
@@ -258,75 +262,89 @@ void NFCCommissioningManagerImpl::SendChainedAPDUs(void)
     ProcessAPDUResponse();
 }
 
-  // Process an APDU response contained in mAPDURxBuffer
-  void NFCCommissioningManagerImpl::ProcessAPDUResponse(void) {
+// Process an APDU response contained in mAPDURxBuffer
+void NFCCommissioningManagerImpl::ProcessAPDUResponse(void)
+{
     CHIP_ERROR res;
 
     // mAPDURxBuffer should contain at least  the 2 status bytes
-    if (mAPDUResponseLength < 2) {
+    if (mAPDUResponseLength < 2)
+    {
         ProcessError("Error! Invalid Type4 response");
         return;
     }
 
     ResetChainedResponseBuffer();
 
-    uint8_t sw1 = mAPDURxBuffer[mAPDUResponseLength-2];
-    uint8_t sw2 = mAPDURxBuffer[mAPDUResponseLength-1];
+    uint8_t sw1 = mAPDURxBuffer[mAPDUResponseLength - 2];
+    uint8_t sw2 = mAPDURxBuffer[mAPDUResponseLength - 1];
 
-    if ((sw1 == ((uint8_t) 0x90)) && (sw2 == 0x00)) {
+    if ((sw1 == ((uint8_t) 0x90)) && (sw2 == 0x00))
+    {
         // Response fits in a single block.
         // Drop the 2 status bytes and return it
-        NotifyResponse(mAPDURxBuffer, mAPDUResponseLength-2);
+        NotifyResponse(mAPDURxBuffer, mAPDUResponseLength - 2);
         return;
-
-    } else if (sw1 == ((uint8_t) 0x61)) {
+    }
+    else if (sw1 == ((uint8_t) 0x61))
+    {
         // SW1=0x61 indicates a chained response. it means that the response is too big to be transmitted in a single packet.
 
         // Put the received bytes (without the 2 status bytes) into the ChainedResponseBuffer
-        res = AddDataToChainedResponseBuffer(mAPDURxBuffer, mAPDUResponseLength-2);
-        if (res != CHIP_NO_ERROR) {
+        res = AddDataToChainedResponseBuffer(mAPDURxBuffer, mAPDUResponseLength - 2);
+        if (res != CHIP_NO_ERROR)
+        {
             ProcessError("Too many data!");
             return;
         }
 
         // SW2 indicates the size of the data in the next response packet.
         // The next response packet can be read thanks to a call to getResponse() command.
-        while (sw1 == 0x61) {
+        while (sw1 == 0x61)
+        {
             // If SW2 is 0x00 or if it is higher than TYPE4_SIMPLE_APDU_MAX_RX_SIZE, we clamp it to TYPE4_SIMPLE_APDU_MAX_RX_SIZE.
-            uint8_t nextBlockLength = ( (sw2 == 0x00) || ((int) sw2 > TYPE4_SIMPLE_APDU_MAX_RX_SIZE)) ? (uint8_t) TYPE4_SIMPLE_APDU_MAX_RX_SIZE : sw2;
+            uint8_t nextBlockLength =
+                ((sw2 == 0x00) || ((int) sw2 > TYPE4_SIMPLE_APDU_MAX_RX_SIZE)) ? (uint8_t) TYPE4_SIMPLE_APDU_MAX_RX_SIZE : sw2;
 
-            mAPDUResponseLength = sizeof(mAPDURxBuffer); // Initialized with with mAPDURxBuffer size to indicate to the low level driver the capacity of the RX buffer
+            mAPDUResponseLength = sizeof(mAPDURxBuffer); // Initialized with with mAPDURxBuffer size to indicate to the low level
+                                                         // driver the capacity of the RX buffer
             // Response will be written into mAPDURxBuffer
             res = GetResponse(nextBlockLength, mAPDURxBuffer, &mAPDUResponseLength);
-            if ((res != CHIP_NO_ERROR) || (mAPDUResponseLength < 2)) {
+            if ((res != CHIP_NO_ERROR) || (mAPDUResponseLength < 2))
+            {
                 ProcessError("Invalid NFC Type4 response");
                 return;
             }
 
-            sw1 = mAPDURxBuffer[mAPDUResponseLength-2];
-            sw2 = mAPDURxBuffer[mAPDUResponseLength-1];
+            sw1 = mAPDURxBuffer[mAPDUResponseLength - 2];
+            sw2 = mAPDURxBuffer[mAPDUResponseLength - 1];
 
-            if ((sw1 == ((uint8_t) 0x90)) && (sw2 == 0x00)) {
+            if ((sw1 == ((uint8_t) 0x90)) && (sw2 == 0x00))
+            {
                 ChipLogProgress(DeviceLayer, "Chained response received successfully");
 
                 // Put the received bytes (without the 2 status bytes) into the ChainedResponseBuffer
-                res = AddDataToChainedResponseBuffer(mAPDURxBuffer, mAPDUResponseLength-2);
-                if (res != CHIP_NO_ERROR) {
+                res = AddDataToChainedResponseBuffer(mAPDURxBuffer, mAPDUResponseLength - 2);
+                if (res != CHIP_NO_ERROR)
+                {
                     ProcessError("Too many data!");
                     return;
                 }
-
-            } else if (sw1 == (uint8_t) 0x61) {
+            }
+            else if (sw1 == (uint8_t) 0x61)
+            {
                 // We have successfully received a block and it is not the last one
 
                 // Put the received bytes (without the 2 status bytes) into the ChainedResponseBuffer
-                res = AddDataToChainedResponseBuffer(mAPDURxBuffer, mAPDUResponseLength-2);
-                if (res != CHIP_NO_ERROR) {
+                res = AddDataToChainedResponseBuffer(mAPDURxBuffer, mAPDUResponseLength - 2);
+                if (res != CHIP_NO_ERROR)
+                {
                     ProcessError("Too many data!");
                     return;
                 }
-
-            } else {
+            }
+            else
+            {
                 PrintSw1Sw2(sw1, sw2);
                 ProcessError("Error! Invalid APDU response");
                 return;
@@ -338,35 +356,42 @@ void NFCCommissioningManagerImpl::SendChainedAPDUs(void)
         // Chained response received successfully
         NotifyResponse(mChainedResponseBuffer, mChainedResponseLength);
         return;
-
-    } else {
+    }
+    else
+    {
         PrintSw1Sw2(sw1, sw2);
         ProcessError("Error! Invalid APDU response");
         return;
     }
-  }
-
-void NFCCommissioningManagerImpl::PrintSw1Sw2(uint8_t sw1, uint8_t sw2) {
-  ChipLogProgress(DeviceLayer, "SW1=0x%x SW2=0x%x", sw1, sw2);
 }
 
-void NFCCommissioningManagerImpl::ProcessError(const char * msg) {
+void NFCCommissioningManagerImpl::PrintSw1Sw2(uint8_t sw1, uint8_t sw2)
+{
+    ChipLogProgress(DeviceLayer, "SW1=0x%x SW2=0x%x", sw1, sw2);
+}
+
+void NFCCommissioningManagerImpl::ProcessError(const char * msg)
+{
     ChipLogError(DeviceLayer, "%s", msg);
     OnNfcTagError();
 }
 
-void NFCCommissioningManagerImpl::NotifyResponse(uint8_t * response, uint32_t responseLen) {
+void NFCCommissioningManagerImpl::NotifyResponse(uint8_t * response, uint32_t responseLen)
+{
 
-    System::PacketBufferHandle buffer =  System::PacketBufferHandle::NewWithData(reinterpret_cast<const uint8_t *>(response), static_cast<size_t>(responseLen));
+    System::PacketBufferHandle buffer =
+        System::PacketBufferHandle::NewWithData(reinterpret_cast<const uint8_t *>(response), static_cast<size_t>(responseLen));
     OnNfcTagResponse(std::move(buffer));
 }
 
-void NFCCommissioningManagerImpl::ResetChainedResponseBuffer(void) {
+void NFCCommissioningManagerImpl::ResetChainedResponseBuffer(void)
+{
     ChipLogProgress(DeviceLayer, "ResetChainedResponseBuffer()");
     mChainedResponseLength = 0;
 }
 
-CHIP_ERROR NFCCommissioningManagerImpl::AddDataToChainedResponseBuffer(uint8_t * data, int dataLen) {
+CHIP_ERROR NFCCommissioningManagerImpl::AddDataToChainedResponseBuffer(uint8_t * data, int dataLen)
+{
 
     ChipLogProgress(DeviceLayer, "Add %d bytes to chainedResponseBuffer", dataLen);
 
@@ -382,22 +407,19 @@ CHIP_ERROR NFCCommissioningManagerImpl::AddDataToChainedResponseBuffer(uint8_t *
 
 /////////////////////////////////////////////////////////////////
 
-CHIP_ERROR NFCCommissioningManagerImpl::SendTransportAPDU(uint8_t * dataToSend,
-                                                          uint32_t dataToSendLength,
-                                                          bool isLastBlock,
-                                                          uint32_t totalLength,
-                                                          uint8_t * pRcvBuffer,
-                                                          uint32_t * pRcvLength) {
+CHIP_ERROR NFCCommissioningManagerImpl::SendTransportAPDU(uint8_t * dataToSend, uint32_t dataToSendLength, bool isLastBlock,
+                                                          uint32_t totalLength, uint8_t * pRcvBuffer, uint32_t * pRcvLength)
+{
 
     VerifyOrReturnLogError(dataToSendLength <= sizeof(mAPDUTxBuffer), CHIP_ERROR_INTERNAL);
 
-    mAPDUTxBuffer[0] = isLastBlock ? (uint8_t) 0x80 : (uint8_t) 0x90;   // CLA
-    mAPDUTxBuffer[1] = 0x20;                                            // INS
-    mAPDUTxBuffer[2] = (uint8_t) ((totalLength >> 8) & 0xFF);           // P1 (contains the totalLength's MSB)
-    mAPDUTxBuffer[3] = (uint8_t) (totalLength & 0xFF);                  // P2 (contains the totalLength's LSB)
-    mAPDUTxBuffer[4] = (uint8_t) dataToSendLength;                      // Lc
+    mAPDUTxBuffer[0] = isLastBlock ? (uint8_t) 0x80 : (uint8_t) 0x90; // CLA
+    mAPDUTxBuffer[1] = 0x20;                                          // INS
+    mAPDUTxBuffer[2] = (uint8_t) ((totalLength >> 8) & 0xFF);         // P1 (contains the totalLength's MSB)
+    mAPDUTxBuffer[3] = (uint8_t) (totalLength & 0xFF);                // P2 (contains the totalLength's LSB)
+    mAPDUTxBuffer[4] = (uint8_t) dataToSendLength;                    // Lc
     memcpy(&(mAPDUTxBuffer[5]), dataToSend, dataToSendLength);
-    mAPDUTxBuffer[5+dataToSendLength] = (uint8_t) TYPE4_SIMPLE_APDU_MAX_RX_SIZE; // Le
+    mAPDUTxBuffer[5 + dataToSendLength] = (uint8_t) TYPE4_SIMPLE_APDU_MAX_RX_SIZE; // Le
 
     uint32_t apduLength = 6 + dataToSendLength;
 
@@ -406,23 +428,23 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendTransportAPDU(uint8_t * dataToSend,
     return result;
 }
 
-CHIP_ERROR NFCCommissioningManagerImpl::GetResponse(uint8_t length,
-                                                    uint8_t * pRcvBuffer,
-                                                    uint32_t * pRcvLength) {
+CHIP_ERROR NFCCommissioningManagerImpl::GetResponse(uint8_t length, uint8_t * pRcvBuffer, uint32_t * pRcvLength)
+{
     uint8_t frame[5];
 
-    frame[0] = 0x00;            // CLA
-    frame[1] = (uint8_t) 0xC0;  // INS
-    frame[2] = 0x00;            // P1
-    frame[3] = 0x00;            // P2
-    frame[4] = length;          // Le
+    frame[0] = 0x00;           // CLA
+    frame[1] = (uint8_t) 0xC0; // INS
+    frame[2] = 0x00;           // P1
+    frame[3] = 0x00;           // P2
+    frame[4] = length;         // Le
 
     CHIP_ERROR result = Transceive("GetResponse", frame, sizeof(frame), pRcvBuffer, pRcvLength);
 
     return result;
 }
 
-CHIP_ERROR NFCCommissioningManagerImpl::Transceive(const char * commandName, uint8_t * pSendBuffer, uint32_t sendBufferLength, uint8_t * pRcvBuffer, uint32_t *pRcvLength)
+CHIP_ERROR NFCCommissioningManagerImpl::Transceive(const char * commandName, uint8_t * pSendBuffer, uint32_t sendBufferLength,
+                                                   uint8_t * pRcvBuffer, uint32_t * pRcvLength)
 {
     CHIP_ERROR ret;
 
@@ -431,22 +453,18 @@ CHIP_ERROR NFCCommissioningManagerImpl::Transceive(const char * commandName, uin
     // After the transceive, they will contain the length of the received data.
     DWORD dwRecvLength = *pRcvLength;
 
-    LONG result = SCardTransmit(
-                        hCard,
-                        &pioSendPci,
-                        pSendBuffer,
-                        sendBufferLength,
-                        NULL,
-                        pRcvBuffer,
-                        &dwRecvLength);
+    LONG result = SCardTransmit(hCard, &pioSendPci, pSendBuffer, sendBufferLength, NULL, pRcvBuffer, &dwRecvLength);
 
-    if ((result == SCARD_S_SUCCESS) && (dwRecvLength >= 2)) {
+    if ((result == SCARD_S_SUCCESS) && (dwRecvLength >= 2))
+    {
         // Copy the length of received data to pRcvLength
         *pRcvLength = (uint32_t) dwRecvLength;
 
         ChipLogProgress(DeviceLayer, "Received length: %d", *pRcvLength);
         ret = CHIP_NO_ERROR;
-    } else {
+    }
+    else
+    {
         ChipLogError(DeviceLayer, "SCardTransmit failed with error 0x" ChipLogFormatX64, ChipLogValueX64(result));
         ret = CHIP_ERROR_INTERNAL;
     }
@@ -467,7 +485,6 @@ CHIP_ERROR NFCCommissioningManagerImpl::OnNfcTagError()
     mNFCBase->OnNfcTagError();
     return CHIP_NO_ERROR;
 }
-
 
 } // namespace Internal
 } // namespace DeviceLayer

@@ -39,9 +39,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-namespace {
-
-} // namespace
+namespace {} // namespace
 
 NFCCommissioningManagerImpl NFCCommissioningManagerImpl::sInstance;
 
@@ -49,14 +47,16 @@ void NFCCommissioningManagerImpl::InitializeWithObject(jobject manager)
 {
     ChipLogProgress(DeviceLayer, "NFCCommissioningManagerImpl::InitializeWithObject()");
 
-   JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(DeviceLayer, "Failed to GetEnvForCurrentThread for NFCCommissioningManager"));
 
     mNFCCommissioningManagerObject = env->NewGlobalRef(manager);
-    VerifyOrReturn(mNFCCommissioningManagerObject != nullptr, ChipLogError(DeviceLayer, "Failed to NewGlobalRef NFCCommissioningManager"));
+    VerifyOrReturn(mNFCCommissioningManagerObject != nullptr,
+                   ChipLogError(DeviceLayer, "Failed to NewGlobalRef NFCCommissioningManager"));
 
     jclass NFCCommissioningManagerClass = env->GetObjectClass(manager);
-    VerifyOrReturn(NFCCommissioningManagerClass != nullptr, ChipLogError(DeviceLayer, "Failed to get NFCCommissioningManagerClass Java class"));
+    VerifyOrReturn(NFCCommissioningManagerClass != nullptr,
+                   ChipLogError(DeviceLayer, "Failed to get NFCCommissioningManagerClass Java class"));
 
     mInitMethod = env->GetMethodID(NFCCommissioningManagerClass, "init", "()I");
     if (mInitMethod == nullptr)
@@ -71,7 +71,6 @@ void NFCCommissioningManagerImpl::InitializeWithObject(jobject manager)
         ChipLogError(Controller, "Failed to access callback 'sendToNfcTag' method");
         env->ExceptionClear();
     }
-
 }
 
 // ===== start impl of NFCCommissioningManager internal interface, ref NFCCommissioningManager.h
@@ -96,11 +95,11 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(System::PacketBufferHandle 
     ChipLogProgress(DeviceLayer, "NFCCommissioningManagerImpl::SendToNfcTag()");
 
     const uint8_t * buffer = msgBuf->Start();
-    uint32_t len = (uint32_t) msgBuf->DataLength();
+    uint32_t len           = (uint32_t) msgBuf->DataLength();
 
-    JNIEnv * env  = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env       = JniReferences::GetInstance().GetEnvForCurrentThread();
     jbyteArray jbArray = env->NewByteArray((int) len);
-    env->SetByteArrayRegion(jbArray, 0, (int) len, (jbyte*) buffer);
+    env->SetByteArrayRegion(jbArray, 0, (int) len, (jbyte *) buffer);
     env->CallVoidMethod(mNFCCommissioningManagerObject, mSendToNfcTagCallback, jbArray);
 
     return CHIP_NO_ERROR;
@@ -135,7 +134,6 @@ CHIP_ERROR NFCCommissioningManagerImpl::OnNfcTagError()
 
     return CHIP_NO_ERROR;
 }
-
 
 } // namespace Internal
 } // namespace DeviceLayer

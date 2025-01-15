@@ -33,18 +33,18 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/KeyValueStoreManager.h>
-#include <platform/internal/NFCCommissioningManager.h>
 #include <platform/internal/BLEManager.h>
+#include <platform/internal/NFCCommissioningManager.h>
 
 #include <android/log.h>
 
 #include "AndroidChipPlatform-JNI.h"
 #include "BLEManagerImpl.h"
-#include "NFCCommissioningManagerImpl.h"
 #include "BleConnectCallback-JNI.h"
 #include "CommissionableDataProviderImpl.h"
 #include "DiagnosticDataProviderImpl.h"
 #include "DnssdImpl.h"
+#include "NFCCommissioningManagerImpl.h"
 #include "tracing.h"
 
 using namespace chip;
@@ -146,7 +146,8 @@ JNI_METHOD(void, onNfcTagResponse)(JNIEnv * env, jobject self, jbyteArray jbArra
     jbyte * data = env->GetByteArrayElements(jbArray, nullptr);
     jsize length = env->GetArrayLength(jbArray);
 
-    System::PacketBufferHandle buffer =  System::PacketBufferHandle::NewWithData(reinterpret_cast<const uint8_t *>(data), static_cast<size_t>(length));
+    System::PacketBufferHandle buffer =
+        System::PacketBufferHandle::NewWithData(reinterpret_cast<const uint8_t *>(data), static_cast<size_t>(length));
 
     chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().OnNfcTagResponse(std::move(buffer));
 #endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING

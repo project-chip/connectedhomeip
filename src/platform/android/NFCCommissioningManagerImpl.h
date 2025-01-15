@@ -38,8 +38,7 @@ namespace Internal {
 /**
  * Concrete implementation of the NFCCommissioningManagerImpl singleton object for the Linux platforms.
  */
-class NFCCommissioningManagerImpl final : public NFCCommissioningManager,
-                             private Nfc::NfcApplicationDelegate
+class NFCCommissioningManagerImpl final : public NFCCommissioningManager, private Nfc::NfcApplicationDelegate
 {
     // Allow the NFCCommissioningManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -72,8 +71,8 @@ private:
     static NFCCommissioningManagerImpl sInstance;
 
     jobject mNFCCommissioningManagerObject = nullptr;
-    jmethodID mInitMethod = nullptr;
-    jmethodID mSendToNfcTagCallback = nullptr;
+    jmethodID mInitMethod                  = nullptr;
+    jmethodID mSendToNfcTagCallback        = nullptr;
 
     Transport::NFCBase * mNFCBase = nullptr;
 };

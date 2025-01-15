@@ -19,8 +19,8 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConnectivityManager.h>
-#include <platform/internal/NFCCommissioningManager.h>
 #include <platform/internal/BLEManager.h>
+#include <platform/internal/NFCCommissioningManager.h>
 
 #include <cstdlib>
 #include <new>

@@ -60,8 +60,8 @@ protected:
     ~NFCCommissioningManager() = default;
 
     // No copy, move or assignment.
-    NFCCommissioningManager(const NFCCommissioningManager &)  = delete;
-    NFCCommissioningManager(const NFCCommissioningManager &&) = delete;
+    NFCCommissioningManager(const NFCCommissioningManager &)             = delete;
+    NFCCommissioningManager(const NFCCommissioningManager &&)            = delete;
     NFCCommissioningManager & operator=(const NFCCommissioningManager &) = delete;
 };
 
@@ -95,7 +95,6 @@ extern NFCCommissioningManagerImpl & NFCCommissioningMgrImpl();
 #include NFC_COMMISSIONING_MANAGER_IMPL_HEADER
 #endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -104,7 +103,6 @@ inline CHIP_ERROR NFCCommissioningManager::Init()
 {
     return static_cast<ImplClass *>(this)->_Init();
 }
-
 
 } // namespace Internal
 } // namespace DeviceLayer

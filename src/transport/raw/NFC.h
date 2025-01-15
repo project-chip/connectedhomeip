@@ -24,12 +24,11 @@
 
 #pragma once
 
-
-#include <utility>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/DLLUtil.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/Base.h>
+#include <utility>
 
 namespace chip {
 namespace Transport {
@@ -44,7 +43,6 @@ public:
 
 private:
 };
-
 
 /** Implements a transport using NFC.
  */
@@ -95,7 +93,7 @@ private:
      */
     CHIP_ERROR SendAfterConnect(System::PacketBufferHandle && msg);
 
-    State mState                    = State::kNotReady; ///< State of the NFC transport
+    State mState = State::kNotReady; ///< State of the NFC transport
 };
 
 class NFC : public NFCBase
@@ -104,7 +102,6 @@ public:
     NFC() : NFCBase() {}
 
 private:
-
 };
 
 } // namespace Transport

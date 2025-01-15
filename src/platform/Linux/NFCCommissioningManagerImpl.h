@@ -36,8 +36,7 @@ namespace Internal {
 /**
  * Concrete implementation of the NFCCommissioningManagerImpl singleton object for the Linux platforms.
  */
-class NFCCommissioningManagerImpl final : public NFCCommissioningManager,
-                             private Nfc::NfcApplicationDelegate
+class NFCCommissioningManagerImpl final : public NFCCommissioningManager, private Nfc::NfcApplicationDelegate
 {
     // Allow the NFCCommissioningManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -71,21 +70,12 @@ private:
     static NFCCommissioningManagerImpl sInstance;
     static void SendChainedAPDUs(intptr_t arg);
 
-    CHIP_ERROR SendTransportAPDU(uint8_t * dataToSend,
-                                 uint32_t dataToSendLength,
-                                 bool isLastBlock,
-                                 uint32_t totalLength,
-                                 uint8_t * pRcvBuffer,
-                                 uint32_t * pRcvLength);
-    CHIP_ERROR GetResponse(uint8_t length,
-                           uint8_t * pRcvBuffer,
-                           uint32_t *pRcvLength);
+    CHIP_ERROR SendTransportAPDU(uint8_t * dataToSend, uint32_t dataToSendLength, bool isLastBlock, uint32_t totalLength,
+                                 uint8_t * pRcvBuffer, uint32_t * pRcvLength);
+    CHIP_ERROR GetResponse(uint8_t length, uint8_t * pRcvBuffer, uint32_t * pRcvLength);
     void ProcessAPDUResponse(void);
-    CHIP_ERROR Transceive(const char * commandName,
-                          uint8_t * pSendBuffer,
-                          uint32_t sendBufferLength,
-                          uint8_t * pRcvBuffer,
-                          uint32_t *pRcvLength);
+    CHIP_ERROR Transceive(const char * commandName, uint8_t * pSendBuffer, uint32_t sendBufferLength, uint8_t * pRcvBuffer,
+                          uint32_t * pRcvLength);
 
     void PrintSw1Sw2(uint8_t sw1, uint8_t sw2);
     void ProcessError(const char * msg);
