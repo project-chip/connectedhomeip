@@ -1,8 +1,5 @@
 /*
- *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,30 +14,21 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides implementations of the CHIP System Layer platform
- *          lock functions that are suitable for use on the platforms using lock.
- */
-/* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include <platform/PlatformManager.h>
+#include <lib/support/CodeUtils.h>
+#include <system/SystemLayer.h>
 #include <system/PlatformLockSupport.h>
 
 namespace chip {
 namespace System {
-namespace PlatformLocking {
 
-void LockMatterStack()
+CHIP_ERROR Layer::RunWithMatterContextLock(std::function<CHIP_ERROR()> nonBlockingFunc)
 {
-    DeviceLayer::PlatformMgr().LockChipStack();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    PlatformLocking::LockMatterStack();
+    err = nonBlockingFunc();
+    PlatformLocking::UnlockMatterStack();
+    return err;
 }
 
-void UnlockMatterStack()
-{
-    DeviceLayer::PlatformMgr().UnlockChipStack();
-}
-} // namespace PlatformLocking
 } // namespace System
 } // namespace chip

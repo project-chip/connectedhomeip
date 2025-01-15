@@ -16,21 +16,19 @@
 
 #pragma once
 
-#include <lib/core/CHIPError.h>
-#include <system/SystemLayer.h>
+/**
+ * The declared functions in this header are defined in src/platform/PlatformLockSupport.cpp because of dependency cycle issues.
+ * The //src/platform:platform library depends on //src/lib/core:core library but the core library depends on the system library
+ * in this directory.
+ */
 
 namespace chip {
 namespace System {
+namespace PlatformLocking {
 
-class Layer;
-class Object;
+void LockMatterStack();
+void UnlockMatterStack();
 
-class PlatformLocking
-{
-public:
-    static void LockMatterStack();
-    static void UnlockMatterStack();
-};
-
+} // namespace PlatformLocking
 } // namespace System
 } // namespace chip
