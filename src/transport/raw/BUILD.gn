@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/inet/inet.gni")
+import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/device.gni")
 
 static_library("raw") {

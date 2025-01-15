@@ -59,9 +59,7 @@ if (chip_enable_nfc_commissioning) {
   static_library("nfc") {
     output_name = "libNfcLayer"
 
-    sources = [
-      "NfcApplicationDelegate.h",
-    ]
+    sources = [ "NfcApplicationDelegate.h" ]
 
     cflags = [ "-Wconversion" ]
 

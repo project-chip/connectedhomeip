@@ -76,11 +76,11 @@ static_library("Linux") {
   ]
 
   cflags = [
-    "-I/tmp/pcsc-lib/include/PCSC",    # Needed for NFCCommissioningManagerImpl
+    "-I/tmp/pcsc-lib/include/PCSC",  # Needed for NFCCommissioningManagerImpl
   ]
 
   libs = [
-    "pcsclite",               # Needed for NFCCommissioningManagerImpl
+    "pcsclite",  # Needed for NFCCommissioningManagerImpl
   ]
 
   if (chip_enable_openthread) {
