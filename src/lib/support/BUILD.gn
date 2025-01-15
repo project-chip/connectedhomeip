@@ -23,6 +23,7 @@ import("${chip_root}/build/chip/chip_version.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
   # Set to true to run the PersistentStorageDelegate API compliance audit
@@ -205,6 +206,7 @@ static_library("support") {
     "Defer.h",
     "FibonacciUtils.cpp",
     "FibonacciUtils.h",
+    "FileDescriptor.h",
     "FixedBufferAllocator.cpp",
     "FixedBufferAllocator.h",
     "Fold.h",
@@ -234,10 +236,12 @@ static_library("support") {
     "ScopedBuffer.h",
     "SetupDiscriminator.h",
     "SortUtils.h",
+    "SpanSearchValue.h",
     "StateMachine.h",
     "StringBuilder.cpp",
     "StringBuilder.h",
     "StringSplitter.h",
+    "TemporaryFileStream.h",
     "ThreadOperationalDataset.cpp",
     "ThreadOperationalDataset.h",
     "TimeUtils.cpp",
@@ -255,7 +259,7 @@ static_library("support") {
     "verhoeff/Verhoeff10.cpp",
   ]
 
-  if (current_os == "android" || matter_enable_java_compilation) {
+  if (chip_device_platform == "android" || matter_enable_java_compilation) {
     if (matter_enable_java_compilation) {
       include_dirs = java_matter_controller_dependent_paths
     }
@@ -304,7 +308,7 @@ static_library("support") {
   # Platforms that utilize CHIP_SYSTEM_CONFIG_PLATFORM_LOG need to
   # be pulled in here as public_deps since they hook into logging at
   # the macro level rather than just providing a LogV implementation.
-  if (current_os == "mac" || current_os == "ios") {
+  if (chip_device_platform == "darwin") {
     public_deps += [ "${chip_root}/src/platform/Darwin:logging" ]
   }
 
@@ -331,9 +335,7 @@ static_library("support") {
   }
 }
 
-static_library("test_utils") {
-  output_name = "libTestUtils"
-  output_dir = "${root_out_dir}/lib"
+source_set("test_utils") {
   deps = [ "${chip_root}/src/platform" ]
 
   sources = [

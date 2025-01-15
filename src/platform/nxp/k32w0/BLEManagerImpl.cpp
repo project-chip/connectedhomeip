@@ -19,7 +19,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
 #include "PWR_Configuration.h"
 #include "PWR_Interface.h"
 #endif
@@ -79,7 +79,7 @@ exit:
 /* Called by BLE when a connect is received */
 void BLEManagerImpl::BLE_SignalFromISRCallback(void)
 {
-#if defined(chip_with_low_power)
+#if defined(nxp_use_low_power)
     PWR_DisallowDeviceToSleep();
 #endif
 }

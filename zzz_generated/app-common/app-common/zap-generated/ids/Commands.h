@@ -1281,20 +1281,6 @@ static constexpr CommandId Id = 0x00000008;
 } // namespace Commands
 } // namespace WindowCovering
 
-namespace BarrierControl {
-namespace Commands {
-
-namespace BarrierControlGoToPercent {
-static constexpr CommandId Id = 0x00000000;
-} // namespace BarrierControlGoToPercent
-
-namespace BarrierControlStop {
-static constexpr CommandId Id = 0x00000001;
-} // namespace BarrierControlStop
-
-} // namespace Commands
-} // namespace BarrierControl
-
 namespace ServiceArea {
 namespace Commands {
 
@@ -1817,6 +1803,232 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace ContentAppObserver
 
+namespace ZoneManagement {
+namespace Commands {
+
+namespace CreateTwoDCartesianZone {
+static constexpr CommandId Id = 0x00000000;
+} // namespace CreateTwoDCartesianZone
+
+namespace CreateTwoDCartesianZoneResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace CreateTwoDCartesianZoneResponse
+
+namespace UpdateTwoDCartesianZone {
+static constexpr CommandId Id = 0x00000002;
+} // namespace UpdateTwoDCartesianZone
+
+namespace GetTwoDCartesianZone {
+static constexpr CommandId Id = 0x00000003;
+} // namespace GetTwoDCartesianZone
+
+namespace GetTwoDCartesianZoneResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace GetTwoDCartesianZoneResponse
+
+namespace RemoveZone {
+static constexpr CommandId Id = 0x00000005;
+} // namespace RemoveZone
+
+} // namespace Commands
+} // namespace ZoneManagement
+
+namespace CameraAvStreamManagement {
+namespace Commands {
+
+namespace AudioStreamAllocate {
+static constexpr CommandId Id = 0x00000000;
+} // namespace AudioStreamAllocate
+
+namespace AudioStreamAllocateResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace AudioStreamAllocateResponse
+
+namespace AudioStreamDeallocate {
+static constexpr CommandId Id = 0x00000002;
+} // namespace AudioStreamDeallocate
+
+namespace VideoStreamAllocate {
+static constexpr CommandId Id = 0x00000003;
+} // namespace VideoStreamAllocate
+
+namespace VideoStreamAllocateResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace VideoStreamAllocateResponse
+
+namespace VideoStreamModify {
+static constexpr CommandId Id = 0x00000005;
+} // namespace VideoStreamModify
+
+namespace VideoStreamDeallocate {
+static constexpr CommandId Id = 0x00000006;
+} // namespace VideoStreamDeallocate
+
+namespace SnapshotStreamAllocate {
+static constexpr CommandId Id = 0x00000007;
+} // namespace SnapshotStreamAllocate
+
+namespace SnapshotStreamAllocateResponse {
+static constexpr CommandId Id = 0x00000008;
+} // namespace SnapshotStreamAllocateResponse
+
+namespace SnapshotStreamDeallocate {
+static constexpr CommandId Id = 0x00000009;
+} // namespace SnapshotStreamDeallocate
+
+namespace SetStreamPriorities {
+static constexpr CommandId Id = 0x0000000A;
+} // namespace SetStreamPriorities
+
+namespace CaptureSnapshot {
+static constexpr CommandId Id = 0x0000000B;
+} // namespace CaptureSnapshot
+
+namespace CaptureSnapshotResponse {
+static constexpr CommandId Id = 0x0000000C;
+} // namespace CaptureSnapshotResponse
+
+} // namespace Commands
+} // namespace CameraAvStreamManagement
+
+namespace CameraAvSettingsUserLevelManagement {
+namespace Commands {
+
+namespace MPTZSetPosition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace MPTZSetPosition
+
+namespace MPTZRelativeMove {
+static constexpr CommandId Id = 0x00000001;
+} // namespace MPTZRelativeMove
+
+namespace MPTZMoveToPreset {
+static constexpr CommandId Id = 0x00000002;
+} // namespace MPTZMoveToPreset
+
+namespace MPTZSavePreset {
+static constexpr CommandId Id = 0x00000003;
+} // namespace MPTZSavePreset
+
+namespace MPTZRemovePreset {
+static constexpr CommandId Id = 0x00000004;
+} // namespace MPTZRemovePreset
+
+namespace DPTZSetViewport {
+static constexpr CommandId Id = 0x00000005;
+} // namespace DPTZSetViewport
+
+namespace DPTZRelativeMove {
+static constexpr CommandId Id = 0x00000006;
+} // namespace DPTZRelativeMove
+
+} // namespace Commands
+} // namespace CameraAvSettingsUserLevelManagement
+
+namespace WebRTCTransportProvider {
+namespace Commands {
+
+namespace SolicitOffer {
+static constexpr CommandId Id = 0x00000001;
+} // namespace SolicitOffer
+
+namespace SolicitOfferResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace SolicitOfferResponse
+
+namespace ProvideOffer {
+static constexpr CommandId Id = 0x00000003;
+} // namespace ProvideOffer
+
+namespace ProvideOfferResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace ProvideOfferResponse
+
+namespace ProvideAnswer {
+static constexpr CommandId Id = 0x00000005;
+} // namespace ProvideAnswer
+
+namespace ProvideICECandidate {
+static constexpr CommandId Id = 0x00000006;
+} // namespace ProvideICECandidate
+
+namespace EndSession {
+static constexpr CommandId Id = 0x00000007;
+} // namespace EndSession
+
+} // namespace Commands
+} // namespace WebRTCTransportProvider
+
+namespace WebRTCTransportRequestor {
+namespace Commands {
+
+namespace Offer {
+static constexpr CommandId Id = 0x00000001;
+} // namespace Offer
+
+namespace Answer {
+static constexpr CommandId Id = 0x00000002;
+} // namespace Answer
+
+namespace ICECandidate {
+static constexpr CommandId Id = 0x00000003;
+} // namespace ICECandidate
+
+namespace End {
+static constexpr CommandId Id = 0x00000004;
+} // namespace End
+
+} // namespace Commands
+} // namespace WebRTCTransportRequestor
+
+namespace PushAvStreamTransport {
+namespace Commands {
+
+namespace AllocatePushTransport {
+static constexpr CommandId Id = 0x00000000;
+} // namespace AllocatePushTransport
+
+namespace AllocatePushTransportResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace AllocatePushTransportResponse
+
+namespace DeallocatePushTransport {
+static constexpr CommandId Id = 0x00000002;
+} // namespace DeallocatePushTransport
+
+namespace ModifyPushTransport {
+static constexpr CommandId Id = 0x00000003;
+} // namespace ModifyPushTransport
+
+namespace SetTransportStatus {
+static constexpr CommandId Id = 0x00000004;
+} // namespace SetTransportStatus
+
+namespace ManuallyTriggerTransport {
+static constexpr CommandId Id = 0x00000005;
+} // namespace ManuallyTriggerTransport
+
+namespace FindTransport {
+static constexpr CommandId Id = 0x00000006;
+} // namespace FindTransport
+
+namespace FindTransportResponse {
+static constexpr CommandId Id = 0x00000007;
+} // namespace FindTransportResponse
+
+} // namespace Commands
+} // namespace PushAvStreamTransport
+
+namespace Chime {
+namespace Commands {
+
+namespace PlayChimeSound {
+static constexpr CommandId Id = 0x00000000;
+} // namespace PlayChimeSound
+
+} // namespace Commands
+} // namespace Chime
+
 namespace CommissionerControl {
 namespace Commands {
 
@@ -1834,28 +2046,6 @@ static constexpr CommandId Id = 0x00000002;
 
 } // namespace Commands
 } // namespace CommissionerControl
-
-namespace ElectricalMeasurement {
-namespace Commands {
-
-namespace GetProfileInfoResponseCommand {
-static constexpr CommandId Id = 0x00000000;
-} // namespace GetProfileInfoResponseCommand
-
-namespace GetProfileInfoCommand {
-static constexpr CommandId Id = 0x00000000;
-} // namespace GetProfileInfoCommand
-
-namespace GetMeasurementProfileResponseCommand {
-static constexpr CommandId Id = 0x00000001;
-} // namespace GetMeasurementProfileResponseCommand
-
-namespace GetMeasurementProfileCommand {
-static constexpr CommandId Id = 0x00000001;
-} // namespace GetMeasurementProfileCommand
-
-} // namespace Commands
-} // namespace ElectricalMeasurement
 
 namespace UnitTesting {
 namespace Commands {

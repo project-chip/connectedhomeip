@@ -20,19 +20,28 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${CHIP_RVC_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${CHIP_RVC_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -180,12 +189,12 @@ class TC_SEAR_1_2(MatterBaseTest):
                 progareaid_list.append(p.areaID)
                 asserts.assert_true(p.areaID in self.areaid_list,
                                     f"Progress entry has invalid AreaID value ({p.areaID})")
-                asserts.assert_true(p.status in (Clusters.ServiceArea.OperationalStatusEnum.kPending,
-                                                 Clusters.ServiceArea.OperationalStatusEnum.kOperating,
-                                                 Clusters.ServiceArea.OperationalStatusEnum.kSkipped,
-                                                 Clusters.ServiceArea.OperationalStatusEnum.kCompleted),
+                asserts.assert_true(p.status in (Clusters.ServiceArea.Enums.OperationalStatusEnum.kPending,
+                                                 Clusters.ServiceArea.Enums.OperationalStatusEnum.kOperating,
+                                                 Clusters.ServiceArea.Enums.OperationalStatusEnum.kSkipped,
+                                                 Clusters.ServiceArea.Enums.OperationalStatusEnum.kCompleted),
                                     f"Progress entry has invalid Status value ({p.status})")
-                if p.status not in (Clusters.ServiceArea.OperationalStatusEnum.kSkipped, Clusters.ServiceArea.OperationalStatusEnum.kCompleted):
+                if p.status not in (Clusters.ServiceArea.Enums.OperationalStatusEnum.kSkipped, Clusters.ServiceArea.Enums.OperationalStatusEnum.kCompleted):
                     asserts.assert_true(p.totalOperationalTime is NullValue,
                                         f"Progress entry should have a null TotalOperationalTime value (Status is {p.status})")
                 # TODO how to check that InitialTimeEstimate is either null or uint32?
@@ -195,7 +204,7 @@ class TC_SEAR_1_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_SEAR_1_2(self):
-        self.endpoint = self.matter_test_config.endpoint
+        self.endpoint = self.get_endpoint(default=1)
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         if self.is_ci:

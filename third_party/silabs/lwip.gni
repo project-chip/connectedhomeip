@@ -13,7 +13,7 @@
 # limitations under the License.
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/lwip.gni")
-import("${efr32_sdk_build_root}/efr32_sdk.gni")
+import("${silabs_sdk_build_root}/efr32_sdk.gni")
 
 # Defines a lwIP build target.
 #
@@ -169,10 +169,8 @@ template("lwip_target") {
         "${_lwip_root}/src/core/ipv6/ip6.c",
         "${_lwip_root}/src/core/ipv6/ip6_addr.c",
         "${_lwip_root}/src/core/ipv6/ip6_frag.c",
+        "${_lwip_root}/src/core/ipv6/mld6.c",
         "${_lwip_root}/src/core/ipv6/nd6.c",
-
-        # TODO: When updating to next Si SDK version, revert change.
-        "${sdk_support_root}/src/core/ipv6/mld6.c",
       ]
     }
 

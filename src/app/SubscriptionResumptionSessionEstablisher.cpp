@@ -17,7 +17,6 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/SubscriptionResumptionSessionEstablisher.h>
-#include <app/codegen-data-model-provider/Instance.h>
 
 namespace chip {
 namespace app {
@@ -104,8 +103,7 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnected(void * cont
         ChipLogProgress(InteractionModel, "no resource for subscription resumption");
         return;
     }
-    ReadHandler * readHandler =
-        imEngine->mReadHandlers.CreateObject(*imEngine, imEngine->GetReportScheduler(), imEngine->GetDataModelProvider());
+    ReadHandler * readHandler = imEngine->mReadHandlers.CreateObject(*imEngine, imEngine->GetReportScheduler());
     if (readHandler == nullptr)
     {
         // TODO - Should we keep the subscription here?

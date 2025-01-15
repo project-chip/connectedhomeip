@@ -219,7 +219,7 @@ CHIP_ERROR BindingTable::LoadEntryFromStorage(uint8_t index, uint8_t & nextIndex
     else
     {
         entry.type = MATTER_MULTICAST_BINDING;
-        ReturnErrorCodeIf(reader.GetTag() != TLV::ContextTag(kTagGroupId), CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrReturnError(reader.GetTag() == TLV::ContextTag(kTagGroupId), CHIP_ERROR_INVALID_TLV_TAG);
         ReturnErrorOnFailure(reader.Get(entry.groupId));
     }
     ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagNextEntry)));

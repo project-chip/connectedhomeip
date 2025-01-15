@@ -25,6 +25,7 @@
 #include "app-common/zap-generated/ids/Attributes.h"
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "app/ConcreteAttributePath.h"
+#include "data-model-providers/codegen/Instance.h"
 #include "protocols/interaction_model/Constants.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AppConfig.h>
@@ -280,12 +281,6 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
         EXPECT_EQ(v.ComputeSize(&arraySize), CHIP_NO_ERROR);
         EXPECT_EQ(arraySize, 0u);
     }
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-    else if (aPath.mAttributeId == Globals::Attributes::EventList::Id)
-    {
-        // Nothing to check for this one; depends on the endpoint.
-    }
-#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     else if (aPath.mAttributeId == Globals::Attributes::AttributeList::Id)
     {
         // Nothing to check for this one; depends on the endpoint.
@@ -487,6 +482,7 @@ TEST_F(TestReadChunking, TestChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -549,6 +545,7 @@ TEST_F(TestReadChunking, TestListChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -582,7 +579,7 @@ TEST_F(TestReadChunking, TestListChunking)
     {
         TestReadCallback readCallback;
 
-        ChipLogDetail(DataManagement, "Running iteration %d\n", packetSize);
+        ChipLogDetail(DataManagement, "Running iteration %d\n", static_cast<int>(packetSize));
 
         gIterationCount = packetSize;
 
@@ -650,6 +647,7 @@ TEST_F(TestReadChunking, TestBadChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(0);
@@ -701,6 +699,7 @@ TEST_F(TestReadChunking, TestDynamicEndpoint)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.

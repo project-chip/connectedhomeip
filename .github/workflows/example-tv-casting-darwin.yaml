@@ -16,8 +16,9 @@ name: TV Casting Example - Darwin
 
 on:
     push:
-        branches-ignore:
-            - "dependabot/**"
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
     workflow_dispatch:
@@ -36,7 +37,7 @@ jobs:
     tv-casting-bridge:
         name: Build TV Casting Bridge example
         if: github.actor != 'restyled-io[bot]'
-        runs-on: macos-13
+        runs-on: macos-14
         steps:
             - name: Checkout
               uses: actions/checkout@v4

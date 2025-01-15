@@ -28,8 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class MTRAsyncWorkQueue;
 
-typedef NSDictionary<NSString *, id> * MTRDeviceDataValueDictionary;
-
 typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 
 typedef NS_ENUM(NSUInteger, MTRInternalDeviceState) {
@@ -51,20 +49,6 @@ typedef NS_ENUM(NSUInteger, MTRInternalDeviceState) {
     // then re-created a subscription.
     MTRInternalDeviceStateLaterSubscriptionEstablished = 4,
 };
-
-/**
- * Information about a cluster: data version and known attribute values.
- */
-MTR_TESTABLE
-@interface MTRDeviceClusterData : NSObject <NSSecureCoding, NSCopying>
-@property (nonatomic, nullable) NSNumber * dataVersion;
-@property (nonatomic, readonly) NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * attributes; // attributeID => data-value dictionary
-
-- (void)storeValue:(MTRDeviceDataValueDictionary _Nullable)value forAttribute:(NSNumber *)attribute;
-- (void)removeValueForAttribute:(NSNumber *)attribute;
-
-- (nullable instancetype)initWithDataVersion:(NSNumber * _Nullable)dataVersion attributes:(NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * _Nullable)attributes;
-@end
 
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
@@ -118,31 +102,15 @@ MTR_DIRECT_MEMBERS
     NSNumber * _nodeID;
 
     // Our controller.  Declared nullable because our property is, though in
-    // practice it does not look like we ever set it to nil.
+    // practice it does not look like we ever set it to nil.  If this changes,
+    // fix _concreteController on MTRDevice_Concrete accordingly.
     MTRDeviceController * _Nullable _deviceController;
-
-    // Whether this device has been accessed via the public deviceWithNodeID API
-    // (as opposed to just via the internal _deviceWithNodeID).
-    BOOL _accessedViaPublicAPI;
 }
 
-/**
- * Internal way of creating an MTRDevice that does not flag the device as being
- * visible to external API consumers.
- */
-+ (MTRDevice *)_deviceWithNodeID:(NSNumber *)nodeID
-                      controller:(MTRDeviceController *)controller;
-
 - (instancetype)initForSubclassesWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
-- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
 // called by controller to clean up and shutdown
 - (void)invalidate;
-
-// Called by controller when a new operational advertisement for what we think
-// is this device's identity has been observed.  This could have
-// false-positives, for example due to compressed fabric id collisions.
-- (void)nodeMayBeAdvertisingOperational;
 
 - (BOOL)_callDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block;
 
@@ -173,22 +141,6 @@ MTR_DIRECT_MEMBERS
 @property (nonatomic) dispatch_queue_t queue;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
 
-// Method to insert persisted cluster data
-//   Contains data version information and attribute values.
-- (void)setPersistedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData;
-
-// Method to insert persisted data that pertains to the whole device.
-- (void)setPersistedDeviceData:(NSDictionary<NSString *, id> *)data;
-
-#ifdef DEBUG
-- (NSUInteger)unitTestAttributeCount;
-#endif
-
-- (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
-
-// Returns whether this MTRDevice uses Thread for communication
-- (BOOL)deviceUsesThread;
-
 #pragma mark - MTRDevice functionality to deal with delegates.
 
 // Returns YES if any non-null delegates were found
@@ -196,12 +148,41 @@ MTR_DIRECT_MEMBERS
 
 - (BOOL)_delegateExists;
 
+// Must be called by subclasses or MTRDevice implementation only.
+- (void)_delegateAdded;
+
 #ifdef DEBUG
 // Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously
 // Returns YES if a delegate is called
 - (void)_callFirstDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block;
 #endif
 
+// Used to generate attribute report that contains all known attributes, taking into consideration expected values
+- (NSArray<NSDictionary<NSString *, id> *> *)getAllAttributesReport;
+
+// Hooks for controller suspend/resume.
+- (void)controllerSuspended;
+- (void)controllerResumed;
+
+// Methods for comparing attribute data values.
+- (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)one isEqualToDataValue:(MTRDeviceDataValueDictionary)theOther;
+- (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)observed satisfiesValueExpectation:(MTRDeviceDataValueDictionary)expected;
+
+// Hook for subclasses to notify us that an attribute value has been reported.
+//
+// For the MTRDevice_Concrete case this will be an actual reported value from
+// the device. For the MTRDevice_XPC case, this might be an expected, not
+// actual, value that is getting reported to us, if something sets up an
+// expected value for the relevant attribute.
+- (void)_attributeValue:(MTRDeviceDataValueDictionary)value reportedForPath:(MTRAttributePath *)path;
+
+- (void)_forgetAttributeWaiter:(MTRAttributeValueWaiter *)attributeValueWaiter;
+
+@end
+
+#pragma mark - MTRDevice internal state monitoring
+@protocol MTRDeviceInternalStateDelegate
+- (void)devicePrivateInternalStateChanged:(MTRDevice *)device internalState:(NSDictionary *)state;
 @end
 
 #pragma mark - Constants
@@ -209,12 +190,20 @@ MTR_DIRECT_MEMBERS
 static NSString * const kDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
 static NSString * const kTestStorageUserDefaultEnabledKey = @"enableTestStorage";
 
-// ex-MTRDeviceClusterData constants
-static NSString * const sDataVersionKey = @"dataVersion";
-static NSString * const sAttributesKey = @"attributes";
-static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribeLatency";
-
 // Declared inside platform, but noting here for reference
 // static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
+
+// Concrete to XPC internal state property dictionary keys
+static NSString * const kMTRDeviceInternalPropertyKeyVendorID = @"MTRDeviceInternalStateKeyVendorID";
+static NSString * const kMTRDeviceInternalPropertyKeyProductID = @"MTRDeviceInternalStateKeyProductID";
+static NSString * const kMTRDeviceInternalPropertyNetworkFeatures = @"MTRDeviceInternalPropertyNetworkFeatures";
+static NSString * const kMTRDeviceInternalPropertyDeviceInternalState = @"MTRDeviceInternalPropertyDeviceInternalState";
+static NSString * const kMTRDeviceInternalPropertyLastSubscriptionAttemptWait = @"kMTRDeviceInternalPropertyLastSubscriptionAttemptWait";
+static NSString * const kMTRDeviceInternalPropertyMostRecentReportTime = @"MTRDeviceInternalPropertyMostRecentReportTime";
+static NSString * const kMTRDeviceInternalPropertyLastSubscriptionFailureTime = @"MTRDeviceInternalPropertyLastSubscriptionFailureTime";
+static NSString * const kMTRDeviceInternalPropertyDeviceState = @"MTRDeviceInternalPropertyDeviceState";
+static NSString * const kMTRDeviceInternalPropertyDeviceCachePrimed = @"MTRDeviceInternalPropertyDeviceCachePrimed";
+static NSString * const kMTRDeviceInternalPropertyEstimatedStartTime = @"MTRDeviceInternalPropertyEstimatedStartTime";
+static NSString * const kMTRDeviceInternalPropertyEstimatedSubscriptionLatency = @"MTRDeviceInternalPropertyEstimatedSubscriptionLatency";
 
 NS_ASSUME_NONNULL_END

@@ -16,87 +16,48 @@
 
 import asyncio
 import contextlib
-import os
 import shutil
 import signal
 import sys
+import typing
 from argparse import ArgumentParser
+from pathlib import Path
 from tempfile import TemporaryDirectory
 
 
-async def asyncio_stdin() -> asyncio.StreamReader:
-    """Wrap sys.stdin in an asyncio StreamReader."""
-    loop = asyncio.get_event_loop()
-    reader = asyncio.StreamReader()
-    protocol = asyncio.StreamReaderProtocol(reader)
-    await loop.connect_read_pipe(lambda: protocol, sys.stdin)
-    return reader
-
-
-async def asyncio_stdout(file=sys.stdout) -> asyncio.StreamWriter:
-    """Wrap an IO stream in an asyncio StreamWriter."""
-    loop = asyncio.get_event_loop()
-    transport, protocol = await loop.connect_write_pipe(
-        lambda: asyncio.streams.FlowControlMixin(loop=loop),
-        os.fdopen(file.fileno(), 'wb'))
-    return asyncio.streams.StreamWriter(transport, protocol, None, loop)
-
-
 async def forward_f(prefix: bytes, f_in: asyncio.StreamReader,
-                    f_out: asyncio.StreamWriter, cb=None):
+                    f_out: typing.BinaryIO, cb=None):
     """Forward f_in to f_out with a prefix attached.
 
     This function can optionally feed received lines to a callback function.
     """
-    while True:
-        line = await f_in.readline()
-        if not line:
-            break
+
+    while line := await f_in.readline():
         if cb is not None:
             cb(line)
-        f_out.write(prefix)
-        f_out.write(line)
-        await f_out.drain()
-
-
-async def forward_pipe(pipe_path: str, f_out: asyncio.StreamWriter):
-    """Forward named pipe to f_out.
-
-    Unfortunately, Python does not support async file I/O on named pipes. This
-    function performs busy waiting with a short asyncio-friendly sleep to read
-    from the pipe.
-    """
-    fd = os.open(pipe_path, os.O_RDONLY | os.O_NONBLOCK)
-    while True:
-        try:
-            data = os.read(fd, 1024)
-            if data:
-                f_out.write(data)
-            if not data:
-                await asyncio.sleep(0.1)
-        except BlockingIOError:
-            await asyncio.sleep(0.1)
+        f_out.buffer.write(prefix)
+        f_out.buffer.write(line)
+        f_out.flush()
 
 
 async def forward_stdin(f_out: asyncio.StreamWriter):
     """Forward stdin to f_out."""
-    reader = await asyncio_stdin()
-    while True:
-        line = await reader.readline()
-        if not line:
-            # Exit on Ctrl-D (EOF).
-            sys.exit(0)
+    loop = asyncio.get_event_loop()
+    reader = asyncio.StreamReader()
+    protocol = asyncio.StreamReaderProtocol(reader)
+    await loop.connect_read_pipe(lambda: protocol, sys.stdin)
+    while line := await reader.readline():
         f_out.write(line)
+        await f_out.drain()
 
 
 class Subprocess:
 
-    def __init__(self, tag: str, program: str, *args, stdout_cb=None):
+    def __init__(self, tag: str, program: str, *args):
         self.event = asyncio.Event()
         self.tag = tag.encode()
         self.program = program
         self.args = args
-        self.stdout_cb = stdout_cb
         self.expected_output = None
 
     def _check_output(self, line: bytes):
@@ -109,15 +70,9 @@ class Subprocess:
                                                       stdout=asyncio.subprocess.PIPE,
                                                       stderr=asyncio.subprocess.PIPE)
         # Add the stdout and stderr processing to the event loop.
-        asyncio.create_task(forward_f(
-            self.tag,
-            self.p.stderr,
-            await asyncio_stdout(sys.stderr)))
-        asyncio.create_task(forward_f(
-            self.tag,
-            self.p.stdout,
-            await asyncio_stdout(sys.stdout),
-            cb=self._check_output))
+        asyncio.create_task(forward_f(self.tag, self.p.stderr, sys.stderr))
+        asyncio.create_task(forward_f(self.tag, self.p.stdout, sys.stdout,
+                                      cb=self._check_output))
 
     async def send(self, message: str, expected_output: str = None, timeout: float = None):
         """Send a message to a process and optionally wait for a response."""
@@ -140,8 +95,7 @@ class Subprocess:
         self.p.terminate()
 
 
-async def run_admin(program, stdout_cb=None, storage_dir=None,
-                    rpc_admin_port=None, rpc_bridge_port=None,
+async def run_admin(program, storage_dir=None, rpc_admin_port=None, rpc_bridge_port=None,
                     paa_trust_store_path=None, commissioner_name=None,
                     commissioner_node_id=None, commissioner_vendor_id=None):
     args = []
@@ -159,8 +113,7 @@ async def run_admin(program, stdout_cb=None, storage_dir=None,
         args.extend(["--commissioner-nodeid", str(commissioner_node_id)])
     if commissioner_vendor_id is not None:
         args.extend(["--commissioner-vendor-id", str(commissioner_vendor_id)])
-    p = Subprocess("[FS-ADMIN]", program, "interactive", "start", *args,
-                   stdout_cb=stdout_cb)
+    p = Subprocess("[FS-ADMIN]", program, "interactive", "start", *args)
     await p.run()
     return p
 
@@ -170,8 +123,7 @@ async def run_bridge(program, storage_dir=None, rpc_admin_port=None,
                      secured_device_port=None):
     args = []
     if storage_dir is not None:
-        args.extend(["--KVS",
-                     os.path.join(storage_dir, "chip_fabric_bridge_kvs")])
+        args.extend(["--KVS", storage_dir.joinpath("chip_fabric_bridge_kvs")])
     if rpc_admin_port is not None:
         args.extend(["--fabric-admin-server-port", str(rpc_admin_port)])
     if rpc_bridge_port is not None:
@@ -197,22 +149,10 @@ async def main(args):
 
     storage_dir = args.storage_dir
     if storage_dir is not None:
-        os.makedirs(storage_dir, exist_ok=True)
+        storage_dir.mkdir(parents=True, exist_ok=True)
     else:
         storage = TemporaryDirectory(prefix="fabric-sync-app")
-        storage_dir = storage.name
-
-    pipe = args.stdin_pipe
-    if pipe and not os.path.exists(pipe):
-        os.mkfifo(pipe)
-
-    def terminate(signum, frame):
-        admin.terminate()
-        bridge.terminate()
-        sys.exit(0)
-
-    signal.signal(signal.SIGINT, terminate)
-    signal.signal(signal.SIGTERM, terminate)
+        storage_dir = Path(storage.name)
 
     admin, bridge = await asyncio.gather(
         run_admin(
@@ -234,6 +174,19 @@ async def main(args):
             discriminator=args.discriminator,
             passcode=args.passcode,
         ))
+
+    loop = asyncio.get_event_loop()
+
+    def terminate():
+        with contextlib.suppress(ProcessLookupError):
+            admin.terminate()
+        with contextlib.suppress(ProcessLookupError):
+            bridge.terminate()
+        loop.remove_signal_handler(signal.SIGINT)
+        loop.remove_signal_handler(signal.SIGTERM)
+
+    loop.add_signal_handler(signal.SIGINT, terminate)
+    loop.add_signal_handler(signal.SIGTERM, terminate)
 
     # Wait a bit for apps to start.
     await asyncio.sleep(1)
@@ -258,7 +211,8 @@ async def main(args):
             cmd,
             # Wait for the log message indicating that the bridge has been
             # added to the fabric.
-            f"Commissioning complete for node ID {bridge_node_id:#018x}: success")
+            f"Commissioning complete for node ID {bridge_node_id:#018x}: success",
+            timeout=30)
 
     # Open commissioning window with original setup code for the bridge.
     cw_endpoint_id = 0
@@ -270,38 +224,40 @@ async def main(args):
                      f" {cw_option} {cw_timeout} {cw_iteration} {cw_discriminator}")
 
     try:
-        await asyncio.gather(
-            forward_pipe(pipe, admin.p.stdin) if pipe else forward_stdin(admin.p.stdin),
-            admin.wait(),
-            bridge.wait(),
-        )
-    except SystemExit:
-        admin.terminate()
-        bridge.terminate()
-    except Exception:
-        admin.terminate()
-        bridge.terminate()
-        raise
+        # Wait for any of the tasks to complete.
+        _, pending = await asyncio.wait([
+            asyncio.create_task(admin.wait()),
+            asyncio.create_task(bridge.wait()),
+            asyncio.create_task(forward_stdin(admin.p.stdin)),
+        ], return_when=asyncio.FIRST_COMPLETED)
+        # Cancel the remaining tasks.
+        for task in pending:
+            task.cancel()
+    except Exception as e:
+        print(e, file=sys.stderr)
+
+    terminate()
+    # Make sure that we will not return until both processes are terminated.
+    await admin.wait()
+    await bridge.wait()
 
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Fabric-Sync Example Application")
-    parser.add_argument("--app-admin", metavar="PATH",
+    parser.add_argument("--app-admin", metavar="PATH", type=Path,
                         default=shutil.which("fabric-admin"),
                         help="path to the fabric-admin executable; default=%(default)s")
-    parser.add_argument("--app-bridge", metavar="PATH",
+    parser.add_argument("--app-bridge", metavar="PATH", type=Path,
                         default=shutil.which("fabric-bridge-app"),
                         help="path to the fabric-bridge executable; default=%(default)s")
     parser.add_argument("--app-admin-rpc-port", metavar="PORT", type=int,
                         help="fabric-admin RPC server port")
     parser.add_argument("--app-bridge-rpc-port", metavar="PORT", type=int,
                         help="fabric-bridge RPC server port")
-    parser.add_argument("--stdin-pipe", metavar="PATH",
-                        help="read input from a named pipe instead of stdin")
-    parser.add_argument("--storage-dir", metavar="PATH",
+    parser.add_argument("--storage-dir", metavar="PATH", type=Path,
                         help=("directory to place storage files in; by default "
                               "volatile storage is used"))
-    parser.add_argument("--paa-trust-store-path", metavar="PATH",
+    parser.add_argument("--paa-trust-store-path", metavar="PATH", type=Path,
                         help="path to directory holding PAA certificates")
     parser.add_argument("--commissioner-name", metavar="NAME",
                         help="commissioner name to use for the admin")
@@ -316,9 +272,9 @@ if __name__ == "__main__":
     parser.add_argument("--passcode", metavar="NUM", type=int,
                         help="passcode to use for the bridge")
     args = parser.parse_args()
-    if args.app_admin is None or not os.path.exists(args.app_admin):
+    if args.app_admin is None or not args.app_admin.exists():
         parser.error("fabric-admin executable not found in PATH. Use '--app-admin' argument to provide it.")
-    if args.app_bridge is None or not os.path.exists(args.app_bridge):
+    if args.app_bridge is None or not args.app_bridge.exists():
         parser.error("fabric-bridge-app executable not found in PATH. Use '--app-bridge' argument to provide it.")
     with contextlib.suppress(KeyboardInterrupt):
         asyncio.run(main(args))

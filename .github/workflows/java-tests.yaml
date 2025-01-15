@@ -16,8 +16,9 @@ name: Java Tests
 
 on:
     push:
-        branches-ignore:
-            - 'dependabot/**'
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
     workflow_dispatch:
@@ -30,7 +31,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     java_tests_linux:
         name: Linux
@@ -42,7 +43,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-java:74
+            image: ghcr.io/project-chip/chip-build-java:97
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -93,6 +94,7 @@ jobs:
                       --target linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-java-matter-controller \
                       --target linux-x64-lit-icd-ipv6only \
+                      --target linux-x64-ota-requestor \
                       build \
                    "
             - name: Build Kotlin Matter Controller
@@ -101,8 +103,10 @@ jobs:
                    "./scripts/build/build_examples.py \
                       --target linux-x64-kotlin-matter-controller \
                       build \
-                   "                   
+                   "
             - name: Run Discover Commissionables Test
+              # Generally completes in seconds
+              timeout-minutes: 2
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -114,6 +118,8 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing Onnetwork Test
+              # Generally completes in seconds
+              timeout-minutes: 2
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -125,6 +131,8 @@ jobs:
                      --factoryreset \
                   '
             - name: Run IM Invoke Test
+              # Generally completes in seconds
+              timeout-minutes: 2
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -134,8 +142,10 @@ jobs:
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
                      --factoryreset \
-                  '                    
+                  '
             - name: Run IM Extendable Invoke Test
+              # Generally completes in seconds
+              timeout-minutes: 2
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -147,6 +157,8 @@ jobs:
                      --factoryreset \
                   '
             - name: Run IM Read Test
+              # Generally completes in seconds
+              timeout-minutes: 2
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -158,6 +170,8 @@ jobs:
                      --factoryreset \
                   '
             - name: Run IM Write Test
+              # Generally completes in seconds
+              timeout-minutes: 2
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -169,6 +183,8 @@ jobs:
                      --factoryreset \
                   '
             - name: Run IM Subscribe Test
+              # Generally completes in seconds
+              timeout-minutes: 2
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -180,6 +196,8 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing AlreadyDiscovered Test
+              # Generally completes in seconds
+              timeout-minutes: 2
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -190,19 +208,22 @@ jobs:
                      --tool-args "already-discovered --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 1000" \
                      --factoryreset \
                   '
-            # Disabled due to failure: https://github.com/project-chip/connectedhomeip/issues/27361
-            # - name: Run Pairing Address-PaseOnly Test
-            #   run: |
-            #      scripts/run_in_python_env.sh out/venv \
-            #       './scripts/tests/run_java_test.py \
-            #          --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
-            #          --app-args "--discriminator 3840 --interface-id -1" \
-            #          --tool-path out/linux-x64-java-matter-controller \
-            #          --tool-cluster "pairing" \
-            #          --tool-args "address-paseonly --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 1000" \
-            #          --factoryreset \
-            #       '
+            - name: Run Pairing Address-PaseOnly Test
+              # Disabled due to failure: https://github.com/project-chip/connectedhomeip/issues/27361
+              if: false
+              run: |
+                 scripts/run_in_python_env.sh out/venv \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "pairing" \
+                     --tool-args "address-paseonly --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 1000" \
+                     --factoryreset \
+                  '
             - name: Run Pairing SetupQRCode Test
+              # Generally completes in seconds
+              timeout-minutes: 2
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -214,6 +235,8 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing ManualCode Test
+              # Generally completes in seconds
+              timeout-minutes: 2
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -225,6 +248,8 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing ICD Onnetwork Test
+              # Generally completes in seconds
+              timeout-minutes: 2
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -235,7 +260,33 @@ jobs:
                      --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
                      --factoryreset \
                   '
+            - name: Run Pairing ICD Onnetwork and OTA test
+              # Generally completes in seconds
+              timeout-minutes: 2
+              run: |
+                  scripts/run_in_python_env.sh out/venv \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-ota-requestor/chip-ota-requestor-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "ota" \
+                     --tool-args "onnetwork-long-ota-over-bdx  --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --factoryreset \
+                  '
+            - name: Run Pairing Onnetwork and get diagnostic log Test
+              run: |
+                  scripts/run_in_python_env.sh out/venv \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1 --crash_log ./crashLog.log --end_user_support_log ./enduser.log --network_diagnostics_log ./network.log" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "bdx" \
+                     --tool-args "onnetwork-long-downloadLog --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000 --logType CrashLogs --fileName ./crashLog.log" \
+                     --factoryreset \
+                  '
             - name: Run Pairing Onnetwork Test
+              # Generally completes in seconds
+              timeout-minutes: 2
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_kotlin_test.py \
@@ -245,8 +296,10 @@ jobs:
                      --tool-cluster "pairing" \
                      --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
                      --factoryreset \
-                  '                  
+                  '
             - name: Run Kotlin IM Invoke Test
+              # Generally completes in seconds
+              timeout-minutes: 2
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_kotlin_test.py \
@@ -258,6 +311,8 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Kotlin IM Read Test
+              # Generally completes in seconds
+              timeout-minutes: 2
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_kotlin_test.py \
@@ -269,6 +324,8 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Kotlin IM Write Test
+              # Generally completes in seconds
+              timeout-minutes: 2
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_kotlin_test.py \
@@ -280,6 +337,8 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Kotlin IM Subscribe Test
+              # Generally completes in seconds
+              timeout-minutes: 2
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_kotlin_test.py \
@@ -289,7 +348,7 @@ jobs:
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-subscribe --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
                      --factoryreset \
-                  '                                                  
+                  '
             - name: Uploading core files
               uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}

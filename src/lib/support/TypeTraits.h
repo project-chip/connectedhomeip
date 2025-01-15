@@ -26,8 +26,17 @@
 
 #include <type_traits>
 
+#if __has_include(<utility>) // For C++23 and later, include <utility> if available
+#include <utility>           // Contains std::to_underlying
+#endif
+
 namespace chip {
 
+#if __cplusplus >= 202300L
+
+using to_underlying = std::to_underlying;
+
+#else
 /**
  * @brief Implemented std::to_underlying introduced in C++23.
  */
@@ -37,6 +46,7 @@ constexpr std::underlying_type_t<T> to_underlying(T e)
     static_assert(std::is_enum<T>::value, "to_underlying called to non-enum values.");
     return static_cast<std::underlying_type_t<T>>(e);
 }
+#endif
 
 /**
  * @brief This template is not designed to be used directly. A common pattern to check the presence of a member of a class is:

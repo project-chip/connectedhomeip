@@ -55,7 +55,6 @@ target_sources(app PRIVATE
                ${NRFCONNECT_COMMON}/util/PWMDevice.cpp)
 
 chip_configure_data_model(app
-    INCLUDE_SERVER
     ZAP_FILE ${WIN_APP_COMMON_DIR}/window-app.zap
 )
 

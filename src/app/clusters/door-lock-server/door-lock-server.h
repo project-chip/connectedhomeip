@@ -449,7 +449,8 @@ private:
                                            uint16_t credentialIndex);
 
     void sendGetCredentialResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                   CredentialTypeEnum credentialType, uint16_t credentialIndex, uint16_t userIndexWithCredential,
+                                   CredentialTypeEnum credentialType, uint16_t credentialIndex,
+                                   chip::app::DataModel::Nullable<uint16_t> nextCredentialIndex, uint16_t userIndexWithCredential,
                                    EmberAfPluginDoorLockCredentialInfo * credentialInfo, bool credentialExists);
 
     void clearCredentialCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,

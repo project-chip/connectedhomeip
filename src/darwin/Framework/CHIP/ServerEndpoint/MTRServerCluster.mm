@@ -346,8 +346,8 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
     _deviceController = controller;
 
-    MTR_LOG("Associated %@, attribute count %llu, with controller", [self _descriptionWhileLocked],
-        static_cast<unsigned long long>(attributeCount));
+    MTR_LOG("Associated %@, attribute count %llu, with controller %@", [self _descriptionWhileLocked],
+        static_cast<unsigned long long>(attributeCount), controller);
 
     return YES;
 }

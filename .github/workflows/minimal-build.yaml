@@ -16,8 +16,9 @@ name: Minimal Build (Linux / configure)
 
 on:
     push:
-        branches-ignore:
-            - 'dependabot/**'
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
 
@@ -33,7 +34,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-minimal:74
+            image: ghcr.io/project-chip/chip-build-minimal:97
 
         steps:
             - name: Checkout
@@ -42,11 +43,11 @@ jobs:
             - name: Checkout submodules # but don't bootstrap!
               uses: ./.github/actions/checkout-submodules
               with:
-                platform: linux
+                  platform: linux
 
             - name: Configure and build All Clusters App
               run: |
-                  CC=gcc CXX=g++ scripts/configure --project=examples/all-clusters-app/linux && ./ninja-build
+                  CC=gcc CXX=g++ scripts/configure --project=examples/all-clusters-app/linux --enable-recommended=no && ./ninja-build
 
     minimal-network-manager:
         name: Linux / configure build of network-manager-app
@@ -55,7 +56,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-minimal:74
+            image: ghcr.io/project-chip/chip-build-minimal:97
 
         steps:
             - name: Checkout
@@ -64,8 +65,8 @@ jobs:
             - name: Checkout submodules # but don't bootstrap!
               uses: ./.github/actions/checkout-submodules
               with:
-                platform: linux
+                  platform: linux
 
             - name: Configure and build Network Manager App
               run: |
-                  CC=gcc CXX=g++ scripts/configure --project=examples/network-manager-app/linux && ./ninja-build
+                  CC=gcc CXX=g++ scripts/configure --project=examples/network-manager-app/linux --enable-recommended=no && ./ninja-build

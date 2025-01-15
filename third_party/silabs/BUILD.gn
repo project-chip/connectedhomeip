@@ -18,12 +18,12 @@ import("//build_overrides/jlink.gni")
 import("//build_overrides/openthread.gni")
 import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${efr32_sdk_build_root}/silabs_board.gni")
+import("${silabs_sdk_build_root}/silabs_board.gni")
 
 if (wifi_soc == true) {  # CCP board
-  import("${efr32_sdk_build_root}/SiWx917_sdk.gni")
+  import("${silabs_sdk_build_root}/SiWx917_sdk.gni")
 } else {
-  import("${efr32_sdk_build_root}/efr32_sdk.gni")
+  import("${silabs_sdk_build_root}/efr32_sdk.gni")
 }
 
 declare_args() {
@@ -49,7 +49,7 @@ config("silabs_config") {
 }
 
 assert(silabs_sdk_target != "", "silabs_sdk_target must be specified")
-group("efr32_sdk") {
+group("silabs_sdk") {
   public_deps = [ silabs_sdk_target ]
   public_configs = [ ":silabs_config" ]
 }
@@ -117,7 +117,7 @@ if (wifi_soc != true) {  # CCP board
 
       public_deps = [
         ":libopenthread-platform",
-        "${efr32_sdk_build_root}:efr32_sdk",
+        "${silabs_sdk_build_root}:silabs_sdk",
       ]
 
       public_configs = [ ":openthread_efr32_config" ]
@@ -190,7 +190,7 @@ if (wifi_soc != true) {  # CCP board
         "${segger_rtt_root}:segger_rtt",
       ]
 
-      deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
+      deps = [ "${silabs_sdk_build_root}:silabs_sdk" ]
 
       # selected thread device type FTD or MTD
       XTD = "ftd"
@@ -206,7 +206,9 @@ if (wifi_soc != true) {  # CCP board
           "${openthread_root}/src/core/mac/mac_frame.cpp",
           "${openthread_root}/src/core/mac/sub_mac.cpp",
           "${openthread_root}/src/core/thread/mle.cpp",
-          "${sl_ot_platform_abstraction}/efr32/radio.c",
+
+          # Temporary file until the files in the SI SDK is fixed
+          "${sdk_support_root}/protocol/openthread/platform-abstraction/efr32/radio.c",
         ]
 
         include_dirs = [ "${sl_ot_platform_abstraction}/include" ]

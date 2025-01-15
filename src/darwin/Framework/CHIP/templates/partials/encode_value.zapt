@@ -27,11 +27,12 @@
       }
       listFreer.add(listHolder_{{depth}});
       for (size_t i_{{depth}} = 0; i_{{depth}} < {{source}}.count; ++i_{{depth}}) {
-        if ( ! [{{source}}[i_{{depth}}] isKindOfClass: [{{asObjectiveCClass type cluster forceNotList=true}} class]] ) {
+        auto element_{{depth}} = MTR_SAFE_CAST({{source}}[i_{{depth}}], {{asObjectiveCClass type cluster forceNotList=true}});
+        if (!element_{{depth}}) {
           // Wrong kind of value.
+          MTR_LOG_ERROR("%@ incorrectly present in list of %@", {{source}}[i_{{depth}}], NSStringFromClass({{asObjectiveCClass type cluster forceNotList=true}}.class));
           {{errorCode}}
         }
-        auto element_{{depth}} = ({{asObjectiveCClass type cluster forceNotList=true}} *){{source}}[i_{{depth}}];
         {{>encode_value target=(concat "listHolder_" depth "->mList[i_" depth "]") source=(concat "element_" depth) cluster=cluster errorCode=errorCode depth=(incrementDepth depth) isArray=false}}
       }
       {{target}} = ListType_{{depth}}(listHolder_{{depth}}->mList, {{source}}.count);

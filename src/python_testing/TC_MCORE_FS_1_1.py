@@ -17,18 +17,57 @@
 
 # This test requires a TH_SERVER application. Please specify with --string-arg th_server_app_path:<path_to_app>
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: examples/fabric-admin/scripts/fabric-sync-app.py
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --discriminator=1234
+#     app-ready-pattern: "Successfully opened pairing window on the device"
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${FABRIC_SYNC_APP}
+#     app-args: --discriminator=1234
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
+
 import logging
 import os
 import random
-import signal
-import subprocess
+import tempfile
 import time
-import uuid
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.apps import AppServerSubprocess
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+_DEVICE_TYPE_AGGREGATOR = 0x000E
 
 
 class TC_MCORE_FS_1_1(MatterBaseTest):
@@ -36,25 +75,34 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
-        self.app_process = None
-        app = self.user_params.get("th_server_app_path", None)
-        if not app:
-            asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
 
-        self.kvs = f'kvs_{str(uuid.uuid4())}'
-        self.port = 5543
-        discriminator = random.randint(0, 4095)
-        passcode = 20202021
-        cmd = [app]
-        cmd.extend(['--secured-device-port', str(5543)])
-        cmd.extend(['--discriminator', str(discriminator)])
-        cmd.extend(['--passcode', str(passcode)])
-        cmd.extend(['--KVS', self.kvs])
-        # TODO: Determine if we want these logs cooked or pushed to somewhere else
-        logging.info("Starting application to acts mock a server portion of TH_FSA")
-        self.app_process = subprocess.Popen(cmd)
-        logging.info("Started application to acts mock a server portion of TH_FSA")
-        time.sleep(3)
+        self.th_server = None
+        self.storage = None
+
+        th_server_app = self.user_params.get("th_server_app_path", None)
+        if not th_server_app:
+            asserts.fail("This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>")
+        if not os.path.exists(th_server_app):
+            asserts.fail(f"The path {th_server_app} does not exist")
+
+        # Create a temporary storage directory for keeping KVS files.
+        self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
+        logging.info("Temporary storage directory: %s", self.storage.name)
+
+        self.th_server_port = 5543
+        self.th_server_discriminator = random.randint(0, 4095)
+        self.th_server_passcode = 20202021
+
+        # Start the TH_SERVER app.
+        self.th_server = AppServerSubprocess(
+            th_server_app,
+            storage_dir=self.storage.name,
+            port=self.th_server_port,
+            discriminator=self.th_server_discriminator,
+            passcode=self.th_server_passcode)
+        self.th_server.start(
+            expected_output="Server initialization complete",
+            timeout=30)
 
         logging.info("Commissioning from separate fabric")
         # Create a second controller on a new fabric to communicate to the server
@@ -63,25 +111,24 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         paa_path = str(self.matter_test_config.paa_trust_store_path)
         self.TH_server_controller = new_fabric_admin.NewController(nodeId=112233, paaTrustStorePath=paa_path)
         self.server_nodeid = 1111
-        await self.TH_server_controller.CommissionOnNetwork(nodeId=self.server_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
+        await self.TH_server_controller.CommissionOnNetwork(
+            nodeId=self.server_nodeid,
+            setupPinCode=self.th_server_passcode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=self.th_server_discriminator)
         logging.info("Commissioning TH_SERVER complete")
 
     def teardown_class(self):
-        # In case the th_server_app_path does not exist, then we failed the test
-        # and there is nothing to remove
-        if self.app_process is not None:
-            logging.warning("Stopping app with SIGTERM")
-            self.app_process.send_signal(signal.SIGTERM.value)
-            self.app_process.wait()
-
-            if os.path.exists(self.kvs):
-                os.remove(self.kvs)
+        if self.th_server is not None:
+            self.th_server.terminate()
+        if self.storage is not None:
+            self.storage.cleanup()
         super().teardown_class()
 
     def steps_TC_MCORE_FS_1_1(self) -> list[TestStep]:
         steps = [TestStep(1, "Enable Fabric Synchronization on DUT_FSA using the manufacturer specified mechanism.", is_commissioning=True),
                  TestStep(2, "Commission DUT_FSA onto TH_FSA fabric."),
-                 TestStep(3, "Reverse Commision Commission TH_FSAs onto DUT_FSA fabric."),
+                 TestStep(3, "Reverse Commission TH_FSAs onto DUT_FSA fabric."),
                  TestStep("3a", "TH_FSA sends RequestCommissioningApproval"),
                  TestStep("3b", "TH_FSA sends CommissionNode"),
                  TestStep("3c", "DUT_FSA commissions TH_FSA")]
@@ -95,9 +142,34 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_1(self):
-        self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
-        # TODO this value should either be determined or passed in from command line
         dut_commissioning_control_endpoint = 0
+
+        # Get the list of endpoints on the DUT_FSA_BRIDGE before adding the TH_SERVER_NO_UID.
+        dut_fsa_bridge_endpoints = set(await self.read_single_attribute_check_success(
+            cluster=Clusters.Descriptor,
+            attribute=Clusters.Descriptor.Attributes.PartsList,
+            node_id=self.dut_node_id,
+            endpoint=0,
+        ))
+
+        # Iterate through the endpoints on the DUT_FSA_BRIDGE
+        for endpoint in dut_fsa_bridge_endpoints:
+            # Read the DeviceTypeList attribute for the current endpoint
+            device_type_list = await self.read_single_attribute_check_success(
+                cluster=Clusters.Descriptor,
+                attribute=Clusters.Descriptor.Attributes.DeviceTypeList,
+                node_id=self.dut_node_id,
+                endpoint=endpoint
+            )
+
+            # Check if any of the device types is an AGGREGATOR
+            if any(device_type.deviceType == _DEVICE_TYPE_AGGREGATOR for device_type in device_type_list):
+                dut_commissioning_control_endpoint = endpoint
+                logging.info(f"Aggregator endpoint found: {dut_commissioning_control_endpoint}")
+                break
+
+        asserts.assert_not_equal(dut_commissioning_control_endpoint, 0, "Invalid aggregator endpoint. Cannot proceed with test.")
+
         self.step(1)
         self.step(2)
         self.step(3)
@@ -111,10 +183,10 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         self.step("3a")
         good_request_id = 0x1234567812345678
         cmd = Clusters.CommissionerControl.Commands.RequestCommissioningApproval(
-            requestId=good_request_id, vendorId=th_fsa_server_vid, productId=th_fsa_server_pid, label="Test Ecosystem")
+            requestID=good_request_id, vendorID=th_fsa_server_vid, productID=th_fsa_server_pid, label="Test Ecosystem")
         await self.send_single_cmd(cmd, endpoint=dut_commissioning_control_endpoint)
 
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input("Approve Commissioning approval request on DUT using manufacturer specified mechanism")
 
         if not events:
@@ -125,12 +197,12 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
 
         asserts.assert_equal(len(new_event), 1, "Unexpected event list len")
         asserts.assert_equal(new_event[0].Data.statusCode, 0, "Unexpected status code")
-        asserts.assert_equal(new_event[0].Data.clientNodeId,
+        asserts.assert_equal(new_event[0].Data.clientNodeID,
                              self.matter_test_config.controller_node_id, "Unexpected client node id")
-        asserts.assert_equal(new_event[0].Data.requestId, good_request_id, "Unexpected request ID")
+        asserts.assert_equal(new_event[0].Data.requestID, good_request_id, "Unexpected request ID")
 
         self.step("3b")
-        cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestId=good_request_id, responseTimeoutSeconds=30)
+        cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestID=good_request_id, responseTimeoutSeconds=30)
         resp = await self.send_single_cmd(cmd, endpoint=dut_commissioning_control_endpoint)
         asserts.assert_equal(type(resp), Clusters.CommissionerControl.Commands.ReverseOpenCommissioningWindow,
                              "Incorrect response type")
@@ -143,14 +215,24 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         await self.send_single_cmd(cmd, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, timedRequestTimeoutMs=5000)
 
         self.step("3c")
-        if not self.is_ci:
-            time.sleep(30)
+        max_wait_time_sec = 30
+        start_time = time.time()
+        elapsed = 0
+        time_remaining = max_wait_time_sec
+        previous_number_th_server_fabrics = len(th_fsa_server_fabrics)
 
-        th_fsa_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
-        # TODO: this should be mocked too.
-        if not self.is_ci:
-            asserts.assert_equal(len(th_fsa_server_fabrics) + 1, len(th_fsa_server_fabrics_new),
-                                 "Unexpected number of fabrics on TH_SERVER")
+        th_fsa_server_fabrics_new = None
+        while time_remaining > 0:
+            time.sleep(2)
+            th_fsa_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
+            if previous_number_th_server_fabrics != len(th_fsa_server_fabrics_new):
+                break
+            elapsed = time.time() - start_time
+            time_remaining = max_wait_time_sec - elapsed
+
+        asserts.assert_not_equal(th_fsa_server_fabrics_new, None, "Failed to read Fabrics attribute")
+        asserts.assert_equal(previous_number_th_server_fabrics + 1, len(th_fsa_server_fabrics_new),
+                             "Unexpected number of fabrics on TH_SERVER")
 
 
 if __name__ == "__main__":

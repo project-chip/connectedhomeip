@@ -1,1 +1,1 @@
-75 : remove workaround for bloaty build, workaround involved cloning and installing abseil
+97 : [Telink] Update Docker image (Zephyr update)

@@ -61,8 +61,9 @@ using namespace Clusters::Globals::Attributes;
 
 namespace {
 
-DataVersion dataVersion           = 0;
-const MockNodeConfig * mockConfig = nullptr;
+unsigned metadataStructureGeneration = 0;
+DataVersion dataVersion              = 0;
+const MockNodeConfig * mockConfig    = nullptr;
 
 const MockNodeConfig & DefaultMockNodeConfig()
 {
@@ -236,6 +237,39 @@ chip::EndpointId emberAfEndpointFromIndex(uint16_t index)
     return config.endpoints[index].id;
 }
 
+namespace chip {
+namespace app {
+
+EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
+{
+    return GetMockNodeConfig().endpoints[endpointIndex].composition;
+}
+
+} // namespace app
+} // namespace chip
+
+EndpointId emberAfParentEndpointFromIndex(uint16_t index)
+{
+    return kInvalidEndpointId;
+}
+
+CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
+                                            Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag)
+{
+    auto ep = GetMockNodeConfig().endpointById(endpoint);
+
+    if (ep)
+    {
+        auto semanticTags = ep->semanticTags();
+        if (index < semanticTags.size())
+        {
+            tag = semanticTags[index];
+            return CHIP_NO_ERROR;
+        }
+    }
+    return CHIP_ERROR_NOT_FOUND;
+}
+
 chip::Optional<chip::ClusterId> emberAfGetNthClusterId(chip::EndpointId endpointId, uint8_t n, bool server)
 {
     VerifyOrReturnValue(server, NullOptional); // only server clusters supported
@@ -313,6 +347,45 @@ DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & a
     return &dataVersion;
 }
 
+chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::EndpointId endpointId, CHIP_ERROR & err)
+{
+    auto endpoint = GetMockNodeConfig().endpointById(endpointId);
+
+    if (endpoint == nullptr)
+    {
+        return chip::Span<const EmberAfDeviceType>();
+    }
+
+    return endpoint->deviceTypes();
+}
+
+chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsigned index, CHIP_ERROR & err)
+{
+    if (index >= GetMockNodeConfig().endpoints.size())
+    {
+        return chip::Span<const EmberAfDeviceType>();
+    }
+
+    return GetMockNodeConfig().endpoints[index].deviceTypes();
+}
+
+void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
+                             AttributesChangedListener * listener)
+{
+    dataVersion++;
+    listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
+}
+
+void emberAfEndpointChanged(EndpointId endpoint, AttributesChangedListener * listener)
+{
+    listener->MarkDirty(AttributePathParams(endpoint));
+}
+
+unsigned emberAfMetadataStructureGeneration()
+{
+    return metadataStructureGeneration;
+}
+
 namespace chip {
 namespace app {
 
@@ -367,6 +440,11 @@ void BumpVersion()
 DataVersion GetVersion()
 {
     return dataVersion;
+}
+
+void SetVersionTo(DataVersion version)
+{
+    dataVersion = version;
 }
 
 CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
@@ -460,12 +538,14 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
 
 void SetMockNodeConfig(const MockNodeConfig & config)
 {
+    metadataStructureGeneration++;
     mockConfig = &config;
 }
 
 /// Resets the mock attribute storage to the default configuration.
 void ResetMockNodeConfig()
 {
+    metadataStructureGeneration++;
     mockConfig = nullptr;
 }
 

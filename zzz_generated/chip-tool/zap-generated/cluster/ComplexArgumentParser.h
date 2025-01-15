@@ -72,6 +72,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs
 
 static void Finalize(chip::app::Clusters::detail::Structs::ErrorStateStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ICEServerStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::detail::Structs::ICEServerStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::LabelStruct::Type & request, Json::Value & value);
 
 static void Finalize(chip::app::Clusters::detail::Structs::LabelStruct::Type & request);
@@ -80,6 +85,16 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::detail::Structs::OperationalStateStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ViewportStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::detail::Structs::ViewportStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::WebRTCSessionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::detail::Structs::WebRTCSessionStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & request,
                         Json::Value & value);
@@ -657,6 +672,140 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentControl:
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ContentControl::Structs::RatingNameStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ZoneManagement::Structs::TwoDCartesianVertexStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ZoneManagement::Structs::TwoDCartesianVertexStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ZoneManagement::Structs::TwoDCartesianZoneStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ZoneManagement::Structs::TwoDCartesianZoneStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ZoneManagement::Structs::ZoneInformationStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ZoneManagement::Structs::ZoneInformationStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ZoneManagement::Structs::ZoneTriggerControlStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ZoneManagement::Structs::ZoneTriggerControlStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::CameraAvStreamManagement::Structs::VideoStreamStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::VideoStreamStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotStreamStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotStreamStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::CameraAvStreamManagement::Structs::RateDistortionTradeOffPointsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::RateDistortionTradeOffPointsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::CameraAvStreamManagement::Structs::AudioCapabilitiesStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::AudioCapabilitiesStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::CameraAvStreamManagement::Structs::AudioStreamStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::AudioStreamStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::CameraAvStreamManagement::Structs::VideoSensorParamsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::VideoSensorParamsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZPresetStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZPresetStruct::Type & request);
+
+static CHIP_ERROR
+Setup(const char * label,
+      chip::app::Clusters::PushAvStreamTransport::Structs::TransportMotionTriggerTimeControlStruct::Type & request,
+      Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::TransportMotionTriggerTimeControlStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::PushAvStreamTransport::Structs::TransportZoneOptionsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::TransportZoneOptionsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::PushAvStreamTransport::Structs::MetadataOptionsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::MetadataOptionsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::PushAvStreamTransport::Structs::TransportTriggerOptionsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::TransportTriggerOptionsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::PushAvStreamTransport::Structs::CMAFContainerOptionsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::CMAFContainerOptionsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::PushAvStreamTransport::Structs::ContainerOptionsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::ContainerOptionsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::PushAvStreamTransport::Structs::TransportOptionsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::TransportOptionsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::PushAvStreamTransport::Structs::TransportConfigurationStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::TransportConfigurationStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::Type & request,

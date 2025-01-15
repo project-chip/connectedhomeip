@@ -23,7 +23,7 @@ import time
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import type_matches
+from chip.testing.matter_testing import type_matches
 from mobly import asserts
 
 
@@ -121,7 +121,6 @@ class DRLK_COMMON:
                                                      credentials=self.createdCredential, userIndex=self.user_index)
 
     async def run_drlk_test_common(self, lockUnlockCommand, lockUnlockCmdRspPICS, lockUnlockText, doAutoRelockTest):
-        is_ci = self.check_pics('PICS_SDK_CI_ONLY')
         self.clear_credential_and_user_flag = True
 
         # Allow for user overrides of these values
@@ -131,7 +130,7 @@ class DRLK_COMMON:
         userCodeTemporaryDisableTime = self.user_params.get("user_code_temporary_disable_time", 15)
         wrongCodeEntryLimit = self.user_params.get("wrong_code_entry_limit", 3)
         autoRelockTime = self.user_params.get("auto_relock_time", 60)
-        if is_ci:
+        if self.is_pics_sdk_ci_only:
             autoRelockTime = 10
 
         cluster = Clusters.Objects.DoorLock
@@ -314,19 +313,21 @@ class DRLK_COMMON:
                 autoRelockTime_dut = await self.read_drlk_attribute_expect_success(attribute=attributes.AutoRelockTime)
                 logging.info("AutoRelockTime value is %s" % (autoRelockTime_dut))
 
-            if self.check_pics(lockUnlockCmdRspPICS):
-                self.print_step("17", "Send %s with valid Pincode and verify success" % lockUnlockText)
-                command = lockUnlockCommand(PINCode=pin_code)
-                await self.send_drlk_cmd_expect_success(command=command)
-            # Add additional wait time buffer for motor movement, etc.
-            time.sleep(autoRelockTime_dut + 5)
+                if self.check_pics(lockUnlockCmdRspPICS):
+                    self.print_step("17", "Send %s with valid Pincode and verify success" % lockUnlockText)
+                    command = lockUnlockCommand(PINCode=pin_code)
+                    await self.send_drlk_cmd_expect_success(command=command)
 
-            if self.check_pics("DRLK.S.A0000"):
-                self.print_step("18", "TH reads LockState attribute after AutoRelockTime Expires")
-                lockstate_dut = await self.read_drlk_attribute_expect_success(attribute=attributes.LockState)
-                logging.info("Current LockState is %s" % (lockstate_dut))
-                asserts.assert_equal(lockstate_dut, Clusters.DoorLock.Enums.DlLockState.kLocked,
-                                     "LockState expected to be value==Locked")
+                if self.check_pics("DRLK.S.A0000"):
+                    self.print_step("18", "TH reads LockState attribute after AutoRelockTime Expires")
+                    # Add additional wait time buffer for motor movement, etc.
+                    time.sleep(autoRelockTime_dut + 5)
+                    lockstate_dut = await self.read_drlk_attribute_expect_success(attribute=attributes.LockState)
+                    logging.info("Current LockState is %s" % (lockstate_dut))
+                    asserts.assert_equal(lockstate_dut, Clusters.DoorLock.Enums.DlLockState.kLocked,
+                                         "LockState expected to be value==Locked")
+            else:
+                logging.info("Steps 15 to 18 are Skipped as the PICs DRLK.S.A0023 not enabled")
             await self.cleanup_users_and_credentials(user_clear_step="20", clear_credential_step="19",
                                                      credentials=credential, userIndex=1)
 

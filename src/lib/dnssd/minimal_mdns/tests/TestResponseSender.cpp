@@ -34,7 +34,6 @@
 
 namespace {
 
-using namespace std;
 using namespace chip;
 using namespace mdns::Minimal;
 using namespace mdns::Minimal::test;

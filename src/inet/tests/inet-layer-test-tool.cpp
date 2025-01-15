@@ -777,7 +777,7 @@ void DriveSend()
         if (sTestState.mStats.mTransmit.mActual < sTestState.mStats.mTransmit.mExpected)
         {
             const uint32_t lRemaining = (sTestState.mStats.mTransmit.mExpected - sTestState.mStats.mTransmit.mActual);
-            const uint32_t lSendSize  = chip::min(lRemaining, static_cast<uint32_t>(gSendSize));
+            const uint32_t lSendSize  = std::min(lRemaining, static_cast<uint32_t>(gSendSize));
 
             // gSendSize is uint16_t, so this cast is safe: the value has to be
             // in the uint16_t range.

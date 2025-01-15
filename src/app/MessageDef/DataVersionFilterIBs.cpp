@@ -69,6 +69,21 @@ DataVersionFilterIB::Builder & DataVersionFilterIBs::Builder::CreateDataVersionF
     return mDataVersionFilter;
 }
 
+CHIP_ERROR DataVersionFilterIBs::Builder::EncodeDataVersionFilterIB(const DataVersionFilter & aFilter)
+{
+    DataVersionFilterIB::Builder & filterIB = CreateDataVersionFilter();
+    ReturnErrorOnFailure(GetError());
+    ClusterPathIB::Builder & path = filterIB.CreatePath();
+    ReturnErrorOnFailure(filterIB.GetError());
+    ReturnErrorOnFailure(path.Endpoint(aFilter.mEndpointId).Cluster(aFilter.mClusterId).EndOfClusterPathIB());
+    ReturnErrorOnFailure(filterIB.DataVersion(aFilter.mDataVersion.Value()).EndOfDataVersionFilterIB());
+
+    ChipLogProgress(DataManagement, "Encoded DataVersionFilter: Endpoint=%u Cluster=" ChipLogFormatMEI " Version=%" PRIu32,
+                    aFilter.mEndpointId, ChipLogValueMEI(aFilter.mClusterId), aFilter.mDataVersion.Value());
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DataVersionFilterIBs::Builder::EndOfDataVersionFilterIBs()
 {
     EndOfContainer();

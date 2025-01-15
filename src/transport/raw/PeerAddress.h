@@ -54,6 +54,7 @@ enum class Type : uint8_t
     kBle,
     kTcp,
     kWiFiPAF,
+    kLast = kWiFiPAF, // This is not an actual transport type, it just refers to the last transport type
 };
 
 /**

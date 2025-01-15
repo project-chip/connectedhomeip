@@ -212,6 +212,13 @@ enum TestGlobalEnum : enum8 {
   kFinalValue = 2;
 }
 
+enum ThreeLevelAutoEnum : enum8 {
+  kLow = 0;
+  kMedium = 1;
+  kHigh = 2;
+  kAutomatic = 3;
+}
+
 bitmap TestGlobalBitmap : bitmap32 {
   kFirstBit = 0x1;
   kSecondBit = 0x2;
@@ -1006,6 +1013,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
   provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
   provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  provisional readonly attribute access(read: administer) optional int32u TCUpdateDeadline = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1413,7 +1421,7 @@ cluster GeneralDiagnostics = 51 {
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
   /** Request a variable length payload response. */
-  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
+  command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -2272,15 +2280,15 @@ endpoint 1 {
   }
 
   server cluster OnOff {
-    ram      attribute onOff default = 0;
+    persist  attribute onOff default = 0;
     ram      attribute globalSceneControl default = 1;
     ram      attribute onTime default = 0;
     ram      attribute offWaitTime default = 0;
-    ram      attribute startUpOnOff;
+    persist  attribute startUpOnOff;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 5;
 
     handle command Off;
@@ -2292,15 +2300,17 @@ endpoint 1 {
   }
 
   server cluster LevelControl {
-    ram      attribute currentLevel default = 0x00;
+    persist  attribute currentLevel default = 0xFE;
     ram      attribute remainingTime default = 0x0000;
-    ram      attribute options default = 0x00;
+    ram      attribute minLevel default = 0x1;
+    ram      attribute maxLevel default = 0xFE;
+    ram      attribute options default = 0x01;
     ram      attribute onLevel;
-    ram      attribute startUpCurrentLevel;
+    persist  attribute startUpCurrentLevel;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 0x3;
     ram      attribute clusterRevision default = 6;
 
     handle command MoveToLevel;
@@ -2327,53 +2337,23 @@ endpoint 1 {
 
   server cluster ColorControl {
     ram      attribute remainingTime default = 0x0000;
-    ram      attribute colorTemperatureMireds default = 0x00FA;
-    ram      attribute colorMode default = 0x02;
+    persist  attribute colorTemperatureMireds default = 0x00FA;
+    persist  attribute colorMode default = 0x02;
     ram      attribute options default = 0x00;
     ram      attribute numberOfPrimaries;
-    ram      attribute primary1X;
-    ram      attribute primary1Y;
-    ram      attribute primary1Intensity;
-    ram      attribute primary2X;
-    ram      attribute primary2Y;
-    ram      attribute primary2Intensity;
-    ram      attribute primary3X;
-    ram      attribute primary3Y;
-    ram      attribute primary3Intensity;
-    ram      attribute primary4X;
-    ram      attribute primary4Y;
-    ram      attribute primary4Intensity;
-    ram      attribute primary5X;
-    ram      attribute primary5Y;
-    ram      attribute primary5Intensity;
-    ram      attribute primary6X;
-    ram      attribute primary6Y;
-    ram      attribute primary6Intensity;
-    ram      attribute enhancedCurrentHue default = 0x0000;
-    ram      attribute enhancedColorMode default = 0x02;
-    ram      attribute colorCapabilities default = 0x0000;
+    persist  attribute enhancedColorMode default = 0x02;
+    ram      attribute colorCapabilities default = 0x0010;
     ram      attribute colorTempPhysicalMinMireds default = 0x009A;
     ram      attribute colorTempPhysicalMaxMireds default = 0x01C6;
     ram      attribute coupleColorTempToLevelMinMireds;
-    ram      attribute startUpColorTemperatureMireds default = 0x00FA;
+    persist  attribute startUpColorTemperatureMireds default = 0x00FA;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0010;
     ram      attribute clusterRevision default = 7;
 
-    handle command MoveToHue;
-    handle command MoveHue;
-    handle command StepHue;
-    handle command MoveToSaturation;
-    handle command MoveSaturation;
-    handle command StepSaturation;
-    handle command MoveToHueAndSaturation;
-    handle command MoveToColor;
-    handle command MoveColor;
-    handle command StepColor;
     handle command MoveToColorTemperature;
-    handle command EnhancedMoveToHue;
     handle command EnhancedMoveHue;
     handle command EnhancedStepHue;
     handle command EnhancedMoveToHueAndSaturation;

@@ -23,6 +23,7 @@
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <init_Matter.h>
 #include <mbedtls/platform.h>
 #ifdef CONFIG_ENABLE_CHIP_SHELL
@@ -100,6 +101,7 @@ CHIP_ERROR MatterInitializer::Init_Matter_Server(void)
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
     chip::Server::GetInstance().Init(initParams);

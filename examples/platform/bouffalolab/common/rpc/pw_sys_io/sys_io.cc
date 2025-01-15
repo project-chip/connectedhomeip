@@ -31,18 +31,18 @@ Status ReadByte(std::byte * dest)
         return Status::InvalidArgument();
 
     int16_t ret = uartRead(reinterpret_cast<char *>(dest), 1);
-    return ret <= 0 ? Status::FailedPrecondition() : OkStatus();
+    return ret < 0 ? Status::FailedPrecondition() : OkStatus();
 }
 
 Status WriteByte(std::byte b)
 {
     int16_t ret = uartWrite(reinterpret_cast<const char *>(&b), 1);
 
-    return ret <= 0 ? Status::FailedPrecondition() : OkStatus();
+    return ret < 0 ? Status::FailedPrecondition() : OkStatus();
 }
 
 // Writes a string using pw::sys_io, and add newline characters at the end.
-StatusWithSize WriteLine(const std::string_view & s)
+StatusWithSize WriteLine(std::string_view s)
 {
     size_t chars_written  = 0;
     StatusWithSize result = WriteBytes(pw::as_bytes(pw::span(s)));

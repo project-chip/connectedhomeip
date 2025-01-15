@@ -41,6 +41,7 @@ static_library("BL702") {
     "../common/DiagnosticDataProviderImpl.cpp",
     "../common/KeyValueStoreManagerImpl.cpp",
     "../common/PlatformManagerImpl.cpp",
+    "../common/SystemTimeSupport.cpp",
   ]
 
   if (chip_enable_ota_requestor) {
@@ -57,8 +58,6 @@ static_library("BL702") {
     ]
   }
 
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
-
   if (chip_enable_factory_data) {
     sources += [
       "../common/FactoryDataProvider.cpp",
@@ -68,7 +67,14 @@ static_library("BL702") {
 
   if (bouffalo_sdk_component_easyflash_enabled) {
     sources += [ "../common/BLConfig.cpp" ]
+  } else {
+    sources += [ "../common/BLConfig_littlefs.cpp" ]
   }
+
+  deps = [
+    "${chip_root}/src/credentials:credentials_header",
+    "${chip_root}/src/platform/logging:headers",
+  ]
 
   if (chip_enable_wifi) {
     sources += [
@@ -113,6 +119,5 @@ static_library("BL702") {
     deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
   }
 
-  deps += [ "${chip_root}/src/credentials:credentials_header" ]
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 }

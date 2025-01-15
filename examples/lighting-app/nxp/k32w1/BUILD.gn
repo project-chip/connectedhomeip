@@ -44,6 +44,8 @@ assert(target_os == "freertos")
 
 example_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
 common_example_dir = "${chip_root}/examples/platform/nxp/common"
+support_common_platform_dir =
+    "${nxp_sdk_matter_support_root}/examples/platform/common"
 
 mcxw71_k32w1_sdk("sdk") {
   defines = []
@@ -58,6 +60,9 @@ mcxw71_k32w1_sdk("sdk") {
 
   # Indicate the default path to OpenThreadConfig.h
   include_dirs += [ "${example_platform_dir}/app/project_include/openthread" ]
+
+  # Indicate the default path to GATT database
+  include_dirs += [ "${support_common_platform_dir}/ble" ]
 
   include_dirs += [
     "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1",
@@ -74,6 +79,7 @@ mcxw71_k32w1_sdk("sdk") {
     "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_extflash.c",
     "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_lp.c",
     "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/hardware_init.c",
+    "${support_common_platform_dir}/ble/ble_function_mux.c",
   ]
 
   if (is_debug) {
@@ -95,7 +101,7 @@ mcxw71_k32w1_sdk("sdk") {
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
   ]
 
-  if (chip_key_storage == "littlefs") {
+  if (nxp_nvm_component == "littlefs") {
     include_dirs += [ "${example_platform_dir}/board" ]
     sources += [
       "${example_platform_dir}/board/peripherals.c",
@@ -125,7 +131,7 @@ mcxw71_k32w1_executable("light_app") {
     "CONFIG_OPERATIONAL_KEYSTORE=1",
     "CONFIG_ENABLE_FEEDBACK=1",
     "APP_QUEUE_TICKS_TO_WAIT=pdMS_TO_TICKS(10)",
-    "EXTERNAL_FACTORY_DATA_PROVIDER_HEADER=\"platform/nxp/common/legacy/FactoryDataProvider.h\"",
+    "EXTERNAL_FACTORY_DATA_PROVIDER_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProvider.h\"",
   ]
 
   # App common files
@@ -140,20 +146,28 @@ mcxw71_k32w1_executable("light_app") {
     "${common_example_dir}/operational_keystore/include",
     "${common_example_dir}/rpc/include",
     "${common_example_dir}/ui_feedback/include",
+    "${common_example_dir}/app_ble/include",
   ]
 
   sources += [
+    "${common_example_dir}/app_ble/source/BLEApplicationManagerEmpty.cpp",
     "${common_example_dir}/app_task/source/AppTaskBase.cpp",
     "${common_example_dir}/app_task/source/AppTaskFreeRTOS.cpp",
     "${common_example_dir}/clusters/source/ZclCallbacks.cpp",
     "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
+    "${common_example_dir}/matter_button/source/ButtonApp.cpp",
+    "${common_example_dir}/matter_button/source/ButtonBle.cpp",
+    "${common_example_dir}/matter_button/source/ButtonManager.cpp",
+    "${common_example_dir}/matter_button/source/ButtonRegistrationAppAndBle.cpp",
+    "${common_example_dir}/matter_button/source/ButtonWithTimer.cpp",
+    "${common_example_dir}/operational_keystore/source/OperationalKeystoreS200.cpp",
     "${example_platform_dir}/factory_data/source/AppFactoryDataExample.cpp",
   ]
 
   if (chip_enable_ota_requestor) {
     defines += [
-      "CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER=\"platform/nxp/common/legacy/OTAImageProcessorImpl.h\"",
+      "CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER=\"platform/nxp/common/ota/OTAImageProcessorImpl.h\"",
 
       # The status LED and the external flash CS pin are wired together. The OTA image writing may fail if used together.
       "LED_MANAGER_ENABLE_STATUS_LED=0",
@@ -171,11 +185,7 @@ mcxw71_k32w1_executable("light_app") {
     "${example_platform_dir}/button",
   ]
 
-  sources += [
-    "${example_platform_dir}/button/ButtonManager.cpp",
-    "${example_platform_dir}/clusters/Identify.cpp",
-    "${example_platform_dir}/operational_keystore/OperationalKeystore.cpp",
-  ]
+  sources += [ "${example_platform_dir}/clusters/Identify.cpp" ]
 
   if (chip_enable_ota_requestor) {
     sources += [ "${example_platform_dir}/ota/OtaUtils.cpp" ]
@@ -185,8 +195,9 @@ mcxw71_k32w1_executable("light_app") {
     sources += [ "${example_platform_dir}/rpc/AppRpc.cpp" ]
   }
 
-  if (chip_with_factory_data == 1) {
-    include_dirs += [ "${chip_root}/src/platform/nxp/common/legacy" ]
+  if (nxp_use_factory_data) {
+    include_dirs +=
+        [ "${chip_root}/src/platform/nxp/common/factory_data/legacy" ]
     deps += [ "${chip_root}/src/platform/nxp:nxp_factory_data" ]
   }
 
@@ -207,7 +218,7 @@ mcxw71_k32w1_executable("light_app") {
     "${chip_root}/src/platform/logging:default",
   ]
 
-  if (chip_config_dimmable_led) {
+  if (nxp_config_dimmable_led) {
     defines += [ "LIGHTING_MANAGER_ENABLE_DIMMABLE_LED=1" ]
     sources += [
       "${common_example_dir}/led_widget/include/LedDimmer.h",
@@ -235,8 +246,8 @@ mcxw71_k32w1_executable("light_app") {
     ]
   }
 
-  if (use_smu2_static) {
-    ldscript = "${example_platform_dir}/app/ldscripts/k32w1_app.ld"
+  if (nxp_use_smu2_static) {
+    ldscript = "${example_platform_dir}/app/ldscripts/app.ld"
     base_ldscript_dir = "${nxp_sdk_root}/middleware/wireless/framework/Common/devices/kw45_k32w1/gcc"
   } else {
     ldscript = "${nxp_sdk_root}/middleware/wireless/framework/Common/devices/kw45_k32w1/gcc/connectivity.ld"
@@ -252,11 +263,11 @@ mcxw71_k32w1_executable("light_app") {
     "-T" + rebase_path(ldscript, root_build_dir),
   ]
 
-  if (chip_with_factory_data == 1) {
+  if (nxp_use_factory_data) {
     ldflags += [ "-Wl,--defsym=gUseFactoryData_d=1" ]
   }
 
-  if (use_smu2_static) {
+  if (nxp_use_smu2_static) {
     ldflags += [ "-L" + rebase_path(base_ldscript_dir, root_build_dir) ]
   }
 

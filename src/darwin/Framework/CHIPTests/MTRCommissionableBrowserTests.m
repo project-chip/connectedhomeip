@@ -17,9 +17,9 @@
 
 #import <Matter/Matter.h>
 
+#import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
 #import "MTRTestKeys.h"
-#import "MTRTestServerAppRunner.h"
 #import "MTRTestStorage.h"
 
 // Fixture 1: chip-all-clusters-app --KVS "$(mktemp -t chip-test-kvs)" --interface-id -1
@@ -30,8 +30,6 @@ static const __auto_type kTestProductIds = @[ @(0x8000u), @(0x8001u) ];
 static const __auto_type kTestDiscriminators = @[ @(2000), @(3839u), @(3840u) ];
 static const uint16_t kDiscoverDeviceTimeoutInSeconds = 10;
 static const uint16_t kExpectedDiscoveredDevicesCount = 3;
-
-static bool sHelperAppsStarted = false;
 
 // Singleton controller we use.
 static MTRDeviceController * sController = nil;
@@ -57,6 +55,7 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
 @property (nonatomic, nullable) XCTestExpectation * expectation;
 @property (nonatomic) NSMutableArray<NSDictionary<NSString *, id> *> * results;
 @property (nonatomic) NSMutableArray<NSDictionary<NSString *, id> *> * removedResults;
+@property (nonatomic) BOOL expectedResultsCountReached;
 
 - (instancetype)initWithExpectation:(XCTestExpectation *)expectation;
 - (void)controller:(MTRDeviceController *)controller didFindCommissionableDevice:(MTRCommissionableBrowserResult *)device;
@@ -73,6 +72,7 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
     _expectation = expectation;
     _results = [[NSMutableArray alloc] init];
     _removedResults = [[NSMutableArray alloc] init];
+    _expectedResultsCountReached = NO;
     return self;
 }
 
@@ -85,6 +85,7 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
     _expectation = nil;
     _results = [[NSMutableArray alloc] init];
     _removedResults = [[NSMutableArray alloc] init];
+    _expectedResultsCountReached = NO;
     return self;
 }
 
@@ -103,19 +104,6 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
 
     [_results addObject:snapshot];
 
-    if (_results.count == kExpectedDiscoveredDevicesCount) {
-        // Do some sanity checking on our results and removedResults to make
-        // sure we really only saw the relevant set of things.
-        NSSet<NSDictionary<NSString *, id> *> * finalResultsSet = [NSSet setWithArray:_results];
-        NSSet<NSDictionary<NSString *, id> *> * allResultsSet = [finalResultsSet copy];
-        allResultsSet = [allResultsSet setByAddingObjectsFromArray:_removedResults];
-
-        // Ensure that we just saw the same results as our final set popping in and out if things
-        // ever got removed here.
-        XCTAssertEqualObjects(finalResultsSet, allResultsSet);
-        [self.expectation fulfill];
-    }
-
     XCTAssertLessThanOrEqual(_results.count, kExpectedDiscoveredDevicesCount);
 
     __auto_type instanceName = device.instanceName;
@@ -130,24 +118,38 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
     XCTAssertTrue([kTestDiscriminators containsObject:discriminator]);
     XCTAssertEqual(commissioningMode, YES);
 
-    NSLog(@"Found Device (%@) with discriminator: %@ (vendor: %@, product: %@)", instanceName, discriminator, vendorId, productId);
+    NSLog(@"Found device %@", snapshot);
+
+    if (_results.count == kExpectedDiscoveredDevicesCount) {
+        // Do some sanity checking on our results and removedResults to make
+        // sure we really only saw the relevant set of things.
+        NSSet<NSDictionary<NSString *, id> *> * finalResultsSet = [NSSet setWithArray:_results];
+        NSSet<NSDictionary<NSString *, id> *> * allResultsSet = [finalResultsSet copy];
+        allResultsSet = [allResultsSet setByAddingObjectsFromArray:_removedResults];
+
+        // Ensure that we just saw the same results as our final set popping in and out if things
+        // ever got removed here.
+        XCTAssertEqualObjects(finalResultsSet, allResultsSet);
+
+        // If we have a remove and re-add after the result count reached the
+        // expected one, we can end up in this branch again.  Doing the above
+        // checks is fine, but we shouldn't double-fulfill the expectation.
+        if (self.expectedResultsCountReached == NO) {
+            self.expectedResultsCountReached = YES;
+            [self.expectation fulfill];
+        }
+    }
 }
 
 - (void)controller:(MTRDeviceController *)controller didRemoveCommissionableDevice:(MTRCommissionableBrowserResult *)device
 {
-    __auto_type instanceName = device.instanceName;
-    __auto_type vendorId = device.vendorID;
-    __auto_type productId = device.productID;
-    __auto_type discriminator = device.discriminator;
-
-    NSLog(
-        @"Removed Device (%@) with discriminator: %@ (vendor: %@, product: %@)", instanceName, discriminator, vendorId, productId);
-
     __auto_type * snapshot = ResultSnapshot(device);
-    XCTAssertTrue([_results containsObject:snapshot], @"Removed device %@ is not something we found before", snapshot);
+    XCTAssertTrue([_results containsObject:snapshot], @"Removed device %@ is not something we found before: %@", snapshot, _results);
 
     [_removedResults addObject:snapshot];
     [_results removeObject:snapshot];
+
+    NSLog(@"Removed device %@", snapshot);
 }
 @end
 
@@ -180,6 +182,17 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
     XCTAssertNotNil(controller);
 
     sController = controller;
+
+    // Start the helper apps our tests use.
+    for (NSString * payload in @[
+             @"MT:Y.K90SO527JA0648G00",
+             @"MT:-24J0AFN00I40648G00",
+         ]) {
+        BOOL started = [self startAppWithName:@"all-clusters"
+                                    arguments:@[]
+                                      payload:payload];
+        XCTAssertTrue(started);
+    }
 }
 
 + (void)tearDown
@@ -197,21 +210,6 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
 - (void)setUp
 {
     [super setUp];
-
-    if (!sHelperAppsStarted) {
-        for (NSString * payload in @[
-                 @"MT:Y.K90SO527JA0648G00",
-                 @"MT:-24J0AFN00I40648G00",
-             ]) {
-            __auto_type * appRunner = [[MTRTestServerAppRunner alloc] initCrossTestWithAppName:@"all-clusters"
-                                                                                     arguments:@[]
-                                                                                       payload:payload
-                                                                                      testcase:self];
-            XCTAssertNotNil(appRunner);
-        }
-        sHelperAppsStarted = true;
-    }
-
     [self setContinueAfterFailure:NO];
 }
 

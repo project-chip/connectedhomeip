@@ -24,6 +24,9 @@
 #include "Globals.h"
 #include "LEDWidget.h"
 #include "chip_porting.h"
+#if CHIP_AMEBA_APP_TASK
+#include "ameba_main_task.h"
+#endif
 #include <DeviceInfoProviderImpl.h>
 
 #include <app/clusters/identify-server/identify-server.h>
@@ -31,6 +34,7 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/endpoint-config-api.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/ErrorStr.h>
 
 #include <platform/Ameba/AmebaConfig.h>
@@ -146,6 +150,7 @@ static void InitServer(intptr_t context)
     initParams.appDelegate = &sAmebaObserver;
 
     initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CONFIG_ENABLE_AMEBA_CRYPTO
     ChipLogProgress(DeviceLayer, "platform crypto enabled!");
@@ -170,7 +175,9 @@ static void InitServer(intptr_t context)
 #if CONFIG_ENABLE_CHIP_SHELL
     InitBindingHandler();
 #endif
-
+#if CHIP_AMEBA_APP_TASK
+    AppTaskInit();
+#endif
     chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);
 }
 

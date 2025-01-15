@@ -143,10 +143,13 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF=${chip_device_config_enable_wifipaf}",
     ]
 
+    public_deps = [ "${chip_root}/src/app/icd/server:icd-server-config" ]
+
     if (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
         chip_device_platform == "tizen" || chip_device_platform == "android" ||
         chip_device_platform == "webos" || chip_device_platform == "bl602" ||
-        chip_device_platform == "bl702" || chip_device_platform == "bl702l") {
+        chip_device_platform == "bl702" || chip_device_platform == "bl702l" ||
+        chip_device_platform == "bl616") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 
@@ -247,6 +250,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET=bouffalolab/common",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
+    } else if (chip_device_platform == "bl616") {
+      device_layer_target_define = "BL616"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=bouffalolab/common",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
     } else if (chip_device_platform == "bl702") {
       device_layer_target_define = "BL702"
       defines += [
@@ -306,6 +315,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     } else if (chip_device_platform == "openiotsdk") {
       device_layer_target_define = "OPEN_IOT_SDK"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=openiotsdk" ]
+      public_deps +=
+          [ "${chip_root}/src/platform/openiotsdk:openiotsdk_buildconfig" ]
     } else if (chip_device_platform == "asr") {
       device_layer_target_define = "ASR"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=ASR" ]
@@ -342,6 +353,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "TELINK",
       "MBED",
       "BL602",
+      "BL616",
       "BL702",
       "BL702L",
       "FAKE",
@@ -492,6 +504,8 @@ if (chip_device_platform != "none") {
       "../include/platform/internal/GenericDeviceInstanceInfoProvider.ipp",
       "../include/platform/internal/GenericPlatformManagerImpl.h",
       "../include/platform/internal/GenericPlatformManagerImpl.ipp",
+      "../include/platform/internal/GenericPlatformManagerImpl_CMSISOS.h",
+      "../include/platform/internal/GenericPlatformManagerImpl_CMSISOS.ipp",
       "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h",
       "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp",
       "../include/platform/internal/GenericPlatformManagerImpl_POSIX.h",
@@ -570,6 +584,8 @@ if (chip_device_platform != "none") {
       _platform_target = "webos"
     } else if (chip_device_platform == "bl602") {
       _platform_target = "bouffalolab/BL602"
+    } else if (chip_device_platform == "bl616") {
+      _platform_target = "bouffalolab/BL616"
     } else if (chip_device_platform == "bl702") {
       _platform_target = "bouffalolab/BL702"
     } else if (chip_device_platform == "bl702l") {

@@ -43,10 +43,13 @@ JNI_METHOD(void, GetConnectedDeviceCallbackForTestJni, onDeviceConnected)
 }
 
 JNI_METHOD(void, GetConnectedDeviceCallbackForTestJni, onDeviceConnectionFailure)
-(JNIEnv * env, jobject self, jlong callbackHandle, jint errorCode)
+(JNIEnv * env, jobject self, jlong callbackHandle, jlong errorCode)
 {
     GetConnectedDeviceCallback * connectedDeviceCallback = reinterpret_cast<GetConnectedDeviceCallback *>(callbackHandle);
     VerifyOrReturn(connectedDeviceCallback != nullptr, ChipLogError(Controller, "GetConnectedDeviceCallbackJni handle is nullptr"));
 
-    GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(connectedDeviceCallback, ScopedNodeId(), chip::ChipError(errorCode));
+    GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(
+        connectedDeviceCallback,
+        OperationalSessionSetup::ConnectionFailureInfo(
+            ScopedNodeId(), chip::ChipError(static_cast<ChipError::StorageType>(errorCode)), SessionEstablishmentStage::kUnknown));
 }

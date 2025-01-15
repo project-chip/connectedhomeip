@@ -343,10 +343,7 @@ class AttributeHandler(BaseHandler):
             if "nullable" in attrs and attrs["nullable"] != "false":
                 self._attribute.definition.qualities |= FieldQuality.NULLABLE
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        elif name == "optionalConform":
-            self._attribute.definition.qualities |= FieldQuality.OPTIONAL
-            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "otherwiseConform":
+        elif name in {"optionalConform", "otherwiseConform"}:
             self._attribute.definition.qualities |= FieldQuality.OPTIONAL
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "mandatoryConform":

@@ -44,7 +44,15 @@ limitations under the License.
       </feature>
     </features>
     
-    <attribute code="0x0000" side="server" define="AVAILABLE_ENDPOINTS" type="array" entryType="endpoint_no" length="20" optional="true">AvailableEndpoints</attribute>
-    <attribute code="0x0001" side="server" define="ACTIVE_ENDPOINTS" type="array" entryType="endpoint_no" length="20" optional="true">ActiveEndpoints</attribute>
+    <attribute code="0x0000" side="server" name="AvailableEndpoints" define="AVAILABLE_ENDPOINTS" type="array" entryType="endpoint_no" length="20" optional="true">
+      <mandatoryConform>
+        <feature name="SET"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute code="0x0001" side="server" name="ActiveEndpoints" define="ACTIVE_ENDPOINTS" type="array" entryType="endpoint_no" length="20" optional="true">
+      <mandatoryConform>
+        <feature name="DYPF"/>
+      </mandatoryConform>
+    </attribute>
   </cluster>
 </configurator>

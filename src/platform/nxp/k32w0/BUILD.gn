@@ -34,8 +34,8 @@ static_library("nxp_platform") {
   defines = []
   sources = [
     "../../SingletonConfigurationManager.cpp",
-    "../common/legacy/BLEManagerCommon.cpp",
-    "../common/legacy/BLEManagerCommon.h",
+    "../common/ble/BLEManagerCommon.cpp",
+    "../common/ble/BLEManagerCommon.h",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
@@ -67,7 +67,7 @@ static_library("nxp_platform") {
     "${chip_root}/src/platform/nxp/k32w0/BLEManagerImpl.h",
   ]
 
-  if (chip_with_factory_data == 1) {
+  if (nxp_use_factory_data) {
     sources += [
       "FactoryDataProvider.cpp",
       "FactoryDataProviderImpl.cpp",
@@ -78,29 +78,28 @@ static_library("nxp_platform") {
     ]
   }
 
-  if (chip_with_low_power != 0) {
+  if (nxp_use_low_power) {
     sources += [ "LowPowerHooks.cpp" ]
   }
 
   if (chip_enable_ota_requestor) {
-    public += [ "../common/legacy/OTAImageProcessorImpl.h" ]
+    public += [ "../common/ota/OTAImageProcessorImpl.h" ]
 
     sources += [
-      "../common/legacy/OTAImageProcessorImpl.cpp",
-      "../common/legacy/OTAImageProcessorImpl.h",
-      "../common/legacy/OTATlvProcessor.cpp",
-      "../common/legacy/OTATlvProcessor.h",
+      "../common/ota/OTAImageProcessorImpl.cpp",
+      "../common/ota/OTAImageProcessorImpl.h",
+      "../common/ota/OTATlvProcessor.cpp",
+      "../common/ota/OTATlvProcessor.h",
     ]
 
-    if (chip_enable_ota_firmware_processor == 1) {
+    if (nxp_enable_ota_firmware_processor) {
       sources += [
         "OTAFirmwareProcessor.cpp",
         "OTAFirmwareProcessor.h",
         "OTAHooks.cpp",
       ]
 
-      if (chip_with_factory_data == 1 &&
-          chip_enable_ota_factory_data_processor == 1) {
+      if (nxp_use_factory_data && nxp_enable_ota_factory_data_processor) {
         sources += [
           "OTAFactoryDataProcessor.cpp",
           "OTAFactoryDataProcessor.h",

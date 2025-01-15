@@ -35,25 +35,36 @@ project(test-driver)
 idf_build_set_property(CXX_COMPILE_OPTIONS "-std=gnu++17;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H" APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)
 
+
+esp32_unit_test(NAME testAccess LIBRARY accesstest)
+esp32_unit_test(NAME testAddressResolve LIBRARY AddressResolveTests)
+esp32_unit_test(NAME testAppClusterBuildingBlock LIBRARY AppClusterBuildingBlockTests)
+esp32_unit_test(NAME testAppDataModel LIBRARY AppDataModelTests)
+esp32_unit_test(NAME testASN1 LIBRARY ASN1Tests)
+esp32_unit_test(NAME testBDX LIBRARY BDXTests)
+esp32_unit_test(NAME testChipCrypto LIBRARY ChipCryptoTests EXTRA_LIBRARIES -lCertTestVectors)
+esp32_unit_test(NAME testCodegenDataModelProvider LIBRARY CodegenDataModelProviderTests)
+esp32_unit_test(NAME testCore LIBRARY CoreTests)
+esp32_unit_test(NAME testFormat LIBRARY FormatTests)
+esp32_unit_test(NAME testIMInterface LIBRARY IMInterfaceTests)
+esp32_unit_test(NAME testInetLayer LIBRARY InetLayerTests)
+esp32_unit_test(NAME testInteractionModel LIBRARY InteractionModelTests)
+esp32_unit_test(NAME testMinimalMdnsCore LIBRARY MinimalMdnsCoreTests)
+esp32_unit_test(NAME testMinimalMdnsRecords LIBRARY MinimalMdnsRecordsTests)
+esp32_unit_test(NAME testMinimalMdnsResponders LIBRARY MinimalMdnsRespondersTests)
+esp32_unit_test(NAME testMdns LIBRARY MdnsTests)
+esp32_unit_test(NAME testRetransmit LIBRARY RetransmitTests)
+esp32_unit_test(NAME testSetupPayload LIBRARY SetupPayloadTests)
+esp32_unit_test(NAME testSystemLayer LIBRARY SystemLayerTests)
+esp32_unit_test(NAME testUserDirectedCommissioning LIBRARY UserDirectedCommissioningTests)
+
 # TODO: libAppTests depends on MessagingTestHelpers, which depends on
 # NetworkTestHelpers.  That sort of depends on InetTestHelpers or
 # equivalent (to provide gSystemLayer, gInet, InitNetwork(),
 # ShutdownNetwork()) but there's only a POSIX implementation of that
-# last, which does not compile on ESP32.  Need to figure out how to
-# make that work.  See comments below for the transport layer tests,
-# which have the same issue.
-#
-# libAppTests.a -lMessagingTestHelpers -lNetworkTestHelpers
-#
-# TODO: ble tests do not compile using CMake (library is not auto-built)
-# libBleLayerTests.a
-
-esp32_unit_test(NAME testASN1 LIBRARY ASN1Tests)
-esp32_unit_test(NAME testChipCrypto LIBRARY ChipCryptoTests EXTRA_LIBRARIES -lCertTestVectors)
-esp32_unit_test(NAME testCore LIBRARY CoreTests)
-esp32_unit_test(NAME testInetLayer LIBRARY InetLayerTests)
-esp32_unit_test(NAME testRetransmit LIBRARY RetransmitTests)
-esp32_unit_test(NAME testSystemLayer LIBRARY SystemLayerTests)
+# last, which does not compile on ESP32.
+# This affects AppTests, MessagingLayerTests, MinimalMdnstests, ControllerTests
+# ControllerDataModelTests, ICDServerTests, SecureChannelTests.
 
 
 # allow other tools to discover what images are available without grepping for '.img'

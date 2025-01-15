@@ -1,5 +1,5 @@
 # Copyright (c) 2021 Project CHIP Authors
-# Copyright 2023 NXP
+# Copyright 2023-2024 NXP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,27 +35,20 @@ assert(target_os == "freertos")
 assert(nxp_platform == "rt/rw61x")
 
 declare_args() {
-  # Allows to start the tcp download test app
-  tcp_download = false
-
-  # Allows to start the wifi connect test app
-  wifi_connect = false
-
-  # The 2 params below are used only if tcp_download or wifi_connect are true, otherwise they're unused.
-  wifi_ssid = ""
-  wifi_password = ""
+  # Allows to connect to a predefine Wi-Fi network at boot
+  wifi_auto_connect_at_boot = false
+  wifi_auto_connect_at_boot_ssid = ""
+  wifi_auto_connect_at_boot_password = ""
 
   # Setup discriminator as argument
   setup_discriminator = 3840
+
+  chip_with_diag_logs_demo = true
 }
 
 example_platform_dir =
     "${nxp_sdk_matter_support_root}/examples/platform/${nxp_platform}"
 common_example_dir = "${chip_root}/examples/platform/nxp/common"
-
-if (tcp_download == true && wifi_connect == true) {
-  assert("Cannot enable tcp_download and wifi_connect at the same time!")
-}
 
 # Use NXP custom zap files for thermostatdevice-types
 app_common_folder = "thermostat/nxp/zap"
@@ -64,14 +57,6 @@ app_common_folder = "thermostat/nxp/zap"
 # Particular sources/defines/includes could be added/changed depending on the target application.
 rt_sdk("sdk") {
   defines = []
-
-  # To be moved, temporary mbedtls config fix to build app with factory data
-  if (chip_enable_secure_dac_private_key_storage == 1) {
-    defines += [
-      "MBEDTLS_NIST_KW_C",
-      "MBEDTLS_PSA_CRYPTO_CLIENT",
-    ]
-  }
 
   cflags = []
   public_deps = []
@@ -104,10 +89,17 @@ rt_sdk("sdk") {
   # Indicate the default path to OpenThreadConfig.h
   include_dirs += [ "${example_platform_dir}/app/project_include/openthread" ]
 
-  # For matter with BR feature, increase FreeRTOS heap size
+  # For matter with BR feature, increase FreeRTOS heap size and enable TBR cluster
   if (chip_enable_wifi && chip_enable_openthread) {
-    defines += [ "configTOTAL_HEAP_SIZE=(size_t)(170 * 1024)" ]
+    defines += [
+      "configTOTAL_HEAP_SIZE=(size_t)(170 * 1024)",
+      "CHIP_DEVICE_CONFIG_ENABLE_TBR=1",
+    ]
   }
+
+  defines += [
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
+  ]
 }
 
 # Create the SDK driver instance.
@@ -125,6 +117,13 @@ rt_executable("thermostat") {
 
   if (chip_enable_openthread) {
     defines += [ "CONFIG_NET_L2_OPENTHREAD=1" ]
+  }
+
+  if (chip_with_diag_logs_demo) {
+    defines += [
+      "CONFIG_DIAG_LOGS_DEMO=1",
+      "CHIP_DEVICE_CONFIG_MAX_DIAG_LOG_SIZE=1024",
+    ]
   }
 
   include_dirs = [
@@ -146,8 +145,39 @@ rt_executable("thermostat") {
     "../../common/main/main.cpp",
   ]
 
-  if (chip_enable_secure_dac_private_key_storage == 1) {
+  if (chip_enable_ble) {
+    defines += [ "APP_BT_DEVICE_NAME=\"NXP-ThermostatApp\"" ]
+    include_dirs += [ "${common_example_dir}/app_ble/include" ]
+    if (ble_adv_data_custom) {
+      # to customize BLE advertising data
+      defines += [ "CONFIG_CHIP_CUSTOM_BLE_ADV_DATA=1" ]
+      include_dirs += [ "${chip_root}/src/platform/nxp/common/ble_zephyr" ]
+      sources += [ "../../common/main/BleZephyrManagerApp.cpp" ]
+    } else {
+      # Empty implementation, default matter advertising data
+      sources += [
+        "${common_example_dir}/app_ble/source/BLEApplicationManagerEmpty.cpp",
+      ]
+    }
+  }
+
+  if (chip_with_diag_logs_demo) {
+    include_dirs += [
+      "${common_example_dir}/diagnostic_logs/include",
+      "${chip_root}",
+    ]
+    sources += [
+      "${common_example_dir}/diagnostic_logs/source/DiagnosticLogsDemo.cpp",
+      "${common_example_dir}/diagnostic_logs/source/DiagnosticLogsProviderDelegateImpl.cpp",
+    ]
+  }
+
+  if (nxp_enable_secure_whole_factory_data ||
+      nxp_enable_secure_EL2GO_factory_data) {
     sources += [ "${chip_root}/examples/platform/nxp/${nxp_platform}/factory_data/source/AppFactoryDataExample.cpp" ]
+    if (nxp_enable_secure_whole_factory_data) {
+      defines += [ "ENABLE_SECURE_WHOLE_FACTORY_DATA" ]
+    }
   } else {
     sources += [
       "${common_example_dir}/factory_data/source/AppFactoryDataDefaultImpl.cpp",
@@ -171,7 +201,7 @@ rt_executable("thermostat") {
     "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
     "${common_example_dir}/icd/source/ICDUtil.cpp",
-    "${common_example_dir}/matter_button/source/AppMatterButtonEmpty.cpp",
+    "${common_example_dir}/matter_button/source/ButtonRegistrationEmpty.cpp",
   ]
 
   deps = [
@@ -179,7 +209,7 @@ rt_executable("thermostat") {
     "${chip_root}/src/platform/logging:default",
   ]
 
-  if (chip_enable_matter_cli) {
+  if (nxp_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]
     deps += [
       "${chip_root}/examples/shell/shell_common:shell_common",
@@ -199,40 +229,19 @@ rt_executable("thermostat") {
     ]
   }
 
-  if (wifi_connect) {
+  if (wifi_auto_connect_at_boot) {
+    assert(wifi_auto_connect_at_boot_ssid != "" &&
+               wifi_auto_connect_at_boot_password != "",
+           "WiFi SSID and password must be specified at build time!")
+
     defines += [
-      "WIFI_CONNECT_TASK=1",
-      "WIFI_CONNECT=1",
+      "CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT=1",
+      "CONFIG_CHIP_APP_WIFI_SSID=\"${wifi_auto_connect_at_boot_ssid}\"",
+      "CONFIG_CHIP_APP_WIFI_PASSWORD=\"${wifi_auto_connect_at_boot_password}\"",
     ]
-
-    if (!chip_enable_matter_cli) {
-      assert(wifi_ssid != "" && wifi_password != "",
-             "WiFi SSID and password must be specified at build time!")
-    }
-
-    if (wifi_ssid != "") {
-      defines += [ "WIFI_SSID=\"${wifi_ssid}\"" ]
-    }
-
-    if (wifi_password != "") {
-      defines += [ "WIFI_PASSWORD=\"${wifi_password}\"" ]
-    }
 
     include_dirs += [ "${common_example_dir}/wifi_connect/include" ]
     sources += [ "${common_example_dir}/wifi_connect/source/WifiConnect.cpp" ]
-  }
-
-  if (tcp_download) {
-    defines += [ "CONFIG_CHIP_TCP_DOWNLOAD=1" ]
-    defines += [
-      "WIFI_CONNECT=1",
-      "WIFI_SSID=\"${wifi_ssid}\"",
-      "WIFI_PASSWORD=\"${wifi_password}\"",
-    ]
-
-    include_dirs += [ "${common_example_dir}/tcp_download_test/include" ]
-    sources +=
-        [ "${common_example_dir}/tcp_download_test/source/TcpDownload.cpp" ]
   }
 
   # In case a dedicated assert function needs to be supported the flag sdk_fsl_assert_support should be set to false
@@ -273,10 +282,6 @@ rt_executable("thermostat") {
       # Consequently, some sections will need to be shifted
       ldflags += [ "-Wl,--defsym=__m_mcuboot_size__=0x20000" ]
     }
-
-    defines += [
-      "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
-    ]
   }
 
   output_dir = root_out_dir

@@ -119,14 +119,22 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
-    DataModel::ActionReturnStatus Invoke(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
-                                         CommandHandler * handler) override;
+    std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request,
+                                                        chip::TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
-    EndpointId FirstEndpoint() override;
-    EndpointId NextEndpoint(EndpointId before) override;
-    DataModel::ClusterEntry FirstCluster(EndpointId endpoint) override;
-    DataModel::ClusterEntry NextCluster(const ConcreteClusterPath & before) override;
-    std::optional<DataModel::ClusterInfo> GetClusterInfo(const ConcreteClusterPath & path) override;
+    DataModel::EndpointEntry FirstEndpoint() override;
+    DataModel::EndpointEntry NextEndpoint(EndpointId before) override;
+    std::optional<DataModel::EndpointInfo> GetEndpointInfo(EndpointId endpoint) override;
+    std::optional<DataModel::DeviceTypeEntry> FirstDeviceType(EndpointId endpoint) override;
+    std::optional<DataModel::DeviceTypeEntry> NextDeviceType(EndpointId endpoint,
+                                                             const DataModel::DeviceTypeEntry & previous) override;
+    std::optional<SemanticTag> GetFirstSemanticTag(EndpointId endpoint) override;
+    std::optional<SemanticTag> GetNextSemanticTag(EndpointId endpoint, const SemanticTag & previous) override;
+    DataModel::ClusterEntry FirstServerCluster(EndpointId endpoint) override;
+    DataModel::ClusterEntry NextServerCluster(const ConcreteClusterPath & before) override;
+    std::optional<DataModel::ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) override;
+    ConcreteClusterPath FirstClientCluster(EndpointId endpoint) override;
+    ConcreteClusterPath NextClientCluster(const ConcreteClusterPath & before) override;
     DataModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
     DataModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
     std::optional<DataModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;
@@ -135,6 +143,7 @@ public:
     std::optional<DataModel::CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) override;
     ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) override;
     ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before) override;
+    void Temporary_ReportAttributeChanged(const AttributePathParams & path) override {}
 };
 
 } // namespace DataModelTests

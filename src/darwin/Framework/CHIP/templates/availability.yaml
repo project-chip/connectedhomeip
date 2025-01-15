@@ -4783,7 +4783,10 @@
           - Deprecated global attribute names
   provisional:
       clusters:
+          # PulseWidthModulation is not in the Matter specification.
           - PulseWidthModulation
+          # TimeSynchronization provisional until spec and SDK are aligned.
+          # See https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/10707
           - TimeSynchronization
 
 - release: "FD8D09B4-6CF7-4EBA-BD4F-7EDE872E3098"
@@ -7469,44 +7472,13 @@
                   - Wpa3Personal
   provisional:
       clusters:
-          ## Not ready at cutoff
-          - RefrigeratorAlarm
-          - TemperatureControl
-          ## Not ready to be public API yet.
-          - ICDManagement
-          - LaundryWasherMode
-          - RefrigeratorAndTemperatureControlledCabinetMode
-          - DishwasherMode
-          - LaundryWasherControls
-          - DishwasherAlarm
+          # SDK example, not part of the specification.
           - SampleMEI
       attributes:
           Scenes:
               # New scenes bits not stable yet.
               - SceneTableSize
-          RVCCleanMode:
-              # People are trying to deprecate this one
-              - OnMode
-          RVCRunMode:
-              # People are trying to deprecate this one
-              - OnMode
-      commands:
-          DoorLock:
-              # Not stable yet
-              - UnboltDoor
-          RVCOperationalState:
-              # Disallowed in the spec, but present in our XML?
-              - Start
-              - Stop
       enum values:
-          DoorLock:
-              # Not stable yet
-              DlLockState:
-                  - Unlatched
-              DlLockType:
-                  - Eurocylinder
-              LockOperationTypeEnum:
-                  - Unlatch
           TimeSynchronization:
               TimeSourceEnum:
                   - NonMatterSNTP
@@ -7521,25 +7493,7 @@
                   - MixedNTPNTS
                   - PTP
                   - GNSS
-      bitmap values:
-          DoorLock:
-              # Not stable yet
-              # Feature was originally named DoorLockFeature, but we generate the
-              # same API for both of those names, so the name can just change
-              # here.
-              Feature:
-                  - Unbolt
-          RVCRunMode:
-              Feature:
-                  # People are trying to deprecate this one
-                  - OnOff
-          RVCCleanMode:
-              Feature:
-                  # People are trying to deprecate this one
-                  - OnOff
-      global attributes:
-          - EventList
-      # Once we actually unmark TimeSynchronization as provisional, all these bits except EventList should go away too, and we should instead
+      # Once we actually unmark TimeSynchronization as provisional, all these bits should go away too, and we should instead
       # mark things as introduced/deprecated as needed.  The "ids" entries should go away, in particular.
       ids:
           attributes:
@@ -7547,15 +7501,6 @@
                   - TimeZoneListMaxSize
                   - DSTOffsetListMaxSize
                   - SupportsDNSResolve
-                  # Because we are special-casing ids for TimeSynchronization
-                  # above, we need to explicitly mark the EventList id
-                  # provisional.
-                  - EventList
-              PulseWidthModulation:
-                  # Because we are special-casing ids for PulseWidthModulation
-                  # above, we need to explicitly mark the EventList id
-                  # provisional.
-                  - EventList
           commands:
               TimeSynchronization:
                   - SetUTCTime
@@ -7592,14 +7537,18 @@
   provisional:
       attributes:
           Descriptor:
+              # New things, not quite finalized.  The XML does not match the spec:
+              # in the spec SemanticTagStruct is not a cluster-specific type.
               - TagList
       structs:
-          # New things, not quite finalized.
           Descriptor:
+              # New things, not quite finalized.  The XML does not match the spec:
+              # in the spec SemanticTagStruct is not a cluster-specific type.
               - SemanticTagStruct
       struct fields:
-          # New things, not quite finalized.
           Descriptor:
+              # New things, not quite finalized.  The XML does not match the spec:
+              # in the spec SemanticTagStruct is not a cluster-specific type.
               SemanticTagStruct:
                   - mfgCode
                   - namespaceID
@@ -7609,12 +7558,14 @@
           # CacheAndSync is provisional in the spec.
           GroupKeyManagement:
               - Feature
-          # New things, not quite finalized.
           Descriptor:
+              # New things, not quite finalized.  The XML does not match the spec:
+              # in the spec SemanticTagStruct is not a cluster-specific type.
               - Feature
       bitmap values:
-          # New things, not quite finalized.
           Descriptor:
+              # New things, not quite finalized.  The XML does not match the spec:
+              # in the spec SemanticTagStruct is not a cluster-specific type.
               Feature:
                   - TagList
           # CacheAndSync is provisional in the spec.
@@ -7744,18 +7695,10 @@
                   - DeadFront
   provisional:
       bitmaps:
-          BarrierControl:
-              - BarrierControlCapabilities
-              - BarrierControlSafetyStatus
           BallastConfiguration:
               # The BallastConfiguration cluster is provisional for now, but not marked that way.
               - BallastStatusBitmap
               - LampAlarmModeBitmap
-      attributes:
-          GeneralDiagnostics:
-              # Not in the spec yet.
-              - AverageWearCount
-              # New things, not quite finalized.
   renames:
       enums:
           OTASoftwareUpdateProvider:
@@ -8235,22 +8178,17 @@
                   - WaterMarks
   provisional:
       clusters:
-          # Targeting Spring 2024 Matter release
-          - MicrowaveOvenControl
-          - MicrowaveOvenMode
+          # DemandResponseLoadControl not finalized as of Fall 2024 Matter release.
           - DemandResponseLoadControl
-          - BooleanStateConfiguration
-          - ValveConfigurationAndControl
+          # Timer does not seem to exist in the Matter specification.
           - Timer
-          - OvenMode
-          - LaundryDryerControls
+          # Targeting Spring 2024 Matter release
           - EnergyEVSE
-          - OvenCavityOperationalState
           - ContentControl
           - ContentAppObserver
-          - DeviceEnergyManagement
-          - ElectricalEnergyMeasurement
+          # Energy Preference is provisional in the Fall 2024 Matter release.
           - EnergyPreference
+          # Scenes Management is provisional in the Fall 2024 Matter release.
           - ScenesManagement
       attributes:
           NetworkCommissioning:
@@ -8906,15 +8844,6 @@
                   - minMeasuredValue
                   - maxMeasuredValue
                   - accuracyRanges
-              MeasurementAccuracyRangeStruct:
-                  - rangeMin
-                  - rangeMax
-                  - percentMax
-                  - percentMin
-                  - percentTypical
-                  - fixedMax
-                  - fixedMin
-                  - fixedTypical
           ElectricalPowerMeasurement:
               MeasurementRangeStruct:
                   - measurementType
@@ -9563,24 +9492,9 @@
       clusters:
           # Targeting Spring 2024 Matter release
           - EnergyEVSEMode
-          - DeviceEnergyManagementMode
           - Messages
           - PowerTopology
       attributes:
-          DoorLock:
-              # Aliro is not ready yet.
-              - AliroReaderVerificationKey
-              - AliroReaderGroupIdentifier
-              - AliroReaderGroupSubIdentifier
-              - AliroExpeditedTransactionSupportedProtocolVersions
-              - AliroGroupResolvingKey
-              - AliroSupportedBLEUWBProtocolVersions
-              - AliroBLEAdvertisingVersion
-              - NumberOfAliroCredentialIssuerKeysSupported
-              - NumberOfAliroEndpointKeysSupported
-          ICDManagement:
-              # Targeting Spring 2024 Matter release
-              - OperatingMode
           Thermostat:
               # Targeting Spring 2024 Matter release
               - PresetTypes
@@ -9600,10 +9514,6 @@
               # for now just start doing that for new additions to it.
               - MeiInt8u
       commands:
-          DoorLock:
-              # Aliro is not ready yet.
-              - SetAliroReaderConfig
-              - ClearAliroReaderConfig
           Thermostat:
               # Targeting Spring 2024 Matter release
               - SetActiveScheduleRequest
@@ -9612,9 +9522,6 @@
               - CancelPresetsSchedulesEditRequest
               - CommitPresetsSchedulesRequest
               - SetTemperatureSetpointHoldPolicy
-          RVCOperationalState:
-              # Targeting Spring 2024 Matter release
-              - GoHome
           UnitTesting:
               # Ideally none of UnitTesting would be exposed as public API, but
               # for now just start doing that for new additions to it.
@@ -9641,25 +9548,6 @@
           Thermostat:
               # Targeting Spring 2024 Matter release
               - PresetScenarioEnum
-      enum values:
-          DoorLock:
-              CredentialTypeEnum:
-                  # Aliro is not ready yet.
-                  - AliroCredentialIssuerKey
-                  - AliroEvictableEndpointKey
-                  - AliroNonEvictableEndpointKey
-              LockDataTypeEnum:
-                  # Aliro is not ready yet.
-                  - AliroCredentialIssuerKey
-                  - AliroEvictableEndpointKey
-                  - AliroNonEvictableEndpointKey
-              OperationSourceEnum:
-                  # Aliro is not ready yet.
-                  - Aliro
-          RVCRunMode:
-              ModeTag:
-                  # Targeting Spring 2024 Matter release
-                  - Mapping
       bitmaps:
           Thermostat:
               # Targeting Spring 2024 Matter release
@@ -9670,11 +9558,6 @@
               # Targeting Spring 2024 Matter release
               - Feature
       bitmap values:
-          DoorLock:
-              Feature:
-                  # Aliro is not ready yet.
-                  - AliroProvisioning
-                  - AliroBLEUWB
           Thermostat:
               Feature:
                   # Targeting Spring 2024 Matter release
@@ -9682,8 +9565,12 @@
                   - Presets
                   - MatterScheduleConfiguration
 
-- release: "Future"
-  versions: "future"
+- release: "6C44AB2F-2F6B-4B57-B523-5CD89584986F"
+  versions:
+      iOS: "18.2"
+      macOS: "15.2"
+      watchOS: "11.2"
+      tvOS: "18.2"
   introduced:
       enums:
           ColorControl:
@@ -9742,6 +9629,73 @@
                   - UpdateDirection
                   - UpdateTime
                   - UpdateStartHue
+      device types:
+          - AirQualitySensor
+          - AirPurifier
+          - Aggregator
+          - BasicVideoPlayer
+          - BridgedNode
+          - CastingVideoClient
+          - CastingVideoPlayer
+          - ColorDimmerSwitch
+          - ColorTemperatureLight
+          - ContactSensor
+          - ContentApp
+          - ControlBridge
+          - CookSurface
+          - Cooktop
+          - DeviceEnergyManagement
+          - DimmableLight
+          - DimmablePlugInUnit
+          - DimmerSwitch
+          - Dishwasher
+          - DoorLock
+          - DoorLockController
+          - ElectricalSensor
+          - EVSE
+          - ExtendedColorLight
+          - ExtractorHood
+          - Fan
+          - FlowSensor
+          - GenericSwitch
+          - HeatingCoolingUnit
+          - HumiditySensor
+          - LaundryDryer
+          - LaundryWasher
+          - LightSensor
+          - MicrowaveOven
+          - ModeSelect
+          - NetworkInfrastructureManager
+          - OccupancySensor
+          - OnOffLight
+          - OnOffLightSwitch
+          - OnOffPlugInUnit
+          - OnOffSensor
+          - OTAProvider
+          - OTARequestor
+          - Oven
+          - PressureSensor
+          - PowerSource
+          - Pump
+          - PumpController
+          - RainSensor
+          - Refrigerator
+          - RoboticVacuumCleaner
+          - RoomAirConditioner
+          - RootNode
+          - SecondaryNetworkInterface
+          - SmokeCOAlarm
+          - Speaker
+          - TemperatureControlledCabinet
+          - TemperatureSensor
+          - Thermostat
+          - ThreadBorderRouter
+          - VideoRemoteControl
+          - WaterFreezeDetector
+          - WaterLeakDetector
+          - WaterValve
+          - WindowCovering
+          - WindowCoveringController
   provisional:
       clusters:
           # Targeting 1.4
@@ -9753,6 +9707,12 @@
           - WaterHeaterManagement
           - WaterHeaterMode
           - WiFiNetworkManagement
+          # Targeting Camera enablement
+          - CameraAVStreamManagement
+          - Chime
+          - WebRTCTransportProvider
+          - WebRTCTransportRequestor
+          - ZoneManagement
       attributes:
           AccessControl:
               # Targeting 1.4
@@ -9767,6 +9727,7 @@
               - TCMinRequiredVersion
               - TCAcknowledgements
               - TCAcknowledgementsRequired
+              - TCUpdateDeadline
           OccupancySensing:
               # Targeting 1.4
               - HoldTime
@@ -9778,6 +9739,8 @@
               - GlobalStruct
               - NullableGlobalEnum
               - NullableGlobalStruct
+              - ReadFailureCode
+              - FailureInt32U
       commands:
           AccessControl:
               # Targeting 1.4
@@ -9801,6 +9764,10 @@
               - GlobalEchoResponse
               - StringEchoRequest
               - StringEchoResponse
+      command fields:
+          DoorLock:
+              GetCredentialStatusResponse:
+                  - credentialData
       structs:
           AccessControl:
               # Targeting 1.4
@@ -9849,6 +9816,8 @@
               - LandmarkTag
               - PositionTag
               - RelativePositionTag
+              # Targeting Camera enablement
+              - ThreeLevelAutoEnum
       enum values:
           ApplicationLauncher:
               StatusEnum:
@@ -9937,6 +9906,11 @@
               - ColorCapabilities
               - ColorLoopUpdateFlags
   removed:
+      clusters:
+          - BarrierControl
+          - BinaryInputBasic
+          - ElectricalMeasurement
+          - OnOffSwitchConfiguration
       enum values:
           ColorControl:
               # Don't expose the new value names on the old enum names
@@ -9952,3 +9926,974 @@
                   - ColorLoop
                   - XY
                   - ColorTemperature
+
+- release: "8377F965-9A14-4120-AAC4-4F296BA64949"
+  versions:
+      iOS: "18.4"
+      macOS: "15.4"
+      watchOS: "11.4"
+      tvOS: "18.4"
+  introduced:
+      clusters:
+          - DeviceEnergyManagement
+          - DeviceEnergyManagementMode
+          - DishwasherAlarm
+          - DishwasherMode
+          - ICDManagement
+          - LaundryDryerControls
+          - LaundryWasherControls
+          - LaundryWasherMode
+          - MicrowaveOvenControl
+          - MicrowaveOvenMode
+          - OvenMode
+          - OvenCavityOperationalState
+          - RefrigeratorAlarm
+          - RefrigeratorAndTemperatureControlledCabinetMode
+          - TemperatureControl
+      attributes:
+          DeviceEnergyManagement:
+              - ESAType
+              - ESACanGenerate
+              - ESAState
+              - AbsMinPower
+              - AbsMaxPower
+              - PowerAdjustmentCapability
+              - Forecast
+              - OptOutState
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          DeviceEnergyManagementMode:
+              - SupportedModes
+              - CurrentMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          DishwasherAlarm:
+              - Mask
+              - Latch
+              - State
+              - Supported
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          DishwasherMode:
+              - SupportedModes
+              - CurrentMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          DoorLock:
+              - AliroReaderVerificationKey
+              - AliroReaderGroupIdentifier
+              - AliroReaderGroupSubIdentifier
+              - AliroExpeditedTransactionSupportedProtocolVersions
+              - AliroGroupResolvingKey
+              - AliroSupportedBLEUWBProtocolVersions
+              - AliroBLEAdvertisingVersion
+              - NumberOfAliroCredentialIssuerKeysSupported
+              - NumberOfAliroEndpointKeysSupported
+          ICDManagement:
+              - IdleModeDuration
+              - ActiveModeDuration
+              - ActiveModeThreshold
+              - RegisteredClients
+              - ICDCounter
+              - ClientsSupportedPerFabric
+              - UserActiveModeTriggerHint
+              - UserActiveModeTriggerInstruction
+              - OperatingMode
+              - MaximumCheckInBackOff
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          LaundryDryerControls:
+              - SupportedDrynessLevels
+              - SelectedDrynessLevel
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          LaundryWasherControls:
+              - SpinSpeeds
+              - SpinSpeedCurrent
+              - NumberOfRinses
+              - SupportedRinses
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          LaundryWasherMode:
+              - SupportedModes
+              - CurrentMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          MicrowaveOvenControl:
+              - CookTime
+              - MaxCookTime
+              - PowerSetting
+              - MinPower
+              - MaxPower
+              - PowerStep
+              # SupportedWatts and SelectedWattIndex are Provisional because WATTS is Provisional in Matter 1.4
+              - WattRating
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          MicrowaveOvenMode:
+              - SupportedModes
+              - CurrentMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          OvenMode:
+              - SupportedModes
+              - CurrentMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          OvenCavityOperationalState:
+              - PhaseList
+              - CurrentPhase
+              - CountdownTime
+              - OperationalStateList
+              - OperationalState
+              - OperationalError
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          RefrigeratorAlarm:
+              - Mask
+              - State
+              - Supported
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          RefrigeratorAndTemperatureControlledCabinetMode:
+              - SupportedModes
+              - CurrentMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          TemperatureControl:
+              - TemperatureSetpoint
+              - MinTemperature
+              - MaxTemperature
+              - Step
+              - SelectedTemperatureLevel
+              - SupportedTemperatureLevels
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+      commands:
+          DeviceEnergyManagement:
+              - PowerAdjustRequest
+              - CancelPowerAdjustRequest
+              - StartTimeAdjustRequest
+              - PauseRequest
+              - ResumeRequest
+              - ModifyForecastRequest
+              - RequestConstraintBasedForecast
+              - CancelRequest
+          DeviceEnergyManagementMode:
+              - ChangeToMode
+              - ChangeToModeResponse
+          DishwasherAlarm:
+              - Reset
+              - ModifyEnabledAlarms
+          DishwasherMode:
+              - ChangeToMode
+              - ChangeToModeResponse
+          DoorLock:
+              - UnboltDoor
+              - SetAliroReaderConfig
+              - ClearAliroReaderConfig
+          ICDManagement:
+              - RegisterClient
+              - RegisterClientResponse
+              - UnregisterClient
+              - StayActiveRequest
+              - StayActiveResponse
+          LaundryWasherMode:
+              - ChangeToMode
+              - ChangeToModeResponse
+          MicrowaveOvenControl:
+              - SetCookingParameters
+              - AddMoreTime
+          OvenCavityOperationalState:
+              - Stop
+              - Start
+              - OperationalCommandResponse
+          OvenMode:
+              - ChangeToMode
+              - ChangeToModeResponse
+          RefrigeratorAndTemperatureControlledCabinetMode:
+              - ChangeToMode
+              - ChangeToModeResponse
+          RVCOperationalState:
+              - GoHome
+          TemperatureControl:
+              - SetTemperature
+      command fields:
+          DeviceEnergyManagement:
+              PowerAdjustRequest:
+                  - power
+                  - duration
+                  - cause
+              StartTimeAdjustRequest:
+                  - requestedStartTime
+                  - cause
+              PauseRequest:
+                  - duration
+                  - cause
+              ModifyForecastRequest:
+                  - forecastID
+                  - slotAdjustments
+                  - cause
+              RequestConstraintBasedForecast:
+                  - constraints
+                  - cause
+          DeviceEnergyManagementMode:
+              ChangeToMode:
+                  - newMode
+              ChangeToModeResponse:
+                  - status
+                  - statusText
+          DishwasherAlarm:
+              Reset:
+                  - alarms
+              ModifyEnabledAlarms:
+                  - mask
+          DishwasherMode:
+              ChangeToMode:
+                  - newMode
+              ChangeToModeResponse:
+                  - status
+                  - statusText
+          DoorLock:
+              UnboltDoor:
+                  - pinCode
+              SetAliroReaderConfig:
+                  - signingKey
+                  - verificationKey
+                  - groupIdentifier
+                  - groupResolvingKey
+          ICDManagement:
+              RegisterClient:
+                  - checkInNodeID
+                  - monitoredSubject
+                  - key
+                  - verificationKey
+                  - clientType
+              RegisterClientResponse:
+                  - icdCounter
+              UnregisterClient:
+                  - checkInNodeID
+                  - verificationKey
+              StayActiveRequest:
+                  - stayActiveDuration
+              StayActiveResponse:
+                  - promisedActiveDuration
+          LaundryWasherMode:
+              ChangeToMode:
+                  - newMode
+              ChangeToModeResponse:
+                  - status
+                  - statusText
+          MicrowaveOvenControl:
+              SetCookingParameters:
+                  - cookMode
+                  - cookTime
+                  - powerSetting
+                  # wattSettingIndex is provisional because WATTS is provisional in Matter 1.4
+                  - startAfterSetting
+              AddMoreTime:
+                  - timeToAdd
+          OvenMode:
+              ChangeToMode:
+                  - newMode
+              ChangeToModeResponse:
+                  - status
+                  - statusText
+          OvenCavityOperationalState:
+              OperationalCommandResponse:
+                  - commandResponseState
+          RefrigeratorAndTemperatureControlledCabinetMode:
+              ChangeToMode:
+                  - newMode
+              ChangeToModeResponse:
+                  - status
+                  - statusText
+          TemperatureControl:
+              SetTemperature:
+                  - targetTemperature
+                  - targetTemperatureLevel
+      structs:
+          DeviceEnergyManagement:
+              - CostStruct
+              - PowerAdjustStruct
+              - PowerAdjustCapabilityStruct
+              - ForecastStruct
+              - SlotStruct
+              - SlotAdjustmentStruct
+              - ConstraintsStruct
+          DeviceEnergyManagementMode:
+              - ModeOptionStruct
+              - ModeTagStruct
+          DishwasherMode:
+              - ModeOptionStruct
+              - ModeTagStruct
+          ElectricalEnergyMeasurement:
+              - MeasurementAccuracyRangeStruct
+          ICDManagement:
+              - MonitoringRegistrationStruct
+          LaundryWasherMode:
+              - ModeOptionStruct
+              - ModeTagStruct
+          MicrowaveOvenMode:
+              - ModeTagStruct
+              - ModeOptionStruct
+          OvenMode:
+              - ModeTagStruct
+              - ModeOptionStruct
+          OvenCavityOperationalState:
+              - ErrorStateStruct
+              - OperationalStateStruct
+          RefrigeratorAndTemperatureControlledCabinetMode:
+              - ModeOptionStruct
+              - ModeTagStruct
+      struct fields:
+          DeviceEnergyManagement:
+              CostStruct:
+                  - costType
+                  - value
+                  - decimalPoints
+                  - currency
+              PowerAdjustStruct:
+                  - minPower
+                  - maxPower
+                  - minDuration
+                  - maxDuration
+              PowerAdjustCapabilityStruct:
+                  - powerAdjustCapability
+                  - cause
+              ForecastStruct:
+                  - forecastID
+                  - activeSlotNumber
+                  - startTime
+                  - endTime
+                  - earliestStartTime
+                  - latestEndTime
+                  - isPausable
+                  - slots
+                  - forecastUpdateReason
+              SlotStruct:
+                  - minDuration
+                  - maxDuration
+                  - defaultDuration
+                  - elapsedSlotTime
+                  - remainingSlotTime
+                  - slotIsPausable
+                  - minPauseDuration
+                  - maxPauseDuration
+                  - manufacturerESAState
+                  - nominalPower
+                  - minPower
+                  - maxPower
+                  - nominalEnergy
+                  - costs
+                  - minPowerAdjustment
+                  - maxPowerAdjustment
+                  - minDurationAdjustment
+                  - maxDurationAdjustment
+              SlotAdjustmentStruct:
+                  - slotIndex
+                  - nominalPower
+                  - duration
+              ConstraintsStruct:
+                  - startTime
+                  - duration
+                  - nominalPower
+                  - maximumEnergy
+                  - loadControl
+          DeviceEnergyManagementMode:
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - modeTags
+              ModeTagStruct:
+                  - mfgCode
+                  - value
+          DishwasherMode:
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - modeTags
+              ModeTagStruct:
+                  - mfgCode
+                  - value
+          ElectricalEnergyMeasurement:
+              MeasurementAccuracyRangeStruct:
+                  - rangeMin
+                  - rangeMax
+                  - percentMax
+                  - percentMin
+                  - percentTypical
+                  - fixedMax
+                  - fixedMin
+                  - fixedTypical
+          ICDManagement:
+              MonitoringRegistrationStruct:
+                  - checkInNodeID
+                  - monitoredSubject
+                  - clientType
+                  - fabricIndex
+          LaundryWasherMode:
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - modeTags
+              ModeTagStruct:
+                  - mfgCode
+                  - value
+          MicrowaveOvenMode:
+              ModeTagStruct:
+                  - mfgCode
+                  - value
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - modeTags
+          OvenMode:
+              ModeTagStruct:
+                  - mfgCode
+                  - value
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - modeTags
+          OvenCavityOperationalState:
+              ErrorStateStruct:
+                  - errorStateID
+                  - errorStateLabel
+                  - errorStateDetails
+              OperationalStateStruct:
+                  - operationalStateID
+                  - operationalStateLabel
+          RefrigeratorAndTemperatureControlledCabinetMode:
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - modeTags
+              ModeTagStruct:
+                  - mfgCode
+                  - value
+      events:
+          DeviceEnergyManagement:
+              - PowerAdjustStart
+              - PowerAdjustEnd
+              - Paused
+              - Resumed
+          DishwasherAlarm:
+              - Notify
+          OvenCavityOperationalState:
+              - OperationalError
+              - OperationCompletion
+          RefrigeratorAlarm:
+              - Notify
+      event fields:
+          DeviceEnergyManagement:
+              PowerAdjustEnd:
+                  - cause
+                  - duration
+                  - energyUse
+              Resumed:
+                  - cause
+          DishwasherAlarm:
+              Notify:
+                  - active
+                  - inactive
+                  - state
+                  - mask
+          OvenCavityOperationalState:
+              OperationalError:
+                  - errorState
+              OperationCompletion:
+                  - completionErrorCode
+                  - totalOperationalTime
+                  - pausedTime
+          RefrigeratorAlarm:
+              Notify:
+                  - active
+                  - inactive
+                  - state
+                  - mask
+      enums:
+          DeviceEnergyManagement:
+              - CostTypeEnum
+              - ESATypeEnum
+              - ESAStateEnum
+              - OptOutStateEnum
+              - CauseEnum
+              - AdjustmentCauseEnum
+              - ForecastUpdateReasonEnum
+              - PowerAdjustReasonEnum
+          DeviceEnergyManagementMode:
+              - ModeTag
+          DishwasherMode:
+              - ModeTag
+          ElectricalEnergyMeasurement:
+              - MeasurementTypeEnum
+          ICDManagement:
+              - ClientTypeEnum
+              - OperatingModeEnum
+          MicrowaveOvenMode:
+              - ModeTag
+          OvenMode:
+              - ModeTag
+          LaundryDryerControls:
+              - DrynessLevelEnum
+          LaundryWasherControls:
+              - NumberOfRinsesEnum
+          LaundryWasherMode:
+              - ModeTag
+          OvenCavityOperationalState:
+              - ErrorStateEnum
+              - OperationalStateEnum
+          RefrigeratorAndTemperatureControlledCabinetMode:
+              - ModeTag
+      enum values:
+          DeviceEnergyManagement:
+              CostTypeEnum:
+                  - Financial
+                  - GHGEmissions
+                  - Comfort
+                  - Temperature
+              ESATypeEnum:
+                  - EVSE
+                  - SpaceHeating
+                  - WaterHeating
+                  - SpaceCooling
+                  - SpaceHeatingCooling
+                  - BatteryStorage
+                  - SolarPV
+                  - FridgeFreezer
+                  - WashingMachine
+                  - Dishwasher
+                  - Cooking
+                  - HomeWaterPump
+                  - IrrigationWaterPump
+                  - PoolPump
+                  - Other
+              ESAStateEnum:
+                  - Offline
+                  - Online
+                  - Fault
+                  - PowerAdjustActive
+                  - Paused
+              OptOutStateEnum:
+                  - NoOptOut
+                  - LocalOptOut
+                  - GridOptOut
+                  - OptOut
+              CauseEnum:
+                  - NormalCompletion
+                  - Offline
+                  - Fault
+                  - UserOptOut
+                  - Cancelled
+              AdjustmentCauseEnum:
+                  - LocalOptimization
+                  - GridOptimization
+              ForecastUpdateReasonEnum:
+                  - InternalOptimization
+                  - LocalOptimization
+                  - GridOptimization
+              PowerAdjustReasonEnum:
+                  - NoAdjustment
+                  - LocalOptimizationAdjustment
+                  - GridOptimizationAdjustment
+          DeviceEnergyManagementMode:
+              ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  - NoOptimization
+                  - DeviceOptimization
+                  - LocalOptimization
+                  - GridOptimization
+          DishwasherMode:
+              ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  - Normal
+                  - Heavy
+                  - Light
+          DoorLock:
+              DlLockState:
+                  - Unlatched
+              DlLockType:
+                  - Eurocylinder
+              LockOperationTypeEnum:
+                  - Unlatch
+              CredentialTypeEnum:
+                  - AliroCredentialIssuerKey
+                  - AliroEvictableEndpointKey
+                  - AliroNonEvictableEndpointKey
+              LockDataTypeEnum:
+                  - AliroCredentialIssuerKey
+                  - AliroEvictableEndpointKey
+                  - AliroNonEvictableEndpointKey
+              OperationSourceEnum:
+                  - Aliro
+          ElectricalEnergyMeasurement:
+              MeasurementTypeEnum:
+                  - Unspecified
+                  - Voltage
+                  - ActiveCurrent
+                  - ReactiveCurrent
+                  - ApparentCurrent
+                  - ActivePower
+                  - ReactivePower
+                  - ApparentPower
+                  - RMSVoltage
+                  - RMSCurrent
+                  - RMSPower
+                  - Frequency
+                  - PowerFactor
+                  - NeutralCurrent
+                  - ElectricalEnergy
+          ICDManagement:
+              ClientTypeEnum:
+                  - Permanent
+                  - Ephemeral
+              OperatingModeEnum:
+                  - SIT
+                  - LIT
+          LaundryDryerControls:
+              DrynessLevelEnum:
+                  - Low
+                  - Normal
+                  - Extra
+                  - Max
+          LaundryWasherControls:
+              NumberOfRinsesEnum:
+                  - None
+                  - Normal
+                  - Extra
+                  - Max
+          LaundryWasherMode:
+              ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  - Normal
+                  - Delicate
+                  - Heavy
+                  - Whites
+          MicrowaveOvenMode:
+              ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  - Normal
+                  - Defrost
+          OvenCavityOperationalState:
+              ErrorStateEnum:
+                  - NoError
+                  - UnableToStartOrResume
+                  - UnableToCompleteOperation
+                  - CommandInvalidInState
+              OperationalStateEnum:
+                  - Stopped
+                  - Running
+                  - Paused
+                  - Error
+          OvenMode:
+              ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  - Bake
+                  - Convection
+                  - Grill
+                  - Roast
+                  - Clean
+                  - ConvectionBake
+                  - ConvectionRoast
+                  - Warming
+                  - Proofing
+                  - Steam
+          RefrigeratorAndTemperatureControlledCabinetMode:
+              ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  - RapidCool
+                  - RapidFreeze
+          RVCCleanMode:
+              ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  - Vacation
+          RVCOperationalState:
+              ErrorStateEnum:
+                  - NoError
+                  - UnableToStartOrResume
+                  - UnableToCompleteOperation
+                  - CommandInvalidInState
+              OperationalStateEnum:
+                  - Stopped
+                  - Running
+                  - Paused
+                  - Error
+          RVCRunMode:
+              ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  - Mapping
+      bitmaps:
+          DeviceEnergyManagement:
+              - Feature
+          DishwasherAlarm:
+              - AlarmBitmap
+              - Feature
+          ICDManagement:
+              - UserActiveModeTriggerBitmap
+              - Feature
+          LaundryWasherControls:
+              - Feature
+          MicrowaveOvenControl:
+              - Feature
+          RefrigeratorAlarm:
+              - AlarmBitmap
+          TemperatureControl:
+              - Feature
+      bitmap values:
+          DeviceEnergyManagement:
+              Feature:
+                  - PowerAdjustment
+                  - PowerForecastReporting
+                  - StateForecastReporting
+                  - StartTimeAdjustment
+                  - Pausable
+                  - ForecastAdjustment
+                  - ConstraintBasedAdjustment
+          DishwasherAlarm:
+              AlarmBitmap:
+                  - DoorError
+              Feature:
+                  - Reset
+          DoorLock:
+              Feature:
+                  - Unbolt
+                  - AliroProvisioning
+                  - AliroBLEUWB
+          ICDManagement:
+              UserActiveModeTriggerBitmap:
+                  - PowerCycle
+                  - SettingsMenu
+                  - CustomInstruction
+                  - DeviceManual
+                  - ActuateSensor
+                  - ActuateSensorSeconds
+                  - ActuateSensorTimes
+                  - ActuateSensorLightsBlink
+                  - ResetButton
+                  - ResetButtonLightsBlink
+                  - ResetButtonSeconds
+                  - ResetButtonTimes
+                  - SetupButton
+                  - SetupButtonSeconds
+                  - SetupButtonLightsBlink
+                  - SetupButtonTimes
+                  - AppDefinedButton
+              Feature:
+                  - CheckInProtocolSupport
+                  - UserActiveModeTrigger
+                  - LongIdleTimeSupport
+                  - DynamicSitLitSupport
+          LaundryWasherControls:
+              Feature:
+                  - Spin
+                  - Rinse
+          MicrowaveOvenControl:
+              Feature:
+                  - PowerAsNumber
+                  # PowerInWatts is provisional because WATTS is provisional in Matter 1.4
+                  - PowerNumberLimits
+          RefrigeratorAlarm:
+              AlarmBitmap:
+                  - DoorOpen
+          TemperatureControl:
+              Feature:
+                  - TemperatureNumber
+                  - TemperatureLevel
+                  - TemperatureStep
+  provisional:
+      attributes:
+          MicrowaveOvenControl:
+              # SupportedWatts and SelectedWattIndex are provisional because WATTS is provisional in Matter 1.4
+              - SupportedWatts
+              - SelectedWattIndex
+      command fields:
+          MicrowaveOvenControl:
+              SetCookingParameters:
+                  # wattSettingIndex is provisional because WATTS is provisional in Matter 1.4
+                  - wattSettingIndex
+      bitmap values:
+          DishwasherAlarm:
+              AlarmBitmap:
+                  # Various AlarmBitmap values are provisional in the Matter 1.4 specification
+                  - InflowError
+                  - DrainError
+                  - TempTooLow
+                  - TempTooHigh
+                  - WaterLevelError
+          MicrowaveOvenControl:
+              Feature:
+                  # PowerInWatts is provisional because WATTS is provisional in Matter 1.4
+                  - PowerInWatts
+      device types:
+          - BatteryStorage
+          - HeatPump
+          - SolarPower
+          - WaterHeater
+  removed:
+      attributes:
+          DishwasherMode:
+              # Marked X in the spec, but for some reason present in the XML
+              - StartUpMode
+              - OnMode
+          LaundryWasherMode:
+              # Marked X in the spec, but for some reason present in the XML
+              - StartUpMode
+              - OnMode
+          OvenMode:
+              # Marked X in the spec, but for some reason present in the XML
+              - StartUpMode
+              - OnMode
+          RefrigeratorAndTemperatureControlledCabinetMode:
+              # Marked X in the spec, but for some reason present in the XML
+              - StartUpMode
+              - OnMode
+      commands:
+          OvenCavityOperationalState:
+              # Marked X in the spec, but for some reason present in the XML
+              - Pause
+              - Resume
+      bitmaps:
+          DeviceEnergyManagementMode:
+              # The one bit in this bitmap is marked X in the spec, but we can't have
+              # an empty bitmap.
+              - Feature
+          DishwasherMode:
+              # The one bit in this bitmap is marked X in the spec, but we can't have
+              # an empty bitmap.
+              - Feature
+          LaundryWasherMode:
+              # The one bit in this bitmap is marked X in the spec, but we can't have
+              # an empty bitmap.
+              - Feature
+          MicrowaveOvenMode:
+              # The one bit in this bitmap is marked X in the spec, but we can't have
+              # an empty bitmap.
+              - Feature
+          OvenMode:
+              # The one bit in this bitmap is marked X in the spec, but we can't have
+              # an empty bitmap.
+              - Feature
+          RefrigeratorAndTemperatureControlledCabinetMode:
+              # The one bit in this bitmap is marked X in the spec, but we can't have
+              # an empty bitmap.
+              - Feature
+
+- release: "Future"
+  versions: "future"

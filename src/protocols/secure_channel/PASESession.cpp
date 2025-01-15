@@ -54,9 +54,7 @@ using namespace Crypto;
 using namespace Messaging;
 using namespace Protocols::SecureChannel;
 
-const char kSpake2pContext[]        = "CHIP PAKE V1 Commissioning";
-const char kSpake2pI2RSessionInfo[] = "Commissioning I2R Key";
-const char kSpake2pR2ISessionInfo[] = "Commissioning R2I Key";
+const char kSpake2pContext[] = "CHIP PAKE V1 Commissioning";
 
 // Amounts of time to allow for server-side processing of messages.
 //
@@ -126,7 +124,7 @@ CHIP_ERROR PASESession::Init(SessionManager & sessionManager, uint32_t setupCode
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
     ChipLogDetail(SecureChannel, "Assigned local session key ID %u", GetLocalSessionId().Value());
 
-    ReturnErrorCodeIf(setupCode >= (1 << kSetupPINCodeFieldLengthInBits), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(setupCode < (1 << kSetupPINCodeFieldLengthInBits), CHIP_ERROR_INVALID_ARGUMENT);
     mSetupPINCode = setupCode;
 
     return CHIP_NO_ERROR;
@@ -139,10 +137,7 @@ CHIP_ERROR PASESession::GeneratePASEVerifier(Spake2pVerifier & verifier, uint32_
 
     if (useRandomPIN)
     {
-        ReturnErrorOnFailure(DRBG_get_bytes(reinterpret_cast<uint8_t *>(&setupPINCode), sizeof(setupPINCode)));
-
-        // Passcodes shall be restricted to the values 00000001 to 99999998 in decimal, see 5.1.1.6
-        setupPINCode = (setupPINCode % kSetupPINCodeMaximumValue) + 1;
+        ReturnErrorOnFailure(SetupPayload::generateRandomSetupPin(setupPINCode));
     }
 
     return verifier.Generate(pbkdf2IterCount, salt, setupPINCode);
@@ -165,10 +160,10 @@ CHIP_ERROR PASESession::WaitForPairing(SessionManager & sessionManager, const Sp
                                        SessionEstablishmentDelegate * delegate)
 {
     // Return early on error here, as we have not initialized any state yet
-    ReturnErrorCodeIf(salt.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(salt.data() == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(salt.size() < kSpake2p_Min_PBKDF_Salt_Length || salt.size() > kSpake2p_Max_PBKDF_Salt_Length,
-                      CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!salt.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(salt.data() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length && salt.size() <= kSpake2p_Max_PBKDF_Salt_Length,
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR err = Init(sessionManager, kSetupPINCodeUndefinedValue, delegate);
     // From here onwards, let's go to exit on error, as some state might have already
@@ -212,7 +207,7 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
                              SessionEstablishmentDelegate * delegate)
 {
     MATTER_TRACE_SCOPE("Pair", "PASESession");
-    ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(exchangeCtxt != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     CHIP_ERROR err = Init(sessionManager, peerSetUpPINCode, delegate);
     SuccessOrExit(err);
 
@@ -235,7 +230,15 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        // If a failure happens before we have placed the incoming exchange into `mExchangeCtxt`, we need to make
+        // sure to close the exchange to fulfill our API contract.
+        if (!mExchangeCtxt.HasValue())
+        {
+            exchangeCtxt->Close();
+        }
         Clear();
+        ChipLogError(SecureChannel, "Failed during PASE session pairing request: %" CHIP_ERROR_FORMAT, err.Format());
+        MATTER_TRACE_COUNTER("PASEFail");
     }
     return err;
 }
@@ -314,7 +317,12 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
 
     mNextExpectedMsg.SetValue(MsgType::PBKDFParamResponse);
 
-    ChipLogDetail(SecureChannel, "Sent PBKDF param request");
+#if CHIP_PROGRESS_LOGGING
+    const auto localMRPConfig = mLocalMRPConfig.Value();
+#endif // CHIP_PROGRESS_LOGGING
+    ChipLogProgress(SecureChannel, "Sent PBKDF param request [II:%" PRIu32 "ms AI:%" PRIu32 "ms AT:%ums)",
+                    localMRPConfig.mIdleRetransTimeout.count(), localMRPConfig.mActiveRetransTimeout.count(),
+                    localMRPConfig.mActiveThresholdTime.count());
 
     return CHIP_NO_ERROR;
 }
@@ -364,7 +372,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
 
     if (tlvReader.Next() != CHIP_END_OF_TLV)
     {
-        SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
+        SuccessOrExit(err = DecodeSessionParametersIfPresent(TLV::ContextTag(5), tlvReader, mRemoteSessionParams));
         mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
             GetRemoteSessionParameters());
     }
@@ -485,7 +493,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
     {
         if (tlvReader.Next() != CHIP_END_OF_TLV)
         {
-            SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
+            SuccessOrExit(err = DecodeSessionParametersIfPresent(TLV::ContextTag(5), tlvReader, mRemoteSessionParams));
             mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
                 GetRemoteSessionParameters());
         }
@@ -511,7 +519,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
 
         if (tlvReader.Next() != CHIP_END_OF_TLV)
         {
-            SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
+            SuccessOrExit(err = DecodeSessionParametersIfPresent(TLV::ContextTag(5), tlvReader, mRemoteSessionParams));
             mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
                 GetRemoteSessionParameters());
         }

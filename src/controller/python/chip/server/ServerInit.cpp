@@ -20,6 +20,7 @@
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -161,6 +162,7 @@ PyChipError pychip_server_native_init()
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     PyReturnErrorOnFailure(ToPyChipError(initParams.InitializeStaticResourcesBeforeServerInit()));
+    initParams.dataModelProvider             = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 

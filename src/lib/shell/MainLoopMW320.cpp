@@ -273,7 +273,7 @@ void Engine::RunMainLoop()
     Engine::Root().RegisterDefaultCommands();
     RegisterMetaCommands();
 
-    while (true)
+    while (mRunning)
     {
         streamer_printf(streamer_get(), CHIP_SHELL_PROMPT);
 

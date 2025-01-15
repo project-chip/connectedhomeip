@@ -19,18 +19,33 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ENERGY_MANAGEMENT_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f --featureSet 0x03 --application water-heater
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ENERGY_MANAGEMENT_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
+#       --enable-key 000102030405060708090a0b0c0d0e0f
+#       --featureSet 0x03
+#       --application water-heater
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
+#       --endpoint 2
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EWATERHTRBase import EWATERHTRBase
 
@@ -50,7 +65,8 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
 
     def steps_TC_EWATERHTR_2_1(self) -> list[TestStep]:
         steps = [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)."),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
+                     is_commissioning=True),
             TestStep("2", "TH reads from the DUT the FeatureMap attribute.",
                      "Verify that the DUT response contains the FeatureMap attribute. Store the value as FeatureMap."),
             TestStep("3", "TH reads from the DUT the HeaterTypes attribute.",
@@ -98,14 +114,14 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
         if em_supported:
             value = await self.read_whm_attribute_expect_success(attribute="TankVolume")
         else:
-            logging.info("Skipping step 4 as PIXIT.EWATERHTR.EM not supported")
+            logging.info("Skipping step 5 as PICS.EWATERHTR.F00(EnergyManagement) not supported")
 
         self.step("6")
         if em_supported:
             value = await self.read_whm_attribute_expect_success(attribute="EstimatedHeatRequired")
             asserts.assert_greater_equal(value, 0, f"Unexpected EstimatedHeatRequired value - expected {value} >= 0")
         else:
-            logging.info("Skipping step 5 as PIXIT.EWATERHTR.EM not supported")
+            logging.info("Skipping step 6 as PICS.EWATERHTR.F00(EnergyManagement) not supported")
 
         self.step("7")
         if tp_supported:
@@ -113,7 +129,7 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
             asserts.assert_greater_equal(value, 0, f"Unexpected TankPercentage value - expected {value} >= 0")
             asserts.assert_less_equal(value, 100, f"Unexpected TankPercentage value - expected {value} <= 100")
         else:
-            logging.info("Skipping step 6 as PIXIT.EWATERHTR.TP not supported")
+            logging.info("Skipping step 7 as PICS.EWATERHTR.F01(TankPercenage) not supported")
 
         self.step("8")
         boost_state = await self.read_whm_attribute_expect_success(attribute="BoostState")

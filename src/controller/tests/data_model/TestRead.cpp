@@ -31,6 +31,7 @@
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <controller/ReadInteraction.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
@@ -47,6 +48,67 @@ using namespace chip::Test;
 
 namespace {
 
+const MockNodeConfig & TestMockNodeConfig()
+{
+    using namespace Clusters::Globals::Attributes;
+
+    // clang-format off
+    static const MockNodeConfig config({
+        MockEndpointConfig(kRootEndpointId, {
+            MockClusterConfig(Clusters::IcdManagement::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
+                Clusters::IcdManagement::Attributes::OperatingMode::Id,
+            }),
+        }),
+        MockEndpointConfig(kTestEndpointId, {
+            MockClusterConfig(Clusters::UnitTesting::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
+                Clusters::UnitTesting::Attributes::Boolean::Id,
+                Clusters::UnitTesting::Attributes::Int16u::Id,
+                Clusters::UnitTesting::Attributes::ListFabricScoped::Id,
+                Clusters::UnitTesting::Attributes::ListStructOctetString::Id,
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint1, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }, {
+                MockEventId(1), MockEventId(2),
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint2, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2),
+            }),
+            MockClusterConfig(MockClusterId(3), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint3, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3), MockAttributeId(4),
+            }),
+            MockClusterConfig(MockClusterId(3), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+            MockClusterConfig(MockClusterId(4), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+        }),
+    });
+    // clang-format on
+    return config;
+}
+
 class TestRead : public chip::Test::AppContext, public app::ReadHandler::ApplicationCallback
 {
 protected:
@@ -56,13 +118,19 @@ protected:
     void SetUp() override
     {
         chip::Test::AppContext::SetUp();
+        // Register app callback, so we can test it as well to ensure we get the right
+        // number of SubscriptionEstablishment/Termination callbacks.
+        InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&CustomDataModel::Instance());
+        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
     }
 
     // Performs teardown for each individual test in the test suite
     void TearDown() override
     {
+        chip::Test::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
+        InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
         chip::Test::AppContext::TearDown();
     }
 
@@ -206,11 +274,6 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithVersionOnlyCache)
     chip::app::ClusterStateCache cache(delegate, Optional<EventNumber>::Missing(), false /*cachedData*/);
 
     chip::app::ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
 
     // read of E2C2A* and E3C2A2. Expect cache E2C2 version
     {
@@ -288,11 +351,6 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
     chip::app::ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
     readPrepareParams.mMaxIntervalCeilingSeconds = 4;
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
 
     [[maybe_unused]] int testId = 0;
 
@@ -1628,12 +1686,6 @@ TEST_F(TestRead, TestReadHandler_MultipleSubscriptions)
     };
 
     //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
     // Try to issue parallel subscriptions that will exceed the value for app::InteractionModelEngine::kReadHandlerPoolSize.
     // If heap allocation is correctly setup, this should result in it successfully servicing more than the number
     // present in that define.
@@ -1663,7 +1715,6 @@ TEST_F(TestRead, TestReadHandler_MultipleSubscriptions)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
     SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
 }
 
 TEST_F(TestRead, TestReadHandler_SubscriptionAppRejection)
@@ -1693,12 +1744,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionAppRejection)
     };
 
     //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
     // Test the application rejecting subscriptions.
     //
     mEmitSubscriptionError = true;
@@ -1724,7 +1769,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionAppRejection)
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
     mEmitSubscriptionError = false;
 }
 
@@ -1767,17 +1811,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest1)
         numSubscriptionEstablishedCalls++;
     };
 
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
-    // Test the server-side application altering the subscription intervals.
-    //
-    mAlterSubscriptionIntervals = false;
-
     EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                   &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 5, 5,
                   onSubscriptionEstablishedCb, nullptr, true),
@@ -1799,9 +1832,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest1)
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-    mAlterSubscriptionIntervals = false;
 }
 
 // Subscriber sends the request with particular max-interval value:
@@ -1842,17 +1872,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest2)
         numSubscriptionEstablishedCalls++;
     };
 
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
-    // Test the server-side application altering the subscription intervals.
-    //
-    mAlterSubscriptionIntervals = false;
-
     EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                   &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
                   onSubscriptionEstablishedCb, nullptr, true),
@@ -1874,9 +1893,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest2)
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-    mAlterSubscriptionIntervals = false;
 }
 
 // Subscriber sends the request with particular max-interval value:
@@ -1918,12 +1934,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest3)
     };
 
     //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
     // Test the server-side application altering the subscription intervals.
     //
     mAlterSubscriptionIntervals = true;
@@ -1949,9 +1959,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest3)
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-    mAlterSubscriptionIntervals = false;
 }
 
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -1986,12 +1993,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest4)
     };
 
     //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
     // Test the server-side application altering the subscription intervals.
     //
     mAlterSubscriptionIntervals = true;
@@ -2016,9 +2017,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest4)
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-    mAlterSubscriptionIntervals = false;
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
@@ -2061,17 +2059,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest5)
         numSubscriptionEstablishedCalls++;
     };
 
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
-    // Test the server-side application altering the subscription intervals.
-    //
-    mAlterSubscriptionIntervals = false;
-
     EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                   &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 4000,
                   onSubscriptionEstablishedCb, nullptr, true),
@@ -2093,9 +2080,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest5)
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-    mAlterSubscriptionIntervals = false;
 }
 
 // Subscriber sends the request with particular max-interval value:
@@ -2137,12 +2121,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest6)
     };
 
     //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
     // Test the server-side application altering the subscription intervals.
     //
     mAlterSubscriptionIntervals = true;
@@ -2168,9 +2146,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest6)
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-    mAlterSubscriptionIntervals = false;
 }
 
 // Subscriber sends the request with particular max-interval value:
@@ -2210,11 +2185,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest7)
 
         numSubscriptionEstablishedCalls++;
     };
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
 
     //
     // Test the server-side application altering the subscription intervals.
@@ -2242,9 +2212,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest7)
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-    mAlterSubscriptionIntervals = false;
 }
 
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -2277,11 +2244,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest8)
                                                                           chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
     };
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
 
     //
     // Test the server-side application altering the subscription intervals.
@@ -2308,9 +2270,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest8)
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-    mAlterSubscriptionIntervals = false;
 }
 
 // Subscriber sends the request with particular max-interval value:
@@ -2341,17 +2300,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest9)
         numSubscriptionEstablishedCalls++;
     };
 
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
-    // Test the server-side application altering the subscription intervals.
-    //
-    mAlterSubscriptionIntervals = false;
-
     EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                   &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 5, 4,
                   onSubscriptionEstablishedCb, nullptr, true),
@@ -2370,9 +2318,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest9)
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-    mAlterSubscriptionIntervals = false;
 }
 
 /**
@@ -3192,6 +3137,7 @@ TEST_F(TestRead, TestSubscribeAttributeDeniedNotExistPath)
         app::AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        attributePathParams[0].mEndpointId             = kRootEndpointId; // this cluster does NOT exist on the root endpoint
         attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
         attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::ListStructOctetString::Id;
 
@@ -3225,8 +3171,6 @@ TEST_F(TestRead, TestReadHandler_KillOverQuotaSubscriptions)
     const auto kExpectedParallelSubs =
         app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric * GetFabricTable().FabricCount();
     const auto kExpectedParallelPaths = kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription;
-
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
 
     // Here, we set up two background perpetual read requests to simulate parallel Read + Subscriptions.
     // We don't care about the data read, we only care about the existence of such read transactions.
@@ -3437,8 +3381,6 @@ TEST_F(TestRead, TestReadHandler_KillOldestSubscriptions)
         app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric * GetFabricTable().FabricCount();
     const auto kExpectedParallelPaths = kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription;
 
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
     TestReadCallback readCallback;
     std::vector<std::unique_ptr<app::ReadClient>> readClients;
 
@@ -3555,8 +3497,6 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     using Params = TestReadHandler_ParallelReads_TestCase_Parameters;
 
     auto sessionHandle = GetSessionBobToAlice();
-
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
 
     auto TestCase = [&](const TestReadHandler_ParallelReads_TestCase_Parameters & params, std::function<void()> body) {
         TestReadHandler_ParallelReads_TestCase(this, params, body);

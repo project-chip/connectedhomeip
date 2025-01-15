@@ -212,6 +212,13 @@ enum TestGlobalEnum : enum8 {
   kFinalValue = 2;
 }
 
+enum ThreeLevelAutoEnum : enum8 {
+  kLow = 0;
+  kMedium = 1;
+  kHigh = 2;
+  kAutomatic = 3;
+}
+
 bitmap TestGlobalBitmap : bitmap32 {
   kFirstBit = 0x1;
   kSecondBit = 0x2;
@@ -539,6 +546,177 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
+/** Provides an interface for providing OTA software updates */
+cluster OtaSoftwareUpdateProvider = 41 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum ApplyUpdateActionEnum : enum8 {
+    kProceed = 0;
+    kAwaitNextAction = 1;
+    kDiscontinue = 2;
+  }
+
+  enum DownloadProtocolEnum : enum8 {
+    kBDXSynchronous = 0;
+    kBDXAsynchronous = 1;
+    kHTTPS = 2;
+    kVendorSpecific = 3;
+  }
+
+  enum StatusEnum : enum8 {
+    kUpdateAvailable = 0;
+    kBusy = 1;
+    kNotAvailable = 2;
+    kDownloadProtocolNotSupported = 3;
+  }
+
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct QueryImageRequest {
+    vendor_id vendorID = 0;
+    int16u productID = 1;
+    int32u softwareVersion = 2;
+    DownloadProtocolEnum protocolsSupported[] = 3;
+    optional int16u hardwareVersion = 4;
+    optional char_string<2> location = 5;
+    optional boolean requestorCanConsent = 6;
+    optional octet_string<512> metadataForProvider = 7;
+  }
+
+  response struct QueryImageResponse = 1 {
+    StatusEnum status = 0;
+    optional int32u delayedActionTime = 1;
+    optional char_string<256> imageURI = 2;
+    optional int32u softwareVersion = 3;
+    optional char_string<64> softwareVersionString = 4;
+    optional octet_string<32> updateToken = 5;
+    optional boolean userConsentNeeded = 6;
+    optional octet_string<512> metadataForRequestor = 7;
+  }
+
+  request struct ApplyUpdateRequestRequest {
+    octet_string<32> updateToken = 0;
+    int32u newVersion = 1;
+  }
+
+  response struct ApplyUpdateResponse = 3 {
+    ApplyUpdateActionEnum action = 0;
+    int32u delayedActionTime = 1;
+  }
+
+  request struct NotifyUpdateAppliedRequest {
+    octet_string<32> updateToken = 0;
+    int32u softwareVersion = 1;
+  }
+
+  /** Determine availability of a new Software Image */
+  command QueryImage(QueryImageRequest): QueryImageResponse = 0;
+  /** Determine next action to take for a downloaded Software Image */
+  command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
+  /** Notify OTA Provider that an update was applied */
+  command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
+}
+
+/** Provides an interface for downloading and applying OTA software updates */
+cluster OtaSoftwareUpdateRequestor = 42 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum AnnouncementReasonEnum : enum8 {
+    kSimpleAnnouncement = 0;
+    kUpdateAvailable = 1;
+    kUrgentUpdateAvailable = 2;
+  }
+
+  enum ChangeReasonEnum : enum8 {
+    kUnknown = 0;
+    kSuccess = 1;
+    kFailure = 2;
+    kTimeOut = 3;
+    kDelayByProvider = 4;
+  }
+
+  enum UpdateStateEnum : enum8 {
+    kUnknown = 0;
+    kIdle = 1;
+    kQuerying = 2;
+    kDelayedOnQuery = 3;
+    kDownloading = 4;
+    kApplying = 5;
+    kDelayedOnApply = 6;
+    kRollingBack = 7;
+    kDelayedOnUserConsent = 8;
+  }
+
+  fabric_scoped struct ProviderLocation {
+    node_id providerNodeID = 1;
+    endpoint_no endpoint = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  info event StateTransition = 0 {
+    UpdateStateEnum previousState = 0;
+    UpdateStateEnum newState = 1;
+    ChangeReasonEnum reason = 2;
+    nullable int32u targetSoftwareVersion = 3;
+  }
+
+  critical event VersionApplied = 1 {
+    int32u softwareVersion = 0;
+    int16u productID = 1;
+  }
+
+  info event DownloadError = 2 {
+    int32u softwareVersion = 0;
+    int64u bytesDownloaded = 1;
+    nullable int8u progressPercent = 2;
+    nullable int64s platformCode = 3;
+  }
+
+  attribute access(write: administer) ProviderLocation defaultOTAProviders[] = 0;
+  readonly attribute boolean updatePossible = 1;
+  readonly attribute UpdateStateEnum updateState = 2;
+  readonly attribute nullable int8u updateStateProgress = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AnnounceOTAProviderRequest {
+    node_id providerNodeID = 0;
+    vendor_id vendorID = 1;
+    AnnouncementReasonEnum announcementReason = 2;
+    optional octet_string<512> metadataForNode = 3;
+    endpoint_no endpoint = 4;
+  }
+
+  /** Announce the presence of an OTA Provider */
+  command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
+}
+
+/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing common languages, units of measurements, and numerical formatting
+      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
+      they can be configured to use a user’s preferred language, units, etc */
+cluster LocalizationConfiguration = 43 {
+  revision 1; // NOTE: Default/not specifically set
+
+  attribute access(write: manage) char_string<35> activeLocale = 0;
+  readonly attribute char_string supportedLocales[] = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 cluster GeneralCommissioning = 48 {
   revision 1; // NOTE: Default/not specifically set
@@ -578,6 +756,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
   provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
   provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  provisional readonly attribute access(read: administer) optional int32u TCUpdateDeadline = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -810,6 +989,53 @@ cluster NetworkCommissioning = 49 {
   command access(invoke: administer) QueryIdentity(QueryIdentityRequest): QueryIdentityResponse = 9;
 }
 
+/** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
+cluster DiagnosticLogs = 50 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum IntentEnum : enum8 {
+    kEndUserSupport = 0;
+    kNetworkDiag = 1;
+    kCrashLogs = 2;
+  }
+
+  enum StatusEnum : enum8 {
+    kSuccess = 0;
+    kExhausted = 1;
+    kNoLogs = 2;
+    kBusy = 3;
+    kDenied = 4;
+  }
+
+  enum TransferProtocolEnum : enum8 {
+    kResponsePayload = 0;
+    kBDX = 1;
+  }
+
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct RetrieveLogsRequestRequest {
+    IntentEnum intent = 0;
+    TransferProtocolEnum requestedProtocol = 1;
+    optional char_string<32> transferFileDesignator = 2;
+  }
+
+  response struct RetrieveLogsResponse = 1 {
+    StatusEnum status = 0;
+    long_octet_string logContent = 1;
+    optional epoch_us UTCTimeStamp = 2;
+    optional systime_us timeSinceBoot = 3;
+  }
+
+  /** Retrieving diagnostic logs from a Node */
+  command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
+}
+
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster GeneralDiagnostics = 51 {
   revision 2;
@@ -938,7 +1164,7 @@ cluster GeneralDiagnostics = 51 {
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
   /** Request a variable length payload response. */
-  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
+  command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -1396,6 +1622,104 @@ cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
   /** Return the list of Group Key Sets associated with the accessing fabric */
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
+}
+
+/** Allows servers to ensure that listed clients are notified when a server is available for communication. */
+cluster IcdManagement = 70 {
+  revision 3;
+
+  enum ClientTypeEnum : enum8 {
+    kPermanent = 0;
+    kEphemeral = 1;
+  }
+
+  enum OperatingModeEnum : enum8 {
+    kSIT = 0;
+    kLIT = 1;
+  }
+
+  bitmap Feature : bitmap32 {
+    kCheckInProtocolSupport = 0x1;
+    kUserActiveModeTrigger = 0x2;
+    kLongIdleTimeSupport = 0x4;
+    kDynamicSitLitSupport = 0x8;
+  }
+
+  bitmap UserActiveModeTriggerBitmap : bitmap32 {
+    kPowerCycle = 0x1;
+    kSettingsMenu = 0x2;
+    kCustomInstruction = 0x4;
+    kDeviceManual = 0x8;
+    kActuateSensor = 0x10;
+    kActuateSensorSeconds = 0x20;
+    kActuateSensorTimes = 0x40;
+    kActuateSensorLightsBlink = 0x80;
+    kResetButton = 0x100;
+    kResetButtonLightsBlink = 0x200;
+    kResetButtonSeconds = 0x400;
+    kResetButtonTimes = 0x800;
+    kSetupButton = 0x1000;
+    kSetupButtonSeconds = 0x2000;
+    kSetupButtonLightsBlink = 0x4000;
+    kSetupButtonTimes = 0x8000;
+    kAppDefinedButton = 0x10000;
+  }
+
+  fabric_scoped struct MonitoringRegistrationStruct {
+    fabric_sensitive node_id checkInNodeID = 1;
+    fabric_sensitive int64u monitoredSubject = 2;
+    fabric_sensitive ClientTypeEnum clientType = 4;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute int32u idleModeDuration = 0;
+  readonly attribute int32u activeModeDuration = 1;
+  readonly attribute int16u activeModeThreshold = 2;
+  readonly attribute access(read: administer) optional MonitoringRegistrationStruct registeredClients[] = 3;
+  readonly attribute access(read: administer) optional int32u ICDCounter = 4;
+  readonly attribute optional int16u clientsSupportedPerFabric = 5;
+  readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
+  readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
+  readonly attribute optional OperatingModeEnum operatingMode = 8;
+  readonly attribute optional int32u maximumCheckInBackOff = 9;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct RegisterClientRequest {
+    node_id checkInNodeID = 0;
+    int64u monitoredSubject = 1;
+    octet_string<16> key = 2;
+    optional octet_string<16> verificationKey = 3;
+    ClientTypeEnum clientType = 4;
+  }
+
+  response struct RegisterClientResponse = 1 {
+    int32u ICDCounter = 0;
+  }
+
+  request struct UnregisterClientRequest {
+    node_id checkInNodeID = 0;
+    optional octet_string<16> verificationKey = 1;
+  }
+
+  request struct StayActiveRequestRequest {
+    int32u stayActiveDuration = 0;
+  }
+
+  response struct StayActiveResponse = 4 {
+    int32u promisedActiveDuration = 0;
+  }
+
+  /** Register a client to the end device */
+  fabric command access(invoke: manage) RegisterClient(RegisterClientRequest): RegisterClientResponse = 0;
+  /** Unregister a client from an end device */
+  fabric command access(invoke: manage) UnregisterClient(UnregisterClientRequest): DefaultSuccess = 2;
+  /** Request the end device to stay in Active Mode for an additional ActiveModeThreshold */
+  command access(invoke: manage) StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
 }
 
 /** An interface to a generic way to secure a door */
@@ -1988,6 +2312,7 @@ cluster DoorLock = 257 {
     nullable fabric_idx creatorFabricIndex = 2;
     nullable fabric_idx lastModifiedFabricIndex = 3;
     nullable int16u nextCredentialIndex = 4;
+    optional nullable octet_string credentialData = 5;
   }
 
   request struct ClearCredentialRequest {
@@ -2050,14 +2375,18 @@ cluster DoorLock = 257 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 2;
 
+  binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
     callback attribute deviceTypeList;
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -2066,11 +2395,14 @@ endpoint 0 {
     emits event AccessControlEntryChanged;
     emits event AccessControlExtensionChanged;
     callback attribute acl;
+    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 1;
     callback attribute clusterRevision;
   }
 
@@ -2093,8 +2425,38 @@ endpoint 0 {
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster OtaSoftwareUpdateRequestor {
+    emits event StateTransition;
+    emits event VersionApplied;
+    emits event DownloadError;
+    callback attribute defaultOTAProviders;
+    ram      attribute updatePossible default = 1;
+    ram      attribute updateState default = 0;
+    ram      attribute updateStateProgress default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command AnnounceOTAProvider;
+  }
+
+  server cluster LocalizationConfiguration {
+    ram      attribute activeLocale;
+    callback attribute supportedLocales;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster GeneralCommissioning {
@@ -2103,6 +2465,9 @@ endpoint 0 {
     callback attribute regulatoryConfig;
     callback attribute locationCapability;
     callback attribute supportsConcurrentConnection;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
@@ -2123,8 +2488,13 @@ endpoint 0 {
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
+    ram      attribute supportedThreadFeatures;
+    ram      attribute threadVersion;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ScanNetworks;
     handle command ScanNetworksResponse;
@@ -2136,12 +2506,27 @@ endpoint 0 {
     handle command ReorderNetwork;
   }
 
+  server cluster DiagnosticLogs {
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command RetrieveLogsRequest;
+    handle command RetrieveLogsResponse;
+  }
+
   server cluster GeneralDiagnostics {
     emits event BootReason;
     callback attribute networkInterfaces;
     callback attribute rebootCount;
     callback attribute upTime;
+    callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2222,6 +2607,9 @@ endpoint 0 {
     callback attribute channelPage0Mask;
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0x000F;
     ram      attribute clusterRevision default = 2;
 
@@ -2232,6 +2620,9 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
@@ -2246,6 +2637,9 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
@@ -2268,6 +2662,9 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2278,13 +2675,24 @@ endpoint 0 {
     handle command KeySetReadAllIndices;
     handle command KeySetReadAllIndicesResponse;
   }
+
+  server cluster IcdManagement {
+    callback attribute idleModeDuration;
+    callback attribute activeModeDuration;
+    callback attribute activeModeThreshold;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0x0000;
+    ram      attribute clusterRevision default = 1;
+  }
 }
 endpoint 1 {
   device type ma_doorlock = 10, version 1;
 
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0;
+    ram      attribute identifyTime default = 0x0000;
     ram      attribute identifyType default = 0x0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -2310,26 +2718,66 @@ endpoint 1 {
 
   server cluster DoorLock {
     emits event DoorLockAlarm;
+    emits event DoorStateChange;
     emits event LockOperation;
     emits event LockOperationError;
     emits event LockUserChange;
-    ram      attribute lockState;
+    persist  attribute lockState default = 1;
     ram      attribute lockType;
     ram      attribute actuatorEnabled;
-    ram      attribute numberOfTotalUsersSupported default = 0;
+    ram      attribute doorState;
+    ram      attribute numberOfTotalUsersSupported default = 10;
+    ram      attribute numberOfPINUsersSupported default = 10;
+    ram      attribute numberOfRFIDUsersSupported default = 10;
+    ram      attribute numberOfWeekDaySchedulesSupportedPerUser default = 10;
+    ram      attribute numberOfYearDaySchedulesSupportedPerUser default = 10;
+    ram      attribute numberOfHolidaySchedulesSupported default = 10;
+    ram      attribute maxPINCodeLength default = 8;
+    ram      attribute minPINCodeLength default = 6;
+    ram      attribute maxRFIDCodeLength default = 20;
+    ram      attribute minRFIDCodeLength default = 10;
     ram      attribute credentialRulesSupport default = 1;
-    ram      attribute autoRelockTime;
-    ram      attribute operatingMode;
+    ram      attribute numberOfCredentialsSupportedPerUser default = 5;
+    ram      attribute language default = "en";
+    ram      attribute autoRelockTime default = 60;
+    ram      attribute soundVolume default = 0;
+    ram      attribute operatingMode default = 0x00;
     ram      attribute supportedOperatingModes default = 0xFFF6;
-    ram      attribute expiringUserTimeout default = 1440;
+    ram      attribute enableOneTouchLocking default = 0x00;
+    ram      attribute enablePrivacyModeButton default = 0x00;
+    ram      attribute wrongCodeEntryLimit default = 3;
+    ram      attribute userCodeTemporaryDisableTime default = 10;
+    ram      attribute requirePINforRemoteOperation default = 0;
+    callback attribute aliroReaderVerificationKey;
+    callback attribute aliroReaderGroupIdentifier;
+    callback attribute aliroReaderGroupSubIdentifier;
+    callback attribute aliroExpeditedTransactionSupportedProtocolVersions;
+    callback attribute aliroGroupResolvingKey;
+    callback attribute aliroSupportedBLEUWBProtocolVersions;
+    callback attribute aliroBLEAdvertisingVersion;
+    callback attribute numberOfAliroCredentialIssuerKeysSupported;
+    callback attribute numberOfAliroEndpointKeysSupported;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x1000;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute featureMap default = 0x7DB3;
+    ram      attribute clusterRevision default = 7;
 
     handle command LockDoor;
     handle command UnlockDoor;
+    handle command UnlockWithTimeout;
+    handle command SetWeekDaySchedule;
+    handle command GetWeekDaySchedule;
+    handle command GetWeekDayScheduleResponse;
+    handle command ClearWeekDaySchedule;
+    handle command SetYearDaySchedule;
+    handle command GetYearDaySchedule;
+    handle command GetYearDayScheduleResponse;
+    handle command ClearYearDaySchedule;
+    handle command SetHolidaySchedule;
+    handle command GetHolidaySchedule;
+    handle command GetHolidayScheduleResponse;
+    handle command ClearHolidaySchedule;
     handle command SetUser;
     handle command GetUser;
     handle command GetUserResponse;
@@ -2338,6 +2786,10 @@ endpoint 1 {
     handle command SetCredentialResponse;
     handle command GetCredentialStatus;
     handle command GetCredentialStatusResponse;
+    handle command ClearCredential;
+    handle command UnboltDoor;
+    handle command SetAliroReaderConfig;
+    handle command ClearAliroReaderConfig;
   }
 }
 

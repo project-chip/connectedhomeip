@@ -61,7 +61,7 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
 CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
 {
     MATTER_TRACE_SCOPE("InitCASEHandshake", "CASEServer");
-    ReturnErrorCodeIf(ec == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Hand over the exchange context to the CASE session.
     ec->SetDelegate(&GetSession());

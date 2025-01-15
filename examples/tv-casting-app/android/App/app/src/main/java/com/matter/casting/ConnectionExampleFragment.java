@@ -29,6 +29,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import com.R;
 import com.matter.casting.core.CastingPlayer;
 import com.matter.casting.support.CommissionerDeclaration;
@@ -54,7 +55,9 @@ public class ConnectionExampleFragment extends Fragment {
   private final CastingPlayer targetCastingPlayer;
   private final boolean useCommissionerGeneratedPasscode;
   private TextView connectionFragmentStatusTextView;
+  private TextView commissionerDeclarationErrorTextView;
   private Button connectionFragmentNextButton;
+  private AlertDialog passcodeDialog;
 
   public ConnectionExampleFragment(
       CastingPlayer targetCastingPlayer, boolean useCommissionerGeneratedPasscode) {
@@ -100,6 +103,8 @@ public class ConnectionExampleFragment extends Fragment {
     Log.i(TAG, "onViewCreated()");
 
     connectionFragmentStatusTextView = getView().findViewById(R.id.connectionFragmentStatusText);
+    commissionerDeclarationErrorTextView =
+        getView().findViewById(R.id.commissionerDeclarationErrorTextView);
     if (useCommissionerGeneratedPasscode) {
       connectionFragmentStatusTextView.setText(
           "Verifying or establishing connection with Casting Player with device name: "
@@ -190,32 +195,57 @@ public class ConnectionExampleFragment extends Fragment {
                       },
                       null);
 
-              // CommissionerDeclaration is only needed for the CastingPlayer/Commissioner-Generated
-              // passcode commissioning flow.
-              if (useCommissionerGeneratedPasscode) {
-                connectionCallbacks.onCommissionerDeclaration =
-                    new MatterCallback<CommissionerDeclaration>() {
-                      @Override
-                      public void handle(CommissionerDeclaration cd) {
-                        Log.i(TAG, "CastingPlayer CommissionerDeclaration message received: ");
-                        cd.logDetail();
+              // The CommissionerDeclaration callback is optional and only needed for the
+              // CastingPlayer/Commissioner-Generated
+              // passcode commissioning flow. However, if we want to know when the
+              // CastingPlayer/Commissioner user
+              // has cancelled the connection attempt when using the Client/Commissionee generated
+              // passcode flow, then we
+              // need to implement this callback.
+              connectionCallbacks.onCommissionerDeclaration =
+                  new MatterCallback<CommissionerDeclaration>() {
+                    @Override
+                    public void handle(CommissionerDeclaration cd) {
+                      Log.i(TAG, "CastingPlayer CommissionerDeclaration message received: ");
+                      cd.logDetail();
 
-                        getActivity()
-                            .runOnUiThread(
-                                () -> {
+                      FragmentActivity activity = getActivity();
+                      // Prevent possible NullPointerException. This callback could be called when
+                      // this fragment is not attached to its host activity or when the fragment's
+                      // lifecycle is not in a valid state for interacting with the activity.
+                      if (activity != null && !activity.isFinishing()) {
+                        activity.runOnUiThread(
+                            () -> {
+                              connectionFragmentStatusTextView.setText(
+                                  "CommissionerDeclaration message received from Casting Player: \n\n");
+                              if (cd.getCommissionerPasscode()) {
+
+                                displayPasscodeInputDialog(activity);
+
+                                connectionFragmentStatusTextView.setText(
+                                    "CommissionerDeclaration message received from Casting Player: A passcode is now displayed for the user by the Casting Player. \n\n");
+                              }
+                              if (cd.getCancelPasscode()) {
+                                if (useCommissionerGeneratedPasscode) {
                                   connectionFragmentStatusTextView.setText(
-                                      "CommissionerDeclaration message received from Casting Player: \n\n");
-                                  if (cd.getCommissionerPasscode()) {
-
-                                    displayPasscodeInputDialog(getActivity());
-
-                                    connectionFragmentStatusTextView.setText(
-                                        "CommissionerDeclaration message received from Casting Player: A passcode is now displayed for the user by the Casting Player. \n\n");
-                                  }
-                                });
+                                      "CastingPlayer/Commissioner-Generated passcode connection attempt cancelled by the CastingPlayer/Commissioner user. \n\nRoute back to exit. \n\n");
+                                } else {
+                                  connectionFragmentStatusTextView.setText(
+                                      "Connection attempt cancelled by the CastingPlayer/Commissioner user. \n\nRoute back to exit. \n\n");
+                                }
+                                if (passcodeDialog != null && passcodeDialog.isShowing()) {
+                                  passcodeDialog.dismiss();
+                                }
+                              }
+                              if (cd.getErrorCode() != CommissionerDeclaration.CdError.noError) {
+                                commissionerDeclarationErrorTextView.setText(
+                                    "CommissionerDeclaration error from CastingPlayer: "
+                                        + cd.getErrorCode().getDescription());
+                              }
+                            });
                       }
-                    };
-              }
+                    }
+                  };
 
               MatterError err =
                   targetCastingPlayer.verifyOrEstablishConnection(
@@ -331,7 +361,7 @@ public class ConnectionExampleFragment extends Fragment {
                 TAG,
                 "displayPasscodeInputDialog() user cancelled the CastingPlayer/Commissioner-Generated Passcode input dialog. Calling stopConnecting()");
             connectionFragmentStatusTextView.setText(
-                "Connection attempt with Casting Player cancelled by the user, route back to exit. \n\n");
+                "Connection attempt with Casting Player cancelled by the Casting Client/Commissionee user. \n\nRoute back to exit. \n\n");
             MatterError err = targetCastingPlayer.stopConnecting();
             if (err.hasError()) {
               MatterError finalErr = err;
@@ -348,9 +378,9 @@ public class ConnectionExampleFragment extends Fragment {
         });
 
     builder.setView(dialogView);
-    AlertDialog alertDialog = builder.create();
-    alertDialog.show();
-    alertDialog
+    passcodeDialog = builder.create(); // Store the dialog instance in the passcodeDialog variable
+    passcodeDialog.show();
+    passcodeDialog
         .getWindow()
         .setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
   }

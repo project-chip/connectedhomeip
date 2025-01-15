@@ -28,7 +28,7 @@ void MTRDeviceConnectionBridge::OnConnected(
     object->Release();
 }
 
-void MTRDeviceConnectionBridge::OnConnectionFailure(void * context, const chip::OperationalSessionSetup::ConnnectionFailureInfo & failureInfo)
+void MTRDeviceConnectionBridge::OnConnectionFailure(void * context, const chip::OperationalSessionSetup::ConnectionFailureInfo & failureInfo)
 {
     NSNumber * retryDelay;
     if (failureInfo.requestedBusyDelay.HasValue()) {

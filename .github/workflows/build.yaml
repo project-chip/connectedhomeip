@@ -16,8 +16,9 @@ name: Builds
 
 on:
     push:
-        branches-ignore:
-            - 'dependabot/**'
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
     workflow_dispatch:
@@ -42,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:74
+            image: ghcr.io/project-chip/chip-build:97
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -75,7 +76,7 @@ jobs:
               with:
                   languages: "cpp"
             - name: Setup Build
-              run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false chip_data_model_check_die_on_failure=true"
+              run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false"
             - name: Run Build
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Run Tests
@@ -138,7 +139,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:74
+            image: ghcr.io/project-chip/chip-build:97
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -156,6 +157,9 @@ jobs:
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  fetch-depth: 2
+                  persist-credentials: true
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -179,12 +183,16 @@ jobs:
                   scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
             - name: Setup Build, Run Build and Run Tests
               run: |
-                  BUILD_TYPE=gcc_release scripts/build/gn_gen.sh --args="is_debug=false chip_data_model_check_die_on_failure=true"
+                  BUILD_TYPE=gcc_release scripts/build/gn_gen.sh --args="is_debug=false"
                   scripts/run_in_build_env.sh "ninja -C ./out/gcc_release"
                   BUILD_TYPE=gcc_release scripts/tests/gn_tests.sh
             - name: Clean output
               run: rm -rf ./out
             - name: Run Tests with sanitizers
+              # Sanitizer tests are not likely to find extra issues so running the same tests
+              # as above repeatedly on every pull request seems extra time. Instead keep this run
+              # for master only
+              if: github.event.pull_request.number == null
               env:
                   LSAN_OPTIONS: detect_leaks=1
               run: |
@@ -197,20 +205,37 @@ jobs:
                       esac
 
                       rm -rf ./out/sanitizers
-                      BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS chip_data_model_check_die_on_failure=true" --export-compile-commands
+                      BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS" --add-export-compile-commands=*
                       BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
                   done
+            - name: Generate tests with sanitizers (for tidy)
+              if: github.event.pull_request.number != null
+              run: |
+                  rm -rf ./out/sanitizers
+                  BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="is_clang=true is_asan=true" --add-export-compile-commands=*
             - name: Ensure codegen is done for sanitize
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/sanitizers"
+            - name: Find changed files
+              id: changed-files
+              uses: tj-actions/changed-files@v45
             - name: Clang-tidy validation
               # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
               #       See https://github.com/llvm/llvm-project/issues/97426
+              env:
+                  ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
               run: |
+                  touch out/changed_files.txt
+                  for file in ${ALL_CHANGED_FILES}; do
+                      echo "$file changed and will be considered for tidy"
+                      echo "$file" >>out/changed_files.txt
+                  done
+
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
                        --compile-database out/sanitizers/compile_commands.json \
                        --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|-ReadImpl|-InvokeSubscribeImpl|CodegenDataModel_Write|QuieterReporting' \
+                       --file-list-file out/changed_files.txt \
                        check \
                     "
             - name: Clean output
@@ -283,7 +308,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:54
+            image: ghcr.io/project-chip/chip-build:97
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -308,7 +333,7 @@ jobs:
 
             - name: Setup Build, Run Build and Run Tests
               run: |
-                  scripts/build/gn_gen.sh --args="enable_rtti=true chip_config_memory_debug_checks=false chip_config_memory_debug_dmalloc=false chip_generate_link_map_file=false chip_data_model_check_die_on_failure=true"
+                  scripts/build/gn_gen.sh --args="enable_rtti=true chip_config_memory_debug_checks=false chip_config_memory_debug_dmalloc=false chip_generate_link_map_file=false"
                   scripts/run_in_build_env.sh "ninja -C ./out"
                   scripts/tests/gn_tests.sh
             - name: Setup test python environment
@@ -316,9 +341,10 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh 'virtualenv pyenv'
                   source pyenv/bin/activate
-                  pip3 install ./out/controller/python/chip_core-0.0-cp37-abi3-linux_x86_64.whl
-                  pip3 install ./out/controller/python/chip_clusters-0.0-py3-none-any.whl
-                  pip3 install ./out/controller/python/chip_repl-0.0-py3-none-any.whl
+                  python -m ensurepip --upgrade
+                  python -m pip install ./out/controller/python/chip_core-0.0-cp37-abi3-linux_x86_64.whl
+                  python -m pip install ./out/controller/python/chip_clusters-0.0-py3-none-any.whl
+                  python -m pip install ./out/controller/python/chip_repl-0.0-py3-none-any.whl
 
             - name: Run Python tests
               shell: bash
@@ -334,7 +360,8 @@ jobs:
                   scripts/run_in_build_env.sh 'scripts/examples/gn_build_example.sh examples/chip-tool out/'
                   scripts/run_in_build_env.sh 'virtualenv pyenv'
                   source pyenv/bin/activate
-                  pip3 install -r scripts/setup/requirements.setuppayload.txt
+                  python -m ensurepip --upgrade
+                  python -m pip install -r scripts/setup/requirements.setuppayload.txt
                   python3 src/setup_payload/tests/run_python_setup_payload_test.py out/chip-tool
 
     build_linux_python_lighting_device:
@@ -344,7 +371,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:54
+            image: ghcr.io/project-chip/chip-build:97
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -372,13 +399,16 @@ jobs:
                   scripts/build_python_device.sh --chip_detail_logging true
 
     build_darwin:
-        name: Build on Darwin (clang, python_lib, simulated)
+        name: Build on Darwin (clang, simulated)
         runs-on: macos-13
         if: github.actor != 'restyled-io[bot]'
 
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  fetch-depth: 2
+                  persist-credentials: true
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -399,37 +429,42 @@ jobs:
                   CHIP_ROOT_PATH=examples/placeholder/linux
                   CHIP_ROOT_PATH="$CHIP_ROOT_PATH" BUILD_TYPE="$BUILD_TYPE" scripts/build/gn_gen.sh --args="$GN_ARGS"
                   scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
-            - name: Setup Build, Run Build and Run Tests
+            - name: Setup Build, Run Build and Run Tests (asan + target_os=all)
               # We can't enable leak checking here in LSAN_OPTIONS, because on
               # Darwin that's only supported with a new enough clang, and we're
               # not building with the pigweed clang here.
+              env:
+                  BUILD_TYPE: default
               run: |
-                  for BUILD_TYPE in default python_lib; do
-                      case $BUILD_TYPE in
-                          # We want to build various standalone example apps
-                          # (similar to what examples-linux-standalone.yaml
-                          # does), so use target_os="all" to get those picked
-                          # up as part of the "unified" build.  But then to
-                          # save CI resources we want to exclude the
-                          # "host clang" build, which uses the pigweed
-                          # clang.
-                          "default") GN_ARGS='target_os="all" is_asan=true enable_host_clang_build=false';;
-                      esac
-                      BUILD_TYPE=$BUILD_TYPE scripts/build/gn_gen.sh --args="$GN_ARGS chip_data_model_check_die_on_failure=true" --export-compile-commands
-                      scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
-                      BUILD_TYPE=$BUILD_TYPE scripts/tests/gn_tests.sh
-                  done
-            - name: Ensure codegen is done for sanitize
+                  # We want to build various standalone example apps (similar to what examples-linux-standalone.yaml
+                  # does), so use target_os="all" to get those picked up as part of the "unified" build.  But then
+                  # to save CI resources we want to exclude the "host clang" build, which uses the pigweed clang.
+                  scripts/build/gn_gen.sh --args='target_os="all" is_asan=true enable_host_clang_build=false' --add-export-compile-commands=*
+                  scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
+                  scripts/tests/gn_tests.sh
+            - name: Ensure codegen is done for default
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/default"
+            - name: Find changed files
+              id: changed-files
+              uses: tj-actions/changed-files@v45
             - name: Clang-tidy validation
               # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
               #       See https://github.com/llvm/llvm-project/issues/97426
+              env:
+                  ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
               run: |
+                  touch out/changed_files.txt
+                  for file in ${ALL_CHANGED_FILES}; do
+                      echo "$file changed and will be considered for tidy"
+                      echo "$file" >>out/changed_files.txt
+                  done
+
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
                        --compile-database out/default/compile_commands.json \
                        --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|CodegenDataModel_Write|QuieterReporting' \
+                       --file-list-file out/changed_files.txt \
                        check \
                     "
             - name: Uploading diagnostic logs
@@ -455,7 +490,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:74
+            image: ghcr.io/project-chip/chip-build:97
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"

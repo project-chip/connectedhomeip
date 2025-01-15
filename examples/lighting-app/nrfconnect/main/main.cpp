@@ -40,9 +40,9 @@ static int InitUSB()
 {
     int err = usb_enable(nullptr);
 
-    if (err)
+    if ((err != 0) && (err != -EALREADY))
     {
-        LOG_ERR("Failed to initialize USB device");
+        LOG_ERR("Failed to initialize USB device %d", err);
         return err;
     }
 

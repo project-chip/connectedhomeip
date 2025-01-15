@@ -58,9 +58,9 @@ tests:
                     }
 
     - label:
-          "Step 0b: TH binds GroupIds 0x0001 and 0x0002 with GroupKeySetID
-          0x01a1 in the GroupKeyMap attribute list on GroupKeyManagement cluster
-          by writing the GroupKeyMap attribute with two entries as follows:"
+          "Step 0b: TH binds GroupIds 0x0001 with GroupKeySetID 0x01a1 in the
+          GroupKeyMap attribute list on GroupKeyManagement cluster by writing
+          the GroupKeyMap attribute with two entries as follows:"
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
@@ -142,7 +142,7 @@ tests:
           value: 0
 
     - label:
-          "Step 2b: TH sends a StoreScene command to DUT with the GroupID field
+          "Step 3: TH sends a StoreScene command to DUT with the GroupID field
           set to G1 and the SceneID field set to 0x01."
       command: "StoreScene"
       arguments:
@@ -160,7 +160,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
 
-    - label: "Step 3: TH sends a AddScene command to DUT with the GroupID field
+    - label: "Step 4: TH sends a AddScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x02, the TransitionTime field set
           to 1000 (1s) and the ExtensionFieldSets set to: '[{ ClusterID: 0x0006,
           AttributeValueList: [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }]}]'
@@ -195,7 +195,7 @@ tests:
                 value: 0x02
 
     - label:
-          "Step 4a: TH sends a RecallScene command to DUT with the GroupID field
+          "Step 5a: TH sends a RecallScene command to DUT with the GroupID field
           set to G1 and the SceneID field set to 0x02."
       PICS: S.S.C05.Rsp
       command: "RecallScene"
@@ -214,7 +214,7 @@ tests:
               - name: "ms"
                 value: 2000
 
-    - label: "Step 4b: after a few seconds, TH reads OnOff attribute from DUT"
+    - label: "Step 5b: after a few seconds, TH reads OnOff attribute from DUT"
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
@@ -222,7 +222,7 @@ tests:
           value: 1
 
     - label:
-          "Step 5a: TH sends a RecallScene command to DUT with the GroupID field
+          "Step 6a: TH sends a RecallScene command to DUT with the GroupID field
           set to G1 and the SceneID field set to 0x01."
       PICS: S.S.C05.Rsp
       command: "RecallScene"
@@ -241,7 +241,7 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label: "Step 5b: after a few seconds, TH reads OnOff attribute from DUT"
+    - label: "Step 6b: after a few seconds, TH reads OnOff attribute from DUT"
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"

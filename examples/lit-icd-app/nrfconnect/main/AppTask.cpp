@@ -30,6 +30,7 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/util/attribute-storage.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -85,6 +86,10 @@ bool sHaveBLEConnections   = false;
 
 #ifdef CONFIG_CHIP_CRYPTO_PSA
 chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
+#endif
+
+#ifdef CONFIG_CHIP_ICD_DSLS_SUPPORT
+bool sIsSitModeRequested = false;
 #endif
 } // namespace
 
@@ -200,6 +205,7 @@ CHIP_ERROR AppTask::Init()
     initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider        = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     AppFabricTableDelegate::Init();
@@ -285,6 +291,16 @@ void AppTask::ButtonEventHandler(uint32_t buttonState, uint32_t hasChanged)
         PostEvent(button_event);
     }
 
+#ifdef CONFIG_CHIP_ICD_DSLS_SUPPORT
+    if (ICD_DSLS_BUTTON_MASK & buttonState & hasChanged)
+    {
+        button_event.ButtonEvent.PinNo  = ICD_DSLS_BUTTON;
+        button_event.ButtonEvent.Action = static_cast<uint8_t>(AppEventType::ButtonPushed);
+        button_event.Handler            = IcdDslsEventHandler;
+        PostEvent(button_event);
+    }
+#endif
+
     if (ICD_UAT_BUTTON_MASK & hasChanged)
     {
         button_event.ButtonEvent.PinNo  = ICD_UAT_BUTTON;
@@ -293,6 +309,23 @@ void AppTask::ButtonEventHandler(uint32_t buttonState, uint32_t hasChanged)
         PostEvent(button_event);
     }
 }
+
+#ifdef CONFIG_CHIP_ICD_DSLS_SUPPORT
+void AppTask::IcdDslsEventHandler(const AppEvent &)
+{
+    if (sIsSitModeRequested)
+    {
+        PlatformMgr().ScheduleWork([](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestWithdrawal(); }, 0);
+        sIsSitModeRequested = false;
+    }
+    else
+    {
+        PlatformMgr().ScheduleWork([](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestNotification(); },
+                                   0);
+        sIsSitModeRequested = true;
+    }
+}
+#endif
 
 void AppTask::IcdUatEventHandler(const AppEvent &)
 {

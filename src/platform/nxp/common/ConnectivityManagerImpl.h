@@ -138,6 +138,8 @@ private:
     bool mBorderRouterInit = false;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    bool mWifiManagerInit = false;
+
     enum WiFiEventGroup{
         kWiFiEventGroup_WiFiStationModeBit = (1 << 0),
     };
@@ -147,14 +149,10 @@ private:
     static constexpr uint32_t kWlanInitWaitMs = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
 
 #if CHIP_ENABLE_OPENTHREAD
-    static constexpr uint8_t kMaxIp6Addr = 3;
-
     Inet::InterfaceId mThreadNetIf;
     Inet::InterfaceId mExternalNetIf;
 
     char mHostname[chip::Dnssd::kHostNameMaxLength + 1] = "";
-    otIp6Address mIp6AddrList[kMaxIp6Addr];
-    uint32_t mIp6AddrNum = 0;
 #endif
 
     static int _WlanEventCallback(enum wlan_event_reason event, void * data);
@@ -164,9 +162,7 @@ private:
     void OnStationDisconnected(void);
     void UpdateInternetConnectivityState(void);
 #if CHIP_ENABLE_OPENTHREAD
-    void BrHandleStateChange(bool bLinkState);
-    void UpdateMdnsHost(void);
-    bool UpdateIp6AddrList(void);
+    void BrHandleStateChange();
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 #endif
     /* CHIP_DEVICE_CONFIG_ENABLE_WPA */

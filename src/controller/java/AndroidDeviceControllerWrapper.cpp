@@ -26,25 +26,22 @@
 #include <string.h>
 
 #include <app/server/Dnssd.h>
-
-#include <lib/support/CodeUtils.h>
-#include <lib/support/JniReferences.h>
-#include <lib/support/JniTypeWrappers.h>
-
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/java/AndroidICDClient.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/TLV.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/KeyValueStoreManager.h>
-#ifndef JAVA_MATTER_CONTROLLER_TEST
-#include <platform/android/CHIPP256KeypairBridge.h>
-#endif // JAVA_MATTER_CONTROLLER_TEST
+
 using namespace chip;
 using namespace chip::Controller;
 using namespace chip::Credentials;
@@ -52,33 +49,7 @@ using namespace TLV;
 
 AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 {
-    mController->Shutdown();
-
-#ifndef JAVA_MATTER_CONTROLLER_TEST
-    if (mKeypairBridge != nullptr)
-    {
-        chip::Platform::Delete(mKeypairBridge);
-        mKeypairBridge = nullptr;
-    }
-#endif // JAVA_MATTER_CONTROLLER_TEST
-
-    if (mDeviceAttestationDelegateBridge != nullptr)
-    {
-        delete mDeviceAttestationDelegateBridge;
-        mDeviceAttestationDelegateBridge = nullptr;
-    }
-
-    if (mDeviceAttestationVerifier != nullptr)
-    {
-        delete mDeviceAttestationVerifier;
-        mDeviceAttestationVerifier = nullptr;
-    }
-
-    if (mAttestationTrustStoreBridge != nullptr)
-    {
-        delete mAttestationTrustStoreBridge;
-        mAttestationTrustStoreBridge = nullptr;
-    }
+    Shutdown();
 }
 
 void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)
@@ -213,6 +184,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     setupParams.defaultCommissioner            = &wrapper->mAutoCommissioner;
     initParams.fabricIndependentStorage        = wrapperStorage;
     initParams.sessionKeystore                 = &wrapper->mSessionKeystore;
+    initParams.dataModelProvider               = app::CodegenDataModelProviderInstance(wrapperStorage);
 
     wrapper->mGroupDataProvider.SetStorageDelegate(wrapperStorage);
     wrapper->mGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
@@ -298,7 +270,6 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 
     // The lifetime of the ephemeralKey variable must be kept until SetupParams is saved.
     Crypto::P256Keypair ephemeralKey;
-#ifndef JAVA_MATTER_CONTROLLER_TEST
     if (rootCertificate != nullptr && nodeOperationalCertificate != nullptr && keypairDelegate != nullptr)
     {
         CHIPP256KeypairBridge * nativeKeypairBridge = wrapper->GetP256KeypairBridge();
@@ -335,7 +306,6 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         setupParams.controllerNOC  = chip::ByteSpan(wrapper->mNocCertificate.data(), wrapper->mNocCertificate.size());
     }
     else
-#endif // JAVA_MATTER_CONTROLLER_TEST
     {
         ChipLogProgress(Controller,
                         "No existing credentials provided: generating ephemeral local NOC chain with OperationalCredentialsIssuer");
@@ -417,14 +387,41 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     {
         return nullptr;
     }
-
+    wrapper->mIsInitialized = true;
     return wrapper.release();
 }
 
 void AndroidDeviceControllerWrapper::Shutdown()
 {
+    VerifyOrReturn(mIsInitialized);
+    getICDClientStorage()->Shutdown();
     mController->Shutdown();
     DeviceControllerFactory::GetInstance().Shutdown();
+
+    if (mKeypairBridge != nullptr)
+    {
+        chip::Platform::Delete(mKeypairBridge);
+        mKeypairBridge = nullptr;
+    }
+
+    if (mDeviceAttestationDelegateBridge != nullptr)
+    {
+        delete mDeviceAttestationDelegateBridge;
+        mDeviceAttestationDelegateBridge = nullptr;
+    }
+
+    if (mDeviceAttestationVerifier != nullptr)
+    {
+        delete mDeviceAttestationVerifier;
+        mDeviceAttestationVerifier = nullptr;
+    }
+
+    if (mAttestationTrustStoreBridge != nullptr)
+    {
+        delete mAttestationTrustStoreBridge;
+        mAttestationTrustStoreBridge = nullptr;
+    }
+    mIsInitialized = false;
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::ApplyNetworkCredentials(chip::Controller::CommissioningParameters & params,
@@ -508,28 +505,50 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Contro
     VerifyOrReturnError(icdRegistrationInfo != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Controller, "Failed to retrieve JNIEnv in %s.", __func__);
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    jmethodID getICDStayActiveDurationMsecMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getICDStayActiveDurationMsec",
+                                                        "()Ljava/lang/Long;", &getICDStayActiveDurationMsecMethod);
+    ReturnErrorOnFailure(err);
+    jobject jStayActiveMsec = env->CallObjectMethod(icdRegistrationInfo, getICDStayActiveDurationMsecMethod);
+    if (jStayActiveMsec != nullptr)
+    {
+        jlong stayActiveMsec = chip::JniReferences::GetInstance().LongToPrimitive(jStayActiveMsec);
+        if (!chip::CanCastTo<uint32_t>(stayActiveMsec))
+        {
+            ChipLogError(Controller, "Failed to process stayActiveMsec in %s since this is not a valid 32-bit integer.", __func__);
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        params.SetICDStayActiveDurationMsec(static_cast<uint32_t>(stayActiveMsec));
+    }
+
     jmethodID getCheckInNodeIdMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getCheckInNodeId", "()Ljava/lang/Long;",
                                                         &getCheckInNodeIdMethod);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    ReturnErrorOnFailure(err);
     jobject jCheckInNodeId = env->CallObjectMethod(icdRegistrationInfo, getCheckInNodeIdMethod);
 
     jmethodID getMonitoredSubjectMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getMonitoredSubject", "()Ljava/lang/Long;",
                                                         &getMonitoredSubjectMethod);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    ReturnErrorOnFailure(err);
     jobject jMonitoredSubject = env->CallObjectMethod(icdRegistrationInfo, getMonitoredSubjectMethod);
 
     jmethodID getSymmetricKeyMethod;
     err =
         chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getSymmetricKey", "()[B", &getSymmetricKeyMethod);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    ReturnErrorOnFailure(err);
     jbyteArray jSymmetricKey = static_cast<jbyteArray>(env->CallObjectMethod(icdRegistrationInfo, getSymmetricKeyMethod));
 
     jmethodID getClientTypeMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getClientType", "()Ljava/lang/Integer;",
                                                         &getClientTypeMethod);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    ReturnErrorOnFailure(err);
     jobject jClientType = env->CallObjectMethod(icdRegistrationInfo, getClientTypeMethod);
 
     chip::NodeId checkInNodeId = chip::kUndefinedNodeId;

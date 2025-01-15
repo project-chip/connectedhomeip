@@ -18,8 +18,10 @@
 #pragma once
 
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <json/json.h>
 #include <lib/support/Span.h>
-#include <string_view>
+
+#include <string>
 
 namespace chip {
 namespace Credentials {
@@ -50,15 +52,42 @@ public:
     // This can be used to skip the revocation check
     void ClearDeviceAttestationRevocationSetPath();
 
+    // Set JSON data directly for unit test purposes.
+    CHIP_ERROR SetDeviceAttestationRevocationData(const std::string & jsonData);
+    void ClearDeviceAttestationRevocationData();
+
 private:
-    CHIP_ERROR GetAKIDHexStr(const ByteSpan & certDer, MutableCharSpan & outAKIDHexStr);
-    CHIP_ERROR GetSerialNumberHexStr(const ByteSpan & certDer, MutableCharSpan & outSerialNumberHexStr);
-    CHIP_ERROR GetIssuerNameBase64Str(const ByteSpan & certDer, MutableCharSpan & outIssuerNameBase64String);
-    bool IsEntryInRevocationSet(const CharSpan & akidHexStr, const CharSpan & issuerNameBase64Str,
-                                const CharSpan & serialNumberHexStr);
+    enum class KeyIdType : uint8_t
+    {
+        kSKID = 0,
+        kAKID = 1,
+    };
+
+    enum class RDNType : uint8_t
+    {
+        kIssuer  = 0,
+        kSubject = 1,
+    };
+
+    bool CrossValidateCert(const Json::Value & revokedSet, const std::string & akIdHexStr, const std::string & issuerNameBase64Str);
+
+    CHIP_ERROR GetKeyIDHexStr(const ByteSpan & certDer, std::string & outKeyIDHexStr, KeyIdType keyIdType);
+    CHIP_ERROR GetAKIDHexStr(const ByteSpan & certDer, std::string & outAKIDHexStr);
+    CHIP_ERROR GetSKIDHexStr(const ByteSpan & certDer, std::string & outSKIDHexStr);
+
+    CHIP_ERROR GetSerialNumberHexStr(const ByteSpan & certDer, std::string & outSerialNumberHexStr);
+
+    CHIP_ERROR GetRDNBase64Str(const ByteSpan & certDer, std::string & outRDNBase64String, RDNType rdnType);
+    CHIP_ERROR GetIssuerNameBase64Str(const ByteSpan & certDer, std::string & outIssuerNameBase64String);
+    CHIP_ERROR GetSubjectNameBase64Str(const ByteSpan & certDer, std::string & outSubjectNameBase64String);
+
+    bool IsEntryInRevocationSet(const std::string & akidHexStr, const std::string & issuerNameBase64Str,
+                                const std::string & serialNumberHexStr);
+
     bool IsCertificateRevoked(const ByteSpan & certDer);
 
-    std::string_view mDeviceAttestationRevocationSetPath;
+    std::string mDeviceAttestationRevocationSetPath;
+    std::string mRevocationData; // Stores direct JSON data
 };
 
 } // namespace Credentials

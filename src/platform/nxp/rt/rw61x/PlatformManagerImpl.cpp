@@ -38,7 +38,7 @@
 
 #include <lwip/tcpip.h>
 
-#include MBEDTLS_PORT_INCLUDE
+#include "els_pkc_mbedtls.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include "OtaSupport.h"
@@ -204,6 +204,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     otPlatLogInit();
     otPlatRadioInit();
     otPlatSetResetFunction(initiateResetInIdle);
+    otPlatRandomInit();
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA

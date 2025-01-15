@@ -6,7 +6,6 @@ void MatterAdministratorCommissioningPluginServerInitCallback();
 void MatterApplicationBasicPluginServerInitCallback();
 void MatterApplicationLauncherPluginServerInitCallback();
 void MatterAudioOutputPluginServerInitCallback();
-void MatterBarrierControlPluginServerInitCallback();
 void MatterBasicInformationPluginServerInitCallback();
 void MatterBinaryInputBasicPluginServerInitCallback();
 void MatterBindingPluginServerInitCallback();
@@ -17,7 +16,6 @@ void MatterContentLauncherPluginServerInitCallback();
 void MatterDescriptorPluginServerInitCallback();
 void MatterDiagnosticLogsPluginServerInitCallback();
 void MatterDoorLockPluginServerInitCallback();
-void MatterElectricalMeasurementPluginServerInitCallback();
 void MatterEthernetNetworkDiagnosticsPluginServerInitCallback();
 void MatterFanControlPluginServerInitCallback();
 void MatterFaultInjectionPluginServerInitCallback();
@@ -40,7 +38,6 @@ void MatterModeSelectPluginServerInitCallback();
 void MatterNetworkCommissioningPluginServerInitCallback();
 void MatterOccupancySensingPluginServerInitCallback();
 void MatterOnOffPluginServerInitCallback();
-void MatterOnOffSwitchConfigurationPluginServerInitCallback();
 void MatterOperationalCredentialsPluginServerInitCallback();
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();
 void MatterPowerSourcePluginServerInitCallback();
@@ -71,7 +68,6 @@ void MatterWindowCoveringPluginServerInitCallback();
     MatterApplicationBasicPluginServerInitCallback(); \
     MatterApplicationLauncherPluginServerInitCallback(); \
     MatterAudioOutputPluginServerInitCallback(); \
-    MatterBarrierControlPluginServerInitCallback(); \
     MatterBasicInformationPluginServerInitCallback(); \
     MatterBinaryInputBasicPluginServerInitCallback(); \
     MatterBindingPluginServerInitCallback(); \
@@ -82,7 +78,6 @@ void MatterWindowCoveringPluginServerInitCallback();
     MatterDescriptorPluginServerInitCallback(); \
     MatterDiagnosticLogsPluginServerInitCallback(); \
     MatterDoorLockPluginServerInitCallback(); \
-    MatterElectricalMeasurementPluginServerInitCallback(); \
     MatterEthernetNetworkDiagnosticsPluginServerInitCallback(); \
     MatterFanControlPluginServerInitCallback(); \
     MatterFaultInjectionPluginServerInitCallback(); \
@@ -105,7 +100,6 @@ void MatterWindowCoveringPluginServerInitCallback();
     MatterNetworkCommissioningPluginServerInitCallback(); \
     MatterOccupancySensingPluginServerInitCallback(); \
     MatterOnOffPluginServerInitCallback(); \
-    MatterOnOffSwitchConfigurationPluginServerInitCallback(); \
     MatterOperationalCredentialsPluginServerInitCallback(); \
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback(); \
     MatterPowerSourcePluginServerInitCallback(); \

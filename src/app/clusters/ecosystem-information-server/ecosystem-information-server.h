@@ -26,6 +26,8 @@
 #include <vector>
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/reporting/reporting.h>
 
 #include <app/AttributeAccessInterface.h>
 
@@ -33,6 +35,21 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace EcosystemInformation {
+
+class MatterContext
+{
+public:
+    virtual ~MatterContext() = default;
+    // MarkDirty
+    virtual void MarkDirty(EndpointId endpointId, AttributeId attributeId)
+    {
+        MatterReportingAttributeChangeCallback(endpointId, Id, attributeId);
+    }
+};
+
+class TestOnlyParameter
+{
+};
 
 // This intentionally mirrors Structs::EcosystemDeviceStruct::Type but has ownership
 // of underlying types.
@@ -143,10 +160,13 @@ private:
     uint64_t mLocationDescriptorLastEditEpochUs;
 };
 
-class EcosystemInformationServer
+class EcosystemInformationServer : public MatterContext
 {
 public:
     static EcosystemInformationServer & Instance();
+
+    EcosystemInformationServer() : mMatterContext(*this){};
+    EcosystemInformationServer(TestOnlyParameter _, MatterContext & aMatterContext) : mMatterContext(aMatterContext){};
 
     /**
      * @brief Add EcosystemInformation Cluster to endpoint so we respond appropriately on endpoint
@@ -211,6 +231,7 @@ private:
     CHIP_ERROR EncodeDeviceDirectoryAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR EncodeLocationStructAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
 
+    MatterContext & mMatterContext;
     std::map<EndpointId, DeviceInfo> mDevicesMap;
 
     static EcosystemInformationServer mInstance;

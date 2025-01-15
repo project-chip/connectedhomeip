@@ -18,7 +18,9 @@
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
-#import <Matter/MTRDevice_Internal.h>
+
+#import "MTRDeviceClusterData.h"
+#import "MTRDevice_Internal.h"
 
 #include <lib/core/CHIPError.h>
 
@@ -90,6 +92,16 @@ typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNu
  */
 - (nullable NSDictionary<NSString *, id> *)getStoredDeviceDataForNodeID:(NSNumber *)nodeID;
 - (void)storeDeviceData:(NSDictionary<NSString *, id> *)data forNodeID:(NSNumber *)nodeID;
+
+/**
+ * Mechanism for an API client to perform a block after previous async operations (writes) on the storage queue have executed.
+ *
+ * This should be used only when something really needs to wait for the asynchronous writes
+ * to complete and can't proceed until they have.
+ *
+ * If no block is passed in, then the method returns after having synchronously flushed the queue.
+ */
+- (void)synchronouslyPerformBlock:(void (^_Nullable)(void))block;
 
 @end
 

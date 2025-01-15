@@ -1159,7 +1159,7 @@ class BaseTestHelper:
             return False
 
     async def TestTriggerTestEventHandler(self, nodeid, enable_key, event_trigger):
-        self.logger.info("Test trigger test event handler for device = %08x", nodeid)
+        self.logger.info("Test trigger test event handler for device = %08x trigger = %016x", nodeid, event_trigger)
         try:
             await self.devCtrl.SendCommand(nodeid, 0, Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=enable_key, eventTrigger=event_trigger))
             return True
@@ -1167,10 +1167,10 @@ class BaseTestHelper:
             self.logger.exception("Failed to trigger test event handler {}".format(ex))
             return False
 
-    async def TestWaitForActive(self, nodeid):
+    async def TestWaitForActive(self, nodeid, stayActiveDurationMs=30000):
         self.logger.info("Test wait for device = %08x", nodeid)
         try:
-            await self.devCtrl.WaitForActive(nodeid)
+            await self.devCtrl.WaitForActive(nodeid, stayActiveDurationMs=stayActiveDurationMs)
             return True
         except Exception as ex:
             self.logger.exception("Failed to wait for active. {}".format(ex))

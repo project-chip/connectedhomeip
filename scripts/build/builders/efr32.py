@@ -31,6 +31,7 @@ class Efr32App(Enum):
     THERMOSTAT = auto()
     PUMP = auto()
     UNIT_TEST = auto()
+    AIR_QUALITY_SENSOR = auto()
 
     def ExampleName(self):
         if self == Efr32App.LIGHT:
@@ -45,6 +46,8 @@ class Efr32App(Enum):
             return 'thermostat'
         elif self == Efr32App.PUMP:
             return 'pump-app'
+        elif self == Efr32App.AIR_QUALITY_SENSOR:
+            return 'air-quality-sensor-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -63,6 +66,8 @@ class Efr32App(Enum):
             return 'matter-silabs-pump-example'
         elif self == Efr32App.UNIT_TEST:
             return 'matter-silabs-device_tests'
+        elif self == Efr32App.AIR_QUALITY_SENSOR:
+            return 'matter-silabs-air-quality-sensor-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -81,6 +86,8 @@ class Efr32App(Enum):
             return 'pump_app.flashbundle.txt'
         elif self == Efr32App.UNIT_TEST:
             return os.path.join('tests', 'efr32_device_tests.flashbundle.txt')
+        elif self == Efr32App.AIR_QUALITY_SENSOR:
+            return 'air_quality_sensor_app.flashbundle.txt'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -104,6 +111,8 @@ class Efr32Board(Enum):
     BRD4186C = 10
     BRD4338A = 11
     BRD2703A = 12
+    BRD2605A = 13
+    BRD4343A = 14
 
     def GnArgName(self):
         if self == Efr32Board.BRD2704B:
@@ -130,6 +139,10 @@ class Efr32Board(Enum):
             return 'BRD4338A'
         elif self == Efr32Board.BRD2703A:
             return 'BRD2703A'
+        elif self == Efr32Board.BRD2605A:
+            return 'BRD2605A'
+        elif self == Efr32Board.BRD4343A:
+            return 'BRD4343A'
         else:
             raise Exception('Unknown board #: %r' % self)
 
@@ -324,7 +337,7 @@ class Efr32Builder(GnBuilder):
     def generate(self):
         cmd = [
             'gn', 'gen', '--check', '--fail-on-unused-args',
-            '--export-compile-commands',
+            '--add-export-compile-commands=*',
             '--root=%s' % self.root
         ]
         if self.dotfile:

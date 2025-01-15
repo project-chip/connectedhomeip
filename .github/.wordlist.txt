@@ -41,6 +41,9 @@ AFL
 AIDL
 algs
 alloc
+allocator
+allocators
+Ambrose
 Ameba
 amebad
 amebaiot
@@ -317,6 +320,7 @@ cryptographic
 CSA
 csg
 csrrequest
+cstdint
 csu
 csv
 ctl
@@ -440,6 +444,7 @@ DNSStubListener
 docbuild
 Dockerfile
 Dockerfiles
+docstrings
 Don'ts
 DoorLock
 DoorState
@@ -453,6 +458,7 @@ dpkg
 dropdown
 dryrun
 DS
+DSLS
 duplicative
 DUT
 DUTS
@@ -461,6 +467,7 @@ DV
 DVK
 dynload
 eabi
+EAF
 EB
 ECC
 ECD
@@ -551,6 +558,7 @@ feff
 ffaa
 ffeebaefa
 FFF
+FFFFFFFFFFFF0102
 fffe
 fffff
 Fi
@@ -562,6 +570,8 @@ FlowMeasurement
 FluorideConcentrationMeasurement
 focusable
 forkpty
+formatter
+formatters
 FOTA
 FreeRTOS
 FreeRTOSConfig
@@ -572,6 +582,7 @@ fsync
 ftd
 fullclean
 fuzzer
+fuzzers
 fuzztest
 FW
 gbl
@@ -727,10 +738,12 @@ IPython
 ISCAN
 isHexString
 isLowerCase
+isort
 isUpperCase
 itemName
 iterable
 itsfoss
+IW
 JDK
 jinja
 JLink
@@ -873,6 +886,7 @@ MediaPlayback
 MediaTek
 MEI
 mem
+memcpy
 memdf
 MemMonitoring
 menuconfig
@@ -889,6 +903,7 @@ microcontroller
 microcontrollers
 MicroSD
 middleware
+MIMXRT
 minApplicableSoftwareVersion
 Minicom
 MinInterval
@@ -920,12 +935,14 @@ Multicast
 multilib
 Multiprotocol
 multithreaded
+Murata
 mutex
 mutexes
 mv
 MX
 mydir
 MyPASSWORD
+mypy
 MySSID
 NAMESERVER
 NAMESPACE
@@ -1002,6 +1019,7 @@ OpenThreadDemo
 openweave
 OperationalCredentials
 operationalDataset
+operationalstate
 opkg
 OPTIGA
 optionMask
@@ -1177,6 +1195,7 @@ rebase
 recommand
 recommanded
 recurse
+refrigeratoralarm
 regen
 registerAttributeAccessOverride
 RegisterCommandHandler
@@ -1434,6 +1453,7 @@ toJson
 tokenization
 tokenized
 tokenizer
+toml
 toolchain
 toolchains
 topologies
@@ -1447,6 +1467,8 @@ trackFree
 TransferSession
 transitionTime
 TransportMgrBase
+triaged
+triaging
 TriggerEffect
 TRNG
 trustm
@@ -1532,6 +1554,7 @@ virtualenv
 visualstudio
 vlatest
 VLEDs
+vm
 vn
 vnc
 vous
@@ -1598,6 +1621,7 @@ xFFF
 xFFFF
 xfffff
 xFFFFFFEFFFFFFFFF
+XMLPICSValidator
 xtensa
 xvzf
 xwayland
@@ -1624,3 +1648,5 @@ zhengyaohan
 Zigbee
 zigbeealliance
 zigbeethread
+zsdk
+TBR

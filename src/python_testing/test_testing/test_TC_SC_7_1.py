@@ -16,20 +16,13 @@
 #    limitations under the License.
 #
 
-import os
 import sys
 from random import randbytes
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
+from chip.testing.matter_testing import MatterTestConfig
 from MockTestRunner import MockTestRunner
-
-try:
-    from matter_testing_support import MatterTestConfig
-except ImportError:
-    sys.path.append(os.path.abspath(
-        os.path.join(os.path.dirname(__file__), '..')))
-    from matter_testing_support import MatterTestConfig
 
 
 def read_trusted_root(filled: bool) -> Attribute.AsyncReadTransaction.ReadResponse:

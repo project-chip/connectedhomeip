@@ -1,3 +1,4 @@
+#!/usr/bin/env -S python3 -B
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
@@ -20,6 +21,8 @@ import glob
 import os
 import subprocess
 
+import yaml
+
 # Function to load --app argument environment variables from a file
 
 
@@ -36,11 +39,8 @@ def load_env_from_yaml(file_path):
     Args:
         file_path (str): The path to the YAML file containing the environment variables.
     """
-    with open(file_path, 'r') as file:
-        for line in file:
-            if line.strip():  # Skip empty lines
-                key, value = line.strip().split(': ', 1)
-                os.environ[key] = value
+    for key, value in yaml.full_load(open(file_path, 'r')).items():
+        os.environ[key] = value
 
 
 def main(search_directory, env_file):
@@ -53,67 +53,8 @@ def main(search_directory, env_file):
     # Define the base command to run tests
     base_command = os.path.join(chip_root, "scripts/tests/run_python_test.py")
 
-    # Define the files and patterns to exclude
-    excluded_patterns = {
-        "MinimalRepresentation.py",
-        "TC_CNET_4_4.py",
-        "TC_CCTRL_2_1.py",
-        "TC_CCTRL_2_2.py",
-        "TC_CCTRL_2_3.py",
-        "TC_DGGEN_3_2.py",
-        "TC_EEVSE_Utils.py",
-        "TC_ECOINFO_2_1.py",
-        "TC_ECOINFO_2_2.py",
-        "TC_EWATERHTRBase.py",
-        "TC_EWATERHTR_2_1.py",
-        "TC_EWATERHTR_2_2.py",
-        "TC_EWATERHTR_2_3.py",
-        "TC_EnergyReporting_Utils.py",
-        "TC_OpstateCommon.py",
-        "TC_pics_checker.py",
-        "TC_TMP_2_1.py",
-        "TC_MCORE_FS_1_1.py",
-        "TC_MCORE_FS_1_2.py",
-        "TC_MCORE_FS_1_3.py",
-        "TC_MCORE_FS_1_4.py",
-        "TC_MCORE_FS_1_5.py",
-        "TC_OCC_3_1.py",
-        "TC_OCC_3_2.py",
-        "TC_BRBINFO_4_1.py",
-        "TestCommissioningTimeSync.py",
-        "TestConformanceSupport.py",
-        "TestChoiceConformanceSupport.py",
-        "TC_DEMTestBase.py",
-        "choice_conformance_support.py",
-        "TestConformanceTest.py",  # Unit test of the conformance test (TC_DeviceConformance) - does not run against an app.
-        "TestIdChecks.py",
-        "TestSpecParsingDeviceType.py",
-        "TestConformanceTest.py",
-        "TestMatterTestingSupport.py",
-        "TestSpecParsingSupport.py",
-        "TestTimeSyncTrustedTimeSource.py",
-        "basic_composition_support.py",
-        "conformance_support.py",
-        "drlk_2_x_common.py",
-        "execute_python_tests.py",
-        "global_attribute_ids.py",
-        "hello_external_runner.py",
-        "hello_test.py",
-        "matter_testing_support.py",
-        "pics_support.py",
-        "spec_parsing_support.py",
-        "taglist_and_topology_test_support.py",
-        "test_plan_support.py",
-        "test_plan_table_generator.py"
-    }
-
-    """
-    Explanation for excluded files:
-    The above list of files are excluded from the tests as they are either not app-specific tests
-    or are run through a different block of tests mentioned in tests.yaml.
-    This is to ensure that only relevant test scripts are executed, avoiding redundancy and ensuring
-    the correctness of the test suite.
-    """
+    metadata = yaml.full_load(open(os.path.join(chip_root, "src/python_testing/test_metadata.yaml")))
+    excluded_patterns = set([item["name"] for item in metadata["not_automated"]])
 
     # Get all .py files in the directory
     all_python_files = glob.glob(os.path.join(search_directory, "*.py"))
@@ -124,7 +65,7 @@ def main(search_directory, env_file):
     # Run each script with the base command
     for script in python_files:
         full_command = f"{base_command} --load-from-env {env_file} --script {script}"
-        print(f"Running command: {full_command}")
+        print(f"Running command: {full_command}", flush=True)  # Flush print to stdout immediately
         subprocess.run(full_command, shell=True, check=True)
 
 

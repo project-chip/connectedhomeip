@@ -36,9 +36,9 @@ buildconfig_header("icd-server-buildconfig") {
     "CHIP_CONFIG_ENABLE_ICD_LIT=${chip_enable_icd_lit}",
     "CHIP_CONFIG_ENABLE_ICD_CIP=${chip_enable_icd_checkin}",
     "CHIP_CONFIG_ENABLE_ICD_UAT=${chip_enable_icd_user_active_mode_trigger}",
+    "CHIP_CONFIG_ENABLE_ICD_DSLS=${chip_enable_icd_dsls}",
     "ICD_REPORT_ON_ENTER_ACTIVE_MODE=${chip_icd_report_on_active_mode}",
     "ICD_MAX_NOTIFICATION_SUBSCRIBERS=${icd_max_notification_subscribers}",
-    "ICD_ENFORCE_SIT_SLOW_POLL_LIMIT=${icd_enforce_sit_slow_poll_limit}",
   ]
 
   visibility = [ ":icd-server-config" ]
@@ -93,7 +93,6 @@ source_set("manager") {
   deps = [ ":icd-server-config" ]
 
   public_deps = [
-    ":check-in-back-off",
     ":configuration-data",
     ":notifier",
     ":observer",
@@ -106,6 +105,7 @@ source_set("manager") {
 
   if (chip_enable_icd_checkin) {
     public_deps += [
+      ":check-in-back-off",
       ":monitoring-table",
       ":sender",
       "${chip_root}/src/app:app_config",

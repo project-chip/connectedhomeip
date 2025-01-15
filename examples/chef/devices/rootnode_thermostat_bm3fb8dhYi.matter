@@ -212,6 +212,13 @@ enum TestGlobalEnum : enum8 {
   kFinalValue = 2;
 }
 
+enum ThreeLevelAutoEnum : enum8 {
+  kLow = 0;
+  kMedium = 1;
+  kHigh = 2;
+  kAutomatic = 3;
+}
+
 bitmap TestGlobalBitmap : bitmap32 {
   kFirstBit = 0x1;
   kSecondBit = 0x2;
@@ -891,6 +898,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
   provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
   provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  provisional readonly attribute access(read: administer) optional int32u TCUpdateDeadline = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1298,7 +1306,7 @@ cluster GeneralDiagnostics = 51 {
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
   /** Request a variable length payload response. */
-  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
+  command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -2461,20 +2469,20 @@ endpoint 1 {
     ram      attribute absMaxCoolSetpointLimit default = 3200;
     ram      attribute PICoolingDemand default = 0;
     ram      attribute PIHeatingDemand default = 0;
-    ram      attribute HVACSystemTypeConfiguration default = 0x00;
-    ram      attribute localTemperatureCalibration default = 0;
-    ram      attribute occupiedCoolingSetpoint default = 0x0A28;
-    ram      attribute occupiedHeatingSetpoint default = 0x07D0;
-    ram      attribute unoccupiedCoolingSetpoint default = 0x0A28;
-    ram      attribute unoccupiedHeatingSetpoint default = 0x07D0;
-    ram      attribute minHeatSetpointLimit default = 700;
-    ram      attribute maxHeatSetpointLimit default = 3000;
-    ram      attribute minCoolSetpointLimit default = 1600;
-    ram      attribute maxCoolSetpointLimit default = 3200;
-    ram      attribute minSetpointDeadBand default = 0x19;
-    ram      attribute remoteSensing default = 0x00;
-    ram      attribute controlSequenceOfOperation default = 0x04;
-    ram      attribute systemMode default = 0x01;
+    persist  attribute HVACSystemTypeConfiguration default = 0x00;
+    persist  attribute localTemperatureCalibration default = 0;
+    persist  attribute occupiedCoolingSetpoint default = 0x0A28;
+    persist  attribute occupiedHeatingSetpoint default = 0x07D0;
+    persist  attribute unoccupiedCoolingSetpoint default = 0x0A28;
+    persist  attribute unoccupiedHeatingSetpoint default = 0x07D0;
+    persist  attribute minHeatSetpointLimit default = 700;
+    persist  attribute maxHeatSetpointLimit default = 3000;
+    persist  attribute minCoolSetpointLimit default = 1600;
+    persist  attribute maxCoolSetpointLimit default = 3200;
+    persist  attribute minSetpointDeadBand default = 0x19;
+    persist  attribute remoteSensing default = 0x00;
+    persist  attribute controlSequenceOfOperation default = 0x04;
+    persist  attribute systemMode default = 0x01;
     ram      attribute thermostatRunningMode default = 0;
     ram      attribute startOfWeek default = 0;
     ram      attribute numberOfWeeklyTransitions default = 0;

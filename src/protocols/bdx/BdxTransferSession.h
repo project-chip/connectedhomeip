@@ -136,6 +136,8 @@ public:
 
         const char * ToString(OutputEventType outputEventType);
 
+        static const char * TypeToString(OutputEventType outputEventType);
+
         static OutputEvent TransferInitEvent(TransferInitData data, System::PacketBufferHandle msg);
         static OutputEvent TransferAcceptEvent(TransferAcceptData data);
         static OutputEvent TransferAcceptEvent(TransferAcceptData data, System::PacketBufferHandle msg);
@@ -164,6 +166,25 @@ public:
      * @param curTime   Current time
      */
     void PollOutput(OutputEvent & event, System::Clock::Timestamp curTime);
+
+    /**
+     * @brief
+     *   Gets the pending output event from the transfer session in the event param passed in by the caller.
+     *   The output event may contain some data for the caller to act upon. If there is no pending output event,
+     *   the caller will get an event of type OutputEventType::kNone.
+     *
+     *   It is possible that consecutive calls to this method may emit different outputs depending on the state of the
+     *   TransferSession object.  The caller is generally expected to keep calling this method until it gets an event of type
+     * OutputEventType::kNone.
+     *
+     *   If the output event type is kMsgToSend, the caller is expected to send the message immediately on the
+     *   relevant exchange.  In this case the BDX session timeout timer will start when GetNextAction is called.
+     *
+     *   See OutputEventType for all possible output event types.
+     *
+     * @param event     Reference to an OutputEvent struct that will be filled out with any pending output event data
+     */
+    void GetNextAction(OutputEvent & event);
 
     /**
      * @brief

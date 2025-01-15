@@ -19,28 +19,36 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${CHIP_LOCK_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --manual-code 10054912339 --bool-arg ignore_in_progress:True allow_provisional:True --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --tests test_TC_IDM_10_2
+# test-runner-runs:
+#   run1:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --bool-arg ignore_in_progress:True allow_provisional:True
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --tests test_TC_IDM_10_2 test_TC_IDM_10_6
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 # TODO: Enable 10.5 in CI once the door lock OTA requestor problem is sorted.
 from typing import Callable
 
 import chip.clusters as Clusters
-from basic_composition_support import BasicCompositionTests
+from chip.testing.basic_composition import BasicCompositionTests
+from chip.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
+                                             evaluate_feature_choice_conformance)
+from chip.testing.conformance import ConformanceDecision, conformance_allowed
+from chip.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type,
+                                               device_type_id_type, is_valid_device_type_id)
+from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
+                                         MatterBaseTest, ProblemNotice, ProblemSeverity, async_test_body, default_matter_test_main)
+from chip.testing.spec_parsing import CommandType, build_xml_clusters, build_xml_device_types
 from chip.tlv import uint
-from choice_conformance_support import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
-                                        evaluate_feature_choice_conformance)
-from conformance_support import ConformanceDecision, conformance_allowed
-from global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type, device_type_id_type,
-                                  is_valid_device_type_id)
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                    MatterBaseTest, ProblemNotice, ProblemSeverity, async_test_body, default_matter_test_main)
-from spec_parsing_support import CommandType, build_xml_clusters, build_xml_device_types
 
 
 class DeviceConformanceTests(BasicCompositionTests):
@@ -166,7 +174,6 @@ class DeviceConformanceTests(BasicCompositionTests):
                     if attribute_id not in self.xml_clusters[cluster_id].attributes.keys():
                         # TODO: Consolidate the range checks with IDM-10.1 once that lands
                         if attribute_id <= 0x4FFF:
-                            # manufacturer attribute
                             record_error(location=location, problem='Standard attribute found on device, but not in spec')
                         continue
                     xml_attribute = self.xml_clusters[cluster_id].attributes[attribute_id]
@@ -193,9 +200,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                         if command_id not in xml_commands_dict:
                             # TODO: Consolidate range checks with IDM-10.1 once that lands
                             if command_id <= 0xFF:
-                                # manufacturer command
-                                continue
-                            record_error(location=location, problem='Standard command found on device, but not in spec')
+                                record_error(location=location, problem='Standard command found on device, but not in spec')
                             continue
                         xml_command = xml_commands_dict[command_id]
                         conformance_decision_with_choice = xml_command.conformance(feature_map, attribute_list, all_command_list)
@@ -268,6 +273,35 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         return success, problems
 
+    def check_device_type_revisions(self) -> tuple[bool, list[ProblemNotice]]:
+        success = True
+        problems = []
+
+        def record_error(location, problem):
+            nonlocal success
+            problems.append(ProblemNotice("IDM-10.6", location, ProblemSeverity.ERROR, problem, ""))
+            success = False
+
+        for endpoint_id, endpoint in self.endpoints.items():
+            if Clusters.Descriptor not in endpoint:
+                # Descriptor cluster presence checked in 10.5
+                continue
+
+            standard_device_types = [x for x in endpoint[Clusters.Descriptor]
+                                     [Clusters.Descriptor.Attributes.DeviceTypeList] if device_type_id_type(x.deviceType) == DeviceTypeIdType.kStandard]
+            for device_type in standard_device_types:
+                device_type_id = device_type.deviceType
+                if device_type_id not in self.xml_device_types.keys():
+                    # problem recorded in 10.5
+                    continue
+                expected_revision = self.xml_device_types[device_type_id].revision
+                actual_revision = device_type.revision
+                if expected_revision != actual_revision:
+                    location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=Clusters.Descriptor.id)
+                    record_error(
+                        location, f"Expected Device type revision for device type {device_type_id} {self.xml_device_types[device_type_id].name} on endpoint {endpoint_id} does not match revision on DUT. Expected: {expected_revision} DUT: {actual_revision}")
+        return success, problems
+
     def check_device_type(self, fail_on_extra_clusters: bool = True, allow_provisional: bool = False) -> tuple[bool, list[ProblemNotice]]:
         success = True
         problems = []
@@ -290,7 +324,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                 continue
 
             device_type_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
-            invalid_device_types = [x for x in device_type_list if not is_valid_device_type_id(device_type_id_type(x.deviceType))]
+            invalid_device_types = [x for x in device_type_list if not is_valid_device_type_id(x.deviceType)]
             standard_device_types = [x for x in endpoint[Clusters.Descriptor]
                                      [Clusters.Descriptor.Attributes.DeviceTypeList] if device_type_id_type(x.deviceType) == DeviceTypeIdType.kStandard]
             endpoint_clusters = []
@@ -305,13 +339,6 @@ class DeviceConformanceTests(BasicCompositionTests):
                 if device_type_id not in self.xml_device_types.keys():
                     record_error(location=location, problem='Unknown device type ID in standard range')
                     continue
-
-                if device_type_id not in self.xml_device_types.keys():
-                    location = DeviceTypePathLocation(device_type_id=device_type_id)
-                    record_error(location=location, problem='Unknown device type')
-                    continue
-
-                # TODO: check revision. Possibly in another test?
 
                 xml_device = self.xml_device_types[device_type_id]
                 # IDM 10.1 checks individual clusters for validity,
@@ -359,9 +386,8 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         # TODO: Turn this off after TE2
         # https://github.com/project-chip/connectedhomeip/issues/34615
         ignore_in_progress = self.user_params.get("ignore_in_progress", True)
-        is_ci = self.check_pics('PICS_SDK_CI_ONLY')
         allow_provisional = self.user_params.get("allow_provisional", False)
-        success, problems = self.check_conformance(ignore_in_progress, is_ci, allow_provisional)
+        success, problems = self.check_conformance(ignore_in_progress, self.is_pics_sdk_ci_only, allow_provisional)
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with conformance")
@@ -380,6 +406,12 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with Device type conformance on one or more endpoints")
+
+    def test_TC_IDM_10_6(self):
+        success, problems = self.check_device_type_revisions()
+        self.problems.extend(problems)
+        if not success:
+            self.fail_current_test("Problems with Device type revisions on one or more endpoints")
 
 
 if __name__ == "__main__":

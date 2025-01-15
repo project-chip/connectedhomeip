@@ -1,4 +1,4 @@
-# SDK Basics
+# SDK Architecture Overview
 
 ## Getting Started
 

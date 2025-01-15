@@ -1,13 +1,12 @@
 &flash {
 	reg = <0x20000000 0x400000>;
 
+	/delete-node/ partitions;
 	partitions {
-		/delete-node/ partition@0;
-		/delete-node/ partition@20000;
-		/delete-node/ partition@88000;
-		/delete-node/ partition@f0000;
-		/delete-node/ partition@f4000;
-		/delete-node/ partition@fe000;
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
 		boot_partition: partition@0 {
 			label = "mcuboot";
 			reg = <0x00000000 0x19000>;

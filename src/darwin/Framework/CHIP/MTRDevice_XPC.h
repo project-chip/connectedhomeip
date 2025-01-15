@@ -17,9 +17,13 @@
 
 #import <Matter/Matter.h>
 
+#import "MTRDeviceController_XPC.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDevice_XPC : MTRDevice <MTRXPCClientProtocol_MTRDevice>
+
+- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController_XPC *)controller;
 
 @end
 

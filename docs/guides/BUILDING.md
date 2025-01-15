@@ -94,7 +94,8 @@ satisfied with the following command:
 ```
 sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
-     python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
+     python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev \
+     default-jre
 ```
 
 #### UI builds
@@ -400,7 +401,11 @@ Tests will be located in:
 `chip_pw_fuzztest` is the name of the toolchain used.
 
 -   Details on How To Run Fuzz Tests in
-    [Running FuzzTests](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md)
+    [Running FuzzTests](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#running-fuzztests)
+
+FAQ: In the event of a build failure related to missing files or dependencies
+for pw_fuzzer, check the
+[FuzzTest FAQ](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#FAQ)
 
 ## Build custom configuration
 

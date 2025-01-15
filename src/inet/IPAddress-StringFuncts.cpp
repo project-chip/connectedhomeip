@@ -23,6 +23,7 @@
  *
  */
 
+#include <algorithm>
 #include <limits>
 #include <stdint.h>
 #include <stdio.h>
@@ -31,7 +32,7 @@
 #include <inet/IPAddress.h>
 #include <lib/support/CodeUtils.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 #include <arpa/inet.h>
 #endif
 
@@ -53,12 +54,12 @@ char * IPAddress::ToString(char * buf, uint32_t bufSize) const
         ip6_addr_t ip6_addr = ToIPv6();
         ip6addr_ntoa_r(&ip6_addr, buf, (int) bufSize);
     }
-#elif CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#elif CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     // socklen_t is sometimes signed, sometimes not, so the only safe way to do
     // this is to promote everything to an unsigned type that's known to be big
     // enough for everything, then cast back to uint32_t after taking the min.
-    bufSize =
-        static_cast<uint32_t>(min(static_cast<uintmax_t>(std::numeric_limits<socklen_t>::max()), static_cast<uintmax_t>(bufSize)));
+    bufSize = static_cast<uint32_t>(
+        std::min(static_cast<uintmax_t>(std::numeric_limits<socklen_t>::max()), static_cast<uintmax_t>(bufSize)));
 #if INET_CONFIG_ENABLE_IPV4
     if (IsIPv4())
     {
@@ -92,7 +93,7 @@ bool IPAddress::FromString(const char * str, IPAddress & output)
         ip4_addr_t ipv4Addr;
         if (!ip4addr_aton(str, &ipv4Addr))
             return false;
-#elif CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#elif CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
         struct in_addr ipv4Addr;
         if (inet_pton(AF_INET, str, &ipv4Addr) < 1)
             return false;
@@ -106,7 +107,7 @@ bool IPAddress::FromString(const char * str, IPAddress & output)
         ip6_addr_t ipv6Addr;
         if (!ip6addr_aton(str, &ipv6Addr))
             return false;
-#elif CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#elif CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
         struct in6_addr ipv6Addr;
         if (inet_pton(AF_INET6, str, &ipv6Addr) < 1)
             return false;

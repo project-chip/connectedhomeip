@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <platform/nxp/common/legacy/OTAImageProcessorImpl.h>
+#include <platform/nxp/common/ota/OTAImageProcessorImpl.h>
 #include <src/include/platform/CHIPDeviceLayer.h>
 
 #include <src/app/clusters/ota-requestor/OTARequestorInterface.h>

@@ -16,14 +16,12 @@ name: Build example - TI CC32XX
 
 on:
     workflow_dispatch:
-    # Temporarely disabled:
-    #    - TI CI runs out of disk space
-    #    - Image should be updated to an Ubuntu 24.04 or higher based one (move from :54 version)
-    # push:
-    #     branches-ignore:
-    #         - 'dependabot/**'
-    # pull_request:
-    # merge_group:
+    push:
+        branches:
+            - master
+            - 'v*-branch'
+    pull_request:
+    merge_group:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -31,7 +29,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     cc32xx:
         name: cc32xx
@@ -43,7 +41,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-ti:74
+            image: ghcr.io/project-chip/chip-build-ti:97
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:

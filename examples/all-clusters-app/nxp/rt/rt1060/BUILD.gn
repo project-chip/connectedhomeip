@@ -1,0 +1,288 @@
+# Copyright (c) 2021-2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/nxp_sdk.gni")
+import("//build_overrides/openthread.gni")
+import("${chip_root}/src/platform/device.gni")
+
+#allows to get common NXP SDK gn options
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+# Allows to get various RT gn options
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/rt_sdk.gni")
+
+import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
+import(
+    "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}/${rt_platform}.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_executable.gni")
+
+assert(current_os == "freertos")
+assert(target_os == "freertos")
+assert(nxp_platform == "rt/rt1060")
+
+declare_args() {
+  # Allows to enable to ota_provider support
+  enable_ota_provider = false
+
+  # Allows to connect to a predefine Wi-Fi network at boot
+  wifi_auto_connect_at_boot = false
+  wifi_auto_connect_at_boot_ssid = ""
+  wifi_auto_connect_at_boot_password = ""
+
+  # Setup discriminator as argument
+  setup_discriminator = 3840
+}
+
+example_platform_dir =
+    "${nxp_sdk_matter_support_root}/examples/platform/${nxp_platform}"
+common_example_dir = "${chip_root}/examples/platform/nxp/common"
+
+app_common_folder = "all-clusters-app/all-clusters-common"
+
+# Create here the SDK instance.
+# Particular sources/defines/includes could be added/changed depending on the target application.
+rt_sdk("sdk") {
+  defines = []
+
+  cflags = []
+  public_deps = []
+  public_configs = []
+  sources = []
+  include_dirs = []
+
+  # Indicate paths to default board files
+  include_dirs += [ "${example_platform_dir}/board/" ]
+
+  # RT1060 rev A use same pin mux as rev B
+  # If user needs different pin mux files for rev A and rev B boards, the source and include from below needs to be updated accordingly
+  if (evkname == "evkmimxrt1060") {
+    include_dirs += [ "${example_platform_dir}/board/evkbmimxrt1060/" ]
+    sources += [ "${example_platform_dir}/board/evkbmimxrt1060/pin_mux.c" ]
+  } else {
+    include_dirs += [ "${example_platform_dir}/board/${evkname}/" ]
+    sources += [ "${example_platform_dir}/board/${evkname}/pin_mux.c" ]
+  }
+
+  sources += [ "${example_platform_dir}/board/hardware_init.c" ]
+  sources += [ "${example_platform_dir}/board/clock_config.c" ]
+  sources += [ "${example_platform_dir}/board/board.c" ]
+  sources += [ "${example_platform_dir}/board/peripherals.c" ]
+
+  # Indicate the path to CHIPProjectConfig.h
+  include_dirs += [ "include/config" ]
+
+  # Indicate the default path to FreeRTOSConfig.h
+  include_dirs += [ "${example_platform_dir}/app/project_include/freeRTOS" ]
+
+  # Indicate the default path to OpenThreadConfig.h
+  include_dirs += [ "${example_platform_dir}/app/project_include/openthread" ]
+
+  # For matter with BR feature, increase FreeRTOS heap size
+  if (chip_enable_wifi && chip_enable_openthread) {
+    defines += [ "configTOTAL_HEAP_SIZE=(size_t)(170 * 1024)" ]
+  }
+
+  defines += [
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
+  ]
+}
+
+# Create the SDK driver instance.
+# Particular sources/defines/includes could be added to add other drivers not available in the default sdk driver template
+rt1060_sdk_drivers("sdk_driver") {
+}
+
+rt_executable("all_cluster_app") {
+  output_name = "chip-rt1060-all-cluster-example"
+
+  defines = [
+    "CONFIG_RENDEZVOUS_MODE=7",
+    "CONFIG_APP_FREERTOS_OS=1",
+  ]
+
+  if (chip_enable_openthread) {
+    defines += [ "CONFIG_NET_L2_OPENTHREAD=1" ]
+  }
+
+  include_dirs = [
+    "../../common/main/include",
+    "../../common/main",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
+    "${chip_root}/examples/providers/",
+  ]
+
+  sources = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
+    "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
+    "../../common/main/AppTask.cpp",
+    "../../common/main/DeviceCallbacks.cpp",
+    "../../common/main/ZclCallbacks.cpp",
+    "../../common/main/include/AppEvent.h",
+    "../../common/main/include/AppTask.h",
+    "../../common/main/include/DeviceCallbacks.h",
+    "../../common/main/main.cpp",
+  ]
+
+  # App common files
+  include_dirs += [
+    "${common_example_dir}/icd/include",
+    "${common_example_dir}/matter_cli/include",
+    "${common_example_dir}/device_manager/include",
+    "${common_example_dir}/device_callbacks/include",
+    "${common_example_dir}/matter_button/include",
+    "${common_example_dir}/factory_data/include",
+    "${common_example_dir}/app_task/include",
+  ]
+
+  sources += [
+    "${chip_root}/examples/platform/nxp/${nxp_platform}/factory_data/source/AppFactoryDataExample.cpp",
+    "${common_example_dir}/app_task/source/AppTaskBase.cpp",
+    "${common_example_dir}/app_task/source/AppTaskFreeRTOS.cpp",
+    "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
+    "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
+    "${common_example_dir}/icd/source/ICDUtil.cpp",
+    "${common_example_dir}/matter_button/source/ButtonDefault.cpp",
+    "${common_example_dir}/matter_button/source/ButtonManager.cpp",
+    "${common_example_dir}/matter_button/source/ButtonRegistrationDefault.cpp",
+  ]
+
+  deps = [ "${chip_root}/examples/${app_common_folder}" ]
+
+  sources += [
+    "${chip_root}/examples/${app_common_folder}/src/bridged-actions-stub.cpp",
+    "${chip_root}/examples/${app_common_folder}/src/smco-stub.cpp",
+    "${chip_root}/examples/${app_common_folder}/src/static-supported-modes-manager.cpp",
+  ]
+
+  if (nxp_enable_matter_cli) {
+    defines += [ "ENABLE_CHIP_SHELL" ]
+    deps += [
+      "${chip_root}/examples/shell/shell_common:shell_common",
+      "${chip_root}/src/lib/shell:shell",
+    ]
+    sources += [
+      "${common_example_dir}/matter_cli/source/AppCLIBase.cpp",
+      "${common_example_dir}/matter_cli/source/AppCLIFreeRTOS.cpp",
+    ]
+  }
+
+  if (chip_enable_ota_requestor) {
+    include_dirs += [ "${common_example_dir}/ota_requestor/include" ]
+    sources += [
+      "${common_example_dir}/ota_requestor/source/OTARequestorInitiator.cpp",
+      "${common_example_dir}/ota_requestor/source/OTARequestorInitiatorCommon.cpp",
+    ]
+  }
+
+  if (wifi_auto_connect_at_boot) {
+    assert(wifi_auto_connect_at_boot_ssid != "" &&
+               wifi_auto_connect_at_boot_password != "",
+           "WiFi SSID and password must be specified at build time!")
+
+    defines += [
+      "CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT=1",
+      "CONFIG_CHIP_APP_WIFI_SSID=\"${wifi_auto_connect_at_boot_ssid}\"",
+      "CONFIG_CHIP_APP_WIFI_PASSWORD=\"${wifi_auto_connect_at_boot_password}\"",
+    ]
+
+    include_dirs += [ "${common_example_dir}/wifi_connect/include" ]
+    sources += [ "${common_example_dir}/wifi_connect/source/WifiConnect.cpp" ]
+  }
+
+  if (enable_ota_provider) {
+    defines += [ "CONFIG_CHIP_OTA_PROVIDER=1" ]
+
+    include_dirs += [
+      "${common_example_dir}/ota_provider/include",
+      "${common_example_dir}/ota_provider/ota-provider-common",
+    ]
+
+    sources += [
+      "${common_example_dir}/ota_provider/ota-provider-common/RTBdxOtaSender.cpp",
+      "${common_example_dir}/ota_provider/ota-provider-common/RTOTAProviderExample.cpp",
+      "${common_example_dir}/ota_provider/source/OTAProvider.cpp",
+    ]
+
+    deps += [
+      "${chip_root}/src/app/server",
+      "${chip_root}/src/protocols/bdx",
+      "${chip_root}/third_party/jsoncpp",
+    ]
+  }
+
+  if (chip_enable_ble) {
+    defines += [ "APP_BT_DEVICE_NAME=\"NXP-AllClustersApp\"" ]
+  }
+
+  # In case a dedicated assert function needs to be supported the flag sdk_fsl_assert_support should be set to false
+  # The would add to the build a dedicated application assert implementation.
+  if (!sdk_fsl_assert_support) {
+    sources += [ "${common_example_dir}/app_assert/source/AppAssert.cpp" ]
+  }
+
+  cflags = [ "-Wconversion" ]
+
+  ldscript =
+      "${example_platform_dir}/app/ldscripts/MIMXRT1062xxxxx_flexspi_nor.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [
+    "-T" + rebase_path(ldscript, root_build_dir),
+    "-fno-common",
+    "-Wl,--defsym=__stack_size__=2048",
+    "-ffreestanding",
+    "-fno-builtin",
+    "-mapcs",
+    "-u qspiflash_config",
+    "-u image_vector_table",
+    "-u boot_data",
+    "-u dcd_data",
+    "-Wl,-print-memory-usage",
+    "-Wl,--no-warn-rwx-segments",
+  ]
+
+  if (evkname == "evkcmimxrt1060") {
+    ldflags += [ "-Wl,--defsym=gEVKCFlashSize_d=0x1000000" ]
+  }
+
+  if (enable_ota_provider) {
+    # As the OTA file will be stored in the littlefs file system, it is required to increase the size of the file system
+    # To be able to store an OTA file with a MAX size of 640K,
+    # it recommended to size the file system with:
+    # 161 sectors of 4K => reserved for the OTA file
+    # 32 sectors of 4K => reserved for Matter/OT/BLE settings storage
+    ldflags += [ "-Wl,--defsym=gNVMSectorCountLink_d=193" ]
+  }
+
+  if (chip_enable_ota_requestor) {
+    # If OTA build flag is enabled,
+    # we would need to reserve enough space for the bootloader (MCUBoot)
+    # MCUBoot requires 0x11000 Bytes to be reserved at the base of the flash
+    # Consequently, some sections will need to be shifted
+    ldflags += [ "-Wl,--defsym=__m_mcuboot_size__=0x40000" ]
+  }
+
+  output_dir = root_out_dir
+}
+
+group("rt1060") {
+  deps = [ ":all_cluster_app" ]
+}
+
+group("default") {
+  deps = [ ":rt1060" ]
+}

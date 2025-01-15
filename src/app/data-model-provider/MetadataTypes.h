@@ -20,15 +20,55 @@
 #include <optional>
 
 #include <access/Privilege.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/data-model/List.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/BitMask.h>
 
 namespace chip {
 namespace app {
 namespace DataModel {
+
+/// Represents various endpoint composition patters as defined in the spec
+/// as `9.2.1. Endpoint Composition patterns`
+enum class EndpointCompositionPattern : uint8_t
+{
+    // Tree pattern supports a general tree of endpoints. Commonly used for
+    // device types that support physical device composition (e.g. Refrigerator)
+    kTree = 0x1,
+
+    // A full-family pattern is a list fo all descendant endpoints, with no
+    // imposed hierarchy.
+    //
+    // For example the Root Node and Aggregator device types use the full-familiy
+    // pattern, as defined in their device type specification
+    kFullFamily = 0x2,
+};
+
+struct EndpointInfo
+{
+    // kInvalidEndpointId if there is no explicit parent endpoint (which means the parent is endpoint 0,
+    // for endpoints other than endpoint 0).
+    EndpointId parentId;
+    EndpointCompositionPattern compositionPattern;
+
+    explicit EndpointInfo(EndpointId parent) : parentId(parent), compositionPattern(EndpointCompositionPattern::kFullFamily) {}
+    EndpointInfo(EndpointId parent, EndpointCompositionPattern pattern) : parentId(parent), compositionPattern(pattern) {}
+};
+
+struct EndpointEntry
+{
+    EndpointId id;
+    EndpointInfo info;
+
+    bool IsValid() const { return id != kInvalidEndpointId; }
+    static const EndpointEntry kInvalid;
+};
 
 enum class ClusterQualityFlags : uint32_t
 {
@@ -83,10 +123,12 @@ struct AttributeEntry
     static const AttributeEntry kInvalid;
 };
 
+// Bitmask values for different Command qualities.
 enum class CommandQualityFlags : uint32_t
 {
     kFabricScoped = 0x0001,
     kTimed        = 0x0002, // `T` quality on commands
+    kLargeMessage = 0x0004, // `L` quality on commands
 };
 
 struct CommandInfo
@@ -103,6 +145,18 @@ struct CommandEntry
     bool IsValid() const { return path.HasValidIds(); }
 
     static const CommandEntry kInvalid;
+};
+
+/// Represents a device type that resides on an endpoint
+struct DeviceTypeEntry
+{
+    DeviceTypeId deviceTypeId;
+    uint8_t deviceTypeRevision;
+
+    bool operator==(const DeviceTypeEntry & other) const
+    {
+        return (deviceTypeId == other.deviceTypeId) && (deviceTypeRevision == other.deviceTypeRevision);
+    }
 };
 
 /// Provides metadata information for a data model
@@ -126,12 +180,31 @@ class ProviderMetadataTree
 public:
     virtual ~ProviderMetadataTree() = default;
 
-    virtual EndpointId FirstEndpoint()                 = 0;
-    virtual EndpointId NextEndpoint(EndpointId before) = 0;
+    // This iteration will list all the endpoints in the data model
+    virtual EndpointEntry FirstEndpoint()                              = 0;
+    virtual EndpointEntry NextEndpoint(EndpointId before)              = 0;
+    virtual std::optional<EndpointInfo> GetEndpointInfo(EndpointId id) = 0;
+    virtual bool EndpointExists(EndpointId id);
 
-    virtual ClusterEntry FirstCluster(EndpointId endpoint)                              = 0;
-    virtual ClusterEntry NextCluster(const ConcreteClusterPath & before)                = 0;
-    virtual std::optional<ClusterInfo> GetClusterInfo(const ConcreteClusterPath & path) = 0;
+    // This iteration describes device types registered on an endpoint
+    virtual std::optional<DeviceTypeEntry> FirstDeviceType(EndpointId endpoint)                                  = 0;
+    virtual std::optional<DeviceTypeEntry> NextDeviceType(EndpointId endpoint, const DeviceTypeEntry & previous) = 0;
+
+    // This iteration describes semantic tags registered on an endpoint
+    using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
+    virtual std::optional<SemanticTag> GetFirstSemanticTag(EndpointId endpoint)                              = 0;
+    virtual std::optional<SemanticTag> GetNextSemanticTag(EndpointId endpoint, const SemanticTag & previous) = 0;
+
+    // This iteration will list all server clusters on a given endpoint
+    virtual ClusterEntry FirstServerCluster(EndpointId endpoint)                              = 0;
+    virtual ClusterEntry NextServerCluster(const ConcreteClusterPath & before)                = 0;
+    virtual std::optional<ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) = 0;
+
+    // This iteration will list all client clusters on a given endpoint
+    // As the client cluster is only a client without any attributes/commands,
+    // these functions only return the cluster path.
+    virtual ConcreteClusterPath FirstClientCluster(EndpointId endpoint)               = 0;
+    virtual ConcreteClusterPath NextClientCluster(const ConcreteClusterPath & before) = 0;
 
     // Attribute iteration and accessors provide cluster-level access over
     // attributes
@@ -148,6 +221,24 @@ public:
     // returned as responses.
     virtual ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) = 0;
     virtual ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before)   = 0;
+
+    /// Workaround function to report attribute change.
+    ///
+    /// When this is invoked, the caller is expected to increment the cluster data version, and the attribute path
+    /// should be marked as `dirty` by the data model provider listener so that the reporter can notify the subscriber
+    /// of attribute changes.
+    /// This function should be invoked when attribute managed by attribute access interface is modified but not
+    /// through an actual Write interaction.
+    /// For example, if the LastNetworkingStatus attribute changes because the NetworkCommissioning driver detects a
+    /// network connection status change and calls SetLastNetworkingStatusValue(). The data model provider can recognize
+    /// this change by invoking this function at the point of change.
+    ///
+    /// This is a workaround function as we cannot notify the attribute change to the data model provider. The provider
+    /// should own its data and versions.
+    ///
+    /// TODO: We should remove this function when the AttributeAccessInterface/CommandHandlerInterface is able to report
+    /// the attribute changes.
+    virtual void Temporary_ReportAttributeChanged(const AttributePathParams & path) = 0;
 };
 
 } // namespace DataModel

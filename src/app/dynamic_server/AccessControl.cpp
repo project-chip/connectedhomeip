@@ -18,17 +18,13 @@
 
 #include <access/AccessControl.h>
 #include <access/Privilege.h>
+#include <access/ProviderDeviceTypeResolver.h>
 #include <access/RequestPath.h>
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/InteractionModelEngine.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Global.h>
-
-// TODO: this include is unclear as dynamic server should NOT link those.
-//       we should probably have some separate includes here for dynamic
-//       server
-#include <app/util/ember-compatibility-functions.h>
 
 using namespace chip;
 using namespace chip::Access;
@@ -39,13 +35,13 @@ namespace {
 // DynamicDispatch.cpp.
 constexpr EndpointId kSupportedEndpoint = 0;
 
-class DeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver
+class DeviceTypeResolver : public chip::Access::DynamicProviderDeviceTypeResolver
 {
 public:
-    bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override
-    {
-        return app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
-    }
+    DeviceTypeResolver() :
+        chip::Access::DynamicProviderDeviceTypeResolver(
+            [] { return chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(); })
+    {}
 };
 
 // TODO: Make the policy more configurable by consumers.

@@ -18,7 +18,6 @@
 
 #include "ApplicationBasicManager.h"
 
-using namespace std;
 using namespace chip::app;
 using namespace chip::app::Clusters::ApplicationBasic;
 

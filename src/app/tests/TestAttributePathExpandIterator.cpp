@@ -16,12 +16,13 @@
  *    limitations under the License.
  */
 
+#include "pw_unit_test/framework.h"
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributePathExpandIterator.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/util/mock/Constants.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
@@ -50,26 +51,17 @@ TEST(TestAttributePathExpandIterator, TestAllWildcard)
         { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint1, MockClusterId(2), MockAttributeId(1) },
         { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::FeatureMap::Id },
@@ -77,9 +69,6 @@ TEST(TestAttributePathExpandIterator, TestAllWildcard)
         { kMockEndpoint2, MockClusterId(2), MockAttributeId(2) },
         { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::FeatureMap::Id },
@@ -88,18 +77,12 @@ TEST(TestAttributePathExpandIterator, TestAllWildcard)
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint3, MockClusterId(1), MockAttributeId(1) },
         { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::FeatureMap::Id },
@@ -109,32 +92,33 @@ TEST(TestAttributePathExpandIterator, TestAllWildcard)
         { kMockEndpoint3, MockClusterId(2), MockAttributeId(4) },
         { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::AttributeList::Id },
     };
 
     size_t index = 0;
 
-    for (app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(), &clusInfo); iter.Get(path); iter.Next())
+    auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+
+    while (true)
     {
+        // re-create the iterator
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+
+        if (!iter.Next(path))
+        {
+            break;
+        }
+
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
         EXPECT_LT(index, ArraySize(paths));
@@ -157,8 +141,16 @@ TEST(TestAttributePathExpandIterator, TestWildcardEndpoint)
 
     size_t index = 0;
 
-    for (app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(), &clusInfo); iter.Get(path); iter.Next())
+    auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+    while (true)
     {
+        // re-create the iterator
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+
+        if (!iter.Next(path))
+        {
+            break;
+        }
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
         EXPECT_LT(index, ArraySize(paths));
@@ -184,8 +176,16 @@ TEST(TestAttributePathExpandIterator, TestWildcardCluster)
 
     size_t index = 0;
 
-    for (app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(), &clusInfo); iter.Get(path); iter.Next())
+    auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+    while (true)
     {
+        // re-create the iterator
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+
+        if (!iter.Next(path))
+        {
+            break;
+        }
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
         EXPECT_LT(index, ArraySize(paths));
@@ -211,8 +211,17 @@ TEST(TestAttributePathExpandIterator, TestWildcardClusterGlobalAttributeNotInMet
 
     size_t index = 0;
 
-    for (app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(), &clusInfo); iter.Get(path); iter.Next())
+    auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+
+    while (true)
     {
+        // re-create the iterator
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+
+        if (!iter.Next(path))
+        {
+            break;
+        }
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
         EXPECT_LT(index, ArraySize(paths));
@@ -237,16 +246,22 @@ TEST(TestAttributePathExpandIterator, TestWildcardAttribute)
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::AttributeList::Id },
     };
 
     size_t index = 0;
 
-    for (app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(), &clusInfo); iter.Get(path); iter.Next())
+    auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+
+    while (true)
     {
+        // re-create the iterator
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+
+        if (!iter.Next(path))
+        {
+            break;
+        }
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
         EXPECT_LT(index, ArraySize(paths));
@@ -270,8 +285,16 @@ TEST(TestAttributePathExpandIterator, TestNoWildcard)
 
     size_t index = 0;
 
-    for (app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(), &clusInfo); iter.Get(path); iter.Next())
+    auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+    while (true)
     {
+        // re-create the iterator
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+
+        if (!iter.Next(path))
+        {
+            break;
+        }
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
         EXPECT_LT(index, ArraySize(paths));
@@ -279,6 +302,69 @@ TEST(TestAttributePathExpandIterator, TestNoWildcard)
         index++;
     }
     EXPECT_EQ(index, ArraySize(paths));
+}
+
+TEST(TestAttributePathExpandIterator, TestFixedPathExpansion)
+{
+    // expansion logic requires that:
+    //   - paths for wildcard expansion ARE VALIDATED
+    //   - path WITHOUT wildcard expansion ARE NOT VALIDATED
+
+    // invalid attribute across all clusters returns empty
+    {
+        SingleLinkedListNode<app::AttributePathParams> clusInfo;
+        clusInfo.mValue.mAttributeId = 122333;
+
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+        ConcreteAttributePath path;
+
+        EXPECT_FALSE(iter.Next(path));
+    }
+
+    // invalid cluster with a valid attribute (featuremap) returns empty
+    {
+        SingleLinkedListNode<app::AttributePathParams> clusInfo;
+        clusInfo.mValue.mClusterId   = 122344;
+        clusInfo.mValue.mAttributeId = Clusters::Globals::Attributes::FeatureMap::Id;
+
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+        ConcreteAttributePath path;
+
+        EXPECT_FALSE(iter.Next(path));
+    }
+
+    // invalid cluster with wildcard attribute returns empty
+    {
+        SingleLinkedListNode<app::AttributePathParams> clusInfo;
+        clusInfo.mValue.mClusterId = 122333;
+
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+        ConcreteAttributePath path;
+
+        EXPECT_FALSE(iter.Next(path));
+    }
+
+    // even though all above WERE invalid, if we specify a non-wildcard path it is returned as-is
+    {
+        SingleLinkedListNode<app::AttributePathParams> clusInfo;
+        clusInfo.mValue.mEndpointId  = 1;
+        clusInfo.mValue.mClusterId   = 122344;
+        clusInfo.mValue.mAttributeId = 122333;
+
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+        ConcreteAttributePath path;
+
+        EXPECT_TRUE(iter.Next(path));
+        EXPECT_EQ(path.mEndpointId, clusInfo.mValue.mEndpointId);
+        EXPECT_EQ(path.mClusterId, clusInfo.mValue.mClusterId);
+        EXPECT_EQ(path.mAttributeId, clusInfo.mValue.mAttributeId);
+
+        EXPECT_FALSE(iter.Next(path));
+    }
 }
 
 TEST(TestAttributePathExpandIterator, TestMultipleClusInfo)
@@ -314,26 +400,17 @@ TEST(TestAttributePathExpandIterator, TestMultipleClusInfo)
         { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint1, MockClusterId(2), MockAttributeId(1) },
         { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::FeatureMap::Id },
@@ -341,9 +418,6 @@ TEST(TestAttributePathExpandIterator, TestMultipleClusInfo)
         { kMockEndpoint2, MockClusterId(2), MockAttributeId(2) },
         { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::FeatureMap::Id },
@@ -352,18 +426,12 @@ TEST(TestAttributePathExpandIterator, TestMultipleClusInfo)
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint3, MockClusterId(1), MockAttributeId(1) },
         { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::FeatureMap::Id },
@@ -373,25 +441,16 @@ TEST(TestAttributePathExpandIterator, TestMultipleClusInfo)
         { kMockEndpoint3, MockClusterId(2), MockAttributeId(4) },
         { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
         { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
@@ -405,24 +464,51 @@ TEST(TestAttributePathExpandIterator, TestMultipleClusInfo)
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::GeneratedCommandList::Id },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::AcceptedCommandList::Id },
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::EventList::Id },
-#endif
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
     };
 
-    size_t index = 0;
-
-    for (app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(), &clusInfo1); iter.Get(path); iter.Next())
+    // Test that a one-shot iterate through all works
     {
-        ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
-                      ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-        EXPECT_LT(index, ArraySize(paths));
-        EXPECT_EQ(paths[index], path);
-        index++;
+        size_t index = 0;
+
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo1);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+
+        while (iter.Next(path))
+        {
+            ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
+                          ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
+            EXPECT_LT(index, ArraySize(paths));
+            EXPECT_EQ(paths[index], path);
+            index++;
+        }
+        EXPECT_EQ(index, ArraySize(paths));
     }
-    EXPECT_EQ(index, ArraySize(paths));
+
+    // identical test, however this checks that position re-use works
+    // the same as a one-shot iteration.
+    {
+        size_t index = 0;
+
+        auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo1);
+        while (true)
+        {
+            // re-create the iterator
+            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+
+            if (!iter.Next(path))
+            {
+                break;
+            }
+            ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
+                          ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
+            EXPECT_LT(index, ArraySize(paths));
+            EXPECT_EQ(paths[index], path);
+            index++;
+        }
+        EXPECT_EQ(index, ArraySize(paths));
+    }
 }
 
 } // namespace

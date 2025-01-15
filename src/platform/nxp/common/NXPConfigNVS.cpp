@@ -20,10 +20,17 @@
 #include <lib/core/CHIPEncoding.h>
 #include <platform/CHIPDeviceError.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
+#include <platform/nxp/common/CHIPDeviceNXPPlatformDefaultConfig.h>
+
+extern "C" {
 #include <settings.h>
+}
 
 /* Only for flash init, to be move to sdk framework */
-#include "port/nvs_port.h"
+#include "nvs_port.h"
+#if (CHIP_DEVICE_CONFIG_KVS_WEAR_STATS == 1)
+#include "fwk_nvs_stats.h"
+#endif /* CHIP_DEVICE_CONFIG_KVS_WEAR_STATS */
 
 // These can be overridden by the application as needed.
 #ifndef CHIP_DEVICE_INTEGER_SETTINGS_KEY
@@ -137,6 +144,17 @@ int DeleteSubtreeCallback(const char * name, size_t /* entrySize */, settings_re
 
     return 0;
 }
+
+#if (CHIP_DEVICE_CONFIG_KVS_WEAR_STATS == 1)
+void OnFlashSectorWearCountUpdate(uint16_t sector_idx, const nvs_storage_wear_profile_t * flash_wear_profile)
+{
+    char keyUser[]                       = CHIP_DEVICE_CONFIG_KVS_WEAR_STATS_KEY;
+    const size_t flash_wear_profile_size = NVS_STORAGE_WEAR_PROFILE_SIZE(flash_wear_profile->sector_count);
+
+    /* Update the NVS stats key in storage */
+    NXPConfig::WriteConfigValueBin((const char *) keyUser, (uint8_t *) flash_wear_profile, flash_wear_profile_size);
+}
+#endif /* CHIP_DEVICE_CONFIG_KVS_WEAR_STATS */
 } // namespace
 
 CHIP_ERROR NXPConfig::Init()
@@ -145,37 +163,79 @@ CHIP_ERROR NXPConfig::Init()
     /* Initialize flash components */
     const struct flash_area * fa;
 
-    ReturnErrorCodeIf(flash_area_open(SETTINGS_PARTITION, &fa), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
-    ReturnErrorCodeIf(flash_init(fa->fa_dev), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    VerifyOrReturnError(!flash_area_open(SETTINGS_PARTITION, &fa), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    VerifyOrReturnError(!flash_init(fa->fa_dev), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
     /* End flash init */
 
-    ReturnErrorCodeIf(settings_subsys_init(), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    VerifyOrReturnError(!settings_subsys_init(), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+
+#if (CHIP_DEVICE_CONFIG_KVS_WEAR_STATS == 1)
+    ReturnErrorOnFailure(InitStorageWearStats());
+#endif /* CHIP_DEVICE_CONFIG_KVS_WEAR_STATS */
 
     return CHIP_NO_ERROR;
 }
 
+#if (CHIP_DEVICE_CONFIG_KVS_WEAR_STATS == 1)
+CHIP_ERROR NXPConfig::InitStorageWearStats(void)
+{
+    nvs_storage_wear_profile_t * flash_wear_profile = NULL;
+    const size_t flash_wear_profile_size            = NVS_STORAGE_WEAR_PROFILE_SIZE((uint32_t) NV_STORAGE_MAX_SECTORS);
+    size_t size;
+    char keyUser[] = CHIP_DEVICE_CONFIG_KVS_WEAR_STATS_KEY;
+
+    /* Create an empty flash wear profile */
+    flash_wear_profile = (nvs_storage_wear_profile_t *) calloc(1, flash_wear_profile_size);
+    VerifyOrReturnError(flash_wear_profile != NULL, CHIP_ERROR_NO_MEMORY);
+
+    /* Try to read the flash wear profile from the User Support diagnostic log key */
+    CHIP_ERROR err = ReadConfigValueBin((const char *) keyUser, (uint8_t *) flash_wear_profile, flash_wear_profile_size, size);
+    if ((err != CHIP_NO_ERROR) || (size != flash_wear_profile_size) ||
+        (flash_wear_profile->sector_count != (uint32_t) NV_STORAGE_MAX_SECTORS))
+    {
+        /* Either the flash wear stats are not available in the persistent
+         * storage or the flash wear statistics that we have read are not
+         * compatible with the current persistent storage configuration. In
+         * this case - just reset and save the flash wear statistics. */
+        flash_wear_profile->sector_count = (uint32_t) NV_STORAGE_MAX_SECTORS;
+        memset(flash_wear_profile->erase_count, 0, (uint32_t) NV_STORAGE_MAX_SECTORS * sizeof(uint16_t));
+        WriteConfigValueBin((const char *) keyUser, (uint8_t *) flash_wear_profile, flash_wear_profile_size);
+    }
+    else
+    {
+        /* Load the flash wear profile into the NVS statistics */
+        nvs_stats_load_profile(flash_wear_profile);
+    }
+    free(flash_wear_profile);
+
+    nvs_stats_config_event_handler(OnFlashSectorWearCountUpdate);
+
+    return CHIP_NO_ERROR;
+}
+#endif /* CHIP_DEVICE_CONFIG_KVS_WEAR_STATS */
+
 CHIP_ERROR NXPConfig::ReadConfigValue(Key key, bool & val)
 {
-    ReturnErrorCodeIf(!ValidConfigKey(key), CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrReturnError(ValidConfigKey(key), CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     return ReadSimpleConfigValue(key, val);
 }
 
 CHIP_ERROR NXPConfig::ReadConfigValue(Key key, uint32_t & val)
 {
-    ReturnErrorCodeIf(!ValidConfigKey(key), CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrReturnError(ValidConfigKey(key), CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     return ReadSimpleConfigValue(key, val);
 }
 
 CHIP_ERROR NXPConfig::ReadConfigValue(Key key, uint64_t & val)
 {
-    ReturnErrorCodeIf(!ValidConfigKey(key), CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrReturnError(ValidConfigKey(key), CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     return ReadSimpleConfigValue(key, val);
 }
 
 CHIP_ERROR NXPConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ReturnErrorCodeIf(!ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrReturnError(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     // Pretend that the buffer is smaller by 1 to secure space for null-character
     err = ReadConfigValueImpl(key, buf, bufSize ? bufSize - 1 : 0, outLen);
 
@@ -202,7 +262,7 @@ CHIP_ERROR NXPConfig::ReadConfigValueBin(const char * keyString, uint8_t * buf, 
 
     // to be able to concat CHIP_DEVICE_STRING_SETTINGS_KEY"/" and keyString, + 1 for end char
     key_name_len = strlen(keyString) + strlen(CHIP_DEVICE_STRING_SETTINGS_KEY) + 1;
-    ReturnErrorCodeIf(key_name_len > (SETTINGS_MAX_NAME_LEN + 1), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    VerifyOrReturnError(key_name_len <= (SETTINGS_MAX_NAME_LEN + 1), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
     sprintf(key_name, CHIP_DEVICE_STRING_SETTINGS_KEY "/%s", keyString);
     settings_load_subtree_direct(key_name, ConfigValueCallback, &request);
@@ -238,7 +298,7 @@ CHIP_ERROR NXPConfig::WriteConfigValueStr(Key key, const char * str)
 
 CHIP_ERROR NXPConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    ReturnErrorCodeIf(!ValidConfigKey(key), CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrReturnError(ValidConfigKey(key), CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     return WriteConfigValueImpl(key, str, strLen);
 }
 
@@ -254,7 +314,7 @@ CHIP_ERROR NXPConfig::WriteConfigValueBin(const char * keyString, const uint8_t 
 
     // to be able to concat CHIP_DEVICE_STRING_SETTINGS_KEY"/" and keyString, + 1 for end char
     key_name_len = strlen(keyString) + strlen(CHIP_DEVICE_STRING_SETTINGS_KEY) + 1;
-    ReturnErrorCodeIf(key_name_len > (SETTINGS_MAX_NAME_LEN + 1), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    VerifyOrReturnError(key_name_len <= (SETTINGS_MAX_NAME_LEN + 1), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
     sprintf(key_name, CHIP_DEVICE_STRING_SETTINGS_KEY "/%s", keyString);
     if (settings_save_one(key_name, data, dataLen) != 0)
@@ -283,7 +343,7 @@ CHIP_ERROR NXPConfig::ClearConfigValue(const char * keyString)
 
     // to be able to concat CHIP_DEVICE_STRING_SETTINGS_KEY"/" and keyString, + 1 for end char
     key_name_len = strlen(keyString) + strlen(CHIP_DEVICE_STRING_SETTINGS_KEY) + 1;
-    ReturnErrorCodeIf(key_name_len > (SETTINGS_MAX_NAME_LEN + 1), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    VerifyOrReturnError(key_name_len <= (SETTINGS_MAX_NAME_LEN + 1), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
     sprintf(key_name, CHIP_DEVICE_STRING_SETTINGS_KEY "/%s", keyString);
     if (settings_delete(key_name) != 0)

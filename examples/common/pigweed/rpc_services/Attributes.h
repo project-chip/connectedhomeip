@@ -22,11 +22,15 @@
 #include "pigweed/rpc_services/internal/StatusUtils.h"
 
 #include <app-common/zap-generated/attribute-type.h>
+#include <app/AppConfig.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/OperationTypes.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
-#include <app/util/ember-compatibility-functions.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>
@@ -69,6 +73,9 @@ public:
             break;
         case chip_rpc_AttributeData_data_bytes_tag:
             data = &request.data.data.data_bytes;
+            break;
+        case chip_rpc_AttributeData_data_single_tag:
+            data = &request.data.data.data_single;
             break;
         default:
             return pw::Status::InvalidArgument();
@@ -125,6 +132,10 @@ public:
             PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_SignedInteger, response.data.data_int32));
             response.which_data = chip_rpc_AttributeData_data_int32_tag;
             break;
+        case chip_rpc_AttributeType_ZCL_SINGLE_ATTRIBUTE_TYPE:
+            PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_FloatingPointNumber, response.data.data_single));
+            response.which_data = chip_rpc_AttributeData_data_single_tag;
+            break;
         case chip_rpc_AttributeType_ZCL_BITMAP8_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_BITMAP16_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_BITMAP32_ATTRIBUTE_TYPE:
@@ -140,7 +151,6 @@ public:
         case chip_rpc_AttributeType_ZCL_INT48S_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_INT56S_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_INT64S_ATTRIBUTE_TYPE:
-        case chip_rpc_AttributeType_ZCL_SINGLE_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_DOUBLE_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_OCTET_STRING_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_CHAR_STRING_ATTRIBUTE_TYPE:
@@ -202,7 +212,32 @@ private:
         writer.Init(tlvBuffer);
         PW_TRY(ChipErrorToPwStatus(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer)));
         PW_TRY(ChipErrorToPwStatus(attributeReports.Init(&writer, kReportContextTag)));
-        PW_TRY(ChipErrorToPwStatus(app::ReadSingleClusterData(subjectDescriptor, false, path, attributeReports, nullptr)));
+
+        // TODO: this assumes a singleton data model provider
+        app::DataModel::Provider * provider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+
+        app::DataModel::ReadAttributeRequest request;
+        request.path = path;
+        request.operationFlags.Set(app::DataModel::OperationFlags::kInternal);
+        request.subjectDescriptor = &subjectDescriptor;
+
+        std::optional<app::DataModel::ClusterInfo> info = provider->GetServerClusterInfo(path);
+        if (!info.has_value())
+        {
+            return ::pw::Status::NotFound();
+        }
+
+        app::AttributeValueEncoder encoder(attributeReports, subjectDescriptor, path, info->dataVersion,
+                                           false /* isFabricFiltered */, nullptr /* attributeEncodingState */);
+        app::DataModel::ActionReturnStatus result = provider->ReadAttribute(request, encoder);
+
+        if (!result.IsSuccess())
+        {
+            app::DataModel::ActionReturnStatus::StringStorage storage;
+            ChipLogError(Support, "Failed to read data: %s", result.c_str(storage));
+            return ::pw::Status::Internal();
+        }
+
         attributeReports.EndOfContainer();
         PW_TRY(ChipErrorToPwStatus(writer.EndContainer(outer)));
         PW_TRY(ChipErrorToPwStatus(writer.Finalize()));

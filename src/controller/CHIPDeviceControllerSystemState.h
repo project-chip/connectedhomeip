@@ -201,7 +201,7 @@ public:
     //
     // The stack will shut down when all references are released.
     //
-    // NB: The system state is owned by the factory; Relase() will not free it
+    // NB: The system state is owned by the factory; Release() will not free it
     // but will free its members (Shutdown()).
     //
     // Returns true if the system state was shut down in response to this call.

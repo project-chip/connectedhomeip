@@ -25,7 +25,9 @@
 #import <Matter/Matter.h>
 
 #import "MTRCommandPayloadExtensions_Internal.h"
+#import "MTRDeviceClusterData.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
+#import "MTRDeviceDataValidation.h"
 #import "MTRDeviceStorageBehaviorConfiguration.h"
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
@@ -43,7 +45,7 @@
 
 // Fixture: chip-all-clusters-app --KVS "$(mktemp -t chip-test-kvs)" --interface-id -1
 
-static const uint16_t kPairingTimeoutInSeconds = 10;
+static const uint16_t kPairingTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId = 0x12344321;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
@@ -127,16 +129,6 @@ static MTRBaseDevice * GetConnectedDevice(void)
 @end
 
 @interface MTRDeviceTests : XCTestCase
-
-+ (void)checkAttributeReportTriggersConfigurationChanged:(MTRAttributeIDType)attributeId
-                                               clusterId:(MTRClusterIDType)clusterId
-                                              endpointId:(NSNumber *)endpointId
-                                                  device:(MTRDevice *)device
-                                                delegate:(MTRDeviceTestDelegate *)delegate
-                                             dataVersion:(NSNumber *)dataVersion
-                                         attributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
-                                                testcase:(XCTestCase *)testcase
-                              expectConfigurationChanged:(BOOL)expectConfigurationChanged;
 
 @end
 
@@ -825,7 +817,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Subscribing...");
     // reportHandler returns TRUE if it got the things it was looking for or if there's an error.
     __block BOOL (^reportHandler)(NSArray * _Nullable value, NSError * _Nullable error);
-    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(60)];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(60)];
     params.resubscribeAutomatically = NO;
     [device subscribeWithQueue:queue
         params:params
@@ -891,7 +883,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Add another subscriber of the attribute to verify that attribute cache still works when there are other subscribers.
     NSLog(@"New subscription...");
     XCTestExpectation * newSubscriptionEstablished = [self expectationWithDescription:@"New subscription established"];
-    MTRSubscribeParams * newParams = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(60)];
+    MTRSubscribeParams * newParams = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(60)];
     newParams.replaceExistingSubscriptions = NO;
     newParams.resubscribeAutomatically = NO;
     [cluster subscribeAttributeOnOffWithParams:newParams
@@ -1451,8 +1443,23 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [subscriptionExpectation fulfill];
     };
 
+    NSMutableSet<NSNumber *> * endpoints = [[NSMutableSet alloc] init];
+    NSMutableSet<MTRClusterPath *> * clusters = [[NSMutableSet alloc] init];
+    NSMutableSet<NSNumber *> * rootBasicInformationAttributes = [[NSMutableSet alloc] init];
     __block unsigned attributeReportsReceived = 0;
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        for (NSDictionary<NSString *, id> * dataItem in data) {
+            MTRAttributePath * path = dataItem[MTRAttributePathKey];
+            XCTAssertNotNil(path);
+            if (dataItem[MTRDataKey]) {
+                [endpoints addObject:path.endpoint];
+                [clusters addObject:[MTRClusterPath clusterPathWithEndpointID:path.endpoint clusterID:path.cluster]];
+                if (path.endpoint.unsignedLongValue == 0 && path.cluster.unsignedLongValue == MTRClusterIDTypeBasicInformationID) {
+                    [rootBasicInformationAttributes addObject:path.attribute];
+                }
+            }
+        }
+
         attributeReportsReceived += data.count;
     };
 
@@ -1463,6 +1470,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __block unsigned eventReportsReceived = 0;
     __block BOOL reportEnded = NO;
     __block BOOL gotOneNonPrimingEvent = NO;
+    __block NSNumber * lastObservedEventNumber = @(0);
     XCTestExpectation * gotNonPrimingEventExpectation = [self expectationWithDescription:@"Received event outside of priming report"];
     delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * eventReport) {
         eventReportsReceived += eventReport.count;
@@ -1482,6 +1490,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             if (!reportEnded) {
                 NSNumber * reportIsHistorical = eventDict[MTREventIsHistoricalKey];
                 XCTAssertTrue(reportIsHistorical.boolValue);
+                lastObservedEventNumber = eventDict[MTREventNumberKey];
             } else {
                 if (!gotOneNonPrimingEvent) {
                     NSNumber * reportIsHistorical = eventDict[MTREventIsHistoricalKey];
@@ -1499,7 +1508,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [device unitTestInjectEventReport:@[ @{
             MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(1) eventID:@(1)],
             MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
-            MTREventTimestampDateKey : [NSDate date]
+            MTREventTimestampDateKey : [NSDate date],
+            MTREventIsHistoricalKey : @(NO),
+            MTREventPriorityKey : @(MTREventPriorityInfo),
+            MTREventNumberKey : @(lastObservedEventNumber.unsignedLongLongValue + 1),
+            MTRDataKey : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[],
+            },
         } ]];
 #endif
     };
@@ -1539,6 +1555,86 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertNotEqual(attributeReportsReceived, 0);
     XCTAssertNotEqual(eventReportsReceived, 0);
 
+    // Test readAttributePaths.  First, try DeviceTypeList across all endpoints.
+    __auto_type * deviceTypeListPath = [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID)];
+    __auto_type * deviceTypes = [device readAttributePaths:@[ deviceTypeListPath ]];
+    XCTAssertEqual(deviceTypes.count, endpoints.count);
+
+    // Now try ClusterRevision across all clusters.
+    __auto_type * clusterRevisionsPath = [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:nil attributeID:@(MTRAttributeIDTypeGlobalAttributeClusterRevisionID)];
+    __auto_type * clusterRevisions = [device readAttributePaths:@[ clusterRevisionsPath ]];
+    XCTAssertEqual(clusterRevisions.count, clusters.count);
+
+    // Now try BasicInformation in a few different ways:
+    __auto_type * basicInformationAllAttributesPath = [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@(MTRClusterIDTypeBasicInformationID) attributeID:nil];
+    __auto_type * basicInformationAllAttributes = [device readAttributePaths:@[ basicInformationAllAttributesPath ]];
+
+    __auto_type * basicInformationAllRootAttributesPath = [MTRAttributeRequestPath requestPathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeBasicInformationID) attributeID:nil];
+    __auto_type * basicInformationAllRootAttributes = [device readAttributePaths:@[ basicInformationAllRootAttributesPath ]];
+    // Should have gotten the same things, because Basic Information only exists
+    // on the root endpoint.
+    XCTAssertEqualObjects([NSSet setWithArray:basicInformationAllAttributes], [NSSet setWithArray:basicInformationAllRootAttributes]);
+    XCTAssertEqual(basicInformationAllAttributes.count, rootBasicInformationAttributes.count);
+
+    // Now try multiple paths.  Should just get the union of all the things for
+    // each path.
+    __auto_type * variousThings = [device readAttributePaths:@[ deviceTypeListPath, basicInformationAllRootAttributesPath ]];
+    XCTAssertEqualObjects([NSSet setWithArray:variousThings],
+        [[NSSet setWithArray:deviceTypes] setByAddingObjectsFromSet:[NSSet setWithArray:basicInformationAllRootAttributes]]);
+
+    // And similar if the paths expand to overlapping sets of existent paths
+    // (e.g. because Basic Information has a ClusterRevision).
+    variousThings = [device readAttributePaths:@[ clusterRevisionsPath, basicInformationAllRootAttributesPath ]];
+    XCTAssertEqualObjects([NSSet setWithArray:variousThings],
+        [[NSSet setWithArray:clusterRevisions] setByAddingObjectsFromSet:[NSSet setWithArray:basicInformationAllRootAttributes]]);
+
+    // Quick test for descriptorClusters
+    __auto_type * descriptorPath = [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:nil];
+    __auto_type * descriptorRead = [device descriptorClusters];
+    __auto_type * descriptorWildcardRead = [device readAttributePaths:@[ descriptorPath ]];
+    XCTAssertEqual(descriptorRead.count, descriptorWildcardRead.count);
+    for (MTRAttributePath * path in descriptorRead) {
+        __auto_type * expectedObj = @{
+            MTRAttributePathKey : path,
+            MTRDataKey : descriptorRead[path],
+        };
+        XCTAssertTrue([descriptorWildcardRead containsObject:expectedObj]);
+    }
+    for (NSDictionary * item in descriptorWildcardRead) {
+        XCTAssertEqualObjects(descriptorRead[item[MTRAttributePathKey]], item[MTRDataKey]);
+    }
+
+    // Some quick tests for waitForAttributeValues.  First, values that we know
+    // are already there:
+    XCTestExpectation * deviceTypesWaitExpectation = [self expectationWithDescription:@"deviceTypes is already the value we expect"];
+    __auto_type * deviceTypesToWaitFor = [NSMutableDictionary dictionary];
+    for (NSDictionary<NSString *, id> * deviceTypesValue in deviceTypes) {
+        deviceTypesToWaitFor[deviceTypesValue[MTRAttributePathKey]] = deviceTypesValue[MTRDataKey];
+    }
+    __auto_type * waiter1 = [device waitForAttributeValues:deviceTypesToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [deviceTypesWaitExpectation fulfill];
+    }];
+    XCTAssertNotNil(waiter1);
+    [self waitForExpectations:@[ deviceTypesWaitExpectation ] timeout:kTimeoutInSeconds];
+
+    // Now values that we know will never be there (the type is wrong).
+    __auto_type * bogusDeviceType = @{
+        deviceTypes[0][MTRAttributePathKey] : @ {
+            MTRTypeKey : MTROctetStringValueType,
+            MTRValueKey : [@"abc" dataUsingEncoding:NSUTF8StringEncoding],
+        },
+    };
+    XCTestExpectation * bogusDeviceTypesWaitExpectation = [self expectationWithDescription:@"bogusDeviceTypes wait should time out"];
+    __auto_type * waiter2 = [device waitForAttributeValues:bogusDeviceType timeout:0.5 queue:queue completion:^(NSError * _Nullable error) {
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeTimeout);
+        [bogusDeviceTypesWaitExpectation fulfill];
+    }];
+    XCTAssertNotNil(waiter2);
+    [self waitForExpectations:@[ bogusDeviceTypesWaitExpectation ] timeout:kTimeoutInSeconds];
+
     // Before resubscribe, first test write failure and expected value effects
     NSNumber * testEndpointID = @(1);
     NSNumber * testClusterID = @(8);
@@ -1563,6 +1659,23 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     NSDictionary * writeValue = [NSDictionary
         dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type", [NSNumber numberWithUnsignedInteger:200], @"value", nil];
+
+    // Also test that waitForAttributeValues does not pick up the transition to
+    // the expected value.
+    XCTestExpectation * nonexistentAttributeValueWaitExpectation = [self expectationWithDescription:@"waiting for a value for an attribute that does not exist should time out"];
+    __auto_type * waiter3 = [device waitForAttributeValues:@{
+        [MTRAttributePath attributePathWithEndpointID:testEndpointID clusterID:testClusterID attributeID:testAttributeID] : writeValue,
+    }
+                                                   timeout:0.5
+                                                     queue:queue
+                                                completion:^(NSError * _Nullable error) {
+                                                    XCTAssertNotNil(error);
+                                                    XCTAssertEqual(error.domain, MTRErrorDomain);
+                                                    XCTAssertEqual(error.code, MTRErrorCodeTimeout);
+                                                    [nonexistentAttributeValueWaitExpectation fulfill];
+                                                }];
+    XCTAssertNotNil(waiter3);
+
     [device writeAttributeWithEndpointID:testEndpointID
                                clusterID:testClusterID
                              attributeID:testAttributeID
@@ -1572,10 +1685,20 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // expected value interval is 20s but expect it get reverted immediately as the write fails because it's writing to a
     // nonexistent attribute
-    [self waitForExpectations:@[ expectedValueReportedExpectation, expectedValueRemovedExpectation ] timeout:5 enforceOrder:YES];
+    [self waitForExpectations:@[ expectedValueReportedExpectation, expectedValueRemovedExpectation, nonexistentAttributeValueWaitExpectation ] timeout:5 enforceOrder:YES];
 
-    // Test if previous value is reported on a write
-    uint16_t testOnTimeValue = 10;
+    // Get the current OnTime value, to make sure we are writing a different one.
+    __auto_type * currentOnTimeValueDictionary = [device readAttributeWithEndpointID:@(1)
+                                                                           clusterID:@(MTRClusterIDTypeOnOffID)
+                                                                         attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)
+                                                                              params:nil];
+    XCTAssertNotNil(currentOnTimeValueDictionary);
+    XCTAssertEqualObjects(currentOnTimeValueDictionary[MTRTypeKey], MTRUnsignedIntegerValueType);
+    uint16_t currentOnTimeValue = [currentOnTimeValueDictionary[MTRValueKey] unsignedShortValue];
+
+    // Test if previous value is reported on a write.  Make sure to write a
+    // value different from the current one.
+    uint16_t testOnTimeValue = currentOnTimeValue > 10 ? currentOnTimeValue - 1 : currentOnTimeValue + 1;
     XCTestExpectation * onTimeWriteSuccess = [self expectationWithDescription:@"OnTime write success"];
     XCTestExpectation * onTimePreviousValue = [self expectationWithDescription:@"OnTime previous value"];
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
@@ -1596,7 +1719,63 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             }
         }
     };
-    NSDictionary * writeOnTimeValue = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(testOnTimeValue) };
+    __auto_type * writeOnTimeValue = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(testOnTimeValue) };
+
+    // Also set up a few attribute value waits to see what happens.
+    __auto_type * onTimeValueToWaitFor = @{
+        [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeOnOffID)
+                                          attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)] : writeOnTimeValue,
+    };
+
+    XCTestExpectation * waitingForOnTimeValue1Expectation = [self expectationWithDescription:@"OnTime value is now the expected value"];
+    __auto_type * waiter4 = [device waitForAttributeValues:onTimeValueToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [waitingForOnTimeValue1Expectation fulfill];
+    }];
+    XCTAssertNotNil(waiter4);
+
+    XCTestExpectation * waitingForOnTimeValue2Expectation = [self expectationWithDescription:@"OnTime value is now the expected value and first device type is the expected value"];
+    __auto_type * onTimeAndDeviceTypeValuesToWaitFor = [NSMutableDictionary dictionaryWithDictionary:onTimeValueToWaitFor];
+    onTimeAndDeviceTypeValuesToWaitFor[deviceTypes[0][MTRAttributePathKey]] = deviceTypes[0][MTRDataKey];
+
+    __auto_type * waiter5 = [device waitForAttributeValues:onTimeAndDeviceTypeValuesToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [waitingForOnTimeValue2Expectation fulfill];
+    }];
+    XCTAssertNotNil(waiter5);
+
+    XCTestExpectation * waitingForOnTimeValue3Expectation = [self expectationWithDescription:@"OnTime value is now the expected value and first device type is bogus, or we timed out"];
+    __auto_type * onTimeAndBogusDeviceTypeValuesToWaitFor = [NSMutableDictionary dictionaryWithDictionary:onTimeValueToWaitFor];
+    [onTimeAndBogusDeviceTypeValuesToWaitFor addEntriesFromDictionary:bogusDeviceType];
+    __auto_type * waiter6 = [device waitForAttributeValues:onTimeAndBogusDeviceTypeValuesToWaitFor timeout:0.5 queue:queue completion:^(NSError * _Nullable error) {
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeTimeout);
+        [waitingForOnTimeValue3Expectation fulfill];
+    }];
+    XCTAssertNotNil(waiter6);
+
+    XCTestExpectation * waitingForOnTimeValue4Expectation = [self expectationWithDescription:@"Waiter should have been canceled"];
+    __auto_type * waiter7 = [device waitForAttributeValues:onTimeValueToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeCancelled);
+        [waitingForOnTimeValue4Expectation fulfill];
+    }];
+    XCTAssertNotNil(waiter7);
+    [waiter7 cancel];
+
+    XCTestExpectation * waitingForOnTimeValue5Expectation = [self expectationWithDescription:@"Waiter should have been canceled due to being destroyed"];
+    @autoreleasepool {
+        // To force the waiter created here to die quickly.
+        [device waitForAttributeValues:onTimeValueToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
+            XCTAssertNotNil(error);
+            XCTAssertEqual(error.domain, MTRErrorDomain);
+            XCTAssertEqual(error.code, MTRErrorCodeCancelled);
+            [waitingForOnTimeValue5Expectation fulfill];
+        }];
+    }
+
     [device writeAttributeWithEndpointID:@(1)
                                clusterID:@(MTRClusterIDTypeOnOffID)
                              attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)
@@ -1604,7 +1783,16 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                    expectedValueInterval:@(10000)
                        timedWriteTimeout:nil];
 
-    [self waitForExpectations:@[ onTimeWriteSuccess, onTimePreviousValue ] timeout:10];
+    [self waitForExpectations:@[
+        onTimeWriteSuccess,
+        onTimePreviousValue,
+        waitingForOnTimeValue1Expectation,
+        waitingForOnTimeValue2Expectation,
+        waitingForOnTimeValue3Expectation,
+        waitingForOnTimeValue4Expectation,
+        waitingForOnTimeValue5Expectation,
+    ]
+                      timeout:10];
 
     __auto_type getOnOffValue = ^{
         return [device readAttributeWithEndpointID:@(1)
@@ -1884,6 +2072,51 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertEqual(value.count, 1);
         MTROperationalCredentialsClusterFabricDescriptorStruct * entry = value[0];
         XCTAssertEqualObjects(entry.label, @"Test");
+        [readFabricLabelExpectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ readFabricLabelExpectation ] timeout:kTimeoutInSeconds];
+
+    // Now test doing the UpdateFabricLabel command but directly via the
+    // MTRDevice API.
+    XCTestExpectation * updateLabelExpectation2 = [self expectationWithDescription:@"Fabric label updated a second time"];
+    // IMPORTANT: commandFields here uses hardcoded strings, not MTR* constants
+    // for the strings, to check for places that are doing string equality wrong.
+    __auto_type * commandFields = @{
+        @"type" : @"Structure",
+        @"value" : @[
+            @{
+                @"contextTag" : @0,
+                @"data" : @ {
+                    @"type" : @"UTF8String",
+                    @"value" : @"Test2",
+                },
+            },
+        ],
+    };
+
+    [device invokeCommandWithEndpointID:@(0)
+                              clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
+                              commandID:@(MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateFabricLabelID)
+                          commandFields:commandFields
+                         expectedValues:nil
+                  expectedValueInterval:nil
+                                  queue:queue
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 XCTAssertNil(error);
+                                 [updateLabelExpectation2 fulfill];
+                             }];
+
+    [self waitForExpectations:@[ updateLabelExpectation2 ] timeout:kTimeoutInSeconds];
+
+    // And again, make sure our fabric label got updated.
+    readFabricLabelExpectation = [self expectationWithDescription:@"Read fabric label third time"];
+    [baseOpCredsCluster readAttributeFabricsWithParams:nil completion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(value);
+        XCTAssertEqual(value.count, 1);
+        MTROperationalCredentialsClusterFabricDescriptorStruct * entry = value[0];
+        XCTAssertEqualObjects(entry.label, @"Test2");
         [readFabricLabelExpectation fulfill];
     }];
 
@@ -3117,73 +3350,73 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
 }
 
+- (void)doEncodeDecodeRoundTrip:(id<NSSecureCoding>)encodable
+{
+    // We know all our encodables are in fact NSObject.
+    NSObject * obj = (NSObject *) encodable;
+
+    NSError * encodeError;
+    NSData * encodedData = [NSKeyedArchiver archivedDataWithRootObject:encodable requiringSecureCoding:YES error:&encodeError];
+    XCTAssertNil(encodeError, @"Failed to encode %@", NSStringFromClass(obj.class));
+
+    NSError * decodeError;
+    id decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:obj.class] fromData:encodedData error:&decodeError];
+    XCTAssertNil(decodeError, @"Failed to decode %@", NSStringFromClass([obj class]));
+    XCTAssertTrue([decodedValue isKindOfClass:obj.class], @"Expected %@ but got %@", NSStringFromClass(obj.class), NSStringFromClass([decodedValue class]));
+
+    XCTAssertEqualObjects(obj, decodedValue, @"Decoding for %@ did not round-trip correctly", NSStringFromClass([obj class]));
+}
+
 - (void)test032_MTRPathClassesEncoding
 {
-    NSError * encodeError;
-    NSData * encodedData;
-    NSError * decodeError;
-    id decodedValue;
-
     // Test attribute path encode / decode
-    MTRAttributePath * originalAttributePath = [MTRAttributePath attributePathWithEndpointID:@(101) clusterID:@(102) attributeID:@(103)];
-    encodedData = [NSKeyedArchiver archivedDataWithRootObject:originalAttributePath requiringSecureCoding:YES error:&encodeError];
-    XCTAssertNil(encodeError);
-
-    decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:[MTRAttributePath class]] fromData:encodedData error:&decodeError];
-    XCTAssertNil(decodeError);
-    XCTAssertTrue([decodedValue isKindOfClass:[MTRAttributePath class]]);
-
-    MTRAttributePath * decodedAttributePath = decodedValue;
-    XCTAssertEqualObjects(originalAttributePath, decodedAttributePath);
+    MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:@(101) clusterID:@(102) attributeID:@(103)];
+    [self doEncodeDecodeRoundTrip:attributePath];
 
     // Test event path encode / decode
-    MTREventPath * originalEventPath = [MTREventPath eventPathWithEndpointID:@(201) clusterID:@(202) eventID:@(203)];
-    encodedData = [NSKeyedArchiver archivedDataWithRootObject:originalEventPath requiringSecureCoding:YES error:&encodeError];
-    XCTAssertNil(encodeError);
-
-    decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:[MTREventPath class]] fromData:encodedData error:&decodeError];
-    XCTAssertNil(decodeError);
-    XCTAssertTrue([decodedValue isKindOfClass:[MTREventPath class]]);
-
-    MTREventPath * decodedEventPath = decodedValue;
-    XCTAssertEqualObjects(originalEventPath, decodedEventPath);
+    MTREventPath * eventPath = [MTREventPath eventPathWithEndpointID:@(201) clusterID:@(202) eventID:@(203)];
+    [self doEncodeDecodeRoundTrip:eventPath];
 
     // Test command path encode / decode
-    MTRCommandPath * originalCommandPath = [MTRCommandPath commandPathWithEndpointID:@(301) clusterID:@(302) commandID:@(303)];
-    encodedData = [NSKeyedArchiver archivedDataWithRootObject:originalCommandPath requiringSecureCoding:YES error:&encodeError];
-    XCTAssertNil(encodeError);
+    MTRCommandPath * commandPath = [MTRCommandPath commandPathWithEndpointID:@(301) clusterID:@(302) commandID:@(303)];
+    [self doEncodeDecodeRoundTrip:commandPath];
 
-    decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:[MTRCommandPath class]] fromData:encodedData error:&decodeError];
-    XCTAssertNil(decodeError);
-    XCTAssertTrue([decodedValue isKindOfClass:[MTRCommandPath class]]);
+    // Test attribute request path encode/decode
+    MTRAttributeRequestPath * attributeRequestPath = [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:nil attributeID:nil];
+    [self doEncodeDecodeRoundTrip:attributeRequestPath];
 
-    MTRCommandPath * decodedCommandPath = decodedValue;
-    XCTAssertEqualObjects(originalCommandPath, decodedCommandPath);
+    attributeRequestPath = [MTRAttributeRequestPath requestPathWithEndpointID:@(101) clusterID:@(102) attributeID:@(103)];
+    [self doEncodeDecodeRoundTrip:attributeRequestPath];
+
+    attributeRequestPath = [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@(105) attributeID:@(106)];
+    [self doEncodeDecodeRoundTrip:attributeRequestPath];
+
+    attributeRequestPath = [MTRAttributeRequestPath requestPathWithEndpointID:@(107) clusterID:nil attributeID:@(109)];
+    [self doEncodeDecodeRoundTrip:attributeRequestPath];
 }
 
 // Helper API to test if changes in an attribute with a path specified by endpointId, clusterId and attributeId trigger
 // device configuration changed callbacks for a given MTRDevice. This API creates a fake attribute report for the given attribute path
 // and injects it into MTRDevice to exercise and test the delegate's device configuration changed callback.
-+ (void)checkAttributeReportTriggersConfigurationChanged:(MTRAttributeIDType)attributeId
+- (void)checkAttributeReportTriggersConfigurationChanged:(MTRAttributeIDType)attributeId
                                                clusterId:(MTRClusterIDType)clusterId
                                               endpointId:(NSNumber *)endpointId
                                                   device:(MTRDevice *)device
                                                 delegate:(MTRDeviceTestDelegate *)delegate
                                              dataVersion:(NSNumber *)dataVersion
                                          attributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
-                                                testcase:(XCTestCase *)testcase
+                                             description:(NSString *)description
                               expectConfigurationChanged:(BOOL)expectConfigurationChanged
 {
-    XCTAssertNotNil(endpointId);
-    XCTAssertNotNil(device);
-    XCTAssertNotNil(delegate);
-    XCTAssertNotNil(dataVersion);
-    XCTAssertNotNil(attributeReport);
-    XCTAssertNotNil(testcase);
+    XCTAssertNotNil(endpointId, @"%@", description);
+    XCTAssertNotNil(device, @"%@", description);
+    XCTAssertNotNil(delegate, @"%@", description);
+    XCTAssertNotNil(dataVersion, @"%@", description);
+    XCTAssertNotNil(attributeReport, @"%@", description);
 
-    XCTestExpectation * gotAttributeReportExpectation = [testcase expectationWithDescription:@"Attribute report has been received"];
-    XCTestExpectation * gotAttributeReportEndExpectation = [testcase expectationWithDescription:@"Attribute report has ended"];
-    XCTestExpectation * deviceConfigurationChangedExpectation = [testcase expectationWithDescription:@"Device configuration changed was received"];
+    XCTestExpectation * gotAttributeReportExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Attribute report has been received (%@)", description]];
+    XCTestExpectation * gotAttributeReportEndExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Attribute report has ended (%@)", description]];
+    XCTestExpectation * deviceConfigurationChangedExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Device configuration changed was received (%@)", description]];
     deviceConfigurationChangedExpectation.inverted = !expectConfigurationChanged;
 
     __block unsigned attributeReportsReceived = 0;
@@ -3193,54 +3426,57 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
         if (attributePath.attribute.unsignedLongLongValue == attributeId) {
             NSDictionary * data = attributeDict[MTRDataKey];
-            XCTAssertNotNil(data);
+            XCTAssertNotNil(data, @"%@", description);
             testDataValue = data[MTRValueKey];
         }
     }
 
     // Check if the received attribute report matches the injected attribute report.
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        NSLog(@"checkAttributeReportTriggersConfigurationChanged: onAttributeDataReceived called");
         attributeReportsReceived += attributeReport.count;
-        XCTAssert(attributeReportsReceived > 0);
+        XCTAssert(attributeReportsReceived > 0, @"%@", description);
         for (NSDictionary<NSString *, id> * attributeDict in attributeReport) {
             MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
-            XCTAssertNotNil(attributePath);
+            XCTAssertNotNil(attributePath, @"%@", description);
 
-            XCTAssertEqualObjects(attributePath.cluster, @(clusterId));
-            XCTAssertEqualObjects(attributePath.attribute, @(attributeId));
+            XCTAssertEqualObjects(attributePath.cluster, @(clusterId), @"%@", description);
+            XCTAssertEqualObjects(attributePath.attribute, @(attributeId), @"%@", description);
 
             NSDictionary * data = attributeDict[MTRDataKey];
-            XCTAssertNotNil(data);
-            XCTAssertEqualObjects(data[MTRDataVersionKey], dataVersion);
+            XCTAssertNotNil(data, @"%@", description);
+            XCTAssertEqualObjects(data[MTRDataVersionKey], dataVersion, @"%@", description);
 
             // This code assumes that none of the attributes in the report can have null values.
             // Since we are injecting the attribute report for testing this with non-null values,
             // we are fine for now. But if we plan to inject attribute reports with attributes having
             // null values, we need to fix the code accordingly.
             id dataValue = data[MTRValueKey];
-            XCTAssertNotNil(dataValue);
-            XCTAssertNotNil(testDataValue);
-            XCTAssertEqualObjects(dataValue, testDataValue);
+            XCTAssertNotNil(dataValue, @"%@", description);
+            XCTAssertNotNil(testDataValue, @"%@", description);
+            XCTAssertEqualObjects(dataValue, testDataValue, @"%@", description);
             [gotAttributeReportExpectation fulfill];
         }
     };
 
     delegate.onReportEnd = ^() {
+        NSLog(@"checkAttributeReportTriggersConfigurationChanged: onReportEnd called");
         [gotAttributeReportEndExpectation fulfill];
     };
 
     __block BOOL wasOnDeviceConfigurationChangedCallbackCalled = NO;
 
     delegate.onDeviceConfigurationChanged = ^() {
+        NSLog(@"checkAttributeReportTriggersConfigurationChanged: onDeviceConfigurationChanged called");
         [deviceConfigurationChangedExpectation fulfill];
         wasOnDeviceConfigurationChangedCallbackCalled = YES;
     };
 
     [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
 
-    [testcase waitForExpectations:@[ gotAttributeReportExpectation, gotAttributeReportEndExpectation, deviceConfigurationChangedExpectation ] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ gotAttributeReportExpectation, gotAttributeReportEndExpectation, deviceConfigurationChangedExpectation ] timeout:kTimeoutInSeconds];
     if (!expectConfigurationChanged) {
-        XCTAssertFalse(wasOnDeviceConfigurationChangedCallbackCalled);
+        XCTAssertFalse(wasOnDeviceConfigurationChangedCallbackCalled, @"%@", description);
     }
 }
 
@@ -3260,28 +3496,29 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     __block unsigned attributeReportsReceived = 0;
 
-    // Get the data version for the following attributes that we will use for the tests - parts list, device types list and server list for descriptor cluster,
-    // attribute list and cluster revision for the Identify cluster, accepted commands list for oven cavity operational state ID cluster and
-    // feature map for groups ID cluster.
-    __block NSNumber * dataVersionForPartsList;
+    // Get the data version for the following clusters that we will use for the tests - Descriptor cluster on endpoint 0,
+    // Identify cluster, On/Off cluster, Oven Cavity Operational State cluster and Groups cluster.
+    __block NSNumber * dataVersionForDescriptor;
     __block NSMutableArray<NSDictionary<NSString *, id> *> * valueForPartsList;
-    __block NSNumber * endpointForPartsList;
-    __block NSNumber * dataVersionForDeviceTypesList;
-    __block NSNumber * endpointForDeviceTypeList;
-    __block NSNumber * dataVersionForServerList;
-    __block NSNumber * endpointForServerList;
-    __block NSNumber * dataVersionForAcceptedCommandList;
-    __block NSNumber * endpointForAcceptedCommandList;
-    __block NSNumber * dataVersionForAttributeList;
-    __block NSNumber * endpointForAttributeList;
-    __block NSNumber * dataVersionForClusterRevision;
-    __block NSNumber * endpointForClusterRevision;
-    __block NSNumber * dataVersionForFeatureMap;
-    __block NSNumber * endpointForFeatureMap;
-    __block NSNumber * dataVersionForPowerConfigurationSources;
-    __block NSNumber * endpointForPowerConfigurationSources;
+    const uint32_t kDescriptorEndpoint = 0;
+
+    __block NSNumber * dataVersionForOvenCavityOperationalState;
+    __block NSNumber * endpointForOvenCavityOperationalStateAcceptedCommandList;
+
+    __block NSNumber * dataVersionForIdentify;
+    __block NSNumber * endpointForIdentifyAttributeList;
+
+    __block NSNumber * dataVersionForOnOff;
+    __block NSNumber * endpointForOnOffClusterRevision;
+
+    __block NSNumber * dataVersionForGroups;
+    __block NSNumber * endpointForGroupsFeatureMap;
+
+    __block NSNumber * dataVersionForPowerSourceConfiguration;
+    __block NSNumber * endpointForPowerSourceConfigurationSources;
 
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        NSLog(@"test033_TestMTRDeviceDeviceConfigurationChanged: onAttributeDataReceived called");
         attributeReportsReceived += attributeReport.count;
         XCTAssert(attributeReportsReceived > 0);
 
@@ -3289,24 +3526,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
             XCTAssertNotNil(attributePath);
 
-            if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeDescriptorID && attributePath.endpoint.unsignedLongValue == 0) {
+            if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeDescriptorID && attributePath.endpoint.unsignedLongValue == kDescriptorEndpoint) {
                 NSDictionary * data = attributeDict[MTRDataKey];
                 XCTAssertNotNil(data);
+                dataVersionForDescriptor = data[MTRDataVersionKey];
+
                 switch (attributePath.attribute.unsignedLongValue) {
                 case MTRAttributeIDTypeClusterDescriptorAttributePartsListID: {
-                    dataVersionForPartsList = data[MTRDataVersionKey];
                     valueForPartsList = [data[MTRValueKey] mutableCopy];
-                    endpointForPartsList = attributePath.endpoint;
-                    break;
-                }
-                case MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID: {
-                    dataVersionForDeviceTypesList = data[MTRDataVersionKey];
-                    endpointForDeviceTypeList = attributePath.endpoint;
-                    break;
-                }
-                case MTRAttributeIDTypeClusterDescriptorAttributeServerListID: {
-                    dataVersionForServerList = data[MTRDataVersionKey];
-                    endpointForServerList = attributePath.endpoint;
                     break;
                 }
                 }
@@ -3315,44 +3542,48 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 XCTAssertNotNil(data);
                 switch (attributePath.attribute.unsignedLongValue) {
                 case MTRAttributeIDTypeGlobalAttributeAttributeListID: {
-                    dataVersionForAttributeList = data[MTRDataVersionKey];
-                    endpointForAttributeList = attributePath.endpoint;
+                    dataVersionForIdentify = data[MTRDataVersionKey];
+                    endpointForIdentifyAttributeList = attributePath.endpoint;
                     break;
                 }
+                }
+            } else if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeOnOffID) {
+                NSDictionary * data = attributeDict[MTRDataKey];
+                XCTAssertNotNil(data);
+                switch (attributePath.attribute.unsignedLongValue) {
                 case MTRAttributeIDTypeGlobalAttributeClusterRevisionID: {
-                    dataVersionForClusterRevision = data[MTRDataVersionKey];
-                    endpointForClusterRevision = attributePath.endpoint;
+                    dataVersionForOnOff = data[MTRDataVersionKey];
+                    endpointForOnOffClusterRevision = attributePath.endpoint;
                     break;
                 }
                 }
             } else if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeOvenCavityOperationalStateID && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID) {
                 NSDictionary * data = attributeDict[MTRDataKey];
                 XCTAssertNotNil(data);
-                dataVersionForAcceptedCommandList = data[MTRDataVersionKey];
-                endpointForAcceptedCommandList = attributePath.endpoint;
+                dataVersionForOvenCavityOperationalState = data[MTRDataVersionKey];
+                endpointForOvenCavityOperationalStateAcceptedCommandList = attributePath.endpoint;
             } else if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeGroupsID && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeGlobalAttributeFeatureMapID) {
                 NSDictionary * data = attributeDict[MTRDataKey];
                 XCTAssertNotNil(data);
-                dataVersionForFeatureMap = data[MTRDataVersionKey];
-                endpointForFeatureMap = attributePath.endpoint;
+                dataVersionForGroups = data[MTRDataVersionKey];
+                endpointForGroupsFeatureMap = attributePath.endpoint;
             } else if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypePowerSourceConfigurationID && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeSourcesID) {
                 NSDictionary * data = attributeDict[MTRDataKey];
                 XCTAssertNotNil(data);
-                dataVersionForPowerConfigurationSources = data[MTRDataVersionKey];
-                endpointForPowerConfigurationSources = attributePath.endpoint;
+                dataVersionForPowerSourceConfiguration = data[MTRDataVersionKey];
+                endpointForPowerSourceConfigurationSources = attributePath.endpoint;
             }
         }
     };
 
     delegate.onReportEnd = ^() {
-        XCTAssertNotNil(dataVersionForPartsList);
-        XCTAssertNotNil(dataVersionForDeviceTypesList);
-        XCTAssertNotNil(dataVersionForServerList);
-        XCTAssertNotNil(dataVersionForAttributeList);
-        XCTAssertNotNil(dataVersionForClusterRevision);
-        XCTAssertNotNil(dataVersionForAcceptedCommandList);
-        XCTAssertNotNil(dataVersionForFeatureMap);
-        XCTAssertNotNil(dataVersionForPowerConfigurationSources);
+        NSLog(@"test033_TestMTRDeviceDeviceConfigurationChanged: onReportEnd called");
+        XCTAssertNotNil(dataVersionForDescriptor);
+        XCTAssertNotNil(dataVersionForOvenCavityOperationalState);
+        XCTAssertNotNil(dataVersionForIdentify);
+        XCTAssertNotNil(dataVersionForOnOff);
+        XCTAssertNotNil(dataVersionForGroups);
+        XCTAssertNotNil(dataVersionForPowerSourceConfiguration);
         [gotInitialReportsExpectation fulfill];
     };
 
@@ -3371,7 +3602,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // 3. Call the helper checkAttributeReportTriggersConfigurationChanged to test if the attribute report affects device configuration changes.
 
     // Test attribute path - endpointId = 0, clusterId = descriptor, attributeId = parts list.
-    dataVersionForPartsList = [NSNumber numberWithUnsignedLongLong:(dataVersionForPartsList.unsignedLongLongValue + 1)];
+    dataVersionForDescriptor = @(dataVersionForDescriptor.unsignedLongLongValue + 1);
     // Figure out an endpoint ID (not 0) we can add to PartsList.
     for (unsigned i = 1; true; ++i) {
         __auto_type unsignedIntegerValue = @{
@@ -3387,18 +3618,18 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         }
     }
     NSArray<NSDictionary<NSString *, id> *> * attributeReport = @[ @{
-        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointForPartsList clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)],
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(kDescriptorEndpoint) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)],
         MTRDataKey : @ {
-            MTRDataVersionKey : dataVersionForPartsList,
+            MTRDataVersionKey : dataVersionForDescriptor,
             MTRTypeKey : MTRArrayValueType,
             MTRValueKey : valueForPartsList,
         }
     } ];
 
-    [MTRDeviceTests checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeClusterDescriptorAttributePartsListID clusterId:MTRClusterIDTypeDescriptorID endpointId:endpointForPartsList device:device delegate:delegate dataVersion:dataVersionForPartsList attributeReport:attributeReport testcase:self expectConfigurationChanged:YES];
+    [self checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeClusterDescriptorAttributePartsListID clusterId:MTRClusterIDTypeDescriptorID endpointId:@(kDescriptorEndpoint) device:device delegate:delegate dataVersion:dataVersionForDescriptor attributeReport:attributeReport description:@"Descriptor PartsList" expectConfigurationChanged:YES];
 
     // Test attribute path - endpointId = 0, clusterId = descriptor, attributeId = device types list.
-    dataVersionForDeviceTypesList = [NSNumber numberWithUnsignedLongLong:(dataVersionForDeviceTypesList.unsignedLongLongValue + 1)];
+    dataVersionForDescriptor = @(dataVersionForDescriptor.unsignedLongLongValue + 1);
     NSArray<NSDictionary<NSString *, id> *> * deviceTypesListValue = @[
         @{
             MTRDataKey : @ {
@@ -3424,9 +3655,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     ];
 
     attributeReport = @[ @{
-        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointForDeviceTypeList clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID)],
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(kDescriptorEndpoint) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID)],
         MTRDataKey : @ {
-            MTRDataVersionKey : dataVersionForDeviceTypesList,
+            MTRDataVersionKey : dataVersionForDescriptor,
             MTRTypeKey : MTRArrayValueType,
             MTRValueKey : deviceTypesListValue,
         }
@@ -3454,85 +3685,85 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         },
     ];
 
-    [MTRDeviceTests checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID clusterId:MTRClusterIDTypeDescriptorID endpointId:endpointForDeviceTypeList device:device delegate:delegate dataVersion:dataVersionForDeviceTypesList attributeReport:attributeReport testcase:self expectConfigurationChanged:YES];
+    [self checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID clusterId:MTRClusterIDTypeDescriptorID endpointId:@(kDescriptorEndpoint) device:device delegate:delegate dataVersion:dataVersionForDescriptor attributeReport:attributeReport description:@"Descriptor DeviceTypeList" expectConfigurationChanged:YES];
 
     // Test attribute path - endpointId = 0, clusterId = descriptor, attributeId = server list.
-    dataVersionForServerList = [NSNumber numberWithUnsignedLongLong:(dataVersionForServerList.unsignedLongLongValue + 1)];
+    dataVersionForDescriptor = @(dataVersionForDescriptor.unsignedLongLongValue + 1);
     attributeReport = @[ @{
-        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointForServerList clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeServerListID)],
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(kDescriptorEndpoint) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeServerListID)],
         MTRDataKey : @ {
-            MTRDataVersionKey : dataVersionForServerList,
+            MTRDataVersionKey : dataVersionForDescriptor,
             MTRTypeKey : MTRArrayValueType,
             MTRValueKey : unsignedIntegerArrayValue,
         }
     } ];
 
-    [MTRDeviceTests checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeClusterDescriptorAttributeServerListID clusterId:MTRClusterIDTypeDescriptorID endpointId:endpointForServerList device:device delegate:delegate dataVersion:dataVersionForServerList attributeReport:attributeReport testcase:self expectConfigurationChanged:YES];
+    [self checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeClusterDescriptorAttributeServerListID clusterId:MTRClusterIDTypeDescriptorID endpointId:@(kDescriptorEndpoint) device:device delegate:delegate dataVersion:dataVersionForDescriptor attributeReport:attributeReport description:@"Descriptor ServerList" expectConfigurationChanged:YES];
 
-    // Test attribute path - endpointId = 1, clusterId = ovencavityoperationalstateID, attributeId = accepted command list.
-    dataVersionForAcceptedCommandList = [NSNumber numberWithUnsignedLongLong:(dataVersionForAcceptedCommandList.unsignedLongLongValue + 1)];
+    // Test attribute path - clusterId = ovencavityoperationalstateID, attributeId = accepted command list.
+    dataVersionForOvenCavityOperationalState = @(dataVersionForOvenCavityOperationalState.unsignedLongLongValue + 1);
     attributeReport = @[ @{
-        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointForAcceptedCommandList clusterID:@(MTRClusterIDTypeOvenCavityOperationalStateID) attributeID:@(MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID)],
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointForOvenCavityOperationalStateAcceptedCommandList clusterID:@(MTRClusterIDTypeOvenCavityOperationalStateID) attributeID:@(MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID)],
         MTRDataKey : @ {
-            MTRDataVersionKey : dataVersionForAcceptedCommandList,
+            MTRDataVersionKey : dataVersionForOvenCavityOperationalState,
             MTRTypeKey : MTRArrayValueType,
             MTRValueKey : unsignedIntegerArrayValue,
         }
     } ];
 
-    [MTRDeviceTests checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID clusterId:MTRClusterIDTypeOvenCavityOperationalStateID endpointId:endpointForAcceptedCommandList device:device delegate:delegate dataVersion:dataVersionForAcceptedCommandList attributeReport:attributeReport testcase:self expectConfigurationChanged:YES];
+    [self checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID clusterId:MTRClusterIDTypeOvenCavityOperationalStateID endpointId:endpointForOvenCavityOperationalStateAcceptedCommandList device:device delegate:delegate dataVersion:dataVersionForOvenCavityOperationalState attributeReport:attributeReport description:@"OvenCavityOperationalState AcceptedCommandList" expectConfigurationChanged:YES];
 
-    // Test attribute path - endpointId = 0, clusterId = identify, attributeId = attribute list.
-    dataVersionForAttributeList = [NSNumber numberWithUnsignedLongLong:(dataVersionForAttributeList.unsignedLongLongValue + 1)];
+    // Test attribute path - clusterId = identify, attributeId = attribute list.
+    dataVersionForIdentify = @(dataVersionForIdentify.unsignedLongLongValue + 1);
     attributeReport = @[ @{
-        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointForAttributeList clusterID:@(MTRClusterIDTypeIdentifyID) attributeID:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)],
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointForIdentifyAttributeList clusterID:@(MTRClusterIDTypeIdentifyID) attributeID:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)],
         MTRDataKey : @ {
-            MTRDataVersionKey : dataVersionForAttributeList,
+            MTRDataVersionKey : dataVersionForIdentify,
             MTRTypeKey : MTRArrayValueType,
             MTRValueKey : unsignedIntegerArrayValue,
         }
     } ];
 
-    [MTRDeviceTests checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeGlobalAttributeAttributeListID clusterId:MTRClusterIDTypeIdentifyID endpointId:endpointForAttributeList device:device delegate:delegate dataVersion:dataVersionForAttributeList attributeReport:attributeReport testcase:self expectConfigurationChanged:YES];
+    [self checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeGlobalAttributeAttributeListID clusterId:MTRClusterIDTypeIdentifyID endpointId:endpointForIdentifyAttributeList device:device delegate:delegate dataVersion:dataVersionForIdentify attributeReport:attributeReport description:@"Identify AttributeList" expectConfigurationChanged:YES];
 
-    // Test attribute path - endpointId = 0, clusterId = identify, attributeId = cluster revision.
-    dataVersionForClusterRevision = [NSNumber numberWithUnsignedLongLong:(dataVersionForClusterRevision.unsignedLongLongValue + 1)];
+    // Test attribute path - clusterId = OnOff, attributeId = cluster revision.
+    dataVersionForOnOff = @(dataVersionForOnOff.unsignedLongLongValue + 1);
     attributeReport = @[ @{
-        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointForClusterRevision clusterID:@(MTRClusterIDTypeIdentifyID) attributeID:@(MTRAttributeIDTypeGlobalAttributeClusterRevisionID)],
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointForOnOffClusterRevision clusterID:@(MTRClusterIDTypeIdentifyID) attributeID:@(MTRAttributeIDTypeGlobalAttributeClusterRevisionID)],
         MTRDataKey : @ {
-            MTRDataVersionKey : dataVersionForClusterRevision,
+            MTRDataVersionKey : dataVersionForOnOff,
             MTRTypeKey : MTRUnsignedIntegerValueType,
             MTRValueKey : @9999,
         }
     } ];
 
-    [MTRDeviceTests checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeGlobalAttributeClusterRevisionID clusterId:MTRClusterIDTypeIdentifyID endpointId:endpointForClusterRevision device:device delegate:delegate dataVersion:dataVersionForClusterRevision attributeReport:attributeReport testcase:self expectConfigurationChanged:YES];
+    [self checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeGlobalAttributeClusterRevisionID clusterId:MTRClusterIDTypeIdentifyID endpointId:endpointForOnOffClusterRevision device:device delegate:delegate dataVersion:dataVersionForOnOff attributeReport:attributeReport description:@"OnOff ClusterRevision" expectConfigurationChanged:YES];
 
-    // Test attribute path - endpointId = 0, clusterId = groupsID, attributeId = feature map.
-    dataVersionForFeatureMap = [NSNumber numberWithUnsignedLongLong:(dataVersionForFeatureMap.unsignedLongLongValue + 1)];
+    // Test attribute path - clusterId = groupsID, attributeId = feature map.
+    dataVersionForGroups = @(dataVersionForGroups.unsignedLongLongValue + 1);
     attributeReport = @[ @{
-        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointForFeatureMap clusterID:@(MTRClusterIDTypeGroupsID) attributeID:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)],
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointForGroupsFeatureMap clusterID:@(MTRClusterIDTypeGroupsID) attributeID:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)],
         MTRDataKey : @ {
-            MTRDataVersionKey : dataVersionForFeatureMap,
+            MTRDataVersionKey : dataVersionForGroups,
             MTRTypeKey : MTRUnsignedIntegerValueType,
             MTRValueKey : @2,
         }
     } ];
 
-    [MTRDeviceTests checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeGlobalAttributeFeatureMapID clusterId:MTRClusterIDTypeGroupsID endpointId:endpointForFeatureMap device:device delegate:delegate dataVersion:dataVersionForFeatureMap attributeReport:attributeReport testcase:self expectConfigurationChanged:YES];
+    [self checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeGlobalAttributeFeatureMapID clusterId:MTRClusterIDTypeGroupsID endpointId:endpointForGroupsFeatureMap device:device delegate:delegate dataVersion:dataVersionForGroups attributeReport:attributeReport description:@"Groups FeatureMap" expectConfigurationChanged:YES];
 
-    // Test attribute path that doesn't cause a device configuration changed - endpointId = 1, clusterId = power source configuration, attributeId = sources.
-    dataVersionForPowerConfigurationSources = [NSNumber numberWithUnsignedLongLong:(dataVersionForPowerConfigurationSources.unsignedLongLongValue + 1)];
+    // Test attribute path that doesn't cause a device configuration clusterId = power source configuration, attributeId = sources.
+    dataVersionForPowerSourceConfiguration = @(dataVersionForPowerSourceConfiguration.unsignedLongLongValue + 1);
     attributeReport = @[ @{
-        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointForPowerConfigurationSources clusterID:@(MTRClusterIDTypePowerSourceConfigurationID) attributeID:@(MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeSourcesID)],
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointForPowerSourceConfigurationSources clusterID:@(MTRClusterIDTypePowerSourceConfigurationID) attributeID:@(MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeSourcesID)],
         MTRDataKey : @ {
-            MTRDataVersionKey : dataVersionForPowerConfigurationSources,
+            MTRDataVersionKey : dataVersionForPowerSourceConfiguration,
             MTRTypeKey : MTRArrayValueType,
             MTRValueKey : unsignedIntegerArrayValue,
         }
     } ];
 
-    [MTRDeviceTests checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeSourcesID clusterId:MTRClusterIDTypePowerSourceConfigurationID endpointId:endpointForPowerConfigurationSources device:device delegate:delegate dataVersion:dataVersionForPowerConfigurationSources attributeReport:attributeReport testcase:self expectConfigurationChanged:NO];
+    [self checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeSourcesID clusterId:MTRClusterIDTypePowerSourceConfigurationID endpointId:endpointForPowerSourceConfigurationSources device:device delegate:delegate dataVersion:dataVersionForPowerSourceConfiguration attributeReport:attributeReport description:@"PowerSourceConfiguration Sources" expectConfigurationChanged:NO];
 
     NSArray<NSDictionary<NSString *, id> *> * newUnsignedIntegerArrayValue = @[
         @{
@@ -3550,30 +3781,30 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     ];
 
     // Test an attribute report with multiple attributes at least one of which triggers device configuration changed.
-    dataVersionForAttributeList = [NSNumber numberWithUnsignedLongLong:(dataVersionForAttributeList.unsignedLongLongValue + 1)];
-    dataVersionForFeatureMap = [NSNumber numberWithUnsignedLongLong:(dataVersionForFeatureMap.unsignedLongLongValue + 1)];
-    dataVersionForPowerConfigurationSources = [NSNumber numberWithUnsignedLongLong:(dataVersionForPowerConfigurationSources.unsignedLongLongValue + 1)];
+    dataVersionForIdentify = @(dataVersionForIdentify.unsignedLongLongValue + 1);
+    dataVersionForGroups = @(dataVersionForGroups.unsignedLongLongValue + 1);
+    dataVersionForPowerSourceConfiguration = @(dataVersionForPowerSourceConfiguration.unsignedLongLongValue + 1);
     attributeReport = @[
         @{
-            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointForAttributeList clusterID:@(MTRClusterIDTypeIdentifyID) attributeID:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)],
+            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointForIdentifyAttributeList clusterID:@(MTRClusterIDTypeIdentifyID) attributeID:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)],
             MTRDataKey : @ {
-                MTRDataVersionKey : dataVersionForAttributeList,
+                MTRDataVersionKey : dataVersionForIdentify,
                 MTRTypeKey : MTRArrayValueType,
                 MTRValueKey : unsignedIntegerArrayValue,
             }
         },
         @{
-            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointForFeatureMap clusterID:@(MTRClusterIDTypeGroupsID) attributeID:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)],
+            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointForGroupsFeatureMap clusterID:@(MTRClusterIDTypeGroupsID) attributeID:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)],
             MTRDataKey : @ {
-                MTRDataVersionKey : dataVersionForFeatureMap,
+                MTRDataVersionKey : dataVersionForGroups,
                 MTRTypeKey : MTRUnsignedIntegerValueType,
                 MTRValueKey : @3,
             }
         },
         @{
-            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointForPowerConfigurationSources clusterID:@(MTRClusterIDTypePowerSourceConfigurationID) attributeID:@(MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeSourcesID)],
+            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointForPowerSourceConfigurationSources clusterID:@(MTRClusterIDTypePowerSourceConfigurationID) attributeID:@(MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeSourcesID)],
             MTRDataKey : @ {
-                MTRDataVersionKey : dataVersionForPowerConfigurationSources,
+                MTRDataVersionKey : dataVersionForPowerSourceConfiguration,
                 MTRTypeKey : MTRArrayValueType,
                 MTRValueKey : newUnsignedIntegerArrayValue,
             }
@@ -3584,16 +3815,19 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * gotAttributeReportWithMultipleAttributesEndExpectation = [self expectationWithDescription:@"Attribute report with multiple attributes has ended"];
     XCTestExpectation * deviceConfigurationChangedExpectationForAttributeReportWithMultipleAttributes = [self expectationWithDescription:@"Device configuration changed was receieved due to an attribute report with multiple attributes "];
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        NSLog(@"test033_TestMTRDeviceDeviceConfigurationChanged: onAttributeDataReceived called with multiple attributes");
         attributeReportsReceived += attributeReport.count;
         XCTAssert(attributeReportsReceived > 0);
         [gotAttributeReportWithMultipleAttributesExpectation fulfill];
     };
 
     delegate.onReportEnd = ^() {
+        NSLog(@"test033_TestMTRDeviceDeviceConfigurationChanged: onReportEnd called with multiple attributes");
         [gotAttributeReportWithMultipleAttributesEndExpectation fulfill];
     };
 
     delegate.onDeviceConfigurationChanged = ^() {
+        NSLog(@"test033_TestMTRDeviceDeviceConfigurationChanged: onDeviceConfigurationChanged called for testing with multiple attributes");
         [deviceConfigurationChangedExpectationForAttributeReportWithMultipleAttributes fulfill];
     };
 
@@ -3683,6 +3917,70 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Must have gotten some events (at least StartUp!)
     XCTAssertTrue(eventReportsReceived > 0);
+
+    // Now try doing some event injection.
+    __block uint64_t eventNumber = 0x1000000; // Should't have that many events on the device yet!
+    __block uint64_t firstNewEventNumber = eventNumber;
+    __auto_type createEventReport = ^{
+        return @{
+            MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(1) eventID:@(1)],
+            MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+            MTREventTimestampDateKey : [NSDate date],
+            MTREventPriorityKey : @(MTREventPriorityInfo),
+            MTREventNumberKey : @(eventNumber++),
+            MTRDataKey : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[],
+            },
+        };
+    };
+
+    eventReportsReceived = 0;
+    const int eventReportsToInject = 5;
+    __block XCTestExpectation * eventReportsFinishedExpectation = [self expectationWithDescription:@"Injecting some new event reports"];
+    __block int historicalEvents = 0;
+    __block int eventReportsToExpect = eventReportsToInject;
+
+    delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * eventReport) {
+        eventReportsReceived += eventReport.count;
+        for (NSDictionary<NSString *, id> * eventDict in eventReport) {
+            NSNumber * reportIsHistorical = eventDict[MTREventIsHistoricalKey];
+            NSNumber * eventNumber = eventDict[MTREventNumberKey];
+            XCTAssertEqual(reportIsHistorical.boolValue, eventNumber.unsignedLongLongValue < firstNewEventNumber,
+                @"eventNumber: %@, firstNewEventNumber: %llu", eventNumber, firstNewEventNumber);
+            historicalEvents += reportIsHistorical.boolValue;
+        }
+
+        if (eventReportsReceived >= eventReportsToExpect) {
+            [eventReportsFinishedExpectation fulfill];
+        }
+    };
+
+    for (int i = 0; i < eventReportsToInject; ++i) {
+        [device unitTestInjectEventReport:@[ createEventReport() ]];
+    }
+
+    [self waitForExpectations:@[ eventReportsFinishedExpectation ] timeout:kTimeoutInSeconds];
+    XCTAssertEqual(historicalEvents, 0);
+
+    // Now inject some mix of historical and non-historical events.  Since this
+    // includes events with old event numbers, those should get filtered out
+    // from reporting.
+    const uint64_t expectedHistoricalEvents = 2;
+    firstNewEventNumber = eventNumber;
+    eventNumber -= expectedHistoricalEvents;
+    eventReportsReceived = 0;
+    historicalEvents = 0;
+    // Events with already-observed event numbers do not get reported.
+    eventReportsToExpect = eventReportsToInject - expectedHistoricalEvents;
+    eventReportsFinishedExpectation = [self expectationWithDescription:@"Injecting a mix of old and new reports"];
+
+    for (int i = 0; i < eventReportsToInject; ++i) {
+        [device unitTestInjectEventReport:@[ createEventReport() ]];
+    }
+
+    [self waitForExpectations:@[ eventReportsFinishedExpectation ] timeout:kTimeoutInSeconds];
+    XCTAssertEqual(historicalEvents, 0);
 }
 
 - (void)test035_TestMTRDeviceSubscriptionNotEstablishedOverXPC
@@ -3716,10 +4014,15 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (NSArray<NSDictionary<NSString *, id> *> *)_testAttributeReportWithValue:(unsigned int)testValue
 {
+    return [self _testAttributeReportWithValue:testValue dataVersion:testValue];
+}
+
+- (NSArray<NSDictionary<NSString *, id> *> *)_testAttributeReportWithValue:(unsigned int)testValue dataVersion:(unsigned int)dataVersion
+{
     return @[ @{
         MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeCurrentLevelID)],
         MTRDataKey : @ {
-            MTRDataVersionKey : @(testValue),
+            MTRDataVersionKey : @(dataVersion),
             MTRTypeKey : MTRUnsignedIntegerValueType,
             MTRValueKey : @(testValue),
         }
@@ -3778,7 +4081,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [device setDelegate:delegate queue:queue];
 
     // Use a counter that will be incremented for each report as the value.
-    unsigned int currentTestValue = 1;
+    __block unsigned int currentTestValue = 1;
 
     // Initial setup: Inject report and see that the attribute persisted.  No delay is
     // expected for the first (priming) report.
@@ -3897,54 +4200,84 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertLessThan(reportToPersistenceDelay, baseTestDelayTime * 2 * 5 * 1.3);
 
     // Test 4: test reporting excessively, and see that persistence does not happen until
-    // reporting frequency goes back above the threshold
-    reportEndTime = nil;
-    dataPersistedTime = nil;
-    XCTestExpectation * dataPersisted4 = [self expectationWithDescription:@"data persisted 4"];
-    delegate.onClusterDataPersisted = ^{
-        os_unfair_lock_lock(&lock);
-        if (!dataPersistedTime) {
-            dataPersistedTime = [NSDate now];
+    // reporting frequency goes back below the threshold
+    __auto_type excessiveReportTest = ^(unsigned int testId, NSArray<NSDictionary<NSString *, id> *> * (^reportGenerator)(void), bool expectPersistence) {
+        reportEndTime = nil;
+        dataPersistedTime = nil;
+        XCTestExpectation * dataPersisted = [self expectationWithDescription:[NSString stringWithFormat:@"data persisted %u", testId]];
+        dataPersisted.inverted = !expectPersistence;
+        delegate.onClusterDataPersisted = ^{
+            os_unfair_lock_lock(&lock);
+            if (!dataPersistedTime) {
+                dataPersistedTime = [NSDate now];
+            }
+            os_unfair_lock_unlock(&lock);
+            [dataPersisted fulfill];
+        };
+
+        // Set report times with short delay and check that the multiplier is engaged
+        [device unitTestSetMostRecentReportTimes:[NSMutableArray arrayWithArray:@[
+            [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1 * 4)],
+            [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1 * 3)],
+            [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1 * 2)],
+            [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1)],
+        ]]];
+
+        // Inject report that makes MTRDevice detect the device is reporting excessively
+        [device unitTestInjectAttributeReport:reportGenerator() fromSubscription:YES];
+
+        // Now keep reporting excessively for base delay time max times max multiplier, plus a bit more
+        NSDate * excessiveStartTime = [NSDate now];
+        for (;;) {
+            usleep((useconds_t) (baseTestDelayTime * 0.1 * USEC_PER_SEC));
+            [device unitTestInjectAttributeReport:reportGenerator() fromSubscription:YES];
+            NSTimeInterval elapsed = -[excessiveStartTime timeIntervalSinceNow];
+            if (elapsed > (baseTestDelayTime * 2 * 5 * 1.2)) {
+                break;
+            }
         }
-        os_unfair_lock_unlock(&lock);
-        [dataPersisted4 fulfill];
+
+        // Check that persistence has not happened because it's now turned off
+        XCTAssertNil(dataPersistedTime);
+
+        // Now force report times to large number, to simulate time passage
+        [device unitTestSetMostRecentReportTimes:[NSMutableArray arrayWithArray:@[
+            [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 10)],
+        ]]];
+
+        // And inject a report to trigger MTRDevice to recalculate that this device is no longer
+        // reporting excessively
+        [device unitTestInjectAttributeReport:reportGenerator() fromSubscription:YES];
+
+        [self waitForExpectations:@[ dataPersisted ] timeout:60];
     };
 
-    // Set report times with short delay and check that the multiplier is engaged
-    [device unitTestSetMostRecentReportTimes:[NSMutableArray arrayWithArray:@[
-        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1 * 4)],
-        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1 * 3)],
-        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1 * 2)],
-        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1)],
-    ]]];
+    excessiveReportTest(
+        4, ^{
+            return [self _testAttributeReportWithValue:currentTestValue++];
+        }, true);
 
-    // Inject report that makes MTRDevice detect the device is reporting excessively
-    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+    // Test 5: test reporting excessively with the same value and different data
+    // versions, and see that persistence does not happen until reporting
+    // frequency goes back below the threshold.
+    __block __auto_type dataVersion = currentTestValue;
+    // We incremented currentTestValue after injecting the last report.  Make sure all the new
+    // reports use that last-reported value.
+    __auto_type lastReportedValue = currentTestValue - 1;
+    excessiveReportTest(
+        5, ^{
+            return [self _testAttributeReportWithValue:lastReportedValue dataVersion:dataVersion++];
+        }, true);
 
-    // Now keep reporting excessively for base delay time max times max multiplier, plus a bit more
-    NSDate * excessiveStartTime = [NSDate now];
-    for (;;) {
-        usleep((useconds_t) (baseTestDelayTime * 0.1 * USEC_PER_SEC));
-        [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
-        NSTimeInterval elapsed = -[excessiveStartTime timeIntervalSinceNow];
-        if (elapsed > (baseTestDelayTime * 2 * 5 * 1.2)) {
-            break;
-        }
-    }
-
-    // Check that persistence has not happened because it's now turned off
-    XCTAssertNil(dataPersistedTime);
-
-    // Now force report times to large number, to simulate time passage
-    [device unitTestSetMostRecentReportTimes:[NSMutableArray arrayWithArray:@[
-        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 10)],
-    ]]];
-
-    // And inject a report to trigger MTRDevice to recalculate that this device is no longer
-    // reporting excessively
-    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
-
-    [self waitForExpectations:@[ dataPersisted4 ] timeout:60];
+    // Test 6: test reporting excessively with the same value and same data
+    // version, and see that persistence does not happen at all.
+    // We incremented dataVersion after injecting the last report.  Make sure all the new
+    // reports use that last-reported value.
+    __block __auto_type lastReportedDataVersion = dataVersion - 1;
+    excessiveReportTest(
+        6, ^{
+            return [self _testAttributeReportWithValue:lastReportedValue dataVersion:lastReportedDataVersion];
+        }, false);
 
     delegate.onReportEnd = nil;
     delegate.onClusterDataPersisted = nil;
@@ -4015,13 +4348,25 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (NSDictionary<NSString *, id> *)_testEventResponseValueWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID
 {
+    // Pick a large event number, so that in practice these event reports will
+    // all have larger event numbers than anything that might have been observed
+    // before.
+    static uint64_t eventNumber = 0x100000000llu;
     return @{
         MTREventPathKey : [MTREventPath eventPathWithEndpointID:endpointID clusterID:clusterID eventID:eventID],
         MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
         MTREventTimestampDateKey : [NSDate date],
-        // For unit test no real data is needed, but timestamp is required
+        MTREventIsHistoricalKey : @(NO),
+        MTREventPriorityKey : @(MTREventPriorityInfo),
+        MTREventNumberKey : @(eventNumber++),
+        // Empty payload.
+        MTRDataKey : @ {
+            MTRTypeKey : MTRStructureValueType,
+            MTRValueKey : @[],
+        },
     };
 }
+
 - (void)test038_MTRDeviceMultipleDelegatesInterestedPaths
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -4272,6 +4617,1111 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertEqual(eventsReceived3, 9);
     XCTAssertEqual(attributesReceived4, 36);
     XCTAssertEqual(eventsReceived4, 36);
+}
+
+- (void)test039_GetAllAttributesReport
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // First start with clean slate by removing the MTRDevice and clearing the persisted cache
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+    [sController removeDevice:device];
+    [sController.controllerDataStore clearAllStoredClusterData];
+    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+
+    // Now recreate device and get subscription primed
+    device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+    XCTestExpectation * gotReportEnd = [self expectationWithDescription:@"Report end for delegate"];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    __weak __auto_type weakdelegate = delegate;
+    __block NSUInteger attributesReceived = 0;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        attributesReceived += data.count;
+    };
+    delegate.onReportEnd = ^{
+        [gotReportEnd fulfill];
+        __strong __auto_type strongDelegate = weakdelegate;
+        strongDelegate.onReportEnd = nil;
+    };
+
+    [device addDelegate:delegate queue:queue];
+
+    // Now inject attributes and check that each delegate gets the right set of attributes
+    NSMutableArray * attributeReport = [NSMutableArray array];
+    // Construct 36 attributes with endpoints 1~4, clusters 11 ~ 33, and attributes 111~333
+    for (int i = 1; i <= 4; i++) {
+        for (int j = 1; j <= 3; j++) {
+            for (int k = 1; k <= 3; k++) {
+                int endpointID = i;
+                int clusterID = i * 10 + j;
+                int attributeID = i * 100 + j * 10 + k;
+                int value = attributeID + 10000;
+                [attributeReport addObject:[self _testAttributeResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) attributeID:@(attributeID) value:value]];
+            }
+        }
+    }
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+
+    [self waitForExpectations:@[ gotReportEnd ] timeout:60];
+
+    NSArray * allAttributesReport = [device getAllAttributesReport];
+
+    XCTAssertEqual(allAttributesReport.count, attributeReport.count);
+
+    for (NSDictionary<NSString *, id> * newResponseValueDict in allAttributesReport) {
+        MTRAttributePath * newPath = newResponseValueDict[MTRAttributePathKey];
+        NSDictionary<NSString *, id> * newDataValueDict = newResponseValueDict[MTRDataKey];
+        NSNumber * newValue = newDataValueDict[MTRValueKey];
+        XCTAssertNotNil(newValue);
+
+        for (NSDictionary<NSString *, id> * originalResponseValueDict in attributeReport) {
+            MTRAttributePath * originalPath = originalResponseValueDict[MTRAttributePathKey];
+            // Find same attribute path and compare value
+            if ([newPath isEqual:originalPath]) {
+                NSDictionary<NSString *, id> * originalDataValueDict = originalResponseValueDict[MTRDataKey];
+                NSNumber * originalValue = originalDataValueDict[MTRValueKey];
+                XCTAssertNotNil(originalValue);
+                XCTAssertEqualObjects(newValue, originalValue);
+                continue;
+            }
+        }
+    }
+}
+
+- (void)test040_AttributeValueExpectationSatisfaction
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+
+    __auto_type * testData = @[
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(7),
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(7)
+            },
+            // Equal unsigned integer should satisfy expectation.
+            @"expectedComparison" : @(YES),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(7),
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(9),
+            },
+            // Unequal unsigned integer should not satisfy expectation
+            @"expectedComparison" : @(NO),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(7),
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRSignedIntegerValueType,
+                MTRValueKey : @(7),
+            },
+            // A signed integer does not satisfy expectation for an unsigned integer.
+            @"expectedComparison" : @(NO),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRNullValueType,
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRNullValueType,
+            },
+            // Null satisfies expectation for null.
+            @"expectedComparison" : @(YES),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(7),
+                        }
+                    },
+                ],
+            },
+            // A longer list does not satisfy expectation for a shorter array.
+            @"expectedComparison" : @(NO),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(7),
+                        }
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                ],
+            },
+            // A shorter list does not satisfy expectation for a longer array.
+            @"expectedComparison" : @(NO),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                ],
+            },
+            // An observed array identical to an expected one satisfies the expectation.
+            @"expectedComparison" : @(YES),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                ],
+            },
+            // An array with entries in a different order does not satisfy the expectation.
+            @"expectedComparison" : @(NO),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUTF8StringValueType,
+                            MTRValueKey : @("abc"),
+                        },
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUTF8StringValueType,
+                            MTRValueKey : @("abc"),
+                        },
+                    },
+                ],
+            },
+            // A struct that has the same fields in the same order satisfiess the
+            // expectation.
+            @"expectedComparison" : @(YES),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUTF8StringValueType,
+                            MTRValueKey : @("abc"),
+                        },
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUTF8StringValueType,
+                            MTRValueKey : @("abcd"),
+                        },
+                    },
+                ],
+            },
+            // A struct that has different fields in the same order does not
+            // satisfy the expectation.
+            @"expectedComparison" : @(NO),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUTF8StringValueType,
+                            MTRValueKey : @("abc"),
+                        },
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUTF8StringValueType,
+                            MTRValueKey : @("abc"),
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        },
+                    },
+                ],
+            },
+            // A struct that has the same fields in a different order satisfies
+            // the expectation.
+            @"expectedComparison" : @(YES),
+        },
+    ];
+
+    for (NSDictionary * test in testData) {
+        XCTAssertEqual([device _attributeDataValue:test[@"observed"] satisfiesValueExpectation:test[@"expected"]], [test[@"expectedComparison"] boolValue],
+            "observed: %@, expected: %@", test[@"observed"], test[@"expected"]);
+    }
+}
+
+- (void)test041_AttributeDataValueValidation
+{
+    __auto_type * testData = @[
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRSignedIntegerValueType,
+                MTRValueKey : @(-5),
+            },
+            // -5 is a valid signed integer.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRSignedIntegerValueType,
+                MTRValueKey : @ {},
+            },
+            // A dictionary is not a valid signed integer.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(7),
+            },
+            // 7 is a valid unsigned integer.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @("abc"),
+            },
+            // "abc" is not an unsigned integer.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRBooleanValueType,
+                MTRValueKey : @(YES),
+            },
+            // YES is a boolean.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRBooleanValueType,
+                MTRValueKey : [NSData data],
+            },
+            // NSData is not a boolean integer.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRFloatValueType,
+                MTRValueKey : @(8),
+            },
+            // 8 is a valid float.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRFloatValueType,
+                MTRValueKey : @(8.5),
+            },
+            // 8.5 is a valid float.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRFloatValueType,
+                MTRValueKey : @[],
+            },
+            // An array is not a float.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRDoubleValueType,
+                MTRValueKey : @(180),
+            },
+            // 180 is a valid double.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRDoubleValueType,
+                MTRValueKey : @(9.5),
+            },
+            // 9.5 is a valid double.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRDoubleValueType,
+                MTRValueKey : [NSDate date],
+            },
+            // A date is not a double.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRNullValueType,
+            },
+            // This is a valid null value.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRUTF8StringValueType,
+                MTRValueKey : @("def"),
+            },
+            // "def" is a valid string.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRUTF8StringValueType,
+                MTRValueKey : [NSData data],
+            },
+            // NSData is not a string.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTROctetStringValueType,
+                MTRValueKey : [NSData data],
+            },
+            // NSData is an octet string.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTROctetStringValueType,
+                MTRValueKey : @(7),
+            },
+            // 7 is not an octet string.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTROctetStringValueType,
+                MTRValueKey : @("abc"),
+            },
+            // "abc" is not an octet string.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[],
+            },
+            // This is a valid empty structure.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[],
+            },
+            // This is a valid empty structure.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(7),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRNullValueType
+                        },
+                    },
+                ],
+            },
+            // This is a valid structure, one null field.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRNullValueType
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(9)
+                        },
+                    },
+                ],
+            },
+            // This is a valid structure with two fields.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @(19),
+            },
+            // 19 is not a structure.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRNullValueType
+                        },
+                    },
+                ],
+            },
+            // Field does not have a context tag.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(7),
+                    },
+                ],
+            },
+            // Field does not have a value.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(7),
+                        MTRDataKey : @(5),
+                    },
+                ],
+            },
+            // Field value is a number, not a data-value
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(7),
+                        MTRDataKey : @[],
+                    },
+                ],
+            },
+            // Field value is an array, not a data-value
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(7),
+                        MTRDataKey : @ {},
+                    },
+                ],
+            },
+            // Field value is an invalid data-value
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @("abc"),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRNullValueType
+                        },
+                    },
+                ],
+            },
+            // Tag is not a number.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[],
+            },
+            // This is a valid empty array.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRNullValueType
+                        },
+                    },
+                ],
+            },
+            // This is an array with a single null value in it.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(8),
+                        },
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(10),
+                        },
+                    },
+                ],
+            },
+            // This is an array with two integers in it.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(8),
+                    },
+                ],
+            },
+            // This does not have a proper array-value in the array: missing MTRDataKey.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[ @(7) ],
+            },
+            // This does not have a proper array-value in the array: not a dictionary.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[ @{} ],
+            },
+            // This does not have a proper array-value in the array: empty
+            // dictionary, so no MTRDataKey.
+            @"valid" : @(NO),
+        },
+    ];
+
+    for (NSDictionary * test in testData) {
+        XCTAssertEqual(MTRDataValueDictionaryIsWellFormed(test[@"input"]), [test[@"valid"] boolValue],
+            "input: %@", test[@"input"]);
+    }
+}
+
+- (void)test042_AttributeReportWellFormedness
+{
+    __auto_type * testData = @[
+        @{
+            @"input" : @[],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @(YES),
+                    },
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @(YES),
+                    },
+                },
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(1)],
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                },
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(1)],
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                },
+            ],
+            // Missing both error and data
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @("abc"),
+                    },
+                },
+            ],
+            // Data dictionary is broken.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {},
+            // Input is not an array.
+            @"valid" : @(NO),
+        },
+    ];
+
+    for (NSDictionary * test in testData) {
+        XCTAssertEqual(MTRAttributeReportIsWellFormed(test[@"input"]), [test[@"valid"] boolValue],
+            "input: %@", test[@"input"]);
+    }
+}
+
+- (void)test043_EventReportWellFormedness
+{
+    __auto_type * testData = @[
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+                    MTREventTimestampDateKey : [NSDate now],
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeSystemUpTime),
+                    MTREventSystemUpTimeKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+                    MTREventTimestampDateKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            // Wrong date type
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @("abc"),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeSystemUpTime),
+                    MTREventSystemUpTimeKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            // Wrong type of EventNumber
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @("abc"),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeSystemUpTime),
+                    MTREventSystemUpTimeKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            // Wrong type of EventPriority
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @("abc"),
+                    MTREventSystemUpTimeKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            // Wrong type of EventTimeType
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[ @(5) ],
+            // Wrong type of data entirely.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {},
+            // Not even an array.
+            @"valid" : @(NO),
+        },
+    ];
+
+    for (NSDictionary * test in testData) {
+        XCTAssertEqual(MTREventReportIsWellFormed(test[@"input"]), [test[@"valid"] boolValue],
+            "input: %@", test[@"input"]);
+    }
+}
+
+- (void)test044_InvokeResponseWellFormedness
+{
+    __auto_type * testData = @[
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                },
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                },
+            ],
+            // Multiple responses
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // Empty structure, valid
+                    },
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    @"commandPath" : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    @"data" : @ {
+                        @"type" : @"Structure",
+                        @"value" : @[], // Empty structure, valid
+                    },
+                },
+            ],
+            // Same as the previous test, but not using the SDK string constants
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // Empty structure, valid
+                    },
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                },
+            ],
+            // Having both data and error not valid.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(5),
+                    },
+                },
+            ],
+            // Data is not a struct.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRDataKey : @(6),
+                },
+            ],
+            // Data is not a data-value at all..
+            @"valid" : @(NO),
+        },
+    ];
+
+    for (NSDictionary * test in testData) {
+        XCTAssertEqual(MTRInvokeResponseIsWellFormed(test[@"input"]), [test[@"valid"] boolValue],
+            "input: %@", test[@"input"]);
+    }
 }
 
 @end

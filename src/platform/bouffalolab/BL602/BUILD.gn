@@ -39,6 +39,7 @@ static_library("BL602") {
     "../common/DiagnosticDataProviderImpl.cpp",
     "../common/KeyValueStoreManagerImpl.cpp",
     "../common/PlatformManagerImpl.cpp",
+    "../common/SystemTimeSupport.cpp",
   ]
 
   if (chip_enable_ota_requestor) {
@@ -64,6 +65,8 @@ static_library("BL602") {
 
   if (bouffalo_sdk_component_easyflash_enabled) {
     sources += [ "../common/BLConfig.cpp" ]
+  } else {
+    sources += [ "../common/BLConfig_littlefs.cpp" ]
   }
 
   deps = [
@@ -71,5 +74,6 @@ static_library("BL602") {
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
   ]
+
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 }
