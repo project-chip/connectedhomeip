@@ -227,6 +227,24 @@ def connect_device_over_ble(devCtrl, discriminator, pinCode, nodeId=None):
 
     return nodeId
 
+def connect_device_over_nfc(devCtrl, pinCode, nodeId=None):
+    """
+    Connect to Matter accessory device over NFC
+    :param devCtrl: device controller instance
+    :param pinCode: CHIP device pin code
+    :param nodeId: default value of node ID
+    :return: node ID is provisioning successful, otherwise None
+    """
+    if nodeId is None:
+        nodeId = random.randint(1, 1000000)
+
+    try:
+        devCtrl.ConnectNFC(int(pinCode), int(nodeId))
+    except exceptions.ChipStackException as ex:
+        log.error("Connect device over NFC failed: {}".format(str(ex)))
+        return None
+
+    return nodeId
 
 def close_connection(devCtrl, nodeId):
     """
