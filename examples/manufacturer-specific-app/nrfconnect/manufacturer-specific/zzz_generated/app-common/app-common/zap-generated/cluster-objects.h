@@ -20361,9 +20361,9 @@ namespace HarmonicCurrents {
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::Nullable<chip::app::DataModel::List<
-                    const chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type>>;
+        const chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type>>;
     using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-           chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>>;
+        chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>>;
     using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
         chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>> &;
 
@@ -20376,9 +20376,9 @@ namespace HarmonicPhases {
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::Nullable<chip::app::DataModel::List<
-                    const chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type>>;
+        const chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type>>;
     using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-           chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>>;
+        chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>>;
     using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
         chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>> &;
 
