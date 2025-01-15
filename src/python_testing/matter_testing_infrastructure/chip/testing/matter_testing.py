@@ -1681,24 +1681,6 @@ class MatterBaseTest(base_test.BaseTestClass):
             logging.info("========= EOF on STDIN =========")
             return None
 
-    def create_new_controller_on_new_fabric(self, nodeid: int = 2, vendorid: bytes = 0xFFF1, fabricid: int = 1):
-        """
-        Create new fabric and controller for commissioning
-        """
-        new_cert_auth = self.certificate_authority_manager.NewCertificateAuthority()
-        new_fabric_admin = new_cert_auth.NewFabricAdmin(vendorId=vendorid, fabricId=fabricid)
-        new_controller = new_fabric_admin.NewController(nodeId=nodeid)
-        return new_controller
-
-    def create_new_controller_on_existing_fabric(self, nodeid: int = 2):
-        """
-        Create new controller on an already established fabric
-        """
-        current_fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
-        new_controller = current_fabric_admin.NewController(nodeId=nodeid)
-        return new_controller
-
-
 def generate_mobly_test_config(matter_test_config: MatterTestConfig):
     test_run_config = TestRunConfig()
     # We use a default name. We don't use Mobly YAML configs, so that we can be

@@ -315,6 +315,21 @@ class CertificateAuthorityManager:
 
         return ca
 
+    def create_new_controller(self, vendorid: int = 0xFFF1, fabricId: int = 1, new_fabric: bool = True, CaList: int = 0, nodeid: int = 2):
+        if new_fabric:
+            """
+            Create new fabric and controller for commissioning
+            """
+            new_cert_auth = self.NewCertificateAuthority()
+            new_fabric_admin = new_cert_auth.NewFabricAdmin(vendorId=vendorid, fabricId=fabricId)
+            return new_fabric_admin.NewController(nodeId=nodeid)
+            
+        else:
+            """
+            Create new controller on an already established fabric
+            """
+            return self.activeCaList[CaList].adminList[CaList].NewController(nodeId=nodeid)
+
     def Shutdown(self):
         ''' Shuts down all active CertificateAuthority instances tracked by this manager, before shutting itself down.
 
