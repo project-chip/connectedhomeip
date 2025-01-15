@@ -83,14 +83,14 @@ public:
         //   - we should figure where the extra const override is used
         //   - we should try to avoid having such footguns. This list template-explosion seems
         //     dangerous for flash.
-        inline CHIP_ERROR Encode(uint64_t const & aArg) const { return Encode((uint64_t) aArg); }
-        inline CHIP_ERROR Encode(uint64_t & aArg) const { return Encode((uint64_t) aArg); }
-        inline CHIP_ERROR Encode(uint32_t const & aArg) const { return Encode((uint32_t) aArg); }
-        inline CHIP_ERROR Encode(uint32_t & aArg) const { return Encode((uint32_t) aArg); }
-        inline CHIP_ERROR Encode(uint16_t const & aArg) const { return Encode((uint16_t) aArg); }
-        inline CHIP_ERROR Encode(uint16_t & aArg) const { return Encode((uint16_t) aArg); }
-        inline CHIP_ERROR Encode(uint8_t const & aArg) const { return Encode((uint8_t) aArg); }
-        inline CHIP_ERROR Encode(uint8_t & aArg) const { return Encode((uint8_t) aArg); }
+        //
+        // This relies on TLV numbers always being encoded as 64-bit value
+        inline CHIP_ERROR Encode(uint32_t const & aArg) const { return Encode<uint64_t>(aArg); }
+        inline CHIP_ERROR Encode(uint32_t & aArg) const { return Encode<uint64_t>(aArg); }
+        inline CHIP_ERROR Encode(uint16_t const & aArg) const { return Encode<uint64_t>(aArg); }
+        inline CHIP_ERROR Encode(uint16_t & aArg) const { return Encode<uint64_t>(aArg); }
+        inline CHIP_ERROR Encode(uint8_t const & aArg) const { return Encode<uint64_t>(aArg); }
+        inline CHIP_ERROR Encode(uint8_t & aArg) const { return Encode<uint64_t>(aArg); }
 
     private:
         AttributeValueEncoder & mAttributeValueEncoder;
