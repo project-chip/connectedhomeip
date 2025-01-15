@@ -17,9 +17,6 @@
 #include <lib/support/CodeUtils.h>
 #include <system/PlatformEventSupport.h>
 #include <system/SystemLayer.h>
-#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
-#include <system/PlatformLockSupport.h>
-#endif
 
 namespace chip {
 namespace System {
@@ -33,17 +30,6 @@ CHIP_ERROR Layer::ScheduleLambdaBridge(LambdaBridge && bridge)
     }
     return lReturn;
 }
-
-#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
-CHIP_ERROR Layer::RunWithMatterContextLock(std::function<CHIP_ERROR()> nonBlockingFunc)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    PlatformLocking::LockMatterStack();
-    err = nonBlockingFunc();
-    PlatformLocking::UnlockMatterStack();
-    return err;
-}
-#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
 } // namespace System
 } // namespace chip

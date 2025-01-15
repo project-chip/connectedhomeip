@@ -52,6 +52,10 @@
 #include <ev.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
 
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+#include <system/PlatformLockSupport.h>
+#endif
+
 namespace chip {
 namespace System {
 
@@ -227,11 +231,20 @@ public:
      *
      * CRITICAL: The function should be non-blocking to avoid dead lock.
      *
-     * @param[in] nonBlockingFunc The non-blocking function to be called with Matter stack lock held.
+     * @param[in] nonBlockingFunc The non-blocking lambda to be called with Matter stack lock held.
      *
      * @retval The return value of the non-blocking function
      */
-    CHIP_ERROR RunWithMatterContextLock(std::function<CHIP_ERROR()> nonBlockingFunc);
+    template <typename Lambda>
+    CHIP_ERROR RunWithMatterContextLock(const Lambda & nonBlockingFunc)
+    {
+        static_assert(std::is_invocable_v<Lambda>, "lambda argument must be an invocable with no arguments");
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        PlatformLocking::LockMatterStack();
+        err = nonBlockingFunc();
+        PlatformLocking::UnlockMatterStack();
+        return err;
+    }
 #endif
 
 private:
