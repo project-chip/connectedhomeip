@@ -157,6 +157,7 @@
 | CameraAvSettingsUserLevelManagement                                 | 0x0552 |
 | WebRTCTransportProvider                                             | 0x0553 |
 | WebRTCTransportRequestor                                            | 0x0554 |
+| PushAvStreamTransport                                               | 0x0555 |
 | Chime                                                               | 0x0556 |
 | EcosystemInformation                                                | 0x0750 |
 | CommissionerControl                                                 | 0x0751 |
@@ -14889,6 +14890,271 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster PushAvStreamTransport                                       | 0x0555 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * AllocatePushTransport                                             |   0x00 |
+| * DeallocatePushTransport                                           |   0x02 |
+| * ModifyPushTransport                                               |   0x03 |
+| * SetTransportStatus                                                |   0x04 |
+| * ManuallyTriggerTransport                                          |   0x05 |
+| * FindTransport                                                     |   0x06 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * SupportedContainerFormats                                         | 0x0000 |
+| * SupportedIngestMethods                                            | 0x0001 |
+| * CurrentConnections                                                | 0x0002 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+| * PushTransportBegin                                                | 0x0000 |
+| * PushTransportEnd                                                  | 0x0001 |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command AllocatePushTransport
+ */
+class PushAvStreamTransportAllocatePushTransport : public ClusterCommand
+{
+public:
+    PushAvStreamTransportAllocatePushTransport(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("allocate-push-transport", credsIssuerConfig), mComplex_TransportOptions(&mRequest.transportOptions)
+    {
+        AddArgument("TransportOptions", &mComplex_TransportOptions);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::PushAvStreamTransport::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::PushAvStreamTransport::Commands::AllocatePushTransport::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::PushAvStreamTransport::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::PushAvStreamTransport::Commands::AllocatePushTransport::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::PushAvStreamTransport::Commands::AllocatePushTransport::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::PushAvStreamTransport::Structs::TransportOptionsStruct::Type>
+        mComplex_TransportOptions;
+};
+
+/*
+ * Command DeallocatePushTransport
+ */
+class PushAvStreamTransportDeallocatePushTransport : public ClusterCommand
+{
+public:
+    PushAvStreamTransportDeallocatePushTransport(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("deallocate-push-transport", credsIssuerConfig)
+    {
+        AddArgument("ConnectionID", 0, UINT16_MAX, &mRequest.connectionID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::PushAvStreamTransport::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::PushAvStreamTransport::Commands::DeallocatePushTransport::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::PushAvStreamTransport::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::PushAvStreamTransport::Commands::DeallocatePushTransport::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::PushAvStreamTransport::Commands::DeallocatePushTransport::Type mRequest;
+};
+
+/*
+ * Command ModifyPushTransport
+ */
+class PushAvStreamTransportModifyPushTransport : public ClusterCommand
+{
+public:
+    PushAvStreamTransportModifyPushTransport(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("modify-push-transport", credsIssuerConfig), mComplex_TransportOptions(&mRequest.transportOptions)
+    {
+        AddArgument("ConnectionID", 0, UINT16_MAX, &mRequest.connectionID);
+        AddArgument("TransportOptions", &mComplex_TransportOptions);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::PushAvStreamTransport::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::PushAvStreamTransport::Commands::ModifyPushTransport::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::PushAvStreamTransport::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::PushAvStreamTransport::Commands::ModifyPushTransport::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::PushAvStreamTransport::Commands::ModifyPushTransport::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::PushAvStreamTransport::Structs::TransportOptionsStruct::Type>
+        mComplex_TransportOptions;
+};
+
+/*
+ * Command SetTransportStatus
+ */
+class PushAvStreamTransportSetTransportStatus : public ClusterCommand
+{
+public:
+    PushAvStreamTransportSetTransportStatus(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-transport-status", credsIssuerConfig)
+    {
+        AddArgument("ConnectionID", 0, UINT16_MAX, &mRequest.connectionID);
+        AddArgument("TransportStatus", 0, UINT8_MAX, &mRequest.transportStatus);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::PushAvStreamTransport::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::PushAvStreamTransport::Commands::SetTransportStatus::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::PushAvStreamTransport::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::PushAvStreamTransport::Commands::SetTransportStatus::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::PushAvStreamTransport::Commands::SetTransportStatus::Type mRequest;
+};
+
+/*
+ * Command ManuallyTriggerTransport
+ */
+class PushAvStreamTransportManuallyTriggerTransport : public ClusterCommand
+{
+public:
+    PushAvStreamTransportManuallyTriggerTransport(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("manually-trigger-transport", credsIssuerConfig), mComplex_TimeControl(&mRequest.timeControl)
+    {
+        AddArgument("ConnectionID", 0, UINT16_MAX, &mRequest.connectionID);
+        AddArgument("ActivationReason", 0, UINT8_MAX, &mRequest.activationReason);
+        AddArgument("TimeControl", &mComplex_TimeControl, "", Argument::kOptional);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::PushAvStreamTransport::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::PushAvStreamTransport::Commands::ManuallyTriggerTransport::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::PushAvStreamTransport::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::PushAvStreamTransport::Commands::ManuallyTriggerTransport::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::PushAvStreamTransport::Commands::ManuallyTriggerTransport::Type mRequest;
+    TypedComplexArgument<
+        chip::Optional<chip::app::Clusters::PushAvStreamTransport::Structs::TransportMotionTriggerTimeControlStruct::Type>>
+        mComplex_TimeControl;
+};
+
+/*
+ * Command FindTransport
+ */
+class PushAvStreamTransportFindTransport : public ClusterCommand
+{
+public:
+    PushAvStreamTransportFindTransport(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("find-transport", credsIssuerConfig)
+    {
+        AddArgument("ConnectionID", 0, UINT16_MAX, &mRequest.connectionID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::PushAvStreamTransport::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::PushAvStreamTransport::Commands::FindTransport::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::PushAvStreamTransport::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::PushAvStreamTransport::Commands::FindTransport::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::PushAvStreamTransport::Commands::FindTransport::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster Chime                                                       | 0x0556 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -27513,6 +27779,80 @@ void registerClusterWebRTCTransportRequestor(Commands & commands, CredentialIssu
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterPushAvStreamTransport(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::PushAvStreamTransport;
+
+    const char * clusterName = "PushAvStreamTransport";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                            //
+        make_unique<PushAvStreamTransportAllocatePushTransport>(credsIssuerConfig),    //
+        make_unique<PushAvStreamTransportDeallocatePushTransport>(credsIssuerConfig),  //
+        make_unique<PushAvStreamTransportModifyPushTransport>(credsIssuerConfig),      //
+        make_unique<PushAvStreamTransportSetTransportStatus>(credsIssuerConfig),       //
+        make_unique<PushAvStreamTransportManuallyTriggerTransport>(credsIssuerConfig), //
+        make_unique<PushAvStreamTransportFindTransport>(credsIssuerConfig),            //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "supported-container-formats", Attributes::SupportedContainerFormats::Id,
+                                   credsIssuerConfig),                                                                         //
+        make_unique<ReadAttribute>(Id, "supported-ingest-methods", Attributes::SupportedIngestMethods::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "current-connections", Attributes::CurrentConnections::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::PushAvStreamTransport::SupportedContainerFormatsBitmap>>>(
+            Id, "supported-container-formats", 0, UINT8_MAX, Attributes::SupportedContainerFormats::Id,
+            WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::PushAvStreamTransport::SupportedIngestMethodsBitmap>>>(
+            Id, "supported-ingest-methods", 0, UINT8_MAX, Attributes::SupportedIngestMethods::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint16_t>>>(
+            Id, "current-connections", Attributes::CurrentConnections::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                  //
+        make_unique<SubscribeAttribute>(Id, "supported-container-formats", Attributes::SupportedContainerFormats::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "supported-ingest-methods", Attributes::SupportedIngestMethods::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "current-connections", Attributes::CurrentConnections::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                              //
+        make_unique<ReadEvent>(Id, "push-transport-begin", Events::PushTransportBegin::Id, credsIssuerConfig),      //
+        make_unique<ReadEvent>(Id, "push-transport-end", Events::PushTransportEnd::Id, credsIssuerConfig),          //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                         //
+        make_unique<SubscribeEvent>(Id, "push-transport-begin", Events::PushTransportBegin::Id, credsIssuerConfig), //
+        make_unique<SubscribeEvent>(Id, "push-transport-end", Events::PushTransportEnd::Id, credsIssuerConfig),     //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterChime(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::Chime;
@@ -28422,6 +28762,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterCameraAvSettingsUserLevelManagement(commands, credsIssuerConfig);
     registerClusterWebRTCTransportProvider(commands, credsIssuerConfig);
     registerClusterWebRTCTransportRequestor(commands, credsIssuerConfig);
+    registerClusterPushAvStreamTransport(commands, credsIssuerConfig);
     registerClusterChime(commands, credsIssuerConfig);
     registerClusterEcosystemInformation(commands, credsIssuerConfig);
     registerClusterCommissionerControl(commands, credsIssuerConfig);

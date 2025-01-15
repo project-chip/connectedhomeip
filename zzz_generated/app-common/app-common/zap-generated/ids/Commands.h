@@ -1981,6 +1981,44 @@ static constexpr CommandId Id = 0x00000004;
 } // namespace Commands
 } // namespace WebRTCTransportRequestor
 
+namespace PushAvStreamTransport {
+namespace Commands {
+
+namespace AllocatePushTransport {
+static constexpr CommandId Id = 0x00000000;
+} // namespace AllocatePushTransport
+
+namespace AllocatePushTransportResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace AllocatePushTransportResponse
+
+namespace DeallocatePushTransport {
+static constexpr CommandId Id = 0x00000002;
+} // namespace DeallocatePushTransport
+
+namespace ModifyPushTransport {
+static constexpr CommandId Id = 0x00000003;
+} // namespace ModifyPushTransport
+
+namespace SetTransportStatus {
+static constexpr CommandId Id = 0x00000004;
+} // namespace SetTransportStatus
+
+namespace ManuallyTriggerTransport {
+static constexpr CommandId Id = 0x00000005;
+} // namespace ManuallyTriggerTransport
+
+namespace FindTransport {
+static constexpr CommandId Id = 0x00000006;
+} // namespace FindTransport
+
+namespace FindTransportResponse {
+static constexpr CommandId Id = 0x00000007;
+} // namespace FindTransportResponse
+
+} // namespace Commands
+} // namespace PushAvStreamTransport
+
 namespace Chime {
 namespace Commands {
 
