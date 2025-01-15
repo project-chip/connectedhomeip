@@ -28,7 +28,6 @@ from __future__ import absolute_import, print_function
 
 import asyncio
 import builtins
-import os
 from ctypes import CFUNCTYPE, Structure, c_bool, c_char_p, c_uint16, c_uint32, c_void_p, py_object, pythonapi
 from threading import Condition, Lock
 from typing import Any, Optional
@@ -259,16 +258,6 @@ class ChipStack(object):
     def LocateChipDLL(self):
         self._loadLib()
         return self._chipDLLPath
-
-    # ----- Private Members -----
-    def _AllDirsToRoot(self, dir):
-        dir = os.path.abspath(dir)
-        while True:
-            yield dir
-            parent = os.path.dirname(dir)
-            if parent == "" or parent == dir:
-                break
-            dir = parent
 
     def _loadLib(self):
         if self._ChipStackLib is None:
