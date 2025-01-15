@@ -34,24 +34,6 @@ config:
         defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
 
 tests:
-    - label: "Precondition: Reset Devices to factory defaults"
-      cluster: "SystemCommands"
-      PICS: PICS_SDK_CI_ONLY
-      command: "FactoryReset"
-
-    - label: "Precondition: Reset Devices to factory defaults"
-      verification: |
-          Reset Devices to factory defaults
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
-      arguments:
-          values:
-              - name: "message"
-                value: "Factory Reset the DUT and enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
-
     - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
