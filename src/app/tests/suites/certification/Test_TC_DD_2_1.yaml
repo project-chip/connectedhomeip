@@ -234,7 +234,7 @@ tests:
       verification: |
          Out of Scope : SoftAP commissioning is currently not supported.
       disabled: true
-   
+
     - label: "Step 12: TH scans and finds the DUT SSID"
       PICS: MCORE.COM.WIFI && MCORE.DD.IE
       verification: |

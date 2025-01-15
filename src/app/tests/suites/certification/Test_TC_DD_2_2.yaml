@@ -48,7 +48,7 @@ tests:
       verification: |
           Initiate the Matter announcement procedure on the TH using BLE transport, and the TH must start sending BLE advertisements successfully.
           ./chip-all-clusters-app --wifi  --discriminator 3841
-          
+
           Verify in TH on the commissionee side:
 
           [1657221603.350406][368108:368108] CHIP:DL: Device Configuration:
@@ -170,7 +170,7 @@ tests:
            [1651743348.446452][5072:5072] CHIP:IN: New secure session created for device <FFFFFFFB00000000, 0>, LSID:2138 PSID:14881!
            [1651743348.446962][5072:5072] CHIP:SVR: Commissioning completed session establishment step
       disabled: true
- 
+
     - label:
           "Step 3a: TH is configured with the default channel to be Channel 6 in
           2.4GHz. If TH has a 5GHz Wi-Fi radio, TH is configured with an
@@ -200,26 +200,26 @@ tests:
     - label: "Step 4a: TH starts SoftAP and begin matter announcement procedure"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope : SoftAP commissioning currently not supported 
+          Out of Scope : SoftAP commissioning currently not supported
       disabled: true
 
     - label:
           "Step 4b: DUT starts Wi-Fi scan of all 2.4 GHz Wi-Fi channels allowed per its operational regulatory domain (channels 1, 6, and 11 are preferred)"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope : SoftAP commissioning currently not supported 
+          Out of Scope : SoftAP commissioning currently not supported
       disabled: true
-   
+
     - label: "Step 5a: DUT scans using Wi-Fi in background"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope : SoftAP commissioning currently not supported 
+          Out of Scope : SoftAP commissioning currently not supported
       disabled: true
 
     - label: "Step 5b: TH starts SoftAP and begin matter announcement procedure"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope : SoftAP commissioning currently not supported 
+          Out of Scope : SoftAP commissioning currently not supported
       disabled: true
     - label:
           "Step 5c: DUT must find TH and provide onboarding data for
@@ -227,14 +227,14 @@ tests:
           as set on TH"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-         Out of Scope : SoftAP commissioning currently not supported 
-      disabled: true 
+         Out of Scope : SoftAP commissioning currently not supported
+      disabled: true
 
     - label:
           "Step 6: With DUT and TH connected to the same network over IP, DUT
           performs service discovery using DNS-SD"
       verification: |
-          TH is in commissioning mode and discoverable by DUT over IP through DNS-SD advertisements. 
+          TH is in commissioning mode and discoverable by DUT over IP through DNS-SD advertisements.
           This can also be verified using through the DUT's pairing command over IP.
 
           Verify in TH as commissionee side:
