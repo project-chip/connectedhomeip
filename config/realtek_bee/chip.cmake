@@ -10,10 +10,7 @@ set(chip-gn chip-gn)
 
 set(matter_enable_rotating_id 1)
 
-#get_filename_component(SDK_ROOT ${bee_sdk_root} REALPATH)
-#get_filename_component(CHIP_ROOT ${chip_dir} REALPATH)
 get_filename_component(CHIP_OUTPUT ${chip_dir_output} REALPATH)
-#get_filename_component(LIB_ROOT ${prj_root}/GCC-RELEASE/project_hp/asdk/lib/application REALPATH)
 
 include(ExternalProject)
 
@@ -25,11 +22,8 @@ list(
 
     -DCHIP_PROJECT=1
     -DCONFIG_USE_MBEDTLS_ROM_ALG
-#    -DCONFIG_FUNCION_O0_OPTIMIZE
-#    -DCONFIG_ENABLE_FACTORY_DATA=1
     -DDM_ODM_SUPPORT_TYPE=32
     -DCHIP_DEVICE_LAYER_TARGET=Realtek_bee
-#    -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
     -D_POSIX_REALTIME_SIGNALS
     -DCHIP_SHELL_MAX_TOKENS=11
 )
@@ -72,20 +66,13 @@ list(
     ${CHIP_ROOT}/src/app
     ${CHIP_ROOT}/src/platform/Realtek_bee
     ${CHIP_ROOT}/src/platform/OpenThread
-#    ${CHIP_ROOT}/src/lwip/bee
-#    ${CHIP_ROOT}/src/lwip/bee/arch
-#    ${CHIP_ROOT}/third_party/lwip/repo/lwip/src/include
-#    ${CHIP_ROOT}/third_party/lwip/repo/lwip/src/include/lwip
-#    ${CHIP_ROOT}/third_party/lwip/repo/lwip/src/include/lwip/priv
     ${CHIP_ROOT}/third_party/nlassert/repo/include
     ${CHIP_ROOT}/third_party/nlio/repo/include
-#    ${CHIP_ROOT}/third_party/nlunit-test/repo/src
 )
 
 execute_process(
     COMMAND echo "mkdir CHIP output folder ..."
     COMMAND mkdir -p ${CHIP_OUTPUT}
-    #COMMAND sudo chmod 777 ${CHIP_OUTPUT}
 )
 
 foreach(tmp IN LISTS CHIP_CFLAGS)
@@ -146,7 +133,6 @@ endif (matter_enable_persistentstorage_audit)
 
 # Build RPC
 if (matter_enable_rpc)
-#string(APPEND CHIP_GN_ARGS "remove_default_configs = [\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:cpp17\"]\n")
 string(APPEND CHIP_GN_ARGS "chip_build_pw_rpc_lib = true\n")
 string(APPEND CHIP_GN_ARGS "pw_log_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic\"\n")
 string(APPEND CHIP_GN_ARGS "pw_assert_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log:check_backend\"\n")

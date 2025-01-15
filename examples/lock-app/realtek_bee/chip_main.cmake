@@ -215,10 +215,6 @@ target_include_directories(
     ${chip_dir}/third_party/nlio/repo/include/
 )
 
-#add_custom_command(TARGET ${chip_main} PRE_LINK
-#    COMMAND cp -f ${chip_dir_output}/lib/libPwRpc.a ${matter_output_path}/lib
-#)
-
 if (matter_enable_rpc)
 target_link_libraries(${chip_main} PUBLIC
     attributes_service.nanopb_rpc
@@ -297,10 +293,3 @@ list(
 )
 target_compile_definitions(${chip_main} PRIVATE ${chip_main_flags} )
 target_compile_options(${chip_main} PRIVATE ${chip_main_cpp_flags})
-
-# move static library post build command
-#add_custom_command(
-#    TARGET ${chip_main}
-#    POST_BUILD
-#    COMMAND cp chip/lib/libCHIP.a ${matter_output_path}/lib
-#)

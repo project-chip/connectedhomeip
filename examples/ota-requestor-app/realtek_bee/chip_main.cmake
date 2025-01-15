@@ -83,7 +83,6 @@ list(
     -DCHIP_PROJECT=1
     -DCHIP_DEVICE_LAYER_TARGET=Realtek_bee
     -DCHIP_HAVE_CONFIG_H
-#    -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
 )
 
 if (matter_dac_key_encryption)
@@ -111,15 +110,7 @@ list(
 
 	-Wno-unused-parameter
 	-std=gnu++17
-#	-std=c++14
 	-fno-rtti
 )
 target_compile_definitions(${chip_main} PRIVATE ${chip_main_flags} )
 target_compile_options(${chip_main} PRIVATE ${chip_main_cpp_flags})
-
-# move static library post build command
-#add_custom_command(
-#    TARGET ${chip_main}
-#    POST_BUILD
-#    COMMAND cp chip/lib/libCHIP.a ${matter_output_path}/lib
-#)

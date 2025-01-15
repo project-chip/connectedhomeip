@@ -352,4 +352,4 @@
 [submodule "third_party/openthread/ot-realtek"]
 	path = third_party/openthread/ot-realtek
 	url = https://github.com/rtkconnectivity/ot-realtek.git
-    platforms = realtek_bee
+	platforms = realtek_bee
