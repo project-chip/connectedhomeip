@@ -185,11 +185,11 @@ tests:
           2.4GHz band."
       PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_PAF
       verification: |
-         WIFI - PAF feature is out of scope for V1.4
+          WIFI - PAF feature is out of scope for V1.4
 
-          [Configuration command to be filled by NXP]
+           [Configuration command to be filled by NXP]
 
-          Configure the AP to the PAF working channel and connect TH to AP
+           Configure the AP to the PAF working channel and connect TH to AP
       disabled: true
 
     - label:
@@ -208,22 +208,22 @@ tests:
     - label: "Step 9: DUT begins sending Wi-Fi PAF Publish messages."
       PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_PAF
       verification: |
-         WIFI - PAF feature is out of scope for V1.4
+          WIFI - PAF feature is out of scope for V1.4
 
-          [Verification command to be filled by NXP]
+           [Verification command to be filled by NXP]
 
-          * 2.4g:
-          $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=2437
-          * 5g, FCC:
-          $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5220
-          * 5g ETSI:
-          $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5745
+           * 2.4g:
+           $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=2437
+           * 5g, FCC:
+           $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5220
+           * 5g ETSI:
+           $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5745
       disabled: true
 
     - label: "Step 10: TH scans and finds the DUT SSID"
       PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-         Out of Scope : SoftAP commissioning is currently not supported.
+          Out of Scope : SoftAP commissioning is currently not supported.
       disabled: true
 
     - label:
@@ -232,7 +232,7 @@ tests:
           command (or reset manually)"
       PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-         Out of Scope : SoftAP commissioning is currently not supported.
+          Out of Scope : SoftAP commissioning is currently not supported.
       disabled: true
 
     - label: "Step 12: TH scans and finds the DUT SSID"

@@ -68,22 +68,22 @@ tests:
           documentation."
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
-         Use a Commissionee with a QR code that has the Custom Flow field set to 2,
-         supports BLE for its Discovery Capability, and ensures the Version bit string
-         follows the current Matter specification. Pass the QR code into the DUT during the commissioning process.
-         ./chip-all-clusters-app --custom-flow 2 --capabilities 2
-         On the TH (All-Clusters App), verify that the user has a QR code available to pass into the DUT
-          [1657235055.253604][370941:370941] CHIP:-: ==== Onboarding payload for Custom Commissioning Flows ====
-          [1657235055.253688][370941:370941] CHIP:SVR: SetupQRCode: [MT:-24J0YXE00KA0648G00]
-          [1657235055.253736][370941:370941] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1657235055.253774][370941:370941] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0YXE00KA0648G00
+          Use a Commissionee with a QR code that has the Custom Flow field set to 2,
+          supports BLE for its Discovery Capability, and ensures the Version bit string
+          follows the current Matter specification. Pass the QR code into the DUT during the commissioning process.
+          ./chip-all-clusters-app --custom-flow 2 --capabilities 2
+          On the TH (All-Clusters App), verify that the user has a QR code available to pass into the DUT
+           [1657235055.253604][370941:370941] CHIP:-: ==== Onboarding payload for Custom Commissioning Flows ====
+           [1657235055.253688][370941:370941] CHIP:SVR: SetupQRCode: [MT:-24J0YXE00KA0648G00]
+           [1657235055.253736][370941:370941] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+           [1657235055.253774][370941:370941] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0YXE00KA0648G00
       disabled: true
 
     - label: "Step 1b: Scan the QR code from the previous step using the DUT."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
-         Scan the QR code generated in the previous step using the DUT. Verify that the QR code is scanned successfully.
-         The chip-tool does not support physically scanning QR codes.
+          Scan the QR code generated in the previous step using the DUT. Verify that the QR code is scanned successfully.
+          The chip-tool does not support physically scanning QR codes.
       disabled: true
 
     - label: "Step 1c: DUT parses QR code."

@@ -123,52 +123,52 @@ tests:
           as set on TH"
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
-           DUT must detect the TH and retrieve the onboarding data for validation
-           1. Discover commissionables over BLE using DUT=chip-tool pairing command
-           Verify in TH as commissionee side:
-           [1651743346.152716][5072:5075] CHIP:DL: Device E4:5F:01:0F:3B:B1 (Path: /org/bluez/hci0/dev_E4_5F_01_0F_3B_B1) Connected
-           [1651743347.908807][5072:5075] CHIP:DL: BluezCharacteristicAcquireWrite is called, conn: 0xffffa0043700
-           [1651743347.911151][5072:5075] CHIP:DL: c1 BluezCharacteristicWriteFD mtu, 517
-           [1651743347.911349][5072:5075] CHIP:BLE: Write request received debug 0xffffa0043700
-           [1651743347.911754][5072:5072] CHIP:BLE: local and remote recv window sizes = 6
-           [1651743347.911829][5072:5072] CHIP:BLE: selected BTP version 4
-           [1651743347.911877][5072:5072] CHIP:BLE: using BTP fragment sizes rx 244 / tx 244.
-           [1651743348.006770][5072:5075] CHIP:DL: CHIPoBLE subscribe received
-           [1651743348.007026][5072:5072] CHIP:IN: BLE EndPoint 0xaaaab7bb3c20 Connection Complete
-           [1651743348.007132][5072:5072] CHIP:DL: HandlePlatformSpecificBLEEvent 32778
-           [1651743348.007196][5072:5072] CHIP:DL: Receive kCHIPoBLEConnectionEstablished
-           [1651743348.150980][5072:5075] CHIP:BLE: Indication confirmation, 0xffffa0043700
-           [1651743348.199997][5072:5075] CHIP:DL: c1 BluezCharacteristicWriteFD mtu, 517
-           [1651743348.200614][5072:5075] CHIP:BLE: Write request received debug 0xffffa0043700
-           [1651743348.201013][5072:5072] CHIP:EM: Received message of type 0x20 with protocolId (0, 0) and MessageCounter:3306320356 on exchange 29381r
-           [1651743348.201117][5072:5072] CHIP:EM: Handling via exchange: 29381r, Delegate: 0xaaaab7bb2a90
-           [1651743348.201191][5072:5072] CHIP:SC: Received PBKDF param request
-           [1651743348.201280][5072:5072] CHIP:SC: Peer assigned session ID 14881
-           [1651743348.201349][5072:5072] CHIP:SC: Found MRP parameters in the message
-           [1651743348.201520][5072:5072] CHIP:SC: Including MRP parameters in PBKDF param response
-           [1651743348.201884][5072:5072] CHIP:IN: Prepared unauthenticated message 0xffffdcf2ef78 to 0x0000000000000000 (0)  of type 0x21 and protocolId (0, 0) on exchange 29381r with MessageCounter:2627159088.
-           [1651743348.201989][5072:5072] CHIP:IN: Sending unauthenticated msg 0xffffdcf2ef78 with MessageCounter:2627159088 to 0x0000000000000000 at monotonic time: 0000000000FF6731 msec
-           [1651743348.202196][5072:5072] CHIP:SC: Sent PBKDF param response
-           [1651743348.298384][5072:5075] CHIP:BLE: Indication confirmation, 0xffffa0043700
-           [1651743348.299274][5072:5075] CHIP:DL: c1 BluezCharacteristicWriteFD mtu, 517
-           [1651743348.300132][5072:5075] CHIP:BLE: Write request received debug 0xffffa0043700
-           [1651743348.300571][5072:5072] CHIP:EM: Received message of type 0x22 with protocolId (0, 0) and MessageCounter:3306320357 on exchange 29381r
-           [1651743348.300655][5072:5072] CHIP:EM: Found matching exchange: 29381r, Delegate: 0xaaaab7bb2a90
-           [1651743348.300741][5072:5072] CHIP:SC: Received spake2p msg1
-           [1651743348.304696][5072:5072] CHIP:IN: Prepared unauthenticated message 0xffffdcf2ee58 to 0x0000000000000000 (0)  of type 0x23 and protocolId (0, 0) on exchange 29381r with MessageCounter:2627159089.
-           [1651743348.304817][5072:5072] CHIP:IN: Sending unauthenticated msg 0xffffdcf2ee58 with MessageCounter:2627159089 to 0x0000000000000000 at monotonic time: 0000000000FF6798 msec
-           [1651743348.305007][5072:5072] CHIP:SC: Sent spake2p msg2
-           [1651743348.444144][5072:5075] CHIP:BLE: Indication confirmation, 0xffffa0043700
-           [1651743348.444992][5072:5075] CHIP:DL: c1 BluezCharacteristicWriteFD mtu, 517
-           [1651743348.445608][5072:5075] CHIP:BLE: Write request received debug 0xffffa0043700
-           [1651743348.445888][5072:5072] CHIP:EM: Received message of type 0x24 with protocolId (0, 0) and MessageCounter:3306320358 on exchange 29381r
-           [1651743348.445943][5072:5072] CHIP:EM: Found matching exchange: 29381r, Delegate: 0xaaaab7bb2a90
-           [1651743348.446001][5072:5072] CHIP:SC: Received spake2p msg3
-           [1651743348.446130][5072:5072] CHIP:SC: Sending status report. Protocol code 0, exchange 29381
-           [1651743348.446202][5072:5072] CHIP:IN: Prepared unauthenticated message 0xffffdcf2eea8 to 0x0000000000000000 (0)  of type 0x40 and protocolId (0, 0) on exchange 29381r with MessageCounter:2627159090.
-           [1651743348.446262][5072:5072] CHIP:IN: Sending unauthenticated msg 0xffffdcf2eea8 with MessageCounter:2627159090 to 0x0000000000000000 at monotonic time: 0000000000FF6825 msec
-           [1651743348.446452][5072:5072] CHIP:IN: New secure session created for device <FFFFFFFB00000000, 0>, LSID:2138 PSID:14881!
-           [1651743348.446962][5072:5072] CHIP:SVR: Commissioning completed session establishment step
+          DUT must detect the TH and retrieve the onboarding data for validation
+          1. Discover commissionables over BLE using DUT=chip-tool pairing command
+          Verify in TH as commissionee side:
+          [1651743346.152716][5072:5075] CHIP:DL: Device E4:5F:01:0F:3B:B1 (Path: /org/bluez/hci0/dev_E4_5F_01_0F_3B_B1) Connected
+          [1651743347.908807][5072:5075] CHIP:DL: BluezCharacteristicAcquireWrite is called, conn: 0xffffa0043700
+          [1651743347.911151][5072:5075] CHIP:DL: c1 BluezCharacteristicWriteFD mtu, 517
+          [1651743347.911349][5072:5075] CHIP:BLE: Write request received debug 0xffffa0043700
+          [1651743347.911754][5072:5072] CHIP:BLE: local and remote recv window sizes = 6
+          [1651743347.911829][5072:5072] CHIP:BLE: selected BTP version 4
+          [1651743347.911877][5072:5072] CHIP:BLE: using BTP fragment sizes rx 244 / tx 244.
+          [1651743348.006770][5072:5075] CHIP:DL: CHIPoBLE subscribe received
+          [1651743348.007026][5072:5072] CHIP:IN: BLE EndPoint 0xaaaab7bb3c20 Connection Complete
+          [1651743348.007132][5072:5072] CHIP:DL: HandlePlatformSpecificBLEEvent 32778
+          [1651743348.007196][5072:5072] CHIP:DL: Receive kCHIPoBLEConnectionEstablished
+          [1651743348.150980][5072:5075] CHIP:BLE: Indication confirmation, 0xffffa0043700
+          [1651743348.199997][5072:5075] CHIP:DL: c1 BluezCharacteristicWriteFD mtu, 517
+          [1651743348.200614][5072:5075] CHIP:BLE: Write request received debug 0xffffa0043700
+          [1651743348.201013][5072:5072] CHIP:EM: Received message of type 0x20 with protocolId (0, 0) and MessageCounter:3306320356 on exchange 29381r
+          [1651743348.201117][5072:5072] CHIP:EM: Handling via exchange: 29381r, Delegate: 0xaaaab7bb2a90
+          [1651743348.201191][5072:5072] CHIP:SC: Received PBKDF param request
+          [1651743348.201280][5072:5072] CHIP:SC: Peer assigned session ID 14881
+          [1651743348.201349][5072:5072] CHIP:SC: Found MRP parameters in the message
+          [1651743348.201520][5072:5072] CHIP:SC: Including MRP parameters in PBKDF param response
+          [1651743348.201884][5072:5072] CHIP:IN: Prepared unauthenticated message 0xffffdcf2ef78 to 0x0000000000000000 (0)  of type 0x21 and protocolId (0, 0) on exchange 29381r with MessageCounter:2627159088.
+          [1651743348.201989][5072:5072] CHIP:IN: Sending unauthenticated msg 0xffffdcf2ef78 with MessageCounter:2627159088 to 0x0000000000000000 at monotonic time: 0000000000FF6731 msec
+          [1651743348.202196][5072:5072] CHIP:SC: Sent PBKDF param response
+          [1651743348.298384][5072:5075] CHIP:BLE: Indication confirmation, 0xffffa0043700
+          [1651743348.299274][5072:5075] CHIP:DL: c1 BluezCharacteristicWriteFD mtu, 517
+          [1651743348.300132][5072:5075] CHIP:BLE: Write request received debug 0xffffa0043700
+          [1651743348.300571][5072:5072] CHIP:EM: Received message of type 0x22 with protocolId (0, 0) and MessageCounter:3306320357 on exchange 29381r
+          [1651743348.300655][5072:5072] CHIP:EM: Found matching exchange: 29381r, Delegate: 0xaaaab7bb2a90
+          [1651743348.300741][5072:5072] CHIP:SC: Received spake2p msg1
+          [1651743348.304696][5072:5072] CHIP:IN: Prepared unauthenticated message 0xffffdcf2ee58 to 0x0000000000000000 (0)  of type 0x23 and protocolId (0, 0) on exchange 29381r with MessageCounter:2627159089.
+          [1651743348.304817][5072:5072] CHIP:IN: Sending unauthenticated msg 0xffffdcf2ee58 with MessageCounter:2627159089 to 0x0000000000000000 at monotonic time: 0000000000FF6798 msec
+          [1651743348.305007][5072:5072] CHIP:SC: Sent spake2p msg2
+          [1651743348.444144][5072:5075] CHIP:BLE: Indication confirmation, 0xffffa0043700
+          [1651743348.444992][5072:5075] CHIP:DL: c1 BluezCharacteristicWriteFD mtu, 517
+          [1651743348.445608][5072:5075] CHIP:BLE: Write request received debug 0xffffa0043700
+          [1651743348.445888][5072:5072] CHIP:EM: Received message of type 0x24 with protocolId (0, 0) and MessageCounter:3306320358 on exchange 29381r
+          [1651743348.445943][5072:5072] CHIP:EM: Found matching exchange: 29381r, Delegate: 0xaaaab7bb2a90
+          [1651743348.446001][5072:5072] CHIP:SC: Received spake2p msg3
+          [1651743348.446130][5072:5072] CHIP:SC: Sending status report. Protocol code 0, exchange 29381
+          [1651743348.446202][5072:5072] CHIP:IN: Prepared unauthenticated message 0xffffdcf2eea8 to 0x0000000000000000 (0)  of type 0x40 and protocolId (0, 0) on exchange 29381r with MessageCounter:2627159090.
+          [1651743348.446262][5072:5072] CHIP:IN: Sending unauthenticated msg 0xffffdcf2eea8 with MessageCounter:2627159090 to 0x0000000000000000 at monotonic time: 0000000000FF6825 msec
+          [1651743348.446452][5072:5072] CHIP:IN: New secure session created for device <FFFFFFFB00000000, 0>, LSID:2138 PSID:14881!
+          [1651743348.446962][5072:5072] CHIP:SVR: Commissioning completed session establishment step
       disabled: true
 
     - label:
@@ -180,21 +180,21 @@ tests:
           regulatory domains."
       PICS: MCORE.DD.DISCOVERY_PAF
       verification: |
-         WIFI - PAF feature is out of scope for V1.4
-          TH must start sending Wi-Fi PAF Publish Frames on the default channel and the channel list.
-          2.4g - $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=2437
-          5g - FCC - $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5220
-          5g ETSI - $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5745
+          WIFI - PAF feature is out of scope for V1.4
+           TH must start sending Wi-Fi PAF Publish Frames on the default channel and the channel list.
+           2.4g - $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=2437
+           5g - FCC - $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5220
+           5g ETSI - $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5745
       disabled: true
 
     - label: "Step 3b: DUT starts Wi-Fi PAF scan in its commissioning channel"
       PICS: MCORE.DD.DISCOVERY_PAF
       verification: |
-         WIFI - PAF feature is out of scope for V1.4
+          WIFI - PAF feature is out of scope for V1.4
 
-          DUT must find TH and provide onboarding data to for validation. Pass Criteria: DUT is able to report the Onboarding payload as set on TH
+           DUT must find TH and provide onboarding data to for validation. Pass Criteria: DUT is able to report the Onboarding payload as set on TH
 
-          $ sudo ./chip-tool pairing wifipaf-wifi 1 n_m_2g nxp12345 20202021 3840
+           $ sudo ./chip-tool pairing wifipaf-wifi 1 n_m_2g nxp12345 20202021 3840
       disabled: true
 
     - label: "Step 4a: TH starts SoftAP and begin matter announcement procedure"
@@ -204,7 +204,9 @@ tests:
       disabled: true
 
     - label:
-          "Step 4b: DUT starts Wi-Fi scan of all 2.4 GHz Wi-Fi channels allowed per its operational regulatory domain (channels 1, 6, and 11 are preferred)"
+          "Step 4b: DUT starts Wi-Fi scan of all 2.4 GHz Wi-Fi channels allowed
+          per its operational regulatory domain (channels 1, 6, and 11 are
+          preferred)"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
           Out of Scope : SoftAP commissioning currently not supported
@@ -227,7 +229,7 @@ tests:
           as set on TH"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-         Out of Scope : SoftAP commissioning currently not supported
+          Out of Scope : SoftAP commissioning currently not supported
       disabled: true
 
     - label:
