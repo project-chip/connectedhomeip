@@ -226,7 +226,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         endpoint_list = [endpoint] if endpoint is not None else list(self.endpoints.keys())
 
         for endpoint in endpoint_list:
-            asserts.assert_in(Clusters.Descriptor.id, read_request.tlvAttributes[endpoint].keys(), "Descriptor cluster not in output")
+            asserts.assert_in(Clusters.Descriptor.id,
+                              read_request.tlvAttributes[endpoint].keys(), "Descriptor cluster not in output")
             asserts.assert_in(Clusters.Descriptor.Attributes.AttributeList.attribute_id,
                               read_request.tlvAttributes[endpoint][Clusters.Descriptor.id], "AttributeList not in output")
 
@@ -241,6 +242,13 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             returned_attributes = read_request.tlvAttributes[endpoint][cluster_obj.id][cluster_obj.Attributes.AttributeList.attribute_id]
             asserts.assert_equal(sorted(returned_attributes), sorted(read_request.tlvAttributes[endpoint][cluster_obj.id].keys()),
                                  "Expected attribute list doesn't match")
+
+    async def verify_cluster_and_server_lists(self, read_request):
+        for endpoint, endpoint_data in read_request.tlvAttributes.items():
+            cluster_list = sorted(endpoint_data.keys())
+            server_list = sorted(endpoint_data.get(Clusters.Descriptor.id, {})
+                                .get(Clusters.Descriptor.Attributes.ServerList.attribute_id, []))
+            asserts.assert_equal(cluster_list, server_list, f"Cluster list and server list do not match for endpoint {endpoint}")
 
     def verify_read_request(self, read_request):
         for endpoint in read_request.tlvAttributes:
@@ -704,13 +712,16 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # TH sends a Read Request Message to read all events and attributes from the DUT.
 
         # Verify that the DUT sends back data of all attributes and events that the TH has access to.
-        read_request = await self.default_controller.Read(nodeid=self.dut_node_id, attributes=(), events=())
+        read_request = await self.default_controller.Read(nodeid=self.dut_node_id, attributes=[()], events=[()])
         asserts.assert_true(hasattr(read_request, 'attributes'), 'attributes not in read_request')
         asserts.assert_true(hasattr(read_request, 'events'), 'events not in read_request')
         asserts.assert_true(hasattr(read_request, 'tlvAttributes'), 'tlvAttributes not in read_request')
-        asserts.assert_equal(read_request.attributes, {})
-        asserts.assert_equal(read_request.events, [])
-        asserts.assert_equal(read_request.tlvAttributes, {})
+        await self.verify_cluster_and_server_lists(read_request)
+        required_attributes = ["Header", "Status", "Data"]
+
+        for event in read_request.events:
+            for attr in required_attributes:
+                asserts.assert_true(hasattr(event, attr), f"{attr} not in event")
 
 
 if __name__ == "__main__":
