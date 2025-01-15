@@ -73,7 +73,8 @@ public:
         //   - we should figure where the extra const override is used
         //   - we should try to avoid having such footguns. This list template-explosion seems
         //     dangerous for flash.
-        CHIP_ERROR Encode(uint32_t const & aArg) const { return Encode((uint32_t &) aArg); }
+        inline CHIP_ERROR Encode(uint32_t const & aArg) const { return Encode((uint32_t) aArg); }
+        inline CHIP_ERROR Encode(uint32_t & aArg) const { return Encode((uint32_t) aArg); }
 
     private:
         AttributeValueEncoder & mAttributeValueEncoder;
