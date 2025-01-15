@@ -17,8 +17,9 @@
 
 /**
  *    @file
- *      mbedTLS based implementation of CHIP crypto primitives
+ *      mbedTLS and Tinycrypt based implementation of CHIP crypto primitives
  */
+#include <string.h>
 
 #include <crypto/CHIPCryptoPAL.h>
 
@@ -34,6 +35,7 @@
 #include <mbedtls/error.h>
 #include <mbedtls/hkdf.h>
 #include <mbedtls/md.h>
+#include <mbedtls/pk.h>
 #include <mbedtls/pkcs5.h>
 #include <mbedtls/sha1.h>
 #include <mbedtls/sha256.h>
@@ -44,7 +46,6 @@
 #include <mbedtls/x509.h>
 #include <mbedtls/x509_csr.h>
 
-#include <mbedtls/pk.h>
 #include <tinycrypt/ecc.h>
 #include <tinycrypt/ecc_dh.h>
 #include <tinycrypt/ecc_dsa.h>
@@ -58,13 +59,17 @@
 #include <lib/support/SafePointerCast.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <string.h>
-
-#ifdef SLI_SI91X_MCU_INTERFACE
+#ifdef __cplusplus
 extern "C" {
-#include "sl_si91x_trng.h"
-}
+#endif
+
+#if defined(SLI_SI91X_MCU_INTERFACE)
+#include <sl_si91x_trng.h>
 #endif // SLI_SI91X_MCU_INTERFACE
+
+#ifdef __cplusplus
+}
+#endif
 
 namespace chip {
 namespace Crypto {
@@ -85,6 +90,8 @@ namespace Crypto {
 #define CHIP_CRYPTO_PAL_PRIVATE_X509(x) x
 #endif
 
+namespace {
+
 typedef struct
 {
     bool mInitialized;
@@ -93,9 +100,15 @@ typedef struct
     mbedtls_entropy_context mEntropy;
 } EntropyContext;
 
+typedef struct
+{
+    uint8_t private_key[NUM_ECC_BYTES];
+    uint8_t public_key[2 * NUM_ECC_BYTES];
+} mbedtls_uecc_keypair;
+
 static EntropyContext gsEntropyContext;
 
-static void _log_mbedTLS_error(int error_code)
+void _log_mbedTLS_error(int error_code)
 {
     if (error_code != 0 && error_code != UECC_SUCCESS)
     {
@@ -110,7 +123,7 @@ static void _log_mbedTLS_error(int error_code)
     }
 }
 
-static bool _isValidTagLength(size_t tag_length)
+bool _isValidTagLength(size_t tag_length)
 {
     if (tag_length == 8 || tag_length == 12 || tag_length == 16)
     {
@@ -118,6 +131,7 @@ static bool _isValidTagLength(size_t tag_length)
     }
     return false;
 }
+} // namespace
 
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
                            const Aes128KeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
@@ -494,11 +508,6 @@ CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
     return CHIP_NO_ERROR;
 }
 
-static int CryptoRNG(void * ctxt, uint8_t * out_buffer, size_t out_length)
-{
-    return (chip::Crypto::DRBG_get_bytes(out_buffer, out_length) == CHIP_NO_ERROR) ? 0 : 1;
-}
-
 mbedtls_ecp_group_id MapECPGroupId(SupportedECPKeyTypes keyType)
 {
     switch (keyType)
@@ -734,53 +743,11 @@ P256Keypair::~P256Keypair()
 
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
-    size_t out_length;
-
-    mbedtls_x509write_csr csr;
-    mbedtls_x509write_csr_init(&csr);
-
-    mbedtls_pk_context pk;
-    pk.CHIP_CRYPTO_PAL_PRIVATE(pk_info) = mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY);
-    pk.CHIP_CRYPTO_PAL_PRIVATE(pk_ctx)  = to_keypair(&mKeypair);
-    VerifyOrExit(pk.CHIP_CRYPTO_PAL_PRIVATE(pk_info) != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_UNINITIALIZED);
-
-    mbedtls_x509write_csr_set_key(&csr, &pk);
-
-    mbedtls_x509write_csr_set_md_alg(&csr, MBEDTLS_MD_SHA256);
-
-    // TODO: mbedTLS CSR parser fails if the subject name is not set (or if empty).
-    //       CHIP Spec doesn't specify the subject name that can be used.
-    //       Figure out the correct value and update this code.
-    result = mbedtls_x509write_csr_set_subject_name(&csr, "O=CSR");
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_x509write_csr_der(&csr, out_csr, csr_length, CryptoRNG, nullptr);
-    VerifyOrExit(result > 0, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(CanCastTo<size_t>(result), error = CHIP_ERROR_INTERNAL);
-
-    out_length = static_cast<size_t>(result);
-    result     = 0;
-    VerifyOrExit(out_length <= csr_length, error = CHIP_ERROR_INTERNAL);
-
-    if (csr_length != out_length)
-    {
-        // mbedTLS API writes the CSR at the end of the provided buffer.
-        // Let's move it to the start of the buffer.
-        size_t offset = csr_length - out_length;
-        memmove(out_csr, &out_csr[offset], out_length);
-    }
-
-    csr_length = out_length;
-
-exit:
-    mbedtls_x509write_csr_free(&csr);
-
-    _log_mbedTLS_error(result);
-    return error;
+    MutableByteSpan csr(out_csr, csr_length);
+    CHIP_ERROR err = GenerateCertificateSigningRequest(this, csr);
+    csr_length     = (CHIP_NO_ERROR == err) ? csr.size() : 0;
+    ChipLogByteSpan(Crypto, csr);
+    return err;
 }
 
 CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_length, P256PublicKey & pubkey)
@@ -1523,7 +1490,7 @@ CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256P
     VerifyOrExit(mbedtls_pk_get_type(&(mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(pk))) == MBEDTLS_PK_ECKEY,
                  error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    keypair                    = mbedtls_pk_uecc(mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(pk));
+    keypair                    = (mbedtls_uecc_keypair *) (mbedtls_pk_ec(mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(pk)));
     Uint8::to_uchar(pubkey)[0] = 0x04; // uncompressed type
     memcpy(Uint8::to_uchar(pubkey) + 1, keypair->public_key, 2 * NUM_ECC_BYTES);
 
