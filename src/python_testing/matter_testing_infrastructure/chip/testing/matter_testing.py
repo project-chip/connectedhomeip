@@ -2378,9 +2378,6 @@ class CommissionDeviceTest(MatterBaseTest):
             logging.debug(
                 f"Setting TC Acknowledgements to version {conf.tc_version_to_simulate} with user response {conf.tc_user_response_to_simulate}.")
             dev_ctrl.SetTCAcknowledgements(conf.tc_version_to_simulate, conf.tc_user_response_to_simulate)
-            dev_ctrl.SetTCRequired(True)
-        else:
-            dev_ctrl.SetTCRequired(False)
 
         if conf.commissioning_method == "on-network":
             try:
