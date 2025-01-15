@@ -48,27 +48,28 @@ class TC_CGEN_2_9(MatterBaseTest):
 
     def steps_TC_CGEN_2_9(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH begins commissioning the DUT and performs the following steps in order:\n"
-                     "* Security setup using PASE\n"
-                     "* Setup fail-safe timer, with ExpiryLengthSeconds field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb value as 1\n"
-                     "* Configure information- UTC time, regulatory, etc."),
-            TestStep(2, "TH sends SetTCAcknowledgements with required values"),
-            TestStep(3, "TH continues commissioning with CSR exchange through CASE setup"),
-            TestStep(4, "TH sends CommissioningComplete to DUT"),
-            TestStep(5, "TH removes all fabrics from DUT with RemoveFabric"),
-            TestStep(6, "Put DUT into commissionable state"),
-            TestStep(7, "TH begins commissioning without TC acknowledgements"),
-            TestStep(8, "Verify CommissioningComplete fails with TCAcknowledgementsNotReceived")
+            TestStep(1, "TH begins commissioning the DUT and performs the following steps in order:\n* Security setup using PASE\n* Setup fail-safe timer, with ExpiryLengthSeconds field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb value as 1\n* Configure information- UTC time, regulatory, etc."),
+            TestStep(2, "TH sends SetTCAcknowledgements to DUT with the following values:\n* TCVersion: PIXIT.CGEN.TCRevision\n* TCUserResponse: PIXIT.CGEN.RequiredTCAcknowledgements"),
+            TestStep(3, "TH continues commissioning with the DUT and performs the steps from 'Operation CSR exchange' through 'Security setup using CASE'"),
+            TestStep(4, "TH sends CommissioningComplete to DUT."),
+            TestStep(5, "TH removes all fabrics from DUT with RemoveFabric."),
+            TestStep(6, "Perform the necessary actions to put the DUT into a commissionable state."),
+            TestStep(7, "TH begins commissioning the DUT and performs all steps from 'Device discovery and establish commissioning channel' through 'Security setup using CASE', skipping the 'Configure TC acknowledgements' step"),
+            TestStep(8, "TH sends CommissioningComplete to DUT."),
         ]
 
     @async_test_body
     async def test_TC_CGEN_2_9(self):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
+        tc_version_to_simulate: int = self.matter_test_config.tc_version_to_simulate
+        tc_user_response_to_simulate: int = self.matter_test_config.tc_user_response_to_simulate
 
         # Step 1: Begin commissioning with PASE and failsafe
         self.step(1)
         commissioner.SetSkipCommissioningComplete(True)
         self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
+        self.matter_test_config.tc_version_to_simulate = None
+        self.matter_test_config.tc_user_response_to_simulate = None
         await self.commission_devices()
 
         # Step 2: Send SetTCAcknowledgements
@@ -77,15 +78,16 @@ class TC_CGEN_2_9(MatterBaseTest):
             nodeid=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(
-                TCVersion=self.pixit['CGEN']['TCRevision'],
-                TCUserResponse=self.pixit['CGEN']['RequiredTCAcknowledgements']),
-            timedRequestTimeoutMs=1000)
+                TCVersion=tc_version_to_simulate, TCUserResponse=tc_user_response_to_simulate
+            ),
+        )
 
         # Verify SetTCAcknowledgements response
         asserts.assert_equal(
             response.errorCode,
             Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
-            'SetTCAcknowledgements failed')
+            "SetTCAcknowledgements failed",
+        )
 
         # Step 3: Continue with CSR and CASE setup
         self.step(3)
@@ -97,13 +99,14 @@ class TC_CGEN_2_9(MatterBaseTest):
             nodeid=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.CommissioningComplete(),
-            timedRequestTimeoutMs=1000)
+        )
 
         # Verify CommissioningComplete response
         asserts.assert_equal(
             response.errorCode,
             Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
-            'First CommissioningComplete failed')
+            "First CommissioningComplete failed",
+        )
 
         # Step 5: Remove all fabrics
         self.step(5)
@@ -111,13 +114,14 @@ class TC_CGEN_2_9(MatterBaseTest):
             nodeid=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.OperationalCredentials.Commands.RemoveFabric(),
-            timedRequestTimeoutMs=1000)
+        )
 
         # Verify RemoveFabric response
         asserts.assert_equal(
             response.errorCode,
             Clusters.OperationalCredentials.Enums.OperationalCredentialsStatusEnum.kSuccess,
-            'RemoveFabric failed')
+            "RemoveFabric failed",
+        )
 
         # Step 6: Put device in commissioning mode
         self.step(6)
@@ -125,9 +129,10 @@ class TC_CGEN_2_9(MatterBaseTest):
 
         # Step 7: Commission without TC acknowledgements
         self.step(7)
-        commissioner.SetTCRequired(False)
         commissioner.SetSkipCommissioningComplete(True)
         self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
+        self.matter_test_config.tc_version_to_simulate = None
+        self.matter_test_config.tc_user_response_to_simulate = None
         await self.commission_devices()
 
         # Step 8: Verify CommissioningComplete fails
@@ -136,13 +141,14 @@ class TC_CGEN_2_9(MatterBaseTest):
             nodeid=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.CommissioningComplete(),
-            timedRequestTimeoutMs=1000)
+        )
 
         # Verify CommissioningComplete fails with correct error
         asserts.assert_equal(
             response.errorCode,
             Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kTCAcknowledgementsNotReceived,
-            'Expected TCAcknowledgementsNotReceived error after fabric removal')
+            "Expected TCAcknowledgementsNotReceived error after fabric removal",
+        )
 
 
 if __name__ == "__main__":

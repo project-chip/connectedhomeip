@@ -500,6 +500,7 @@ jobs:
                       --target linux-x64-fabric-bridge-rpc-ipv6only-no-ble-no-wifi-clang \
                       --target linux-x64-fabric-sync-ipv6only-no-ble-no-wifi-clang \
                       --target linux-x64-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang \
+                      --target linux-x64-terms-and-conditions \
                       --target linux-x64-python-bindings \
                       build \
                       --copy-artifacts-to objdir-clone \
@@ -518,6 +519,7 @@ jobs:
                   echo "FABRIC_BRIDGE_APP: out/linux-x64-fabric-bridge-rpc-ipv6only-no-ble-no-wifi-clang/fabric-bridge-app" >> /tmp/test_env.yaml
                   echo "FABRIC_SYNC_APP: out/linux-x64-fabric-sync-ipv6only-no-ble-no-wifi-clang/fabric-sync" >> /tmp/test_env.yaml
                   echo "LIGHTING_APP_NO_UNIQUE_ID: out/linux-x64-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang/chip-lighting-app" >> /tmp/test_env.yaml
+                  echo "TERMS_AND_CONDITIONS_APP: out/linux-x64-terms-and-conditions/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml

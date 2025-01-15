@@ -27,8 +27,6 @@
 #           --capabilities 6
 #       script-args:
 #           --in-test-commissioning-method on-network
-#           --tc-version-to-simulate 1
-#           --tc-user-response-to-simulate 1
 #           --qr-code MT:-24J0AFN00KA0648G00
 #           --trace-to json:log
 #       factoryreset: True
@@ -49,7 +47,7 @@ class TC_CGEN_2_6(MatterBaseTest):
     def steps_TC_CGEN_2_6(self) -> list[TestStep]:
         return [
             TestStep(1, "TH starts commissioning the DUT. It performs all commissioning steps from 'Device discovery and establish commissioning channel' to 'Security setup using CASE', except for TC configuration with SetTCAcknowledgements."),
-            TestStep(2, "TH sends CommissioningComplete to DUT and verifies error response."),
+            TestStep(2, "TH sends CommissioningComplete to DUT."),
         ]
 
     @async_test_body
@@ -58,11 +56,11 @@ class TC_CGEN_2_6(MatterBaseTest):
 
         # Step 1: Commission device without setting TC acknowledgements
         self.step(1)
-        # Don't set TCs for the next commissioning and skip CommissioningComplete
-        # so we can manually call CommissioningComplete to check the response error code
-        commissioner.SetTCRequired(False)
+        # Don't set TCs for the next commissioning and skip CommissioningComplete so we can manually call CommissioningComplete to check the response error code
         commissioner.SetSkipCommissioningComplete(True)
         self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
+        self.matter_test_config.tc_version_to_simulate = None
+        self.matter_test_config.tc_user_response_to_simulate = None
         await self.commission_devices()
 
         # Step 2: Send CommissioningComplete and verify error response
@@ -71,14 +69,14 @@ class TC_CGEN_2_6(MatterBaseTest):
             nodeid=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.CommissioningComplete(),
-            timedRequestTimeoutMs=1000)
+        )
 
-        # Verify that DUT sends CommissioningCompleteResponse Command to TH
-        # With ErrorCode as 'TCAcknowledgementsNotReceived'(6)
+        # Verify that DUT sends CommissioningCompleteResponse Command to TH with ErrorCode as 'TCAcknowledgementsNotReceived'(6)
         asserts.assert_equal(
             response.errorCode,
             Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kTCAcknowledgementsNotReceived,
-            'Expected TCAcknowledgementsNotReceived error code')
+            "Expected TCAcknowledgementsNotReceived error code",
+        )
 
 
 if __name__ == "__main__":

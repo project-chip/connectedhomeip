@@ -48,34 +48,32 @@ class TC_CGEN_2_7(MatterBaseTest):
 
     def steps_TC_CGEN_2_7(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH begins commissioning the DUT and performs the following steps in order:\n"
-                     "* Security setup using PASE\n"
-                     "* Setup fail-safe timer, with ExpiryLengthSeconds field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb value as 1\n"
-                     "* Configure information- UTC time, regulatory, etc."),
-            TestStep(2, "TH reads TCMinRequiredVersion attribute."),
-            TestStep(3, "TH sends SetTCAcknowledgements with TCVersion=minVersion and TCUserResponse=0"),
+            TestStep(1, "TH begins commissioning the DUT and performs the following steps in order:\n* Security setup using PASE\n* Setup fail-safe timer, with ExpiryLengthSeconds field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb value as 1\n* Configure information- UTC time, regulatory, etc."),
+            TestStep(2, "TH reads from the DUT the attribute TCMinRequiredVersion. Store the value as minVersion."),
+            TestStep(3, "TH sends SetTCAcknowledgements to DUT with the following values:\n* TCVersion: minVersion\n* TCUserResponse: 0"),
             TestStep(4, "TH continues commissioning with the DUT and performs the steps from 'Operation CSR exchange' through 'Security setup using CASE'"),
             TestStep(5, "TH sends CommissioningComplete to DUT."),
-            TestStep(6, "TH sends SetTCAcknowledgements with valid TC values"),
-            TestStep(7, "TH sends CommissioningComplete to DUT.")
+            TestStep(6, "TH sends SetTCAcknowledgements to DUT with the following values:\n* TCVersion: PIXIT.CGEN.TCRevision\n* TCUserResponse: PIXIT.CGEN.RequiredTCAcknowledgements"),
+            TestStep(7, "TH sends CommissioningComplete to DUT."),
         ]
 
     @async_test_body
     async def test_TC_CGEN_2_7(self):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
+        tc_version_to_simulate: int = self.matter_test_config.tc_version_to_simulate
+        tc_user_response_to_simulate: int = self.matter_test_config.tc_user_response_to_simulate
 
         # Step 1: Begin commissioning with PASE and failsafe
         self.step(1)
-        commissioner.SetTCRequired(False)
         commissioner.SetSkipCommissioningComplete(True)
         self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
+        self.matter_test_config.tc_version_to_simulate = None
+        self.matter_test_config.tc_user_response_to_simulate = None
         await self.commission_devices()
 
         # Step 2: Read TCMinRequiredVersion
         self.step(2)
-        response = await commissioner.ReadAttribute(
-            nodeid=self.dut_node_id,
-            attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCMinRequiredVersion)])
+        response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCMinRequiredVersion)])
         min_version = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCMinRequiredVersion]
 
         # Step 3: Send SetTCAcknowledgements with invalid response
@@ -84,15 +82,16 @@ class TC_CGEN_2_7(MatterBaseTest):
             nodeid=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(
-                TCVersion=min_version,
-                TCUserResponse=0),
-            timedRequestTimeoutMs=1000)
+                TCVersion=min_version, TCUserResponse=0
+            ),
+        )
 
         # Verify error code is RequiredTCNotAccepted
         asserts.assert_equal(
             response.errorCode,
             Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kRequiredTCNotAccepted,
-            'Expected RequiredTCNotAccepted error code')
+            "Expected RequiredTCNotAccepted error code",
+        )
 
         # Step 4: Continue with CSR and CASE setup
         self.step(4)
@@ -104,13 +103,14 @@ class TC_CGEN_2_7(MatterBaseTest):
             nodeid=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.CommissioningComplete(),
-            timedRequestTimeoutMs=1000)
+        )
 
         # Verify error code is TCAcknowledgementsNotReceived
         asserts.assert_equal(
             response.errorCode,
             Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kTCAcknowledgementsNotReceived,
-            'Expected TCAcknowledgementsNotReceived error code')
+            "Expected TCAcknowledgementsNotReceived error code",
+        )
 
         # Step 6: Send SetTCAcknowledgements with valid values
         self.step(6)
@@ -118,15 +118,16 @@ class TC_CGEN_2_7(MatterBaseTest):
             nodeid=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(
-                TCVersion=self.pixit['CGEN']['TCRevision'],
-                TCUserResponse=self.pixit['CGEN']['RequiredTCAcknowledgements']),
-            timedRequestTimeoutMs=1000)
+                TCVersion=tc_version_to_simulate, TCUserResponse=tc_user_response_to_simulate
+            ),
+        )
 
         # Verify error code is OK
         asserts.assert_equal(
             response.errorCode,
             Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
-            'Expected OK response for valid TC acknowledgements')
+            "Expected OK response for valid TC acknowledgements",
+        )
 
         # Step 7: Send CommissioningComplete and verify success
         self.step(7)
@@ -134,13 +135,14 @@ class TC_CGEN_2_7(MatterBaseTest):
             nodeid=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.CommissioningComplete(),
-            timedRequestTimeoutMs=1000)
+        )
 
         # Verify error code is OK
         asserts.assert_equal(
             response.errorCode,
             Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
-            'Expected OK response for CommissioningComplete')
+            "Expected OK response for CommissioningComplete",
+        )
 
 
 if __name__ == "__main__":

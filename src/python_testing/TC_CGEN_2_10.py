@@ -26,7 +26,7 @@
 #           --custom-flow 2
 #           --capabilities 6
 #       script-args:
-#           --in-test-commissioning-method on-network
+#           --commissioning-method on-network
 #           --tc-version-to-simulate 1
 #           --tc-user-response-to-simulate 1
 #           --qr-code MT:-24J0AFN00KA0648G00
@@ -48,32 +48,29 @@ class TC_CGEN_2_10(MatterBaseTest):
 
     def steps_TC_CGEN_2_10(self) -> list[TestStep]:
         return [
-            TestStep(1, "Read TCAcceptedVersion attribute"),
-            TestStep(2, "Read TCAcknowledgements attribute"),
-            TestStep(3, "Send SetTCAcknowledgements with TCVersion=0 and TCUserResponse=65535"),
-            TestStep(4, "Verify TCAcceptedVersion unchanged"),
-            TestStep(5, "Verify TCAcknowledgements unchanged"),
-            TestStep(6, "Send SetTCAcknowledgements with TCVersion=acceptedVersion+1 and TCUserResponse=0"),
-            TestStep(7, "Verify TCAcceptedVersion unchanged"),
-            TestStep(8, "Verify TCAcknowledgements unchanged")
+            TestStep(1, "TH reads from the DUT the attribute TCAcceptedVersion. Store the value as acceptedVersion."),
+            TestStep(2, "TH reads from the DUT the attribute TCAcknowledgements. Store the value as userAcknowledgements."),
+            TestStep(3, "TH Sends the SetTCAcknowledgements command to the DUT with the fields set as follows:\n* TCVersion: 0\n* TCUserResponse: 65535"),
+            TestStep(4, "TH reads from the DUT the attribute TCAcceptedVersion."),
+            TestStep(5, "TH reads from the DUT the attribute TCAcknowledgements."),
+            TestStep(6, "TH Sends the SetTCAcknowledgements command to the DUT with the fields set as follows:\n* TCVersion: acceptedVersion + 1\n* TCUserResponse: 0"),
+            TestStep(7, "TH reads from the DUT the attribute TCAcceptedVersion."),
+            TestStep(8, "TH reads from the DUT the attribute TCAcknowledgements."),
         ]
 
     @async_test_body
     async def test_TC_CGEN_2_10(self):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
+        await self.commission_devices()
 
         # Step 1: Read TCAcceptedVersion
         self.step(1)
-        response = await commissioner.ReadAttribute(
-            nodeid=self.dut_node_id,
-            attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion)])
+        response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion)])
         accepted_version = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion]
 
         # Step 2: Read TCAcknowledgements
         self.step(2)
-        response = await commissioner.ReadAttribute(
-            nodeid=self.dut_node_id,
-            attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgements)])
+        response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgements)])
         user_acknowledgements = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgements]
 
         # Step 3: Send SetTCAcknowledgements with invalid version
@@ -81,38 +78,27 @@ class TC_CGEN_2_10(MatterBaseTest):
         response = await commissioner.SendCommand(
             nodeid=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
-            payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(
-                TCVersion=0,
-                TCUserResponse=65535),
-            timedRequestTimeoutMs=1000)
+            payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(TCVersion=0, TCUserResponse=65535),
+        )
 
         # Verify TCMinVersionNotMet error
         asserts.assert_equal(
             response.errorCode,
             Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kTCMinVersionNotMet,
-            'Expected TCMinVersionNotMet error')
+            "Expected TCMinVersionNotMet error",
+        )
 
         # Step 4: Verify TCAcceptedVersion unchanged
         self.step(4)
-        response = await commissioner.ReadAttribute(
-            nodeid=self.dut_node_id,
-            attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion)])
+        response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion)])
         current_version = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion]
-        asserts.assert_equal(
-            current_version,
-            accepted_version,
-            'TCAcceptedVersion changed unexpectedly')
+        asserts.assert_equal(current_version, accepted_version, "TCAcceptedVersion changed unexpectedly")
 
         # Step 5: Verify TCAcknowledgements unchanged
         self.step(5)
-        response = await commissioner.ReadAttribute(
-            nodeid=self.dut_node_id,
-            attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgements)])
+        response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgements)])
         current_acknowledgements = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgements]
-        asserts.assert_equal(
-            current_acknowledgements,
-            user_acknowledgements,
-            'TCAcknowledgements changed unexpectedly')
+        asserts.assert_equal(current_acknowledgements, user_acknowledgements, "TCAcknowledgements changed unexpectedly")
 
         # Step 6: Send SetTCAcknowledgements with invalid response
         self.step(6)
@@ -120,37 +106,32 @@ class TC_CGEN_2_10(MatterBaseTest):
             nodeid=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(
-                TCVersion=accepted_version + 1,
-                TCUserResponse=0),
-            timedRequestTimeoutMs=1000)
+                TCVersion=accepted_version + 1, TCUserResponse=0
+            ),
+        )
 
         # Verify RequiredTCNotAccepted error
         asserts.assert_equal(
             response.errorCode,
             Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kRequiredTCNotAccepted,
-            'Expected RequiredTCNotAccepted error')
+            "Expected RequiredTCNotAccepted error",
+        )
 
         # Step 7: Verify TCAcceptedVersion still unchanged
         self.step(7)
-        response = await commissioner.ReadAttribute(
-            nodeid=self.dut_node_id,
-            attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion)])
+        response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion)])
         current_version = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion]
-        asserts.assert_equal(
-            current_version,
-            accepted_version,
-            'TCAcceptedVersion changed unexpectedly after second attempt')
+        asserts.assert_equal(current_version, accepted_version, "TCAcceptedVersion changed unexpectedly after second attempt")
 
         # Step 8: Verify TCAcknowledgements still unchanged
         self.step(8)
-        response = await commissioner.ReadAttribute(
-            nodeid=self.dut_node_id,
-            attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgements)])
+        response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgements)])
         current_acknowledgements = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgements]
         asserts.assert_equal(
             current_acknowledgements,
             user_acknowledgements,
-            'TCAcknowledgements changed unexpectedly after second attempt')
+            "TCAcknowledgements changed unexpectedly after second attempt",
+        )
 
 
 if __name__ == "__main__":
