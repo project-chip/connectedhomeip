@@ -106,7 +106,7 @@ while (($#)); do
         --enable_nfc_commissioning | -n)
             enable_nfc_commissioning=$2
             if [[ "enable_nfc_commissioning" != "true" && "enable_nfc_commissioning" != "false" ]]; then
-                echo "chip_detail_logging should have a true/false value, not '$enable_nfc_commissioning'"
+                echo "enable_nfc_commissioning should have a true/false value, not '$enable_nfc_commissioning'"
                 exit
             fi
             shift
