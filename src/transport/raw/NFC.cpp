@@ -67,10 +67,6 @@ void NFCBase::OnNfcTagResponse(System::PacketBufferHandle && buffer)
 {
     ChipLogProgress(Controller, "NFCBase::OnNfcTagResponse");
 
-#ifdef DUMP_BLE_MESSAGES
-    chip::Encoding::LogByteArrayAsHex("NFCBase::OnNfcTagResponse", buffer->Start(), buffer->DataLength());
-#endif
-
     HandleMessageReceived(Transport::PeerAddress(Transport::Type::kNfc), std::move(buffer));
 }
 
@@ -81,10 +77,6 @@ void NFCBase::OnNfcTagError()
 
 CHIP_ERROR NFCBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
-#ifdef DUMP_BLE_MESSAGES
-    chip::Encoding::LogByteArrayAsHex("NFCBase::SendMessage()", msgBuf->Start(), msgBuf->DataLength());
-#endif
-
     VerifyOrReturnError(address.GetTransportType() == Type::kNfc, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mState != State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
 
