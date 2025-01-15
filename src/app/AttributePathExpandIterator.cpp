@@ -30,7 +30,6 @@ namespace app {
 AttributePathExpandIterator::AttributePathExpandIterator(DataModel::Provider * dataModel, Position & position) :
     mDataModelProvider(dataModel), mPosition(position)
 {
-    // TODO: initialize position iterators if position is set
     if (mPosition.mOutputPath.mEndpointId != kInvalidEndpointId)
     {
         mEndpointIterator = mDataModelProvider->GetEndpoints();
