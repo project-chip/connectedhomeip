@@ -19,14 +19,14 @@ limitations under the License.
 
   <cluster>
     <domain>General</domain>
-    <name>Sample External manufacturer-specific cluster</name>
+    <name>Sample External Manufacturer-Specific</name>
     <!-- The MSB 16 bits of <code> are the VendorID. Replace this with your
          VendorID. 0xFFF1 is a Test VendorID.
 
          The LSB 16 bits of <code> are a self-assigned ClusterID -->
     <code>0xFFF1FC21</code>
     <define>SAMPLE_EXTERNAL_MANUFACTURER_SPECIFIC_CLUSTER</define>
-    <description>The Sample External manufacturer-specific cluster showcases an out-of-tree cluster manufacturer extensions</description>
+    <description>A sample showcasing an out-of-tree definition of a manufacturer specific cluster</description>
 
     <!-- Attributes -->
     <!-- A simple boolean attribute that flips or flops -->

@@ -2578,7 +2578,7 @@ cluster ColorControl = 768 {
 }
 
 /** The Sample External manufacturer-specific cluster showcases an out-of-tree cluster manufacturer extensions */
-cluster SampleExternalManufacturerSpecificCluster = 4294048801 {
+cluster SampleExternalManufacturerSpecific = 4294048801 {
   revision 1; // NOTE: Default/not specifically set
 
   info event PingCountEvent = 0 {
@@ -3096,7 +3096,7 @@ endpoint 1 {
     handle command StepColorTemperature;
   }
 
-  server cluster SampleExternalManufacturerSpecificCluster {
+  server cluster SampleExternalManufacturerSpecific {
     emits event PingCountEvent;
     ram      attribute flipFlop default = false;
     callback attribute generatedCommandList;
@@ -3110,5 +3110,3 @@ endpoint 1 {
     handle command AddArguments;
   }
 }
-
-

@@ -676,7 +676,7 @@ void emberAfSampleManufacturerSpecificClusterInitCallback(chip::EndpointId endpo
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfSampleExternalManufacturerSpecificClusterClusterInitCallback(chip::EndpointId endpoint);
+void emberAfSampleExternalManufacturerSpecificClusterInitCallback(chip::EndpointId endpoint);
 
 // Cluster Server/Client Init Functions
 
@@ -5626,28 +5626,28 @@ chip::Protocols::InteractionModel::Status MatterSampleManufacturerSpecificCluste
 void emberAfSampleManufacturerSpecificClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
-// Sample External manufacturer-specific cluster Cluster
+// Sample External manufacturer-specific Cluster
 //
 
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfSampleExternalManufacturerSpecificClusterClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfSampleExternalManufacturerSpecificClusterServerInitCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being shutdown
  */
-void MatterSampleExternalManufacturerSpecificClusterClusterServerShutdownCallback(chip::EndpointId endpoint);
+void MatterSampleExternalManufacturerSpecificClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfSampleExternalManufacturerSpecificClusterClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfSampleExternalManufacturerSpecificClusterClientInitCallback(chip::EndpointId endpoint);
 
 /**
  * @param attributePath Concrete attribute path that changed
  */
-void MatterSampleExternalManufacturerSpecificClusterClusterServerAttributeChangedCallback(
+void MatterSampleExternalManufacturerSpecificClusterServerAttributeChangedCallback(
     const chip::app::ConcreteAttributePath & attributePath);
 
 /**
@@ -5656,13 +5656,13 @@ void MatterSampleExternalManufacturerSpecificClusterClusterServerAttributeChange
  * @param size          Attribute size
  * @param value         Attribute value
  */
-chip::Protocols::InteractionModel::Status MatterSampleExternalManufacturerSpecificClusterClusterServerPreAttributeChangedCallback(
+chip::Protocols::InteractionModel::Status MatterSampleExternalManufacturerSpecificClusterServerPreAttributeChangedCallback(
     const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /**
  * @param endpoint  Endpoint that is being served
  */
-void emberAfSampleExternalManufacturerSpecificClusterClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfSampleExternalManufacturerSpecificClusterServerTickCallback(chip::EndpointId endpoint);
 
 // Cluster Commands Callback
 
@@ -7222,14 +7222,14 @@ bool emberAfSampleManufacturerSpecificClusterAddArgumentsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::SampleManufacturerSpecific::Commands::AddArguments::DecodableType & commandData);
 /**
- * @brief Sample External manufacturer-specific cluster Cluster Ping Command callback (from client)
+ * @brief Sample External manufacturer-specific Cluster Ping Command callback (from client)
  */
-bool emberAfSampleExternalManufacturerSpecificClusterClusterPingCallback(
+bool emberAfSampleExternalManufacturerSpecificClusterPingCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::SampleExternalManufacturerSpecificCluster::Commands::Ping::DecodableType & commandData);
+    const chip::app::Clusters::SampleExternalManufacturerSpecific::Commands::Ping::DecodableType & commandData);
 /**
- * @brief Sample External manufacturer-specific cluster Cluster AddArguments Command callback (from client)
+ * @brief Sample External manufacturer-specific Cluster AddArguments Command callback (from client)
  */
-bool emberAfSampleExternalManufacturerSpecificClusterClusterAddArgumentsCallback(
+bool emberAfSampleExternalManufacturerSpecificClusterAddArgumentsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::SampleExternalManufacturerSpecificCluster::Commands::AddArguments::DecodableType & commandData);
+    const chip::app::Clusters::SampleExternalManufacturerSpecific::Commands::AddArguments::DecodableType & commandData);

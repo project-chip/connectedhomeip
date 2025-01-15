@@ -5737,7 +5737,7 @@ enum class FaultType : uint8_t
 
 namespace SampleManufacturerSpecific {} // namespace SampleManufacturerSpecific
 
-namespace SampleExternalManufacturerSpecificCluster {} // namespace SampleExternalManufacturerSpecificCluster
+namespace SampleExternalManufacturerSpecific {} // namespace SampleExternalManufacturerSpecific
 
 } // namespace Clusters
 } // namespace app

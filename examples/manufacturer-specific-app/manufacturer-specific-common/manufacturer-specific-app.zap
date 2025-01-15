@@ -5649,7 +5649,7 @@
           ]
         },
         {
-          "name": "Sample External manufacturer-specific cluster",
+          "name": "Sample External Manufacturer-Specific",
           "code": 4294048801,
           "mfgCode": null,
           "define": "SAMPLE_EXTERNAL_MANUFACTURER_SPECIFIC_CLUSTER",

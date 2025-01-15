@@ -34650,7 +34650,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Events
 
 } // namespace SampleManufacturerSpecific
-namespace SampleExternalManufacturerSpecificCluster {
+namespace SampleExternalManufacturerSpecific {
 
 namespace Commands {
 namespace Ping {
@@ -34809,7 +34809,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace PingCountEvent.
 } // namespace Events
 
-} // namespace SampleExternalManufacturerSpecificCluster
+} // namespace SampleExternalManufacturerSpecific
 
 } // namespace Clusters
 
@@ -35540,7 +35540,7 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
-    case Clusters::SampleExternalManufacturerSpecificCluster::Id: {
+    case Clusters::SampleExternalManufacturerSpecific::Id: {
         switch (aCommand)
         {
         default:
