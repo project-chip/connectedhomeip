@@ -146,6 +146,7 @@ def BuildHostTarget():
         TargetPart('air-quality-sensor', app=HostApp.AIR_QUALITY_SENSOR),
         TargetPart('network-manager', app=HostApp.NETWORK_MANAGER),
         TargetPart('energy-management', app=HostApp.ENERGY_MANAGEMENT),
+        TargetPart('terms-and-conditions', app=HostApp.TERMS_AND_CONDITIONS),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
