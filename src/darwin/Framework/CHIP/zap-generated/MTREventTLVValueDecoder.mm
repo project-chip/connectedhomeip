@@ -4898,6 +4898,18 @@ static id _Nullable DecodeEventPayloadForCameraAVStreamManagementCluster(EventId
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForCameraAVSettingsUserLevelManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::CameraAvSettingsUserLevelManagement;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForWebRTCTransportProviderCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::WebRTCTransportProvider;
@@ -5529,6 +5541,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::CameraAvStreamManagement::Id: {
         return DecodeEventPayloadForCameraAVStreamManagementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::CameraAvSettingsUserLevelManagement::Id: {
+        return DecodeEventPayloadForCameraAVSettingsUserLevelManagementCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::WebRTCTransportProvider::Id: {
         return DecodeEventPayloadForWebRTCTransportProviderCluster(aPath.mEventId, aReader, aError);

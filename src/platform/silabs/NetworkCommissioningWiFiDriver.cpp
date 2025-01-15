@@ -186,7 +186,7 @@ void SlWiFiDriver::UpdateNetworkingStatus()
     }
 
     ByteSpan networkId = ByteSpan((const unsigned char *) mStagingNetwork.ssid, mStagingNetwork.ssidLen);
-    if (!wfx_is_sta_connected())
+    if (!IsStationConnected())
     {
         // TODO: https://github.com/project-chip/connectedhomeip/issues/26861
         mpStatusChangeCallback->OnNetworkingStatusChange(Status::kUnknownError, MakeOptional(networkId),
@@ -336,7 +336,7 @@ CHIP_ERROR GetConnectedNetwork(Network & network)
     network.connected    = false;
     // we are able to fetch the wifi provision data and STA should be connected
     VerifyOrReturnError(wfx_get_wifi_provision(&wifiConfig), CHIP_ERROR_UNINITIALIZED);
-    VerifyOrReturnError(wfx_is_sta_connected(), CHIP_ERROR_NOT_CONNECTED);
+    VerifyOrReturnError(IsStationConnected(), CHIP_ERROR_NOT_CONNECTED);
     network.connected = true;
     uint8_t length    = strnlen(wifiConfig.ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
     VerifyOrReturnError(length < sizeof(network.networkID), CHIP_ERROR_BUFFER_TOO_SMALL);

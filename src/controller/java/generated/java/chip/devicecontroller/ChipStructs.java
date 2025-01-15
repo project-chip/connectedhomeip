@@ -14102,6 +14102,249 @@ public static class CameraAvStreamManagementClusterViewportStruct {
     return output.toString();
   }
 }
+public static class CameraAvSettingsUserLevelManagementClusterMPTZStruct {
+  public Optional<Integer> pan;
+  public Optional<Integer> tilt;
+  public Optional<Integer> zoom;
+  private static final long PAN_ID = 0L;
+  private static final long TILT_ID = 1L;
+  private static final long ZOOM_ID = 2L;
+
+  public CameraAvSettingsUserLevelManagementClusterMPTZStruct(
+    Optional<Integer> pan,
+    Optional<Integer> tilt,
+    Optional<Integer> zoom
+  ) {
+    this.pan = pan;
+    this.tilt = tilt;
+    this.zoom = zoom;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(PAN_ID, pan.<BaseTLVType>map((nonOptionalpan) -> new IntType(nonOptionalpan)).orElse(new EmptyType())));
+    values.add(new StructElement(TILT_ID, tilt.<BaseTLVType>map((nonOptionaltilt) -> new IntType(nonOptionaltilt)).orElse(new EmptyType())));
+    values.add(new StructElement(ZOOM_ID, zoom.<BaseTLVType>map((nonOptionalzoom) -> new UIntType(nonOptionalzoom)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static CameraAvSettingsUserLevelManagementClusterMPTZStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Integer> pan = Optional.empty();
+    Optional<Integer> tilt = Optional.empty();
+    Optional<Integer> zoom = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == PAN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          pan = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == TILT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          tilt = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == ZOOM_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          zoom = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new CameraAvSettingsUserLevelManagementClusterMPTZStruct(
+      pan,
+      tilt,
+      zoom
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CameraAvSettingsUserLevelManagementClusterMPTZStruct {\n");
+    output.append("\tpan: ");
+    output.append(pan);
+    output.append("\n");
+    output.append("\ttilt: ");
+    output.append(tilt);
+    output.append("\n");
+    output.append("\tzoom: ");
+    output.append(zoom);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct {
+  public Integer presetID;
+  public String name;
+  public ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct settings;
+  private static final long PRESET_ID_ID = 0L;
+  private static final long NAME_ID = 1L;
+  private static final long SETTINGS_ID = 2L;
+
+  public CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct(
+    Integer presetID,
+    String name,
+    ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct settings
+  ) {
+    this.presetID = presetID;
+    this.name = name;
+    this.settings = settings;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(PRESET_ID_ID, new UIntType(presetID)));
+    values.add(new StructElement(NAME_ID, new StringType(name)));
+    values.add(new StructElement(SETTINGS_ID, settings.encodeTlv()));
+
+    return new StructType(values);
+  }
+
+  public static CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer presetID = null;
+    String name = null;
+    ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct settings = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == PRESET_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          presetID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          name = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == SETTINGS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          settings = ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct.decodeTlv(castingValue);
+        }
+      }
+    }
+    return new CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct(
+      presetID,
+      name,
+      settings
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct {\n");
+    output.append("\tpresetID: ");
+    output.append(presetID);
+    output.append("\n");
+    output.append("\tname: ");
+    output.append(name);
+    output.append("\n");
+    output.append("\tsettings: ");
+    output.append(settings);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class CameraAvSettingsUserLevelManagementClusterViewportStruct {
+  public Integer x1;
+  public Integer y1;
+  public Integer x2;
+  public Integer y2;
+  private static final long X1_ID = 0L;
+  private static final long Y1_ID = 1L;
+  private static final long X2_ID = 2L;
+  private static final long Y2_ID = 3L;
+
+  public CameraAvSettingsUserLevelManagementClusterViewportStruct(
+    Integer x1,
+    Integer y1,
+    Integer x2,
+    Integer y2
+  ) {
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(X1_ID, new UIntType(x1)));
+    values.add(new StructElement(Y1_ID, new UIntType(y1)));
+    values.add(new StructElement(X2_ID, new UIntType(x2)));
+    values.add(new StructElement(Y2_ID, new UIntType(y2)));
+
+    return new StructType(values);
+  }
+
+  public static CameraAvSettingsUserLevelManagementClusterViewportStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer x1 = null;
+    Integer y1 = null;
+    Integer x2 = null;
+    Integer y2 = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == X1_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          x1 = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == Y1_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          y1 = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == X2_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          x2 = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == Y2_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          y2 = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new CameraAvSettingsUserLevelManagementClusterViewportStruct(
+      x1,
+      y1,
+      x2,
+      y2
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CameraAvSettingsUserLevelManagementClusterViewportStruct {\n");
+    output.append("\tx1: ");
+    output.append(x1);
+    output.append("\n");
+    output.append("\ty1: ");
+    output.append(y1);
+    output.append("\n");
+    output.append("\tx2: ");
+    output.append(x2);
+    output.append("\n");
+    output.append("\ty2: ");
+    output.append(y2);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class WebRTCTransportProviderClusterICEServerStruct {
   public ArrayList<String> urls;
   public Optional<String> username;
