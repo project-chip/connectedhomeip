@@ -328,7 +328,7 @@ class CertificateAuthorityManager:
             """
             Create new controller on an already established fabric
             """
-            return self.activeCaList[CaList].adminList[CaList].NewController(nodeId=nodeid)
+            return self.activeCaList[CaList].adminList[0].NewController(nodeId=nodeid)
 
     def Shutdown(self):
         ''' Shuts down all active CertificateAuthority instances tracked by this manager, before shutting itself down.
