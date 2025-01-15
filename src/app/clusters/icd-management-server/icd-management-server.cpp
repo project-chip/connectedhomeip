@@ -70,13 +70,14 @@ private:
         return encoder.Encode(mICDConfigurationData->GetFeatureMap());
     }
 
-#if CHIP_CONFIG_ENABLE_ICD_LIT
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
     CHIP_ERROR ReadOperatingMode(EndpointId endpoint, AttributeValueEncoder & encoder)
     {
         return mICDConfigurationData->GetICDMode() == ICDConfigurationData::ICDMode::SIT
             ? encoder.Encode(IcdManagement::OperatingModeEnum::kSit)
             : encoder.Encode(IcdManagement::OperatingModeEnum::kLit);
     }
+#endif // CHIP_CONFIG_ENABLE_ICD_DSLS
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     CHIP_ERROR ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder);
@@ -88,7 +89,6 @@ private:
     Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
     FabricTable * mFabricTable                     = nullptr;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
-#endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
     ICDConfigurationData * mICDConfigurationData = nullptr;
 };
@@ -110,11 +110,10 @@ CHIP_ERROR IcdManagementAttributeAccess::Read(const ConcreteReadAttributePath & 
 
     case IcdManagement::Attributes::FeatureMap::Id:
         return ReadFeatureMap(aPath.mEndpointId, aEncoder);
-
-#if CHIP_CONFIG_ENABLE_ICD_LIT
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
     case IcdManagement::Attributes::OperatingMode::Id:
         return ReadOperatingMode(aPath.mEndpointId, aEncoder);
-
+#endif // CHIP_CONFIG_ENABLE_ICD_DSLS
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     case IcdManagement::Attributes::RegisteredClients::Id:
         return ReadRegisteredClients(aPath.mEndpointId, aEncoder);
@@ -128,7 +127,6 @@ CHIP_ERROR IcdManagementAttributeAccess::Read(const ConcreteReadAttributePath & 
     case IcdManagement::Attributes::MaximumCheckInBackOff::Id:
         return ReadMaximumCheckInBackOff(aPath.mEndpointId, aEncoder);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
-#endif // CHIP_CONFIG_ENABLE_ICD_LIT
     }
 
     return CHIP_NO_ERROR;

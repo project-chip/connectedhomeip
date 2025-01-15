@@ -17,7 +17,9 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-enums.h>
 #include <app/icd/server/ICDConfigurationData.h>
+#include <lib/support/BitFlags.h>
 
 namespace chip {
 namespace Test {
@@ -39,7 +41,7 @@ public:
         return mData->SetModeDurations(activeModeDuration, idleModeDuration);
     }
 
-    void SetFeatureMap(uint32_t featureMap) { mData->SetFeatureMap(featureMap); }
+    void SetFeatureMap(BitFlags<app::Clusters::IcdManagement::Feature> featureMap) { mData->SetFeatureMap(featureMap); }
 
 private:
     ICDConfigurationData * mData = nullptr;

@@ -99,14 +99,14 @@ private:
     ICDConfigurationData()
     {
         // Initialize feature map
-#if CHIP_CONFIG_ENABLE_ICD_LIT
-        mFeatureMap.Set(app::Clusters::IcdManagement::Feature::kLongIdleTimeSupport);
 #if CHIP_CONFIG_ENABLE_ICD_CIP
         mFeatureMap.Set(app::Clusters::IcdManagement::Feature::kCheckInProtocolSupport);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 #if CHIP_CONFIG_ENABLE_ICD_UAT
         mFeatureMap.Set(app::Clusters::IcdManagement::Feature::kUserActiveModeTrigger);
 #endif // CHIP_CONFIG_ENABLE_ICD_UAT
+#if CHIP_CONFIG_ENABLE_ICD_LIT
+        mFeatureMap.Set(app::Clusters::IcdManagement::Feature::kLongIdleTimeSupport);
 #if CHIP_CONFIG_ENABLE_ICD_DSLS
         mFeatureMap.Set(app::Clusters::IcdManagement::Feature::kDynamicSitLitSupport);
 #endif // CHIP_CONFIG_ENABLE_ICD_DSLS
@@ -144,7 +144,7 @@ private:
     CHIP_ERROR SetModeDurations(Optional<System::Clock::Milliseconds32> activeModeDuration,
                                 Optional<System::Clock::Milliseconds32> idleModeDuration);
 
-    void SetFeatureMap(uint32_t featureMap) { mFeatureMap.SetRaw(featureMap); }
+    void SetFeatureMap(BitFlags<app::Clusters::IcdManagement::Feature> featureMap) { mFeatureMap = featureMap; }
 
     static constexpr System::Clock::Seconds32 kMaxIdleModeDuration = System::Clock::Seconds32(18 * kSecondsPerHour);
     static constexpr System::Clock::Seconds32 kMinIdleModeDuration = System::Clock::Seconds32(1);

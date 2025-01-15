@@ -22,13 +22,17 @@ buildconfig_header("icd-server-buildconfig") {
   header = "ICDServerBuildConfig.h"
   header_dir = "app/icd/server"
 
-  if (chip_enable_icd_lit || chip_enable_icd_checkin ||
+  if (chip_enable_icd_lit || chip_enable_icd_checkin || chip_enable_icd_dsls ||
       chip_enable_icd_user_active_mode_trigger) {
     assert(chip_enable_icd_server)
   }
 
   if (chip_enable_icd_lit) {
     assert(chip_enable_icd_checkin && chip_enable_icd_user_active_mode_trigger)
+  }
+
+  if (chip_enable_icd_dsls) {
+    assert(chip_enable_icd_lit)
   }
 
   defines = [
