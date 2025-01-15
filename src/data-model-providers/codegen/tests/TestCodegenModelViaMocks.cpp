@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/data-model-provider/MetadataSearch.h"
 #include <pw_unit_test/framework.h>
 
 #include <data-model-providers/codegen/tests/EmberInvokeOverride.h>
@@ -35,6 +34,7 @@
 #include <app/GlobalAttributes.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/data-model-provider/MetadataList.h>
+#include <app/data-model-provider/MetadataSearch.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/StringBuilderAdapters.h>
