@@ -23,7 +23,7 @@
 ## Run RPC Console
 
 -   Build chip-console following this
-    [guide](../../common/pigweed/rpc_console/README.md)
+    [guide](../../../examples/common/pigweed/rpc_console/README.md)
 
 -   Start the console
 

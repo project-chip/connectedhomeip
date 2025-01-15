@@ -242,7 +242,7 @@ build and [guide](../../../examples/chip-tool/README.md) use chip-tool for test.
 
 Thread wireless protocol could runs on BL704L/BL706/BL616, which needs a Thread
 border router to connect Thread network to Wi-Fi/Ethernet network. Please follow
-this [guide](../../../docs/guides/openthread_border_router_pi.md) to setup a
+this [guide](../openthread/openthread_border_router_pi.md) to setup a
 raspberry Pi border router.
 
 After Thread border router setup, please type following command on Thread border
