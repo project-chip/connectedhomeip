@@ -21,11 +21,11 @@
 
 #pragma once
 
-#include "data-model-providers/codegen/CodegenDataModelProvider.h"
 #include <app/CommandHandler.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Scoped.h>
 
