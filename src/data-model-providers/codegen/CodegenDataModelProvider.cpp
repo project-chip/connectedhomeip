@@ -247,9 +247,9 @@ DataModel::ServerClusterEntry ServerClusterEntryFrom(EndpointId endpointId, cons
     return entry;
 }
 
-DataModel::AttributeEntry2 AttributeEntry2From(const ConcreteClusterPath & clusterPath, const EmberAfAttributeMetadata & attribute)
+DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & clusterPath, const EmberAfAttributeMetadata & attribute)
 {
-    DataModel::AttributeEntry2 entry;
+    DataModel::AttributeEntry entry;
 
     const ConcreteAttributePath attributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
 
@@ -465,11 +465,11 @@ DataModel::MetadataList<DataModel::ServerClusterEntry> CodegenDataModelProvider:
     return result;
 }
 
-DataModel::MetadataList<DataModel::AttributeEntry2> CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path)
+DataModel::MetadataList<DataModel::AttributeEntry> CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path)
 {
     const EmberAfCluster * cluster = FindServerCluster(path);
 
-    DataModel::MetadataList<DataModel::AttributeEntry2> result;
+    DataModel::MetadataList<DataModel::AttributeEntry> result;
 
     VerifyOrReturnValue(cluster != nullptr, result);
     VerifyOrReturnValue(cluster->attributeCount > 0, result);
@@ -488,7 +488,7 @@ DataModel::MetadataList<DataModel::AttributeEntry2> CodegenDataModelProvider::At
 
     for (auto & attribute : attributeSpan)
     {
-        err = result.Append(AttributeEntry2From(path, attribute));
+        err = result.Append(AttributeEntryFrom(path, attribute));
         if (err != CHIP_NO_ERROR)
         {
 #if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING

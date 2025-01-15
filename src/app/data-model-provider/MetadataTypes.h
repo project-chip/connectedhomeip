@@ -93,7 +93,7 @@ enum class AttributeQualityFlags : uint32_t
     kTimed           = 0x0040, // `T` quality on attributes (writes require timed interactions)
 };
 
-struct AttributeEntry2
+struct AttributeEntry
 {
     AttributeId attributeId;
     BitFlags<AttributeQualityFlags> flags;
@@ -165,7 +165,7 @@ public:
     virtual MetadataList<ClusterId> ClientClusters(EndpointId endpointId)          = 0;
     virtual MetadataList<ServerClusterEntry> ServerClusters(EndpointId endpointId) = 0;
 
-    virtual MetadataList<AttributeEntry2> Attributes(const ConcreteClusterPath & path)            = 0;
+    virtual MetadataList<AttributeEntry> Attributes(const ConcreteClusterPath & path)             = 0;
     virtual MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath & path)           = 0;
     virtual MetadataList<AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) = 0;
 

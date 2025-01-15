@@ -1026,7 +1026,7 @@ TEST_F(TestCodegenModelViaMocks, FindAttribute)
     ASSERT_FALSE(finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10))).has_value());
 
     // valid info
-    std::optional<AttributeEntry2> info = finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), FeatureMap::Id));
+    std::optional<AttributeEntry> info = finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), FeatureMap::Id));
     ASSERT_TRUE(info.has_value());
     EXPECT_FALSE(info->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
 
@@ -1056,7 +1056,7 @@ TEST_F(TestCodegenModelViaMocks, GlobalAttributeInfo)
 
     AttributeFinder finder(&model);
 
-    std::optional<AttributeEntry2> info = finder.Find(
+    std::optional<AttributeEntry> info = finder.Find(
         ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id));
 
     ASSERT_FALSE(info.has_value());

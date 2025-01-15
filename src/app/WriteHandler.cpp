@@ -112,7 +112,7 @@ std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePat
     }
 
     DataModel::AttributeFinder finder(mDataModelProvider);
-    std::optional<DataModel::AttributeEntry2> info = finder.Find(path);
+    std::optional<DataModel::AttributeEntry> info = finder.Find(path);
 
     if (!info.has_value())
     {

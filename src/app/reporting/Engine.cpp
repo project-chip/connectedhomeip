@@ -84,7 +84,7 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
 
     DataModel::AttributeFinder finder(dataModel);
 
-    std::optional<DataModel::AttributeEntry2> info = finder.Find(path);
+    std::optional<DataModel::AttributeEntry> info = finder.Find(path);
 
     // If the attribute exists, we know whether it is readable (readPrivilege has value)
     // and what the required access privilege is. However for attributes missing from the metatada

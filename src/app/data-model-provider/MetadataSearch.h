@@ -17,12 +17,12 @@
  */
 #pragma once
 
-#include "app/ConcreteAttributePath.h"
-#include "app/ConcreteClusterPath.h"
-#include "lib/core/DataModelTypes.h"
-#include "lib/support/CodeUtils.h"
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/CodeUtils.h>
 
 #include <algorithm>
 #include <optional>
@@ -40,23 +40,7 @@ class ServerClusterFinder
 public:
     ServerClusterFinder(ProviderMetadataTree * provider) : mProvider(provider) {}
 
-    std::optional<ServerClusterEntry> Find(const ConcreteClusterPath & path)
-    {
-        VerifyOrReturnValue(mProvider != nullptr, std::nullopt);
-
-        if (mEndpointId != path.mEndpointId)
-        {
-            mClusterEntries = mProvider->ServerClusters(path.mEndpointId);
-        }
-
-        auto serverClustersSpan = mClusterEntries.GetSpanValidForLifetime();
-
-        auto pos = std::find_if(serverClustersSpan.begin(), serverClustersSpan.end(),
-                                [&path](const ServerClusterEntry & cluster) { return cluster.clusterId == path.mClusterId; });
-        VerifyOrReturnValue(pos != serverClustersSpan.end(), std::nullopt);
-
-        return *pos;
-    }
+    std::optional<ServerClusterEntry> Find(const ConcreteClusterPath & path);
 
 private:
     ProviderMetadataTree * mProvider;
@@ -73,28 +57,12 @@ class AttributeFinder
 public:
     AttributeFinder(ProviderMetadataTree * provider) : mProvider(provider), mClusterPath(kInvalidEndpointId, kInvalidClusterId) {}
 
-    std::optional<AttributeEntry2> Find(const ConcreteAttributePath & path)
-    {
-        VerifyOrReturnValue(mProvider != nullptr, std::nullopt);
-
-        if (mClusterPath != path)
-        {
-            mAttributes = mProvider->Attributes(path);
-        }
-
-        auto serverClustersSpan = mAttributes.GetSpanValidForLifetime();
-
-        auto pos = std::find_if(serverClustersSpan.begin(), serverClustersSpan.end(),
-                                [&path](const AttributeEntry2 & attr) { return attr.attributeId == path.mAttributeId; });
-        VerifyOrReturnValue(pos != serverClustersSpan.end(), std::nullopt);
-
-        return *pos;
-    }
+    std::optional<AttributeEntry> Find(const ConcreteAttributePath & path);
 
 private:
     ProviderMetadataTree * mProvider;
     ConcreteClusterPath mClusterPath;
-    MetadataList<AttributeEntry2> mAttributes;
+    MetadataList<AttributeEntry> mAttributes;
 };
 
 /// Helps search for a specific server endpoint in the given
@@ -112,16 +80,7 @@ public:
         }
     }
 
-    std::optional<EndpointEntry> Find(EndpointId endpointId)
-    {
-        auto span = mEndpoints.GetSpanValidForLifetime();
-        auto pos  = std::find_if(span.begin(), span.end(),
-                                 [&endpointId](const EndpointEntry & endpoint) { return endpoint.id == endpointId; });
-
-        VerifyOrReturnValue(pos != span.end(), std::nullopt);
-
-        return *pos;
-    }
+    std::optional<EndpointEntry> Find(EndpointId endpointId);
 
 private:
     ProviderMetadataTree * mProvider;
