@@ -21,6 +21,7 @@ public interface NfcCommissioningManager {
 
   // For app
   void setNfcCallback(NfcCallback nfcCallback);
+
   NfcCallback getCallback();
 
   void setAndroidChipPlatform(AndroidChipPlatform platform);
@@ -30,5 +31,4 @@ public interface NfcCommissioningManager {
 
   // NfcApplicationDelegate
   void sendToNfcTag(byte[] buf);
-
 }

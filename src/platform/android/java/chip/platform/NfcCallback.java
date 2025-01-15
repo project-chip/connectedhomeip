@@ -17,6 +17,4 @@
  */
 package chip.platform;
 
-public interface NfcCallback {
-
-}
+public interface NfcCallback {}
