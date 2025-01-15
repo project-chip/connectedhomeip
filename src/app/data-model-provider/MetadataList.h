@@ -28,6 +28,8 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
+namespace detail {
+
 // essentially a `void *` untyped metadata list base,
 // so that actual functionality does not template-explode
 class GenericMetadataList
@@ -79,11 +81,18 @@ private:
     mutable bool mIsImmutable = false;
 };
 
+} // namespace detail
+
 template <typename T>
 class MetadataList : public GenericMetadataList
 {
 public:
     using SpanType = Span<const T>;
+
+    // we do not call destructors, just malloc things.
+    // Note that classes should also be trivially assignable (we do NOT call the assignment operator)
+    // This makes this class somewhat dangerous...
+    static_assert(std::is_destructible_v<T>);
 
     MetadataList() : GenericMetadataList(sizeof(T)) {}
     MetadataList(const MetadataList &)                   = delete;

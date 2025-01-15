@@ -23,6 +23,7 @@
 namespace chip {
 namespace app {
 namespace DataModel {
+namespace detail {
 
 GenericMetadataList::~GenericMetadataList()
 {
@@ -119,6 +120,7 @@ void GenericMetadataList::AquireExistingBuffer(const void * buffer, size_t eleme
     mBuffer = static_cast<uint8_t *>(const_cast<void *>(buffer));
 }
 
+} // namespace detail
 } // namespace DataModel
 } // namespace app
 } // namespace chip
