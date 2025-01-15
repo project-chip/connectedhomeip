@@ -247,7 +247,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         for endpoint, endpoint_data in read_request.tlvAttributes.items():
             cluster_list = sorted(endpoint_data.keys())
             server_list = sorted(endpoint_data.get(Clusters.Descriptor.id, {})
-                                .get(Clusters.Descriptor.Attributes.ServerList.attribute_id, []))
+                                 .get(Clusters.Descriptor.Attributes.ServerList.attribute_id, []))
             asserts.assert_equal(cluster_list, server_list, f"Cluster list and server list do not match for endpoint {endpoint}")
 
     def verify_read_request(self, read_request):
