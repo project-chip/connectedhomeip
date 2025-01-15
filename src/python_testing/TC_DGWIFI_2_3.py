@@ -60,10 +60,12 @@ class TC_DGWIFI_2_3(MatterBaseTest):
     async def read_attribute_and_validate(self, endpoint, attribute, validation_func, field_name):
         """Reads an attribute and validates it using the provided function."""
         value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.WiFiNetworkDiagnostics, attribute=attribute)
-        if value is not None:
-            asserts.assert_true(isinstance(value, Nullable), f"{field_name} must be of type 'Nullable' when not None.")
-            if value != NullValue:
-                asserts.assert_true(validation_func(value.Value), f"{field_name} has an invalid value: {value.Value}")
+        if value is None:
+            return
+        asserts.assert_true(isinstance(value, Nullable), f"{field_name} must be of type 'Nullable' when not None.")
+        if value == NullValue:
+            return
+        asserts.assert_true(validation_func(value.Value), f"{field_name} has an invalid value: {value.Value}")
 
     def desc_TC_DGWIFI_2_3(self) -> str:
         """Returns a description of this test."""
