@@ -972,18 +972,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         # The named pipe name must be set in the derived classes
         self.app_pipe = None
 
-    async def commission_devices(self) -> bool:
-        conf = self.matter_test_config
-
-        for commission_idx, node_id in enumerate(conf.dut_node_ids):
-            logging.info(
-                f"Starting commissioning for root index {conf.root_of_trust_index}, fabric ID 0x{conf.fabric_id:016X}, node ID 0x{node_id:016X}")
-            logging.info(f"Commissioning method: {conf.commissioning_method}")
-
-            await CommissionDeviceTest.commission_device(self, commission_idx)
-
-        return True
-
     def get_test_steps(self, test: str) -> list[TestStep]:
         ''' Retrieves the test step list for the given test
 
@@ -2370,11 +2358,22 @@ class CommissionDeviceTest(MatterBaseTest):
         if not asyncio.run(self.commission_devices()):
             raise signals.TestAbortAll("Failed to commission node")
 
-    async def commission_device(instance: MatterBaseTest, i) -> bool:
-        dev_ctrl = instance.default_controller
-        conf = instance.matter_test_config
+    async def commission_devices(self) -> bool:
+        conf = self.matter_test_config
 
-        info = instance.get_setup_payload_info()[i]
+        commissioned = []
+        setup_payloads = self.get_setup_payload_info()
+        for node_id, setup_payload in zip(conf.dut_node_ids, setup_payloads):
+            logging.info(f"Starting commissioning for root index {conf.root_of_trust_index}, "
+                         f"fabric ID 0x{conf.fabric_id:016X}, node ID 0x{node_id:016X}")
+            logging.info(f"Commissioning method: {conf.commissioning_method}")
+            commissioned.append(await self.commission_device(node_id, setup_payload))
+
+        return all(commissioned)
+
+    async def commission_device(self, node_id: int, info: SetupPayloadInfo) -> bool:
+        dev_ctrl = self.default_controller
+        conf = self.matter_test_config
 
         if conf.tc_version_to_simulate is not None and conf.tc_user_response_to_simulate is not None:
             logging.debug(
@@ -2384,7 +2383,7 @@ class CommissionDeviceTest(MatterBaseTest):
         if conf.commissioning_method == "on-network":
             try:
                 await dev_ctrl.CommissionOnNetwork(
-                    nodeId=conf.dut_node_ids[i],
+                    nodeId=node_id,
                     setupPinCode=info.passcode,
                     filterType=info.filter_type,
                     filter=info.filter_value
@@ -2398,7 +2397,7 @@ class CommissionDeviceTest(MatterBaseTest):
                 await dev_ctrl.CommissionWiFi(
                     info.filter_value,
                     info.passcode,
-                    conf.dut_node_ids[i],
+                    node_id,
                     conf.wifi_ssid,
                     conf.wifi_passphrase,
                     isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
@@ -2412,7 +2411,7 @@ class CommissionDeviceTest(MatterBaseTest):
                 await dev_ctrl.CommissionThread(
                     info.filter_value,
                     info.passcode,
-                    conf.dut_node_ids[i],
+                    node_id,
                     conf.thread_operational_dataset,
                     isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
                 )
@@ -2425,7 +2424,8 @@ class CommissionDeviceTest(MatterBaseTest):
                 logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
                 await dev_ctrl.CommissionIP(
                     ipaddr=conf.commissionee_ip_address_just_for_testing,
-                    setupPinCode=info.passcode, nodeid=conf.dut_node_ids[i]
+                    setupPinCode=info.passcode,
+                    nodeid=node_id,
                 )
                 return True
             except ChipStackError as e:
