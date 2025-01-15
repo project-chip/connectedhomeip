@@ -2577,7 +2577,7 @@ cluster ColorControl = 768 {
   command StepColorTemperature(StepColorTemperatureRequest): DefaultSuccess = 76;
 }
 
-/** The Sample External manufacturer-specific cluster showcases an out-of-tree cluster manufacturer extensions */
+/** A sample showcasing an out-of-tree definition of a manufacturer specific cluster */
 cluster SampleExternalManufacturerSpecific = 4294048801 {
   revision 1; // NOTE: Default/not specifically set
 
@@ -3110,3 +3110,5 @@ endpoint 1 {
     handle command AddArguments;
   }
 }
+
+

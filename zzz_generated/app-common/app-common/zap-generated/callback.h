@@ -7135,15 +7135,3 @@ bool emberAfFaultInjectionClusterFailAtFaultCallback(
 bool emberAfFaultInjectionClusterFailRandomlyAtFaultCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::FaultInjection::Commands::FailRandomlyAtFault::DecodableType & commandData);
-/**
- * @brief Sample Manufacturer-Specific Cluster Ping Command callback (from client)
- */
-bool emberAfSampleManufacturerSpecificClusterPingCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::SampleManufacturerSpecific::Commands::Ping::DecodableType & commandData);
-/**
- * @brief Sample Manufacturer-Specific Cluster AddArguments Command callback (from client)
- */
-bool emberAfSampleManufacturerSpecificClusterAddArgumentsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::SampleManufacturerSpecific::Commands::AddArguments::DecodableType & commandData);
