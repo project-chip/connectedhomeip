@@ -433,8 +433,14 @@ DataModel::MetadataList<DataModel::ServerClusterEntry> CodegenDataModelProvider:
     const EmberAfCluster * begin = endpoint->cluster;
     const EmberAfCluster * end   = endpoint->cluster + endpoint->clusterCount;
 
-    const size_t serverClusterCount =
-        static_cast<size_t>(std::count_if(begin, end, [](const EmberAfCluster & cluster) { return cluster.IsServer(); }));
+    size_t serverClusterCount = 0;
+    for (const EmberAfCluster * cluster = begin; cluster != end; cluster++)
+    {
+        if (cluster->IsServer())
+        {
+            serverClusterCount++;
+        }
+    }
 
     CHIP_ERROR err = result.reserve(serverClusterCount);
     if (err != CHIP_NO_ERROR)
@@ -514,8 +520,15 @@ DataModel::MetadataList<ClusterId> CodegenDataModelProvider::ClientClusters(Endp
     const EmberAfCluster * begin = endpoint->cluster;
     const EmberAfCluster * end   = endpoint->cluster + endpoint->clusterCount;
 
-    const size_t clientClusterCount =
-        static_cast<size_t>(std::count_if(begin, end, [](const EmberAfCluster & cluster) { return cluster.IsClient(); }));
+    size_t clientClusterCount = 0;
+
+    for (const EmberAfCluster * cluster = begin; cluster != end; cluster++)
+    {
+        if (cluster->IsClient())
+        {
+            clientClusterCount++;
+        }
+    }
 
     CHIP_ERROR err = result.reserve(clientClusterCount);
     if (err != CHIP_NO_ERROR)
