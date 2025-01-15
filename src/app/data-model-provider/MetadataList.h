@@ -84,7 +84,7 @@ private:
 } // namespace detail
 
 template <typename T>
-class MetadataList : public GenericMetadataList
+class MetadataList : public detail::GenericMetadataList
 {
 public:
     using SpanType = Span<const T>;
