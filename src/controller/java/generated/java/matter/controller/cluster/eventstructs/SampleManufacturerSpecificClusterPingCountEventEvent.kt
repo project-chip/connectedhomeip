@@ -22,9 +22,12 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class SampleMeiClusterPingCountEventEvent(val count: UInt, val fabricIndex: UByte) {
+class SampleManufacturerSpecificClusterPingCountEventEvent(
+  val count: UInt,
+  val fabricIndex: UByte,
+) {
   override fun toString(): String = buildString {
-    append("SampleMeiClusterPingCountEventEvent {\n")
+    append("SampleManufacturerSpecificClusterPingCountEventEvent {\n")
     append("\tcount : $count\n")
     append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
@@ -43,14 +46,17 @@ class SampleMeiClusterPingCountEventEvent(val count: UInt, val fabricIndex: UByt
     private const val TAG_COUNT = 1
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SampleMeiClusterPingCountEventEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): SampleManufacturerSpecificClusterPingCountEventEvent {
       tlvReader.enterStructure(tlvTag)
       val count = tlvReader.getUInt(ContextSpecificTag(TAG_COUNT))
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
-      return SampleMeiClusterPingCountEventEvent(count, fabricIndex)
+      return SampleManufacturerSpecificClusterPingCountEventEvent(count, fabricIndex)
     }
   }
 }

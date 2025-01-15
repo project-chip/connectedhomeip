@@ -7081,13 +7081,13 @@ public static class UnitTestingClusterTestDifferentVendorMeiEventEvent {
     return output.toString();
   }
 }
-public static class SampleMeiClusterPingCountEventEvent {
+public static class SampleManufacturerSpecificClusterPingCountEventEvent {
   public Long count;
   public Integer fabricIndex;
   private static final long COUNT_ID = 1L;
   private static final long FABRIC_INDEX_ID = 254L;
 
-  public SampleMeiClusterPingCountEventEvent(
+  public SampleManufacturerSpecificClusterPingCountEventEvent(
     Long count,
     Integer fabricIndex
   ) {
@@ -7103,7 +7103,7 @@ public static class SampleMeiClusterPingCountEventEvent {
     return new StructType(values);
   }
 
-  public static SampleMeiClusterPingCountEventEvent decodeTlv(BaseTLVType tlvValue) {
+  public static SampleManufacturerSpecificClusterPingCountEventEvent decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
@@ -7122,7 +7122,7 @@ public static class SampleMeiClusterPingCountEventEvent {
         }
       }
     }
-    return new SampleMeiClusterPingCountEventEvent(
+    return new SampleManufacturerSpecificClusterPingCountEventEvent(
       count,
       fabricIndex
     );
@@ -7131,7 +7131,7 @@ public static class SampleMeiClusterPingCountEventEvent {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("SampleMeiClusterPingCountEventEvent {\n");
+    output.append("SampleManufacturerSpecificClusterPingCountEventEvent {\n");
     output.append("\tcount: ");
     output.append(count);
     output.append("\n");

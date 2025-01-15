@@ -118,6 +118,7 @@ endfunction()
 # Arguments:
 #   INPUT     - the name of the ".zap" file to use for generation
 #   GENERATOR - generator to use, like "app-templates"
+#   TEMPLATES_JSON - 
 #   OUTPUTS   - EXPECTED output names
 #
 #   OUTPUT_PATH  - [OUT] output variable will contain the directory where the
@@ -129,7 +130,7 @@ endfunction()
 function(chip_zapgen TARGET_NAME)
     cmake_parse_arguments(ARG
          ""
-         "INPUT;GENERATOR;OUTPUT_PATH;OUTPUT_FILES"
+         "INPUT;GENERATOR;OUTPUT_PATH;OUTPUT_FILES;TEMPLATES_JSON"
          "OUTPUTS"
          ${ARGN}
     )
@@ -147,14 +148,18 @@ function(chip_zapgen TARGET_NAME)
             CONTENT "${OUTPUT_AS_NEWLINES}"
         )
 
-
         set(OUT_NAMES)
         foreach(NAME IN LISTS ARG_OUTPUTS)
             list(APPEND OUT_NAMES "${GEN_FOLDER}/${NAME}")
         endforeach()
 
         if ("${ARG_GENERATOR}" STREQUAL "app-templates")
-            SET(TEMPLATE_PATH "${CHIP_ROOT}/src/app/zap-templates/app-templates.json")
+
+            if ("${ARG_TEMPLATES_JSON}" STREQUAL "")
+                SET(TEMPLATE_PATH "${CHIP_ROOT}/src/app/zap-templates/app-templates.json")
+            else()
+                SET(TEMPLATE_PATH "${ARG_TEMPLATES_JSON}")
+            endif()
 
             # TODO: unclear how to maintain these: there is no parser that can figure
             #       out links of template files and zap files and such

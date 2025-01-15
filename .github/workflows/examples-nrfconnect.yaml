@@ -193,6 +193,13 @@ jobs:
                     nrfconnect nrf7002dk_nrf5340_cpuapp all-clusters-app \
                     examples/all-clusters-app/nrfconnect/build/nrfconnect/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
+            - name: Build example nRF Connect SDK Manufacturer Specific App on nRF52840 DK
+              run: |
+                  scripts/examples/nrfconnect_example.sh manufacturer-specific-app nrf52840dk/nrf52840
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    nrfconnect nrf52840dk_nrf52840 manufacturer-specific-app \
+                    examples/manufacturer-specific-app/nrfconnect/build/nrfconnect/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
             - name: Run unit tests for Zephyr native_posix_64 platform
               if: github.event_name == 'push' || steps.changed_paths.outputs.tests == 'true' || steps.changed_paths.outputs.nrfconnect == 'true'
               run: |

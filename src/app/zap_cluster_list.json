@@ -69,7 +69,7 @@
         "MESSAGES_CLUSTER": [],
         "MODE_SELECT_CLUSTER": [],
         "NETWORK_COMMISSIONING_CLUSTER": [],
-        "SAMPLE_MEI_CLUSTER": [],
+        "SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER": [],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "OCCUPANCY_SENSING_CLUSTER": [],
         "ON_OFF_CLUSTER": [],
@@ -233,7 +233,9 @@
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
-        "SAMPLE_MEI_CLUSTER": ["sample-mei-server"],
+        "SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER": [
+            "sample-manufacturer-specific-server"
+        ],
         "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
         "ON_OFF_CLUSTER": ["on-off-server"],
         "POWER_TOPOLOGY_CLUSTER": ["power-topology-server"],

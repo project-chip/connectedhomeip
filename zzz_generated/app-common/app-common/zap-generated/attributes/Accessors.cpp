@@ -44413,7 +44413,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 } // namespace Attributes
 } // namespace FaultInjection
 
-namespace SampleMei {
+namespace SampleManufacturerSpecific {
 namespace Attributes {
 
 namespace FlipFlop {
@@ -44424,7 +44424,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::SampleMei::Id, Id, readable, sizeof(temp));
+        emberAfReadAttribute(endpoint, Clusters::SampleManufacturerSpecific::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -44444,7 +44444,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::SampleMei::Id, Id),
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::SampleManufacturerSpecific::Id, Id),
                                  EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
@@ -44458,7 +44458,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SampleMei::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::SampleManufacturerSpecific::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace FlipFlop
@@ -44471,7 +44471,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::SampleMei::Id, Id, readable, sizeof(temp));
+        emberAfReadAttribute(endpoint, Clusters::SampleManufacturerSpecific::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -44491,7 +44491,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::SampleMei::Id, Id),
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::SampleManufacturerSpecific::Id, Id),
                                  EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
@@ -44505,7 +44505,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SampleMei::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::SampleManufacturerSpecific::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -44518,7 +44518,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::SampleMei::Id, Id, readable, sizeof(temp));
+        emberAfReadAttribute(endpoint, Clusters::SampleManufacturerSpecific::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -44538,7 +44538,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::SampleMei::Id, Id),
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::SampleManufacturerSpecific::Id, Id),
                                  EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
@@ -44552,13 +44552,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SampleMei::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::SampleManufacturerSpecific::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace SampleMei
+} // namespace SampleManufacturerSpecific
 
 } // namespace Clusters
 } // namespace app

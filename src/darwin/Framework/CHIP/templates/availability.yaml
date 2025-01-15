@@ -7473,7 +7473,7 @@
   provisional:
       clusters:
           # SDK example, not part of the specification.
-          - SampleMEI
+          - SampleManufacturerSpecific
       attributes:
           Scenes:
               # New scenes bits not stable yet.

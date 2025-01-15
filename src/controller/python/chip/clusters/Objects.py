@@ -167,7 +167,7 @@ __all__ = [
     "CommissionerControl",
     "UnitTesting",
     "FaultInjection",
-    "SampleMei",
+    "SampleManufacturerSpecific",
 ]
 
 
@@ -50836,7 +50836,7 @@ class FaultInjection(Cluster):
 
 
 @dataclass
-class SampleMei(Cluster):
+class SampleManufacturerSpecific(Cluster):
     id: typing.ClassVar[int] = 0xFFF1FC20
 
     @ChipUtility.classproperty

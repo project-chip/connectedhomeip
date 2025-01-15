@@ -34,7 +34,8 @@ CommandHandlerInterfaceOnlyClusters:
     - Activated Carbon Filter Monitoring
     - HEPA Filter Monitoring
     - RVC Operational State
-    - Sample MEI
+    - Sample External Manufacturer-Specific
+    - Sample Manufacturer-Specific
     - Microwave Oven Control
     - Chime
     - Commissioner Control
@@ -66,7 +67,8 @@ ClustersWithInitFunctions:
     - Time Format Localization
     - Thermostat
     - Mode Select
-    - Sample MEI
+    - Sample External Manufacturer-Specific
+    - Sample Manufacturer-Specific
     - Scenes Management
 
 ClustersWithAttributeChangedFunctions:
@@ -84,7 +86,8 @@ ClustersWithShutdownFunctions:
     - Door Lock
     - Level Control
     - Color Control
-    - Sample MEI
+    - Sample External Manufacturer-Specific
+    - Sample Manufacturer-Specific
     - Scenes Management
     - Thermostat
 

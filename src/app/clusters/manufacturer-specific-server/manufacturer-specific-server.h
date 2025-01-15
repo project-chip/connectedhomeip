@@ -1,5 +1,5 @@
-#ifndef SRC_APP_CLUSTERS_SAMPLE_MEI_CLUSTER_SERVER_SERVER_H_
-#define SRC_APP_CLUSTERS_SAMPLE_MEI_CLUSTER_SERVER_SERVER_H_
+#ifndef SRC_APP_CLUSTERS_SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER_SERVER_SERVER_H_
+#define SRC_APP_CLUSTERS_SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER_SERVER_SERVER_H_
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
@@ -11,24 +11,24 @@
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
 
-#ifdef ZCL_USING_SAMPLE_MEI_CLUSTER_SERVER
-#define SAMPLE_MEI_NUM_SUPPORTED_ENDPOINTS                                                                                         \
-    (MATTER_DM_SAMPLE_MEI_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+#ifdef ZCL_USING_SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER_SERVER
+#define SAMPLE_MANUFACTURER_SPECIFIC_NUM_SUPPORTED_ENDPOINTS                                                                       \
+    (MATTER_DM_SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
 #else
-#define SAMPLE_MEI_NUM_SUPPORTED_ENDPOINTS CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
-#endif /* ZCL_USING_SAMPLE_MEI_CLUSTER_SERVER */
-static constexpr size_t kNumSupportedEndpoints = SAMPLE_MEI_NUM_SUPPORTED_ENDPOINTS;
+#define SAMPLE_MANUFACTURER_SPECIFIC_NUM_SUPPORTED_ENDPOINTS CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
+#endif /* ZCL_USING_SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER_SERVER */
+static constexpr size_t kNumSupportedEndpoints = SAMPLE_MANUFACTURER_SPECIFIC_NUM_SUPPORTED_ENDPOINTS;
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace SampleMei {
+namespace SampleManufacturerSpecific {
 
 // *****************************************************************************
-// SampleMeiContent has the stateful attributes of the cluster: its endpoint
+// SampleManufacturerSpecificContent has the stateful attributes of the cluster: its endpoint
 // and attributes
 
-class SampleMeiContent
+class SampleManufacturerSpecificContent
 {
 public:
     EndpointId endpoint;
@@ -37,22 +37,22 @@ public:
     // Attribute List
     bool flipflop; /* Attributes::FlipFlop::Id */
 
-    SampleMeiContent(EndpointId endpoint);
-    SampleMeiContent();
+    SampleManufacturerSpecificContent(EndpointId endpoint);
+    SampleManufacturerSpecificContent();
 };
 
 // *****************************************************************************
-// SampleMeiServer implements both Attributes and Commands
+// SampleManufacturerSpecificServer implements both Attributes and Commands
 
-class SampleMeiServer : public AttributeAccessInterface, public CommandHandlerInterface
+class SampleManufacturerSpecificServer : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
     // Register on all endpoints.
-    SampleMeiServer() :
-        AttributeAccessInterface(Optional<EndpointId>::Missing(), SampleMei::Id),
+    SampleManufacturerSpecificServer() :
+        AttributeAccessInterface(Optional<EndpointId>::Missing(), SampleManufacturerSpecific::Id),
         CommandHandlerInterface(Optional<EndpointId>(), Id)
     {}
-    static SampleMeiServer & Instance();
+    static SampleManufacturerSpecificServer & Instance();
 
     // Currently not used, but should be called from a whole-cluster shutdown
     // callback once cluster lifecycle is clearer
@@ -66,10 +66,10 @@ public:
     void InvokeCommand(HandlerContext & ctx) override;
 
     // Attribute storage
-#if SAMPLE_MEI_NUM_SUPPORTED_ENDPOINTS > 0
-    SampleMeiContent content[kNumSupportedEndpoints];
+#if SAMPLE_MANUFACTURER_SPECIFIC_NUM_SUPPORTED_ENDPOINTS > 0
+    SampleManufacturerSpecificContent content[kNumSupportedEndpoints];
 #else
-    SampleMeiContent * content = nullptr;
+    SampleManufacturerSpecificContent * content = nullptr;
 #endif
 
     size_t GetNumSupportedEndpoints() const;
@@ -82,9 +82,9 @@ private:
     size_t NextEmptyIndex() const;
 };
 
-} // namespace SampleMei
+} // namespace SampleManufacturerSpecific
 } // namespace Clusters
 } // namespace app
 } // namespace chip
 
-#endif // SRC_APP_CLUSTERS_SAMPLE_MEI_CLUSTER_SERVER_SERVER_H_
+#endif // SRC_APP_CLUSTERS_SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER_SERVER_SERVER_H_

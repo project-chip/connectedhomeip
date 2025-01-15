@@ -316,6 +316,11 @@ config CHIP_PROJECT_CONFIG
 	  configuration file that can be used to override any of Matter's default or
 	  platform-specific settings.
 
+config  CHIP_PROJECT_APP_COMMON_INCLUDE_DIRS
+	string "Project specific app-common directory for Manufacturer-specific clusters"
+	help
+	  Provides a directory to the app-common/ folder.
+
 # Thread network features
 
 config CHIP_ENABLE_DNSSD_SRP

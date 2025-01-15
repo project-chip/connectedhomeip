@@ -67,10 +67,12 @@ endfunction()
 # EXTERNAL_CLUSTERS Clusters with external implementations. The default implementations
 # will not be used nor required for these clusters.
 # Format: MY_CUSTOM_CLUSTER'.
+# TEMPLATES_JSON Use external templates.json (because of out-of-tree manufacturer
+# specific clusters, which need to be configured via an out-of-tree config-data.yaml)
 #
 function(chip_configure_data_model APP_TARGET)
     set(SCOPE PRIVATE)
-    cmake_parse_arguments(ARG "" "SCOPE;ZAP_FILE;IDL" "EXTERNAL_CLUSTERS" ${ARGN})
+    cmake_parse_arguments(ARG "" "SCOPE;ZAP_FILE;IDL;TEMPLATES_JSON" "EXTERNAL_CLUSTERS;EXTERNAL_APP_COMMON" ${ARGN})
 
     if(ARG_SCOPE)
         set(SCOPE ${ARG_SCOPE})
@@ -133,17 +135,10 @@ function(chip_configure_data_model APP_TARGET)
         ${CHIP_APP_BASE_DIR}/icd/server/ICDConfigurationData.cpp
     )
 
-    # This is:
-    #    //src/app/common:cluster-objects
-    #
-    # TODO: ideally we would avoid duplication and would link gn-built items
-    target_sources(${APP_TARGET} ${SCOPE}
-        ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
-    )
-
     chip_zapgen(${APP_TARGET}-zapgen
         INPUT "${ARG_ZAP_FILE}"
         GENERATOR "app-templates"
+        TEMPLATES_JSON ${ARG_TEMPLATES_JSON}
         OUTPUTS
         "zap-generated/access.h"
         "zap-generated/endpoint_config.h"
@@ -156,7 +151,6 @@ function(chip_configure_data_model APP_TARGET)
     add_dependencies(${APP_TARGET} ${APP_TARGET}-zapgen)
 
     target_sources(${APP_TARGET} ${SCOPE}
-        ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
         ${CHIP_APP_BASE_DIR}/reporting/reporting.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-table.cpp
@@ -173,4 +167,19 @@ function(chip_configure_data_model APP_TARGET)
         ${APP_GEN_FILES}
         ${APP_TEMPLATES_GEN_FILES}
     )
+
+    if(ARG_EXTERNAL_APP_COMMON)
+        target_sources(${APP_TARGET} ${SCOPE}
+                ${ARG_EXTERNAL_APP_COMMON}/app-common/zap-generated/attributes/Accessors.cpp
+                # TODO: ideally we would avoid duplication and would link gn-built items
+                ${ARG_EXTERNAL_APP_COMMON}/app-common/zap-generated/cluster-objects.cpp
+        )
+    else()
+        target_sources(${APP_TARGET} ${SCOPE}
+                ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
+                 # TODO: ideally we would avoid duplication and would link gn-built items
+                ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
+        )
+    endif()
+
 endfunction()

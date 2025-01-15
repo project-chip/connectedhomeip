@@ -43,7 +43,10 @@ import matter.tlv.ContextSpecificTag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class SampleMeiCluster(private val controller: MatterController, private val endpointId: UShort) {
+class SampleManufacturerSpecificCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort,
+) {
   class AddArgumentsResponse(val returnValue: UByte)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -825,7 +828,7 @@ class SampleMeiCluster(private val controller: MatterController, private val end
   }
 
   companion object {
-    private val logger = Logger.getLogger(SampleMeiCluster::class.java.name)
+    private val logger = Logger.getLogger(SampleManufacturerSpecificCluster::class.java.name)
     const val CLUSTER_ID: UInt = 4294048800u
   }
 }

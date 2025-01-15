@@ -3258,10 +3258,10 @@
           "enabled": 1
         },
         {
-          "name": "Sample MEI",
+          "name": "Sample Manufacturer-Specific",
           "code": 4294048800,
           "mfgCode": null,
-          "define": "SAMPLE_MEI_CLUSTER",
+          "define": "SAMPLE_MANUFACTURER_SPECIFIC_CLUSTER",
           "side": "server",
           "enabled": 1,
           "commands": [

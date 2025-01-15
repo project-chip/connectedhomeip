@@ -210,7 +210,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/temperature-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/matter-devices.xml \
                       src/app/zap-templates/zcl/data-model/chip/resource-monitoring-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/sample-mei-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/sample-manufacturer-specific-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/electrical-energy-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/electrical-power-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/zone-management-cluster.xml \

@@ -1,0 +1,67 @@
+/*
+ *    Copyright (c) 2021 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include <zephyr/dt-bindings/ipc_service/static_vrings.h>
+
+/ {
+	chosen {
+		nordic,pm-ext-flash = &mx25r64;
+	};
+
+	/*
+	* By default, PWM module is only configured for led0 (LED1 on the board).
+	* The lighting-app, however, uses LED2 to show the state of the lighting,
+	* including its brightness level.
+	*/
+	aliases {
+		pwm-led1 = &pwm_led1;
+	};
+
+	pwmleds {
+		compatible = "pwm-leds";
+		pwm_led1: pwm_led_1 {
+			pwms = < &pwm0 1 PWM_MSEC(20) PWM_POLARITY_INVERTED>;
+		};
+	};
+};
+
+/* Set IPC thread priority to the highest value to not collide with other threads. */
+&ipc0 {
+    zephyr,priority = <0 PRIO_COOP>;
+};
+
+&pwm0 {
+	pinctrl-0 = <&pwm0_default_alt>;
+	pinctrl-1 = <&pwm0_sleep_alt>;
+	pinctrl-names = "default", "sleep";
+};
+
+&pinctrl {
+	pwm0_default_alt: pwm0_default_alt {
+		group1 {
+			psels = <NRF_PSEL(PWM_OUT1, 0, 29)>;
+			nordic,invert;
+		};
+	};
+
+	pwm0_sleep_alt: pwm0_sleep_alt {
+		group1 {
+			psels = <NRF_PSEL(PWM_OUT1, 0, 29)>;
+			low-power-enable;
+		};
+	};
+
+};

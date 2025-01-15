@@ -15980,19 +15980,19 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @end
 
 /**
- * Cluster Sample MEI
+ * Cluster Sample Manufacturer-Specific
  *
- * The Sample MEI cluster showcases a cluster manufacturer extensions
+ * A manufacturer-specific sample cluster
  */
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRBaseClusterSampleMEI : MTRGenericBaseCluster
+@interface MTRBaseClusterSampleManufacturerSpecific : MTRGenericBaseCluster
 
 /**
  * Command Ping
  *
  * Simple command without any parameters and without a response.
  */
-- (void)pingWithParams:(MTRSampleMEIClusterPingParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)pingWithParams:(MTRSampleManufacturerSpecificClusterPingParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)pingWithCompletion:(MTRStatusCompletion)completion
     MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -16000,7 +16000,7 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * Command that takes two uint8 arguments and returns their sum.
  */
-- (void)addArgumentsWithParams:(MTRSampleMEIClusterAddArgumentsParams *)params completion:(void (^)(MTRSampleMEIClusterAddArgumentsResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)addArgumentsWithParams:(MTRSampleManufacturerSpecificClusterAddArgumentsParams *)params completion:(void (^)(MTRSampleManufacturerSpecificClusterAddArgumentsResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeFlipFlopWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeFlipFlopWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
@@ -16045,7 +16045,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @end
 
-@interface MTRBaseClusterSampleMEI (Availability)
+@interface MTRBaseClusterSampleManufacturerSpecific (Availability)
 
 /**
  * For all instance methods (reads, writes, commands) that take a completion,

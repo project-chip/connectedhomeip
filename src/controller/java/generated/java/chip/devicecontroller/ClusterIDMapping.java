@@ -409,8 +409,8 @@ public class ClusterIDMapping {
         if (clusterId == FaultInjection.ID) {
             return new FaultInjection();
         }
-        if (clusterId == SampleMei.ID) {
-            return new SampleMei();
+        if (clusterId == SampleManufacturerSpecific.ID) {
+            return new SampleManufacturerSpecific();
         }return null;
     }
     public static class Identify implements BaseCluster {
@@ -19047,7 +19047,7 @@ public class ClusterIDMapping {
             return Command.valueOf(name).getID();
         }
     }
-    public static class SampleMei implements BaseCluster {
+    public static class SampleManufacturerSpecific implements BaseCluster {
         public static final long ID = 4294048800L;
         public long getID() {
             return ID;

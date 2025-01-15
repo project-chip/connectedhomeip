@@ -5156,9 +5156,9 @@ static id _Nullable DecodeEventPayloadForUnitTestingCluster(EventId aEventId, TL
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForSampleMEICluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForSampleManufacturerSpecificCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::SampleMei;
+    using namespace Clusters::SampleManufacturerSpecific;
     switch (aEventId) {
     case Events::PingCountEvent::Id: {
         Events::PingCountEvent::DecodableType cppValue;
@@ -5167,7 +5167,7 @@ static id _Nullable DecodeEventPayloadForSampleMEICluster(EventId aEventId, TLV:
             return nil;
         }
 
-        __auto_type * value = [MTRSampleMEIClusterPingCountEventEvent new];
+        __auto_type * value = [MTRSampleManufacturerSpecificClusterPingCountEventEvent new];
 
         do {
             NSNumber * _Nonnull memberValue;
@@ -5563,8 +5563,8 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::UnitTesting::Id: {
         return DecodeEventPayloadForUnitTestingCluster(aPath.mEventId, aReader, aError);
     }
-    case Clusters::SampleMei::Id: {
-        return DecodeEventPayloadForSampleMEICluster(aPath.mEventId, aReader, aError);
+    case Clusters::SampleManufacturerSpecific::Id: {
+        return DecodeEventPayloadForSampleManufacturerSpecificCluster(aPath.mEventId, aReader, aError);
     }
     default: {
         break;

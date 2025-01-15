@@ -133,7 +133,7 @@
         "wifi-network-management-cluster.xml",
         "window-covering.xml",
         "matter-devices.xml",
-        "sample-mei-cluster.xml",
+        "sample-manufacturer-specific-cluster.xml",
         "types/door-lock.xml",
         "types/occupancy-sensing.xml",
         "types/thermostat-user-interface-configuration.xml",

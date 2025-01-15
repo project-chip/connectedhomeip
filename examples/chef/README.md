@@ -235,9 +235,9 @@ To add new devices for chef:
 ## Manufacturer Extensions / Custom Clusters
 
 You may add vendor-defined features to chef. The
-`rootnode_onofflight_meisample*` device showcases its usage by using the Sample
-MEI cluster which is defined on
-`src/app/zap-templates/zcl/data-model/chip/sample-mei-cluster.xml`
+`rootnode_onofflight_manufacturer_specific_sample*` device showcases its usage
+by using the Sample Manufacturer-specific cluster which is defined in
+`src/app/zap-templates/zcl/data-model/chip/sample-manufacturer-specific-cluster.xml`
 
 This cluster has
 
@@ -246,15 +246,16 @@ This cluster has
 -   A command/response pair `add-arguments`. The command takes two uint8
     arguments and the response command returns their sum.
 
-You may test the `Sample MEI` via chip-tool using the following commands:
+You may test the `Sample Manufacturer Specific Cluster` via chip-tool using the
+following commands:
 
 ```
 # commissioning of on-network chef device
 chip-tool pairing onnetwork 1 20202021
 # tests command to sum arguments: returns 30
-chip-tool samplemei add-arguments 1 1 10 20
+chip-tool sample-manufacturer-specific add-arguments 1 1 10 20
 # sets Flip-Flop to false
-chip-tool samplemei write flip-flop 0 1 1
+chip-tool sample-manufacturer-specific write flip-flop 0 1 1
 # reads Flip-Flop
-chip-tool samplemei read flip-flop 1 1
+chip-tool sample-manufacturer-specific read flip-flop 1 1
 ```

@@ -1317,7 +1317,7 @@ tests:
                         h: 0.1,
                     }
 
-    - label: "Send MEI command in cluster"
+    - label: "Send Manufacturer-specific command in cluster"
       command: "TestDifferentVendorMeiRequest"
       arguments:
           values:
@@ -3873,13 +3873,13 @@ tests:
           # here yet.
           error: FAILURE
 
-    - label: "Write different vendor MEI attribute"
+    - label: "Write different vendor Manufacturer-specific attribute"
       command: "writeAttribute"
       attribute: "mei_int8u"
       arguments:
           value: 201
 
-    - label: "Verify different vendor MEI attribute"
+    - label: "Verify different vendor Manufacturer-specific attribute"
       command: "readAttribute"
       attribute: "mei_int8u"
       response:

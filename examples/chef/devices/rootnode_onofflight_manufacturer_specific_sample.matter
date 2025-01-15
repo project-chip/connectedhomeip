@@ -1755,8 +1755,8 @@ cluster FixedLabel = 64 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Sample MEI cluster showcases a cluster manufacturer extensions */
-cluster SampleMei = 4294048800 {
+/** A manufacturer-specific sample cluster */
+cluster SampleManufacturerSpecific = 4294048800 {
   revision 1; // NOTE: Default/not specifically set
 
   fabric_sensitive info event PingCountEvent = 0 {
@@ -2082,7 +2082,7 @@ endpoint 1 {
     callback attribute clusterRevision;
   }
 
-  server cluster SampleMei {
+  server cluster SampleManufacturerSpecific {
     emits event PingCountEvent;
     ram      attribute flipFlop default = false;
     callback attribute generatedCommandList;
