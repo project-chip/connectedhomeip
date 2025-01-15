@@ -92,10 +92,6 @@ static wfx_wifi_scan_result_t ap_info;
 #define STA_IP_FAIL (0)
 #define WLAN_TASK_PRIORITY (1)
 
-#define WE_ST_STARTED 1
-#define WE_ST_STA_CONN 2
-#define WE_ST_HW_STARTED 4
-
 #ifdef SL_WFX_CONFIG_SOFTAP
 // Connection parameters
 char softap_ssid[32]                   = SOFTAP_SSID_DEFAULT;
@@ -120,12 +116,14 @@ static struct scan_result_holder
     struct scan_result_holder * next;
     wfx_wifi_scan_result scan;
 } * scan_save;
+
 static uint8_t scan_count = 0;
 static ScanCallback scan_cb;              /* user-callback - when scan is done */
 static uint8_t * scan_ssid     = nullptr; /* Which one are we scanning for */
 static size_t scan_ssid_length = 0;
 static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_result);
 static void sl_wfx_scan_complete_callback(uint32_t status);
+static sl_status_t wfx_wifi_hw_start(void);
 
 static void wfx_events_task(void * p_arg);
 
@@ -148,7 +146,7 @@ namespace {
 
 // wfx_fmac_driver context
 sl_wfx_context_t wifiContext;
-uint8_t wifi_extra;
+chip::BitFlags<WifiState> wifi_extra;
 
 typedef struct __attribute__((__packed__)) sl_wfx_get_counters_cnf_body_s
 {
@@ -335,6 +333,38 @@ CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback)
 
     xEventGroupSetBits(sl_wfx_event_group, SL_WFX_SCAN_START);
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR StartWifiTask()
+{
+    if (wifi_extra.Has(WifiState::kStationInit))
+    {
+        ChipLogDetail(DeviceLayer, "WIFI: Already started");
+        return CHIP_NO_ERROR;
+    }
+    wifi_extra.Set(WifiState::kStationInit);
+
+    VerifyOrReturnError(wfx_soft_init() == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "Failed to execute the WFX software init."));
+    VerifyOrReturnError(wfx_wifi_hw_start() == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "Failed to execute the WFX HW start."));
+
+    return CHIP_NO_ERROR;
+}
+
+void ConfigureStationMode()
+{
+    wifi_extra.Set(WifiState::kStationMode);
+}
+
+bool IsStationModeEnabled(void)
+{
+    return wifi_extra.Has(WifiState::kStationMode);
+}
+
+bool IsStationConnected()
+{
+    return wifi_extra.Has(WifiState::kStationConnected);
 }
 
 /***************************************************************************
@@ -717,7 +747,7 @@ static void wfx_events_task(void * p_arg)
             wfx_connect_to_ap();
         }
 
-        if (wifi_extra & WE_ST_STA_CONN)
+        if (wifi_extra.Has(WifiState::kStationConnected))
         {
             if ((now = xTaskGetTickCount()) > (last_dhcp_poll + pdMS_TO_TICKS(250)))
             {
@@ -765,7 +795,7 @@ static void wfx_events_task(void * p_arg)
             hasNotifiedIPV6             = false;
             hasNotifiedWifiConnectivity = false;
             ChipLogProgress(DeviceLayer, "connected to AP");
-            wifi_extra |= WE_ST_STA_CONN;
+            wifi_extra.Set(WifiState::kStationConnected);
             retryJoin = 0;
             wfx_lwip_set_sta_link_up();
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -789,7 +819,7 @@ static void wfx_events_task(void * p_arg)
             NotifyIPv6Change(false);
             hasNotifiedIPV6             = false;
             hasNotifiedWifiConnectivity = false;
-            wifi_extra &= ~WE_ST_STA_CONN;
+            wifi_extra.Clear(WifiState::kStationConnected);
             wfx_lwip_set_sta_link_down();
         }
 
@@ -906,29 +936,32 @@ static sl_status_t wfx_init(void)
  * @return
  *    sl_status_t Shows init succes or error.
  ******************************************************************************/
-static void wfx_wifi_hw_start(void)
+static sl_status_t wfx_wifi_hw_start(void)
 {
-    sl_status_t status;
+    sl_status_t status = SL_STATUS_OK;
 
-    if (wifi_extra & WE_ST_HW_STARTED)
-        return;
+    if (wifi_extra.Has(WifiState::kStationStarted))
+    {
+        return SL_STATUS_OK;
+    }
+
     ChipLogDetail(DeviceLayer, "STARTING WF200");
-    wifi_extra |= WE_ST_HW_STARTED;
 
     sl_wfx_host_gpio_init();
-    if ((status = wfx_init()) == SL_STATUS_OK)
-    {
-        /* Initialize the LwIP stack */
-        ChipLogDetail(DeviceLayer, "WF200:Start LWIP");
-        sl_matter_lwip_start();
-        sl_matter_wifi_task_started();
-        wifiContext.state = SL_WFX_STARTED; /* Really this is a bit mask */
-        ChipLogDetail(DeviceLayer, "WF200:ready..");
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "WF200:init failed");
-    }
+
+    status = wfx_init();
+    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "WF200:init failed"));
+
+    /* Initialize the LwIP stack */
+    ChipLogDetail(DeviceLayer, "WF200:Start LWIP");
+    sl_matter_lwip_start();
+    sl_matter_wifi_task_started();
+    wifiContext.state = SL_WFX_STARTED; /* Really this is a bit mask */
+
+    ChipLogDetail(DeviceLayer, "WF200:ready.");
+    wifi_extra.Set(WifiState::kStationStarted);
+
+    return SL_STATUS_OK;
 }
 
 /***********************************************************************
@@ -1003,25 +1036,6 @@ int32_t wfx_reset_counts(void)
 {
     /* TODO */
     return -1;
-}
-
-/*************************************************************************
- * @brief
- * I think that this is getting called before FreeRTOS threads are ready
- * @return  returns SL_STATUS_OK
- **************************************************************************/
-sl_status_t wfx_wifi_start(void)
-{
-    if (wifi_extra & WE_ST_STARTED)
-    {
-        ChipLogDetail(DeviceLayer, "WIFI: Already started");
-        return SL_STATUS_OK;
-    }
-    wifi_extra |= WE_ST_STARTED;
-    wfx_soft_init();
-    wfx_wifi_hw_start();
-
-    return SL_STATUS_OK;
 }
 
 /****************************************************************************
@@ -1152,7 +1166,7 @@ bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
 bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
 {
     VerifyOrReturnError(which_if == SL_WFX_STA_INTERFACE, false);
-    return wfx_is_sta_connected();
+    return IsStationConnected();
 }
 
 /****************************************************************************
@@ -1164,33 +1178,12 @@ bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
 sl_status_t sl_matter_wifi_disconnect(void)
 {
     ChipLogProgress(DeviceLayer, "STA-Disconnecting");
+
     int32_t status = sl_wfx_send_disconnect_command();
-    wifi_extra &= ~WE_ST_STA_CONN;
+    wifi_extra.Clear(WifiState::kStationConnected);
+
     xEventGroupSetBits(sl_wfx_event_group, SL_WFX_RETRY_CONNECT);
     return status;
-}
-
-/****************************************************************************
- * @brief
- *     enable the STA mode
- * @return returns true
- *****************************************************************************/
-bool wfx_is_sta_mode_enabled(void)
-{
-    return true; /* It always is */
-}
-
-/****************************************************************************
- * @brief
- *     fuction called when driver is STA connected
- * @return returns true if sucessful,
- *         false otherwise
- *****************************************************************************/
-bool wfx_is_sta_connected(void)
-{
-    bool val;
-    val = (wifi_extra & WE_ST_STA_CONN) ? true : false;
-    return val;
 }
 
 /****************************************************************************
@@ -1250,16 +1243,6 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     NotifyIPv4Change(true);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-
-/*****************************************************************************
- * @brief
- *    function called from connectivityManager
- ******************************************************************************/
-void wfx_enable_sta_mode(void)
-{
-    /* Nothing to do - default is that it is
-       place holder */
-}
 
 /****************************************************************************
  * @brief
