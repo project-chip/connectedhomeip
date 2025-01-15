@@ -32,8 +32,6 @@
 # === END CI TEST ARGUMENTS ===
 #
 
-import asyncio
-
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -99,9 +97,6 @@ class TC_DGWIFI_2_3(MatterBaseTest):
         # STEP 2: Send ResetCounts command
         self.step(2)
         await self.send_reset_counts_command(endpoint)
-
-        # Allow time for the reset to propagate
-        await asyncio.sleep(1)
 
         # STEP 2.1: Verify BeaconLostCount attribute
         self.step(2.1)
