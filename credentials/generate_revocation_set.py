@@ -20,11 +20,13 @@
 # Usage:
 #     python ./credentials/generate-revocation-set.py --help
 
+import os
 import base64
 import json
 import logging
 import subprocess
 import sys
+import unittest
 from enum import Enum
 from typing import Optional
 
@@ -602,8 +604,79 @@ def from_crl(crl, crl_signer, delegator, paa, output, is_paa):
     output.write(json.dumps([revocation_set], indent=4))
 
 
+class TestRevocationSetGeneration(unittest.TestCase):
+    """Test class for revocation set generation"""
+    
+    def setUp(self):
+        # Get the directory containing this file
+        self.test_base_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    def get_test_file_path(self, filename):
+        return os.path.join(self.test_base_dir, 'test', filename)
+
+    def compare_revocation_sets(self, generated_set, expected_file):
+        with open(os.path.join(self.test_base_dir, expected_file), 'r') as f:
+            expected_set = json.load(f)
+
+        # Compare the contents
+        self.assertEqual(len([generated_set]), len(expected_set))
+        expected = expected_set[0]
+        
+        # Compare required fields
+        self.assertEqual(generated_set['type'], expected['type'])
+        self.assertEqual(generated_set['issuer_subject_key_id'], expected['issuer_subject_key_id'])
+        self.assertEqual(generated_set['issuer_name'], expected['issuer_name'])
+        self.assertEqual(set(generated_set['revoked_serial_numbers']), set(expected['revoked_serial_numbers']))
+        self.assertEqual(generated_set['crl_signer_cert'], expected['crl_signer_cert'])
+
+        # Compare optional fields if present in either set
+        if 'crl_signer_delegator' in generated_set and 'crl_signer_delegator' in expected:
+            self.assertEqual(generated_set['crl_signer_delegator'], expected['crl_signer_delegator'], "CRL signer delegator certificates do not match")
+        elif 'crl_signer_delegator' in generated_set or 'crl_signer_delegator' in expected:
+            self.fail("CRL signer delegator certificate is missing in one of the sets")
+
+    def test_paa_revocation_set(self):
+        """Test generation of PAA revocation set"""
+        with open(self.get_test_file_path('revoked-attestation-certificates/Chip-Test-PAA-FFF1-CRL.pem'), 'rb') as f:
+            crl = x509.load_pem_x509_crl(f.read())
+        with open(self.get_test_file_path('revoked-attestation-certificates/Chip-Test-PAA-FFF1-Cert.pem'), 'rb') as f:
+            crl_signer = x509.load_pem_x509_certificate(f.read())
+        
+        ca_name_b64, ca_akid_hex = get_certificate_authority_details(
+            crl_signer, None, None, True)
+        revocation_set = generate_revocation_set_from_crl(
+            crl, crl_signer, ca_name_b64, ca_akid_hex, None)
+        
+        self.compare_revocation_sets(
+            revocation_set,
+            'test/revoked-attestation-certificates/revocation-sets/revocation-set-for-paa.json'
+        )
+
+    def test_pai_revocation_set(self):
+        """Test generation of PAI revocation set"""
+        with open(self.get_test_file_path('revoked-attestation-certificates/Matter-Development-PAI-FFF1-noPID-CRL.pem'), 'rb') as f:
+            crl = x509.load_pem_x509_crl(f.read())
+        with open(self.get_test_file_path('revoked-attestation-certificates/Matter-Development-PAI-FFF1-noPID-Cert.pem'), 'rb') as f:
+            crl_signer = x509.load_pem_x509_certificate(f.read())
+        with open(self.get_test_file_path('revoked-attestation-certificates/Chip-Test-PAA-FFF1-Cert.pem'), 'rb') as f:
+            paa = x509.load_pem_x509_certificate(f.read())
+        
+        ca_name_b64, ca_akid_hex = get_certificate_authority_details(
+            crl_signer, None, paa, False)
+        revocation_set = generate_revocation_set_from_crl(
+            crl, crl_signer, ca_name_b64, ca_akid_hex, None)
+            
+        self.compare_revocation_sets(
+            revocation_set,
+            'test/revoked-attestation-certificates/revocation-sets/revocation-set-for-pai.json'
+        )
+
 if __name__ == "__main__":
-    if len(sys.argv) == 1:
+    if len(sys.argv) > 1 and sys.argv[1] == 'test':
+        # Remove the 'test' argument and run tests
+        sys.argv.pop(1)
+        unittest.main()
+    elif len(sys.argv) == 1:
         cli.main(['--help'])
     else:
         cli()
