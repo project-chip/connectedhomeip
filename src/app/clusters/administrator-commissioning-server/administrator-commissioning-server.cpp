@@ -92,8 +92,28 @@ CHIP_ERROR AdministratorCommissioningServer::Read(const ConcreteReadAttributePat
     return CHIP_NO_ERROR;
 }
 
-bool HandleOpenCommissioningWindowCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                          const Commands::OpenCommissioningWindow::DecodableType & commandData)
+void AdministratorCommissioningServer::InvokeCommand(HandlerContext & context)
+{
+    switch (context.mRequestPath.mCommandId)
+    {
+    case Commands::OpenCommissioningWindow::Id:
+        HandleCommand<Commands::OpenCommissioningWindow::DecodableType>(
+            context, [this](HandlerContext & context, const auto & commandData) { OpenCommissioningWindow(context, commandData); });
+        break;
+    case Commands::OpenBasicCommissioningWindow::Id:
+        HandleCommand<Commands::OpenBasicCommissioningWindow::DecodableType>(
+            context,
+            [this](HandlerContext & context, const auto & commandData) { OpenBasicCommissioningWindow(context, commandData); });
+        break;
+    case Commands::RevokeCommissioning::Id:
+        HandleCommand<Commands::RevokeCommissioning::DecodableType>(
+            context, [this](HandlerContext & context, const auto & commandData) { RevokeCommissioning(context, commandData); });
+        break;
+    }
+}
+
+void AdministratorCommissioningServer::OpenCommissioningWindow(HandlerContext & context,
+                                                               const Commands::OpenCommissioningWindow::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("OpenCommissioningWindow", "AdministratorCommissioning");
     auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
@@ -108,7 +128,7 @@ bool HandleOpenCommissioningWindowCommand(app::CommandHandler * commandObj, cons
 
     ChipLogProgress(Zcl, "Received command to open commissioning window");
 
-    FabricIndex fabricIndex       = commandObj->GetAccessingFabricIndex();
+    FabricIndex fabricIndex       = context.mCommandHandler.GetAccessingFabricIndex();
     const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
     auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
     auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
@@ -135,7 +155,7 @@ exit:
     if (status.HasValue())
     {
         ChipLogError(Zcl, "Failed to open commissioning window. Cluster status 0x%02x", to_underlying(status.Value()));
-        commandObj->AddClusterSpecificFailure(commandPath, to_underlying(status.Value()));
+        context.mCommandHandler.AddClusterSpecificFailure(context.mRequestPath, to_underlying(status.Value()));
     }
     else
     {
@@ -144,13 +164,12 @@ exit:
             ChipLogError(Zcl, "Failed to open commissioning window. Global status " ChipLogFormatIMStatus,
                          ChipLogValueIMStatus(globalStatus));
         }
-        commandObj->AddStatus(commandPath, globalStatus);
+        context.mCommandHandler.AddStatus(context.mRequestPath, globalStatus);
     }
-    return true;
 }
 
-bool HandleOpenBasicCommissioningWindowCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                               const Commands::OpenBasicCommissioningWindow::DecodableType & commandData)
+void AdministratorCommissioningServer::OpenBasicCommissioningWindow(
+    CommandHandlerInterface::HandlerContext & context, const Commands::OpenBasicCommissioningWindow::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("OpenBasicCommissioningWindow", "AdministratorCommissioning");
     auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
@@ -159,7 +178,7 @@ bool HandleOpenBasicCommissioningWindowCommand(app::CommandHandler * commandObj,
     Status globalStatus         = Status::Success;
     ChipLogProgress(Zcl, "Received command to open basic commissioning window");
 
-    FabricIndex fabricIndex       = commandObj->GetAccessingFabricIndex();
+    FabricIndex fabricIndex       = context.mCommandHandler.GetAccessingFabricIndex();
     const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
     auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
     auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
@@ -179,7 +198,7 @@ exit:
     if (status.HasValue())
     {
         ChipLogError(Zcl, "Failed to open commissioning window. Cluster status 0x%02x", to_underlying(status.Value()));
-        commandObj->AddClusterSpecificFailure(commandPath, to_underlying(status.Value()));
+        context.mCommandHandler.AddClusterSpecificFailure(context.mRequestPath, to_underlying(status.Value()));
     }
     else
     {
@@ -188,13 +207,12 @@ exit:
             ChipLogError(Zcl, "Failed to open commissioning window. Global status " ChipLogFormatIMStatus,
                          ChipLogValueIMStatus(globalStatus));
         }
-        commandObj->AddStatus(commandPath, globalStatus);
+        context.mCommandHandler.AddStatus(context.mRequestPath, globalStatus);
     }
-    return true;
 }
 
-bool HandleRevokeCommissioningCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                      const Commands::RevokeCommissioning::DecodableType & commandData)
+void AdministratorCommissioningServer::RevokeCommissioning(CommandHandlerInterface::HandlerContext & context,
+                                                           const Commands::RevokeCommissioning::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("RevokeCommissioning", "AdministratorCommissioning");
     ChipLogProgress(Zcl, "Received command to close commissioning window");
@@ -204,15 +222,14 @@ bool HandleRevokeCommissioningCommand(app::CommandHandler * commandObj, const ap
     if (!Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
     {
         ChipLogError(Zcl, "Commissioning window is currently not open");
-        commandObj->AddClusterSpecificFailure(commandPath, to_underlying(StatusCode::kWindowNotOpen));
+        context.mCommandHandler.AddClusterSpecificFailure(context.mRequestPath, to_underlying(StatusCode::kWindowNotOpen));
     }
     else
     {
         Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
         ChipLogProgress(Zcl, "Commissioning window is now closed");
-        commandObj->AddStatus(commandPath, Status::Success);
+        context.mCommandHandler.AddStatus(context.mRequestPath, Status::Success);
     }
-    return true;
 }
 
 void MatterAdministratorCommissioningPluginServerInitCallback()
@@ -220,51 +237,4 @@ void MatterAdministratorCommissioningPluginServerInitCallback()
     ChipLogProgress(Zcl, "Initiating Admin Commissioning cluster.");
     CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gAdminCommissioningServer);
     AttributeAccessInterfaceRegistry::Instance().Register(&gAdminCommissioningServer);
-}
-
-void AdministratorCommissioningServer::InvokeCommand(HandlerContext & context)
-{
-    switch (context.mRequestPath.mCommandId)
-    {
-    case Commands::OpenCommissioningWindow::Id:
-        HandleCommand<Commands::OpenCommissioningWindow::DecodableType>(
-            context, [this](HandlerContext & context, const auto & commandData) { OpenCommissioningWindow(context, commandData); });
-        break;
-    case Commands::OpenBasicCommissioningWindow::Id:
-        HandleCommand<Commands::OpenBasicCommissioningWindow::DecodableType>(
-            context,
-            [this](HandlerContext & context, const auto & commandData) { OpenBasicCommissioningWindow(context, commandData); });
-        break;
-    case Commands::RevokeCommissioning::Id:
-        HandleCommand<Commands::RevokeCommissioning::DecodableType>(
-            context, [this](HandlerContext & context, const auto & commandData) { RevokeCommissioning(context, commandData); });
-        break;
-    }
-}
-
-void AdministratorCommissioningServer::OpenCommissioningWindow(HandlerContext & context,
-                                                               const Commands::OpenCommissioningWindow::DecodableType & commandData)
-{
-    if (!HandleOpenCommissioningWindowCommand(&context.mCommandHandler, context.mRequestPath, commandData))
-    {
-        context.SetCommandNotHandled();
-    }
-}
-
-void AdministratorCommissioningServer::OpenBasicCommissioningWindow(
-    CommandHandlerInterface::HandlerContext & context, const Commands::OpenBasicCommissioningWindow::DecodableType & commandData)
-{
-    if (!HandleOpenBasicCommissioningWindowCommand(&context.mCommandHandler, context.mRequestPath, commandData))
-    {
-        context.SetCommandNotHandled();
-    }
-}
-
-void AdministratorCommissioningServer::RevokeCommissioning(CommandHandlerInterface::HandlerContext & context,
-                                                           const Commands::RevokeCommissioning::DecodableType & commandData)
-{
-    if (!HandleRevokeCommissioningCommand(&context.mCommandHandler, context.mRequestPath, commandData))
-    {
-        context.SetCommandNotHandled();
-    }
 }
