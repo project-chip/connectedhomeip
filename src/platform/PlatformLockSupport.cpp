@@ -17,11 +17,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides implementations of the CHIP System Layer platform
- *          lock functions that are suitable for use on the platforms using lock.
- */
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
