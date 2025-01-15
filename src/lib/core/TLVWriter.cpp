@@ -295,9 +295,10 @@ CHIP_ERROR TLVWriter::PutString(Tag tag, const char * buf)
     else if (mMaxLen == 0)
         return CHIP_ERROR_INCORRECT_STATE;
 
-    // No length is provided, so we cannot assume a well-formed C string.
-    // Use the container size as the limit when dereferencing the buffer.
-    // This may exceed mRemainingLen in CircularTLVWriter, so use mMaxLen.
+    // Calculate length with a hard limit to prevent unbounded reads.
+    // Use mMaxLen instead of mRemainingLen to account for CircularTLVWriter.
+    // Note: Overrun is still possible if buf is not null-terminated, and this
+    // check cannot prevent all invalid memory reads.
     size_t len = strnlen(buf, mMaxLen);
 
     if (!CanCastTo<uint32_t>(len))

@@ -2608,7 +2608,7 @@ TEST_F(TestTLV, CheckCircularTLVBufferEdge)
 
 TEST_F(TestTLV, CheckTLVPutStringOverrun)
 {
-    const size_t bufSize = 8;
+    const size_t bufSize          = 8;
     uint8_t backingStore[bufSize] = {};
 
     const char * badPointer = "Foo <segfault here>";
