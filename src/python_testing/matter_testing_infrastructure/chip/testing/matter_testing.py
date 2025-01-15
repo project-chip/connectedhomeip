@@ -2092,8 +2092,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
     timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
-    runner_with_timeout = asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout)
-    return asyncio.run(runner_with_timeout)
+    return self.event_loop.run_until_complete(asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout))
 
 
 def async_test_body(body):
@@ -2286,7 +2285,7 @@ def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction):
     def run_on_singleton_matching_endpoint_internal(body):
         def matching_runner(self: MatterBaseTest, *args, **kwargs):
             runner_with_timeout = asyncio.wait_for(_get_all_matching_endpoints(self, accept_function), timeout=30)
-            matching = asyncio.run(runner_with_timeout)
+            matching = self.event_loop.run_until_complete(runner_with_timeout)
             asserts.assert_less_equal(len(matching), 1, "More than one matching endpoint found for singleton test.")
             if not matching:
                 logging.info("Test is not applicable to any endpoint - skipping test")
@@ -2333,7 +2332,7 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
     def run_if_endpoint_matches_internal(body):
         def per_endpoint_runner(self: MatterBaseTest, *args, **kwargs):
             runner_with_timeout = asyncio.wait_for(should_run_test_on_endpoint(self, accept_function), timeout=60)
-            should_run_test = asyncio.run(runner_with_timeout)
+            should_run_test = self.event_loop.run_until_complete(runner_with_timeout)
             if not should_run_test:
                 logging.info("Test is not applicable to this endpoint - skipping test")
                 asserts.skip('Endpoint does not match test requirements')
@@ -2352,8 +2351,8 @@ class CommissionDeviceTest(MatterBaseTest):
         self.is_commissioning = True
 
     def test_run_commissioning(self):
-        if not asyncio.run(self.commission_devices()):
-            raise signals.TestAbortAll("Failed to commission node")
+        if not self.event_loop.run_until_complete(self.commission_devices()):
+            raise signals.TestAbortAll("Failed to commission node(s)")
 
     async def commission_devices(self) -> bool:
         conf = self.matter_test_config
@@ -2438,10 +2437,10 @@ def default_matter_test_main():
     In this case, only one test class in a test script is allowed.
     To make your test script executable, add the following to your file:
     .. code-block:: python
-      from chip.testing.matter_testing.py import default_matter_test_main
+      from chip.testing.matter_testing import default_matter_test_main
       ...
       if __name__ == '__main__':
-        default_matter_test_main.main()
+        default_matter_test_main()
     """
 
     matter_test_config = parse_matter_test_args()
@@ -2470,7 +2469,15 @@ def get_test_info(test_class: MatterBaseTest, matter_test_config: MatterTestConf
     return info
 
 
-def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> bool:
+def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTestConfig,
+                      event_loop: asyncio.AbstractEventLoop, hooks: TestRunnerHooks,
+                      default_controller=None, external_stack=None) -> bool:
+
+    # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
+    #       Mobly deep copies the user params before passing them to the test class and the event
+    #       loop is not serializable. So, we are setting the event loop as a test class member.
+    CommissionDeviceTest.event_loop = event_loop
+    test_class.event_loop = event_loop
 
     get_test_info(test_class, matter_test_config)
 
@@ -2550,9 +2557,13 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
         duration = (datetime.now(timezone.utc) - runner_start_time) / timedelta(microseconds=1)
         hooks.stop(duration=duration)
 
-    # Shutdown the stack when all done
     if not external_stack:
-        stack.Shutdown()
+        async def shutdown():
+            stack.Shutdown()
+        # Shutdown the stack when all done. Use the async runner to ensure that
+        # during the shutdown callbacks can use tha same async context which was used
+        # during the initialization.
+        event_loop.run_until_complete(shutdown())
 
     if ok:
         logging.info("Final result: PASS !")
@@ -2561,6 +2572,9 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
     return ok
 
 
-def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> None:
-    if not run_tests_no_exit(test_class, matter_test_config, hooks, default_controller, external_stack):
-        sys.exit(1)
+def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig,
+              hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> None:
+    with asyncio.Runner() as runner:
+        if not run_tests_no_exit(test_class, matter_test_config, runner.get_loop(),
+                                 hooks, default_controller, external_stack):
+            sys.exit(1)
