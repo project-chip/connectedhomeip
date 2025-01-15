@@ -50,24 +50,30 @@ std::optional<AttributeEntry> AttributeFinder::Find(const ConcreteAttributePath 
         mAttributes = mProvider->Attributes(path);
     }
 
-    auto serverClustersSpan = mAttributes.GetSpanValidForLifetime();
+    auto attributesSpan = mAttributes.GetSpanValidForLifetime();
+    for (auto & attributeEntry : attributesSpan)
+    {
+        if (attributeEntry.attributeId == path.mAttributeId)
+        {
+            return attributeEntry;
+        }
+    }
 
-    auto pos = std::find_if(serverClustersSpan.begin(), serverClustersSpan.end(),
-                            [&path](const AttributeEntry & attr) { return attr.attributeId == path.mAttributeId; });
-    VerifyOrReturnValue(pos != serverClustersSpan.end(), std::nullopt);
-
-    return *pos;
+    return std::nullopt;
 }
 
 std::optional<EndpointEntry> EndpointFinder::Find(EndpointId endpointId)
 {
-    auto span = mEndpoints.GetSpanValidForLifetime();
-    auto pos =
-        std::find_if(span.begin(), span.end(), [&endpointId](const EndpointEntry & endpoint) { return endpoint.id == endpointId; });
+    auto endpointsSpan = mEndpoints.GetSpanValidForLifetime();
+    for (auto & endpointEntry : endpointsSpan)
+    {
+        if (endpointEntry.id == endpointId)
+        {
+            return endpointEntry;
+        }
+    }
 
-    VerifyOrReturnValue(pos != span.end(), std::nullopt);
-
-    return *pos;
+    return std::nullopt;
 }
 
 } // namespace DataModel
