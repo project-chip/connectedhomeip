@@ -16,6 +16,8 @@
 # limitations under the License.
 #
 
+set -x
+
 cd /tmp
 rm -rf connectedhomeip
 git clone --recurse-submodules https://github.com/project-chip/connectedhomeip.git
@@ -23,8 +25,14 @@ cd connectedhomeip
 # Generate coverage report
 ./scripts/build_coverage.sh 2>&1 | tee /tmp/matter_build.log
 
+# Activate environment
+source scripts/activate.sh
+
+# Build python environment
+./scripts/build_python.sh -i out/python_env
+
 # Generate Example Conformance Report
-python3 scripts/examples/conformance_report.py
+python3 -u scripts/examples/conformance_report.py
 
 cd out/coverage/coverage
 
