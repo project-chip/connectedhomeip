@@ -81,6 +81,10 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[]   
 #include "temperature-control/static-supported-temperature-levels.h"
 #endif // MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
 
+#ifdef MATTER_DM_PLUGIN_VALVE_CONFIGURATION_AND_CONTROL_SERVER
+#include "clusters/valve-configuration-and-control/chef-valve-configuration-and-control-delegate-impl.h"
+#endif // MATTER_DM_PLUGIN_VALVE_CONFIGURATION_AND_CONTROL_SERVER
+
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
                                                                          uint8_t * buffer, uint16_t maxReadLength)
@@ -147,6 +151,10 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
     case chip::app::Clusters::OperationalState::Id:
         return chefOperationalStateReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
 #endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
+#ifdef MATTER_DM_PLUGIN_VALVE_CONFIGURATION_AND_CONTROL_SERVER
+    case chip::app::Clusters::ValveConfigurationAndControl::Id:
+        return chefValveConfigurationAndControlReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+#endif // MATTER_DM_PLUGIN_VALVE_CONFIGURATION_AND_CONTROL_SERVER
     default:
         break;
     }
@@ -229,6 +237,10 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     case chip::app::Clusters::OperationalState::Id:
         return chefOperationalStateWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
 #endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
+#ifdef MATTER_DM_PLUGIN_VALVE_CONFIGURATION_AND_CONTROL_SERVER
+    case chip::app::Clusters::ValveConfigurationAndControl::Id:
+        return chefValveConfigurationAndControlWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+#endif // MATTER_DM_PLUGIN_VALVE_CONFIGURATION_AND_CONTROL_SERVER
     default:
         break;
     }
@@ -360,3 +372,4 @@ void ApplicationShutdown()
 // No-op function, used to force linking this file,
 // instead of the weak functions from other files
 extern "C" void chef_include_stubs_impl(void) {}
+

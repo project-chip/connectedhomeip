@@ -422,6 +422,24 @@ void UpdateAutoCloseTime(uint64_t time)
         }
     }
 }
+
+CHIP_ERROR SetRemainingDurationExt(EndpointId endpoint, DataModel::Nullable<uint32_t> duration)
+{
+    SetRemainingDuration(endpoint, duration);
+    DataModel::Nullable<uint32_t> updatedDuration;
+    bool res = GetRemainingDuration(endpoint, updatedDuration);
+    if (!res || updatedDuration != duration)
+        return CHIP_ERROR_WRITE_FAILED;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GetRemainingDurationExt(EndpointId endpoint, DataModel::Nullable<uint32_t> & duration)
+{
+    bool res = GetRemainingDuration(endpoint, duration);
+    if (!res)
+        return CHIP_ERROR_READ_FAILED;
+    return CHIP_NO_ERROR;
+}
 } // namespace ValveConfigurationAndControl
 } // namespace Clusters
 } // namespace app
@@ -529,3 +547,4 @@ void MatterValveConfigurationAndControlPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }
+
