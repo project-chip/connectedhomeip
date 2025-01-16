@@ -34,7 +34,7 @@ config CHIP_NRF_PLATFORM
 config CHIP_DEVICE_VENDOR_NAME
 	default "Nordic Semiconductor ASA"
 
-config CHIP_NFC_COMMISSIONING
+config CHIP_NFC_ONBOARDING_PAYLOAD
 	bool "Share onboarding payload in NFC tag"
 	default n
 	imply NFC_T2T_NRFXLIB
