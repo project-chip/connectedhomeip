@@ -19,6 +19,7 @@
 #include "chef-valve-configuration-and-control-delegate-impl.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
+#include <src/app/util/odd-sized-integers.h>
 
 #ifdef MATTER_DM_PLUGIN_VALVE_CONFIGURATION_AND_CONTROL_SERVER
 
@@ -65,8 +66,6 @@ chip::Protocols::InteractionModel::Status
 chefValveConfigurationAndControlWriteCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
                                               const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
-    chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
-
     if (endpointId != 1)
     {
         ChipLogError(DeviceLayer, "Endpoint %d not supported for ValveConfigurationAndControl cluster.", endpointId);
@@ -81,23 +80,29 @@ chefValveConfigurationAndControlWriteCallback(chip::EndpointId endpointId, chip:
         uint32_t newVal = 0;
         std::memcpy(&newVal, buffer, sizeof(uint32_t));
         ChipLogProgress(DeviceLayer, "Setting RemainingDuration to %d", newVal);
-        DataModel::Nullable<uint32_t> aRemainingDuration(newVal);
-        CHIP_ERROR err = SetRemainingDurationExt(endpointId, aRemainingDuration);
+        CHIP_ERROR err;
+        if (newVal == static_cast<utin32_t>(MaxUnsignedValue(sizeof(uint32_t)))) // Max value is interpreted as NULL
+        {
+            err = SetRemainingDurationNull(endpointId);
+        }
+        else
+        {
+            DataModel::Nullable<uint32_t> aRemainingDuration(newVal);
+            err = SetRemainingDuration(endpointId, aRemainingDuration);
+        }
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "Unable to write RemainingDuration");
-            ret = chip::Protocols::InteractionModel::Status::Failure;
+            return chip::Protocols::InteractionModel::Status::Failure;
         }
         break;
     }
-    break;
     default:
-        ret = chip::Protocols::InteractionModel::Status::UnsupportedAttribute;
         ChipLogError(DeviceLayer, "Unsupported Attribute ID: %d", static_cast<int>(attributeId));
-        break;
+        return chip::Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
 
-    return ret;
+    return chip::Protocols::InteractionModel::Status::Success;
 }
 
 chip::Protocols::InteractionModel::Status
@@ -105,8 +110,6 @@ chefValveConfigurationAndControlReadCallback(chip::EndpointId endpointId, chip::
                                              const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
                                              uint16_t maxReadLength)
 {
-    chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
-
     if (endpointId != 1)
     {
         ChipLogError(DeviceLayer, "Endpoint %d not supported for ValveConfigurationAndControl cluster.", endpointId);
@@ -120,31 +123,30 @@ chefValveConfigurationAndControlReadCallback(chip::EndpointId endpointId, chip::
     case chip::app::Clusters::ValveConfigurationAndControl::Attributes::RemainingDuration::Id: {
 
         DataModel::Nullable<uint32_t> duration;
-        CHIP_ERROR err = GetRemainingDurationExt(endpointId, duration);
+        CHIP_ERROR err = GetRemainingDuration(endpointId, duration);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "Unable to read RemainingDuration");
-            ret = chip::Protocols::InteractionModel::Status::Failure;
-            break;
+            return chip::Protocols::InteractionModel::Status::Failure;
         }
         if (duration.IsNull())
         {
-            std::memset(buffer, '\0', maxReadLength);
+            // Max value is interpreted as NULL
+            std::memset(buffer, 0xFF, maxReadLength);
         }
         else
         {
             uint32_t val = duration.Value();
-            std::memcpy(buffer, &val, std::min(maxReadLength, static_cast<uint16_t>(sizeof(uint32_t))));
+            std::memcpy(buffer, &val, std::min<size_t>(maxReadLength, sizeof(uint32_t)));
         }
-    }
-    break;
-    default:
-        ret = chip::Protocols::InteractionModel::Status::UnsupportedAttribute;
-        ChipLogError(DeviceLayer, "Unsupported Attribute ID: %d", static_cast<int>(attributeId));
         break;
     }
+    default:
+        ChipLogError(DeviceLayer, "Unsupported Attribute ID: %d", static_cast<int>(attributeId));
+        return chip::Protocols::InteractionModel::Status::UnsupportedAttribute;
+    }
 
-    return ret;
+    return chip::Protocols::InteractionModel::Status::Success;
 }
 
 void emberAfValveConfigurationAndControlClusterInitCallback(chip::EndpointId endpointId)
@@ -162,4 +164,3 @@ void emberAfValveConfigurationAndControlClusterInitCallback(chip::EndpointId end
 }
 
 #endif // MATTER_DM_PLUGIN_VALVE_CONFIGURATION_AND_CONTROL_SERVER
-

@@ -67,40 +67,6 @@ struct RemainingDurationTable
 RemainingDurationTable gRemainingDuration[kValveConfigurationAndControlDelegateTableSize];
 Delegate * gDelegateTable[kValveConfigurationAndControlDelegateTableSize] = { nullptr };
 
-bool GetRemainingDuration(EndpointId endpoint, DataModel::Nullable<uint32_t> & duration)
-{
-    uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
-                                                          MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    VerifyOrReturnValue(epIdx < kValveConfigurationAndControlDelegateTableSize, false);
-    duration = gRemainingDuration[epIdx].remainingDuration;
-    return true;
-}
-
-void SetRemainingDuration(EndpointId endpoint, DataModel::Nullable<uint32_t> duration)
-{
-    uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
-                                                          MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    if (epIdx < kValveConfigurationAndControlDelegateTableSize)
-    {
-        gRemainingDuration[epIdx].endpoint          = endpoint;
-        gRemainingDuration[epIdx].remainingDuration = duration;
-    }
-}
-
-void SetRemainingDurationNull(EndpointId endpoint)
-{
-    uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
-                                                          MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    if (epIdx < kValveConfigurationAndControlDelegateTableSize)
-    {
-        if (!gRemainingDuration[epIdx].remainingDuration.IsNull())
-        {
-            MatterReportingAttributeChangeCallback(endpoint, ValveConfigurationAndControl::Id, RemainingDuration::Id);
-        }
-        gRemainingDuration[epIdx].remainingDuration.SetNull();
-    }
-}
-
 RemainingDurationTable * GetRemainingDurationItem(EndpointId endpoint)
 {
     uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
@@ -145,7 +111,8 @@ ValveConfigAndControlAttrAccess gAttrAccess;
 CHIP_ERROR ValveConfigAndControlAttrAccess::ReadRemainingDuration(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     DataModel::Nullable<uint32_t> rDuration;
-    VerifyOrReturnError(GetRemainingDuration(endpoint, rDuration), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+    VerifyOrReturnError(ValveConfigurationAndControl::GetRemainingDuration(endpoint, rDuration) == CHIP_NO_ERROR,
+                        CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 
     return aEncoder.Encode(rDuration);
 }
@@ -223,7 +190,7 @@ static void onValveConfigurationAndControlTick(System::Layer * systemLayer, void
 
     if (rDuration.Value() > 0)
     {
-        SetRemainingDuration(ep, DataModel::MakeNullable<uint32_t>(--rDuration.Value()));
+        ValveConfigurationAndControl::SetRemainingDuration(ep, DataModel::MakeNullable<uint32_t>(--rDuration.Value()));
         startRemainingDurationTick(ep);
     }
     else
@@ -423,23 +390,42 @@ void UpdateAutoCloseTime(uint64_t time)
     }
 }
 
-CHIP_ERROR SetRemainingDurationExt(EndpointId endpoint, DataModel::Nullable<uint32_t> duration)
+CHIP_ERROR GetRemainingDuration(EndpointId endpoint, DataModel::Nullable<uint32_t> & duration)
 {
-    SetRemainingDuration(endpoint, duration);
-    DataModel::Nullable<uint32_t> updatedDuration;
-    bool res = GetRemainingDuration(endpoint, updatedDuration);
-    if (!res || updatedDuration != duration)
-        return CHIP_ERROR_WRITE_FAILED;
-    MatterReportingAttributeChangeCallback(endpoint, ValveConfigurationAndControl::Id, RemainingDuration::Id);
+    uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
+                                                          MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    VerifyOrReturnValue(epIdx < kValveConfigurationAndControlDelegateTableSize, CHIP_ERROR_READ_FAILED);
+    duration = gRemainingDuration[epIdx].remainingDuration;
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GetRemainingDurationExt(EndpointId endpoint, DataModel::Nullable<uint32_t> & duration)
+CHIP_ERROR SetRemainingDuration(EndpointId endpoint, DataModel::Nullable<uint32_t> duration)
 {
-    bool res = GetRemainingDuration(endpoint, duration);
-    if (!res)
-        return CHIP_ERROR_READ_FAILED;
-    return CHIP_NO_ERROR;
+    uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
+                                                          MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (epIdx < kValveConfigurationAndControlDelegateTableSize)
+    {
+        gRemainingDuration[epIdx].endpoint          = endpoint;
+        gRemainingDuration[epIdx].remainingDuration = duration;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_WRITE_FAILED;
+}
+
+CHIP_ERROR SetRemainingDurationNull(EndpointId endpoint)
+{
+    uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
+                                                          MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (epIdx < kValveConfigurationAndControlDelegateTableSize)
+    {
+        if (!gRemainingDuration[epIdx].remainingDuration.IsNull())
+        {
+            MatterReportingAttributeChangeCallback(endpoint, ValveConfigurationAndControl::Id, RemainingDuration::Id);
+        }
+        gRemainingDuration[epIdx].remainingDuration.SetNull();
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_WRITE_FAILED;
 }
 } // namespace ValveConfigurationAndControl
 } // namespace Clusters
@@ -548,4 +534,3 @@ void MatterValveConfigurationAndControlPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }
-
