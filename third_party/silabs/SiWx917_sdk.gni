@@ -251,6 +251,8 @@ template("siwx917_sdk") {
       "TIMER_ROMDRIVER_PRESENT=1",
       "UDMA_ROMDRIVER_PRESENT=1",
       "PLL_ROMDRIVER_PRESENT=1",
+      "SL_CODE_COMPONENT_FREERTOS_KERNEL=freertos_kernel",
+      "SLI_CODE_CLASSIFICATION_DISABLE=1",
       "SL_MATTER_GN_BUILD=1",
     ]
 
@@ -260,7 +262,10 @@ template("siwx917_sdk") {
       defines += [ "SILABS_LOG_ENABLED=0" ]
     }
 
-    defines += [ "LWIP_NETIF_API=1" ]
+    defines += [
+      "LWIP_NETIF_API=1",
+      "SLI_SI91X_LWIP_HOSTED_NETWORK_STACK=1",
+    ]
     if (chip_enable_wifi_ipv4) {
       defines += [
         "LWIP_IPV4=1",
@@ -299,6 +304,7 @@ template("siwx917_sdk") {
 
     if (!disable_lcd) {
       defines += [
+        "SI917_MEMLCD=1",
         "SYSCALLS_WRITE",
         "SPI_MULTI_SLAVE",
         "SL_ULP_TIMER",
