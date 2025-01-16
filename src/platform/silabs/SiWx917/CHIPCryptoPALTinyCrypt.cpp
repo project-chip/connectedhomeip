@@ -131,7 +131,6 @@ bool _isValidTagLength(size_t tag_length)
     }
     return false;
 }
-
 } // namespace
 
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
