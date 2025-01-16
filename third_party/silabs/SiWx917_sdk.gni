@@ -88,7 +88,6 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver/config",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver/CMSIS/Driver/Include",
-      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/clock_manager/inc",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/nvm3/inc",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/inc",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/inc",
