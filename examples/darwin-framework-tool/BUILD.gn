@@ -49,6 +49,8 @@ declare_args() {
 
   # Use Network.framework instead of POSIX sockets
   use_network_framework = false
+
+  libs = []
 }
 
 sdk = "macosx"
@@ -299,7 +301,7 @@ executable("darwin-framework-tool") {
   # Other SDKs are linked statically to Matter.framework but the macosx SDK is linked dynamically but needs some symbols that are
   # not exposed by the dylib.
   if (sdk == "macosx" || sdk_root_parts[0] == "macosx") {
-    libs = [ "${root_out_dir}/macos_framework_output/Build/Intermediates.noindex/Matter.build/${output_sdk_type}/Matter.build/out/lib/libCHIP.a" ]
+    libs += [ "${root_out_dir}/macos_framework_output/Build/Intermediates.noindex/Matter.build/${output_sdk_type}/Matter.build/out/lib/libCHIP.a" ]
   }
 
   if (enable_provisional_features) {
