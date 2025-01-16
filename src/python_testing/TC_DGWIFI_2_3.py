@@ -74,14 +74,14 @@ class TC_DGWIFI_2_3(MatterBaseTest):
 
     def steps_TC_DGWIFI_2_3(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commission DUT to TH (already done)", is_commissioning=True),
-            TestStep(2, "Send ResetCounts command to DUT"),
-            TestStep(2.1, "Verify BeaconLostCount attribute after reset"),
-            TestStep(2.2, "Verify BeaconRxCount attribute after reset"),
-            TestStep(2.3, "Verify PacketMulticastRxCount attribute after reset"),
-            TestStep(2.4, "Verify PacketMulticastTxCount attribute after reset"),
-            TestStep(2.5, "Verify PacketUnicastRxCount attribute after reset"),
-            TestStep(2.6, "Verify PacketUnicastTxCount attribute after reset"),
+            TestStep("1", "Commission DUT to TH (already done)", is_commissioning=True),
+            TestStep("2", "Send ResetCounts command to DUT"),
+            TestStep("2a", "Verify BeaconLostCount attribute after reset"),
+            TestStep("2b", "Verify BeaconRxCount attribute after reset"),
+            TestStep("2c", "Verify PacketMulticastRxCount attribute after reset"),
+            TestStep("2d", "Verify PacketMulticastTxCount attribute after reset"),
+            TestStep("2e", "Verify PacketUnicastRxCount attribute after reset"),
+            TestStep("2f", "Verify PacketUnicastTxCount attribute after reset"),
         ]
         return steps
 
@@ -90,12 +90,12 @@ class TC_DGWIFI_2_3(MatterBaseTest):
         endpoint = self.get_endpoint(default=0)
 
         # STEP 1: Commission DUT (already done)
-        self.step(1)
+        self.step("1")
         # Typically, we assume commissioning was performed by harness scripts.
         attributes = Clusters.WiFiNetworkDiagnostics.Attributes
 
         # STEP 2: Send ResetCounts command
-        self.step(2)
+        self.step("2")
         await self.send_reset_counts_command(endpoint)
 
         # STEP 2a: Verify BeaconLostCount attribute
