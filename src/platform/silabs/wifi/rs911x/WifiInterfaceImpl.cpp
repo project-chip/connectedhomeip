@@ -761,7 +761,7 @@ void ProcessEvent(WifiPlatformEvent event)
 /*********************************************************************************
  * @fn  void sl_matter_wifi_task(void *arg)
  * @brief
- * The main WLAN task - started by wfx_wifi_start () that interfaces with RSI.
+ * The main WLAN task - started by StartWifiTask () that interfaces with RSI.
  * The rest of RSI stuff come in call-backs.
  * The initialization has been already done.
  * @param[in] arg:

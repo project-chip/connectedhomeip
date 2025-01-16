@@ -28,6 +28,9 @@
 // Configurations necessary for ot coap cert libs
 #if SL_USE_COAP_CONFIG
 #define PSA_WANT_ALG_CBC_NO_PADDING
+#define PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_BASIC
+#define PSA_WANT_ALG_JPAKE
+#define PSA_WANT_ECC_SECP_R1_256
 #endif // SL_USE_COAP_CONFIG
 
 // Multi-chip OTA encryption processing

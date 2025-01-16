@@ -646,6 +646,11 @@ void emberAfWebRTCTransportRequestorClusterInitCallback(chip::EndpointId endpoin
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfPushAvStreamTransportClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfChimeClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -657,6 +662,11 @@ void emberAfEcosystemInformationClusterInitCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfCommissionerControlClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTlsCertificateManagementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -5390,6 +5400,44 @@ chip::Protocols::InteractionModel::Status MatterWebRTCTransportRequestorClusterS
 void emberAfWebRTCTransportRequestorClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Push AV Stream Transport Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfPushAvStreamTransportClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterPushAvStreamTransportClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfPushAvStreamTransportClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterPushAvStreamTransportClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterPushAvStreamTransportClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfPushAvStreamTransportClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Chime Cluster
 //
 
@@ -5503,6 +5551,44 @@ chip::Protocols::InteractionModel::Status MatterCommissionerControlClusterServer
  * @param endpoint  Endpoint that is being served
  */
 void emberAfCommissionerControlClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
+// TLS Certificate Management Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTlsCertificateManagementClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterTlsCertificateManagementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTlsCertificateManagementClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterTlsCertificateManagementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterTlsCertificateManagementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfTlsCertificateManagementClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // Unit Testing Cluster
@@ -6962,6 +7048,96 @@ bool emberAfWebRTCTransportRequestorClusterICECandidateCallback(
 bool emberAfWebRTCTransportRequestorClusterEndCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WebRTCTransportRequestor::Commands::End::DecodableType & commandData);
+/**
+ * @brief Push AV Stream Transport Cluster AllocatePushTransport Command callback (from client)
+ */
+bool emberAfPushAvStreamTransportClusterAllocatePushTransportCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::PushAvStreamTransport::Commands::AllocatePushTransport::DecodableType & commandData);
+/**
+ * @brief Push AV Stream Transport Cluster DeallocatePushTransport Command callback (from client)
+ */
+bool emberAfPushAvStreamTransportClusterDeallocatePushTransportCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::PushAvStreamTransport::Commands::DeallocatePushTransport::DecodableType & commandData);
+/**
+ * @brief Push AV Stream Transport Cluster ModifyPushTransport Command callback (from client)
+ */
+bool emberAfPushAvStreamTransportClusterModifyPushTransportCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::PushAvStreamTransport::Commands::ModifyPushTransport::DecodableType & commandData);
+/**
+ * @brief Push AV Stream Transport Cluster SetTransportStatus Command callback (from client)
+ */
+bool emberAfPushAvStreamTransportClusterSetTransportStatusCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::PushAvStreamTransport::Commands::SetTransportStatus::DecodableType & commandData);
+/**
+ * @brief Push AV Stream Transport Cluster ManuallyTriggerTransport Command callback (from client)
+ */
+bool emberAfPushAvStreamTransportClusterManuallyTriggerTransportCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::PushAvStreamTransport::Commands::ManuallyTriggerTransport::DecodableType & commandData);
+/**
+ * @brief Push AV Stream Transport Cluster FindTransport Command callback (from client)
+ */
+bool emberAfPushAvStreamTransportClusterFindTransportCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::PushAvStreamTransport::Commands::FindTransport::DecodableType & commandData);
+/**
+ * @brief TLS Certificate Management Cluster ProvisionRootCertificate Command callback (from client)
+ */
+bool emberAfTlsCertificateManagementClusterProvisionRootCertificateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificate::DecodableType & commandData);
+/**
+ * @brief TLS Certificate Management Cluster FindRootCertificate Command callback (from client)
+ */
+bool emberAfTlsCertificateManagementClusterFindRootCertificateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsCertificateManagement::Commands::FindRootCertificate::DecodableType & commandData);
+/**
+ * @brief TLS Certificate Management Cluster LookupRootCertificate Command callback (from client)
+ */
+bool emberAfTlsCertificateManagementClusterLookupRootCertificateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsCertificateManagement::Commands::LookupRootCertificate::DecodableType & commandData);
+/**
+ * @brief TLS Certificate Management Cluster RemoveRootCertificate Command callback (from client)
+ */
+bool emberAfTlsCertificateManagementClusterRemoveRootCertificateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::DecodableType & commandData);
+/**
+ * @brief TLS Certificate Management Cluster TLSClientCSR Command callback (from client)
+ */
+bool emberAfTlsCertificateManagementClusterTLSClientCSRCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSR::DecodableType & commandData);
+/**
+ * @brief TLS Certificate Management Cluster ProvisionClientCertificate Command callback (from client)
+ */
+bool emberAfTlsCertificateManagementClusterProvisionClientCertificateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::DecodableType & commandData);
+/**
+ * @brief TLS Certificate Management Cluster FindClientCertificate Command callback (from client)
+ */
+bool emberAfTlsCertificateManagementClusterFindClientCertificateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificate::DecodableType & commandData);
+/**
+ * @brief TLS Certificate Management Cluster LookupClientCertificate Command callback (from client)
+ */
+bool emberAfTlsCertificateManagementClusterLookupClientCertificateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificate::DecodableType & commandData);
+/**
+ * @brief TLS Certificate Management Cluster RemoveClientCertificate Command callback (from client)
+ */
+bool emberAfTlsCertificateManagementClusterRemoveClientCertificateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsCertificateManagement::Commands::RemoveClientCertificate::DecodableType & commandData);
 /**
  * @brief Unit Testing Cluster Test Command callback (from client)
  */
