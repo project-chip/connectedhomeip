@@ -11,7 +11,7 @@ T = TypeVar('T')
 # Integer assertions
 
 
-def assert_uint32(value: Any, description: str) -> None:
+def assert_valid_uint32(value: Any, description: str) -> None:
     """
     Asserts that the value is a valid uint32.
 
@@ -27,7 +27,7 @@ def assert_uint32(value: Any, description: str) -> None:
     asserts.assert_less_equal(value, 0xFFFFFFFF, f"{description} must not exceed 0xFFFFFFFF")
 
 
-def assert_uint64(value: Any, description: str) -> None:
+def assert_valid_uint64(value: Any, description: str) -> None:
     """
     Asserts that the value is a valid uint64.
 
@@ -89,7 +89,7 @@ def assert_list_element_type(value: List[Any], description: str, expected_type: 
 # String assertions
 
 
-def assert_string(value: Any, description: str) -> None:
+def assert_is_string(value: Any, description: str) -> None:
     """
     Asserts that the value is a string.
 
@@ -118,9 +118,9 @@ def assert_string_length(value: Any, description: str, min_length: Optional[int]
 
     Note:
         - Use min_length=1 instead of assert_non_empty_string when you want to ensure non-emptiness
-        - Use min_length=None, max_length=None to only validate string type (same as assert_string)
+        - Use min_length=None, max_length=None to only validate string type (same as assert_is_string)
     """
-    assert_string(value, description)
+    assert_is_string(value, description)
 
     if min_length is not None:
         asserts.assert_greater_equal(len(value), min_length,
@@ -160,7 +160,7 @@ def assert_string_matches_pattern(value: str, description: str, pattern: str) ->
         AssertionError: If value is not a string or doesn't match the pattern
     """
     import re
-    assert_string(value, description)
+    assert_is_string(value, description)
     asserts.assert_true(bool(re.match(pattern, value)),
                         f"{description} must match pattern: {pattern}")
 
