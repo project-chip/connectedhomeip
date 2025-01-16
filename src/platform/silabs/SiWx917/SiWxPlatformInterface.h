@@ -58,6 +58,13 @@ void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
         VerifyOrReturn(status == SL_STATUS_OK, ChipLogError(DeviceLayer, "failed to mask interrupt: %ld", status));
     }
 }
+/**
+ * @brief Processing function when a button is triggered
+ *
+ * @param btn which button was pressed
+ * @param btnAction the action that triggered the buttone vent
+ */
+void sl_button_on_change(uint8_t btn, uint8_t btnAction);
 
 #endif // SLI_SI91X_MCU_INTERFACE
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
