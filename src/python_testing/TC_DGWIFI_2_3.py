@@ -98,8 +98,8 @@ class TC_DGWIFI_2_3(MatterBaseTest):
         self.step(2)
         await self.send_reset_counts_command(endpoint)
 
-        # STEP 2.1: Verify BeaconLostCount attribute
-        self.step(2.1)
+        # STEP 2a: Verify BeaconLostCount attribute
+        self.step("2a")
         await self.read_attribute_and_validate(
             endpoint,
             attributes.BeaconLostCount,
@@ -107,8 +107,8 @@ class TC_DGWIFI_2_3(MatterBaseTest):
             "BeaconLostCount"
         )
 
-        # STEP 2.2: Verify BeaconRxCount attribute
-        self.step(2.2)
+        # STEP 2b: Verify BeaconRxCount attribute
+        self.step("2b")
         await self.read_attribute_and_validate(
             endpoint,
             attributes.BeaconRxCount,
@@ -116,8 +116,8 @@ class TC_DGWIFI_2_3(MatterBaseTest):
             "BeaconRxCount"
         )
 
-        # STEP 2.3: Verify PacketMulticastRxCount attribute
-        self.step(2.3)
+        # STEP 2c: Verify PacketMulticastRxCount attribute
+        self.step("2c")
         await self.read_attribute_and_validate(
             endpoint,
             attributes.PacketMulticastRxCount,
@@ -125,8 +125,8 @@ class TC_DGWIFI_2_3(MatterBaseTest):
             "PacketMulticastRxCount"
         )
 
-        # STEP 2.4: Verify PacketMulticastTxCount attribute
-        self.step(2.4)
+        # STEP 2d: Verify PacketMulticastTxCount attribute
+        self.step("2d")
         await self.read_attribute_and_validate(
             endpoint,
             attributes.PacketMulticastTxCount,
@@ -134,8 +134,8 @@ class TC_DGWIFI_2_3(MatterBaseTest):
             "PacketMulticastTxCount"
         )
 
-        # STEP 2.5: Verify PacketUnicastRxCount attribute
-        self.step(2.5)
+        # STEP 2e: Verify PacketUnicastRxCount attribute
+        self.step("2e")
         await self.read_attribute_and_validate(
             endpoint,
             attributes.PacketUnicastRxCount,
@@ -143,8 +143,8 @@ class TC_DGWIFI_2_3(MatterBaseTest):
             "PacketUnicastRxCount"
         )
 
-        # STEP 2.6: Verify PacketUnicastTxCount attribute
-        self.step(2.6)
+        # STEP 2f: Verify PacketUnicastTxCount attribute
+        self.step("2f")
         await self.read_attribute_and_validate(
             endpoint,
             attributes.PacketUnicastTxCount,
