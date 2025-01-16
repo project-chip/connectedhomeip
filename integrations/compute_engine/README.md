@@ -8,7 +8,7 @@ We created a VM named `matter-build-coverage`. The machine configuration is loca
 
 This virtual machine is scheduled to run daily, starting at 11:45PM and stopping at 2am. During boot, the machine runs the `startup-script.sh`.
 
-The `startup-script.sh` script contains commands to checkout the SDK repository and create both the SDK coverage report and comformance report.
+The `startup-script.sh` script contains commands to checkout the SDK repository and create both the SDK coverage report and conformance report.
 The startup script uses `scripts/build_coverage.sh` to generate the coverage report and `scripts/examples/conformance_report.py` to generate the conformance report. The resulting HTML files are published via an App Engine service and available here ([coverage report](https://matter-build-automation.ue.r.appspot.com/), [conformance report](https://matter-build-automation.ue.r.appspot.com/conformance_report.html)).
 
 ### Making Changes to "startup-script.sh"
