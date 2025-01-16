@@ -22,9 +22,9 @@ from datetime import datetime, timedelta, timezone
 
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
-from chip.testing.matter_testing import (MatterBaseTest, async_test_body, compare_time, default_matter_test_main,
-                                         get_wait_seconds_from_set_time, parse_matter_test_args, type_matches,
-                                         utc_time_in_matter_epoch)
+from chip.testing.matter_testing import (MatterBaseTest, PIXITDefinition, PIXITType, PIXITValidationError, PIXITValidator,
+                                         async_test_body, compare_time, default_matter_test_main, get_wait_seconds_from_set_time,
+                                         parse_matter_test_args, type_matches, utc_time_in_matter_epoch)
 from chip.testing.pics import parse_pics, parse_pics_xml
 from chip.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
@@ -658,6 +658,194 @@ class TestMatterTestingSupport(MatterBaseTest):
         asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.STR.MULTI.1"), "foo")
         asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.STR.MULTI.2"), "bar")
         asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.JSON"), {"key": "value"})
+
+    def test_pixit_validation(self):
+        # Test integer validation
+        PIXITValidator.validate_int_pixit_value("123")  # Should pass
+        PIXITValidator.validate_int_pixit_value("-123")  # Should pass
+        PIXITValidator.validate_int_pixit_value("0")  # Should pass
+
+        try:
+            PIXITValidator.validate_int_pixit_value("abc")
+            asserts.fail("Expected ValueError for invalid integer")
+        except ValueError:
+            pass
+
+        try:
+            PIXITValidator.validate_int_pixit_value("12.34")
+            asserts.fail("Expected ValueError for float value")
+        except ValueError:
+            pass
+
+        # Test boolean validation
+        PIXITValidator.validate_bool_pixit_value("true")  # Should pass
+        PIXITValidator.validate_bool_pixit_value("false")  # Should pass
+        PIXITValidator.validate_bool_pixit_value("True")  # Should pass
+        PIXITValidator.validate_bool_pixit_value("False")  # Should pass
+
+        try:
+            PIXITValidator.validate_bool_pixit_value("yes")
+            asserts.fail("Expected ValueError for invalid boolean")
+        except ValueError:
+            pass
+
+        try:
+            PIXITValidator.validate_bool_pixit_value("1")
+            asserts.fail("Expected ValueError for numeric boolean")
+        except ValueError:
+            pass
+
+        # Test float validation
+        PIXITValidator.validate_float_pixit_value("123.45")  # Should pass
+        PIXITValidator.validate_float_pixit_value("-123.45")  # Should pass
+        PIXITValidator.validate_float_pixit_value("0.0")  # Should pass
+
+        try:
+            PIXITValidator.validate_float_pixit_value("abc")
+            asserts.fail("Expected ValueError for invalid float")
+        except ValueError:
+            pass
+
+        # Test string validation - should accept most inputs
+        PIXITValidator.validate_string_pixit_value("abc")  # Should pass
+        PIXITValidator.validate_string_pixit_value("123")  # Should pass
+
+        # Test JSON validation
+        PIXITValidator.validate_json_pixit_value('{"key": "value"}')  # Should pass
+        PIXITValidator.validate_json_pixit_value('[]')  # Should pass
+        PIXITValidator.validate_json_pixit_value('null')  # Should pass
+
+        try:
+            PIXITValidator.validate_json_pixit_value('{invalid json}')
+            asserts.fail("Expected ValueError for invalid JSON")
+        except ValueError:
+            pass
+
+        try:
+            PIXITValidator.validate_json_pixit_value('{"unclosed": "object"')
+            asserts.fail("Expected ValueError for malformed JSON")
+        except ValueError:
+            pass
+
+        # Test hex validation
+        PIXITValidator.validate_hex_pixit_value("0x1234")  # Should pass
+        PIXITValidator.validate_hex_pixit_value("1234")  # Should pass
+        PIXITValidator.validate_hex_pixit_value("ABCD")  # Should pass
+        PIXITValidator.validate_hex_pixit_value("abcd")  # Should pass
+        PIXITValidator.validate_hex_pixit_value("hex:12ab")  # Should pass
+
+        try:
+            PIXITValidator.validate_hex_pixit_value("0x123")  # Odd number of digits
+            asserts.fail("Expected ValueError for odd number of hex digits")
+        except ValueError:
+            pass
+
+        try:
+            PIXITValidator.validate_hex_pixit_value("123")  # Odd number of digits
+            asserts.fail("Expected ValueError for odd number of hex digits")
+        except ValueError:
+            pass
+
+        try:
+            PIXITValidator.validate_hex_pixit_value("WXYZ")  # Invalid hex chars
+            asserts.fail("Expected ValueError for invalid hex characters")
+        except ValueError:
+            pass
+
+        # Test full PIXIT validation
+        pixit_def = PIXITDefinition(
+            name="PIXIT.TEST.INT",
+            pixit_type=PIXITType.INT,
+            description="Test integer PIXIT",
+            required=True
+        )
+
+        PIXITValidator.validate_value("123", pixit_def)  # Should pass
+
+        try:
+            PIXITValidator.validate_value("abc", pixit_def)
+            asserts.fail("Expected PIXITValidationError for invalid type")
+        except PIXITValidationError:
+            pass
+
+        try:
+            PIXITValidator.validate_value(None, pixit_def)  # Required but None
+            asserts.fail("Expected PIXITValidationError for missing required value")
+        except PIXITValidationError:
+            pass
+
+        # Test optional PIXIT
+        optional_pixit = PIXITDefinition(
+            name="PIXIT.TEST.INT",
+            pixit_type=PIXITType.INT,
+            description="Test integer PIXIT",
+            required=False
+        )
+
+        PIXITValidator.validate_value(None, optional_pixit)  # Should pass as it's optional
+
+    def test_pixits_validation(self):
+        """Test bulk PIXIT validation functionality"""
+        pixits = [
+            PIXITDefinition(
+                name="PIXIT.TEST.INT",
+                pixit_type=PIXITType.INT,
+                description="Test integer PIXIT"
+            ),
+            PIXITDefinition(
+                name="PIXIT.TEST.STRING",
+                pixit_type=PIXITType.STRING,
+                description="Test string PIXIT",
+                required=False
+            ),
+            PIXITDefinition(
+                name="PIXIT.TEST.HEX",
+                pixit_type=PIXITType.HEX,
+                description="Test hex PIXIT"
+            )
+        ]
+
+        # Test valid values
+        valid_values = {
+            "PIXIT.TEST.INT": "42",
+            "PIXIT.TEST.STRING": "test string",
+            "PIXIT.TEST.HEX": "0x1234"
+        }
+        PIXITValidator.validate_pixits(pixits, valid_values)  # Should pass
+
+        # Test missing required PIXIT
+        missing_required = {
+            "PIXIT.TEST.STRING": "test string",
+            "PIXIT.TEST.HEX": "0x1234"
+        }
+        try:
+            PIXITValidator.validate_pixits(pixits, missing_required)
+            asserts.fail("Expected PIXITValidationError for missing required PIXIT")
+        except PIXITValidationError as e:
+            asserts.assert_true("PIXIT.TEST.INT" in str(e),
+                                "Error message should indicate missing PIXIT")
+
+        # Test missing optional PIXIT (should pass)
+        missing_optional = {
+            "PIXIT.TEST.INT": "42",
+            "PIXIT.TEST.HEX": "0x1234"
+        }
+        PIXITValidator.validate_pixits(pixits, missing_optional)  # Should pass
+
+        # Test multiple validation errors
+        multiple_errors = {
+            "PIXIT.TEST.INT": "not a number",
+            "PIXIT.TEST.HEX": "invalid hex"
+        }
+        try:
+            PIXITValidator.validate_pixits(pixits, multiple_errors)
+            asserts.fail("Expected PIXITValidationError for multiple validation errors")
+        except PIXITValidationError as e:
+            error_msg = str(e)
+            asserts.assert_true("Invalid value for PIXIT.TEST.INT" in error_msg,
+                                "Error message should indicate invalid INT PIXIT value")
+            asserts.assert_true("Invalid value for PIXIT.TEST.HEX" in error_msg,
+                                "Error message should indicate invalid HEX PIXIT value")
 
 
 if __name__ == "__main__":
