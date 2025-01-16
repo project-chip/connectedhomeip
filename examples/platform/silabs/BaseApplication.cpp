@@ -576,7 +576,7 @@ void BaseApplication::UpdateDisplay()
 #ifdef DISPLAY_ENABLED
     UpdateLCDStatusScreen();
     slLCD.CycleScreens();
-#endif
+#endif // DISPLAY_ENABLED
 }
 
 void BaseApplication::CancelFunctionTimer()
