@@ -269,12 +269,16 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "WebRTCTransportProvider";
     case chip::app::Clusters::WebRTCTransportRequestor::Id:
         return "WebRTCTransportRequestor";
+    case chip::app::Clusters::PushAvStreamTransport::Id:
+        return "PushAvStreamTransport";
     case chip::app::Clusters::Chime::Id:
         return "Chime";
     case chip::app::Clusters::EcosystemInformation::Id:
         return "EcosystemInformation";
     case chip::app::Clusters::CommissionerControl::Id:
         return "CommissionerControl";
+    case chip::app::Clusters::TlsCertificateManagement::Id:
+        return "TlsCertificateManagement";
     case chip::app::Clusters::UnitTesting::Id:
         return "UnitTesting";
     case chip::app::Clusters::FaultInjection::Id:
@@ -4340,6 +4344,29 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::PushAvStreamTransport::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::SupportedContainerFormats::Id:
+            return "SupportedContainerFormats";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::SupportedIngestMethods::Id:
+            return "SupportedIngestMethods";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::CurrentConnections::Id:
+            return "CurrentConnections";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::Chime::Id: {
         switch (id)
         {
@@ -4398,6 +4425,31 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::CommissionerControl::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::CommissionerControl::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TlsCertificateManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::MaxRootCertificates::Id:
+            return "MaxRootCertificates";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::CurrentRootCertificates::Id:
+            return "CurrentRootCertificates";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::MaxClientCertificates::Id:
+            return "MaxClientCertificates";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::CurrentClientCertificates::Id:
+            return "CurrentClientCertificates";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -5772,6 +5824,25 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::PushAvStreamTransport::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::PushAvStreamTransport::Commands::AllocatePushTransport::Id:
+            return "AllocatePushTransport";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::DeallocatePushTransport::Id:
+            return "DeallocatePushTransport";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::ModifyPushTransport::Id:
+            return "ModifyPushTransport";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::SetTransportStatus::Id:
+            return "SetTransportStatus";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::ManuallyTriggerTransport::Id:
+            return "ManuallyTriggerTransport";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::FindTransport::Id:
+            return "FindTransport";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::Chime::Id: {
         switch (id)
         {
@@ -5788,6 +5859,31 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "RequestCommissioningApproval";
         case chip::app::Clusters::CommissionerControl::Commands::CommissionNode::Id:
             return "CommissionNode";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TlsCertificateManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificate::Id:
+            return "ProvisionRootCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::FindRootCertificate::Id:
+            return "FindRootCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::LookupRootCertificate::Id:
+            return "LookupRootCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id:
+            return "RemoveRootCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id:
+            return "TLSClientCSR";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Id:
+            return "ProvisionClientCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificate::Id:
+            return "FindClientCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificate::Id:
+            return "LookupClientCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::RemoveClientCertificate::Id:
+            return "RemoveClientCertificate";
         default:
             return "Unknown";
         }
@@ -6341,11 +6437,43 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "Unknown";
         }
     }
+    case chip::app::Clusters::PushAvStreamTransport::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::PushAvStreamTransport::Commands::AllocatePushTransportResponse::Id:
+            return "AllocatePushTransportResponse";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::FindTransportResponse::Id:
+            return "FindTransportResponse";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::CommissionerControl::Id: {
         switch (id)
         {
         case chip::app::Clusters::CommissionerControl::Commands::ReverseOpenCommissioningWindow::Id:
             return "ReverseOpenCommissioningWindow";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TlsCertificateManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificateResponse::Id:
+            return "ProvisionRootCertificateResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::FindRootCertificateResponse::Id:
+            return "FindRootCertificateResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::LookupRootCertificateResponse::Id:
+            return "LookupRootCertificateResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSRResponse::Id:
+            return "TLSClientCSRResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificateResponse::Id:
+            return "ProvisionClientCertificateResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::Id:
+            return "FindClientCertificateResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificateResponse::Id:
+            return "LookupClientCertificateResponse";
         default:
             return "Unknown";
         }
