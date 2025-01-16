@@ -116,6 +116,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mUserDirectedCommissioningPort = initParams.userDirectedCommissioningPort;
     mInterfaceId                   = initParams.interfaceId;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    auto tcpListenParams = TcpListenParameters(DeviceLayer::TCPEndPointManager())
+                               .SetAddressType(IPAddressType::kIPv6)
+                               .SetListenPort(mOperationalServicePort);
+#endif
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(initParams.persistentStorageDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -214,12 +220,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(mOperationalServicePort)
                                .SetNativeParams(initParams.endpointNativeParams)
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-                               ,
-                           TcpListenParameters(DeviceLayer::TCPEndPointManager())
-                               .SetAddressType(IPAddressType::kIPv6)
-                               .SetListenPort(mOperationalServicePort)
-#endif
 #if INET_CONFIG_ENABLE_IPV4
                                ,
                            UdpListenParameters(DeviceLayer::UDPEndPointManager())
@@ -230,8 +230,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                ,
                            BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                ,
+                           tcpListenParams
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                           ,
                            Transport::WiFiPAFListenParameters(DeviceLayer::ConnectivityMgr().GetWiFiPAF())
 #endif
     );
@@ -333,7 +337,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    app::DnssdServer::Instance().SetTCPServerEnabled(mTransports.GetTransport().GetImplAtIndex<1>().IsServerListenEnabled());
+    // Enable the TCP Server based on the TCPListenParameters setting.
+    app::DnssdServer::Instance().SetTCPServerEnabled(tcpListenParams.IsServerListenEnabled());
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     if (GetFabricTable().FabricCount() != 0)
