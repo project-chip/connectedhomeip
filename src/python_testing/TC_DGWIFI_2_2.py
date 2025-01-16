@@ -41,10 +41,8 @@
 # === END CI TEST ARGUMENTS ===
 #
 
-import asyncio
-
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -91,31 +89,13 @@ class TC_DGWIFI_2_2(MatterBaseTest):
         # Send test event trigger to programmatically cause a Wi-Fi disconnection in the DUT.
         await self.send_test_event_triggers(eventTrigger=0x0036000000000000)
 
-    async def read_disconnection_events(self, endpoint):
-        event_path = [(endpoint, Clusters.WiFiNetworkDiagnostics.Events.Disconnection, 0)]
-        return await self.default_controller.ReadEvent(
-            nodeid=self.dut_node_id, events=event_path
-        )
-
     async def send_wifi_association_failure_test_event_trigger(self):
         # Send test event trigger to programmatically cause repeated association failures on the DUT.
         await self.send_test_event_triggers(eventTrigger=0x0036000000000001)
 
-    async def read_association_failure_events(self, endpoint):
-        event_path = [(endpoint, Clusters.WiFiNetworkDiagnostics.Events.AssociationFailure, 0)]
-        return await self.default_controller.ReadEvent(
-            nodeid=self.dut_node_id, events=event_path
-        )
-
     async def send_wifi_reconnection_test_event_trigger(self):
         # Send test event trigger to programmatically reconnect the DUT to Wi-Fi.
         await self.send_test_event_triggers(eventTrigger=0x0036000000000002)
-
-    async def read_connection_status_events(self, endpoint):
-        event_path = [(endpoint, Clusters.WiFiNetworkDiagnostics.Events.ConnectionStatus, 0)]
-        return await self.default_controller.ReadEvent(
-            nodeid=self.dut_node_id, events=event_path
-        )
 
     #
     # Test description & PICS
@@ -149,70 +129,63 @@ class TC_DGWIFI_2_2(MatterBaseTest):
         self.step(1)
 
         #
-        # STEP 2: Cause a Wi-Fi Disconnection -> read Disconnection event from the DUT
+        # Create and start an EventChangeCallback to subscribe for events
+        #
+        events_callback = EventChangeCallback(Clusters.WiFiNetworkDiagnostics)
+        await events_callback.start(
+            self.default_controller,     # The controller
+            self.dut_node_id,            # DUT's node id
+            endpoint                     # The endpoint on which we expect Wi-Fi events
+        )
+
+        #
+        # STEP 2: Cause a Wi-Fi Disconnection -> wait for Disconnection event
         #
         self.step(2)
         await self.send_wifi_disconnection_test_event_trigger()
 
-        # Allow time for the event to propagate
-        await asyncio.sleep(1)
-
-        disconnection_events = await self.read_disconnection_events(endpoint)
-        asserts.assert_true(
-            len(disconnection_events) > 0,
-            "No Disconnection events were received from the DUT after forced Wi-Fi disconnection."
+        # Wait (block) for the Disconnection event to arrive
+        event_data = events_callback.wait_for_event_report(
+            Clusters.WiFiNetworkDiagnostics.Events.Disconnection
         )
 
         # Validate the Disconnection event fields
-        for event in disconnection_events:
-            asserts.assert_true(
-                self.is_valid_disconnection_event_data(event.Data),
-                f"Invalid Disconnection event data: {event.Data}"
-            )
+        asserts.assert_true(
+            self.is_valid_disconnection_event_data(event_data),
+            f"Invalid Disconnection event data: {event_data}"
+        )
 
         #
-        # STEP 3: Cause repeated association failures -> read AssociationFailure event
+        # STEP 3: Cause repeated association failures -> wait for AssociationFailure event
         #
         self.step(3)
         await self.send_wifi_association_failure_test_event_trigger()
 
-        # Allow time for the event
-        await asyncio.sleep(1)
-
-        association_failure_events = await self.read_association_failure_events(endpoint)
-        asserts.assert_true(
-            len(association_failure_events) > 0,
-            "No AssociationFailure events were received from the DUT after triggering association failures."
+        event_data = events_callback.wait_for_event_report(
+            Clusters.WiFiNetworkDiagnostics.Events.AssociationFailure
         )
 
         # Validate the AssociationFailure event fields
-        for event in association_failure_events:
-            asserts.assert_true(
-                self.is_valid_association_failure_data(event.Data),
-                f"Invalid AssociationFailure event data: {event.Data}"
-            )
+        asserts.assert_true(
+            self.is_valid_association_failure_data(event_data),
+            f"Invalid AssociationFailure event data: {event_data}"
+        )
 
         #
-        # STEP 4: Reconnect Wi-Fi -> read ConnectionStatus event
+        # STEP 4: Reconnect Wi-Fi -> wait for ConnectionStatus event
         #
         self.step(4)
         await self.send_wifi_reconnection_test_event_trigger()
 
-        # Allow time for the event
-        await asyncio.sleep(1)
-
-        connection_status_events = await self.read_connection_status_events(endpoint)
-        asserts.assert_true(
-            len(connection_status_events) > 0,
-            "No ConnectionStatus events were received from the DUT after reconnecting Wi-Fi."
+        event_data = events_callback.wait_for_event_report(
+            Clusters.WiFiNetworkDiagnostics.Events.ConnectionStatus
         )
 
         # Validate the ConnectionStatus event fields
-        for event in connection_status_events:
-            asserts.assert_true(
-                self.is_valid_connection_status_data(event.Data),
-                f"Invalid ConnectionStatus event data: {event.Data}"
-            )
+        asserts.assert_true(
+            self.is_valid_connection_status_data(event_data),
+            f"Invalid ConnectionStatus event data: {event_data}"
+        )
 
 
 if __name__ == "__main__":
