@@ -34,7 +34,7 @@ from matter_idl.generators.idl import IdlGenerator
 from matter_idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeInstantiation, AttributeQuality,
                                          AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation, CommandQuality,
                                          ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality,
-                                         Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructTag)
+                                         Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructTag, Typedef)
 
 
 class GeneratorContentStorage(GeneratorStorage):
@@ -335,6 +335,20 @@ class TestParser(unittest.TestCase):
                              ])],
                     )])
         self.assertIdlEqual(actual, expected)
+
+    def test_cluster_typedef(self):
+      actual = parseText("""
+            client cluster WithTypedefs = 0xab {
+                typedef TestTypedef : int16u;
+            }
+        """)
+      expected = Idl(clusters=[
+          Cluster(name="WithTypedefs",
+                  code=0xab,
+                  typedefs=[
+                      Typedef(name="TestTypedef", base_type="int16u")],
+                  )])
+      self.assertIdlEqual(actual, expected)
 
     def test_event_field_api_maturity(self):
         actual = parseText("""

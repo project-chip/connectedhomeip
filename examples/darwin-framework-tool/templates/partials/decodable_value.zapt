@@ -27,18 +27,24 @@
       {{>decodable_value target=(concat ../target "." (asStructPropertyName label)) source=(concat ../source "." (asLowerCamelCase label)) cluster=../cluster depth=(incrementDepth ../depth) }}
     {{/zcl_struct_items_by_struct_and_cluster_name}}
   {{else}}
-    {{#if_is_strongly_typed_chip_enum type}}
-      {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:chip::to_underlying({{source}})];
+  {{#if_is_typedef type}}
+    {{#zcl_typedef_by_typedef_and_cluster_name type cluster}}
+      {{>decodable_value target=../target source=../source errorCode=../errorCode cluster=../cluster depth=../depth }}
+    {{/zcl_typedef_by_typedef_and_cluster_name}}
     {{else}}
-      {{#if_is_strongly_typed_bitmap type}}
-        {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:{{source}}.Raw()];
-      {{else if (isOctetString type)}}
-        {{target}} = [NSData dataWithBytes:{{source}}.data() length:{{source}}.size()];
-      {{else if (isCharString type)}}
-        {{target}} = [[NSString alloc] initWithBytes:{{source}}.data() length:{{source}}.size() encoding:NSUTF8StringEncoding];
+      {{#if_is_strongly_typed_chip_enum type}}
+        {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:chip::to_underlying({{source}})];
       {{else}}
-        {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:{{source}}];
-      {{/if_is_strongly_typed_bitmap}}
-    {{/if_is_strongly_typed_chip_enum}}
+        {{#if_is_strongly_typed_bitmap type}}
+          {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:{{source}}.Raw()];
+        {{else if (isOctetString type)}}
+          {{target}} = [NSData dataWithBytes:{{source}}.data() length:{{source}}.size()];
+        {{else if (isCharString type)}}
+          {{target}} = [[NSString alloc] initWithBytes:{{source}}.data() length:{{source}}.size() encoding:NSUTF8StringEncoding];
+        {{else}}
+          {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:{{source}}];
+        {{/if_is_strongly_typed_bitmap}}
+      {{/if_is_strongly_typed_chip_enum}}
+    {{/if_is_typedef}}
   {{/if_is_struct}}
 {{/if}}

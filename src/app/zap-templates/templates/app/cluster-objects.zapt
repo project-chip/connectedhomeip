@@ -13,6 +13,7 @@
 #include <lib/core/ClusterEnums.h>
 #include <lib/support/BitMask.h>
 #include <protocols/interaction_model/Constants.h>
+#include <app-common/zap-generated/cluster-typedefs.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>

@@ -8,6 +8,12 @@ enum {{asUpperCamelCase name preserveAcronyms=true}} : enum{{multiply size 8}} {
 
 {{/if}}
 {{/zcl_enums}}
+{{#zcl_typedefs}}
+{{#if has_no_clusters}}
+typedef {{asUpperCamelCase name preserveAcronyms=true}} : {{type}};
+
+{{/if}}
+{{/zcl_typedefs}}
 {{#zcl_bitmaps}}
 {{#if has_no_clusters}}
 {{#if_is_atomic name}}

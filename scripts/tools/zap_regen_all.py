@@ -312,6 +312,8 @@ class JinjaCodegenTarget():
     def generate(self) -> TargetRunStats:
         generate_start = time.time()
 
+        logging.info("Executing: %s" % self.command)
+
         subprocess.check_call(self.command)
 
         self.codeFormat()

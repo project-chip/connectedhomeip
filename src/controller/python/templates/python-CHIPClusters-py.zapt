@@ -26,9 +26,11 @@ class ChipClusters:
 {{#zcl_command_arguments}}
      {{#if_is_struct type}}
                     "{{asLowerCamelCase label}}": "{{type}}",
-    {{else}}
+     {{else if_is_typedef type}}
+                    "{{asLowerCamelCase label}}": "{{type}}",
+     {{else}}
                     "{{asLowerCamelCase label}}": "{{#if (isCharString type)}}str{{else}}{{as_underlying_python_zcl_type type ../../id}}{{/if}}",
-    {{/if_is_struct}}
+     {{/if_is_struct}}
 {{/zcl_command_arguments}}
                 },
             },

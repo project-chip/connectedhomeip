@@ -55,6 +55,10 @@ bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
 
 {% endfor %}
 
+{%- for typedef in idl.global_typedefs %}
+typedef {{typedef.name}} : {{ typedef.base_type}};
+{% endfor %}
+
 {%- for cluster in idl.clusters %}
 {% if cluster.description %}/** {{cluster.description}} */
 {% endif %}
@@ -79,6 +83,13 @@ bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
     {{entry.name}} = 0x{{"%X" | format(entry.code)}};
     {% endfor %}
   }
+  */
+
+  {% endfor %}
+
+  {%- for typedef in cluster.typedefs | selectattr("is_global")%}
+  /* GLOBAL:
+  typedef {{typedef.name}} : {{ typedef.base_type}};
   */
 
   {% endfor %}

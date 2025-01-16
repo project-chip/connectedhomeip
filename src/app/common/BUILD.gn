@@ -68,3 +68,9 @@ source_set("enums") {
 
   public_configs = [ ":includes" ]
 }
+
+source_set("typedefs") {
+  sources = [ "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-typedefs.h" ]
+
+  public_configs = [ ":includes" ]
+}

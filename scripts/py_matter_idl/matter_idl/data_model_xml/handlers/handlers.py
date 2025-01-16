@@ -18,7 +18,7 @@ from typing import Optional
 from xml.sax.xmlreader import AttributesImpl
 
 from matter_idl.matter_idl_types import (ApiMaturity, Attribute, AttributeQuality, Bitmap, Cluster, Command, CommandQuality,
-                                         ConstantEntry, DataType, Enum, Field, FieldQuality, Idl, Struct, StructTag)
+                                         ConstantEntry, DataType, Enum, Field, FieldQuality, Idl, Struct, StructTag, Typedef)
 
 from .base import BaseHandler, HandledDepth
 from .context import Context
@@ -178,6 +178,10 @@ class FieldHandler(BaseHandler):
             self._field.data_type.name = NormalizeDataType(attrs["type"])
 
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+        elif name == "typedef":
+            LOGGER.warning(
+                f"Anonymous typedef not supported when handling field {self._field.name}")
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
             return BaseHandler(self.context)
 
@@ -281,6 +285,24 @@ class EnumHandler(BaseHandler):
         else:
             return BaseHandler(self.context)
 
+class TypedefHandler(BaseHandler):
+    def __init__(self, context: Context, cluster: Cluster, attrs: AttributesImpl):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._cluster = cluster
+
+        # TODO: base type is GUESSED here because xml does not contain it
+        self._typedef = Typedef(name=NormalizeName(
+            attrs["name"]), base_type="UNKNOWN")
+
+    def EndProcessing(self):
+        self._cluster.typedefs.append(self._typedef)
+
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
+        if name == "section":
+            # Documentation data, skipped
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        else:
+            return BaseHandler(self.context)
 
 class EventsHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster):
@@ -548,6 +570,8 @@ class DataTypesHandler(BaseHandler):
             return BitmapHandler(self.context, self._cluster, attrs)
         elif name == "struct":
             return StructHandler(self.context, self._cluster, attrs)
+        elif name == "typedef":
+            return TypedefHandler(self.context, self._cluster, attrs)
         else:
             return BaseHandler(self.context)
 

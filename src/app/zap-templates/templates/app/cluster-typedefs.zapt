@@ -1,0 +1,53 @@
+{{> header}}
+
+#pragma once
+
+#include <stdint.h>
+
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+namespace detail {
+// typedefs shared across multiple clusters.
+{{#zcl_typedefs}}
+
+{{#if has_more_than_one_cluster}}
+
+{{> cluster_typedefs_typedef ns=""}}
+
+{{/if}}
+{{/zcl_typedefs}}
+
+} // namespace detail
+
+namespace Globals {
+// Global typedefs.
+{{#zcl_typedefs}}
+
+{{#if has_no_clusters}}
+
+{{> cluster_typedefs_typedef ns=""}}
+
+{{/if}}
+{{/zcl_typedefs}}
+} // namespace Globals
+
+{{#zcl_clusters}}
+namespace {{asUpperCamelCase name}} {
+{{#zcl_typedefs}}
+
+{{#if has_more_than_one_cluster}}
+using {{asUpperCamelCase name}} = Clusters::detail::{{asUpperCamelCase name}};
+{{else}}
+{{> cluster_typedefs_typedef ns=(asUpperCamelCase ../name)}}
+
+{{/if}}
+{{/zcl_typedefs}}
+} // namespace {{asUpperCamelCase name}}
+
+{{/zcl_clusters}}
+} // namespace Clusters
+} // namespace app
+} // namespace chip
