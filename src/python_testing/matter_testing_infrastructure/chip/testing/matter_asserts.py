@@ -1,0 +1,172 @@
+"""
+Matter-specific assertions building on top of Mobly asserts.
+"""
+
+from typing import Any, List, Optional, Type, TypeVar
+
+from mobly import asserts
+
+T = TypeVar('T')
+
+
+def assert_uint32(value: Any, description: str) -> None:
+    """
+    Asserts that the value is a valid uint32.
+
+    Args:
+        value: The value to check
+        description: User-defined description for error messages
+
+    Raises:
+        AssertionError: If value is not an integer or outside the uint32 range (0 to 0xFFFFFFFF)
+    """
+    asserts.assert_true(isinstance(value, int), f"{description} must be an integer")
+    asserts.assert_true(0 <= value <= 0xFFFFFFFF, f"{description} must be between 0 and 0xFFFFFFFF")
+
+
+def assert_uint64(value: Any, description: str) -> None:
+    """
+    Asserts that the value is a valid uint64.
+
+    Args:
+        value: The value to check
+        description: User-defined description for error messages
+
+    Raises:
+        AssertionError: If value is not an integer or outside the uint64 range (0 to 0xFFFFFFFFFFFFFFFF)
+    """
+    asserts.assert_true(isinstance(value, int), f"{description} must be an integer")
+    asserts.assert_true(0 <= value <= 0xFFFFFFFFFFFFFFFF, f"{description} must be between 0 and 0xFFFFFFFFFFFFFFFF")
+
+
+def assert_string(value: Any, description: str) -> None:
+    """
+    Asserts that the value is a string.
+
+    Args:
+        value: The value to check
+        description: User-defined description for error messages
+
+    Raises:
+        AssertionError: If value is not a string
+    """
+    asserts.assert_true(isinstance(value, str), f"{description} must be a string")
+
+
+def assert_non_empty_string(value: Any, description: str) -> None:
+    """
+    Asserts that the value is a non-empty string.
+
+    Args:
+        value: The value to check
+        description: User-defined description for error messages
+
+    Raises:
+        AssertionError: If value is not a string or is empty
+    """
+    assert_string(value, description)
+    asserts.assert_true(len(value) > 0, f"{description} cannot be empty")
+
+
+def assert_string_length(value: Any, description: str, min_length: Optional[int] = None, max_length: Optional[int] = None) -> None:
+    """
+    Asserts that the string length is within the specified bounds.
+
+    Args:
+        value: The value to check
+        description: User-defined description for error messages
+        min_length: Optional minimum length (inclusive)
+        max_length: Optional maximum length (inclusive)
+
+    Raises:
+        AssertionError: If value is not a string or fails length constraints
+
+    Note:
+        - Use min_length=1 instead of assert_non_empty_string when you want to ensure non-emptiness
+        - Use min_length=None, max_length=None to only validate string type (same as assert_string)
+    """
+    assert_string(value, description)
+
+    if min_length is not None:
+        asserts.assert_true(len(value) >= min_length,
+                            f"{description} length must be at least {min_length} characters")
+
+    if max_length is not None:
+        asserts.assert_true(len(value) <= max_length,
+                            f"{description} length must not exceed {max_length} characters")
+
+
+def assert_list(value: Any, description: str, min_length: Optional[int] = None, max_length: Optional[int] = None) -> None:
+    """
+    Asserts that the value is a list with optional length constraints.
+
+    Args:
+        value: The value to check
+        description: User-defined description for error messages
+        min_length: Optional minimum length (inclusive)
+        max_length: Optional maximum length (inclusive)
+
+    Raises:
+        AssertionError: If value is not a list or fails length constraints
+    """
+    asserts.assert_true(isinstance(value, list), f"{description} must be a list")
+
+    if min_length is not None:
+        asserts.assert_true(len(value) >= min_length, f"{description} must have at least {min_length} elements")
+
+    if max_length is not None:
+        asserts.assert_true(len(value) <= max_length, f"{description} must not exceed {max_length} elements")
+
+
+def assert_list_element_type(value: List[Any], description: str, expected_type: Type[T]) -> None:
+    """
+    Asserts that all elements in the list are of the expected type.
+
+    Args:
+        value: The list to validate
+        description: User-defined description for error messages
+        expected_type: The type that all elements should match
+
+    Raises:
+        AssertionError: If value is not a list or contains elements of wrong type
+    """
+    assert_list(value, description)
+    for i, item in enumerate(value):
+        asserts.assert_true(isinstance(item, expected_type),
+                            f"{description}[{i}] must be of type {expected_type.__name__}")
+
+
+def assert_string_matches_pattern(value: str, field_name: str, pattern: str) -> None:
+    """Asserts that the string matches the given regex pattern."""
+    import re
+    asserts.assert_true(isinstance(value, str), f"{field_name} must be a string")
+    asserts.assert_true(bool(re.match(pattern, value)),
+                        f"{field_name} must match pattern: {pattern}")
+
+
+def assert_valid_attribute_id(id: int, allow_test: bool = False) -> None:
+    """Asserts that the given ID is a valid attribute ID."""
+    from chip.testing.global_attribute_ids import is_valid_attribute_id
+    asserts.assert_true(is_valid_attribute_id(id, allow_test),
+                        f"Invalid attribute ID: {hex(id)}")
+
+
+def assert_standard_attribute_id(id: int) -> None:
+    """Asserts that the given ID is a standard attribute ID."""
+    from chip.testing.global_attribute_ids import is_standard_attribute_id
+    asserts.assert_true(is_standard_attribute_id(id),
+                        f"Not a standard attribute ID: {hex(id)}")
+
+
+def assert_valid_command_id(id: int, allow_test: bool = False) -> None:
+    """Asserts that the given ID is a valid command ID."""
+    from chip.testing.global_attribute_ids import is_valid_command_id
+    asserts.assert_true(is_valid_command_id(id, allow_test),
+                        f"Invalid command ID: {hex(id)}")
+
+
+def assert_standard_command_id(id: int) -> None:
+    """Asserts that the given ID is a standard command ID."""
+    from chip.testing.global_attribute_ids import is_standard_command_id
+    asserts.assert_true(is_standard_command_id(id),
+                        f"Not a standard command ID: {hex(id)}")
