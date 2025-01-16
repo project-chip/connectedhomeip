@@ -98,16 +98,15 @@ void AdministratorCommissioningServer::InvokeCommand(HandlerContext & context)
     {
     case Commands::OpenCommissioningWindow::Id:
         HandleCommand<Commands::OpenCommissioningWindow::DecodableType>(
-            context, [this](HandlerContext & context, const auto & commandData) { OpenCommissioningWindow(context, commandData); });
+            context, [this](HandlerContext & ctx, const auto & commandData) { OpenCommissioningWindow(ctx, commandData); });
         break;
     case Commands::OpenBasicCommissioningWindow::Id:
         HandleCommand<Commands::OpenBasicCommissioningWindow::DecodableType>(
-            context,
-            [this](HandlerContext & context, const auto & commandData) { OpenBasicCommissioningWindow(context, commandData); });
+            context, [this](HandlerContext & ctx, const auto & commandData) { OpenBasicCommissioningWindow(ctx, commandData); });
         break;
     case Commands::RevokeCommissioning::Id:
         HandleCommand<Commands::RevokeCommissioning::DecodableType>(
-            context, [this](HandlerContext & context, const auto & commandData) { RevokeCommissioning(context, commandData); });
+            context, [this](HandlerContext & ctx, const auto & commandData) { RevokeCommissioning(ctx, commandData); });
         break;
     }
 }
