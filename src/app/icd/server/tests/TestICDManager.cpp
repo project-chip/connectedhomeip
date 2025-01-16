@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "app-common/zap-generated/cluster-enums.h"
+#include <app-common/zap-generated/cluster-enums.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/SubscriptionsInfoProvider.h>
