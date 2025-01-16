@@ -77,6 +77,14 @@ extern "C" {
 #include "sl_si91x_power_manager.h"
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
 
+// TODO : Temporary work-around for wifi-init failure in 917NCP and 917SOC ACX module boards.
+// Can be removed after Wiseconnect fixes region code for all ACX module boards.
+#if (SL_SI91X_ACX_MODULE == 1) || defined(EXP_BOARD)
+#define REGION_CODE IGNORE_REGION
+#else
+#define REGION_CODE US
+#endif
+
 WfxRsi_t wfx_rsi;
 extern osSemaphoreId_t sl_rs_ble_init_sem;
 
@@ -107,7 +115,7 @@ const sl_wifi_device_configuration_t config = {
     .boot_option = LOAD_NWP_FW,
     .mac_address = NULL,
     .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-    .region_code = US,
+    .region_code = REGION_CODE,
     .boot_config = { .oper_mode = SL_SI91X_CLIENT_MODE,
                      .coex_mode = SL_SI91X_WLAN_BLE_MODE,
                      .feature_bit_map =
