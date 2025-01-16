@@ -186,7 +186,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
     async def _verify_non_empty_tuple(self, attr_path, read_request):
         endpoint, cluster_obj = attr_path[0]
-        cluster_ids = list(read_request.tlvAttributes[endpoint].keys())
 
         if hasattr(cluster_obj, 'cluster_id'):  # cluster_obj is an Attribute
             return await self._verify_attribute_cluster(read_request, endpoint, cluster_obj)
