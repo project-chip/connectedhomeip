@@ -552,6 +552,32 @@ TEST_F(TestTCP, CheckSimpleInitTest6)
     CheckSimpleInitTest(IPAddressType::kIPv6);
 }
 
+TEST_F(TestTCP, InitializeAsTCPClient)
+{
+    TCPImpl tcp;
+    auto tcpListenParams = Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager());
+    CHIP_ERROR err =
+        tcp.Init(tcpListenParams.SetAddressType(IPAddressType::kIPv6).SetListenPort(gChipTCPPort).SetServerListenEnabled(false));
+
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    bool isServerEnabled = tcpListenParams.IsServerListenEnabled();
+    EXPECT_EQ(isServerEnabled, false);
+}
+
+TEST_F(TestTCP, InitializeAsTCPClientServer)
+{
+    TCPImpl tcp;
+    auto tcpListenParams = Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager());
+
+    CHIP_ERROR err = tcp.Init(tcpListenParams.SetAddressType(IPAddressType::kIPv6).SetListenPort(gChipTCPPort));
+
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    bool isServerEnabled = tcpListenParams.IsServerListenEnabled();
+    EXPECT_EQ(isServerEnabled, true);
+}
+
 TEST_F(TestTCP, CheckMessageTest6)
 {
     IPAddress addr;

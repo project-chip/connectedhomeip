@@ -20,6 +20,7 @@ import logging
 import multiprocessing
 import os
 import os.path
+import shlex
 import shutil
 import subprocess
 import sys
@@ -209,7 +210,7 @@ class ZAPGenerateTarget:
         """Runs a ZAP generate command on the configured zap/template/outputs.
         """
         cmd = self.build_cmd()
-        logging.info("Generating target: %s" % " ".join(cmd))
+        logging.info("Generating target: %s" % shlex.join(cmd))
 
         generate_start = time.time()
         subprocess.check_call(cmd)

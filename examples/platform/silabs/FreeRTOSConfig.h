@@ -203,7 +203,10 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configENABLE_FPU 1
 #define configENABLE_MPU 0
 /* FreeRTOS Secure Side Only and TrustZone Security Extension */
+#ifndef configRUN_FREERTOS_SECURE_ONLY
+// prevent redefinition with Series 3
 #define configRUN_FREERTOS_SECURE_ONLY 1
+#endif
 #define configENABLE_TRUSTZONE 0
 /* FreeRTOS MPU specific definitions. */
 #define configINCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS (0)

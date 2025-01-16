@@ -23,7 +23,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
+#include <platform/silabs/wifi/WifiInterface.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -166,7 +166,7 @@ void wfx_retry_connection(uint16_t retryAttempt)
         return;
     }
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
-    wfx_power_save(RSI_SLEEP_MODE_8, STANDBY_POWER_SAVE_WITH_RAM_RETENTION);
+    wfx_power_save(RSI_SLEEP_MODE_8, DEEP_SLEEP_WITH_RAM_RETENTION);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
     ChipLogProgress(DeviceLayer, "wfx_retry_connection : Next attempt after %d Seconds", retryInterval);
     retryInterval += retryInterval;

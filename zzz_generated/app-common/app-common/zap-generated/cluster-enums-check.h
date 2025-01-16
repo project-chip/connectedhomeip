@@ -3704,6 +3704,97 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(CameraAvStreamManagemen
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::ContainerFormatEnum val)
+{
+    using EnumType = PushAvStreamTransport::ContainerFormatEnum;
+    switch (val)
+    {
+    case EnumType::kCmaf:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::IngestMethodsEnum val)
+{
+    using EnumType = PushAvStreamTransport::IngestMethodsEnum;
+    switch (val)
+    {
+    case EnumType::kCMAFIngest:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::StatusCodeEnum val)
+{
+    using EnumType = PushAvStreamTransport::StatusCodeEnum;
+    switch (val)
+    {
+    case EnumType::kAllocationNotPermitted:
+    case EnumType::kInvalidTLSEndpoint:
+    case EnumType::kInvalidStream:
+    case EnumType::kInvalidURL:
+    case EnumType::kInvalidZone:
+    case EnumType::kUnsupportedContainerFormat:
+    case EnumType::kUnsupportedIngestMethod:
+    case EnumType::kInvalidTriggerType:
+    case EnumType::kInvalidTransportStatus:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::StreamMultiplexingEnum val)
+{
+    using EnumType = PushAvStreamTransport::StreamMultiplexingEnum;
+    switch (val)
+    {
+    case EnumType::kInterleaved:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::TransportStatusEnum val)
+{
+    using EnumType = PushAvStreamTransport::TransportStatusEnum;
+    switch (val)
+    {
+    case EnumType::kActive:
+    case EnumType::kInactive:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::TransportTriggerTypeEnum val)
+{
+    using EnumType = PushAvStreamTransport::TransportTriggerTypeEnum;
+    switch (val)
+    {
+    case EnumType::kCommand:
+    case EnumType::kMotion:
+    case EnumType::kContinuous:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::TriggerActivationReasonEnum val)
+{
+    using EnumType = PushAvStreamTransport::TriggerActivationReasonEnum;
+    switch (val)
+    {
+    case EnumType::kUserInitiated:
+    case EnumType::kAutomation:
+    case EnumType::kEmergency:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(UnitTesting::SimpleEnum val)
 {
     using EnumType = UnitTesting::SimpleEnum;
