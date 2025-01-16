@@ -49,6 +49,11 @@
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
+// Temporarily keep backwards compatibility. To be removed
+#ifndef CONFIG_CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
+#define CONFIG_CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
+#endif
+
 /*******************************************************************************
  * Local data types
  *******************************************************************************/

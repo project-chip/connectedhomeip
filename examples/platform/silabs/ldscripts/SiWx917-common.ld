@@ -152,6 +152,9 @@ SECTIONS
     *sl_si91x_low_power_tickless_mode.c.o(.text*)
     *sl_core_cortexm.c.o(.text*)
 
+    /* ipmu calibration data */
+    *(.common_ipmu_ram*)
+
     . = ALIGN(4);
     /* preinit data */
     PROVIDE_HIDDEN (__preinit_array_start = .);
