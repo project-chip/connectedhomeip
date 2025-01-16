@@ -290,8 +290,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         //
         app::DnssdServer::Instance().SetFabricTable(stateParams.fabricTable);
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
         // Disable the TCP Server based on the TCPListenParameters setting.
         app::DnssdServer::Instance().SetTCPServerEnabled(tcpListenParams.IsServerListenEnabled());
+#endif
     }
 
     stateParams.sessionSetupPool = Platform::New<DeviceControllerSystemStateParams::SessionSetupPool>();
