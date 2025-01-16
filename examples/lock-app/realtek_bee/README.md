@@ -15,8 +15,8 @@ The example is based on:
 
 ## Introduction
 
-The application showcases a lock device that communicates with clients
-over a low-power, 802.15.4 Thread network.
+The application showcases a lock device that communicates with clients over a
+low-power, 802.15.4 Thread network.
 
 It can be commissioned into an existing Matter network using a controller such
 as `chip-tool`.
