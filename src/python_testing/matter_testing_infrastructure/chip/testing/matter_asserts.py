@@ -42,6 +42,24 @@ def assert_valid_uint64(value: Any, description: str) -> None:
     asserts.assert_greater_equal(value, 0, f"{description} must be non-negative")
     asserts.assert_less_equal(value, 0xFFFFFFFFFFFFFFFF, f"{description} must not exceed 0xFFFFFFFFFFFFFFFF")
 
+
+def assert_int_in_range(value: Any, min_value: int, max_value: int, description: str) -> None:
+    """
+    Asserts that the value is an integer within the specified range (inclusive).
+
+    Args:
+        value: The value to check
+        min_value: Minimum allowed value (inclusive)
+        max_value: Maximum allowed value (inclusive)
+        description: User-defined description for error messages
+
+    Raises:
+        AssertionError: If value is not an integer or outside the specified range
+    """
+    asserts.assert_true(isinstance(value, int), f"{description} must be an integer")
+    asserts.assert_greater_equal(value, min_value, f"{description} must be greater than or equal to {min_value}")
+    asserts.assert_less_equal(value, max_value, f"{description} must be less than or equal to {max_value}")
+
 # List assertions
 
 
