@@ -75,6 +75,11 @@ void AirPurifierManager::PostAttributeChangeCallback(EndpointId endpoint, Cluste
         break;
     }
 
+    case OnOff::Id: {
+        HandleOnOffAttributeChange(attributeId, type, size, value);
+        break;
+    }
+
     default:
         break;
     }
@@ -151,6 +156,26 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
 
 void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
 {
+
+    // If the device is off when the PercentSetting, SpeedSetting or FanMode is changed, switch it on.
+    switch (attributeId)
+    {
+    case FanControl::Attributes::PercentSetting::Id:
+    case FanControl::Attributes::SpeedSetting::Id:
+    case FanControl::Attributes::FanMode::Id: {
+        Status err = OnOff::Attributes::OnOff::Set(mEndpointId, true);
+        if (err != Status::Success)
+        {
+            ChipLogError(NotSpecified, "OnOff::Attributes::OnOff::Set() Failed %d", to_underlying(err));
+        }
+
+        break;
+    }
+    default: {
+        break;
+    }
+    }
+
     switch (attributeId)
     {
     case FanControl::Attributes::PercentSetting::Id: {
@@ -362,6 +387,60 @@ void AirPurifierManager::ThermostatHeatingSetpointWriteCallback(int16_t aNewHeat
 void AirPurifierManager::ThermostatSystemModeWriteCallback(uint8_t aNewSystemMode)
 {
     mThermostatManager.SystemModeWriteCallback(aNewSystemMode);
+}
+
+void AirPurifierManager::SetFanPower(bool onoff)
+{
+    // On
+    if (onoff) {
+        auto speedSetting = GetSpeedSetting();
+        if (!speedSetting.IsNull())
+        {
+            speedCurrent = speedSetting.Value();
+            Status status = FanControl::Attributes::SpeedCurrent::Set(mEndpointId, speedCurrent);
+            if (status != Status::Success)
+            {
+                ChipLogError(NotSpecified, "FanControl::Attributes::SpeedCurrent::Set() Failed %d", to_underlying(status));
+            }
+
+        }
+
+        auto percentSetting = GetPercentSetting();
+        if (!percentSetting.IsNull())
+        {
+            percentCurrent = percentSetting.Value();
+            Status status = FanControl::Attributes::PercentCurrent::Set(mEndpointId, percentCurrent);
+            if (status != Status::Success)
+            {
+                ChipLogError(NotSpecified, "FanControl::Attributes::PercentCurrent::Set() Failed %d", to_underlying(status));
+            }
+
+        }
+
+        return;
+    }
+
+    // Off
+    speedCurrent = 0;
+    FanControl::Attributes::SpeedCurrent::Set(mEndpointId, speedCurrent);
+    percentCurrent = 0;
+    FanControl::Attributes::PercentCurrent::Set(mEndpointId, percentCurrent);
+
+}
+
+void AirPurifierManager::HandleOnOffAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
+{
+    switch (attributeId)
+    {
+    case OnOff::Attributes::OnOff::Id: {
+        bool onOff = static_cast<bool>(*value);
+        ChipLogProgress(NotSpecified, "AirPurifierManager::HandleOnOffAttributeChange: onOff attribute changed to %s", onOff ? "True" : "False");
+        SetFanPower(onOff);
+
+        // todo switch the heater on/off
+        break;
+    }
+    }
 }
 
 void AirPurifierManager::HeatingCallback()
