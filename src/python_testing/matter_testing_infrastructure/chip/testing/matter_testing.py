@@ -344,6 +344,44 @@ class AttributeChangeCallback:
             asserts.fail(f"[AttributeChangeCallback] Attribute {self._expected_attribute} not found in returned report")
 
 
+class AttributeChangeCallbackFan: # COPY of AttributeChangeCallback to fiddle with
+    def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):
+        self._output: queue.Queue = queue.Queue()
+        self._expected_attribute = expected_attribute
+        print(f"\n\n\n\t\t [FANS] AttributeChangeCallbackFan __init__ queue: {self._output.queue}")
+
+    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
+        """This is the subscription callback when an attribute is updated.
+           It checks the passed in attribute is the same as the subscribed to attribute and
+           then posts it into the queue for later processing."""
+           
+        asserts.assert_equal(path.AttributeType, self._expected_attribute,
+                             f"[AttributeChangeCallback] Attribute mismatch. Expected: {self._expected_attribute}, received: {path.AttributeType}")
+        logging.debug(f"[AttributeChangeCallback] Attribute update callback for {path.AttributeType}")
+        q = (path, transaction)
+        self._output.put(q)
+        print(f"\n\n\n\t\t [FANS] AttributeChangeCallbackFan __call__ queue: {self._output.queue}")
+
+    def wait_for_report(self):
+        print(f"\n\n\n\t\t [FANS] AttributeChangeCallbackFan wait_for_report START")
+
+        try:
+            path, transaction = self._output.get(block=True, timeout=10)
+        except queue.Empty:
+            asserts.fail(
+                f"[AttributeChangeCallback] Failed to receive a report for the {self._expected_attribute} attribute change")
+
+        asserts.assert_equal(path.AttributeType, self._expected_attribute,
+                             f"[AttributeChangeCallback] Received incorrect report. Expected: {self._expected_attribute}, received: {path.AttributeType}")
+        try:
+            attribute_value = transaction.GetAttribute(path)
+            logging.info(
+                f"[AttributeChangeCallback] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
+        except KeyError:
+            asserts.fail(f"[AttributeChangeCallback] Attribute {self._expected_attribute} not found in returned report")
+        
+        return attribute_value
+
 def clear_queue(report_queue: queue.Queue):
     """Flush all contents of a report queue. Useful to get back to empty point."""
     while not report_queue.empty():
