@@ -19,9 +19,8 @@
 #include "chef-valve-configuration-and-control-delegate-impl.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
-#include <app/util/config.h>
 
-// #ifdef MATTER_DM_PLUGIN_VALVE_CONFIGURATION_AND_CONTROL_SERVER
+#ifdef MATTER_DM_PLUGIN_VALVE_CONFIGURATION_AND_CONTROL_SERVER
 
 using namespace chip::app::Clusters::ValveConfigurationAndControl;
 using namespace chip::app::Clusters;
@@ -162,5 +161,5 @@ void emberAfValveConfigurationAndControlClusterInitCallback(chip::EndpointId end
     ValveConfigurationAndControl::SetDefaultDelegate(endpointId, gValveConfigurationAndControlDelegate);
 }
 
-// #endif // #ifdef MATTER_DM_PLUGIN_VALVE_CONFIGURATION_AND_CONTROL_SERVER
+#endif // MATTER_DM_PLUGIN_VALVE_CONFIGURATION_AND_CONTROL_SERVER
 

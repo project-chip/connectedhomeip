@@ -23,9 +23,10 @@
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 #include <app/data-model/Nullable.h>
 #include <app/util/basic-types.h>
+#include <app/util/config.h>
 #include <lib/core/CHIPError.h>
 
-// #ifdef MATTER_DM_PLUGIN_VALVE_CONFIGURATION_AND_CONTROL_SERVER
+#ifdef MATTER_DM_PLUGIN_VALVE_CONFIGURATION_AND_CONTROL_SERVER
 
 namespace chip {
 namespace app {
@@ -63,5 +64,5 @@ chefValveConfigurationAndControlReadCallback(chip::EndpointId endpointId, chip::
                                              const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
                                              uint16_t maxReadLength);
 
-// #endif // #ifdef MATTER_DM_PLUGIN_VALVE_CONFIGURATION_AND_CONTROL_SERVER
+#endif // MATTER_DM_PLUGIN_VALVE_CONFIGURATION_AND_CONTROL_SERVER
 
