@@ -13,4 +13,4 @@ The startup script uses `scripts/build_coverage.sh` to generate the coverage rep
 
 ### Making Changes to "startup-script.sh"
 
-If you make changes to `startup-script.sh`, make sure you go to the [VM configuration](https://pantheon.corp.google.com/compute/instancesDetail/zones/us-central1-a/instances/matter-build-coverage?inv=1&invt=AbnAfg&project=matter-build-automation), click `edit` and update the startup script in the `Automation` text box, to reflext your changes. The script in the Matter SDK repo is just a copy of the configuration in the VM.
+If you make changes to `startup-script.sh`, make sure you go to the [VM configuration](https://pantheon.corp.google.com/compute/instancesDetail/zones/us-central1-a/instances/matter-build-coverage?inv=1&invt=AbnAfg&project=matter-build-automation), click `edit` and update the startup script in the `Automation` text box, to reflect your changes. The script in the Matter SDK repo is just a copy of the configuration in the VM.
