@@ -37,7 +37,8 @@ DEFAULT_TESTS = ["TC_DeviceBasicComposition", "TC_DeviceConformance"]
 TMP_RESULTS_DIR = "/tmp/comformance_report"
 OUT_DIR = "./out"
 TEST_COMMAND = "scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py --app {} --factory-reset --app-args \"--trace-to json:log\" --script src/python_testing/{}.py --script-args \"--qr-code MT:-24J0AFN00KA0648G00\"'"
-BUILD_COMMAND = "python3 scripts/build/build_examples.py --target {} build"
+BUILD_COMMAND = "python3 scripts/build/build_examples.py --ninja-jobs {} --target {} build"
+NINJA_JOBS = max(os.cpu_count() - 2, 1)  # Limit # of jobs to avoid using too much CPU and RAM
 
 
 def find_executables(dirs):
@@ -178,10 +179,11 @@ def build_targets(targets, skip_building):
             print(f"Building: {target} ...skipped")
             continue
 
-        command = BUILD_COMMAND.format(target)
+        command = BUILD_COMMAND.format(NINJA_JOBS, target)
         try:
             print(f"Building: {target}")
-            result = subprocess.run(command, shell=True, capture_output=True, text=True)
+            print(command)
+            result = subprocess.run(command, shell=True, capture_output=False, text=True)
             result.check_returncode()  # Raise CalledProcessError if build fails
         except subprocess.CalledProcessError as e:
             print(f"Error building {target}:")
