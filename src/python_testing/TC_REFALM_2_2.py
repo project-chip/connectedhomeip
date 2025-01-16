@@ -34,7 +34,9 @@
 
 import logging
 from time import sleep
+from typing import Any
 import queue
+import json
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, SimpleEventCallback
 from mobly import asserts
@@ -60,7 +62,7 @@ class TC_REFALM_2_2(MatterBaseTest):
             TestStep( 2, "Ensure that the door on the DUT is closed"),
             TestStep( 3, "TH reads from the DUT the State attribute"),
             TestStep( 4, "Manually open the door on the DUT"),
-            # TestStep( 5, "Wait for the time defined in PIXIT.REFALM.AlarmThreshold"),
+            TestStep( 5, "Wait for the time defined in PIXIT.REFALM.AlarmThreshold"),
             TestStep( 6, "TH reads from the DUT the State attribute"),
             TestStep( 7, "Ensure that the door on the DUT is closed"),
             TestStep( 8, "TH reads from the DUT the State attribute"),
@@ -68,25 +70,32 @@ class TC_REFALM_2_2(MatterBaseTest):
             TestStep( 10, "TH sends ModifyEnabledAlarms command to the DUT"),
             TestStep( 11, "Set up subscription to the Notify event"),
             TestStep( "12.a", "Repeating step 4 Manually open the door on the DUT"),
-            #TestStep( "12.b", "Step 12b: Repeat step 5 Wait for the time defined in PIXIT.REFALM.AlarmThreshold"),
+            TestStep( "12.b", "Step 12b: Repeat step 5 Wait for the time defined in PIXIT.REFALM.AlarmThreshold"),
             TestStep( "12.c", "After step 5 (repeated), receive a Notify event with the State attribute bit 0 set to 1."),
-            # TestStep( "13.a", "Repeat step 7 Ensure that the door on the DUT is closed"),
-            # TestStep( "13.b", "Receive a Notify event with the State attribute bit 0 set to 0"),
+            TestStep( "13.a", "Repeat step 7 Ensure that the door on the DUT is closed"),
+            TestStep( "13.b", "Receive a Notify event with the State attribute bit 0 set to 0"),
         ]
 
         return steps
 
     def _ask_for_closed_door(self):
-        user_response = self.wait_for_user_input(prompt_msg=f"Ensure that the door on the DUT is closed. Enter 'y' or 'n' after completition",
-            prompt_msg_placeholder="y",
-            default_value="y")
-        asserts.assert_equal(user_response.lower(), "y")
+        
+        if self.is_ci:
+            user_response = self.wait_for_user_input(prompt_msg=f"Ensure that the door on the DUT is closed. Enter 'y' or 'n' after completition",
+                prompt_msg_placeholder="y",
+                default_value="y")
+            asserts.assert_equal(user_response.lower(), "y")
+        else:
+            self._send_close_door_commnad()
 
-    def _ask_for_open_door(self):
-        user_response = self.wait_for_user_input(prompt_msg=f"Manually open the door on the DUT. Enter 'y' or 'n' after completition",
-            prompt_msg_placeholder="y",
-            default_value="y")
-        asserts.assert_equal(user_response.lower(), "y")
+    def _ask_for_open_door(self ):
+        if self.is_ci:
+            user_response = self.wait_for_user_input(prompt_msg=f"Manually open the door on the DUT. Enter 'y' or 'n' after completition",
+                prompt_msg_placeholder="y",
+                default_value="y")
+            asserts.assert_equal(user_response.lower(), "y")
+        else:
+            self._send_open_door_command()
 
     async def read_refalm_state_attribute(self):
         cluster = Clusters.Objects.RefrigeratorAlarm
@@ -95,14 +104,44 @@ class TC_REFALM_2_2(MatterBaseTest):
             cluster=cluster,
             attribute=Clusters.RefrigeratorAlarm.Attributes.State
         )
-    
-    async def wait_thresshold(self,alarm_threshold):
-        sleep(alarm_threshold)
+
+    def wait_thresshold(self):
+        sleep(self.wait_thresshold_v/1000)
+
+    def _send_named_pipe_command(self, command_dict: dict[str, Any]):
+        app_pid = self.matter_test_config.app_pid
+        if app_pid == 0:
+            asserts.fail("The --app-pid flag must be set when usage of door state simulation named pipe is required (e.g. CI)")
+
+        app_pipe = f"/tmp/chip_all_clusters_fifo_{app_pid}"
+        command = json.dumps(command_dict)
+
+        # Sends an out-of-band command to the sample app
+        with open(app_pipe, "w") as outfile:
+            logging.info(f"Sending named pipe command to {app_pipe}: '{command}'")
+            outfile.write(command + "\n")
+        # Delay for pipe command to be processed (otherwise tests may be flaky).
+        sleep(0.1)
+
+    def _send_open_door_command(self):
+        command_dict  = {"Name":"SetRefDoorStatus", "EndpointId": self.endpoint, "Status": 1}
+        self._send_named_pipe_command(command_dict)
+
+    def _send_close_door_commnad(self):
+        command_dict  = {"Name":"SetRefDoorStatus", "EndpointId": self.endpoint, "Status": 0}
+        self._send_named_pipe_command(command_dict)
+
 
     @async_test_body
     async def test_TC_REFALM_2_2(self):
-        
+        self.wait_thresshold_v = 5000
+        self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
+        logger.info(f"Is this really CI {self.is_ci}")
+        #ev_crl = self.default_controller
         self.endpoint = self.get_endpoint(default=1)
+        cluster = Clusters.RefrigeratorAlarm
+        # feature_map = await self.read_single_attribute_check_success(cluster=cluster,endpoint=self.endpoint ,attribute=cluster.Attributes.FeatureMap)
+        
         logger.info(f"Default endpoint {self.endpoint}")
         self.step(1)
 
@@ -120,48 +159,10 @@ class TC_REFALM_2_2(MatterBaseTest):
         # # open the door manually
         self.step(4)
         self._ask_for_open_door()
-        # I think this will 
-        Clusters.Objects.RefrigeratorAlarm.Bitmaps.AlarmBitmap.kDoorOpen = 1
 
-
-        # # wait  PIXIT.REFALM.AlarmThreshold (5s)
-        # self.step(5)
-
-        # Result [MatterTest] 01-13 18:01:36.897 INFO Attr str [0, 2, 3, 65528, 65529, 65531, 65532, 65533]
-        attr_list = await self.read_single_attribute_check_success(
-            endpoint=self.endpoint,
-            cluster=Clusters.Objects.RefrigeratorAlarm,
-            attribute=Clusters.RefrigeratorAlarm.Attributes.AttributeList
-        )
-        logger.info(f"Attr list  {attr_list}")
-
-        # Result [MatterTest] 01-13 18:01:36.897 INFO Attr str []
-        accepted_command_list = await self.read_single_attribute_check_success(
-            endpoint=self.endpoint,
-            cluster=Clusters.Objects.RefrigeratorAlarm,
-            attribute=Clusters.RefrigeratorAlarm.Attributes.AcceptedCommandList
-        )        
-        logger.info(f"Accepted commands {accepted_command_list}")
-
-
-        # Result is empty[]
-        generated_command_list = await self.read_single_attribute_check_success(
-            endpoint=self.endpoint,
-            cluster=Clusters.Objects.RefrigeratorAlarm,
-            attribute=Clusters.RefrigeratorAlarm.Attributes.GeneratedCommandList
-        )        
-        logger.info(f"Generated commands {generated_command_list}")
-
-        A0002_status  = self.check_pics('REFALM.S.A0002')
-        logger.info(f"A0002 commands {A0002_status}")
-
-        c00_status  = self.check_pics('REFALM.S.C00.Rsp')
-        logger.info(f"c00 commands {c00_status}")
-
-        c01_status  = self.check_pics('REFALM.S.C0.Rsp')
-        logger.info(f"c01 commands {c01_status}")
-
-        Clusters.Objects.RefrigeratorAlarm.Events.Notify
+        # wait  PIXIT.REFALM.AlarmThreshold (5s)
+        self.step(5)
+        self.wait_thresshold()
 
         # # read the status
         self.step(6)
@@ -179,20 +180,20 @@ class TC_REFALM_2_2(MatterBaseTest):
 
         # step 9
         self.step(9)
-        asserts.assert_true(self.check_pics('REFALM.S.C00.Rsp'),"UNSUPPORTED_COMMAND(0x81)")
+        try:
+            await self.default_controller.SendCommandByIds(nodeid=self.dut_node_id, endpoint=0, clusterId=0, commandId=0, timedRequestTimeoutMs=6000)
+        except  Exception as e:
+            logger.info(f"Exception {e}")
+            asserts.assert_in(e,"UNSUPPORTED_COMMAND(0x81)")
 
-        if self.pics_guard(self.check_pics('REFALM.S .C00.Rsp') ):
-            ret = await self.send_single_cmd(cmd=Clusters.Objects.RefrigeratorAlarm.acceptedCommandList.Reset,endpoint=self.endpoint)
-            logger.info(f"Reset: {ret}")
-         
 
         # step 10
         self.step(10)
-        asserts.assert_true(self.check_pics('REFALM.S.C01.Rsp')," UNSUPPORTED_COMMAND(0x81)")
-
-        if self.pics_guard(self.check_pics('REFALM.S.C01.Rsp')):
-            ret = await self.send_single_cmd(cmd=Clusters.Objects.RefrigeratorAlarm.acceptedCommandList.ModifyEnabledAlarms,endpoint=self.endpoint)
-            logger.info(f"ModifyEnabledAlarms: {ret}")
+        try: 
+            await self.default_controller.SendCommandByIds(nodeid=self.dut_node_id, endpoint=0, clusterId=0, commandId=0, timedRequestTimeoutMs=6000)
+        except Exception as e:
+            logger.info(f"Exception {e}")
+            asserts.assert_in(e," UNSUPPORTED_COMMAND(0x81)")
 
         # step 11
         self.step(11)
@@ -203,13 +204,13 @@ class TC_REFALM_2_2(MatterBaseTest):
         subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, notify_event, urgent)], reportInterval=[1, 3])
         subscription.SetEventUpdateCallback(callback=cb)
 
-        # step(12)
-        self.step("12.a")
-        # self._ask_for_open_door()
-
-        # step(12)
+        # step(12.a)
         self.step("12.a")
         self._ask_for_open_door()
+
+        # step(12.b)
+        self.step("12.b")
+        self.wait_thresshold()
 
 
         # step(12.c)
