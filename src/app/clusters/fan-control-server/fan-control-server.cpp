@@ -26,6 +26,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/cluster-building-blocks/QuieterReporting.h>
 #include <app/clusters/fan-control-server/fan-control-server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
@@ -51,7 +52,20 @@ static_assert(kFanControlDelegateTableSize <= kEmberInvalidEndpointIndex, "FanCo
 
 Delegate * gDelegateTable[kFanControlDelegateTableSize] = { nullptr };
 
+struct EmberAfFanControlState
+{
+    bool moveStarted;
+    chip::Percent endPercent;
+    QuieterReportingAttribute<chip::Percent> quietPercentCurrent{ chip::Percent(0) };
+};
+
+static EmberAfFanControlState stateTable[kFanControlDelegateTableSize];
+
 } // anonymous namespace
+
+static EmberAfFanControlState * getState(EndpointId endpoint);
+
+static Status SetPercentCurrentQuietReport(EndpointId endpoint, chip::Percent newValue);
 
 namespace chip {
 namespace app {
@@ -145,6 +159,29 @@ inline bool SupportsAirflowDirection(EndpointId endpointId)
 }
 
 } // anonymous namespace
+
+void emberAfFanControlClusterServerInitCallback(EndpointId endpoint)
+{
+    EmberAfFanControlState * state = getState(endpoint);
+    auto now                       = System::SystemClock().GetMonotonicTimestamp();
+
+    if (state == nullptr)
+    {
+        ChipLogProgress(Zcl, "ERR: Fan control cluster not available on ep%d", endpoint);
+        return;
+    }
+
+    state->quietPercentCurrent.policy().Set(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
+
+    chip::Percent percentCurrent;
+    Status status      = Attributes::PercentCurrent::Get(endpoint, &percentCurrent);
+    state->moveStarted = false;
+    if (status == Status::Success)
+    {
+        state->endPercent = percentCurrent;
+        state->quietPercentCurrent.SetValue(percentCurrent, now);
+    }
+}
 
 // =============================================================================
 // Pre-change callbacks for cluster attributes
@@ -257,7 +294,20 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
         }
         else
         {
-            res = Status::Success;
+            // record a movement start for this endpoint (might need to be a potential move as move could be rejected via other
+            // logic???)
+            EmberAfFanControlState * state = getState(attributePath.mEndpointId);
+            if (state == nullptr)
+            {
+                ChipLogProgress(Zcl, "ERR: Fan control cluster not available on ep%d", attributePath.mEndpointId);
+                res = Status::Failure;
+            }
+            else
+            {
+                state->moveStarted = true;
+                state->endPercent  = (chip::Percent) *value;
+                res                = Status::Success;
+            }
         }
         break;
     }
@@ -314,6 +364,10 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
         {
             res = Status::UnsupportedAttribute;
         }
+        break;
+    }
+    case PercentCurrent::Id: {
+        res = SetPercentCurrentQuietReport(attributePath.mEndpointId, (chip::Percent) *value);
         break;
     }
     default:
@@ -483,4 +537,70 @@ bool emberAfFanControlClusterStepCallback(app::CommandHandler * commandObj, cons
 
     commandObj->AddStatus(commandPath, status);
     return true;
+}
+
+static EmberAfFanControlState * getState(EndpointId endpoint)
+{
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, FanControl::Id, MATTER_DM_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kFanControlDelegateTableSize ? nullptr : &stateTable[ep]);
+}
+
+/*
+ * @brief
+ * This function is used to update the percent current attribute
+ * while respecting its defined quiet reporting quality:
+ * The attribute will be reported:
+ * - At most once per second, or
+ * - At the start of the movement/transition, or
+ * - At the end of the movement/transition, or
+ * - When it changes from null to any other value and vice versa.
+ *
+ * @param endpoint: endpoint on which the percentCurrent attribute must be updated.
+ * @param newValue: Value to update the attribute with
+ * @return WriteIgnored in setting the attribute value or the IM error code for the failure.
+ */
+static Status SetPercentCurrentQuietReport(EndpointId endpoint, chip::Percent newValue)
+{
+    AttributeDirtyState dirtyState;
+    auto now                       = System::SystemClock().GetMonotonicTimestamp();
+    EmberAfFanControlState * state = getState(endpoint);
+
+    if (state == nullptr)
+    {
+        ChipLogProgress(Zcl, "ERR: Fan control cluster not available on ep%d", endpoint);
+        return Status::Failure;
+    }
+
+    bool isStartOrEndOfTransition = state->moveStarted || (newValue == state->endPercent);
+    state->moveStarted            = false;
+
+    if (isStartOrEndOfTransition)
+    {
+        // At the start or end of the movement/transition we must report
+        auto predicate = [](const decltype(state->quietPercentCurrent)::SufficientChangePredicateCandidate &) -> bool {
+            return true;
+        };
+        dirtyState = state->quietPercentCurrent.SetValue(newValue, now, predicate);
+    }
+    else
+    {
+        // During transtions, reports should be at most once per second
+        System::Clock::Milliseconds64 reportInterval = System::Clock::Milliseconds64(1000);
+        auto predicate = state->quietPercentCurrent.GetPredicateForSufficientTimeSinceLastDirty(reportInterval);
+        dirtyState     = state->quietPercentCurrent.SetValue(newValue, now, predicate);
+    }
+
+    MarkAttributeDirty markDirty = MarkAttributeDirty::kNo;
+    if (dirtyState == AttributeDirtyState::kMustReport)
+    {
+        markDirty = MarkAttributeDirty::kYes;
+    }
+
+    Status res = Attributes::PercentCurrent::Set(endpoint, state->quietPercentCurrent.value().Value(), markDirty);
+    if (res == Status::Success)
+    {
+        res = Status::WriteIgnored;
+    }
+    return res;
 }
