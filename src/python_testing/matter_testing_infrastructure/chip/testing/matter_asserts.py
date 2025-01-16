@@ -108,6 +108,12 @@ def assert_list(value: Any, description: str, min_length: Optional[int] = None, 
 
     Raises:
         AssertionError: If value is not a list or fails length constraints
+
+    Examples:
+        >>> assert_list([1, 2, 3], "Test list", min_length=1, max_length=5)  # Passes
+        >>> assert_list([], "Empty list", min_length=1)  # Raises AssertionError
+        >>> assert_list([1, 2, 3, 4, 5, 6], "Long list", max_length=5)  # Raises AssertionError
+        >>> assert_list("not a list", "Not a list")  # Raises AssertionError
     """
     asserts.assert_true(isinstance(value, list), f"{description} must be a list")
 
@@ -129,6 +135,12 @@ def assert_list_element_type(value: List[Any], description: str, expected_type: 
 
     Raises:
         AssertionError: If value is not a list or contains elements of wrong type
+
+    Examples:
+        >>> assert_list_element_type([1, 2, 3], "Integer list", int)  # Passes
+        >>> assert_list_element_type(["a", "b", "c"], "String list", str)  # Passes
+        >>> assert_list_element_type([1, "2", 3], "Mixed list", int)  # Raises AssertionError
+        >>> assert_list_element_type("not a list", "Not a list", int)  # Raises AssertionError
     """
     assert_list(value, description)
     for i, item in enumerate(value):
