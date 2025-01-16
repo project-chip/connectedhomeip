@@ -1830,7 +1830,7 @@ endpoint 1 {
 
   server cluster ValveConfigurationAndControl {
     ram      attribute openDuration;
-    ram      attribute defaultOpenDuration;
+    ram      attribute defaultOpenDuration default = 100;
     callback attribute remainingDuration;
     ram      attribute currentState;
     ram      attribute targetState;
@@ -1840,7 +1840,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
 
     handle command Open;

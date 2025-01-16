@@ -31,7 +31,14 @@ static DelegateImpl * gValveConfigurationAndControlDelegate = nullptr;
 
 DataModel::Nullable<chip::Percent> DelegateImpl::HandleOpenValve(DataModel::Nullable<chip::Percent> level)
 {
-    ChipLogProgress(DeviceLayer, "HandleOpenValve with level = %d", level.Value());
+    if (!level.IsNull())
+    {
+        ChipLogProgress(DeviceLayer, "HandleOpenValve with level = %d", level.Value());
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "HandleOpenValve with level = NULL");
+    }
     return level;
 }
 
@@ -149,6 +156,8 @@ void emberAfValveConfigurationAndControlClusterInitCallback(chip::EndpointId end
     // Ensures this is called only once
     VerifyOrDieWithMsg(gValveConfigurationAndControlDelegate == nullptr, DeviceLayer,
                        "Attempted to call emberAfValveConfigurationAndControlClusterInitCallback more than once.");
+
+    gValveConfigurationAndControlDelegate = new DelegateImpl;
 
     ValveConfigurationAndControl::SetDefaultDelegate(endpointId, gValveConfigurationAndControlDelegate);
 }
