@@ -163,8 +163,8 @@ class MTRSwiftDeviceTests : XCTestCase {
     }
     
     static override func tearDown() {
-        ResetCommissionee(sConnectedDevice, DispatchQueue.main, nil, UInt16(DeviceConstants.timeoutInSeconds))
-
+        XCTAssertNotNil(sConnectedDevice)
+        ResetCommissionee(sConnectedDevice!, DispatchQueue.main, nil, UInt16(DeviceConstants.timeoutInSeconds))
         let controller = sController
         XCTAssertNotNil(controller)
         controller!.shutdown()
