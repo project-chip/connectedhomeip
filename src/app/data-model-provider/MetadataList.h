@@ -63,7 +63,7 @@ protected:
     CHIP_ERROR AppendRaw(const void * buffer);
     const void * RawBuffer() const { return mBuffer; }
 
-    /// Marks a list as immutable and immutability is aquired
+    /// Marks a list as immutable and immutability is acquired
     /// during const access (so this is const)
     void SetImmutable() const { mIsImmutable = true; }
 
