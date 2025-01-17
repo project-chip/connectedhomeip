@@ -128,7 +128,7 @@ bool AttributePathExpandIterator::IsValidAttributeId(AttributeId attributeId)
 
 std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
 {
-    if (mPosition.mOutputPath.mAttributeId == kInvalidClusterId)
+    if (mPosition.mOutputPath.mAttributeId == kInvalidAttributeId)
     {
         mAttributeIndex = kInvalidIndex;
     }
