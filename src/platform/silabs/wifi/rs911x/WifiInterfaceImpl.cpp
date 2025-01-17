@@ -19,6 +19,7 @@
 #include "silabs_utils.h"
 #include "sl_status.h"
 #include <cmsis_os2.h>
+#include <inet/IPAddress.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
