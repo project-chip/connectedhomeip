@@ -96,6 +96,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/global-bitmaps.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-enums.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-structs.xml \
+                      src/app/zap-templates/zcl/data-model/chip/push-av-stream-transport-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/semantic-tag-namespace-enums.xml \
                       src/app/zap-templates/zcl/data-model/chip/access-control-definitions.xml \
                       src/app/zap-templates/zcl/data-model/chip/access-control-cluster.xml \
@@ -197,6 +198,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/time-format-localization-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/time-synchronization-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/timer-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/tls-certificate-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/user-label-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/unit-localization-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/wake-on-lan-cluster.xml \
