@@ -498,7 +498,7 @@ DataModel::MetadataList<DataModel::AttributeEntry> CodegenDataModelProvider::Att
         if (err != CHIP_NO_ERROR)
         {
 #if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-            ChipLogError(AppServer, "Failed to append attribute id: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(AppServer, "Failed to append attribute entry: %" CHIP_ERROR_FORMAT, err.Format());
 #endif
             break;
         }
