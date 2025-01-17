@@ -462,7 +462,7 @@ DataModel::MetadataList<DataModel::ServerClusterEntry> CodegenDataModelProvider:
         if (err != CHIP_NO_ERROR)
         {
 #if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-            ChipLogError(AppServer, "Failed to append client cluster id: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(AppServer, "Failed to append server cluster entry: %" CHIP_ERROR_FORMAT, err.Format());
 #endif
             break;
         }
