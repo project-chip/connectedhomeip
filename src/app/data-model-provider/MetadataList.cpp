@@ -122,7 +122,8 @@ void GenericMetadataList::AquireExistingBuffer(const void * buffer, size_t eleme
     mElementCount = elements;
     mCapacity     = elements;
     mIsImmutable  = true;
-    // NOTE: const cast, however we are marked as immutable and not allocated
+    // NOTE: const cast, however we are marked as immutable and not allocated,
+    // so will never perform any writes on mBuffer's contents or try to deallocate it.
     mBuffer = static_cast<uint8_t *>(const_cast<void *>(buffer));
 }
 
