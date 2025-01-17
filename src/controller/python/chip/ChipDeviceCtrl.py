@@ -1215,6 +1215,42 @@ class ChipDeviceControllerBase():
         res.raise_on_error()
         return await future
 
+    async def SendCommandByIds(self, nodeid: int, endpoint: int, clusterId: int, commandId: int, responseType=None,
+                          timedRequestTimeoutMs: typing.Optional[int] = None,
+                          interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
+                          suppressResponse: typing.Optional[bool] = None,
+                          payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+        '''
+        Send a cluster-object encapsulated command to a node and get returned a future that can be awaited upon to receive
+        the response. If a valid responseType is passed in, that will be used to de-serialize the object. If not,
+        the type will be automatically deduced from the metadata received over the wire.
+
+        timedWriteTimeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
+        interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
+                              right timeout value based on transport characteristics as well as the responsiveness of the target.
+
+        Returns:
+            - command response. The type of the response is defined by the command.
+        Raises:
+            - InteractionModelError on error
+        '''
+        self.CheckIsActive()
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+        payload = ClusterObjects.ClusterCommand()
+        device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
+        # ClusterCommand.SendCommand(future,eventLoop,responseType,device.deviceProxy,Cluster)
+        res = await ClusterCommand.SendCommand(
+            future, eventLoop, responseType, device.deviceProxy, ClusterCommand.CommandPath(
+                EndpointId=endpoint,
+                ClusterId=clusterId,
+                CommandId=commandId,
+            ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs,
+            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse)
+        res.raise_on_error()
+        return await future
+
     async def SendBatchCommands(self, nodeid: int, commands: typing.List[ClusterCommand.InvokeRequestInfo],
                                 timedRequestTimeoutMs: typing.Optional[int] = None,
                                 interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,

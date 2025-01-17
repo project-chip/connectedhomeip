@@ -318,7 +318,7 @@ void HandleSetRefDoorStatus(Json::Value & jsonValue)
         (void) RefrigeratorAlarm::Attributes::State::Set(endpointId,doorStatus);
         ChipLogDetail(NotSpecified, "Refrigeratoralarm status updated to :%d", doorStatus);
     }else {
-        ChipLogError(NotSpecified, "Invalid Occupancy state to set.");
+        ChipLogError(NotSpecified, "Invalid State value to set.");
         return;
     }
 }

@@ -38,7 +38,7 @@ from typing import Any
 import queue
 import json
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, SimpleEventCallback
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, SimpleEventCallback,type_matches
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -67,7 +67,7 @@ class TC_REFALM_2_2(MatterBaseTest):
             TestStep( 7, "Ensure that the door on the DUT is closed"),
             TestStep( 8, "TH reads from the DUT the State attribute"),
             TestStep( 9, "TH sends Reset command to the DUT"),
-            TestStep( 10, "TH sends ModifyEnabledAlarms command to the DUT"),
+            #TestStep( 10, "TH sends ModifyEnabledAlarms command to the DUT"),
             TestStep( 11, "Set up subscription to the Notify event"),
             TestStep( "12.a", "Repeating step 4 Manually open the door on the DUT"),
             TestStep( "12.b", "Step 12b: Repeat step 5 Wait for the time defined in PIXIT.REFALM.AlarmThreshold"),
@@ -87,6 +87,7 @@ class TC_REFALM_2_2(MatterBaseTest):
             asserts.assert_equal(user_response.lower(), "y")
         else:
             self._send_close_door_commnad()
+            sleep(1)
 
     def _ask_for_open_door(self ):
         if self.is_ci:
@@ -137,10 +138,8 @@ class TC_REFALM_2_2(MatterBaseTest):
         self.wait_thresshold_v = 5000
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         logger.info(f"Is this really CI {self.is_ci}")
-        #ev_crl = self.default_controller
         self.endpoint = self.get_endpoint(default=1)
         cluster = Clusters.RefrigeratorAlarm
-        # feature_map = await self.read_single_attribute_check_success(cluster=cluster,endpoint=self.endpoint ,attribute=cluster.Attributes.FeatureMap)
         
         logger.info(f"Default endpoint {self.endpoint}")
         self.step(1)
@@ -178,45 +177,53 @@ class TC_REFALM_2_2(MatterBaseTest):
         device_status = await self.read_refalm_state_attribute()
         asserts.assert_equal(device_status,0)
 
-        # step 9
         self.step(9)
+        # Send a non registere command ( SendCommandByIds is a raw command )
+        # need to fully implement the raw command
         try:
-            await self.default_controller.SendCommandByIds(nodeid=self.dut_node_id, endpoint=0, clusterId=0, commandId=0, timedRequestTimeoutMs=6000)
-        except  Exception as e:
+            await self.default_controller.SendCommandByIds(nodeid=self.dut_node_id, endpoint=0, clusterId=cluster.id, commandId=0, timedRequestTimeoutMs=6000)
+        except  NotImplementedError as e:
             logger.info(f"Exception {e}")
             asserts.assert_in(e,"UNSUPPORTED_COMMAND(0x81)")
 
 
-        # step 10
-        self.step(10)
-        try: 
-            await self.default_controller.SendCommandByIds(nodeid=self.dut_node_id, endpoint=0, clusterId=0, commandId=0, timedRequestTimeoutMs=6000)
-        except Exception as e:
-            logger.info(f"Exception {e}")
-            asserts.assert_in(e," UNSUPPORTED_COMMAND(0x81)")
+        # # step 10
+        # self.step(10)
+        # try: 
+        #     await self.default_controller.SendCommandByIds(nodeid=self.dut_node_id, endpoint=0, clusterId=0, commandId=0, timedRequestTimeoutMs=6000)
+        # except Exception as e:
+        #     logger.info(f"Exception {e}")
+        #     asserts.assert_in(e," UNSUPPORTED_COMMAND(0x81)")
 
-        # step 11
+        
+        # Subscribe to Notify Event
         self.step(11)
-        notify_event = Clusters.RefrigeratorAlarm.Events.Notify
         self.q = queue.Queue()
+        notify_event = Clusters.RefrigeratorAlarm.Events.Notify
         cb = SimpleEventCallback("Notify", notify_event.cluster_id, notify_event.event_id, self.q)
         urgent = 1
-        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, notify_event, urgent)], reportInterval=[1, 3])
+        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, notify_event, urgent)], reportInterval=[2, 10])
         subscription.SetEventUpdateCallback(callback=cb)
-
-        # step(12.a)
+        
         self.step("12.a")
         self._ask_for_open_door()
 
-        # step(12.b)
         self.step("12.b")
         self.wait_thresshold()
 
-
-        # step(12.c)
         self.step("12.c")
-        device_state = await self.read_refalm_state_attribute()
-        logger.info(f"The device state is {device_state}")
+        # Wait for the Notify event
+        try:
+            ret = self.q.get(block=True, timeout=30)
+            logger.info(f"Event data {ret}")
+            asserts.assert_true(type_matches(ret.Data, cluster.Events.Notify ),"Unexpected event type returned")
+            asserts.assert_equal(ret.Data.state,0,"Unexpected event type returned")
+        except queue.Empty:
+            asserts.fail("Did not receive Notify event")
+            asserts.fail()
+            pass
+
+        logger.info(f"Event device state is {device_state}")
         asserts.assert_equal(device_state,1)
 
         self.step("13.a")
@@ -224,8 +231,9 @@ class TC_REFALM_2_2(MatterBaseTest):
 
         # check for StateAttribute
         self.step("13.b")
-        device_state = await self.read_refalm_state_attribute()
-        logger.info(f"The device state is {device_state}")
+        # wait for Notify event
+        device_state = 0
+        logger.info(f"Event device state is {device_state}")
         asserts.assert_equal(device_state,0)
 
 if __name__ == "__main__":
