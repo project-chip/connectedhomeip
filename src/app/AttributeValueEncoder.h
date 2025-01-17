@@ -168,6 +168,19 @@ private:
     friend class ListEncodeHelper;
     friend class TestOnlyAttributeValueEncoderAccessor;
 
+    // Some definitions for "narrow" (i.e. not full-width, smaller than 8-byte)
+    // integer types, so we can detect them and widen them to the 8-byte type.
+    template <typename T>
+    constexpr static bool IsNarrowIntegerType()
+    {
+        static_assert(std::is_same_v<T, std::remove_cv_t<std::remove_reference_t<T>>>);
+        return std::is_integral_v<T> && !std::is_same_v<T, bool> && !std::is_same_v<T, uint64_t> && !std::is_same_v<T, int64_t>;
+    }
+
+    // FullWidthTypeForNarrowType<T> should only be used if IsNarrowIntegerType<T>() is true.
+    template <typename T>
+    using FullWidthTypeForNarrowType = std::conditional_t<std::is_signed_v<T>, int64_t, uint64_t>;
+
     // Returns true if the list item should be encoded.  If it should, the
     // passed-in TLVWriter will be used to checkpoint the current state of our
     // attribute report list builder.
@@ -180,7 +193,7 @@ private:
     // arg, or not.  Represent that via a parameter pack (which might be
     // empty). In practice, for any given ItemType the extra arg is either there
     // or not, so we don't get more template explosion due to aExtraArgs.
-    template <typename ItemType, typename... ExtraArgTypes>
+    template <typename ItemType, typename... ExtraArgTypes, std::enable_if_t<!IsNarrowIntegerType<ItemType>(), bool> = true>
     CHIP_ERROR EncodeListItem(TLV::TLVWriter & aCheckpoint, const ItemType & aItem, ExtraArgTypes &&... aExtraArgs)
     {
         if (!ShouldEncodeListItem(aCheckpoint))
@@ -203,6 +216,19 @@ private:
 
         PostEncodeListItem(err, aCheckpoint);
         return err;
+    }
+
+    // For "narrow" integer types, we can just widen them to the 8-byte type and
+    // call EncodeListItem for that.  This reduces the number of instantiations
+    // of EncodeListItem that we need.
+    //
+    // It would be nice to do this for enum types too, but then we would lose
+    // the encode-time checks that we are not encoding the "unknown value" enum
+    // value, which is different for different enums.
+    template <typename ItemType, std::enable_if_t<IsNarrowIntegerType<ItemType>(), bool> = true>
+    CHIP_ERROR EncodeListItem(TLV::TLVWriter & aCheckpoint, const ItemType & aItem)
+    {
+        return EncodeListItem(aCheckpoint, static_cast<FullWidthTypeForNarrowType<ItemType>>(aItem));
     }
 
     /**
