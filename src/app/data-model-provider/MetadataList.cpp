@@ -115,7 +115,7 @@ CHIP_ERROR GenericMetadataList::CopyExistingBuffer(const void * buffer, size_t e
     return CHIP_NO_ERROR;
 }
 
-void GenericMetadataList::AquireExistingBuffer(const void * buffer, size_t elements)
+void GenericMetadataList::AcquireExistingBuffer(const void * buffer, size_t elements)
 {
     Invalidate();
     mAllocated    = false;

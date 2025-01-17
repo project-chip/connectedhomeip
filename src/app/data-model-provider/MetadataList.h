@@ -58,7 +58,7 @@ protected:
     CHIP_ERROR CopyExistingBuffer(const void * buffer, size_t elements);
 
     /// use existing buffer AS IS
-    void AquireExistingBuffer(const void * buffer, size_t elements);
+    void AcquireExistingBuffer(const void * buffer, size_t elements);
 
     CHIP_ERROR AppendRaw(const void * buffer);
     const void * RawBuffer() const { return mBuffer; }
@@ -125,14 +125,14 @@ public:
     static MetadataList FromConstArray(const std::array<const T, N> & arr)
     {
         MetadataList<T> list;
-        list.AquireExistingBuffer(arr.data(), arr.size());
+        list.AcquireExistingBuffer(arr.data(), arr.size());
         return list;
     }
 
     static MetadataList FromConstSpan(const Span<const T> & span)
     {
         MetadataList<T> list;
-        list.AquireExistingBuffer(span.data(), span.size());
+        list.AcquireExistingBuffer(span.data(), span.size());
         return list;
     }
 
