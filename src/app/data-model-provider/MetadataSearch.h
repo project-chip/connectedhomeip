@@ -67,7 +67,7 @@ private:
 /// Helps search for a specific server endpoint in the given
 /// metadata provider.
 ///
-/// Facilitates the operation of "find a endpoint with a given ID".
+/// Facilitates the operation of "find an endpoint with a given ID".
 class EndpointFinder
 {
 public:
