@@ -153,10 +153,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 
-    if (chip_enable_nfc) {
+    if (chip_enable_nfc_onboarding_payload) {
       defines += [
-        "CHIP_DEVICE_CONFIG_ENABLE_NFC=1",
-        "CONFIG_CHIP_NFC_COMMISSIONING=1",
+        "CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD=1",
+        "CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD=1",
       ]
     }
 

@@ -394,6 +394,9 @@ public class ClusterIDMapping {
         if (clusterId == WebRTCTransportRequestor.ID) {
             return new WebRTCTransportRequestor();
         }
+        if (clusterId == PushAvStreamTransport.ID) {
+            return new PushAvStreamTransport();
+        }
         if (clusterId == Chime.ID) {
             return new Chime();
         }
@@ -402,6 +405,9 @@ public class ClusterIDMapping {
         }
         if (clusterId == CommissionerControl.ID) {
             return new CommissionerControl();
+        }
+        if (clusterId == TlsCertificateManagement.ID) {
+            return new TlsCertificateManagement();
         }
         if (clusterId == UnitTesting.ID) {
             return new UnitTesting();
@@ -17974,6 +17980,219 @@ public class ClusterIDMapping {
             return Command.valueOf(name).getID();
         }
     }
+    public static class PushAvStreamTransport implements BaseCluster {
+        public static final long ID = 1365L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            SupportedContainerFormats(0L),
+            SupportedIngestMethods(1L),
+            CurrentConnections(2L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {
+            PushTransportBegin(0L),
+            PushTransportEnd(1L),;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            AllocatePushTransport(0L),
+            DeallocatePushTransport(2L),
+            ModifyPushTransport(3L),
+            SetTransportStatus(4L),
+            ManuallyTriggerTransport(5L),
+            FindTransport(6L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum AllocatePushTransportCommandField {TransportOptions(0),;
+                    private final int id;
+                    AllocatePushTransportCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static AllocatePushTransportCommandField value(int id) throws NoSuchFieldError {
+                        for (AllocatePushTransportCommandField field : AllocatePushTransportCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum DeallocatePushTransportCommandField {ConnectionID(0),;
+                    private final int id;
+                    DeallocatePushTransportCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static DeallocatePushTransportCommandField value(int id) throws NoSuchFieldError {
+                        for (DeallocatePushTransportCommandField field : DeallocatePushTransportCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ModifyPushTransportCommandField {ConnectionID(0),TransportOptions(1),;
+                    private final int id;
+                    ModifyPushTransportCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ModifyPushTransportCommandField value(int id) throws NoSuchFieldError {
+                        for (ModifyPushTransportCommandField field : ModifyPushTransportCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetTransportStatusCommandField {ConnectionID(0),TransportStatus(1),;
+                    private final int id;
+                    SetTransportStatusCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetTransportStatusCommandField value(int id) throws NoSuchFieldError {
+                        for (SetTransportStatusCommandField field : SetTransportStatusCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ManuallyTriggerTransportCommandField {ConnectionID(0),ActivationReason(1),TimeControl(2),;
+                    private final int id;
+                    ManuallyTriggerTransportCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ManuallyTriggerTransportCommandField value(int id) throws NoSuchFieldError {
+                        for (ManuallyTriggerTransportCommandField field : ManuallyTriggerTransportCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum FindTransportCommandField {ConnectionID(0),;
+                    private final int id;
+                    FindTransportCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static FindTransportCommandField value(int id) throws NoSuchFieldError {
+                        for (FindTransportCommandField field : FindTransportCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
     public static class Chime implements BaseCluster {
         public static final long ID = 1366L;
         public long getID() {
@@ -18282,6 +18501,272 @@ public class ClusterIDMapping {
                     }
                     public static CommissionNodeCommandField value(int id) throws NoSuchFieldError {
                         for (CommissionNodeCommandField field : CommissionNodeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class TlsCertificateManagement implements BaseCluster {
+        public static final long ID = 2049L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            MaxRootCertificates(0L),
+            CurrentRootCertificates(1L),
+            MaxClientCertificates(2L),
+            CurrentClientCertificates(3L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            ProvisionRootCertificate(0L),
+            FindRootCertificate(2L),
+            LookupRootCertificate(4L),
+            RemoveRootCertificate(6L),
+            TLSClientCSR(7L),
+            ProvisionClientCertificate(9L),
+            FindClientCertificate(11L),
+            LookupClientCertificate(13L),
+            RemoveClientCertificate(15L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum ProvisionRootCertificateCommandField {Certificate(0),Caid(1),;
+                    private final int id;
+                    ProvisionRootCertificateCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ProvisionRootCertificateCommandField value(int id) throws NoSuchFieldError {
+                        for (ProvisionRootCertificateCommandField field : ProvisionRootCertificateCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum FindRootCertificateCommandField {Caid(0),;
+                    private final int id;
+                    FindRootCertificateCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static FindRootCertificateCommandField value(int id) throws NoSuchFieldError {
+                        for (FindRootCertificateCommandField field : FindRootCertificateCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum LookupRootCertificateCommandField {Fingerprint(0),;
+                    private final int id;
+                    LookupRootCertificateCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static LookupRootCertificateCommandField value(int id) throws NoSuchFieldError {
+                        for (LookupRootCertificateCommandField field : LookupRootCertificateCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum RemoveRootCertificateCommandField {Caid(0),;
+                    private final int id;
+                    RemoveRootCertificateCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static RemoveRootCertificateCommandField value(int id) throws NoSuchFieldError {
+                        for (RemoveRootCertificateCommandField field : RemoveRootCertificateCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum TLSClientCSRCommandField {Nonce(0),;
+                    private final int id;
+                    TLSClientCSRCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static TLSClientCSRCommandField value(int id) throws NoSuchFieldError {
+                        for (TLSClientCSRCommandField field : TLSClientCSRCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ProvisionClientCertificateCommandField {Ccdid(0),ClientCertificateDetails(1),;
+                    private final int id;
+                    ProvisionClientCertificateCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ProvisionClientCertificateCommandField value(int id) throws NoSuchFieldError {
+                        for (ProvisionClientCertificateCommandField field : ProvisionClientCertificateCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum FindClientCertificateCommandField {Ccdid(0),;
+                    private final int id;
+                    FindClientCertificateCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static FindClientCertificateCommandField value(int id) throws NoSuchFieldError {
+                        for (FindClientCertificateCommandField field : FindClientCertificateCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum LookupClientCertificateCommandField {Fingerprint(0),;
+                    private final int id;
+                    LookupClientCertificateCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static LookupClientCertificateCommandField value(int id) throws NoSuchFieldError {
+                        for (LookupClientCertificateCommandField field : LookupClientCertificateCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum RemoveClientCertificateCommandField {Ccdid(0),;
+                    private final int id;
+                    RemoveClientCertificateCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static RemoveClientCertificateCommandField value(int id) throws NoSuchFieldError {
+                        for (RemoveClientCertificateCommandField field : RemoveClientCertificateCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

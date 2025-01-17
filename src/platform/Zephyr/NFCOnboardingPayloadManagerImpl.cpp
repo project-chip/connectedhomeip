@@ -17,7 +17,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/NFCManager.h>
+#include <platform/NFCOnboardingPayloadManager.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
@@ -34,15 +34,15 @@ namespace {
 void nfcCallback(void * /* context */, nfc_t2t_event_t, const uint8_t * /* data */, size_t /* data_length */) {}
 } // namespace
 
-NFCManagerImpl NFCManagerImpl::sInstance;
+NFCOnboardingPayloadManagerImpl NFCOnboardingPayloadManagerImpl::sInstance;
 
-CHIP_ERROR NFCManagerImpl::_Init()
+CHIP_ERROR NFCOnboardingPayloadManagerImpl::_Init()
 {
     mIsStarted = false;
     return nfc_t2t_setup(nfcCallback, nullptr) ? CHIP_ERROR_INTERNAL : CHIP_NO_ERROR;
 }
 
-CHIP_ERROR NFCManagerImpl::_StartTagEmulation(const char * payload, size_t payloadLength)
+CHIP_ERROR NFCOnboardingPayloadManagerImpl::_StartTagEmulation(const char * payload, size_t payloadLength)
 {
     CHIP_ERROR error    = CHIP_NO_ERROR;
     int result          = 0;
@@ -85,7 +85,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR NFCManagerImpl::_StopTagEmulation()
+CHIP_ERROR NFCOnboardingPayloadManagerImpl::_StopTagEmulation()
 {
     VerifyOrReturnError(mIsStarted, CHIP_NO_ERROR);
 
