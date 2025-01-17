@@ -41,8 +41,8 @@ namespace Clusters {
 
 namespace AdministratorCommissioning {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -94,15 +94,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace AdministratorCommissioning
 
 namespace BooleanStateConfiguration {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -143,15 +145,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace BooleanStateConfiguration
 
 namespace ColorControl {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -345,15 +349,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace ColorControl
 
 namespace DiagnosticLogs {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -384,15 +390,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace DiagnosticLogs
 
 namespace DishwasherAlarm {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -432,15 +440,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace DishwasherAlarm
 
 namespace EthernetNetworkDiagnostics {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -471,15 +481,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace EthernetNetworkDiagnostics
 
 namespace FanControl {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -510,15 +522,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace FanControl
 
 namespace FaultInjection {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -558,15 +572,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace FaultInjection
 
 namespace GeneralDiagnostics {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -615,15 +631,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace GeneralDiagnostics
 
 namespace GroupKeyManagement {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -681,15 +699,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace GroupKeyManagement
 
 namespace Groups {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -765,15 +785,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace Groups
 
 namespace Identify {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -813,15 +835,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace Identify
 
 namespace LevelControl {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -915,15 +939,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace LevelControl
 
 namespace LowPower {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -954,15 +980,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace LowPower
 
 namespace ModeSelect {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -993,15 +1021,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace ModeSelect
 
 namespace OtaSoftwareUpdateRequestor {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1033,15 +1063,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace OtaSoftwareUpdateRequestor
 
 namespace OnOff {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1117,15 +1149,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace OnOff
 
 namespace OperationalCredentials {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1222,15 +1256,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace OperationalCredentials
 
 namespace SmokeCoAlarm {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1261,15 +1297,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace SmokeCoAlarm
 
 namespace TemperatureControl {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1300,15 +1338,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace TemperatureControl
 
 namespace Thermostat {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1366,15 +1406,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace Thermostat
 
 namespace ThreadNetworkDiagnostics {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1405,15 +1447,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace ThreadNetworkDiagnostics
 
 namespace TimeSynchronization {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1480,15 +1524,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace TimeSynchronization
 
 namespace UnitTesting {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1706,15 +1752,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace UnitTesting
 
 namespace ValveConfigurationAndControl {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1754,15 +1802,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace ValveConfigurationAndControl
 
 namespace WiFiNetworkDiagnostics {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1793,15 +1843,17 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace WiFiNetworkDiagnostics
 
 namespace WindowCovering {
 
-std::optional<Protocols::InteractionModel::Status>
-DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1886,7 +1938,9 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    return std::nullopt;
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace WindowCovering
@@ -1895,100 +1949,100 @@ DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath &
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {
-    std::optional<Protocols::InteractionModel::Status> status = std::nullopt;
+    Protocols::InteractionModel::Status errorStatus = Protocols::InteractionModel::Status::Success;
 
     switch (aCommandPath.mClusterId)
     {
     case Clusters::AdministratorCommissioning::Id:
-        status = Clusters::AdministratorCommissioning::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::AdministratorCommissioning::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::BooleanStateConfiguration::Id:
-        status = Clusters::BooleanStateConfiguration::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::BooleanStateConfiguration::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::ColorControl::Id:
-        status = Clusters::ColorControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::ColorControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::DiagnosticLogs::Id:
-        status = Clusters::DiagnosticLogs::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::DiagnosticLogs::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::DishwasherAlarm::Id:
-        status = Clusters::DishwasherAlarm::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::DishwasherAlarm::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::EthernetNetworkDiagnostics::Id:
-        status = Clusters::EthernetNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::EthernetNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::FanControl::Id:
-        status = Clusters::FanControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::FanControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::FaultInjection::Id:
-        status = Clusters::FaultInjection::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::FaultInjection::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::GeneralDiagnostics::Id:
-        status = Clusters::GeneralDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::GeneralDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::GroupKeyManagement::Id:
-        status = Clusters::GroupKeyManagement::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::GroupKeyManagement::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::Groups::Id:
-        status = Clusters::Groups::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::Groups::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::Identify::Id:
-        status = Clusters::Identify::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::Identify::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::LevelControl::Id:
-        status = Clusters::LevelControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::LevelControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::LowPower::Id:
-        status = Clusters::LowPower::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::LowPower::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::ModeSelect::Id:
-        status = Clusters::ModeSelect::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::ModeSelect::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::OtaSoftwareUpdateRequestor::Id:
-        status = Clusters::OtaSoftwareUpdateRequestor::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::OtaSoftwareUpdateRequestor::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::OnOff::Id:
-        status = Clusters::OnOff::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::OnOff::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::OperationalCredentials::Id:
-        status = Clusters::OperationalCredentials::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::OperationalCredentials::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::SmokeCoAlarm::Id:
-        status = Clusters::SmokeCoAlarm::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::SmokeCoAlarm::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::TemperatureControl::Id:
-        status = Clusters::TemperatureControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::TemperatureControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::Thermostat::Id:
-        status = Clusters::Thermostat::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::Thermostat::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::ThreadNetworkDiagnostics::Id:
-        status = Clusters::ThreadNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::ThreadNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::TimeSynchronization::Id:
-        status = Clusters::TimeSynchronization::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::TimeSynchronization::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::UnitTesting::Id:
-        status = Clusters::UnitTesting::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::UnitTesting::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::ValveConfigurationAndControl::Id:
-        status = Clusters::ValveConfigurationAndControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::ValveConfigurationAndControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::WiFiNetworkDiagnostics::Id:
-        status = Clusters::WiFiNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::WiFiNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::WindowCovering::Id:
-        status = Clusters::WindowCovering::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::WindowCovering::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     default:
         ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
-        status = Protocols::InteractionModel::Status::UnsupportedCluster;
+        errorStatus = Protocols::InteractionModel::Status::UnsupportedCluster;
         break;
     }
 
-    if (status.has_value())
+    if (errorStatus != Protocols::InteractionModel::Status::Success)
     {
-        apCommandObj->AddStatus(aCommandPath, *status);
+        apCommandObj->AddStatus(aCommandPath, errorStatus);
     }
 }
 
