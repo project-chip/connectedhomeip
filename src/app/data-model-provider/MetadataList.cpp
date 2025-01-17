@@ -73,7 +73,7 @@ CHIP_ERROR GenericMetadataList::reserve(size_t numElements)
         chip::Platform::MemoryFree(mBuffer);
     }
 
-    mBuffer = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(numElements * mElementSize));
+    mBuffer = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(numElements, mElementSize));
 
     VerifyOrReturnError(mBuffer != nullptr, CHIP_ERROR_NO_MEMORY);
 
