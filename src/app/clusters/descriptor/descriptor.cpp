@@ -129,7 +129,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
 
     // find the given endpoint
     unsigned idx = 0;
-    while (idx < endpoints.size())
+    while (idx < endpoints.Size())
     {
         if (endpoints[idx].id == endpoint)
         {
@@ -137,7 +137,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
         }
         idx++;
     }
-    if (idx >= endpoints.size())
+    if (idx >= endpoints.Size())
     {
         // not found
         return CHIP_ERROR_NOT_FOUND;
