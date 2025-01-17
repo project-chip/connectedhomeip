@@ -41,10 +41,8 @@
 # === END CI TEST ARGUMENTS ===
 #
 
-import asyncio
-
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -61,10 +59,33 @@ class TC_DGSW_2_2(MatterBaseTest):
     async def send_software_fault_test_event_trigger(self):
         await self.send_test_event_triggers(eventTrigger=0x0034000000000000)
 
-    async def read_software_fault_events(self, endpoint):
-        event_path = [(endpoint, Clusters.SoftwareDiagnostics.Events.SoftwareFault, 1)]
-        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
-        return events
+    def validate_soft_fault_event_data(self, event_data):
+        """
+        Validates the SoftFault event data according to the test plan and specification.
+
+        This method checks:
+          - `Id` field: Must be of type uint64
+          - `Name` field: Vendor-specific string
+          - `FaultRecording` field: Vendor-specific payload in octet string format (bytes/bytearray)
+        """
+
+        # Validate 'Id' field: Ensure it is a uint64 type
+        asserts.assert_true(
+            self.is_valid_uint64_value(event_data.id),
+            "The 'Id' field must be a uint64 type"
+        )
+
+        # Validate 'Name' field: Ensure it is a string
+        asserts.assert_true(
+            isinstance(event_data.name, str),
+            "The 'Name' field must be a string type"
+        )
+
+        # Validate 'FaultRecording' field: Ensure it is an octet string (bytes or bytearray)
+        asserts.assert_true(
+            self.is_valid_octet_string(event_data.faultRecording),
+            "The 'FaultRecording' field must be an octet string (bytes or bytearray)"
+        )
 
     def desc_TC_DGSW_2_2(self) -> str:
         """Returns a description of this test"""
@@ -88,40 +109,27 @@ class TC_DGSW_2_2(MatterBaseTest):
         # STEP 1: Commission DUT (already done)
         self.step(1)
 
+        # Create and start an EventChangeCallback to subscribe for events
+        events_callback = EventChangeCallback(Clusters.SoftwareDiagnostics)
+        await events_callback.start(
+            self.default_controller,     # The controller
+            self.dut_node_id,            # DUT's node id
+            endpoint                     # The endpoint on which we expect Wi-Fi events
+        )
+
         # STEP 2: DUT sends an event report to TH. TH reads a list of SoftwareFault structs from DUT.
         self.step(2)
 
         # Trigger a SoftwareFault event on the DUT
         await self.send_software_fault_test_event_trigger()
 
-        # Allow some time for the event to be processed
-        await asyncio.sleep(1)
+        # Wait (block) for the SoftwareFault event to arrive
+        event_data = events_callback.wait_for_event_report(
+            Clusters.SoftwareDiagnostics.Events.SoftwareFault
+        )
 
-        # Read the SoftwareFault events
-        software_fault_events = await self.read_software_fault_events(endpoint)
-
-        # There should be at least one SoftwareFault event for this test to be valid.
-        asserts.assert_true(len(software_fault_events) > 0, "No SoftwareFault events received from the DUT.")
-
-        # For each event, verify the data type requirements
-        for event_data in software_fault_events:
-            # According to the test plan and specification:
-            # - Id is mandatory, uint64
-            # - Name is vendor-specific string
-            # - FaultRecording is vendor-specific payload in octstr format
-
-            # Validate Id
-            asserts.assert_true(self.is_valid_uint64_value(event_data.Data.id),
-                                "Id field should be a uint64 type")
-
-            # Validate Name (string) - assuming event_data.Name is a string
-            asserts.assert_true(isinstance(event_data.Data.name, str),
-                                "Name field should be a string type")
-
-            # Validate FaultRecording (octet_string)
-            # Assuming event_data.FaultRecording is bytes or bytearray
-            asserts.assert_true(self.is_valid_octet_string(event_data.Data.faultRecording),
-                                "FaultRecording field should be an octet string (bytes/bytearray)")
+        # Validate the SoftwareFault event fields
+        self.validate_soft_fault_event_data(event_data)
 
 
 if __name__ == "__main__":
