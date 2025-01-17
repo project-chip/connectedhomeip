@@ -348,7 +348,7 @@ class AttributeChangeCallbackFan: # COPY of AttributeChangeCallback to fiddle wi
     def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):
         self._output: queue.Queue = queue.Queue()
         self._expected_attribute = expected_attribute
-        print(f"\n\n\n\t\t [FANS] AttributeChangeCallbackFan __init__ queue: {self._output.queue}")
+        # print(f"\n\n\n\t\t [FANS] AttributeChangeCallbackFan __init__ queue: {self._output.queue}")
 
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
         """This is the subscription callback when an attribute is updated.
@@ -363,7 +363,7 @@ class AttributeChangeCallbackFan: # COPY of AttributeChangeCallback to fiddle wi
         print(f"\n\n\n\t\t [FANS] AttributeChangeCallbackFan __call__ queue: {self._output.queue}")
 
     def wait_for_report(self):
-        print(f"\n\n\n\t\t [FANS] AttributeChangeCallbackFan wait_for_report START")
+        print(f"\n\n\n\t\t [FANS] AttributeChangeCallbackFan wait_for_report")
 
         try:
             path, transaction = self._output.get(block=True, timeout=10)
