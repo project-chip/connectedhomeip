@@ -144,7 +144,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
 
     if (endpointInfo.compositionPattern == DataModel::EndpointCompositionPattern::kFullFamily)
     {
-        // endodes ALL endpoints that have the specified endpoint as a descendant
+        // encodes ALL endpoints that have the specified endpoint as a descendant
         return aEncoder.EncodeList([&endpoints, endpoint](const auto & encoder) -> CHIP_ERROR {
             for (auto & ep : endpoints.GetSpanValidForLifetime())
             {
