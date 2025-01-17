@@ -45,7 +45,7 @@ bool IsDescendantOf(EndpointId childId, const EndpointId parentId, Span<const Da
     // NOTE: this is not very efficient, however most compositions should be of small depth
     while (childId != kInvalidEndpointId)
     {
-        // find the requested value in the array to get it's parent
+        // find the requested value in the array to get its parent
         for (auto & ep : allEndpoints)
         {
             if (ep.id != childId)
