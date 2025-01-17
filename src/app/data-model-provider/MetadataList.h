@@ -57,7 +57,7 @@ protected:
     /// Copy over the data from the given buffer
     CHIP_ERROR CopyExistingBuffer(const void * buffer, size_t elements);
 
-    /// use existing buffer AS IS
+    /// use existing buffer AS IS, without taking ownership.
     void AcquireExistingBuffer(const void * buffer, size_t elements);
 
     CHIP_ERROR AppendRaw(const void * buffer);
