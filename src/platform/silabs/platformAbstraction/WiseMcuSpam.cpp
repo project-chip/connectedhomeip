@@ -16,7 +16,6 @@
  */
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
-#include <sl_si91x_button_pin_config.h>
 #include <sl_si91x_common_flash_intf.h>
 
 #include <FreeRTOS.h>
@@ -36,17 +35,28 @@ extern "C" {
 #include "em_core.h"
 #include "rsi_board.h"
 #include "sl_event_handler.h"
+
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #include "sl_si91x_button.h"
 #include "sl_si91x_button_pin_config.h"
-#if defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
+
+#ifdef ENABLE_WSTK_LEDS
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 #include "sl_si91x_rgb_led.h"
 #include "sl_si91x_rgb_led_config.h"
 #include "sl_si91x_rgb_led_instances.h"
+#define SL_LED_COUNT SL_SI91X_RGB_LED_COUNT
+const sl_rgb_led_t * ledPinArray[SL_LED_COUNT] = { &led_led0 };
+#define SL_RGB_LED_INSTANCE(n) (ledPinArray[n])
 #else
 #include "sl_si91x_led.h"
 #include "sl_si91x_led_config.h"
 #include "sl_si91x_led_instances.h"
-#endif // defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED
+#define SL_LED_COUNT SL_SI91x_LED_COUNT
+uint8_t ledPinArray[SL_LED_COUNT] = { SL_LED_LED0_PIN, SL_LED_LED1_PIN };
+#endif // SL_MATTER_RGB_LED_ENABLED
+#endif // ENABLE_WSTK_LEDS
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
 void soc_pll_config(void);
@@ -61,20 +71,15 @@ void soc_pll_config(void);
 #include "uart.h"
 #endif
 
-#if defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED
-#define SL_LED_COUNT SL_SI91X_RGB_LED_COUNT
-const sl_rgb_led_t * ledPinArray[SL_LED_COUNT] = { &led_led0 };
-#define SL_RGB_LED_INSTANCE(n) (ledPinArray[n])
-#else
-#define SL_LED_COUNT SL_SI91x_LED_COUNT
-uint8_t ledPinArray[SL_LED_COUNT] = { SL_LED_LED0_PIN, SL_LED_LED1_PIN };
-#endif // defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED
-
 namespace chip {
 namespace DeviceLayer {
 namespace Silabs {
 namespace {
+
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 uint8_t sButtonStates[SL_SI91x_BUTTON_COUNT] = { 0 };
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
+
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 bool btn0_pressed = false;
 #endif /* SL_ICD_ENABLED */
@@ -121,7 +126,7 @@ void SilabsPlatform::InitLed(void)
 CHIP_ERROR SilabsPlatform::SetLed(bool state, uint8_t led)
 {
     VerifyOrReturnError(led < SL_LED_COUNT, CHIP_ERROR_INVALID_ARGUMENT);
-#if defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
     (state) ? sl_si91x_simple_rgb_led_on(SL_RGB_LED_INSTANCE(led)) : sl_si91x_simple_rgb_led_off(SL_RGB_LED_INSTANCE(led));
 #else
     (state) ? sl_si91x_led_set(ledPinArray[led]) : sl_si91x_led_clear(ledPinArray[led]);
@@ -138,7 +143,7 @@ bool SilabsPlatform::GetLedState(uint8_t led)
 CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
 {
     VerifyOrReturnError(led < SL_LED_COUNT, CHIP_ERROR_INVALID_ARGUMENT);
-#if defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
     sl_si91x_simple_rgb_led_toggle(SL_RGB_LED_INSTANCE(led));
 #else
     sl_si91x_led_toggle(ledPinArray[led]);
@@ -152,6 +157,7 @@ void SilabsPlatform::StartScheduler()
     vTaskStartScheduler();
 }
 
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 extern "C" void sl_button_on_change(uint8_t btn, uint8_t btnAction)
 {
 #if SL_ICD_ENABLED
@@ -191,6 +197,12 @@ uint8_t SilabsPlatform::GetButtonState(uint8_t button)
 {
     return (button < SL_SI91x_BUTTON_COUNT) ? sButtonStates[button] : 0;
 }
+#else
+uint8_t SilabsPlatform::GetButtonState(uint8_t button)
+{
+    return 0;
+}
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
 CHIP_ERROR SilabsPlatform::FlashInit()
 {
