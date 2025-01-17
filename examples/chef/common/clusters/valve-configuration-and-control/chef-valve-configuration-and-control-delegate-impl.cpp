@@ -81,7 +81,7 @@ chefValveConfigurationAndControlWriteCallback(chip::EndpointId endpointId, chip:
         std::memcpy(&newVal, buffer, sizeof(uint32_t));
         ChipLogProgress(DeviceLayer, "Setting RemainingDuration to %d", newVal);
         CHIP_ERROR err;
-        if (newVal == static_cast<uint32_t>(0xFFFF)) // Max value is interpreted as NULL
+        if (newVal == static_cast<uint32_t>(std::numeric_limits<uint32_t>::max())) // Max value is interpreted as NULL
         {
             err = SetRemainingDurationNull(endpointId);
         }
@@ -92,7 +92,7 @@ chefValveConfigurationAndControlWriteCallback(chip::EndpointId endpointId, chip:
         }
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "Unable to write RemainingDuration");
+            ChipLogError(DeviceLayer, "Unable to write RemainingDuration: %" CHIP_ERROR_FORMAT, err.format());
             return chip::Protocols::InteractionModel::Status::Failure;
         }
         MatterReportingAttributeChangeCallback(endpointId, ValveConfigurationAndControl::Id,
@@ -128,19 +128,12 @@ chefValveConfigurationAndControlReadCallback(chip::EndpointId endpointId, chip::
         CHIP_ERROR err = GetRemainingDuration(endpointId, duration);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "Unable to read RemainingDuration");
+            ChipLogError(DeviceLayer, "Unable to read RemainingDuration: %" CHIP_ERROR_FORMAT, err.format());
             return chip::Protocols::InteractionModel::Status::Failure;
         }
-        if (duration.IsNull())
-        {
-            // Max value is interpreted as NULL
-            std::memset(buffer, 0xFF, maxReadLength);
-        }
-        else
-        {
-            uint32_t val = duration.Value();
-            std::memcpy(buffer, &val, std::min<size_t>(maxReadLength, sizeof(uint32_t)));
-        }
+        // Max value is interpreted as NULL
+        uint32_t val = duration.ValueOr(std::numeric_limits<uint32_t>::max());
+        std::memcpy(buffer, &val, std::min<size_t>(maxReadLength, sizeof(uint32_t)));
         break;
     }
     default:
