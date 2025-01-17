@@ -147,7 +147,8 @@ class TC_EPREF_2_1(MatterBaseTest):
 
             # If there are more than 2 BalanceStructs, verify the 'step' values are in ascending order
             for i, (current_balance, next_balance) in enumerate(zip(energy_balances[:-1], energy_balances[1:])):
-                asserts.assert_true(current_balance.step < next_balance.step, f"The step at index {i+1} ({next_balance.step}) should larger than the previous step ({current_balance.step})")
+                asserts.assert_true(current_balance.step < next_balance.step,
+                                    f"The step at index {i+1} ({next_balance.step}) should larger than the previous step ({current_balance.step})")
 
         else:
             logging.info("Test step skipped EnergyBalances Attribute")
@@ -264,7 +265,8 @@ class TC_EPREF_2_1(MatterBaseTest):
 
             # If there are more than 2 BalanceStructs, verify that the Step field is in ascending order
             for i, (current_balance, next_balance) in enumerate(zip(energy_balances[:-1], energy_balances[1:])):
-                asserts.assert_true(current_balance.step < next_balance.step, f"The step at index {i+1} ({next_balance.step}) should larger than the previous step ({current_balance.step})")
+                asserts.assert_true(current_balance.step < next_balance.step,
+                                    f"The step at index {i+1} ({next_balance.step}) should larger than the previous step ({current_balance.step})")
 
         else:
             logging.info("Test step skipped")
