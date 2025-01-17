@@ -429,19 +429,7 @@ DataModel::MetadataList<DataModel::ServerClusterEntry> CodegenDataModelProvider:
     VerifyOrReturnValue(endpoint->clusterCount > 0, result);
     VerifyOrReturnValue(endpoint->cluster != nullptr, result);
 
-    const EmberAfCluster * begin = endpoint->cluster;
-    const EmberAfCluster * end   = endpoint->cluster + endpoint->clusterCount;
-
-    size_t serverClusterCount = 0;
-    for (const EmberAfCluster * cluster = begin; cluster != end; cluster++)
-    {
-        if (cluster->IsServer())
-        {
-            serverClusterCount++;
-        }
-    }
-
-    CHIP_ERROR err = result.reserve(serverClusterCount);
+    CHIP_ERROR err = result.reserve(emberAfClusterCountForEndpointType(endpoint, /* server = */ true));
     if (err != CHIP_NO_ERROR)
     {
 #if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
@@ -450,6 +438,8 @@ DataModel::MetadataList<DataModel::ServerClusterEntry> CodegenDataModelProvider:
         return {};
     }
 
+    const EmberAfCluster * begin = endpoint->cluster;
+    const EmberAfCluster * end   = endpoint->cluster + endpoint->clusterCount;
     for (const EmberAfCluster * cluster = begin; cluster != end; cluster++)
     {
         if (!cluster->IsServer())
@@ -516,20 +506,7 @@ DataModel::MetadataList<ClusterId> CodegenDataModelProvider::ClientClusters(Endp
     VerifyOrReturnValue(endpoint->clusterCount > 0, result);
     VerifyOrReturnValue(endpoint->cluster != nullptr, result);
 
-    const EmberAfCluster * begin = endpoint->cluster;
-    const EmberAfCluster * end   = endpoint->cluster + endpoint->clusterCount;
-
-    size_t clientClusterCount = 0;
-
-    for (const EmberAfCluster * cluster = begin; cluster != end; cluster++)
-    {
-        if (cluster->IsClient())
-        {
-            clientClusterCount++;
-        }
-    }
-
-    CHIP_ERROR err = result.reserve(clientClusterCount);
+    CHIP_ERROR err = result.reserve(emberAfClusterCountForEndpointType(endpoint, /* server = */ false));
     if (err != CHIP_NO_ERROR)
     {
 #if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
@@ -538,6 +515,8 @@ DataModel::MetadataList<ClusterId> CodegenDataModelProvider::ClientClusters(Endp
         return {};
     }
 
+    const EmberAfCluster * begin = endpoint->cluster;
+    const EmberAfCluster * end   = endpoint->cluster + endpoint->clusterCount;
     for (const EmberAfCluster * cluster = begin; cluster != end; cluster++)
     {
         if (!cluster->IsClient())
