@@ -60,22 +60,20 @@ be removed.
 
 We use the following auto-formatters on code:
 
-| Language    | Formatter          | Style File                                                                                 |
-| ----------- | ------------------ | ------------------------------------------------------------------------------------------ |
-| C++         | clang-format       | [.clang-format](https://github.com/project-chip/connectedhomeip/blob/master/.clang-format) |
-| Objective-C | clang-format       | [.clang-format](https://github.com/project-chip/connectedhomeip/blob/master/.clang-format) |
-| java        | google-java-format | N/A                                                                                        |
-| Python      | pep8, isort, ruff  | [.restyled.yaml][restyle_link] (command line), [isort][isort_link], [ruff][ruff_link]      |
-| YAML        | prettier           | None                                                                                       |
-| JSON        | prettier           | None                                                                                       |
-| markdown    | prettier           | None                                                                                       |
+| Language    | Formatter          | Style File                         |
+| ----------- | ------------------ | -----------------------------------|
+| C++         | clang-format       | [.clang-format][clang_format_link] |
+| Objective-C | clang-format       | [.clang-format][clang_format_link] |
+| java        | google-java-format | N/A                                |
+| Python      | pep8, isort, ruff  | [pyproject.toml][pyproject_link]   |
+| YAML        | prettier           | None                               |
+| JSON        | prettier           | None                               |
+| markdown    | prettier           | None                               |
 
-[restyle_link]:
-    https://github.com/project-chip/connectedhomeip/blob/master/.restyled.yaml
-[isort_link]:
-    https://github.com/project-chip/connectedhomeip/blob/master/.isort.cfg
-[ruff_link]:
-    https://github.com/project-chip/connectedhomeip/blob/master/ruff.toml
+[clang_format_link]:
+    https://github.com/project-chip/connectedhomeip/blob/master/.clang-format
+[pyproject_link]:
+    https://github.com/project-chip/connectedhomeip/blob/master/pyproject.toml
 
 All pull requests run formatting checks using these tools before merge is
 allowed. Generated code is not run through restyle.
