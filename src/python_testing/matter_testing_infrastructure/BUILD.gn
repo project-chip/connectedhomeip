@@ -50,6 +50,7 @@ pw_python_package("chip-testing-module") {
   tests = [
     "chip/testing/test_metadata.py",
     "chip/testing/test_tasks.py",
+    "chip/testing/test_matter_asserts.py",
   ]
 }
 
