@@ -168,18 +168,18 @@ private:
     friend class ListEncodeHelper;
     friend class TestOnlyAttributeValueEncoderAccessor;
 
-    // Some definitions for "narrow" (i.e. not full-width, smaller than 8-byte)
-    // integer types, so we can detect them and widen them to the 8-byte type.
+    // Some definitions for "narrow" (i.e. not full-width, smaller than 4-byte)
+    // integer types, so we can detect them and widen them to the 4-byte type.
     template <typename T>
     constexpr static bool IsNarrowIntegerType()
     {
         static_assert(std::is_same_v<T, std::remove_cv_t<std::remove_reference_t<T>>>);
-        return std::is_integral_v<T> && !std::is_same_v<T, bool> && !std::is_same_v<T, uint64_t> && !std::is_same_v<T, int64_t>;
+        return std::is_integral_v<T> && !std::is_same_v<T, bool> && sizeof(T) < sizeof(uint32_t);
     }
 
     // FullWidthTypeForNarrowType<T> should only be used if IsNarrowIntegerType<T>() is true.
     template <typename T>
-    using FullWidthTypeForNarrowType = std::conditional_t<std::is_signed_v<T>, int64_t, uint64_t>;
+    using FullWidthTypeForNarrowType = std::conditional_t<std::is_signed_v<T>, int32_t, uint32_t>;
 
     // Returns true if the list item should be encoded.  If it should, the
     // passed-in TLVWriter will be used to checkpoint the current state of our
