@@ -20,6 +20,7 @@
 #include <access/AccessControl.h>
 #include <access/Privilege.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
@@ -64,6 +65,19 @@ private:
     CHIP_ERROR ReadIdleModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder);
     CHIP_ERROR ReadActiveModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder);
     CHIP_ERROR ReadActiveModeThreshold(EndpointId endpoint, AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadFeatureMap(EndpointId endpoint, AttributeValueEncoder & encoder)
+    {
+        return encoder.Encode(mICDConfigurationData->GetFeatureMap());
+    }
+
+#if CHIP_CONFIG_ENABLE_ICD_LIT
+    CHIP_ERROR ReadOperatingMode(EndpointId endpoint, AttributeValueEncoder & encoder)
+    {
+        return mICDConfigurationData->GetICDMode() == ICDConfigurationData::ICDMode::SIT
+            ? encoder.Encode(IcdManagement::OperatingModeEnum::kSit)
+            : encoder.Encode(IcdManagement::OperatingModeEnum::kLit);
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     CHIP_ERROR ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder);
@@ -94,6 +108,12 @@ CHIP_ERROR IcdManagementAttributeAccess::Read(const ConcreteReadAttributePath & 
     case IcdManagement::Attributes::ActiveModeThreshold::Id:
         return ReadActiveModeThreshold(aPath.mEndpointId, aEncoder);
 
+    case IcdManagement::Attributes::FeatureMap::Id:
+        return ReadFeatureMap(aPath.mEndpointId, aEncoder);
+#if CHIP_CONFIG_ENABLE_ICD_LIT
+    case IcdManagement::Attributes::OperatingMode::Id:
+        return ReadOperatingMode(aPath.mEndpointId, aEncoder);
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     case IcdManagement::Attributes::RegisteredClients::Id:
         return ReadRegisteredClients(aPath.mEndpointId, aEncoder);

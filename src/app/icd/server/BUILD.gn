@@ -31,6 +31,10 @@ buildconfig_header("icd-server-buildconfig") {
     assert(chip_enable_icd_checkin && chip_enable_icd_user_active_mode_trigger)
   }
 
+  if (chip_enable_icd_dsls) {
+    assert(chip_enable_icd_lit)
+  }
+
   defines = [
     "CHIP_CONFIG_ENABLE_ICD_SERVER=${chip_enable_icd_server}",
     "CHIP_CONFIG_ENABLE_ICD_LIT=${chip_enable_icd_lit}",

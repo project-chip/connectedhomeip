@@ -288,7 +288,9 @@
             "RegisteredClients",
             "ICDCounter",
             "ClientsSupportedPerFabric",
-            "MaximumCheckInBackOff"
+            "MaximumCheckInBackOff",
+            "OperatingMode",
+            "FeatureMap"
         ],
         "Occupancy Sensing": ["HoldTimeLimits", "HoldTime", "FeatureMap"],
         "Operational Credentials": [
