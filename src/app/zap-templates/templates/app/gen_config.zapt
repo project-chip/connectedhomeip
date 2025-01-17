@@ -69,7 +69,7 @@
   {{#if (isServer clusterSide)}}
     //  {{asUpperCamelCase clusterName}} Cluster Commands  
     {{#all_incoming_commands_for_cluster clusterName clusterSide}}
-#define {{as_delimited_macro clusterName}}_ENABLE_{{as_delimited_macro commandName}} 1
+#define {{as_delimited_macro clusterName}}_ENABLE_{{as_delimited_macro commandName}}_CMD 1
     {{/all_incoming_commands_for_cluster}}
 
   {{/if}}

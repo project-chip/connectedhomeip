@@ -138,7 +138,7 @@ private:
     void HandleTestEventTrigger(HandlerContext & ctx, const Commands::TestEventTrigger::DecodableType & commandData);
     void HandleTimeSnapshot(HandlerContext & ctx, const Commands::TimeSnapshot::DecodableType & commandData);
 
-#ifdef GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST
+#ifdef GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD
     void HandlePayloadTestRequest(HandlerContext & ctx, const Commands::PayloadTestRequest::DecodableType & commandData);
 #endif
 
@@ -206,9 +206,6 @@ CHIP_ERROR GeneralDiagosticsGlobalInstance::Read(const ConcreteReadAttributePath
     case ClusterRevision::Id: {
         return aEncoder.Encode(kCurrentClusterRevision);
     }
-
-    default:
-        break;
     }
     return CHIP_NO_ERROR;
 }
@@ -227,7 +224,7 @@ void GeneralDiagosticsGlobalInstance::InvokeCommand(HandlerContext & handlerCont
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleTimeSnapshot(ctx, commandData); });
         break;
 
-#ifdef GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST
+#ifdef GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD
     case Commands::PayloadTestRequest::Id:
         CommandHandlerInterface::HandleCommand<Commands::PayloadTestRequest::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandlePayloadTestRequest(ctx, commandData); });
@@ -355,7 +352,7 @@ void GeneralDiagosticsGlobalInstance::HandleTimeSnapshot(HandlerContext & ctx,
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-#ifdef GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST
+#ifdef GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD
 void GeneralDiagosticsGlobalInstance::HandlePayloadTestRequest(HandlerContext & ctx,
                                                                const Commands::PayloadTestRequest::DecodableType & commandData)
 {
@@ -390,7 +387,7 @@ void GeneralDiagosticsGlobalInstance::HandlePayloadTestRequest(HandlerContext & 
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
     }
 }
-#endif // GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST
+#endif // GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD
 
 GeneralDiagosticsGlobalInstance gGeneralDiagosticsInstance;
 
