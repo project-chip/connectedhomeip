@@ -30,8 +30,6 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/TypeTraits.h>
 
-#include <optional>
-
 namespace chip {
 namespace app {
 
