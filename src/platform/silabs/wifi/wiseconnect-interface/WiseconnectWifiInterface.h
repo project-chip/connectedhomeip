@@ -114,7 +114,7 @@ void PostWifiPlatformEvent(WifiPlatformEvent event);
 void MatterWifiTask(void * arg);
 
 /**
- * @brief Function initializes SiWx917 Wi-Fi interface
+ * @brief Function initializes SiWx Wi-Fi interface
  *
  * TODO: This function is specific to the SiWx platform and should not be present in the WiseconnectWifiInterface.
  *       Once the SoC and NCP init sequence are harmonised, remove this API.
