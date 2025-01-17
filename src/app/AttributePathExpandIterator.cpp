@@ -305,13 +305,10 @@ std::optional<EndpointId> AttributePathExpandIterator::NextEndpointId()
     }
     else
     {
-        // If endpoints is not a wildcard and we enter here, we are asked for "next endpoint after the first"
-        // however this is not a wildcard expansion, so we retur nullopt in that case
-        // the `kInvalidEndpointId` check above returns the first value.
-        VerifyOrReturnValue(mPosition.mAttributePath->mValue.HasWildcardEndpointId(), std::nullopt);
         mEndpointIndex++;
     }
 
+    VerifyOrReturnValue(mPosition.mAttributePath->mValue.HasWildcardEndpointId(), std::nullopt);
     VerifyOrReturnValue(mEndpointIndex < mEndpoints.size(), std::nullopt);
 
     return mEndpoints[mEndpointIndex].id;
