@@ -39,7 +39,7 @@ namespace ValveConfigurationAndControl {
 class DelegateImpl : public ValveConfigurationAndControl::Delegate
 {
 public:
-    DelegateImpl() {};
+    DelegateImpl(){};
 
     // shall return current level if supported, otherwise null
     DataModel::Nullable<chip::Percent> HandleOpenValve(DataModel::Nullable<chip::Percent> level) override;
