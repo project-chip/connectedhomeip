@@ -281,12 +281,7 @@ gboolean OnResolveFinalize(gpointer userData)
     ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
     auto rCtx = reinterpret_cast<chip::Dnssd::ResolveContext *>(userData);
 
-    {
-        // Lock the stack mutex when calling the callback function, so that the callback
-        // function could safely perform message exchange (e.g. PASE session pairing).
-        chip::DeviceLayer::StackLock lock;
-        rCtx->Finalize(CHIP_NO_ERROR);
-    }
+    rCtx->Finalize(CHIP_NO_ERROR);
 
     rCtx->mInstance->RemoveContext(rCtx);
     return G_SOURCE_REMOVE;
@@ -377,9 +372,26 @@ exit:
 
 CHIP_ERROR ResolveAsync(chip::Dnssd::ResolveContext * rCtx)
 {
+    int ret;
+
     ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
 
-    int ret = dnssd_resolve_service(rCtx->mServiceHandle, OnResolve, rCtx);
+    if (rCtx->mInterfaceId == 0)
+    {
+        ret = dnssd_create_remote_service(rCtx->mType, rCtx->mName, nullptr, &rCtx->mServiceHandle);
+    }
+    else
+    {
+        char iface[IF_NAMESIZE + 1] = "";
+        VerifyOrReturnValue(if_indextoname(rCtx->mInterfaceId, iface) != nullptr, CHIP_ERROR_POSIX(errno),
+                            ChipLogError(DeviceLayer, "if_indextoname() failed: %s", strerror(errno)));
+        ret = dnssd_create_remote_service(rCtx->mType, rCtx->mName, iface, &rCtx->mServiceHandle);
+    }
+
+    VerifyOrReturnValue(ret == DNSSD_ERROR_NONE, TizenToChipError(ret),
+                        ChipLogError(DeviceLayer, "dnssd_create_remote_service() failed: %s", get_error_message(ret)));
+
+    ret = dnssd_resolve_service(rCtx->mServiceHandle, OnResolve, rCtx);
     VerifyOrReturnValue(ret == DNSSD_ERROR_NONE, TizenToChipError(ret),
                         ChipLogError(DeviceLayer, "dnssd_resolve_service() failed: %s", get_error_message(ret)));
 
@@ -628,29 +640,11 @@ CHIP_ERROR DnssdTizen::Resolve(const DnssdService & browseResult, chip::Inet::In
     std::string fullType = GetFullType(browseResult.mType, browseResult.mProtocol);
     auto interfaceId     = interface.GetPlatformInterface();
     CHIP_ERROR err       = CHIP_NO_ERROR;
-    int ret;
 
     ChipLogDetail(DeviceLayer, "DNSsd %s: name: %s, type: %s, interfaceId: %u", __func__, browseResult.mName, fullType.c_str(),
                   interfaceId);
 
     auto resolveCtx = CreateResolveContext(browseResult.mName, fullType.c_str(), interfaceId, callback, context);
-
-    if (interfaceId == 0)
-    {
-        ret = dnssd_create_remote_service(fullType.c_str(), browseResult.mName, nullptr, &resolveCtx->mServiceHandle);
-    }
-    else
-    {
-        char iface[IF_NAMESIZE + 1] = "";
-        VerifyOrExit(if_indextoname(interfaceId, iface) != nullptr,
-                     ChipLogError(DeviceLayer, "if_indextoname() failed: %s", strerror(errno));
-                     err = CHIP_ERROR_POSIX(errno));
-        ret = dnssd_create_remote_service(fullType.c_str(), browseResult.mName, iface, &resolveCtx->mServiceHandle);
-    }
-
-    VerifyOrExit(ret == DNSSD_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "dnssd_create_remote_service() failed: %s", get_error_message(ret));
-                 err = TizenToChipError(ret));
 
     err = DeviceLayer::PlatformMgrImpl().GLibMatterContextInvokeSync(ResolveAsync, resolveCtx);
     SuccessOrExit(err);
