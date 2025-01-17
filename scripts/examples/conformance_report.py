@@ -45,6 +45,20 @@ def find_executables(dirs):
     """
     Look for the first executable file in a list of directories.
 
+    dirs is a list of directories for each sample app built. We assume there's only
+    a single executable in each directory, so once we find one we put it on the list to return.
+
+    This is just to avoid maintaining a list with the names of all executables for each target.
+    For example, for a list of directories:
+
+    dirs = [out/linux-x64-lock-no-ble-clang-boringssl,
+                out/linux-x64-network-manager-ipv6only-no-ble-clang-boringssl]
+
+    find_executables(dirs) will return:
+
+    [out/linux-x64-lock-no-ble-clang-boringssl/chip-lock-app,
+    out/linux-x64-network-manager-ipv6only-no-ble-clang-boringssl/matter-network-manager-app]
+
     Args:
       dirs: A list of directories to search.
 
