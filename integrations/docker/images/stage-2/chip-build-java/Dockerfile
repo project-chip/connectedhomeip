@@ -1,4 +1,4 @@
-ARG VERSION=1
+ARG VERSION=2
 FROM ghcr.io/project-chip/chip-build:${VERSION}
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
@@ -20,4 +20,4 @@ RUN set -x \
     && : # last line
 
 ENV PATH $PATH:/usr/lib/kotlinc/bin
-ENV JAVA_PATH=/usr/lib/jvm/java-8-openjdk-amd64
+ENV JAVA_PATH=/usr/lib/jvm/java-11-openjdk-amd64
