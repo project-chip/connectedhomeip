@@ -381,7 +381,7 @@ DataModel::MetadataList<DataModel::EndpointEntry> CodegenDataModelProvider::Endp
             entry.compositionPattern = DataModel::EndpointCompositionPattern::kFullFamily;
             break;
         case EndpointComposition::kTree:
-        default:
+        case EndpointComposition::kInvalid: // should NOT happen, but force compiler to check we validate all versions
             entry.compositionPattern = DataModel::EndpointCompositionPattern::kTree;
             break;
         }
