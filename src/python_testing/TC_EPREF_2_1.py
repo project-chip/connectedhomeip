@@ -119,6 +119,7 @@ class TC_EPREF_2_1(MatterBaseTest):
                 logging.info(f"Step: {balance_struct.step}")
                 if hasattr(balance_struct, 'label') and balance_struct.label is not None:
                     logging.info(f"Label: {balance_struct.label}")
+                logging.info("}")
 
             # Verify the DUT response contains a list of BalanceStruct Type
             asserts.assert_true(isinstance(energy_balances, list), "EnergyBalances should be a list of BalanceStructs")
@@ -145,12 +146,8 @@ class TC_EPREF_2_1(MatterBaseTest):
                                  "The 'step' value of the last BalanceStruct should be 100")
 
             # If there are more than 2 BalanceStructs, verify the 'step' values are in ascending order
-            if list_size > 2:
-                for i in range(1, list_size):
-                    previous_step = energy_balances[i - 1].step
-                    current_step = energy_balances[i].step
-                    asserts.assert_true(current_step > previous_step,
-                                        f"The 'step' value at index {i} ({current_step}) should be larger than the previous step value ({previous_step})")
+            for i, (current_balance, next_balance) in enumerate(zip(energy_balances[:-1], energy_balances[1:])):
+                asserts.assert_true(current_balance.step < next_balance.step, f"The step at index {i+1} ({next_balance.step}) should larger than the previous step ({current_balance.step})")
 
         else:
             logging.info("Test step skipped EnergyBalances Attribute")
@@ -172,7 +169,7 @@ class TC_EPREF_2_1(MatterBaseTest):
         self.step("3a")
         if self.pics_guard(self.check_pics("EPREF.S.A0000") and self.check_pics("EPREF.S.A0001")):
             energy_balances = await self.read_energy_balances(endpoint=endpoint)
-            if len(energy_balances) > 0:
+            if energy_balances:
                 energy_balances_entries = len(energy_balances)
                 status = await self.write_current_energy_balance(endpoint=endpoint, current_energy_balance=energy_balances_entries-1)
                 asserts.assert_equal(status, Status.Success, "CurrentEnergyBalance write failed")
@@ -243,12 +240,13 @@ class TC_EPREF_2_1(MatterBaseTest):
 
             # Logging the LowPowerModeSensitivities Attribute output responses from the DUT:
             num_of_entries = len(low_power_mode_sensitivities)
-            logging.info(f"\nLowPowerModeSensitivities: {num_of_entries} entries")
+            logging.info(f"LowPowerModeSensitivities: {num_of_entries} entries")
             for index, balance_struct in enumerate(low_power_mode_sensitivities, start=1):
                 logging.info(f"[{index}]: {{")
                 logging.info(f"  Step: {balance_struct.step}")
                 if hasattr(balance_struct, 'label') and balance_struct.label is not None:
                     logging.info(f"  Label: {balance_struct.label}")
+                logging.info("}")
 
             # Verify the DUT response contains a list of BalanceStruct Type
             asserts.assert_true(
@@ -265,14 +263,8 @@ class TC_EPREF_2_1(MatterBaseTest):
             )
 
             # If there are more than 2 BalanceStructs, verify that the Step field is in ascending order
-            if list_size > 2:
-                for i in range(1, list_size):
-                    previous_step = low_power_mode_sensitivities[i - 1].step
-                    current_step = low_power_mode_sensitivities[i].step
-                    asserts.assert_true(
-                        current_step > previous_step,
-                        f"The 'step' value at index {i} ({current_step}) should be larger than the previous step value ({previous_step})"
-                    )
+            for i, (current_balance, next_balance) in enumerate(zip(energy_balances[:-1], energy_balances[1:])):
+                asserts.assert_true(current_balance.step < next_balance.step, f"The step at index {i+1} ({next_balance.step}) should larger than the previous step ({current_balance.step})")
 
         else:
             logging.info("Test step skipped")
