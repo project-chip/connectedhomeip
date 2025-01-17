@@ -320,7 +320,7 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 
     // TODO: Platform specific init should not be required here
 #if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1
-    VerifyOrReturnError(InitSiWx917Wifi() == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(InitSiWxWifi() == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
 #endif // SLI_SI91X_MCU_INTERFACE
 
     return CHIP_NO_ERROR;

@@ -123,4 +123,4 @@ void MatterWifiTask(void * arg);
  *                     SL_STATUS_ALLOCATION_FAILED, if there are a memory allocation failure,
  *                     SL_STATUS_FAILURE, otherwise
  */
-sl_status_t InitSiWx917Wifi();
+sl_status_t InitSiWxWifi();

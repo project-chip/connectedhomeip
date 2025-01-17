@@ -284,9 +284,9 @@ sl_status_t sl_wifi_siwx917_init(void)
 
 #else
     // NCP Configurations
-    status = InitSiWx917Wifi();
+    status = InitSiWxWifi();
     VerifyOrReturnError(status == SL_STATUS_OK, status,
-                        ChipLogError(DeviceLayer, "InitSiWx917Wifi failed: 0x%lx", static_cast<uint32_t>(status)));
+                        ChipLogError(DeviceLayer, "InitSiWxWifi failed: 0x%lx", static_cast<uint32_t>(status)));
 #endif // SLI_SI91X_MCU_INTERFACE
 
     sl_wifi_firmware_version_t version = { 0 };
@@ -537,7 +537,7 @@ CHIP_ERROR ResetCounters()
     return CHIP_NO_ERROR;
 }
 
-sl_status_t InitSiWx917Wifi(void)
+sl_status_t InitSiWxWifi(void)
 {
     sl_status_t status = SL_STATUS_OK;
 
@@ -782,7 +782,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     /*
      * Acquire the new IP address
      */
-    wfx_rsi.ip4_addr[0] = (ip) & 0xFF;
+    wfx_rsi.ip4_addr[0] = (ip) &0xFF;
     wfx_rsi.ip4_addr[1] = (ip >> 8) & 0xFF;
     wfx_rsi.ip4_addr[2] = (ip >> 16) & 0xFF;
     wfx_rsi.ip4_addr[3] = (ip >> 24) & 0xFF;
