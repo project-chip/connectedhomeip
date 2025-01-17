@@ -145,8 +145,9 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
 
     auto & endpointInfo = endpoints[idx];
 
-    if (endpointInfo.compositionPattern == DataModel::EndpointCompositionPattern::kFullFamily)
+    switch (endpointInfo.compositionPattern)
     {
+    case DataModel::EndpointCompositionPattern::kFullFamily:
         // encodes ALL endpoints that have the specified endpoint as a descendant
         return aEncoder.EncodeList([&endpoints, endpoint](const auto & encoder) -> CHIP_ERROR {
             for (auto & ep : endpoints.GetSpanValidForLifetime())
@@ -158,21 +159,24 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
             }
             return CHIP_NO_ERROR;
         });
-    }
 
-    // ASSERT we know all composition types and this should be tree:
-    // assert(endpointInfo.compositionPattern == DataModel::EndpointCompositionPattern::kTree)
-    return aEncoder.EncodeList([&endpoints, endpoint](const auto & encoder) -> CHIP_ERROR {
-        for (auto & ep : endpoints.GetSpanValidForLifetime())
-        {
-            if (ep.parentId != endpoint)
+    case DataModel::EndpointCompositionPattern::kTree:
+        return aEncoder.EncodeList([&endpoints, endpoint](const auto & encoder) -> CHIP_ERROR {
+            for (auto & ep : endpoints.GetSpanValidForLifetime())
             {
-                continue;
+                if (ep.parentId != endpoint)
+                {
+                    continue;
+                }
+                ReturnErrorOnFailure(encoder.Encode(ep.id));
             }
-            ReturnErrorOnFailure(encoder.Encode(ep.id));
-        }
-        return CHIP_NO_ERROR;
-    });
+            return CHIP_NO_ERROR;
+        });
+        // NOTE: no default to enforce that we handle all possible composition patterns.
+    default:
+        // unreachable: all variants should be handled above
+        chipDie();
+    }
 }
 
 CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
