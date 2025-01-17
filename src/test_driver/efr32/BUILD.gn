@@ -68,6 +68,7 @@ config("efr32_ldflags") {
   ldflags = [
     "-T" + rebase_path(_ldscript, root_build_dir),
     "-Wl,--no-warn-rwx-segment",
+    "-fno-lto",
   ]
 }
 

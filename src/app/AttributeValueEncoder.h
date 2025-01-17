@@ -46,7 +46,7 @@ public:
         ListEncodeHelper(AttributeValueEncoder & encoder) : mAttributeValueEncoder(encoder) {}
 
         template <typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
-        CHIP_ERROR Encode(T && aArg) const
+        CHIP_ERROR Encode(const T & aArg) const
         {
             VerifyOrReturnError(aArg.GetFabricIndex() != kUndefinedFabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
@@ -55,17 +55,22 @@ public:
             VerifyOrReturnError(!mAttributeValueEncoder.mIsFabricFiltered ||
                                     aArg.GetFabricIndex() == mAttributeValueEncoder.AccessingFabricIndex(),
                                 CHIP_NO_ERROR);
-            return mAttributeValueEncoder.EncodeListItem(mAttributeValueEncoder.AccessingFabricIndex(), std::forward<T>(aArg));
+            return mAttributeValueEncoder.EncodeListItem(mCheckpoint, aArg, mAttributeValueEncoder.AccessingFabricIndex());
         }
 
         template <typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
-        CHIP_ERROR Encode(T && aArg) const
+        CHIP_ERROR Encode(const T & aArg) const
         {
-            return mAttributeValueEncoder.EncodeListItem(std::forward<T>(aArg));
+            return mAttributeValueEncoder.EncodeListItem(mCheckpoint, aArg);
         }
 
     private:
         AttributeValueEncoder & mAttributeValueEncoder;
+        // Avoid calling the TLVWriter constructor for every instantiation of
+        // EncodeListItem.  We treat encoding as a const operation, so either
+        // have to put this on the stack (in which case it's per-instantiation),
+        // or have it as mutable state.
+        mutable TLV::TLVWriter mCheckpoint;
     };
 
     AttributeValueEncoder(AttributeReportIBs::Builder & aAttributeReportIBsBuilder, Access::SubjectDescriptor subjectDescriptor,
@@ -163,45 +168,41 @@ private:
     friend class ListEncodeHelper;
     friend class TestOnlyAttributeValueEncoderAccessor;
 
-    template <typename... Ts>
-    CHIP_ERROR EncodeListItem(Ts &&... aArgs)
+    // Returns true if the list item should be encoded.  If it should, the
+    // passed-in TLVWriter will be used to checkpoint the current state of our
+    // attribute report list builder.
+    bool ShouldEncodeListItem(TLV::TLVWriter & aCheckpoint);
+
+    // Does any cleanup work needed after attempting to encode a list item.
+    void PostEncodeListItem(CHIP_ERROR aEncodeStatus, const TLV::TLVWriter & aCheckpoint);
+
+    // EncodeListItem may be given an extra FabricIndex argument as a second
+    // arg, or not.  Represent that via a parameter pack (which might be
+    // empty). In practice, for any given ItemType the extra arg is either there
+    // or not, so we don't get more template explosion due to aExtraArgs.
+    template <typename ItemType, typename... ExtraArgTypes>
+    CHIP_ERROR EncodeListItem(TLV::TLVWriter & aCheckpoint, const ItemType & aItem, ExtraArgTypes &&... aExtraArgs)
     {
-        // EncodeListItem must be called after EnsureListStarted(), thus mCurrentEncodingListIndex and
-        // mEncodeState.mCurrentEncodingListIndex are not invalid values.
-        if (mCurrentEncodingListIndex < mEncodeState.CurrentEncodingListIndex())
+        if (!ShouldEncodeListItem(aCheckpoint))
         {
-            // We have encoded this element in previous chunks, skip it.
-            mCurrentEncodingListIndex++;
             return CHIP_NO_ERROR;
         }
-
-        TLV::TLVWriter backup;
-        mAttributeReportIBsBuilder.Checkpoint(backup);
 
         CHIP_ERROR err;
         if (mEncodingInitialList)
         {
             // Just encode a single item, with an anonymous tag.
             AttributeReportBuilder builder;
-            err = builder.EncodeValue(mAttributeReportIBsBuilder, TLV::AnonymousTag(), std::forward<Ts>(aArgs)...);
+            err = builder.EncodeValue(mAttributeReportIBsBuilder, TLV::AnonymousTag(), aItem,
+                                      std::forward<ExtraArgTypes>(aExtraArgs)...);
         }
         else
         {
-            err = EncodeAttributeReportIB(std::forward<Ts>(aArgs)...);
-        }
-        if (err != CHIP_NO_ERROR)
-        {
-            // For list chunking, ReportEngine should not rollback the buffer when CHIP_ERROR_NO_MEMORY or similar error occurred.
-            // However, the error might be raised in the middle of encoding procedure, then the buffer may contain partial data,
-            // unclosed containers etc. This line clears all possible partial data and makes EncodeListItem is atomic.
-            mAttributeReportIBsBuilder.Rollback(backup);
-            return err;
+            err = EncodeAttributeReportIB(aItem, std::forward<ExtraArgTypes>(aExtraArgs)...);
         }
 
-        mCurrentEncodingListIndex++;
-        mEncodeState.SetCurrentEncodingListIndex(mCurrentEncodingListIndex);
-        mEncodedAtLeastOneListItem = true;
-        return CHIP_NO_ERROR;
+        PostEncodeListItem(err, aCheckpoint);
+        return err;
     }
 
     /**
@@ -211,14 +212,19 @@ private:
      * In particular, when we are encoding a single element in the list, mPath
      * must indicate a null list index to represent an "append" operation.
      * operation.
+     *
+     * EncodeAttributeReportIB may be given an extra FabricIndex argument as a second
+     * arg, or not.  Represent that via a parameter pack (which might be
+     * empty). In practice, for any given ItemType the extra arg is either
+     * there or not, so we don't get more template explosion due to aExtraArgs.
      */
-    template <typename... Ts>
-    CHIP_ERROR EncodeAttributeReportIB(Ts &&... aArgs)
+    template <typename ItemType, typename... ExtraArgTypes>
+    CHIP_ERROR EncodeAttributeReportIB(const ItemType & aItem, ExtraArgTypes &&... aExtraArgs)
     {
         AttributeReportBuilder builder;
         ReturnErrorOnFailure(builder.PrepareAttribute(mAttributeReportIBsBuilder, mPath, mDataVersion));
-        ReturnErrorOnFailure(builder.EncodeValue(mAttributeReportIBsBuilder, TLV::ContextTag(AttributeDataIB::Tag::kData),
-                                                 std::forward<Ts>(aArgs)...));
+        ReturnErrorOnFailure(builder.EncodeValue(mAttributeReportIBsBuilder, TLV::ContextTag(AttributeDataIB::Tag::kData), aItem,
+                                                 std::forward<ExtraArgTypes>(aExtraArgs)...));
 
         return builder.FinishAttribute(mAttributeReportIBsBuilder);
     }

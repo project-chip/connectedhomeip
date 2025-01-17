@@ -267,8 +267,13 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     osDelay(100); // sl-temp: delay for uart print before verifyImage
 #endif            // _SILICON_LABS_32B_SERIES_3 && CHIP_PROGRESS_LOGGING
     LockRadioProcessing();
+#if defined(SL_TRUSTZONE_NONSECURE)
+    WRAP_BL_DFU_CALL(err = bootloader_verifyImage(mSlotId))
+#else
     WRAP_BL_DFU_CALL(err = bootloader_verifyImage(mSlotId, NULL))
+#endif
     UnlockRadioProcessing();
+
     if (err != SL_BOOTLOADER_OK)
     {
         ChipLogError(SoftwareUpdate, "bootloader_verifyImage() error: %ld", err);

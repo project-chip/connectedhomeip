@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "wifi-network-diagnostics-server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -26,7 +27,6 @@
 #include <app/EventLogging.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/Optional.h>
-#include <platform/DiagnosticDataProvider.h>
 #include <tracing/macros.h>
 #include <tracing/metric_event.h>
 
@@ -240,70 +240,81 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPat
     return CHIP_NO_ERROR;
 }
 
-class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
-{
-    // Gets called when the Node detects Node’s Wi-Fi connection has been disconnected.
-    void OnDisconnectionDetected(uint16_t reasonCode) override
-    {
-        MATTER_TRACE_SCOPE("OnDisconnectionDetected", "WiFiDiagnosticsDelegate");
-        ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnDisconnectionDetected");
-
-        for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
-        {
-            // If Wi-Fi Network Diagnostics cluster is implemented on this endpoint
-            Events::Disconnection::Type event{ reasonCode };
-            EventNumber eventNumber;
-
-            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
-            {
-                ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record Disconnection event");
-            }
-        }
-    }
-
-    // Gets called when the Node fails to associate or authenticate an access point.
-    void OnAssociationFailureDetected(uint8_t associationFailureCause, uint16_t status) override
-    {
-        MATTER_TRACE_SCOPE("OnAssociationFailureDetected", "WiFiDiagnosticsDelegate");
-        ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnAssociationFailureDetected");
-
-        Events::AssociationFailure::Type event{ static_cast<AssociationFailureCauseEnum>(associationFailureCause), status };
-
-        for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
-        {
-            // If Wi-Fi Network Diagnostics cluster is implemented on this endpoint
-            EventNumber eventNumber;
-
-            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
-            {
-                ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record AssociationFailure event");
-            }
-        }
-    }
-
-    // Gets when the Node’s connection status to a Wi-Fi network has changed.
-    void OnConnectionStatusChanged(uint8_t connectionStatus) override
-    {
-        MATTER_TRACE_SCOPE("OnConnectionStatusChanged", "WiFiDiagnosticsDelegate");
-        ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnConnectionStatusChanged");
-
-        Events::ConnectionStatus::Type event{ static_cast<ConnectionStatusEnum>(connectionStatus) };
-        for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
-        {
-            // If Wi-Fi Network Diagnostics cluster is implemented on this endpoint
-            EventNumber eventNumber;
-
-            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
-            {
-                ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record ConnectionStatus event");
-            }
-        }
-    }
-};
-
-WiFiDiagnosticsDelegate gDiagnosticDelegate;
-
 } // anonymous namespace
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+WiFiDiagnosticsServer WiFiDiagnosticsServer::instance;
+
+/**********************************************************
+ * WiFiDiagnosticsServer Implementation
+ *********************************************************/
+
+WiFiDiagnosticsServer & WiFiDiagnosticsServer::Instance()
+{
+    return instance;
+}
+
+void WiFiDiagnosticsServer::OnDisconnectionDetected(uint16_t reasonCode)
+{
+    MATTER_TRACE_SCOPE("OnDisconnectionDetected", "WiFiDiagnosticsDelegate");
+    ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnDisconnectionDetected");
+
+    for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
+    {
+        // If Wi-Fi Network Diagnostics cluster is implemented on this endpoint
+        Events::Disconnection::Type event{ reasonCode };
+        EventNumber eventNumber;
+
+        if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+        {
+            ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record Disconnection event");
+        }
+    }
+}
+
+void WiFiDiagnosticsServer::OnAssociationFailureDetected(uint8_t associationFailureCause, uint16_t status)
+{
+    MATTER_TRACE_SCOPE("OnAssociationFailureDetected", "WiFiDiagnosticsDelegate");
+    ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnAssociationFailureDetected");
+
+    Events::AssociationFailure::Type event{ static_cast<AssociationFailureCauseEnum>(associationFailureCause), status };
+
+    for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
+    {
+        // If Wi-Fi Network Diagnostics cluster is implemented on this endpoint
+        EventNumber eventNumber;
+
+        if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+        {
+            ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record AssociationFailure event");
+        }
+    }
+}
+
+void WiFiDiagnosticsServer::OnConnectionStatusChanged(uint8_t connectionStatus)
+{
+    MATTER_TRACE_SCOPE("OnConnectionStatusChanged", "WiFiDiagnosticsDelegate");
+    ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnConnectionStatusChanged");
+
+    Events::ConnectionStatus::Type event{ static_cast<ConnectionStatusEnum>(connectionStatus) };
+    for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
+    {
+        // If Wi-Fi Network Diagnostics cluster is implemented on this endpoint
+        EventNumber eventNumber;
+
+        if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+        {
+            ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record ConnectionStatus event");
+        }
+    }
+}
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
 bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,
                                                              const app::ConcreteCommandPath & commandPath,
@@ -318,5 +329,5 @@ bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
-    GetDiagnosticDataProvider().SetWiFiDiagnosticsDelegate(&gDiagnosticDelegate);
+    GetDiagnosticDataProvider().SetWiFiDiagnosticsDelegate(&WiFiDiagnosticsServer::Instance());
 }

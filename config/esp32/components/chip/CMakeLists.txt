@@ -432,6 +432,10 @@ if (CONFIG_OPENTHREAD_BORDER_ROUTER)
     list(APPEND matter_requires espressif__esp_rcp_update)
 endif()
 
+if (CONFIG_SEC_CERT_DAC_PROVIDER)
+    list(APPEND matter_requires espressif__esp_secure_cert_mgr)
+endif()
+
 add_prebuilt_library(matterlib "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a"
                      REQUIRES ${matter_requires})
 

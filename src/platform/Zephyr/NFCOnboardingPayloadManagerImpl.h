@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      Platform-specific NFCManager implementation for Zephyr RTOS.
+ *      Platform-specific NFCOnboardingPayloadManager implementation for Zephyr RTOS.
  */
 
 #pragma once
@@ -28,12 +28,12 @@
 namespace chip {
 namespace DeviceLayer {
 
-class NFCManagerImpl final : public NFCManager
+class NFCOnboardingPayloadManagerImpl final : public NFCOnboardingPayloadManager
 {
-    friend class NFCManager;
+    friend class NFCOnboardingPayloadManager;
 
 private:
-    // ===== Members that implement the NFCManager internal interface.
+    // ===== Members that implement the NFCOnboardingPayloadManager internal interface.
 
     CHIP_ERROR _Init();
     CHIP_ERROR _StartTagEmulation(const char * payload, size_t payloadLength);
@@ -49,20 +49,20 @@ private:
 
     // ===== Members for internal use by the following friends.
 
-    friend NFCManager & NFCMgr();
-    friend NFCManagerImpl & NFCMgrImpl();
+    friend NFCOnboardingPayloadManager & NFCOnboardingPayloadMgr();
+    friend NFCOnboardingPayloadManagerImpl & NFCOnboardingPayloadMgrImpl();
 
-    static NFCManagerImpl sInstance;
+    static NFCOnboardingPayloadManagerImpl sInstance;
 };
 
-inline NFCManager & NFCMgr()
+inline NFCOnboardingPayloadManager & NFCOnboardingPayloadMgr()
 {
-    return NFCManagerImpl::sInstance;
+    return NFCOnboardingPayloadManagerImpl::sInstance;
 }
 
-inline NFCManagerImpl & NFCMgrImpl()
+inline NFCOnboardingPayloadManagerImpl & NFCOnboardingPayloadMgrImpl()
 {
-    return NFCManagerImpl::sInstance;
+    return NFCOnboardingPayloadManagerImpl::sInstance;
 }
 
 } // namespace DeviceLayer

@@ -135,6 +135,4 @@ extern "C" void app_main()
     sButton.SetUatButtonPressCallback(UatButtonHandler);
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
-
-    ESPOpenThreadInit();
 }

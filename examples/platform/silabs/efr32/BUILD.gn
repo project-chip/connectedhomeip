@@ -137,7 +137,10 @@ config("efr32-common-config") {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MULTI_OTA_REQUESTOR=1" ]
   }
 
-  ldflags = [ "-Wl,--no-warn-rwx-segment" ]
+  ldflags = [
+    "-Wl,--no-warn-rwx-segment",
+    "-fno-lto",
+  ]
 }
 
 source_set("efr32-common") {

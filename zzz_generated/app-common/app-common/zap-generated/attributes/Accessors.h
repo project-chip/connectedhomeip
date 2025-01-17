@@ -1423,20 +1423,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
 } // namespace UserActiveModeTriggerInstruction
 
-namespace OperatingMode {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::IcdManagement::OperatingModeEnum * value); // OperatingModeEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::IcdManagement::OperatingModeEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::IcdManagement::OperatingModeEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace OperatingMode
-
-namespace FeatureMap {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-} // namespace FeatureMap
-
 namespace ClusterRevision {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);

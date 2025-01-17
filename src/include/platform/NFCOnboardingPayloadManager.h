@@ -29,20 +29,20 @@
 namespace chip {
 namespace DeviceLayer {
 
-class NFCManagerImpl;
+class NFCOnboardingPayloadManagerImpl;
 
 /**
- * @brief Defines an abstract interface for programming an NFC Tag.
+ * @brief Defines an abstract interface for programming an NFC Tag with onboarding payload.
  *
- * NFC Tag can be used in Project CHIP to share commissioning information such
- * as the device discriminator and PIN code with a commissioner. This class
+ * NFC Tag can be used in Project CHIP to share the onboarding payload, including
+ * the device discriminator and PIN code, with a commissioner. This class
  * provides an interface to set contents of a programmable NFC Tag.
  */
-class NFCManager
+class NFCOnboardingPayloadManager
 {
 public:
     /**
-     * Initializes the NFCManager singleton object.
+     * Initializes the NFCOnboardingPayloadManager singleton object.
      *
      * @return CHIP_NO_ERROR On success.
      */
@@ -75,70 +75,70 @@ public:
 
 protected:
     // Construction/destruction limited to subclasses.
-    NFCManager()  = default;
-    ~NFCManager() = default;
+    NFCOnboardingPayloadManager()  = default;
+    ~NFCOnboardingPayloadManager() = default;
 
     // No copy, move or assignment.
-    NFCManager(const NFCManager &)     = delete;
-    NFCManager(NFCManager &&)          = delete;
-    void operator=(const NFCManager &) = delete;
+    NFCOnboardingPayloadManager(const NFCOnboardingPayloadManager &) = delete;
+    NFCOnboardingPayloadManager(NFCOnboardingPayloadManager &&)      = delete;
+    void operator=(const NFCOnboardingPayloadManager &)              = delete;
 
-    // NFCManager implementation getters.
-    NFCManagerImpl * Impl();
-    const NFCManagerImpl * Impl() const;
+    // NFCOnboardingPayloadManager implementation getters.
+    NFCOnboardingPayloadManagerImpl * Impl();
+    const NFCOnboardingPayloadManagerImpl * Impl() const;
 };
 
 /**
- * Returns a reference to the public interface of the NFCManager singleton object.
+ * Returns a reference to the public interface of the NFCOnboardingPayloadManager singleton object.
  */
-extern NFCManager & NFCMgr();
+extern NFCOnboardingPayloadManager & NFCOnboardingPayloadMgr();
 
 /**
- * Returns a reference to the platform-specific NFCManager singleton object.
+ * Returns a reference to the platform-specific NFCOnboardingPayloadManager singleton object.
  */
-extern NFCManagerImpl & NFCMgrImpl();
+extern NFCOnboardingPayloadManagerImpl & NFCOnboardingPayloadMgrImpl();
 
 } // namespace DeviceLayer
 } // namespace chip
 
-#ifdef EXTERNAL_NFCMANAGERIMPL_HEADER
-#include EXTERNAL_NFCMANAGERIMPL_HEADER
+#ifdef EXTERNAL_NFC_ONBOARDING_PAYLOAD_MANAGER_IMPL_HEADER
+#include EXTERNAL_NFC_ONBOARDING_PAYLOAD_MANAGER_IMPL_HEADER
 #elif defined(CHIP_DEVICE_LAYER_TARGET)
-#define NFCMANAGERIMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/NFCManagerImpl.h>
-#include NFCMANAGERIMPL_HEADER
+#define NFC_ONBOARDING_PAYLOAD_MANAGER_IMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/NFCOnboardingPayloadManagerImpl.h>
+#include NFC_ONBOARDING_PAYLOAD_MANAGER_IMPL_HEADER
 #endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
 namespace chip {
 namespace DeviceLayer {
 
-inline CHIP_ERROR NFCManager::Init()
+inline CHIP_ERROR NFCOnboardingPayloadManager::Init()
 {
     return Impl()->_Init();
 }
 
-inline CHIP_ERROR NFCManager::StartTagEmulation(const char * payload, size_t payloadLength)
+inline CHIP_ERROR NFCOnboardingPayloadManager::StartTagEmulation(const char * payload, size_t payloadLength)
 {
     return Impl()->_StartTagEmulation(payload, payloadLength);
 }
 
-inline CHIP_ERROR NFCManager::StopTagEmulation()
+inline CHIP_ERROR NFCOnboardingPayloadManager::StopTagEmulation()
 {
     return Impl()->_StopTagEmulation();
 }
 
-inline bool NFCManager::IsTagEmulationStarted() const
+inline bool NFCOnboardingPayloadManager::IsTagEmulationStarted() const
 {
     return Impl()->_IsTagEmulationStarted();
 }
 
-inline NFCManagerImpl * NFCManager::Impl()
+inline NFCOnboardingPayloadManagerImpl * NFCOnboardingPayloadManager::Impl()
 {
-    return static_cast<NFCManagerImpl *>(this);
+    return static_cast<NFCOnboardingPayloadManagerImpl *>(this);
 }
 
-inline const NFCManagerImpl * NFCManager::Impl() const
+inline const NFCOnboardingPayloadManagerImpl * NFCOnboardingPayloadManager::Impl() const
 {
-    return static_cast<const NFCManagerImpl *>(this);
+    return static_cast<const NFCOnboardingPayloadManagerImpl *>(this);
 }
 
 } // namespace DeviceLayer

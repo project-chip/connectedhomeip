@@ -17,7 +17,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/NFCManager.h>
+#include <platform/NFCOnboardingPayloadManager.h>
 
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -35,14 +35,14 @@ void nfc_callback(const struct device * dev, enum nfc_tag_event event, const uin
 namespace chip {
 namespace DeviceLayer {
 
-NFCManagerImpl NFCManagerImpl::sInstance;
+NFCOnboardingPayloadManagerImpl NFCOnboardingPayloadManagerImpl::sInstance;
 
-CHIP_ERROR NFCManagerImpl::_Init()
+CHIP_ERROR NFCOnboardingPayloadManagerImpl::_Init()
 {
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR NFCManagerImpl::_StartTagEmulation(const char * payload, size_t payloadLength)
+CHIP_ERROR NFCOnboardingPayloadManagerImpl::_StartTagEmulation(const char * payload, size_t payloadLength)
 {
     /* Set up NFC driver*/
     uint8_t ndef_msg_buf[NDEF_MSG_BUF_SIZE];
@@ -89,7 +89,7 @@ CHIP_ERROR NFCManagerImpl::_StartTagEmulation(const char * payload, size_t paylo
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR NFCManagerImpl::_StopTagEmulation()
+CHIP_ERROR NFCOnboardingPayloadManagerImpl::_StopTagEmulation()
 {
     if (nfc_tag_stop(dev))
     {

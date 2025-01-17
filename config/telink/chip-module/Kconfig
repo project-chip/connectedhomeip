@@ -22,7 +22,7 @@ if CHIP
 config CHIP_DEVICE_VENDOR_NAME
 	default "Telink Semiconductor"
 
-config CHIP_NFC_COMMISSIONING
+config CHIP_NFC_ONBOARDING_PAYLOAD
 	bool "Share onboarding payload in NFC tag"
 	default n
 	imply I2C

@@ -112,10 +112,10 @@ static_library("nrfconnect") {
     ]
   }
 
-  if (chip_enable_nfc) {
+  if (chip_enable_nfc_onboarding_payload) {
     sources += [
-      "../Zephyr/NFCManagerImpl.cpp",
-      "NFCManagerImpl.h",
+      "../Zephyr/NFCOnboardingPayloadManagerImpl.cpp",
+      "NFCOnboardingPayloadManagerImpl.h",
     ]
   }
 

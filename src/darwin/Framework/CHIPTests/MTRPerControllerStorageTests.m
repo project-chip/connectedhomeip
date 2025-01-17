@@ -2873,7 +2873,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     // Reset our commissionees.
     for (NSNumber * deviceID in orderedDeviceIDs) {
         __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
-        ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+        ResetCommissioneeWithNodeID(baseDevice, queue, self, kTimeoutInSeconds, deviceID);
     }
 
     [controller shutdown];
