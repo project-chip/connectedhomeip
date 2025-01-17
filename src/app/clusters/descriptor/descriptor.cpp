@@ -40,7 +40,7 @@ using namespace chip::app::Clusters::Descriptor::Attributes;
 namespace {
 
 /// Figures out if `childId` is a descendant of `parentId` given some specific endpoint entries
-bool IsDescendantOf(const DataModel::EndpointEntry * childEndpoint, const EndpointId parentId,
+bool IsDescendantOf(const DataModel::EndpointEntry * __restrict__ childEndpoint, const EndpointId parentId,
                     Span<const DataModel::EndpointEntry> allEndpoints)
 {
     // NOTE: this is not very efficient as we loop through all endpoints for each parent search
