@@ -83,6 +83,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     "//integrations/mobly:chip_mobly",
     "//scripts/py_matter_yamltests:matter_yamltests",
     "//src/python_testing/matter_testing_infrastructure:chip-testing",
+    "//src/setup_payload/python:matter-setup-payload",
   ]
 
   pw_python_venv("matter_build_venv") {
@@ -124,6 +125,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/scripts:matter_yamltests_distribution.wheel",
         "${chip_root}/src/controller/python:chip-repl",
         "${chip_root}/src/python_testing/matter_testing_infrastructure:chip-testing.wheel",
+        "${chip_root}/src/setup_payload/python:matter-setup-payload.wheel",
       ]
     }
   }
@@ -251,6 +253,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "//scripts/py_matter_yamltests:matter_yamltests.tests",
         "//src:tests_run",
         "//src/python_testing/matter_testing_infrastructure:chip-testing.tests",
+        "//src/setup_payload/python:matter-setup-payload.tests",
       ]
 
       if (current_os == "linux" || current_os == "mac") {
