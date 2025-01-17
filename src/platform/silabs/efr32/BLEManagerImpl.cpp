@@ -680,7 +680,7 @@ void BLEManagerImpl::HandleConnectParams(volatile sl_bt_msg_t * evt)
 
     uint16_t desiredTimeout = con_param_evt->timeout < BLE_CONFIG_TIMEOUT ? BLE_CONFIG_TIMEOUT : con_param_evt->timeout;
 
-    // For beter stability, renegotiate the connection parameters if the received ones from the central are outside
+    // For better stability, renegotiate the connection parameters if the received ones from the central are outside
     // of our defined constraints
     if (desiredTimeout != con_param_evt->timeout || con_param_evt->interval < BLE_CONFIG_MIN_INTERVAL ||
         con_param_evt->interval > BLE_CONFIG_MAX_INTERVAL)
