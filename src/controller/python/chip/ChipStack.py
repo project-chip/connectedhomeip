@@ -191,7 +191,10 @@ class ChipStack(object):
 
     def Shutdown(self):
 
-        # Shutdown all subscriptions before shutting down the stack.
+        # Shutdown all subscriptions before shutting down the stack. Please note it is not
+        # possible to directly iterate over the dictionary values, because when the subscription
+        # is shut down, it will remove itself from the dictionary - causing the iterator to be
+        # invalidated. Hence, we need to create a local copy of the values before iterating.
         for subscription in tuple(self._subscriptions.values()):
             subscription.Shutdown()
 
