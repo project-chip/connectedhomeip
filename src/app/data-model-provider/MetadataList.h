@@ -105,7 +105,7 @@ public:
 
     MetadataList & operator=(MetadataList && other)
     {
-        *((GenericMetadataList *) this) = std::move(other);
+        *static_cast<GenericMetadataList *>(this) = std::move(other);
         return *this;
     }
 
