@@ -33,7 +33,7 @@ namespace DataModel {
 /// Helps search for a specific server cluster in the given
 /// metadata provider.
 ///
-/// Facilitates the very common operation of "find a cluster with a given ID".
+/// Facilitates the very common operation of "find a cluster on a given cluster path".
 class ServerClusterFinder
 {
 public:

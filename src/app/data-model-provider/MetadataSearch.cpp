@@ -25,6 +25,7 @@ std::optional<ServerClusterEntry> ServerClusterFinder::Find(const ConcreteCluste
 
     if (mEndpointId != path.mEndpointId)
     {
+        mEndpointId = path.mEndpointId;
         mClusterEntries = mProvider->ServerClusters(path.mEndpointId);
     }
 
@@ -47,6 +48,7 @@ std::optional<AttributeEntry> AttributeFinder::Find(const ConcreteAttributePath 
 
     if (mClusterPath != path)
     {
+        mClusterPath = path;
         mAttributes = mProvider->Attributes(path);
     }
 
