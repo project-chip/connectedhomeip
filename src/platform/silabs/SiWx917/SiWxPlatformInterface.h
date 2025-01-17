@@ -30,8 +30,10 @@ extern "C" {
 #endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #if SLI_SI91X_MCU_INTERFACE
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #include "sl_si91x_button.h"
 #include "sl_si91x_button_pin_config.h"
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #include "sl_si91x_driver_gpio.h"
 #include "sl_si91x_power_manager.h"
 

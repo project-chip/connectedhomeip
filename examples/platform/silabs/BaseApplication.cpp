@@ -66,7 +66,7 @@
 #ifdef SL_WIFI
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
-#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
+#include <platform/silabs/wifi/WifiInterface.h>
 #endif // SL_WIFI
 
 #ifdef DIC_ENABLE
@@ -187,7 +187,7 @@ void BaseApplicationDelegate::OnCommissioningWindowClosed()
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
     if (!BaseApplication::GetProvisionStatus() && !isComissioningStarted)
     {
-        int32_t status = wfx_power_save(RSI_SLEEP_MODE_8, STANDBY_POWER_SAVE_WITH_RAM_RETENTION);
+        int32_t status = wfx_power_save(RSI_SLEEP_MODE_8, DEEP_SLEEP_WITH_RAM_RETENTION);
         if (status != SL_STATUS_OK)
         {
             ChipLogError(AppServer, "Failed to enable the TA Deep Sleep");
