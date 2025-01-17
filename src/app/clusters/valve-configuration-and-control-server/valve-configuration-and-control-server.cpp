@@ -195,7 +195,7 @@ static void onValveConfigurationAndControlTick(System::Layer * systemLayer, void
     }
     else
     {
-        SetRemainingDurationNull(ep);
+        ValveConfigurationAndControl::SetRemainingDurationNull(ep);
     }
 }
 

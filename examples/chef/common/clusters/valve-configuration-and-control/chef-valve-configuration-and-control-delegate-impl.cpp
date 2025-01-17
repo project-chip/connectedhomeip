@@ -19,7 +19,6 @@
 #include "chef-valve-configuration-and-control-delegate-impl.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
-#include <src/app/util/odd-sized-integers.h>
 
 #ifdef MATTER_DM_PLUGIN_VALVE_CONFIGURATION_AND_CONTROL_SERVER
 
@@ -81,7 +80,7 @@ chefValveConfigurationAndControlWriteCallback(chip::EndpointId endpointId, chip:
         std::memcpy(&newVal, buffer, sizeof(uint32_t));
         ChipLogProgress(DeviceLayer, "Setting RemainingDuration to %d", newVal);
         CHIP_ERROR err;
-        if (newVal == static_cast<utin32_t>(MaxUnsignedValue(sizeof(uint32_t)))) // Max value is interpreted as NULL
+        if (newVal == static_cast<utin32_t>(0xFFFF)) // Max value is interpreted as NULL
         {
             err = SetRemainingDurationNull(endpointId);
         }
