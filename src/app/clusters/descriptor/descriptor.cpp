@@ -40,28 +40,31 @@ using namespace chip::app::Clusters::Descriptor::Attributes;
 namespace {
 
 /// Figures out if `childId` is a descendant of `parentId` given some specific endpoint entries
-bool IsDescendantOf(EndpointId childId, const EndpointId parentId, Span<const DataModel::EndpointEntry> allEndpoints)
+bool IsDescendantOf(const DataModel::EndpointEntry * childEndpoint, const EndpointId parentId,
+                    Span<const DataModel::EndpointEntry> allEndpoints)
 {
-    // NOTE: this is not very efficient, however most compositions should be of small depth
-    while (childId != kInvalidEndpointId)
+    // NOTE: this is not very efficient as we loop through all endpoints for each parent search
+    //       however endpoint depth should not be as large.
+    while (true)
     {
+
+        VerifyOrReturnValue(childEndpoint != nullptr, false);
+        VerifyOrReturnValue(childEndpoint->parentId != parentId, true);
+        VerifyOrReturnValue(childEndpoint->parentId != kInvalidEndpointId, false);
+
+        const auto lookupId = childEndpoint->parentId;
+        childEndpoint       = nullptr; // we will look it up again
+
         // find the requested value in the array to get its parent
         for (auto & ep : allEndpoints)
         {
-            if (ep.id != childId)
+            if (ep.id == lookupId)
             {
-                continue;
+                childEndpoint = &ep;
+                break;
             }
-
-            if (ep.parentId == parentId)
-            {
-                return true;
-            }
-            childId = ep.parentId; // see if parent is a descendant
         }
     }
-
-    return false;
 }
 
 class DescriptorAttrAccess : public AttributeAccessInterface
@@ -148,7 +151,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
         return aEncoder.EncodeList([&endpoints, endpoint](const auto & encoder) -> CHIP_ERROR {
             for (auto & ep : endpoints.GetSpanValidForLifetime())
             {
-                if (IsDescendantOf(ep.id, endpoint, endpoints.GetSpanValidForLifetime()))
+                if (IsDescendantOf(&ep, endpoint, endpoints.GetSpanValidForLifetime()))
                 {
                     ReturnErrorOnFailure(encoder.Encode(ep.id));
                 }
