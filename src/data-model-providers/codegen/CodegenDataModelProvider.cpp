@@ -97,7 +97,7 @@ CHIP_ERROR FetchAcceptedCommands(const ConcreteClusterPath & path, const EmberAf
             enumerationData.commandPath     = ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId);
             enumerationData.processingError = CHIP_NO_ERROR;
 
-            ReturnErrorOnFailure(enumerationData.acceptedCommandList.reserve(commandCount));
+            ReturnErrorOnFailure(enumerationData.acceptedCommandList.Reserve(commandCount));
 
             ReturnErrorOnFailure(interface->EnumerateAcceptedCommands(
                 path,
@@ -116,7 +116,7 @@ CHIP_ERROR FetchAcceptedCommands(const ConcreteClusterPath & path, const EmberAf
             ReturnErrorOnFailure(enumerationData.processingError);
 
             // the two invocations MUST return the same sizes.
-            VerifyOrReturnError(enumerationData.acceptedCommandList.size() == commandCount, CHIP_ERROR_INTERNAL);
+            VerifyOrReturnError(enumerationData.acceptedCommandList.Size() == commandCount, CHIP_ERROR_INTERNAL);
 
             result = std::move(enumerationData.acceptedCommandList);
             return CHIP_NO_ERROR;
@@ -136,7 +136,7 @@ CHIP_ERROR FetchAcceptedCommands(const ConcreteClusterPath & path, const EmberAf
     }
     const size_t commandCount = static_cast<size_t>(endOfList - serverCluster->acceptedCommandList);
 
-    ReturnErrorOnFailure(result.reserve(commandCount));
+    ReturnErrorOnFailure(result.Reserve(commandCount));
 
     ConcreteCommandPath commandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId);
     for (const chip::CommandId * p = serverCluster->acceptedCommandList; p != endOfList; p++)
@@ -170,7 +170,7 @@ CHIP_ERROR FetchGeneratedCommands(const ConcreteClusterPath & path, const EmberA
 
         if (err == CHIP_NO_ERROR)
         {
-            ReturnErrorOnFailure(result.reserve(commandCount));
+            ReturnErrorOnFailure(result.Reserve(commandCount));
 
             using EnumerationData = struct
             {
@@ -197,7 +197,7 @@ CHIP_ERROR FetchGeneratedCommands(const ConcreteClusterPath & path, const EmberA
             ReturnErrorOnFailure(enumerationData.processingError);
 
             // the two invocations MUST return the same sizes.
-            VerifyOrReturnError(enumerationData.generatedCommandList.size() == commandCount, CHIP_ERROR_INTERNAL);
+            VerifyOrReturnError(enumerationData.generatedCommandList.Size() == commandCount, CHIP_ERROR_INTERNAL);
 
             result = std::move(enumerationData.generatedCommandList);
             return CHIP_NO_ERROR;
@@ -356,7 +356,7 @@ DataModel::MetadataList<DataModel::EndpointEntry> CodegenDataModelProvider::Endp
     const uint16_t endpointCount = emberAfEndpointCount();
 
     // allocate the max as some endpoints may be disabled
-    CHIP_ERROR err = result.reserve(endpointCount);
+    CHIP_ERROR err = result.Reserve(endpointCount);
     if (err != CHIP_NO_ERROR)
     {
 #if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
@@ -430,7 +430,7 @@ DataModel::MetadataList<DataModel::ServerClusterEntry> CodegenDataModelProvider:
     VerifyOrReturnValue(endpoint->clusterCount > 0, result);
     VerifyOrReturnValue(endpoint->cluster != nullptr, result);
 
-    CHIP_ERROR err = result.reserve(emberAfClusterCountForEndpointType(endpoint, /* server = */ true));
+    CHIP_ERROR err = result.Reserve(emberAfClusterCountForEndpointType(endpoint, /* server = */ true));
     if (err != CHIP_NO_ERROR)
     {
 #if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
@@ -471,7 +471,7 @@ DataModel::MetadataList<DataModel::AttributeEntry> CodegenDataModelProvider::Att
     VerifyOrReturnValue(cluster->attributeCount > 0, result);
     VerifyOrReturnValue(cluster->attributes != nullptr, result);
 
-    CHIP_ERROR err = result.reserve(cluster->attributeCount);
+    CHIP_ERROR err = result.Reserve(cluster->attributeCount);
     if (err != CHIP_NO_ERROR)
     {
 #if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
@@ -507,7 +507,7 @@ DataModel::MetadataList<ClusterId> CodegenDataModelProvider::ClientClusters(Endp
     VerifyOrReturnValue(endpoint->clusterCount > 0, result);
     VerifyOrReturnValue(endpoint->cluster != nullptr, result);
 
-    CHIP_ERROR err = result.reserve(emberAfClusterCountForEndpointType(endpoint, /* server = */ false));
+    CHIP_ERROR err = result.Reserve(emberAfClusterCountForEndpointType(endpoint, /* server = */ false));
     if (err != CHIP_NO_ERROR)
     {
 #if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
@@ -607,7 +607,7 @@ DataModel::MetadataList<DataModel::DeviceTypeEntry> CodegenDataModelProvider::De
     Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
 
     DataModel::MetadataList<DataModel::DeviceTypeEntry> result;
-    err = result.reserve(deviceTypes.size());
+    err = result.Reserve(deviceTypes.size());
     if (err != CHIP_NO_ERROR)
     {
 #if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
@@ -641,7 +641,7 @@ DataModel::MetadataList<DataModel::Provider::SemanticTag> CodegenDataModelProvid
     }
     DataModel::MetadataList<DataModel::Provider::SemanticTag> result;
 
-    CHIP_ERROR err = result.reserve(count);
+    CHIP_ERROR err = result.Reserve(count);
     if (err != CHIP_NO_ERROR)
     {
 #if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING

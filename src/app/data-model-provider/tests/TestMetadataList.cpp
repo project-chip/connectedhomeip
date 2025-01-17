@@ -57,38 +57,38 @@ struct IdAndValue
 TEST_F(TestMetadataList, MetadataListWorks)
 {
     MetadataList<IdAndValue<int>> list1;
-    EXPECT_EQ(list1.size(), 0u);
-    EXPECT_TRUE(list1.empty());
+    EXPECT_EQ(list1.Size(), 0u);
+    EXPECT_TRUE(list1.Empty());
 
     // Reservation should always work when empty
-    ASSERT_EQ(list1.reserve(5), CHIP_NO_ERROR);
-    EXPECT_EQ(list1.capacity(), 5u);
-    EXPECT_EQ(list1.size(), 0u);
-    EXPECT_TRUE(list1.empty());
+    ASSERT_EQ(list1.Reserve(5), CHIP_NO_ERROR);
+    EXPECT_EQ(list1.Capacity(), 5u);
+    EXPECT_EQ(list1.Size(), 0u);
+    EXPECT_TRUE(list1.Empty());
 
     // You can re-reserve differently if still empty.
-    ASSERT_EQ(list1.reserve(2), CHIP_NO_ERROR);
-    EXPECT_EQ(list1.capacity(), 2u);
+    ASSERT_EQ(list1.Reserve(2), CHIP_NO_ERROR);
+    EXPECT_EQ(list1.Capacity(), 2u);
 
     // Values can be appended until the capacity.
     EXPECT_EQ(list1.Append({ 0xA1, 111 }), CHIP_NO_ERROR);
-    EXPECT_EQ(list1.size(), 1u);
+    EXPECT_EQ(list1.Size(), 1u);
 
     EXPECT_EQ(list1.Append({ 0xA2, 222 }), CHIP_NO_ERROR);
-    EXPECT_EQ(list1.size(), 2u);
+    EXPECT_EQ(list1.Size(), 2u);
 
     EXPECT_EQ(list1.Append({ 0xA3, 333 }), CHIP_ERROR_NO_MEMORY);
-    EXPECT_EQ(list1.size(), 2u);
+    EXPECT_EQ(list1.Size(), 2u);
 
     MetadataList<IdAndValue<int>> list2 = std::move(list1);
 
     // Moved-from list is "empty", un-Metadata and span is empty.
-    EXPECT_EQ(list1.size(), 0u);                          // NOLINT(bugprone-use-after-move)
-    EXPECT_EQ(list1.capacity(), 0u);                      // NOLINT(bugprone-use-after-move)
+    EXPECT_EQ(list1.Size(), 0u);                          // NOLINT(bugprone-use-after-move)
+    EXPECT_EQ(list1.Capacity(), 0u);                      // NOLINT(bugprone-use-after-move)
     EXPECT_TRUE(list1.GetSpanValidForLifetime().empty()); // NOLINT(bugprone-use-after-move)
 
     // Moved-to list has storage.
-    EXPECT_EQ(list2.size(), 2u);
+    EXPECT_EQ(list2.Size(), 2u);
 
     // A span can be obtained over the list.
     decltype(list2)::SpanType contents = list2.GetSpanValidForLifetime();
@@ -106,11 +106,11 @@ TEST_F(TestMetadataList, MetadataListWorks)
 
     // After getting a span, list becomes immutable and it is no longer possible to append to the list.
     EXPECT_EQ(list2.Append({ 0xA3, 333 }), CHIP_ERROR_INCORRECT_STATE);
-    EXPECT_EQ(list2.size(), 2u);
-    EXPECT_EQ(list2.capacity(), 2u);
+    EXPECT_EQ(list2.Size(), 2u);
+    EXPECT_EQ(list2.Capacity(), 2u);
 
     // Cannot re-reserve once the list has become immutable due to span-taking.
-    EXPECT_EQ(list2.reserve(6), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(list2.Reserve(6), CHIP_ERROR_INCORRECT_STATE);
 }
 
 static constexpr std::array<const int, 3> kConstantArray{ 1, 2, 3 };
@@ -119,14 +119,14 @@ TEST_F(TestMetadataList, MetadataListConvertersWork)
 {
     {
         MetadataList<int> list{ MetadataList<int>::FromArray(std::array{ 1, 2, 3 }) };
-        EXPECT_FALSE(list.empty());
-        EXPECT_EQ(list.size(), 3u);
+        EXPECT_FALSE(list.Empty());
+        EXPECT_EQ(list.Size(), 3u);
         EXPECT_EQ(list[0], 1);
         EXPECT_EQ(list[1], 2);
         EXPECT_EQ(list[2], 3);
 
         auto list2 = std::move(list);
-        EXPECT_EQ(list.size(), 0u); // NOLINT(bugprone-use-after-move)
+        EXPECT_EQ(list.Size(), 0u); // NOLINT(bugprone-use-after-move)
 
         auto list2Span = list2.GetSpanValidForLifetime();
         EXPECT_EQ(list2Span.size(), 3u);
@@ -134,22 +134,22 @@ TEST_F(TestMetadataList, MetadataListConvertersWork)
         EXPECT_EQ(list2Span[1], 2);
         EXPECT_EQ(list2Span[2], 3);
 
-        EXPECT_EQ(list2.reserve(10), CHIP_ERROR_INCORRECT_STATE);
+        EXPECT_EQ(list2.Reserve(10), CHIP_ERROR_INCORRECT_STATE);
         EXPECT_EQ(list2.Append(4), CHIP_ERROR_INCORRECT_STATE);
     }
 
     {
         MetadataList<int> list1{ MetadataList<int>::FromConstArray(kConstantArray) };
-        EXPECT_EQ(list1.size(), 3u);
+        EXPECT_EQ(list1.Size(), 3u);
         EXPECT_EQ(list1[0], 1);
         EXPECT_EQ(list1[1], 2);
         EXPECT_EQ(list1[2], 3);
 
-        EXPECT_EQ(list1.reserve(10), CHIP_ERROR_INCORRECT_STATE);
+        EXPECT_EQ(list1.Reserve(10), CHIP_ERROR_INCORRECT_STATE);
         EXPECT_EQ(list1.Append(4), CHIP_ERROR_INCORRECT_STATE);
 
         MetadataList<int> list2{ MetadataList<int>::FromConstArray(kConstantArray) };
-        EXPECT_EQ(list2.size(), 3u);
+        EXPECT_EQ(list2.Size(), 3u);
         EXPECT_EQ(list2[0], 1);
         EXPECT_EQ(list2[1], 2);
         EXPECT_EQ(list2[2], 3);
@@ -164,16 +164,16 @@ TEST_F(TestMetadataList, MetadataListConvertersWork)
 
     {
         MetadataList<int> list1{ MetadataList<int>::FromConstSpan(Span<const int>{ kConstantArray }) };
-        EXPECT_EQ(list1.size(), 3u);
+        EXPECT_EQ(list1.Size(), 3u);
         EXPECT_EQ(list1[0], 1);
         EXPECT_EQ(list1[1], 2);
         EXPECT_EQ(list1[2], 3);
 
-        EXPECT_EQ(list1.reserve(10), CHIP_ERROR_INCORRECT_STATE);
+        EXPECT_EQ(list1.Reserve(10), CHIP_ERROR_INCORRECT_STATE);
         EXPECT_EQ(list1.Append(4), CHIP_ERROR_INCORRECT_STATE);
 
         MetadataList<int> list2{ MetadataList<int>::FromConstSpan(Span<const int>{ kConstantArray }) };
-        EXPECT_EQ(list2.size(), 3u);
+        EXPECT_EQ(list2.Size(), 3u);
         EXPECT_EQ(list2[0], 1);
         EXPECT_EQ(list2[1], 2);
         EXPECT_EQ(list2[2], 3);
@@ -270,7 +270,7 @@ MetadataList<T> FilterElements(Span<const T> elementTable, std::function<bool(co
 {
     MetadataList<T> result;
 
-    if (result.reserve(elementTable.size()) != CHIP_NO_ERROR)
+    if (result.Reserve(elementTable.size()) != CHIP_NO_ERROR)
     {
         result.Invalidate();
         return result;
@@ -382,14 +382,14 @@ TEST_F(TestMetadataList, CommandsForFeaturesAreAsExpected)
         cluster.SetFeatures(BitFlags<NetworkCommissioningFeatureBits>{}.Set(NetworkCommissioningFeatureBits::kWifi));
 
         auto supportedCommands = cluster.GetSupportedCommands();
-        EXPECT_EQ(supportedCommands.size(), 8u);
+        EXPECT_EQ(supportedCommands.Size(), 8u);
     }
 
     {
         cluster.SetFeatures(BitFlags<NetworkCommissioningFeatureBits>{}.Set(NetworkCommissioningFeatureBits::kEthernet));
 
         auto supportedCommands = cluster.GetSupportedCommands();
-        EXPECT_EQ(supportedCommands.size(), 0u);
+        EXPECT_EQ(supportedCommands.Size(), 0u);
     }
 }
 

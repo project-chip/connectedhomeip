@@ -142,7 +142,7 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
         {
             // Position on the correct attribute if we have a start point
             mAttributeIndex = 0;
-            while ((mAttributeIndex < mAttributes.size()) &&
+            while ((mAttributeIndex < mAttributes.Size()) &&
                    (mAttributes[mAttributeIndex].attributeId != mPosition.mOutputPath.mAttributeId))
             {
                 mAttributeIndex++;
@@ -196,7 +196,7 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
         return std::nullopt;
     }
 
-    if (mAttributeIndex < mAttributes.size())
+    if (mAttributeIndex < mAttributes.Size())
     {
         return mAttributes[mAttributeIndex].attributeId;
     }
@@ -222,7 +222,7 @@ std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()
         {
             // Position on the correct cluster if we have a start point
             mClusterIndex = 0;
-            while ((mClusterIndex < mClusters.size()) && (mClusters[mClusterIndex].clusterId != mPosition.mOutputPath.mClusterId))
+            while ((mClusterIndex < mClusters.Size()) && (mClusters[mClusterIndex].clusterId != mPosition.mOutputPath.mClusterId))
             {
                 mClusterIndex++;
             }
@@ -270,7 +270,7 @@ std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()
     }
 
     VerifyOrReturnValue(mPosition.mAttributePath->mValue.HasWildcardClusterId(), std::nullopt);
-    VerifyOrReturnValue(mClusterIndex < mClusters.size(), std::nullopt);
+    VerifyOrReturnValue(mClusterIndex < mClusters.Size(), std::nullopt);
 
     return mClusters[mClusterIndex].clusterId;
 }
@@ -286,7 +286,7 @@ std::optional<EndpointId> AttributePathExpandIterator::NextEndpointId()
         {
             // Position on the correct endpoint if we have a start point
             mEndpointIndex = 0;
-            while ((mEndpointIndex < mEndpoints.size()) && (mEndpoints[mEndpointIndex].id != mPosition.mOutputPath.mEndpointId))
+            while ((mEndpointIndex < mEndpoints.Size()) && (mEndpoints[mEndpointIndex].id != mPosition.mOutputPath.mEndpointId))
             {
                 mEndpointIndex++;
             }
@@ -309,7 +309,7 @@ std::optional<EndpointId> AttributePathExpandIterator::NextEndpointId()
     }
 
     VerifyOrReturnValue(mPosition.mAttributePath->mValue.HasWildcardEndpointId(), std::nullopt);
-    VerifyOrReturnValue(mEndpointIndex < mEndpoints.size(), std::nullopt);
+    VerifyOrReturnValue(mEndpointIndex < mEndpoints.Size(), std::nullopt);
 
     return mEndpoints[mEndpointIndex].id;
 }

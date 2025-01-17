@@ -63,7 +63,7 @@ const void * GenericMetadataList::operator[](size_t index) const
     return mBuffer + index * mElementSize;
 }
 
-CHIP_ERROR GenericMetadataList::reserve(size_t numElements)
+CHIP_ERROR GenericMetadataList::Reserve(size_t numElements)
 {
     VerifyOrReturnError(!mIsImmutable, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mElementCount == 0, CHIP_ERROR_INCORRECT_STATE);
@@ -107,7 +107,7 @@ void GenericMetadataList::Invalidate()
 
 CHIP_ERROR GenericMetadataList::CopyExistingBuffer(const void * buffer, size_t elements)
 {
-    ReturnErrorOnFailure(reserve(elements));
+    ReturnErrorOnFailure(Reserve(elements));
     memcpy(mBuffer, buffer, mElementSize * elements);
     mIsImmutable  = true;
     mElementCount = elements;

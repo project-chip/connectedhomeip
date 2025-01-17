@@ -46,12 +46,12 @@ public:
     GenericMetadataList & operator=(GenericMetadataList && other);
     const void * operator[](size_t index) const;
 
-    CHIP_ERROR reserve(size_t numElements);
+    CHIP_ERROR Reserve(size_t numElements);
     void Invalidate();
 
-    size_t elementCount() const { return mElementCount; }
-    size_t capacity() const { return mCapacity; }
-    bool empty() const { return mElementCount == 0; }
+    size_t ElementCount() const { return mElementCount; }
+    size_t Capacity() const { return mCapacity; }
+    bool Empty() const { return mElementCount == 0; }
 
 protected:
     /// Copy over the data from the given buffer
@@ -139,12 +139,12 @@ public:
         return list;
     }
 
-    size_t size() const { return elementCount(); }
+    size_t Size() const { return ElementCount(); }
 
     Span<const T> GetSpanValidForLifetime() const
     {
         SetImmutable();
-        return Span<const T>(static_cast<const T *>(RawBuffer()), elementCount());
+        return Span<const T>(static_cast<const T *>(RawBuffer()), ElementCount());
     }
 
     CHIP_ERROR Append(const T & value) { return AppendRaw(&value); }
