@@ -347,7 +347,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     uint16_t framelength = 0;
     uint16_t datalength  = 0;
     int32_t status       = 0;
-#ifdef WIFI_DEBUG_ENABLED
+#if WIFI_DEBUG_ENABLED
     ChipLogProgress(DeviceLayer, "LWIP : low_level_output");
 #endif
     if (xSemaphoreTake(ethout_sem, portMAX_DELAY) != pdTRUE)
