@@ -98,7 +98,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
 
     if (status.has_value())
     {
-        apCommandObj->AddStatus( aCommandPath, *status);
+        apCommandObj->AddStatus(aCommandPath, *status);
     }
 }
 
