@@ -40,13 +40,13 @@ tests:
 
           1. Execute the below commands in the interactive mode:
           ./chip-tool interactive start
-          2. Before running the below steps ensure that  \tmp folder on the system does not contain the below files. If they are present please delete these files 
+          2. Before running the below steps ensure that  \tmp folder on the system does not contain the below files. If they are present please delete these files
           TH_LOG_OK_NORMAL : "Length_1234567.txt"
           TH_LOG_OK_FULL_LENGTH : "Length_123456789123456789123.txt"
-          3. 
-          NOTE : The below setting is shown for sample, DUT can be setting logs of any size. 
+          3.
+          NOTE : The below setting is shown for sample, DUT can be setting logs of any size.
 
-          Use the below command in the all-cluster-app for setting up the diagonistics logs. 
+          Use the below command in the all-cluster-app for setting up the diagonistics logs.
           ./chip-all-clusters-app --trace_decode 1 --end_user_support_log ~/tmp/end_user_support_log.txt --network_diagnostics_log ~/tmp/nw_log.txt --crash_log ~/tmp/crash_log.txt
           The log file content can be set such that the file size can be as follows to obtain different status code from DUT:
           1. end_user_support_log  > 1024 bytes
@@ -143,7 +143,7 @@ tests:
 
           [1707967219.637228][10723:10726] CHIP:TOO:   RetrieveLogsResponse: {
           [1707967219.637242][10723:10726] CHIP:TOO:     status: 2
-          [1707967219.637248][10723:10726] CHIP:TOO:     logContent: 
+          [1707967219.637248][10723:10726] CHIP:TOO:     logContent:
           [1707967219.637253][10723:10726] CHIP:TOO:    }
       disabled: true
 
@@ -200,9 +200,9 @@ tests:
           On TH (chip-tool): Verify that the DUT responds with the RetrieveLogsResponse command with a Success(0) status code and  LogContent field is empty:
 
           1707894874.239127][34353:34356] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0032 Command 0x0000_0001
-          [1707894874.239189][34353:34356] CHIP:TOO:   RetrieveLogsResponse: {          
+          [1707894874.239189][34353:34356] CHIP:TOO:   RetrieveLogsResponse: {
           [1707894874.239208][34353:34356] CHIP:TOO:     status: 0
-          [1707894874.239219][34353:34356] CHIP:TOO:     logContent: 
+          [1707894874.239219][34353:34356] CHIP:TOO:     logContent:
           [1707894874.239227][34353:34356] CHIP:TOO:    }
 
           2. File Transfer Verification:
@@ -241,7 +241,7 @@ tests:
 
           [1707967219.637228][10723:10726] CHIP:TOO:   RetrieveLogsResponse: {
           [1707967219.637242][10723:10726] CHIP:TOO:     status: 2
-          [1707967219.637248][10723:10726] CHIP:TOO:     logContent: 
+          [1707967219.637248][10723:10726] CHIP:TOO:     logContent:
           [1707967219.637253][10723:10726] CHIP:TOO:    }
       disabled: true
 
@@ -294,7 +294,7 @@ tests:
           1707894874.239127][34353:34356] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0032 Command 0x0000_0001
           [1707894874.239189][34353:34356] CHIP:TOO:   RetrieveLogsResponse: {
           [1707894874.239208][34353:34356] CHIP:TOO:     status: 0
-          [1707894874.239219][34353:34356] CHIP:TOO:     logContent: 
+          [1707894874.239219][34353:34356] CHIP:TOO:     logContent:
           [1707894874.239227][34353:34356] CHIP:TOO:    }
 
           2. File Transfer Verification:
@@ -333,7 +333,7 @@ tests:
 
           [1707967219.637228][10723:10726] CHIP:TOO:   RetrieveLogsResponse: {
           [1707967219.637242][10723:10726] CHIP:TOO:     status: 2
-          [1707967219.637248][10723:10726] CHIP:TOO:     logContent: 
+          [1707967219.637248][10723:10726] CHIP:TOO:     logContent:
           [1707967219.637253][10723:10726] CHIP:TOO:    }
       disabled: true
 
@@ -374,7 +374,7 @@ tests:
 
           [1707967219.637228][10723:10726] CHIP:TOO:   RetrieveLogsResponse: {
           [1707967219.637242][10723:10726] CHIP:TOO:     status: 4
-          [1707967219.637248][10723:10726] CHIP:TOO:     logContent: 
+          [1707967219.637248][10723:10726] CHIP:TOO:     logContent:
           [1707967219.637253][10723:10726] CHIP:TOO:    }
       disabled: true
 
@@ -385,7 +385,7 @@ tests:
           by setting Intent field to . NetworkDiag . CrashLogs"
       PICS: MCORE.BDX.Initiator
       verification: |
-          diagnosticlogs retrieve-logs-request 0 0 1 0 
+          diagnosticlogs retrieve-logs-request 0 0 1 0
 
           On TH(chip-tool), Verify that the DUT responds with Success(0) status code for the RetrieveLogsResponse command Verify that LogContent field contains at most 1024 bytes
 
@@ -398,14 +398,14 @@ tests:
 
           [1707967219.637228][10723:10726] CHIP:TOO:   RetrieveLogsResponse: {
           [1707967219.637242][10723:10726] CHIP:TOO:     status: 2
-          [1707967219.637248][10723:10726] CHIP:TOO:     logContent: 
+          [1707967219.637248][10723:10726] CHIP:TOO:     logContent:
           [1707967219.637253][10723:10726] CHIP:TOO:    }
 
-          Repeat this step by setting Intent field to NetworkDiag by giving following command : 
-          diagnosticlogs retrieve-logs-request 1 0 1 0 
+          Repeat this step by setting Intent field to NetworkDiag by giving following command :
+          diagnosticlogs retrieve-logs-request 1 0 1 0
 
-          Repeat this step by setting Intent field to CrashLogs by giving following command : 
-          diagnosticlogs retrieve-logs-request 2 0 1 0 
+          Repeat this step by setting Intent field to CrashLogs by giving following command :
+          diagnosticlogs retrieve-logs-request 2 0 1 0
       disabled: true
 
     - label:
@@ -416,7 +416,7 @@ tests:
       verification: |
           diagnosticlogs retrieve-logs-request 0 1 1 0
 
-          On TH(chip-tool), Verify that the DUT responds with INVALID_COMMAND for the RetrieveLogsRequest that was sent without TransferFileDesignator 
+          On TH(chip-tool), Verify that the DUT responds with INVALID_COMMAND for the RetrieveLogsRequest that was sent without TransferFileDesignator
 
 
           [1707924172.241489][42120:42123] CHIP:DMG:                 InvokeResponseIB =
@@ -429,18 +429,18 @@ tests:
           [1707924172.241514][42120:42123] CHIP:DMG:                                         ClusterId = 0x32,
           [1707924172.241519][42120:42123] CHIP:DMG:                                         CommandId = 0x0,
           [1707924172.241527][42120:42123] CHIP:DMG:                                 },
-          [1707924172.241536][42120:42123] CHIP:DMG:                                 
+          [1707924172.241536][42120:42123] CHIP:DMG:
           [1707924172.241539][42120:42123] CHIP:DMG:                                 StatusIB =
           [1707924172.241543][42120:42123] CHIP:DMG:                                 {
           [1707924172.241546][42120:42123] CHIP:DMG:                                         status = 0x85 (INVALID_COMMAND),
           [1707924172.241549][42120:42123] CHIP:DMG:                                 },
-          [1707924172.241553][42120:42123] CHIP:DMG:                                 
+          [1707924172.241553][42120:42123] CHIP:DMG:
           [1707924172.241555][42120:42123] CHIP:DMG:                         },
-          [1707924172.241560][42120:42123] CHIP:DMG:                         
+          [1707924172.241560][42120:42123] CHIP:DMG:
           [1707924172.241562][42120:42123] CHIP:DMG:                 },
-          [1707924172.241567][42120:42123] CHIP:DMG:                 
+          [1707924172.241567][42120:42123] CHIP:DMG:
           [1707924172.241573][42120:42123] CHIP:DMG:         ],
-          [1707924172.241577][42120:42123] CHIP:DMG:         
+          [1707924172.241577][42120:42123] CHIP:DMG:
           [1707924172.241579][42120:42123] CHIP:DMG:         InteractionModelRevision = 11
           [1707924172.241582][42120:42123] CHIP:DMG: },
       disabled: true
@@ -464,7 +464,7 @@ tests:
 
           [1707967219.637228][10723:10726] CHIP:TOO:   RetrieveLogsResponse: {
           [1707967219.637242][10723:10726] CHIP:TOO:     status: 2
-          [1707967219.637248][10723:10726] CHIP:TOO:     logContent: 
+          [1707967219.637248][10723:10726] CHIP:TOO:     logContent:
           [1707967219.637253][10723:10726] CHIP:TOO:    }
 
       disabled: true
@@ -478,20 +478,20 @@ tests:
           diagnosticlogs retrieve-logs-request 3 0 1 0 --TransferFileDesignator Length_1234567.txt
 
           On TH(chip-tool), Verify that the DUT responds with INVALID_COMMAND for the RetrieveLogsRequest that was sent invalid Intent(3)
-                                        
+
           [1707901794.468552][36124:36127] CHIP:DMG:                                 StatusIB =
           [1707901794.468560][36124:36127] CHIP:DMG:                                 {
           [1707901794.468569][36124:36127] CHIP:DMG:                                         status = 0x85 (INVALID_COMMAND),
           [1707901794.468576][36124:36127] CHIP:DMG:                                 },
-          [1707901794.468584][36124:36127] CHIP:DMG:                                 
+          [1707901794.468584][36124:36127] CHIP:DMG:
           [1707901794.468591][36124:36127] CHIP:DMG:                         },
 
           Repeat this step by setting RequestedProtocol as ResponsePayload :
-              
+
           diagnosticlogs retrieve-logs-request 3 1 1 0 --TransferFileDesignator Length_1234567.txt
 
           On TH(chip-tool), Verify that the DUT responds with INVALID_COMMAND for the RetrieveLogsRequest that was sent invalid Intent(3)
-                                      
+
           [1707901794.468552][36124:36127] CHIP:DMG:                                 StatusIB =
           [1707901794.468560][36124:36127] CHIP:DMG:                                 {
           [1707901794.468569][36124:36127] CHIP:DMG:                                         status = 0x85 (INVALID_COMMAND),
@@ -510,7 +510,7 @@ tests:
 
           707901794.468418][36124:36127] CHIP:DMG: InvokeResponseMessage =
           [1707901794.468425][36124:36127] CHIP:DMG: {
-          [1707901794.468433][36124:36127] CHIP:DMG:         suppressResponse = false, 
+          [1707901794.468433][36124:36127] CHIP:DMG:         suppressResponse = false,
           [1707901794.468440][36124:36127] CHIP:DMG:         InvokeResponseIBs =
           [1707901794.468452][36124:36127] CHIP:DMG:         [
           [1707901794.468459][36124:36127] CHIP:DMG:                 InvokeResponseIB =
@@ -523,18 +523,18 @@ tests:
           [1707901794.468518][36124:36127] CHIP:DMG:                                         ClusterId = 0x32,
           [1707901794.468526][36124:36127] CHIP:DMG:                                         CommandId = 0x0,
           [1707901794.468533][36124:36127] CHIP:DMG:                                 },
-          [1707901794.468545][36124:36127] CHIP:DMG:                                 
+          [1707901794.468545][36124:36127] CHIP:DMG:
           [1707901794.468552][36124:36127] CHIP:DMG:                                 StatusIB =
           [1707901794.468560][36124:36127] CHIP:DMG:                                 {
           [1707901794.468569][36124:36127] CHIP:DMG:                                         status = 0x85 (INVALID_COMMAND),
           [1707901794.468576][36124:36127] CHIP:DMG:                                 },
-          [1707901794.468584][36124:36127] CHIP:DMG:                                 
+          [1707901794.468584][36124:36127] CHIP:DMG:
           [1707901794.468591][36124:36127] CHIP:DMG:                         },
-          [1707901794.468602][36124:36127] CHIP:DMG:                         
+          [1707901794.468602][36124:36127] CHIP:DMG:
           [1707901794.468608][36124:36127] CHIP:DMG:                 },
-          [1707901794.468619][36124:36127] CHIP:DMG:                 
+          [1707901794.468619][36124:36127] CHIP:DMG:
           [1707901794.468624][36124:36127] CHIP:DMG:         ],
-          [1707901794.468635][36124:36127] CHIP:DMG:         
+          [1707901794.468635][36124:36127] CHIP:DMG:
       disabled: true
 
     - label:
@@ -559,14 +559,14 @@ tests:
 
           [1707967219.637228][10723:10726] CHIP:TOO:   RetrieveLogsResponse: {
           [1707967219.637242][10723:10726] CHIP:TOO:     status: 2
-          [1707967219.637248][10723:10726] CHIP:TOO:     logContent: 
+          [1707967219.637248][10723:10726] CHIP:TOO:     logContent:
           [1707967219.637253][10723:10726] CHIP:TOO:    }
 
           else if DUT responds with NoLogs(4) status code verify that LogContent field is empty
 
           [1719990173.360981][8053:8056] CHIP:TOO:   RetrieveLogsResponse: {
           [1719990173.361009][8053:8056] CHIP:TOO:     status: 4
-          [1719990173.361021][8053:8056] CHIP:TOO:     logContent: 
+          [1719990173.361021][8053:8056] CHIP:TOO:     logContent:
           [1719990173.361030][8053:8056] CHIP:TOO:    }
       disabled: true
 
@@ -584,7 +584,7 @@ tests:
           [1707904517.151453][36678:36681] CHIP:DMG: ICR moving to [ResponseRe]
           [1707904517.151489][36678:36681] CHIP:DMG: InvokeResponseMessage =
           [1707904517.151501][36678:36681] CHIP:DMG: {
-          [1707904517.151511][36678:36681] CHIP:DMG:         suppressResponse = false, 
+          [1707904517.151511][36678:36681] CHIP:DMG:         suppressResponse = false,
           [1707904517.151522][36678:36681] CHIP:DMG:         InvokeResponseIBs =
           [1707904517.151541][36678:36681] CHIP:DMG:         [
           [1707904517.151548][36678:36681] CHIP:DMG:                 InvokeResponseIB =
@@ -597,18 +597,18 @@ tests:
           [1707904517.151627][36678:36681] CHIP:DMG:                                         ClusterId = 0x32,
           [1707904517.151640][36678:36681] CHIP:DMG:                                         CommandId = 0x0,
           [1707904517.151652][36678:36681] CHIP:DMG:                                 },
-          [1707904517.151670][36678:36681] CHIP:DMG:                                 
+          [1707904517.151670][36678:36681] CHIP:DMG:
           [1707904517.151681][36678:36681] CHIP:DMG:                                 StatusIB =
           [1707904517.151696][36678:36681] CHIP:DMG:                                 {
           [1707904517.151708][36678:36681] CHIP:DMG:                                         status = 0x87 (CONSTRAINT_ERROR),
           [1707904517.151720][36678:36681] CHIP:DMG:                                 },
-          [1707904517.151734][36678:36681] CHIP:DMG:                                 
+          [1707904517.151734][36678:36681] CHIP:DMG:
           [1707904517.151745][36678:36681] CHIP:DMG:                         },
-          [1707904517.151763][36678:36681] CHIP:DMG:                         
+          [1707904517.151763][36678:36681] CHIP:DMG:
           [1707904517.151772][36678:36681] CHIP:DMG:                 },
-          [1707904517.151790][36678:36681] CHIP:DMG:                 
+          [1707904517.151790][36678:36681] CHIP:DMG:
           [1707904517.151798][36678:36681] CHIP:DMG:         ],
-          [1707904517.151816][36678:36681] CHIP:DMG:         
+          [1707904517.151816][36678:36681] CHIP:DMG:
           [1707904517.151824][36678:36681] CHIP:DMG:         InteractionModelRevision = 11
           [1707904517.151830][36678:36681] CHIP:DMG: },
       disabled: true
