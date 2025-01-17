@@ -34,7 +34,7 @@ DEFAULT_TARGETS = [
     "linux-x64-water-leak-detector-no-ble"
 ]
 DEFAULT_TESTS = ["TC_DeviceBasicComposition", "TC_DeviceConformance"]
-TMP_RESULTS_DIR = "/tmp/comformance_report"
+TMP_RESULTS_DIR = "/tmp/conformance_report"
 OUT_DIR = "./out"
 TEST_COMMAND = "scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py --app {} --factory-reset --app-args \"--trace-to json:log\" --script src/python_testing/{}.py --script-args \"--qr-code MT:-24J0AFN00KA0648G00\"'"
 BUILD_COMMAND = "python3 scripts/build/build_examples.py --ninja-jobs {} --target {} build"
