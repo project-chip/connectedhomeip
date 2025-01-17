@@ -70,7 +70,7 @@ protected:
 private:
     bool mAllocated = false;
 
-    // buffer may point to both allocated or re-used (e.g. from const arrays) buffers.
+    // buffer may point to either allocated or re-used (e.g. from const arrays) buffers.
     // buffer is assumed allocated if mAllocated is true.
     uint8_t * mBuffer = nullptr;
     size_t mElementSize;
