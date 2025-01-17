@@ -58,6 +58,7 @@ void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
         VerifyOrReturn(status == SL_STATUS_OK, ChipLogError(DeviceLayer, "failed to mask interrupt: %ld", status));
     }
 }
+
 /**
  * @brief Processing function when a button is triggered
  *

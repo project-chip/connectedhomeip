@@ -27,8 +27,9 @@
 #ifdef SL_WIFI
 #include <platform/silabs/wifi/WifiInterface.h>
 
+// TODO: We shouldn't need any platform specific includes in this file
 #ifdef WF200_WIFI
-#include <platform/silabs/wifi/sl_wfx_task.h>
+#include <platform/silabs/wifi/wf200/ncp/sl_wfx_task.h>
 #endif // WF200_WIFI
 #endif // SL_WIFI
 
@@ -44,6 +45,7 @@
 #include "MemMonitoring.h"
 #endif
 
+// TODO: We shouldn't need any platform specific includes in this file
 #if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1
 #include <platform/silabs/SiWx917/SiWxPlatformInterface.h>
 #include <platform/silabs/wifi/wiseconnect-interface/WiseconnectWifiInterface.h>
