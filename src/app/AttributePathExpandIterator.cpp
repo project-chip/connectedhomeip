@@ -135,7 +135,7 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
 
     if (mAttributeIndex == kInvalidIndex)
     {
-        // start a new iteration on the current endpoint
+        // start a new iteration of attributes on the current cluster path.
         mAttributes = mDataModelProvider->Attributes(mPosition.mOutputPath);
 
         if (mPosition.mOutputPath.mAttributeId != kInvalidAttributeId)
