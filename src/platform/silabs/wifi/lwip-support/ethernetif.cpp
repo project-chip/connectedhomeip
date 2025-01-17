@@ -67,6 +67,7 @@ StaticSemaphore_t xEthernetIfSemaBuffer;
 #define LWIP_FRAME_ALIGNMENT 60
 
 uint32_t gOverrunCount = 0;
+sl_status_t status     = 0;
 
 /*****************************************************************************
  * Variables
@@ -334,7 +335,6 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
 {
 #if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
     UNUSED_PARAMETER(netif);
-    sl_status_t status;
     status = sl_wifi_send_raw_data_frame(SL_WIFI_CLIENT_INTERFACE, (uint8_t *) p->payload, p->len);
     if (status != SL_STATUS_OK)
     {
@@ -346,7 +346,6 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     struct pbuf * q;
     uint16_t framelength = 0;
     uint16_t datalength  = 0;
-    int32_t status       = 0;
 #if WIFI_DEBUG_ENABLED
     ChipLogProgress(DeviceLayer, "LWIP : low_level_output");
 #endif
@@ -406,7 +405,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     status = wfx_rsi_send_data(packet, datalength);
     if (status != 0)
     {
-        ChipLogError(DeviceLayer, "*ERR*EN-RSI:Send fail: %d", status);
+        ChipLogError(DeviceLayer, "*ERR*EN-RSI:Send fail: %ld", status);
         xSemaphoreGive(ethout_sem);
         return ERR_IF;
     }
