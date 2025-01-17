@@ -19,6 +19,7 @@
 #include "chef-valve-configuration-and-control-delegate-impl.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
+#include <app/reporting/reporting.h>
 
 #ifdef MATTER_DM_PLUGIN_VALVE_CONFIGURATION_AND_CONTROL_SERVER
 
@@ -94,6 +95,7 @@ chefValveConfigurationAndControlWriteCallback(chip::EndpointId endpointId, chip:
             ChipLogError(DeviceLayer, "Unable to write RemainingDuration");
             return chip::Protocols::InteractionModel::Status::Failure;
         }
+        MatterReportingAttributeChangeCallback(endpointId, ValveConfigurationAndControl::Id, RemainingDuration::Id);
         break;
     }
     default:
