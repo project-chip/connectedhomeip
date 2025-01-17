@@ -80,7 +80,7 @@ chefValveConfigurationAndControlWriteCallback(chip::EndpointId endpointId, chip:
         std::memcpy(&newVal, buffer, sizeof(uint32_t));
         ChipLogProgress(DeviceLayer, "Setting RemainingDuration to %d", newVal);
         CHIP_ERROR err;
-        if (newVal == static_cast<utin32_t>(0xFFFF)) // Max value is interpreted as NULL
+        if (newVal == static_cast<uint32_t>(0xFFFF)) // Max value is interpreted as NULL
         {
             err = SetRemainingDurationNull(endpointId);
         }
