@@ -39,14 +39,12 @@ namespace ValveConfigurationAndControl {
 class DelegateImpl : public ValveConfigurationAndControl::Delegate
 {
 public:
-    DelegateImpl(){};
-
+    DelegateImpl()  = default;
+    ~DelegateImpl() = default;
     // shall return current level if supported, otherwise null
     DataModel::Nullable<chip::Percent> HandleOpenValve(DataModel::Nullable<chip::Percent> level) override;
     CHIP_ERROR HandleCloseValve() override;
     void HandleRemainingDurationTick(uint32_t duration) override;
-
-    ~DelegateImpl() = default;
 };
 
 void Shutdown();
