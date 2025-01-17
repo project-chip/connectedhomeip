@@ -34,7 +34,7 @@
 #include <app/GlobalAttributes.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/data-model-provider/MetadataList.h>
-#include <app/data-model-provider/MetadataSearch.h>
+#include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/StringBuilderAdapters.h>

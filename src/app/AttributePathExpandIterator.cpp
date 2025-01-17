@@ -17,7 +17,7 @@
 #include <app/AttributePathExpandIterator.h>
 
 #include <app/GlobalAttributes.h>
-#include <app/data-model-provider/MetadataSearch.h>
+#include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
