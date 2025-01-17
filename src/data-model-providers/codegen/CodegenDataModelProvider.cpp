@@ -126,7 +126,7 @@ CHIP_ERROR FetchAcceptedCommands(const ConcreteClusterPath & path, const EmberAf
 
     if ((serverCluster == nullptr) || (serverCluster->acceptedCommandList == nullptr))
     {
-        // No data if cluster is not valid.
+        // No data if cluster no cluster or cluster has no accepted commands
         return CHIP_NO_ERROR;
     }
     const chip::CommandId * endOfList = serverCluster->acceptedCommandList;
@@ -207,7 +207,8 @@ CHIP_ERROR FetchGeneratedCommands(const ConcreteClusterPath & path, const EmberA
 
     if ((serverCluster == nullptr) || (serverCluster->generatedCommandList == nullptr))
     {
-        return {};
+        // No data if cluster no cluster or cluster has no generated commands
+        return CHIP_NO_ERROR;
     }
     const chip::CommandId * endOfList = serverCluster->generatedCommandList;
     while (*endOfList != kInvalidCommandId)
