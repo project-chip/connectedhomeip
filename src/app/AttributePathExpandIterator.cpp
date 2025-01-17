@@ -140,7 +140,7 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
 
         if (mPosition.mOutputPath.mAttributeId != kInvalidAttributeId)
         {
-            // Position on the correct cluster if we have a start point
+            // Position on the correct attribute if we have a start point
             mAttributeIndex = 0;
             while ((mAttributeIndex < mAttributes.size()) &&
                    (mAttributes[mAttributeIndex].attributeId != mPosition.mOutputPath.mAttributeId))
