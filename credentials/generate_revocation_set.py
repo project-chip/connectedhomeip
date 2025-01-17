@@ -240,7 +240,10 @@ def generate_revocation_set_from_crl(crl_file: x509.CertificateRevocationList,
         except Exception:
             pass
 
-        serialnumber_list.append(bytes(str('{:02X}'.format(revoked_cert.serial_number)), 'utf-8').decode('utf-8'))
+        # ensuse serial number is always 2 byte aligned hex string
+        serialnumber = '{:02X}'.format(revoked_cert.serial_number)
+        serialnumber = serialnumber if len(serialnumber) % 2 == 0 else '0' + serialnumber
+        serialnumber_list.append(serialnumber)
 
     entry = {
         "type": "revocation_set",
