@@ -92,7 +92,10 @@ public:
     // we do not call destructors, just malloc things.
     // Note that classes should also be trivially assignable (we do NOT call the assignment operator)
     // This makes this class somewhat dangerous...
-    static_assert(std::is_destructible_v<T>);
+    //
+    // Note: ideally we would want `is_trivially_copyable_v` as well however our chip::Optional
+    //       implrmentation does not actually report that.
+    static_assert(std::is_trivially_destructible_v<T>);
 
     MetadataList() : GenericMetadataList(sizeof(T)) {}
     MetadataList(const MetadataList &)                   = delete;
