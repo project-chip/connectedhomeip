@@ -92,7 +92,7 @@ chefValveConfigurationAndControlWriteCallback(chip::EndpointId endpointId, chip:
         }
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "Unable to write RemainingDuration: %" CHIP_ERROR_FORMAT, err.format());
+            ChipLogError(DeviceLayer, "Unable to write RemainingDuration: %" CHIP_ERROR_FORMAT, err.Format());
             return chip::Protocols::InteractionModel::Status::Failure;
         }
         MatterReportingAttributeChangeCallback(endpointId, ValveConfigurationAndControl::Id,
@@ -128,7 +128,7 @@ chefValveConfigurationAndControlReadCallback(chip::EndpointId endpointId, chip::
         CHIP_ERROR err = GetRemainingDuration(endpointId, duration);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "Unable to read RemainingDuration: %" CHIP_ERROR_FORMAT, err.format());
+            ChipLogError(DeviceLayer, "Unable to read RemainingDuration: %" CHIP_ERROR_FORMAT, err.Format());
             return chip::Protocols::InteractionModel::Status::Failure;
         }
         // Max value is interpreted as NULL
