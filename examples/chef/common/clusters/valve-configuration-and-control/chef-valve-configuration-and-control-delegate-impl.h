@@ -65,4 +65,3 @@ chefValveConfigurationAndControlReadCallback(chip::EndpointId endpointId, chip::
                                              uint16_t maxReadLength);
 
 #endif // MATTER_DM_PLUGIN_VALVE_CONFIGURATION_AND_CONTROL_SERVER
-
