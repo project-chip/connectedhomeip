@@ -95,7 +95,8 @@ chefValveConfigurationAndControlWriteCallback(chip::EndpointId endpointId, chip:
             ChipLogError(DeviceLayer, "Unable to write RemainingDuration");
             return chip::Protocols::InteractionModel::Status::Failure;
         }
-        MatterReportingAttributeChangeCallback(endpointId, ValveConfigurationAndControl::Id, RemainingDuration::Id);
+        MatterReportingAttributeChangeCallback(endpointId, ValveConfigurationAndControl::Id,
+                                               ValveConfigurationAndControl::Attributes::RemainingDuration::Id);
         break;
     }
     default:
