@@ -50,7 +50,7 @@ private:
 /// Helps search for a specific server attribute in the given
 /// metadata provider.
 ///
-/// Facilitates the very common operation of "find a cluster with a given ID".
+/// Facilitates the very common operation of "find an attribute on a given attribute path".
 class AttributeFinder
 {
 public:
