@@ -170,7 +170,6 @@ CHIP_ERROR FetchGeneratedCommands(const ConcreteClusterPath & path, const EmberA
 
         if (err == CHIP_NO_ERROR)
         {
-            ReturnErrorOnFailure(result.Reserve(commandCount));
 
             using EnumerationData = struct
             {
@@ -179,6 +178,8 @@ CHIP_ERROR FetchGeneratedCommands(const ConcreteClusterPath & path, const EmberA
             };
             EnumerationData enumerationData;
             enumerationData.processingError = CHIP_NO_ERROR;
+
+            ReturnErrorOnFailure(enumerationData.generatedCommandList.Reserve(commandCount));
 
             ReturnErrorOnFailure(interface->EnumerateGeneratedCommands(
                 path,
