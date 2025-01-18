@@ -26,7 +26,12 @@
 
 #ifdef SL_WIFI
 #include <platform/silabs/wifi/WifiInterface.h>
-#endif /* SL_WIFI */
+
+// TODO: We shouldn't need any platform specific includes in this file
+#ifdef WF200_WIFI
+#include <platform/silabs/wifi/wf200/ncp/sl_wfx_task.h>
+#endif // WF200_WIFI
+#endif // SL_WIFI
 
 #if PW_RPC_ENABLED
 #include "Rpc.h"
@@ -40,6 +45,7 @@
 #include "MemMonitoring.h"
 #endif
 
+// TODO: We shouldn't need any platform specific includes in this file
 #if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1
 #include <platform/silabs/SiWx917/SiWxPlatformInterface.h>
 #include <platform/silabs/wifi/wiseconnect-interface/WiseconnectWifiInterface.h>
@@ -308,17 +314,15 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #ifdef SL_WIFI
 CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 {
+    // TODO: Platform specific init should not be required here
 #ifdef WF200_WIFI
     // Start wfx bus communication task.
     wfx_bus_start();
-#ifdef SL_WFX_USE_SECURE_LINK
-    // start securelink key renegotiation task
-    wfx_securelink_task_start();
-#endif // SL_WFX_USE_SECURE_LINK
 #endif // WF200_WIFI
 
+    // TODO: Platform specific init should not be required here
 #if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1
-    VerifyOrReturnError(sl_matter_wifi_platform_init() == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(InitSiWxWifi() == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
 #endif // SLI_SI91X_MCU_INTERFACE
 
     return CHIP_NO_ERROR;

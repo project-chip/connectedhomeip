@@ -45,6 +45,11 @@ constexpr uint8_t kWlanMaxRetryIntervalsInSec = 60;
 uint8_t retryInterval                         = kWlanMinRetryIntervalsInSec;
 osTimerId_t sRetryTimer;
 
+bool hasNotifiedIPV6 = false;
+#if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
+bool hasNotifiedIPV4 = false;
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
+
 /*
  * Notifications to the upper-layer
  * All done in the context of the RSI/WiFi task (rsi_if.c)
@@ -66,15 +71,19 @@ void RetryConnectionTimerHandler(void * arg)
 
 void NotifyIPv6Change(bool gotIPv6Addr)
 {
+    hasNotifiedIPV6 = gotIPv6Addr;
+
     sl_wfx_generic_message_t eventData = {};
     eventData.header.id                = gotIPv6Addr ? to_underlying(WifiEvent::kGotIPv6) : to_underlying(WifiEvent::kLostIP);
     eventData.header.length            = sizeof(eventData.header);
 
     HandleWFXSystemEvent(&eventData);
 }
-
+#if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
 void NotifyIPv4Change(bool gotIPv4Addr)
 {
+    hasNotifiedIPV4 = gotIPv4Addr;
+
     sl_wfx_generic_message_t eventData;
 
     memset(&eventData, 0, sizeof(eventData));
@@ -82,6 +91,7 @@ void NotifyIPv4Change(bool gotIPv4Addr)
     eventData.header.length = sizeof(eventData.header);
     HandleWFXSystemEvent(&eventData);
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
 
 void NotifyDisconnection(WifiDisconnectionReasons reason)
 {
@@ -106,6 +116,25 @@ void NotifyConnection(const MacAddress & ap)
     HandleWFXSystemEvent((sl_wfx_generic_message_t *) &evt);
 }
 
+bool HasNotifiedIPv6Change()
+{
+    return hasNotifiedIPV6;
+}
+
+#if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
+bool HasNotifiedIPv4Change()
+{
+    return hasNotifiedIPV4;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
+
+void ResetIPNotificationStates()
+{
+    hasNotifiedIPV6 = false;
+#if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
+    hasNotifiedIPV4 = false;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
+}
 /* Function to update */
 
 /***********************************************************************************
