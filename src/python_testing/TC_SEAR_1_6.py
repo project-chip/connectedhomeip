@@ -94,6 +94,17 @@ class TC_SEAR_1_6(MatterBaseTest):
                 asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
             self.app_pipe = self.app_pipe + str(app_pid)
 
+        attributes = Clusters.ServiceArea.Attributes
+
+        if not await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.SupportedAreas):
+            asserts.fail("Supported areas attribute required in attribute list to run test")
+
+        if not await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.SelectedAreas):
+            asserts.fail("Selected areas attribute required in attribute list to run test")
+
+        if not await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.Progress):
+            asserts.fail("Progress attribute required in attribute list to run test")
+
         self.print_step(1, "Commissioning, already done")
 
         # Ensure that the device is in the correct state
