@@ -89,6 +89,11 @@ struct WriteAttributeRequest : OperationRequest
     ConcreteDataAttributePath path; // NOTE: this also contains LIST operation options (i.e. "data" path type)
     BitFlags<WriteFlags> writeFlags;
 
+    // When markDirty is true, the attribute should be marked as dirty after this operation.
+    // When markDirty is false, the attribute should not be marked as dirty after this operation.
+    // When markDirty is nullopt, the attribute should be marked as dirty when its value changes beacuse of this operation.
+    std::optional<bool> markDirty;
+
     // The path of the previous successful write in the same write transaction, if any.
     //
     // In particular this means that a write to this path has succeeded before (i.e. it passed required ACL checks).
