@@ -231,7 +231,7 @@ DataModel::ServerClusterEntry ServerClusterEntryFrom(EndpointId endpointId, cons
     if (versionPtr == nullptr)
     {
 #if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        ChipLogError(AppServer, "Failed to get data version for %d/" ChipLogFormatMEI, static_cast<int>(endpointId),
+        ChipLogError(AppServer, "Failed to get data version for %d/" ChipLogFormatMEI, endpointId,
                      ChipLogValueMEI(cluster.clusterId));
 #endif
         entry.dataVersion = 0;
