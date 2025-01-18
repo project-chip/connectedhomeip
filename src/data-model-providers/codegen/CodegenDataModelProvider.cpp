@@ -193,7 +193,7 @@ CHIP_ERROR FetchGeneratedCommands(const ConcreteClusterPath & path, const EmberA
                     }
                     return Loop::Continue;
                 },
-                reinterpret_cast<void *>(&result)));
+                reinterpret_cast<void *>(&enumerationData)));
             ReturnErrorOnFailure(enumerationData.processingError);
 
             // the two invocations MUST return the same sizes.
