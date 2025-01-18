@@ -94,7 +94,7 @@ public:
     // This makes this class somewhat dangerous...
     //
     // Note: ideally we would want `is_trivially_copyable_v` as well however our chip::Optional
-    //       implrmentation does not actually report that.
+    //       implementation does not actually report that.
     static_assert(std::is_trivially_destructible_v<T>);
 
     MetadataList() : GenericMetadataList(sizeof(T)) {}
