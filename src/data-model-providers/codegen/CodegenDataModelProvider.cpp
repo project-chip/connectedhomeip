@@ -126,7 +126,7 @@ CHIP_ERROR FetchAcceptedCommands(const ConcreteClusterPath & path, const EmberAf
 
     if ((serverCluster == nullptr) || (serverCluster->acceptedCommandList == nullptr))
     {
-        // No data if cluster no cluster or cluster has no accepted commands
+        // No data if cluster does not exist or cluster has no accepted commands
         return CHIP_NO_ERROR;
     }
     const chip::CommandId * endOfList = serverCluster->acceptedCommandList;
