@@ -387,6 +387,7 @@ def python_tests(
             FABRIC_SYNC_APP: {
                 as_runner(f'out/{target_prefix}-fabric-sync-no-ble-no-wifi-ipv6only-clang-boringssl/fabric-sync')}
             LIGHTING_APP_NO_UNIQUE_ID: {as_runner(f'out/{target_prefix}-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang/chip-lighting-app')}
+            TERMS_AND_CONDITIONS_APP: {as_runner(f'out/{target_prefix}-terms-and-conditions/chip-terms-and-conditions-app')}
             TRACE_APP: out/trace_data/app-{{SCRIPT_BASE_NAME}}
             TRACE_TEST_JSON: out/trace_data/test-{{SCRIPT_BASE_NAME}}
             TRACE_TEST_PERFETTO: out/trace_data/test-{{SCRIPT_BASE_NAME}}
