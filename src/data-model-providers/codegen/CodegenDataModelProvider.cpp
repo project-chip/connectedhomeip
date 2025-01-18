@@ -207,7 +207,7 @@ CHIP_ERROR FetchGeneratedCommands(const ConcreteClusterPath & path, const EmberA
 
     if ((serverCluster == nullptr) || (serverCluster->generatedCommandList == nullptr))
     {
-        // No data if cluster no cluster or cluster has no generated commands
+        // No data if cluster does not exist or cluster has no generated commands
         return CHIP_NO_ERROR;
     }
     const chip::CommandId * endOfList = serverCluster->generatedCommandList;
