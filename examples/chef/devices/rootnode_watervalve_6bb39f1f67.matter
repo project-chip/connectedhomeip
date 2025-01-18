@@ -1777,8 +1777,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_powersource = 66, version 1;
-  device type ma_water_valve = 17, version 1;
+  device type ma_powersource = 17, version 1;
+  device type ma_water_valve = 66, version 1;
 
 
   server cluster Identify {
@@ -1830,14 +1830,17 @@ endpoint 1 {
 
   server cluster ValveConfigurationAndControl {
     ram      attribute openDuration;
-    ram      attribute defaultOpenDuration;
+    ram      attribute defaultOpenDuration default = 100;
     callback attribute remainingDuration;
     ram      attribute currentState;
     ram      attribute targetState;
+    ram      attribute currentLevel;
+    ram      attribute targetLevel;
+    ram      attribute defaultOpenLevel default = 100;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
 
     handle command Open;
