@@ -50,6 +50,10 @@ bool IsDescendantOf(const DataModel::EndpointEntry * __restrict__ childEndpoint,
 
         VerifyOrReturnValue(childEndpoint != nullptr, false);
         VerifyOrReturnValue(childEndpoint->parentId != parentId, true);
+
+        // Parent endpoint id 0 is never here: EndpointEntry::parentId uses
+        // kInvalidEndpointId to reference no explicit endpoint. See `EndpointEntry`
+        // comments.
         VerifyOrReturnValue(childEndpoint->parentId != kInvalidEndpointId, false);
 
         const auto lookupId = childEndpoint->parentId;
@@ -172,11 +176,10 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
             }
             return CHIP_NO_ERROR;
         });
-        // NOTE: no default to enforce that we handle all possible composition patterns.
-    default:
-        // unreachable: all variants should be handled above
-        chipDie();
     }
+    // not actually reachable and compiler will validate we
+    // handle all switch cases above
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)

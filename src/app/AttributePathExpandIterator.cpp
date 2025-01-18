@@ -130,6 +130,9 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
 {
     if (mPosition.mOutputPath.mAttributeId == kInvalidAttributeId)
     {
+        // Attribute ID is tied to attribute index. If no attribute id available yet
+        // this means index is invalid. Processing logic in output advance only resets
+        // attribute ID to invalid when resetting iteration.
         mAttributeIndex = kInvalidIndex;
     }
 
@@ -210,6 +213,9 @@ std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()
 {
     if (mPosition.mOutputPath.mClusterId == kInvalidClusterId)
     {
+        // Cluster ID is tied to cluster index. If no cluster id available yet
+        // this means index is invalid. Processing logic in output advance only resets
+        // cluster ID to invalid when resetting iteration.
         mClusterIndex = kInvalidIndex;
     }
 
