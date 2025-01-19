@@ -27,7 +27,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/data-model-provider/MetadataTypes.h>
-#include <app/util/attribute-storage.h>
+#include <app/util/ember-api.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>

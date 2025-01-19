@@ -75,3 +75,11 @@ source_set("callbacks") {
     "${chip_root}/src/app:paths",
   ]
 }
+
+source_set("binding-table-headers") {
+  sources = [ "binding-table.h" ]
+}
+
+source_set("ember-api-headers") {
+  sources = [ "ember-api.h" ]
+}
