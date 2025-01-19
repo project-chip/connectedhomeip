@@ -241,7 +241,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
             // We can't reallocate mExtraReadPaths yet as this would free the old buffer,
             // and the caller might be passing a sub-span of the old paths.
             decltype(mExtraReadPaths) oldReadPaths(std::move(mExtraReadPaths));
-            VerifyOrReturnError(mExtraReadPaths.Alloc(extraReadPaths.size()).Get() != nullptr, CHIP_ERROR_NO_MEMORY);
+            VerifyOrReturnError(mExtraReadPaths.Alloc(extraReadPaths.size()), CHIP_ERROR_NO_MEMORY);
             memcpy(mExtraReadPaths.Get(), extraReadPaths.data(), extraReadPaths.size() * sizeof(ReadPath));
         }
 
