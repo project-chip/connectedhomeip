@@ -45,7 +45,7 @@ MTR_DIRECT_MEMBERS
 
 - (NSString *)name
 {
-    return const_cast<NSString *>(_meta->name);
+    return _meta->name;
 }
 
 - (BOOL)isUtility

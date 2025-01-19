@@ -164,6 +164,7 @@ MTR_DIRECT_MEMBERS
         NSArray<MTRDescriptorClusterDeviceTypeStruct *> * deviceTypeList = MTRDecodeAttributeValue(path, *cache, &err);
         if (!deviceTypeList) {
             MTR_LOG_ERROR("Ignoring invalid DeviceTypeList for endpoint %u: %" CHIP_ERROR_FORMAT, path.mEndpointId, err.Format());
+            // proceed with deviceTypeList == nil, equivalent to an empty list
         }
 
         NSMutableArray * deviceTypes = [[NSMutableArray alloc] initWithCapacity:deviceTypeList.count];
