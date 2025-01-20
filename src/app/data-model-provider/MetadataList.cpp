@@ -90,7 +90,7 @@ CHIP_ERROR GenericAppendOnlyBuffer::EnsureAppendCapacity(size_t numElements)
 
     // we already have the data in buffer. we have two choices:
     //   - allocated buffer needs to be extended
-    //   - re-used const buffer neext to be copied over
+    //   - re-used const buffer needs to be copied over
     if (mBufferIsAllocated)
     {
         auto new_buffer = static_cast<uint8_t *>(Platform::MemoryRealloc(mBuffer, (mElementCount + numElements) * mElementSize));

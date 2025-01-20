@@ -255,7 +255,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
 
         InteractionModelEngine::GetInstance()->GetDataModelProvider()->AcceptedCommands(
             ConcreteClusterPath(mEndpointId, OperationalState::Id), builder);
-        auto acceptedCommands = builder.Build();
+        auto acceptedCommands = acceptedCommandsList.TakeBuffer();
 
         bool commandExists =
             std::find_if(acceptedCommands.begin(), acceptedCommands.end(), [](const DataModel::AcceptedCommandEntry & entry) {
