@@ -15,7 +15,6 @@
  */
 #include <app/data-model-provider/MetadataList.h>
 
-#include <cassert>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>

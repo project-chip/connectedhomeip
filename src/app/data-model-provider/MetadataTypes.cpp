@@ -15,8 +15,9 @@
  *    limitations under the License.
  */
 
-#include "app/data-model-provider/MetadataList.h"
 #include <app/data-model-provider/MetadataTypes.h>
+
+#include <app/data-model-provider/MetadataList.h>
 
 namespace chip {
 namespace app {
