@@ -137,7 +137,6 @@ CHIP_ERROR GenericAppendOnlyBuffer::ReferenceExistingElementArrayRaw(const void 
         mBuffer       = const_cast<uint8_t *>(static_cast<const uint8_t *>(buffer));
         mElementCount = numElements;
         // The assertions below are because we know the buffer is null/not allocated yet
-        // Not included because these seem to affect flash size surprisingly enough...
         VerifyOrDie(mCapacity == 0);
         VerifyOrDie(!mBufferIsAllocated);
         return CHIP_NO_ERROR;
