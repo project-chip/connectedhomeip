@@ -254,10 +254,10 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         return ReadDeviceAttribute(aPath.mEndpointId, aEncoder);
     }
     case ServerList::Id: {
-        return ReadClientClusters(aPath.mEndpointId, aEncoder);
+        return ReadServerClusters(aPath.mEndpointId, aEncoder);
     }
     case ClientList::Id: {
-        return ReadServerClusters(aPath.mEndpointId, aEncoder);
+        return ReadClientClusters(aPath.mEndpointId, aEncoder);
     }
     case PartsList::Id: {
         return ReadPartsAttribute(aPath.mEndpointId, aEncoder);
