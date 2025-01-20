@@ -226,10 +226,10 @@ CHIP_ERROR DescriptorAttrAccess::ReadServerClusters(EndpointId endpoint, Attribu
 
 CHIP_ERROR DescriptorAttrAccess::ReadClientClusters(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    DataModel::ListBuilder<ClusterId> builder;
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->ClientClusters(endpoint, builder));
-    return aEncoder.EncodeList([&builder](const auto & encoder) -> CHIP_ERROR {
-        for (auto & id : builder.TakeBuffer())
+    DataModel::ListBuilder<ClusterId> clusterIdList;
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->ClientClusters(endpoint, clusterIdList));
+    return aEncoder.EncodeList([&clusterIdList](const auto & encoder) -> CHIP_ERROR {
+        for (const auto & id : clusterIdList.TakeBuffer())
         {
             ReturnErrorOnFailure(encoder.Encode(id));
         }
