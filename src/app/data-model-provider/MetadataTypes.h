@@ -189,9 +189,9 @@ public:
 
     // "conveneience" functions that just return the data and ignore the error
     // This returns the builder as-is even after the error (e.g. not found would return empty data)
-    ScopedSpan<EndpointEntry> EndpointsIgnoreError();
-    ScopedSpan<ServerClusterEntry> ServerClustersIgnoreError(EndpointId endpointId);
-    ScopedSpan<AttributeEntry> AttributesIgnoreError(const ConcreteClusterPath & path);
+    ReadOnlyBuffer<EndpointEntry> EndpointsIgnoreError();
+    ReadOnlyBuffer<ServerClusterEntry> ServerClustersIgnoreError(EndpointId endpointId);
+    ReadOnlyBuffer<AttributeEntry> AttributesIgnoreError(const ConcreteClusterPath & path);
 };
 
 } // namespace DataModel

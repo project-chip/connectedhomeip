@@ -910,7 +910,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverEndpoints)
 
     ASSERT_EQ(model.Endpoints(endpointsBuilder), CHIP_NO_ERROR);
 
-    auto endpoints = endpointsBuilder.Build();
+    auto endpoints = endpointsBuilder.TakeBuffer();
 
     ASSERT_EQ(endpoints.size(), 3u);
 
@@ -943,7 +943,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverServerClusters)
 
     // mock endpoint 1 has 2 mock clusters: 1 and 2
     EXPECT_EQ(model.ServerClusters(kMockEndpoint1, builder), CHIP_NO_ERROR);
-    auto serverClusters = builder.Build();
+    auto serverClusters = builder.TakeBuffer();
     ASSERT_EQ(serverClusters.size(), 2u);
 
     EXPECT_EQ(serverClusters[0].clusterId, MockClusterId(1));
@@ -957,14 +957,14 @@ TEST_F(TestCodegenModelViaMocks, IterateOverServerClusters)
     chip::Test::BumpVersion();
 
     EXPECT_EQ(model.ServerClusters(kMockEndpoint1, builder), CHIP_NO_ERROR);
-    serverClusters = builder.Build();
+    serverClusters = builder.TakeBuffer();
     ASSERT_EQ(serverClusters.size(), 2u);
     EXPECT_EQ(serverClusters[0].dataVersion, 1u);
     EXPECT_EQ(serverClusters[1].dataVersion, 1u);
 
     // mock endpoint 3 has 4 mock clusters: 1 through 4
     EXPECT_EQ(model.ServerClusters(kMockEndpoint3, builder), CHIP_NO_ERROR);
-    serverClusters = builder.Build();
+    serverClusters = builder.TakeBuffer();
     ASSERT_EQ(serverClusters.size(), 4u);
     EXPECT_EQ(serverClusters[0].clusterId, MockClusterId(1));
     EXPECT_EQ(serverClusters[1].clusterId, MockClusterId(2));
@@ -986,14 +986,14 @@ TEST_F(TestCodegenModelViaMocks, IterateOverClientClusters)
 
     // mock endpoint 1 has 2 mock client clusters: 3 and 4
     EXPECT_EQ(model.ClientClusters(kMockEndpoint1, builder), CHIP_NO_ERROR);
-    auto clientClusters = builder.Build();
+    auto clientClusters = builder.TakeBuffer();
 
     const ClusterId kExpectedClusters1[] = { MockClusterId(3), MockClusterId(4) };
     ASSERT_TRUE(clientClusters.data_equal(Span<const ClusterId>(kExpectedClusters1)));
 
     // mock endpoint 2 has 1 mock client clusters: 3(has server side at the same time) and 4
     EXPECT_EQ(model.ClientClusters(kMockEndpoint2, builder), CHIP_NO_ERROR);
-    clientClusters = builder.Build();
+    clientClusters = builder.TakeBuffer();
 
     const ClusterId kExpectedClusters2[] = { MockClusterId(3), MockClusterId(4) };
     ASSERT_TRUE(clientClusters.data_equal(Span<const ClusterId>(kExpectedClusters2)));
@@ -1020,7 +1020,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAttributes)
     ASSERT_EQ(model.Attributes(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId), builder), CHIP_ERROR_NOT_FOUND);
 
     EXPECT_EQ(model.Attributes(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)), builder), CHIP_NO_ERROR);
-    auto attributes = builder.Build();
+    auto attributes = builder.TakeBuffer();
     ASSERT_EQ(attributes.size(), 4u);
 
     ASSERT_EQ(attributes[0].attributeId, ClusterRevision::Id);
@@ -1113,7 +1113,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
     ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)), builder), CHIP_NO_ERROR);
     ASSERT_EQ(builder.Size(), 3u);
 
-    auto cmds = builder.Build();
+    auto cmds = builder.TakeBuffer();
 
     // took ownership
     ASSERT_EQ(builder.Size(), 0u);
@@ -1145,13 +1145,13 @@ TEST_F(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
 
     // should be able to iterate over valid paths
     ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)), builder), CHIP_NO_ERROR);
-    auto cmds = builder.Build();
+    auto cmds = builder.TakeBuffer();
 
     const CommandId expectedCommands2[] = { 2, 10 };
     ASSERT_TRUE(cmds.data_equal(Span<const CommandId>(expectedCommands2)));
 
     ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(3)), builder), CHIP_NO_ERROR);
-    cmds                                = builder.Build();
+    cmds                                = builder.TakeBuffer();
     const CommandId expectedCommands3[] = { 4, 6 };
     ASSERT_TRUE(cmds.data_equal(Span<const CommandId>(expectedCommands3)));
 }
@@ -1191,14 +1191,14 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
     handler.GeneratedVec().push_back(33);
 
     ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), acceptedBuilder), CHIP_NO_ERROR);
-    auto acceptedCommands = acceptedBuilder.Build();
+    auto acceptedCommands = acceptedBuilder.TakeBuffer();
 
     ASSERT_EQ(acceptedCommands.size(), 2u);
     ASSERT_EQ(acceptedCommands[0].commandId, 1234u);
     ASSERT_EQ(acceptedCommands[1].commandId, 999u);
 
     ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), generatedBuilder), CHIP_NO_ERROR);
-    auto generatedCommands                      = generatedBuilder.Build();
+    auto generatedCommands                      = generatedBuilder.TakeBuffer();
     const CommandId expectedGeneratedCommands[] = { 33 };
     ASSERT_TRUE(generatedCommands.data_equal(Span<const CommandId>(expectedGeneratedCommands)));
 }
@@ -2451,7 +2451,7 @@ TEST_F(TestCodegenModelViaMocks, DeviceTypeIteration)
     // Mock endpoint 1 has 3 device types
     DataModel::ListBuilder<DataModel::DeviceTypeEntry> builder;
     ASSERT_EQ(model.DeviceTypes(kMockEndpoint1, builder), CHIP_NO_ERROR);
-    auto deviceTypes = builder.Build();
+    auto deviceTypes = builder.TakeBuffer();
     ASSERT_EQ(deviceTypes.size(), 3u);
 
     const DeviceTypeEntry expected1[] = {
@@ -2467,7 +2467,7 @@ TEST_F(TestCodegenModelViaMocks, DeviceTypeIteration)
     // Mock endpoint 2 has 1 device types
     ASSERT_TRUE(builder.IsEmpty()); // ownership taken above, we start fresh
     ASSERT_EQ(model.DeviceTypes(kMockEndpoint2, builder), CHIP_NO_ERROR);
-    deviceTypes = builder.Build();
+    deviceTypes = builder.TakeBuffer();
     ASSERT_EQ(deviceTypes.size(), 1u);
     const DeviceTypeEntry expected2 = { .deviceTypeId = kDeviceTypeId2, .deviceTypeRevision = kDeviceTypeId2Version };
     ASSERT_EQ(deviceTypes[0], expected2);
@@ -2476,7 +2476,7 @@ TEST_F(TestCodegenModelViaMocks, DeviceTypeIteration)
     ASSERT_TRUE(builder.IsEmpty()); // ownership taken above, we start fresh
     ASSERT_EQ(model.DeviceTypes(kMockEndpoint3, builder), CHIP_NO_ERROR);
     ASSERT_TRUE(builder.IsEmpty());
-    ASSERT_TRUE(builder.Build().empty());
+    ASSERT_TRUE(builder.TakeBuffer().empty());
 }
 
 TEST_F(TestCodegenModelViaMocks, SemanticTagIteration)
@@ -2487,13 +2487,13 @@ TEST_F(TestCodegenModelViaMocks, SemanticTagIteration)
     DataModel::ListBuilder<Provider::SemanticTag> builder;
     ASSERT_EQ(model.SemanticTags(kMockEndpoint2, builder), CHIP_NO_ERROR);
     ASSERT_TRUE(builder.IsEmpty());
-    auto tags = builder.Build();
+    auto tags = builder.TakeBuffer();
     ASSERT_TRUE(tags.empty());
 
     // Mock endpoint 1 has 3 semantic tags
     ASSERT_EQ(model.SemanticTags(kMockEndpoint1, builder), CHIP_NO_ERROR);
     ASSERT_EQ(builder.Size(), 3u);
-    tags = builder.Build();
+    tags = builder.TakeBuffer();
     ASSERT_EQ(tags.size(), 3u);
     ASSERT_TRUE(builder.IsEmpty()); // ownership taken
 

@@ -23,27 +23,27 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
-ScopedSpan<EndpointEntry> ProviderMetadataTree::EndpointsIgnoreError()
+ReadOnlyBuffer<EndpointEntry> ProviderMetadataTree::EndpointsIgnoreError()
 {
 
     ListBuilder<EndpointEntry> builder;
     (void) Endpoints(builder);
-    return builder.Build();
+    return builder.TakeBuffer();
 }
 
-ScopedSpan<ServerClusterEntry> ProviderMetadataTree::ServerClustersIgnoreError(EndpointId endpointId)
+ReadOnlyBuffer<ServerClusterEntry> ProviderMetadataTree::ServerClustersIgnoreError(EndpointId endpointId)
 {
 
     ListBuilder<ServerClusterEntry> builder;
     (void) ServerClusters(endpointId, builder);
-    return builder.Build();
+    return builder.TakeBuffer();
 }
 
-ScopedSpan<AttributeEntry> ProviderMetadataTree::AttributesIgnoreError(const ConcreteClusterPath & path)
+ReadOnlyBuffer<AttributeEntry> ProviderMetadataTree::AttributesIgnoreError(const ConcreteClusterPath & path)
 {
     ListBuilder<AttributeEntry> builder;
     (void) Attributes(path, builder);
-    return builder.Build();
+    return builder.TakeBuffer();
 }
 
 } // namespace DataModel

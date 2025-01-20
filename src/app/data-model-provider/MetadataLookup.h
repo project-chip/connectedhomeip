@@ -44,7 +44,7 @@ public:
 private:
     ProviderMetadataTree * mProvider;
     EndpointId mEndpointId = kInvalidEndpointId;
-    ScopedSpan<ServerClusterEntry> mClusterEntries;
+    ReadOnlyBuffer<ServerClusterEntry> mClusterEntries;
 };
 
 /// Helps search for a specific server attribute in the given
@@ -61,7 +61,7 @@ public:
 private:
     ProviderMetadataTree * mProvider;
     ConcreteClusterPath mClusterPath;
-    ScopedSpan<AttributeEntry> mAttributes;
+    ReadOnlyBuffer<AttributeEntry> mAttributes;
 };
 
 /// Helps search for a specific server endpoint in the given
@@ -76,7 +76,7 @@ public:
 
 private:
     ProviderMetadataTree * mProvider;
-    ScopedSpan<EndpointEntry> mEndpoints;
+    ReadOnlyBuffer<EndpointEntry> mEndpoints;
 };
 
 } // namespace DataModel

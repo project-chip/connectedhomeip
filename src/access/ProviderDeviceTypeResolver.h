@@ -35,7 +35,7 @@ public:
     {
         app::DataModel::ListBuilder<app::DataModel::DeviceTypeEntry> builder;
         (void) mModelGetter()->DeviceTypes(endpoint, builder);
-        for (auto & type : builder.Build())
+        for (auto & type : builder.TakeBuffer())
         {
             if (type.deviceTypeId == deviceType)
             {

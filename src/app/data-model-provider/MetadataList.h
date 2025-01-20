@@ -113,16 +113,16 @@ private:
 } // namespace detail
 
 template <typename T>
-class ScopedSpan : public Span<const T>, detail::ScopedBuffer
+class ReadOnlyBuffer : public Span<const T>, detail::ScopedBuffer
 {
 public:
-    ScopedSpan() : ScopedBuffer(nullptr) {}
-    ScopedSpan(const T * buffer, size_t size, bool allocated) :
+    ReadOnlyBuffer() : ScopedBuffer(nullptr) {}
+    ReadOnlyBuffer(const T * buffer, size_t size, bool allocated) :
         Span<const T>(buffer, size), ScopedBuffer(allocated ? const_cast<void *>(static_cast<const void *>(buffer)) : nullptr)
     {}
-    ~ScopedSpan() = default;
+    ~ReadOnlyBuffer() = default;
 
-    ScopedSpan & operator=(ScopedSpan && other)
+    ReadOnlyBuffer & operator=(ReadOnlyBuffer && other)
     {
         *static_cast<Span<const T> *>(this) = other;
         *static_cast<ScopedBuffer *>(this)  = std::move(other);
@@ -173,14 +173,14 @@ public:
 
     /// Once a list is built, the data is taken as a scoped SPAN that owns its data
     /// and the original list is cleared
-    ScopedSpan<T> Build()
+    ReadOnlyBuffer<T> TakeBuffer()
     {
         void * buffer;
         size_t size;
         bool allocated;
         ReleaseBuffer(buffer, size, allocated);
 
-        return ScopedSpan<T>(static_cast<const T *>(buffer), size, allocated);
+        return ReadOnlyBuffer<T>(static_cast<const T *>(buffer), size, allocated);
     }
 };
 

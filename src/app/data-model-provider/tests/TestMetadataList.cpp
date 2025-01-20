@@ -83,16 +83,16 @@ TEST_F(TestMetadataList, ListBuilderWorks)
     ListBuilder<IdAndValue<int>> list2 = std::move(list1);
 
     // Moved-from list is "empty", un-Metadata and span is empty.
-    EXPECT_EQ(list1.Size(), 0u);        // NOLINT(bugprone-use-after-move)
-    EXPECT_TRUE(list1.IsEmpty());       // NOLINT(bugprone-use-after-move)
-    EXPECT_TRUE(list1.Build().empty()); // NOLINT(bugprone-use-after-move)
+    EXPECT_EQ(list1.Size(), 0u);             // NOLINT(bugprone-use-after-move)
+    EXPECT_TRUE(list1.IsEmpty());            // NOLINT(bugprone-use-after-move)
+    EXPECT_TRUE(list1.TakeBuffer().empty()); // NOLINT(bugprone-use-after-move)
 
     // Moved-to list has storage.
     EXPECT_EQ(list2.Size(), 3u);
     EXPECT_FALSE(list2.IsEmpty());
 
     // A span can be obtained over the list.
-    auto contents = list2.Build();
+    auto contents = list2.TakeBuffer();
     EXPECT_EQ(contents.size(), 3u);
 
     // contents takes ownersip of the list and clears it (and has no capacity)
@@ -120,7 +120,7 @@ TEST_F(TestMetadataList, ListBuilderConvertersWorks)
         auto list2 = std::move(list);
         EXPECT_EQ(list.Size(), 0u); // NOLINT(bugprone-use-after-move)
 
-        auto list2Span = list2.Build();
+        auto list2Span = list2.TakeBuffer();
         EXPECT_TRUE(list2.IsEmpty()); // took over
         EXPECT_EQ(list2Span.size(), 3u);
         EXPECT_EQ(list2Span[0], 1);
@@ -138,7 +138,7 @@ TEST_F(TestMetadataList, ListBuilderConvertersWorks)
         auto list2 = std::move(list);
         EXPECT_EQ(list.Size(), 0u); // NOLINT(bugprone-use-after-move)
 
-        auto list2Span = list2.Build();
+        auto list2Span = list2.TakeBuffer();
         EXPECT_TRUE(list2.IsEmpty()); // took over
         EXPECT_EQ(list2Span.size(), 6u);
         EXPECT_EQ(list2Span[0], 1);
@@ -165,7 +165,7 @@ TEST_F(TestMetadataList, ListBuilderConvertersWorks)
         auto list2 = std::move(list);
         EXPECT_EQ(list.Size(), 0u); // NOLINT(bugprone-use-after-move)
 
-        auto list2Span = list2.Build();
+        auto list2Span = list2.TakeBuffer();
         EXPECT_TRUE(list2.IsEmpty()); // took over
         EXPECT_EQ(list2Span.size(), 5u);
         EXPECT_EQ(list2Span[0], 10);
@@ -191,7 +191,7 @@ TEST_F(TestMetadataList, ListBuilderConvertersWorks)
         auto list2 = std::move(list);
         EXPECT_EQ(list.Size(), 0u); // NOLINT(bugprone-use-after-move)
 
-        auto list2Span = list2.Build();
+        auto list2Span = list2.TakeBuffer();
         EXPECT_TRUE(list2.IsEmpty()); // took over
         EXPECT_EQ(list2Span.size(), 7u);
         EXPECT_EQ(list2Span[0], 10);

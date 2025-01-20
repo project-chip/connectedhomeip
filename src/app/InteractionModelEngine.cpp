@@ -1792,7 +1792,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
 
     DataModel::ListBuilder<DataModel::AcceptedCommandEntry> builder;
     (void) provider->AcceptedCommands(aCommandPath, builder);
-    for (auto & existing : builder.Build())
+    for (auto & existing : builder.TakeBuffer())
     {
         if (existing.commandId == aCommandPath.mCommandId)
         {
