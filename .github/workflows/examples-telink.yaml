@@ -71,7 +71,7 @@ jobs:
                 gh-context: ${{ toJson(github) }}
 
             - name: Update Zephyr to specific revision (for developers purpose)
-              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py a7da81c749aa3fba2e97089d62cd5bf04c7b4680"
+              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 10c1c1cbee585531c7c1e09cd855b3d63b697a9e"
 
             - name: Build example Telink (B92 retention) Air Quality Sensor App
               # Run test for master and s07641069 PRs
@@ -202,6 +202,17 @@ jobs:
                     /tmp/bloat_reports/
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
+
+              - name: Build example Telink (TL7218 retention) Light Switch App with OTA (LZMA), Factory Data
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tl7218_retention-light-switch-ota-compress-lzma-factory-data' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tl7218_retention light-switch-app-ota-compress-lzma-factory-data \
+                    out/telink-tl7218_retention-light-switch-ota-compress-lzma-factory-data/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
 
             - name: Build example Telink (B92) Light Switch App with OTA (LZMA), Shell, Factory Data, 4Mb flash
               # Run test for master and all PRs

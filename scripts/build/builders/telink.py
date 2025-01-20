@@ -123,6 +123,7 @@ class TelinkBoard(Enum):
     TLSR9258A_RETENTION = auto()
     TL3218 = auto()
     TL7218 = auto()
+    TL7218_RETENTION = auto()
 
     def GnArgName(self):
         if self == TelinkBoard.TLRS9118BDK40D:
@@ -141,6 +142,8 @@ class TelinkBoard(Enum):
             return 'tl3218'
         elif self == TelinkBoard.TL7218:
             return 'tl7218'
+        elif self == TelinkBoard.TL7218_RETENTION:
+            return 'tl7218_retention'
         else:
             raise Exception('Unknown board type: %r' % self)
 
