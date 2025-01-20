@@ -157,7 +157,7 @@ def BuildHostTarget():
 
     target.AppendFixedTargets(app_parts)
 
-    target.AppendModifier('nodeps', enable_ble=False, enable_wifi=False, enable_thread=False,
+    target.AppendModifier('nodeps', enable_ble=False, enable_wifi=False, enable_thread=False, enable_nfc_commissioning=False,
                           crypto_library=HostCryptoLibrary.MBEDTLS, use_clang=True).ExceptIfRe('-(clang|noble|boringssl|mbedtls)')
 
     target.AppendModifier('nlfaultinject', use_nl_fault_injection=True)
@@ -170,6 +170,7 @@ def BuildHostTarget():
         'no-interactive', interactive_mode=False).OnlyIfRe('-chip-tool')
     target.AppendModifier("ipv6only", enable_ipv4=False)
     target.AppendModifier("no-ble", enable_ble=False)
+    target.AppendModifier("no-nfc", enable_nfc_commissioning=False)
     target.AppendModifier("no-wifi", enable_wifi=False)
     target.AppendModifier("no-thread", enable_thread=False)
     target.AppendModifier('no-shell', disable_shell=True)
