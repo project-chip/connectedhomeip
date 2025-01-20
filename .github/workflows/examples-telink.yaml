@@ -58,7 +58,7 @@ jobs:
                 gh-context: ${{ toJson(github) }}
 
             - name: Update Zephyr to specific revision (for developers purpose)
-              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py b6355f59ed78a1a735e9c4c97434ec95f4a27c0a"
+              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 3186756b6338a3b1cad5b86037f3c5331ba8b4a8"
 
             - name: Build example Telink (B92 retention) Air Quality Sensor App
               # Run test for master and s07641069 PRs
