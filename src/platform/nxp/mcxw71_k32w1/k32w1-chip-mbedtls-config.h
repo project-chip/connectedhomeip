@@ -71,7 +71,6 @@
 #define MBEDTLS_X509_CRT_PARSE_C
 #endif
 
-
 #define MBEDTLS_MPI_WINDOW_SIZE 1       /**< Maximum windows size used. */
 #define MBEDTLS_MPI_MAX_SIZE 32         /**< Maximum number of bytes for usable MPIs. */
 #define MBEDTLS_ECP_MAX_BITS 256        /**< Maximum bit size of groups */
