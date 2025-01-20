@@ -252,9 +252,9 @@ void ApplicationInit()
     ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationInit()");
 
     MatterEcosystemInformationPluginServerInitCallback();
-    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&bridge::gAdministratorCommissioningCommandHandler);
-    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&bridge::gBridgedDeviceInformationCommandHandler);
-    AttributeAccessInterfaceRegistry::Instance().Register(&bridge::gBridgedDeviceBasicInformationAttributes);
+    VerifyOrDie(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&bridge::gAdministratorCommissioningCommandHandler) == CHIP_NO_ERROR);
+    VerifyOrDie(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&bridge::gBridgedDeviceInformationCommandHandler) == CHIP_NO_ERROR);
+    VerifyOrDie(AttributeAccessInterfaceRegistry::Instance().Register(&bridge::gBridgedDeviceBasicInformationAttributes));
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
     bridge::SetRpcRemoteServerPort(gFabricAdminServerPort);
