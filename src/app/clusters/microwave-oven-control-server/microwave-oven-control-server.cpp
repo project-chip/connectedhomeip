@@ -16,6 +16,7 @@
  *
  */
 
+#include "app/data-model-provider/MetadataList.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -249,15 +250,17 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
 
     if (startAfterSetting.HasValue())
     {
-        DataModel::MetadataList<DataModel::AcceptedCommandEntry> acceptedCommands =
-            InteractionModelEngine::GetInstance()->GetDataModelProvider()->AcceptedCommands(
-                ConcreteClusterPath(mEndpointId, OperationalState::Id));
-        Span<const DataModel::AcceptedCommandEntry> acceptedCommandsSpan = acceptedCommands.GetSpanValidForLifetime();
 
-        bool commandExists = std::find_if(acceptedCommandsSpan.begin(), acceptedCommandsSpan.end(),
-                                          [](const DataModel::AcceptedCommandEntry & entry) {
-                                              return entry.commandId == OperationalState::Commands::Start::Id;
-                                          }) != acceptedCommandsSpan.end();
+        DataModel::ListBuilder<DataModel::AcceptedCommandEntry> builder;
+
+        InteractionModelEngine::GetInstance()->GetDataModelProvider()->AcceptedCommands(
+            ConcreteClusterPath(mEndpointId, OperationalState::Id), builder);
+        auto acceptedCommands = builder.Build();
+
+        bool commandExists =
+            std::find_if(acceptedCommands.begin(), acceptedCommands.end(), [](const DataModel::AcceptedCommandEntry & entry) {
+                return entry.commandId == OperationalState::Commands::Start::Id;
+            }) != acceptedCommands.end();
 
         VerifyOrExit(
             commandExists, status = Status::InvalidCommand; ChipLogError(

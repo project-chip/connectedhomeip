@@ -16,6 +16,8 @@
  */
 
 #include "descriptor.h"
+#include "app/data-model-provider/MetadataList.h"
+#include "app/data-model/List.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -83,7 +85,8 @@ private:
     CHIP_ERROR ReadTagListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadClientServerAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder, bool server);
+    CHIP_ERROR ReadClientClusters(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadServerClusters(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadFeatureMap(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 };
@@ -103,9 +106,11 @@ CHIP_ERROR DescriptorAttrAccess::ReadFeatureMap(EndpointId endpoint, AttributeVa
 
 CHIP_ERROR DescriptorAttrAccess::ReadTagListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
-        auto tags = InteractionModelEngine::GetInstance()->GetDataModelProvider()->SemanticTags(endpoint);
-        for (auto & tag : tags.GetSpanValidForLifetime())
+    DataModel::ListBuilder<DataModel::Provider::SemanticTag> builder;
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->SemanticTags(endpoint, builder));
+
+    return aEncoder.EncodeList([&builder](const auto & encoder) -> CHIP_ERROR {
+        for (auto & tag : builder.Build())
         {
             ReturnErrorOnFailure(encoder.Encode(tag));
         }
@@ -115,11 +120,14 @@ CHIP_ERROR DescriptorAttrAccess::ReadTagListAttribute(EndpointId endpoint, Attri
 
 CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    auto endpoints = InteractionModelEngine::GetInstance()->GetDataModelProvider()->Endpoints();
+    DataModel::ListBuilder<DataModel::EndpointEntry> builder;
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->Endpoints(builder));
+
+    auto endpoints = builder.Build();
     if (endpoint == 0x00)
     {
         return aEncoder.EncodeList([&endpoints](const auto & encoder) -> CHIP_ERROR {
-            for (auto & ep : endpoints.GetSpanValidForLifetime())
+            for (auto & ep : endpoints)
             {
                 if (ep.id == 0)
                 {
@@ -133,7 +141,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
 
     // find the given endpoint
     unsigned idx = 0;
-    while (idx < endpoints.Size())
+    while (idx < endpoints.size())
     {
         if (endpoints[idx].id == endpoint)
         {
@@ -141,7 +149,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
         }
         idx++;
     }
-    if (idx >= endpoints.Size())
+    if (idx >= endpoints.size())
     {
         // not found
         return CHIP_ERROR_NOT_FOUND;
@@ -154,9 +162,9 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
     case DataModel::EndpointCompositionPattern::kFullFamily:
         // encodes ALL endpoints that have the specified endpoint as a descendant
         return aEncoder.EncodeList([&endpoints, endpoint](const auto & encoder) -> CHIP_ERROR {
-            for (auto & ep : endpoints.GetSpanValidForLifetime())
+            for (auto & ep : endpoints)
             {
-                if (IsDescendantOf(&ep, endpoint, endpoints.GetSpanValidForLifetime()))
+                if (IsDescendantOf(&ep, endpoint, endpoints))
                 {
                     ReturnErrorOnFailure(encoder.Encode(ep.id));
                 }
@@ -166,7 +174,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
 
     case DataModel::EndpointCompositionPattern::kTree:
         return aEncoder.EncodeList([&endpoints, endpoint](const auto & encoder) -> CHIP_ERROR {
-            for (auto & ep : endpoints.GetSpanValidForLifetime())
+            for (auto & ep : endpoints)
             {
                 if (ep.parentId != endpoint)
                 {
@@ -184,11 +192,14 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
 
 CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
-        Descriptor::Structs::DeviceTypeStruct::Type deviceStruct;
+    DataModel::ListBuilder<DataModel::DeviceTypeEntry> builder;
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->DeviceTypes(endpoint, builder));
 
-        auto deviceTypes = InteractionModelEngine::GetInstance()->GetDataModelProvider()->DeviceTypes(endpoint);
-        for (auto & type : deviceTypes.GetSpanValidForLifetime())
+    auto span = builder.Build();
+
+    CHIP_ERROR err = aEncoder.EncodeList([&span](const auto & encoder) -> CHIP_ERROR {
+        Descriptor::Structs::DeviceTypeStruct::Type deviceStruct;
+        for (auto & type : span)
         {
             deviceStruct.deviceType = type.deviceTypeId;
             deviceStruct.revision   = type.deviceTypeRevision;
@@ -201,30 +212,30 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
     return err;
 }
 
-CHIP_ERROR DescriptorAttrAccess::ReadClientServerAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder, bool server)
+CHIP_ERROR DescriptorAttrAccess::ReadServerClusters(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = aEncoder.EncodeList([&endpoint, server](const auto & encoder) -> CHIP_ERROR {
-        if (server)
+    DataModel::ListBuilder<DataModel::ServerClusterEntry> builder;
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->ServerClusters(endpoint, builder));
+    return aEncoder.EncodeList([&builder](const auto & encoder) -> CHIP_ERROR {
+        for (auto & cluster : builder.Build())
         {
-            auto clusters = InteractionModelEngine::GetInstance()->GetDataModelProvider()->ServerClusters(endpoint);
-            for (auto & cluster : clusters.GetSpanValidForLifetime())
-            {
-                ReturnErrorOnFailure(encoder.Encode(cluster.clusterId));
-            }
+            ReturnErrorOnFailure(encoder.Encode(cluster.clusterId));
         }
-        else
-        {
-            auto clusters = InteractionModelEngine::GetInstance()->GetDataModelProvider()->ClientClusters(endpoint);
-            for (auto & id : clusters.GetSpanValidForLifetime())
-            {
-                ReturnErrorOnFailure(encoder.Encode(id));
-            }
-        }
-
         return CHIP_NO_ERROR;
     });
+}
 
-    return err;
+CHIP_ERROR DescriptorAttrAccess::ReadClientClusters(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    DataModel::ListBuilder<ClusterId> builder;
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->ClientClusters(endpoint, builder));
+    return aEncoder.EncodeList([&builder](const auto & encoder) -> CHIP_ERROR {
+        for (auto & id : builder.Build())
+        {
+            ReturnErrorOnFailure(encoder.Encode(id));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 CHIP_ERROR DescriptorAttrAccess::ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder)
@@ -244,10 +255,10 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         return ReadDeviceAttribute(aPath.mEndpointId, aEncoder);
     }
     case ServerList::Id: {
-        return ReadClientServerAttribute(aPath.mEndpointId, aEncoder, true);
+        return ReadClientClusters(aPath.mEndpointId, aEncoder);
     }
     case ClientList::Id: {
-        return ReadClientServerAttribute(aPath.mEndpointId, aEncoder, false);
+        return ReadServerClusters(aPath.mEndpointId, aEncoder);
     }
     case PartsList::Id: {
         return ReadPartsAttribute(aPath.mEndpointId, aEncoder);

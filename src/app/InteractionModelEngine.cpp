@@ -24,6 +24,8 @@
  */
 
 #include "InteractionModelEngine.h"
+#include "app/data-model-provider/MetadataList.h"
+#include "app/data-model/List.h"
 
 #include <cinttypes>
 
@@ -91,8 +93,7 @@ bool MayHaveAccessibleEventPathForEndpoint(DataModel::Provider * aProvider, Endp
                                                                aSubjectDescriptor);
     }
 
-    auto serverClusters = aProvider->ServerClusters(aEventPath.mEndpointId);
-    for (auto & cluster : serverClusters.GetSpanValidForLifetime())
+    for (auto & cluster : aProvider->ServerClustersIgnoreError(aEventPath.mEndpointId))
     {
         if (MayHaveAccessibleEventPathForEndpointAndCluster(ConcreteClusterPath(aEventPath.mEndpointId, cluster.clusterId),
                                                             aEventPath, aSubjectDescriptor))
@@ -114,8 +115,7 @@ bool MayHaveAccessibleEventPath(DataModel::Provider * aProvider, const EventPath
         return MayHaveAccessibleEventPathForEndpoint(aProvider, aEventPath.mEndpointId, aEventPath, subjectDescriptor);
     }
 
-    auto endpoints = aProvider->Endpoints();
-    for (const DataModel::EndpointEntry & ep : endpoints.GetSpanValidForLifetime())
+    for (const DataModel::EndpointEntry & ep : aProvider->EndpointsIgnoreError())
     {
         if (MayHaveAccessibleEventPathForEndpoint(aProvider, ep.id, aEventPath, subjectDescriptor))
         {
@@ -1790,8 +1790,9 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
 {
     auto provider = GetDataModelProvider();
 
-    DataModel::MetadataList<DataModel::AcceptedCommandEntry> acceptedCommands = provider->AcceptedCommands(aCommandPath);
-    for (auto & existing : acceptedCommands.GetSpanValidForLifetime())
+    DataModel::ListBuilder<DataModel::AcceptedCommandEntry> builder;
+    (void) provider->AcceptedCommands(aCommandPath, builder);
+    for (auto & existing : builder.Build())
     {
         if (existing.commandId == aCommandPath.mCommandId)
         {

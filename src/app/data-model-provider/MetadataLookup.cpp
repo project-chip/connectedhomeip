@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/data-model-provider/MetadataList.h"
 #include <app/data-model-provider/MetadataLookup.h>
 
 namespace chip {
@@ -26,12 +27,10 @@ std::optional<ServerClusterEntry> ServerClusterFinder::Find(const ConcreteCluste
     if (mEndpointId != path.mEndpointId)
     {
         mEndpointId     = path.mEndpointId;
-        mClusterEntries = mProvider->ServerClusters(path.mEndpointId);
+        mClusterEntries = mProvider->ServerClustersIgnoreError(path.mEndpointId);
     }
 
-    auto serverClustersSpan = mClusterEntries.GetSpanValidForLifetime();
-
-    for (auto & clusterEntry : serverClustersSpan)
+    for (auto & clusterEntry : mClusterEntries)
     {
         if (clusterEntry.clusterId == path.mClusterId)
         {
@@ -49,11 +48,10 @@ std::optional<AttributeEntry> AttributeFinder::Find(const ConcreteAttributePath 
     if (mClusterPath != path)
     {
         mClusterPath = path;
-        mAttributes  = mProvider->Attributes(path);
+        mAttributes  = mProvider->AttributesIgnoreError(path);
     }
 
-    auto attributesSpan = mAttributes.GetSpanValidForLifetime();
-    for (auto & attributeEntry : attributesSpan)
+    for (auto & attributeEntry : mAttributes)
     {
         if (attributeEntry.attributeId == path.mAttributeId)
         {
@@ -64,10 +62,17 @@ std::optional<AttributeEntry> AttributeFinder::Find(const ConcreteAttributePath 
     return std::nullopt;
 }
 
+EndpointFinder::EndpointFinder(ProviderMetadataTree * provider) : mProvider(provider)
+{
+    VerifyOrReturn(mProvider != nullptr);
+
+    // failure will just mean incomplete data, so we will not find it
+    mEndpoints = mProvider->EndpointsIgnoreError();
+}
+
 std::optional<EndpointEntry> EndpointFinder::Find(EndpointId endpointId)
 {
-    auto endpointsSpan = mEndpoints.GetSpanValidForLifetime();
-    for (auto & endpointEntry : endpointsSpan)
+    for (auto & endpointEntry : mEndpoints)
     {
         if (endpointEntry.id == endpointId)
         {
