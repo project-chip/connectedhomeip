@@ -132,6 +132,7 @@ static_library("NuttX") {
       "ThreadStackManagerImpl.h",
     ]
 
+    deps += [ "${chip_root}/src/app:app_config" ]
     public_deps += [ "dbus/openthread" ]
   }
 
