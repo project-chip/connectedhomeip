@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "app/data-model-provider/MetadataLookup.h"
+#include <app/data-model-provider/MetadataLookup.h>
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeValueDecoder.h>
