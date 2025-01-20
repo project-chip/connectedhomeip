@@ -15,12 +15,12 @@
  *    limitations under the License.
  */
 #include "reporting.h"
-#include "lib/support/CodeUtils.h"
 
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelEngine.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/LockTracker.h>
 
 using namespace chip;
