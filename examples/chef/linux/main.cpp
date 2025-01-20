@@ -29,6 +29,12 @@ using namespace chip::Shell;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
+void notifyIcdActive(System::Layer * layer, void *)
+{
+    ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
+    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(10000), notifyIcdActive, nullptr);
+}
+
 int main(int argc, char * argv[])
 {
     if (ChipLinuxAppInit(argc, argv) != 0)
@@ -48,6 +54,8 @@ int main(int argc, char * argv[])
 #if CHIP_SHELL_ENABLE_CMD_SERVER
     cmd_app_server_init();
 #endif
+
+    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(10000), notifyIcdActive, nullptr);
 
     ChipLinuxAppMainLoop();
 

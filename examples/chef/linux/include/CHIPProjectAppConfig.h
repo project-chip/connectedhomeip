@@ -32,3 +32,11 @@
 
 // Allows app options (ports) to be configured on launch of app
 #define CHIP_DEVICE_ENABLE_PORT_PARAMS 1
+
+// Enable subscriptions synchronization
+#define CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED 1
+
+// ICD configurations
+#define CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC 30
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS 10000
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS 5000
