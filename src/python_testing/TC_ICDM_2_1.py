@@ -35,6 +35,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import re
 
@@ -149,48 +150,35 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate ActiveModeThreshold
         self.step(2)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.ActiveModeThreshold):
-            activeModeThreshold = await self._read_icdm_attribute_expect_success(
-                attributes.ActiveModeThreshold)
-            # Verify ActiveModeThreshold is not bigger than uint16
-            asserts.assert_true(self.is_valid_uint16_value(activeModeThreshold),
-                                "ActiveModeThreshold attribute does not fit in a uint16.")
+        activeModeThreshold = await self._read_icdm_attribute_expect_success(
+            attributes.ActiveModeThreshold)
+        # Verify ActiveModeThreshold is not bigger than uint16
+        asserts.assert_true(self.is_valid_uint16_value(activeModeThreshold),
+                            "ActiveModeThreshold attribute does not fit in a uint16.")
 
-            if featureMap > 0 and features.kLongIdleTimeSupport in features(featureMap):
-                asserts.assert_greater_equal(
-                    activeModeThreshold, 5000, "Minimum ActiveModeThreshold is 5s for a LIT ICD.")
-
-        else:
-            asserts.assert_true(
-                False, "ActiveModeThreshold is a mandatory attribute and must be present in the PICS file")
+        if featureMap > 0 and features.kLongIdleTimeSupport in features(featureMap):
+            asserts.assert_greater_equal(
+                activeModeThreshold, 5000, "Minimum ActiveModeThreshold is 5s for a LIT ICD.")
 
         # Validate ActiveModeDuration
         self.step(3)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.ActiveModeDuration):
-            activeModeDuration = await self._read_icdm_attribute_expect_success(
-                attributes.ActiveModeDuration)
-            # Verify ActiveModeDuration is not bigger than uint32
-            asserts.assert_true(self.is_valid_uint32_value(activeModeDuration),
-                                "ActiveModeDuration attribute does not fit in a uint32")
-        else:
-            asserts.assert_true(
-                False, "ActiveModeDuration is a mandatory attribute and must be present in the PICS file")
+        activeModeDuration = await self._read_icdm_attribute_expect_success(
+            attributes.ActiveModeDuration)
+        # Verify ActiveModeDuration is not bigger than uint32
+        asserts.assert_true(self.is_valid_uint32_value(activeModeDuration),
+                            "ActiveModeDuration attribute does not fit in a uint32")
 
         # Validate IdleModeDuration
         self.step(4)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.IdleModeDuration):
-            idleModeDuration = await self._read_icdm_attribute_expect_success(
-                attributes.IdleModeDuration)
-            # Verify IdleModeDuration is not bigger than uint32
-            asserts.assert_greater_equal(
-                idleModeDuration, 1, "IdleModeDuration attribute is smaller than minimum value (1).")
-            asserts.assert_less_equal(
-                idleModeDuration, 64800, "IdleModeDuration attribute is greater than maximum value (64800).")
-            asserts.assert_greater_equal(idleModeDuration * 1000, activeModeDuration,
-                                         "ActiveModeDuration attribute is greater than the IdleModeDuration attrbiute.")
-        else:
-            asserts.assert_true(
-                False, "IdleModeDuration is a mandatory attribute and must be present in the PICS file")
+        idleModeDuration = await self._read_icdm_attribute_expect_success(
+            attributes.IdleModeDuration)
+        # Verify IdleModeDuration is not bigger than uint32
+        asserts.assert_greater_equal(
+            idleModeDuration, 1, "IdleModeDuration attribute is smaller than minimum value (1).")
+        asserts.assert_less_equal(
+            idleModeDuration, 64800, "IdleModeDuration attribute is greater than maximum value (64800).")
+        asserts.assert_greater_equal(idleModeDuration * 1000, activeModeDuration,
+                                        "ActiveModeDuration attribute is greater than the IdleModeDuration attrbiute.")
 
         # Validate ClientsSupportedPerFabric
         self.step(5)
