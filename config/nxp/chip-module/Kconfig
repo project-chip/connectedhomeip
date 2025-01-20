@@ -197,7 +197,7 @@ config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
 endif #CHIP_FACTORY_DATA_BUILD
 
 # See config/zephyr/Kconfig for full definition
-config CHIP_FACTORY_RESET_ERASE_NVS
+config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	bool
 	default y
 
