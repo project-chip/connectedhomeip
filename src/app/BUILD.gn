@@ -219,6 +219,7 @@ static_library("interaction-model") {
     ":event-reporter",
     ":paths",
     ":subscription-info-provider",
+    "${chip_root}/src/access",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
