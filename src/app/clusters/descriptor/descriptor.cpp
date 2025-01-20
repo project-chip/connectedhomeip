@@ -194,11 +194,11 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
     DataModel::ListBuilder<DataModel::DeviceTypeEntry> deviceTypesList;
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->DeviceTypes(endpoint, deviceTypesList));
 
-    auto span = builder.TakeBuffer();
+    auto deviceTypes = builder.TakeBuffer();
 
-    CHIP_ERROR err = aEncoder.EncodeList([&span](const auto & encoder) -> CHIP_ERROR {
+    CHIP_ERROR err = aEncoder.EncodeList([&deviceTypes](const auto & encoder) -> CHIP_ERROR {
         Descriptor::Structs::DeviceTypeStruct::Type deviceStruct;
-        for (auto & type : span)
+        for (const auto & type : deviceTypes)
         {
             deviceStruct.deviceType = type.deviceTypeId;
             deviceStruct.revision   = type.deviceTypeRevision;
