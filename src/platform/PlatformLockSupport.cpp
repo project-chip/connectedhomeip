@@ -15,6 +15,9 @@
  *    limitations under the License.
  */
 
+/* this file behaves like a config.h, comes first */
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <platform/PlatformManager.h>
 #include <system/PlatformLockSupport.h>
 
