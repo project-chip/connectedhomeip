@@ -26,7 +26,7 @@ openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 config("openthread_k32w1_config") {
   include_dirs = [
     "${openthread_nxp_root}/src/k32w1",
-    "${openthread_nxp_root}/src/mcxw71"
+    "${openthread_nxp_root}/src/mcxw71",
   ]
 
   defines = [
@@ -114,13 +114,9 @@ source_set("libopenthread-k32w1") {
     "../..:libopenthread-platform-utils",
   ]
 
-  public_deps += [
-    "${nxp_sdk_build_root}:nxp_mbedtls"
-  ]
+  public_deps += [ "${nxp_sdk_build_root}:nxp_mbedtls" ]
 
   if (!nxp_external_sdk) {
-    public_deps += [
-      nxp_sdk_target
-    ]
+    public_deps += [ nxp_sdk_target ]
   }
 }

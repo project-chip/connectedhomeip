@@ -12,25 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import("//build_overrides/nxp_sdk.gni")
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
 ota_root = get_path_info(".", "abspath")
 
 ota_sources = [
-    "${ota_root}/OTAImageProcessorImpl.cpp",
-    "${ota_root}/OTAImageProcessorImpl.h",
-    "${ota_root}/OTATlvProcessor.cpp",
-    "${ota_root}/OTATlvProcessor.h",
-    "${ota_root}/OTAFirmwareProcessor.cpp",
-    "${ota_root}/OTAFirmwareProcessor.h",
-    "${ota_root}/OTAHooks.cpp",
+  "${ota_root}/OTAFirmwareProcessor.cpp",
+  "${ota_root}/OTAFirmwareProcessor.h",
+  "${ota_root}/OTAHooks.cpp",
+  "${ota_root}/OTAImageProcessorImpl.cpp",
+  "${ota_root}/OTAImageProcessorImpl.h",
+  "${ota_root}/OTATlvProcessor.cpp",
+  "${ota_root}/OTATlvProcessor.h",
 ]
 
 if (nxp_use_factory_data && nxp_enable_ota_factory_data_processor) {
-    ota_sources += [
-        "${ota_root}/OTAFactoryDataProcessor.cpp",
-        "${ota_root}/OTAFactoryDataProcessor.h",
-    ]
+  ota_sources += [
+    "${ota_root}/OTAFactoryDataProcessor.cpp",
+    "${ota_root}/OTAFactoryDataProcessor.h",
+  ]
 }
