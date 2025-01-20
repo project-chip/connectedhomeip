@@ -251,10 +251,10 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
     if (startAfterSetting.HasValue())
     {
 
-        DataModel::ListBuilder<DataModel::AcceptedCommandEntry> builder;
+        DataModel::ListBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsList;
 
         InteractionModelEngine::GetInstance()->GetDataModelProvider()->AcceptedCommands(
-            ConcreteClusterPath(mEndpointId, OperationalState::Id), builder);
+            ConcreteClusterPath(mEndpointId, OperationalState::Id), acceptedCommandsList);
         auto acceptedCommands = acceptedCommandsList.TakeBuffer();
 
         bool commandExists =
