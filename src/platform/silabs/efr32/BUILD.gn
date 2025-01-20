@@ -138,6 +138,7 @@ static_library("efr32") {
 
     deps += [
       "${chip_root}/src/app:app_config",
+      "${chip_root}/src/app:app_config",
       "${chip_root}/third_party/openthread:openthread_cli",
     ]
 

@@ -119,7 +119,10 @@ static_library("BL702") {
       "EthernetInterface.c",
     ]
 
-    deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+    deps += [
+      "${chip_root}/src/app:app_config",
+      "${chip_root}/src/lib/dnssd:platform_header",
+    ]
   }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
