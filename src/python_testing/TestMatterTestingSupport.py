@@ -20,6 +20,8 @@ import time
 import typing
 from datetime import datetime, timedelta, timezone
 
+from mobly import asserts, signals
+
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.testing.matter_testing import (MatterBaseTest, async_test_body, compare_time, default_matter_test_main,
@@ -30,7 +32,6 @@ from chip.testing.taglist_and_topology_test import (TagProblem, create_device_ty
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
                                                     get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
 from chip.tlv import uint
-from mobly import asserts, signals
 
 
 def get_raw_type_list():

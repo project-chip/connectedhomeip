@@ -23,8 +23,9 @@ import sys
 import typing
 from pathlib import Path
 
-import chip.clusters as Clusters
 import click
+
+import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters import Attribute
 from chip.interaction_model import InteractionModelError, Status

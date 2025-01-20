@@ -32,11 +32,12 @@
 # === END CI TEST ARGUMENTS ===
 #
 
+from mobly import asserts
+
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.testing import matter_asserts
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
 
 
 class TC_DGWIFI_2_1(MatterBaseTest):

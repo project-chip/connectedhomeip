@@ -17,10 +17,11 @@ import logging
 from time import sleep
 
 import pytest
-from chip import ChipDeviceCtrl, exceptions
-from chip.setup_payload import SetupPayload
 from common.utils import check_chip_ble_devices_advertising
 from packaging import version
+
+from chip import ChipDeviceCtrl, exceptions
+from chip.setup_payload import SetupPayload
 
 log = logging.getLogger(__name__)
 

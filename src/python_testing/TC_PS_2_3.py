@@ -37,10 +37,11 @@
 import logging
 import time
 
+from mobly import asserts
+
 import chip.clusters as Clusters
 from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
                                          default_matter_test_main)
-from mobly import asserts
 
 
 class TC_PS_2_3(MatterBaseTest):

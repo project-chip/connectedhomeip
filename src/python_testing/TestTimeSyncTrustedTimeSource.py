@@ -16,10 +16,11 @@
 #
 import time
 
+from mobly import asserts
+
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from mobly import asserts
 
 # We don't have a good pipe between the c++ enums in CommissioningDelegate and python
 # so this is hardcoded.

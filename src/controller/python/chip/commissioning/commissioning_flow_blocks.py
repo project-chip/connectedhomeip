@@ -18,13 +18,14 @@
 import base64
 import logging
 
+from cryptography import x509
+from cryptography.hazmat.primitives import serialization
+
 import chip.credentials.cert
 import chip.crypto.fabric
 from chip import ChipDeviceCtrl
 from chip import clusters as Clusters
 from chip import commissioning
-from cryptography import x509
-from cryptography.hazmat.primitives import serialization
 
 
 class CommissioningFlowBlocks:

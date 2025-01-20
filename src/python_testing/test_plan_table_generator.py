@@ -22,6 +22,7 @@ import sys
 from pathlib import Path
 
 import click
+
 from chip.testing.matter_testing import MatterTestConfig, generate_mobly_test_config
 
 

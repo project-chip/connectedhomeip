@@ -19,9 +19,10 @@ import os
 import pprint
 import sys
 
-import chip.clusters as Clusters
 import graphviz
 from rich.console import Console
+
+import chip.clusters as Clusters
 
 # Add the path to python_testing folder, in order to be able to import from chip.testing.matter_testing
 sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))

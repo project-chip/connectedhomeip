@@ -41,22 +41,18 @@ from functools import partial
 from itertools import chain
 from typing import Any, Iterable, List, Optional, Tuple
 
-from chip.tlv import float32, uint
+from mobly import asserts, base_test, signals, utils
+from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
+from mobly.test_runner import TestRunner
 
-# isort: off
-
-from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
-import chip.FabricAdmin  # Needed before chip.CertificateAuthority
 import chip.CertificateAuthority
-from chip.ChipDeviceCtrl import CommissioningParameters
-
-# isort: on
-from time import sleep
-
 import chip.clusters as Clusters
+import chip.FabricAdmin
 import chip.logging
 import chip.native
+from chip import ChipDeviceCtrl
 from chip import discovery
+from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.ChipStack import ChipStack
 from chip.clusters import Attribute
 from chip.clusters import ClusterObjects as ClusterObjects
@@ -67,10 +63,8 @@ from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.pics import read_pics_from_file
+from chip.tlv import float32, uint
 from chip.tracing import TracingContext
-from mobly import asserts, base_test, signals, utils
-from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
-from mobly.test_runner import TestRunner
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
@@ -1075,7 +1069,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             with open(app_pipe_name, "w") as app_pipe:
                 app_pipe.write(command + "\n")
             # TODO(#31239): remove the need for sleep
-            sleep(0.001)
+            time.sleep(0.001)
         else:
             logging.info(f"Using DUT IP address: {dut_ip}")
 

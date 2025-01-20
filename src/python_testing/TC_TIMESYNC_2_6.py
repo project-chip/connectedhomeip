@@ -37,11 +37,12 @@
 
 import typing
 
+from mobly import asserts
+
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from mobly import asserts
 
 
 class TC_TIMESYNC_2_6(MatterBaseTest):

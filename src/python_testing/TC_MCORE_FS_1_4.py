@@ -66,13 +66,14 @@ import os
 import random
 import tempfile
 
+from mobly import asserts
+
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
 from chip.testing.apps import AppServerSubprocess
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from chip.testing.tasks import Subprocess
-from mobly import asserts
 
 
 class FabricSyncApp(Subprocess):

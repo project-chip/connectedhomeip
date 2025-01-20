@@ -39,10 +39,11 @@
 import logging
 from time import sleep
 
+from mobly import asserts
+
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
-from mobly import asserts
 
 
 # Takes an OpState or RvcOpState state enum and returns a string representation

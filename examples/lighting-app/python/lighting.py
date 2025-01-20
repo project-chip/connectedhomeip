@@ -22,10 +22,11 @@ import textwrap
 import threading
 from cmd import Cmd
 
-from chip.server import GetLibraryHandle, PostAttributeChangeCallback
 from dali.address import Broadcast
 from dali.driver.hid import tridonic
 from dali.gear.general import DAPC, Off, RecallMaxLevel
+
+from chip.server import GetLibraryHandle, PostAttributeChangeCallback
 
 dali_loop = None
 dev = None

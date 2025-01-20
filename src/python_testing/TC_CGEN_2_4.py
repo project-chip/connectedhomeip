@@ -38,6 +38,8 @@ import logging
 import random
 import time
 
+from mobly import asserts
+
 import chip.CertificateAuthority
 import chip.clusters as Clusters
 import chip.clusters.enum
@@ -47,7 +49,6 @@ from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
 from chip.native import PyChipError
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from mobly import asserts
 
 # Commissioning stage numbers - we should find a better way to match these to the C++ code
 # TODO: https://github.com/project-chip/connectedhomeip/issues/36629

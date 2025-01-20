@@ -19,11 +19,12 @@ import itertools
 import xml.etree.ElementTree as ElementTree
 
 import jinja2
+from mobly import asserts
+
 from chip.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
                                              evaluate_feature_choice_conformance)
 from chip.testing.matter_testing import MatterBaseTest, ProblemNotice, default_matter_test_main
 from chip.testing.spec_parsing import XmlCluster, add_cluster_data_from_xml
-from mobly import asserts
 
 FEATURE_TEMPLATE = '''\
     <feature bit="{{ id }}" code="{{ name }}" name="{{ name }}" summary="summary">

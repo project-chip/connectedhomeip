@@ -35,8 +35,9 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from drlk_2_x_common import DRLK_COMMON
+
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
 # Configurable parameters:
 # - userIndex: userIndex to use when creating a user on the DUT for testing purposes

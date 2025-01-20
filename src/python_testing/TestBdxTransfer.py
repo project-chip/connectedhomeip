@@ -38,10 +38,11 @@
 import asyncio
 import random
 
+from mobly import asserts
+
 import chip.clusters as Clusters
 from chip.bdx import BdxProtocol, BdxTransfer
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
 
 
 class TestBdxTransfer(MatterBaseTest):

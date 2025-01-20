@@ -18,10 +18,11 @@
 import logging
 import typing
 
+from mobly import asserts
+
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from mobly import asserts
 
 logger = logging.getLogger(__name__)
 

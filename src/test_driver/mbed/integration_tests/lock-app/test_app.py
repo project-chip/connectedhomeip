@@ -18,13 +18,14 @@ from time import sleep
 
 import pytest
 from button_service import button_service_pb2
-from chip import ChipDeviceCtrl
 from common.pigweed_client import PigweedClient
 from common.utils import (check_chip_ble_devices_advertising, close_ble, close_connection, commissioning_wifi,
                           connect_device_over_ble, get_device_details, resolve_device, send_zcl_command)
 from device_service import device_service_pb2
 from locking_service import locking_service_pb2
 from pw_status import Status
+
+from chip import ChipDeviceCtrl
 
 log = logging.getLogger(__name__)
 

@@ -37,10 +37,11 @@
 
 import logging
 
+from mobly import asserts
+
 import chip.clusters as Clusters
 from chip.testing import matter_asserts
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
 
 
 class TC_DGSW_2_3(MatterBaseTest):

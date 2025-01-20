@@ -5,14 +5,15 @@ import logging
 import os
 import pathlib
 
+import coloredlogs
+from rich import inspect, pretty
+from rich.console import Console
+
 import chip.CertificateAuthority
 import chip.FabricAdmin
 import chip.logging
 import chip.native
-import coloredlogs
 from chip.ChipStack import ChipStack
-from rich import inspect, pretty
-from rich.console import Console
 
 _fabricAdmins = None
 

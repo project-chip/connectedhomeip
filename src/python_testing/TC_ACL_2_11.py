@@ -41,8 +41,10 @@
 import logging
 import queue
 
-import chip.clusters as Clusters
 import matter_testing_infrastructure.chip.testing.global_attribute_ids as global_attribute_ids
+from mobly import asserts
+
+import chip.clusters as Clusters
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, ValueDecodeFailure
 from chip.clusters.ClusterObjects import ALL_ACCEPTED_COMMANDS, ALL_ATTRIBUTES, ALL_CLUSTERS, ClusterEvent
 from chip.clusters.Objects import AccessControl
@@ -50,7 +52,6 @@ from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import arls_populated
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
 
 
 class EventChangeCallback:

@@ -27,11 +27,12 @@ from dataclasses import dataclass
 from pprint import pformat, pprint
 from typing import Any, Optional
 
+from mobly import asserts
+
 import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
 from chip.clusters.Attribute import ValueDecodeFailure
-from mobly import asserts
 
 
 @dataclass

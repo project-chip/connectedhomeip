@@ -29,14 +29,15 @@ from dataclasses import dataclass, field
 from enum import Enum, unique
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
+import construct  # type: ignore
+from rich.pretty import pprint  # type: ignore
+
 import chip
 import chip.exceptions
 import chip.interaction_model
 import chip.tlv
-import construct  # type: ignore
 from chip.interaction_model import PyWriteAttributeData
 from chip.native import ErrorSDKPart, PyChipError
-from rich.pretty import pprint  # type: ignore
 
 from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEvent
 

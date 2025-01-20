@@ -22,6 +22,9 @@ from dataclasses import dataclass, field
 from enum import Enum, IntEnum
 from typing import Any, Optional, Tuple
 
+from matter_idl.generators.filters import to_pascal_case, to_snake_case
+from matter_yamltests.pseudo_clusters.pseudo_clusters import get_default_pseudo_clusters
+
 import chip.interaction_model
 import chip.yaml.format_converter as Converter
 from chip.ChipDeviceCtrl import ChipDeviceController, discovery
@@ -31,8 +34,6 @@ from chip.clusters.Attribute import (AttributeStatus, EventReadResult, Subscript
 from chip.exceptions import ChipStackError
 from chip.yaml.data_model_lookup import DataModelLookup
 from chip.yaml.errors import ActionCreationError, UnexpectedActionCreationError
-from matter_idl.generators.filters import to_pascal_case, to_snake_case
-from matter_yamltests.pseudo_clusters.pseudo_clusters import get_default_pseudo_clusters
 
 from .data_model_lookup import PreDefinedDataModelLookup
 

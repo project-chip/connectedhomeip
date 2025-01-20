@@ -3,8 +3,9 @@
 import enum
 import unittest
 
-from chip.testing import matter_asserts
 from mobly import signals
+
+from chip.testing import matter_asserts
 
 
 class MyTestEnum(enum.Enum):

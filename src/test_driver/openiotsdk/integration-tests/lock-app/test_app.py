@@ -19,9 +19,10 @@ import logging
 import os
 
 import pytest
+from common.utils import connect_device, disconnect_device, discover_device, get_setup_payload, read_zcl_attribute, send_zcl_command
+
 from chip.clusters.Objects import DoorLock
 from chip.clusters.Types import NullValue
-from common.utils import connect_device, disconnect_device, discover_device, get_setup_payload, read_zcl_attribute, send_zcl_command
 
 log = logging.getLogger(__name__)
 

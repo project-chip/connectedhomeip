@@ -20,9 +20,10 @@ import typing
 from dataclasses import asdict, dataclass, field, make_dataclass
 from typing import Any, ClassVar, Dict, List, Mapping, Union
 
+from dacite import from_dict  # type: ignore
+
 from chip import ChipUtility, tlv
 from chip.clusters.Types import Nullable, NullValue
-from dacite import from_dict  # type: ignore
 
 
 def GetUnionUnderlyingType(typeToCheck, matchingType=None):

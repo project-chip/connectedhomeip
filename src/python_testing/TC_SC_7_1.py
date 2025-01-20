@@ -37,9 +37,10 @@
 # This should still be fine as this test has unit tests for other conditions. See test_TC_SC_7_1.py
 import logging
 
+from mobly import asserts
+
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
 
 
 def _trusted_root_test_step(dut_num: int) -> TestStep:

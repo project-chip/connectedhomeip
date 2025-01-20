@@ -38,12 +38,13 @@ import logging
 import random
 import string
 
+from drlk_2_x_common import DRLK_COMMON
+from mobly import asserts
+
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
-from drlk_2_x_common import DRLK_COMMON
-from mobly import asserts
 
 logger = logging.getLogger(__name__)
 

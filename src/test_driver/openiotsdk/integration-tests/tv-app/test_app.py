@@ -19,12 +19,13 @@ import logging
 import os
 import re
 
-import chip.native
 import pytest
-from chip import exceptions
-from chip.clusters.Objects import ApplicationLauncher, Channel, ContentLauncher, KeypadInput, MediaPlayback, TargetNavigator
 from common.utils import (connect_device, disconnect_device, discover_device, get_log_messages_from_response, get_setup_payload,
                           get_shell_commands_from_help_response, read_zcl_attribute, send_zcl_command)
+
+import chip.native
+from chip import exceptions
+from chip.clusters.Objects import ApplicationLauncher, Channel, ContentLauncher, KeypadInput, MediaPlayback, TargetNavigator
 
 cecKeyCode = KeypadInput.Enums.CecKeyCode
 log = logging.getLogger(__name__)
