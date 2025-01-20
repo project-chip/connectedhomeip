@@ -66,8 +66,6 @@ std::optional<AttributeEntry> AttributeFinder::Find(const ConcreteAttributePath 
 EndpointFinder::EndpointFinder(ProviderMetadataTree * provider) : mProvider(provider)
 {
     VerifyOrReturn(mProvider != nullptr);
-
-    // failure will just mean incomplete data, so we will not find it
     mEndpoints = mProvider->EndpointsIgnoreError();
 }
 
