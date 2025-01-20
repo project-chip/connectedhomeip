@@ -29,11 +29,13 @@ using namespace chip::Shell;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
 void notifyIcdActive(System::Layer * layer, void *)
 {
     ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
     DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(10000), notifyIcdActive, nullptr);
 }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 int main(int argc, char * argv[])
 {
@@ -55,7 +57,9 @@ int main(int argc, char * argv[])
     cmd_app_server_init();
 #endif
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(10000), notifyIcdActive, nullptr);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     ChipLinuxAppMainLoop();
 
