@@ -94,6 +94,7 @@ source_set("trace_handlers_decoder") {
 
   deps = [
     ":trace_handlers",
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/core:types",
   ]
