@@ -120,10 +120,9 @@ CHIP_ERROR DescriptorAttrAccess::ReadTagListAttribute(EndpointId endpoint, Attri
 
 CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    DataModel::ListBuilder<DataModel::EndpointEntry> builder;
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->Endpoints(builder));
-
-    auto endpoints = builder.TakeBuffer();
+    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->Endpoints(endpointsList));
+    auto endpoints = endpointsList.TakeBuffer();
     if (endpoint == 0x00)
     {
         return aEncoder.EncodeList([&endpoints](const auto & encoder) -> CHIP_ERROR {
