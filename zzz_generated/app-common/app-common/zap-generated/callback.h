@@ -5959,24 +5959,6 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::DecodableType & commandData);
 /**
- * @brief General Diagnostics Cluster TestEventTrigger Command callback (from client)
- */
-bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GeneralDiagnostics::Commands::TestEventTrigger::DecodableType & commandData);
-/**
- * @brief General Diagnostics Cluster TimeSnapshot Command callback (from client)
- */
-bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GeneralDiagnostics::Commands::TimeSnapshot::DecodableType & commandData);
-/**
- * @brief General Diagnostics Cluster PayloadTestRequest Command callback (from client)
- */
-bool emberAfGeneralDiagnosticsClusterPayloadTestRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType & commandData);
-/**
  * @brief Thread Network Diagnostics Cluster ResetCounts Command callback (from client)
  */
 bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(

@@ -50,6 +50,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Water Heater Management
     - Water Heater Mode
     - General Commissioning
+    - General Diagnostics
     - Software Diagnostics
 
 # We need a more configurable way of deciding which clusters have which init functions....

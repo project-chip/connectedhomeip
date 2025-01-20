@@ -16,6 +16,7 @@
 #    limitations under the License.
 #
 
+import asyncio
 import base64
 import os
 import pathlib
@@ -137,7 +138,9 @@ class MyMock(MockTestRunner):
         self.default_controller.FindOrEstablishPASESession = AsyncMock(return_value=None)
         self.default_controller.ReadEvent = AsyncMock(return_value=[], side_effect=dynamic_event_return)
 
-        return run_tests_no_exit(self.test_class, self.config, hooks, self.default_controller, self.stack)
+        with asyncio.Runner() as runner:
+            return run_tests_no_exit(self.test_class, self.config, runner.get_loop(),
+                                     hooks, self.default_controller, self.stack)
 
 
 @click.command()

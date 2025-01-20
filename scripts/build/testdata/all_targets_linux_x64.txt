@@ -5,7 +5,7 @@ bouffalolab-{bl602dk,bl616dk,bl704ldk,bl706dk,bl602-night-light,bl706-night-ligh
 cc32xx-{lock,air-purifier}
 ti-cc13x4_26x4-{lighting,lock,pump,pump-controller}[-mtd][-ftd]
 cyw30739-{cyw30739b2_p5_evk_01,cyw30739b2_p5_evk_02,cyw30739b2_p5_evk_03,cyw930739m2evb_01,cyw930739m2evb_02}-{light,light-switch,lock,thermostat}
-efr32-{brd2704b,brd4316a,brd4317a,brd4318a,brd4319a,brd4186a,brd4187a,brd2601b,brd4187c,brd4186c,brd2703a,brd4338a,brd2605a,brd4343a}-{window-covering,switch,unit-test,light,lock,thermostat,pump,air-quality-sensor-app}[-rpc][-with-ota-requestor][-icd][-low-power][-shell][-no-logging][-openthread-mtd][-heap-monitoring][-no-openthread-cli][-show-qr-code][-wifi][-rs9116][-wf200][-siwx917][-ipv4][-additional-data-advertising][-use-ot-lib][-use-ot-coap-lib][-no-version][-skip-rps-generation]
+efr32-{brd2704b,brd4316a,brd4317a,brd4318a,brd4319a,brd4186a,brd4187a,brd2601b,brd4187c,brd4186c,brd2703a,brd4338a,brd2605a,brd4343a,brd4342a}-{window-covering,switch,unit-test,light,lock,thermostat,pump,air-quality-sensor-app}[-rpc][-with-ota-requestor][-icd][-low-power][-shell][-no-logging][-openthread-mtd][-heap-monitoring][-no-openthread-cli][-show-qr-code][-wifi][-rs9116][-wf200][-siwx917][-ipv4][-additional-data-advertising][-use-ot-lib][-use-ot-coap-lib][-no-version][-skip-rps-generation]
 esp32-{m5stack,c3devkit,devkitc,qemu}-{all-clusters,all-clusters-minimal,energy-management,ota-provider,ota-requestor,shell,light,lock,bridge,temperature-measurement,ota-requestor,tests}[-rpc][-ipv6only][-tracing]
 genio-lighting-app
 linux-fake-tests[-mbedtls][-boringssl][-asan][-tsan][-ubsan][-libfuzzer][-ossfuzz][-pw-fuzztest][-coverage][-dmalloc][-clang]

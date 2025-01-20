@@ -1581,8 +1581,7 @@ class ChipDeviceControllerBase():
 
         if result := transaction.GetSubscriptionHandler():
             return result
-        else:
-            return transaction.GetReadResponse()
+        return transaction.GetReadResponse()
 
     async def ReadAttribute(
         self,
