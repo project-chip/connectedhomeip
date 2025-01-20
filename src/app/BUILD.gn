@@ -350,6 +350,7 @@ source_set("status-response") {
     ":constants",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/interaction_model",
   ]
 }
 
@@ -387,6 +388,7 @@ source_set("command-handler-impl") {
     ":status-response",
     "${chip_root}/src/access:types",
     "${chip_root}/src/app/MessageDef",
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/util:callbacks",

@@ -43,6 +43,7 @@ source_set("types") {
 
   public_deps = [
     ":access_config",
+    "${chip_root}/src/app:app_config",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:types",
   ]
