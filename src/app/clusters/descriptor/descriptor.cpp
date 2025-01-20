@@ -106,11 +106,11 @@ CHIP_ERROR DescriptorAttrAccess::ReadFeatureMap(EndpointId endpoint, AttributeVa
 
 CHIP_ERROR DescriptorAttrAccess::ReadTagListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    DataModel::ListBuilder<DataModel::Provider::SemanticTag> builder;
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->SemanticTags(endpoint, builder));
+    DataModel::ListBuilder<DataModel::Provider::SemanticTag> semanticTagsList;
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->SemanticTags(endpoint, semanticTagsList));
 
-    return aEncoder.EncodeList([&builder](const auto & encoder) -> CHIP_ERROR {
-        for (auto & tag : builder.TakeBuffer())
+    return aEncoder.EncodeList([&semanticTagsList](const auto & encoder) -> CHIP_ERROR {
+        for (const auto & tag : semanticTagsList.TakeBuffer())
         {
             ReturnErrorOnFailure(encoder.Encode(tag));
         }
