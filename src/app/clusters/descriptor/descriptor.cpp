@@ -191,8 +191,8 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
 
 CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    DataModel::ListBuilder<DataModel::DeviceTypeEntry> builder;
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->DeviceTypes(endpoint, builder));
+    DataModel::ListBuilder<DataModel::DeviceTypeEntry> deviceTypesList;
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->DeviceTypes(endpoint, deviceTypesList));
 
     auto span = builder.TakeBuffer();
 
