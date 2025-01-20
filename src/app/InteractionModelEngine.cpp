@@ -1790,9 +1790,9 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
 {
     auto provider = GetDataModelProvider();
 
-    DataModel::ListBuilder<DataModel::AcceptedCommandEntry> builder;
-    (void) provider->AcceptedCommands(aCommandPath, builder);
-    for (auto & existing : builder.TakeBuffer())
+    DataModel::ListBuilder<DataModel::AcceptedCommandEntry> acceptedCommands;
+    (void) provider->AcceptedCommands(aCommandPath, acceptedCommands);
+    for (auto & existing : acceptedCommands.TakeBuffer())
     {
         if (existing.commandId == aCommandPath.mCommandId)
         {
