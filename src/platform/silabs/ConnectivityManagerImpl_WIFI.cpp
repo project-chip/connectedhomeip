@@ -260,8 +260,8 @@ void ConnectivityManagerImpl::DriveStationState()
         {
             ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
 
-            CHIP_ERROR error = TriggerWifiDisconnection();
-            SuccessOrExitAction(error, ChipLogError(DeviceLayer, "TriggerWifiDisconnection() failed: %s", ErrorStr(error)));
+            CHIP_ERROR error = TriggerDisconnection();
+            SuccessOrExitAction(error, ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %s", ErrorStr(error)));
 
             ChangeWiFiStationState(kWiFiStationState_Disconnecting);
         }

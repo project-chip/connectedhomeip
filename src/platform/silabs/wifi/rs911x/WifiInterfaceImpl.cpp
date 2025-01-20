@@ -106,43 +106,38 @@ CHIP_ERROR GetAccessPointInfo(wfx_wifi_scan_result_t & info)
 
 CHIP_ERROR GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & info)
 {
-    uint8_t buff[RSI_RESPONSE_MAX_SIZE] = { 0 };
+    rsi_wlan_ext_stats_t stats = { 0 };
 
-    int32_t status = rsi_wlan_get(RSI_WLAN_EXT_STATS, buff, sizeof(buff));
+    int32_t status = rsi_wlan_get(RSI_WLAN_EXT_STATS, reinterpret_cast<uint8_t *>(&stats), sizeof(stats));
     VerifyOrReturnError(status == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "Failed, Error Code : 0x%lX", status));
 
-    // TODO: We need to clean up this casting for the extended information
-    rsi_wlan_ext_stats_t * test = (rsi_wlan_ext_stats_t *) buff;
-
-    info.beacon_lost_count = test->beacon_lost_count - temp_reset.beacon_lost_count;
-    info.beacon_rx_count   = test->beacon_rx_count - temp_reset.beacon_rx_count;
-    info.mcast_rx_count    = test->mcast_rx_count - temp_reset.mcast_rx_count;
-    info.mcast_tx_count    = test->mcast_tx_count - temp_reset.mcast_tx_count;
-    info.ucast_rx_count    = test->ucast_rx_count - temp_reset.ucast_rx_count;
-    info.ucast_tx_count    = test->ucast_tx_count - temp_reset.ucast_tx_count;
-    info.overrun_count     = test->overrun_count - temp_reset.overrun_count;
+    info.beacon_lost_count = stats.beacon_lost_count - temp_reset.beacon_lost_count;
+    info.beacon_rx_count   = stats.beacon_rx_count - temp_reset.beacon_rx_count;
+    info.mcast_rx_count    = stats.mcast_rx_count - temp_reset.mcast_rx_count;
+    info.mcast_tx_count    = stats.mcast_tx_count - temp_reset.mcast_tx_count;
+    info.ucast_rx_count    = stats.ucast_rx_count - temp_reset.ucast_rx_count;
+    info.ucast_tx_count    = stats.ucast_tx_count - temp_reset.ucast_tx_count;
+    info.overrun_count     = stats.overrun_count - temp_reset.overrun_count;
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ResetCounters()
 {
-    uint8_t buff[RSI_RESPONSE_MAX_SIZE] = { 0 };
-    int32_t status                      = rsi_wlan_get(RSI_WLAN_EXT_STATS, buff, sizeof(buff));
+    rsi_wlan_ext_stats_t stats = { 0 };
+
+    int32_t status = rsi_wlan_get(RSI_WLAN_EXT_STATS, reinterpret_cast<uint8_t *>(&stats), sizeof(stats));
     VerifyOrReturnError(status == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "Failed, Error Code : 0x%lX", status));
 
-    // TODO: We need to clean up this casting for the extended information
-    rsi_wlan_ext_stats_t * test = (rsi_wlan_ext_stats_t *) buff;
-
-    temp_reset.beacon_lost_count = test->beacon_lost_count;
-    temp_reset.beacon_rx_count   = test->beacon_rx_count;
-    temp_reset.mcast_rx_count    = test->mcast_rx_count;
-    temp_reset.mcast_tx_count    = test->mcast_tx_count;
-    temp_reset.ucast_rx_count    = test->ucast_rx_count;
-    temp_reset.ucast_tx_count    = test->ucast_tx_count;
-    temp_reset.overrun_count     = test->overrun_count;
+    temp_reset.beacon_lost_count = stats.beacon_lost_count;
+    temp_reset.beacon_rx_count   = stats.beacon_rx_count;
+    temp_reset.mcast_rx_count    = stats.mcast_rx_count;
+    temp_reset.mcast_tx_count    = stats.mcast_tx_count;
+    temp_reset.ucast_rx_count    = stats.ucast_rx_count;
+    temp_reset.ucast_tx_count    = stats.ucast_tx_count;
+    temp_reset.overrun_count     = stats.overrun_count;
 
     return CHIP_NO_ERROR;
 }

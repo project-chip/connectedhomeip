@@ -365,12 +365,12 @@ bool IsStationConnected()
     return wifi_extra.Has(WifiState::kStationConnected);
 }
 
-bool IsHardwareReady()
+bool IsStationReady()
 {
     return wifi_extra.Has(WifiState::kStationInit);
 }
 
-CHIP_ERROR TriggerWifiDisconnection(void)
+CHIP_ERROR TriggerDisconnection(void)
 {
     ChipLogProgress(DeviceLayer, "STA-Disconnecting");
 

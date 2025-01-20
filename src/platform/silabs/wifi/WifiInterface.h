@@ -301,12 +301,12 @@ bool IsStationConnected();
 bool IsStationModeEnabled();
 
 /**
- * @brief Returns the state of the Hardware
+ * @brief Returns the state of the Wi-Fi station initialization
  *
- * @return true, if the hardware is ready to be used
+ * @return true, if the initialization was successful
  *         false, otherwise
  */
-bool IsHardwareReady();
+bool IsStationReady();
 
 /**
  * @brief Triggers the device to disconnect from the connected Wi-Fi network
@@ -317,7 +317,7 @@ bool IsHardwareReady();
  * @return CHIP_ERROR CHIP_NO_ERROR, disconnection request was succesfully triggered
  *         otherwise, CHIP_ERROR_INTERNAL
  */
-CHIP_ERROR TriggerWifiDisconnection();
+CHIP_ERROR TriggerDisconnection();
 
 /**
  * @brief Gets the connected access point information.

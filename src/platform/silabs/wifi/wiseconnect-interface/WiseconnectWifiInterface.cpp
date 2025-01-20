@@ -114,12 +114,12 @@ bool IsStationConnected()
     return wfx_rsi.dev_state.Has(WifiState::kStationConnected);
 }
 
-bool IsHardwareReady()
+bool IsStationReady()
 {
     return wfx_rsi.dev_state.Has(WifiState::kStationInit);
 }
 
-CHIP_ERROR TriggerWifiDisconnection()
+CHIP_ERROR TriggerDisconnection()
 {
     VerifyOrReturnError(TriggerPlatformWifiDisconnection() == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
     wfx_rsi.dev_state.Clear(WifiState::kStationConnected);

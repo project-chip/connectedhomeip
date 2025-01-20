@@ -290,10 +290,10 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    error = TriggerWifiDisconnection();
+    error = TriggerDisconnection();
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "TriggerWifiDisconnection() failed: %s", chip::ErrorStr(error));
+        ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %s", chip::ErrorStr(error));
     }
 
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");

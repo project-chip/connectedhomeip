@@ -62,6 +62,8 @@ void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
 /**
  * @brief Processing function when a button is triggered
  *
+ * TODO: Move this to SPAM
+ *
  * @param btn which button was pressed
  * @param btnAction the action that triggered the buttone vent
  */

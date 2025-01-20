@@ -261,7 +261,7 @@ CHIP_ERROR BaseApplication::Init()
      * Wait for the WiFi to be initialized
      */
     ChipLogProgress(AppServer, "APP: Wait WiFi Init");
-    while (!IsHardwareReady())
+    while (!IsStationReady())
     {
         osDelay(pdMS_TO_TICKS(10));
     }
