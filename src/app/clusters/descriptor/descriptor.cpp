@@ -62,7 +62,7 @@ bool IsDescendantOf(const DataModel::EndpointEntry * __restrict__ childEndpoint,
         childEndpoint       = nullptr; // we will look it up again
 
         // find the requested value in the array to get its parent
-        for (auto & ep : allEndpoints)
+        for (const auto & ep : allEndpoints)
         {
             if (ep.id == lookupId)
             {
@@ -110,7 +110,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadTagListAttribute(EndpointId endpoint, Attri
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->SemanticTags(endpoint, builder));
 
     return aEncoder.EncodeList([&builder](const auto & encoder) -> CHIP_ERROR {
-        for (auto & tag : builder.TakeBuffer())
+        for (const auto & tag : builder.TakeBuffer())
         {
             ReturnErrorOnFailure(encoder.Encode(tag));
         }
@@ -127,7 +127,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
     if (endpoint == 0x00)
     {
         return aEncoder.EncodeList([&endpoints](const auto & encoder) -> CHIP_ERROR {
-            for (auto & ep : endpoints)
+            for (const auto & ep : endpoints)
             {
                 if (ep.id == 0)
                 {
@@ -162,7 +162,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
     case DataModel::EndpointCompositionPattern::kFullFamily:
         // encodes ALL endpoints that have the specified endpoint as a descendant
         return aEncoder.EncodeList([&endpoints, endpoint](const auto & encoder) -> CHIP_ERROR {
-            for (auto & ep : endpoints)
+            for (const auto & ep : endpoints)
             {
                 if (IsDescendantOf(&ep, endpoint, endpoints))
                 {
@@ -174,7 +174,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
 
     case DataModel::EndpointCompositionPattern::kTree:
         return aEncoder.EncodeList([&endpoints, endpoint](const auto & encoder) -> CHIP_ERROR {
-            for (auto & ep : endpoints)
+            for (const auto & ep : endpoints)
             {
                 if (ep.parentId != endpoint)
                 {
@@ -199,7 +199,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
 
     CHIP_ERROR err = aEncoder.EncodeList([&span](const auto & encoder) -> CHIP_ERROR {
         Descriptor::Structs::DeviceTypeStruct::Type deviceStruct;
-        for (auto & type : span)
+        for (const auto & type : span)
         {
             deviceStruct.deviceType = type.deviceTypeId;
             deviceStruct.revision   = type.deviceTypeRevision;
@@ -217,7 +217,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadServerClusters(EndpointId endpoint, Attribu
     DataModel::ListBuilder<DataModel::ServerClusterEntry> builder;
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->ServerClusters(endpoint, builder));
     return aEncoder.EncodeList([&builder](const auto & encoder) -> CHIP_ERROR {
-        for (auto & cluster : builder.TakeBuffer())
+        for (const auto & cluster : builder.TakeBuffer())
         {
             ReturnErrorOnFailure(encoder.Encode(cluster.clusterId));
         }
@@ -230,7 +230,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadClientClusters(EndpointId endpoint, Attribu
     DataModel::ListBuilder<ClusterId> builder;
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->ClientClusters(endpoint, builder));
     return aEncoder.EncodeList([&builder](const auto & encoder) -> CHIP_ERROR {
-        for (auto & id : builder.TakeBuffer())
+        for (const auto & id : builder.TakeBuffer())
         {
             ReturnErrorOnFailure(encoder.Encode(id));
         }
