@@ -334,8 +334,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
 {
 #if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
     UNUSED_PARAMETER(netif);
-    sl_status_t status;
-    status = sl_wifi_send_raw_data_frame(SL_WIFI_CLIENT_INTERFACE, (uint8_t *) p->payload, p->len);
+    sl_status_t status = sl_wifi_send_raw_data_frame(SL_WIFI_CLIENT_INTERFACE, (uint8_t *) p->payload, p->len);
     if (status != SL_STATUS_OK)
     {
         return ERR_IF;
@@ -346,7 +345,6 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     struct pbuf * q;
     uint16_t framelength = 0;
     uint16_t datalength  = 0;
-    int32_t status       = 0;
 #if WIFI_DEBUG_ENABLED
     ChipLogProgress(DeviceLayer, "LWIP : low_level_output");
 #endif
@@ -403,7 +401,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     /* forward the generated packet to RSI to
      * send the data over wifi network
      */
-    status = wfx_rsi_send_data(packet, datalength);
+    int32_t status = wfx_rsi_send_data(packet, datalength);
     if (status != 0)
     {
         ChipLogError(DeviceLayer, "*ERR*EN-RSI:Send fail: %d", status);
