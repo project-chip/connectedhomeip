@@ -3,6 +3,7 @@ max_line_length = 132
 
 [tool.isort]
 line_length = 132
+known_first_party = "chip"
 
 [tool.ruff]
 line-length = 132
