@@ -130,7 +130,7 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
 {
     if (mPosition.mOutputPath.mAttributeId == kInvalidAttributeId)
     {
-        // Attribute ID is tied to attribute index. If no attribute id available yet
+        // Attribute ID is tied to attribute index. If no attribute id is available yet
         // this means index is invalid. Processing logic in output advance only resets
         // attribute ID to invalid when resetting iteration.
         mAttributeIndex = kInvalidIndex;
