@@ -338,7 +338,6 @@ sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_res
 #else
         security = SL_WIFI_WPA_WPA2_MIXED;
 #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
-
     }
     else
     {
