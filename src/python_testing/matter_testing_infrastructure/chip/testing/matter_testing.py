@@ -50,8 +50,7 @@ import chip.clusters as Clusters
 import chip.FabricAdmin
 import chip.logging
 import chip.native
-from chip import ChipDeviceCtrl
-from chip import discovery
+from chip import ChipDeviceCtrl, discovery
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.ChipStack import ChipStack
 from chip.clusters import Attribute
