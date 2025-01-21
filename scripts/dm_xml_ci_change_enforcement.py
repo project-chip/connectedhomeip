@@ -36,7 +36,7 @@ def check_dm_directory(dir):
 
     def check_dir(dir):
         cmd = f'git diff HEAD^..HEAD --name-only -- {dir}'
-        output = subprocess.check_output(cmd, shell=True).decode().splitlines()
+        output = subprocess.check_output(cmd, shell=True).decode()
         if output and 'spec_sha' not in output and 'scraper_version' not in output:
             print(f'Data model directory {dir} had changes to the following files without a corresponding update to the spec SHA')
             print(output)
@@ -44,7 +44,7 @@ def check_dm_directory(dir):
             return 1
         return 0
 
-    ret = check_dir(clusters) + check_dir(device_types)
+    ret = check_dir(dir)
     sys.exit(ret)
 
 
