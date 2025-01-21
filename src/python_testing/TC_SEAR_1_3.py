@@ -83,7 +83,7 @@ class TC_SEAR_1_3(MatterBaseTest):
                              expected_response,
                              f"Command response ({ret.status}) doesn't match the expected one")
 
-    def TC_SEAR_1_3(self) -> list[str]:
+    def pics_TC_SEAR_1_3(self) -> list[str]:
         return ["SEAR.S"]
 
     @async_test_body
