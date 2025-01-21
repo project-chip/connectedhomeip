@@ -277,18 +277,6 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
     return entry;
 }
 
-// TODO: DeviceTypeEntry content is IDENTICAL to EmberAfDeviceType, so centralizing
-//       to a common type is probably better. Need to figure out dependencies since
-//       this would make ember return datamodel-provider types.
-//       See: https://github.com/project-chip/connectedhomeip/issues/35889
-DataModel::DeviceTypeEntry DeviceTypeEntryFromEmber(const EmberAfDeviceType & other)
-{
-    return DataModel::DeviceTypeEntry{
-        .deviceTypeId       = other.deviceId,
-        .deviceTypeRevision = other.deviceVersion,
-    };
-}
-
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
 
 DefaultAttributePersistenceProvider gDefaultAttributePersistence;
@@ -604,31 +592,9 @@ DataModel::MetadataList<DataModel::DeviceTypeEntry> CodegenDataModelProvider::De
         return {};
     }
 
-    CHIP_ERROR err                            = CHIP_NO_ERROR;
-    Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
-
-    DataModel::MetadataList<DataModel::DeviceTypeEntry> result;
-    err = result.Reserve(deviceTypes.size());
-    if (err != CHIP_NO_ERROR)
-    {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        ChipLogError(AppServer, "Failed to reserve device type buffer space: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
-        return {};
-    }
-    for (auto & entry : deviceTypes)
-    {
-        err = result.Append(DeviceTypeEntryFromEmber(entry));
-        if (err != CHIP_NO_ERROR)
-        {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-            ChipLogError(AppServer, "Failed to append device type entry: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
-            break;
-        }
-    }
-
-    return result;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    return DataModel::MetadataList<DataModel::DeviceTypeEntry>::FromConstSpan(
+        emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
 }
 
 DataModel::MetadataList<DataModel::Provider::SemanticTag> CodegenDataModelProvider::SemanticTags(EndpointId endpointId)
