@@ -446,7 +446,7 @@ To add user data as an argument to the
 script, add the following line to the argument list:
 
 ```
---user-data {user data JSON}
+--user '{user data JSON}'
 ```
 
 As `user data JSON`, provide a flat JSON map with a value file that consists of
@@ -464,7 +464,7 @@ follows:
 When added to the argument line, the final result would look like follows:
 
 ```
---user-data '{"name": "product_name", "version": 123, "revision": "0x123"}'
+--user '{"name": "product_name", "version": 123, "revision": "0x123"}'
 ```
 
 #### How to handle user data
