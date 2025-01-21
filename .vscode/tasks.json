@@ -158,6 +158,30 @@
             }
         },
         {
+            "label": "Build EFR32 Unit Tests and Test Runner",
+            "type": "shell",
+            "command": "source scripts/activate.sh; scripts/build/build_examples.py --target efr32-${input:efr32Board}-unit-test build; scripts/build/build_examples.py --target linux-x64-efr32-test-runner build; pip3 install out/linux-x64-efr32-test-runner/chip_pw_test_runner_wheels/*.whl --force-reinstall",
+            "problemMatcher": []
+        },
+        {
+            "label": "Rebuild EFR32 Unit Tests and Test Runner",
+            "type": "shell",
+            "command": "source scripts/activate.sh; rm -rf out/efr32-brd*-unit-test out/linux-x64-efr32-test-runner; scripts/build/build_examples.py --target efr32-${input:efr32Board}-unit-test build; scripts/build/build_examples.py --target linux-x64-efr32-test-runner build; pip3 install out/linux-x64-efr32-test-runner/chip_pw_test_runner_wheels/*.whl --force-reinstall",
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean EFR32 Unit Tests and Test Runner",
+            "type": "shell",
+            "command": "rm -rf out/efr32-brd*-unit-test out/linux-x64-efr32-test-runner",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run EFR32 Unit Tests",
+            "type": "shell",
+            "command": "source scripts/activate.sh; python -m src.test_driver.efr32.py.pw_test_runner.pw_test_runner -d /dev/ttyACM1 -f out/efr32-brd2703a-unit-test/tests -o out.log",
+            "problemMatcher": []
+        },
+        {
             "label": "Flash EFR32 board",
             "type": "shell",
             "command": "python3",
@@ -644,6 +668,27 @@
                 "telink-tlsr9518adk80d-thermostat",
                 "telink-tlsr9518adk80d-window-covering",
                 "tizen-arm-light"
+            ]
+        },
+        {
+            "type": "pickString",
+            "id": "efr32Board",
+            "description": "Which board",
+            "options": [
+                "brd2704b",
+                "brd4316a",
+                "brd4317a",
+                "brd4318a",
+                "brd4319a",
+                "brd4186a",
+                "brd4187a",
+                "brd2601b",
+                "brd4187c",
+                "brd4186c",
+                "brd2703a",
+                "brd4338a",
+                "brd2605a",
+                "brd4343a"
             ]
         },
         {

@@ -205,7 +205,7 @@ else
 
                 NCP_DIR_SUFFIX="/"$2
                 USE_WIFI=true
-                optArgs+="chip_device_platform =\"efr32\" chip_crypto_keystore=\"psa\""
+                optArgs+="chip_device_platform =\"efr32\" chip_crypto_keystore=\"psa\" "
                 shift
                 shift
                 ;;

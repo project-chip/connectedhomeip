@@ -108,7 +108,10 @@ static_library("nxp_platform") {
     }
   }
 
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/platform/logging:headers",
+  ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
@@ -135,6 +138,7 @@ static_library("nxp_platform") {
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
+    deps += [ "${chip_root}/src/app:app_config" ]
 
     if (chip_mdns == "platform") {
       sources += [

@@ -53,7 +53,10 @@ static_library("Zephyr") {
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/platform/logging:headers",
+  ]
 
   if (chip_enable_openthread) {
     sources += [
@@ -61,6 +64,7 @@ static_library("Zephyr") {
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
+    deps += [ "${chip_root}/src/app:app_config" ]
 
     if (chip_mdns == "platform") {
       sources += [

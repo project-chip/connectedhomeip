@@ -136,7 +136,11 @@ static_library("efr32") {
   if (chip_enable_openthread) {
     public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
 
-    deps += [ "${chip_root}/third_party/openthread:openthread_cli" ]
+    deps += [
+      "${chip_root}/src/app:app_config",
+      "${chip_root}/src/app:app_config",
+      "${chip_root}/third_party/openthread:openthread_cli",
+    ]
 
     sources += [
       "${silabs_platform_dir}/ThreadStackManagerImpl.h",

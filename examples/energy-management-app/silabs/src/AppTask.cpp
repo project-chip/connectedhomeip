@@ -133,7 +133,7 @@ AppTask AppTask::sAppTask;
 
 EndpointId GetEnergyDeviceEndpointId()
 {
-#if defined(SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE)
+#if SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
     return kWaterHeaterEndpoint;
 #else
     return kEvseEndpoint;

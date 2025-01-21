@@ -136,15 +136,10 @@ Status SlWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCh
 
 CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
-    int32_t status = SL_STATUS_OK;
     if (ConnectivityMgr().IsWiFiStationProvisioned())
     {
         ChipLogProgress(DeviceLayer, "Disconecting for current wifi");
-        status = sl_matter_wifi_disconnect();
-        if (status != SL_STATUS_OK)
-        {
-            return CHIP_ERROR_INTERNAL;
-        }
+        ReturnErrorOnFailure(TriggerDisconnection());
     }
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
 

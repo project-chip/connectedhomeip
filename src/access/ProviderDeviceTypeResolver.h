@@ -31,10 +31,10 @@ public:
 
     bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
     {
-        app::DataModel::Provider * model = mModelGetter();
-        for (auto type = model->FirstDeviceType(endpoint); type.has_value(); type = model->NextDeviceType(endpoint, *type))
+        auto deviceTypes = mModelGetter()->DeviceTypes(endpoint);
+        for (auto & type : deviceTypes.GetSpanValidForLifetime())
         {
-            if (type->deviceTypeId == deviceType)
+            if (type.deviceTypeId == deviceType)
             {
                 return true;
             }
