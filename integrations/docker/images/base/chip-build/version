@@ -1,1 +1,1 @@
-98 : [nrfconnect] Update nRF Connect SDK version.
+99 : [ST] Added libpcsclite-dev package for NFC Commissioning on Linux platforms.
