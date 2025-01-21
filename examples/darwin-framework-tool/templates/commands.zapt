@@ -223,29 +223,14 @@ public:
         params.timedWriteTimeout = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.dataVersion = mDataVersion.HasValue() ? [NSNumber numberWithUnsignedInt:mDataVersion.Value()] : nil;
         {{#if_chip_complex}}
-        {{asObjectiveCType type parent.name}} value;
-        {{>decodable_value target="value" source="mValue" cluster=parent.name errorCode="return err;" depth=0}}
+          {{asObjectiveCType type parent.name}} value;
+          {{>decodable_value target="value" source="mValue" cluster=parent.name errorCode="return err;" depth=0}}
+        {{else if isNullable}}
+          {{asObjectiveCType type parent.name}} value;
+          {{>decodable_value target="value" source="mValue" cluster=parent.name isOptional=false isArray=false errorCode="return err;" depth=0}}
         {{else}}
-          {{#if isNullable}}
-            {{asObjectiveCType type parent.name}} value = nil;
-            if (!mValue.IsNull()) {
-              {{#if (isOctetString type)}}
-                value = [[NSData alloc] initWithBytes:mValue.Value().data() length:mValue.Value().size()];
-              {{else if (isString type)}}
-                value = [[NSString alloc] initWithBytes:mValue.Value().data() length:mValue.Value().size() encoding:NSUTF8StringEncoding];
-              {{else}}
-                value = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:mValue.Value()];
-              {{/if}}
-            }
-          {{else}}
-            {{#if (isOctetString type)}}
-              {{asObjectiveCType type parent.name}} value = [[NSData alloc] initWithBytes:mValue.data() length:mValue.size()];
-            {{else if (isString type)}}
-              {{asObjectiveCType type parent.name}} value = [[NSString alloc] initWithBytes:mValue.data() length:mValue.size() encoding:NSUTF8StringEncoding];
-            {{else}}
-              {{asObjectiveCType type parent.name}} value = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:mValue{{#if isNullable}}.Value(){{/if}}];
-            {{/if}}
-          {{/if}}
+          {{asObjectiveCType type parent.name}}
+          {{>decodable_value target="value" source="mValue" cluster=parent.name isOptional=false isArray=false errorCode="return err;" depth=0}}
         {{/if_chip_complex}}
 
         [cluster write{{>attribute}}WithValue:value params:params completion:^(NSError * _Nullable error) {
