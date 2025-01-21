@@ -39,7 +39,7 @@ class ClusterInfo():
     cluster_code: int
     cluster_spec_revision: int
     cluster_name: str
-    json_attribute: object
+    json_attribute: dict[str, object]
 
     def cluster_revision(self):
         return int(self.json_attribute["defaultValue"])
@@ -87,10 +87,10 @@ def get_outdated_clusters(data: object, xml_clusters: dict, args) -> list[Cluste
                 except (KeyError, ValueError):
                     continue
                 # Filter in outdated clusters only
-                if (cluster_revision == spec_revision):
+                if cluster_revision == spec_revision:
                     break
                 # If old_revision is present, filter in matching only
-                if (args.old_revision is not None and cluster_revision != args.old_revision):
+                if (args.old_revision is not None) and (cluster_revision != args.old_revision):
                     break
                 cluster_info = ClusterInfo(endpoint_id=endpoint_id, cluster_code=cluster.get("code"),
                                            cluster_spec_revision=spec_revision, cluster_name=cluster.get("name"), json_attribute=attribute)
@@ -170,7 +170,7 @@ def updateOne(item):
     subprocess.check_call(['./scripts/tools/zap/convert.py', target])
 
 
-def updateOneToLatest(item):
+def update_one_to_latest(item):
     """
     Helper method that may be run in parallel to update all clusters in a single .zap file to the latest revision according to the spec.
     """
@@ -202,7 +202,7 @@ def updateOneToLatest(item):
             json.dump(data, file)
 
         # Now run convert.py on the file to have ZAP reformat it however it likes.
-        subprocess.check_call(['./scripts/tools/zap/convert.py', target])
+        subprocess.check_call(['python3', 'scripts/tools/zap/convert.py', target])
 
 
 def main():
@@ -225,7 +225,7 @@ def main():
         update_func = updateOne
         items = [(args, target, None) for target in targets]
     else:
-        update_func = updateOneToLatest
+        update_func = update_one_to_latest
         try:
             from chip.testing.spec_parsing import build_xml_clusters
         except ImportError:
