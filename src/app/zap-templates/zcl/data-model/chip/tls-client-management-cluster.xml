@@ -39,7 +39,7 @@ Git: 1.4-819-g9894ad1b9
   </struct>
 
   <cluster apiMaturity="provisional">
-    <domain name="Cameras"/>
+    <domain name="General"/>
     <name>TLS Client Management</name>
     <code>0x0802</code>
     <define>TLS_CLIENT_MANAGEMENT_CLUSTER</define>
