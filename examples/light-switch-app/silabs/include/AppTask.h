@@ -66,16 +66,6 @@ public:
 
     CHIP_ERROR StartAppTask();
 
-    /**
-     * @brief Event handler when a button is pressed
-     * Function posts an event for button processing
-     *
-     * @param buttonHandle APP_LIGHT_SWITCH or APP_FUNCTION_BUTTON
-     * @param btnAction button action - SL_SIMPLE_BUTTON_PRESSED,
-     *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
-     */
-    static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
-
 private:
     static AppTask sAppTask;
 
@@ -86,20 +76,4 @@ private:
      */
     CHIP_ERROR Init();
 
-    /**
-     * @brief PB0 Button event processing function
-     *        Press and hold will trigger a factory reset timer start
-     *        Press and release will restart BLEAdvertising if not commisionned
-     *
-     * @param aEvent button event being processed
-     */
-    static void ButtonHandler(AppEvent * aEvent);
-
-    /**
-     * @brief PB1 Button event processing function
-     *        Function triggers a switch action sent to the CHIP task
-     *
-     * @param aEvent button event being processed
-     */
-    static void SwitchActionEventHandler(AppEvent * aEvent);
 };
