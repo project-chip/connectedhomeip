@@ -53,7 +53,7 @@ extern "C" {
 #endif
 #include "sl_uartdrv_instances.h"
 #if SL_WIFI
-#include "spi_multiplex.h"
+#include <platform/silabs/wifi/ncp/spi_multiplex.h>
 #endif // SL_WIFI
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
 #include "sl_uartdrv_eusart_vcom_config.h"

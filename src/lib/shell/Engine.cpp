@@ -86,6 +86,8 @@ CHIP_ERROR Engine::ExecCommand(int argc, char * argv[])
     CHIP_ERROR retval = CHIP_ERROR_INVALID_ARGUMENT;
 
     VerifyOrReturnError(argc > 0, retval);
+    VerifyOrReturnError(nullptr != argv, retval);
+
     // Find the command
     for (unsigned i = 0; i < _commandSetCount; i++)
     {
@@ -117,7 +119,7 @@ void Engine::RegisterDefaultCommands()
     RegisterDeviceCommands();
     RegisterOnboardingCodesCommands();
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD
     RegisterNFCCommands();
 #endif
     RegisterDnsCommands();

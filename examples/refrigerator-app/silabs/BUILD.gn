@@ -143,6 +143,10 @@ silabs_executable("refrigerator_app") {
     "src/refrigerator-and-temperature-controlled-cabinet-mode.cpp",
   ]
 
+  if (chip_build_libshell) {
+    sources += [ "src/EventHandlerLibShell.cpp" ]
+  }
+
   if (use_temp_sensor) {
     sources += [
       "${efr32_sdk_root}/hardware/driver/si70xx/src/sl_si70xx.c",

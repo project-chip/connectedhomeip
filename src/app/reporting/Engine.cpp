@@ -19,11 +19,13 @@
 #include <access/AccessRestrictionProvider.h>
 #include <access/Privilege.h>
 #include <app/AppConfig.h>
+#include <app/AttributePathExpandIterator.h>
 #include <app/ConcreteEventPath.h>
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
@@ -51,12 +53,16 @@ using Protocols::InteractionModel::Status;
 
 Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eventPath)
 {
-    if (!model->GetClusterInfo(eventPath).has_value())
     {
-        return model->EndpointExists(eventPath.mEndpointId) ? Status::UnsupportedCluster : Status::UnsupportedEndpoint;
+        DataModel::ServerClusterFinder serverClusterFinder(model);
+        if (serverClusterFinder.Find(eventPath).has_value())
+        {
+            return Status::Success;
+        }
     }
 
-    return Status::Success;
+    DataModel::EndpointFinder endpointFinder(model);
+    return endpointFinder.Find(eventPath.mEndpointId).has_value() ? Status::UnsupportedCluster : Status::UnsupportedEndpoint;
 }
 
 /// Returns the status of ACL validation.
@@ -76,7 +82,9 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
                              .requestType = RequestType::kAttributeReadRequest,
                              .entityId    = path.mAttributeId };
 
-    std::optional<DataModel::AttributeInfo> info = dataModel->GetAttributeInfo(path);
+    DataModel::AttributeFinder finder(dataModel);
+
+    std::optional<DataModel::AttributeEntry> info = finder.Find(path);
 
     // If the attribute exists, we know whether it is readable (readPrivilege has value)
     // and what the required access privilege is. However for attributes missing from the metatada
@@ -147,8 +155,10 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     readRequest.subjectDescriptor = &subjectDescriptor;
     readRequest.path              = path;
 
+    DataModel::ServerClusterFinder serverClusterFinder(dataModel);
+
     DataVersion version = 0;
-    if (std::optional<DataModel::ClusterInfo> clusterInfo = dataModel->GetClusterInfo(path); clusterInfo.has_value())
+    if (auto clusterInfo = serverClusterFinder.Find(path); clusterInfo.has_value())
     {
         version = clusterInfo->dataVersion;
     }
@@ -208,23 +218,23 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
 
 bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const ConcreteClusterPath & path, DataVersion dataVersion)
 {
-    std::optional<DataModel::ClusterInfo> info = dataModel->GetClusterInfo(path);
-    if (!info.has_value())
-    {
-        return false;
-    }
+    DataModel::ServerClusterFinder serverClusterFinder(dataModel);
+    auto info = serverClusterFinder.Find(path);
 
-    return (info->dataVersion == dataVersion);
+    return info.has_value() && (info->dataVersion == dataVersion);
 }
 
 } // namespace
 
 Engine::Engine(InteractionModelEngine * apImEngine) : mpImEngine(apImEngine) {}
 
-CHIP_ERROR Engine::Init()
+CHIP_ERROR Engine::Init(EventManagement * apEventManagement)
 {
+    VerifyOrReturnError(apEventManagement != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mNumReportsInFlight = 0;
     mCurReadHandlerIdx  = 0;
+    mpEventManagement   = apEventManagement;
+
     return CHIP_NO_ERROR;
 }
 
@@ -312,8 +322,9 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
 #endif
 
         // For each path included in the interested path of the read handler...
-        for (; apReadHandler->GetAttributePathExpandIterator()->Get(readPath);
-             apReadHandler->GetAttributePathExpandIterator()->Next())
+        for (RollbackAttributePathExpandIterator iterator(mpImEngine->GetDataModelProvider(),
+                                                          apReadHandler->AttributeIterationPosition());
+             iterator.Next(readPath); iterator.MarkCompleted())
         {
             if (!apReadHandler->IsPriming())
             {
@@ -425,6 +436,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             // Successfully encoded the attribute, clear the internal state.
             apReadHandler->SetAttributeEncodeState(AttributeEncodeState());
         }
+
         // We just visited all paths interested by this read handler and did not abort in the middle of iteration, there are no more
         // chunks for this report.
         hasMoreChunks = false;
@@ -560,20 +572,20 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     size_t eventCount     = 0;
     bool hasEncodedStatus = false;
     TLV::TLVWriter backup;
-    bool eventClean                = true;
-    auto & eventMin                = apReadHandler->GetEventMin();
-    EventManagement & eventManager = EventManagement::GetInstance();
-    bool hasMoreChunks             = false;
+    bool eventClean    = true;
+    auto & eventMin    = apReadHandler->GetEventMin();
+    bool hasMoreChunks = false;
 
     aReportDataBuilder.Checkpoint(backup);
 
     VerifyOrExit(apReadHandler->GetEventPathList() != nullptr, );
 
-    // If the eventManager is not valid or has not been initialized,
+    // If the mpEventManagement is not valid or has not been initialized,
     // skip the rest of processing
-    VerifyOrExit(eventManager.IsValid(), ChipLogError(DataManagement, "EventManagement has not yet initialized"));
+    VerifyOrExit(mpEventManagement != nullptr && mpEventManagement->IsValid(),
+                 ChipLogError(DataManagement, "EventManagement has not yet initialized"));
 
-    eventClean = apReadHandler->CheckEventClean(eventManager);
+    eventClean = apReadHandler->CheckEventClean(*mpEventManagement);
 
     // proceed only if there are new events.
     if (eventClean)
@@ -593,8 +605,8 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
         err = CheckAccessDeniedEventPaths(*(eventReportIBs.GetWriter()), hasEncodedStatus, apReadHandler);
         SuccessOrExit(err);
 
-        err = eventManager.FetchEventsSince(*(eventReportIBs.GetWriter()), apReadHandler->GetEventPathList(), eventMin, eventCount,
-                                            apReadHandler->GetSubjectDescriptor());
+        err = mpEventManagement->FetchEventsSince(*(eventReportIBs.GetWriter()), apReadHandler->GetEventPathList(), eventMin,
+                                                  eventCount, apReadHandler->GetSubjectDescriptor());
 
         if ((err == CHIP_END_OF_TLV) || (err == CHIP_ERROR_TLV_UNDERRUN) || (err == CHIP_NO_ERROR))
         {
@@ -1039,8 +1051,9 @@ CHIP_ERROR Engine::SetDirty(const AttributePathParams & aAttributePath)
 {
     BumpDirtySetGeneration();
 
-    bool intersectsInterestPath = false;
-    mpImEngine->mReadHandlers.ForEachActiveObject([&aAttributePath, &intersectsInterestPath](ReadHandler * handler) {
+    bool intersectsInterestPath     = false;
+    DataModel::Provider * dataModel = mpImEngine->GetDataModelProvider();
+    mpImEngine->mReadHandlers.ForEachActiveObject([&dataModel, &aAttributePath, &intersectsInterestPath](ReadHandler * handler) {
         // We call AttributePathIsDirty for both read interactions and subscribe interactions, since we may send inconsistent
         // attribute data between two chunks. AttributePathIsDirty will not schedule a new run for read handlers which are
         // waiting for a response to the last message chunk for read interactions.
@@ -1050,7 +1063,7 @@ CHIP_ERROR Engine::SetDirty(const AttributePathParams & aAttributePath)
             {
                 if (object->mValue.Intersects(aAttributePath))
                 {
-                    handler->AttributePathIsDirty(aAttributePath);
+                    handler->AttributePathIsDirty(dataModel, aAttributePath);
                     intersectsInterestPath = true;
                     break;
                 }
@@ -1128,7 +1141,7 @@ CHIP_ERROR Engine::ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten)
+CHIP_ERROR Engine::NewEventGenerated(ConcreteEventPath & aPath, uint32_t aBytesConsumed)
 {
     // If we literally have no read handlers right now that care about any events,
     // we don't need to call schedule run for event.
@@ -1166,7 +1179,7 @@ CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBy
         return CHIP_NO_ERROR;
     }
 
-    return ScheduleBufferPressureEventDelivery(aBytesWritten);
+    return ScheduleBufferPressureEventDelivery(aBytesConsumed);
 }
 
 void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)

@@ -284,6 +284,13 @@ struct BLEManagerImpl::ServiceData
 
 inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest()
 {
+#ifdef CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
+    if (mCustomAdvertising.empty())
+    {
+        ChipLogError(DeviceLayer, "mCustomAdvertising should be set when CONFIG_CHIP_CUSTOM_BLE_ADV_DATA is define");
+        return CHIP_ERROR_INTERNAL;
+    }
+#else
     static ServiceData serviceData;
     static std::array<bt_data, 2> advertisingData;
     static std::array<bt_data, 1> scanResponseData;
@@ -304,9 +311,10 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest()
     }
 #endif
 
-    advertisingData[0]  = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
-    advertisingData[1]  = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
-    scanResponseData[0] = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
+    advertisingData[0]                   = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
+    advertisingData[1]                   = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
+    scanResponseData[0]                  = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
+#endif // CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
 
     mAdvertisingRequest.priority = CHIP_DEVICE_BLE_ADVERTISING_PRIORITY;
     mAdvertisingRequest.options  = kAdvertisingOptions;
@@ -328,9 +336,13 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest()
         mAdvertisingRequest.minInterval = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
         mAdvertisingRequest.maxInterval = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
     }
+#ifdef CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
+    mAdvertisingRequest.advertisingData  = mCustomAdvertising;
+    mAdvertisingRequest.scanResponseData = mCustomScanResponse;
+#else
     mAdvertisingRequest.advertisingData  = Span<bt_data>(advertisingData);
     mAdvertisingRequest.scanResponseData = nameSize ? Span<bt_data>(scanResponseData) : Span<bt_data>{};
-
+#endif
     mAdvertisingRequest.onStarted = [](int rc) {
         if (rc == 0)
         {
@@ -964,6 +976,17 @@ ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gat
     // field is 2 bytes long. So, the cast to uint16_t should be fine.
     return bt_gatt_attr_read(conId, attr, buf, len, offset, sInstance.c3CharDataBufferHandle->Start(),
                              static_cast<uint16_t>(sInstance.c3CharDataBufferHandle->DataLength()));
+}
+#endif
+
+#ifdef CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
+void BLEManagerImpl::SetCustomAdvertising(Span<bt_data> CustomAdvertising)
+{
+    mCustomAdvertising = CustomAdvertising;
+}
+void BLEManagerImpl::SetCustomScanResponse(Span<bt_data> CustomScanResponse)
+{
+    mCustomScanResponse = CustomScanResponse;
 }
 #endif
 

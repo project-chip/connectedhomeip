@@ -21,6 +21,7 @@
 #ifdef MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
 #include "static-supported-temperature-levels.h"
 #include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;

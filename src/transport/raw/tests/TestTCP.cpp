@@ -64,7 +64,8 @@ constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
 constexpr uint32_t kMessageCounter  = 18;
 
-const char PAYLOAD[] = "Hello!";
+const char PAYLOAD[]          = "Hello!";
+const char messageSize_TEST[] = "\x00\x00\x00\x00";
 
 class MockTransportMgrDelegate : public chip::TransportMgrDelegate
 {
@@ -551,6 +552,32 @@ TEST_F(TestTCP, CheckSimpleInitTest6)
     CheckSimpleInitTest(IPAddressType::kIPv6);
 }
 
+TEST_F(TestTCP, InitializeAsTCPClient)
+{
+    TCPImpl tcp;
+    auto tcpListenParams = Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager());
+    CHIP_ERROR err =
+        tcp.Init(tcpListenParams.SetAddressType(IPAddressType::kIPv6).SetListenPort(gChipTCPPort).SetServerListenEnabled(false));
+
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    bool isServerEnabled = tcpListenParams.IsServerListenEnabled();
+    EXPECT_EQ(isServerEnabled, false);
+}
+
+TEST_F(TestTCP, InitializeAsTCPClientServer)
+{
+    TCPImpl tcp;
+    auto tcpListenParams = Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager());
+
+    CHIP_ERROR err = tcp.Init(tcpListenParams.SetAddressType(IPAddressType::kIPv6).SetListenPort(gChipTCPPort));
+
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    bool isServerEnabled = tcpListenParams.IsServerListenEnabled();
+    EXPECT_EQ(isServerEnabled, true);
+}
+
 TEST_F(TestTCP, CheckMessageTest6)
 {
     IPAddress addr;
@@ -609,6 +636,29 @@ TEST_F(TestTCP, HandleConnCloseCalledTest6)
     HandleConnCloseTest(addr);
 }
 
+TEST_F(TestTCP, CheckTCPEndpointAfterCloseTest)
+{
+    TCPImpl tcp;
+
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
+    gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
+    gMockTransportMgrDelegate.ConnectTest(tcp, addr);
+
+    Transport::PeerAddress lPeerAddress = Transport::PeerAddress::TCP(addr, gChipTCPPort);
+    void * state                        = TestAccess::FindActiveConnection(tcp, lPeerAddress);
+    ASSERT_NE(state, nullptr);
+    TCPEndPoint * lEndPoint = TestAccess::GetEndpoint(state);
+    ASSERT_NE(lEndPoint, nullptr);
+
+    // Call Close and check the TCPEndpoint
+    tcp.Close();
+    lEndPoint = TestAccess::GetEndpoint(state);
+    ASSERT_EQ(lEndPoint, nullptr);
+}
+
 TEST_F(TestTCP, CheckProcessReceivedBuffer)
 {
     TCPImpl tcp;
@@ -632,6 +682,12 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestData testData[2];
     gMockTransportMgrDelegate.SetCallback(TestDataCallbackCheck, testData);
+
+    // Test a single packet buffer with zero message size.
+    System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(messageSize_TEST, 4);
+    ASSERT_NE(&buf, nullptr);
+    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(buf));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // Test a single packet buffer.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;

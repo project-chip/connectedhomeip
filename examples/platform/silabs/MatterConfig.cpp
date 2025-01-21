@@ -25,8 +25,13 @@
 #include <mbedtls/platform.h>
 
 #ifdef SL_WIFI
-#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
-#endif /* SL_WIFI */
+#include <platform/silabs/wifi/WifiInterface.h>
+
+// TODO: We shouldn't need any platform specific includes in this file
+#ifdef WF200_WIFI
+#include <platform/silabs/wifi/wf200/ncp/sl_wfx_task.h>
+#endif // WF200_WIFI
+#endif // SL_WIFI
 
 #if PW_RPC_ENABLED
 #include "Rpc.h"
@@ -40,9 +45,10 @@
 #include "MemMonitoring.h"
 #endif
 
+// TODO: We shouldn't need any platform specific includes in this file
 #if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1
 #include <platform/silabs/SiWx917/SiWxPlatformInterface.h>
-#include <platform/silabs/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.h>
+#include <platform/silabs/wifi/wiseconnect-interface/WiseconnectWifiInterface.h>
 #endif // SLI_SI91X_MCU_INTERFACE
 
 #include <crypto/CHIPCryptoPAL.h>
@@ -56,7 +62,7 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include <ProvisionManager.h>
 #include <app/InteractionModelEngine.h>
 #include <app/TimerDelegates.h>
-#include <app/codegen-data-model-provider/Instance.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 #include "SilabsTestEventTriggerDelegate.h" // nogncheck
@@ -276,7 +282,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     // Initialize the remaining (not overridden) providers to the SDK example defaults
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CHIP_ENABLE_OPENTHREAD
     // Set up OpenThread configuration when OpenThread is included
@@ -308,17 +314,15 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #ifdef SL_WIFI
 CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 {
+    // TODO: Platform specific init should not be required here
 #ifdef WF200_WIFI
     // Start wfx bus communication task.
     wfx_bus_start();
-#ifdef SL_WFX_USE_SECURE_LINK
-    // start securelink key renegotiation task
-    wfx_securelink_task_start();
-#endif // SL_WFX_USE_SECURE_LINK
 #endif // WF200_WIFI
 
+    // TODO: Platform specific init should not be required here
 #if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1
-    VerifyOrReturnError(sl_matter_wifi_platform_init() == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(InitSiWxWifi() == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
 #endif // SLI_SI91X_MCU_INTERFACE
 
     return CHIP_NO_ERROR;
@@ -331,7 +335,9 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 extern "C" void vApplicationIdleHook(void)
 {
 #if (SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER)
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     SiWxPlatformInterface::sl_si91x_btn_event_handler();
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
     SiWxPlatformInterface::sl_si91x_uart_power_requirement_handler();
 #endif
 }

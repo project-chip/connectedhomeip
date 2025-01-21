@@ -181,7 +181,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
         events_callback = EventChangeCallback(Clusters.DeviceEnergyManagement)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
-                                    self.matter_test_config.endpoint)
+                                    self.get_endpoint(default=1))
 
         self.step("4")
         await self.check_test_event_triggers_enabled()

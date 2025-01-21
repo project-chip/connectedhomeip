@@ -83,6 +83,8 @@ public:
 
     void SetMaximallyLargeCertsUsed(bool enabled) { mExampleOpCredsIssuer.SetMaximallyLargeCertsUsed(enabled); }
 
+    void SetCertificateValidityPeriod(uint32_t validity) { mExampleOpCredsIssuer.SetCertificateValidityPeriod(validity); }
+
 private:
     CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
@@ -162,7 +164,7 @@ public:
                 mCompletionError = err;
             }
         }
-        if (report.stageCompleted == chip::Controller::CommissioningStage::kReadCommissioningInfo2)
+        if (report.stageCompleted == chip::Controller::CommissioningStage::kReadCommissioningInfo)
         {
             mReadCommissioningInfo = report.Get<chip::Controller::ReadCommissioningInfo>();
         }
@@ -490,7 +492,8 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
 
     // Initialize device attestation verifier
     const chip::Credentials::AttestationTrustStore * testingRootStore = GetTestFileAttestationTrustStore(paaTrustStorePath);
-    SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+    chip::Credentials::DeviceAttestationVerifier * dacVerifier        = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
+    SetDeviceAttestationVerifier(dacVerifier);
 
     chip::Crypto::P256Keypair ephemeralKey;
     chip::Crypto::P256Keypair * controllerKeyPair;
@@ -544,6 +547,7 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     initParams.controllerVendorId                   = adminVendorId;
     initParams.permitMultiControllerFabrics         = true;
     initParams.hasExternallyOwnedOperationalKeypair = operationalKey != nullptr;
+    initParams.deviceAttestationVerifier            = dacVerifier;
 
     if (useTestCommissioner)
     {
@@ -601,6 +605,15 @@ PyChipError pychip_OpCreds_SetMaximallyLargeCertsUsed(OpCredsContext * context, 
     VerifyOrReturnError(context != nullptr && context->mAdapter != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
 
     context->mAdapter->SetMaximallyLargeCertsUsed(enabled);
+
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_OpCreds_SetCertificateValidityPeriod(OpCredsContext * context, uint32_t validity)
+{
+    VerifyOrReturnError(context != nullptr && context->mAdapter != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
+
+    context->mAdapter->SetCertificateValidityPeriod(validity);
 
     return ToPyChipError(CHIP_NO_ERROR);
 }

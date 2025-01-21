@@ -99,7 +99,7 @@ CHIP_ERROR AlarmEventHandler(int argc, char ** argv)
     if (argc >= 2)
     {
         ChipLogError(Zcl, "Too many arguments provided to function %s, line %d", __func__, __LINE__);
-        return APP_ERROR_TOO_MANY_SHELL_ARGUMENTS;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     AlarmEventData * data = Platform::New<AlarmEventData>();
@@ -131,7 +131,7 @@ CHIP_ERROR DoorStateEventHandler(int argc, char ** argv)
     if (argc >= 2)
     {
         ChipLogError(Zcl, "Too many arguments provided to function %s, line %d", __func__, __LINE__);
-        return APP_ERROR_TOO_MANY_SHELL_ARGUMENTS;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     DoorStateEventData * data = Platform::New<DoorStateEventData>();

@@ -1794,12 +1794,6 @@ static BOOL AttributeIsSpecifiedInOvenModeCluster(AttributeId aAttributeId)
     case Attributes::CurrentMode::Id: {
         return YES;
     }
-    case Attributes::StartUpMode::Id: {
-        return YES;
-    }
-    case Attributes::OnMode::Id: {
-        return YES;
-    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -1902,12 +1896,6 @@ static BOOL AttributeIsSpecifiedInLaundryWasherModeCluster(AttributeId aAttribut
     case Attributes::CurrentMode::Id: {
         return YES;
     }
-    case Attributes::StartUpMode::Id: {
-        return YES;
-    }
-    case Attributes::OnMode::Id: {
-        return YES;
-    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -1936,12 +1924,6 @@ static BOOL AttributeIsSpecifiedInRefrigeratorAndTemperatureControlledCabinetMod
         return YES;
     }
     case Attributes::CurrentMode::Id: {
-        return YES;
-    }
-    case Attributes::StartUpMode::Id: {
-        return YES;
-    }
-    case Attributes::OnMode::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -2143,12 +2125,6 @@ static BOOL AttributeIsSpecifiedInDishwasherModeCluster(AttributeId aAttributeId
         return YES;
     }
     case Attributes::CurrentMode::Id: {
-        return YES;
-    }
-    case Attributes::StartUpMode::Id: {
-        return YES;
-    }
-    case Attributes::OnMode::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5738,6 +5714,57 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     }
     }
 }
+static BOOL AttributeIsSpecifiedInCameraAVSettingsUserLevelManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CameraAvSettingsUserLevelManagement;
+    switch (aAttributeId) {
+    case Attributes::MPTZPosition::Id: {
+        return YES;
+    }
+    case Attributes::MaxPresets::Id: {
+        return YES;
+    }
+    case Attributes::MPTZPresets::Id: {
+        return YES;
+    }
+    case Attributes::DPTZRelativeMove::Id: {
+        return YES;
+    }
+    case Attributes::ZoomMax::Id: {
+        return YES;
+    }
+    case Attributes::TiltMin::Id: {
+        return YES;
+    }
+    case Attributes::TiltMax::Id: {
+        return YES;
+    }
+    case Attributes::PanMin::Id: {
+        return YES;
+    }
+    case Attributes::PanMax::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInWebRTCTransportProviderCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WebRTCTransportProvider;
@@ -5770,6 +5797,39 @@ static BOOL AttributeIsSpecifiedInWebRTCTransportRequestorCluster(AttributeId aA
     using namespace Clusters::WebRTCTransportRequestor;
     switch (aAttributeId) {
     case Attributes::CurrentSessions::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInPushAVStreamTransportCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::PushAvStreamTransport;
+    switch (aAttributeId) {
+    case Attributes::SupportedContainerFormats::Id: {
+        return YES;
+    }
+    case Attributes::SupportedIngestMethods::Id: {
+        return YES;
+    }
+    case Attributes::CurrentConnections::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5860,6 +5920,42 @@ static BOOL AttributeIsSpecifiedInCommissionerControlCluster(AttributeId aAttrib
     using namespace Clusters::CommissionerControl;
     switch (aAttributeId) {
     case Attributes::SupportedDeviceCategories::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInTLSCertificateManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::TlsCertificateManagement;
+    switch (aAttributeId) {
+    case Attributes::MaxRootCertificates::Id: {
+        return YES;
+    }
+    case Attributes::CurrentRootCertificates::Id: {
+        return YES;
+    }
+    case Attributes::MaxClientCertificates::Id: {
+        return YES;
+    }
+    case Attributes::CurrentClientCertificates::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6552,11 +6648,17 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::CameraAvStreamManagement::Id: {
         return AttributeIsSpecifiedInCameraAVStreamManagementCluster(aAttributeId);
     }
+    case Clusters::CameraAvSettingsUserLevelManagement::Id: {
+        return AttributeIsSpecifiedInCameraAVSettingsUserLevelManagementCluster(aAttributeId);
+    }
     case Clusters::WebRTCTransportProvider::Id: {
         return AttributeIsSpecifiedInWebRTCTransportProviderCluster(aAttributeId);
     }
     case Clusters::WebRTCTransportRequestor::Id: {
         return AttributeIsSpecifiedInWebRTCTransportRequestorCluster(aAttributeId);
+    }
+    case Clusters::PushAvStreamTransport::Id: {
+        return AttributeIsSpecifiedInPushAVStreamTransportCluster(aAttributeId);
     }
     case Clusters::Chime::Id: {
         return AttributeIsSpecifiedInChimeCluster(aAttributeId);
@@ -6566,6 +6668,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::CommissionerControl::Id: {
         return AttributeIsSpecifiedInCommissionerControlCluster(aAttributeId);
+    }
+    case Clusters::TlsCertificateManagement::Id: {
+        return AttributeIsSpecifiedInTLSCertificateManagementCluster(aAttributeId);
     }
     case Clusters::UnitTesting::Id: {
         return AttributeIsSpecifiedInUnitTestingCluster(aAttributeId);

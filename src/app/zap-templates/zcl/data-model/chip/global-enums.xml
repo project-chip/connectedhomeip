@@ -35,7 +35,7 @@ TODO: Make these structures global rather than defining them for each cluster.
     <item name="Automatic" value="0x03"/>
   </enum>
 
-  <enum name="StreamTypeEnum" type="enum8">
+  <enum name="StreamUsageEnum" type="enum8">
     <cluster code="0x0551"/>
     <cluster code="0x0553"/>
     <cluster code="0x0554"/>

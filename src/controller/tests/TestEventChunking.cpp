@@ -30,12 +30,12 @@
 #include <app/EventLogging.h>
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/DataModelHandler.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -287,7 +287,8 @@ TEST_F(TestEventChunking, TestEventChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    CodegenDataModelProviderInstance()->Shutdown();
+    CodegenDataModelProviderInstance(nullptr /* delegate */)->Shutdown();
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -354,7 +355,8 @@ TEST_F(TestEventChunking, TestMixedEventsAndAttributesChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    CodegenDataModelProviderInstance()->Shutdown();
+    CodegenDataModelProviderInstance(nullptr /* delegate */)->Shutdown();
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -431,7 +433,8 @@ TEST_F(TestEventChunking, TestMixedEventsAndLargeAttributesChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    CodegenDataModelProviderInstance()->Shutdown();
+    CodegenDataModelProviderInstance(nullptr /* delegate */)->Shutdown();
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.

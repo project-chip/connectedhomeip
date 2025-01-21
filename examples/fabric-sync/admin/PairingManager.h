@@ -106,10 +106,11 @@ public:
      *
      * @param nodeId The target node ID for pairing.
      * @param payload The setup code payload, which typically contains device-specific pairing information.
+     * @param icdRegistration The boolean value to set for mICDRegistration.*
      *
      * @return CHIP_NO_ERROR on successful initiation of the pairing process, or an appropriate CHIP_ERROR if pairing fails.
      */
-    CHIP_ERROR PairDeviceWithCode(chip::NodeId nodeId, const char * payload);
+    CHIP_ERROR PairDeviceWithCode(chip::NodeId nodeId, const char * payload, bool icdRegistration = false);
 
     /**
      * Pairs a device using its setup PIN code and remote IP address.
@@ -131,6 +132,12 @@ public:
      * @return CHIP_NO_ERROR if the device is successfully unpaired, or an appropriate CHIP_ERROR if the process fails.
      */
     CHIP_ERROR UnpairDevice(chip::NodeId nodeId);
+
+    /**
+     * Resets the PairingManager's internal state to a baseline, making it ready to handle a new command.
+     * This method clears all internal states and resets all members to their initial values.
+     */
+    void ResetForNextCommand();
 
 private:
     // Constructors

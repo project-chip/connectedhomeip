@@ -39,6 +39,7 @@ constexpr EndpointId kAggregatorEndpointId = 1;
 constexpr uint16_t kWindowTimeout          = 300;
 constexpr uint16_t kIteration              = 1000;
 constexpr uint16_t kMaxDiscriminatorLength = 4095;
+constexpr uint16_t kResponseTimeoutSeconds = 30;
 
 } // namespace
 
@@ -177,47 +178,6 @@ void DeviceManager::OpenRemoteDeviceCommissioningWindow(EndpointId remoteEndpoin
     }
 }
 
-void DeviceManager::PairRemoteFabricBridge(NodeId nodeId, uint32_t setupPINCode, const char * deviceRemoteIp,
-                                           uint16_t deviceRemotePort)
-{
-    if (PairingManager::Instance().PairDevice(nodeId, setupPINCode, deviceRemoteIp, deviceRemotePort) != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to pair remote fabric bridge " ChipLogFormatX64, ChipLogValueX64(nodeId));
-    }
-}
-
-void DeviceManager::PairRemoteDevice(NodeId nodeId, const char * payload)
-{
-    if (PairingManager::Instance().PairDeviceWithCode(nodeId, payload) != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to pair remote device " ChipLogFormatX64, ChipLogValueX64(nodeId));
-    }
-}
-
-void DeviceManager::PairLocalFabricBridge(NodeId nodeId)
-{
-    if (PairingManager::Instance().PairDevice(nodeId, mLocalBridgeSetupPinCode, "::1", mLocalBridgePort) != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to pair local fabric bridge " ChipLogFormatX64, ChipLogValueX64(nodeId));
-    }
-}
-
-void DeviceManager::UnpairRemoteFabricBridge()
-{
-    if (PairingManager::Instance().UnpairDevice(mRemoteBridgeNodeId) != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to unpair remote bridge device " ChipLogFormatX64, ChipLogValueX64(mRemoteBridgeNodeId));
-    }
-}
-
-void DeviceManager::UnpairLocalFabricBridge()
-{
-    if (PairingManager::Instance().UnpairDevice(mLocalBridgeNodeId) != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to unpair local bridge device " ChipLogFormatX64, ChipLogValueX64(mLocalBridgeNodeId));
-    }
-}
-
 void DeviceManager::SubscribeRemoteFabricBridge()
 {
     ChipLogProgress(NotSpecified, "Start subscription to the remote bridge.");
@@ -227,8 +187,9 @@ void DeviceManager::SubscribeRemoteFabricBridge()
 
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Failed to subscribe to the remote bridge (NodeId: %lu). Error: %" CHIP_ERROR_FORMAT,
-                     mRemoteBridgeNodeId, error.Format());
+        ChipLogError(NotSpecified,
+                     "Failed to subscribe to the remote bridge (NodeId: " ChipLogFormatX64 "). Error: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(mRemoteBridgeNodeId), error.Format());
         return;
     }
 }
@@ -251,8 +212,9 @@ void DeviceManager::ReadSupportedDeviceCategories()
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified,
-                     "Failed to read SupportedDeviceCategories from the remote bridge (NodeId: %lu). Error: %" CHIP_ERROR_FORMAT,
-                     mRemoteBridgeNodeId, error.Format());
+                     "Failed to read SupportedDeviceCategories from the remote bridge (NodeId: " ChipLogFormatX64
+                     "). Error: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(mRemoteBridgeNodeId), error.Format());
     }
 }
 
@@ -293,8 +255,9 @@ void DeviceManager::RequestCommissioningApproval()
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified,
-                     "Failed to request commissioning-approval to the remote bridge (NodeId: %lu). Error: %" CHIP_ERROR_FORMAT,
-                     mRemoteBridgeNodeId, error.Format());
+                     "Failed to request commissioning-approval to the remote bridge (NodeId: " ChipLogFormatX64
+                     "). Error: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(mRemoteBridgeNodeId), error.Format());
         return;
     }
 
@@ -417,8 +380,9 @@ void DeviceManager::SendCommissionNodeRequest(uint64_t requestId, uint16_t respo
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified,
-                     "Failed to send CommissionNode command to the remote bridge (NodeId: %lu). Error: %" CHIP_ERROR_FORMAT,
-                     mRemoteBridgeNodeId, error.Format());
+                     "Failed to send CommissionNode command to the remote bridge (NodeId: " ChipLogFormatX64
+                     "). Error: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(mRemoteBridgeNodeId), error.Format());
         return;
     }
 }

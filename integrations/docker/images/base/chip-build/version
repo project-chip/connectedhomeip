@@ -1,1 +1,1 @@
-93 : [Telink] Update Docker image (Zephyr update)
+100 : [linux] Added libpcsclite-dev package for NFC Commissioning on Linux platforms.

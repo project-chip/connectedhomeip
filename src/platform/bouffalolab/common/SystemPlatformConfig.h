@@ -34,5 +34,13 @@ struct ChipDeviceEvent;
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 8
 #endif
 
+#if CHIP_DEVICE_LAYER_TARGET_BL616
+// #define CHIP_CONFIG_SHA256_CONTEXT_SIZE sizeof(mbedtls_sha256_context) in hw_acc/sha256_alt.h
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE (32 + 64 + 64 + 19 * 32)
+#define CHIP_CONFIG_SHA256_CONTEXT_ALIGN 32
+#define CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE (388)
+#else
+
 // #define CHIP_CONFIG_SHA256_CONTEXT_SIZE sizeof(bl_sha_ctx_t)
 #define CHIP_CONFIG_SHA256_CONTEXT_SIZE ((7 + 1 + 5 + 18 + 16 + 16 + 7) * sizeof(unsigned int))
+#endif

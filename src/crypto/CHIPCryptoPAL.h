@@ -941,10 +941,10 @@ public:
     void Clear();
 
 private:
+    // Check if the digest computation has been initialized; implement this if your backend needs it.
+    bool IsInitialized();
+
     HashSHA256OpaqueContext mContext;
-#if CHIP_CRYPTO_BORINGSSL || CHIP_CRYPTO_OPENSSL
-    bool mInitialized = false;
-#endif
 };
 
 class HKDF_sha

@@ -26,6 +26,7 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
 #include <app/util/endpoint-config-api.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #include <lib/core/ErrorStr.h>
 #include <platform/Ameba/AmebaConfig.h>
@@ -78,7 +79,8 @@ static void InitServer(intptr_t context)
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     static AmebaObserver sAmebaObserver;
-    initParams.appDelegate = &sAmebaObserver;
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+    initParams.appDelegate       = &sAmebaObserver;
     chip::Server::GetInstance().Init(initParams);
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);

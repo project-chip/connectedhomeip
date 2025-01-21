@@ -116,7 +116,7 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const
         mLabel.ClearValue();
     }
 
-    CHIP_ERROR err = CommissionerControlServer::Instance().GenerateCommissioningRequestResultEvent(kAggregatorEndpointId, result);
+    CHIP_ERROR err = mCommissionerControlServer.GenerateCommissioningRequestResultEvent(kAggregatorEndpointId, result);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -228,7 +228,7 @@ CHIP_ERROR CommissionerControlInit()
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    err = Clusters::CommissionerControl::CommissionerControlServer::Instance().Init(*sCommissionerControlDelegate);
+    err = sCommissionerControlDelegate->GetCommissionerControlServer().Init();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Initialization failed on Commissioner Control Delegate.");
@@ -242,7 +242,7 @@ CHIP_ERROR CommissionerControlInit()
     supportedDeviceCategories.SetField(Clusters::CommissionerControl::SupportedDeviceCategoryBitmap::kFabricSynchronization, 1);
 
     Protocols::InteractionModel::Status status =
-        Clusters::CommissionerControl::CommissionerControlServer::Instance().SetSupportedDeviceCategoriesValue(
+        sCommissionerControlDelegate->GetCommissionerControlServer().SetSupportedDeviceCategoriesValue(
             Clusters::CommissionerControl::kAggregatorEndpointId, supportedDeviceCategories);
 
     if (status != Protocols::InteractionModel::Status::Success)
