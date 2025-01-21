@@ -2480,6 +2480,9 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @interface MTRClusterRefrigeratorAlarm : MTRGenericCluster
 
+- (void)resetWithParams:(MTRRefrigeratorAlarmClusterResetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)modifyEnabledAlarmsWithParams:(MTRRefrigeratorAlarmClusterModifyEnabledAlarmsParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMaskWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeStateWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
@@ -2504,8 +2507,8 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @interface MTRClusterRefrigeratorAlarm (Availability)
 
 /**
- * The queue is currently unused, but may be used in the future for calling completions
- * for command invocations if commands are added to this cluster.
+ * For all instance methods that take a completion (i.e. command invocations),
+ * the completion will be called on the provided queue.
  */
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID

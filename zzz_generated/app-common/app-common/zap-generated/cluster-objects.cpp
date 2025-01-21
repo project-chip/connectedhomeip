@@ -11771,7 +11771,76 @@ namespace Events {} // namespace Events
 } // namespace TemperatureControl
 namespace RefrigeratorAlarm {
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+namespace Reset {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kAlarms), alarms);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kAlarms))
+        {
+            err = DataModel::Decode(reader, alarms);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace Reset.
+namespace ModifyEnabledAlarms {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kMask), mask);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kMask))
+        {
+            err = DataModel::Decode(reader, mask);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace ModifyEnabledAlarms.
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -34998,6 +35067,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::TemperatureControl::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::RefrigeratorAlarm::Id: {
         switch (aCommand)
         {
         default:

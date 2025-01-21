@@ -5065,6 +5065,17 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::RefrigeratorAlarm::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::RefrigeratorAlarm::Commands::Reset::Id:
+            return "Reset";
+        case chip::app::Clusters::RefrigeratorAlarm::Commands::ModifyEnabledAlarms::Id:
+            return "ModifyEnabledAlarms";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::DishwasherMode::Id: {
         switch (id)
         {

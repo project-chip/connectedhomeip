@@ -6087,6 +6087,18 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TemperatureControl::Commands::SetTemperature::DecodableType & commandData);
 /**
+ * @brief Refrigerator Alarm Cluster Reset Command callback (from client)
+ */
+bool emberAfRefrigeratorAlarmClusterResetCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::RefrigeratorAlarm::Commands::Reset::DecodableType & commandData);
+/**
+ * @brief Refrigerator Alarm Cluster ModifyEnabledAlarms Command callback (from client)
+ */
+bool emberAfRefrigeratorAlarmClusterModifyEnabledAlarmsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::RefrigeratorAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
+/**
  * @brief Smoke CO Alarm Cluster SelfTestRequest Command callback (from client)
  */
 bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(

@@ -5191,6 +5191,8 @@ private:
 | Cluster RefrigeratorAlarm                                           | 0x0057 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * Reset                                                             |   0x00 |
+| * ModifyEnabledAlarms                                               |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Mask                                                              | 0x0000 |
@@ -5205,6 +5207,81 @@ private:
 | Events:                                                             |        |
 | * Notify                                                            | 0x0000 |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Command Reset
+ */
+class RefrigeratorAlarmReset : public ClusterCommand
+{
+public:
+    RefrigeratorAlarmReset(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("reset", credsIssuerConfig)
+    {
+        AddArgument("Alarms", 0, UINT32_MAX, &mRequest.alarms);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::RefrigeratorAlarm::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::RefrigeratorAlarm::Commands::Reset::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::RefrigeratorAlarm::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::RefrigeratorAlarm::Commands::Reset::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::RefrigeratorAlarm::Commands::Reset::Type mRequest;
+};
+
+/*
+ * Command ModifyEnabledAlarms
+ */
+class RefrigeratorAlarmModifyEnabledAlarms : public ClusterCommand
+{
+public:
+    RefrigeratorAlarmModifyEnabledAlarms(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("modify-enabled-alarms", credsIssuerConfig)
+    {
+        AddArgument("Mask", 0, UINT32_MAX, &mRequest.mask);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::RefrigeratorAlarm::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::RefrigeratorAlarm::Commands::ModifyEnabledAlarms::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::RefrigeratorAlarm::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::RefrigeratorAlarm::Commands::ModifyEnabledAlarms::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::RefrigeratorAlarm::Commands::ModifyEnabledAlarms::Type mRequest;
+};
 
 /*----------------------------------------------------------------------------*\
 | Cluster DishwasherMode                                              | 0x0059 |
@@ -20453,7 +20530,9 @@ void registerClusterRefrigeratorAlarm(Commands & commands, CredentialIssuerComma
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                   //
+        make_unique<RefrigeratorAlarmReset>(credsIssuerConfig),               //
+        make_unique<RefrigeratorAlarmModifyEnabledAlarms>(credsIssuerConfig), //
         //
         // Attributes
         //

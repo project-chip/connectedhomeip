@@ -5208,6 +5208,19 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @interface MTRBaseClusterRefrigeratorAlarm : MTRGenericBaseCluster
 
+/**
+ * Command Reset
+ *
+ * Reset alarm
+ */
+- (void)resetWithParams:(MTRRefrigeratorAlarmClusterResetParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command ModifyEnabledAlarms
+ *
+ * Modify enabled alarms
+ */
+- (void)modifyEnabledAlarmsWithParams:(MTRRefrigeratorAlarmClusterModifyEnabledAlarmsParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+
 - (void)readAttributeMaskWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 - (void)subscribeAttributeMaskWithParams:(MTRSubscribeParams *)params
                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished

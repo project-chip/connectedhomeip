@@ -3419,6 +3419,19 @@ cluster RefrigeratorAlarm = 87 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct ResetRequest {
+    AlarmBitmap alarms = 0;
+  }
+
+  request struct ModifyEnabledAlarmsRequest {
+    AlarmBitmap mask = 0;
+  }
+
+  /** Reset alarm */
+  command Reset(ResetRequest): DefaultSuccess = 0;
+  /** Modify enabled alarms */
+  command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */

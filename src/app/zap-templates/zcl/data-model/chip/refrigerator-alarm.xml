@@ -39,6 +39,20 @@ limitations under the License.
       <mandatoryConform/>
     </attribute>
 
+    <command source="client" code="0x00" name="Reset" optional="true">
+      <description>Reset alarm</description>
+      <arg name="Alarms" type="AlarmBitmap" optional="false"/>
+      <mandatoryConform>
+        <feature name="RESET"/>
+      </mandatoryConform>
+    </command>
+
+    <command source="client" code="0x01" name="ModifyEnabledAlarms" optional="true">
+      <description>Modify enabled alarms</description>
+      <arg name="Mask" type="AlarmBitmap" optional="false"/>
+      <optionalConform/>
+    </command>
+
     <event side="server" code="0x00" priority="info" name="Notify" optional="false">
       <description>Notify</description>
       <field id="0" name="Active" type="AlarmBitmap" />

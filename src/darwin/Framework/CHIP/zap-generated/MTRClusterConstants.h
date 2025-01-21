@@ -6311,6 +6311,10 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster TemperatureControl commands
     MTRCommandIDTypeClusterTemperatureControlCommandSetTemperatureID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
 
+    // Cluster RefrigeratorAlarm commands
+    MTRCommandIDTypeClusterRefrigeratorAlarmCommandResetID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterRefrigeratorAlarmCommandModifyEnabledAlarmsID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+
     // Cluster DishwasherMode commands
     MTRCommandIDTypeClusterDishwasherModeCommandChangeToModeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
     MTRCommandIDTypeClusterDishwasherModeCommandChangeToModeResponseID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000001,

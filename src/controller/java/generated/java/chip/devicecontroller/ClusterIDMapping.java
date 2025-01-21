@@ -7198,7 +7198,9 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Command {;
+        public enum Command {
+            Reset(0L),
+            ModifyEnabledAlarms(1L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -7216,7 +7218,41 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }@Override
+        }public enum ResetCommandField {Alarms(0),;
+                    private final int id;
+                    ResetCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ResetCommandField value(int id) throws NoSuchFieldError {
+                        for (ResetCommandField field : ResetCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ModifyEnabledAlarmsCommandField {Mask(0),;
+                    private final int id;
+                    ModifyEnabledAlarmsCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ModifyEnabledAlarmsCommandField value(int id) throws NoSuchFieldError {
+                        for (ModifyEnabledAlarmsCommandField field : ModifyEnabledAlarmsCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
         }

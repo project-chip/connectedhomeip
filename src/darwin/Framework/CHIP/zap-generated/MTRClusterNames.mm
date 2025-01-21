@@ -9428,6 +9428,14 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         switch (commandID) {
 
+        case MTRCommandIDTypeClusterRefrigeratorAlarmCommandResetID:
+            result = @"Reset";
+            break;
+
+        case MTRCommandIDTypeClusterRefrigeratorAlarmCommandModifyEnabledAlarmsID:
+            result = @"ModifyEnabledAlarms";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;

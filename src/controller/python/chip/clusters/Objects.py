@@ -17017,6 +17017,39 @@ class RefrigeratorAlarm(Cluster):
         class AlarmBitmap(IntFlag):
             kDoorOpen = 0x1
 
+    class Commands:
+        @dataclass
+        class Reset(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000057
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="alarms", Tag=0, Type=uint),
+                    ])
+
+            alarms: uint = 0
+
+        @dataclass
+        class ModifyEnabledAlarms(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000057
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="mask", Tag=0, Type=uint),
+                    ])
+
+            mask: uint = 0
+
     class Attributes:
         @dataclass
         class Mask(ClusterAttributeDescriptor):
