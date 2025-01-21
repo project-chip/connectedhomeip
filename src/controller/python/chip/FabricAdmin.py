@@ -63,7 +63,7 @@ class FabricAdmin:
         self._isActive = True
         self._activeControllers: List[ChipDeviceCtrl.ChipDeviceController] = []
 
-    def NewController(self, nodeId: Optional[int] = None, paaTrustStorePath: str = "",
+    def NewController(self, nodeId: Optional[int] = None, paaTrustStorePath: str = "", dacRevocationSetPath: str = "",
                       useTestCommissioner: bool = False, catTags: List[int] = [], keypair: p256keypair.P256Keypair = None):
         ''' Create a new chip.ChipDeviceCtrl.ChipDeviceController instance on this fabric.
 
@@ -75,6 +75,7 @@ class FabricAdmin:
                             is not provided.
 
             paaTrustStorePath:      Path to the PAA trust store. If one isn't provided, a suitable default is selected.
+            dacRevocationSetPath:   Path to the DAC revocation set.
             useTestCommissioner:    If a test commmisioner is to be created.
             catTags:			    A list of 32-bit CAT tags that will added to the NOC generated for this controller.
         '''
@@ -102,6 +103,7 @@ class FabricAdmin:
             nodeId=nodeId,
             adminVendorId=self._vendorId,
             paaTrustStorePath=paaTrustStorePath,
+            dacRevocationSetPath=dacRevocationSetPath,
             useTestCommissioner=useTestCommissioner,
             fabricAdmin=self,
             catTags=catTags,

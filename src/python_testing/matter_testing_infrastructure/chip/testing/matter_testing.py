@@ -617,6 +617,7 @@ class MatterTestConfig:
     storage_path: pathlib.Path = pathlib.Path(".")
     logs_path: pathlib.Path = pathlib.Path(".")
     paa_trust_store_path: Optional[pathlib.Path] = None
+    dac_revocation_set_path: Optional[pathlib.Path] = None
     ble_interface_id: Optional[int] = None
     commission_only: bool = False
 
@@ -1936,6 +1937,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.storage_path = pathlib.Path(_DEFAULT_STORAGE_PATH) if args.storage_path is None else args.storage_path
     config.logs_path = pathlib.Path(_DEFAULT_LOG_PATH) if args.logs_path is None else args.logs_path
     config.paa_trust_store_path = args.paa_trust_store_path
+    config.dac_revocation_set_path = args.dac_revocation_set_path
     config.ble_interface_id = args.ble_interface_id
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
     config.tests = list(chain.from_iterable(args.tests or []))
@@ -1984,6 +1986,8 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
     paa_path_default = get_default_paa_trust_store(pathlib.Path.cwd())
     basic_group.add_argument('--paa-trust-store-path', action="store", type=pathlib.Path, metavar="PATH", default=paa_path_default,
                              help="PAA trust store path (default: %s)" % str(paa_path_default))
+    basic_group.add_argument('--dac-revocation-set-path', action="store", type=pathlib.Path, metavar="PATH",
+                             help="Path to JSON file containing the device attestation revocation set.")
     basic_group.add_argument('--ble-interface-id', action="store", type=int,
                              metavar="INTERFACE_ID", help="ID of BLE adapter (from hciconfig)")
     basic_group.add_argument('-N', '--controller-node-id', type=int_decimal_or_hex,
@@ -2506,6 +2510,7 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
             default_controller = stack.certificate_authorities[0].adminList[0].NewController(
                 nodeId=matter_test_config.controller_node_id,
                 paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
+                dacRevocationSetPath=str(matter_test_config.dac_revocation_set_path) if matter_test_config.dac_revocation_set_path else "",
                 catTags=matter_test_config.controller_cat_tags
             )
         test_config.user_params["default_controller"] = stash_globally(default_controller)
