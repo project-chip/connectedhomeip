@@ -59,16 +59,6 @@ uint32_t rx_ldma_channel;
 uint32_t tx_ldma_channel;
 osMutexId_t ncp_transfer_mutex = 0;
 
-/*
-// LDMA descriptor and transfer configuration structures for USART TX channel
-LDMA_Descriptor_t ldmaTXDescriptor[LDMA_DESCRIPTOR_ARRAY_LENGTH];
-LDMA_TransferCfg_t ldmaTXConfig;
-
-// LDMA descriptor and transfer configuration structures for USART RX channel
-LDMA_Descriptor_t ldmaRXDescriptor[LDMA_DESCRIPTOR_ARRAY_LENGTH];
-LDMA_TransferCfg_t ldmaRXConfig;
-*/
-
 static osSemaphoreId_t transfer_done_semaphore = NULL;
 
 static void gpio_interrupt([[maybe_unused]] uint8_t interrupt_number)
