@@ -26,9 +26,11 @@
 #           --custom-flow 2
 #           --capabilities 6
 #       script-args:
+#           --PICS src/app/tests/suites/certification/ci-pics-values
 #           --in-test-commissioning-method on-network
-#           --tc-version-to-simulate 1
-#           --tc-user-response-to-simulate 1
+#           --int-arg PIXIT.CGEN.FailsafeExpiryLengthSeconds:900
+#           --int-arg PIXIT.CGEN.RequiredTCAcknowledgements:1
+#           --int-arg PIXIT.CGEN.TCRevision:1
 #           --qr-code MT:-24J0AFN00KA0648G00
 #           --trace-to json:log
 #       factoryreset: True
@@ -46,8 +48,13 @@ class TC_CGEN_2_7(MatterBaseTest):
     def desc_TC_CGEN_2_7(self) -> str:
         return "[TC-CGEN-2.7] Verification for CommissioningComplete when SetTCAcknowledgements provides invalid terms [DUT as Server]"
 
+    def pics_TC_CGEN_2_7(self) -> list[str]:
+        """ This function returns a list of PICS for this test case that must be True for the test to be run"""
+        return ["CGEN.S", "CGEN.S.F00(TC)"]
+
     def steps_TC_CGEN_2_7(self) -> list[TestStep]:
         return [
+            TestStep(0, description="", expectation="", is_commissioning=False),
             TestStep(1, "TH begins commissioning the DUT and performs the following steps in order:\n* Security setup using PASE\n* Setup fail-safe timer, with ExpiryLengthSeconds field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb value as 1\n* Configure information- UTC time, regulatory, etc."),
             TestStep(2, "TH reads from the DUT the attribute TCMinRequiredVersion. Store the value as minVersion."),
             TestStep(3, "TH sends SetTCAcknowledgements to DUT with the following values:\n* TCVersion: minVersion\n* TCUserResponse: 0"),
@@ -60,8 +67,14 @@ class TC_CGEN_2_7(MatterBaseTest):
     @async_test_body
     async def test_TC_CGEN_2_7(self):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
-        tc_version_to_simulate: int = self.matter_test_config.tc_version_to_simulate
-        tc_user_response_to_simulate: int = self.matter_test_config.tc_user_response_to_simulate
+        failsafe_expiry_length_seconds = self.matter_test_config.global_test_params['PIXIT.CGEN.FailsafeExpiryLengthSeconds']
+        tc_version_to_simulate = self.matter_test_config.global_test_params['PIXIT.CGEN.TCRevision']
+        tc_user_response_to_simulate = self.matter_test_config.global_test_params['PIXIT.CGEN.RequiredTCAcknowledgements']
+
+        self.step(0)
+        if not self.pics_guard(self.check_pics("CGEN.S.F00(TC)")):
+            self.skip_all_remaining_steps(1)
+            return
 
         # Step 1: Begin commissioning with PASE and failsafe
         self.step(1)
@@ -70,6 +83,18 @@ class TC_CGEN_2_7(MatterBaseTest):
         self.matter_test_config.tc_version_to_simulate = None
         self.matter_test_config.tc_user_response_to_simulate = None
         await self.commission_devices()
+
+        response = await commissioner.SendCommand(
+            nodeid=self.dut_node_id,
+            endpoint=ROOT_ENDPOINT_ID,
+            payload=Clusters.GeneralCommissioning.Commands.ArmFailSafe(
+                expiryLengthSeconds=failsafe_expiry_length_seconds, breadcrumb=1),
+        )
+        asserts.assert_equal(
+            response.errorCode,
+            Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+            "ArmFailSafeResponse error code is not OK.",
+        )
 
         # Step 2: Read TCMinRequiredVersion
         self.step(2)

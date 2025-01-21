@@ -26,7 +26,8 @@
 #           --custom-flow 2
 #           --capabilities 6
 #       script-args:
-#           --commissioning-method on-network
+#           --PICS src/app/tests/suites/certification/ci-pics-values
+#           --in-test-commissioning-method on-network
 #           --tc-version-to-simulate 1
 #           --tc-user-response-to-simulate 1
 #           --qr-code MT:-24J0AFN00KA0648G00
@@ -46,8 +47,13 @@ class TC_CGEN_2_10(MatterBaseTest):
     def desc_TC_CGEN_2_10(self) -> str:
         return "[TC-CGEN-2.10] Verification that required terms can't be unset from TCAcknowledgements with SetTCAcknowledgements [DUT as Server]"
 
+    def pics_TC_CGEN_2_10(self) -> list[str]:
+        """ This function returns a list of PICS for this test case that must be True for the test to be run"""
+        return ["CGEN.S", "CGEN.S.F00(TC)"]
+
     def steps_TC_CGEN_2_10(self) -> list[TestStep]:
         return [
+            TestStep(0, description="", expectation="", is_commissioning=False),
             TestStep(1, "TH reads from the DUT the attribute TCAcceptedVersion. Store the value as acceptedVersion."),
             TestStep(2, "TH reads from the DUT the attribute TCAcknowledgements. Store the value as userAcknowledgements."),
             TestStep(3, "TH Sends the SetTCAcknowledgements command to the DUT with the fields set as follows:\n* TCVersion: 0\n* TCUserResponse: 65535"),
@@ -61,8 +67,22 @@ class TC_CGEN_2_10(MatterBaseTest):
     @async_test_body
     async def test_TC_CGEN_2_10(self):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
+
+        self.step(0)
+        if not self.pics_guard(self.check_pics("CGEN.S.F00(TC)")):
+            self.skip_all_remaining_steps(1)
+            return
+
+        # Step 1: Begin commissioning with PASE and failsafe
+        commissioner.SetSkipCommissioningComplete(True)
+        self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
+        self.matter_test_config.tc_version_to_simulate = None
+        self.matter_test_config.tc_user_response_to_simulate = None
         await self.commission_devices()
 
+        # await self.commission_devices()
+        # self.skip_all_remaining_steps(1)
+        # return
         # Step 1: Read TCAcceptedVersion
         self.step(1)
         response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion)])

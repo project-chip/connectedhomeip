@@ -26,6 +26,7 @@
 #           --custom-flow 2
 #           --capabilities 6
 #       script-args:
+#           --PICS src/app/tests/suites/certification/ci-pics-values
 #           --in-test-commissioning-method on-network
 #           --qr-code MT:-24J0AFN00KA0648G00
 #           --trace-to json:log
@@ -44,8 +45,13 @@ class TC_CGEN_2_6(MatterBaseTest):
     def desc_TC_CGEN_2_6(self) -> str:
         return "[TC-CGEN-2.6] Verification for CommissioningComplete no terms accepted when required [DUT as Server]"
 
+    def pics_TC_CGEN_2_6(self) -> list[str]:
+        """ This function returns a list of PICS for this test case that must be True for the test to be run"""
+        return ["CGEN.S", "CGEN.S.F00(TC)"]
+
     def steps_TC_CGEN_2_6(self) -> list[TestStep]:
         return [
+            TestStep(0, description="", expectation="", is_commissioning=False),
             TestStep(1, "TH starts commissioning the DUT. It performs all commissioning steps from 'Device discovery and establish commissioning channel' to 'Security setup using CASE', except for TC configuration with SetTCAcknowledgements."),
             TestStep(2, "TH sends CommissioningComplete to DUT."),
         ]
@@ -53,6 +59,11 @@ class TC_CGEN_2_6(MatterBaseTest):
     @async_test_body
     async def test_TC_CGEN_2_6(self):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
+
+        self.step(0)
+        if not self.pics_guard(self.check_pics("CGEN.S.F00(TC)")):
+            self.skip_all_remaining_steps(1)
+            return
 
         # Step 1: Commission device without setting TC acknowledgements
         self.step(1)

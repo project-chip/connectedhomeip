@@ -26,9 +26,11 @@
 #           --custom-flow 2
 #           --capabilities 6
 #       script-args:
+#           --PICS src/app/tests/suites/certification/ci-pics-values
 #           --in-test-commissioning-method on-network
-#           --tc-version-to-simulate 1
-#           --tc-user-response-to-simulate 1
+#           --int-arg PIXIT.CGEN.FailsafeExpiryLengthSeconds:900
+#           --int-arg PIXIT.CGEN.RequiredTCAcknowledgements:1
+#           --int-arg PIXIT.CGEN.TCRevision:1
 #           --qr-code MT:-24J0AFN00KA0648G00
 #           --trace-to json:log
 #       factoryreset: True
@@ -46,8 +48,13 @@ class TC_CGEN_2_8(MatterBaseTest):
     def desc_TC_CGEN_2_8(self) -> str:
         return "[TC-CGEN-2.8] Verification that TCAcknowledgements is reset after Factory Reset [DUT as Server]"
 
+    def pics_TC_CGEN_2_8(self) -> list[str]:
+        """ This function returns a list of PICS for this test case that must be True for the test to be run"""
+        return ["CGEN.S", "CGEN.S.F00(TC)"]
+
     def steps_TC_CGEN_2_8(self) -> list[TestStep]:
         return [
+            TestStep(0, description="", expectation="", is_commissioning=False),
             TestStep(1, "TH begins commissioning the DUT and performs the following steps in order:\n* Security setup using PASE\n* Setup fail-safe timer, with ExpiryLengthSeconds field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb value as 1\n* Configure information- UTC time, regulatory, etc."),
             TestStep(2, "TH sends SetTCAcknowledgements to DUT with the following values:\n* TCVersion: PIXIT.CGEN.TCRevision\n* TCUserResponse: PIXIT.CGEN.RequiredTCAcknowledgements"),
             TestStep(3, "TH continues commissioning steps with the DUT and performs steps 'Operation CSR exchange' through 'Security setup using CASE'"),
@@ -61,16 +68,34 @@ class TC_CGEN_2_8(MatterBaseTest):
     @async_test_body
     async def test_TC_CGEN_2_8(self):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
-        tc_version_to_simulate: int = self.matter_test_config.tc_version_to_simulate
-        tc_user_response_to_simulate: int = self.matter_test_config.tc_user_response_to_simulate
+        failsafe_expiry_length_seconds = self.matter_test_config.global_test_params['PIXIT.CGEN.FailsafeExpiryLengthSeconds']
+        tc_version_to_simulate = self.matter_test_config.global_test_params['PIXIT.CGEN.TCRevision']
+        tc_user_response_to_simulate = self.matter_test_config.global_test_params['PIXIT.CGEN.RequiredTCAcknowledgements']
 
-        # Steps 1-4: Initial commissioning with TC acknowledgements
+        self.step(0)
+        if not self.pics_guard(self.check_pics("CGEN.S.F00(TC)")):
+            self.skip_all_remaining_steps(1)
+            return
+
+        # Step 1: Begin commissioning with PASE and failsafe
         self.step(1)
         commissioner.SetSkipCommissioningComplete(True)
         self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
         self.matter_test_config.tc_version_to_simulate = None
         self.matter_test_config.tc_user_response_to_simulate = None
         await self.commission_devices()
+
+        response = await commissioner.SendCommand(
+            nodeid=self.dut_node_id,
+            endpoint=ROOT_ENDPOINT_ID,
+            payload=Clusters.GeneralCommissioning.Commands.ArmFailSafe(
+                expiryLengthSeconds=failsafe_expiry_length_seconds, breadcrumb=1),
+        )
+        asserts.assert_equal(
+            response.errorCode,
+            Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+            "ArmFailSafeResponse error code is not OK.",
+        )
 
         # Step 2: Send SetTCAcknowledgements
         self.step(2)
@@ -107,14 +132,17 @@ class TC_CGEN_2_8(MatterBaseTest):
         # Step 5: Factory reset is handled by test runner configuration
         self.step(5)
 
-        # Step 6: Put device in commissioning mode
+        # Step 6: Put device in commissioning mode (requiring user input, so skip in CI)
         self.step(6)
+        if not self.check_pics('PICS_USER_PROMPT'):
+            self.skip_all_remaining_steps(7)
+            return
+
         self.wait_for_user_input(prompt_msg="Set the DUT into commissioning mode")
 
         # Step 7: Commission without TC acknowledgements
         self.step(7)
         commissioner.SetSkipCommissioningComplete(True)
-        self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
         self.matter_test_config.tc_version_to_simulate = None
         self.matter_test_config.tc_user_response_to_simulate = None
         await self.commission_devices()
