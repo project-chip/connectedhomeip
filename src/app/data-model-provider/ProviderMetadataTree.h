@@ -1,4 +1,34 @@
+/*
+ *    Copyright (c) 2024 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+#pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributePathParams.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteClusterPath.h>
+#include <app/ConcreteCommandPath.h>
+#include <app/data-model-provider/MetadataList.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model/List.h>
+#include <lib/support/Span.h>
+
+namespace chip {
+namespace app {
+namespace DataModel {
 
 /// Provides metadata information for a data model
 ///
@@ -16,22 +46,6 @@
 ///       are returned, when iterating over a cluster, all attributes/commands are iterated over)
 ///     - uniqueness and completeness (iterate over all possible distinct values as long as no
 ///       internal structural changes occur)
-#pragma once
-
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributePathParams.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/ConcreteClusterPath.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/data-model-provider/MetadataList.h>
-#include <app/data-model-provider/MetadataTypes.h>
-#include <app/data-model/List.h>
-#include <lib/support/Span.h>
-
-namespace chip {
-namespace app {
-namespace DataModel {
-
 class ProviderMetadataTree
 {
 public:
