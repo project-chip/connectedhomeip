@@ -86,7 +86,6 @@ extern "C" {
 #endif
 
 WfxRsi_t wfx_rsi;
-extern osSemaphoreId_t sl_rs_ble_init_sem;
 
 namespace {
 
@@ -310,7 +309,6 @@ sl_status_t sl_wifi_siwx917_init(void)
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 
     wfx_rsi.dev_state.Set(WifiState::kStationInit);
-    osSemaphoreRelease(sl_rs_ble_init_sem);
     return status;
 }
 

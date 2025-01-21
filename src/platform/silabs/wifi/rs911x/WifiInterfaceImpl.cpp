@@ -71,10 +71,6 @@ osThreadAttr_t kDrvTaskAttr = { .name       = "drv_rsi",
                                 .stack_size = kDrvTaskSize,
                                 .priority   = osPriorityHigh };
 
-#if (RSI_BLE_ENABLE)
-extern rsi_semaphore_handle_t sl_rs_ble_init_sem;
-#endif
-
 static osMessageQueueId_t sWifiEventQueue = NULL;
 /*
  * This file implements the interface to the RSI SAPIs
@@ -330,10 +326,6 @@ static int32_t sl_matter_wifi_init(void)
         ChipLogError(DeviceLayer, "rsi_wlan_register_callbacks failed: %ld", status);
         return status;
     }
-
-#if (RSI_BLE_ENABLE)
-    rsi_semaphore_post(&sl_rs_ble_init_sem);
-#endif
 
     wfx_rsi.dev_state.Set(WifiState::kStationInit);
     return RSI_SUCCESS;
@@ -646,15 +638,15 @@ void ProcessEvent(WifiPlatformEvent event)
     }
 }
 
+sl_status_t sl_matter_wifi_platform_init(void)
+{
+    VerifyOrReturnError(sl_matter_wifi_init() == RSI_SUCCESS, SL_STATUS_FAIL);
+    return SL_STATUS_OK;
+}
+
 void MatterWifiTask(void * arg)
 {
     (void) arg;
-    uint32_t rsi_status = sl_matter_wifi_init();
-    if (rsi_status != RSI_SUCCESS)
-    {
-        ChipLogError(DeviceLayer, "MatterWifiTask: sl_matter_wifi_init failed: %ld", rsi_status);
-        return;
-    }
     WifiPlatformEvent event;
     sl_matter_lwip_start();
     sl_matter_wifi_task_started();
