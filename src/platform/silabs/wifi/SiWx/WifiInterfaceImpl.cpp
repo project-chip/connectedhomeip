@@ -314,7 +314,6 @@ sl_status_t sl_wifi_siwx917_init(void)
     return status;
 }
 
-// TODO: this changes will be reverted back after the Silabs WiFi SDK team fix the scan API
 sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_result, uint32_t result_length, void * arg)
 {
     sl_status_t status = SL_STATUS_OK;
@@ -344,10 +343,8 @@ sl_status_t InitiateScan()
 {
     sl_status_t status = SL_STATUS_OK;
 
-    // TODO: this changes will be reverted back after the Silabs WiFi SDK team fix the scan API
     sl_wifi_ssid_t ssid = { 0 };
 
-    // TODO: this changes will be reverted back after the Silabs WiFi SDK team fix the scan API
     sl_wifi_scan_configuration_t wifi_scan_configuration = default_wifi_scan_configuration;
 
     ssid.length = wfx_rsi.sec.ssid_length;
