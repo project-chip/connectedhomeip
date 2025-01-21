@@ -1,4 +1,4 @@
-ARG VERSION=2
+ARG VERSION=1
 FROM ghcr.io/project-chip/chip-build-java:${VERSION}
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
