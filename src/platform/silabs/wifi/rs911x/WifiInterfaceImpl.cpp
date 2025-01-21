@@ -638,7 +638,7 @@ void ProcessEvent(WifiPlatformEvent event)
     }
 }
 
-sl_status_t sl_matter_wifi_platform_init(void)
+sl_status_t InitSiWxWifi(void)
 {
     VerifyOrReturnError(sl_matter_wifi_init() == RSI_SUCCESS, SL_STATUS_FAIL);
     return SL_STATUS_OK;

@@ -324,9 +324,9 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 #endif // WF200_WIFI
 
     // TODO: Platform specific init should not be required here
-#if ((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1) || defined(EXP_BOARD))
+#if RS911X_WIFI
     VerifyOrReturnError(InitSiWxWifi() == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
-#endif //((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1 ) || defined(EXP_BOARD))
+#endif // RS911X_WIFI
 
     return CHIP_NO_ERROR;
 }
