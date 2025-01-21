@@ -22,7 +22,7 @@
 #include "em_gpio.h"
 #include "em_usart.h"
 #include "gpiointerrupt.h"
-#include "sl_board_configuration_SiWx917.h"
+#include "sl_board_configuration.h"
 #include "sl_constants.h"
 #include "sl_rsi_utility.h"
 #include "sl_si91x_host_interface.h"
