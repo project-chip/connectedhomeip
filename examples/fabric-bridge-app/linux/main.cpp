@@ -132,7 +132,8 @@ private:
 
 CHIP_ERROR AdministratorCommissioningCommandHandler::Init()
 {
-    mOriginalCommandHandlerInterface = CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(kRootEndpointId, AdministratorCommissioning::Id);
+    mOriginalCommandHandlerInterface =
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(kRootEndpointId, AdministratorCommissioning::Id);
     VerifyOrReturnError(mOriginalCommandHandlerInterface, CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(mOriginalCommandHandlerInterface));
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
@@ -267,8 +268,11 @@ void ApplicationInit()
     ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationInit()");
 
     MatterEcosystemInformationPluginServerInitCallback();
-    VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&bridge::gBridgedDeviceInformationCommandHandler) == CHIP_NO_ERROR, NotSpecified, "Failed to register bridged device command handler");
-    VerifyOrDieWithMsg(AttributeAccessInterfaceRegistry::Instance().Register(&bridge::gBridgedDeviceBasicInformationAttributes), NotSpecified, "Failed to register bridged device attribute access");
+    VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(
+                           &bridge::gBridgedDeviceInformationCommandHandler) == CHIP_NO_ERROR,
+                       NotSpecified, "Failed to register bridged device command handler");
+    VerifyOrDieWithMsg(AttributeAccessInterfaceRegistry::Instance().Register(&bridge::gBridgedDeviceBasicInformationAttributes),
+                       NotSpecified, "Failed to register bridged device attribute access");
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
     bridge::SetRpcRemoteServerPort(gFabricAdminServerPort);
@@ -278,8 +282,8 @@ void ApplicationInit()
 
     bridge::BridgedDeviceManager::Instance().Init();
     VerifyOrDie(bridge::gBridgedAdministratorCommissioning.Init() == CHIP_NO_ERROR);
-    VerifyOrDieWithMsg(bridge::gAdministratorCommissioningCommandHandler.Init() == CHIP_NO_ERROR,
-    NotSpecified, "Failed to initialize Commissioner command handler");
+    VerifyOrDieWithMsg(bridge::gAdministratorCommissioningCommandHandler.Init() == CHIP_NO_ERROR, NotSpecified,
+                       "Failed to initialize Commissioner command handler");
 
     VerifyOrDieWithMsg(bridge::CommissionerControlInit() == CHIP_NO_ERROR, NotSpecified,
                        "Failed to initialize Commissioner Control Server");
