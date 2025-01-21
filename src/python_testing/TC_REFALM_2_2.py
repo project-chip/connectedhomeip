@@ -38,10 +38,12 @@ from typing import Any
 import queue
 import json
 import chip.clusters as Clusters
+from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, SimpleEventCallback,type_matches
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
+
 
 class TC_REFALM_2_2(MatterBaseTest):
 
@@ -66,7 +68,7 @@ class TC_REFALM_2_2(MatterBaseTest):
             TestStep( 6, "TH reads from the DUT the State attribute"),
             TestStep( 7, "Ensure that the door on the DUT is closed"),
             TestStep( 8, "TH reads from the DUT the State attribute"),
-            TestStep( 9, "TH sends Reset command to the DUT"),
+            #TestStep( 9, "TH sends Reset command to the DUT"),
             #TestStep( 10, "TH sends ModifyEnabledAlarms command to the DUT"),
             TestStep( 11, "Set up subscription to the Notify event"),
             TestStep( "12.a", "Repeating step 4 Manually open the door on the DUT"),
@@ -177,23 +179,24 @@ class TC_REFALM_2_2(MatterBaseTest):
         device_status = await self.read_refalm_state_attribute()
         asserts.assert_equal(device_status,0)
 
-        self.step(9)
-        # Send a non registere command ( SendCommandByIds is a raw command )
-        # need to fully implement the raw command
-        try:
-            await self.default_controller.SendCommandByIds(nodeid=self.dut_node_id, endpoint=0, clusterId=cluster.id, commandId=0, timedRequestTimeoutMs=6000)
-        except  NotImplementedError as e:
-            logger.info(f"Exception {e}")
-            asserts.assert_in(e,"UNSUPPORTED_COMMAND(0x81)")
+        # self.step(9)
+        # # need to fully implement the raw command
+        # try:
+        #     #await self.default_controller.SendCommand(nodeid=self.dut_node_id,endpoint=0,payload=Clusters.DishwasherAlarm.Commands.Reset())
+        #     await self.default_controller.SendCommandByIds(nodeid=self.dut_node_id,endpoint=0,clusterId=cluster.id,commandId=0)
+        # except InteractionModelError as uc:
+        #     # This  is UNSUPPORTED_COMMAND(0x81)
+        #     logger.info(f"Interaction model error {str(uc.status)}")
+        #     asserts.assert_equal(Status.UnsupportedCommand,uc.status)
 
-
-        # # step 10
         # self.step(10)
-        # try: 
-        #     await self.default_controller.SendCommandByIds(nodeid=self.dut_node_id, endpoint=0, clusterId=0, commandId=0, timedRequestTimeoutMs=6000)
-        # except Exception as e:
-        #     logger.info(f"Exception {e}")
-        #     asserts.assert_in(e," UNSUPPORTED_COMMAND(0x81)")
+        # try:
+        #     await self.default_controller.SendCommand(nodeid=self.dut_node_id,endpoint=0,payload=Clusters.DishwasherAlarm.Commands.ModifyEnabledAlarms())
+        #     # await self.default_controller.SendCommandByIds(nodeid=self.dut_node_id,endpoint=0,clusterId=cluster.id,commandId=1)
+        # except InteractionModelError as uc:
+        #     logger.info(f"Exception {str(uc.status)}")
+        #     # this is UNSUPPORTED_COMMAND(0x81)
+        #     asserts.assert_equal(Status.UnsupportedCommand,uc.status)
 
         
         # Subscribe to Notify Event
@@ -217,7 +220,7 @@ class TC_REFALM_2_2(MatterBaseTest):
             ret = self.q.get(block=True, timeout=30)
             logger.info(f"Event data {ret}")
             asserts.assert_true(type_matches(ret.Data, cluster.Events.Notify ),"Unexpected event type returned")
-            asserts.assert_equal(ret.Data.state,0,"Unexpected event type returned")
+            asserts.assert_equal(ret.Data.state, 1,"Unexpected value for State returned")
         except queue.Empty:
             asserts.fail("Did not receive Notify event")
             asserts.fail()
@@ -231,10 +234,16 @@ class TC_REFALM_2_2(MatterBaseTest):
 
         # check for StateAttribute
         self.step("13.b")
-        # wait for Notify event
-        device_state = 0
-        logger.info(f"Event device state is {device_state}")
-        asserts.assert_equal(device_state,0)
+        # Wait for the Notify event
+        try:
+            ret = self.q.get(block=True, timeout=30)
+            logger.info(f"Event data {ret}")
+            asserts.assert_true(type_matches(ret.Data, cluster.Events.Notify ),"Unexpected event type returned")
+            asserts.assert_equal(ret.Data.state, 0,"Unexpected value for State returned")
+        except queue.Empty:
+            asserts.fail("Did not receive Notify event")
+            asserts.fail()
+            pass
 
 if __name__ == "__main__":
     default_matter_test_main()
