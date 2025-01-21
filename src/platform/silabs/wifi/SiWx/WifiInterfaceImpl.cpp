@@ -281,14 +281,8 @@ sl_status_t sl_wifi_siwx917_init(void)
     RSI_NPSSGPIO_InputBufferEn(RTE_UULP_GPIO_1_PIN, 1);
 #endif // ENABLE_CHIP_SHELL
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-#if 0
-#else
-    // NCP Configurations
-    status = InitSiWxWifi();
-    VerifyOrReturnError(status == SL_STATUS_OK, status,
-                        ChipLogError(DeviceLayer, "InitSiWxWifi failed: 0x%lx", static_cast<uint32_t>(status)));
 #endif // SLI_SI91X_MCU_INTERFACE
-#endif
+
     sl_wifi_firmware_version_t version = { 0 };
     status                             = sl_wifi_get_firmware_version(&version);
     VerifyOrReturnError(status == SL_STATUS_OK, status,
@@ -321,7 +315,6 @@ sl_status_t sl_wifi_siwx917_init(void)
 }
 
 // TODO: this changes will be reverted back after the Silabs WiFi SDK team fix the scan API
-// #ifndef EXP_BOARD
 sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_result, uint32_t result_length, void * arg)
 {
     sl_status_t status = SL_STATUS_OK;
@@ -346,14 +339,12 @@ sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_res
     osSemaphoreRelease(sScanCompleteSemaphore);
     return status;
 }
-// #endif
 
 sl_status_t InitiateScan()
 {
     sl_status_t status = SL_STATUS_OK;
 
     // TODO: this changes will be reverted back after the Silabs WiFi SDK team fix the scan API
-    // #ifndef EXP_BOARD
     sl_wifi_ssid_t ssid = { 0 };
 
     // TODO: this changes will be reverted back after the Silabs WiFi SDK team fix the scan API
@@ -376,7 +367,6 @@ sl_status_t InitiateScan()
     }
 
     osSemaphoreRelease(sScanInProgressSemaphore);
-    // #endif
 
     return status;
 }

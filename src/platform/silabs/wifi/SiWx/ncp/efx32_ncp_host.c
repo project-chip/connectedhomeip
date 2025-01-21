@@ -59,6 +59,7 @@ uint32_t rx_ldma_channel;
 uint32_t tx_ldma_channel;
 osMutexId_t ncp_transfer_mutex = 0;
 
+/*
 // LDMA descriptor and transfer configuration structures for USART TX channel
 LDMA_Descriptor_t ldmaTXDescriptor[LDMA_DESCRIPTOR_ARRAY_LENGTH];
 LDMA_TransferCfg_t ldmaTXConfig;
@@ -66,6 +67,7 @@ LDMA_TransferCfg_t ldmaTXConfig;
 // LDMA descriptor and transfer configuration structures for USART RX channel
 LDMA_Descriptor_t ldmaRXDescriptor[LDMA_DESCRIPTOR_ARRAY_LENGTH];
 LDMA_TransferCfg_t ldmaRXConfig;
+*/
 
 static osSemaphoreId_t transfer_done_semaphore = NULL;
 
@@ -162,14 +164,14 @@ uint32_t sl_si91x_host_get_wake_indicator(void)
 
 sl_status_t sl_si91x_host_init(const sl_si91x_host_init_configuration * config)
 {
-#if 0
+#if SL_SPICTRL_MUX
     sl_status_t status = sl_board_disable_display();
     if (SL_STATUS_OK != status)
     {
         SILABS_LOG("sl_board_disable_display failed with error: %x", status);
         return status;
     }
-#endif // 0
+#endif // SL_SPICTRL_MUX
     init_config.rx_irq      = config->rx_irq;
     init_config.rx_done     = config->rx_done;
     init_config.boot_option = config->boot_option;
@@ -177,9 +179,9 @@ sl_status_t sl_si91x_host_init(const sl_si91x_host_init_configuration * config)
     // Enable clock (not needed on xG21)
     CMU_ClockEnable(cmuClock_GPIO, true);
 
-#if 0
+#if SL_SPICTRL_MUX
     spi_board_init();
-#endif // 0
+#endif // SL_SPICTRL_MUX
 
     if (transfer_done_semaphore == NULL)
     {
@@ -226,9 +228,9 @@ sl_status_t sl_si91x_host_spi_transfer(const void * tx_buffer, void * rx_buffer,
 {
     osMutexAcquire(ncp_transfer_mutex, 0xFFFFFFFFUL);
 
-#if 0
+#if SL_SPICTRL_MUX
     sl_wfx_host_spi_cs_assert();
-#endif // 0
+#endif // SL_SPICTRL_MUX
 
     if (ECODE_EMDRV_SPIDRV_BUSY == si91x_SPIDRV_MTransfer(SPI_HANDLE, tx_buffer, rx_buffer, buffer_length, spi_dma_callback))
     {
@@ -239,9 +241,9 @@ sl_status_t sl_si91x_host_spi_transfer(const void * tx_buffer, void * rx_buffer,
     }
 
     osMutexRelease(ncp_transfer_mutex);
-#if 0
+#if SL_SPICTRL_MUX
     sl_wfx_host_spi_cs_deassert();
-#endif // 0
+#endif // SL_SPICTRL_MUX
     return SL_STATUS_OK;
 }
 
