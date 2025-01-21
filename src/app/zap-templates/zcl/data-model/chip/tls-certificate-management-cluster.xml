@@ -36,7 +36,7 @@ Git: 1.4-534-g3214b3502
   </struct>
 
   <cluster apiMaturity="provisional">
-    <domain name="Cameras"/>
+    <domain name="General"/>
     <name>TLS Certificate Management</name>
     <code>0x0801</code>
     <define>TLS_CERTIFICATE_MANAGEMENT_CLUSTER</define>
