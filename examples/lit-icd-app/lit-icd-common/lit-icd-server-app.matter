@@ -2089,12 +2089,12 @@ endpoint 0 {
     callback attribute clientsSupportedPerFabric;
     ram      attribute userActiveModeTriggerHint default = 0x111D;
     ram      attribute userActiveModeTriggerInstruction default = "Restart the application";
-    ram      attribute operatingMode default = 0;
+    callback attribute operatingMode;
     callback attribute maximumCheckInBackOff;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x000F;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
 
     handle command RegisterClient;

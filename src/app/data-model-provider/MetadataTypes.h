@@ -25,10 +25,12 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/data-model-provider/MetadataList.h>
 #include <app/data-model/List.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/BitMask.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace app {
@@ -50,29 +52,26 @@ enum class EndpointCompositionPattern : uint8_t
     kFullFamily = 0x2,
 };
 
-struct EndpointInfo
+struct EndpointEntry
 {
+    EndpointId id;
+
     // kInvalidEndpointId if there is no explicit parent endpoint (which means the parent is endpoint 0,
     // for endpoints other than endpoint 0).
     EndpointId parentId;
     EndpointCompositionPattern compositionPattern;
-
-    explicit EndpointInfo(EndpointId parent) : parentId(parent), compositionPattern(EndpointCompositionPattern::kFullFamily) {}
-    EndpointInfo(EndpointId parent, EndpointCompositionPattern pattern) : parentId(parent), compositionPattern(pattern) {}
-};
-
-struct EndpointEntry
-{
-    EndpointId id;
-    EndpointInfo info;
-
-    bool IsValid() const { return id != kInvalidEndpointId; }
-    static const EndpointEntry kInvalid;
 };
 
 enum class ClusterQualityFlags : uint32_t
 {
     kDiagnosticsData = 0x0001, // `K` quality, may be filtered out in subscriptions
+};
+
+struct ServerClusterEntry
+{
+    ClusterId clusterId;
+    DataVersion dataVersion; // current cluster data version,
+    BitFlags<ClusterQualityFlags> flags;
 };
 
 struct ClusterInfo
@@ -85,16 +84,6 @@ struct ClusterInfo
     ClusterInfo(DataVersion version) : dataVersion(version) {}
 };
 
-struct ClusterEntry
-{
-    ConcreteClusterPath path;
-    ClusterInfo info;
-
-    bool IsValid() const { return path.HasValidIds(); }
-
-    static const ClusterEntry kInvalid;
-};
-
 enum class AttributeQualityFlags : uint32_t
 {
     kListAttribute   = 0x0004, // This attribute is a list attribute
@@ -104,23 +93,16 @@ enum class AttributeQualityFlags : uint32_t
     kTimed           = 0x0040, // `T` quality on attributes (writes require timed interactions)
 };
 
-struct AttributeInfo
+struct AttributeEntry
 {
+    AttributeId attributeId;
     BitFlags<AttributeQualityFlags> flags;
 
     // read/write access will be missing if read/write is NOT allowed
+    //
+    // NOTE: this should be compacted for size
     std::optional<Access::Privilege> readPrivilege;  // generally defaults to View if readable
     std::optional<Access::Privilege> writePrivilege; // generally defaults to Operate if writable
-};
-
-struct AttributeEntry
-{
-    ConcreteAttributePath path;
-    AttributeInfo info;
-
-    bool IsValid() const { return path.HasValidIds(); }
-
-    static const AttributeEntry kInvalid;
 };
 
 // Bitmask values for different Command qualities.
@@ -131,20 +113,14 @@ enum class CommandQualityFlags : uint32_t
     kLargeMessage = 0x0004, // `L` quality on commands
 };
 
-struct CommandInfo
+struct AcceptedCommandEntry
 {
+    CommandId commandId;
+
+    // TODO: this can be more compact (use some flags for privilege)
+    //       to make this compact, add a compact enum and make flags/invokePrivilege getters (to still be type safe)
     BitFlags<CommandQualityFlags> flags;
     Access::Privilege invokePrivilege = Access::Privilege::kOperate;
-};
-
-struct CommandEntry
-{
-    ConcreteCommandPath path;
-    CommandInfo info;
-
-    bool IsValid() const { return path.HasValidIds(); }
-
-    static const CommandEntry kInvalid;
 };
 
 /// Represents a device type that resides on an endpoint
@@ -180,47 +156,18 @@ class ProviderMetadataTree
 public:
     virtual ~ProviderMetadataTree() = default;
 
-    // This iteration will list all the endpoints in the data model
-    virtual EndpointEntry FirstEndpoint()                              = 0;
-    virtual EndpointEntry NextEndpoint(EndpointId before)              = 0;
-    virtual std::optional<EndpointInfo> GetEndpointInfo(EndpointId id) = 0;
-    virtual bool EndpointExists(EndpointId id);
-
-    // This iteration describes device types registered on an endpoint
-    virtual std::optional<DeviceTypeEntry> FirstDeviceType(EndpointId endpoint)                                  = 0;
-    virtual std::optional<DeviceTypeEntry> NextDeviceType(EndpointId endpoint, const DeviceTypeEntry & previous) = 0;
-
-    // This iteration describes semantic tags registered on an endpoint
     using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
-    virtual std::optional<SemanticTag> GetFirstSemanticTag(EndpointId endpoint)                              = 0;
-    virtual std::optional<SemanticTag> GetNextSemanticTag(EndpointId endpoint, const SemanticTag & previous) = 0;
 
-    // This iteration will list all server clusters on a given endpoint
-    virtual ClusterEntry FirstServerCluster(EndpointId endpoint)                              = 0;
-    virtual ClusterEntry NextServerCluster(const ConcreteClusterPath & before)                = 0;
-    virtual std::optional<ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) = 0;
+    virtual MetadataList<EndpointEntry> Endpoints() = 0;
 
-    // This iteration will list all client clusters on a given endpoint
-    // As the client cluster is only a client without any attributes/commands,
-    // these functions only return the cluster path.
-    virtual ConcreteClusterPath FirstClientCluster(EndpointId endpoint)               = 0;
-    virtual ConcreteClusterPath NextClientCluster(const ConcreteClusterPath & before) = 0;
+    virtual MetadataList<SemanticTag> SemanticTags(EndpointId endpointId)          = 0;
+    virtual MetadataList<DeviceTypeEntry> DeviceTypes(EndpointId endpointId)       = 0;
+    virtual MetadataList<ClusterId> ClientClusters(EndpointId endpointId)          = 0;
+    virtual MetadataList<ServerClusterEntry> ServerClusters(EndpointId endpointId) = 0;
 
-    // Attribute iteration and accessors provide cluster-level access over
-    // attributes
-    virtual AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster)                = 0;
-    virtual AttributeEntry NextAttribute(const ConcreteAttributePath & before)                = 0;
-    virtual std::optional<AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) = 0;
-
-    // Command iteration and accessors provide cluster-level access over commands
-    virtual CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster)              = 0;
-    virtual CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before)                = 0;
-    virtual std::optional<CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) = 0;
-
-    // "generated" commands are purely for reporting what types of command ids can be
-    // returned as responses.
-    virtual ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) = 0;
-    virtual ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before)   = 0;
+    virtual MetadataList<AttributeEntry> Attributes(const ConcreteClusterPath & path)             = 0;
+    virtual MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath & path)           = 0;
+    virtual MetadataList<AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) = 0;
 
     /// Workaround function to report attribute change.
     ///

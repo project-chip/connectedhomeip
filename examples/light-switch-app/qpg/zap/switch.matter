@@ -3242,11 +3242,11 @@ endpoint 0 {
     callback attribute clientsSupportedPerFabric;
     ram      attribute userActiveModeTriggerHint default = 0x100;
     ram      attribute userActiveModeTriggerInstruction default = "Reset the application";
-    ram      attribute operatingMode default = 1;
+    callback attribute operatingMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0007;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
 
     handle command RegisterClient;
