@@ -15,9 +15,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
 source_set("metadata") {
-  sources = [
-    "MetadataTypes.h",
-  ]
+  sources = [ "MetadataTypes.h" ]
 
   public_deps = [
     "${chip_root}/src/access:types",
