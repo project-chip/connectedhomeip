@@ -21,7 +21,6 @@ import("${chip_root}/third_party/silabs/silabs_board.gni")
 declare_args() {
   # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
   sl_wfx_config_softap = false
-  sl_wfx_config_scan = true
 
   # Argument to force enable WPA3 security on rs91x
   rs91x_wpa3_transition = true
@@ -85,10 +84,6 @@ config("wifi-platform-config") {
     defines += [ "SL_WFX_CONFIG_SOFTAP" ]
   }
 
-  if (sl_wfx_config_scan) {
-    defines += [ "SL_WFX_CONFIG_SCAN" ]
-  }
-
   if (chip_enable_wifi_ipv4) {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
   }
@@ -107,8 +102,8 @@ config("wifi-platform-config") {
 
 source_set("wifi-platform") {
   sources = [
-    "${silabs_platform_dir}/wifi/WifiInterfaceAbstraction.cpp",
-    "${silabs_platform_dir}/wifi/WifiInterfaceAbstraction.h",
+    "${silabs_platform_dir}/wifi/WifiInterface.cpp",
+    "${silabs_platform_dir}/wifi/WifiInterface.h",
     "${silabs_platform_dir}/wifi/wfx_msgs.h",
   ]
 
@@ -136,9 +131,9 @@ source_set("wifi-platform") {
 
   if (wifi_soc) {
     sources += [
-      "${silabs_platform_dir}/wifi/SiWx/WifiInterface.cpp",
-      "${silabs_platform_dir}/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.cpp",
-      "${silabs_platform_dir}/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.h",
+      "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp",
+      "${silabs_platform_dir}/wifi/wiseconnect-interface/WiseconnectWifiInterface.cpp",
+      "${silabs_platform_dir}/wifi/wiseconnect-interface/WiseconnectWifiInterface.h",
 
       # Wi-Fi Config - Using the file sdk support until the wiseconnect file is fixed
       "${sdk_support_root}/components/service/network_manager/src/sl_net_for_lwip.c",

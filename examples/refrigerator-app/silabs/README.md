@@ -303,8 +303,8 @@ combination with JLinkRTTClient as follows:
 
     Enpoint for temperaturecontrol is 2 and 3
 
-    Cold Cabinet Endpoint Id 2
-    Freeze Cabinet Endpoint Id 3
+    Freeze Cabinet Endpoint Id 2
+    Cold Cabinet Endpoint Id 3
 
     This enpoint support Temperature control cluster
     ```

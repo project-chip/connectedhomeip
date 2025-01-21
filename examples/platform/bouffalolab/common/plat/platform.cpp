@@ -159,7 +159,7 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
         break;
     case DeviceEventType::kCommissioningComplete:
         ChipLogProgress(NotSpecified, "Commissioning complete");
-        GetAppTask().PostEvent(AppTask::APP_EVENT_LIGHTING_MASK);
+        GetAppTask().PostEvent(AppTask::APP_EVENT_COMMISSION_COMPLETE);
         break;
     default:
         break;
@@ -212,8 +212,13 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
     ReturnLogErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router));
 #else
-    ReturnLogErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice));
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice));
+#else
+    ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice));
 #endif
+#endif
+
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI

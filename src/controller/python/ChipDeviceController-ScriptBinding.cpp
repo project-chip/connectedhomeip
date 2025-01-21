@@ -183,6 +183,10 @@ PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::De
 bool pychip_DeviceController_GetIPForDiscoveredDevice(chip::Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
                                                       uint32_t len);
 
+PyChipError pychip_DeviceController_SetTermsAcknowledgements(uint16_t tcVersion, uint16_t tcUserResponse);
+
+PyChipError pychip_DeviceController_SetSkipCommissioningComplete(bool skipCommissioningComplete);
+
 // Pairing Delegate
 PyChipError
 pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
@@ -569,6 +573,19 @@ PyChipError pychip_DeviceController_SetDefaultNtp(const char * defaultNTP)
     VerifyOrReturnError(sDefaultNTPBuf.Alloc(len), ToPyChipError(CHIP_ERROR_NO_MEMORY));
     memcpy(sDefaultNTPBuf.Get(), defaultNTP, len);
     sCommissioningParameters.SetDefaultNTP(chip::app::DataModel::MakeNullable(CharSpan(sDefaultNTPBuf.Get(), len)));
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_SetTermsAcknowledgements(uint16_t tcVersion, uint16_t tcUserResponse)
+{
+    sCommissioningParameters.SetTermsAndConditionsAcknowledgement(
+        { .acceptedTermsAndConditions = tcUserResponse, .acceptedTermsAndConditionsVersion = tcVersion });
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_SetSkipCommissioningComplete(bool skipCommissioningComplete)
+{
+    sCommissioningParameters.SetSkipCommissioningComplete(skipCommissioningComplete);
     return ToPyChipError(CHIP_NO_ERROR);
 }
 

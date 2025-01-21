@@ -80,26 +80,20 @@ struct CopyAndAdjustDeltaTimeContext
     EventLoadOutContext * mpContext = nullptr;
 };
 
-void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
-                           CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources,
-                           MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
-                           System::Clock::Milliseconds64 aMonotonicStartupTime)
+CHIP_ERROR EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
+                                 CircularEventBuffer * apCircularEventBuffer,
+                                 const LogStorageResources * const apLogStorageResources,
+                                 MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
+                                 System::Clock::Milliseconds64 aMonotonicStartupTime, EventReporter * apEventReporter)
 {
+    VerifyOrReturnError(apEventReporter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aNumBuffers != 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mState == EventManagementStates::Shutdown, CHIP_ERROR_INCORRECT_STATE);
+
     CircularEventBuffer * current = nullptr;
     CircularEventBuffer * prev    = nullptr;
     CircularEventBuffer * next    = nullptr;
 
-    if (aNumBuffers == 0)
-    {
-        ChipLogError(EventLogging, "Invalid aNumBuffers");
-        return;
-    }
-
-    if (mState != EventManagementStates::Shutdown)
-    {
-        ChipLogError(EventLogging, "Invalid EventManagement State");
-        return;
-    }
     mpExchangeMgr = apExchangeManager;
 
     for (uint32_t bufferIndex = 0; bufferIndex < aNumBuffers; bufferIndex++)
@@ -124,6 +118,10 @@ void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint3
     mBytesWritten = 0;
 
     mMonotonicStartupTime = aMonotonicStartupTime;
+
+    mpEventReporter = apEventReporter;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR EventManagement::CopyToNextBuffer(CircularEventBuffer * apEventBuffer)
@@ -345,7 +343,7 @@ void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExcha
 {
 
     sInstance.Init(apExchangeManager, aNumBuffers, apCircularEventBuffer, apLogStorageResources, apEventNumberCounter,
-                   aMonotonicStartupTime);
+                   aMonotonicStartupTime, &InteractionModelEngine::GetInstance()->GetReportingEngine());
 }
 
 /**
@@ -490,7 +488,7 @@ exit:
                       opts.mTimestamp.mType == Timestamp::Type::kSystem ? "Sys" : "Epoch", ChipLogValueX64(opts.mTimestamp.mValue));
 #endif // CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
 
-        err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleEventDelivery(opts.mPath, mBytesWritten);
+        err = mpEventReporter->NewEventGenerated(opts.mPath, mBytesWritten);
     }
 
     return err;

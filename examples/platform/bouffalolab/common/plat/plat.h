@@ -23,6 +23,8 @@
 
 #define EXT_DISCOVERY_TIMEOUT_SECS 20
 
+typedef void (*app_pds_gpio_irq_handler_t)(void * arg);
+
 #ifdef __cplusplus
 
 #include <lib/core/CHIPError.h>
@@ -33,5 +35,6 @@ extern "C" void platform_port_init(void);
 
 void appError(int err);
 void platform_port_init(void);
-
 #endif
+
+void app_pds_init(app_pds_gpio_irq_handler_t pinHandler);

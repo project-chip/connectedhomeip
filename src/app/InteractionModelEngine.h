@@ -49,6 +49,7 @@
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
@@ -126,11 +127,13 @@ public:
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apFabricTable    A pointer to the FabricTable object.
      *  @param[in]    apCASESessionMgr An optional pointer to a CASESessionManager (used for re-subscriptions).
+     *  @parma[in]    eventManagement  An optional pointer to a EventManagement. If null, the global instance will be used.
      *
      */
     CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
                     reporting::ReportScheduler * reportScheduler, CASESessionManager * apCASESessionMgr = nullptr,
-                    SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr);
+                    SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr,
+                    EventManagement * eventManagement                             = nullptr);
 
     void Shutdown();
 
@@ -612,9 +615,12 @@ private:
     void ShutdownMatchingSubscriptions(const Optional<FabricIndex> & aFabricIndex = NullOptional,
                                        const Optional<NodeId> & aPeerNodeId       = NullOptional);
 
-    Status CheckCommandExistence(const ConcreteCommandPath & aCommandPath);
-    Status CheckCommandAccess(const DataModel::InvokeRequest & aRequest);
-    Status CheckCommandFlags(const DataModel::InvokeRequest & aRequest);
+    /**
+     * Validates that the command exists and on success returns the data for the command in `entry`.
+     */
+    Status CheckCommandExistence(const ConcreteCommandPath & aCommandPath, DataModel::AcceptedCommandEntry & entry);
+    Status CheckCommandAccess(const DataModel::InvokeRequest & aRequest, const DataModel::AcceptedCommandEntry & entry);
+    Status CheckCommandFlags(const DataModel::InvokeRequest & aRequest, const DataModel::AcceptedCommandEntry & entry);
 
     /**
      * Check if the given attribute path is a valid path in the data model provider.

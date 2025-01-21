@@ -76,6 +76,7 @@ buildconfig_header("app_buildconfig") {
     "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER=${chip_build_controller_dynamic_server}",
     "CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP=${chip_enable_busy_handling_for_operational_session_setup}",
     "CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING=${chip_data_model_extra_logging}",
+    "CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED=${chip_terms_and_conditions_required}",
   ]
 
   visibility = [ ":app_config" ]
@@ -149,6 +150,10 @@ source_set("test-event-trigger") {
   sources = [ "TestEventTriggerDelegate.h" ]
 }
 
+source_set("event-reporter") {
+  sources = [ "EventReporter.h" ]
+}
+
 # interaction-model is a static-library because it currently requires global functions (app/util/...) that are stubbed in different test files that depend on the app static_library
 # which in tern depens on the interaction-model.
 # Using source_set prevents the unit test to build correctly.
@@ -202,6 +207,7 @@ static_library("interaction-model") {
   ]
 
   deps = [
+    ":path-expansion",
     "${chip_root}/src/app:events",
     "${chip_root}/src/app:global-attributes",
   ]
@@ -210,8 +216,10 @@ static_library("interaction-model") {
     ":app_config",
     ":command-handler-impl",
     ":constants",
+    ":event-reporter",
     ":paths",
     ":subscription-info-provider",
+    "${chip_root}/src/access",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
@@ -343,6 +351,7 @@ source_set("status-response") {
     ":constants",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/interaction_model",
   ]
 }
 
@@ -380,6 +389,7 @@ source_set("command-handler-impl") {
     ":status-response",
     "${chip_root}/src/access:types",
     "${chip_root}/src/app/MessageDef",
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/util:callbacks",
@@ -396,6 +406,21 @@ source_set("storage-wrapper") {
 
   public_deps = [
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+source_set("path-expansion") {
+  sources = [
+    "AttributePathExpandIterator.cpp",
+    "AttributePathExpandIterator.h",
+  ]
+
+  public_deps = [
+    ":global-attributes",
+    ":paths",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support",
   ]
 }
@@ -423,9 +448,6 @@ static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
-    "AttributePathExpandIterator.cpp",
-    "AttributePathExpandIterator.h",
-    "AttributePathExpandIterator.h",
     "ChunkedWriteCallback.cpp",
     "ChunkedWriteCallback.h",
     "CommandResponseHelper.h",
@@ -455,8 +477,10 @@ static_library("app") {
     ":app_config",
     ":attribute-access",
     ":constants",
+    ":event-reporter",
     ":global-attributes",
     ":interaction-model",
+    ":path-expansion",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
