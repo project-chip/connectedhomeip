@@ -227,6 +227,7 @@ def connect_device_over_ble(devCtrl, discriminator, pinCode, nodeId=None):
 
     return nodeId
 
+
 def connect_device_over_nfc(devCtrl, pinCode, nodeId=None):
     """
     Connect to Matter accessory device over NFC
@@ -245,6 +246,7 @@ def connect_device_over_nfc(devCtrl, pinCode, nodeId=None):
         return None
 
     return nodeId
+
 
 def close_connection(devCtrl, nodeId):
     """

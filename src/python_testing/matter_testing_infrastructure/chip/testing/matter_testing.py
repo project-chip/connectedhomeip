@@ -2435,9 +2435,9 @@ class CommissionDeviceTest(MatterBaseTest):
             try:
                 logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
                 await dev_ctrl.CommissionIP(
-                    ipaddr=conf.commissionee_ip_address_just_for_testing,
-                    setupPinCode=info.passcode,
-                    nodeid=node_id,
+                    ipaddr = conf.commissionee_ip_address_just_for_testing,
+                    setupPinCode = info.passcode,
+                    nodeid = node_id,
                 )
                 return True
             except ChipStackError as e:
@@ -2459,26 +2459,26 @@ def default_matter_test_main():
         default_matter_test_main()
     """
 
-    matter_test_config = parse_matter_test_args()
+    matter_test_config=parse_matter_test_args()
 
     # Find the test class in the test script.
-    test_class = _find_test_class()
+    test_class=_find_test_class()
 
-    hooks = InternalTestRunnerHooks()
+    hooks=InternalTestRunnerHooks()
 
     run_tests(test_class, matter_test_config, hooks)
 
 
 def get_test_info(test_class: MatterBaseTest, matter_test_config: MatterTestConfig) -> list[TestInfo]:
-    test_config = generate_mobly_test_config(matter_test_config)
-    base = test_class(test_config)
+    test_config=generate_mobly_test_config(matter_test_config)
+    base=test_class(test_config)
 
     if len(matter_test_config.tests) > 0:
-        tests = matter_test_config.tests
+        tests=matter_test_config.tests
     else:
-        tests = base.get_existing_test_names()
+        tests=base.get_existing_test_names()
 
-    info = []
+    info=[]
     for t in tests:
         info.append(TestInfo(t, steps=base.get_test_steps(t), desc=base.get_test_desc(t), pics=base.get_test_pics(t)))
 
@@ -2487,58 +2487,58 @@ def get_test_info(test_class: MatterBaseTest, matter_test_config: MatterTestConf
 
 def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTestConfig,
                       event_loop: asyncio.AbstractEventLoop, hooks: TestRunnerHooks,
-                      default_controller=None, external_stack=None) -> bool:
+                      default_controller = None, external_stack = None) -> bool:
 
     # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
     #       Mobly deep copies the user params before passing them to the test class and the event
     #       loop is not serializable. So, we are setting the event loop as a test class member.
-    CommissionDeviceTest.event_loop = event_loop
-    test_class.event_loop = event_loop
+    CommissionDeviceTest.event_loop=event_loop
+    test_class.event_loop=event_loop
 
     get_test_info(test_class, matter_test_config)
 
     # Load test config file.
-    test_config = generate_mobly_test_config(matter_test_config)
+    test_config=generate_mobly_test_config(matter_test_config)
 
     # Parse test specifiers if exist.
-    tests = None
+    tests=None
     if len(matter_test_config.tests) > 0:
-        tests = matter_test_config.tests
+        tests=matter_test_config.tests
 
     if external_stack:
-        stack = external_stack
+        stack=external_stack
     else:
-        stack = MatterStackState(matter_test_config)
+        stack=MatterStackState(matter_test_config)
 
     with TracingContext() as tracing_ctx:
         for destination in matter_test_config.trace_to:
             tracing_ctx.StartFromString(destination)
 
-        test_config.user_params["matter_stack"] = stash_globally(stack)
+        test_config.user_params["matter_stack"]=stash_globally(stack)
 
         # TODO: Steer to right FabricAdmin!
         # TODO: If CASE Admin Subject is a CAT tag range, then make sure to issue NOC with that CAT tag
         if not default_controller:
-            default_controller = stack.certificate_authorities[0].adminList[0].NewController(
-                nodeId=matter_test_config.controller_node_id,
-                paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
-                catTags=matter_test_config.controller_cat_tags
+            default_controller=stack.certificate_authorities[0].adminList[0].NewController(
+                nodeId = matter_test_config.controller_node_id,
+                paaTrustStorePath = str(matter_test_config.paa_trust_store_path),
+                catTags = matter_test_config.controller_cat_tags
             )
-        test_config.user_params["default_controller"] = stash_globally(default_controller)
+        test_config.user_params["default_controller"]=stash_globally(default_controller)
 
-        test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
-        test_config.user_params["hooks"] = stash_globally(hooks)
-
-        # Execute the test class with the config
-        ok = True
-
-        test_config.user_params["certificate_authority_manager"] = stash_globally(stack.certificate_authority_manager)
+        test_config.user_params["matter_test_config"]=stash_globally(matter_test_config)
+        test_config.user_params["hooks"]=stash_globally(hooks)
 
         # Execute the test class with the config
-        ok = True
+        ok=True
 
-        runner = TestRunner(log_dir=test_config.log_path,
-                            testbed_name=test_config.testbed_name)
+        test_config.user_params["certificate_authority_manager"]=stash_globally(stack.certificate_authority_manager)
+
+        # Execute the test class with the config
+        ok=True
+
+        runner=TestRunner(log_dir = test_config.log_path,
+                            testbed_name = test_config.testbed_name)
 
         with runner.mobly_logger():
             if matter_test_config.commissioning_method is not None:
@@ -2552,26 +2552,26 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
                 # Right now, we only support running a single test class at once,
                 # but it's relatively easy to expand that to make the test process faster
                 # TODO: support a list of tests
-                hooks.start(count=1)
+                hooks.start(count = 1)
                 # Mobly gives the test run time in seconds, lets be a bit more precise
-                runner_start_time = datetime.now(timezone.utc)
+                runner_start_time=datetime.now(timezone.utc)
 
             try:
                 runner.run()
-                ok = runner.results.is_all_pass and ok
+                ok=runner.results.is_all_pass and ok
                 if matter_test_config.fail_on_skipped_tests and runner.results.skipped:
-                    ok = False
+                    ok=False
             except TimeoutError:
-                ok = False
+                ok=False
             except signals.TestAbortAll:
-                ok = False
+                ok=False
             except Exception:
                 logging.exception('Exception when executing %s.', test_config.testbed_name)
-                ok = False
+                ok=False
 
     if hooks:
-        duration = (datetime.now(timezone.utc) - runner_start_time) / timedelta(microseconds=1)
-        hooks.stop(duration=duration)
+        duration=(datetime.now(timezone.utc) - runner_start_time) / timedelta(microseconds = 1)
+        hooks.stop(duration = duration)
 
     if not external_stack:
         async def shutdown():
