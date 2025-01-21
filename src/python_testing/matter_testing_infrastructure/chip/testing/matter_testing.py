@@ -2510,7 +2510,8 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
             default_controller = stack.certificate_authorities[0].adminList[0].NewController(
                 nodeId=matter_test_config.controller_node_id,
                 paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
-                dacRevocationSetPath=str(matter_test_config.dac_revocation_set_path) if matter_test_config.dac_revocation_set_path else "",
+                dacRevocationSetPath=str(
+                    matter_test_config.dac_revocation_set_path) if matter_test_config.dac_revocation_set_path else "",
                 catTags=matter_test_config.controller_cat_tags
             )
         test_config.user_params["default_controller"] = stash_globally(default_controller)
