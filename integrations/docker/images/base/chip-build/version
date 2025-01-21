@@ -1,1 +1,1 @@
-98 : [nrfconnect] Update nRF Connect SDK version.
+99 : Update Dockerfile for updating java version (Java 8 -> Java 11)
