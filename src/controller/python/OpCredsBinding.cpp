@@ -478,9 +478,9 @@ PyChipError pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(
 PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Controller::DeviceCommissioner ** outDevCtrl,
                                               chip::Controller::ScriptDevicePairingDelegate ** outPairingDelegate,
                                               FabricId fabricId, chip::NodeId nodeId, chip::VendorId adminVendorId,
-                                              const char * paaTrustStorePath, const char * dacRevocationSetPath, bool useTestCommissioner,
-                                              bool enableServerInteractions, CASEAuthTag * caseAuthTags, uint32_t caseAuthTagLen,
-                                              chip::python::pychip_P256Keypair * operationalKey)
+                                              const char * paaTrustStorePath, const char * dacRevocationSetPath,
+                                              bool useTestCommissioner, bool enableServerInteractions, CASEAuthTag * caseAuthTags,
+                                              uint32_t caseAuthTagLen, chip::python::pychip_P256Keypair * operationalKey)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -502,8 +502,10 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
 
     // Initialize device attestation verifier
     const chip::Credentials::AttestationTrustStore * testingRootStore = GetTestFileAttestationTrustStore(paaTrustStorePath);
-    chip::Credentials::DeviceAttestationRevocationDelegate * dacRevocationDelegate = GetAttestationRevocationDelegate(dacRevocationSetPath);
-    chip::Credentials::DeviceAttestationVerifier * dacVerifier        = chip::Credentials::GetDefaultDACVerifier(testingRootStore, dacRevocationDelegate);
+    chip::Credentials::DeviceAttestationRevocationDelegate * dacRevocationDelegate =
+        GetAttestationRevocationDelegate(dacRevocationSetPath);
+    chip::Credentials::DeviceAttestationVerifier * dacVerifier =
+        chip::Credentials::GetDefaultDACVerifier(testingRootStore, dacRevocationDelegate);
     SetDeviceAttestationVerifier(dacVerifier);
 
     chip::Crypto::P256Keypair ephemeralKey;
