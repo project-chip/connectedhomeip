@@ -207,15 +207,15 @@ config PWM
 
 endif
 
-if BOARD_TL7218_RETENTION || BOARD_TL3218_RETENTION
+if BOARD_TL7218_RETENTION || BOARD_TL3218_RETENTION || BOARD_TL3218
 config SOC_SERIES_RISCV_TELINK_TLX_NON_RETENTION_RAM_CODE
     default n if PM
 
 config TELINK_TLX_MATTER_RETENTION_LAYOUT
-    default y if PM
+    default y if PM || BOARD_TL3218X
 
 config PWM
-    default n
+    default n if PM
 
 endif
 
