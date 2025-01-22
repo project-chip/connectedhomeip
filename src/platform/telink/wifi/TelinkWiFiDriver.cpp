@@ -17,10 +17,13 @@
 
 #include "TelinkWiFiDriver.h"
 
+#include <stdint.h>
+
 #include <platform/KeyValueStoreManager.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/TypeTraits.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip;
@@ -103,8 +106,9 @@ CHIP_ERROR TelinkWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusCha
 
     if (mStagingNetwork.IsConfigured())
     {
-        WiFiManager::ConnectionHandling handling{ [] { Instance().OnNetworkStatusChanged(Status::kSuccess); },
-                                                  [] { Instance().OnNetworkStatusChanged(Status::kUnknownError); },
+        WiFiManager::ConnectionHandling handling{ [](const wifi_conn_status & connStatus) {
+                                                     Instance().OnNetworkConnStatusChanged(connStatus);
+                                                 },
                                                   System::Clock::Seconds32{ kWiFiConnectNetworkTimeoutSeconds } };
         ReturnErrorOnFailure(
             WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(), handling));
@@ -113,8 +117,11 @@ CHIP_ERROR TelinkWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusCha
     return CHIP_NO_ERROR;
 }
 
-void TelinkWiFiDriver::OnNetworkStatusChanged(Status status)
+void TelinkWiFiDriver::OnNetworkConnStatusChanged(const wifi_conn_status & connStatus)
 {
+    // TODO: check if we can report more accurate errors
+    Status status = connStatus ? Status::kUnknownError : Status::kSuccess;
+
     if (status == Status::kSuccess)
     {
         ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
@@ -136,8 +143,9 @@ void TelinkWiFiDriver::OnNetworkStatusChanged(Status status)
             ssid    = WiFiManager::Instance().GetWantedNetwork().ssid;
             ssidLen = WiFiManager::Instance().GetWantedNetwork().ssidLen;
         }
-        mpNetworkStatusChangeCallback->OnNetworkingStatusChange(status, MakeOptional(ByteSpan(wifiInfo.mSsid, wifiInfo.mSsidLen)),
-                                                                NullOptional);
+        mpNetworkStatusChangeCallback->OnNetworkingStatusChange(status, MakeOptional(ByteSpan(ssid, ssidLen)),
+                                                                connStatus ? MakeOptional(static_cast<int32_t>(connStatus))
+                                                                           : NullOptional);
     }
 
     if (mpConnectCallback)
@@ -179,8 +187,9 @@ CHIP_ERROR TelinkWiFiDriver::RevertConfiguration()
 
     if (mStagingNetwork.IsConfigured())
     {
-        WiFiManager::ConnectionHandling handling{ [] { Instance().OnNetworkStatusChanged(Status::kSuccess); },
-                                                  [] { Instance().OnNetworkStatusChanged(Status::kUnknownError); },
+        WiFiManager::ConnectionHandling handling{ [](const wifi_conn_status & connStatus) {
+                                                     Instance().OnNetworkConnStatusChanged(connStatus);
+                                                 },
                                                   System::Clock::Seconds32{ kWiFiConnectNetworkTimeoutSeconds } };
         ReturnErrorOnFailure(
             WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(), handling));
@@ -233,8 +242,9 @@ Status TelinkWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, Mutab
 void TelinkWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
 {
     Status status = Status::kSuccess;
-    WiFiManager::ConnectionHandling handling{ [] { Instance().OnNetworkStatusChanged(Status::kSuccess); },
-                                              [] { Instance().OnNetworkStatusChanged(Status::kUnknownError); },
+    WiFiManager::ConnectionHandling handling{ [](const wifi_conn_status & connStatus) {
+                                                 Instance().OnNetworkConnStatusChanged(connStatus);
+                                             },
                                               System::Clock::Seconds32{ kWiFiConnectNetworkTimeoutSeconds } };
 
     VerifyOrExit(mpConnectCallback == nullptr, status = Status::kUnknownError);
