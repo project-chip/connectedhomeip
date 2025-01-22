@@ -640,7 +640,12 @@ void ProcessEvent(WifiPlatformEvent event)
 
 sl_status_t InitSiWxWifi(void)
 {
-    VerifyOrReturnError(sl_matter_wifi_init() == RSI_SUCCESS, SL_STATUS_FAIL);
+    int32_t status = sl_matter_wifi_init();
+    if (status != RSI_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "sl_matter_wifi_init: failed: %ld", status);
+        return SL_STATUS_FAIL;
+    }
     return SL_STATUS_OK;
 }
 
