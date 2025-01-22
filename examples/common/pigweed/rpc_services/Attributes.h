@@ -91,9 +91,10 @@ public:
             write_status = writer.Put(kDataTag, data.data.data_single);
             break;
         case chip_rpc_AttributeData_data_bytes_tag:
-            // TODO: should we differentiate between string and bytes here?
-            //       bytes is binary and string should be UTF8
             write_status = writer.PutBytes(kDataTag, data.data.data_bytes.bytes, data.data.data_bytes.size);
+            break;
+        case chip_rpc_AttributeData_data_string_tag:
+            write_status = writer.PutString(kDataTag, data.data.data_string);
             break;
         default:
             return pw::Status::InvalidArgument();
@@ -201,6 +202,16 @@ public:
             PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_FloatingPointNumber, response.data.data_single));
             response.which_data = chip_rpc_AttributeData_data_single_tag;
             break;
+        case chip_rpc_AttributeType_ZCL_OCTET_STRING_ATTRIBUTE_TYPE:
+        case chip_rpc_AttributeType_ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE:
+            PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_ByteString, response.data.data_bytes));
+            response.which_data = chip_rpc_AttributeData_data_bytes_tag;
+            break;
+        case chip_rpc_AttributeType_ZCL_CHAR_STRING_ATTRIBUTE_TYPE:
+        case chip_rpc_AttributeType_ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:
+            PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_UTF8String, response.data.data_string));
+            response.which_data = chip_rpc_AttributeData_data_string_tag;
+            break;
         case chip_rpc_AttributeType_ZCL_BITMAP8_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_BITMAP16_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_BITMAP32_ATTRIBUTE_TYPE:
@@ -217,10 +228,6 @@ public:
         case chip_rpc_AttributeType_ZCL_INT56S_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_INT64S_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_DOUBLE_ATTRIBUTE_TYPE:
-        case chip_rpc_AttributeType_ZCL_OCTET_STRING_ATTRIBUTE_TYPE:
-        case chip_rpc_AttributeType_ZCL_CHAR_STRING_ATTRIBUTE_TYPE:
-        case chip_rpc_AttributeType_ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE:
-        case chip_rpc_AttributeType_ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_STRUCT_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_TOD_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_DATE_ATTRIBUTE_TYPE:
@@ -314,6 +321,24 @@ private:
     }
 
     template <typename T>
+    CHIP_ERROR TlvGet(TLV::TLVReader & reader, T & value)
+    {
+        return reader.Get(value);
+    }
+
+    CHIP_ERROR TlvGet(TLV::TLVReader & reader, chip_rpc_AttributeData_data_bytes_t &value)
+    {
+        value.size = reader.GetLength();
+        return reader.GetBytes(value.bytes, sizeof(value.bytes));
+    }
+
+    template <size_t N>
+    CHIP_ERROR TlvGet(TLV::TLVReader & reader, char (&value)[N])
+    {
+        return reader.GetString(value, N);
+    }
+
+    template <typename T>
     ::pw::Status TlvBufferGetData(ByteSpan tlvBuffer, TLV::TLVType expectedDataType, T & responseData)
     {
         TLV::TLVReader reader;
@@ -339,7 +364,7 @@ private:
         TLV::TLVReader dataReader;
         PW_TRY(ChipErrorToPwStatus(dataParser.GetData(&dataReader)));
         PW_TRY(CheckTlvTagAndType(&dataReader, TLV::ContextTag(0x2), expectedDataType));
-        PW_TRY(ChipErrorToPwStatus(dataReader.Get(responseData)));
+        PW_TRY(ChipErrorToPwStatus(TlvGet(dataReader, responseData)));
 
         return ::pw::OkStatus();
     }
