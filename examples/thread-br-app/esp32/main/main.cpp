@@ -151,8 +151,6 @@ extern "C" void app_main()
     esp_openthread_set_backbone_netif(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"));
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
-
-    ESPOpenThreadInit();
 }
 
 extern "C" void otSysProcessDrivers(otInstance * aInstance)

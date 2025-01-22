@@ -121,6 +121,7 @@
         "time-format-localization-cluster.xml",
         "time-synchronization-cluster.xml",
         "timer-cluster.xml",
+        "tls-certificate-management-cluster.xml",
         "user-label-cluster.xml",
         "unit-localization-cluster.xml",
         "valve-configuration-and-control-cluster.xml",
@@ -288,7 +289,9 @@
             "RegisteredClients",
             "ICDCounter",
             "ClientsSupportedPerFabric",
-            "MaximumCheckInBackOff"
+            "MaximumCheckInBackOff",
+            "OperatingMode",
+            "FeatureMap"
         ],
         "Occupancy Sensing": [
             "HoldTimeLimits",

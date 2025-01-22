@@ -5769,6 +5769,8 @@ enum class SupportedDeviceCategoryBitmap : uint32_t
 };
 } // namespace CommissionerControl
 
+namespace TlsCertificateManagement {} // namespace TlsCertificateManagement
+
 namespace UnitTesting {
 
 // Enum for SimpleEnum

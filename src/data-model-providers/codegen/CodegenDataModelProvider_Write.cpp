@@ -190,15 +190,16 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 
     if (request.path.mDataVersion.HasValue())
     {
-        std::optional<DataModel::ClusterInfo> clusterInfo = GetServerClusterInfo(request.path);
-        if (!clusterInfo.has_value())
+        DataVersion * versionPtr = emberAfDataVersionStorage(request.path);
+
+        if (versionPtr == nullptr)
         {
             ChipLogError(DataManagement, "Unable to get cluster info for Endpoint 0x%x, Cluster " ChipLogFormatMEI,
                          request.path.mEndpointId, ChipLogValueMEI(request.path.mClusterId));
             return Status::DataVersionMismatch;
         }
 
-        if (request.path.mDataVersion.Value() != clusterInfo->dataVersion)
+        if (request.path.mDataVersion.Value() != *versionPtr)
         {
             ChipLogError(DataManagement, "Write Version mismatch for Endpoint 0x%x, Cluster " ChipLogFormatMEI,
                          request.path.mEndpointId, ChipLogValueMEI(request.path.mClusterId));

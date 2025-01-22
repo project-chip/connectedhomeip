@@ -403,6 +403,9 @@ static constexpr ClusterId Id = 0x00000750;
 namespace CommissionerControl {
 static constexpr ClusterId Id = 0x00000751;
 } // namespace CommissionerControl
+namespace TlsCertificateManagement {
+static constexpr ClusterId Id = 0x00000801;
+} // namespace TlsCertificateManagement
 namespace UnitTesting {
 static constexpr ClusterId Id = 0xFFF1FC05;
 } // namespace UnitTesting

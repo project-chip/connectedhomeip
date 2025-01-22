@@ -2329,6 +2329,12 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
                                                 Clusters::IcdManagement::Attributes::ActiveModeDuration::Id));
         VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
                                                 Clusters::IcdManagement::Attributes::ActiveModeThreshold::Id));
+
+        // Extra paths requested via CommissioningParameters
+        for (auto const & path : params.GetExtraReadPaths())
+        {
+            VerifyOrReturn(builder.AddAttributePath(path));
+        }
     }();
 
     VerifyOrDie(builder.size() > 0); // our logic is broken if there is nothing to read
@@ -2363,6 +2369,7 @@ void DeviceCommissioner::FinishReadingCommissioningInfo()
     // up returning an error (e.g. because some mandatory information was missing).
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReadCommissioningInfo info;
+    info.attributes = mAttributeCache.get();
     AccumulateErrors(err, ParseGeneralCommissioningInfo(info));
     AccumulateErrors(err, ParseBasicInformation(info));
     AccumulateErrors(err, ParseNetworkCommissioningInfo(info));

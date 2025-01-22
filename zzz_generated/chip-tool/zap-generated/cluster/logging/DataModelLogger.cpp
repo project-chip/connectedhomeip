@@ -6297,6 +6297,66 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::TlsCertificateManagement::Structs::TLSCertStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Caid", indent + 1, value.caid);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Caid'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Certificate", indent + 1, value.certificate);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Certificate'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Ccdid", indent + 1, value.ccdid);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Ccdid'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ClientCertificate", indent + 1, value.clientCertificate);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ClientCertificate'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("IntermediateCertificates", indent + 1, value.intermediateCertificates);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'IntermediateCertificates'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType & value)
 {
@@ -10335,6 +10395,67 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     ReturnErrorOnFailure(DataModelLogger::LogValue("discriminator", indent + 1, value.discriminator));
     ReturnErrorOnFailure(DataModelLogger::LogValue("iterations", indent + 1, value.iterations));
     ReturnErrorOnFailure(DataModelLogger::LogValue("salt", indent + 1, value.salt));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const TlsCertificateManagement::Commands::ProvisionRootCertificateResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("caid", indent + 1, value.caid));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const TlsCertificateManagement::Commands::FindRootCertificateResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("certificateDetails", indent + 1, value.certificateDetails));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const TlsCertificateManagement::Commands::LookupRootCertificateResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("caid", indent + 1, value.caid));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const TlsCertificateManagement::Commands::TLSClientCSRResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("ccdid", indent + 1, value.ccdid));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("csr", indent + 1, value.csr));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("nonce", indent + 1, value.nonce));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const TlsCertificateManagement::Commands::ProvisionClientCertificateResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("ccdid", indent + 1, value.ccdid));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const TlsCertificateManagement::Commands::FindClientCertificateResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("certificateDetails", indent + 1, value.certificateDetails));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const TlsCertificateManagement::Commands::LookupClientCertificateResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("ccdid", indent + 1, value.ccdid));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -19546,6 +19667,57 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case TlsCertificateManagement::Id: {
+        switch (path.mAttributeId)
+        {
+        case TlsCertificateManagement::Attributes::MaxRootCertificates::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxRootCertificates", 1, value);
+        }
+        case TlsCertificateManagement::Attributes::CurrentRootCertificates::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentRootCertificates", 1, value);
+        }
+        case TlsCertificateManagement::Attributes::MaxClientCertificates::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxClientCertificates", 1, value);
+        }
+        case TlsCertificateManagement::Attributes::CurrentClientCertificates::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentClientCertificates", 1, value);
+        }
+        case TlsCertificateManagement::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, TlsCertificateManagement::Id);
+        }
+        case TlsCertificateManagement::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, TlsCertificateManagement::Id);
+        }
+        case TlsCertificateManagement::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, TlsCertificateManagement::Id);
+        }
+        case TlsCertificateManagement::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case TlsCertificateManagement::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case UnitTesting::Id: {
         switch (path.mAttributeId)
         {
@@ -20777,6 +20949,47 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             CommissionerControl::Commands::ReverseOpenCommissioningWindow::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ReverseOpenCommissioningWindow", 1, value);
+        }
+        }
+        break;
+    }
+    case TlsCertificateManagement::Id: {
+        switch (path.mCommandId)
+        {
+        case TlsCertificateManagement::Commands::ProvisionRootCertificateResponse::Id: {
+            TlsCertificateManagement::Commands::ProvisionRootCertificateResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ProvisionRootCertificateResponse", 1, value);
+        }
+        case TlsCertificateManagement::Commands::FindRootCertificateResponse::Id: {
+            TlsCertificateManagement::Commands::FindRootCertificateResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FindRootCertificateResponse", 1, value);
+        }
+        case TlsCertificateManagement::Commands::LookupRootCertificateResponse::Id: {
+            TlsCertificateManagement::Commands::LookupRootCertificateResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LookupRootCertificateResponse", 1, value);
+        }
+        case TlsCertificateManagement::Commands::TLSClientCSRResponse::Id: {
+            TlsCertificateManagement::Commands::TLSClientCSRResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TLSClientCSRResponse", 1, value);
+        }
+        case TlsCertificateManagement::Commands::ProvisionClientCertificateResponse::Id: {
+            TlsCertificateManagement::Commands::ProvisionClientCertificateResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ProvisionClientCertificateResponse", 1, value);
+        }
+        case TlsCertificateManagement::Commands::FindClientCertificateResponse::Id: {
+            TlsCertificateManagement::Commands::FindClientCertificateResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FindClientCertificateResponse", 1, value);
+        }
+        case TlsCertificateManagement::Commands::LookupClientCertificateResponse::Id: {
+            TlsCertificateManagement::Commands::LookupClientCertificateResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LookupClientCertificateResponse", 1, value);
         }
         }
         break;

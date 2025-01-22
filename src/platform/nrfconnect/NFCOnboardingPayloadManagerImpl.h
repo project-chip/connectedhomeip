@@ -17,10 +17,10 @@
 
 /**
  *    @file
- *      Provides an implementation of the NFCManager interface for nRF Connect
+ *      Provides an implementation of the NFCOnboardingPayloadManager interface for nRF Connect
  *      SDK platform, by including Zephyr platform implementation.
  */
 
 #pragma once
 
-#include <platform/Zephyr/NFCManagerImpl.h>
+#include <platform/Zephyr/NFCOnboardingPayloadManagerImpl.h>

@@ -207,6 +207,14 @@ uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
     return (server) ? emberAfGetClusterCountForEndpoint(endpoint) : 0;
 }
 
+uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * type, bool server)
+{
+    const EmberAfClusterMask cluster_mask = server ? CLUSTER_MASK_SERVER : CLUSTER_MASK_CLIENT;
+
+    return static_cast<uint8_t>(std::count_if(type->cluster, type->cluster + type->clusterCount,
+                                              [=](const EmberAfCluster & cluster) { return (cluster.mask & cluster_mask) != 0; }));
+}
+
 uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpointId, chip::ClusterId clusterId)
 {
     auto cluster = GetMockNodeConfig().clusterByIds(endpointId, clusterId);
