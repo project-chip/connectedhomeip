@@ -48,9 +48,9 @@ CHIP_ERROR DelegateImpl::HandleCloseValve()
     return CHIP_NO_ERROR;
 }
 
-void DelegateImpl::HandleRemainingDurationTick(uint32_t duration)
+void DelegateImpl::HandleRemainingDurationTick(uint32_t duration_sec)
 {
-    ChipLogProgress(DeviceLayer, "HandleRemainingDurationTick with duration = %d", duration);
+    ChipLogProgress(DeviceLayer, "HandleRemainingDurationTick with duration_sec = %d", duration_sec);
 }
 
 void ValveConfigurationAndControl::Shutdown()
@@ -76,18 +76,17 @@ chefValveConfigurationAndControlWriteCallback(chip::EndpointId endpointId, chip:
 
     switch (attributeId)
     {
-    case chip::app::Clusters::ValveConfigurationAndControl::Attributes::RemainingDuration::Id: {
-        uint32_t newVal = 0;
-        std::memcpy(&newVal, buffer, sizeof(uint32_t));
-        ChipLogProgress(DeviceLayer, "Setting RemainingDuration to %d", newVal);
+    case Attributes::RemainingDuration::Id: {
         CHIP_ERROR err;
-        if (newVal == static_cast<uint32_t>(std::numeric_limits<uint32_t>::max())) // Max value is interpreted as NULL
+        if (NumericAttributeTraits<uint32_t>::IsNullValue(*buffer)) // Max value is interpreted as NULL
         {
+            ChipLogProgress(DeviceLayer, "Setting RemainingDuration to NULL.");
             err = SetRemainingDurationNull(endpointId);
         }
         else
         {
-            DataModel::Nullable<uint32_t> aRemainingDuration(newVal);
+            DataModel::Nullable<uint32_t> aRemainingDuration(NumericAttributeTraits<uint32_t>::StorageToWorking(*buffer));
+            ChipLogProgress(DeviceLayer, "Setting RemainingDuration to %d.", aRemainingDuration.Value());
             err = SetRemainingDuration(endpointId, aRemainingDuration);
         }
         if (err != CHIP_NO_ERROR)
@@ -95,8 +94,7 @@ chefValveConfigurationAndControlWriteCallback(chip::EndpointId endpointId, chip:
             ChipLogError(DeviceLayer, "Unable to write RemainingDuration: %" CHIP_ERROR_FORMAT, err.Format());
             return chip::Protocols::InteractionModel::Status::Failure;
         }
-        MatterReportingAttributeChangeCallback(endpointId, ValveConfigurationAndControl::Id,
-                                               ValveConfigurationAndControl::Attributes::RemainingDuration::Id);
+        MatterReportingAttributeChangeCallback(endpointId, ValveConfigurationAndControl::Id, Attributes::RemainingDuration::Id);
         break;
     }
     default:
@@ -122,7 +120,7 @@ chefValveConfigurationAndControlReadCallback(chip::EndpointId endpointId, chip::
 
     switch (attributeId)
     {
-    case chip::app::Clusters::ValveConfigurationAndControl::Attributes::RemainingDuration::Id: {
+    case Attributes::RemainingDuration::Id: {
 
         DataModel::Nullable<uint32_t> duration;
         CHIP_ERROR err = GetRemainingDuration(endpointId, duration);

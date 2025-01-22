@@ -394,7 +394,7 @@ CHIP_ERROR GetRemainingDuration(EndpointId endpoint, DataModel::Nullable<uint32_
 {
     uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
                                                           MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    VerifyOrReturnValue(epIdx < kValveConfigurationAndControlDelegateTableSize, CHIP_ERROR_READ_FAILED);
+    VerifyOrReturnValue(epIdx < kValveConfigurationAndControlDelegateTableSize, CHIP_ERROR_NOT_FOUND);
     duration = gRemainingDuration[epIdx].remainingDuration;
     return CHIP_NO_ERROR;
 }
