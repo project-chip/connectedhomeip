@@ -49,10 +49,6 @@ from mobly import asserts
 class TC_DGSW_2_2(MatterBaseTest):
 
     @staticmethod
-    def is_valid_uint64_value(value):
-        return isinstance(value, int) and 0 <= value <= 0xFFFFFFFFFFFFFFFF
-
-    @staticmethod
     def is_valid_octet_string(value):
         return isinstance(value, (bytes, bytearray))
 
@@ -71,7 +67,7 @@ class TC_DGSW_2_2(MatterBaseTest):
 
         # Validate 'Id' field: Ensure it is a uint64 type
         asserts.assert_true(
-            self.is_valid_uint64_value(event_data.id),
+            self.is_valid_uint_value(event_data.id, bit_count=64),
             "The 'Id' field must be a uint64 type"
         )
 
