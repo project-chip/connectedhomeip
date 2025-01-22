@@ -50,7 +50,7 @@ CHIP_ERROR DelegateImpl::HandleCloseValve()
 
 void DelegateImpl::HandleRemainingDurationTick(uint32_t duration_sec)
 {
-    ChipLogProgress(DeviceLayer, "HandleRemainingDurationTick with duration_sec = %d", duration_sec);
+    ChipLogProgress(DeviceLayer, "HandleRemainingDurationTick with duration_sec = %u", duration_sec);
 }
 
 void ValveConfigurationAndControl::Shutdown()
@@ -87,7 +87,7 @@ chefValveConfigurationAndControlWriteCallback(chip::EndpointId endpointId, chip:
         else
         {
             DataModel::Nullable<uint32_t> aRemainingDuration(NumericAttributeTraits<uint32_t>::StorageToWorking(*bufUint32));
-            ChipLogProgress(DeviceLayer, "Setting RemainingDuration to %d.", aRemainingDuration.Value());
+            ChipLogProgress(DeviceLayer, "Setting RemainingDuration to %u.", aRemainingDuration.Value());
             err = SetRemainingDuration(endpointId, aRemainingDuration);
         }
         if (err != CHIP_NO_ERROR)
