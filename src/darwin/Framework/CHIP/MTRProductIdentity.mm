@@ -22,15 +22,40 @@
 #include <lib/support/CodeUtils.h>
 
 MTR_DIRECT_MEMBERS
-@implementation MTRProductIdentity
+@implementation MTRProductIdentity {
+    uint16_t _vendorID;
+    uint16_t _productID;
+}
 
 - (instancetype)initWithVendorID:(NSNumber *)vendorID productID:(NSNumber *)productID
 {
     self = [super init];
     VerifyOrReturnValue(vendorID != nil && productID != nil, nil);
-    _vendorID = vendorID;
-    _productID = productID;
+    _vendorID = vendorID.unsignedShortValue;
+    _productID = productID.unsignedShortValue;
     return self;
+}
+
+static NSString * const sVendorIDKey = @"v";
+static NSString * const sProductIDKey = @"p";
+
+- (nullable instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super init];
+    _vendorID = static_cast<uint16_t>([coder decodeIntForKey:sVendorIDKey]);
+    _productID = static_cast<uint16_t>([coder decodeIntForKey:sProductIDKey]);
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [coder encodeInt:_vendorID forKey:sVendorIDKey];
+    [coder encodeInt:_productID forKey:sProductIDKey];
+}
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -40,19 +65,31 @@ MTR_DIRECT_MEMBERS
 
 - (NSUInteger)hash
 {
-    return _vendorID.hash ^ _productID.hash;
+    return (_vendorID << 16) | _productID;
 }
 
 - (BOOL)isEqual:(id)object
 {
     VerifyOrReturnValue([object class] == [self class], NO);
     MTRProductIdentity * other = object;
-    return MTREqualObjects(_vendorID, other.vendorID) && MTREqualObjects(_productID, other.productID);
+    VerifyOrReturnValue(_vendorID == other->_vendorID, NO);
+    VerifyOrReturnValue(_productID == other->_productID, NO);
+    return YES;
 }
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: vid 0x%x pid 0x%x>", self.class, _vendorID.unsignedIntValue, _productID.unsignedIntValue];
+    return [NSString stringWithFormat:@"<%@: vid 0x%x pid 0x%x>", self.class, _vendorID, _productID];
+}
+
+- (NSNumber *)vendorID
+{
+    return @(_vendorID);
+}
+
+- (NSNumber *)productID
+{
+    return @(_productID);
 }
 
 @end

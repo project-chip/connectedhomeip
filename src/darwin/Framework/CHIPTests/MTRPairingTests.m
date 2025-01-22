@@ -148,7 +148,7 @@ static MTRTestKeys * sTestKeys = nil;
     if (self.shouldReadEndpointInformation) {
         XCTAssertNotNil(info.endpointsById);
         XCTAssertNotNil(info.rootEndpoint);
-        XCTAssertGreaterThanOrEqual(info.rootEndpoint.children.count, 2); // at least one application endpoint
+        XCTAssertGreaterThanOrEqual(info.rootEndpoint.children.count, 1); // at least one application endpoint
         for (MTREndpointInfo * endpoint in info.endpointsById.allValues) {
             XCTAssertGreaterThanOrEqual(endpoint.deviceTypes.count, 1);
             XCTAssertNotNil(endpoint.children);
@@ -158,6 +158,16 @@ static MTRTestKeys * sTestKeys = nil;
                 XCTAssertTrue([endpoint.partsList containsObject:child.endpointID]);
             }
         }
+
+        // There is currently no convenient way to initialize an MTRCommissioneeInfo
+        // object from basic ObjC data types, so we do some unit testing here.
+        NSData * data = [NSKeyedArchiver archivedDataWithRootObject:info requiringSecureCoding:YES error:NULL];
+        MTRCommissioneeInfo * decoded = [NSKeyedUnarchiver unarchivedObjectOfClass:MTRCommissioneeInfo.class fromData:data error:NULL];
+        XCTAssertNotNil(decoded);
+        XCTAssertTrue([decoded isEqual:info]);
+        XCTAssertEqualObjects(decoded.productIdentity, info.productIdentity);
+        XCTAssertEqualObjects(decoded.endpointsById, info.endpointsById);
+        XCTAssertEqualObjects(decoded.rootEndpoint.children, info.rootEndpoint.children);
     } else {
         XCTAssertNil(info.endpointsById);
         XCTAssertNil(info.rootEndpoint);

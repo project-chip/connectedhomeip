@@ -24,6 +24,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 using namespace chip;
 
 MTR_DIRECT_MEMBERS
@@ -68,7 +70,7 @@ MTR_DIRECT_MEMBERS
     return [[MTRDeviceType alloc] initWithDeviceTypeData:deviceTypeData];
 }
 
-- (id)copyWithZone:(NSZone *)zone
+- (id)copyWithZone:(nullable NSZone *)zone
 {
     return self; // immutable
 }
@@ -92,3 +94,5 @@ MTR_DIRECT_MEMBERS
 }
 
 @end
+
+NS_ASSUME_NONNULL_END

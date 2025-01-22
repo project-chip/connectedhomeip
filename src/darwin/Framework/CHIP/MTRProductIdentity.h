@@ -21,8 +21,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * A representation of a (vendor, product) pair that identifies a specific product.
  */
+NS_SWIFT_SENDABLE
 MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
-@interface MTRProductIdentity : NSObject /* <NSCopying> (see below) */
+@interface MTRProductIdentity : NSObject /* <NSCopying, NSSecureCoding> (see below) */
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -35,7 +36,7 @@ MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRProductIdentity () <NSCopying>
+@interface MTRProductIdentity () <NSCopying, NSSecureCoding>
 @end
 
 NS_ASSUME_NONNULL_END

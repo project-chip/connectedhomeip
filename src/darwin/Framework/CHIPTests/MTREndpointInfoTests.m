@@ -15,6 +15,7 @@
  */
 
 #import "MTREndpointInfo_Test.h"
+#import <Matter/Matter.h>
 
 #import <XCTest/XCTest.h>
 
@@ -141,6 +142,60 @@ static NSArray<NSNumber *> * Exclude(NSArray<NSNumber *> * numbers, NSNumber * n
     // Endpoint 6 has multiple parents, so we make no guarantees where (or if) it shows up
     XCTAssertEqualObjects(Exclude(ChildEndpointIDs(endpoints[@1]), @6), (@[ @2, @3 ]));
     XCTAssertEqualObjects(Exclude(ChildEndpointIDs(endpoints[@5]), @6), (@[]));
+}
+
+- (void)testEqualityAndCopying
+{
+    MTRDeviceTypeRevision * doorLock = [[MTRDeviceTypeRevision alloc] initWithDeviceTypeID:@0x0A revision:@1];
+    MTRDeviceTypeRevision * rootNode = [[MTRDeviceTypeRevision alloc] initWithDeviceTypeID:@0x16 revision:@1];
+    MTREndpointInfo * a1 = [[MTREndpointInfo alloc] initWithEndpointID:@1 deviceTypes:@[ rootNode ] partsList:@[]];
+    XCTAssertTrue([a1 isEqual:a1]);
+    XCTAssertTrue([a1 isEqual:[a1 copy]]);
+    XCTAssertFalse([a1 isEqual:nil]);
+    XCTAssertFalse([a1 isEqual:@"hello"]);
+    MTREndpointInfo * a2 = [[MTREndpointInfo alloc] initWithEndpointID:@1 deviceTypes:@[ rootNode ] partsList:@[]];
+    XCTAssertTrue([a1 isEqual:a2]);
+    XCTAssertTrue([a2 isEqual:a1]);
+    XCTAssertEqual(a1.hash, a2.hash);
+    MTREndpointInfo * b = [[MTREndpointInfo alloc] initWithEndpointID:@1 deviceTypes:@[ rootNode ] partsList:@[ @2 ]];
+    XCTAssertFalse([a1 isEqual:b]);
+    XCTAssertFalse([b isEqual:a1]);
+    MTREndpointInfo * c = [[MTREndpointInfo alloc] initWithEndpointID:@1 deviceTypes:@[ doorLock ] partsList:@[]];
+    XCTAssertFalse([a1 isEqual:c]);
+    XCTAssertFalse([c isEqual:a1]);
+    MTREndpointInfo * d = [[MTREndpointInfo alloc] initWithEndpointID:@2 deviceTypes:@[ rootNode ] partsList:@[]];
+    XCTAssertFalse([a1 isEqual:d]);
+    XCTAssertFalse([d isEqual:a1]);
+}
+
+- (void)testSecureCoding
+{
+    NSDictionary<NSNumber *, MTREndpointInfo *> * endpoints = [self indexEndpoints:@[
+        MakeEndpoint(@0, @[ @1, @2, @3, @4, @5, @6 ]), // full-family pattern
+        MakeEndpoint(@1, @[ @2, @3 ]),
+        MakeEndpoint(@2, @[]),
+        MakeEndpoint(@3, @[]),
+        MakeEndpoint(@4, @[ @5, @6 ]), // full-family pattern
+        MakeEndpoint(@5, @[ @6 ]),
+        MakeEndpoint(@6, @[]),
+    ]];
+    XCTAssertTrue([MTREndpointInfo populateChildrenForEndpoints:endpoints]);
+
+    NSData * data = [NSKeyedArchiver archivedDataWithRootObject:endpoints.allValues requiringSecureCoding:YES error:NULL];
+    NSArray<MTREndpointInfo *> * decodedEndpoints = [NSKeyedUnarchiver unarchivedArrayOfObjectsOfClass:MTREndpointInfo.class fromData:data error:NULL];
+
+    XCTAssertNotNil(decodedEndpoints);
+    XCTAssertEqualObjects(decodedEndpoints, endpoints.allValues);
+
+    // Deeply compare by hand as well, `children` is not checked by isEqual:
+    [decodedEndpoints enumerateObjectsUsingBlock:^(MTREndpointInfo * decoded, NSUInteger idx, BOOL * stop) {
+        MTREndpointInfo * original = endpoints.allValues[idx];
+        XCTAssertTrue([decoded isEqual:original]);
+        XCTAssertEqualObjects(decoded.endpointID, original.endpointID);
+        XCTAssertEqualObjects(decoded.deviceTypes, original.deviceTypes);
+        XCTAssertEqualObjects(decoded.partsList, original.partsList);
+        XCTAssertEqualObjects(decoded.children, original.children);
+    }];
 }
 
 @end

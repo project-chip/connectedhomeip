@@ -25,7 +25,7 @@ MTR_TESTABLE_DIRECT_MEMBERS
 
 - (instancetype)initWithEndpointID:(NSNumber *)endpointID
                        deviceTypes:(NSArray<MTRDeviceTypeRevision *> *)deviceTypes
-                         partsList:(NSArray<NSNumber *> *)partsList NS_DESIGNATED_INITIALIZER;
+                         partsList:(NSArray<NSNumber *> *)partsList;
 
 // Populates the children array for each endpoint in the provided dictionary.
 // Returns YES if the endpoint hierarchy was populated correctly.

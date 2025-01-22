@@ -25,6 +25,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 using namespace chip;
 
 MTR_DIRECT_MEMBERS
@@ -56,7 +58,7 @@ MTR_DIRECT_MEMBERS
     return [self initInternalWithDeviceTypeID:[deviceTypeID copy] revision:[revision copy]];
 }
 
-- (instancetype)initWithDeviceTypeStruct:(MTRDescriptorClusterDeviceTypeStruct *)deviceTypeStruct
+- (nullable instancetype)initWithDeviceTypeStruct:(MTRDescriptorClusterDeviceTypeStruct *)deviceTypeStruct
 {
     return [self initWithDeviceTypeID:deviceTypeStruct.deviceType revision:deviceTypeStruct.revision];
 }
@@ -71,12 +73,34 @@ MTR_DIRECT_MEMBERS
     return self;
 }
 
-- (MTRDeviceType *)typeInformation
+static NSString * const sTypeIdCodingKey = @"ty";
+static NSString * const sRevisionCodingKey = @"re";
+
+- (nullable instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super init];
+    _deviceTypeID = @(static_cast<DeviceTypeId>([coder decodeInt64ForKey:sTypeIdCodingKey])); // int64_t encompasses uint32_t
+    _deviceTypeRevision = @(static_cast<uint16_t>([coder decodeIntegerForKey:sRevisionCodingKey]));
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [coder encodeInt64:static_cast<DeviceTypeId>(_deviceTypeID.unsignedLongLongValue) forKey:sTypeIdCodingKey];
+    [coder encodeInteger:static_cast<uint16_t>(_deviceTypeRevision.unsignedIntegerValue) forKey:sRevisionCodingKey];
+}
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (nullable MTRDeviceType *)typeInformation
 {
     return [MTRDeviceType deviceTypeForID:_deviceTypeID];
 }
 
-- (id)copyWithZone:(NSZone *)zone
+- (id)copyWithZone:(nullable NSZone *)zone
 {
     // We have no mutable state.
     return self;
@@ -106,3 +130,5 @@ MTR_DIRECT_MEMBERS
 }
 
 @end
+
+NS_ASSUME_NONNULL_END

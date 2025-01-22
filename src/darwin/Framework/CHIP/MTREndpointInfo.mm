@@ -26,6 +26,8 @@
 
 #include <deque>
 
+NS_ASSUME_NONNULL_BEGIN
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -56,14 +58,67 @@ MTR_DIRECT_MEMBERS
     return self;
 }
 
-- (NSNumber *)endpointID
+static NSString * const sEndpointIDCodingKey = @"id";
+static NSString * const sDeviceTypesCodingKey = @"dt";
+static NSString * const sPartsListCodingKey = @"pl";
+static NSString * const sChildrenCodingKey = @"ch";
+
+- (nullable instancetype)initWithCoder:(NSCoder *)coder
 {
-    return @(_endpointID);
+    self = [super init];
+    _endpointID = static_cast<EndpointId>([coder decodeIntegerForKey:sEndpointIDCodingKey]);
+    _deviceTypes = [coder decodeArrayOfObjectsOfClass:MTRDeviceTypeRevision.class forKey:sDeviceTypesCodingKey];
+    VerifyOrReturnValue(_deviceTypes != nil, nil);
+    _partsList = [coder decodeArrayOfObjectsOfClass:NSNumber.class forKey:sPartsListCodingKey];
+    VerifyOrReturnValue(_partsList != nil, nil);
+    _children = [coder decodeArrayOfObjectsOfClass:MTREndpointInfo.class forKey:sChildrenCodingKey];
+    VerifyOrReturnValue(_children != nil, nil);
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [coder encodeInteger:_endpointID forKey:sEndpointIDCodingKey];
+    [coder encodeObject:_deviceTypes forKey:sDeviceTypesCodingKey];
+    [coder encodeObject:_partsList forKey:sPartsListCodingKey];
+    [coder encodeObject:_children forKey:sChildrenCodingKey];
+}
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    return self; // no (externally) mutable state
+}
+
+- (NSUInteger)hash
+{
+    return _endpointID;
+}
+
+- (BOOL)isEqual:(id)object
+{
+    VerifyOrReturnValue([object class] == [self class], NO);
+    MTREndpointInfo * other = object;
+    VerifyOrReturnValue(_endpointID == other->_endpointID, NO);
+    VerifyOrReturnValue([_deviceTypes isEqual:other->_deviceTypes], NO);
+    VerifyOrReturnValue([_partsList isEqual:other->_partsList], NO);
+    // Children are derived from PartsLists, so we don't need to compare them.
+    // This avoids a lot recursive comparisons when comparing a dictionary of endpoints.
+    return YES;
 }
 
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@ %u>", self.class, _endpointID];
+}
+
+- (NSNumber *)endpointID
+{
+    return @(_endpointID);
 }
 
 + (BOOL)populateChildrenForEndpoints:(NSDictionary<NSNumber *, MTREndpointInfo *> *)endpoints
@@ -210,3 +265,5 @@ MTR_DIRECT_MEMBERS
 }
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 NS_SWIFT_SENDABLE
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
-@interface MTRDeviceTypeRevision : NSObject <NSCopying>
+@interface MTRDeviceTypeRevision : NSObject <NSCopying> /* <NSSecureCoding> (see below) */
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -55,6 +55,10 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  */
 @property (nonatomic, copy, readonly, nullable) MTRDeviceType * typeInformation MTR_NEWLY_AVAILABLE;
 
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRDeviceTypeRevision () <NSSecureCoding>
 @end
 
 NS_ASSUME_NONNULL_END

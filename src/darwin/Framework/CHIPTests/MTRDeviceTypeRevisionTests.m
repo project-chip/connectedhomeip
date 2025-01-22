@@ -82,4 +82,15 @@
     XCTAssertFalse([b isEqual:c]);
 }
 
+- (void)testSecureCoding
+{
+    MTRDeviceTypeRevision * a = [[MTRDeviceTypeRevision alloc] initWithDeviceTypeID:@(MTRDeviceTypeIDTypeMicrowaveOvenID) revision:@1];
+    NSData * data = [NSKeyedArchiver archivedDataWithRootObject:a requiringSecureCoding:YES error:NULL];
+    MTRDeviceTypeRevision * b = [NSKeyedUnarchiver unarchivedObjectOfClass:MTRDeviceTypeRevision.class fromData:data error:NULL];
+    XCTAssertNotNil(b);
+    XCTAssertEqualObjects(b.deviceTypeID, a.deviceTypeID);
+    XCTAssertEqualObjects(b.deviceTypeRevision, a.deviceTypeRevision);
+    XCTAssertTrue([b isEqual:a]);
+}
+
 @end

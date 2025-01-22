@@ -16,10 +16,13 @@
 
 #import <Matter/MTRCommissioneeInfo.h>
 
+#import "MTRDefines_Internal.h"
+
 #include <controller/CommissioningDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
+MTR_DIRECT_MEMBERS
 @interface MTRCommissioneeInfo ()
 
 - (instancetype)initWithCommissioningInfo:(const chip::Controller::ReadCommissioningInfo &)info;

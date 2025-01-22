@@ -24,8 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Information read from the commissionee device during commissioning.
  */
+NS_SWIFT_SENDABLE
 MTR_NEWLY_AVAILABLE
-@interface MTRCommissioneeInfo : NSObject
+@interface MTRCommissioneeInfo : NSObject <NSCopying, NSSecureCoding>
 
 /**
  * The product identity (VID / PID) of the commissionee.

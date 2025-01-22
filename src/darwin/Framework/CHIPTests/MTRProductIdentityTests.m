@@ -50,4 +50,15 @@
     XCTAssertFalse([b isEqual:c]);
 }
 
+- (void)testSecureCoding
+{
+    MTRProductIdentity * a = [[MTRProductIdentity alloc] initWithVendorID:@123 productID:@42];
+    NSData * data = [NSKeyedArchiver archivedDataWithRootObject:a requiringSecureCoding:YES error:NULL];
+    MTRProductIdentity * b = [NSKeyedUnarchiver unarchivedObjectOfClass:MTRProductIdentity.class fromData:data error:NULL];
+    XCTAssertNotNil(b);
+    XCTAssertEqualObjects(b.vendorID, a.vendorID);
+    XCTAssertEqualObjects(b.productID, a.productID);
+    XCTAssertTrue([b isEqual:a]);
+}
+
 @end
