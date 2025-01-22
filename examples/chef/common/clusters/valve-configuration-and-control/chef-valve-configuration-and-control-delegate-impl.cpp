@@ -78,7 +78,7 @@ chefValveConfigurationAndControlWriteCallback(chip::EndpointId endpointId, chip:
     {
     case Attributes::RemainingDuration::Id: {
         CHIP_ERROR err;
-        uint32_t * bufUint32 = static_cast<uint32_t *>(buffer);
+        uint32_t * bufUint32 = reinterpret_cast<uint32_t *>(buffer);
         if (NumericAttributeTraits<uint32_t>::IsNullValue(*bufUint32)) // Max value is interpreted as NULL
         {
             ChipLogProgress(DeviceLayer, "Setting RemainingDuration to NULL.");
