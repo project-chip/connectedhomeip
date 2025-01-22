@@ -11,7 +11,9 @@ in the SDK.
 *
 ```
 
-## Integration and Certification tests
+## SDK development
+
+### Integration and Certification tests
 
 Integration tests test the entire software stack using the same mechanisms as a
 standard controller.
@@ -27,7 +29,7 @@ product as a black box.
 -   [Enabling tests in the CI](./ci_testing.md)
 -   [Integration test utilities](./integration_test_utilities.md)
 
-## Unit testing
+### Unit testing
 
 Unit tests run on small pieces (“units”) of business logic. They do not use an
 external controller and instead test at the public interface of the class or
@@ -38,10 +40,28 @@ from the global ember and message delivery layers.
 
 -   [Unit tests](./unit_testing.md)
 
-## PICS and PIXIT
+### Fuzz testing
 
--   [PICS and PIXIT](./pics_and_pixit.md)
+Fuzz Testing involves providing random and unexpected data as input to functions
+and methods to uncover bugs, security vulnerabilities, or to determine if the
+software crashes.
 
-## Testing in the CI
+Information on how to develop and run fuzz tests for SDK code can be found here:
+
+-   [Fuzz Testing](./fuzz_testing.md)
+
+### Testing in the CI
 
 -   [CI testing](./ci_testing.md)
+
+## Testing a product for certification
+
+Product development and certification is a process that varies heavily based on
+the product and your company policies and decisions. The documents provided in
+this section aim to provide guidance around the general process for product
+development and certification. This is not aiming to be a complete guide for all
+products, but a knowledge base around common mechanisms and challenges.
+
+-   [Product development and Certification](./product_development_and_certification/index.html)
+
+## Developing Certification tests for a feature
