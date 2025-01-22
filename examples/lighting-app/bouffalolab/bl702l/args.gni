@@ -24,6 +24,8 @@ pw_assert_BACKEND = "${chip_root}/src/pw_backends/assert"
 pw_rpc_CONFIG = "$dir_pw_rpc:disable_global_mutex"
 
 chip_detail_logging = false
+
+# use -Os instead of -Og
 is_debug = false
 
 pw_build_LINK_DEPS = [

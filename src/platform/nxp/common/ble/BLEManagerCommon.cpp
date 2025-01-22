@@ -776,7 +776,7 @@ CHIP_ERROR BLEManagerCommon::StopAdvertising(void)
             CancelBleAdvTimeoutTimer();
         }
 
-#if CONFIG_CHIP_NFC_COMMISSIONING
+#if CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
         /* schedule NFC emulation stop */
         ChipDeviceEvent advChange;
         advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
