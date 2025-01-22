@@ -99,7 +99,6 @@ void emberAfLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gLaundryWasherModeDelegate == nullptr && gLaundryWasherModeInstance == nullptr);
     gLaundryWasherModeDelegate = new LaundryWasherMode::LaundryWasherModeDelegate;
-    gLaundryWasherModeInstance =
-        new ModeBase::Instance(gLaundryWasherModeDelegate, 0x1, LaundryWasherMode::Id, 0);
+    gLaundryWasherModeInstance = new ModeBase::Instance(gLaundryWasherModeDelegate, 0x1, LaundryWasherMode::Id, 0);
     gLaundryWasherModeInstance->Init();
 }
