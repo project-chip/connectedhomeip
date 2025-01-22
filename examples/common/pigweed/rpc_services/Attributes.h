@@ -212,7 +212,7 @@ public:
         if (!result.IsSuccess())
         {
             app::DataModel::ActionReturnStatus::StringStorage storage;
-            ChipLogError(Support, "Failed to read data: %s", result.c_str(storage));
+            ChipLogError(Support, "Failed to write data: %s", result.c_str(storage));
             return ::pw::Status::Internal();
         }
 
