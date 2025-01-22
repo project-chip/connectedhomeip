@@ -15,12 +15,20 @@
 #    limitations under the License.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args:  --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#     factory-reset: true
+#     quiet: false
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -31,7 +39,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from mdns_discovery.mdns_discovery import DNSRecordType, MdnsDiscovery, MdnsServiceType
 from mobly import asserts
 
 
@@ -71,12 +80,6 @@ class TC_CADMIN_1_15(MatterBaseTest):
         await th.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
-
-    def generate_unique_random_value(self, value):
-        while True:
-            random_value = random.randint(10000000, 99999999)
-            if random_value != value:
-                return random_value
 
     def steps_TC_CADMIN_1_15(self) -> list[TestStep]:
         return [
@@ -166,7 +169,25 @@ class TC_CADMIN_1_15(MatterBaseTest):
             asserts.fail("Expected number of fabrics not correct")
 
         self.step(8)
-        # TODO: Currently on hold for impl created by Raul for DNS-SD check of multiple operational service records
+        # Gathering instance names and servers associated in order to verify there are 3 service records for DUT.
+        mdns = MdnsDiscovery()
+        services = await MdnsDiscovery.get_all_services(mdns, log_output=True)
+        compressed_fabric_id = self.default_controller.GetCompressedFabricId()
+        instance_name = f'{compressed_fabric_id:016X}-{self.dut_node_id:016X}'
+        instance_qname = f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}"
+        self.print_step("instance qname", instance_qname)
+
+        target_server = None
+        instance_names = []
+        for service in services['_matter._tcp.local.']:
+            if service.instance_name not in instance_names:
+                if service.instance_name in instance_qname:
+                    target_server = service.server
+
+            if target_server != None:
+                instance_names.append(service.instance_name)
+        
+        asserts.assert_equal(3, len(instance_names), f"Did not get back the expected number of instances as we expected 3, but got len(instance_names)")
 
         self.step(9)
         fabric_idx_cr2 = await self.read_currentfabricindex(th=self.th2)
