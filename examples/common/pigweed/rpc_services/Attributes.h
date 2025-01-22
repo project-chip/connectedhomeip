@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "attributes_service/attributes_service.pb.h"
 #include "attributes_service/attributes_service.rpc.pb.h"
 #include "pigweed/rpc_services/internal/StatusUtils.h"
 
@@ -44,46 +45,109 @@ namespace rpc {
 class Attributes : public pw_rpc::nanopb::Attributes::Service<Attributes>
 {
 public:
-    ::pw::Status Write(const chip_rpc_AttributeWrite & request, pw_protobuf_Empty & response)
+    pw::Result<TLV::TLVReader> ReadIntoTlv(const chip_rpc_AttributeData & data, chip::MutableByteSpan tempBuffer)
     {
-        const void * data;
-        DeviceLayer::StackLock lock;
+        TLV::TLVReader result;
 
-        switch (request.data.which_data)
+        if (data.has_tlv_data)
+        {
+            // We can directly reference the embedded TLV data here
+            result.Init(data.tlv_data.bytes, data.tlv_data.size);
+            return result;
+        }
+
+        TLV::TLVWriter writer;
+
+        writer.Init(tempBuffer);
+
+        CHIP_ERROR write_status;
+
+        constexpr TLV::Tag kDataTag = TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData));
+
+        switch (data.which_data)
         {
         case chip_rpc_AttributeData_data_bool_tag:
-            data = &request.data.data.data_bool;
+            write_status = writer.Put(kDataTag, data.data.data_bool);
             break;
         case chip_rpc_AttributeData_data_uint8_tag:
-            data = &request.data.data.data_uint8;
+            write_status = writer.Put(kDataTag, data.data.data_uint8);
             break;
         case chip_rpc_AttributeData_data_uint16_tag:
-            data = &request.data.data.data_uint16;
+            write_status = writer.Put(kDataTag, data.data.data_uint16);
             break;
         case chip_rpc_AttributeData_data_uint32_tag:
-            data = &request.data.data.data_uint32;
+            write_status = writer.Put(kDataTag, data.data.data_uint32);
             break;
         case chip_rpc_AttributeData_data_int8_tag:
-            data = &request.data.data.data_int8;
+            write_status = writer.Put(kDataTag, data.data.data_int8);
             break;
         case chip_rpc_AttributeData_data_int16_tag:
-            data = &request.data.data.data_int16;
+            write_status = writer.Put(kDataTag, data.data.data_int16);
             break;
         case chip_rpc_AttributeData_data_int32_tag:
-            data = &request.data.data.data_int32;
-            break;
-        case chip_rpc_AttributeData_data_bytes_tag:
-            data = &request.data.data.data_bytes;
+            write_status = writer.Put(kDataTag, data.data.data_int32);
             break;
         case chip_rpc_AttributeData_data_single_tag:
-            data = &request.data.data.data_single;
+            write_status = writer.Put(kDataTag, data.data.data_single);
+            break;
+        case chip_rpc_AttributeData_data_bytes_tag:
+            // TODO: should we differentiate between string and bytes here?
+            //       bytes is binary and string should be UTF8
+            write_status = writer.PutBytes(kDataTag, data.data.data_bytes.bytes, data.data.data_bytes.size);
             break;
         default:
             return pw::Status::InvalidArgument();
         }
-        RETURN_STATUS_IF_NOT_OK(
-            emberAfWriteAttribute(request.metadata.endpoint, request.metadata.cluster, request.metadata.attribute_id,
-                                  const_cast<uint8_t *>(static_cast<const uint8_t *>(data)), request.metadata.type));
+
+        if (write_status != CHIP_NO_ERROR)
+        {
+            ChipLogError(Support, "Failed to encode TLV data: %" CHIP_ERROR_FORMAT, write_status.Format());
+            return pw::Status::Internal();
+        }
+
+        return pw::OkStatus();
+    }
+
+    ::pw::Status Write(const chip_rpc_AttributeWrite & request, pw_protobuf_Empty & response)
+    {
+        app::ConcreteAttributePath path(request.metadata.endpoint, request.metadata.cluster, request.metadata.attribute_id);
+
+        DeviceLayer::StackLock lock;
+
+        // TODO: this assumes a singleton data model provider
+        app::DataModel::Provider * provider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+
+        app::DataModel::ServerClusterFinder serverClusterFinder(provider);
+        auto info = serverClusterFinder.Find(path);
+        if (!info.has_value())
+        {
+            return ::pw::Status::NotFound();
+        }
+
+        Access::SubjectDescriptor subjectDescriptor{ .authMode = chip::Access::AuthMode::kPase };
+        app::DataModel::WriteAttributeRequest write_request;
+        write_request.path = path;
+        write_request.operationFlags.Set(app::DataModel::OperationFlags::kInternal);
+        write_request.subjectDescriptor = &subjectDescriptor;
+
+        uint8_t raw_value_buffer[64]; // enough to hold general types
+        pw::Result<TLV::TLVReader> tlvReader = ReadIntoTlv(request.data, chip::MutableByteSpan(raw_value_buffer));
+
+        if (!tlvReader.status().ok())
+        {
+            return tlvReader.status();
+        }
+
+        app::AttributeValueDecoder decoder(tlvReader.value(), subjectDescriptor);
+        app::DataModel::ActionReturnStatus result = provider->WriteAttribute(write_request, decoder);
+
+        if (!result.IsSuccess())
+        {
+            app::DataModel::ActionReturnStatus::StringStorage storage;
+            ChipLogError(Support, "Failed to read data: %s", result.c_str(storage));
+            return ::pw::Status::Internal();
+        }
+
         return pw::OkStatus();
     }
 
