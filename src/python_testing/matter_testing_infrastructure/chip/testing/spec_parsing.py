@@ -512,6 +512,7 @@ def check_clusters_for_unknown_commands(clusters: dict[int, XmlCluster], problem
 class PrebuiltDataModelDirectory(Enum):
     k1_3 = auto()
     k1_4 = auto()
+    k1_4_1 = auto()
     kMaster = auto()
 
     @property
@@ -520,6 +521,8 @@ class PrebuiltDataModelDirectory(Enum):
             return "1.3"
         if self == PrebuiltDataModelDirectory.k1_4:
             return "1.4"
+        if self == PrebuiltDataModelDirectory.k1_4_1:
+            return "1.4.1"
         if self == PrebuiltDataModelDirectory.kMaster:
             return "master"
         raise KeyError("Invalid enum: %r" % self)

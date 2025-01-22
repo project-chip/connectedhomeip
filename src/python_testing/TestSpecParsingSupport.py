@@ -255,20 +255,26 @@ class TestSpecParsingSupport(MatterBaseTest):
         self.all_spec_clusters = set([(id, c.name, c.pics) for id, c in self.spec_xml_clusters.items()])
 
     def test_build_xml_override(self):
-        # checks that the 1.3 spec (default) does not contain in-progress clusters and the TOT does
         tot_xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.kMaster)
         one_three_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
         one_four_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
+        one_four_one_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
         asserts.assert_greater(len(set(tot_xml_clusters.keys()) - set(one_three_clusters.keys())),
                                0, "Master dir does not contain any clusters not in 1.3")
         asserts.assert_greater(len(set(tot_xml_clusters.keys()) - set(one_four_clusters.keys())),
                                0, "Master dir does not contain any clusters not in 1.4")
+        asserts.assert_greater(len(set(tot_xml_clusters.keys()) - set(one_four_one_clusters.keys())),
+                               0, "Master dir does not contain any clusters not in 1.4")
         asserts.assert_greater(len(set(one_four_clusters.keys()) - set(one_three_clusters.keys())),
                                0, "1.4 dir does not contain any clusters not in 1.3")
+        asserts.assert_greater(len(set(one_four_one_clusters.keys()) - set(one_three_clusters.keys())),
+                               0, "1.4.1 dir does not contain any clusters not in 1.3")
         # only the pulse width modulation cluster was removed post 1.3
         asserts.assert_equal(set(one_three_clusters.keys()) - set(tot_xml_clusters.keys()),
                              set([Clusters.PulseWidthModulation.id]), "There are some 1.3 clusters that are not included in the TOT spec")
         asserts.assert_equal(set(one_four_clusters.keys())-set(tot_xml_clusters.keys()),
+                             set(), "There are some 1.4 clusters that are not included in the TOT spec")
+        asserts.assert_equal(set(one_four_one_clusters.keys())-set(tot_xml_clusters.keys()),
                              set(), "There are some 1.4 clusters that are not included in the TOT spec")
 
         str_path = get_data_model_directory(PrebuiltDataModelDirectory.k1_4, DataModelLevel.kCluster)
