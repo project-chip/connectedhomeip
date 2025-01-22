@@ -3640,18 +3640,14 @@ PICS:
           and conditions feature?"
       id: CGEN.S.F00(TC)
 
-    - label:
-          "The device's failsafe expiration limit."
+    - label: "The device's failsafe expiration limit."
       id: PIXIT.CGEN.FailsafeExpiryLengthSeconds
 
-    - label:
-          "The device's required terms and conditions acknowledgements."
+    - label: "The device's required terms and conditions acknowledgements."
       id: PIXIT.CGEN.RequiredTCAcknowledgements
 
-    - label:
-          "The device's required minimum terms and conditions revision."
+    - label: "The device's required minimum terms and conditions revision."
       id: PIXIT.CGEN.TCRevision
-
 
     # General Diagnostics Cluster Test Plan
     - label:
