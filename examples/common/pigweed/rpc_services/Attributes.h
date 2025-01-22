@@ -45,35 +45,69 @@ namespace rpc {
 class Attributes : public pw_rpc::nanopb::Attributes::Service<Attributes>
 {
 public:
+    static constexpr TLV::Tag kAttributeDataTag = TLV::ContextTag(1);
+    static constexpr TLV::Tag kDataTag          = TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData));
+
+    CHIP_ERROR PositionOnDataElement(chip::TLV::TLVReader & reader)
+    {
+        // Expect the TLV to be the full structure as received from a read (or subset)
+        // TLV is a full ReportDataMessage
+        //   - Anonymous Structure (container of everything)
+        //     - 1: Array (one element)
+        //       - Anonymous (the element)
+        //         - 1 (AttributeData/AttributeDataIB) - Structure
+        //           - 0 - Data Version
+        //           - 1 - Path (1: Node, 2: Endpoint, 3: Cluster, 4: Attribute, ...)
+        //           - 2 - Data (variable - may be raw data or a Structure)
+
+        TLV::TLVType unused_outer_type;
+
+        // Enter anonymous wrapper
+        ReturnErrorOnFailure(reader.Next()); // got to anonymous
+        ReturnErrorOnFailure(reader.EnterContainer(unused_outer_type));
+
+        // Enter the array
+        ReturnErrorOnFailure(reader.Next());
+        ReturnErrorOnFailure(reader.EnterContainer(unused_outer_type));
+
+        // enter the structure of data
+        ReturnErrorOnFailure(reader.Next());
+        ReturnErrorOnFailure(reader.EnterContainer(unused_outer_type));
+
+        // Find AttributeData Container
+        {
+            chip::TLV::TLVReader tmp;
+            ReturnErrorOnFailure(reader.FindElementWithTag(kAttributeDataTag, tmp));
+            reader = tmp;
+        }
+
+        // Enter into AttributeData Container
+        ReturnErrorOnFailure(reader.EnterContainer(unused_outer_type));
+
+        // Find Data Container
+        {
+            chip::TLV::TLVReader tmp;
+            ReturnErrorOnFailure(reader.FindElementWithTag(kDataTag, tmp));
+            reader = tmp;
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
     pw::Result<TLV::TLVReader> ReadIntoTlv(const chip_rpc_AttributeData & data, chip::MutableByteSpan tempBuffer)
     {
         TLV::TLVReader result;
 
         if (data.has_tlv_data)
         {
-            // We can directly reference the embedded TLV data here
             result.Init(data.tlv_data.bytes, data.tlv_data.size);
-            CHIP_ERROR err = result.Next();
+            CHIP_ERROR err = PositionOnDataElement(result);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Support, "Input TLV data did not have data: %" CHIP_ERROR_FORMAT, err.Format());
+                ChipLogError(Support, "Failed to parse input TLV buffer: %" CHIP_ERROR_FORMAT, err.Format());
                 return pw::Status::InvalidArgument();
             }
 
-            TLV::TLVType outer;
-            err = result.EnterContainer(outer);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Support, "Input TLV data has no wrapper container: %" CHIP_ERROR_FORMAT, err.Format());
-                return pw::Status::InvalidArgument();
-            }
-
-            err = result.Next();
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Support, "Input TLV stucture did not have a first element: %" CHIP_ERROR_FORMAT, err.Format());
-                return pw::Status::InvalidArgument();
-            }
             return result;
         }
 
@@ -82,8 +116,6 @@ public:
         writer.Init(tempBuffer);
 
         CHIP_ERROR write_status;
-
-        constexpr TLV::Tag kDataTag = TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData));
 
         TLV::TLVType outer;
         VerifyOrReturnError(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer) == CHIP_NO_ERROR,
@@ -132,10 +164,13 @@ public:
         }
 
         VerifyOrReturnValue(writer.EndContainer(outer) == CHIP_NO_ERROR, pw::Status::Internal());
+        VerifyOrReturnValue(writer.Finalize() == CHIP_NO_ERROR, pw::Status::Internal());
         result.Init(tempBuffer.data(), writer.GetLengthWritten());
 
         VerifyOrReturnError(result.Next() == CHIP_NO_ERROR, pw::Status::Internal());
         VerifyOrReturnError(result.EnterContainer(outer) == CHIP_NO_ERROR, pw::Status::Internal());
+
+        // This positions on the data element
         VerifyOrReturnError(result.Next() == CHIP_NO_ERROR, pw::Status::Internal());
 
         return result;
@@ -189,6 +224,7 @@ public:
         app::ConcreteAttributePath path(request.endpoint, request.cluster, request.attribute_id);
         MutableByteSpan tlvBuffer(response.tlv_data.bytes);
         PW_TRY(ReadAttributeIntoTlvBuffer(path, tlvBuffer));
+        // NOTE: TLV will be a full AttributeReportIB (so not purely the data)
         response.tlv_data.size = tlvBuffer.size();
         response.has_tlv_data  = true;
 
