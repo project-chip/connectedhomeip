@@ -42,6 +42,7 @@ uint16_t socket_port                  = 33000;
 
 stream::ServerSocket server_socket;
 stream::SocketStream socket_stream;
+bool socket_stream_ready = false;
 
 hdlc::RpcChannelOutput hdlc_channel_output(socket_stream, hdlc::kDefaultRpcAddress, "HDLC channel");
 Channel channels[] = { rpc::Channel::Create<1>(&hdlc_channel_output) };
@@ -69,7 +70,8 @@ void Init()
         PW_LOG_ERROR("Accept failed. Initialization failed.");
         return;
     }
-    socket_stream = *std::move(accept_result);
+    socket_stream       = *std::move(accept_result);
+    socket_stream_ready = true;
 }
 
 rpc::Server & Server()
@@ -79,6 +81,11 @@ rpc::Server & Server()
 
 Status Start()
 {
+    if (!socket_stream_ready)
+    {
+        PW_LOG_ERROR("Socket failed to initialize. PWRPC start failed.");
+        return Status::FailedPrecondition();
+    }
     // Declare a buffer for decoding incoming HDLC frames.
     std::array<std::byte, kMaxTransmissionUnit> input_buffer;
     hdlc::Decoder decoder(input_buffer);
