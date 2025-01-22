@@ -48,12 +48,11 @@
 // TODO: We shouldn't need any platform specific includes in this file
 #if (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
 #include <platform/silabs/SiWx917/SiWxPlatformInterface.h>
-#include <platform/silabs/wifi/wiseconnect-interface/WiseconnectWifiInterface.h>
 #endif // (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1 )
 
-#if defined(EXP_BOARD))
+#if ((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1) || defined(EXP_BOARD))
 #include <platform/silabs/wifi/wiseconnect-interface/WiseconnectWifiInterface.h>
-#endif // defined(EXP_BOARD)
+#endif // ((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1) || defined(EXP_BOARD))
 
 #include <crypto/CHIPCryptoPAL.h>
 // If building with the EFR32-provided crypto backend, we can use the
