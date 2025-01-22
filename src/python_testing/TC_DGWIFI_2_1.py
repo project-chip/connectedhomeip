@@ -63,18 +63,6 @@ class TC_DGWIFI_2_1(MatterBaseTest):
 
         return False
 
-    @staticmethod
-    def is_valid_uint_value(value, bit_count=64):
-        """
-        Checks if 'value' is a non-negative integer fitting into 'bit_count' bits.
-        For example, bit_count=32 => must fit within 0 <= value <= 0xFFFFFFFF
-        """
-        if not isinstance(value, int):
-            return False
-        if value < 0:
-            return False
-        return value < 2**bit_count
-
     def assert_valid_bssid(self, value, field_name):
         """Asserts that the value is a valid BSSID (MAC address), None, or NullValue."""
         if isinstance(value, Nullable):
@@ -85,26 +73,6 @@ class TC_DGWIFI_2_1(MatterBaseTest):
         if value is not None:
             asserts.assert_true(self.is_valid_bssid(value),
                                 f"{field_name} should be a valid BSSID string (e.g., '00:11:22:33:44:55') or None/NullValue.")
-
-    def assert_valid_uint64(self, value, field_name):
-        """Asserts that the value is a valid uint64 or None (if attribute can return NULL)."""
-        asserts.assert_true(value is None or self.is_valid_uint_value(value, bit_count=64),
-                            f"{field_name} should be a uint64 or NULL.")
-
-    def assert_valid_uint32(self, value, field_name):
-        """Asserts that the value is a valid uint32 or None (if attribute can return NULL)."""
-        asserts.assert_true(value is None or self.is_valid_uint_value(value, bit_count=32),
-                            f"{field_name} should be a uint32 or NULL.")
-
-    def assert_valid_uint16(self, value, field_name):
-        """Asserts that the value is a valid uint16 or None (if attribute can return NULL)."""
-        asserts.assert_true(value is None or self.is_valid_uint_value(value, bit_count=16),
-                            f"{field_name} should be a uint16 or NULL.")
-
-    def assert_valid_uint8(self, value, field_name):
-        """Asserts that the value is a valid uint16 or None (if attribute can return NULL)."""
-        asserts.assert_true(value is None or self.is_valid_uint_value(value, bit_count=8),
-                            f"{field_name} should be a uint8 or NULL.")
 
     async def read_dgwifi_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.WiFiNetworkDiagnostics
