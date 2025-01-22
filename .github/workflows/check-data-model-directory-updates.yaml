@@ -37,3 +37,6 @@ jobs:
       - name: Check for changes to 1.4 data_model directory without a SHA update
         run: |
           python3 scripts/dm_xml_ci_change_enforcement.py data_model/1.4
+      - name: Check for changes to 1.4.1 data_model directory without a SHA update
+        run: |
+          python3 scripts/dm_xml_ci_change_enforcement.py data_model/1.4.1
