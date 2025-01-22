@@ -57,9 +57,18 @@ void set_socket_port(uint16_t new_socket_port)
 void Init()
 {
     PW_LOG_INFO("Starting pw_rpc server on port %d", socket_port);
-    PW_CHECK_OK(server_socket.Listen(socket_port));
+    Status status = server_socket.Listen(socket_port);
+    if (!status.ok())
+    {
+        PW_LOG_ERROR("Listen failed. Initialization failed.");
+        return;
+    }
     auto accept_result = server_socket.Accept();
-    PW_CHECK_OK(accept_result.status());
+    if (!accept_result.status().ok())
+    {
+        PW_LOG_ERROR("Accept failed. Initialization failed.");
+        return;
+    }
     socket_stream = *std::move(accept_result);
 }
 
