@@ -326,7 +326,7 @@ private:
         return reader.Get(value);
     }
 
-    CHIP_ERROR TlvGet(TLV::TLVReader & reader, chip_rpc_AttributeData_data_bytes_t &value)
+    CHIP_ERROR TlvGet(TLV::TLVReader & reader, chip_rpc_AttributeData_data_bytes_t & value)
     {
         value.size = reader.GetLength();
         return reader.GetBytes(value.bytes, sizeof(value.bytes));
