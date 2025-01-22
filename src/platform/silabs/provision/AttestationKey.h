@@ -41,6 +41,11 @@ public:
     CHIP_ERROR GenerateCSR(uint16_t vid, uint16_t pid, const CharSpan & cn, MutableCharSpan & csr);
     CHIP_ERROR SignMessage(const ByteSpan & message, MutableByteSpan & out_span);
 
+#if (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE)
+    static CHIP_ERROR Unwrap(const uint8_t * asn1, size_t size, MutableByteSpan & private_key);
+    static CHIP_ERROR SignMessageWithKey(const uint8_t * private_key, const ByteSpan & message, MutableByteSpan & out_span);
+#endif // SLI_SI91X_MCU_INTERFACE
+
 protected:
     uint32_t mId = 0;
 };

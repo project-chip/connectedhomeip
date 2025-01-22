@@ -14,9 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "ProvisionStorage.h"
 #include <algorithm>
 #include <lib/support/CodeUtils.h>
+#include <platform/silabs/provision/ProvisionStorage.h>
 #include <string.h>
 
 namespace chip {

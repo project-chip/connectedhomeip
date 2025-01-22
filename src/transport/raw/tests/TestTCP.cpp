@@ -555,29 +555,26 @@ TEST_F(TestTCP, CheckSimpleInitTest6)
 TEST_F(TestTCP, InitializeAsTCPClient)
 {
     TCPImpl tcp;
-
-    CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager())
-                                  .SetAddressType(IPAddressType::kIPv6)
-                                  .SetListenPort(gChipTCPPort)
-                                  .SetServerListenEnabled(false));
+    auto tcpListenParams = Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager());
+    CHIP_ERROR err =
+        tcp.Init(tcpListenParams.SetAddressType(IPAddressType::kIPv6).SetListenPort(gChipTCPPort).SetServerListenEnabled(false));
 
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    bool isServerEnabled = tcp.IsServerListenEnabled();
+    bool isServerEnabled = tcpListenParams.IsServerListenEnabled();
     EXPECT_EQ(isServerEnabled, false);
 }
 
 TEST_F(TestTCP, InitializeAsTCPClientServer)
 {
     TCPImpl tcp;
+    auto tcpListenParams = Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager());
 
-    CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager())
-                                  .SetAddressType(IPAddressType::kIPv6)
-                                  .SetListenPort(gChipTCPPort));
+    CHIP_ERROR err = tcp.Init(tcpListenParams.SetAddressType(IPAddressType::kIPv6).SetListenPort(gChipTCPPort));
 
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    bool isServerEnabled = tcp.IsServerListenEnabled();
+    bool isServerEnabled = tcpListenParams.IsServerListenEnabled();
     EXPECT_EQ(isServerEnabled, true);
 }
 

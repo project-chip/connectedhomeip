@@ -86,6 +86,7 @@ class HostApp(Enum):
     NETWORK_MANAGER = auto()
     ENERGY_MANAGEMENT = auto()
     WATER_LEAK_DETECTOR = auto()
+    TERMS_AND_CONDITIONS = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -160,6 +161,8 @@ class HostApp(Enum):
             return 'energy-management-app/linux'
         elif self == HostApp.WATER_LEAK_DETECTOR:
             return 'water-leak-detector-app/linux'
+        elif self == HostApp.TERMS_AND_CONDITIONS:
+            return 'terms-and-conditions-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -278,6 +281,9 @@ class HostApp(Enum):
         elif self == HostApp.WATER_LEAK_DETECTOR:
             yield 'water-leak-detector-app'
             yield 'water-leak-detector-app.map'
+        elif self == HostApp.TERMS_AND_CONDITIONS:
+            yield 'terms-and-conditions-app'
+            yield 'terms-and-conditions-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 

@@ -178,10 +178,10 @@ config MPSL_FEM_NRF21540_RUNTIME_PA_GAIN_CONTROL
     default y if MPSL_FEM
 
 # ==============================================================================
-# NFC configuration
+# NFC Onboarding Payload configuration
 # ==============================================================================
 
-config CHIP_NFC_COMMISSIONING
+config CHIP_NFC_ONBOARDING_PAYLOAD
     default y
 
 # Disable not needed NFC callback to save flash

@@ -13095,6 +13095,108 @@ class ChipClusters:
             },
         },
     }
+    _PUSH_AV_STREAM_TRANSPORT_CLUSTER_INFO = {
+        "clusterName": "PushAvStreamTransport",
+        "clusterId": 0x00000555,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "AllocatePushTransport",
+                "args": {
+                    "transportOptions": "TransportOptionsStruct",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "DeallocatePushTransport",
+                "args": {
+                    "connectionID": "int",
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "ModifyPushTransport",
+                "args": {
+                    "connectionID": "int",
+                    "transportOptions": "TransportOptionsStruct",
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "SetTransportStatus",
+                "args": {
+                    "connectionID": "int",
+                    "transportStatus": "int",
+                },
+            },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "ManuallyTriggerTransport",
+                "args": {
+                    "connectionID": "int",
+                    "activationReason": "int",
+                    "timeControl": "TransportMotionTriggerTimeControlStruct",
+                },
+            },
+            0x00000006: {
+                "commandId": 0x00000006,
+                "commandName": "FindTransport",
+                "args": {
+                    "connectionID": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SupportedContainerFormats",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "SupportedIngestMethods",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "CurrentConnections",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _CHIME_CLUSTER_INFO = {
         "clusterName": "Chime",
         "clusterId": 0x00000556,
@@ -13236,6 +13338,133 @@ class ChipClusters:
             0x00000000: {
                 "attributeName": "SupportedDeviceCategories",
                 "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _TLS_CERTIFICATE_MANAGEMENT_CLUSTER_INFO = {
+        "clusterName": "TlsCertificateManagement",
+        "clusterId": 0x00000801,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ProvisionRootCertificate",
+                "args": {
+                    "certificate": "bytes",
+                    "caid": "int",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "FindRootCertificate",
+                "args": {
+                    "caid": "int",
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "LookupRootCertificate",
+                "args": {
+                    "fingerprint": "bytes",
+                },
+            },
+            0x00000006: {
+                "commandId": 0x00000006,
+                "commandName": "RemoveRootCertificate",
+                "args": {
+                    "caid": "int",
+                },
+            },
+            0x00000007: {
+                "commandId": 0x00000007,
+                "commandName": "TLSClientCSR",
+                "args": {
+                    "nonce": "bytes",
+                },
+            },
+            0x00000009: {
+                "commandId": 0x00000009,
+                "commandName": "ProvisionClientCertificate",
+                "args": {
+                    "ccdid": "int",
+                    "clientCertificateDetails": "TLSClientCertificateDetailStruct",
+                },
+            },
+            0x0000000B: {
+                "commandId": 0x0000000B,
+                "commandName": "FindClientCertificate",
+                "args": {
+                    "ccdid": "int",
+                },
+            },
+            0x0000000D: {
+                "commandId": 0x0000000D,
+                "commandName": "LookupClientCertificate",
+                "args": {
+                    "fingerprint": "bytes",
+                },
+            },
+            0x0000000F: {
+                "commandId": 0x0000000F,
+                "commandName": "RemoveClientCertificate",
+                "args": {
+                    "ccdid": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "MaxRootCertificates",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "CurrentRootCertificates",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "MaxClientCertificates",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "CurrentClientCertificates",
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
             },
@@ -14382,9 +14611,11 @@ class ChipClusters:
         0x00000552: _CAMERA_AV_SETTINGS_USER_LEVEL_MANAGEMENT_CLUSTER_INFO,
         0x00000553: _WEB_RTC_TRANSPORT_PROVIDER_CLUSTER_INFO,
         0x00000554: _WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER_INFO,
+        0x00000555: _PUSH_AV_STREAM_TRANSPORT_CLUSTER_INFO,
         0x00000556: _CHIME_CLUSTER_INFO,
         0x00000750: _ECOSYSTEM_INFORMATION_CLUSTER_INFO,
         0x00000751: _COMMISSIONER_CONTROL_CLUSTER_INFO,
+        0x00000801: _TLS_CERTIFICATE_MANAGEMENT_CLUSTER_INFO,
         0xFFF1FC05: _UNIT_TESTING_CLUSTER_INFO,
         0xFFF1FC06: _FAULT_INJECTION_CLUSTER_INFO,
         0xFFF1FC20: _SAMPLE_MEI_CLUSTER_INFO,
@@ -14513,9 +14744,11 @@ class ChipClusters:
         "CameraAvSettingsUserLevelManagement": _CAMERA_AV_SETTINGS_USER_LEVEL_MANAGEMENT_CLUSTER_INFO,
         "WebRTCTransportProvider": _WEB_RTC_TRANSPORT_PROVIDER_CLUSTER_INFO,
         "WebRTCTransportRequestor": _WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER_INFO,
+        "PushAvStreamTransport": _PUSH_AV_STREAM_TRANSPORT_CLUSTER_INFO,
         "Chime": _CHIME_CLUSTER_INFO,
         "EcosystemInformation": _ECOSYSTEM_INFORMATION_CLUSTER_INFO,
         "CommissionerControl": _COMMISSIONER_CONTROL_CLUSTER_INFO,
+        "TlsCertificateManagement": _TLS_CERTIFICATE_MANAGEMENT_CLUSTER_INFO,
         "UnitTesting": _UNIT_TESTING_CLUSTER_INFO,
         "FaultInjection": _FAULT_INJECTION_CLUSTER_INFO,
         "SampleMei": _SAMPLE_MEI_CLUSTER_INFO,

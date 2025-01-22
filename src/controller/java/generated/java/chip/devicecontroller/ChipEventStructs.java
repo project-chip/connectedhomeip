@@ -6777,6 +6777,158 @@ public static class CameraAvStreamManagementClusterSnapshotStreamChangedEvent {
     return output.toString();
   }
 }
+public static class PushAvStreamTransportClusterPushTransportBeginEvent {
+  public Integer connectionID;
+  public Integer triggerType;
+  public Optional<Integer> activationReason;
+  private static final long CONNECTION_ID_ID = 0L;
+  private static final long TRIGGER_TYPE_ID = 1L;
+  private static final long ACTIVATION_REASON_ID = 2L;
+
+  public PushAvStreamTransportClusterPushTransportBeginEvent(
+    Integer connectionID,
+    Integer triggerType,
+    Optional<Integer> activationReason
+  ) {
+    this.connectionID = connectionID;
+    this.triggerType = triggerType;
+    this.activationReason = activationReason;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CONNECTION_ID_ID, new UIntType(connectionID)));
+    values.add(new StructElement(TRIGGER_TYPE_ID, new UIntType(triggerType)));
+    values.add(new StructElement(ACTIVATION_REASON_ID, activationReason.<BaseTLVType>map((nonOptionalactivationReason) -> new UIntType(nonOptionalactivationReason)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static PushAvStreamTransportClusterPushTransportBeginEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer connectionID = null;
+    Integer triggerType = null;
+    Optional<Integer> activationReason = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CONNECTION_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          connectionID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == TRIGGER_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          triggerType = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ACTIVATION_REASON_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          activationReason = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new PushAvStreamTransportClusterPushTransportBeginEvent(
+      connectionID,
+      triggerType,
+      activationReason
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PushAvStreamTransportClusterPushTransportBeginEvent {\n");
+    output.append("\tconnectionID: ");
+    output.append(connectionID);
+    output.append("\n");
+    output.append("\ttriggerType: ");
+    output.append(triggerType);
+    output.append("\n");
+    output.append("\tactivationReason: ");
+    output.append(activationReason);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PushAvStreamTransportClusterPushTransportEndEvent {
+  public Integer connectionID;
+  public Integer triggerType;
+  public Optional<Integer> activationReason;
+  private static final long CONNECTION_ID_ID = 0L;
+  private static final long TRIGGER_TYPE_ID = 1L;
+  private static final long ACTIVATION_REASON_ID = 2L;
+
+  public PushAvStreamTransportClusterPushTransportEndEvent(
+    Integer connectionID,
+    Integer triggerType,
+    Optional<Integer> activationReason
+  ) {
+    this.connectionID = connectionID;
+    this.triggerType = triggerType;
+    this.activationReason = activationReason;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CONNECTION_ID_ID, new UIntType(connectionID)));
+    values.add(new StructElement(TRIGGER_TYPE_ID, new UIntType(triggerType)));
+    values.add(new StructElement(ACTIVATION_REASON_ID, activationReason.<BaseTLVType>map((nonOptionalactivationReason) -> new UIntType(nonOptionalactivationReason)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static PushAvStreamTransportClusterPushTransportEndEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer connectionID = null;
+    Integer triggerType = null;
+    Optional<Integer> activationReason = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CONNECTION_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          connectionID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == TRIGGER_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          triggerType = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ACTIVATION_REASON_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          activationReason = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new PushAvStreamTransportClusterPushTransportEndEvent(
+      connectionID,
+      triggerType,
+      activationReason
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PushAvStreamTransportClusterPushTransportEndEvent {\n");
+    output.append("\tconnectionID: ");
+    output.append(connectionID);
+    output.append("\n");
+    output.append("\ttriggerType: ");
+    output.append(triggerType);
+    output.append("\n");
+    output.append("\tactivationReason: ");
+    output.append(activationReason);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class CommissionerControlClusterCommissioningRequestResultEvent {
   public Long requestID;
   public Long clientNodeID;

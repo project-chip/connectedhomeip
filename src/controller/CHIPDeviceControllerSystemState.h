@@ -74,10 +74,6 @@ inline constexpr size_t kMaxDeviceTransportTcpPendingPackets = CHIP_CONFIG_MAX_T
 
 using DeviceTransportMgr =
     TransportMgr<Transport::UDP /* IPv6 */
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-                 ,
-                 Transport::TCP<kMaxDeviceTransportTcpActiveConnectionCount, kMaxDeviceTransportTcpPendingPackets>
-#endif
 #if INET_CONFIG_ENABLE_IPV4
                  ,
                  Transport::UDP /* IPv4 */
@@ -85,6 +81,10 @@ using DeviceTransportMgr =
 #if CONFIG_NETWORK_LAYER_BLE
                  ,
                  Transport::BLE<kMaxDeviceTransportBlePendingPackets> /* BLE */
+#endif
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                 ,
+                 Transport::TCP<kMaxDeviceTransportTcpActiveConnectionCount, kMaxDeviceTransportTcpPendingPackets>
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
                  ,

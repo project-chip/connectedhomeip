@@ -43,6 +43,7 @@ static_library("cc32xx") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app:app_config",
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]

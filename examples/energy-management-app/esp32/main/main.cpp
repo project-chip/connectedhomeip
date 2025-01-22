@@ -294,7 +294,6 @@ extern "C" void app_main()
 #endif
 
     SetDeviceAttestationCredentialsProvider(get_dac_provider());
-    ESPOpenThreadInit();
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }

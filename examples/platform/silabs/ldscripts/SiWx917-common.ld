@@ -39,7 +39,8 @@ SECTIONS
 	.text :
 	{
 		KEEP(*(.isr_vector))
-     	KEEP(*(.reset_handler))
+		. = ALIGN(32);
+		KEEP(*(.reset_handler))
 		*(EXCLUDE_FILE(*sl_si91x_bus.c.o *sl_si91x_driver.c.o *sli_si91x_multithreaded.c.o *rsi_hal_mcu_m4_ram.c.o *rsi_hal_mcu_m4_rom.c.o *rsi_deepsleep_soc.c.o *croutine.c.o *event_groups.c.o *list.c.o *queue.c.o *stream_buffer.c.o *tasks.c.o *timers.c.o *cmsis_os2.c.o *freertos_umm_malloc_host.c.o *malloc_buffers.c.o *sl_rsi_utility.c.o *port.c.o *sl_sleeptimer.c.o *sl_sleeptimer_hal_si91x_sysrtc.c.o *rsi_sysrtc.c.o *sl_si91x_low_power_tickless_mode.c.o *heap_*.c.o *sl_core_cortexm.c.o) .text*)
 		
     /* .ctors */
@@ -151,6 +152,9 @@ SECTIONS
     *rsi_sysrtc.c.o(.text*)
     *sl_si91x_low_power_tickless_mode.c.o(.text*)
     *sl_core_cortexm.c.o(.text*)
+
+    /* ipmu calibration data */
+    *(.common_ipmu_ram*)
 
     . = ALIGN(4);
     /* preinit data */

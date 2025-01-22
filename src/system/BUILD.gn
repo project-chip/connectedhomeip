@@ -272,6 +272,10 @@ static_library("system") {
     sources += [ "SocketEvents.h" ]
   }
 
+  if (current_os == "zephyr") {
+    public_deps += [ "${chip_root}/src/inet:inet_zephyr_socket" ]
+  }
+
   if (chip_with_nlfaultinjection) {
     sources += [
       "SystemFaultInjection.cpp",

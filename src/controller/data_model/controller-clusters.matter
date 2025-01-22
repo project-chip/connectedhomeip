@@ -10139,6 +10139,200 @@ provisional cluster WebRTCTransportRequestor = 1364 {
   command End(EndRequest): DefaultSuccess = 4;
 }
 
+/** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
+cluster PushAvStreamTransport = 1365 {
+  revision 1;
+
+  enum ContainerFormatEnum : enum8 {
+    kCMAF = 0;
+  }
+
+  enum IngestMethodsEnum : enum8 {
+    kCMAFIngest = 0;
+  }
+
+  enum StatusCodeEnum : enum8 {
+    kAllocationNotPermitted = 2;
+    kInvalidTLSEndpoint = 3;
+    kInvalidStream = 4;
+    kInvalidURL = 5;
+    kInvalidZone = 6;
+    kUnsupportedContainerFormat = 7;
+    kUnsupportedIngestMethod = 8;
+    kInvalidTriggerType = 9;
+    kInvalidTransportStatus = 16;
+  }
+
+  enum StreamMultiplexingEnum : enum8 {
+    kInterleaved = 0;
+  }
+
+  enum StreamUsageEnum : enum8 {
+    kInternal = 0;
+    kRecording = 1;
+    kAnalysis = 2;
+    kLiveView = 3;
+  }
+
+  enum TransportStatusEnum : enum8 {
+    kActive = 0;
+    kInactive = 1;
+  }
+
+  enum TransportTriggerTypeEnum : enum8 {
+    kCommand = 0;
+    kMotion = 1;
+    kContinuous = 2;
+  }
+
+  enum TriggerActivationReasonEnum : enum8 {
+    kUserInitiated = 0;
+    kAutomation = 1;
+    kEmergency = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPerZoneSensitivity = 0x1;
+  }
+
+  bitmap SupportedContainerFormatsBitmap : bitmap8 {
+    kCMAF = 0x1;
+  }
+
+  bitmap SupportedIngestMethodsBitmap : bitmap8 {
+    kCMAFIngest = 0x1;
+  }
+
+  struct TransportMotionTriggerTimeControlStruct {
+    int16u initialDuration = 0;
+    int16u augmentationDuration = 1;
+    elapsed_s maxDuration = 2;
+    int16u blindDuration = 3;
+  }
+
+  struct TransportZoneOptionsStruct {
+    nullable int16u zone = 1;
+    optional int8u sensitivity = 2;
+  }
+
+  struct MetadataOptionsStruct {
+    StreamMultiplexingEnum multiplexing = 0;
+    boolean includeMotionZones = 1;
+    boolean enableMetadataPrivacySensitive = 2;
+  }
+
+  struct TransportTriggerOptionsStruct {
+    TransportTriggerTypeEnum triggerType = 0;
+    optional nullable TransportZoneOptionsStruct motionZones[] = 1;
+    optional nullable int8u motionSensitivity = 2;
+    optional TransportMotionTriggerTimeControlStruct motionTimeControl = 3;
+    optional int16u maxPreRollLen = 4;
+  }
+
+  struct CMAFContainerOptionsStruct {
+    int16u chunkDuration = 0;
+    optional octet_string CENCKey = 1;
+  }
+
+  struct ContainerOptionsStruct {
+    ContainerFormatEnum containerType = 0;
+    optional CMAFContainerOptionsStruct CMAFContainerOptions = 1;
+  }
+
+  struct TransportOptionsStruct {
+    StreamUsageEnum streamUsage = 0;
+    optional int16u videoStreamID = 1;
+    optional int16u audioStreamID = 2;
+    int16u endpointID = 3;
+    long_char_string<2000> url = 4;
+    TransportTriggerOptionsStruct triggerOptions = 5;
+    IngestMethodsEnum ingestMethod = 6;
+    ContainerFormatEnum containerFormat = 7;
+    ContainerOptionsStruct containerOptions = 8;
+    optional MetadataOptionsStruct metadataOptions = 9;
+    optional epoch_s expiryTime = 10;
+  }
+
+  struct TransportConfigurationStruct {
+    int16u connectionID = 0;
+    TransportStatusEnum transportStatus = 1;
+    TransportOptionsStruct transportOptions = 2;
+  }
+
+  info event PushTransportBegin = 0 {
+    int16u connectionID = 0;
+    TransportTriggerTypeEnum triggerType = 1;
+    optional TriggerActivationReasonEnum activationReason = 2;
+  }
+
+  info event PushTransportEnd = 1 {
+    int16u connectionID = 0;
+    TransportTriggerTypeEnum triggerType = 1;
+    optional TriggerActivationReasonEnum activationReason = 2;
+  }
+
+  readonly attribute SupportedContainerFormatsBitmap supportedContainerFormats = 0;
+  readonly attribute SupportedIngestMethodsBitmap supportedIngestMethods = 1;
+  readonly attribute int16u currentConnections[] = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AllocatePushTransportRequest {
+    TransportOptionsStruct transportOptions = 0;
+  }
+
+  response struct AllocatePushTransportResponse = 1 {
+    int16u connectionID = 0;
+    TransportOptionsStruct transportOptions = 1;
+    TransportStatusEnum transportStatus = 2;
+  }
+
+  request struct DeallocatePushTransportRequest {
+    int16u connectionID = 0;
+  }
+
+  request struct ModifyPushTransportRequest {
+    int16u connectionID = 0;
+    TransportOptionsStruct transportOptions = 1;
+  }
+
+  request struct SetTransportStatusRequest {
+    int16u connectionID = 0;
+    TransportStatusEnum transportStatus = 1;
+  }
+
+  request struct ManuallyTriggerTransportRequest {
+    int16u connectionID = 0;
+    TriggerActivationReasonEnum activationReason = 1;
+    optional TransportMotionTriggerTimeControlStruct timeControl = 2;
+  }
+
+  request struct FindTransportRequest {
+    optional nullable int16u connectionID = 0;
+  }
+
+  response struct FindTransportResponse = 7 {
+    TransportConfigurationStruct streamConfigurations[] = 0;
+  }
+
+  /** This command SHALL allocate a transport and return a PushTransportConnectionID. */
+  command access(invoke: manage) AllocatePushTransport(AllocatePushTransportRequest): AllocatePushTransportResponse = 0;
+  /** This command SHALL be generated to request the Node deallocates the specified transport. */
+  command access(invoke: manage) DeallocatePushTransport(DeallocatePushTransportRequest): DefaultSuccess = 2;
+  /** This command is used to request the Node modifies the configuration of the specified push transport. */
+  command access(invoke: manage) ModifyPushTransport(ModifyPushTransportRequest): DefaultSuccess = 3;
+  /** This command SHALL be generated to request the Node modifies the Transport Status of the transport. */
+  command access(invoke: manage) SetTransportStatus(SetTransportStatusRequest): DefaultSuccess = 4;
+  /** This command SHALL be generated to request the Node to manually start the specified push transport. */
+  command ManuallyTriggerTransport(ManuallyTriggerTransportRequest): DefaultSuccess = 5;
+  /** This command SHALL return the Stream Options Configuration for the specified push transport. */
+  command FindTransport(FindTransportRequest): FindTransportResponse = 6;
+}
+
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
 provisional cluster Chime = 1366 {
   revision 1;
@@ -10245,6 +10439,121 @@ cluster CommissionerControl = 1873 {
   command access(invoke: manage) RequestCommissioningApproval(RequestCommissioningApprovalRequest): DefaultSuccess = 0;
   /** This command is sent by a client to request that the server begins commissioning a previously approved request. */
   command access(invoke: manage) CommissionNode(CommissionNodeRequest): ReverseOpenCommissioningWindow = 1;
+}
+
+/** This Cluster is used to manage TLS Client Certificates and to provision
+      TLS endpoints with enough information to facilitate subsequent connection. */
+provisional cluster TlsCertificateManagement = 2049 {
+  revision 1;
+
+  struct TLSCertStruct {
+    int16u caid = 0;
+    long_octet_string<3000> certificate = 1;
+  }
+
+  struct TLSClientCertificateDetailStruct {
+    int16u ccdid = 0;
+    long_octet_string<3000> clientCertificate = 1;
+    octet_string intermediateCertificates[] = 2;
+  }
+
+  readonly attribute int8u maxRootCertificates = 0;
+  readonly attribute int8u currentRootCertificates = 1;
+  readonly attribute int8u maxClientCertificates = 2;
+  readonly attribute int8u currentClientCertificates = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ProvisionRootCertificateRequest {
+    long_octet_string<3000> certificate = 0;
+    nullable int16u caid = 1;
+  }
+
+  response struct ProvisionRootCertificateResponse = 1 {
+    int16u caid = 0;
+  }
+
+  request struct FindRootCertificateRequest {
+    nullable int16u caid = 0;
+  }
+
+  response struct FindRootCertificateResponse = 3 {
+    TLSCertStruct certificateDetails[] = 0;
+  }
+
+  request struct LookupRootCertificateRequest {
+    octet_string<64> fingerprint = 0;
+  }
+
+  response struct LookupRootCertificateResponse = 5 {
+    int16u caid = 0;
+  }
+
+  request struct RemoveRootCertificateRequest {
+    int16u caid = 0;
+  }
+
+  request struct TLSClientCSRRequest {
+    octet_string nonce = 0;
+  }
+
+  response struct TLSClientCSRResponse = 8 {
+    int16u ccdid = 0;
+    octet_string csr = 1;
+    octet_string nonce = 2;
+  }
+
+  request struct ProvisionClientCertificateRequest {
+    int16u ccdid = 0;
+    TLSClientCertificateDetailStruct clientCertificateDetails = 1;
+  }
+
+  response struct ProvisionClientCertificateResponse = 10 {
+    int16u ccdid = 0;
+  }
+
+  request struct FindClientCertificateRequest {
+    int16u ccdid = 0;
+  }
+
+  response struct FindClientCertificateResponse = 12 {
+    TLSClientCertificateDetailStruct certificateDetails[] = 0;
+  }
+
+  request struct LookupClientCertificateRequest {
+    octet_string<64> fingerprint = 0;
+  }
+
+  response struct LookupClientCertificateResponse = 14 {
+    int16u ccdid = 0;
+  }
+
+  request struct RemoveClientCertificateRequest {
+    int16u ccdid = 0;
+  }
+
+  /** This command SHALL provision the provided certificate for the passed in CAID. */
+  command access(invoke: administer) ProvisionRootCertificate(ProvisionRootCertificateRequest): ProvisionRootCertificateResponse = 0;
+  /** This command SHALL return the TLSCertStruct for the passed in CAID. */
+  command FindRootCertificate(FindRootCertificateRequest): FindRootCertificateResponse = 2;
+  /** This command SHALL return the CAID for the passed in fingerprint. */
+  command LookupRootCertificate(LookupRootCertificateRequest): LookupRootCertificateResponse = 4;
+  /** This command SHALL be generated to request the server removes the certificate provisioned to the provided Certificate Authority ID. */
+  command access(invoke: administer) RemoveRootCertificate(RemoveRootCertificateRequest): DefaultSuccess = 6;
+  /** This command SHALL be generated to request the Node generates a Certificate Signing Request. */
+  command access(invoke: administer) TLSClientCSR(TLSClientCSRRequest): TLSClientCSRResponse = 7;
+  /** This command SHALL be generated to request the Node provisions the provided Client Certificate Details. */
+  command access(invoke: administer) ProvisionClientCertificate(ProvisionClientCertificateRequest): ProvisionClientCertificateResponse = 9;
+  /** This command SHALL return the TLSClientCertificateDetailStruct for the passed in CCDID. */
+  command FindClientCertificate(FindClientCertificateRequest): FindClientCertificateResponse = 11;
+  /** This command SHALL return the CCDID for the passed in Fingerprint. */
+  command LookupClientCertificate(LookupClientCertificateRequest): LookupClientCertificateResponse = 13;
+  /** This command SHALL be generated to request the Node removes the certificate provisioned to the provided Client Certificate Details ID. */
+  command access(invoke: administer) RemoveClientCertificate(RemoveClientCertificateRequest): DefaultSuccess = 15;
 }
 
 /** The Test Cluster is meant to validate the generated code */
