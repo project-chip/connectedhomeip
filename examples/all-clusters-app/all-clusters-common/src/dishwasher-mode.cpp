@@ -101,6 +101,6 @@ void emberAfDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(gDishwasherModeDelegate == nullptr && gDishwasherModeInstance == nullptr);
     gDishwasherModeDelegate = new DishwasherMode::DishwasherModeDelegate;
     gDishwasherModeInstance =
-        new ModeBase::Instance(gDishwasherModeDelegate, 0x1, DishwasherMode::Id, chip::to_underlying(Feature::kOnOff));
+        new ModeBase::Instance(gDishwasherModeDelegate, 0x1, DishwasherMode::Id, 0);
     gDishwasherModeInstance->Init();
 }
