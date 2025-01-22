@@ -195,7 +195,7 @@ else
                 if [ "$2" = "rs9116" ]; then
                     optArgs+="use_rs9116=true "
                 elif [ "$2" = "SiWx917" ]; then
-                    optArgs+="use_SiWx917=true disable_lcd=true use_external_flash=false "
+                    optArgs+="use_SiWx917=true "
                 elif [ "$2" = "wf200" ]; then
                     optArgs+="use_wf200=true "
                 else
