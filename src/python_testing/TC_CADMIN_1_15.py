@@ -40,7 +40,7 @@ from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mdns_discovery.mdns_discovery import DNSRecordType, MdnsDiscovery, MdnsServiceType
+from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mobly import asserts
 
 
@@ -184,11 +184,11 @@ class TC_CADMIN_1_15(MatterBaseTest):
                 if service.instance_name in instance_qname:
                     target_server = service.server
 
-            if target_server != None:
+            if target_server is not None:
                 instance_names.append(service.instance_name)
 
         asserts.assert_equal(3, len(instance_names),
-                             f"Did not get back the expected number of instances as we expected 3, but got len(instance_names)")
+                            f"Did not get back the expected number of instances as we expected 3, but got {len(instance_names)}")
 
         self.step(9)
         fabric_idx_cr2 = await self.read_currentfabricindex(th=self.th2)
