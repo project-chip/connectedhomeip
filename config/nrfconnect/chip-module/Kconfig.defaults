@@ -161,6 +161,10 @@ config BT_BUF_ACL_RX_SIZE
 config BT_BUF_ACL_TX_SIZE
     default 251
 
+# It is set based on BT_BUF_ACL_RX_COUNT_EXTRA = 6 - (BT_MAX_CONN + 1)
+config BT_BUF_ACL_RX_COUNT_EXTRA
+    default 4
+
 config BT_RX_STACK_SIZE
     default 1200
 
