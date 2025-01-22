@@ -37,34 +37,9 @@
 
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
 
 
 class TC_DGSW_2_1(MatterBaseTest):
-
-    @staticmethod
-    def is_valid_uint64_value(value):
-        return isinstance(value, int) and 0 <= value <= 0xFFFFFFFFFFFFFFFF
-
-    @staticmethod
-    def is_valid_uint32_value(value):
-        return isinstance(value, int) and 0 <= value <= 0xFFFFFFFF
-
-    @staticmethod
-    def is_valid_str_value(value):
-        return isinstance(value, str) and len(value) > 0
-
-    def assert_valid_uint64(self, value, field_name):
-        """Asserts that the value is a valid uint64."""
-        asserts.assert_true(self.is_valid_uint64_value(value), f"{field_name} field should be a uint64 type")
-
-    def assert_valid_uint32(self, value, field_name):
-        """Asserts that the value is a valid uint32."""
-        asserts.assert_true(self.is_valid_uint32_value(value), f"{field_name} field should be a uint32 type")
-
-    def assert_valid_str(self, value, field_name):
-        """Asserts that the value is a non-empty string."""
-        asserts.assert_true(self.is_valid_str_value(value), f"{field_name} field should be a non-empty string")
 
     async def read_dgsw_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.SoftwareDiagnostics
