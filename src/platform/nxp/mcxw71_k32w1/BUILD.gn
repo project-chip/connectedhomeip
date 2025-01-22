@@ -123,18 +123,6 @@ static_library("nxp_platform") {
       "ram_storage.c",
       "ram_storage.h",
     ]
-  } else if (nxp_nvm_component == "littlefs") {
-    defines += [
-      "CHIP_PLAT_NVM_SUPPORT=3",
-      "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"platform/nxp/common/KeyValueStoreManagerImpl.h\"",
-    ]
-
-    sources += [
-      "../common/KeyValueStoreManagerImpl.cpp",
-      "../common/KeyValueStoreManagerImpl.h",
-      "../common/NXPConfig.h",
-      "../common/NXPConfigKS.cpp",
-    ]
   } else if (nxp_nvm_component == "nvs") {
     defines += [
       "gAppNvsExternalFlash_c=0",
