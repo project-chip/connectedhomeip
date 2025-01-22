@@ -116,21 +116,6 @@ void DeviceCallbacks::UpdateStatusLED()
     }
 }
 
-#if CONFIG_ENABLE_ATTRIBUTE_SUBSCRIBE
-void DeviceCallbacks::TriggerSubscribe()
-{
-    for (const auto & binding : BindingTable::GetInstance())
-    {
-        if (binding.type == MATTER_UNICAST_BINDING &&
-            (!binding.clusterId.has_value() || binding.clusterId.value() == Clusters::OnOff::Id))
-        {
-            ChipLogProgress(DeviceLayer, "binding.local = %d", binding.local);
-            DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerFunction2, binding.local);
-        }
-    }
-}
-#endif
-
 void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
     // ChipLogProgress(Zcl, "DeviceEventCallback event_type 0x%x", event->Type);
@@ -179,9 +164,6 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         }
 #endif
 
-#if CONFIG_ENABLE_ATTRIBUTE_SUBSCRIBE
-        // TriggerSubscribe();
-#endif
     }
 
     break;
