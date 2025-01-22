@@ -21,6 +21,7 @@ openthread_root =
 nxp_platform = "mcxw71_k32w1"
 nxp_sdk_name = "mcxw71_k32w1_sdk"
 nxp_device_layer = "nxp/${nxp_platform}"
+nxp_nvm_component = "nvs"
 nxp_use_lwip = false
 
 # ARM architecture flags will be set based on NXP board.

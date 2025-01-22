@@ -21,8 +21,7 @@ import("${chip_root}/src/platform/device.gni")
 assert(chip_device_platform == "asr")
 
 static_library("ASR") {
-  sources = []
-  sources += [
+  sources = [
     "../SingletonConfigurationManager.cpp",
     "ASRConfig.cpp",
     "ASRConfig.h",
@@ -72,6 +71,7 @@ static_library("ASR") {
   ]
 
   deps = [
+    "${chip_root}/src/app:app_config",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
