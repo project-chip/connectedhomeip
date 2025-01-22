@@ -33,6 +33,7 @@ import time
 import typing
 import uuid
 from binascii import hexlify, unhexlify
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
@@ -2074,6 +2075,18 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
 
     return convert_args_to_matter_config(parser.parse_known_args(argv)[0])
 
+
+def async_function_runner(function, timeout):
+    """
+    Runs an async function synchronously, even if an event loop is already running.
+    Follows similar below flow for _async_runner() 
+    """
+    async def frapper():
+        return await asyncio.wait_for(function, timeout=timeout)
+
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(lambda: asyncio.run(frapper()))        
+        return future.result()
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
     timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout

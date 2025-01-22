@@ -40,7 +40,7 @@ import logging
 import re
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, async_function_runner
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -137,6 +137,7 @@ class TC_ICDM_2_1(MatterBaseTest):
     @async_test_body
     async def test_TC_ICDM_2_1(self):
         self.endpoint = self.get_endpoint()
+        self.timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
 
         cluster = Clusters.Objects.IcdManagement
         attributes = cluster.Attributes
@@ -182,7 +183,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate ClientsSupportedPerFabric
         self.step(5)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.ClientsSupportedPerFabric):
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.ClientsSupportedPerFabric), timeout=self.timeout):
             clientsSupportedPerFabric = await self._read_icdm_attribute_expect_success(
                 attributes.ClientsSupportedPerFabric)
 
@@ -195,7 +196,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate RegisteredClients
         self.step(6)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.RegisteredClients):
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.RegisteredClients), timeout= self.timeout):
             registeredClients = await self._read_icdm_attribute_expect_success(
                 attributes.RegisteredClients)
 
@@ -204,7 +205,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate ICDCounter
         self.step(7)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.ICDCounter):
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.ICDCounter), timeout= self.timeout):
             icdCounter = await self._read_icdm_attribute_expect_success(
                 attributes.ICDCounter)
             # Verify ICDCounter is not bigger than uint32
@@ -213,7 +214,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate UserActiveModeTriggerHint
         self.step(8)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.UserActiveModeTriggerHint):
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.UserActiveModeTriggerHint), timeout= self.timeout):
             userActiveModeTriggerHint = await self._read_icdm_attribute_expect_success(
                 attributes.UserActiveModeTriggerHint)
 
@@ -230,7 +231,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Valdate UserActiveModeTriggerInstruction
         self.step(9)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.UserActiveModeTriggerInstruction):
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.UserActiveModeTriggerInstruction), timeout= self.timeout):
             userActiveModeTriggerInstruction = await self._read_icdm_attribute_expect_success(
                 attributes.UserActiveModeTriggerInstruction)
 
@@ -262,7 +263,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Verify OperatingMode
         self.step(10)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OperatingMode):
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OperatingMode), timeout= self.timeout):
             operatingMode = await self._read_icdm_attribute_expect_success(
                 attributes.OperatingMode)
 
@@ -273,7 +274,7 @@ class TC_ICDM_2_1(MatterBaseTest):
                 operatingMode, modes.kUnknownEnumValue, "OperatingMode can only have 0 and 1 as valid values")
 
         self.step(11)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.MaximumCheckInBackOff):
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.MaximumCheckInBackOff), timeout= self.timeout):
             maximumCheckInBackOff = await self._read_icdm_attribute_expect_success(attributes.MaximumCheckInBackOff)
 
             asserts.assert_true(self.is_valid_uint32_value(maximumCheckInBackOff),
