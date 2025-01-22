@@ -100,7 +100,6 @@ void emberAfDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gDishwasherModeDelegate == nullptr && gDishwasherModeInstance == nullptr);
     gDishwasherModeDelegate = new DishwasherMode::DishwasherModeDelegate;
-    gDishwasherModeInstance =
-        new ModeBase::Instance(gDishwasherModeDelegate, 0x1, DishwasherMode::Id, 0);
+    gDishwasherModeInstance = new ModeBase::Instance(gDishwasherModeDelegate, 0x1, DishwasherMode::Id, 0);
     gDishwasherModeInstance->Init();
 }
