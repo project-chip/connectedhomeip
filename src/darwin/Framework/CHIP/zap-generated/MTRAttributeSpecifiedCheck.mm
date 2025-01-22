@@ -5942,6 +5942,42 @@ static BOOL AttributeIsSpecifiedInCommissionerControlCluster(AttributeId aAttrib
     }
     }
 }
+static BOOL AttributeIsSpecifiedInTLSCertificateManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::TlsCertificateManagement;
+    switch (aAttributeId) {
+    case Attributes::MaxRootCertificates::Id: {
+        return YES;
+    }
+    case Attributes::CurrentRootCertificates::Id: {
+        return YES;
+    }
+    case Attributes::MaxClientCertificates::Id: {
+        return YES;
+    }
+    case Attributes::CurrentClientCertificates::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::UnitTesting;
@@ -6632,6 +6668,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::CommissionerControl::Id: {
         return AttributeIsSpecifiedInCommissionerControlCluster(aAttributeId);
+    }
+    case Clusters::TlsCertificateManagement::Id: {
+        return AttributeIsSpecifiedInTLSCertificateManagementCluster(aAttributeId);
     }
     case Clusters::UnitTesting::Id: {
         return AttributeIsSpecifiedInUnitTestingCluster(aAttributeId);

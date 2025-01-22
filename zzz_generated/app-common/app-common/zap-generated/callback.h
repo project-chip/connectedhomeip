@@ -666,6 +666,11 @@ void emberAfCommissionerControlClusterInitCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfTlsCertificateManagementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfUnitTestingClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -5548,6 +5553,44 @@ chip::Protocols::InteractionModel::Status MatterCommissionerControlClusterServer
 void emberAfCommissionerControlClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// TLS Certificate Management Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTlsCertificateManagementClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterTlsCertificateManagementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTlsCertificateManagementClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterTlsCertificateManagementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterTlsCertificateManagementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfTlsCertificateManagementClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Unit Testing Cluster
 //
 
@@ -5916,35 +5959,11 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::DecodableType & commandData);
 /**
- * @brief General Diagnostics Cluster TestEventTrigger Command callback (from client)
- */
-bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GeneralDiagnostics::Commands::TestEventTrigger::DecodableType & commandData);
-/**
- * @brief General Diagnostics Cluster TimeSnapshot Command callback (from client)
- */
-bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GeneralDiagnostics::Commands::TimeSnapshot::DecodableType & commandData);
-/**
- * @brief General Diagnostics Cluster PayloadTestRequest Command callback (from client)
- */
-bool emberAfGeneralDiagnosticsClusterPayloadTestRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType & commandData);
-/**
  * @brief Thread Network Diagnostics Cluster ResetCounts Command callback (from client)
  */
 bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::DecodableType & commandData);
-/**
- * @brief Wi-Fi Network Diagnostics Cluster ResetCounts Command callback (from client)
- */
-bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::DecodableType & commandData);
 /**
  * @brief Ethernet Network Diagnostics Cluster ResetCounts Command callback (from client)
  */
@@ -7023,6 +7042,60 @@ bool emberAfPushAvStreamTransportClusterManuallyTriggerTransportCallback(
 bool emberAfPushAvStreamTransportClusterFindTransportCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::PushAvStreamTransport::Commands::FindTransport::DecodableType & commandData);
+/**
+ * @brief TLS Certificate Management Cluster ProvisionRootCertificate Command callback (from client)
+ */
+bool emberAfTlsCertificateManagementClusterProvisionRootCertificateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificate::DecodableType & commandData);
+/**
+ * @brief TLS Certificate Management Cluster FindRootCertificate Command callback (from client)
+ */
+bool emberAfTlsCertificateManagementClusterFindRootCertificateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsCertificateManagement::Commands::FindRootCertificate::DecodableType & commandData);
+/**
+ * @brief TLS Certificate Management Cluster LookupRootCertificate Command callback (from client)
+ */
+bool emberAfTlsCertificateManagementClusterLookupRootCertificateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsCertificateManagement::Commands::LookupRootCertificate::DecodableType & commandData);
+/**
+ * @brief TLS Certificate Management Cluster RemoveRootCertificate Command callback (from client)
+ */
+bool emberAfTlsCertificateManagementClusterRemoveRootCertificateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::DecodableType & commandData);
+/**
+ * @brief TLS Certificate Management Cluster TLSClientCSR Command callback (from client)
+ */
+bool emberAfTlsCertificateManagementClusterTLSClientCSRCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSR::DecodableType & commandData);
+/**
+ * @brief TLS Certificate Management Cluster ProvisionClientCertificate Command callback (from client)
+ */
+bool emberAfTlsCertificateManagementClusterProvisionClientCertificateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::DecodableType & commandData);
+/**
+ * @brief TLS Certificate Management Cluster FindClientCertificate Command callback (from client)
+ */
+bool emberAfTlsCertificateManagementClusterFindClientCertificateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificate::DecodableType & commandData);
+/**
+ * @brief TLS Certificate Management Cluster LookupClientCertificate Command callback (from client)
+ */
+bool emberAfTlsCertificateManagementClusterLookupClientCertificateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificate::DecodableType & commandData);
+/**
+ * @brief TLS Certificate Management Cluster RemoveClientCertificate Command callback (from client)
+ */
+bool emberAfTlsCertificateManagementClusterRemoveClientCertificateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsCertificateManagement::Commands::RemoveClientCertificate::DecodableType & commandData);
 /**
  * @brief Unit Testing Cluster Test Command callback (from client)
  */

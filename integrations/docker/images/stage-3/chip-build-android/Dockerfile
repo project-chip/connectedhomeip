@@ -8,7 +8,7 @@ LABEL org.opencontainers.image.source https://github.com/project-chip/connectedh
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
-    openjdk-8-jdk \
+    openjdk-11-jdk \
     rsync \
     swig \
     && rm -rf /var/lib/apt/lists/ \

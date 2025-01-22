@@ -238,7 +238,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         // send system reset request to reset the MCU and upgrade the m4 image
         ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
         // Reboots the device
-        sl_si91x_soc_soft_reset();
+        sl_si91x_soc_nvic_reset();
     }
 }
 
