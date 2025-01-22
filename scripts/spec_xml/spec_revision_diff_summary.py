@@ -47,8 +47,8 @@ def str_changes(element, added, removed, change_ids, old, new):
     for id in change_ids:
         name = old[id].name if old[id].name == new[id].name else f'{new[id].name} (previously {old[id].name})'
         ret.append(f'\t\t{name}')
-        ret.append(f'\t\t\t{old[id]}')
-        ret.append(f'\t\t\t{new[id]}')
+        ret.append(f'\t\t\tprior: {old[id]}')
+        ret.append(f'\t\t\tnew  : {new[id]}')
     return ret
 
 
@@ -59,8 +59,8 @@ def str_element_changes(element, old, new):
 
 
 def diff_clusters(prior_revision: PrebuiltDataModelDirectory, new_revision: PrebuiltDataModelDirectory) -> None:
-    prior_clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
-    new_clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
+    prior_clusters, _ = build_xml_clusters(prior_revision)
+    new_clusters, _ = build_xml_clusters(new_revision)
 
     additional_clusters, removed_clusters, same_cluster_ids = get_changes(prior_clusters, new_clusters)
 
