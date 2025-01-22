@@ -20,6 +20,7 @@ import importlib.resources as pkg_resources
 import logging
 import typing
 import xml.etree.ElementTree as ElementTree
+import zipfile
 from copy import deepcopy
 from dataclasses import dataclass
 from enum import Enum, auto
@@ -549,8 +550,11 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
         return data_model_directory
 
     # If it's a prebuilt directory, build the path based on the version and data model level
-    return pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
-        'data_model').joinpath(data_model_directory.dirname).joinpath(data_model_level.dirname)
+    zip_path = pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
+        'data_model').joinpath(data_model_directory.dirname).joinpath('allfiles.zip')
+    path = zipfile.Path(zip_path)
+
+    return path.joinpath(data_model_level.dirname)
 
 
 def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable] = PrebuiltDataModelDirectory.k1_4) -> typing.Tuple[dict[int, dict], list]:
