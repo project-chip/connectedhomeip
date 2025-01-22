@@ -34,6 +34,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 @class MTRCommissioningParameters;
 @class MTRCommissionableBrowserResult;
 @class MTRSetupPayload;
+@class MTRDevice;
 @protocol MTRDevicePairingDelegate;
 @protocol MTRDeviceControllerDelegate;
 
@@ -268,6 +269,11 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * completes.
  */
 - (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+
+/**
+ * Delete a device from a device controller, also purge storage for the device.
+ */
+- (void)deleteDevice:(MTRDevice *)device MTR_NEWLY_AVAILABLE;
 
 /**
  * Compute a PASE verifier for the desired setup passcode.

@@ -25,13 +25,11 @@
 #import "MTRXPCClientProtocol.h"
 #import "MTRXPCServerProtocol.h"
 
-#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME)                 \
-    MTR_SIMPLE_REMOTE_XPC_GETTER(self.xpcConnection, NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, deviceController \
-                                 : self.uniqueIdentifier)
+#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME) \
+    MTR_SIMPLE_REMOTE_XPC_GETTER(self.xpcConnection, NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, deviceController : self.uniqueIdentifier)
 
-#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS)                 \
-    MTR_SIMPLE_REMOTE_XPC_COMMAND(self.xpcConnection, METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, deviceController \
-                                  : self.uniqueIdentifier)
+#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS) \
+    MTR_SIMPLE_REMOTE_XPC_COMMAND(self.xpcConnection, METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, deviceController : self.uniqueIdentifier)
 
 @interface MTRDeviceController_XPC ()
 
@@ -56,9 +54,8 @@ NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey 
 
 #pragma mark - Node ID Management
 
-MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
-                                               : (NSDictionary *) controllerState, updateControllerConfiguration
-                                               : (NSDictionary *) controllerState)
+MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration : (NSDictionary *) controllerState, updateControllerConfiguration : (NSDictionary *) controllerState)
+MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(deleteNodeID : (NSNumber *) nodeID, deleteNodeID : (NSNumber *) nodeID)
 
 - (void)_updateRegistrationInfo
 {
@@ -93,6 +90,15 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
 {
     [super removeDevice:device];
     [self _updateRegistrationInfo];
+}
+
+- (void)deleteDevice:(MTRDevice *)device
+{
+    MTR_LOG("%@: Delete device: %@", self, device);
+    if (device.nodeID) {
+        [self deleteNodeID:device.nodeID];
+    }
+    [super deleteDevice:device];
 }
 
 #pragma mark - XPC

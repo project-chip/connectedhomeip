@@ -387,6 +387,11 @@ using namespace chip::Tracing::DarwinFramework;
     return [self _deviceForNodeID:nodeID createIfNeeded:YES];
 }
 
+- (void)deleteDevice:(MTRDevice *)device
+{
+    [self removeDevice:device];
+}
+
 - (void)removeDevice:(MTRDevice *)device
 {
     std::lock_guard lock(*self.deviceMapLock);

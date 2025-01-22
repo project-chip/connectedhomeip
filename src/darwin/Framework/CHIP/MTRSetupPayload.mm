@@ -206,6 +206,11 @@ MTR_DIRECT_MEMBERS
     NSNumber * _Nullable _shadowDiscriminator;
 }
 
++ (BOOL)isValidSetupPIN:(NSUInteger)setupPIN
+{
+    return [[MTRSetupPayload alloc] initWithPayload:[NSString stringWithFormat:@"%lu", static_cast<unsigned long>(setupPIN)]] != nil;
+}
+
 + (void)initialize
 {
     // Some aspects of working with chip::SetupPayload use Platform memory primitives.
@@ -519,7 +524,7 @@ MTR_DIRECT_MEMBERS
     // Note: The description does not include the passcode for security reasons!
 
     NSMutableString * result = [NSMutableString stringWithFormat:@"<MTRSetupPayload: discriminator=0x%0*x",
-                                                (self.hasShortDiscriminator ? 1 : 3), self.discriminator.unsignedIntValue];
+        (self.hasShortDiscriminator ? 1 : 3), self.discriminator.unsignedIntValue];
 
     auto capabilities = self.discoveryCapabilities;
     if (capabilities != MTRDiscoveryCapabilitiesUnknown) {

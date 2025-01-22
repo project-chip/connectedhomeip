@@ -218,6 +218,8 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRSetupPayload () <NSCopying>
+
++ (BOOL)isValidSetupPIN:(NSUInteger)setupPIN MTR_NEWLY_AVAILABLE;
 @end
 
 @interface MTROptionalQRCodeInfo (Deprecated)
