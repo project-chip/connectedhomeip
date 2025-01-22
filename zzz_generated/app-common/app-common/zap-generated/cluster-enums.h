@@ -2134,12 +2134,6 @@ enum class ModeTag : uint16_t
     // prone, and was removed. See
     // src/app/common/templates/config-data.yaml.
 };
-
-// Bitmap for Feature
-enum class Feature : uint32_t
-{
-    kOnOff = 0x1,
-};
 } // namespace LaundryWasherMode
 
 namespace RefrigeratorAndTemperatureControlledCabinetMode {
@@ -2164,12 +2158,6 @@ enum class ModeTag : uint16_t
     // cluster. As a result having kUnknownEnumValue in this enum is error
     // prone, and was removed. See
     // src/app/common/templates/config-data.yaml.
-};
-
-// Bitmap for Feature
-enum class Feature : uint32_t
-{
-    kOnOff = 0x1,
 };
 } // namespace RefrigeratorAndTemperatureControlledCabinetMode
 
@@ -2333,12 +2321,6 @@ enum class ModeTag : uint16_t
     // cluster. As a result having kUnknownEnumValue in this enum is error
     // prone, and was removed. See
     // src/app/common/templates/config-data.yaml.
-};
-
-// Bitmap for Feature
-enum class Feature : uint32_t
-{
-    kOnOff = 0x1,
 };
 } // namespace DishwasherMode
 
@@ -2506,12 +2488,6 @@ enum class ModeTag : uint16_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 10,
-};
-
-// Bitmap for Feature
-enum class Feature : uint32_t
-{
-    kOnOff = 0x1,
 };
 } // namespace MicrowaveOvenMode
 
