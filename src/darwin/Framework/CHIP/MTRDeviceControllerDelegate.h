@@ -19,6 +19,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class MTRCommissioneeInfo;
 @class MTRDeviceController;
 @class MTRDeviceTypeRevision;
 @class MTREndpointInfo;
@@ -33,33 +34,6 @@ typedef NS_ENUM(NSInteger, MTRCommissioningStatus) {
         ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 3,
 } MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-
-/**
- * Information read from the commissionee device during commissioning.
- */
-MTR_NEWLY_AVAILABLE
-@interface MTRCommissioneeInfo : NSObject
-
-/**
- * The product identity (VID / PID) of the commissionee.
- */
-@property (nonatomic, copy, readonly) MTRProductIdentity * productIdentity;
-
-/**
- * Endpoint information for all endpoints of the commissionee.
- * Will be present only if readEndpointInformation is set to YES on MTRCommissioningParameters.
- *
- * Use `rootEndpoint` and `-[MTREndpointInfo children]` to traverse endpoints in composition order.
- */
-@property (nonatomic, copy, readonly, nullable) NSDictionary<NSNumber *, MTREndpointInfo *> * endpointsById;
-
-/**
- * Endpoint information for the root endpoint of the commissionee.
- * Will be present only if readEndpointInformation is set to YES on MTRCommissioningParameters.
- */
-@property (nonatomic, copy, readonly, nullable) MTREndpointInfo * rootEndpoint;
-
-@end
 
 /**
  * The protocol definition for the MTRDeviceControllerDelegate.

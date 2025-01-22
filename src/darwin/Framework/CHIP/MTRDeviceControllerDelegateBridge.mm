@@ -15,6 +15,8 @@
  */
 
 #import "MTRDeviceControllerDelegateBridge.h"
+
+#import "MTRCommissioneeInfo_Internal.h"
 #import "MTRDeviceController.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTREndpointInfo_Internal.h"
@@ -23,32 +25,9 @@
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
 #import "MTRProductIdentity.h"
+#import "MTRUtilities.h"
 
 using namespace chip::Tracing::DarwinFramework;
-
-@implementation MTRCommissioneeInfo
-
-- (instancetype)initWithCommissioningInfo:(const chip::Controller::ReadCommissioningInfo &)info
-{
-    self = [super init];
-    _productIdentity = [[MTRProductIdentity alloc] initWithVendorID:@(info.basic.vendorId) productID:@(info.basic.productId)];
-
-    // TODO: We should probably hold onto our MTRCommissioningParameters so we can look at `readEndpointInformation`
-    // instead of just reading whatever Descriptor cluster information happens to be in the cache.
-    auto * endpoints = [MTREndpointInfo endpointsFromAttributeCache:info.attributes];
-    if (endpoints.count > 0) {
-        _endpointsById = endpoints;
-    }
-
-    return self;
-}
-
-- (MTREndpointInfo *)rootEndpoint
-{
-    return self.endpointsById[@0];
-}
-
-@end
 
 MTRDeviceControllerDelegateBridge::MTRDeviceControllerDelegateBridge(void)
     : mDelegate(nil)
