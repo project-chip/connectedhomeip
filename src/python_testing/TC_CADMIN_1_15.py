@@ -186,8 +186,9 @@ class TC_CADMIN_1_15(MatterBaseTest):
 
             if target_server != None:
                 instance_names.append(service.instance_name)
-        
-        asserts.assert_equal(3, len(instance_names), f"Did not get back the expected number of instances as we expected 3, but got len(instance_names)")
+
+        asserts.assert_equal(3, len(instance_names),
+                             f"Did not get back the expected number of instances as we expected 3, but got len(instance_names)")
 
         self.step(9)
         fabric_idx_cr2 = await self.read_currentfabricindex(th=self.th2)
