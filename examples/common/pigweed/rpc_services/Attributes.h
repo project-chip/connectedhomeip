@@ -53,6 +53,27 @@ public:
         {
             // We can directly reference the embedded TLV data here
             result.Init(data.tlv_data.bytes, data.tlv_data.size);
+            CHIP_ERROR err = result.Next();
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Support, "Input TLV data did not have data: %" CHIP_ERROR_FORMAT, err.Format());
+                return pw::Status::InvalidArgument();
+            }
+
+            TLV::TLVType outer;
+            err = result.EnterContainer(outer);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Support, "Input TLV data has no wrapper container: %" CHIP_ERROR_FORMAT, err.Format());
+                return pw::Status::InvalidArgument();
+            }
+
+            err = result.Next();
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Support, "Input TLV stucture did not have a first element: %" CHIP_ERROR_FORMAT, err.Format());
+                return pw::Status::InvalidArgument();
+            }
             return result;
         }
 
@@ -63,6 +84,10 @@ public:
         CHIP_ERROR write_status;
 
         constexpr TLV::Tag kDataTag = TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData));
+
+        TLV::TLVType outer;
+        VerifyOrReturnError(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer) == CHIP_NO_ERROR,
+                            pw::Status::Internal());
 
         switch (data.which_data)
         {
@@ -106,7 +131,14 @@ public:
             return pw::Status::Internal();
         }
 
-        return pw::OkStatus();
+        VerifyOrReturnValue(writer.EndContainer(outer) == CHIP_NO_ERROR, pw::Status::Internal());
+        result.Init(tempBuffer.data(), writer.GetLengthWritten());
+
+        VerifyOrReturnError(result.Next() == CHIP_NO_ERROR, pw::Status::Internal());
+        VerifyOrReturnError(result.EnterContainer(outer) == CHIP_NO_ERROR, pw::Status::Internal());
+        VerifyOrReturnError(result.Next() == CHIP_NO_ERROR, pw::Status::Internal());
+
+        return result;
     }
 
     ::pw::Status Write(const chip_rpc_AttributeWrite & request, pw_protobuf_Empty & response)
