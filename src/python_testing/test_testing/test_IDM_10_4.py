@@ -82,9 +82,10 @@ def create_read(include_reachable: bool = False, include_max_paths: bool = False
 def main():
     # TODO: add the same test for commands and features
 
-    with open('example_pics_xml_basic_info.xml') as f:
+    script_dir = Path(__file__).resolve().parent
+    with open(script_dir / 'example_pics_xml_basic_info.xml') as f:
         pics = parse_pics_xml(f.read())
-    test_runner = MockTestRunner(Path(__file__).parent / '../TC_pics_checker.py',
+    test_runner = MockTestRunner(script_dir / '../TC_pics_checker.py',
                                  'TC_PICS_Checker', 'test_TC_IDM_10_4', 0, pics)
     failures = []
 

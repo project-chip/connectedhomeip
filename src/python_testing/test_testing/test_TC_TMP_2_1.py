@@ -19,6 +19,7 @@
 import sys
 import typing
 from dataclasses import dataclass
+from pathlib import Path
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
