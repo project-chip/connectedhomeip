@@ -105,6 +105,7 @@ Ecode_t si91x_SPIDRV_MTransfer(SPIDRV_Handle_t handle, const void * txBuffer, vo
     uint8_t * tx          = (txBuffer != NULL) ? (uint8_t *) txBuffer : dummy_buffer;
     uint8_t * rx          = (rxBuffer != NULL) ? (uint8_t *) rxBuffer : dummy_buffer;
 
+    // For transfers less than 16 bytes, directly interacting with USART buffers is faster than using DMA
     if (count < 16)
     {
         while (count > 0)
