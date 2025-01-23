@@ -240,7 +240,13 @@ def generate_revocation_set_from_crl(crl_file: x509.CertificateRevocationList,
         except Exception:
             pass
 
-        serialnumber_list.append(bytes(str('{:02X}'.format(revoked_cert.serial_number)), 'utf-8').decode('utf-8'))
+        # Ensure the serial number is always a 2-byte aligned hex string.
+        # TestDACRevocationDelegateImpl encodes the serial number as an even-length hex string
+        # using BytesToHex in src/lib/support/BytesToHex.cpp.
+        # As the primary consumer of this data, we should use the same here.
+        serialnumber = '{:02X}'.format(revoked_cert.serial_number)
+        serialnumber = serialnumber if len(serialnumber) % 2 == 0 else '0' + serialnumber
+        serialnumber_list.append(serialnumber)
 
     entry = {
         "type": "revocation_set",
