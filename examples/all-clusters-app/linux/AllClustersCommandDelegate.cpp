@@ -299,7 +299,7 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
  *
  * @param jsonValue - JSON payload from named pipe
  */
-void HandleSetRefDoorStatus(Json::Value & jsonValue)
+void SetRefrigetatorDoorStatusHandler(Json::Value & jsonValue)
 {
     bool hasEndpointId = HasNumericField(jsonValue, "EndpointId");
     bool hasDoorStatus = HasNumericField(jsonValue, "Status");
@@ -313,7 +313,7 @@ void HandleSetRefDoorStatus(Json::Value & jsonValue)
     // values to updatethe state
     EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
     uint8_t doorStatus    = static_cast<uint8_t>(jsonValue["Status"].asUInt());
-    ChipLogDetail(NotSpecified, "HandleSetRefDoorStatus State -> %d.",doorStatus);
+    ChipLogDetail(NotSpecified, "SetRefrigetatorDoorStatusHandler State -> %d.",doorStatus);
      if ( doorStatus == 0 ||  doorStatus == 1 ) {        
         RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId,doorStatus);
         RefrigeratorAlarmServer::Instance().SetStateValue(endpointId,doorStatus);
@@ -549,9 +549,9 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
             ChipLogError(NotSpecified, "Invalid Occupancy state to set.");
         }
     }
-    else if (name == "SetRefDoorStatus")
+    else if (name == "SetRefrigeratorDoorStatus")
     {
-        HandleSetRefDoorStatus(self->mJsonValue);
+        SetRefrigetatorDoorStatusHandler(self->mJsonValue);
     }
     else
     {
