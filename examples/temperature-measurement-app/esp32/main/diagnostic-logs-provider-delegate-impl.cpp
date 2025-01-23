@@ -29,7 +29,7 @@ using namespace chip::app::Clusters::DiagnosticLogs;
 LogProvider LogProvider::sInstance;
 LogProvider::CrashLogContext LogProvider::sCrashLogContext;
 
-#if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 static uint32_t sReadEntries = 0;
 static uint8_t retrievalBuffer[CONFIG_RETRIEVAL_BUFFER_SIZE];
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
@@ -80,7 +80,7 @@ size_t LogProvider::GetSizeForIntent(IntentEnum intent)
     switch (intent)
     {
     case IntentEnum::kEndUserSupport: {
-#if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
         VerifyOrReturnError(mStorageInstance != nullptr, 0,
                             ChipLogError(DeviceLayer, "Diagnostic Storage instance cannot be null."));
         return mStorageInstance->GetDataSize();
@@ -120,7 +120,7 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
     switch (intent)
     {
     case IntentEnum::kEndUserSupport: {
-#if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
         VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INTERNAL,
                             ChipLogError(DeviceLayer, "Diagnostic Storage instance cannot be null."));
         MutableByteSpan endUserSupportSpan(retrievalBuffer, CONFIG_RETRIEVAL_BUFFER_SIZE);
@@ -130,7 +130,7 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
         CHIP_ERROR err = mStorageInstance->Retrieve(endUserSupportSpan, sReadEntries);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "Failed to retrieve data: %s", chip::ErrorStr(err));
+            ChipLogError(DeviceLayer, "Failed to retrieve data: %" CHIP_ERROR_FORMAT, err.Format());
             return err;
         }
         context->EndUserSupport.span = endUserSupportSpan;
@@ -318,7 +318,7 @@ CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle, CHIP_ER
         }
         else
         {
-            ChipLogProgress(DeviceLayer, "Cleared all read diagnostics successfully");
+            ChipLogDetail(DeviceLayer, "Cleared all read diagnostics successfully");
         }
     }
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
