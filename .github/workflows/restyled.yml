@@ -14,13 +14,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Restyler
       - uses: restyled-io/actions/setup@v4
         with:
           # Pin the Restyler version to v0.6.0.2
-          version: v0.6.0.2
+          tag: 'v0.6.0.2'
 
-      - name: Run Restyler      
       - id: restyler
         uses: restyled-io/actions/run@v4
         with:
