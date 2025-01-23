@@ -69,6 +69,13 @@ declare_args() {
   chip_enable_ble_rs911x = use_rs9116 || use_SiWx917
 }
 
+# TODO - This needs to be removed once multiplexing issues resolved
+if (use_SiWx917) {
+  disable_lcd = true
+  show_qr_code = false
+  use_external_flash = false
+}
+
 if (silabs_board == "") {
   silabs_board = getenv("SILABS_BOARD")
 }
