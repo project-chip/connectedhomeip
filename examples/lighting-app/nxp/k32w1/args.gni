@@ -35,7 +35,5 @@ chip_system_config_provide_statistics = false
 chip_system_config_use_open_thread_inet_endpoints = true
 chip_with_lwip = false
 
-nxp_nvm_component = "nvs"
-
 nxp_use_smu2_static = true
 nxp_use_smu2_dynamic = true
