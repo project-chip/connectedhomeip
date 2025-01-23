@@ -221,7 +221,6 @@ def get_wait_seconds_from_set_time(set_time_matter_us: int, wait_seconds: int):
     return wait_seconds - seconds_passed
 
 
-
 @dataclass
 class SetupPayloadInfo:
     filter_type: discovery.FilterType = discovery.FilterType.LONG_DISCRIMINATOR
@@ -1300,7 +1299,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     @property
     def is_pics_sdk_ci_only(self) -> bool:
         return self.check_pics('PICS_SDK_CI_ONLY')
-    
+
     async def commission_devices(self) -> bool:
         dev_ctrl: ChipDeviceCtrl.ChipDeviceController = self.default_controller
         dut_node_ids: List[int] = self.matter_test_config.dut_node_ids
@@ -2497,7 +2496,6 @@ class CommissionDeviceTest(MatterBaseTest):
     def test_run_commissioning(self):
         if not self.event_loop.run_until_complete(self.commission_devices()):
             raise signals.TestAbortAll("Failed to commission node(s)")
-
 
 
 def default_matter_test_main():
