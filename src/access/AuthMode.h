@@ -28,6 +28,7 @@ namespace Access {
 enum class AuthMode : uint8_t
 {
     kNone  = 0,
+    kInternal = 1 << 4, // Not part of an external interaction
     kPase  = 1 << 5,
     kCase  = 1 << 6,
     kGroup = 1 << 7

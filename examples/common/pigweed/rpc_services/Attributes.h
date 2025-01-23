@@ -192,7 +192,7 @@ public:
             return ::pw::Status::NotFound();
         }
 
-        Access::SubjectDescriptor subjectDescriptor{ .authMode = chip::Access::AuthMode::kPase };
+        Access::SubjectDescriptor subjectDescriptor{ .authMode = chip::Access::AuthMode::kInternal };
         app::DataModel::WriteAttributeRequest write_request;
         write_request.path = path;
         write_request.operationFlags.Set(app::DataModel::OperationFlags::kInternal);
@@ -343,7 +343,7 @@ private:
 
     ::pw::Status ReadAttributeIntoTlvBuffer(const app::ConcreteAttributePath & path, MutableByteSpan & tlvBuffer)
     {
-        Access::SubjectDescriptor subjectDescriptor{ .authMode = chip::Access::AuthMode::kPase };
+        Access::SubjectDescriptor subjectDescriptor{ .authMode = chip::Access::AuthMode::kInternal };
         app::AttributeReportIBs::Builder attributeReports;
         TLV::TLVWriter writer;
         TLV::TLVType outer;
