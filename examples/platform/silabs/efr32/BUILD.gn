@@ -18,9 +18,9 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/silabs/provision/args.gni")
 import("${silabs_sdk_build_root}/efr32_sdk.gni")
 import("${silabs_sdk_build_root}/silabs_board.gni")
-import("${chip_root}/src/platform/silabs/provision/args.gni")
 
 declare_args() {
   enable_heap_monitoring = false
