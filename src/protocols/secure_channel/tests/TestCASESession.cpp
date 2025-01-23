@@ -849,7 +849,7 @@ struct Sigma1TooLongResumptionId : public Sigma1WithResumption
     static constexpr bool kExpectSuccess     = false;
 };
 
-struct Sigma1TooShortResumptionId : public BadSigma1ParamsBase
+struct Sigma1TooShortResumptionId : public Sigma1WithResumption
 {
     static constexpr size_t kResumptionIdLen = 15;
     static constexpr bool kExpectSuccess     = false;
@@ -865,6 +865,18 @@ struct Sigma1TooShortResumeMIC : public Sigma1WithResumption
 {
     static constexpr size_t kInitiatorResumeMICLen = 15;
     static constexpr bool kExpectSuccess           = false;
+};
+
+struct Sigma1WithResumptionIdNoResumeMIC : public Sigma1WithResumption
+{
+    static constexpr size_t kInitiatorResumeMICLen = 0;
+    static constexpr bool kExpectSuccess           = false;
+};
+
+struct Sigma1WithResumeMICNoResumptionId : public Sigma1WithResumption
+{
+    static constexpr size_t kResumptionIdLen = 0;
+    static constexpr bool kExpectSuccess     = false;
 };
 
 struct Sigma1SessionIdMax : public Sigma1Params
@@ -909,6 +921,8 @@ TEST_F(TestCASESession, Sigma1ParsingTest)
     TestSigma1Parsing(mem, bufferSize, Sigma1TooShortResumptionId);
     TestSigma1Parsing(mem, bufferSize, Sigma1TooLongResumeMIC);
     TestSigma1Parsing(mem, bufferSize, Sigma1TooShortResumeMIC);
+    TestSigma1Parsing(mem, bufferSize, Sigma1WithResumptionIdNoResumeMIC);
+    TestSigma1Parsing(mem, bufferSize, Sigma1WithResumeMICNoResumptionId);
     TestSigma1Parsing(mem, bufferSize, Sigma1SessionIdMax);
     TestSigma1Parsing(mem, bufferSize, Sigma1SessionIdTooBig);
     TestSigma1Parsing(mem, bufferSize, Sigma1FutureProofTlvElement);
