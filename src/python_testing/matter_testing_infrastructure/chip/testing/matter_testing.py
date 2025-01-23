@@ -2140,8 +2140,9 @@ def async_function_runner(function, timeout):
         return await asyncio.wait_for(function, timeout=timeout)
 
     with ThreadPoolExecutor(max_workers=1) as executor:
-        future = executor.submit(lambda: asyncio.run(frapper()))        
+        future = executor.submit(lambda: asyncio.run(frapper()))
         return future.result()
+
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
     timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout

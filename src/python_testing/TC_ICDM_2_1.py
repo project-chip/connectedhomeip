@@ -178,7 +178,7 @@ class TC_ICDM_2_1(MatterBaseTest):
         asserts.assert_less_equal(
             idleModeDuration, 64800, "IdleModeDuration attribute is greater than maximum value (64800).")
         asserts.assert_greater_equal(idleModeDuration * 1000, activeModeDuration,
-                                        "ActiveModeDuration attribute is greater than the IdleModeDuration attrbiute.")
+                                     "ActiveModeDuration attribute is greater than the IdleModeDuration attrbiute.")
 
         # Validate ClientsSupportedPerFabric
         self.step(5)
@@ -195,7 +195,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate RegisteredClients
         self.step(6)
-        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.RegisteredClients), timeout= self.timeout):
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.RegisteredClients), timeout=self.timeout):
             registeredClients = await self._read_icdm_attribute_expect_success(
                 attributes.RegisteredClients)
 
@@ -204,7 +204,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate ICDCounter
         self.step(7)
-        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.ICDCounter), timeout= self.timeout):
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.ICDCounter), timeout=self.timeout):
             icdCounter = await self._read_icdm_attribute_expect_success(
                 attributes.ICDCounter)
             # Verify ICDCounter is not bigger than uint32
@@ -213,7 +213,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate UserActiveModeTriggerHint
         self.step(8)
-        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.UserActiveModeTriggerHint), timeout= self.timeout):
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.UserActiveModeTriggerHint), timeout=self.timeout):
             userActiveModeTriggerHint = await self._read_icdm_attribute_expect_success(
                 attributes.UserActiveModeTriggerHint)
 
@@ -230,7 +230,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Valdate UserActiveModeTriggerInstruction
         self.step(9)
-        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.UserActiveModeTriggerInstruction), timeout= self.timeout):
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.UserActiveModeTriggerInstruction), timeout=self.timeout):
             userActiveModeTriggerInstruction = await self._read_icdm_attribute_expect_success(
                 attributes.UserActiveModeTriggerInstruction)
 
@@ -262,7 +262,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Verify OperatingMode
         self.step(10)
-        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OperatingMode), timeout= self.timeout):
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OperatingMode), timeout=self.timeout):
             operatingMode = await self._read_icdm_attribute_expect_success(
                 attributes.OperatingMode)
 
@@ -273,7 +273,7 @@ class TC_ICDM_2_1(MatterBaseTest):
                 operatingMode, modes.kUnknownEnumValue, "OperatingMode can only have 0 and 1 as valid values")
 
         self.step(11)
-        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.MaximumCheckInBackOff), timeout= self.timeout):
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.MaximumCheckInBackOff), timeout=self.timeout):
             maximumCheckInBackOff = await self._read_icdm_attribute_expect_success(attributes.MaximumCheckInBackOff)
 
             asserts.assert_true(self.is_valid_uint32_value(maximumCheckInBackOff),
