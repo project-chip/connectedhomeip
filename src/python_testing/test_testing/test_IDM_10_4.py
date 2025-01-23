@@ -16,7 +16,6 @@
 #    limitations under the License.
 #
 
-import os
 import sys
 from pathlib import Path
 
