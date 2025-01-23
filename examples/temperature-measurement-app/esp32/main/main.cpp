@@ -52,7 +52,7 @@
 #include <DeviceInfoProviderImpl.h>
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
-#if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 #include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
 static uint8_t endUserBuffer[CONFIG_END_USER_BUFFER_SIZE]; // Global static buffer used to store diagnostics
 using namespace chip::Tracing::Diagnostics;
@@ -82,8 +82,7 @@ static AppDeviceCallbacks EchoCallbacks;
 static void InitServer(intptr_t context)
 {
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
-#if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-    diagnosticStorage.Init(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE);
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     static ESP32Diagnostics diagnosticBackend(&diagnosticStorage);
     Tracing::Register(diagnosticBackend);
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
@@ -144,10 +143,9 @@ extern "C" void app_main()
 using namespace chip::app::Clusters::DiagnosticLogs;
 void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 {
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-    auto & logProvider = LogProvider::GetInstance(&diagnosticStorage);
-#else
     auto & logProvider = LogProvider::GetInstance();
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+    logProvider.SetDiagnosticStorageInstance(&diagnosticStorage);
 #endif
     DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }
