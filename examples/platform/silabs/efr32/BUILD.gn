@@ -20,6 +20,7 @@ import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${silabs_sdk_build_root}/efr32_sdk.gni")
 import("${silabs_sdk_build_root}/silabs_board.gni")
+import("${chip_root}/src/platform/silabs/provision/args.gni")
 
 declare_args() {
   enable_heap_monitoring = false
@@ -71,7 +72,7 @@ source_set("test-event-trigger") {
     "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.h",
   ]
 
-  deps = [ "${chip_root}/src/platform/silabs/provision:provision-headers" ]
+  deps = [ "${sl_provision_root}:provision-headers" ]
   public_configs = [ ":test-event-trigger-config" ]
   public_deps = [
     "${chip_root}/src/app:test-event-trigger",
