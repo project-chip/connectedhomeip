@@ -28,6 +28,8 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --app-pid ${CLUSTER_PID}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
@@ -38,6 +40,7 @@ from typing import Any
 import queue
 import json
 import chip.clusters as Clusters
+import typing
 from  chip.clusters.ClusterObjects import ClusterObjectDescriptor, ClusterCommand, ClusterObjectFieldDescriptor
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, SimpleEventCallback,type_matches
@@ -46,11 +49,10 @@ from dataclasses import dataclass
 from chip import ChipUtility
 from chip.tlv import  uint
 
-import typing
 
 logger = logging.getLogger(__name__)
 
-# Implement fake command inside the RefrigeratorAlarm Cluster #
+# Implement fake commands inside the RefrigeratorAlarm Cluster #
 @dataclass
 class FakeReset(ClusterCommand):
     cluster_id: typing.ClassVar[int] = 0x00000057
@@ -84,7 +86,7 @@ class FakeModifyEnabledAlarms(ClusterCommand):
     mask: uint = 0
 
 class TC_REFALM_2_2(MatterBaseTest):
-
+    """Implementation of test case TC_REFALM_2_2."""
 
     def TC_REFALM_2_2(self) -> str :
         return "223.2.2. [TC-REFALM-2.2] Primary functionality with DUT as Server"
@@ -97,6 +99,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         return pics
 
     def steps_TC_REFALM_2_2(self) -> list[TestStep]:
+        """Execute the test steps."""
         steps = [
             TestStep( 1, "Commission DUT to TH (can be skipped if done in a preceding test)",is_commissioning=True),
             TestStep( 2, "Ensure that the door on the DUT is closed"),
@@ -121,39 +124,50 @@ class TC_REFALM_2_2(MatterBaseTest):
     async def verify_unsupported_command(self,cmd: ClusterCommand,cmd_str:str=""):
 
         if self.is_ci:
-            user_response = self.wait_for_user_input(prompt_msg=f"{cmd_str} command is not implemeted in Chip-tool. Enter 'y' or 'n' after confirm.",
-                prompt_msg_placeholder="y",
-                default_value="y")
-            asserts.assert_equal(user_response.lower(), "y")
-        else:
             try:
                 await self.default_controller.SendCommand(nodeid=self.dut_node_id,endpoint=self.endpoint,payload=cmd)
             except InteractionModelError as uc:
                 # This  is UNSUPPORTED_COMMAND(0x81)
                 logger.info(f"Interaction model error {str(uc.status)}")
                 asserts.assert_equal(Status.UnsupportedCommand,uc.status)
+        else:
+            user_response = self.wait_for_user_input(prompt_msg=f"{cmd_str} command is not implemeted in Chip-tool. Enter 'y' or 'n' after confirm.",
+                prompt_msg_placeholder="y",
+                default_value="y")
+            asserts.assert_equal(user_response.lower(), "y")
+
 
     def _ask_for_closed_door(self):
         
         if self.is_ci:
+            self._send_close_door_commnad()
+            sleep(1)
+        else:
             user_response = self.wait_for_user_input(prompt_msg=f"Ensure that the door on the DUT is closed. Enter 'y' or 'n' after completition",
                 prompt_msg_placeholder="y",
                 default_value="y")
             asserts.assert_equal(user_response.lower(), "y")
-        else:
-            self._send_close_door_commnad()
-            sleep(1)
+
 
     def _ask_for_open_door(self ):
         if self.is_ci:
+            self._send_open_door_command()
+        else:
             user_response = self.wait_for_user_input(prompt_msg=f"Manually open the door on the DUT. Enter 'y' or 'n' after completition",
                 prompt_msg_placeholder="y",
                 default_value="y")
             asserts.assert_equal(user_response.lower(), "y")
-        else:
-            self._send_open_door_command()
+
 
     async def read_refalm_state_attribute(self):
+        cluster = Clusters.Objects.RefrigeratorAlarm
+        return await self.read_single_attribute_check_success(
+            endpoint=self.endpoint,
+            cluster=cluster,
+            attribute=Clusters.RefrigeratorAlarm.Attributes.State
+        )
+    
+    async def read_refalm_mask_attribute(self):
         cluster = Clusters.Objects.RefrigeratorAlarm
         return await self.read_single_attribute_check_success(
             endpoint=self.endpoint,
@@ -180,7 +194,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         sleep(0.1)
 
     def _send_open_door_command(self):
-        command_dict  = {"Name":"SetRefrigeratorDoorStatus", "EndpointId": self.endpoint, "Status": 1}
+        command_dict  = {"Name":"SetRefrigeratorDoorStatus", "EndpointId": self.endpoint, "Status": Clusters.RefrigeratorAlarm.Bitmaps.AlarmBitmap.kDoorOpen}
         self._send_named_pipe_command(command_dict)
 
     def _send_close_door_commnad(self):
@@ -190,9 +204,9 @@ class TC_REFALM_2_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_REFALM_2_2(self):
+        """Run the test steps."""
         self.wait_thresshold_v = 5000
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        logger.info(f"Is this really CI {self.is_ci}")
         self.endpoint = self.get_endpoint(default=1)
         cluster = Clusters.RefrigeratorAlarm
         
@@ -221,6 +235,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         # # read the status
         self.step(6)
         device_state = await self.read_refalm_state_attribute()
+        logger.info(f"The device state is {device_state}")
         asserts.assert_equal(device_state,1)
 
         # # # ensure the door is closed
@@ -230,10 +245,10 @@ class TC_REFALM_2_2(MatterBaseTest):
         # # read from the state attr
         self.step(8)
         device_status = await self.read_refalm_state_attribute()
+        logger.info(f"The device state is {device_state}")
         asserts.assert_equal(device_status,0)
 
         self.step(9)
-        # need to fully implement the raw command
         self.verify_unsupported_command(cmd=FakeReset(),cmd_str="Reset")
 
         self.step(10)

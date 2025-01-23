@@ -314,10 +314,12 @@ void SetRefrigetatorDoorStatusHandler(Json::Value & jsonValue)
     EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
     uint8_t doorStatus    = static_cast<uint8_t>(jsonValue["Status"].asUInt());
     ChipLogDetail(NotSpecified, "SetRefrigetatorDoorStatusHandler State -> %d.",doorStatus);
-     if ( doorStatus == 0 ||  doorStatus == 1 ) {        
+     if ( doorStatus == 0 ) {        
+        RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId,doorStatus);
+        ChipLogDetail(NotSpecified, "Refrigeratoralarm status updated to :%d", doorStatus);
+    }else if (doorStatus == 1){
         RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId,doorStatus);
         RefrigeratorAlarmServer::Instance().SetStateValue(endpointId,doorStatus);
-        ChipLogDetail(NotSpecified, "Refrigeratoralarm status updated to :%d", doorStatus);
     }else {
         ChipLogError(NotSpecified, "Invalid State value to set.");
         return;
