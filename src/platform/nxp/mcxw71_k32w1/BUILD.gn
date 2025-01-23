@@ -18,6 +18,7 @@ import("//build_overrides/openthread.gni")
 
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/nxp/common/ota/ota.gni")
 
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
@@ -53,22 +54,7 @@ source_set("nxp_factory_data") {
 source_set("nxp_ota") {
   public = [ "../common/ota/OTAImageProcessorImpl.h" ]
 
-  sources = [
-    "../common/ota/OTAFirmwareProcessor.cpp",
-    "../common/ota/OTAFirmwareProcessor.h",
-    "../common/ota/OTAHooks.cpp",
-    "../common/ota/OTAImageProcessorImpl.cpp",
-    "../common/ota/OTAImageProcessorImpl.h",
-    "../common/ota/OTATlvProcessor.cpp",
-    "../common/ota/OTATlvProcessor.h",
-  ]
-
-  if (nxp_use_factory_data && nxp_enable_ota_factory_data_processor) {
-    sources += [
-      "../common/ota/OTAFactoryDataProcessor.cpp",
-      "../common/ota/OTAFactoryDataProcessor.h",
-    ]
-  }
+  sources = ota_sources
 
   deps = [
     ":nxp_platform",
@@ -136,6 +122,12 @@ static_library("nxp_platform") {
       "../common/NXPConfig.h",
       "../common/NXPConfigNVS.cpp",
     ]
+  }
+
+  # When the app is built using cmake, we must ensure the OTA platform files are also compiled.
+  # When the app is built using gn, the app selects the nxp_ota target through its build file.
+  if (nxp_external_sdk && chip_enable_ota_requestor) {
+    sources += ota_sources
   }
 
   if (nxp_use_plain_dac_key) {
