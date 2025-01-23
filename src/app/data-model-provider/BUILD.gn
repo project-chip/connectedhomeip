@@ -25,6 +25,7 @@ source_set("data-model-provider") {
     "MetadataList.h",
     "MetadataLookup.cpp",
     "MetadataLookup.h",
+    "MetadataTypes.cpp",
     "MetadataTypes.h",
     "OperationTypes.h",
     "Provider.h",
