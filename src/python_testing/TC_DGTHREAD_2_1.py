@@ -34,6 +34,7 @@
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
+from chip.testing import matter_asserts
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -126,7 +127,7 @@ class TC_THREADND_2_1(MatterBaseTest):
 
         # Thread devices operate in the 2.4GHz band using IEEE802.15.4 channels 11 through 26.
         if channel is not NullValue:
-            self.assert_valid_uint16(channel, "Channel")
+            matter_asserts.assert_valid_uint16(channel, "Channel")
             asserts.assert_true(11 <= channel <= 26, "Channel out of expected range")
 
         #
@@ -135,7 +136,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         self.step(3)
         routing_role = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.RoutingRole)
         if routing_role is not NullValue:
-            self.assert_valid_enum(routing_role, "RoutingRole", Clusters.ThreadNetworkDiagnostics.Enums.RoutingRoleEnum)
+            matter_asserts.assert_valid_enum(routing_role, "RoutingRole", Clusters.ThreadNetworkDiagnostics.Enums.RoutingRoleEnum)
 
         #
         # STEP 4: Read NetworkName
@@ -144,7 +145,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         network_name = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.NetworkName)
         if network_name is not NullValue:
             # Must be a string up to 16 bytes
-            self.assert_valid_string(network_name, "NetworkName")
+            matter_asserts.assert_is_string(network_name, "NetworkName")
             asserts.assert_true(len(network_name.encode("utf-8")) <= 16, f"{network_name} length exceeds 16 bytes.")
 
         #
@@ -153,7 +154,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         self.step(5)
         pan_id = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.PanId)
         if pan_id is not NullValue:
-            self.assert_valid_uint16(pan_id, "PanId")
+            matter_asserts.assert_valid_uint16(pan_id, "PanId")
 
         #
         # STEP 6: Read ExtendedPanId
@@ -161,7 +162,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         self.step(6)
         extended_pan_id = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.ExtendedPanId)
         if extended_pan_id is not NullValue:
-            self.assert_valid_uint64(extended_pan_id, "ExtendedPanId")
+            matter_asserts.assert_valid_uint64(extended_pan_id, "ExtendedPanId")
 
         #
         # STEP 7: Read MeshLocalPrefix
@@ -169,10 +170,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         self.step(7)
         mesh_local_prefix = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.MeshLocalPrefix)
         if mesh_local_prefix is not NullValue:
-            asserts.assert_true(
-                self.is_valid_octstr(mesh_local_prefix),
-                "MeshLocalPrefix must be an octet string or NULL."
-            )
+            matter_asserts.assert_is_octstr(mesh_local_prefix, "MeshLocalPrefix")
             # Verify that MeshLocalPrefix is IPv6 address and is exactly 8 bytes long.
             asserts.assert_equal(
                 len(mesh_local_prefix),
@@ -186,7 +184,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         self.step(8)
         overrun_count = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.OverrunCount)
         if overrun_count is not None:
-            self.assert_valid_uint64(overrun_count, "OverrunCount")
+            matter_asserts.assert_valid_uint64(overrun_count, "OverrunCount")
 
         #
         # STEP 9: Read NeighborTable
@@ -215,31 +213,31 @@ class TC_THREADND_2_1(MatterBaseTest):
         # Verify the list type:
         for entry in neighbor_table:
             # Each entry is typically a cluster object with the fields below:
-            self.assert_valid_uint64(entry.extAddress, "NeighborTable.ExtAddress")
-            self.assert_valid_uint32(entry.age, "NeighborTable.Age")
-            self.assert_valid_uint16(entry.rloc16, "NeighborTable.Rloc16")
-            self.assert_valid_uint32(entry.linkFrameCounter, "NeighborTable.LinkFrameCounter")
-            self.assert_valid_uint32(entry.mleFrameCounter, "NeighborTable.MleFrameCounter")
+            matter_asserts.assert_valid_uint64(entry.extAddress, "NeighborTable.ExtAddress")
+            matter_asserts.assert_valid_uint32(entry.age, "NeighborTable.Age")
+            matter_asserts.assert_valid_uint16(entry.rloc16, "NeighborTable.Rloc16")
+            matter_asserts.assert_valid_uint32(entry.linkFrameCounter, "NeighborTable.LinkFrameCounter")
+            matter_asserts.assert_valid_uint32(entry.mleFrameCounter, "NeighborTable.MleFrameCounter")
 
-            self.assert_valid_uint8(entry.lqi, "NeighborTable.LQI")
+            matter_asserts.assert_valid_uint8(entry.lqi, "NeighborTable.LQI")
             asserts.assert_true(0 <= entry.lqi <= 255, "NeighborTable.LQI must be 0..255")
 
-            self.assert_valid_int8(entry.averageRssi, "NeighborTable.AverageRssi")
+            matter_asserts.assert_valid_int8(entry.averageRssi, "NeighborTable.AverageRssi")
             asserts.assert_true(-128 <= entry.averageRssi <= 0, "AverageRssi must be -128..0 dBm")
 
-            self.assert_valid_int8(entry.lastRssi, "NeighborTable.LastRssi")
+            matter_asserts.assert_valid_int8(entry.lastRssi, "NeighborTable.LastRssi")
             asserts.assert_true(-128 <= entry.lastRssi <= 0, "LastRssi must be -128..0 dBm")
 
-            self.assert_valid_uint8(entry.frameErrorRate, "NeighborTable.FrameErrorRate")
+            matter_asserts.assert_valid_uint8(entry.frameErrorRate, "NeighborTable.FrameErrorRate")
             asserts.assert_true(0 <= entry.frameErrorRate <= 100, "FrameErrorRate must be 0..100")
 
-            self.assert_valid_uint8(entry.messageErrorRate, "NeighborTable.MessageErrorRate")
+            matter_asserts.assert_valid_uint8(entry.messageErrorRate, "NeighborTable.MessageErrorRate")
             asserts.assert_true(0 <= entry.messageErrorRate <= 100, "MessageErrorRate must be 0..100")
 
-            self.assert_valid_bool(entry.rxOnWhenIdle, "NeighborTable.RxOnWhenIdle")
-            self.assert_valid_bool(entry.fullThreadDevice, "NeighborTable.FullThreadDevice")
-            self.assert_valid_bool(entry.fullNetworkData, "NeighborTable.FullNetworkData")
-            self.assert_valid_bool(entry.isChild, "NeighborTable.IsChild")
+            matter_asserts.assert_valid_bool(entry.rxOnWhenIdle, "NeighborTable.RxOnWhenIdle")
+            matter_asserts.assert_valid_bool(entry.fullThreadDevice, "NeighborTable.FullThreadDevice")
+            matter_asserts.assert_valid_bool(entry.fullNetworkData, "NeighborTable.FullNetworkData")
+            matter_asserts.assert_valid_bool(entry.isChild, "NeighborTable.IsChild")
 
         #
         # STEP 10: Read RouteTable
@@ -260,21 +258,21 @@ class TC_THREADND_2_1(MatterBaseTest):
             #   Age (uint8),
             #   Allocated (bool),
             #   LinkEstablished (bool)
-            self.assert_valid_uint64(entry.extAddress, "RouteTable.ExtAddress")
-            self.assert_valid_uint16(entry.rloc16, "RouteTable.Rloc16")
-            self.assert_valid_uint8(entry.routerId, "RouteTable.RouterId")
-            self.assert_valid_uint8(entry.nextHop, "RouteTable.NextHop")
-            self.assert_valid_uint8(entry.pathCost, "RouteTable.PathCost")
+            matter_asserts.assert_valid_uint64(entry.extAddress, "RouteTable.ExtAddress")
+            matter_asserts.assert_valid_uint16(entry.rloc16, "RouteTable.Rloc16")
+            matter_asserts.assert_valid_uint8(entry.routerId, "RouteTable.RouterId")
+            matter_asserts.assert_valid_uint8(entry.nextHop, "RouteTable.NextHop")
+            matter_asserts.assert_valid_uint8(entry.pathCost, "RouteTable.PathCost")
 
-            self.assert_valid_uint8(entry.lqiIn, "RouteTable.LQIIn")
+            matter_asserts.assert_valid_uint8(entry.lqiIn, "RouteTable.LQIIn")
             asserts.assert_true(0 <= entry.lqiIn <= 255, "RouteTable.LQIIn must be 0..255")
 
-            self.assert_valid_uint8(entry.lqiOut, "RouteTable.LQIOut")
+            matter_asserts.assert_valid_uint8(entry.lqiOut, "RouteTable.LQIOut")
             asserts.assert_true(0 <= entry.lqiOut <= 255, "RouteTable.LQIOut must be 0..255")
 
-            self.assert_valid_uint8(entry.age, "RouteTable.Age")
-            self.assert_valid_bool(entry.allocated, "RouteTable.Allocated")
-            self.assert_valid_bool(entry.linkEstablished, "RouteTable.LinkEstablished")
+            matter_asserts.assert_valid_uint8(entry.age, "RouteTable.Age")
+            matter_asserts.assert_valid_bool(entry.allocated, "RouteTable.Allocated")
+            matter_asserts.assert_valid_bool(entry.linkEstablished, "RouteTable.LinkEstablished")
 
         #
         # STEP 11: Read PartitionId
@@ -282,7 +280,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         self.step(11)
         partition_id = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.PartitionId)
         if partition_id is not NullValue:
-            self.assert_valid_uint32(partition_id, "PartitionId")
+            matter_asserts.assert_valid_uint32(partition_id, "PartitionId")
 
         #
         # STEP 12: Read Weighting
@@ -290,7 +288,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         self.step(12)
         weighting = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.Weighting)
         if weighting is not NullValue:
-            self.assert_valid_uint8(weighting, "Weighting")
+            matter_asserts.assert_valid_uint8(weighting, "Weighting")
 
         #
         # STEP 13: Read DataVersion
@@ -298,7 +296,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         self.step(13)
         data_version = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.DataVersion)
         if data_version is not NullValue:
-            self.assert_valid_uint8(data_version, "DataVersion")
+            matter_asserts.assert_valid_uint8(data_version, "DataVersion")
 
         #
         # STEP 14: Read StableDataVersion
@@ -306,7 +304,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         self.step(14)
         stable_data_version = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.StableDataVersion)
         if stable_data_version is not NullValue:
-            self.assert_valid_uint8(stable_data_version, "StableDataVersion")
+            matter_asserts.assert_valid_uint8(stable_data_version, "StableDataVersion")
 
         #
         # STEP 15: Read LeaderRouterId
@@ -314,7 +312,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         self.step(15)
         leader_router_id = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.LeaderRouterId)
         if leader_router_id is not NullValue:
-            self.assert_valid_uint8(leader_router_id, "LeaderRouterId")
+            matter_asserts.assert_valid_uint8(leader_router_id, "LeaderRouterId")
 
         #
         # STEP 16: Read DetachedRoleCount
@@ -322,7 +320,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         self.step(16)
         detached_role_count = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.DetachedRoleCount)
         if detached_role_count is not None:
-            self.assert_valid_uint16(detached_role_count, "DetachedRoleCount")
+            matter_asserts.assert_valid_uint16(detached_role_count, "DetachedRoleCount")
 
         #
         # STEP 17: Read ChildRoleCount
@@ -330,7 +328,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         self.step(17)
         child_role_count = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.ChildRoleCount)
         if child_role_count is not None:
-            self.assert_valid_uint16(child_role_count, "ChildRoleCount")
+            matter_asserts.assert_valid_uint16(child_role_count, "ChildRoleCount")
 
         #
         # STEP 18: Read RouterRoleCount
@@ -338,7 +336,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         self.step(18)
         router_role_count = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.RouterRoleCount)
         if router_role_count is not None:
-            self.assert_valid_uint16(router_role_count, "RouterRoleCount")
+            matter_asserts.assert_valid_uint16(router_role_count, "RouterRoleCount")
 
         #
         # STEP 19: Read LeaderRoleCount
@@ -346,7 +344,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         self.step(19)
         leader_role_count = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.LeaderRoleCount)
         if leader_role_count is not None:
-            self.assert_valid_uint16(leader_role_count, "LeaderRoleCount")
+            matter_asserts.assert_valid_uint16(leader_role_count, "LeaderRoleCount")
 
         #
         # STEP 20: Read AttachAttemptCount
@@ -354,7 +352,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         self.step(20)
         attach_attempt_count = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.AttachAttemptCount)
         if attach_attempt_count is not None:
-            self.assert_valid_uint16(attach_attempt_count, "AttachAttemptCount")
+            matter_asserts.assert_valid_uint16(attach_attempt_count, "AttachAttemptCount")
 
         #
         # STEP 21: Read PartitionIdChangeCount
@@ -362,7 +360,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         self.step(21)
         partition_id_change_count = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.PartitionIdChangeCount)
         if partition_id_change_count is not None:
-            self.assert_valid_uint16(partition_id_change_count, "PartitionIdChangeCount")
+            matter_asserts.assert_valid_uint16(partition_id_change_count, "PartitionIdChangeCount")
 
         #
         # STEP 22: Read BetterPartitionAttachAttemptCount
@@ -371,7 +369,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         better_partition_attach_attempt_count = await self.read_thread_diagnostics_attribute_expect_success(
             endpoint, attributes.BetterPartitionAttachAttemptCount)
         if better_partition_attach_attempt_count is not None:
-            self.assert_valid_uint16(better_partition_attach_attempt_count, "BetterPartitionAttachAttemptCount")
+            matter_asserts.assert_valid_uint16(better_partition_attach_attempt_count, "BetterPartitionAttachAttemptCount")
 
         #
         # STEP 23: Read ParentChangeCount
@@ -379,7 +377,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         self.step(23)
         parent_change_count = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.ParentChangeCount)
         if parent_change_count is not None:
-            self.assert_valid_uint16(parent_change_count, "ParentChangeCount")
+            matter_asserts.assert_valid_uint16(parent_change_count, "ParentChangeCount")
 
         #
         # STEP 24: Read ActiveTimestamp
@@ -388,7 +386,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         active_timestamp = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.ActiveTimestamp)
         if active_timestamp is not None:
             if active_timestamp is not NullValue:
-                self.assert_valid_uint64(active_timestamp, "ActiveTimestamp")
+                matter_asserts.assert_valid_uint64(active_timestamp, "ActiveTimestamp")
 
         #
         # STEP 25: Read PendingTimestamp
@@ -397,7 +395,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         pending_timestamp = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.PendingTimestamp)
         if pending_timestamp is not None:
             if pending_timestamp is not NullValue:
-                self.assert_valid_uint64(pending_timestamp, "PendingTimestamp")
+                matter_asserts.assert_valid_uint64(pending_timestamp, "PendingTimestamp")
 
         #
         # STEP 26: Read Delay
@@ -406,7 +404,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         delay = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.Delay)
         if delay is not None:
             if delay is not NullValue:
-                self.assert_valid_uint64(delay, "Delay")
+                matter_asserts.assert_valid_uint64(delay, "Delay")
 
         #
         # STEP 27: Read SecurityPolicy
@@ -420,8 +418,8 @@ class TC_THREADND_2_1(MatterBaseTest):
             asserts.assert_true(hasattr(security_policy, "rotationTime"), "SecurityPolicy missing rotationTime field.")
             asserts.assert_true(hasattr(security_policy, "flags"), "SecurityPolicy missing flags field.")
 
-            self.assert_valid_uint16(security_policy.rotationTime, "SecurityPolicy.RotationTime")
-            self.assert_valid_uint16(security_policy.flags, "SecurityPolicy.Flags")
+            matter_asserts.assert_valid_uint16(security_policy.rotationTime, "SecurityPolicy.RotationTime")
+            matter_asserts.assert_valid_uint16(security_policy.flags, "SecurityPolicy.Flags")
 
         #
         # STEP 28: Read ChannelPage0Mask
@@ -429,8 +427,7 @@ class TC_THREADND_2_1(MatterBaseTest):
         self.step(28)
         channel_page0_mask = await self.read_thread_diagnostics_attribute_expect_success(endpoint, attributes.ChannelPage0Mask)
         if channel_page0_mask is not NullValue:
-            asserts.assert_true(self.is_valid_octstr(channel_page0_mask),
-                                "ChannelPage0Mask must be an octet string (bytes).")
+            matter_asserts.assert_is_octstr(channel_page0_mask, "ChannelPage0Mask")
 
         #
         # STEP 29: Read OperationalDatasetComponents
@@ -450,7 +447,8 @@ class TC_THREADND_2_1(MatterBaseTest):
                     hasattr(dataset_components, field_name),
                     f"OperationalDatasetComponents missing '{field_name}' field."
                 )
-                self.assert_valid_bool(getattr(dataset_components, field_name), f"OperationalDatasetComponents.{field_name}")
+                matter_asserts.assert_valid_bool(getattr(dataset_components, field_name),
+                                                 f"OperationalDatasetComponents.{field_name}")
 
         #
         # STEP 30: Read ActiveNetworkFaults
