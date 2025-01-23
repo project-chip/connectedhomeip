@@ -63,48 +63,11 @@ class TC_DGWIFI_2_1(MatterBaseTest):
 
         return False
 
-    @staticmethod
-    def is_valid_uint_value(value, bit_count=64):
-        """
-        Checks if 'value' is a non-negative integer fitting into 'bit_count' bits.
-        For example, bit_count=32 => must fit within 0 <= value <= 0xFFFFFFFF
-        """
-        if not isinstance(value, int):
-            return False
-        if value < 0:
-            return False
-        return value < 2**bit_count
-
     def assert_valid_bssid(self, value, field_name):
-        """Asserts that the value is a valid BSSID (MAC address), None, or NullValue."""
-        if isinstance(value, Nullable):
-            if value == NullValue:
-                return
-            value = value.Value
-
-        if value is not None:
+        """Asserts that the value is a valid BSSID (MAC address), or NullValue."""
+        if value is not NullValue:
             asserts.assert_true(self.is_valid_bssid(value),
-                                f"{field_name} should be a valid BSSID string (e.g., '00:11:22:33:44:55') or None/NullValue.")
-
-    def assert_valid_uint64(self, value, field_name):
-        """Asserts that the value is a valid uint64 or None (if attribute can return NULL)."""
-        asserts.assert_true(value is None or self.is_valid_uint_value(value, bit_count=64),
-                            f"{field_name} should be a uint64 or NULL.")
-
-    def assert_valid_uint32(self, value, field_name):
-        """Asserts that the value is a valid uint32 or None (if attribute can return NULL)."""
-        asserts.assert_true(value is None or self.is_valid_uint_value(value, bit_count=32),
-                            f"{field_name} should be a uint32 or NULL.")
-
-    def assert_valid_uint16(self, value, field_name):
-        """Asserts that the value is a valid uint16 or None (if attribute can return NULL)."""
-        asserts.assert_true(value is None or self.is_valid_uint_value(value, bit_count=16),
-                            f"{field_name} should be a uint16 or NULL.")
-
-    def assert_valid_uint8(self, value, field_name):
-        """Asserts that the value is a valid uint16 or None (if attribute can return NULL)."""
-        asserts.assert_true(value is None or self.is_valid_uint_value(value, bit_count=8),
-                            f"{field_name} should be a uint8 or NULL.")
+                                f"{field_name} should be a valid BSSID string (e.g., '00:11:22:33:44:55') or NullValue.")
 
     async def read_dgwifi_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.WiFiNetworkDiagnostics
@@ -166,26 +129,22 @@ class TC_DGWIFI_2_1(MatterBaseTest):
         # SecurityType is an enum. If the interface is not operational, it could be NULL.
         # If not NULL, we expect an integer in the SecurityType enum range.
         # Just do a minimal check here; you can refine or extend based on the spec.
-        if security_type is not None:
-            asserts.assert_true(isinstance(security_type, Nullable),
-                                "SecurityType must be of type 'Nullable' when not None.")
+        if security_type is not NullValue:
+            security_type_value = security_type.Value
+            self.assert_valid_uint8(security_type_value, "SecurityType")
 
-            if security_type is not NullValue:
-                security_type_value = security_type.Value
-                self.assert_valid_uint8(security_type_value, "SecurityType")
+            # Check if the security_type is a valid SecurityTypeEnum member
+            self.assert_true(
+                security_type_value in [item.value for item in Clusters.Objects.WiFiNetworkDiagnostics.Enums.SecurityTypeEnum],
+                f"SecurityType {security_type_value} is not a valid SecurityTypeEnum value"
+            )
 
-                # Check if the security_type is a valid SecurityTypeEnum member
-                self.assert_true(
-                    security_type_value in [item.value for item in Clusters.Objects.WiFiNetworkDiagnostics.Enums.SecurityTypeEnum],
-                    f"SecurityType {security_type_value} is not a valid SecurityTypeEnum value"
-                )
-
-                # Additional check that it's not kUnknownEnumValue:
-                self.assert_true(
-                    security_type_value != Clusters.Objects.WiFiNetworkDiagnostics.Enums.SecurityTypeEnum.kUnknownEnumValue.value,
-                    f"SecurityType should not be kUnknownEnumValue "
-                    f"({Clusters.Objects.WiFiNetworkDiagnostics.Enums.SecurityTypeEnum.kUnknownEnumValue.value})"
-                )
+            # Additional check that it's not kUnknownEnumValue:
+            self.assert_true(
+                security_type_value != Clusters.Objects.WiFiNetworkDiagnostics.Enums.SecurityTypeEnum.kUnknownEnumValue.value,
+                f"SecurityType should not be kUnknownEnumValue "
+                f"({Clusters.Objects.WiFiNetworkDiagnostics.Enums.SecurityTypeEnum.kUnknownEnumValue.value})"
+            )
 
         #
         # STEP 4: TH reads WiFiVersion attribute
@@ -193,21 +152,17 @@ class TC_DGWIFI_2_1(MatterBaseTest):
         self.step(4)
         wifi_version = await self.read_dgwifi_attribute_expect_success(endpoint=endpoint, attribute=attributes.WiFiVersion)
         # WiFiVersion is an enum. If not configured or operational, might be NULL.
-        if wifi_version is not None:
-            asserts.assert_true(isinstance(wifi_version, Nullable),
-                                "WiFiVersion must be of type 'Nullable' when not None.")
+        if wifi_version is not NullValue:
+            wifi_version_value = wifi_version.Value
+            self.assert_valid_uint8(wifi_version_value, "WiFiVersion")
 
-            if wifi_version is not NullValue:
-                wifi_version_value = wifi_version.Value
-                self.assert_valid_uint8(wifi_version_value, "WiFiVersion")
+            # Check if the wifi_version is a valid WiFiVersionEnum member
+            self.assert_true(wifi_version_value in [item.value for item in Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum],
+                             f"WiFiVersion {wifi_version_value} is not a valid WiFiVersionEnum value")
 
-                # Check if the wifi_version is a valid WiFiVersionEnum member
-                self.assert_true(wifi_version_value in [item.value for item in Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum],
-                                 f"WiFiVersion {wifi_version_value} is not a valid WiFiVersionEnum value")
-
-                # Additional check that it's not kUnknownEnumValue:
-                self.assert_true(wifi_version_value != Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum.kUnknownEnumValue.value,
-                                 f"WiFiVersion should not be kUnknownEnumValue ({Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum.kUnknownEnumValue.value})")
+            # Additional check that it's not kUnknownEnumValue:
+            self.assert_true(wifi_version_value != Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum.kUnknownEnumValue.value,
+                             f"WiFiVersion should not be kUnknownEnumValue ({Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum.kUnknownEnumValue.value})")
 
         #
         # STEP 5: TH reads ChannelNumber attribute
@@ -215,12 +170,8 @@ class TC_DGWIFI_2_1(MatterBaseTest):
         self.step(5)
         channel_number = await self.read_dgwifi_attribute_expect_success(endpoint=endpoint, attribute=attributes.ChannelNumber)
         # If not operational, might be NULL. Else we expect an unsigned integer channel.
-        if channel_number is not None:
-            asserts.assert_true(isinstance(channel_number, Nullable),
-                                "ChannelNumber must be of type 'Nullable' when not None.")
-
-            if channel_number is not NullValue:
-                self.assert_valid_uint16(channel_number.Value, "ChannelNumber")
+        if channel_number is not NullValue:
+            self.assert_valid_uint16(channel_number.Value, "ChannelNumber")
 
         #
         # STEP 6: TH reads RSSI attribute
@@ -228,14 +179,10 @@ class TC_DGWIFI_2_1(MatterBaseTest):
         self.step(6)
         rssi = await self.read_dgwifi_attribute_expect_success(endpoint=endpoint, attribute=attributes.Rssi)
         # RSSI is typically a signed integer (dB). If not operational, might be NULL.
-        if rssi is not None:
-            asserts.assert_true(isinstance(rssi, Nullable),
-                                "RSSI must be of type 'Nullable' when not None.")
-
-            if rssi is not NullValue:
-                rssi_value = rssi.Value
-                asserts.assert_true(isinstance(rssi_value, int) and -120 <= rssi_value <= 0,
-                                    "rssi_value is not within valid range.")
+        if rssi is not NullValue:
+            rssi_value = rssi.Value
+            asserts.assert_true(isinstance(rssi_value, int) and -120 <= rssi_value <= 0,
+                                "rssi_value is not within valid range.")
 
         #
         # STEP 7: TH reads BeaconLostCount attribute
