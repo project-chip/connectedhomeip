@@ -172,13 +172,11 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
         {
             return std::nullopt;
         }
-        else
-        {
-            // If we reach here, it means this particular CommandHandlerInterface recognized the cluster but the command is invalid
-            // or cannot be processed.
-            handler->AddStatus(request.path, Protocols::InteractionModel::Status::InvalidCommand);
-            return std::nullopt;
-        }
+
+        // If we reach here, it means this particular CommandHandlerInterface recognized the cluster but the command is invalid
+        // or cannot be processed.
+        handler->AddStatus(request.path, Protocols::InteractionModel::Status::InvalidCommand);
+        return std::nullopt;
     }
 
     // Ember always sets the return in the handler
