@@ -66,7 +66,7 @@ class TC_CGEN_2_5(MatterBaseTest):
             TestStep(8, "TH sends CommissioningComplete to DUT."),
             TestStep(9, "TH reads from the DUT the attribute TCAcceptedVersion."),
             TestStep(10, "TH reads from the DUT the attribute TCAcknowledgements."),
-            TestStep(11, "TH reads from the DUT the attribute."),
+            TestStep(11, "TH reads from the DUT the attribute TCMinRequiredVersion."),
             TestStep(12, "TH reads from the DUT the attribute TCAcknowledgementsRequired."),
         ]
 

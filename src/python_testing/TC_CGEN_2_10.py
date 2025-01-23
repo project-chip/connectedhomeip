@@ -80,9 +80,6 @@ class TC_CGEN_2_10(MatterBaseTest):
         self.matter_test_config.tc_user_response_to_simulate = None
         await self.commission_devices()
 
-        # await self.commission_devices()
-        # self.skip_all_remaining_steps(1)
-        # return
         # Step 1: Read TCAcceptedVersion
         self.step(1)
         response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion)])
