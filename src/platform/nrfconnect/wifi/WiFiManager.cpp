@@ -68,9 +68,8 @@ NetworkCommissioning::WiFiScanResponse ToScanResponse(const wifi_scan_result * r
 {
     NetworkCommissioning::WiFiScanResponse response = {};
 
-    if (result != nullptr)
+    if (result != nullptr && sizeof(response.ssid) >= result->ssid_length)
     {
-        static_assert(sizeof(response.ssid) == sizeof(result->ssid), "SSID length mismatch");
         static_assert(sizeof(response.bssid) == sizeof(result->mac), "BSSID length mismatch");
 
         // TODO: Distinguish WPA versions
