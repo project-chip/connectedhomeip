@@ -212,18 +212,10 @@ rt_executable("thermostat") {
   }
 
   if (chip_enable_ota_requestor) {
+    include_dirs += [ "${common_example_dir}/ota_requestor/include" ]
     sources += [
-      "${chip_root}/examples/platform/nxp/common/mcuboot_app_support/flash_partitioning.h",
       "${common_example_dir}/ota_requestor/source/OTARequestorInitiator.cpp",
       "${common_example_dir}/ota_requestor/source/OTARequestorInitiatorCommon.cpp",
-
-      #Adding mcuboot files
-      "${chip_root}/examples/platform/nxp/common/mcuboot_app_support/mcuboot_app_support.c",
-      "${chip_root}/examples/platform/nxp/common/mcuboot_app_support/mcuboot_app_support.h",
-    ]
-    include_dirs += [
-      "$${common_example_dir}/ota_requestor/include",
-      "${chip_root}/examples/platform/nxp/common/mcuboot_app_support",
     ]
   }
 
@@ -291,6 +283,9 @@ rt_executable("thermostat") {
     "-Wl,--no-warn-rwx-segments",
   ]
 
+  if (evkname == "evkcmimxrt1060") {
+    ldflags += [ "-Wl,--defsym=gEVKCFlashSize_d=0x1000000" ]
+  }
   if (enable_ota_provider) {
     # As the OTA file will be stored in the littlefs file system, it is required to increase the size of the file system
     # To be able to store an OTA file with a MAX size of 640K,
@@ -305,7 +300,7 @@ rt_executable("thermostat") {
     # we would need to reserve enough space for the bootloader (MCUBoot)
     # MCUBoot requires 0x11000 Bytes to be reserved at the base of the flash
     # Consequently, some sections will need to be shifted
-    ldflags += [ "-Wl,--defsym=__mcu_boot_size__=0x11000" ]
+    ldflags += [ "-Wl,--defsym=__m_mcuboot_size__=0x40000" ]
   }
 
   output_dir = root_out_dir

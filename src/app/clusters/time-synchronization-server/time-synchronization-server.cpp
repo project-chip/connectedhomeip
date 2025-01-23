@@ -909,7 +909,7 @@ TimeState TimeSynchronizationServer::UpdateDSTOffsetState()
         int32_t previousOffset         = dstList[activeDstIndex].offset;
         dstList[activeDstIndex].offset = 0; // not using dst and last DST item in the list is not active yet
         // TODO: This enum mixes state and transitions in a way that's very confusing. This should return either an active, an
-        // inactive or an invalid and the caller should make the judgement about whether that has changed OR this function should
+        // inactive or an invalid and the caller should make the judgment about whether that has changed OR this function should
         // just return a bool indicating whether a change happened
         return previousOffset == 0 ? TimeState::kStopped : TimeState::kChanged;
     }

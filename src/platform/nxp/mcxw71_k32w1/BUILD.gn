@@ -18,6 +18,7 @@ import("//build_overrides/openthread.gni")
 
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/nxp/common/ota/ota.gni")
 
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
@@ -53,22 +54,7 @@ source_set("nxp_factory_data") {
 source_set("nxp_ota") {
   public = [ "../common/ota/OTAImageProcessorImpl.h" ]
 
-  sources = [
-    "../common/ota/OTAFirmwareProcessor.cpp",
-    "../common/ota/OTAFirmwareProcessor.h",
-    "../common/ota/OTAHooks.cpp",
-    "../common/ota/OTAImageProcessorImpl.cpp",
-    "../common/ota/OTAImageProcessorImpl.h",
-    "../common/ota/OTATlvProcessor.cpp",
-    "../common/ota/OTATlvProcessor.h",
-  ]
-
-  if (nxp_use_factory_data && nxp_enable_ota_factory_data_processor) {
-    sources += [
-      "../common/ota/OTAFactoryDataProcessor.cpp",
-      "../common/ota/OTAFactoryDataProcessor.h",
-    ]
-  }
+  sources = ota_sources
 
   deps = [
     ":nxp_platform",
@@ -87,7 +73,6 @@ config("nxp_platform_config") {
 }
 
 static_library("nxp_platform") {
-  deps = []
   defines = [
     "NXP_DEVICE_K32W1_MCXW7X=1",
     "NXP_USE_MML=1",
@@ -111,6 +96,7 @@ static_library("nxp_platform") {
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",
   ]
+  deps = [ "${chip_root}/src/app:app_config" ]
 
   if (nxp_nvm_component == "fwk_nvm") {
     defines += [ "CHIP_PLAT_NVM_SUPPORT=1" ]
@@ -122,18 +108,6 @@ static_library("nxp_platform") {
       "KeyValueStoreManagerImpl.h",
       "ram_storage.c",
       "ram_storage.h",
-    ]
-  } else if (nxp_nvm_component == "littlefs") {
-    defines += [
-      "CHIP_PLAT_NVM_SUPPORT=3",
-      "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"platform/nxp/common/KeyValueStoreManagerImpl.h\"",
-    ]
-
-    sources += [
-      "../common/KeyValueStoreManagerImpl.cpp",
-      "../common/KeyValueStoreManagerImpl.h",
-      "../common/NXPConfig.h",
-      "../common/NXPConfigKS.cpp",
     ]
   } else if (nxp_nvm_component == "nvs") {
     defines += [
@@ -148,6 +122,12 @@ static_library("nxp_platform") {
       "../common/NXPConfig.h",
       "../common/NXPConfigNVS.cpp",
     ]
+  }
+
+  # When the app is built using cmake, we must ensure the OTA platform files are also compiled.
+  # When the app is built using gn, the app selects the nxp_ota target through its build file.
+  if (nxp_external_sdk && chip_enable_ota_requestor) {
+    sources += ota_sources
   }
 
   if (nxp_use_plain_dac_key) {
@@ -190,6 +170,7 @@ static_library("nxp_platform") {
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
+    deps += [ "${chip_root}/src/app:app_config" ]
 
     deps += [ "${chip_root}/third_party/openthread:openthread" ]
     public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]

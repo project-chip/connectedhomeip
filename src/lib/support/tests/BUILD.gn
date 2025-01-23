@@ -87,6 +87,7 @@ chip_test_suite("tests") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/credentials",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:string-builder-adapters",

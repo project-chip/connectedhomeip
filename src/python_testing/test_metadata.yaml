@@ -9,6 +9,10 @@ not_automated:
       reason:
           src/python_testing/test_testing/test_TC_DGGEN_3_2.py is the Unit test
           of this test
+    - name: TC_LVL_2_3.py
+      reason:
+          The microwave-oven-app does not have level control cluster on endpoint
+          1 - https://github.com/project-chip/connectedhomeip/issues/36885
     - name: TC_EEVSE_Utils.py
       reason: Shared code for TC_EEVSE, not a standalone test
     - name: TC_EWATERHTRBase.py
@@ -73,8 +77,10 @@ not_automated:
       reason: Shared code for TC_*, not a standalone test
     - name: test_plan_table_generator.py
       reason: Code/Test not being used or not shared code for any other tests
+    - name: modebase_cluster_check.py
+      reason: Shared code for Modebase derived clusters, not a standalone test.
 
-# This is a list of slow tests (just arbitrarely picked around 20 seconds)
+# This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
 # to consider improving. May not be exhaustive
 slow_tests:

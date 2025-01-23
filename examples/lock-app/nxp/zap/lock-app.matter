@@ -1678,10 +1678,10 @@ cluster IcdManagement = 70 {
   readonly attribute access(read: administer) optional MonitoringRegistrationStruct registeredClients[] = 3;
   readonly attribute access(read: administer) optional int32u ICDCounter = 4;
   readonly attribute optional int16u clientsSupportedPerFabric = 5;
-  provisional readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
-  provisional readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
-  provisional readonly attribute optional OperatingModeEnum operatingMode = 8;
-  provisional readonly attribute optional int32u maximumCheckInBackOff = 9;
+  readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
+  readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
+  readonly attribute optional OperatingModeEnum operatingMode = 8;
+  readonly attribute optional int32u maximumCheckInBackOff = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2683,7 +2683,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0000;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 }

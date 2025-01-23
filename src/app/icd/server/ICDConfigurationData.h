@@ -17,8 +17,10 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-enums.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/Optional.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/TimeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/CheckInCounter.h>
@@ -77,6 +79,8 @@ public:
 
     System::Clock::Seconds32 GetMaximumCheckInBackoff() { return mMaximumCheckInBackOff; }
 
+    BitFlags<app::Clusters::IcdManagement::Feature> GetFeatureMap() { return mFeatureMap; }
+
     /**
      * The returned value will depend on the devices operating mode.
      * If ICDMode == SIT && the configured slow poll interval is superior to the maximum threshold (15s), the function will return
@@ -92,7 +96,22 @@ public:
 
 private:
     // Singleton Object
-    ICDConfigurationData() = default;
+    ICDConfigurationData()
+    {
+        // Initialize feature map
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+        mFeatureMap.Set(app::Clusters::IcdManagement::Feature::kCheckInProtocolSupport);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+        mFeatureMap.Set(app::Clusters::IcdManagement::Feature::kUserActiveModeTrigger);
+#endif // CHIP_CONFIG_ENABLE_ICD_UAT
+#if CHIP_CONFIG_ENABLE_ICD_LIT
+        mFeatureMap.Set(app::Clusters::IcdManagement::Feature::kLongIdleTimeSupport);
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+        mFeatureMap.Set(app::Clusters::IcdManagement::Feature::kDynamicSitLitSupport);
+#endif // CHIP_CONFIG_ENABLE_ICD_DSLS
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT
+    }
     static ICDConfigurationData instance;
 
     // ICD related information is managed by the ICDManager but stored in the ICDConfigurationData to enable consummers to access it
@@ -124,6 +143,8 @@ private:
      */
     CHIP_ERROR SetModeDurations(Optional<System::Clock::Milliseconds32> activeModeDuration,
                                 Optional<System::Clock::Milliseconds32> idleModeDuration);
+
+    void SetFeatureMap(BitFlags<app::Clusters::IcdManagement::Feature> featureMap) { mFeatureMap = featureMap; }
 
     static constexpr System::Clock::Seconds32 kMaxIdleModeDuration = System::Clock::Seconds32(18 * kSecondsPerHour);
     static constexpr System::Clock::Seconds32 kMinIdleModeDuration = System::Clock::Seconds32(1);
@@ -168,6 +189,8 @@ private:
 #endif
     System::Clock::Milliseconds32 mSlowPollingInterval = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
     System::Clock::Milliseconds32 mFastPollingInterval = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
+
+    BitFlags<app::Clusters::IcdManagement::Feature> mFeatureMap;
 
     ICDMode mICDMode = ICDMode::SIT;
 };
