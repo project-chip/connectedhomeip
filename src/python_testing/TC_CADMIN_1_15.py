@@ -169,13 +169,14 @@ class TC_CADMIN_1_15(MatterBaseTest):
             asserts.fail("Expected number of fabrics not correct")
 
         self.step(8)
-        # Gathering instance names and servers associated in order to verify there are 3 service records for DUT.
+        # Gathering instance names associated with compressed fabrics for each TH in order to verify there are 3 operational service records for DUT.
         mdns = MdnsDiscovery()
         compressed_fabric_ids = {
             "th1": self.th1.GetCompressedFabricId(),
             "th2": self.th2.GetCompressedFabricId(),
             "th3": self.th3.GetCompressedFabricId(),
         }
+
         op_services = []
         for th, compressed_id in compressed_fabric_ids.items():
             service = await MdnsDiscovery.get_operational_service(
@@ -185,9 +186,10 @@ class TC_CADMIN_1_15(MatterBaseTest):
                 log_output=True
             )
             op_services.append(service.instance_name)
+
         asserts.assert_equal(
             3,
-            len(op_services),
+            len(set(op_services)),
             f"Expected 3 instances but got {len(op_services)}"
         )
 

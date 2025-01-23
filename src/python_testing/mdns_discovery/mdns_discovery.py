@@ -515,7 +515,7 @@ class MdnsDiscovery:
             logger.info("Getting service from discovered services: %s", self._discovered_services)
 
         if service_type.value in self._discovered_services:
-            return self._discovered_services[service_type.value][0]
+            return self._discovered_services[service_type.value][-1]
         else:
             return None
 
