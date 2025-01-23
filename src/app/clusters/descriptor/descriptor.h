@@ -14,6 +14,8 @@
  *    limitations under the License.
  */
 
+#include <cstdint>
+
 namespace chip {
 namespace app {
 namespace Clusters {
