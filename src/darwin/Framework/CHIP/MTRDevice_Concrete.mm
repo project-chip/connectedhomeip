@@ -1487,6 +1487,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     os_unfair_lock_assert_owner(&self->_lock);
     if (!self.reattemptingSubscription) {
+        [self _clearSubscriptionPoolWork];
         return;
     }
 
