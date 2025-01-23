@@ -28,7 +28,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
-#     quiet: false
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -171,24 +171,25 @@ class TC_CADMIN_1_15(MatterBaseTest):
         self.step(8)
         # Gathering instance names and servers associated in order to verify there are 3 service records for DUT.
         mdns = MdnsDiscovery()
-        services = await MdnsDiscovery.get_all_services(mdns, log_output=True)
-        compressed_fabric_id = self.default_controller.GetCompressedFabricId()
-        instance_name = f'{compressed_fabric_id:016X}-{self.dut_node_id:016X}'
-        instance_qname = f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}"
-        self.print_step("instance qname", instance_qname)
-
-        target_server = None
-        instance_names = []
-        for service in services['_matter._tcp.local.']:
-            if service.instance_name not in instance_names:
-                if service.instance_name in instance_qname:
-                    target_server = service.server
-
-            if target_server is not None:
-                instance_names.append(service.instance_name)
-
-        asserts.assert_equal(3, len(instance_names),
-                             f"Did not get back the expected number of instances as we expected 3, but got {len(instance_names)}")
+        compressed_fabric_ids = {
+            "th1": self.th1.GetCompressedFabricId(),
+            "th2": self.th2.GetCompressedFabricId(),
+            "th3": self.th3.GetCompressedFabricId(),
+        }
+        op_services = []
+        for th, compressed_id in compressed_fabric_ids.items():
+            service = await MdnsDiscovery.get_operational_service(
+                mdns,
+                node_id=self.dut_node_id,
+                compressed_fabric_id=compressed_id,
+                log_output=True
+            )
+            op_services.append(service.instance_name)
+        asserts.assert_equal(
+            3,
+            len(op_services),
+            f"Expected 3 instances but got {len(op_services)}"
+        )
 
         self.step(9)
         fabric_idx_cr2 = await self.read_currentfabricindex(th=self.th2)
