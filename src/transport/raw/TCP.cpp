@@ -76,25 +76,27 @@ CHIP_ERROR TCPBase::Init(TcpListenParameters & params)
 
     VerifyOrExit(mState == TCPState::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    err = params.GetEndPointManager()->NewEndPoint(&mListenSocket);
-#else
-    err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
-    SuccessOrExit(err);
-
-    err = mListenSocket->Bind(params.GetAddressType(), Inet::IPAddress::Any, params.GetListenPort(),
-                              params.GetInterfaceId().IsPresent());
-    SuccessOrExit(err);
-
-    mListenSocket->mAppState            = reinterpret_cast<void *>(this);
-    mListenSocket->OnConnectionReceived = HandleIncomingConnection;
-    mListenSocket->OnAcceptError        = HandleAcceptError;
-
     mEndpointType = params.GetAddressType();
 
-    err = mListenSocket->Listen(kListenBacklogSize);
+    // Primary socket endpoint created to help get EndPointManager handle for creating multiple
+    // connection endpoints at runtime.
+    err = params.GetEndPointManager()->NewEndPoint(&mListenSocket);
     SuccessOrExit(err);
+
+    if (params.IsServerListenEnabled())
+    {
+        err = mListenSocket->Bind(params.GetAddressType(), Inet::IPAddress::Any, params.GetListenPort(),
+                                  params.GetInterfaceId().IsPresent());
+        SuccessOrExit(err);
+
+        mListenSocket->mAppState            = reinterpret_cast<void *>(this);
+        mListenSocket->OnConnectionReceived = HandleIncomingConnection;
+        mListenSocket->OnAcceptError        = HandleAcceptError;
+
+        err = mListenSocket->Listen(kListenBacklogSize);
+        SuccessOrExit(err);
+        ChipLogProgress(Inet, "TCP server listening on port %d for incoming connections", params.GetListenPort());
+    }
 
     mState = TCPState::kInitialized;
 

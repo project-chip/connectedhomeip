@@ -44,18 +44,6 @@ from mobly import asserts
 
 class TC_DGSW_2_3(MatterBaseTest):
 
-    @staticmethod
-    def is_valid_uint64_value(value):
-        return isinstance(value, int) and 0 <= value <= 0xFFFFFFFFFFFFFFFF
-
-    @staticmethod
-    def is_valid_uint32_value(value):
-        return isinstance(value, int) and 0 <= value <= 0xFFFFFFFF
-
-    @staticmethod
-    def is_valid_str_value(value):
-        return isinstance(value, str) and len(value) > 0
-
     async def read_dgsw_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.SoftwareDiagnostics
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -67,7 +55,7 @@ class TC_DGSW_2_3(MatterBaseTest):
 
     def desc_TC_DGSW_2_3(self) -> str:
         """Returns a description of this test"""
-        return "[TC-DGSW-2.1] Attributes with Server as DUT"
+        return "[TC-DGSW-2.3] Attributes with Server as DUT"
 
     def pics_TC_DGSW_2_3(self) -> list[str]:
         return ["DGSW.S"]
@@ -106,35 +94,32 @@ class TC_DGSW_2_3(MatterBaseTest):
             # Iterate over all items in the list and validate each one
             for metric in thread_metrics_original:
                 # The Id field is mandatory
-                asserts.assert_true(self.is_valid_uint64_value(metric.id), "Id field should be a uint64 type")
+                self.assert_valid_uint64(metric.id, "Id")
 
                 if metric.name is not None:
-                    asserts.assert_true(self.is_valid_str_value(metric.name), "Name field should be a string type")
+                    self.assert_valid_str(metric.name, "Name")
 
                 if metric.stackFreeCurrent is not None:
-                    asserts.assert_true(self.is_valid_uint32_value(metric.stackFreeCurrent),
-                                        "StackFreeCurrent field should be a uint32 type")
+                    self.assert_valid_uint32(metric.stackFreeCurrent, "StackFreeCurrent")
 
                 if metric.stackFreeMinimum is not None:
-                    asserts.assert_true(self.is_valid_uint32_value(metric.stackFreeMinimum),
-                                        "StackFreeMinimum field should be a uint32 type")
+                    self.assert_valid_uint32(metric.stackFreeMinimum, "StackFreeMinimum")
 
                 if metric.stackSize is not None:
-                    asserts.assert_true(self.is_valid_uint32_value(metric.stackSize), "StackSize field should be a uint32 type")
+                    self.assert_valid_uint32(metric.stackSize, "StackSize")
 
         # STEP 4: TH reads from the DUT the CurrentHeapHighWatermark attribute
         self.step(4)
         if self.pics_guard(attributes.CurrentHeapHighWatermark.attribute_id in attribute_list):
             high_watermark_original = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
-            asserts.assert_true(self.is_valid_uint64_value(high_watermark_original),
-                                "CurrentHeapHighWatermark field should be a uint64 type")
+            self.assert_valid_uint64(high_watermark_original, "CurrentHeapHighWatermark")
 
         # STEP 5: TH reads from the DUT the CurrentHeapUsed attribute
         self.step(5)
         if self.pics_guard(attributes.CurrentHeapUsed.attribute_id in attribute_list):
             current_heap_used_original = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
-            asserts.assert_true(self.is_valid_uint64_value(current_heap_used_original),
-                                "CurrentHeapUsed field should be a uint64 type")
+            self.assert_valid_uint64(current_heap_used_original, "CurrentHeapUsed")
+
             if high_watermark_original is not None:
                 asserts.assert_true(current_heap_used_original <= high_watermark_original,
                                     "CurrentHeapUsed should be less than or equal to CurrentHeapHighWatermark")
@@ -148,8 +133,7 @@ class TC_DGSW_2_3(MatterBaseTest):
         self.step(7)
         if self.pics_guard(attributes.CurrentHeapHighWatermark.attribute_id in attribute_list):
             current_heap_high_watermark = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
-            asserts.assert_true(self.is_valid_uint64_value(current_heap_high_watermark),
-                                "CurrentHeapHighWatermark field should be a uint64 type")
+            self.assert_valid_uint64(current_heap_high_watermark, "CurrentHeapHighWatermark")
 
             # Verify that the returned value is <= high_watermark_original
             asserts.assert_true(current_heap_high_watermark <= high_watermark_original,
@@ -168,22 +152,19 @@ class TC_DGSW_2_3(MatterBaseTest):
 
             # Validate all elements in the list
             for metric in thread_metrics_reset:
-                # The Id field is mandatory
-                asserts.assert_true(self.is_valid_uint64_value(metric.id), "Id field should be a uint64 type")
+                self.assert_valid_uint64(metric.id, "Id")
 
                 if metric.name is not None:
-                    asserts.assert_true(self.is_valid_str_value(metric.name), "Name field should be a string type")
+                    self.assert_valid_str(metric.name, "Name")
 
                 if metric.stackFreeCurrent is not None:
-                    asserts.assert_true(self.is_valid_uint32_value(metric.stackFreeCurrent),
-                                        "StackFreeCurrent field should be a uint32 type")
+                    self.assert_valid_uint32(metric.stackFreeCurrent, "StackFreeCurrent")
 
                 if metric.stackFreeMinimum is not None:
-                    asserts.assert_true(self.is_valid_uint32_value(metric.stackFreeMinimum),
-                                        "StackFreeMinimum field should be a uint32 type")
+                    self.assert_valid_uint32(metric.stackFreeMinimum, "StackFreeMinimum")
 
                 if metric.stackSize is not None:
-                    asserts.assert_true(self.is_valid_uint32_value(metric.stackSize), "StackSize field should be a uint32 type")
+                    self.assert_valid_uint32(metric.stackSize, "StackSize")
 
             # Ensure the list length matches thread_metrics_original to simplify matching
             asserts.assert_equal(len(thread_metrics_reset), len(thread_metrics_original),
