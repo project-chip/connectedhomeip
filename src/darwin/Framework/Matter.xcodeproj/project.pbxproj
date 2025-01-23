@@ -802,6 +802,7 @@
 		75B765BF2A1D70F80014719B /* MTRAttributeSpecifiedCheck-src.zapt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "MTRAttributeSpecifiedCheck-src.zapt"; sourceTree = "<group>"; };
 		75B765C02A1D71BC0014719B /* MTRAttributeSpecifiedCheck.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRAttributeSpecifiedCheck.h; sourceTree = "<group>"; };
 		75B765C22A1D82D30014719B /* MTRAttributeSpecifiedCheck.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRAttributeSpecifiedCheck.mm; sourceTree = "<group>"; };
+		7CD490112D378CF4007F9145 /* Matter.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = Matter.modulemap; sourceTree = "<group>"; };
 		8874C1312B69C7060084BEFD /* MTRMetricsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRMetricsTests.m; sourceTree = "<group>"; };
 		88E07D602B9A89A4005FD53E /* MTRMetricKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRMetricKeys.h; sourceTree = "<group>"; };
 		88E6C9432B6334ED001A1FE0 /* MTRMetrics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRMetrics.h; sourceTree = "<group>"; };
@@ -1415,6 +1416,7 @@
 		B202528F2459E34F00F97062 /* CHIP */ = {
 			isa = PBXGroup;
 			children = (
+				7CD490112D378CF4007F9145 /* Matter.modulemap */,
 				CF3B63CB2CA31E71003C1C87 /* MTROTAImageTransferHandler.h */,
 				CF3B63CD2CA31E71003C1C87 /* MTROTAImageTransferHandler.mm */,
 				CF3B63CC2CA31E71003C1C87 /* MTROTAUnsolicitedBDXMessageHandler.h */,
@@ -2654,6 +2656,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LIBRARY_SEARCH_PATHS = "$(TEMP_DIR)/out/lib";
+				MODULEMAP_FILE = CHIP/Matter.modulemap;
 				OTHER_CFLAGS = "-fmacro-prefix-map=$(SRCROOT)/CHIP/=";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
@@ -2823,6 +2826,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LIBRARY_SEARCH_PATHS = "$(TEMP_DIR)/out/lib";
+				MODULEMAP_FILE = CHIP/Matter.modulemap;
 				OTHER_CFLAGS = "-fmacro-prefix-map=$(SRCROOT)/CHIP/=";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
