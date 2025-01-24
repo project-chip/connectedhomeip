@@ -495,7 +495,7 @@ class MdnsDiscovery:
     async def _get_service(self, service_type: MdnsServiceType,
                            log_output: bool,
                            discovery_timeout_sec: float,
-                           expected_value: str = None, 
+                           expected_value: str = None,
                            ) -> Optional[MdnsServiceInfo]:
         """
         Asynchronously discovers a specific type of mDNS service within the network and returns its details.
@@ -519,7 +519,7 @@ class MdnsDiscovery:
         if service_type.value in self._discovered_services:
             if expected_value is not None:
                 for service in self._discovered_services[service_type.value]:
-                    if service.service_name == expected_value.replace("._MATTER._TCP.LOCAL.","._matter._tcp.local."):
+                    if service.service_name == expected_value.replace("._MATTER._TCP.LOCAL.", "._matter._tcp.local."):
                         return service
             else:
                 return self._discovered_services[service_type.value][0]
