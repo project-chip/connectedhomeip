@@ -39,6 +39,7 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.testing import matter_asserts
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from mobly import asserts
 
 
 class TC_DGETH_2_1(MatterBaseTest):
@@ -47,6 +48,10 @@ class TC_DGETH_2_1(MatterBaseTest):
 
     This test case verifies the behavior of the attributes of the Ethernet Diagnostics cluster server.
     See the test plan steps for details on each attribute read and expected outcome.
+
+    Requirements:
+    - The Test Harness and DUT must be running on different physical devices.
+    - Communication between the Test Harness and DUT should occur via Ethernet.    
     """
 
     async def read_dgeth_attribute_expect_success(self, endpoint, attribute):
@@ -104,12 +109,16 @@ class TC_DGETH_2_1(MatterBaseTest):
         packet_rx_count_attr = await self.read_dgeth_attribute_expect_success(endpoint=endpoint, attribute=attributes.PacketRxCount)
         if packet_rx_count_attr is not None:
             matter_asserts.assert_valid_uint64(packet_rx_count_attr, "PacketRxCount")
+            if not self.is_pics_sdk_ci_only:
+                asserts.assert_true(packet_rx_count_attr > 0, f"PacketRxCount ({packet_rx_count_attr}) should be > 0)")
 
         # STEP 5: TH reads from the DUT the PacketTxCount attribute
         self.step(5)
         packet_tx_count_attr = await self.read_dgeth_attribute_expect_success(endpoint=endpoint, attribute=attributes.PacketTxCount)
         if packet_tx_count_attr is not None:
             matter_asserts.assert_valid_uint64(packet_tx_count_attr, "PacketTxCount")
+            if not self.is_pics_sdk_ci_only:
+                asserts.assert_true(packet_tx_count_attr > 0, f"PacketTxCount ({packet_tx_count_attr}) should be > 0)")
 
         # STEP 6: TH reads from the DUT the TxErrCount attribute
         self.step(6)
