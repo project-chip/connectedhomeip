@@ -311,7 +311,7 @@ CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle, CHIP_ER
                         ChipLogError(DeviceLayer, "Diagnostic Storage instance cannot be null."));
     if (error == CHIP_NO_ERROR)
     {
-        CHIP_ERROR err = mStorageInstance->ClearReadMemory(sReadEntries);
+        CHIP_ERROR err = mStorageInstance->ClearBuffer(sReadEntries);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "Failed to clear diagnostic read entries");
