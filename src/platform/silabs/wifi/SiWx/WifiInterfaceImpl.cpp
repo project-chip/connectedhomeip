@@ -329,8 +329,8 @@ sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_res
     {
         if (scan_result != nullptr)
         {
-            status = *(sl_status_t *)scan_result;
-            ChipLogError(DeviceLayer, "ScanCallback: failed: 0x%lx", static_cast<uint32_t>(status));
+            status = *reinterpret_cast<sl_status_t *>(scan_result);
+            ChipLogError(DeviceLayer, "ScanCallback: failed: 0x%lx", status);
         }
 
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
@@ -458,8 +458,8 @@ sl_status_t JoinCallback(sl_wifi_event_t event, char * result, uint32_t resultLe
     wfx_rsi.dev_state.Clear(WifiState::kStationConnecting);
     if (SL_WIFI_CHECK_IF_EVENT_FAILED(event))
     {
-        status = *(sl_status_t *)result;
-        ChipLogError(DeviceLayer, "JoinCallback: failed: 0x%lx", static_cast<uint32_t>(status));
+        status = *reinterpret_cast<sl_status_t *>(result);
+        ChipLogError(DeviceLayer, "JoinCallback: failed: 0x%lx", status);
         wfx_rsi.dev_state.Clear(WifiState::kStationConnected);
         wfx_retry_connection(++wfx_rsi.join_retries);
     }
