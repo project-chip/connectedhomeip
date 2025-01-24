@@ -1,1 +1,1 @@
-100 : [linux] Added libpcsclite-dev package for NFC Commissioning on Linux platforms.
+101: [Silabs] Update Silabs docker to support MG26 Modules.
