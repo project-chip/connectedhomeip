@@ -3265,6 +3265,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             if ([now compare:cutoffTime] == NSOrderedDescending) {
                 // Our timed invoke timeout has expired already.  Command
                 // was queued for too long.  Do not send it out.
+                MTR_LOG("Invoke work item [%llu] timed out its timed invoke timeout before being dispatched", workItemID);
                 workDone(nil, [MTRError errorForIMStatusCode:Status::Timeout]);
                 return;
             }
