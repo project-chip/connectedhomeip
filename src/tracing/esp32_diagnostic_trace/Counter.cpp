@@ -42,13 +42,11 @@ uint32_t ESPDiagnosticCounter::GetInstanceCount(const char * label) const
     return mCounterList[label];
 }
 
-CHIP_ERROR ESPDiagnosticCounter::ReportMetrics(const char * label, DiagnosticStorageInterface * mStorageInstance)
+CHIP_ERROR ESPDiagnosticCounter::ReportMetrics(const char * label, DiagnosticStorageInterface * storageInstance)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrReturnError(mStorageInstance != nullptr, err, ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
+    VerifyOrReturnError(storageInstance != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
     Diagnostic<uint32_t> counter(label, GetInstanceCount(label), esp_log_timestamp());
-    err = mStorageInstance->Store(counter);
-    return err;
+    return storageInstance->Store(counter);
 }
 
 } // namespace Diagnostics
