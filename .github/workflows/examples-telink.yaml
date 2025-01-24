@@ -167,14 +167,14 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (tl321x) Lighting App with OTA (LZMA), Shell, Factory Data
+            - name: Build example Telink (tl321x) Lighting App with OTA, Shell, Factory Data
               # Run test for master and all PRs
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tl3218x-light-ota-compress-lzma-shell-factory-data' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl3218x-light-ota-shell-factory-data' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tl3218x light-app-ota-compress-lzma-shell-factory-data \
-                    out/telink-tl3218x-light-ota-compress-lzma-shell-factory-data/zephyr/zephyr.elf \
+                    telink tl3218x light-app-ota-shell-factory-data \
+                    out/telink-tl3218x-light-ota-shell-factory-data/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
