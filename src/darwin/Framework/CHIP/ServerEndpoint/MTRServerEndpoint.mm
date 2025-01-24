@@ -302,8 +302,8 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
         auto & matterType = _matterDeviceTypes[index];
 
         matterType.deviceTypeId = static_cast<DeviceTypeId>(deviceType.deviceTypeID.unsignedLongLongValue);
-        // TODO: The spec allows 16-bit revisions, but the Ember bits only
-        // support 8-bit....
+        // TODO: The spec allows 16-bit revisions, but DeviceTypeEntry only
+        // supports 8-bit....
         matterType.deviceTypeRevision = static_cast<uint8_t>(deviceType.deviceTypeRevision.unsignedLongLongValue);
     }
 
