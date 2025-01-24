@@ -18,11 +18,6 @@
             "source": "/dev/bus/usb",
             "target": "/dev/bus/usb",
             "type": "bind"
-        },
-        {
-            "source": "/run/dbus/system_bus_socket",
-            "target": "/run/dbus/system_bus_socket",
-            "type": "bind"
         }
     ],
     "initializeCommand": "bash .devcontainer/build.sh --tag matter-dev-environment:local --version 97",
