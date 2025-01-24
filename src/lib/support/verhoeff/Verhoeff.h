@@ -37,7 +37,7 @@ class VerhoeffTest;
 //
 class DLL_EXPORT Verhoeff10
 {
-    friend class VerhoeffTest;
+    friend class VerhoeffTestAccess;
 
 public:
     enum
