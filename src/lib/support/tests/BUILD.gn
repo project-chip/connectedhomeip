@@ -70,13 +70,12 @@ chip_test_suite("tests") {
     "TestVariant.cpp",
     "TestVerhoeff.cpp",
     "TestZclString.cpp",
-    "VerhoeffTestAccess.h",
   ]
   if (current_os != "mbed") {
     test_sources += [ "TestCHIPArgParser.cpp" ]
   }
 
-  sources = []
+  sources = [ "VerhoeffTestAccess.h" ]
 
   cflags = [
     "-Wconversion",
