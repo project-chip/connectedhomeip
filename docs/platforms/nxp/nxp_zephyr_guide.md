@@ -57,7 +57,7 @@ Prerequisites:
     follows:
 
 ```shell
-$ west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr nxp-v4.0.0
+$ west init zephyrproject -m ssh://git@bitbucket.sw.nxp.com/mcucore/nxp-zsdk.git --mr nxp-v4.1.0-rc1
 ```
 
 > **Note**: While some of NXP platforms are supported in Zephyr upstream, we
@@ -65,7 +65,7 @@ $ west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr nxp
 > not upstream yet. While you can decide to use nxp-zsdk top of tree, we
 > recommend using a proper release tag delivered by NXP. This will ensure a
 > certain level of quality of the nxp-zsdk in use. Currently, we highly
-> recommend using the `nxp-v4.0.0` tag, based on Zephyr 4.0 release. Reach to
+> recommend using the `nxp-v4.1.0-rc1` tag, based on Zephyr 4.1 release. Reach to
 > your NXP contact for more details.
 
 Steps to build the example:
@@ -211,6 +211,17 @@ See
 [Guide for writing manufacturing data on NXP devices](./nxp_manufacturing_flow.md)
 
 <a name="ota-software-update"></a>
+
+### Build in release mode
+
+To build the example in release mode, you can add
+`-DEXTRA_CONF_FILE=prj_release.conf` in the west build command line.
+
+Example:
+
+```bash
+west build -b <board> -p  <path to example folder> -- -DEXTRA_CONF_FILE=prj_release.conf
+```
 
 ## OTA Software Update
 

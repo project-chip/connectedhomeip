@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -301,7 +301,11 @@ CHIP_ERROR WiFiManager::GetWiFiInfo(WiFiInfo & info) const
         info.mRssi           = static_cast<int8_t>(status.rssi);
         info.mChannel        = static_cast<uint16_t>(status.channel);
         info.mSsidLen        = status.ssid_len;
+#ifdef CONFIG_WIFI_NXP
+        info.mCurrentPhyRate = static_cast<uint64_t>(status.current_phy_tx_rate);
+#else
         info.mCurrentPhyRate = static_cast<uint64_t>(status.current_phy_rate);
+#endif
         memcpy(info.mSsid, status.ssid, status.ssid_len);
         memcpy(info.mBssId, status.bssid, sizeof(status.bssid));
 
@@ -318,20 +322,11 @@ CHIP_ERROR WiFiManager::GetNetworkStatistics(NetworkStatistics & stats) const
 
     stats.mPacketMulticastRxCount = data.multicast.rx;
     stats.mPacketMulticastTxCount = data.multicast.tx;
-#ifdef CONFIG_WIFI_NXP
-    // Workaround as unicast stats are missing on NXP wifi driver
-    stats.mPacketUnicastRxCount = data.pkts.rx - (data.broadcast.rx + data.multicast.rx);
-    stats.mPacketUnicastTxCount = data.pkts.tx - (data.broadcast.tx + data.multicast.tx);
-    // Most of the cases in stats.errors are overrun.
-    // TODO: Use Zephyr's overrun_count once it's supported by the WiFi Driver
-    stats.mOverRunCount = data.errors.rx + data.errors.tx;
-#else
-    stats.mPacketUnicastRxCount = data.unicast.rx;
-    stats.mPacketUnicastTxCount = data.unicast.tx;
-    stats.mOverRunCount         = data.overrun_count;
-#endif
-    stats.mBeaconsSuccessCount = data.sta_mgmt.beacons_rx;
-    stats.mBeaconsLostCount    = data.sta_mgmt.beacons_miss;
+    stats.mPacketUnicastRxCount   = data.unicast.rx;
+    stats.mPacketUnicastTxCount   = data.unicast.tx;
+    stats.mOverRunCount           = data.overrun_count;
+    stats.mBeaconsSuccessCount    = data.sta_mgmt.beacons_rx;
+    stats.mBeaconsLostCount       = data.sta_mgmt.beacons_miss;
 
     return CHIP_NO_ERROR;
 }
