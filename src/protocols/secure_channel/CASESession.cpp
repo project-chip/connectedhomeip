@@ -110,7 +110,7 @@ constexpr chip::TLV::Tag AsTlvContextTag(Enum e)
     return chip::TLV::ContextTag(chip::to_underlying(e));
 }
 
-constexpr size_t kCaseOverheadForFutureTbeData = 128;
+constexpr size_t kCaseOverheadForFutureTBEData = 128;
 
 } // namespace
 
@@ -1370,16 +1370,16 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
     ParsedSigma2Resume parsedSigma2Resume;
     SuccessOrExit(err = ParseSigma2Resume(tlvReader, parsedSigma2Resume));
 
+    SuccessOrExit(err = ValidateSigmaResumeMIC(parsedSigma2Resume.sigma2ResumeMIC, ByteSpan(mInitiatorRandom),
+                                               parsedSigma2Resume.resumptionId, ByteSpan(kKDFS2RKeyInfo),
+                                               ByteSpan(kResume2MIC_Nonce)));
+
     if (parsedSigma2Resume.responderSessionParamStructPresent)
     {
         SetRemoteSessionParameters(parsedSigma2Resume.responderSessionParams);
         mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
             GetRemoteSessionParameters());
     }
-
-    SuccessOrExit(err = ValidateSigmaResumeMIC(parsedSigma2Resume.sigma2ResumeMIC, ByteSpan(mInitiatorRandom),
-                                               parsedSigma2Resume.resumptionId, ByteSpan(kKDFS2RKeyInfo),
-                                               ByteSpan(kResume2MIC_Nonce)));
 
     ChipLogDetail(SecureChannel, "Peer assigned session ID %d", parsedSigma2Resume.responderSessionId);
     SetPeerSessionId(parsedSigma2Resume.responderSessionId);
@@ -1494,9 +1494,6 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     ParsedSigma2 parsedSigma2;
     ReturnErrorOnFailure(ParseSigma2(tlvReader, parsedSigma2));
 
-    ChipLogDetail(SecureChannel, "Peer assigned session ID %d", parsedSigma2.responderSessionId);
-    SetPeerSessionId(parsedSigma2.responderSessionId);
-
     //  ParseSigma2 ensures that:
     //  mRemotePubKey.Length() == responderEphPubKey.size() == kP256_PublicKey_Length.
     memcpy(mRemotePubKey.Bytes(), parsedSigma2.responderEphPubKey.data(), mRemotePubKey.Length());
@@ -1509,29 +1506,20 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     {
         uint8_t msg_salt[kIPKSize + kSigmaParamRandomNumberSize + kP256_PublicKey_Length + kSHA256_Hash_Length];
         MutableByteSpan saltSpan(msg_salt);
-        ReturnErrorOnFailure(ConstructSaltSigma2(ByteSpan(parsedSigma2.responderRandom), mRemotePubKey, ByteSpan(mIPK), saltSpan));
+        ReturnErrorOnFailure(ConstructSaltSigma2(parsedSigma2.responderRandom, mRemotePubKey, ByteSpan(mIPK), saltSpan));
         ReturnErrorOnFailure(DeriveSigmaKey(saltSpan, ByteSpan(kKDFSR2Info), sr2k));
     }
     // Msg2 should only be added to MessageDigest after we construct SaltSigma2 that is used to derive S2K
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ buf, buflen }));
 
-    if (parsedSigma2.responderSessionParamStructPresent)
-    {
-        SetRemoteSessionParameters(parsedSigma2.responderSessionParams);
-        mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
-            GetRemoteSessionParameters());
-    }
-
     ReturnErrorOnFailure(AES_CCM_decrypt(parsedSigma2.msgR2EncryptedPayload.data(), parsedSigma2.msgR2EncryptedPayload.size(),
-                                         nullptr, 0, parsedSigma2.msgR2Mic.data(), parsedSigma2.msgR2Mic.size(), sr2k.KeyHandle(),
+                                         nullptr, 0, parsedSigma2.msgR2MIC.data(), parsedSigma2.msgR2MIC.size(), sr2k.KeyHandle(),
                                          kTBEData2_Nonce, kTBEDataNonceLength, parsedSigma2.msgR2EncryptedPayload.data()));
 
     ContiguousBufferTLVReader decryptedDataTlvReader;
     decryptedDataTlvReader.Init(parsedSigma2.msgR2EncryptedPayload.data(), parsedSigma2.msgR2EncryptedPayload.size());
     ParsedSigma2TBEData parsedSigma2TBEData;
     ReturnErrorOnFailure(ParseSigma2TBEData(decryptedDataTlvReader, parsedSigma2TBEData));
-
-    std::copy(parsedSigma2TBEData.resumptionId.begin(), parsedSigma2TBEData.resumptionId.end(), mNewResumptionId.begin());
 
     // Validate responder identity located in msgR2Encrypted
     // Constructing responder identity
@@ -1569,8 +1557,20 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     ReturnErrorOnFailure(
         responderPublicKey.ECDSA_validate_msg_signature(msgR2Signed.Get(), msgR2SignedLen, parsedSigma2TBEData.tbsData2Signature));
 
+    ChipLogDetail(SecureChannel, "Peer assigned session ID %d", parsedSigma2.responderSessionId);
+    SetPeerSessionId(parsedSigma2.responderSessionId);
+
+    std::copy(parsedSigma2TBEData.resumptionId.begin(), parsedSigma2TBEData.resumptionId.end(), mNewResumptionId.begin());
+
     // Retrieve peer CASE Authenticated Tags (CATs) from peer's NOC.
     ReturnErrorOnFailure(ExtractCATsFromOpCert(parsedSigma2TBEData.responderNOC, mPeerCATs));
+
+    if (parsedSigma2.responderSessionParamStructPresent)
+    {
+        SetRemoteSessionParameters(parsedSigma2.responderSessionParams);
+        mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
+            GetRemoteSessionParameters());
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -1603,7 +1603,7 @@ CHIP_ERROR CASESession::ParseSigma2(ContiguousBufferTLVReader & tlvReader, Parse
                                                          kMaxCHIPCertLength,                          // responderICAC
                                                          kMax_ECDSA_Signature_Length,                 // signature
                                                          SessionResumptionStorage::kResumptionIdSize, // resumptionID
-                                                         kCaseOverheadForFutureTbeData // extra bytes for future-proofing
+                                                         kCaseOverheadForFutureTBEData // extra bytes for future-proofing
     );
 
     size_t msgR2EncryptedLenWithTag = tlvReader.GetLength();
@@ -1616,7 +1616,7 @@ CHIP_ERROR CASESession::ParseSigma2(ContiguousBufferTLVReader & tlvReader, Parse
 
     size_t msgR2EncryptedPayloadLen       = msgR2EncryptedLenWithTag - CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
     outParsedSigma2.msgR2EncryptedPayload = MutableByteSpan(outParsedSigma2.msgR2Encrypted.Get(), msgR2EncryptedPayloadLen);
-    outParsedSigma2.msgR2Mic =
+    outParsedSigma2.msgR2MIC =
         ByteSpan(outParsedSigma2.msgR2Encrypted.Get() + msgR2EncryptedPayloadLen, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     // Retrieve responderSessionParams if present
@@ -1924,13 +1924,13 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
         // Step 1
         // msgR3Encrypted will be allocated and initialised within ParseSigma3()
         Platform::ScopedMemoryBufferWithSize<uint8_t> msgR3Encrypted;
-        // both msgR3EncryptedPayload and msgR3Mic will become backed by msgR3Encrypted in ParseSigma3()
+        // both msgR3EncryptedPayload and msgR3MIC will become backed by msgR3Encrypted in ParseSigma3()
         MutableByteSpan msgR3EncryptedPayload;
-        ByteSpan msgR3Mic;
+        ByteSpan msgR3MIC;
         {
             System::PacketBufferTLVReader tlvReader;
             tlvReader.Init(std::move(msg));
-            SuccessOrExit(err = ParseSigma3(tlvReader, msgR3Encrypted, msgR3EncryptedPayload, msgR3Mic));
+            SuccessOrExit(err = ParseSigma3(tlvReader, msgR3Encrypted, msgR3EncryptedPayload, msgR3MIC));
 
             // Generate the S3K key
             MutableByteSpan saltSpan(msg_salt);
@@ -1941,8 +1941,8 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
             SuccessOrExit(err = mCommissioningHash.AddData(ByteSpan{ buf, bufLen }));
         }
         // Step 2 - Decrypt data blob
-        SuccessOrExit(err = AES_CCM_decrypt(msgR3EncryptedPayload.data(), msgR3EncryptedPayload.size(), nullptr, 0, msgR3Mic.data(),
-                                            msgR3Mic.size(), sr3k.KeyHandle(), kTBEData3_Nonce, kTBEDataNonceLength,
+        SuccessOrExit(err = AES_CCM_decrypt(msgR3EncryptedPayload.data(), msgR3EncryptedPayload.size(), nullptr, 0, msgR3MIC.data(),
+                                            msgR3MIC.size(), sr3k.KeyHandle(), kTBEData3_Nonce, kTBEDataNonceLength,
                                             msgR3EncryptedPayload.data()));
 
         decryptedDataTlvReader.Init(msgR3EncryptedPayload.data(), msgR3EncryptedPayload.size());
@@ -2011,7 +2011,7 @@ exit:
 
 CHIP_ERROR CASESession::ParseSigma3(ContiguousBufferTLVReader & tlvReader,
                                     Platform::ScopedMemoryBufferWithSize<uint8_t> & outMsgR3Encrypted,
-                                    MutableByteSpan & outMsgR3EncryptedPayload, ByteSpan & outMsgR3Mic)
+                                    MutableByteSpan & outMsgR3EncryptedPayload, ByteSpan & outMsgR3MIC)
 {
     TLVType containerType = kTLVType_Structure;
 
@@ -2024,7 +2024,7 @@ CHIP_ERROR CASESession::ParseSigma3(ContiguousBufferTLVReader & tlvReader,
     size_t maxMsgR3SignedEncLen = EstimateStructOverhead(kMaxCHIPCertLength,           // initiatorNOC
                                                          kMaxCHIPCertLength,           // initiatorICAC
                                                          kMax_ECDSA_Signature_Length,  // signature
-                                                         kCaseOverheadForFutureTbeData // extra bytes for future-proofing
+                                                         kCaseOverheadForFutureTBEData // extra bytes for future-proofing
     );
 
     size_t msgR3EncryptedLenWithTag = tlvReader.GetLength();
@@ -2037,7 +2037,7 @@ CHIP_ERROR CASESession::ParseSigma3(ContiguousBufferTLVReader & tlvReader,
 
     size_t msgR3EncryptedPayloadLen = msgR3EncryptedLenWithTag - CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
     outMsgR3EncryptedPayload        = MutableByteSpan(outMsgR3Encrypted.Get(), msgR3EncryptedPayloadLen);
-    outMsgR3Mic = ByteSpan(outMsgR3Encrypted.Get() + msgR3EncryptedPayloadLen, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
+    outMsgR3MIC = ByteSpan(outMsgR3Encrypted.Get() + msgR3EncryptedPayloadLen, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     ReturnErrorOnFailure(tlvReader.ExitContainer(containerType));
 
