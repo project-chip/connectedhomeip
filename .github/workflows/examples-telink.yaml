@@ -203,7 +203,7 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-              - name: Build example Telink (TL7218 retention) Light Switch App with OTA (LZMA), Factory Data
+            - name: Build example Telink (TL7218 retention) Light Switch App with OTA (LZMA), Factory Data
               # Run test for master and s07641069 PRs
               if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
