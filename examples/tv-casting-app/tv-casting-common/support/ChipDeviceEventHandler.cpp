@@ -44,6 +44,7 @@ void ChipDeviceEventHandler::Handle(const chip::DeviceLayer::ChipDeviceEvent * e
     if (event->Type == chip::DeviceLayer::DeviceEventType::kFailSafeTimerExpired &&
         CastingPlayer::GetTargetCastingPlayer()->mConnectionState == CASTING_PLAYER_CONNECTING)
     {
+        ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle() event kFailSafeTimerExpired");
         HandleFailSafeTimerExpired();
     }
     else if (event->Type == chip::DeviceLayer::DeviceEventType::kBindingsChangedViaCluster &&
@@ -53,16 +54,19 @@ void ChipDeviceEventHandler::Handle(const chip::DeviceLayer::ChipDeviceEvent * e
     }
     else if (event->Type == chip::DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
+        // True when device completes initial commissioning (PASE).
+        // Note: Not triggered for subsequent CASE sessions established via CastingPlayer::FindOrEstablishSession()
         HandleCommissioningComplete(event, arg, runPostCommissioning, targetNodeId, targetFabricIndex);
     }
 
+    // Run post commissioing for kBindingsChangedViaCluster and kCommissioningComplete events.
     if (runPostCommissioning)
     {
         sUdcInProgress = false;
         CastingPlayer::GetTargetCastingPlayer()->SetNodeId(targetNodeId);
         CastingPlayer::GetTargetCastingPlayer()->SetFabricIndex(targetFabricIndex);
 
-        ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle() calling FindOrEstablishSession()");
+        ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle() calling CastingPlayer FindOrEstablishSession()");
         CastingPlayer::GetTargetCastingPlayer()->FindOrEstablishSession(
             nullptr,
             [](void * context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle) {

@@ -129,9 +129,6 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         params.SetCountryCode(CharSpan::fromCharString(mCountryCode.Value()));
     }
 
-    // Default requiring TCs to false, to preserve release 1.3 chip-tool behavior
-    params.SetRequireTermsAndConditionsAcknowledgement(mRequireTCAcknowledgements.ValueOr(false));
-
     // mTCAcknowledgements and mTCAcknowledgementVersion are optional, but related. When one is missing, default the value to 0, to
     // increase the test tools ability to test the applications.
     if (mTCAcknowledgements.HasValue() || mTCAcknowledgementVersion.HasValue())

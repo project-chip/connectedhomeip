@@ -21,6 +21,7 @@ on:
         paths:
             - "third_party/**"
             - ".gitmodules"
+        types: [opened, synchronize, reopened, labeled, unlabeled]
 
 jobs:
     check-submodule-update-label:
@@ -32,7 +33,7 @@ jobs:
               run: |
                   echo This pull request attempts to update submodules without the changing-submodules-on-purpose label. Please apply that label if the changes are intentional, or remove those changes.
                   exit 1
-            - if: ${{ contains(github.event.pull_request.labels.*.name, 'changing-submodules-on-purpose') }} 
+            - if: ${{ contains(github.event.pull_request.labels.*.name, 'changing-submodules-on-purpose') }}
               name: Success
               run: |
                   echo PR looks good.

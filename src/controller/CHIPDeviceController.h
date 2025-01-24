@@ -816,6 +816,7 @@ public:
 
     Optional<CommissioningParameters> GetCommissioningParameters()
     {
+        // TODO: Return a non-optional const & to avoid a copy, mDefaultCommissioner is never null
         return mDefaultCommissioner == nullptr ? NullOptional : MakeOptional(mDefaultCommissioner->GetCommissioningParameters());
     }
 

@@ -211,7 +211,7 @@ public class ConnectionExampleFragment extends Fragment {
 
                       FragmentActivity activity = getActivity();
                       // Prevent possible NullPointerException. This callback could be called when
-                      // this Fragment is not attached to its host activity or when the fragment's
+                      // this fragment is not attached to its host activity or when the fragment's
                       // lifecycle is not in a valid state for interacting with the activity.
                       if (activity != null && !activity.isFinishing()) {
                         activity.runOnUiThread(

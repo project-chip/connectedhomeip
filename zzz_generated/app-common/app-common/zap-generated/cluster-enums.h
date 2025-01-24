@@ -5643,6 +5643,119 @@ using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
 using WebRTCMetadataOptions = Clusters::detail::WebRTCMetadataOptions;
 } // namespace WebRTCTransportRequestor
 
+namespace PushAvStreamTransport {
+
+// Enum for ContainerFormatEnum
+enum class ContainerFormatEnum : uint8_t
+{
+    kCmaf = 0x00,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 1,
+};
+
+// Enum for IngestMethodsEnum
+enum class IngestMethodsEnum : uint8_t
+{
+    kCMAFIngest = 0x00,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 1,
+};
+
+// Enum for StatusCodeEnum
+enum class StatusCodeEnum : uint8_t
+{
+    kAllocationNotPermitted     = 0x02,
+    kInvalidTLSEndpoint         = 0x03,
+    kInvalidStream              = 0x04,
+    kInvalidURL                 = 0x05,
+    kInvalidZone                = 0x06,
+    kUnsupportedContainerFormat = 0x07,
+    kUnsupportedIngestMethod    = 0x08,
+    kInvalidTriggerType         = 0x09,
+    kInvalidTransportStatus     = 0x10,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Enum for StreamMultiplexingEnum
+enum class StreamMultiplexingEnum : uint8_t
+{
+    kInterleaved = 0x00,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 1,
+};
+
+using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
+
+// Enum for TransportStatusEnum
+enum class TransportStatusEnum : uint8_t
+{
+    kActive   = 0x00,
+    kInactive = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for TransportTriggerTypeEnum
+enum class TransportTriggerTypeEnum : uint8_t
+{
+    kCommand    = 0x00,
+    kMotion     = 0x01,
+    kContinuous = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for TriggerActivationReasonEnum
+enum class TriggerActivationReasonEnum : uint8_t
+{
+    kUserInitiated = 0x00,
+    kAutomation    = 0x01,
+    kEmergency     = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kPerZoneSensitivity = 0x1,
+};
+
+// Bitmap for SupportedContainerFormatsBitmap
+enum class SupportedContainerFormatsBitmap : uint8_t
+{
+    kCmaf = 0x1,
+};
+
+// Bitmap for SupportedIngestMethodsBitmap
+enum class SupportedIngestMethodsBitmap : uint8_t
+{
+    kCMAFIngest = 0x1,
+};
+} // namespace PushAvStreamTransport
+
 namespace Chime {} // namespace Chime
 
 namespace EcosystemInformation {} // namespace EcosystemInformation
@@ -5655,6 +5768,8 @@ enum class SupportedDeviceCategoryBitmap : uint32_t
     kFabricSynchronization = 0x1,
 };
 } // namespace CommissionerControl
+
+namespace TlsCertificateManagement {} // namespace TlsCertificateManagement
 
 namespace UnitTesting {
 

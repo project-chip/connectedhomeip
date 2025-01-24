@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2020-2023 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -656,11 +655,13 @@ using namespace chip::Tracing::DarwinFramework;
     } logString:__PRETTY_FUNCTION__];
 }
 
-- (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(MTRProductIdentity *)info
+- (void)controller:(MTRDeviceController *)controller readCommissioneeInfo:(MTRCommissioneeInfo *)info
 {
     [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
-        if ([delegate respondsToSelector:@selector(controller:readCommissioningInfo:)]) {
-            [delegate controller:controller readCommissioningInfo:info];
+        if ([delegate respondsToSelector:@selector(controller:readCommissioneeInfo:)]) {
+            [delegate controller:controller readCommissioneeInfo:info];
+        } else if ([delegate respondsToSelector:@selector(controller:readCommissioningInfo:)]) {
+            [delegate controller:controller readCommissioningInfo:info.productIdentity];
         }
     } logString:__PRETTY_FUNCTION__];
 }

@@ -31,3 +31,4 @@ chip_enable_smoke_co_trigger = true
 chip_enable_boolean_state_configuration_trigger = true
 chip_enable_water_heater_management_trigger = true
 chip_enable_software_diagnostics_trigger = true
+chip_enable_wifi_diagnostics_trigger = true

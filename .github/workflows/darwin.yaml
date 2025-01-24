@@ -117,9 +117,18 @@ jobs:
                   export TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1
 
                   # Disable BLE (CHIP_IS_BLE=NO) because the app does not have the permission to use it and that may crash the CI.
-                  xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx ${{ matrix.options.arguments }} \
+                  xcodebuild test -target "Matter" -scheme "Matter Framework Tests" \
+                    -resultBundlePath /tmp/darwin/framework-tests/TestResults.xcresult \
+                    -sdk macosx ${{ matrix.options.arguments }} \
                     CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} ${{ matrix.options.defines }}' \
                     > >(tee /tmp/darwin/framework-tests/darwin-tests.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-err.log >&2)
+            - name: Generate Summary
+              if: always()
+              working-directory: /tmp
+              run: |
+                  wget https://github.com/a7ex/xcresultparser/releases/download/1.8.4/xcresultparser.zip
+                  unzip -j xcresultparser.zip
+                  ./xcresultparser --output-format md --failed-tests-only /tmp/darwin/framework-tests/TestResults.xcresult >>"$GITHUB_STEP_SUMMARY"
             - name: Collect crash logs
               if: failure() && !env.ACT
               run: |

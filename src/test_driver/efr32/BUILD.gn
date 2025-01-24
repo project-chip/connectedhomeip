@@ -18,6 +18,7 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
+import("${chip_root}/src/platform/silabs/provision/args.gni")
 import("${silabs_sdk_build_root}/efr32_sdk.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
@@ -68,6 +69,7 @@ config("efr32_ldflags") {
   ldflags = [
     "-T" + rebase_path(_ldscript, root_build_dir),
     "-Wl,--no-warn-rwx-segment",
+    "-fno-lto",
   ]
 }
 
@@ -93,8 +95,8 @@ source_set("efr32_test_main") {
     "${chip_root}/examples/common/pigweed:system_rpc_server",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support:pw_tests_wrapper",
-    "${chip_root}/src/platform/silabs/provision:provision-headers",
     "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs",
+    "${sl_provision_root}:provision-headers",
   ]
 
   # OpenThread Settings

@@ -385,6 +385,7 @@ void GeneralCommissioningGlobalInstance::HandleCommissioningComplete(
     ChipLogProgress(FailSafe, "GeneralCommissioning: Received CommissioningComplete");
 
     Commands::CommissioningCompleteResponse::Type response;
+    CHIP_ERROR err;
 
     // Fail-safe must be armed
     if (!failSafe.IsFailSafeArmed())
@@ -452,7 +453,6 @@ void GeneralCommissioningGlobalInstance::HandleCommissioningComplete(
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
     SessionHandle handle = ctx.mCommandHandler.GetExchangeContext()->GetSessionHandle();
-    CHIP_ERROR err       = CHIP_NO_ERROR;
 
     // Ensure it's a valid CASE session
     if (handle->GetSessionType() != Session::SessionType::kSecure ||

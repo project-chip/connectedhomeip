@@ -44,11 +44,6 @@ void TransportMgrBase::TCPDisconnect(Transport::ActiveTCPConnectionState * conn,
 {
     mTransport->TCPDisconnect(conn, shouldAbort);
 }
-
-bool TransportMgrBase::IsServerListenEnabled()
-{
-    return mTransport->IsServerListenEnabled();
-}
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 CHIP_ERROR TransportMgrBase::Init(Transport::Base * transport)

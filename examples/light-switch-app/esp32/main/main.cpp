@@ -19,6 +19,7 @@
 #include "DeviceCallbacks.h"
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
+#include <common/Esp32ThreadInit.h>
 
 #include "AppTask.h"
 #include "BindingHandler.h"
@@ -134,19 +135,6 @@ extern "C" void app_main()
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    if (DeviceLayer::ThreadStackMgr().InitThreadStack() != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Failed to initialize Thread stack");
-        return;
-    }
-    if (DeviceLayer::ThreadStackMgr().StartThreadTask() != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Failed to launch Thread task");
-        return;
-    }
-#endif
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 

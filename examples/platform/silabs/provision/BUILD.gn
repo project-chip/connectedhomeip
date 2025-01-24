@@ -14,6 +14,7 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
+import("${chip_root}/src/platform/silabs/provision/args.gni")
 import("${silabs_sdk_build_root}/silabs_board.gni")
 
 if (wifi_soc) {
@@ -48,8 +49,7 @@ source_set("storage") {
 
   deps = [ "${chip_root}/src/lib" ]
 
-  public_deps =
-      [ "${chip_root}/src/platform/silabs/provision:provision-headers" ]
+  public_deps = [ "${sl_provision_root}:provision-headers" ]
 
   if (sl_enable_test_event_trigger) {
     # Temporary workaround since we have duplicated configurations

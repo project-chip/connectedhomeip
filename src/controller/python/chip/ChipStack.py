@@ -28,7 +28,6 @@ from __future__ import absolute_import, print_function
 
 import asyncio
 import builtins
-import os
 from ctypes import CFUNCTYPE, Structure, c_bool, c_char_p, c_uint16, c_uint32, c_void_p, py_object, pythonapi
 from threading import Condition, Lock
 from typing import Any, Optional
@@ -149,11 +148,10 @@ class ChipStack(object):
         self._chipDLLPath = None
         self.devMgr = None
         self._enableServerInteractions = enableServerInteractions
+        self._subscriptions = {}
 
-        #
         # Locate and load the chip shared library.
-        # This also implictly does a minimal stack initialization (i.e call MemoryInit).
-        #
+        # This also implicitly does a minimal stack initialization (i.e call MemoryInit).
         self._loadLib()
 
         @_ChipThreadTaskRunnerFunct
@@ -162,10 +160,8 @@ class ChipStack(object):
 
         self.cbHandleChipThreadRun = HandleChipThreadRun
 
-        #
         # Storage has to be initialized BEFORE initializing the stack, since the latter
         # requires a PersistentStorageDelegate to be provided to DeviceControllerFactory.
-        #
         self._persistentStorage = PersistentStorage(persistentStoragePath)
 
         # Initialize the chip stack.
@@ -187,23 +183,31 @@ class ChipStack(object):
     def enableServerInteractions(self):
         return self._enableServerInteractions
 
+    def RegisterSubscription(self, subscription: ClusterAttribute.SubscriptionTransaction):
+        self._subscriptions[id(subscription)] = subscription
+
+    def UnregisterSubscription(self, subscription: ClusterAttribute.SubscriptionTransaction):
+        del self._subscriptions[id(subscription)]
+
     def Shutdown(self):
-        #
+
+        # Shutdown all subscriptions before shutting down the stack. Please note it is not
+        # possible to directly iterate over the dictionary values, because when the subscription
+        # is shut down, it will remove itself from the dictionary - causing the iterator to be
+        # invalidated. Hence, we need to create a local copy of the values before iterating.
+        for subscription in tuple(self._subscriptions.values()):
+            subscription.Shutdown()
+
         # Terminate Matter thread and shutdown the stack.
-        #
         self._ChipStackLib.pychip_DeviceController_StackShutdown()
 
-        #
         # We only shutdown the persistent storage layer AFTER we've shut down the stack,
         # since there is a possibility of interactions with the storage layer during shutdown.
-        #
         self._persistentStorage.Shutdown()
         self._persistentStorage = None
 
-        #
         # Stack init happens in native, but shutdown happens here unfortunately.
         # #20437 tracks consolidating these.
-        #
         self._ChipStackLib.pychip_CommonStackShutdown()
         self.completeEvent = None
         self._ChipStackLib = None
@@ -257,16 +261,6 @@ class ChipStack(object):
     def LocateChipDLL(self):
         self._loadLib()
         return self._chipDLLPath
-
-    # ----- Private Members -----
-    def _AllDirsToRoot(self, dir):
-        dir = os.path.abspath(dir)
-        while True:
-            yield dir
-            parent = os.path.dirname(dir)
-            if parent == "" or parent == dir:
-                break
-            dir = parent
 
     def _loadLib(self):
         if self._ChipStackLib is None:

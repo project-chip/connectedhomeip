@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,35 +14,36 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #include <app/data-model-provider/MetadataTypes.h>
+
+#include <app/data-model-provider/MetadataList.h>
 
 namespace chip {
 namespace app {
 namespace DataModel {
 
-const AttributeEntry AttributeEntry::kInvalid{ .path = ConcreteAttributePath(kInvalidEndpointId, kInvalidClusterId,
-                                                                             kInvalidAttributeId) };
-
-const CommandEntry CommandEntry::kInvalid{ .path = ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId) };
-
-const ClusterEntry ClusterEntry::kInvalid{
-    .path = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId),
-    .info = ClusterInfo(0 /* version */), // version of invalid cluster entry does not matter
-};
-
-const EndpointEntry EndpointEntry::kInvalid{ .id = kInvalidEndpointId, .info = EndpointInfo(kInvalidEndpointId) };
-
-// A default implementation if just first/next exist
-bool ProviderMetadataTree::EndpointExists(EndpointId endpoint)
+ReadOnlyBuffer<EndpointEntry> ProviderMetadataTree::EndpointsIgnoreError()
 {
-    for (EndpointEntry ep = FirstEndpoint(); ep.IsValid(); ep = NextEndpoint(ep.id))
-    {
-        if (ep.id == endpoint)
-        {
-            return true;
-        }
-    }
-    return false;
+
+    ListBuilder<EndpointEntry> builder;
+    (void) Endpoints(builder);
+    return builder.TakeBuffer();
+}
+
+ReadOnlyBuffer<ServerClusterEntry> ProviderMetadataTree::ServerClustersIgnoreError(EndpointId endpointId)
+{
+
+    ListBuilder<ServerClusterEntry> builder;
+    (void) ServerClusters(endpointId, builder);
+    return builder.TakeBuffer();
+}
+
+ReadOnlyBuffer<AttributeEntry> ProviderMetadataTree::AttributesIgnoreError(const ConcreteClusterPath & path)
+{
+    ListBuilder<AttributeEntry> builder;
+    (void) Attributes(path, builder);
+    return builder.TakeBuffer();
 }
 
 } // namespace DataModel

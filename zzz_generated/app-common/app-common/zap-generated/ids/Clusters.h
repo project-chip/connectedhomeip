@@ -391,6 +391,9 @@ static constexpr ClusterId Id = 0x00000553;
 namespace WebRTCTransportRequestor {
 static constexpr ClusterId Id = 0x00000554;
 } // namespace WebRTCTransportRequestor
+namespace PushAvStreamTransport {
+static constexpr ClusterId Id = 0x00000555;
+} // namespace PushAvStreamTransport
 namespace Chime {
 static constexpr ClusterId Id = 0x00000556;
 } // namespace Chime
@@ -400,6 +403,9 @@ static constexpr ClusterId Id = 0x00000750;
 namespace CommissionerControl {
 static constexpr ClusterId Id = 0x00000751;
 } // namespace CommissionerControl
+namespace TlsCertificateManagement {
+static constexpr ClusterId Id = 0x00000801;
+} // namespace TlsCertificateManagement
 namespace UnitTesting {
 static constexpr ClusterId Id = 0xFFF1FC05;
 } // namespace UnitTesting

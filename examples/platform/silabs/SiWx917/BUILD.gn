@@ -18,6 +18,7 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/examples/platform/silabs/args.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/silabs/provision/args.gni")
 import("${chip_root}/src/platform/silabs/wifi/args.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 import("${silabs_sdk_build_root}/SiWx917_sdk.gni")
@@ -67,7 +68,7 @@ source_set("test-event-trigger") {
     "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.h",
   ]
 
-  deps = [ "${chip_root}/src/platform/silabs/provision:provision-headers" ]
+  deps = [ "${sl_provision_root}:provision-headers" ]
   public_configs = [ ":test-event-trigger-config" ]
   public_deps = [
     "${chip_root}/src/app:test-event-trigger",

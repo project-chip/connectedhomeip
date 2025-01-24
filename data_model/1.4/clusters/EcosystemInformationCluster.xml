@@ -120,4 +120,18 @@ Davis, CA 95616, USA
       <access fabricScoped="true"/>
     </struct>
   </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="DeviceDirectory" type="list">
+      <entry type="EcosystemDeviceStruct"/>
+      <access read="true" readPrivilege="manage" fabricScoped="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="LocationDirectory" type="list">
+      <entry type="EcosystemLocationStruct"/>
+      <access read="true" readPrivilege="manage" fabricScoped="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform/>
+    </attribute>
+  </attributes>
 </cluster>

@@ -116,6 +116,24 @@ jobs:
       - name: Clean out build output
         run: rm -rf ./out
 
+      - name: Build example BL702L Contact Sensor
+        timeout-minutes: 30
+        run: |
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py \
+              --target bouffalolab-bl704ldk-contact-sensor-thread-mtd-littlefs-mfd \
+              build \
+              --copy-artifacts-to out/artifacts \
+            "
+      - name: Prepare some bloat report from the previous builds
+        run: |
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl702l bl702l+mfd+littlefs contact-sensor-app \
+              out/artifacts/bouffalolab-bl704ldk-contact-sensor-thread-mtd-littlefs-mfd/chip-bl702l-contact-sensor-example.out \
+              /tmp/bloat_reports/
+      - name: Clean out build output
+        run: rm -rf ./out
+
       - name: Uploading Size Reports
         uses: ./.github/actions/upload-size-reports
         if: ${{ !env.ACT }}

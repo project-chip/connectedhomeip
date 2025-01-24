@@ -26,6 +26,7 @@ if (current_os != "nuttx") {
 
 declare_args() {
   chip_enable_software_diagnostics_trigger = false
+  chip_enable_wifi_diagnostics_trigger = false
   chip_enable_smoke_co_trigger = false
   chip_enable_boolean_state_configuration_trigger = false
   chip_enable_energy_evse_trigger = false
@@ -46,6 +47,10 @@ source_set("ota-test-event-trigger") {
 
 source_set("software-diagnostics-test-event-trigger") {
   sources = [ "${chip_root}/src/app/clusters/software-diagnostics-server/SoftwareDiagnosticsTestEventTriggerHandler.h" ]
+}
+
+source_set("wifi-diagnostics-test-event-trigger") {
+  sources = [ "${chip_root}/src/app/clusters/wifi-network-diagnostics-server/WiFiDiagnosticsTestEventTriggerHandler.h" ]
 }
 
 source_set("smco-test-event-trigger") {
@@ -100,6 +105,7 @@ source_set("app-main") {
     ":smco-test-event-trigger",
     ":software-diagnostics-test-event-trigger",
     ":water-heater-management-test-event-trigger",
+    ":wifi-diagnostics-test-event-trigger",
     "${chip_root}/src/data-model-providers/codegen:instance-header",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
@@ -150,6 +156,7 @@ source_set("app-main") {
     "CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER=${chip_enable_energy_evse_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER=${chip_enable_energy_reporting_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER=${chip_enable_water_heater_management_trigger}",
+    "CHIP_DEVICE_CONFIG_ENABLE_WIFI_DIAGNOSTIC_TRIGGER=${chip_enable_wifi_diagnostics_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER=${chip_enable_device_energy_management_trigger}",
   ]
 
