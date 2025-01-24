@@ -60,6 +60,7 @@ source_set("af-types") {
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/data-model-provider:metadata",
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols/interaction_model",
   ]
