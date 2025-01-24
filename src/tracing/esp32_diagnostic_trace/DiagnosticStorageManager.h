@@ -38,6 +38,7 @@ public:
 
     CHIP_ERROR Retrieve(MutableByteSpan & span, uint32_t & read_entries) override
     {
+        CHIP_ERROR err = CHIP_NO_ERROR;
         mReader.Init(*this);
 
         chip::TLV::TLVWriter writer;
@@ -47,11 +48,11 @@ public:
         bool close_success                = true; // To check if the last TLV is copied successfully.
         uint32_t successful_written_bytes = 0;    // Store temporary writer length in case last TLV is not copied successfully.
 
-        while (CHIP_NO_ERROR == mReader.Next())
+        while ((err = mReader.Next()) == CHIP_NO_ERROR)
         {
             if (mReader.GetType() == chip::TLV::kTLVType_Structure && mReader.GetTag() == chip::TLV::AnonymousTag())
             {
-                CHIP_ERROR err = writer.CopyElement(mReader);
+                err = writer.CopyElement(mReader);
                 if (err == CHIP_NO_ERROR)
                 {
                     successful_written_bytes = writer.GetLengthWritten();
@@ -60,13 +61,12 @@ public:
                 else
                 {
                     close_success = false;
-                    ChipLogError(DeviceLayer, "Failed to copy TLV element: %s", ErrorStr(err));
                     break;
                 }
             }
             else
             {
-                ChipLogError(DeviceLayer, "Skipping unexpected TLV element");
+                ChipLogDetail(DeviceLayer, "Skipping unexpected TLV element");
             }
         }
         ReturnErrorOnFailure(writer.Finalize());
@@ -83,18 +83,22 @@ public:
 
     uint32_t GetDataSize() override { return DataLength(); }
 
-    CHIP_ERROR ClearReadMemory(uint32_t entries)
+    CHIP_ERROR ClearBuffer() override
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
+        while (!IsBufferEmpty())
+        {
+            ReturnErrorOnFailure(EvictHead());
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR ClearBuffer(uint32_t entries)
+    {
         while (entries--)
         {
-            err = EvictHead();
-            if (err != CHIP_NO_ERROR)
-            {
-                break;
-            }
+            ReturnErrorOnFailure(EvictHead());
         }
-        return err;
+        return CHIP_NO_ERROR;
     }
 
 private:

@@ -81,7 +81,8 @@ HashValue gSkipList[kPermitListMaxSize] = {
 
 bool IsPresent(const char * str, HashValue * list)
 {
-    for (int i = 0; i < kPermitListMaxSize; i++) {
+    for (int i = 0; i < kPermitListMaxSize; i++)
+    {
         if (list[i] == 0)
         {
             break;
@@ -158,7 +159,8 @@ void ESP32Diagnostics::TraceInstant(const char * label, const char * value)
 
 CHIP_ERROR ESP32Diagnostics::StoreDiagnostics(const char * label, const char * group)
 {
-    VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
+    VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
     Diagnostic<const char *> trace(label, group, esp_log_timestamp());
     return mStorageInstance->Store(trace);
 }

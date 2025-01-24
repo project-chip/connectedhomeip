@@ -56,9 +56,7 @@ public:
     CHIP_ERROR GetLogForIntent(IntentEnum intent, MutableByteSpan & outBuffer, Optional<uint64_t> & outTimeStamp,
                                Optional<uint64_t> & outTimeSinceBoot) override;
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-    void SetDiagnosticStorageInstance(CircularDiagnosticBuffer * bufferInstance) {
-        mStorageInstance = bufferInstance;
-    }
+    void SetDiagnosticStorageInstance(CircularDiagnosticBuffer * bufferInstance) { mStorageInstance = bufferInstance; }
 #endif
 
 private:
