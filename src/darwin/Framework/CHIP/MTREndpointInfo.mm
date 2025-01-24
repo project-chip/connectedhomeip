@@ -165,9 +165,9 @@ static NSString * const sChildrenCodingKey = @"ch";
                 break; // visited the root, DFS traversal done
             }
         } else /* endpoint->_mark == EndpointMark::Visited */ {
-            // Nodes can be visited multiple times due to Full-Family
-            // ancestors like the root node, or in scenarios where a
-            // nodes is erroneously in the PartsList of two separate
+            // Endpoints can be visited multiple times due to Full-Family
+            // ancestors like the root node, or in scenarios where an
+            // endpoint is erroneously in the PartsList of two separate
             // branches of the tree. There is no easy way to distinguish
             // these cases here, so we are not setting valid = NO.
             deque.pop_front(); // nothing else to do
