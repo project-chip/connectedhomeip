@@ -1,6 +1,5 @@
-/*
- *    Copyright (c) 2023 Project CHIP Authors
- *    All rights reserved.
+/**
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,27 +14,19 @@
  *    limitations under the License.
  */
 
-#pragma once
+#import <Matter/MTRCommissioneeInfo.h>
 
-#import <Foundation/Foundation.h>
+#import "MTRDefines_Internal.h"
 
-#include <lib/core/DataModelTypes.h>
+#include <controller/CommissioningDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-enum class MTRDeviceTypeClass {
-    Utility,
-    Simple,
-    Node, // Might not be a real class, but we have it for Root Node for now.
-};
+MTR_DIRECT_MEMBERS
+@interface MTRCommissioneeInfo ()
 
-struct MTRDeviceTypeData {
-    chip::DeviceTypeId id;
-    MTRDeviceTypeClass deviceClass;
-    NSString * name;
-};
+- (instancetype)initWithCommissioningInfo:(const chip::Controller::ReadCommissioningInfo &)info;
 
-// Returns null for unknown device types.
-const MTRDeviceTypeData * _Nullable MTRDeviceTypeDataForID(chip::DeviceTypeId aDeviceTypeId);
+@end
 
 NS_ASSUME_NONNULL_END
