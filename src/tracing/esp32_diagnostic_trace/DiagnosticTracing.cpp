@@ -63,25 +63,30 @@ constexpr size_t kPermitListMaxSize = CONFIG_MAX_PERMIT_LIST_SIZE;
 using HashValue                     = uint32_t;
 using namespace Utils;
 
+// Only traces with scope in gPermitList are allowed.
+// Used for MATTER_TRACE_SCOPE()
 HashValue gPermitList[kPermitListMaxSize] = { MurmurHash("PASESession"),
                                               MurmurHash("CASESession"),
                                               MurmurHash("NetworkCommissioning"),
                                               MurmurHash("GeneralCommissioning"),
                                               MurmurHash("OperationalCredentials"),
                                               MurmurHash("CASEServer"),
-                                              MurmurHash("Fabric"),
-                                              MurmurHash("Resolver") }; // namespace
+                                              MurmurHash("Fabric") }; // namespace
 
-bool IsPermitted(const char * str)
+// All traces with value from gSkipList are skipped.
+// Used for MATTER_TRACE_INSTANT()
+HashValue gSkipList[kPermitListMaxSize] = {
+    MurmurHash("Resolver"),
+};
+
+bool IsPresent(const char * str, HashValue * list)
 {
-    HashValue hashValue = MurmurHash(str);
-    for (HashValue permitted : gPermitList)
-    {
-        if (permitted == 0)
+    for (int i = 0; i < kPermitListMaxSize; i++) {
+        if (list[i] == 0)
         {
             break;
         }
-        if (hashValue == permitted)
+        if (MurmurHash(str) == list[i])
         {
             return true;
         }
@@ -101,21 +106,20 @@ void ESP32Diagnostics::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info) {}
 
 void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrReturn(mStorageInstance != nullptr, ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
     switch (event.ValueType())
     {
     case ValueType::kInt32: {
         ChipLogProgress(DeviceLayer, "The value of %s is %" PRId32, event.key(), event.ValueInt32());
         Diagnostic<int32_t> metric(event.key(), event.ValueInt32(), esp_log_timestamp());
-        err = mStorageInstance->Store(metric);
+        ReturnOnFailure(mStorageInstance->Store(metric));
     }
     break;
 
     case ValueType::kUInt32: {
         ChipLogProgress(DeviceLayer, "The value of %s is %" PRId32, event.key(), event.ValueUInt32());
         Diagnostic<uint32_t> metric(event.key(), event.ValueUInt32(), esp_log_timestamp());
-        err = mStorageInstance->Store(metric);
+        ReturnOnFailure(mStorageInstance->Store(metric));
     }
     break;
 
@@ -131,43 +135,32 @@ void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
         ChipLogProgress(DeviceLayer, "The value of %s is of an UNKNOWN TYPE", event.key());
         break;
     }
-
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to store Metric Diagnostic data"));
 }
 
 void ESP32Diagnostics::TraceCounter(const char * label)
 {
-    CHIP_ERROR err = ESPDiagnosticCounter::GetInstance(label).ReportMetrics(label, mStorageInstance);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to store Counter Diagnostic data"));
+    ReturnOnFailure(ESPDiagnosticCounter::GetInstance(label).ReportMetrics(label, mStorageInstance));
 }
 
 void ESP32Diagnostics::TraceBegin(const char * label, const char * group)
 {
-    if (IsPermitted(group))
-    {
-        CHIP_ERROR err = StoreDiagnostics(label, group);
-        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to store Trace Diagnostic data"));
-    }
+    VerifyOrReturn(IsPresent(group, gPermitList));
+    ReturnOnFailure(StoreDiagnostics(label, group));
 }
 
 void ESP32Diagnostics::TraceEnd(const char * label, const char * group) {}
 
 void ESP32Diagnostics::TraceInstant(const char * label, const char * value)
 {
-    if (!IsPermitted(value))
-    {
-        CHIP_ERROR err = StoreDiagnostics(label, value);
-        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to store Trace Diagnostic data"));
-    }
+    VerifyOrReturn(IsPresent(value, gSkipList));
+    ReturnOnFailure(StoreDiagnostics(label, value));
 }
 
 CHIP_ERROR ESP32Diagnostics::StoreDiagnostics(const char * label, const char * group)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrReturnError(mStorageInstance != nullptr, err, ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
+    VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
     Diagnostic<const char *> trace(label, group, esp_log_timestamp());
-    err = mStorageInstance->Store(trace);
-    return err;
+    return mStorageInstance->Store(trace);
 }
 
 } // namespace Diagnostics
