@@ -212,7 +212,7 @@ config SOC_SERIES_RISCV_TELINK_TLX_NON_RETENTION_RAM_CODE
     default n if PM
 
 config TELINK_TLX_MATTER_RETENTION_LAYOUT
-    default y if PM || BOARD_TL3218X
+    default y if PM || BOARD_TL3218
 
 config PWM
     default n if PM
