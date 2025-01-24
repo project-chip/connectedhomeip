@@ -102,29 +102,29 @@ class TC_REFALM_2_2(MatterBaseTest):
     def steps_TC_REFALM_2_2(self) -> list[TestStep]:
         """Execute the test steps."""
         steps = [
-            TestStep( 1, "Commission DUT to TH (can be skipped if done in a preceding test)",is_commissioning=True),
-            TestStep( 2, "Ensure that the door on the DUT is closed"),
-            TestStep( 3, "TH reads from the DUT the State attribute"),
-            TestStep( 4, "Manually open the door on the DUT"),
-            TestStep( 5, "Wait for the time defined in PIXIT.REFALM.AlarmThreshold"),
-            TestStep( 6, "TH reads from the DUT the State attribute"),
-            TestStep( 7, "Ensure that the door on the DUT is closed"),
-            TestStep( 8, "TH reads from the DUT the State attribute"),
-            TestStep( 9, "TH sends Reset command to the DUT"),
-            TestStep( 10, "TH sends ModifyEnabledAlarms command to the DUT"),
-            TestStep( 11, "Set up subscription to the Notify event"),
-            TestStep( "12.a", "Repeating step 4 Manually open the door on the DUT"),
-            TestStep( "12.b", "Step 12b: Repeat step 5 Wait for the time defined in PIXIT.REFALM.AlarmThreshold"),
-            TestStep( "12.c", "After step 5 (repeated), receive a Notify event with the State attribute bit 0 set to 1."),
-            TestStep( "13.a", "Repeat step 7 Ensure that the door on the DUT is closed"),
-            TestStep( "13.b", "Receive a Notify event with the State attribute bit 0 set to 0"),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
+            TestStep(2, "Ensure that the door on the DUT is closed"),
+            TestStep(3, "TH reads from the DUT the State attribute"),
+            TestStep(4, "Manually open the door on the DUT"),
+            TestStep(5, "Wait for the time defined in PIXIT.REFALM.AlarmThreshold"),
+            TestStep(6, "TH reads from the DUT the State attribute"),
+            TestStep(7, "Ensure that the door on the DUT is closed"),
+            TestStep(8, "TH reads from the DUT the State attribute"),
+            TestStep(9, "TH sends Reset command to the DUT"),
+            TestStep(10, "TH sends ModifyEnabledAlarms command to the DUT"),
+            TestStep(11, "Set up subscription to the Notify event"),
+            TestStep("12.a", "Repeating step 4 Manually open the door on the DUT"),
+            TestStep("12.b", "Step 12b: Repeat step 5 Wait for the time defined in PIXIT.REFALM.AlarmThreshold"),
+            TestStep("12.c", "After step 5 (repeated), receive a Notify event with the State attribute bit 0 set to 1."),
+            TestStep("13.a", "Repeat step 7 Ensure that the door on the DUT is closed"),
+            TestStep("13.b", "Receive a Notify event with the State attribute bit 0 set to 0"),
         ]
 
         return steps
 
-    async def get_command_status(self,cmd: ClusterCommand,cmd_str:str=""):
-        """Return the status of the executed command.By default the status is 0x0 unless a different 
-        status on InteractionModel is returned."""
+    async def _get_command_status(self,cmd: ClusterCommand,cmd_str:str=""):
+        """Return the status of the executed command. By default the status is 0x0 unless a different 
+        status on InteractionModel is returned. For this test we consider the status 0x0 as not succesfull."""
         cmd_status = Status.Success
         if self.is_ci:
             try:
@@ -133,9 +133,11 @@ class TC_REFALM_2_2(MatterBaseTest):
                 cmd_status = uc.status
         else:
             user_response = self.wait_for_user_input(prompt_msg=f"{cmd_str} command is implemented in the DUT?. Enter 'y' or 'n' to confirm.",
-                prompt_msg_placeholder="y",
-                default_value="y")
+                default_value="n")
             asserts.assert_equal(user_response.lower(), "n")
+            if user_response.lower() == "n":
+                cmd_status = Status.UnsupportedCommand
+            
         return cmd_status
 
 
@@ -144,8 +146,7 @@ class TC_REFALM_2_2(MatterBaseTest):
             self._send_close_door_commnad()
             sleep(1)
         else:
-            user_response = self.wait_for_user_input(prompt_msg=f"Ensure that the door on the DUT is closed. Enter 'y' or 'n' after completition",
-                prompt_msg_placeholder="y",
+            user_response = self.wait_for_user_input(prompt_msg=f"Ensure that the door on the DUT is closed.",
                 default_value="y")
             asserts.assert_equal(user_response.lower(), "y")
 
@@ -154,11 +155,10 @@ class TC_REFALM_2_2(MatterBaseTest):
             self._send_open_door_command()
         else:
             user_response = self.wait_for_user_input(prompt_msg=f"Manually open the door on the DUT. Enter 'y' or 'n' after completition",
-                prompt_msg_placeholder="y",
                 default_value="y")
             asserts.assert_equal(user_response.lower(), "y")
 
-    async def read_refalm_state_attribute(self):
+    async def _read_refalm_state_attribute(self):
         cluster = Clusters.Objects.RefrigeratorAlarm
         return await self.read_single_attribute_check_success(
             endpoint=self.endpoint,
@@ -166,7 +166,7 @@ class TC_REFALM_2_2(MatterBaseTest):
             attribute=Clusters.RefrigeratorAlarm.Attributes.State
         )
 
-    def wait_thresshold(self):
+    def _wait_thresshold(self):
         sleep(self.wait_thresshold_v/1000)
 
     def _send_named_pipe_command(self, command_dict: dict[str, Any]):
@@ -209,7 +209,7 @@ class TC_REFALM_2_2(MatterBaseTest):
 
         self.step(3)
         # reads the state attribute , must be a bitMap32 ( list wich values are 32 bits)
-        device_state = await self.read_refalm_state_attribute()
+        device_state = await self._read_refalm_state_attribute()
         logger.info(f"The device state is {device_state}")
         asserts.assert_equal(device_state,0)
 
@@ -220,11 +220,11 @@ class TC_REFALM_2_2(MatterBaseTest):
 
         # wait  PIXIT.REFALM.AlarmThreshold (5s)
         self.step(5)
-        self.wait_thresshold()
+        self._wait_thresshold()
 
         # # read the status
         self.step(6)
-        device_state = await self.read_refalm_state_attribute()
+        device_state = await self._read_refalm_state_attribute()
         logger.info(f"The device state is {device_state}")
         asserts.assert_equal(device_state,1)
 
@@ -234,16 +234,16 @@ class TC_REFALM_2_2(MatterBaseTest):
 
         # # read from the state attr
         self.step(8)
-        device_status = await self.read_refalm_state_attribute()
+        device_status = await self._read_refalm_state_attribute()
         logger.info(f"The device state is {device_state}")
         asserts.assert_equal(device_status,0)
 
         self.step(9)
-        cmd_status  = await self.get_command_status(cmd=FakeReset(),cmd_str="Reset")
+        cmd_status  = await self._get_command_status(cmd=FakeReset(),cmd_str="Reset")
         asserts.assert_equal(Status.UnsupportedCommand,cmd_status, msg=f"Command status is not {Status.UnsupportedCommand}, is {cmd_status}")
 
         self.step(10)
-        cmd_status = await self.get_command_status(cmd=FakeModifyEnabledAlarms(),cmd_str="ModifyEnabledAlarms")
+        cmd_status = await self._get_command_status(cmd=FakeModifyEnabledAlarms(),cmd_str="ModifyEnabledAlarms")
         asserts.assert_equal(Status.UnsupportedCommand,cmd_status,msg=f"Command status is not {Status.UnsupportedCommand}, is {cmd_status}")
 
         
@@ -260,7 +260,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         self._ask_for_open_door()
 
         self.step("12.b")
-        self.wait_thresshold()
+        self._wait_thresshold()
 
         self.step("12.c")
         # Wait for the Notify event with the State value.
