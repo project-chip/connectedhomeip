@@ -483,8 +483,9 @@ CHIP_ERROR CodegenDataModelProvider::DeviceTypes(EndpointId endpointId,
     }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    return DataModel::MetadataList<DataModel::DeviceTypeEntry>::FromConstSpan(
-        emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
+
+    builder.ReferenceExisting(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CodegenDataModelProvider::SemanticTags(EndpointId endpointId, DataModel::ListBuilder<SemanticTag> & builder)

@@ -53,16 +53,16 @@ public:
 
     using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
 
-    virtual MetadataList<EndpointEntry> Endpoints() = 0;
+    virtual CHIP_ERROR Endpoints(ListBuilder<EndpointEntry> & builder) = 0;
 
-    virtual MetadataList<SemanticTag> SemanticTags(EndpointId endpointId)          = 0;
-    virtual MetadataList<DeviceTypeEntry> DeviceTypes(EndpointId endpointId)       = 0;
-    virtual MetadataList<ClusterId> ClientClusters(EndpointId endpointId)          = 0;
-    virtual MetadataList<ServerClusterEntry> ServerClusters(EndpointId endpointId) = 0;
+    virtual CHIP_ERROR SemanticTags(EndpointId endpointId, ListBuilder<SemanticTag> & builder)          = 0;
+    virtual CHIP_ERROR DeviceTypes(EndpointId endpointId, ListBuilder<DeviceTypeEntry> & builder)       = 0;
+    virtual CHIP_ERROR ClientClusters(EndpointId endpointId, ListBuilder<ClusterId> & builder)          = 0;
+    virtual CHIP_ERROR ServerClusters(EndpointId endpointId, ListBuilder<ServerClusterEntry> & builder) = 0;
 
-    virtual MetadataList<AttributeEntry> Attributes(const ConcreteClusterPath & path)             = 0;
-    virtual MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath & path)           = 0;
-    virtual MetadataList<AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) = 0;
+    virtual CHIP_ERROR Attributes(const ConcreteClusterPath & path, ListBuilder<AttributeEntry> & builder)             = 0;
+    virtual CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ListBuilder<CommandId> & builder)           = 0;
+    virtual CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path, ListBuilder<AcceptedCommandEntry> & builder) = 0;
 
     /// Workaround function to report attribute change.
     ///
@@ -81,6 +81,12 @@ public:
     /// TODO: We should remove this function when the AttributeAccessInterface/CommandHandlerInterface is able to report
     /// the attribute changes.
     virtual void Temporary_ReportAttributeChanged(const AttributePathParams & path) = 0;
+
+    // "convenience" functions that just return the data and ignore the error
+    // This returns the builder as-is even after the error (e.g. not found would return empty data)
+    ReadOnlyBuffer<EndpointEntry> EndpointsIgnoreError();
+    ReadOnlyBuffer<ServerClusterEntry> ServerClustersIgnoreError(EndpointId endpointId);
+    ReadOnlyBuffer<AttributeEntry> AttributesIgnoreError(const ConcreteClusterPath & path);
 };
 
 } // namespace DataModel
