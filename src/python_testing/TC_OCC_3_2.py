@@ -179,7 +179,8 @@ class TC_OCC_3_2(MatterBaseTest):
         await self.write_single_attribute(attributes.HoldTime(hold_time_max))
 
         self.step("4d")
-        await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.HoldTime, sequence=[hold_time_max], timeout_sec=post_prompt_settle_delay_seconds)
+        await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, 
+                                  attribute=cluster.Attributes.HoldTime, sequence=[hold_time_max], timeout_sec=post_prompt_settle_delay_seconds)
 
 
 if __name__ == "__main__":
