@@ -18,10 +18,12 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 
+#include <cstdint>
 #include <type_traits>
 
 namespace chip {
@@ -30,61 +32,106 @@ namespace DataModel {
 
 namespace detail {
 
-// essentially a `void *` untyped metadata list base,
-// so that actual functionality does not template-explode
-class GenericMetadataList
+class GenericAppendOnlyBuffer
 {
 public:
-    GenericMetadataList(size_t elementSize) : mElementSize(elementSize) {}
-    ~GenericMetadataList();
+    GenericAppendOnlyBuffer(size_t elementSize) : mElementSize(elementSize) {}
+    ~GenericAppendOnlyBuffer();
 
-    GenericMetadataList(const GenericMetadataList &)                   = delete;
-    GenericMetadataList & operator=(const GenericMetadataList & other) = delete;
+    GenericAppendOnlyBuffer(GenericAppendOnlyBuffer && other);
+    GenericAppendOnlyBuffer & operator=(GenericAppendOnlyBuffer &&);
 
-    GenericMetadataList(GenericMetadataList && other) { *this = std::move(other); }
+    GenericAppendOnlyBuffer()                                            = delete;
+    GenericAppendOnlyBuffer & operator=(const GenericAppendOnlyBuffer &) = delete;
 
-    GenericMetadataList & operator=(GenericMetadataList && other);
-    const void * operator[](size_t index) const;
+    /// Ensure that at least the specified number of elements
+    /// can be appended to the internal buffer;
+    ///
+    /// This will cause the internal buffer to become and allocated buffer
+    CHIP_ERROR EnsureAppendCapacity(size_t numElements);
 
-    CHIP_ERROR Reserve(size_t numElements);
-    void Invalidate();
+    bool IsEmpty() const { return mElementCount == 0; }
 
-    size_t ElementCount() const { return mElementCount; }
-    size_t Capacity() const { return mCapacity; }
-    bool Empty() const { return mElementCount == 0; }
+    /// Number of elements stored in the object.
+    size_t Size() const { return mElementCount; }
 
 protected:
-    /// Copy over the data from the given buffer
-    CHIP_ERROR CopyExistingBuffer(const void * buffer, size_t elements);
+    /// Appends a single element of mElementSize size.
+    ///
+    /// ALWAYS COPIES the given element internally.
+    /// Sufficient capacity MUST exist to append.
+    CHIP_ERROR AppendSingleElementRaw(const void * buffer);
 
-    /// use existing buffer AS IS, without taking ownership.
-    void AcquireExistingBuffer(const void * buffer, size_t elements);
+    /// Appends a list of elements from a raw array.
+    ///
+    /// This ALWAYS COPIES the elements internally.
+    /// Additional capacity is AUTOMATICALLY ADDED.
+    CHIP_ERROR AppendElementArrayRaw(const void * buffer, size_t numElements);
 
-    CHIP_ERROR AppendRaw(const void * buffer);
-    const void * RawBuffer() const { return mBuffer; }
+    /// Appends a list of elements from a raw array.
+    ///
+    /// If the buffer contains no elements, this will just REFERENCE the given
+    /// buffer, so its lifetime MUST be longer than the lifetime of this buffer and
+    /// its usage.
+    ///
+    /// If the buffer already contains some elements, this will AUTOMATICALLY
+    /// add additional capacity and COPY the elements at the end of the internal array.
+    CHIP_ERROR ReferenceExistingElementArrayRaw(const void * buffer, size_t numElements);
 
-    /// Marks a list as immutable and immutability is acquired
-    /// during const access (so this is const)
-    void SetImmutable() const { mIsImmutable = true; }
+    /// release ownership of any used buffer.
+    ///
+    /// Returns the current buffer details and releases ownership of it (clears internal state)
+    void ReleaseBuffer(void *& buffer, size_t & size, bool & allocated);
 
 private:
-    bool mAllocated = false;
+    const size_t mElementSize; // size of one element in the buffer
+    uint8_t * mBuffer       = nullptr;
+    size_t mElementCount    = 0;     // how many elements are stored in the class
+    size_t mCapacity        = 0;     // how many elements can be stored in total in mBuffer
+    bool mBufferIsAllocated = false; // if mBuffer is an allocated buffer
+};
 
-    // buffer may point to either allocated or re-used (e.g. from const arrays) buffers.
-    // buffer is assumed allocated if mAllocated is true.
-    uint8_t * mBuffer = nullptr;
-    size_t mElementSize;
-    size_t mElementCount = 0;
-    size_t mCapacity     = 0;
+/// Represents a RAII instance owning a buffer.
+///
+/// It auto-frees the owned buffer on destruction
+class ScopedBuffer
+{
+public:
+    ScopedBuffer(void * buffer) : mBuffer(buffer) {}
+    ~ScopedBuffer();
 
-    // Set to true as soon as a span is obtained, since more writes may invalidate the span.
-    mutable bool mIsImmutable = false;
+    ScopedBuffer(const ScopedBuffer &)             = delete;
+    ScopedBuffer & operator=(const ScopedBuffer &) = delete;
+
+    ScopedBuffer(ScopedBuffer && other) : mBuffer(other.mBuffer) { other.mBuffer = nullptr; }
+    ScopedBuffer & operator=(ScopedBuffer && other);
+
+private:
+    void * mBuffer;
 };
 
 } // namespace detail
 
 template <typename T>
-class MetadataList : public detail::GenericMetadataList
+class ReadOnlyBuffer : public Span<const T>, detail::ScopedBuffer
+{
+public:
+    ReadOnlyBuffer() : ScopedBuffer(nullptr) {}
+    ReadOnlyBuffer(const T * buffer, size_t size, bool allocated) :
+        Span<const T>(buffer, size), ScopedBuffer(allocated ? const_cast<void *>(static_cast<const void *>(buffer)) : nullptr)
+    {}
+    ~ReadOnlyBuffer() = default;
+
+    ReadOnlyBuffer & operator=(ReadOnlyBuffer && other)
+    {
+        *static_cast<Span<const T> *>(this) = other;
+        *static_cast<ScopedBuffer *>(this)  = std::move(other);
+        return *this;
+    }
+};
+
+template <typename T>
+class ListBuilder : public detail::GenericAppendOnlyBuffer
 {
 public:
     using SpanType = Span<const T>;
@@ -97,57 +144,44 @@ public:
     //       implementation does not actually report that.
     static_assert(std::is_trivially_destructible_v<T>);
 
-    MetadataList() : GenericMetadataList(sizeof(T)) {}
-    MetadataList(const MetadataList &)                   = delete;
-    MetadataList & operator=(const MetadataList & other) = delete;
+    ListBuilder() : GenericAppendOnlyBuffer(sizeof(T)) {}
 
-    MetadataList(MetadataList && other) : GenericMetadataList(sizeof(T)) { *this = std::move(other); }
+    ListBuilder(const ListBuilder &)                   = delete;
+    ListBuilder & operator=(const ListBuilder & other) = delete;
 
-    MetadataList & operator=(MetadataList && other)
+    ListBuilder(ListBuilder && other) : GenericAppendOnlyBuffer(sizeof(T)) { *this = std::move(other); }
+
+    ListBuilder & operator=(ListBuilder && other)
     {
-        *static_cast<GenericMetadataList *>(this) = std::move(other);
+        *static_cast<GenericAppendOnlyBuffer *>(this) = std::move(other);
         return *this;
     }
 
-    const T & operator[](size_t index) { return *static_cast<const T *>(GenericMetadataList::operator[](index)); }
+    /// Reference methods attempt to reference the existing array IN PLACE
+    /// so its lifetime is assumed to be longer than the usage of this list.
+    CHIP_ERROR ReferenceExisting(SpanType span) { return ReferenceExistingElementArrayRaw(span.data(), span.size()); }
 
-    template <size_t N>
-    static MetadataList FromArray(const std::array<T, N> & arr)
+    /// Append always attempts to append/extend existing memory.
+    ///
+    /// Automatically attempts to allocate sufficient space to fulfill the element
+    /// requirements.
+    CHIP_ERROR AppendElements(SpanType span) { return AppendElementArrayRaw(span.data(), span.size()); }
+
+    /// Append a single element.
+    /// Sufficent append capacity MUST exist.
+    CHIP_ERROR Append(const T & value) { return AppendSingleElementRaw(&value); }
+
+    /// Once a list is built, the data is taken as a scoped SPAN that owns its data
+    /// and the original list is cleared
+    ReadOnlyBuffer<T> TakeBuffer()
     {
-        MetadataList<T> list;
+        void * buffer;
+        size_t size;
+        bool allocated;
+        ReleaseBuffer(buffer, size, allocated);
 
-        if (list.CopyExistingBuffer(arr.data(), arr.size()) != CHIP_NO_ERROR)
-        {
-            list.Invalidate();
-        }
-
-        return list;
+        return ReadOnlyBuffer<T>(static_cast<const T *>(buffer), size, allocated);
     }
-
-    template <size_t N>
-    static MetadataList FromConstArray(const std::array<const T, N> & arr)
-    {
-        MetadataList<T> list;
-        list.AcquireExistingBuffer(arr.data(), arr.size());
-        return list;
-    }
-
-    static MetadataList FromConstSpan(const Span<const T> & span)
-    {
-        MetadataList<T> list;
-        list.AcquireExistingBuffer(span.data(), span.size());
-        return list;
-    }
-
-    size_t Size() const { return ElementCount(); }
-
-    Span<const T> GetSpanValidForLifetime() const
-    {
-        SetImmutable();
-        return Span<const T>(static_cast<const T *>(RawBuffer()), ElementCount());
-    }
-
-    CHIP_ERROR Append(const T & value) { return AppendRaw(&value); }
 };
 
 } // namespace DataModel

@@ -16,6 +16,8 @@
 #pragma once
 
 #include <access/AccessControl.h>
+#include <app/data-model-provider/MetadataList.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
 
 namespace chip {
@@ -31,8 +33,9 @@ public:
 
     bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
     {
-        auto deviceTypes = mModelGetter()->DeviceTypes(endpoint);
-        for (auto & type : deviceTypes.GetSpanValidForLifetime())
+        app::DataModel::ListBuilder<app::DataModel::DeviceTypeEntry> builder;
+        (void) mModelGetter()->DeviceTypes(endpoint, builder);
+        for (auto & type : builder.TakeBuffer())
         {
             if (type.deviceTypeId == deviceType)
             {
