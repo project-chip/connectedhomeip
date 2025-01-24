@@ -44,7 +44,7 @@ public:
 private:
     ProviderMetadataTree * mProvider;
     EndpointId mEndpointId = kInvalidEndpointId;
-    MetadataList<ServerClusterEntry> mClusterEntries;
+    ReadOnlyBuffer<ServerClusterEntry> mClusterEntries;
 };
 
 /// Helps search for a specific server attribute in the given
@@ -61,7 +61,7 @@ public:
 private:
     ProviderMetadataTree * mProvider;
     ConcreteClusterPath mClusterPath;
-    MetadataList<AttributeEntry> mAttributes;
+    ReadOnlyBuffer<AttributeEntry> mAttributes;
 };
 
 /// Helps search for a specific server endpoint in the given
@@ -71,19 +71,12 @@ private:
 class EndpointFinder
 {
 public:
-    EndpointFinder(ProviderMetadataTree * provider) : mProvider(provider)
-    {
-        if (mProvider != nullptr)
-        {
-            mEndpoints = mProvider->Endpoints();
-        }
-    }
-
+    EndpointFinder(ProviderMetadataTree * provider);
     std::optional<EndpointEntry> Find(EndpointId endpointId);
 
 private:
     ProviderMetadataTree * mProvider;
-    MetadataList<EndpointEntry> mEndpoints;
+    ReadOnlyBuffer<EndpointEntry> mEndpoints;
 };
 
 } // namespace DataModel

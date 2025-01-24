@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "attributes_service/attributes_service.pb.h"
 #include "attributes_service/attributes_service.rpc.pb.h"
 #include "pigweed/rpc_services/internal/StatusUtils.h"
 
@@ -44,46 +45,177 @@ namespace rpc {
 class Attributes : public pw_rpc::nanopb::Attributes::Service<Attributes>
 {
 public:
-    ::pw::Status Write(const chip_rpc_AttributeWrite & request, pw_protobuf_Empty & response)
-    {
-        const void * data;
-        DeviceLayer::StackLock lock;
+    static constexpr TLV::Tag kAttributeDataTag = TLV::ContextTag(1);
+    static constexpr TLV::Tag kDataTag          = TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData));
 
-        switch (request.data.which_data)
+    CHIP_ERROR PositionOnDataElement(chip::TLV::TLVReader & reader)
+    {
+        // Expect the TLV to be the full structure as received from a read (or subset)
+        // TLV is a full ReportDataMessage
+        //   - Anonymous Structure (container of everything)
+        //     - 1: Array (one element)
+        //       - Anonymous (the element)
+        //         - 1 (AttributeData/AttributeDataIB) - Structure
+        //           - 0 - Data Version
+        //           - 1 - Path (1: Node, 2: Endpoint, 3: Cluster, 4: Attribute, ...)
+        //           - 2 - Data (variable - may be raw data or a Structure)
+
+        TLV::TLVType unused_outer_type;
+
+        // Enter anonymous wrapper
+        ReturnErrorOnFailure(reader.Next()); // got to anonymous
+        ReturnErrorOnFailure(reader.EnterContainer(unused_outer_type));
+
+        // Enter the array
+        ReturnErrorOnFailure(reader.Next());
+        ReturnErrorOnFailure(reader.EnterContainer(unused_outer_type));
+
+        // enter the structure of data
+        ReturnErrorOnFailure(reader.Next());
+        ReturnErrorOnFailure(reader.EnterContainer(unused_outer_type));
+
+        // Find AttributeData Container
+        {
+            chip::TLV::TLVReader tmp;
+            ReturnErrorOnFailure(reader.FindElementWithTag(kAttributeDataTag, tmp));
+            reader = tmp;
+        }
+
+        // Enter into AttributeData Container
+        ReturnErrorOnFailure(reader.EnterContainer(unused_outer_type));
+
+        // Find Data Container
+        {
+            chip::TLV::TLVReader tmp;
+            ReturnErrorOnFailure(reader.FindElementWithTag(kDataTag, tmp));
+            reader = tmp;
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    pw::Result<TLV::TLVReader> ReadIntoTlv(const chip_rpc_AttributeData & data, chip::MutableByteSpan tempBuffer)
+    {
+        TLV::TLVReader result;
+
+        if (data.has_tlv_data)
+        {
+            result.Init(data.tlv_data.bytes, data.tlv_data.size);
+            CHIP_ERROR err = PositionOnDataElement(result);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Support, "Failed to parse input TLV buffer: %" CHIP_ERROR_FORMAT, err.Format());
+                return pw::Status::InvalidArgument();
+            }
+
+            return result;
+        }
+
+        TLV::TLVWriter writer;
+
+        writer.Init(tempBuffer);
+
+        CHIP_ERROR write_status;
+
+        TLV::TLVType outer;
+        VerifyOrReturnError(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer) == CHIP_NO_ERROR,
+                            pw::Status::Internal());
+
+        switch (data.which_data)
         {
         case chip_rpc_AttributeData_data_bool_tag:
-            data = &request.data.data.data_bool;
+            write_status = writer.Put(kDataTag, data.data.data_bool);
             break;
         case chip_rpc_AttributeData_data_uint8_tag:
-            data = &request.data.data.data_uint8;
+            write_status = writer.Put(kDataTag, data.data.data_uint8);
             break;
         case chip_rpc_AttributeData_data_uint16_tag:
-            data = &request.data.data.data_uint16;
+            write_status = writer.Put(kDataTag, data.data.data_uint16);
             break;
         case chip_rpc_AttributeData_data_uint32_tag:
-            data = &request.data.data.data_uint32;
+            write_status = writer.Put(kDataTag, data.data.data_uint32);
             break;
         case chip_rpc_AttributeData_data_int8_tag:
-            data = &request.data.data.data_int8;
+            write_status = writer.Put(kDataTag, data.data.data_int8);
             break;
         case chip_rpc_AttributeData_data_int16_tag:
-            data = &request.data.data.data_int16;
+            write_status = writer.Put(kDataTag, data.data.data_int16);
             break;
         case chip_rpc_AttributeData_data_int32_tag:
-            data = &request.data.data.data_int32;
-            break;
-        case chip_rpc_AttributeData_data_bytes_tag:
-            data = &request.data.data.data_bytes;
+            write_status = writer.Put(kDataTag, data.data.data_int32);
             break;
         case chip_rpc_AttributeData_data_single_tag:
-            data = &request.data.data.data_single;
+            write_status = writer.Put(kDataTag, data.data.data_single);
+            break;
+        case chip_rpc_AttributeData_data_bytes_tag:
+            write_status = writer.PutBytes(kDataTag, data.data.data_bytes.bytes, data.data.data_bytes.size);
+            break;
+        case chip_rpc_AttributeData_data_string_tag:
+            write_status = writer.PutString(kDataTag, data.data.data_string);
             break;
         default:
             return pw::Status::InvalidArgument();
         }
-        RETURN_STATUS_IF_NOT_OK(
-            emberAfWriteAttribute(request.metadata.endpoint, request.metadata.cluster, request.metadata.attribute_id,
-                                  const_cast<uint8_t *>(static_cast<const uint8_t *>(data)), request.metadata.type));
+
+        if (write_status != CHIP_NO_ERROR)
+        {
+            ChipLogError(Support, "Failed to encode TLV data: %" CHIP_ERROR_FORMAT, write_status.Format());
+            return pw::Status::Internal();
+        }
+
+        VerifyOrReturnValue(writer.EndContainer(outer) == CHIP_NO_ERROR, pw::Status::Internal());
+        VerifyOrReturnValue(writer.Finalize() == CHIP_NO_ERROR, pw::Status::Internal());
+        result.Init(tempBuffer.data(), writer.GetLengthWritten());
+
+        VerifyOrReturnError(result.Next() == CHIP_NO_ERROR, pw::Status::Internal());
+        VerifyOrReturnError(result.EnterContainer(outer) == CHIP_NO_ERROR, pw::Status::Internal());
+
+        // This positions on the data element
+        VerifyOrReturnError(result.Next() == CHIP_NO_ERROR, pw::Status::Internal());
+
+        return result;
+    }
+
+    ::pw::Status Write(const chip_rpc_AttributeWrite & request, pw_protobuf_Empty & response)
+    {
+        app::ConcreteAttributePath path(request.metadata.endpoint, request.metadata.cluster, request.metadata.attribute_id);
+
+        DeviceLayer::StackLock lock;
+
+        // TODO: this assumes a singleton data model provider
+        app::DataModel::Provider * provider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+
+        app::DataModel::ServerClusterFinder serverClusterFinder(provider);
+        auto info = serverClusterFinder.Find(path);
+        if (!info.has_value())
+        {
+            return ::pw::Status::NotFound();
+        }
+
+        Access::SubjectDescriptor subjectDescriptor{ .authMode = chip::Access::AuthMode::kPase };
+        app::DataModel::WriteAttributeRequest write_request;
+        write_request.path = path;
+        write_request.operationFlags.Set(app::DataModel::OperationFlags::kInternal);
+        write_request.subjectDescriptor = &subjectDescriptor;
+
+        uint8_t raw_value_buffer[64]; // enough to hold general types
+        pw::Result<TLV::TLVReader> tlvReader = ReadIntoTlv(request.data, chip::MutableByteSpan(raw_value_buffer));
+
+        if (!tlvReader.status().ok())
+        {
+            return tlvReader.status();
+        }
+
+        app::AttributeValueDecoder decoder(tlvReader.value(), subjectDescriptor);
+        app::DataModel::ActionReturnStatus result = provider->WriteAttribute(write_request, decoder);
+
+        if (!result.IsSuccess())
+        {
+            app::DataModel::ActionReturnStatus::StringStorage storage;
+            ChipLogError(Support, "Failed to write data: %s", result.c_str(storage));
+            return ::pw::Status::Internal();
+        }
+
         return pw::OkStatus();
     }
 
@@ -92,6 +224,7 @@ public:
         app::ConcreteAttributePath path(request.endpoint, request.cluster, request.attribute_id);
         MutableByteSpan tlvBuffer(response.tlv_data.bytes);
         PW_TRY(ReadAttributeIntoTlvBuffer(path, tlvBuffer));
+        // NOTE: TLV will be a full AttributeReportIB (so not purely the data)
         response.tlv_data.size = tlvBuffer.size();
         response.has_tlv_data  = true;
 
@@ -137,6 +270,16 @@ public:
             PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_FloatingPointNumber, response.data.data_single));
             response.which_data = chip_rpc_AttributeData_data_single_tag;
             break;
+        case chip_rpc_AttributeType_ZCL_OCTET_STRING_ATTRIBUTE_TYPE:
+        case chip_rpc_AttributeType_ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE:
+            PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_ByteString, response.data.data_bytes));
+            response.which_data = chip_rpc_AttributeData_data_bytes_tag;
+            break;
+        case chip_rpc_AttributeType_ZCL_CHAR_STRING_ATTRIBUTE_TYPE:
+        case chip_rpc_AttributeType_ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:
+            PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_UTF8String, response.data.data_string));
+            response.which_data = chip_rpc_AttributeData_data_string_tag;
+            break;
         case chip_rpc_AttributeType_ZCL_BITMAP8_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_BITMAP16_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_BITMAP32_ATTRIBUTE_TYPE:
@@ -153,10 +296,6 @@ public:
         case chip_rpc_AttributeType_ZCL_INT56S_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_INT64S_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_DOUBLE_ATTRIBUTE_TYPE:
-        case chip_rpc_AttributeType_ZCL_OCTET_STRING_ATTRIBUTE_TYPE:
-        case chip_rpc_AttributeType_ZCL_CHAR_STRING_ATTRIBUTE_TYPE:
-        case chip_rpc_AttributeType_ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE:
-        case chip_rpc_AttributeType_ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_STRUCT_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_TOD_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_DATE_ATTRIBUTE_TYPE:
@@ -250,6 +389,24 @@ private:
     }
 
     template <typename T>
+    CHIP_ERROR TlvGet(TLV::TLVReader & reader, T & value)
+    {
+        return reader.Get(value);
+    }
+
+    CHIP_ERROR TlvGet(TLV::TLVReader & reader, chip_rpc_AttributeData_data_bytes_t & value)
+    {
+        value.size = reader.GetLength();
+        return reader.GetBytes(value.bytes, sizeof(value.bytes));
+    }
+
+    template <size_t N>
+    CHIP_ERROR TlvGet(TLV::TLVReader & reader, char (&value)[N])
+    {
+        return reader.GetString(value, N);
+    }
+
+    template <typename T>
     ::pw::Status TlvBufferGetData(ByteSpan tlvBuffer, TLV::TLVType expectedDataType, T & responseData)
     {
         TLV::TLVReader reader;
@@ -275,7 +432,7 @@ private:
         TLV::TLVReader dataReader;
         PW_TRY(ChipErrorToPwStatus(dataParser.GetData(&dataReader)));
         PW_TRY(CheckTlvTagAndType(&dataReader, TLV::ContextTag(0x2), expectedDataType));
-        PW_TRY(ChipErrorToPwStatus(dataReader.Get(responseData)));
+        PW_TRY(ChipErrorToPwStatus(TlvGet(dataReader, responseData)));
 
         return ::pw::OkStatus();
     }

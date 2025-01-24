@@ -1,1 +1,1 @@
-99 : Update Dockerfile for updating java version (Java 8 -> Java 11)
+100 : [linux] Added libpcsclite-dev package for NFC Commissioning on Linux platforms.

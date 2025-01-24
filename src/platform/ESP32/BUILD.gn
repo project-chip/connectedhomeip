@@ -124,13 +124,6 @@ static_library("ESP32") {
       "NetworkCommissioningDriver.cpp",
       "NetworkCommissioningDriver.h",
     ]
-
-    # TODO: this is NOT ok, however we added a layering dependecy
-    # in NetworkCommissioningDriver accessing app/InteractionModelEngine.h
-    #
-    # Should be removed after https://github.com/project-chip/connectedhomeip/issues/37126
-    # is fixed
-    deps += [ "${chip_root}/src/access:access_config" ]
   }
 
   if (chip_mdns == "platform") {
