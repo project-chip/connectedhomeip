@@ -4510,6 +4510,64 @@ TEST_F(TestRead, TestReadHandler_TwoParallelReadsSecondTooManyPaths)
     engine->SetForceHandlerQuota(false);
 }
 
+TEST_F(TestRead, TestReadHandler_MultipleSubscriptions_OnFabricRemoved)
+{
+    auto sessionHandle                       = GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        numSubscriptionEstablishedCalls++;
+    };
+
+    //
+    // Try to issue parallel subscriptions that will exceed the value for app::InteractionModelEngine::kReadHandlerPoolSize.
+    // If heap allocation is correctly setup, this should result in it successfully servicing more than the number
+    // present in that define.
+    //
+    for (size_t i = 0; i < (app::InteractionModelEngine::kReadHandlerPoolSize + 1); i++)
+    {
+        EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+                      &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 20,
+                      onSubscriptionEstablishedCb, nullptr, false, true),
+                  CHIP_NO_ERROR);
+    }
+
+    // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
+    // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
+    GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), [&]() {
+        return numSuccessCalls == (app::InteractionModelEngine::kReadHandlerPoolSize + 1) &&
+            numSubscriptionEstablishedCalls == (app::InteractionModelEngine::kReadHandlerPoolSize + 1);
+    });
+
+    EXPECT_EQ(numSuccessCalls, (app::InteractionModelEngine::kReadHandlerPoolSize + 1));
+    EXPECT_EQ(numSubscriptionEstablishedCalls, (app::InteractionModelEngine::kReadHandlerPoolSize + 1));
+    EXPECT_EQ(mNumActiveSubscriptions, static_cast<int32_t>(app::InteractionModelEngine::kReadHandlerPoolSize + 1));
+
+    app::InteractionModelEngine::GetInstance()->GetFabricTable()->DeleteAllFabrics();
+
+    EXPECT_EQ(mNumActiveSubscriptions, 0);
+    size_t numActiveReadClients = app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients();
+    EXPECT_EQ(numActiveReadClients, 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
+}
+
 TEST_F(TestRead, TestReadAttribute_ManyDataValues)
 {
     auto sessionHandle  = GetSessionBobToAlice();
