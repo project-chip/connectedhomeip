@@ -21,8 +21,11 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/reporting/reporting.h>
 
+#include <app/SafeAttributePersistenceProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/support/TypeTraits.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -30,26 +33,29 @@ namespace app {
 namespace Clusters {
 namespace CameraAvStreamManagement {
 
-using VideoStreamStruct       = Structs::VideoStreamStruct::Type;
-using AudioStreamStruct       = Structs::AudioStreamStruct::Type;
-using SnapshotStreamStruct    = Structs::SnapshotStreamStruct::Type;
-using AudioCapabilitiesStruct = Structs::AudioCapabilitiesStruct::Type;
-using VideoSensorParamsStruct = Structs::VideoSensorParamsStruct::Type;
-using SnapshotParamsStruct    = Structs::SnapshotParamsStruct::Type;
-using VideoResolutionStruct   = Structs::VideoResolutionStruct::Type;
-using ViewportStruct          = Structs::ViewportStruct::Type;
+using VideoStreamStruct            = Structs::VideoStreamStruct::Type;
+using AudioStreamStruct            = Structs::AudioStreamStruct::Type;
+using SnapshotStreamStruct         = Structs::SnapshotStreamStruct::Type;
+using AudioCapabilitiesStruct      = Structs::AudioCapabilitiesStruct::Type;
+using VideoSensorParamsStruct      = Structs::VideoSensorParamsStruct::Type;
+using SnapshotParamsStruct         = Structs::SnapshotParamsStruct::Type;
+using VideoResolutionStruct        = Structs::VideoResolutionStruct::Type;
+using ViewportStruct               = Structs::ViewportStruct::Type;
+using RateDistortionTradeOffStruct = Structs::RateDistortionTradeOffPointsStruct::Type;
+using SnapshotParamsStruct         = Structs::SnapshotParamsStruct::Type;
 
 constexpr uint8_t kMaxSpeakerLevel          = 254;
 constexpr uint8_t kMaxMicrophoneLevel       = 254;
 constexpr uint16_t kMaxImageRotationDegrees = 359;
 
-constexpr size_t kViewportStructMaxSerializedSize = TLV::EstimateStructOverhead(sizeof(uint16_t) * 4);
+constexpr size_t kViewportStructMaxSerializedSize =
+    TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t));
 
-// The number of different use case types for the streams(Recording, Liveview, etc).
+// The number of possible values of use case types for the streams, as specified in StreamUsageEnum.
 constexpr size_t kNumOfStreamUsageTypes = 4;
 
-// StreamUsageEnum + Anonymous tag(1 byte)
-constexpr size_t kStreamUsageTlvSize = sizeof(StreamUsageEnum) + 1;
+// StreamUsageEnum(using a uint8_t) + Anonymous tag(1 byte).
+constexpr size_t kStreamUsageTlvSize = sizeof(uint8_t) + 1;
 
 // 1 control byte + end-of-array marker
 constexpr size_t kArrayTlvOverhead = 2;
@@ -93,18 +99,23 @@ public:
      *   @param maxFragmentLen     Indicates the maximum length(msecs) of a clip fragment for the video stream.
      *
      *   @param waterMarkEnabled   Indicates  whether a watermark can be applied on the video stream.
+     *                             Value defaults to false if feature unsupported.
      *
      *   @param osdEnabled         Indicates  whether the on-screen display can be applied on the video stream.
+     *                             Value defaults to false if feature unsupported.
+     *
+     *   @param outStreamID        Indicates the ID of the allocated Video Stream.
      *
      *   @return Success if the allocation is successful and a VideoStreamID was
      *   produced; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
     virtual Protocols::InteractionModel::Status
-    VideoStreamAllocate(StreamUsageEnum streamUsage, CameraAvStreamManagement::VideoCodecEnum videoCodec,
-                        const uint16_t minFrameRate, const uint16_t maxFrameRate, VideoResolutionStruct minResolution,
-                        VideoResolutionStruct maxResolution, const uint32_t minBitRate, const uint32_t maxBitRate,
-                        const uint16_t minFragmentLen, const uint16_t maxFragmentLen, bool waterMarkEnabled, bool osdEnabled) = 0;
+    VideoStreamAllocate(StreamUsageEnum streamUsage, VideoCodecEnum videoCodec, const uint16_t minFrameRate,
+                        const uint16_t maxFrameRate, const VideoResolutionStruct & minResolution,
+                        const VideoResolutionStruct & maxResolution, const uint32_t minBitRate, const uint32_t maxBitRate,
+                        const uint16_t minFragmentLen, const uint16_t maxFragmentLen, bool waterMarkEnabled, bool osdEnabled,
+                        uint16_t & outStreamID) = 0;
 
     /**
      *   @brief Handle Command Delegate for Video stream modification.
@@ -112,8 +123,10 @@ public:
      *   @param streamID           Indicates the streamID of the video stream to modify.
      *
      *   @param waterMarkEnabled   Indicates  whether a watermark can be applied on the video stream.
+     *                             Value defaults to false if feature unsupported.
      *
      *   @param osdEnabled         Indicates  whether the on-screen display can be applied on the video stream.
+     *                             Value defaults to false if feature unsupported.
      *
      *   @return Success if the stream modification is successful; otherwise, the command SHALL be rejected with an appropriate
      *   error.
@@ -148,13 +161,16 @@ public:
      *
      *   @param bitDepth           Indicates the number of information bits(8, 16, 24 or 32) used to represent each sample.
      *
+     *   @param outStreamID        Indicates the ID of the allocated Audio Stream.
+     *
      *   @return Success if the allocation is successful and an AudioStreamID was
      *   produced; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
     virtual Protocols::InteractionModel::Status AudioStreamAllocate(StreamUsageEnum streamUsage, AudioCodecEnum audioCodec,
                                                                     const uint8_t channelCount, const uint32_t sampleRate,
-                                                                    const uint32_t bitRate, const uint32_t bitDepth) = 0;
+                                                                    const uint32_t bitRate, const uint8_t bitDepth,
+                                                                    uint16_t & outStreamID) = 0;
 
     /**
      *   @brief Handle Command Delegate for Audio stream deallocation.
@@ -169,26 +185,30 @@ public:
     /**
      *   @brief Handle Command Delegate for Snapshot stream allocation.
      *
-     *   @param imageCodec         Indicates the type of image codec to be used by the stream.
+     *   @param imageCodec          Indicates the type of image codec to be used by the stream.
      *
-     *   @param frameRate          Indicates the frame rate(frames/second) of the stream.
+     *   @param frameRate           Indicates the frame rate(frames/second) of the stream.
      *
-     *   @param bitRate            Indicates the bitrate(bits/sec) of the stream.
+     *   @param bitRate             Indicates the bitrate(bits/sec) of the stream.
      *
-     *   @param minResolution      Indicates the minimum resolution of the stream.
+     *   @param minResolution       Indicates the minimum resolution of the stream.
      *
-     *   @param maxResolution      Indicates the maximum resolution of the stream.
+     *   @param maxResolution       Indicates the maximum resolution of the stream.
      *
-     *   @param quality            Indicates a codec quality metric(integer between 1 and 100) for the stream.
+     *   @param quality             Indicates a codec quality metric(integer between 1 and 100) for the stream.
+     *
+     *   @param outStreamID         Indicates the ID of the allocated Audio Stream.
+     *
      *
      *   @return Success if the allocation is successful and a SnapshotStreamID was
      *   produced; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
     virtual Protocols::InteractionModel::Status SnapshotStreamAllocate(ImageCodecEnum imageCodec, const uint16_t frameRate,
-                                                                       const uint32_t bitRate, VideoResolutionStruct minResolution,
-                                                                       VideoResolutionStruct maxResolution,
-                                                                       const uint8_t quality) = 0;
+                                                                       const uint32_t bitRate,
+                                                                       const VideoResolutionStruct & minResolution,
+                                                                       const VideoResolutionStruct & maxResolution,
+                                                                       const uint8_t quality, uint16_t & outStreamID) = 0;
 
     /**
      *   @brief Handle Command Delegate for Snapshot stream deallocation.
@@ -221,7 +241,8 @@ public:
      *   @return Success if the processing of the Command is successful; otherwise, the command SHALL be rejected with an
      * appropriate error.
      */
-    virtual Protocols::InteractionModel::Status CaptureSnapshot(const uint16_t streamID, VideoResolutionStruct videoResolution) = 0;
+    virtual Protocols::InteractionModel::Status CaptureSnapshot(const uint16_t streamID,
+                                                                const VideoResolutionStruct & videoResolution) = 0;
 
     /**
      *  Delegate functions to load the allocated video, audio, and snapshot streams.
@@ -248,7 +269,7 @@ public:
      */
     virtual Protocols::InteractionModel::Status PersistentAttributesLoadedCallback() = 0;
 
-protected:
+private:
     friend class CameraAVStreamMgmtServer;
 
     CameraAVStreamMgmtServer * mCameraAVStreamMgmtServer = nullptr;
@@ -264,10 +285,11 @@ protected:
         mCameraAVStreamMgmtServer = aCameraAVStreamMgmtServer;
     }
 
+protected:
     CameraAVStreamMgmtServer * GetCameraAVStreamMgmtServer() const { return mCameraAVStreamMgmtServer; }
 };
 
-enum class OptionalAttributes : uint32_t
+enum class OptionalAttribute : uint32_t
 {
     kSupportsHDRModeEnabled        = 0x0001,
     kSupportsHardPrivacyModeOn     = 0x0002,
@@ -293,16 +315,15 @@ public:
      *                                          lifetime.
      *
      * @param aEndpointId                       The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aClusterId                        The ID of the Camera AV Stream Management cluster to be instantiated.
-     * @param aFeature                          The bitmask value that identifies which features are supported by this instance.
-     * @param aOptionalAttrs                    The bitmask value that identifies the optional attributes supported by this
+     * @param aFeature                          The bitflags value that identifies which features are supported by this instance.
+     * @param aOptionalAttrs                    The bitflags value that identifies the optional attributes supported by this
      *                                          instance.
      * @param aPersistentStorage                The storage delegate to use to persist attributes.
      * @param aMaxConcurrentVideoEncoders       The maximum number of video encoders supported by camera.
-     * @param aMaxEncodedPixelRate              The maximum data rate(encoded pixels/dec)supported by camera.
+     * @param aMaxEncodedPixelRate              The maximum data rate ( encoded pixels/dec ) supported by camera.
      * @param aVideoSensorParams                The set of video sensor parameters for the camera.
      * @param aNightVisionCapable               Indicates whether the camera supports night vision.
-     * @param aMinViewPort                      Indicates minimum resolution(width/height) in pixels allowed for camera viewport.
+     * @param aMinViewPort                      Indicates minimum resolution ( width/height ) in pixels allowed for camera viewport.
      * @param aRateDistortionTradeOffPoints     Indicates the list of rate distortion trade-off points for supported hardware
      *                                          encoders.
      * @param aMaxContentBufferSize             The maximum size of the content buffer containing data for all streams, including
@@ -319,16 +340,15 @@ public:
      *                                          the transmission of its media streams.
      *
      */
-    CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
-                             BitMask<Feature> aFeature, OptionalAttributes aOptionalAttrs,
-                             PersistentStorageDelegate & aPersistentStorage, uint8_t aMaxConcurrentVideoEncoders,
-                             uint32_t aMaxEncodedPixelRate, const VideoSensorParamsStruct & aVideoSensorParams,
-                             bool aNightVisionCapable, const VideoResolutionStruct & aMinViewPort,
-                             const std::vector<Structs::RateDistortionTradeOffPointsStruct::Type> & aRateDistortionTradeOffPoints,
+    CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeature,
+                             const BitFlags<OptionalAttribute> aOptionalAttr, PersistentStorageDelegate & aPersistentStorage,
+                             uint8_t aMaxConcurrentVideoEncoders, uint32_t aMaxEncodedPixelRate,
+                             const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionCapable,
+                             const VideoResolutionStruct & aMinViewPort,
+                             const std::vector<RateDistortionTradeOffStruct> & aRateDistortionTradeOffPoints,
                              uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
                              const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
-                             const std::vector<Structs::SnapshotParamsStruct::Type> & aSupportedSnapshotParams,
-                             uint32_t aMaxNetworkBandwidth);
+                             const std::vector<SnapshotParamsStruct> & aSupportedSnapshotParams, uint32_t aMaxNetworkBandwidth);
 
     ~CameraAVStreamMgmtServer() override;
 
@@ -337,64 +357,64 @@ public:
      * This function must be called after defining an CameraAVStreamMgmtServer class object.
      * @return Returns an error if the given endpoint and cluster ID have not been enabled in zap or if the
      * CommandHandler or AttributeHandler registration fails, else returns CHIP_NO_ERROR.
-     * This method also checks if the feature setting is valid, if invalid it will returns CHIP_ERROR_INVALID_ARGUMENT.
+     * This method also checks if the feature setting is valid, if invalid it will return CHIP_ERROR_INVALID_ARGUMENT.
      */
     CHIP_ERROR Init();
 
     bool HasFeature(Feature feature) const;
 
-    bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
+    bool SupportsOptAttr(OptionalAttribute aOptionalAttr) const;
 
     bool IsLocalVideoRecordingEnabled() const;
 
     // Attribute Setters
-    Protocols::InteractionModel::Status SetCurrentFrameRate(uint16_t aCurrentFrameRate);
+    CHIP_ERROR SetCurrentFrameRate(uint16_t aCurrentFrameRate);
 
-    Protocols::InteractionModel::Status SetHDRModeEnabled(bool aHDRModeEnabled);
+    CHIP_ERROR SetHDRModeEnabled(bool aHDRModeEnabled);
 
-    Protocols::InteractionModel::Status SetSoftRecordingPrivacyModeEnabled(bool aSoftRecordingPrivacyModeEnabled);
+    CHIP_ERROR SetSoftRecordingPrivacyModeEnabled(bool aSoftRecordingPrivacyModeEnabled);
 
-    Protocols::InteractionModel::Status SetSoftLivestreamPrivacyModeEnabled(bool aSoftLivestreamPrivacyModeEnabled);
+    CHIP_ERROR SetSoftLivestreamPrivacyModeEnabled(bool aSoftLivestreamPrivacyModeEnabled);
 
-    Protocols::InteractionModel::Status SetHardPrivacyModeOn(bool aHardPrivacyModeOn);
+    CHIP_ERROR SetHardPrivacyModeOn(bool aHardPrivacyModeOn);
 
-    Protocols::InteractionModel::Status SetNightVision(TriStateAutoEnum aNightVision);
+    CHIP_ERROR SetNightVision(TriStateAutoEnum aNightVision);
 
-    Protocols::InteractionModel::Status SetNightVisionIllum(TriStateAutoEnum aNightVisionIllum);
+    CHIP_ERROR SetNightVisionIllum(TriStateAutoEnum aNightVisionIllum);
 
-    Protocols::InteractionModel::Status SetViewport(const ViewportStruct & aViewport);
+    CHIP_ERROR SetViewport(const ViewportStruct & aViewport);
 
-    Protocols::InteractionModel::Status SetSpeakerMuted(bool aSpeakerMuted);
+    CHIP_ERROR SetSpeakerMuted(bool aSpeakerMuted);
 
-    Protocols::InteractionModel::Status SetSpeakerVolumeLevel(uint8_t aSpeakerVolumeLevel);
+    CHIP_ERROR SetSpeakerVolumeLevel(uint8_t aSpeakerVolumeLevel);
 
-    Protocols::InteractionModel::Status SetSpeakerMaxLevel(uint8_t aSpeakerMaxLevel);
+    CHIP_ERROR SetSpeakerMaxLevel(uint8_t aSpeakerMaxLevel);
 
-    Protocols::InteractionModel::Status SetSpeakerMinLevel(uint8_t aSpeakerMinLevel);
+    CHIP_ERROR SetSpeakerMinLevel(uint8_t aSpeakerMinLevel);
 
-    Protocols::InteractionModel::Status SetMicrophoneMuted(bool aMicrophoneMuted);
+    CHIP_ERROR SetMicrophoneMuted(bool aMicrophoneMuted);
 
-    Protocols::InteractionModel::Status SetMicrophoneVolumeLevel(uint8_t aMicrophoneVolumeLevel);
+    CHIP_ERROR SetMicrophoneVolumeLevel(uint8_t aMicrophoneVolumeLevel);
 
-    Protocols::InteractionModel::Status SetMicrophoneMaxLevel(uint8_t aMicrophoneMaxLevel);
+    CHIP_ERROR SetMicrophoneMaxLevel(uint8_t aMicrophoneMaxLevel);
 
-    Protocols::InteractionModel::Status SetMicrophoneMinLevel(uint8_t aMicrophoneMinLevel);
+    CHIP_ERROR SetMicrophoneMinLevel(uint8_t aMicrophoneMinLevel);
 
-    Protocols::InteractionModel::Status SetMicrophoneAGCEnabled(bool aMicrophoneAGCEnabled);
+    CHIP_ERROR SetMicrophoneAGCEnabled(bool aMicrophoneAGCEnabled);
 
-    Protocols::InteractionModel::Status SetImageRotation(uint16_t aImageRotation);
+    CHIP_ERROR SetImageRotation(uint16_t aImageRotation);
 
-    Protocols::InteractionModel::Status SetImageFlipHorizontal(bool aImageFlipVertical);
+    CHIP_ERROR SetImageFlipHorizontal(bool aImageFlipVertical);
 
-    Protocols::InteractionModel::Status SetImageFlipVertical(bool aImageFlipVertical);
+    CHIP_ERROR SetImageFlipVertical(bool aImageFlipVertical);
 
-    Protocols::InteractionModel::Status SetLocalVideoRecordingEnabled(bool aLocalVideoRecordingEnabled);
+    CHIP_ERROR SetLocalVideoRecordingEnabled(bool aLocalVideoRecordingEnabled);
 
-    Protocols::InteractionModel::Status SetLocalSnapshotRecordingEnabled(bool aLocalVideoRecordingEnabled);
+    CHIP_ERROR SetLocalSnapshotRecordingEnabled(bool aLocalVideoRecordingEnabled);
 
-    Protocols::InteractionModel::Status SetStatusLightEnabled(bool aStatusLightEnabled);
+    CHIP_ERROR SetStatusLightEnabled(bool aStatusLightEnabled);
 
-    Protocols::InteractionModel::Status SetStatusLightBrightness(Globals::ThreeLevelAutoEnum aStatusLightBrightness);
+    CHIP_ERROR SetStatusLightBrightness(Globals::ThreeLevelAutoEnum aStatusLightBrightness);
 
     // Attribute Getters
     uint8_t GetMaxConcurrentVideoEncoders() const { return mMaxConcurrentVideoEncoders; }
@@ -407,7 +427,7 @@ public:
 
     const VideoResolutionStruct & GetMinViewport() const { return mMinViewPort; }
 
-    const std::vector<Structs::RateDistortionTradeOffPointsStruct::Type> & GetRateDistortionTradeOffPoints() const
+    const std::vector<RateDistortionTradeOffStruct> & GetRateDistortionTradeOffPoints() const
     {
         return mRateDistortionTradeOffPointsList;
     }
@@ -420,10 +440,7 @@ public:
 
     TwoWayTalkSupportTypeEnum GetTwoWayTalkSupport() const { return mTwoWayTalkSupport; }
 
-    const std::vector<Structs::SnapshotParamsStruct::Type> & GetSupportedSnapshotParams() const
-    {
-        return mSupportedSnapshotParamsList;
-    }
+    const std::vector<SnapshotParamsStruct> & GetSupportedSnapshotParams() const { return mSupportedSnapshotParamsList; }
 
     uint32_t GetMaxNetworkBandwidth() const { return mMaxNetworkBandwidth; }
 
@@ -509,9 +526,8 @@ public:
 private:
     CameraAVStreamMgmtDelegate & mDelegate;
     EndpointId mEndpointId;
-    ClusterId mClusterId;
-    BitMask<Feature> mFeature;
-    BitMask<OptionalAttributes> mOptionalAttrs;
+    const BitFlags<Feature> mFeature;
+    const BitFlags<OptionalAttribute> mOptionalAttrs;
     PersistentStorageDelegate * mPersistentStorage = nullptr;
 
     // Attributes
@@ -520,12 +536,12 @@ private:
     const VideoSensorParamsStruct mVideoSensorParams;
     const bool mNightVisionCapable;
     const VideoResolutionStruct mMinViewPort;
-    const std::vector<Structs::RateDistortionTradeOffPointsStruct::Type> mRateDistortionTradeOffPointsList;
+    const std::vector<RateDistortionTradeOffStruct> mRateDistortionTradeOffPointsList;
     const uint32_t mMaxContentBufferSize;
     const AudioCapabilitiesStruct mMicrophoneCapabilities;
     const AudioCapabilitiesStruct mSpeakerCapabilities;
     const TwoWayTalkSupportTypeEnum mTwoWayTalkSupport;
-    const std::vector<Structs::SnapshotParamsStruct::Type> mSupportedSnapshotParamsList;
+    const std::vector<SnapshotParamsStruct> mSupportedSnapshotParamsList;
     const uint32_t mMaxNetworkBandwidth;
 
     uint16_t mCurrentFrameRate             = 0;
@@ -562,6 +578,23 @@ private:
     std::vector<VideoStreamStruct> mAllocatedVideoStreams;
     std::vector<AudioStreamStruct> mAllocatedAudioStreams;
     std::vector<SnapshotStreamStruct> mAllocatedSnapshotStreams;
+
+    // Utility function to set and persist attributes
+    template <typename T>
+    CHIP_ERROR SetAttributeIfDifferent(T & currentValue, const T & newValue, AttributeId attributeId, bool shouldPersist = true)
+    {
+        if (currentValue != newValue)
+        {
+            currentValue = newValue;
+            auto path    = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, attributeId);
+            if (shouldPersist)
+            {
+                ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, currentValue));
+            }
+            MatterReportingAttributeChangeCallback(path);
+        }
+        return CHIP_NO_ERROR;
+    }
 
     /**
      * IM-level implementation of read
