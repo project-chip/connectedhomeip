@@ -118,18 +118,6 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
     return entry;
 }
 
-// TODO: DeviceTypeEntry content is IDENTICAL to EmberAfDeviceType, so centralizing
-//       to a common type is probably better. Need to figure out dependencies since
-//       this would make ember return datamodel-provider types.
-//       See: https://github.com/project-chip/connectedhomeip/issues/35889
-DataModel::DeviceTypeEntry DeviceTypeEntryFromEmber(const EmberAfDeviceType & other)
-{
-    return DataModel::DeviceTypeEntry{
-        .deviceTypeId       = other.deviceId,
-        .deviceTypeRevision = other.deviceVersion,
-    };
-}
-
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
 
 DefaultAttributePersistenceProvider gDefaultAttributePersistence;
@@ -494,16 +482,9 @@ CHIP_ERROR CodegenDataModelProvider::DeviceTypes(EndpointId endpointId,
         return {};
     }
 
-    CHIP_ERROR err                            = CHIP_NO_ERROR;
-    Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(deviceTypes.size()));
-
-    for (auto & entry : deviceTypes)
-    {
-        ReturnErrorOnFailure(builder.Append(DeviceTypeEntryFromEmber(entry)));
-    }
-
+    builder.ReferenceExisting(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
     return CHIP_NO_ERROR;
 }
 
