@@ -330,12 +330,6 @@ public:
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-
-    //
-    // Get fabric table
-    //
-    FabricTable * GetFabricTable() { return mpFabricTable; }
-
     //
     // Get direct access to the underlying read handler pool
     //

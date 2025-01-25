@@ -4557,7 +4557,7 @@ TEST_F(TestRead, TestReadHandler_MultipleSubscriptions_OnFabricRemoved)
     EXPECT_EQ(numSubscriptionEstablishedCalls, (app::InteractionModelEngine::kReadHandlerPoolSize + 1));
     EXPECT_EQ(mNumActiveSubscriptions, static_cast<int32_t>(app::InteractionModelEngine::kReadHandlerPoolSize + 1));
 
-    app::InteractionModelEngine::GetInstance()->GetFabricTable()->DeleteAllFabrics();
+    chip::Test::MessagingContext::GetFabricTable().DeleteAllFabrics();
 
     EXPECT_EQ(mNumActiveSubscriptions, 0);
     size_t numActiveReadClients = app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients();

@@ -113,9 +113,6 @@ ReadClient::~ReadClient()
             mpImEngine->RemoveReadClient(this);
         }
     }
-    mpExchangeMgr = nullptr;
-    mpNext        = nullptr;
-    mpImEngine    = nullptr;
 }
 
 uint32_t ReadClient::ComputeTimeTillNextSubscription()
