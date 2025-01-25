@@ -30,25 +30,28 @@ namespace app {
 namespace Clusters {
 namespace CameraAvStreamManagement {
 
-using VideoStreamStruct       = Structs::VideoStreamStruct::Type;
-using AudioStreamStruct       = Structs::AudioStreamStruct::Type;
-using SnapshotStreamStruct    = Structs::SnapshotStreamStruct::Type;
-using AudioCapabilitiesStruct = Structs::AudioCapabilitiesStruct::Type;
-using VideoSensorParamsStruct = Structs::VideoSensorParamsStruct::Type;
-using SnapshotParamsStruct    = Structs::SnapshotParamsStruct::Type;
-using VideoResolutionStruct   = Structs::VideoResolutionStruct::Type;
-using ViewportStruct          = Structs::ViewportStruct::Type;
+using VideoStreamStruct            = Structs::VideoStreamStruct::Type;
+using AudioStreamStruct            = Structs::AudioStreamStruct::Type;
+using SnapshotStreamStruct         = Structs::SnapshotStreamStruct::Type;
+using AudioCapabilitiesStruct      = Structs::AudioCapabilitiesStruct::Type;
+using VideoSensorParamsStruct      = Structs::VideoSensorParamsStruct::Type;
+using SnapshotParamsStruct         = Structs::SnapshotParamsStruct::Type;
+using VideoResolutionStruct        = Structs::VideoResolutionStruct::Type;
+using ViewportStruct               = Structs::ViewportStruct::Type;
+using RateDistortionTradeOffStruct = Structs::RateDistortionTradeOffPointsStruct::Type;
+using SnapshotParamsStruct         = Structs::SnapshotParamsStruct::Type;
 
 constexpr uint8_t kMaxSpeakerLevel          = 254;
 constexpr uint8_t kMaxMicrophoneLevel       = 254;
 constexpr uint16_t kMaxImageRotationDegrees = 359;
 
-constexpr size_t kViewportStructMaxSerializedSize = TLV::EstimateStructOverhead(sizeof(uint16_t) * 4);
+constexpr size_t kViewportStructMaxSerializedSize =
+    TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t));
 
-// The number of different use case types for the streams(Recording, Liveview, etc).
+// The number of possible values of use case types for the streams, as specified in StreamUsageEnum.
 constexpr size_t kNumOfStreamUsageTypes = 4;
 
-// StreamUsageEnum + Anonymous tag(1 byte)
+// StreamUsageEnum + Anonymous tag(1 byte).
 constexpr size_t kStreamUsageTlvSize = sizeof(StreamUsageEnum) + 1;
 
 // 1 control byte + end-of-array marker
@@ -101,9 +104,9 @@ public:
      *   error.
      */
     virtual Protocols::InteractionModel::Status
-    VideoStreamAllocate(StreamUsageEnum streamUsage, CameraAvStreamManagement::VideoCodecEnum videoCodec,
-                        const uint16_t minFrameRate, const uint16_t maxFrameRate, VideoResolutionStruct minResolution,
-                        VideoResolutionStruct maxResolution, const uint32_t minBitRate, const uint32_t maxBitRate,
+    VideoStreamAllocate(StreamUsageEnum streamUsage, VideoCodecEnum videoCodec, const uint16_t minFrameRate,
+                        const uint16_t maxFrameRate, const VideoResolutionStruct & minResolution,
+                        const VideoResolutionStruct & maxResolution, const uint32_t minBitRate, const uint32_t maxBitRate,
                         const uint16_t minFragmentLen, const uint16_t maxFragmentLen, bool waterMarkEnabled, bool osdEnabled) = 0;
 
     /**
@@ -154,7 +157,7 @@ public:
      */
     virtual Protocols::InteractionModel::Status AudioStreamAllocate(StreamUsageEnum streamUsage, AudioCodecEnum audioCodec,
                                                                     const uint8_t channelCount, const uint32_t sampleRate,
-                                                                    const uint32_t bitRate, const uint32_t bitDepth) = 0;
+                                                                    const uint32_t bitRate, const uint8_t bitDepth) = 0;
 
     /**
      *   @brief Handle Command Delegate for Audio stream deallocation.
@@ -186,8 +189,9 @@ public:
      *   error.
      */
     virtual Protocols::InteractionModel::Status SnapshotStreamAllocate(ImageCodecEnum imageCodec, const uint16_t frameRate,
-                                                                       const uint32_t bitRate, VideoResolutionStruct minResolution,
-                                                                       VideoResolutionStruct maxResolution,
+                                                                       const uint32_t bitRate,
+                                                                       const VideoResolutionStruct & minResolution,
+                                                                       const VideoResolutionStruct & maxResolution,
                                                                        const uint8_t quality) = 0;
 
     /**
@@ -221,7 +225,8 @@ public:
      *   @return Success if the processing of the Command is successful; otherwise, the command SHALL be rejected with an
      * appropriate error.
      */
-    virtual Protocols::InteractionModel::Status CaptureSnapshot(const uint16_t streamID, VideoResolutionStruct videoResolution) = 0;
+    virtual Protocols::InteractionModel::Status CaptureSnapshot(const uint16_t streamID,
+                                                                const VideoResolutionStruct & videoResolution) = 0;
 
     /**
      *  Delegate functions to load the allocated video, audio, and snapshot streams.
@@ -248,7 +253,7 @@ public:
      */
     virtual Protocols::InteractionModel::Status PersistentAttributesLoadedCallback() = 0;
 
-protected:
+private:
     friend class CameraAVStreamMgmtServer;
 
     CameraAVStreamMgmtServer * mCameraAVStreamMgmtServer = nullptr;
@@ -264,6 +269,7 @@ protected:
         mCameraAVStreamMgmtServer = aCameraAVStreamMgmtServer;
     }
 
+protected:
     CameraAVStreamMgmtServer * GetCameraAVStreamMgmtServer() const { return mCameraAVStreamMgmtServer; }
 };
 
@@ -293,16 +299,15 @@ public:
      *                                          lifetime.
      *
      * @param aEndpointId                       The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aClusterId                        The ID of the Camera AV Stream Management cluster to be instantiated.
      * @param aFeature                          The bitmask value that identifies which features are supported by this instance.
      * @param aOptionalAttrs                    The bitmask value that identifies the optional attributes supported by this
      *                                          instance.
      * @param aPersistentStorage                The storage delegate to use to persist attributes.
      * @param aMaxConcurrentVideoEncoders       The maximum number of video encoders supported by camera.
-     * @param aMaxEncodedPixelRate              The maximum data rate(encoded pixels/dec)supported by camera.
+     * @param aMaxEncodedPixelRate              The maximum data rate ( encoded pixels/dec ) supported by camera.
      * @param aVideoSensorParams                The set of video sensor parameters for the camera.
      * @param aNightVisionCapable               Indicates whether the camera supports night vision.
-     * @param aMinViewPort                      Indicates minimum resolution(width/height) in pixels allowed for camera viewport.
+     * @param aMinViewPort                      Indicates minimum resolution ( width/height ) in pixels allowed for camera viewport.
      * @param aRateDistortionTradeOffPoints     Indicates the list of rate distortion trade-off points for supported hardware
      *                                          encoders.
      * @param aMaxContentBufferSize             The maximum size of the content buffer containing data for all streams, including
@@ -319,16 +324,15 @@ public:
      *                                          the transmission of its media streams.
      *
      */
-    CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
-                             BitMask<Feature> aFeature, OptionalAttributes aOptionalAttrs,
-                             PersistentStorageDelegate & aPersistentStorage, uint8_t aMaxConcurrentVideoEncoders,
-                             uint32_t aMaxEncodedPixelRate, const VideoSensorParamsStruct & aVideoSensorParams,
-                             bool aNightVisionCapable, const VideoResolutionStruct & aMinViewPort,
-                             const std::vector<Structs::RateDistortionTradeOffPointsStruct::Type> & aRateDistortionTradeOffPoints,
+    CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, BitMask<Feature> aFeature,
+                             OptionalAttributes aOptionalAttrs, PersistentStorageDelegate & aPersistentStorage,
+                             uint8_t aMaxConcurrentVideoEncoders, uint32_t aMaxEncodedPixelRate,
+                             const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionCapable,
+                             const VideoResolutionStruct & aMinViewPort,
+                             const std::vector<RateDistortionTradeOffStruct> & aRateDistortionTradeOffPoints,
                              uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
                              const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
-                             const std::vector<Structs::SnapshotParamsStruct::Type> & aSupportedSnapshotParams,
-                             uint32_t aMaxNetworkBandwidth);
+                             const std::vector<SnapshotParamsStruct> & aSupportedSnapshotParams, uint32_t aMaxNetworkBandwidth);
 
     ~CameraAVStreamMgmtServer() override;
 
@@ -337,7 +341,7 @@ public:
      * This function must be called after defining an CameraAVStreamMgmtServer class object.
      * @return Returns an error if the given endpoint and cluster ID have not been enabled in zap or if the
      * CommandHandler or AttributeHandler registration fails, else returns CHIP_NO_ERROR.
-     * This method also checks if the feature setting is valid, if invalid it will returns CHIP_ERROR_INVALID_ARGUMENT.
+     * This method also checks if the feature setting is valid, if invalid it will return CHIP_ERROR_INVALID_ARGUMENT.
      */
     CHIP_ERROR Init();
 
@@ -407,7 +411,7 @@ public:
 
     const VideoResolutionStruct & GetMinViewport() const { return mMinViewPort; }
 
-    const std::vector<Structs::RateDistortionTradeOffPointsStruct::Type> & GetRateDistortionTradeOffPoints() const
+    const std::vector<RateDistortionTradeOffStruct> & GetRateDistortionTradeOffPoints() const
     {
         return mRateDistortionTradeOffPointsList;
     }
@@ -420,10 +424,7 @@ public:
 
     TwoWayTalkSupportTypeEnum GetTwoWayTalkSupport() const { return mTwoWayTalkSupport; }
 
-    const std::vector<Structs::SnapshotParamsStruct::Type> & GetSupportedSnapshotParams() const
-    {
-        return mSupportedSnapshotParamsList;
-    }
+    const std::vector<SnapshotParamsStruct> & GetSupportedSnapshotParams() const { return mSupportedSnapshotParamsList; }
 
     uint32_t GetMaxNetworkBandwidth() const { return mMaxNetworkBandwidth; }
 
@@ -509,7 +510,6 @@ public:
 private:
     CameraAVStreamMgmtDelegate & mDelegate;
     EndpointId mEndpointId;
-    ClusterId mClusterId;
     BitMask<Feature> mFeature;
     BitMask<OptionalAttributes> mOptionalAttrs;
     PersistentStorageDelegate * mPersistentStorage = nullptr;
@@ -520,12 +520,12 @@ private:
     const VideoSensorParamsStruct mVideoSensorParams;
     const bool mNightVisionCapable;
     const VideoResolutionStruct mMinViewPort;
-    const std::vector<Structs::RateDistortionTradeOffPointsStruct::Type> mRateDistortionTradeOffPointsList;
+    const std::vector<RateDistortionTradeOffStruct> mRateDistortionTradeOffPointsList;
     const uint32_t mMaxContentBufferSize;
     const AudioCapabilitiesStruct mMicrophoneCapabilities;
     const AudioCapabilitiesStruct mSpeakerCapabilities;
     const TwoWayTalkSupportTypeEnum mTwoWayTalkSupport;
-    const std::vector<Structs::SnapshotParamsStruct::Type> mSupportedSnapshotParamsList;
+    const std::vector<SnapshotParamsStruct> mSupportedSnapshotParamsList;
     const uint32_t mMaxNetworkBandwidth;
 
     uint16_t mCurrentFrameRate             = 0;
