@@ -25,10 +25,14 @@ chip_test_suite("tests") {
   sources = []
 
   public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:string-builder-adapters",
-    "${chip_root}/src/lib/support:test_utils",
+    "${chip_root}/src/lib/support:static-support",
     "${chip_root}/src/lib/support:testing",
-    "${chip_root}/src/messaging/tests:helpers",
+    "${chip_root}/src/lib/support/jsontlv",
+    "${chip_root}/src/platform",
   ]
 
   cflags = [ "-Wconversion" ]
