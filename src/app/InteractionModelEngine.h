@@ -336,7 +336,6 @@ public:
     //
     FabricTable * GetFabricTable() { return mpFabricTable; }
 
-
     //
     // Get direct access to the underlying read handler pool
     //

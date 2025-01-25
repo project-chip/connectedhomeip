@@ -1980,7 +1980,6 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
         {
             readClient = readClient->GetNextClient();
         }
-
     }
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 

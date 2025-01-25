@@ -4526,8 +4526,7 @@ TEST_F(TestRead, TestReadHandler_MultipleSubscriptions_OnFabricRemoved)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-    };
+    auto onFailureCb = [](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {};
 
     auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
                                                                           chip::SubscriptionId aSubscriptionId) {
