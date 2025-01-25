@@ -260,10 +260,6 @@ public:
     // Terms and Conditions Acceptance Key
     // Stores the terms and conditions acceptance including terms and conditions revision, TLV encoded
     static StorageKeyName TermsAndConditionsAcceptance() { return StorageKeyName::FromConst("g/tc"); }
-
-    // CameraAvStreamManagement cluster
-    static StorageKeyName CameraAVStreamMgmtViewport() { return StorageKeyName::FromConst("g/cam/vwprt"); }
-    static StorageKeyName CameraAVStreamMgmtRankedVideoStreamPriorities() { return StorageKeyName::FromConst("g/cam/rnvidpr"); }
 };
 
 } // namespace chip
