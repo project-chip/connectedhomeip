@@ -228,9 +228,10 @@ class ClusterParser:
         except (KeyError, StopIteration):
             self._derived = None
 
-        for id in cluster.iter('clusterIds'):
-            if list(id.iter('provisionalConform')):
-                self._is_provisional = True
+        for ids in cluster.iter('clusterIds'):
+            for id in ids.iter('clusterId'):
+                if id.attrib['name'] == name and list(id.iter('provisionalConform')):
+                    self._is_provisional = True
 
         self._pics: Optional[str] = None
         try:
