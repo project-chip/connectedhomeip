@@ -439,7 +439,7 @@
     XCTAssertNotEqualObjects(a.description, b.description);
 }
 
-- (uint32)generateRepeatedDigitPasscode:(uint8_t)digit
+- (uint32_t)generateRepeatedDigitPasscode:(uint8_t)digit
 {
     // "digit" is expected to be a single digit.  Generates a number that has
     // that digit repeated 8 times.
