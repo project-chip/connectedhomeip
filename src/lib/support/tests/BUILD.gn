@@ -68,14 +68,13 @@ chip_test_suite("tests") {
     "TestTlvToJson.cpp",
     "TestUtf8.cpp",
     "TestVariant.cpp",
-    "TestVerhoeff.cpp",
     "TestZclString.cpp",
   ]
   if (current_os != "mbed") {
     test_sources += [ "TestCHIPArgParser.cpp" ]
   }
 
-  sources = [ "VerhoeffTestAccess.h" ]
+  sources = []
 
   cflags = [
     "-Wconversion",

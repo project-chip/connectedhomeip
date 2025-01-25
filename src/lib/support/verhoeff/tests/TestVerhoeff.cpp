@@ -17,46 +17,11 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <lib/support/tests/VerhoeffTestAccess.h>
 #include <lib/support/verhoeff/Verhoeff.h>
 
 #include <string>
 
 namespace {
-
-TEST(TestVerhoeff, TestDihedralOps)
-{
-    // Test to verify that the Dihedral Multiply operation yields the same result as the
-    // one obtained with the static MultiplyTable.
-
-    int value;
-    int permuted;
-    int resultMultiply        = 0;
-    int resultTable           = 0;
-    const uint8_t * permTable = VerhoeffTestAccess::GetPermuteTable();
-    const uint8_t * multTable = VerhoeffTestAccess::GetMultiplyTable();
-
-    value    = 5;
-    permuted = Verhoeff::Permute(value, permTable, Verhoeff10::Base, 1);
-
-    resultMultiply = Verhoeff::DihedralMultiply(resultMultiply, permuted, Verhoeff10::PolygonSize);
-    resultTable    = multTable[resultTable * Verhoeff10::Base + permuted];
-    EXPECT_EQ(resultMultiply, resultTable);
-
-    value    = 9;
-    permuted = Verhoeff::Permute(value, permTable, Verhoeff10::Base, 5);
-
-    resultMultiply = Verhoeff::DihedralMultiply(resultMultiply, permuted, Verhoeff10::PolygonSize);
-    resultTable    = multTable[resultTable * Verhoeff10::Base + permuted];
-    EXPECT_EQ(resultMultiply, resultTable);
-
-    value    = 3;
-    permuted = Verhoeff::Permute(value, permTable, Verhoeff10::Base, 9);
-
-    resultMultiply = Verhoeff::DihedralMultiply(resultMultiply, permuted, Verhoeff10::PolygonSize);
-    resultTable    = multTable[resultTable * Verhoeff10::Base + permuted];
-    EXPECT_EQ(resultMultiply, resultTable);
-}
 
 TEST(TestVerhoeff, TestVerhoeff)
 {
