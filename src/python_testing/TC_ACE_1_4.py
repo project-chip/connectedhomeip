@@ -44,6 +44,13 @@ import chip.clusters as Clusters
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
+# from matter_testing_infrastructure.chip.testing import conformance
+
+# from chip.testing.spec_parsing import CommandType, build_xml_clusters, build_xml_device_types
+from chip.testing.spec_parsing import build_xml_clusters, build_xml_device_types, parse_single_device_type, XmlDeviceType
+from chip.clusters import ClusterObjects as ClusterObjects
+from chip.clusters.ClusterObjects import ClusterObject
+from chip.testing import conformance
 
 # This test requires several additional command line arguments
 # run with
@@ -58,8 +65,18 @@ def str_to_cluster(str):
 def str_to_attribute(cluster, str):
     return getattr(cluster.Attributes, str)
 
+# phase 1 - let's start from a list
+# phase 2 - get the list of application clusters and device types from the XML scrape
+# Use build_xml_clusters() for building device types, etc. -- 
+# from matter_testing_infrastructure.chip.testing.spec_parsing import build_xml_clusters
 
 class TC_ACE_1_4(MatterBaseTest):
+# class TC_ACE_1_4(DeviceConformanceTests):
+    # async def setup_class_helper(self):
+    #     await super().setup_class_helper()
+    #     self.xml_clusters, self.problems = build_xml_clusters()
+    #     self.xml_device_types, problems = build_xml_device_types()
+    #     self.problems.extend(problems)
 
     async def write_acl(self, acl):
         # This returns an attribute status
@@ -101,27 +118,88 @@ class TC_ACE_1_4(MatterBaseTest):
 
     @async_test_body
     async def test_TC_ACE_1_4(self):
+        # await super().setup_class_helper()
+        self.xml_clusters, self.problems = build_xml_clusters()
+        self.xml_device_types, problems = build_xml_device_types()
+        self.problems.extend(problems)
+        device_ids = sorted(self.xml_device_types.keys())
+        read_request = await self.default_controller.Read(self.dut_node_id, [()])
+        
+        # for i in device_ids:
+        #     name = self.xml_device_types[i].name
+        #     print((i, name))
+        
+        self.device_list = []
+        self.endpoint_list = []
+        for endpoint in read_request.tlvAttributes:
+            if Clusters.Descriptor.id in read_request.tlvAttributes[endpoint]:
+                self.endpoint_list.append(endpoint)
+                raw_device_list_ep = read_request.tlvAttributes[endpoint][Clusters.Descriptor.id][Clusters.Descriptor.Attributes.DeviceTypeList.attribute_id]
+                for device in raw_device_list_ep:
+                    device_id = device[0]  # device[1] = revision, not sure if that is relevant
+                    if device_id not in self.device_list:
+                        self.device_list.append(device_id)
+        self.device_list.sort()
+
+        chosen_vars = None
+        for device_id in self.device_list:
+            if chosen_vars is None:
+                device_type = self.xml_device_types[device_id]
+                server_clusters = device_type.server_clusters
+                for cluster_id in server_clusters:
+                    # print(cluster_id, device_type.server_clusters[cluster_id])
+                    if isinstance(device_type.server_clusters[cluster_id].conformance, conformance.mandatory):
+                        
+                        for attribute in self.xml_clusters[cluster_id].attributes:
+                            if isinstance(self.xml_clusters[cluster_id].attributes[attribute].conformance, conformance.mandatory):
+                                chosen_attribute = attribute
+                                break
+                        else:
+                            chosen_attribute = None
+                        chosen_vars = {"Device": device_id, "Cluster": cluster_id, "Attribute": attribute}
+                        break
+        # print(chosen_vars)
+        
+
+        # parse_single_device_type(None)
+        # p vars(self.xml_device_types[2128]).keys()
+        # dict_keys(['name', 'revision', 'server_clusters', 'client_clusters', 'classification_class', 'classification_scope'])
+
+        # xml = self.template.render(device_type_id=self.device_type_id, revision=self.revision, classification_class=self.classification_class,
+        #                            classification_scope=self.classification_scope, clusters=self.clusters)
+        # et = ElementTree.fromstring(xml)
+
+
+    # async def setup_class_helper(self):
+    #     await super().setup_class_helper()
+    #     self.xml_clusters, self.problems = build_xml_clusters()
+    #     self.xml_device_types, problems = build_xml_device_types()
+    #     self.problems.extend(problems)
         # TODO: Guard these on the PICS
-        asserts.assert_true('PIXIT.ACE.APPENDPOINT' in self.matter_test_config.global_test_params,
-                            "PIXIT.ACE.APPENDPOINT must be included on the command line in "
-                            "the --int-arg flag as PIXIT.ACE.APPENDPOINT:<endpoint>")
-        asserts.assert_true('PIXIT.ACE.APPCLUSTER' in self.matter_test_config.global_test_params,
-                            "PIXIT.ACE.APPCLUSTER must be included on the command line in "
-                            "the --string-arg flag as PIXIT.ACE.APPCLUSTER:<cluster_name>")
-        asserts.assert_true('PIXIT.ACE.APPATTRIBUTE' in self.matter_test_config.global_test_params,
-                            "PIXIT.ACE.APPATTRIBUTE must be included on the command line in "
-                            "the --string-arg flag as PIXIT.ACE.APPATTRIBUTE:<attribute_name>")
-        asserts.assert_true('PIXIT.ACE.APPDEVTYPEID' in self.matter_test_config.global_test_params,
-                            "PIXIT.ACE.APPDEVTYPEID must be included on the command line in "
-                            "the --int-arg flag as PIXIT.ACE.APPDEVTYPEID:<device_type_id>")
 
-        cluster_str = self.matter_test_config.global_test_params['PIXIT.ACE.APPCLUSTER']
-        attribute_str = self.matter_test_config.global_test_params['PIXIT.ACE.APPATTRIBUTE']
-
+        # asserts.assert_true('PIXIT.ACE.APPENDPOINT' in self.matter_test_config.global_test_params,
+        #                     "PIXIT.ACE.APPENDPOINT must be included on the command line in "
+        #                     "the --int-arg flag as PIXIT.ACE.APPENDPOINT:<endpoint>")
+        # asserts.assert_true('PIXIT.ACE.APPCLUSTER' in self.matter_test_config.global_test_params,
+        #                     "PIXIT.ACE.APPCLUSTER must be included on the command line in "
+        #                     "the --string-arg flag as PIXIT.ACE.APPCLUSTER:<cluster_name>")
+        # asserts.assert_true('PIXIT.ACE.APPATTRIBUTE' in self.matter_test_config.global_test_params,
+        #                     "PIXIT.ACE.APPATTRIBUTE must be included on the command line in "
+        #                     "the --string-arg flag as PIXIT.ACE.APPATTRIBUTE:<attribute_name>")
+        # asserts.assert_true('PIXIT.ACE.APPDEVTYPEID' in self.matter_test_config.global_test_params,
+        #                     "PIXIT.ACE.APPDEVTYPEID must be included on the command line in "
+        #                     "the --int-arg flag as PIXIT.ACE.APPDEVTYPEID:<device_type_id>")
+        cluster_str = self.xml_clusters[chosen_vars["Cluster"]].name
+        # cluster_str = self.xml_clusters[cluster_id].name
+        # cluster_str = self.matter_test_config.global_test_params['PIXIT.ACE.APPCLUSTER']
+        attribute_str = self.xml_clusters[chosen_vars["Cluster"]].attributes[chosen_vars["Attribute"]].name
+        # attribute_str = self.matter_test_config.global_test_params['PIXIT.ACE.APPATTRIBUTE']
         self.cluster = str_to_cluster(cluster_str)
         self.attribute = str_to_attribute(self.cluster, attribute_str)
-        self.devtype = self.matter_test_config.global_test_params['PIXIT.ACE.APPDEVTYPEID']
-        self.endpoint = self.matter_test_config.global_test_params['PIXIT.ACE.APPENDPOINT']
+        # self.devtype = self.matter_test_config.global_test_params['PIXIT.ACE.APPDEVTYPEID']
+        self.devtype = chosen_vars["Device"]
+        self.endpoint = next(iter(self.endpoint_list))
+        # self.endpoint = self.matter_test_config.global_test_params['PIXIT.ACE.APPENDPOINT']
 
         asserts.assert_true(self.cluster is not None, "Invalid cluster name")
         asserts.assert_true(self.attribute is not None, "Invalue attribute name")
