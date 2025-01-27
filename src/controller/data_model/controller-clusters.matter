@@ -10570,7 +10570,7 @@ provisional cluster TlsClientManagement = 2050 {
     octet_string hostname = 1;
     int16u port = 2;
     int16u caid = 3;
-    optional nullable int16u ccdid = 4;
+    nullable int16u ccdid = 4;
     TLSEndpointStatusEnum status = 5;
   }
 
@@ -10584,8 +10584,7 @@ provisional cluster TlsClientManagement = 2050 {
 
   readonly attribute int8u maxProvisioned = 0;
   readonly attribute int8u currentProvisioned = 1;
-  readonly attribute int8u maxInUse = 2;
-  readonly attribute int8u currentInUse = 3;
+  readonly attribute int8u currentInUse = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -10597,8 +10596,8 @@ provisional cluster TlsClientManagement = 2050 {
     octet_string hostname = 0;
     int16u port = 1;
     int16u caid = 2;
-    optional nullable int16u ccdid = 3;
-    optional nullable int16u endpointID = 4;
+    nullable int16u ccdid = 3;
+    nullable int16u endpointID = 4;
   }
 
   response struct ProvisionEndpointResponse = 1 {
@@ -10606,7 +10605,7 @@ provisional cluster TlsClientManagement = 2050 {
   }
 
   request struct FindEndpointRequest {
-    optional nullable int16u endpointID = 0;
+    nullable int16u endpointID = 0;
   }
 
   response struct FindEndpointResponse = 3 {
@@ -10619,7 +10618,7 @@ provisional cluster TlsClientManagement = 2050 {
 
   /** This command SHALL provision a TLS Endpoint for the provided HostName / Port combination. */
   command access(invoke: administer) ProvisionEndpoint(ProvisionEndpointRequest): ProvisionEndpointResponse = 0;
-  /** This command SHALL return the TLS Endpoint details for the passed in EndpointID. */
+  /** This command SHALL return the TLS Endpoint details for the passed in EndpointID, or all provisioned endpoints if nu */
   command FindEndpoint(FindEndpointRequest): FindEndpointResponse = 2;
   /** This command SHALL be generated to request the Node terminates the TLS Connection. */
   command access(invoke: administer) RemoveEndpoint(RemoveEndpointRequest): DefaultSuccess = 4;

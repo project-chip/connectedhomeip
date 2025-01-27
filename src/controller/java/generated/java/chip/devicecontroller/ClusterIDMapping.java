@@ -18815,8 +18815,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             MaxProvisioned(0L),
             CurrentProvisioned(1L),
-            MaxInUse(2L),
-            CurrentInUse(3L),
+            CurrentInUse(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

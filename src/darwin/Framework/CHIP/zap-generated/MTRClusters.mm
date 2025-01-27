@@ -20893,11 +20893,7 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)findEndpointWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRTLSClientManagementClusterFindEndpointResponseParams * _Nullable data, NSError * _Nullable error))completion
-{
-    [self findEndpointWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
-}
-- (void)findEndpointWithParams:(MTRTLSClientManagementClusterFindEndpointParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRTLSClientManagementClusterFindEndpointResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)findEndpointWithParams:(MTRTLSClientManagementClusterFindEndpointParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRTLSClientManagementClusterFindEndpointResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
         params = [[MTRTLSClientManagementClusterFindEndpointParams
@@ -20959,11 +20955,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentProvisionedWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTLSClientManagementID) attributeID:@(MTRAttributeIDTypeClusterTLSClientManagementAttributeCurrentProvisionedID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxInUseWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTLSClientManagementID) attributeID:@(MTRAttributeIDTypeClusterTLSClientManagementAttributeMaxInUseID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentInUseWithParams:(MTRReadParams * _Nullable)params

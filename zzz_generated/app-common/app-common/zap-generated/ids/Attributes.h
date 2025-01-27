@@ -7368,12 +7368,8 @@ namespace CurrentProvisioned {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentProvisioned
 
-namespace MaxInUse {
-static constexpr AttributeId Id = 0x00000002;
-} // namespace MaxInUse
-
 namespace CurrentInUse {
-static constexpr AttributeId Id = 0x00000003;
+static constexpr AttributeId Id = 0x00000002;
 } // namespace CurrentInUse
 
 namespace GeneratedCommandList {

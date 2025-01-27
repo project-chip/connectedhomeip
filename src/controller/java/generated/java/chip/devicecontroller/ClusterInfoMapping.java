@@ -31408,10 +31408,10 @@ public class ClusterInfoMapping {
     CommandParameterInfo tlsClientManagementprovisionEndpointcaidCommandParameterInfo = new CommandParameterInfo("caid", Integer.class, Integer.class);
     tlsClientManagementprovisionEndpointCommandParams.put("caid",tlsClientManagementprovisionEndpointcaidCommandParameterInfo);
 
-    CommandParameterInfo tlsClientManagementprovisionEndpointccdidCommandParameterInfo = new CommandParameterInfo("ccdid", Optional.class, Integer.class);
+    CommandParameterInfo tlsClientManagementprovisionEndpointccdidCommandParameterInfo = new CommandParameterInfo("ccdid", Integer.class, Integer.class);
     tlsClientManagementprovisionEndpointCommandParams.put("ccdid",tlsClientManagementprovisionEndpointccdidCommandParameterInfo);
 
-    CommandParameterInfo tlsClientManagementprovisionEndpointendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Optional.class, Integer.class);
+    CommandParameterInfo tlsClientManagementprovisionEndpointendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
     tlsClientManagementprovisionEndpointCommandParams.put("endpointID",tlsClientManagementprovisionEndpointendpointIDCommandParameterInfo);
     InteractionInfo tlsClientManagementprovisionEndpointInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
@@ -31426,10 +31426,10 @@ public class ClusterInfoMapping {
            , (Integer)
              commandArguments.get("caid")
 
-           , (Optional<Integer>)
+           , (Integer)
              commandArguments.get("ccdid")
 
-           , (Optional<Integer>)
+           , (Integer)
              commandArguments.get("endpointID")
 
             );
@@ -31441,13 +31441,13 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> tlsClientManagementfindEndpointCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo tlsClientManagementfindEndpointendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Optional.class, Integer.class);
+    CommandParameterInfo tlsClientManagementfindEndpointendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
     tlsClientManagementfindEndpointCommandParams.put("endpointID",tlsClientManagementfindEndpointendpointIDCommandParameterInfo);
     InteractionInfo tlsClientManagementfindEndpointInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.TlsClientManagementCluster) cluster)
           .findEndpoint((ChipClusters.TlsClientManagementCluster.FindEndpointResponseCallback) callback
-           , (Optional<Integer>)
+           , (Integer)
              commandArguments.get("endpointID")
 
             );

@@ -5988,9 +5988,6 @@ static BOOL AttributeIsSpecifiedInTLSClientManagementCluster(AttributeId aAttrib
     case Attributes::CurrentProvisioned::Id: {
         return YES;
     }
-    case Attributes::MaxInUse::Id: {
-        return YES;
-    }
     case Attributes::CurrentInUse::Id: {
         return YES;
     }

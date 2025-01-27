@@ -48956,8 +48956,7 @@ class TlsClientManagement(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="maxProvisioned", Tag=0x00000000, Type=uint),
                 ClusterObjectFieldDescriptor(Label="currentProvisioned", Tag=0x00000001, Type=uint),
-                ClusterObjectFieldDescriptor(Label="maxInUse", Tag=0x00000002, Type=uint),
-                ClusterObjectFieldDescriptor(Label="currentInUse", Tag=0x00000003, Type=uint),
+                ClusterObjectFieldDescriptor(Label="currentInUse", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -48967,7 +48966,6 @@ class TlsClientManagement(Cluster):
 
     maxProvisioned: uint = 0
     currentProvisioned: uint = 0
-    maxInUse: uint = 0
     currentInUse: uint = 0
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -48996,7 +48994,7 @@ class TlsClientManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="hostname", Tag=1, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="port", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="caid", Tag=3, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="ccdid", Tag=4, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="ccdid", Tag=4, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="status", Tag=5, Type=TlsClientManagement.Enums.TLSEndpointStatusEnum),
                     ])
 
@@ -49004,7 +49002,7 @@ class TlsClientManagement(Cluster):
             hostname: 'bytes' = b""
             port: 'uint' = 0
             caid: 'uint' = 0
-            ccdid: 'typing.Union[None, Nullable, uint]' = None
+            ccdid: 'typing.Union[Nullable, uint]' = NullValue
             status: 'TlsClientManagement.Enums.TLSEndpointStatusEnum' = 0
 
     class Commands:
@@ -49022,15 +49020,15 @@ class TlsClientManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="hostname", Tag=0, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="port", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="caid", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="ccdid", Tag=3, Type=typing.Union[None, Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="endpointID", Tag=4, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="ccdid", Tag=3, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="endpointID", Tag=4, Type=typing.Union[Nullable, uint]),
                     ])
 
             hostname: bytes = b""
             port: uint = 0
             caid: uint = 0
-            ccdid: typing.Union[None, Nullable, uint] = None
-            endpointID: typing.Union[None, Nullable, uint] = None
+            ccdid: typing.Union[Nullable, uint] = NullValue
+            endpointID: typing.Union[Nullable, uint] = NullValue
 
         @dataclass
         class ProvisionEndpointResponse(ClusterCommand):
@@ -49059,10 +49057,10 @@ class TlsClientManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="endpointID", Tag=0, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="endpointID", Tag=0, Type=typing.Union[Nullable, uint]),
                     ])
 
-            endpointID: typing.Union[None, Nullable, uint] = None
+            endpointID: typing.Union[Nullable, uint] = NullValue
 
         @dataclass
         class FindEndpointResponse(ClusterCommand):
@@ -49130,22 +49128,6 @@ class TlsClientManagement(Cluster):
             value: uint = 0
 
         @dataclass
-        class MaxInUse(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000802
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000002
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
-
-            value: uint = 0
-
-        @dataclass
         class CurrentInUse(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -49153,7 +49135,7 @@ class TlsClientManagement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000003
+                return 0x00000002
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:

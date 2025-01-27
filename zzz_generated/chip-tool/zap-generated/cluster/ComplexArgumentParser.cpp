@@ -7198,6 +7198,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::EnsureMemberExist("TLSEndpointStruct.hostname", "hostname", value.isMember("hostname")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TLSEndpointStruct.port", "port", value.isMember("port")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TLSEndpointStruct.caid", "caid", value.isMember("caid")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TLSEndpointStruct.ccdid", "ccdid", value.isMember("ccdid")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TLSEndpointStruct.status", "status", value.isMember("status")));
 
     char labelWithMember[kMaxLabelLength];
@@ -7217,11 +7218,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.caid, value["caid"]));
     valueCopy.removeMember("caid");
 
-    if (value.isMember("ccdid"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "ccdid");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.ccdid, value["ccdid"]));
-    }
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "ccdid");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.ccdid, value["ccdid"]));
     valueCopy.removeMember("ccdid");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "status");

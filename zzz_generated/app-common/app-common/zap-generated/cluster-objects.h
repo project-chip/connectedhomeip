@@ -45820,7 +45820,7 @@ public:
     chip::ByteSpan hostname;
     uint16_t port = static_cast<uint16_t>(0);
     uint16_t caid = static_cast<uint16_t>(0);
-    Optional<DataModel::Nullable<uint16_t>> ccdid;
+    DataModel::Nullable<uint16_t> ccdid;
     TLSEndpointStatusEnum status = static_cast<TLSEndpointStatusEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -45886,8 +45886,8 @@ public:
     chip::ByteSpan hostname;
     uint16_t port = static_cast<uint16_t>(0);
     uint16_t caid = static_cast<uint16_t>(0);
-    Optional<DataModel::Nullable<uint16_t>> ccdid;
-    Optional<DataModel::Nullable<uint16_t>> endpointID;
+    DataModel::Nullable<uint16_t> ccdid;
+    DataModel::Nullable<uint16_t> endpointID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -45905,8 +45905,8 @@ public:
     chip::ByteSpan hostname;
     uint16_t port = static_cast<uint16_t>(0);
     uint16_t caid = static_cast<uint16_t>(0);
-    Optional<DataModel::Nullable<uint16_t>> ccdid;
-    Optional<DataModel::Nullable<uint16_t>> endpointID;
+    DataModel::Nullable<uint16_t> ccdid;
+    DataModel::Nullable<uint16_t> endpointID;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ProvisionEndpoint
@@ -45955,7 +45955,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::FindEndpoint::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
 
-    Optional<DataModel::Nullable<uint16_t>> endpointID;
+    DataModel::Nullable<uint16_t> endpointID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -45970,7 +45970,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::FindEndpoint::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
 
-    Optional<DataModel::Nullable<uint16_t>> endpointID;
+    DataModel::Nullable<uint16_t> endpointID;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace FindEndpoint
@@ -46066,18 +46066,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentProvisioned
-namespace MaxInUse {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::MaxInUse::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace MaxInUse
 namespace CurrentInUse {
 struct TypeInfo
 {
@@ -46131,7 +46119,6 @@ struct TypeInfo
 
         Attributes::MaxProvisioned::TypeInfo::DecodableType maxProvisioned         = static_cast<uint8_t>(0);
         Attributes::CurrentProvisioned::TypeInfo::DecodableType currentProvisioned = static_cast<uint8_t>(0);
-        Attributes::MaxInUse::TypeInfo::DecodableType maxInUse                     = static_cast<uint8_t>(0);
         Attributes::CurrentInUse::TypeInfo::DecodableType currentInUse             = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;

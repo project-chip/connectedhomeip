@@ -15715,8 +15715,7 @@ private:
 | Attributes:                                                         |        |
 | * MaxProvisioned                                                    | 0x0000 |
 | * CurrentProvisioned                                                | 0x0001 |
-| * MaxInUse                                                          | 0x0002 |
-| * CurrentInUse                                                      | 0x0003 |
+| * CurrentInUse                                                      | 0x0002 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -28648,7 +28647,6 @@ void registerClusterTlsClientManagement(Commands & commands, CredentialIssuerCom
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "max-provisioned", Attributes::MaxProvisioned::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-provisioned", Attributes::CurrentProvisioned::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "max-in-use", Attributes::MaxInUse::Id, credsIssuerConfig),                         //
         make_unique<ReadAttribute>(Id, "current-in-use", Attributes::CurrentInUse::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
@@ -28659,8 +28657,6 @@ void registerClusterTlsClientManagement(Commands & commands, CredentialIssuerCom
         make_unique<WriteAttribute<uint8_t>>(Id, "max-provisioned", 0, UINT8_MAX, Attributes::MaxProvisioned::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "current-provisioned", 0, UINT8_MAX, Attributes::CurrentProvisioned::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "max-in-use", 0, UINT8_MAX, Attributes::MaxInUse::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "current-in-use", 0, UINT8_MAX, Attributes::CurrentInUse::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -28678,7 +28674,6 @@ void registerClusterTlsClientManagement(Commands & commands, CredentialIssuerCom
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "max-provisioned", Attributes::MaxProvisioned::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-provisioned", Attributes::CurrentProvisioned::Id, credsIssuerConfig),      //
-        make_unique<SubscribeAttribute>(Id, "max-in-use", Attributes::MaxInUse::Id, credsIssuerConfig),                         //
         make_unique<SubscribeAttribute>(Id, "current-in-use", Attributes::CurrentInUse::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //

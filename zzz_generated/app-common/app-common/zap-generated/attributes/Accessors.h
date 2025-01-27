@@ -6016,12 +6016,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
 } // namespace CurrentProvisioned
 
-namespace MaxInUse {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
-} // namespace MaxInUse
-
 namespace CurrentInUse {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);

@@ -37823,25 +37823,19 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.caid = self.caid.unsignedShortValue;
     }
     {
-        if (self.ccdid != nil) {
-            auto & definedValue_0 = encodableStruct.ccdid.Emplace();
-            if (self.ccdid == nil) {
-                definedValue_0.SetNull();
-            } else {
-                auto & nonNullValue_1 = definedValue_0.SetNonNull();
-                nonNullValue_1 = self.ccdid.unsignedShortValue;
-            }
+        if (self.ccdid == nil) {
+            encodableStruct.ccdid.SetNull();
+        } else {
+            auto & nonNullValue_0 = encodableStruct.ccdid.SetNonNull();
+            nonNullValue_0 = self.ccdid.unsignedShortValue;
         }
     }
     {
-        if (self.endpointID != nil) {
-            auto & definedValue_0 = encodableStruct.endpointID.Emplace();
-            if (self.endpointID == nil) {
-                definedValue_0.SetNull();
-            } else {
-                auto & nonNullValue_1 = definedValue_0.SetNonNull();
-                nonNullValue_1 = self.endpointID.unsignedShortValue;
-            }
+        if (self.endpointID == nil) {
+            encodableStruct.endpointID.SetNull();
+        } else {
+            auto & nonNullValue_0 = encodableStruct.endpointID.SetNonNull();
+            nonNullValue_0 = self.endpointID.unsignedShortValue;
         }
     }
 
@@ -38000,14 +37994,11 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::TlsClientManagement::Commands::FindEndpoint::Type encodableStruct;
     ListFreer listFreer;
     {
-        if (self.endpointID != nil) {
-            auto & definedValue_0 = encodableStruct.endpointID.Emplace();
-            if (self.endpointID == nil) {
-                definedValue_0.SetNull();
-            } else {
-                auto & nonNullValue_1 = definedValue_0.SetNonNull();
-                nonNullValue_1 = self.endpointID.unsignedShortValue;
-            }
+        if (self.endpointID == nil) {
+            encodableStruct.endpointID.SetNull();
+        } else {
+            auto & nonNullValue_0 = encodableStruct.endpointID.SetNonNull();
+            nonNullValue_0 = self.endpointID.unsignedShortValue;
         }
     }
 
@@ -38132,14 +38123,10 @@ NS_ASSUME_NONNULL_BEGIN
                 newElement_0.hostname = AsData(entry_0.hostname);
                 newElement_0.port = [NSNumber numberWithUnsignedShort:entry_0.port];
                 newElement_0.caid = [NSNumber numberWithUnsignedShort:entry_0.caid];
-                if (entry_0.ccdid.HasValue()) {
-                    if (entry_0.ccdid.Value().IsNull()) {
-                        newElement_0.ccdid = nil;
-                    } else {
-                        newElement_0.ccdid = [NSNumber numberWithUnsignedShort:entry_0.ccdid.Value().Value()];
-                    }
-                } else {
+                if (entry_0.ccdid.IsNull()) {
                     newElement_0.ccdid = nil;
+                } else {
+                    newElement_0.ccdid = [NSNumber numberWithUnsignedShort:entry_0.ccdid.Value()];
                 }
                 newElement_0.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.status)];
                 [array_0 addObject:newElement_0];

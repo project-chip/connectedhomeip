@@ -4464,8 +4464,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MaxProvisioned";
         case chip::app::Clusters::TlsClientManagement::Attributes::CurrentProvisioned::Id:
             return "CurrentProvisioned";
-        case chip::app::Clusters::TlsClientManagement::Attributes::MaxInUse::Id:
-            return "MaxInUse";
         case chip::app::Clusters::TlsClientManagement::Attributes::CurrentInUse::Id:
             return "CurrentInUse";
         case chip::app::Clusters::TlsClientManagement::Attributes::GeneratedCommandList::Id:

@@ -16109,7 +16109,7 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
   public byte[] hostname;
   public Integer port;
   public Integer caid;
-  public @Nullable Optional<Integer> ccdid;
+  public @Nullable Integer ccdid;
   public Integer status;
   private static final long ENDPOINT_ID_ID = 0L;
   private static final long HOSTNAME_ID = 1L;
@@ -16123,7 +16123,7 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
     byte[] hostname,
     Integer port,
     Integer caid,
-    @Nullable Optional<Integer> ccdid,
+    @Nullable Integer ccdid,
     Integer status
   ) {
     this.endpointID = endpointID;
@@ -16140,7 +16140,7 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
     values.add(new StructElement(HOSTNAME_ID, new ByteArrayType(hostname)));
     values.add(new StructElement(PORT_ID, new UIntType(port)));
     values.add(new StructElement(CAID_ID, new UIntType(caid)));
-    values.add(new StructElement(CCDID_ID, ccdid != null ? ccdid.<BaseTLVType>map((nonOptionalccdid) -> new UIntType(nonOptionalccdid)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(CCDID_ID, ccdid != null ? new UIntType(ccdid) : new NullType()));
     values.add(new StructElement(STATUS_ID, new UIntType(status)));
 
     return new StructType(values);
@@ -16154,7 +16154,7 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
     byte[] hostname = null;
     Integer port = null;
     Integer caid = null;
-    @Nullable Optional<Integer> ccdid = null;
+    @Nullable Integer ccdid = null;
     Integer status = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ENDPOINT_ID_ID) {
@@ -16180,7 +16180,7 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
       } else if (element.contextTagNum() == CCDID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          ccdid = Optional.of(castingValue.value(Integer.class));
+          ccdid = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == STATUS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {

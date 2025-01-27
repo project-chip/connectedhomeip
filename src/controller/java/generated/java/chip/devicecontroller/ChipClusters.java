@@ -64933,8 +64933,7 @@ public class ChipClusters {
 
     private static final long MAX_PROVISIONED_ATTRIBUTE_ID = 0L;
     private static final long CURRENT_PROVISIONED_ATTRIBUTE_ID = 1L;
-    private static final long MAX_IN_USE_ATTRIBUTE_ID = 2L;
-    private static final long CURRENT_IN_USE_ATTRIBUTE_ID = 3L;
+    private static final long CURRENT_IN_USE_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -64952,11 +64951,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void provisionEndpoint(ProvisionEndpointResponseCallback callback, byte[] hostname, Integer port, Integer caid, @Nullable Optional<Integer> ccdid, @Nullable Optional<Integer> endpointID) {
+    public void provisionEndpoint(ProvisionEndpointResponseCallback callback, byte[] hostname, Integer port, Integer caid, @Nullable Integer ccdid, @Nullable Integer endpointID) {
       provisionEndpoint(callback, hostname, port, caid, ccdid, endpointID, 0);
     }
 
-    public void provisionEndpoint(ProvisionEndpointResponseCallback callback, byte[] hostname, Integer port, Integer caid, @Nullable Optional<Integer> ccdid, @Nullable Optional<Integer> endpointID, int timedInvokeTimeoutMs) {
+    public void provisionEndpoint(ProvisionEndpointResponseCallback callback, byte[] hostname, Integer port, Integer caid, @Nullable Integer ccdid, @Nullable Integer endpointID, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -64973,11 +64972,11 @@ public class ChipClusters {
       elements.add(new StructElement(caidFieldID, caidtlvValue));
 
       final long ccdidFieldID = 3L;
-      BaseTLVType ccdidtlvValue = ccdid != null ? ccdid.<BaseTLVType>map((nonOptionalccdid) -> new UIntType(nonOptionalccdid)).orElse(new EmptyType()) : new NullType();
+      BaseTLVType ccdidtlvValue = ccdid != null ? new UIntType(ccdid) : new NullType();
       elements.add(new StructElement(ccdidFieldID, ccdidtlvValue));
 
       final long endpointIDFieldID = 4L;
-      BaseTLVType endpointIDtlvValue = endpointID != null ? endpointID.<BaseTLVType>map((nonOptionalendpointID) -> new UIntType(nonOptionalendpointID)).orElse(new EmptyType()) : new NullType();
+      BaseTLVType endpointIDtlvValue = endpointID != null ? new UIntType(endpointID) : new NullType();
       elements.add(new StructElement(endpointIDFieldID, endpointIDtlvValue));
 
       StructType commandArgs = new StructType(elements);
@@ -64998,16 +64997,16 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void findEndpoint(FindEndpointResponseCallback callback, @Nullable Optional<Integer> endpointID) {
+    public void findEndpoint(FindEndpointResponseCallback callback, @Nullable Integer endpointID) {
       findEndpoint(callback, endpointID, 0);
     }
 
-    public void findEndpoint(FindEndpointResponseCallback callback, @Nullable Optional<Integer> endpointID, int timedInvokeTimeoutMs) {
+    public void findEndpoint(FindEndpointResponseCallback callback, @Nullable Integer endpointID, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long endpointIDFieldID = 0L;
-      BaseTLVType endpointIDtlvValue = endpointID != null ? endpointID.<BaseTLVType>map((nonOptionalendpointID) -> new UIntType(nonOptionalendpointID)).orElse(new EmptyType()) : new NullType();
+      BaseTLVType endpointIDtlvValue = endpointID != null ? new UIntType(endpointID) : new NullType();
       elements.add(new StructElement(endpointIDFieldID, endpointIDtlvValue));
 
       StructType commandArgs = new StructType(elements);
@@ -65122,32 +65121,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, CURRENT_PROVISIONED_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readMaxInUseAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_IN_USE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, MAX_IN_USE_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeMaxInUseAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_IN_USE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, MAX_IN_USE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readCurrentInUseAttribute(

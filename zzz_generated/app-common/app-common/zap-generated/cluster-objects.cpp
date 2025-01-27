@@ -33636,8 +33636,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, maxProvisioned);
     case Attributes::CurrentProvisioned::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, currentProvisioned);
-    case Attributes::MaxInUse::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxInUse);
     case Attributes::CurrentInUse::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, currentInUse);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
@@ -37303,6 +37301,30 @@ bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
     }
     if ((aCluster == Clusters::CameraAvStreamManagement::Id) &&
         (aCommand == Clusters::CameraAvStreamManagement::Commands::CaptureSnapshotResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsClientManagement::Id) &&
+        (aCommand == Clusters::TlsClientManagement::Commands::ProvisionEndpoint::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsClientManagement::Id) &&
+        (aCommand == Clusters::TlsClientManagement::Commands::ProvisionEndpointResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsClientManagement::Id) && (aCommand == Clusters::TlsClientManagement::Commands::FindEndpoint::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsClientManagement::Id) &&
+        (aCommand == Clusters::TlsClientManagement::Commands::FindEndpointResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsClientManagement::Id) &&
+        (aCommand == Clusters::TlsClientManagement::Commands::RemoveEndpoint::Id))
     {
         return true;
     }

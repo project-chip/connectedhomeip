@@ -8254,10 +8254,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentProvisioned";
             break;
 
-        case MTRAttributeIDTypeClusterTLSClientManagementAttributeMaxInUseID:
-            result = @"MaxInUse";
-            break;
-
         case MTRAttributeIDTypeClusterTLSClientManagementAttributeCurrentInUseID:
             result = @"CurrentInUse";
             break;

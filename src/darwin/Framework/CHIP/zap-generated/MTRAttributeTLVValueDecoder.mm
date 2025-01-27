@@ -18184,17 +18184,6 @@ static id _Nullable DecodeAttributeValueForTLSClientManagementCluster(AttributeI
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
-    case Attributes::MaxInUse::Id: {
-        using TypeInfo = Attributes::MaxInUse::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
-        return value;
-    }
     case Attributes::CurrentInUse::Id: {
         using TypeInfo = Attributes::CurrentInUse::TypeInfo;
         TypeInfo::DecodableType cppValue;

@@ -19597,17 +19597,6 @@ public class ClusterReadMapping {
           readTlsClientManagementCurrentProvisionedCommandParams
         );
         result.put("readCurrentProvisionedAttribute", readTlsClientManagementCurrentProvisionedAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readTlsClientManagementMaxInUseCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readTlsClientManagementMaxInUseAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.TlsClientManagementCluster) cluster).readMaxInUseAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readTlsClientManagementMaxInUseCommandParams
-        );
-        result.put("readMaxInUseAttribute", readTlsClientManagementMaxInUseAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readTlsClientManagementCurrentInUseCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readTlsClientManagementCurrentInUseAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

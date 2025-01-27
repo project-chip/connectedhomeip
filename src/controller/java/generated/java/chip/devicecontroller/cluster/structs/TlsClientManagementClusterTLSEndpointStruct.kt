@@ -17,7 +17,6 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -28,7 +27,7 @@ class TlsClientManagementClusterTLSEndpointStruct(
   val hostname: ByteArray,
   val port: UInt,
   val caid: UInt,
-  val ccdid: Optional<UInt>?,
+  val ccdid: UInt?,
   val status: UInt,
 ) {
   override fun toString(): String = buildString {
@@ -50,10 +49,7 @@ class TlsClientManagementClusterTLSEndpointStruct(
       put(ContextSpecificTag(TAG_PORT), port)
       put(ContextSpecificTag(TAG_CAID), caid)
       if (ccdid != null) {
-        if (ccdid.isPresent) {
-          val optccdid = ccdid.get()
-          put(ContextSpecificTag(TAG_CCDID), optccdid)
-        }
+        put(ContextSpecificTag(TAG_CCDID), ccdid)
       } else {
         putNull(ContextSpecificTag(TAG_CCDID))
       }
@@ -78,11 +74,7 @@ class TlsClientManagementClusterTLSEndpointStruct(
       val caid = tlvReader.getUInt(ContextSpecificTag(TAG_CAID))
       val ccdid =
         if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_CCDID))) {
-            Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_CCDID)))
-          } else {
-            Optional.empty()
-          }
+          tlvReader.getUInt(ContextSpecificTag(TAG_CCDID))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_CCDID))
           null
