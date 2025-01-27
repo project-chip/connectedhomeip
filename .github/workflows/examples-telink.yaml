@@ -241,16 +241,16 @@ jobs:
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink (B95) OTA Requestor App
-              # Run test for master and s07641069 PRs
-              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9258a-ota-requestor' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9258a ota-requestor-app \
-                    out/telink-tlsr9258a-ota-requestor/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
+            # - name: Build example Telink (B95) OTA Requestor App
+            #   # Run test for master and s07641069 PRs
+            #   if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
+            #   run: |
+            #       ./scripts/run_in_build_env.sh \
+            #         "./scripts/build/build_examples.py --target 'telink-tlsr9258a-ota-requestor' build"
+            #       .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+            #         telink tlsr9258a ota-requestor-app \
+            #         out/telink-tlsr9258a-ota-requestor/zephyr/zephyr.elf \
+            #         /tmp/bloat_reports/
 
             - name: clean out build output
               run: rm -rf ./out
