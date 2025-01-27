@@ -144,7 +144,7 @@ TEST_F(TestEventLoopHandler, EventLoopHandlerWake)
     // adjust it if the test machine is under heavy load, e.g. in CI or on a slow VM.
     // By default, we expect the sleep duration to be close to the requested 400ms.
     unsigned int expectedMaxDuration = 500u; // allow some slack for test machine load
-    const char * maxDurationEnv = std::getenv("CHIP_TEST_EVENT_LOOP_HANDLER_MAX_DURATION_MS");
+    const char * maxDurationEnv      = std::getenv("CHIP_TEST_EVENT_LOOP_HANDLER_MAX_DURATION_MS");
     if (maxDurationEnv != nullptr)
     {
         ChipLogDetail(Test, "CHIP_TEST_EVENT_LOOP_HANDLER_MAX_DURATION_MS=%s", maxDurationEnv);
