@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import contextlib
 import glob
 import json
 import os
@@ -24,7 +25,7 @@ from pathlib import Path
 
 import click
 from chip.testing.spec_parsing import build_xml_clusters
-from paths import get_chip_root, get_documentation_file_path, get_in_progress_defines
+from paths import get_chip_root, get_documentation_file_path
 
 CURRENT_IN_PROGRESS_DEFINES = [
     "cameras",
@@ -263,7 +264,8 @@ def dump_versions(scraper, spec_root, output_dir, legacy):
             output.write(f'{tag[0].split("/")[-1]}\n')
     else:
         print(f"WARNING: no tag found for sha {sha}")
-        os.remove(tag_file)
+        with contextlib.suppress(FileNotFoundError):
+            os.remove(tag_file)
 
     scraper_file = os.path.abspath(os.path.join(output_dir, 'scraper_version'))
     version_cmd = 'version'
