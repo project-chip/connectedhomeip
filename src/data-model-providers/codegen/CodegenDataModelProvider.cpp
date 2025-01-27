@@ -159,8 +159,7 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
                                                                               TLV::TLVReader & input_arguments,
                                                                               CommandHandler * handler)
 {
-    // Some commands are registered of ALL endpoints, so make sure first that
-    // the cluster actually exists on this endpoint before trying command handling
+    // Ensure the command actually exists on the relevant cluster instance.
     const EmberAfCluster * cluster = FindServerCluster(request.path);
     if (cluster == nullptr)
     {
