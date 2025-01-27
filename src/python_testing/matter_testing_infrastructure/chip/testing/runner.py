@@ -15,8 +15,8 @@
 #    limitations under the License.
 #
 
+import asyncio
 import importlib
-import os
 import sys
 from pathlib import Path
 from unittest.mock import MagicMock
@@ -32,11 +32,12 @@ class AsyncMock(MagicMock):
 
 class MockTestRunner():
 
-    def __init__(self, filename: str, classname: str, test: str, endpoint: int = None, pics: dict[str, bool] = None, paa_trust_store_path=None):
+    def __init__(self, abs_filename: str, classname: str, test: str, endpoint: int = None,
+                 pics: dict[str, bool] = None, paa_trust_store_path=None):
         self.kvs_storage = 'kvs_admin.json'
         self.config = MatterTestConfig(endpoint=endpoint, paa_trust_store_path=paa_trust_store_path,
                                        pics=pics, storage_path=self.kvs_storage)
-        self.set_test(filename, classname, test)
+        self.set_test(abs_filename, classname, test)
 
         self.set_test_config(self.config)
 
@@ -47,17 +48,16 @@ class MockTestRunner():
             catTags=self.config.controller_cat_tags
         )
 
-    def set_test(self, filename: str, classname: str, test: str):
+    def set_test(self, abs_filename: str, classname: str, test: str):
         self.test = test
         self.config.tests = [self.test]
 
-        module_name = Path(os.path.basename(filename)).stem
-
         try:
-            module = importlib.import_module(module_name)
+            filename_path = Path(abs_filename)
+            module = importlib.import_module(filename_path.stem)
         except ModuleNotFoundError:
-            sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-            module = importlib.import_module(module_name)
+            sys.path.append(str(filename_path.parent.resolve()))
+            module = importlib.import_module(filename_path.stem)
 
         self.test_class = getattr(module, classname)
 
@@ -71,8 +71,10 @@ class MockTestRunner():
     def Shutdown(self):
         self.stack.Shutdown()
 
-    def run_test_with_mock_read(self,  read_cache: Attribute.AsyncReadTransaction.ReadResponse, hooks=None):
+    def run_test_with_mock_read(self, read_cache: Attribute.AsyncReadTransaction.ReadResponse, hooks=None):
         self.default_controller.Read = AsyncMock(return_value=read_cache)
         # This doesn't need to do anything since we are overriding the read anyway
         self.default_controller.FindOrEstablishPASESession = AsyncMock(return_value=None)
-        return run_tests_no_exit(self.test_class, self.config, hooks, self.default_controller, self.stack)
+        with asyncio.Runner() as runner:
+            return run_tests_no_exit(self.test_class, self.config, runner.get_loop(),
+                                     hooks, self.default_controller, self.stack)

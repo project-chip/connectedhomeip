@@ -26,6 +26,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 /**
  * Helper macro we can use to pretend we got a reply from the server in cases
@@ -96,7 +97,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
 /// TODO items for above:
 ///      - once IM only supports DataModel
 ///      - break ember-overrides in this h/cpp file
-class TestImCustomDataModel : public DataModel::Provider
+class TestImCustomDataModel : public CodegenDataModelProvider
 {
 public:
     static TestImCustomDataModel & Instance();
@@ -109,29 +110,6 @@ public:
                                                  AttributeValueDecoder & decoder) override;
     std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request,
                                                         chip::TLV::TLVReader & input_arguments, CommandHandler * handler) override;
-
-    DataModel::EndpointEntry FirstEndpoint() override;
-    DataModel::EndpointEntry NextEndpoint(EndpointId before) override;
-    std::optional<DataModel::EndpointInfo> GetEndpointInfo(EndpointId endpoint) override;
-    std::optional<DataModel::DeviceTypeEntry> FirstDeviceType(EndpointId endpoint) override;
-    std::optional<DataModel::DeviceTypeEntry> NextDeviceType(EndpointId endpoint,
-                                                             const DataModel::DeviceTypeEntry & previous) override;
-    std::optional<SemanticTag> GetFirstSemanticTag(EndpointId endpoint) override;
-    std::optional<SemanticTag> GetNextSemanticTag(EndpointId endpoint, const SemanticTag & previous) override;
-    DataModel::ClusterEntry FirstServerCluster(EndpointId endpoint) override;
-    DataModel::ClusterEntry NextServerCluster(const ConcreteClusterPath & before) override;
-    std::optional<DataModel::ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) override;
-    ConcreteClusterPath FirstClientCluster(EndpointId endpoint) override;
-    ConcreteClusterPath NextClientCluster(const ConcreteClusterPath & before) override;
-    DataModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
-    DataModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
-    std::optional<DataModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;
-    DataModel::CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster) override;
-    DataModel::CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before) override;
-    std::optional<DataModel::CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) override;
-    ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) override;
-    ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before) override;
-    void Temporary_ReportAttributeChanged(const AttributePathParams & path) override {}
 };
 
 } // namespace app

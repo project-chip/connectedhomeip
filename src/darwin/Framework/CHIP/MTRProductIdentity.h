@@ -14,33 +14,29 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
 #import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * A representation of a "device type revision" in the sense used in the Matter
- * specification.  This has an identifier and a version number.
+ * A representation of a (vendor, product) pair that identifies a specific product.
  */
 NS_SWIFT_SENDABLE
-MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
-@interface MTRDeviceTypeRevision : NSObject <NSCopying>
+MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
+@interface MTRProductIdentity : NSObject /* <NSCopying, NSSecureCoding> (see below) */
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
-/**
- * The provided deviceTypeID must be in the range 0xVVVV0000-0xVVVVBFFF, where
- * VVVV is the vendor identifier (0 for standard device types).
- *
- * The provided deviceTypeRevision must be in the range 1-65535.
- */
-- (nullable instancetype)initWithDeviceTypeID:(NSNumber *)deviceTypeID revision:(NSNumber *)revision;
+- (instancetype)initWithVendorID:(NSNumber *)vendorID productID:(NSNumber *)productID;
 
-@property (nonatomic, copy, readonly) NSNumber * deviceTypeID;
-@property (nonatomic, copy, readonly) NSNumber * deviceTypeRevision;
+@property (nonatomic, copy, readonly) NSNumber * vendorID;
+@property (nonatomic, copy, readonly) NSNumber * productID;
 
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRProductIdentity () <NSCopying, NSSecureCoding>
 @end
 
 NS_ASSUME_NONNULL_END

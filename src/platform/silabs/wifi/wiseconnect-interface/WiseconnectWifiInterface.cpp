@@ -14,9 +14,11 @@
  *    limitations under the License.
  */
 
+#include <cmsis_os2.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/silabs/wifi/wiseconnect-interface/WiseconnectWifiInterface.h>
+#include <sl_cmsis_os2_common.h>
 
 extern WfxRsi_t wfx_rsi;
 
@@ -34,6 +36,9 @@ constexpr osThreadAttr_t kWlanTaskAttr = { .name       = "wlan_rsi",
                                            .stack_mem  = wlanStack,
                                            .stack_size = kWlanTaskSize,
                                            .priority   = osPriorityAboveNormal7 };
+
+osTimerId_t sDHCPTimer;
+bool hasNotifiedWifiConnectivity = false;
 
 } // namespace
 
@@ -76,7 +81,7 @@ CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback)
 
     // TODO: We should be calling the start function directly instead of doing it asynchronously
     WifiPlatformEvent event = WifiPlatformEvent::kScan;
-    sl_matter_wifi_post_event(event);
+    PostWifiPlatformEvent(event);
 
     return CHIP_NO_ERROR;
 }
@@ -88,7 +93,7 @@ CHIP_ERROR StartWifiTask()
     wfx_rsi.dev_state.Set(WifiState::kStationStarted);
 
     // Creating a Wi-Fi task thread
-    sWlanThread = osThreadNew(sl_matter_wifi_task, NULL, &kWlanTaskAttr);
+    sWlanThread = osThreadNew(MatterWifiTask, NULL, &kWlanTaskAttr);
     VerifyOrReturnError(sWlanThread != NULL, CHIP_ERROR_NO_MEMORY, ChipLogError(DeviceLayer, "Unable to create the WifiTask."););
 
     return CHIP_NO_ERROR;
@@ -107,6 +112,73 @@ bool IsStationModeEnabled()
 bool IsStationConnected()
 {
     return wfx_rsi.dev_state.Has(WifiState::kStationConnected);
+}
+
+bool IsStationReady()
+{
+    return wfx_rsi.dev_state.Has(WifiState::kStationInit);
+}
+
+CHIP_ERROR TriggerDisconnection()
+{
+    VerifyOrReturnError(TriggerPlatformWifiDisconnection() == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
+    wfx_rsi.dev_state.Clear(WifiState::kStationConnected);
+
+    return CHIP_NO_ERROR;
+}
+
+void DHCPTimerEventHandler(void * arg)
+{
+    WifiPlatformEvent event = WifiPlatformEvent::kStationDhcpPoll;
+    PostWifiPlatformEvent(event);
+}
+
+void CancelDHCPTimer(void)
+{
+    VerifyOrReturn(osTimerIsRunning(sDHCPTimer), ChipLogDetail(DeviceLayer, "CancelDHCPTimer: timer not running"));
+    VerifyOrReturn(osTimerStop(sDHCPTimer) == osOK, ChipLogError(DeviceLayer, "CancelDHCPTimer: failed to stop timer"));
+}
+
+void StartDHCPTimer(uint32_t timeout)
+{
+    // Cancel timer if already started
+    CancelDHCPTimer();
+
+    VerifyOrReturn(osTimerStart(sDHCPTimer, pdMS_TO_TICKS(timeout)) == osOK,
+                   ChipLogError(DeviceLayer, "StartDHCPTimer: failed to start timer"));
+}
+
+void NotifyConnectivity(void)
+{
+    VerifyOrReturn(!hasNotifiedWifiConnectivity);
+
+    NotifyConnection(wfx_rsi.ap_mac);
+    hasNotifiedWifiConnectivity = true;
+}
+
+sl_status_t CreateDHCPTimer()
+{
+    // TODO: Use LWIP timer instead of creating a new one here
+    sDHCPTimer = osTimerNew(DHCPTimerEventHandler, osTimerPeriodic, nullptr, nullptr);
+    VerifyOrReturnError(sDHCPTimer != nullptr, SL_STATUS_ALLOCATION_FAILED);
+
+    return SL_STATUS_OK;
+}
+
+/**
+ * @brief Reset the flags that are used to notify the application about DHCP connectivity
+ *        and emits a WifiPlatformEvent::kStationDoDhcp event to trigger DHCP polling checks.
+ *
+ * TODO: This function should be moved to the protected section once the class structure is done.
+ */
+void ResetDHCPNotificationFlags(void)
+{
+
+    ResetIPNotificationStates();
+    hasNotifiedWifiConnectivity = false;
+
+    WifiPlatformEvent event = WifiPlatformEvent::kStationDoDhcp;
+    PostWifiPlatformEvent(event);
 }
 
 /*********************************************************************
@@ -169,55 +241,10 @@ sl_status_t wfx_connect_to_ap(void)
     ChipLogProgress(DeviceLayer, "connect to access point: %s", wfx_rsi.sec.ssid);
 
     WifiPlatformEvent event = WifiPlatformEvent::kStationStartJoin;
-    sl_matter_wifi_post_event(event);
+    PostWifiPlatformEvent(event);
     return SL_STATUS_OK;
 }
 
-/*********************************************************************
- * @fn  void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
- * @brief
- *      Implement the ipv6 setup
- * @param[in]  whichif:
- * @return  None
- ***********************************************************************/
-void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
-{
-    /*
-     * TODO: Implement IPV6 setup, currently in sl_matter_wifi_task()
-     * This is hooked with MATTER code.
-     */
-}
-
-/*********************************************************************
- * @fn  wifi_mode_t wfx_get_wifi_mode(void)
- * @brief
- *      get the wifi mode
- * @param[in]  None
- * @return  return WIFI_MODE_NULL if successful,
- *          WIFI_MODE_STA otherwise
- ***********************************************************************/
-wifi_mode_t wfx_get_wifi_mode(void)
-{
-    if (wfx_rsi.dev_state.Has(WifiState::kStationInit))
-        return WIFI_MODE_STA;
-    return WIFI_MODE_NULL;
-}
-
-/*********************************************************************
- * @fn  sl_status_t sl_matter_wifi_disconnect(void)
- * @brief
- *      called fuction when STA disconnected
- * @param[in]  None
- * @return  return SL_STATUS_OK if successful,
- *          SL_STATUS_FAIL otherwise
- ***********************************************************************/
-sl_status_t sl_matter_wifi_disconnect(void)
-{
-    sl_status_t status;
-    status = sl_wifi_platform_disconnect();
-    wfx_rsi.dev_state.Clear(WifiState::kStationConnected);
-    return status;
-}
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
 /*********************************************************************
  * @fn  bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
@@ -247,58 +274,6 @@ bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
     VerifyOrReturnError(which_if == SL_WFX_STA_INTERFACE, false);
     // TODO: WifiState::kStationConnected does not guarantee SLAAC IPv6 LLA, maybe use a different FLAG
     return wfx_rsi.dev_state.Has(WifiState::kStationConnected);
-}
-
-/*********************************************************************
- * @fn  bool wfx_hw_ready(void)
- * @brief
- *      called fuction when driver ready
- * @param[in]  None
- * @return  returns ture if successful,
- *          false otherwise
- ***********************************************************************/
-bool wfx_hw_ready(void)
-{
-    return wfx_rsi.dev_state.Has(WifiState::kStationInit);
-}
-
-/*********************************************************************
- * @fn  int32_t wfx_get_ap_info(wfx_wifi_scan_result_t *ap)
- * @brief
- *      get the access point information
- * @param[in]  ap: access point
- * @return
- *      access point information
- ***********************************************************************/
-int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap)
-{
-    return wfx_rsi_get_ap_info(ap);
-}
-
-/*********************************************************************
- * @fn   int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t *extra_info)
- * @brief
- *      get the access point extra information
- * @param[in]  extra_info:access point extra information
- * @return
- *      access point extra information
- ***********************************************************************/
-int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
-{
-    return wfx_rsi_get_ap_ext(extra_info);
-}
-
-/***************************************************************************
- * @fn   int32_t wfx_reset_counts(void)
- * @brief
- *      get the driver reset count
- * @param[in]  None
- * @return
- *      reset count
- *****************************************************************************/
-int32_t wfx_reset_counts(void)
-{
-    return wfx_rsi_reset_count();
 }
 
 /***************************************************************************
