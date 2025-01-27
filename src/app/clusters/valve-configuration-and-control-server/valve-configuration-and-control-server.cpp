@@ -407,6 +407,7 @@ CHIP_ERROR SetRemainingDuration(EndpointId endpoint, DataModel::Nullable<uint32_
     {
         gRemainingDuration[epIdx].endpoint          = endpoint;
         gRemainingDuration[epIdx].remainingDuration = duration;
+        MatterReportingAttributeChangeCallback(endpoint, ValveConfigurationAndControl::Id, RemainingDuration::Id);
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_WRITE_FAILED;
