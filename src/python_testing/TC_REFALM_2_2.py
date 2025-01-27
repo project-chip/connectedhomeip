@@ -52,7 +52,9 @@ from chip.tlv import  uint
 
 logger = logging.getLogger(__name__)
 
-# Implement fake commands for the RefrigeratorAlarm Cluster #
+# TODO(#37217)  Refactor using generic method.
+# Implement fake commands for the RefrigeratorAlarm Cluster
+# These comands are Disallowed (X) in the spec. 
 # When running those commands must return 0x81 (UNSUPPORTED COMMAND)
 @dataclass
 class FakeReset(ClusterCommand):
@@ -185,11 +187,11 @@ class TC_REFALM_2_2(MatterBaseTest):
         sleep(0.1)
 
     def _send_open_door_command(self):
-        command_dict  = {"Name":"SetRefrigeratorDoorStatus", "EndpointId": self.endpoint, "Status": Clusters.RefrigeratorAlarm.Bitmaps.AlarmBitmap.kDoorOpen}
+        command_dict  = {"Name":"SetRefrigeratorDoorStatus", "EndpointId": self.endpoint, "DoorOpen": Clusters.RefrigeratorAlarm.Bitmaps.AlarmBitmap.kDoorOpen}
         self._send_named_pipe_command(command_dict)
 
     def _send_close_door_commnad(self):
-        command_dict  = {"Name":"SetRefrigeratorDoorStatus", "EndpointId": self.endpoint, "Status": 0}
+        command_dict  = {"Name":"SetRefrigeratorDoorStatus", "EndpointId": self.endpoint, "DoorOpen": 0}
         self._send_named_pipe_command(command_dict)
 
     @async_test_body

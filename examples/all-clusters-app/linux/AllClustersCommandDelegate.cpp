@@ -287,22 +287,22 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
 }
 
 /**
- * Named pipe handler for simulating a latched switch movement.
+ * Named pipe handler for simulating a Door Opening.
  *
  * Usage example:
  *   echo '{"Name":"SetRefDoorStatus", "EndpointId": 1, "Status": 1}' > /tmp/chip_all_clusters_fifo_1146610
  *
  * JSON Arguments:
  *   - "Name": Must be "SetRefDoorStatus"
- *   - "EndpointId": ID of endpoint having a switch cluster
- *   - "Status": Status of the door, open or closed.
+ *   - "EndpointId": ID of endpoint
+ *   - "DoorOpen": Status of the door, open or closed.
  *
  * @param jsonValue - JSON payload from named pipe
  */
 void SetRefrigetatorDoorStatusHandler(Json::Value & jsonValue)
 {
     bool hasEndpointId = HasNumericField(jsonValue, "EndpointId");
-    bool hasDoorStatus = HasNumericField(jsonValue, "Status");
+    bool hasDoorStatus = HasNumericField(jsonValue, "DoorOpen");
 
     if (!hasEndpointId || !hasDoorStatus)
     {
@@ -310,18 +310,18 @@ void SetRefrigetatorDoorStatusHandler(Json::Value & jsonValue)
         ChipLogError(NotSpecified, "Missing or invalid value for one of EndpointId, Status in %s", inputJson.c_str());
         return;
     }
-    // values to updatethe state
+    // values to update the door status
     EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
-    uint8_t doorStatus    = static_cast<uint8_t>(jsonValue["Status"].asUInt());
+    bool doorStatus    = static_cast<bool>(jsonValue["DoorOpen"].asBool());
     ChipLogDetail(NotSpecified, "SetRefrigetatorDoorStatusHandler State -> %d.",doorStatus);
-     if ( doorStatus == 0 ) {        
+     if ( !doorStatus  ) {
         RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId,doorStatus);
         ChipLogDetail(NotSpecified, "Refrigeratoralarm status updated to :%d", doorStatus);
-    }else if (doorStatus == 1){
+    }else if (doorStatus){
         RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId,doorStatus);
         RefrigeratorAlarmServer::Instance().SetStateValue(endpointId,doorStatus);
     }else {
-        ChipLogError(NotSpecified, "Invalid State value to set.");
+        ChipLogError(NotSpecified, "Invalid value to set.");
         return;
     }
 }
