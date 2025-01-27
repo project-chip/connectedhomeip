@@ -692,6 +692,11 @@ std::optional<DataModel::AttributeInfo> CodegenDataModelProvider::GetAttributeIn
 
 DataModel::CommandEntry CodegenDataModelProvider::FirstAcceptedCommand(const ConcreteClusterPath & path)
 {
+    // As some CommandHandlerInterface commands are registered on wildcard interfaces,
+    // the valid endpoint/cluster check is done BEFORE attempting command handler interface handling
+    const EmberAfCluster * cluster = FindServerCluster(path);
+    VerifyOrReturnValue(cluster != nullptr, DataModel::CommandEntry::kInvalid);
+
     auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
                                      .FindCommandEntry(EnumeratorCommandFinder::Operation::kFindFirst,
                                                        ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId));
@@ -700,10 +705,6 @@ DataModel::CommandEntry CodegenDataModelProvider::FirstAcceptedCommand(const Con
     {
         return *handlerInterfaceValue;
     }
-
-    const EmberAfCluster * cluster = FindServerCluster(path);
-
-    VerifyOrReturnValue(cluster != nullptr, DataModel::CommandEntry::kInvalid);
 
     std::optional<CommandId> commandId = mAcceptedCommandsIterator.First(cluster->acceptedCommandList);
     VerifyOrReturnValue(commandId.has_value(), DataModel::CommandEntry::kInvalid);
@@ -757,6 +758,11 @@ std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedComma
 
 ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const ConcreteClusterPath & path)
 {
+    // As some CommandHandlerInterface commands are registered on wildcard interfaces,
+    // the valid endpoint/cluster check is done BEFORE attempting command handler interface handling
+    const EmberAfCluster * cluster = FindServerCluster(path);
+    VerifyOrReturnValue(cluster != nullptr, kInvalidCommandPath);
+
     std::optional<CommandId> commandId =
         EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateGeneratedCommands)
             .FindCommandId(EnumeratorCommandFinder::Operation::kFindFirst,
@@ -766,9 +772,6 @@ ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const Concre
         return *commandId == kInvalidCommandId ? kInvalidCommandPath
                                                : ConcreteCommandPath(path.mEndpointId, path.mClusterId, *commandId);
     }
-
-    const EmberAfCluster * cluster = FindServerCluster(path);
-    VerifyOrReturnValue(cluster != nullptr, kInvalidCommandPath);
 
     commandId = mGeneratedCommandsIterator.First(cluster->generatedCommandList);
     VerifyOrReturnValue(commandId.has_value(), kInvalidCommandPath);

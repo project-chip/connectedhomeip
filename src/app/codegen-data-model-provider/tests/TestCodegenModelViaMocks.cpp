@@ -1384,6 +1384,33 @@ TEST(TestCodegenModelViaMocks, CommandHandlerInterfaceValidity)
     }
 }
 
+TEST(TestCodegenModelViaMocks, AcceptedGeneratedCommandsOnInvalidEndpoints)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    // register a CHI on ALL endpoints
+    CustomListCommandHandler handler(chip::NullOptional, MockClusterId(1));
+
+    // check a valid endpoint (no override)
+    EXPECT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).IsValid());
+    EXPECT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).HasValidIds());
+
+    handler.SetOverrideAccepted(true);
+    handler.SetOverrideGenerated(true);
+
+    // Make the lists non-empty som something is returned.
+    handler.AcceptedVec().push_back(1234);
+    handler.GeneratedVec().push_back(33);
+
+    EXPECT_TRUE(model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).IsValid());
+    EXPECT_TRUE(model.FirstGeneratedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).HasValidIds());
+
+    // invalid endpoint
+    EXPECT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).IsValid());
+    EXPECT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).HasValidIds());
+}
+
 TEST(TestCodegenModelViaMocks, CommandHandlerInterfaceAcceptedCommands)
 {
 
