@@ -255,7 +255,8 @@ class TC_ICDM_2_1(MatterBaseTest):
                 pattern = re.compile(r'^[0-9A-F]{6}$')
                 asserts.assert_true(pattern.match(userActiveModeTriggerInstruction),
                                     "UserActiveModeTriggerInstruction is not in the correct format for the associated UserActiveModeTriggerHint")
-        elif self.check_pics("ICDM.S.A0006"):
+
+        elif async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.UserActiveModeTriggerHint), timeout=self.timeout):
             # Check if the UserActiveModeTriggerInstruction was required
             asserts.assert_false(uatHintInstructionDepedentBitmap in kUatInstructionMandatoryBitMask,
                                  "UserActiveModeTriggerHint requires the UserActiveModeTriggerInstruction")
