@@ -1238,6 +1238,16 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceValidity)
         ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ &commandHandler),
                   Protocols::InteractionModel::Status::UnsupportedEndpoint);
     }
+
+    // Command fails on an invalid cluster
+    {
+        const ConcreteCommandPath kCommandPath(kMockEndpoint1, MockClusterId(0x1123), kMockCommandId1);
+        const InvokeRequest kInvokeRequest{ .path = kCommandPath };
+        chip::TLV::TLVReader tlvReader;
+
+        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ &commandHandler),
+                  Protocols::InteractionModel::Status::UnsupportedCluster);
+    }
 }
 
 TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
