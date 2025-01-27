@@ -502,7 +502,7 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
 
     // Initialize device attestation verifier
     const chip::Credentials::AttestationTrustStore * testingRootStore = GetTestFileAttestationTrustStore(paaTrustStorePath);
-    chip::Credentials::DeviceAttestationVerifier * dacVerifier = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
+    chip::Credentials::DeviceAttestationVerifier * dacVerifier        = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
     SetDeviceAttestationVerifier(dacVerifier);
 
     chip::Crypto::P256Keypair ephemeralKey;
@@ -724,7 +724,8 @@ PyChipError pychip_DeviceController_SetDACRevocationSetPath(const char * dacRevo
     // GetDefaultDACVerifier returns the pointer of type DeviceAttestationVerifier and it does not have the
     // SetRevocationDelegate method so we are safely downcasting to DefaultDACVerifier, and set the revocation
     // delegate
-    if (chip::Credentials::DefaultDACVerifier * defaultDACVerifier = dynamic_cast<chip::Credentials::DefaultDACVerifier *>(dacVerifier))
+    if (chip::Credentials::DefaultDACVerifier * defaultDACVerifier =
+            dynamic_cast<chip::Credentials::DefaultDACVerifier *>(dacVerifier))
     {
         defaultDACVerifier->SetRevocationDelegate(dacRevocationDelegate);
     }
