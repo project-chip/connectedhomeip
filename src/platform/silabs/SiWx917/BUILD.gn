@@ -18,6 +18,7 @@ import("${chip_root}/src/platform/device.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/platform/silabs/provision/args.gni")
 import("${chip_root}/src/platform/silabs/wifi/args.gni")
 import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
@@ -87,7 +88,10 @@ static_library("SiWx917") {
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/platform:platform_base",
   ]
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  deps = [
+    "${chip_root}/src/platform/logging:headers",
+    "${sl_provision_root}:provision-headers",
+  ]
 
   # Add platform crypto implementation
   if (chip_crypto == "platform") {

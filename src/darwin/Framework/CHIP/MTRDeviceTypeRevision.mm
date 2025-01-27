@@ -14,13 +14,18 @@
  *    limitations under the License.
  */
 
+#import "MTRDeviceTypeRevision.h"
 #import "MTRDefines_Internal.h"
+#import "MTRDeviceType.h"
 #import "MTRLogging_Internal.h"
-#import <Matter/MTRDeviceTypeRevision.h>
+#import "MTRStructsObjc.h"
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 using namespace chip;
 
@@ -29,6 +34,9 @@ MTR_DIRECT_MEMBERS
 
 - (nullable instancetype)initWithDeviceTypeID:(NSNumber *)deviceTypeID revision:(NSNumber *)revision
 {
+    VerifyOrReturnValue(deviceTypeID != nil, nil);
+    VerifyOrReturnValue(revision != nil, nil);
+
     auto deviceTypeIDValue = deviceTypeID.unsignedLongLongValue;
     if (!CanCastTo<DeviceTypeId>(deviceTypeIDValue)) {
         MTR_LOG_ERROR("MTRDeviceTypeRevision provided too-large device type ID: 0x%llx", deviceTypeIDValue);
@@ -50,20 +58,49 @@ MTR_DIRECT_MEMBERS
     return [self initInternalWithDeviceTypeID:[deviceTypeID copy] revision:[revision copy]];
 }
 
+- (nullable instancetype)initWithDeviceTypeStruct:(MTRDescriptorClusterDeviceTypeStruct *)deviceTypeStruct
+{
+    return [self initWithDeviceTypeID:deviceTypeStruct.deviceType revision:deviceTypeStruct.revision];
+}
+
 // initInternalWithDeviceTypeID:revision assumes that the device type ID and device
 // revision have already been validated and, if needed, copied from the input.
 - (instancetype)initInternalWithDeviceTypeID:(NSNumber *)deviceTypeID revision:(NSNumber *)revision
 {
-    if (!(self = [super init])) {
-        return nil;
-    }
-
+    self = [super init];
     _deviceTypeID = deviceTypeID;
     _deviceTypeRevision = revision;
     return self;
 }
 
-- (id)copyWithZone:(NSZone *)zone
+static NSString * const sTypeIdCodingKey = @"ty";
+static NSString * const sRevisionCodingKey = @"re";
+
+- (nullable instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super init];
+    _deviceTypeID = @(static_cast<DeviceTypeId>([coder decodeInt64ForKey:sTypeIdCodingKey])); // int64_t encompasses uint32_t
+    _deviceTypeRevision = @(static_cast<uint16_t>([coder decodeIntegerForKey:sRevisionCodingKey]));
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [coder encodeInt64:static_cast<DeviceTypeId>(_deviceTypeID.unsignedLongLongValue) forKey:sTypeIdCodingKey];
+    [coder encodeInteger:static_cast<uint16_t>(_deviceTypeRevision.unsignedIntegerValue) forKey:sRevisionCodingKey];
+}
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (nullable MTRDeviceType *)typeInformation
+{
+    return [MTRDeviceType deviceTypeForID:_deviceTypeID];
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone
 {
     // We have no mutable state.
     return self;
@@ -85,4 +122,13 @@ MTR_DIRECT_MEMBERS
     return _deviceTypeID.unsignedLongValue ^ _deviceTypeRevision.unsignedShortValue;
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@ 0x%" PRIx32 " (%@) rev %d>",
+                     self.class, _deviceTypeID.unsignedIntValue,
+                     self.typeInformation.name ?: @"???", _deviceTypeRevision.unsignedIntValue];
+}
+
 @end
+
+NS_ASSUME_NONNULL_END

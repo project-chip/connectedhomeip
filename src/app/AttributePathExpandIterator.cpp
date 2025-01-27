@@ -17,6 +17,7 @@
 #include <app/AttributePathExpandIterator.h>
 
 #include <app/GlobalAttributes.h>
+#include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
@@ -139,13 +140,13 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
     if (mAttributeIndex == kInvalidIndex)
     {
         // start a new iteration of attributes on the current cluster path.
-        mAttributes = mDataModelProvider->Attributes(mPosition.mOutputPath);
+        mAttributes = mDataModelProvider->AttributesIgnoreError(mPosition.mOutputPath);
 
         if (mPosition.mOutputPath.mAttributeId != kInvalidAttributeId)
         {
             // Position on the correct attribute if we have a start point
             mAttributeIndex = 0;
-            while ((mAttributeIndex < mAttributes.Size()) &&
+            while ((mAttributeIndex < mAttributes.size()) &&
                    (mAttributes[mAttributeIndex].attributeId != mPosition.mOutputPath.mAttributeId))
             {
                 mAttributeIndex++;
@@ -199,7 +200,7 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
         return std::nullopt;
     }
 
-    if (mAttributeIndex < mAttributes.Size())
+    if (mAttributeIndex < mAttributes.size())
     {
         return mAttributes[mAttributeIndex].attributeId;
     }
@@ -222,13 +223,13 @@ std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()
     if (mClusterIndex == kInvalidIndex)
     {
         // start a new iteration on the current endpoint
-        mClusters = mDataModelProvider->ServerClusters(mPosition.mOutputPath.mEndpointId);
+        mClusters = mDataModelProvider->ServerClustersIgnoreError(mPosition.mOutputPath.mEndpointId);
 
         if (mPosition.mOutputPath.mClusterId != kInvalidClusterId)
         {
             // Position on the correct cluster if we have a start point
             mClusterIndex = 0;
-            while ((mClusterIndex < mClusters.Size()) && (mClusters[mClusterIndex].clusterId != mPosition.mOutputPath.mClusterId))
+            while ((mClusterIndex < mClusters.size()) && (mClusters[mClusterIndex].clusterId != mPosition.mOutputPath.mClusterId))
             {
                 mClusterIndex++;
             }
@@ -248,10 +249,8 @@ std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()
             {
                 const ClusterId clusterId = mPosition.mAttributePath->mValue.mClusterId;
 
-                auto span = mClusters.GetSpanValidForLifetime();
-
                 bool found = false;
-                for (auto & entry : span)
+                for (auto & entry : mClusters)
                 {
                     if (entry.clusterId == clusterId)
                     {
@@ -276,7 +275,7 @@ std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()
     }
 
     VerifyOrReturnValue(mPosition.mAttributePath->mValue.HasWildcardClusterId(), std::nullopt);
-    VerifyOrReturnValue(mClusterIndex < mClusters.Size(), std::nullopt);
+    VerifyOrReturnValue(mClusterIndex < mClusters.size(), std::nullopt);
 
     return mClusters[mClusterIndex].clusterId;
 }
@@ -286,13 +285,13 @@ std::optional<EndpointId> AttributePathExpandIterator::NextEndpointId()
     if (mEndpointIndex == kInvalidIndex)
     {
         // index is missing, have to start a new iteration
-        mEndpoints = mDataModelProvider->Endpoints();
+        mEndpoints = mDataModelProvider->EndpointsIgnoreError();
 
         if (mPosition.mOutputPath.mEndpointId != kInvalidEndpointId)
         {
             // Position on the correct endpoint if we have a start point
             mEndpointIndex = 0;
-            while ((mEndpointIndex < mEndpoints.Size()) && (mEndpoints[mEndpointIndex].id != mPosition.mOutputPath.mEndpointId))
+            while ((mEndpointIndex < mEndpoints.size()) && (mEndpoints[mEndpointIndex].id != mPosition.mOutputPath.mEndpointId))
             {
                 mEndpointIndex++;
             }
@@ -315,7 +314,7 @@ std::optional<EndpointId> AttributePathExpandIterator::NextEndpointId()
     }
 
     VerifyOrReturnValue(mPosition.mAttributePath->mValue.HasWildcardEndpointId(), std::nullopt);
-    VerifyOrReturnValue(mEndpointIndex < mEndpoints.Size(), std::nullopt);
+    VerifyOrReturnValue(mEndpointIndex < mEndpoints.size(), std::nullopt);
 
     return mEndpoints[mEndpointIndex].id;
 }

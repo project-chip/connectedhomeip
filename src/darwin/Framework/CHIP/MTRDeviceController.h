@@ -270,6 +270,12 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
+ * Forget any information we have about the device with the given node ID.  That
+ * includes clearing any information we have stored about it.
+ */
+- (void)forgetDeviceWithNodeID:(NSNumber *)nodeID MTR_NEWLY_AVAILABLE;
+
+/**
  * Compute a PASE verifier for the desired setup passcode.
  *
  * @param[in] setupPasscode   The desired passcode to use.

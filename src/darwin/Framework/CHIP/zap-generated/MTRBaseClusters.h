@@ -14086,7 +14086,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command VideoStreamModify
  *
- * This command SHALL be used to modify the resolution of a stream specified by the VideoStreamID.
+ * This command SHALL be used to modify a stream specified by the VideoStreamID.
  */
 - (void)videoStreamModifyWithParams:(MTRCameraAVStreamManagementClusterVideoStreamModifyParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**

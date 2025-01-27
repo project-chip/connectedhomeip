@@ -8,39 +8,102 @@ from mobly import asserts
 
 T = TypeVar('T')
 
+
+# Internal helper functions
+
+def is_valid_uint_value(value: Any, bit_count: int = 64) -> bool:
+    """
+    Checks if 'value' is a non-negative integer that fits into 'bit_count' bits.
+    For example, bit_count=32 => 0 <= value <= 0xFFFFFFFF
+    """
+    if not isinstance(value, int):
+        return False
+    if value < 0:
+        return False
+    return value < (1 << bit_count)
+
+
+def is_valid_int_value(value: Any, bit_count: int = 8) -> bool:
+    """
+    Checks if 'value' is a signed integer that fits into 'bit_count' bits.
+    For example, for int8: -128 <= value <= 127.
+    """
+    min_val = -(1 << (bit_count - 1))
+    max_val = (1 << (bit_count - 1)) - 1
+    return isinstance(value, int) and (min_val <= value <= max_val)
+
+
+def is_valid_bool_value(value: Any) -> bool:
+    """
+    Checks if 'value' is a boolean.
+    """
+    return isinstance(value, bool)
+
+
 # Integer assertions
+
+def assert_valid_uint64(value: Any, description: str) -> None:
+    """
+    Asserts that the value is a valid uint64 (0 <= value < 2^64).
+    """
+    asserts.assert_true(is_valid_uint_value(value, bit_count=64),
+                        f"{description} must be a valid uint64 integer")
 
 
 def assert_valid_uint32(value: Any, description: str) -> None:
     """
-    Asserts that the value is a valid uint32.
-
-    Args:
-        value: The value to check
-        description: User-defined description for error messages
-
-    Raises:
-        AssertionError: If value is not an integer or outside the uint32 range (0 to 0xFFFFFFFF)
+    Asserts that the value is a valid uint32 (0 <= value < 2^32).
     """
-    asserts.assert_true(isinstance(value, int), f"{description} must be an integer")
-    asserts.assert_greater_equal(value, 0, f"{description} must be non-negative")
-    asserts.assert_less_equal(value, 0xFFFFFFFF, f"{description} must not exceed 0xFFFFFFFF")
+    asserts.assert_true(is_valid_uint_value(value, bit_count=32),
+                        f"{description} must be a valid uint32 integer")
 
 
-def assert_valid_uint64(value: Any, description: str) -> None:
+def assert_valid_uint16(value: Any, description: str) -> None:
     """
-    Asserts that the value is a valid uint64.
-
-    Args:
-        value: The value to check
-        description: User-defined description for error messages
-
-    Raises:
-        AssertionError: If value is not an integer or outside the uint64 range (0 to 0xFFFFFFFFFFFFFFFF)
+    Asserts that the value is a valid uint16 (0 <= value < 2^16).
     """
-    asserts.assert_true(isinstance(value, int), f"{description} must be an integer")
-    asserts.assert_greater_equal(value, 0, f"{description} must be non-negative")
-    asserts.assert_less_equal(value, 0xFFFFFFFFFFFFFFFF, f"{description} must not exceed 0xFFFFFFFFFFFFFFFF")
+    asserts.assert_true(is_valid_uint_value(value, bit_count=16),
+                        f"{description} must be a valid uint16 integer")
+
+
+def assert_valid_uint8(value: Any, description: str) -> None:
+    """
+    Asserts that the value is a valid uint8 (0 <= value < 2^8).
+    """
+    asserts.assert_true(is_valid_uint_value(value, bit_count=8),
+                        f"{description} must be a valid uint8 integer")
+
+
+def assert_valid_int64(value: Any, description: str) -> None:
+    """
+    Asserts that the value is a valid int64 (-2^63 <= value <= 2^63-1).
+    """
+    asserts.assert_true(is_valid_int_value(value, bit_count=64),
+                        f"{description} must be a valid int64 integer")
+
+
+def assert_valid_int32(value: Any, description: str) -> None:
+    """
+    Asserts that the value is a valid int32 (-2^31 <= value <= 2^31-1).
+    """
+    asserts.assert_true(is_valid_int_value(value, bit_count=32),
+                        f"{description} must be a valid int32 integer")
+
+
+def assert_valid_int16(value: Any, description: str) -> None:
+    """
+    Asserts that the value is a valid int16 (-2^15 <= value <= 2^15-1).
+    """
+    asserts.assert_true(is_valid_int_value(value, bit_count=16),
+                        f"{description} must be a valid int16 integer")
+
+
+def assert_valid_int8(value: Any, description: str) -> None:
+    """
+    Asserts that the value is a valid int8 (-128 <= value <= 127).
+    """
+    asserts.assert_true(is_valid_int_value(value, bit_count=8),
+                        f"{description} must be a valid int8 integer")
 
 
 def assert_int_in_range(value: Any, min_value: int, max_value: int, description: str) -> None:
@@ -60,8 +123,8 @@ def assert_int_in_range(value: Any, min_value: int, max_value: int, description:
     asserts.assert_greater_equal(value, min_value, f"{description} must be greater than or equal to {min_value}")
     asserts.assert_less_equal(value, max_value, f"{description} must be less than or equal to {max_value}")
 
-# List assertions
 
+# List assertions
 
 def assert_list(value: Any, description: str, min_length: Optional[int] = None, max_length: Optional[int] = None) -> None:
     """
@@ -104,8 +167,8 @@ def assert_list_element_type(value: List[Any], description: str, expected_type: 
         asserts.assert_true(isinstance(item, expected_type),
                             f"{description}[{i}] must be of type {expected_type.__name__}")
 
-# String assertions
 
+# String assertions
 
 def assert_is_string(value: Any, description: str) -> None:
     """
@@ -139,11 +202,9 @@ def assert_string_length(value: Any, description: str, min_length: Optional[int]
         - Use min_length=None, max_length=None to only validate string type (same as assert_is_string)
     """
     assert_is_string(value, description)
-
     if min_length is not None:
         asserts.assert_greater_equal(len(value), min_length,
                                      f"{description} length must be at least {min_length} characters")
-
     if max_length is not None:
         asserts.assert_less_equal(len(value), max_length,
                                   f"{description} length must not exceed {max_length} characters")
@@ -162,8 +223,22 @@ def assert_non_empty_string(value: Any, description: str) -> None:
     """
     assert_string_length(value, description, min_length=1)
 
-# Matter-specific assertions
 
+def assert_is_octstr(value: Any, description: str) -> None:
+    """
+    Asserts that the value is a octet string.
+
+    Args:
+        value: The value to check
+        description: User-defined description for error messages
+
+    Raises:
+        AssertionError: If value is not a octet string (bytes)
+    """
+    asserts.assert_true(isinstance(value, bytes), f"{description} must be a octet string (bytes)")
+
+
+# Matter-specific assertions
 
 def assert_string_matches_pattern(value: str, description: str, pattern: str) -> None:
     """
@@ -243,3 +318,11 @@ def assert_standard_command_id(id: int) -> None:
     from chip.testing.global_attribute_ids import is_standard_command_id
     asserts.assert_true(is_standard_command_id(id),
                         f"Not a standard command ID: {hex(id)}")
+
+
+def assert_valid_enum(value: Any, description: str, enum_type: type) -> None:
+    """
+    Asserts that 'value' is a valid instance of the specified enum type.
+    """
+    asserts.assert_true(isinstance(value, enum_type),
+                        f"{description} must be of type {enum_type.__name__}")

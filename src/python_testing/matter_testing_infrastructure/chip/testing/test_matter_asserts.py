@@ -1,9 +1,15 @@
 """Unit tests for matter_asserts module."""
 
+import enum
 import unittest
 
 from chip.testing import matter_asserts
 from mobly import signals
+
+
+class MyTestEnum(enum.Enum):
+    VALID_MEMBER = 1
+    ANOTHER_MEMBER = 2
 
 
 class TestMatterAsserts(unittest.TestCase):
@@ -41,6 +47,90 @@ class TestMatterAsserts(unittest.TestCase):
             matter_asserts.assert_valid_uint64("42", "test_string")
         with self.assertRaises(signals.TestFailure):
             matter_asserts.assert_valid_uint64(42.0, "test_float")
+
+    def test_assert_valid_uint16(self):
+        """Test assert_valid_uint16 with valid and invalid values."""
+        # Valid cases
+        matter_asserts.assert_valid_uint16(0, "test_min")
+        matter_asserts.assert_valid_uint16(0xFFFF, "test_max")
+
+        # Invalid cases
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_uint16(-1, "test_negative")
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_uint16(0x10000, "test_too_large")
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_uint16("42", "test_string")
+
+    def test_assert_valid_uint8(self):
+        """Test assert_valid_uint8 with valid and invalid values."""
+        # Valid cases
+        matter_asserts.assert_valid_uint8(0, "test_min")
+        matter_asserts.assert_valid_uint8(0xFF, "test_max")
+
+        # Invalid cases
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_uint8(-1, "test_negative")
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_uint8(0x100, "test_too_large")
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_uint8("42", "test_string")
+
+    def test_assert_valid_int64(self):
+        """Test assert_valid_int64 with valid and invalid values."""
+        # Valid cases
+        matter_asserts.assert_valid_int64(-2**63, "test_min")
+        matter_asserts.assert_valid_int64(2**63 - 1, "test_max")
+
+        # Invalid cases
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_int64(-2**63 - 1, "test_too_small")
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_int64(2**63, "test_too_large")
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_int64("42", "test_string")
+
+    def test_assert_valid_int32(self):
+        """Test assert_valid_int32 with valid and invalid values."""
+        # Valid cases
+        matter_asserts.assert_valid_int32(-2**31, "test_min")
+        matter_asserts.assert_valid_int32(2**31 - 1, "test_max")
+
+        # Invalid cases
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_int32(-2**31 - 1, "test_too_small")
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_int32(2**31, "test_too_large")
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_int32("42", "test_string")
+
+    def test_assert_valid_int16(self):
+        """Test assert_valid_int16 with valid and invalid values."""
+        # Valid cases
+        matter_asserts.assert_valid_int16(-2**15, "test_min")
+        matter_asserts.assert_valid_int16(2**15 - 1, "test_max")
+
+        # Invalid cases
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_int16(-2**15 - 1, "test_too_small")
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_int16(2**15, "test_too_large")
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_int16("42", "test_string")
+
+    def test_assert_valid_int8(self):
+        """Test assert_valid_int8 with valid and invalid values."""
+        # Valid cases
+        matter_asserts.assert_valid_int8(-128, "test_min")
+        matter_asserts.assert_valid_int8(127, "test_max")
+
+        # Invalid cases
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_int8(-129, "test_too_small")
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_int8(128, "test_too_large")
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_int8("42", "test_string")
 
     def test_assert_int_in_range(self):
         """Test assert_int_in_range with valid and invalid values."""
@@ -125,6 +215,41 @@ class TestMatterAsserts(unittest.TestCase):
             matter_asserts.assert_non_empty_string("", "test_empty")
         with self.assertRaises(signals.TestFailure):
             matter_asserts.assert_non_empty_string(42, "test_not_string")
+
+    def test_assert_is_octstr(self):
+        """Test assert_is_octstr with valid and invalid values."""
+        # Valid case
+        matter_asserts.assert_is_octstr(b"", "test_empty_bytes")
+        matter_asserts.assert_is_octstr(b"\x01\x02", "test_some_bytes")
+
+        # Invalid cases
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_is_octstr("not_bytes", "test_string")
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_is_octstr(123, "test_int")
+
+    def test_assert_string_matches_pattern(self):
+        """Test assert_string_matches_pattern with valid and invalid values."""
+        # Valid cases
+        matter_asserts.assert_string_matches_pattern("abc123", "test_alphanumeric", r'^[a-z0-9]+$')
+        matter_asserts.assert_string_matches_pattern("hello", "test_hello", r'^hello$')
+
+        # Invalid cases
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_string_matches_pattern(123, "test_not_string", r'^.*$')
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_string_matches_pattern("abc!", "test_pattern_mismatch", r'^[a-z0-9]+$')
+
+    def test_assert_valid_enum(self):
+        """Test assert_valid_enum with valid and invalid values."""
+        # Valid case
+        matter_asserts.assert_valid_enum(MyTestEnum.VALID_MEMBER, "test_enum_member", MyTestEnum)
+
+        # Invalid cases: not an enum member or wrong type
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_enum(1, "test_int_instead_of_enum", MyTestEnum)
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_valid_enum("INVALID", "test_string", MyTestEnum)
 
     # Matter-specific assertion tests
     def test_assert_valid_attribute_id(self):
