@@ -1412,9 +1412,9 @@ TEST(TestCodegenModelViaMocks, AcceptedGeneratedCommandsOnInvalidEndpoints)
 
     // invalid endpoint
     EXPECT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).IsValid());
-    EXPECT_FALSE(model.NextAcceptedCommand(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234)).IsValid());
+    EXPECT_FALSE(model.NextAcceptedCommand(ConcreteCommandPath(kEndpointIdThatIsMissing, MockClusterId(1), 1234)).IsValid());
     EXPECT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).HasValidIds());
-    EXPECT_FALSE(model.NextGeneratedCommand(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 33)).HasValidIds());
+    EXPECT_FALSE(model.NextGeneratedCommand(ConcreteCommandPath(kEndpointIdThatIsMissing, MockClusterId(1), 33)).HasValidIds());
 }
 
 TEST(TestCodegenModelViaMocks, CommandHandlerInterfaceAcceptedCommands)

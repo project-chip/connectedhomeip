@@ -797,7 +797,6 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
                                               : ConcreteCommandPath(before.mEndpointId, before.mClusterId, *nextId);
     }
 
-
     std::optional<CommandId> commandId = mGeneratedCommandsIterator.Next(cluster->generatedCommandList, before.mCommandId);
     VerifyOrReturnValue(commandId.has_value(), kInvalidCommandPath);
 
