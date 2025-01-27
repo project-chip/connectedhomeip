@@ -1330,7 +1330,6 @@ TEST(TestCodegenModelViaMocks, AcceptedCommandValidity)
 
     handler.SetOverrideAccepted(true);
     handler.AcceptedVec().push_back(1234);
-    handler.AcceptedVec().push_back(999);
 
     // Command succeeds on a valid endpoint
     EXPECT_TRUE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234)).has_value());
@@ -1372,6 +1371,16 @@ TEST(TestCodegenModelViaMocks, CommandHandlerInterfaceValidity)
 
         ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ &commandHandler),
                   Protocols::InteractionModel::Status::UnsupportedEndpoint);
+    }
+
+    // Command fails on an invalid cluster
+    {
+        const ConcreteCommandPath kCommandPath(kMockEndpoint1, MockClusterId(0x1123), kMockCommandId1);
+        const InvokeRequest kInvokeRequest{ .path = kCommandPath };
+        chip::TLV::TLVReader tlvReader;
+
+        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ &commandHandler),
+                  Protocols::InteractionModel::Status::UnsupportedCluster);
     }
 }
 
