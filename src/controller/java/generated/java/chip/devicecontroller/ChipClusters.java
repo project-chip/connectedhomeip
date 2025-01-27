@@ -16113,6 +16113,82 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public void setVidVerificationStatement(DefaultClusterCallback callback, Optional<Integer> vendorID, Optional<byte[]> vidVerificationStatement, Optional<byte[]> vvsc) {
+      setVidVerificationStatement(callback, vendorID, vidVerificationStatement, vvsc, 0);
+    }
+
+    public void setVidVerificationStatement(DefaultClusterCallback callback, Optional<Integer> vendorID, Optional<byte[]> vidVerificationStatement, Optional<byte[]> vvsc, int timedInvokeTimeoutMs) {
+      final long commandId = 12L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long vendorIDFieldID = 0L;
+      BaseTLVType vendorIDtlvValue = vendorID.<BaseTLVType>map((nonOptionalvendorID) -> new UIntType(nonOptionalvendorID)).orElse(new EmptyType());
+      elements.add(new StructElement(vendorIDFieldID, vendorIDtlvValue));
+
+      final long vidVerificationStatementFieldID = 1L;
+      BaseTLVType vidVerificationStatementtlvValue = vidVerificationStatement.<BaseTLVType>map((nonOptionalvidVerificationStatement) -> new ByteArrayType(nonOptionalvidVerificationStatement)).orElse(new EmptyType());
+      elements.add(new StructElement(vidVerificationStatementFieldID, vidVerificationStatementtlvValue));
+
+      final long vvscFieldID = 2L;
+      BaseTLVType vvsctlvValue = vvsc.<BaseTLVType>map((nonOptionalvvsc) -> new ByteArrayType(nonOptionalvvsc)).orElse(new EmptyType());
+      elements.add(new StructElement(vvscFieldID, vvsctlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void signVidVerificationRequest(SignVidVerificationResponseCallback callback, Integer fabricIndex, byte[] clientChallenge) {
+      signVidVerificationRequest(callback, fabricIndex, clientChallenge, 0);
+    }
+
+    public void signVidVerificationRequest(SignVidVerificationResponseCallback callback, Integer fabricIndex, byte[] clientChallenge, int timedInvokeTimeoutMs) {
+      final long commandId = 13L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long fabricIndexFieldID = 0L;
+      BaseTLVType fabricIndextlvValue = new UIntType(fabricIndex);
+      elements.add(new StructElement(fabricIndexFieldID, fabricIndextlvValue));
+
+      final long clientChallengeFieldID = 1L;
+      BaseTLVType clientChallengetlvValue = new ByteArrayType(clientChallenge);
+      elements.add(new StructElement(clientChallengeFieldID, clientChallengetlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long fabricIndexFieldID = 0L;
+          Integer fabricIndex = null;
+          final long fabricBindingVersionFieldID = 1L;
+          Integer fabricBindingVersion = null;
+          final long signatureFieldID = 2L;
+          byte[] signature = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == fabricIndexFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                fabricIndex = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == fabricBindingVersionFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                fabricBindingVersion = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == signatureFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+                ByteArrayType castingValue = element.value(ByteArrayType.class);
+                signature = castingValue.value(byte[].class);
+              }
+            }
+          }
+          callback.onSuccess(fabricIndex, fabricBindingVersion, signature);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public interface AttestationResponseCallback extends BaseClusterCallback {
       void onSuccess(byte[] attestationElements, byte[] attestationSignature);
     }
@@ -16127,6 +16203,10 @@ public class ChipClusters {
 
     public interface NOCResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer statusCode, Optional<Integer> fabricIndex, Optional<String> debugText);
+    }
+
+    public interface SignVidVerificationResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer fabricIndex, Integer fabricBindingVersion, byte[] signature);
     }
 
     public interface NOCsAttributeCallback extends BaseAttributeCallback {
@@ -62340,9 +62420,9 @@ public class ChipClusters {
           final long webRTCSessionIDFieldID = 0L;
           Integer webRTCSessionID = null;
           final long videoStreamIDFieldID = 1L;
-          Integer videoStreamID = null;
+          @Nullable Optional<Integer> videoStreamID = null;
           final long audioStreamIDFieldID = 2L;
-          Integer audioStreamID = null;
+          @Nullable Optional<Integer> audioStreamID = null;
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == webRTCSessionIDFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -62352,12 +62432,12 @@ public class ChipClusters {
             } else if (element.contextTagNum() == videoStreamIDFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
                 UIntType castingValue = element.value(UIntType.class);
-                videoStreamID = castingValue.value(Integer.class);
+                videoStreamID = Optional.of(castingValue.value(Integer.class));
               }
             } else if (element.contextTagNum() == audioStreamIDFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
                 UIntType castingValue = element.value(UIntType.class);
-                audioStreamID = castingValue.value(Integer.class);
+                audioStreamID = Optional.of(castingValue.value(Integer.class));
               }
             }
           }
@@ -62389,11 +62469,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void provideICECandidate(DefaultClusterCallback callback, Integer webRTCSessionID, String ICECandidate) {
-      provideICECandidate(callback, webRTCSessionID, ICECandidate, 0);
+    public void provideICECandidates(DefaultClusterCallback callback, Integer webRTCSessionID, ArrayList<String> ICECandidates) {
+      provideICECandidates(callback, webRTCSessionID, ICECandidates, 0);
     }
 
-    public void provideICECandidate(DefaultClusterCallback callback, Integer webRTCSessionID, String ICECandidate, int timedInvokeTimeoutMs) {
+    public void provideICECandidates(DefaultClusterCallback callback, Integer webRTCSessionID, ArrayList<String> ICECandidates, int timedInvokeTimeoutMs) {
       final long commandId = 6L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -62401,9 +62481,9 @@ public class ChipClusters {
       BaseTLVType webRTCSessionIDtlvValue = new UIntType(webRTCSessionID);
       elements.add(new StructElement(webRTCSessionIDFieldID, webRTCSessionIDtlvValue));
 
-      final long ICECandidateFieldID = 1L;
-      BaseTLVType ICECandidatetlvValue = new StringType(ICECandidate);
-      elements.add(new StructElement(ICECandidateFieldID, ICECandidatetlvValue));
+      final long ICECandidatesFieldID = 1L;
+      BaseTLVType ICECandidatestlvValue = ArrayType.generateArrayType(ICECandidates, (elementICECandidates) -> new StringType(elementICECandidates));
+      elements.add(new StructElement(ICECandidatesFieldID, ICECandidatestlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -62442,7 +62522,7 @@ public class ChipClusters {
     }
 
     public interface ProvideOfferResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer webRTCSessionID, Integer videoStreamID, Integer audioStreamID);
+      void onSuccess(Integer webRTCSessionID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID);
     }
 
     public interface CurrentSessionsAttributeCallback extends BaseAttributeCallback {
@@ -62725,11 +62805,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void ICECandidate(DefaultClusterCallback callback, Integer webRTCSessionID, String ICECandidate) {
-      ICECandidate(callback, webRTCSessionID, ICECandidate, 0);
+    public void ICECandidates(DefaultClusterCallback callback, Integer webRTCSessionID, ArrayList<String> ICECandidates) {
+      ICECandidates(callback, webRTCSessionID, ICECandidates, 0);
     }
 
-    public void ICECandidate(DefaultClusterCallback callback, Integer webRTCSessionID, String ICECandidate, int timedInvokeTimeoutMs) {
+    public void ICECandidates(DefaultClusterCallback callback, Integer webRTCSessionID, ArrayList<String> ICECandidates, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -62737,9 +62817,9 @@ public class ChipClusters {
       BaseTLVType webRTCSessionIDtlvValue = new UIntType(webRTCSessionID);
       elements.add(new StructElement(webRTCSessionIDFieldID, webRTCSessionIDtlvValue));
 
-      final long ICECandidateFieldID = 1L;
-      BaseTLVType ICECandidatetlvValue = new StringType(ICECandidate);
-      elements.add(new StructElement(ICECandidateFieldID, ICECandidatetlvValue));
+      final long ICECandidatesFieldID = 1L;
+      BaseTLVType ICECandidatestlvValue = ArrayType.generateArrayType(ICECandidates, (elementICECandidates) -> new StringType(elementICECandidates));
+      elements.add(new StructElement(ICECandidatesFieldID, ICECandidatestlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -63436,7 +63516,7 @@ public class ChipClusters {
     public static final long CLUSTER_ID = 1366L;
 
     private static final long INSTALLED_CHIME_SOUNDS_ATTRIBUTE_ID = 0L;
-    private static final long ACTIVE_CHIME_ID_ATTRIBUTE_ID = 1L;
+    private static final long SELECTED_CHIME_ATTRIBUTE_ID = 1L;
     private static final long ENABLED_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
@@ -63517,9 +63597,9 @@ public class ChipClusters {
         }, INSTALLED_CHIME_SOUNDS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readActiveChimeIDAttribute(
+    public void readSelectedChimeAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_CHIME_ID_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SELECTED_CHIME_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -63527,21 +63607,21 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ACTIVE_CHIME_ID_ATTRIBUTE_ID, true);
+        }, SELECTED_CHIME_ATTRIBUTE_ID, true);
     }
 
-    public void writeActiveChimeIDAttribute(DefaultClusterCallback callback, Integer value) {
-      writeActiveChimeIDAttribute(callback, value, 0);
+    public void writeSelectedChimeAttribute(DefaultClusterCallback callback, Integer value) {
+      writeSelectedChimeAttribute(callback, value, 0);
     }
 
-    public void writeActiveChimeIDAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+    public void writeSelectedChimeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), ACTIVE_CHIME_ID_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), SELECTED_CHIME_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
-    public void subscribeActiveChimeIDAttribute(
+    public void subscribeSelectedChimeAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_CHIME_ID_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SELECTED_CHIME_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -63549,7 +63629,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ACTIVE_CHIME_ID_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, SELECTED_CHIME_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readEnabledAttribute(
@@ -64543,16 +64623,16 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void findClientCertificate(FindClientCertificateResponseCallback callback, Integer ccdid) {
+    public void findClientCertificate(FindClientCertificateResponseCallback callback, @Nullable Integer ccdid) {
       findClientCertificate(callback, ccdid, 0);
     }
 
-    public void findClientCertificate(FindClientCertificateResponseCallback callback, Integer ccdid, int timedInvokeTimeoutMs) {
+    public void findClientCertificate(FindClientCertificateResponseCallback callback, @Nullable Integer ccdid, int timedInvokeTimeoutMs) {
       final long commandId = 11L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long ccdidFieldID = 0L;
-      BaseTLVType ccdidtlvValue = new UIntType(ccdid);
+      BaseTLVType ccdidtlvValue = ccdid != null ? new UIntType(ccdid) : new NullType();
       elements.add(new StructElement(ccdidFieldID, ccdidtlvValue));
 
       StructType commandArgs = new StructType(elements);
