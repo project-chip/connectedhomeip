@@ -46,10 +46,13 @@
 #endif
 
 // TODO: We shouldn't need any platform specific includes in this file
-#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1
+#if (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
 #include <platform/silabs/SiWx917/SiWxPlatformInterface.h>
+#endif // (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1 )
+
+#if ((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1) || defined(EXP_BOARD))
 #include <platform/silabs/wifi/wiseconnect-interface/WiseconnectWifiInterface.h>
-#endif // SLI_SI91X_MCU_INTERFACE
+#endif // ((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1) || defined(EXP_BOARD))
 
 #include <crypto/CHIPCryptoPAL.h>
 // If building with the EFR32-provided crypto backend, we can use the
@@ -321,9 +324,9 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 #endif // WF200_WIFI
 
     // TODO: Platform specific init should not be required here
-#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1
+#if ((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1) || defined(EXP_BOARD))
     VerifyOrReturnError(InitSiWxWifi() == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
-#endif // SLI_SI91X_MCU_INTERFACE
+#endif //((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1 ) || defined(EXP_BOARD))
 
     return CHIP_NO_ERROR;
 }
