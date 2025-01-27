@@ -154,7 +154,7 @@ class TC_FAN_3_1(MatterBaseTest):
             # Write to attribute
             result = await TH.WriteAttribute(
                 self.dut_node_id,
-                [(endpoint, attr_to_write(value=value_to_write * 10))]
+                [(endpoint, attr_to_write(value=value_to_write))]
             )
             print(f"\t\t [FANS] write_status: {result[0].Status.name}\n\n\n\n")
 
