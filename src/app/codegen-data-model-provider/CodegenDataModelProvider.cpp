@@ -419,7 +419,7 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
                                                                               CommandHandler * handler)
 {
     // As some CommandHandlerInterface commands are registered on wildcard interfaces,
-    // the valid endpoint/cluster check is done BEFORE attemptiong command handler interface handling
+    // the valid endpoint/cluster check is done BEFORE attempting command handler interface handling
     const EmberAfCluster * cluster = FindServerCluster(request.path);
     if (cluster == nullptr)
     {
