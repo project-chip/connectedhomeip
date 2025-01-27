@@ -419,8 +419,9 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
 CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path,
                                                        DataModel::ListBuilder<CommandId> & builder)
 {
-    // Some commands are registered of ALL endpoints, so make sure first that
-    // the cluster actually exists on this endpoint before trying command handling
+    // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
+    // the cluster actually exists on this endpoint before asking the CommandHandlerInterface whether it
+    // supports the command.
     const EmberAfCluster * serverCluster = FindServerCluster(path);
     VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
 
