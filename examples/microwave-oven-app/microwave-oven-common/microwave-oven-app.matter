@@ -1731,19 +1731,6 @@ endpoint 1 {
     callback attribute clusterRevision;
   }
 
-  server cluster AccessControl {
-    callback attribute acl;
-    callback attribute extension;
-    callback attribute subjectsPerAccessControlEntry;
-    callback attribute targetsPerAccessControlEntry;
-    callback attribute accessControlEntriesPerFabric;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    callback attribute clusterRevision;
-  }
-
   server cluster BasicInformation {
     callback attribute dataModelRevision;
     callback attribute vendorName;
@@ -1765,42 +1752,6 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
-  }
-
-  server cluster GeneralCommissioning {
-    ram      attribute breadcrumb default = 0x0000000000000000;
-    callback attribute basicCommissioningInfo;
-    callback attribute regulatoryConfig;
-    callback attribute locationCapability;
-    callback attribute supportsConcurrentConnection;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
-
-    handle command ArmFailSafe;
-    handle command ArmFailSafeResponse;
-    handle command SetRegulatoryConfig;
-    handle command SetRegulatoryConfigResponse;
-    handle command CommissioningComplete;
-    handle command CommissioningCompleteResponse;
-  }
-
-  server cluster NetworkCommissioning {
-    ram      attribute maxNetworks;
-    callback attribute networks;
-    ram      attribute scanMaxTimeSeconds;
-    ram      attribute connectMaxTimeSeconds;
-    ram      attribute interfaceEnabled;
-    ram      attribute lastNetworkingStatus;
-    ram      attribute lastNetworkID;
-    ram      attribute lastConnectErrorValue;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
   }
 
   server cluster MicrowaveOvenMode {
