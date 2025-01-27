@@ -23,8 +23,9 @@ import xml.etree.ElementTree as ElementTree
 from pathlib import Path
 
 import click
-from chip.testing.spec_parsing import build_xml_clusters
 from paths import get_chip_root, get_documentation_file_path, get_in_progress_defines
+
+from chip.testing.spec_parsing import build_xml_clusters
 
 # Use the get_in_progress_defines() function to fetch the in-progress defines
 CURRENT_IN_PROGRESS_DEFINES = get_in_progress_defines()

@@ -21,6 +21,7 @@
 # spec expectations before the 1.4 release and we should continue to do so going forward.
 
 import click
+
 from chip.testing.conformance import ConformanceDecision
 from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types
 
