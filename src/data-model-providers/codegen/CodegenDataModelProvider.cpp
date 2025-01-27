@@ -164,7 +164,7 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
     const EmberAfCluster * cluster = FindServerCluster(request.path);
     if (cluster == nullptr)
     {
-        // this is not a valid cluster. Return the right command.
+        // This is not a valid cluster. Return the right error code depending on what is valid.
         std::optional<unsigned> endpoint_index = TryFindEndpointIndex(request.path.mEndpointId);
         return endpoint_index.has_value() ? Protocols::InteractionModel::Status::UnsupportedCluster
                                           : Protocols::InteractionModel::Status::UnsupportedEndpoint;
