@@ -41,7 +41,7 @@ private:
     };
 
     // Dummy endpoint list.
-    const EndpointId firstEpList[1]  = { 0 };
+    const EndpointId firstEpList[3]  = { 0, 1, 2 };
     const EndpointId secondEpList[1] = { 0 };
     const EndpointId thirdEpList[1]  = { 0 };
 
