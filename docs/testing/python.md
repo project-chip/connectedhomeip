@@ -25,7 +25,7 @@ Python tests located in src/python_testing
         section should include various parameters and their respective values,
         which will guide the test runner on how to execute the tests.
 -   All test classes inherit from `MatterBaseTest` in
-    [matter_testing_support.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_support.py)
+    [matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/chip/testing/matter_testing.py)
     -   Support for commissioning using the python controller
     -   Default controller (`self.default_controller`) of type `ChipDeviceCtrl`
     -   `MatterBaseTest` inherits from the Mobly BaseTestClass
@@ -38,7 +38,7 @@ Python tests located in src/python_testing
         decorated with the @async_test_body decorator
 -   Use `ChipDeviceCtrl` to interact with the DUT
     -   Controller API is in `ChipDeviceCtrl.py` (see API doc in file)
-    -   Some support methods in `matter_testing_support.py`
+    -   Some support methods in `matter_testing.py`
 -   Use Mobly assertions for failing tests
 -   `self.step()` along with a `steps_*` method to mark test plan steps for cert
     tests
@@ -217,7 +217,7 @@ Each `Clusters.<ClusterName>.Structs.<StructName>` has:
 
 Example:
 
-```
+```python
 Clusters.BasicInformation.Structs.ProductAppearanceStruct(
    finish=Clusters.BasicInformation.Enums.ProductFinishEnum.kFabric,
    primaryColor=Clusters.BasicInformation.Enums.ColorEnum.kBlack)
@@ -293,7 +293,7 @@ Multi-path
 
 Example:
 
-```
+```python
 urgent = 1
 
 await dev_ctrl ReadEvent(node_id, [(1,
@@ -359,7 +359,7 @@ asserts.assert_equal(ret[0].status, Status.Success, “write failed”)
 
 Example:
 
-```
+```python
 pai = await dev_ctrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Commands.CertificateChainRequest(2))
 ```
 
@@ -379,7 +379,7 @@ pai = await dev_ctrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Comm
 ## Mobly helpers
 
 The test system is based on Mobly, and the
-[matter_testing_support.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_support.py)
+[matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/chip/testing/matter_testing.py)
 class provides some helpers for Mobly integration.
 
 -   `default_matter_test_main`
@@ -387,7 +387,7 @@ class provides some helpers for Mobly integration.
 
 use as:
 
-```
+```python
 if __name__ == "__main__":
     default_matter_test_main()
 ```
@@ -479,7 +479,7 @@ See
 
 To create a controller on a new fabric:
 
-```
+```python
 new_CA = self.certificate_authority_manager.NewCertificateAuthority()
 
 new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1,
@@ -490,7 +490,7 @@ TH2 = new_fabric_admin.NewController(nodeId=112233)
 
 Open a commissioning window (ECW):
 
-```
+```python
 params = self.OpenCommissioningWindow(dev_ctrl=self.default_controller, node_id=self.dut_node_id)
 ```
 
@@ -499,7 +499,7 @@ the fabric admin.
 
 Fabric admin for default controller:
 
-```
+```python
   fa = self.certificate_authority_manager.activeCaList[0].adminList[0]
   second_ctrl = fa.new_fabric_admin.NewController(nodeId=node_id)
 ```
@@ -561,11 +561,11 @@ these steps to set this up:
 
 ## Other support utilities
 
--   `basic_composition_support`
+-   `basic_composition`
     -   wildcard read, whole device analysis
 -   `CommissioningFlowBlocks`
     -   various commissioning support for core tests
--   `spec_parsing_support`
+-   `spec_parsing`
     -   parsing data model XML into python readable format
 
 # Running tests locally
@@ -577,25 +577,24 @@ running. To compile and install the wheel, do the following:
 
 First activate the matter environment using either
 
-```
+```shell
 . ./scripts/bootstrap.sh
 ```
 
 or
 
-```
+```shell
 . ./scripts/activate.sh
 ```
 
 bootstrap.sh should be used for for the first setup, activate.sh may be used for
 subsequent setups as it is faster.
 
-Next build the python wheels and create / activate a venv (called `pyenv` here,
-but any name may be used)
+Next build the python wheels and create / activate a venv
 
-```
+```shell
 ./scripts/build_python.sh -i out/python_env
-source pyenv/bin/activate
+source out/python_env/bin/activate
 ```
 
 ## Running tests
@@ -610,7 +609,7 @@ that will be commissioned either over BLE or WiFi.
 
 For example, to run the TC-ACE-1.2 tests against an un-commissioned DUT:
 
-```
+```shell
 python3 src/python_testing/TC_ACE_1_2.py --commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00
 ```
 
@@ -618,7 +617,7 @@ Some tests require additional arguments (ex. PIXITs or configuration variables
 for the CI). These arguments can be passed as sets of key/value pairs using the
 `--<type>-arg:<value>` command line arguments. For example:
 
-```
+```shell
 --int-arg PIXIT.ACE.APPENDPOINT:1 --int-arg PIXIT.ACE.APPDEVTYPEID:0x0100 --string-arg PIXIT.ACE.APPCLUSTER:OnOff --string-arg PIXIT.ACE.APPATTRIBUTE:OnOff
 ```
 
@@ -629,6 +628,12 @@ example DUT on the host and includes factory reset support
 
 ```shell
 ./scripts/tests/run_python_test.py --factory-reset --app <your_app> --app-args "whatever" --script <your_script> --script-args "whatever"
+```
+
+For example, to run TC-ACE-1.2 tests against the linux `chip-lighting-app`:
+
+```shell
+./scripts/tests/run_python_test.py --factory-reset --app ./out/linux-x64-light-no-ble/chip-lighting-app --app-args "--trace-to json:log" --script src/python_testing/TC_ACE_1_2.py --script-args "--commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00"
 ```
 
 # Running tests in CI
@@ -716,6 +721,11 @@ for that run, e.g.:
     the pattern is found.
 
     -   Example: `"Manual pairing code: \\[\\d+\\]"`
+
+-   `app-stdin-pipe`: Specifies the path to the named pipe that the test runner
+    might use to send input to the application.
+
+    -   Example: `/tmp/app-fifo`
 
 -   `script-args`: Specifies the arguments to be passed to the test script.
 

@@ -43,7 +43,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 # Assumes `--enable-key 000102030405060708090a0b0c0d0e0f` on Linux app command line, or a DUT

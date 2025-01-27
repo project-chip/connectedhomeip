@@ -37,7 +37,7 @@
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 # This test requires several additional command line arguments
@@ -107,7 +107,7 @@ class TC_MWOCTRL_2_1(MatterBaseTest):
     @async_test_body
     async def test_TC_MWOCTRL_2_1(self):
 
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.get_endpoint(default=1)
 
         self.step(1)
         attributes = Clusters.MicrowaveOvenControl.Attributes

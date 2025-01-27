@@ -64,24 +64,42 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum.</description>
-
-    <globalAttribute side="either" code="0xFFFD" value="1" />
-
-    <attribute side="server" code="0x0000" define="PHASE_LIST"              type="array" entryType="char_string"                                     writable="false" isNullable="true"  optional="false">PhaseList</attribute>
-    <attribute side="server" code="0x0001" define="CURRENT_PHASE"           type="int8u"                                    min="0x00" max="0x1F"    writable="false" isNullable="true"  optional="false">CurrentPhase</attribute>
-    <attribute side="server" code="0x0002" define="COUNTDOWN_TIME"          type="elapsed_s"                                min="0"    max="259200"  writable="false" isNullable="true"  optional="true">CountdownTime</attribute>
-    <attribute side="server" code="0x0003" define="OPERATIONAL_STATE_LIST"  type="array" entryType="OperationalStateStruct"                          writable="false"                    optional="false">OperationalStateList</attribute>
-
-<!--
+    
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
+    
+    <attribute side="server" code="0x0000" name="PhaseList" define="PHASE_LIST" type="array" entryType="char_string" isNullable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="CurrentPhase" define="CURRENT_PHASE" type="int8u" min="0x00" max="0x1F" isNullable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0002" name="CountdownTime" define="COUNTDOWN_TIME" type="elapsed_s" min="0" max="259200" isNullable="true" optional="true">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x0003" name="OperationalStateList" define="OPERATIONAL_STATE_LIST" type="array" entryType="OperationalStateStruct">
+      <mandatoryConform/>
+    </attribute>
+    
+    <!--
 The type of this attribute in the spec is OperationalStateEnum, but the OperationalStateEnum in our XML
 excludes the values from the base OperationalState cluster.  Just use ENUM8 for the type, so it allows
 both values from this cluster and from the base cluster.
 -->
-    <attribute side="server" code="0x0004" define="OPERATIONAL_STATE"       type="enum8"                                                             writable="false"                    optional="false">OperationalState</attribute>
-    <attribute side="server" code="0x0005" define="OPERATIONAL_ERROR"       type="ErrorStateStruct"                                                  writable="false"                    optional="false">OperationalError</attribute>
+    <attribute side="server" code="0x0004" name="OperationalState" define="OPERATIONAL_STATE" type="enum8">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0005" name="OperationalError" define="OPERATIONAL_ERROR" type="ErrorStateStruct">
+      <mandatoryConform/>
+    </attribute>
 
     <command source="client" code="0x00" name="Pause" response="OperationalCommandResponse" optional="true">
       <description>Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server.</description>
+      <otherwiseConform>
+        <mandatoryConform>
+          <command name="Resume"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
     </command>
 
     <!-- Command Stop with code 0x01 is deprecated -->
@@ -90,27 +108,47 @@ both values from this cluster and from the base cluster.
 
     <command source="client" code="0x03" name="Resume" response="OperationalCommandResponse" optional="true">
       <description>Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press).</description>
+      <otherwiseConform>
+        <mandatoryConform>
+          <command name="Pause"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
     </command>
 
     <command source="server" code="0x04" name="OperationalCommandResponse" optional="true">
       <description>This command SHALL be generated in response to any of the Start, Stop, Pause, or Resume commands.</description>
       <arg name="CommandResponseState" type="ErrorStateStruct"/>
+      <mandatoryConform>
+        <orTerm>
+          <command name="Pause"/>
+          <command name="Stop"/>
+          <command name="Start"/>
+          <command name="Resume"/>
+        </orTerm>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x80" name="GoHome" response="OperationalCommandResponse" optional="true">
       <description>On receipt of this command, the device SHALL start seeking the charging dock, if possible in the current state of the device.</description>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </command>
 
     <event side="server" code="0x00" priority="critical" name="OperationalError" optional="false">
       <description>OperationalError</description>
-      <field id="0" name="ErrorState" type="ErrorStateStruct" />
+      <field id="0" name="ErrorState" type="ErrorStateStruct"/>
+      <mandatoryConform/>
     </event>
 
-     <event side="server" code="0x01" priority="info" name="OperationCompletion" optional="true">
+    <event side="server" code="0x01" priority="info" name="OperationCompletion" optional="true">
       <description>OperationCompletion</description>
       <field id="0" name="CompletionErrorCode"  type="enum8"                            optional="false"/>
-      <field id="1" name="TotalOperationalTime" type="elapsed_s"      isNullable="true" optional="true"/>
-      <field id="2" name="PausedTime"           type="elapsed_s"      isNullable="true" optional="true"/>
+      <field id="1" name="TotalOperationalTime" type="elapsed_s" isNullable="true" optional="true"/>
+      <field id="2" name="PausedTime" type="elapsed_s" isNullable="true" optional="true"/>
+      <optionalConform/>
     </event>
 
   </cluster>

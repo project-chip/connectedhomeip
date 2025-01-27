@@ -131,659 +131,856 @@ limitations under the License.
          3. Everything that depends on a certain feature is optional because we have no way
             of setting up the dependencies here. Dependencies would be probably resolved in the
             cluster itself. Those attributes/commands are marked with a special comment. -->
-
-        <!-- Attributes -->
-        <attribute side="server" code="0" define="LOCK_STATE" type="DlLockState" min="0" max="3" isNullable="true" reportable="true" writable="false">LockState</attribute>
-        <attribute side="server" code="1" define="LOCK_TYPE" type="DlLockType" min="0" max="11" writable="false">LockType</attribute>
-        <attribute side="server" code="2" define="ACTUATOR_ENABLED" type="boolean" writable="false">ActuatorEnabled</attribute>
-        <!-- Conformance feature DPS - for now optional -->
-        <attribute side="server" code="3" define="DOOR_STATE" type="DoorStateEnum" min="0" max="5" isNullable="true" reportable="true" optional="true">DoorState</attribute>
-        <!-- Conformance feature [DPS] - for now optional -->
-        <attribute side="server" code="4" define="DOOR_OPEN_EVENTS" type="int32u" writable="true" optional="true">
-            <description>DoorOpenEvents</description>
-            <access op="read" role="view" />
-            <access op="write" role="manage" />
-        </attribute>
-        <!-- Conformance feature [DPS] - for now optional -->
-        <attribute side="server" code="5" define="DOOR_CLOSED_EVENTS" type="int32u" writable="true" optional="true">
-            <description>DoorClosedEvents</description>
-            <access op="read" role="view" />
-            <access op="write" role="manage" />
-        </attribute>
-        <!-- Conformance feature [DPS] - for now optional -->
-        <attribute side="server" code="6" define="OPEN_PERIOD" type="int16u" writable="true" optional="true">
-            <description>OpenPeriod</description>
-            <access op="read" role="view" />
-            <access op="write" role="manage" />
-        </attribute>
-        <!-- Conformance feature USR - for now optional -->
-        <attribute side="server" code="17" define="NUM_TOTAL_USERS_SUPPORTED" type="int16u" default="0" writable="false" optional="true">NumberOfTotalUsersSupported</attribute>
-        <!-- Conformance feature PIN - for now optional -->
-        <attribute side="server" code="18" define="NUM_PIN_USERS_SUPPORTED" type="int16u" default="0" writable="false" optional="true">NumberOfPINUsersSupported</attribute>
-        <!-- Conformance feature RFID - for now optional -->
-        <attribute side="server" code="19" define="NUM_RFID_USERS_SUPPORTED" type="int16u" default="0" writable="false" optional="true">NumberOfRFIDUsersSupported</attribute>
-        <!-- Conformance feature WDSCH - for now optional -->
-        <attribute side="server" code="20" define="NUM_WEEKDAY_SCHEDULES_SUPPORTED_PER_USER" type="int8u" default="0" writable="false" optional="true">NumberOfWeekDaySchedulesSupportedPerUser</attribute>
-        <!-- Conformance feature YDSCH - for now optional -->
-        <attribute side="server" code="21" define="NUM_YEARDAY_SCHEDULES_SUPPORTED_PER_USER" type="int8u" default="0" writable="false" optional="true">NumberOfYearDaySchedulesSupportedPerUser</attribute>
-        <!-- Conformance feature HDSCH - for now optional -->
-        <attribute side="server" code="22" define="NUM_HOLIDAY_SCHEDULES_SUPPORTED" type="int8u" default="0" writable="false" optional="true">NumberOfHolidaySchedulesSupported</attribute>
-        <!-- Conformance feature PIN - for now optional -->
-        <attribute side="server" code="23" define="MAX_PIN_LENGTH" type="int8u" writable="false" optional="true">MaxPINCodeLength</attribute>
-        <!-- Conformance feature PIN - for now optional -->
-        <attribute side="server" code="24" define="MIN_PIN_LENGTH" type="int8u" writable="false" optional="true">MinPINCodeLength</attribute>
-        <!-- Conformance feature RID - for now optional -->
-        <attribute side="server" code="25" define="MAX_RFID_CODE_LENGTH" type="int8u" writable="false" optional="true">MaxRFIDCodeLength</attribute>
-        <!-- Conformance feature RID - for now optional -->
-        <attribute side="server" code="26" define="MIN_RFID_CODE_LENGTH" type="int8u" writable="false" optional="true">MinRFIDCodeLength</attribute>
-        <!-- Conformance feature USR - for now optional -->
-        <attribute side="server" code="27" define="CREDENTIAL_RULES_SUPPORT" type="DlCredentialRuleMask" min="0x00" max="0xFF" default="1" writable="false" optional="true">CredentialRulesSupport</attribute>
-        <!-- Conformance feature USR - for now optional  -->
-        <attribute side="server" code="28" define="NUM_CREDENTIALS_SUPPORTED_PER_USER" type="int8u" default="0" writable="false" optional="true">NumberOfCredentialsSupportedPerUser</attribute>
-        <attribute side="server" code="33" define="LANGUAGE" type="char_string" length="3" reportable="true" writable="true" optional="true">
-            <description>Language</description>
-            <access op="read" role="view" />
-            <access op="write" role="manage" />
-        </attribute>
-        <attribute side="server" code="34" define="LED_SETTINGS" type="int8u" min="0" max="2" reportable="true" default="0" writable="true" optional="true">
-            <description>LEDSettings</description>
-            <access op="read" role="view" />
-            <access op="write" role="manage" />
-        </attribute>
-        <attribute side="server" code="35" define="AUTO_RELOCK_TIME" type="int32u" reportable="true" writable="true" optional="true">
-            <description>AutoRelockTime</description>
-            <access op="read" role="view" />
-            <access op="write" role="manage" />
-        </attribute>
-        <attribute side="server" code="36" define="SOUND_VOLUME" type="int8u" min="0" max="3" reportable="true" default="0" writable="true" optional="true">
-            <description>SoundVolume</description>
-            <access op="read" role="view" />
-            <access op="write" role="manage" />
-        </attribute>
-        <attribute side="server" code="37" define="OPERATING_MODE" type="OperatingModeEnum" min="0" max="4" reportable="true" writable="true">
-            <description>OperatingMode</description>
-            <access op="read" role="view" />
-            <access op="write" role="manage" />
-        </attribute>
-        <attribute side="server" code="38" define="SUPPORTED_OPERATING_MODES" type="DlSupportedOperatingModes" min="0x0000" max="0xFFFF" default="0xFFF6" writable="false">SupportedOperatingModes</attribute>
-        <attribute side="server" code="39" define="DEFAULT_CONFIGURATION_REGISTER" type="DlDefaultConfigurationRegister" min="0x0000" max="0xFFFF" reportable="true" default="0" writable="false" optional="true">DefaultConfigurationRegister</attribute>
-        <attribute side="server" code="40" define="ENABLE_LOCAL_PROGRAMMING" type="boolean" reportable="true" default="1" writable="true" optional="true">
-            <description>EnableLocalProgramming</description>
-            <access op="read" role="view" />
-            <access op="write" role="administer" />
-        </attribute>
-        <attribute side="server" code="41" define="ENABLE_ONE_TOUCH_LOCKING" type="boolean" reportable="true" default="0" writable="true" optional="true">
-            <description>EnableOneTouchLocking</description>
-            <access op="read" role="view" />
-            <access op="write" role="manage" />
-        </attribute>
-        <attribute side="server" code="42" define="ENABLE_INSIDE_STATUS_LED" type="boolean" reportable="true" default="0" writable="true" optional="true">
-            <description>EnableInsideStatusLED</description>
-            <access op="read" role="view" />
-            <access op="write" role="manage" />
-        </attribute>
-        <attribute side="server" code="43" define="ENABLE_PRIVACY_MODE_BUTTON" type="boolean" reportable="true" default="0" writable="true" optional="true">
-            <description>EnablePrivacyModeButton</description>
-            <access op="read" role="view" />
-            <access op="write" role="manage" />
-        </attribute>
-        <attribute side="server" code="44" define="LOCAL_PROGRAMMING_FEATURES" type="DlLocalProgrammingFeatures" min="0x0" max="0x0F" reportable="true" default="0" writable="true" optional="true">
-            <description>LocalProgrammingFeatures</description>
-            <access op="read" role="view" />
-            <access op="write" role="administer" />
-        </attribute>
-        <!-- Conformance feature PIN | RID - for now optional -->
-        <attribute side="server" code="48" define="WRONG_CODE_ENTRY_LIMIT" type="int8u" min="1" max="255" reportable="true" writable="true" optional="true">
-            <description>WrongCodeEntryLimit</description>
-            <access op="read" role="view" />
-            <access op="write" role="administer" />
-        </attribute>
-        <!-- Conformance feature PIN | RID - for now optional -->
-        <attribute side="server" code="49" define="USER_CODE_TEMPORARY_DISABLE_TIME" type="int8u" min="1" max="255" reportable="true" writable="true" optional="true">
-            <description>UserCodeTemporaryDisableTime</description>
-            <access op="read" role="view" />
-            <access op="write" role="administer" />
-        </attribute>
-        <!-- Conformance feature [PIN] - for now optional -->
-        <attribute side="server" code="50" define="SEND_PIN_OVER_THE_AIR" type="boolean" reportable="true" default="0" writable="true" optional="true">
-            <description>SendPINOverTheAir</description>
-            <access op="read" role="view" />
-            <access op="write" role="administer" />
-        </attribute>
-        <!-- Conformance feature COTA & PIN - for now optional -->
-        <attribute side="server" code="51" define="REQUIRE_PIN_FOR_REMOTE_OPERATION" type="boolean" reportable="true" default="0" writable="true" optional="true">
-            <description>RequirePINforRemoteOperation</description>
-            <access op="read" role="view" />
-            <access op="write" role="administer" />
-        </attribute>
-        <!-- Attribute SecurityLevel with code 52 is deprecated -->
-        <!-- Conformance feature [USR] - for now optional -->
-        <attribute side="server" code="53" define="EXPIRING_USER_TIMEOUT" type="int16u" min="1" max="2880" reportable="true" writable="true" optional="true">
-            <description>ExpiringUserTimeout</description>
-            <access op="read" role="view" />
-            <access op="write" role="administer" />
-        </attribute>
-        <!-- Conformance feature [ALIRO] - optional -->
-        <attribute side="server" code="128" define="ALIRO_READER_VERIFICATION_KEY" type="octet_string" length="65" writable="false" optional="true" isNullable="true" apiMaturity="provisional">
-            <description>AliroReaderVerificationKey</description>
-            <access op="read" privilege="administer" />
-        </attribute>
-        <!-- Conformance feature [ALIRO] - optional -->
-        <attribute side="server" code="129" define="ALIRO_READER_GROUP_IDENTIFIER" type="octet_string" length="16" writable="false" optional="true" isNullable="true" apiMaturity="provisional">
-            <description>AliroReaderGroupIdentifier</description>
-            <access op="read" privilege="administer" />
-        </attribute>
-        <!-- Conformance feature [ALIRO] - optional -->
-        <attribute side="server" code="130" define="ALIRO_READER_GROUP_SUBIDENTIFIER" type="octet_string" length="16" writable="false" optional="true" apiMaturity="provisional">
-            <description>AliroReaderGroupSubIdentifier</description>
-            <access op="read" privilege="administer" />
-        </attribute>
-        <!-- Conformance feature [ALIRO] - optional -->
-        <attribute side="server" code="131" define="ALIRO_EXPEDITED_TRANSACTION_SUPPORTED_PROTOCOL_VERSIONS" type="array" entryType="octet_string" length="16" writable="false" optional="true" apiMaturity="provisional">
-            <description>AliroExpeditedTransactionSupportedProtocolVersions</description>
-            <access op="read" privilege="administer" />
-        </attribute>
-        <!-- Conformance feature [ALBU] - optional if ALIRO is supported -->
-        <attribute side="server" code="132" define="ALIRO_GROUP_RESOLVING_KEY" type="octet_string" length="16" writable="false" optional="true" isNullable="true" apiMaturity="provisional">
-            <description>AliroGroupResolvingKey</description>
-            <access op="read" privilege="administer" />
-        </attribute>
-        <!-- Conformance feature [ALBU] - optional if ALIRO is supported -->
-        <attribute side="server" code="133" define="ALIRO_SUPPORTED_BLE_UWB_PROTOCOL_VERSIONS" type="array" entryType="octet_string" length="16" writable="false" optional="true" apiMaturity="provisional">
-            <description>AliroSupportedBLEUWBProtocolVersions</description>
-            <access op="read" privilege="administer" />
-        </attribute>
-        <!-- Conformance feature [ALBU] - optional if ALIRO is supported -->
-        <attribute side="server" code="134" define="ALIRO_BLE_ADVERTISING_VERSION" type="int8u" writable="false" optional="true" apiMaturity="provisional">
-            <description>AliroBLEAdvertisingVersion</description>
-            <access op="read" privilege="administer" />
-        </attribute>
-        <!-- Conformance feature [ALIRO] - optional -->
-        <attribute side="server" code="135" define="NUMBER_OF_ALIRO_CREDENTIAL_ISSUER_KEYS_SUPPORTED" type="int16u" writable="false" optional="true" apiMaturity="provisional">NumberOfAliroCredentialIssuerKeysSupported</attribute>
-        <!-- Conformance feature [ALIRO] - optional -->
-        <attribute side="server" code="136" define="NUMBER_OF_ALIRO_ENDPOINT_KEYS_SUPPORTED" type="int16u" writable="false" optional="true" apiMaturity="provisional">NumberOfAliroEndpointKeysSupported</attribute>
-
-        <!-- Commands -->
-        <command source="client" code="0" name="LockDoor" mustUseTimedInvoke="true">
-            <description>This command causes the lock device to lock the door.</description>
-            <!-- Conformance feature [COTA & PIN] - for now optional -->
-            <arg name="PINCode" type="octet_string" optional="true" />
-        </command>
-        <command source="client" code="1" name="UnlockDoor" mustUseTimedInvoke="true">
-            <description>This command causes the lock device to unlock the door.</description>
-            <!-- Conformance feature [COTA & PIN] - for now optional -->
-            <arg name="PINCode" type="octet_string" optional="true" />
-        </command>
-        <!-- Command Toggle with ID 2 is deprecated/disallowed -->
-        <command source="client" code="3" name="UnlockWithTimeout" mustUseTimedInvoke="true" optional="true">
-            <description>This command causes the lock device to unlock the door with a timeout parameter.</description>
-            <arg name="Timeout" type="int16u" />
-            <!-- Conformance feature [COTA & PIN] - for now optional -->
-            <arg name="PINCode" type="octet_string" optional="true" />
-        </command>
-        <!-- Conformance feature WDSCH - for now optional -->
-        <command source="client" code="11" name="SetWeekDaySchedule" optional="true">
-            <description>Set a weekly repeating schedule for a specified user.</description>
-            <access op="invoke" role="administer" />
-            <arg name="WeekDayIndex" type="int8u" />
-            <arg name="UserIndex" type="int16u" />
-            <arg name="DaysMask" type="DaysMaskMap" />
-            <arg name="StartHour" type="int8u" />
-            <arg name="StartMinute" type="int8u" />
-            <arg name="EndHour" type="int8u" />
-            <arg name="EndMinute" type="int8u" />
-        </command>
-        <!-- Conformance feature WDSCH - for now optional -->
-        <command source="client" code="12" name="GetWeekDaySchedule" response="GetWeekDayScheduleResponse" optional="true">
-            <description>Retrieve the specific weekly schedule for the specific user.</description>
-            <access op="invoke" role="administer" />
-            <arg name="WeekDayIndex" type="int8u" />
-            <arg name="UserIndex" type="int16u" />
-        </command>
-        <!-- Conformance feature WDSCH - for now optional -->
-        <command source="server" code="12" name="GetWeekDayScheduleResponse" disableDefaultResponse="true" optional="true">
-            <description>Returns the weekly repeating schedule data for the specified schedule index.</description>
-            <arg name="WeekDayIndex" type="int8u" />
-            <arg name="UserIndex" type="int16u" />
-            <arg name="Status" type="DlStatus" />
-            <arg name="DaysMask" type="DaysMaskMap" optional="true" />
-            <arg name="StartHour" type="int8u" optional="true" />
-            <arg name="StartMinute" type="int8u" optional="true" />
-            <arg name="EndHour" type="int8u" optional="true" />
-            <arg name="EndMinute" type="int8u" optional="true" />
-        </command>
-        <!-- Conformance feature WDSCH - for now optional -->
-        <command source="client" code="13" name="ClearWeekDaySchedule" optional="true">
-            <description>Clear the specific weekly schedule or all weekly schedules for the specific user.</description>
-            <access op="invoke" role="administer" />
-            <arg name="WeekDayIndex" type="int8u" />
-            <arg name="UserIndex" type="int16u" />
-        </command>
-        <!-- Conformance feature YDSCH - for now optional -->
-        <command source="client" code="14" name="SetYearDaySchedule" optional="true">
-            <description>Set a time-specific schedule ID for a specified user.</description>
-            <access op="invoke" role="administer" />
-            <arg name="YearDayIndex" type="int8u" />
-            <arg name="UserIndex" type="int16u" />
-            <arg name="LocalStartTime" type="epoch_s" />
-            <arg name="LocalEndTime" type="epoch_s" />
-        </command>
-        <!-- Conformance feature YDSCH - for now optional -->
-        <command source="client" code="15" name="GetYearDaySchedule" response="GetYearDayScheduleResponse" optional="true">
-            <description>Returns the year day schedule data for the specified schedule and user indexes.</description>
-            <access op="invoke" role="administer" />
-            <arg name="YearDayIndex" type="int8u" />
-            <arg name="UserIndex" type="int16u" />
-        </command>
-        <!-- Conformance feature YDSCH - for now optional -->
-        <command source="server" code="15" name="GetYearDayScheduleResponse" disableDefaultResponse="true" optional="true">
-            <description>Returns the year day schedule data for the specified schedule and user indexes.</description>
-            <arg name="YearDayIndex" type="int8u" />
-            <arg name="UserIndex" type="int16u" />
-            <arg name="Status" type="DlStatus" />
-            <arg name="LocalStartTime" type="epoch_s" optional="true" />
-            <arg name="LocalEndTime" type="epoch_s" optional="true" />
-        </command>
-        <!-- Conformance feature YDSCH - for now optional -->
-        <command source="client" code="16" name="ClearYearDaySchedule" optional="true">
-            <description>Clears the specific year day schedule or all year day schedules for the specific user.</description>
-            <access op="invoke" role="administer" />
-            <arg name="YearDayIndex" type="int8u" />
-            <arg name="UserIndex" type="int16u" />
-        </command>
-        <!-- Conformance feature HDSCH - for now optional -->
-        <command source="client" code="17" name="SetHolidaySchedule" optional="true">
-            <description>Set the holiday Schedule by specifying local start time and local end time with respect to any Lock Operating Mode.</description>
-            <access op="invoke" role="administer" />
-            <arg name="HolidayIndex" type="int8u" />
-            <arg name="LocalStartTime" type="epoch_s" />
-            <arg name="LocalEndTime" type="epoch_s" />
-            <arg name="OperatingMode" type="OperatingModeEnum" />
-        </command>
-        <!-- Conformance feature HDSCH - for now optional -->
-        <command source="client" code="18" name="GetHolidaySchedule" response="GetHolidayScheduleResponse" optional="true">
-            <description>Get the holiday schedule for the specified index.</description>
-            <access op="invoke" role="administer" />
-            <arg name="HolidayIndex" type="int8u" />
-        </command>
-        <!-- Conformance feature HDSCH - for now optional -->
-        <command source="server" code="18" name="GetHolidayScheduleResponse" disableDefaultResponse="true" optional="true">
-            <description>Returns the Holiday Schedule Entry for the specified Holiday ID.</description>
-            <arg name="HolidayIndex" type="int8u" />
-            <arg name="Status" type="DlStatus" />
-            <arg name="LocalStartTime" type="epoch_s" optional="true" />
-            <arg name="LocalEndTime" type="epoch_s" optional="true" />
-            <arg name="OperatingMode" type="OperatingModeEnum" optional="true" />
-        </command>
-        <!-- Conformance feature HDSCH - for now optional -->
-        <command source="client" code="19" name="ClearHolidaySchedule" optional="true">
-            <description>Clears the holiday schedule or all holiday schedules.</description>
-            <access op="invoke" role="administer" />
-            <arg name="HolidayIndex" type="int8u" />
-        </command>
-        <!-- Conformance feature USR - for now optional -->
-        <command source="client" code="26" name="SetUser" mustUseTimedInvoke="true" optional="true">
-            <description>Set User into the lock.</description>
-            <access op="invoke" role="administer" />
-            <arg name="OperationType" type="DataOperationTypeEnum" />
-            <arg name="UserIndex" type="int16u" />
-            <arg name="UserName" type="char_string" isNullable="true" />
-            <arg name="UserUniqueID" type="int32u" isNullable="true" />
-            <arg name="UserStatus" type="UserStatusEnum" isNullable="true" />
-            <arg name="UserType" type="UserTypeEnum" isNullable="true" />
-            <arg name="CredentialRule" type="CredentialRuleEnum" isNullable="true" />
-        </command>
-        <!-- Conformance feature USR - for now optional -->
-        <command source="client" code="27" name="GetUser" response="GetUserResponse" optional="true">
-            <description>Retrieve User.</description>
-            <access op="invoke" role="administer" />
-            <arg name="UserIndex" type="int16u" />
-        </command>
-        <!-- Conformance feature USR - for now optional -->
-        <command source="server" code="28" name="GetUserResponse" disableDefaultResponse="true" optional="true">
-            <description>Returns the User for the specified UserIndex.</description>
-            <arg name="UserIndex" type="int16u" />
-            <arg name="UserName" type="char_string" isNullable="true" />
-            <arg name="UserUniqueID" type="int32u" isNullable="true" />
-            <arg name="UserStatus" type="UserStatusEnum" isNullable="true" />
-            <arg name="UserType" type="UserTypeEnum" isNullable="true" />
-            <arg name="CredentialRule" type="CredentialRuleEnum" isNullable="true" />
-            <arg name="Credentials" type="CredentialStruct" array="true" isNullable="true" />
-            <arg name="CreatorFabricIndex" type="fabric_idx" isNullable="true" />
-            <arg name="LastModifiedFabricIndex" type="fabric_idx" isNullable="true" />
-            <arg name="NextUserIndex" type="int16u" isNullable="true" />
-        </command>
-        <!-- Conformance feature USR - for now optional -->
-        <command source="client" code="29" name="ClearUser" mustUseTimedInvoke="true" optional="true">
-            <description>Clears a User or all Users.</description>
-            <access op="invoke" role="administer" />
-            <arg name="UserIndex" type="int16u" />
-        </command>
-        <!-- Conformance feature USR - for now optional -->
-        <command source="client" code="34" name="SetCredential" response="SetCredentialResponse" mustUseTimedInvoke="true" optional="true">
-            <description>Set a credential (e.g. PIN, RFID, Fingerprint, etc.) into the lock for a new user, existing user, or ProgrammingUser.</description>
-            <access op="invoke" role="administer" />
-            <arg name="OperationType" type="DataOperationTypeEnum" />
-            <arg name="Credential" type="CredentialStruct" />
-            <arg name="CredentialData" type="long_octet_string" />
-            <arg name="UserIndex" type="int16u" isNullable="true" />
-            <arg name="UserStatus" type="UserStatusEnum" isNullable="true" />
-            <arg name="UserType" type="UserTypeEnum" isNullable="true" />
-        </command>
-        <!-- Conformance feature USR - for now optional -->
-        <command source="server" code="35" name="SetCredentialResponse" disableDefaultResponse="true" optional="true">
-            <description>Returns the status for setting the specified credential.</description>
-            <arg name="Status" type="DlStatus" />
-            <arg name="UserIndex" type="int16u" isNullable="true" />
-            <arg name="NextCredentialIndex" type="int16u" isNullable="true" />
-        </command>
-        <!-- Conformance feature USR - for now optional -->
-        <command source="client" code="36" name="GetCredentialStatus" response="GetCredentialStatusResponse" optional="true">
-            <description>Retrieve the status of a particular credential (e.g. PIN, RFID, Fingerprint, etc.) by index.</description>
-            <access op="invoke" role="administer" />
-            <arg name="Credential" type="CredentialStruct" />
-        </command>
-        <!-- Conformance feature USR - for now optional -->
-        <command source="server" code="37" name="GetCredentialStatusResponse" disableDefaultResponse="true" optional="true">
-            <description>Returns the status for the specified credential.</description>
-            <arg name="CredentialExists" type="boolean" />
-            <arg name="UserIndex" type="int16u" isNullable="true" />
-            <arg name="CreatorFabricIndex" type="fabric_idx" isNullable="true" />
-            <arg name="LastModifiedFabricIndex" type="fabric_idx" isNullable="true" />
-            <arg name="NextCredentialIndex" type="int16u" isNullable="true" />
-            <arg name="CredentialData" type="octet_string" isNullable="true" optional="true" />
-        </command>
-        <!-- Conformance feature USR - for now optional -->
-        <command source="client" code="38" name="ClearCredential" mustUseTimedInvoke="true" optional="true">
-            <description>Clear one, one type, or all credentials except ProgrammingPIN credential.</description>
-            <access op="invoke" role="administer" />
-            <arg name="Credential" type="CredentialStruct" isNullable="true"/>
-        </command>
-        <command source="client" code="39" name="UnboltDoor" mustUseTimedInvoke="true" optional="true">
-            <description>This command causes the lock device to unlock the door without pulling the latch.</description>
-            <!-- Conformance feature [COTA & PIN] - for now optional -->
-            <arg name="PINCode" type="octet_string" optional="true" />
-        </command>
-        <command source="client" code="40" name="SetAliroReaderConfig" mustUseTimedInvoke="true" optional="true" apiMaturity="provisional">
-            <description>This command communicates an Aliro Reader configuration to the lock.</description>
-            <access op="invoke" privilege="administer" />
-            <arg name="SigningKey" type="octet_string" length="32" />
-            <arg name="VerificationKey" type="octet_string" length="65" />
-            <arg name="GroupIdentifier" type="octet_string" length="16" />
-            <arg name="GroupResolvingKey" type="octet_string" length="16" optional="true" />
-        </command>
-        <command source="client" code="41" name="ClearAliroReaderConfig" mustUseTimedInvoke="true" optional="true" apiMaturity="provisional">
-            <description>This command clears an existing Aliro Reader configuration for the lock.</description>
-            <access op="invoke" privilege="administer" />
-        </command>
-
-
-        <!-- Events -->
-        <event side="server" code="0" name="DoorLockAlarm" priority="critical">
-            <description>The door lock cluster provides several alarms which can be sent when there is a critical state on the door lock.</description>
-            <field id="0" name="AlarmCode" type="AlarmCodeEnum" />
-        </event>
-        <!-- Conformance feature DPS - for now optional -->
-        <event side="server" code="1" name="DoorStateChange" priority="critical" optional="true">
-            <description>The door lock server sends out a DoorStateChange event when the door lock door state changes.</description>
-            <field id="0" name="DoorState" type="DoorStateEnum" />
-        </event>
-        <event side="server" code="2" name="LockOperation" priority="critical">
-            <description>The door lock server sends out a LockOperation event when the event is triggered by the various lock operation sources.</description>
-            <field id="0" name="LockOperationType" type="LockOperationTypeEnum" />
-            <field id="1" name="OperationSource" type="OperationSourceEnum" />
-            <field id="2" name="UserIndex" type="int16u" isNullable="true" />
-            <field id="3" name="FabricIndex" type="fabric_idx" isNullable="true" />
-            <field id="4" name="SourceNode" type="node_id" isNullable="true" />
-            <!-- Conformance feature [USR] - for now optional -->
-            <field id="5" name="Credentials" type="CredentialStruct" array="true" isNullable="true" optional="true" />
-        </event>
-        <event side="server" code="3" name="LockOperationError" priority="critical">
-            <description>The door lock server sends out a LockOperationError event when a lock operation fails for various reasons.</description>
-            <field id="0" name="LockOperationType" type="LockOperationTypeEnum" />
-            <field id="1" name="OperationSource" type="OperationSourceEnum" />
-            <field id="2" name="OperationError" type="OperationErrorEnum" />
-            <field id="3" name="UserIndex" type="int16u" isNullable="true" />
-            <field id="4" name="FabricIndex" type="fabric_idx" isNullable="true" />
-            <field id="5" name="SourceNode" type="node_id" isNullable="true" />
-            <!-- Conformance feature [USR] - for now optional -->
-            <field id="6" name="Credentials" type="CredentialStruct" array="true" isNullable="true" optional="true" />
-        </event>
-        <event side="server" code="4" name="LockUserChange" priority="info">
-            <description>The door lock server sends out a LockUserChange event when a lock user, schedule, or credential change has occurred.</description>
-            <field id="0" name="LockDataType" type="LockDataTypeEnum" />
-            <field id="1" name="DataOperationType" type="DataOperationTypeEnum" />
-            <field id="2" name="OperationSource" type="OperationSourceEnum" />
-            <field id="3" name="UserIndex" type="int16u" isNullable="true" />
-            <field id="4" name="FabricIndex" type="fabric_idx" isNullable="true" />
-            <field id="5" name="SourceNode" type="node_id" isNullable="true" />
-            <field id="6" name="DataIndex" type="int16u" isNullable="true" />
-        </event>
-    </cluster>
-
-
-    <!-- Cluster data types -->
-    <enum name="AlarmCodeEnum" type="enum8">
-        <cluster code="0x0101" />
-        <item value="0" name="LockJammed" />
-        <item value="1" name="LockFactoryReset" />
-        <item value="3" name="LockRadioPowerCycled" />
-        <item value="4" name="WrongCodeEntryLimit" />
-        <item value="5" name="FrontEsceutcheonRemoved" />
-        <item value="6" name="DoorForcedOpen" />
-        <item value="7" name="DoorAjar" />
-        <item value="8" name="ForcedUser" />
-    </enum>
-
-    <enum name="CredentialRuleEnum" type="enum8">
-        <cluster code="0x0101" />
-        <item value="0" name="Single" />
-        <item value="1" name="Dual" />
-        <item value="2" name="Tri" />
-    </enum>
-
-    <bitmap name="DlCredentialRuleMask" type="bitmap8">
-        <cluster code="0x0101" />
-        <field mask="0x01" name="Single" />
-        <field mask="0x02" name="Dual" />
-        <field mask="0x04" name="Tri" />
-    </bitmap> 
-
-    <struct name="CredentialStruct">
-        <cluster code="0x0101" />
-        <item name="CredentialType" type="CredentialTypeEnum" />
-        <item name="CredentialIndex" type="int16u" />
-    </struct>
-
-    <enum name="CredentialTypeEnum" type="enum8">
-        <cluster code="0x0101" />
-        <item value="0" name="ProgrammingPIN" />
-        <item value="1" name="PIN" />
-        <item value="2" name="RFID" />
-        <item value="3" name="Fingerprint" />
-        <item value="4" name="FingerVein" />
-        <item value="5" name="Face" />
-        <item value="6" name="AliroCredentialIssuerKey" />
-        <item value="7" name="AliroEvictableEndpointKey" />
-        <item value="8" name="AliroNonEvictableEndpointKey" />
-    </enum>
-
-    <enum name="DataOperationTypeEnum" type="enum8">
-        <cluster code="0x0101" />
-        <item value="0" name="Add" />
-        <item value="1" name="Clear" />
-        <item value="2" name="Modify" />
-    </enum>
-
-    <bitmap name="DaysMaskMap" type="bitmap8">
-        <cluster code="0x0101" />
-        <field mask="0x01" name="Sunday" />
-        <field mask="0x02" name="Monday" />
-        <field mask="0x04" name="Tuesday" />
-        <field mask="0x08" name="Wednesday" />
-        <field mask="0x10" name="Thursday" />
-        <field mask="0x20" name="Friday" />
-        <field mask="0x40" name="Saturday" />
-    </bitmap>
-
-    <enum name="DoorStateEnum" type="enum8">
-        <cluster code="0x0101" />
-        <item value="0" name="DoorOpen" />
-        <item value="1" name="DoorClosed" />
-        <item value="2" name="DoorJammed" />
-        <item value="3" name="DoorForcedOpen" />
-        <item value="4" name="DoorUnspecifiedError" />
-        <item value="5" name="DoorAjar" />
-    </enum>
-
-    <enum name="LockDataTypeEnum" type="enum8">
-        <cluster code="0x0101" />
-        <item value="0" name="Unspecified" />
-        <item value="1" name="ProgrammingCode" />
-        <item value="2" name="UserIndex" />
-        <item value="3" name="WeekDaySchedule" />
-        <item value="4" name="YearDaySchedule" />
-        <item value="5" name="HolidaySchedule" />
-        <item value="6" name="PIN" />
-        <item value="7" name="RFID" />
-        <item value="8" name="Fingerprint" />
-        <item value="9" name="FingerVein" />
-        <item value="10" name="Face" />
-        <item value="11" name="AliroCredentialIssuerKey" />
-        <item value="12" name="AliroEvictableEndpointKey" />
-        <item value="13" name="AliroNonEvictableEndpointKey" />
-    </enum>
-
-    <enum name="LockOperationTypeEnum" type="enum8">
-        <cluster code="0x0101" />
-        <item value="0" name="Lock" />
-        <item value="1" name="Unlock" />
-        <item value="2" name="NonAccessUserEvent" />
-        <item value="3" name="ForcedUserEvent" />
-        <item value="4" name="Unlatch" />
-    </enum>
-
-    <enum name="OperationErrorEnum" type="enum8">
-        <cluster code="0x0101" />
-        <item value="0" name="Unspecified" />
-        <item value="1" name="InvalidCredential" />
-        <item value="2" name="DisabledUserDenied" />
-        <item value="3" name="Restricted" />
-        <item value="4" name="InsufficientBattery" />
-    </enum>
-
-    <enum name="OperatingModeEnum" type="enum8">
-        <cluster code="0x0101" />
-        <item value="0" name="Normal" />
-        <item value="1" name="Vacation" />
-        <item value="2" name="Privacy" />
-        <item value="3" name="NoRemoteLockUnlock" />
-        <item value="4" name="Passage" />
-    </enum>
-
-    <enum name="OperationSourceEnum" type="enum8">
-        <cluster code="0x0101" />
-        <item value="0" name="Unspecified" />
-        <item value="1" name="Manual" />
-        <item value="2" name="ProprietaryRemote" />
-        <item value="3" name="Keypad" />
-        <item value="4" name="Auto" />
-        <item value="5" name="Button" />
-        <item value="6" name="Schedule" />
-        <item value="7" name="Remote" />
-        <item value="8" name="RFID" />
-        <item value="9" name="Biometric" />
-        <item value="10" name="Aliro" />
-    </enum>
-
-    <enum name="UserStatusEnum" type="enum8">
-        <cluster code="0x0101" />
-        <item value="0" name="Available" />
-        <item value="1" name="OccupiedEnabled" />
-        <item value="3" name="OccupiedDisabled" />
-    </enum>
-
-    <enum name="UserTypeEnum" type="enum8">
-        <cluster code="0x0101" />
-        <item value="0" name="UnrestrictedUser" />
-        <item value="1" name="YearDayScheduleUser" />
-        <item value="2" name="WeekDayScheduleUser" />
-        <item value="3" name="ProgrammingUser" />
-        <item value="4" name="NonAccessUser" />
-        <item value="5" name="ForcedUser" />
-        <item value="6" name="DisposableUser" />
-        <item value="7" name="ExpiringUser" />
-        <item value="8" name="ScheduleRestrictedUser" />
-        <item value="9" name="RemoteOnlyUser" />
-    </enum>
+    
+    <!-- Attributes -->
+    <attribute side="server" code="0" name="LockState" define="LOCK_STATE" type="DlLockState" min="0" max="3" isNullable="true" reportable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="1" name="LockType" define="LOCK_TYPE" type="DlLockType" min="0" max="11">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="2" name="ActuatorEnabled" define="ACTUATOR_ENABLED" type="boolean">
+      <mandatoryConform/>
+    </attribute>
+    <!-- Conformance feature DPS - for now optional -->
+    <attribute side="server" code="3" name="DoorState" define="DOOR_STATE" type="DoorStateEnum" min="0" max="5" isNullable="true" reportable="true" optional="true">
+      <mandatoryConform>
+        <feature name="DPS"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature [DPS] - for now optional -->
+    <attribute side="server" code="4" name="DoorOpenEvents" define="DOOR_OPEN_EVENTS" type="int32u" writable="true" optional="true">
+      <access op="read" role="view" />
+      <access op="write" role="manage"/>
+      <optionalConform>
+        <feature name="DPS"/>
+      </optionalConform>
+    </attribute>
+    <!-- Conformance feature [DPS] - for now optional -->
+    <attribute side="server" code="5" name="DoorClosedEvents" define="DOOR_CLOSED_EVENTS" type="int32u" writable="true" optional="true">
+      <access op="read" role="view" />
+      <access op="write" role="manage"/>
+      <optionalConform>
+        <feature name="DPS"/>
+      </optionalConform>
+    </attribute>
+    <!-- Conformance feature [DPS] - for now optional -->
+    <attribute side="server" code="6" name="OpenPeriod" define="OPEN_PERIOD" type="int16u" writable="true" optional="true">
+      <access op="read" role="view" />
+      <access op="write" role="manage"/>
+      <optionalConform>
+        <feature name="DPS"/>
+      </optionalConform>
+    </attribute>
+    <!-- Conformance feature USR - for now optional -->
+    <attribute side="server" code="17" name="NumberOfTotalUsersSupported" define="NUM_TOTAL_USERS_SUPPORTED" type="int16u" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature PIN - for now optional -->
+    <attribute side="server" code="18" name="NumberOfPINUsersSupported" define="NUM_PIN_USERS_SUPPORTED" type="int16u" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="PIN"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature RFID - for now optional -->
+    <attribute side="server" code="19" name="NumberOfRFIDUsersSupported" define="NUM_RFID_USERS_SUPPORTED" type="int16u" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="RID"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature WDSCH - for now optional -->
+    <attribute side="server" code="20" name="NumberOfWeekDaySchedulesSupportedPerUser" define="NUM_WEEKDAY_SCHEDULES_SUPPORTED_PER_USER" type="int8u" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="WDSCH"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature YDSCH - for now optional -->
+    <attribute side="server" code="21" name="NumberOfYearDaySchedulesSupportedPerUser" define="NUM_YEARDAY_SCHEDULES_SUPPORTED_PER_USER" type="int8u" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="YDSCH"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature HDSCH - for now optional -->
+    <attribute side="server" code="22" name="NumberOfHolidaySchedulesSupported" define="NUM_HOLIDAY_SCHEDULES_SUPPORTED" type="int8u" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="HDSCH"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature PIN - for now optional -->
+    <attribute side="server" code="23" name="MaxPINCodeLength" define="MAX_PIN_LENGTH" type="int8u" optional="true">
+      <mandatoryConform>
+        <feature name="PIN"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature PIN - for now optional -->
+    <attribute side="server" code="24" name="MinPINCodeLength" define="MIN_PIN_LENGTH" type="int8u" optional="true">
+      <mandatoryConform>
+        <feature name="PIN"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature RID - for now optional -->
+    <attribute side="server" code="25" name="MaxRFIDCodeLength" define="MAX_RFID_CODE_LENGTH" type="int8u" optional="true">
+      <mandatoryConform>
+        <feature name="RID"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature RID - for now optional -->
+    <attribute side="server" code="26" name="MinRFIDCodeLength" define="MIN_RFID_CODE_LENGTH" type="int8u" optional="true">
+      <mandatoryConform>
+        <feature name="RID"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature USR - for now optional -->
+    <attribute side="server" code="27" name="CredentialRulesSupport" define="CREDENTIAL_RULES_SUPPORT" type="DlCredentialRuleMask" min="0x00" max="0xFF" default="1" optional="true">
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature USR - for now optional  -->
+    <attribute side="server" code="28" name="NumberOfCredentialsSupportedPerUser" define="NUM_CREDENTIALS_SUPPORTED_PER_USER" type="int8u" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="33" name="Language" define="LANGUAGE" type="char_string" length="3" reportable="true" writable="true" optional="true">
+      <access op="read" role="view" />
+      <access op="write" role="manage"/>
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="34" name="LEDSettings" define="LED_SETTINGS" type="int8u" min="0" max="2" reportable="true" default="0" writable="true" optional="true">
+      <access op="read" role="view" />
+      <access op="write" role="manage"/>
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="35" name="AutoRelockTime" define="AUTO_RELOCK_TIME" type="int32u" reportable="true" writable="true" optional="true">
+      <access op="read" role="view" />
+      <access op="write" role="manage"/>
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="36" name="SoundVolume" define="SOUND_VOLUME" type="int8u" min="0" max="3" reportable="true" default="0" writable="true" optional="true">
+      <access op="read" role="view" />
+      <access op="write" role="manage"/>
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="37" name="OperatingMode" define="OPERATING_MODE" type="OperatingModeEnum" min="0" max="4" reportable="true" writable="true">
+      <access op="read" role="view" />
+      <access op="write" role="manage"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="38" name="SupportedOperatingModes" define="SUPPORTED_OPERATING_MODES" type="DlSupportedOperatingModes" min="0x0000" max="0xFFFF" default="0xFFF6">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="39" name="DefaultConfigurationRegister" define="DEFAULT_CONFIGURATION_REGISTER" type="DlDefaultConfigurationRegister" min="0x0000" max="0xFFFF" reportable="true" default="0" optional="true">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="40" name="EnableLocalProgramming" define="ENABLE_LOCAL_PROGRAMMING" type="boolean" reportable="true" default="1" writable="true" optional="true">
+      <access op="read" role="view" />
+      <access op="write" role="administer"/>
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="41" name="EnableOneTouchLocking" define="ENABLE_ONE_TOUCH_LOCKING" type="boolean" reportable="true" default="0" writable="true" optional="true">
+      <access op="read" role="view" />
+      <access op="write" role="manage"/>
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="42" name="EnableInsideStatusLED" define="ENABLE_INSIDE_STATUS_LED" type="boolean" reportable="true" default="0" writable="true" optional="true">
+      <access op="read" role="view" />
+      <access op="write" role="manage"/>
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="43" name="EnablePrivacyModeButton" define="ENABLE_PRIVACY_MODE_BUTTON" type="boolean" reportable="true" default="0" writable="true" optional="true">
+      <access op="read" role="view" />
+      <access op="write" role="manage"/>
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="44" name="LocalProgrammingFeatures" define="LOCAL_PROGRAMMING_FEATURES" type="DlLocalProgrammingFeatures" min="0x0" max="0x0F" reportable="true" default="0" writable="true" optional="true">
+      <access op="read" role="view" />
+      <access op="write" role="administer"/>
+      <optionalConform/>
+    </attribute>
+    <!-- Conformance feature PIN | RID - for now optional -->
+    <attribute side="server" code="48" name="WrongCodeEntryLimit" define="WRONG_CODE_ENTRY_LIMIT" type="int8u" min="1" max="255" reportable="true" writable="true" optional="true">
+      <access op="read" role="view" />
+      <access op="write" role="administer"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="PIN"/>
+          <feature name="RID"/>
+        </orTerm>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature PIN | RID - for now optional -->
+    <attribute side="server" code="49" name="UserCodeTemporaryDisableTime" define="USER_CODE_TEMPORARY_DISABLE_TIME" type="int8u" min="1" max="255" reportable="true" writable="true" optional="true">
+      <access op="read" role="view" />
+      <access op="write" role="administer"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="PIN"/>
+          <feature name="RID"/>
+        </orTerm>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature [PIN] - for now optional -->
+    <attribute side="server" code="50" name="SendPINOverTheAir" define="SEND_PIN_OVER_THE_AIR" type="boolean" reportable="true" default="0" writable="true" optional="true">
+      <access op="read" role="view" />
+      <access op="write" role="administer"/>
+      <optionalConform>
+        <andTerm>
+          <notTerm>
+            <feature name="USR"/>
+          </notTerm>
+          <feature name="PIN"/>
+        </andTerm>
+      </optionalConform>
+    </attribute>
+    <!-- Conformance feature COTA & PIN - for now optional -->
+    <attribute side="server" code="51" name="RequirePINforRemoteOperation" define="REQUIRE_PIN_FOR_REMOTE_OPERATION" type="boolean" reportable="true" default="0" writable="true" optional="true">
+      <access op="read" role="view" />
+      <access op="write" role="administer"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="COTA"/>
+          <feature name="PIN"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
+    <!-- Attribute SecurityLevel with code 52 is deprecated -->
+    <!-- Conformance feature [USR] - for now optional -->
+    <attribute side="server" code="53" name="ExpiringUserTimeout" define="EXPIRING_USER_TIMEOUT" type="int16u" min="1" max="2880" reportable="true" writable="true" optional="true">
+      <access op="read" role="view" />
+      <access op="write" role="administer"/>
+      <optionalConform>
+        <feature name="USR"/>
+      </optionalConform>
+    </attribute>
+    <!-- Conformance feature [ALIRO] - optional -->
+    <attribute side="server" code="128" name="AliroReaderVerificationKey" define="ALIRO_READER_VERIFICATION_KEY" type="octet_string" length="65" optional="true" isNullable="true" apiMaturity="provisional">
+      <access op="read" privilege="administer"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature [ALIRO] - optional -->
+    <attribute side="server" code="129" name="AliroReaderGroupIdentifier" define="ALIRO_READER_GROUP_IDENTIFIER" type="octet_string" length="16" optional="true" isNullable="true" apiMaturity="provisional">
+      <access op="read" privilege="administer"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature [ALIRO] - optional -->
+    <attribute side="server" code="130" name="AliroReaderGroupSubIdentifier" define="ALIRO_READER_GROUP_SUBIDENTIFIER" type="octet_string" length="16" optional="true" apiMaturity="provisional">
+      <access op="read" privilege="administer"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature [ALIRO] - optional -->
+    <attribute side="server" code="131" name="AliroExpeditedTransactionSupportedProtocolVersions" define="ALIRO_EXPEDITED_TRANSACTION_SUPPORTED_PROTOCOL_VERSIONS" type="array" entryType="octet_string" length="16" optional="true" apiMaturity="provisional">
+      <access op="read" privilege="administer"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature [ALBU] - optional if ALIRO is supported -->
+    <attribute side="server" code="132" name="AliroGroupResolvingKey" define="ALIRO_GROUP_RESOLVING_KEY" type="octet_string" length="16" optional="true" isNullable="true" apiMaturity="provisional">
+      <access op="read" privilege="administer"/>
+      <mandatoryConform>
+        <feature name="ALBU"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature [ALBU] - optional if ALIRO is supported -->
+    <attribute side="server" code="133" name="AliroSupportedBLEUWBProtocolVersions" define="ALIRO_SUPPORTED_BLE_UWB_PROTOCOL_VERSIONS" type="array" entryType="octet_string" length="16" optional="true" apiMaturity="provisional">
+      <access op="read" privilege="administer"/>
+      <mandatoryConform>
+        <feature name="ALBU"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature [ALBU] - optional if ALIRO is supported -->
+    <attribute side="server" code="134" name="AliroBLEAdvertisingVersion" define="ALIRO_BLE_ADVERTISING_VERSION" type="int8u" optional="true" apiMaturity="provisional">
+      <access op="read" privilege="administer"/>
+      <mandatoryConform>
+        <feature name="ALBU"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature [ALIRO] - optional -->
+    <attribute side="server" code="135" name="NumberOfAliroCredentialIssuerKeysSupported" define="NUMBER_OF_ALIRO_CREDENTIAL_ISSUER_KEYS_SUPPORTED" type="int16u" optional="true" apiMaturity="provisional">
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Conformance feature [ALIRO] - optional -->
+    <attribute side="server" code="136" name="NumberOfAliroEndpointKeysSupported" define="NUMBER_OF_ALIRO_ENDPOINT_KEYS_SUPPORTED" type="int16u" optional="true" apiMaturity="provisional">
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+    </attribute>
+    <!-- Commands -->
+    <command source="client" code="0" name="LockDoor" mustUseTimedInvoke="true">
+      <description>This command causes the lock device to lock the door.</description>
+      <!-- Conformance feature [COTA & PIN] - for now optional -->
+      <arg name="PINCode" type="octet_string" optional="true"/>
+      <mandatoryConform/>
+    </command>
+    <command source="client" code="1" name="UnlockDoor" mustUseTimedInvoke="true">
+      <description>This command causes the lock device to unlock the door.</description>
+      <!-- Conformance feature [COTA & PIN] - for now optional -->
+      <arg name="PINCode" type="octet_string" optional="true"/>
+      <mandatoryConform/>
+    </command>
+    <!-- Command Toggle with ID 2 is deprecated/disallowed -->
+    <command source="client" code="3" name="UnlockWithTimeout" mustUseTimedInvoke="true" optional="true">
+      <description>This command causes the lock device to unlock the door with a timeout parameter.</description>
+      <arg name="Timeout" type="int16u"/>
+      <!-- Conformance feature [COTA & PIN] - for now optional -->
+      <arg name="PINCode" type="octet_string" optional="true"/>
+      <optionalConform/>
+    </command>
+    <!-- Conformance feature WDSCH - for now optional -->
+    <command source="client" code="11" name="SetWeekDaySchedule" optional="true">
+      <description>Set a weekly repeating schedule for a specified user.</description>
+      <access op="invoke" role="administer"/>
+      <arg name="WeekDayIndex" type="int8u" />
+      <arg name="UserIndex" type="int16u" />
+      <arg name="DaysMask" type="DaysMaskMap" />
+      <arg name="StartHour" type="int8u" />
+      <arg name="StartMinute" type="int8u" />
+      <arg name="EndHour" type="int8u" />
+      <arg name="EndMinute" type="int8u" />
+      <mandatoryConform>
+        <feature name="WDSCH"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature WDSCH - for now optional -->
+    <command source="client" code="12" name="GetWeekDaySchedule" response="GetWeekDayScheduleResponse" optional="true">
+      <description>Retrieve the specific weekly schedule for the specific user.</description>
+      <access op="invoke" role="administer"/>
+      <arg name="WeekDayIndex" type="int8u" />
+      <arg name="UserIndex" type="int16u" />
+      <mandatoryConform>
+        <feature name="WDSCH"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature WDSCH - for now optional -->
+    <command source="server" code="12" name="GetWeekDayScheduleResponse" disableDefaultResponse="true" optional="true">
+      <description>Returns the weekly repeating schedule data for the specified schedule index.</description>
+      <arg name="WeekDayIndex" type="int8u" />
+      <arg name="UserIndex" type="int16u" />
+      <arg name="Status" type="DlStatus" />
+      <arg name="DaysMask" type="DaysMaskMap" optional="true" />
+      <arg name="StartHour" type="int8u" optional="true" />
+      <arg name="StartMinute" type="int8u" optional="true" />
+      <arg name="EndHour" type="int8u" optional="true" />
+      <arg name="EndMinute" type="int8u" optional="true" />
+      <mandatoryConform>
+        <feature name="WDSCH"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature WDSCH - for now optional -->
+    <command source="client" code="13" name="ClearWeekDaySchedule" optional="true">
+      <description>Clear the specific weekly schedule or all weekly schedules for the specific user.</description>
+      <access op="invoke" role="administer"/>
+      <arg name="WeekDayIndex" type="int8u" />
+      <arg name="UserIndex" type="int16u" />
+      <mandatoryConform>
+        <feature name="WDSCH"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature YDSCH - for now optional -->
+    <command source="client" code="14" name="SetYearDaySchedule" optional="true">
+      <description>Set a time-specific schedule ID for a specified user.</description>
+      <access op="invoke" role="administer"/>
+      <arg name="YearDayIndex" type="int8u" />
+      <arg name="UserIndex" type="int16u" />
+      <arg name="LocalStartTime" type="epoch_s" />
+      <arg name="LocalEndTime" type="epoch_s" />
+      <mandatoryConform>
+        <feature name="YDSCH"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature YDSCH - for now optional -->
+    <command source="client" code="15" name="GetYearDaySchedule" response="GetYearDayScheduleResponse" optional="true">
+      <description>Returns the year day schedule data for the specified schedule and user indexes.</description>
+      <access op="invoke" role="administer"/>
+      <arg name="YearDayIndex" type="int8u" />
+      <arg name="UserIndex" type="int16u" />
+      <mandatoryConform>
+        <feature name="YDSCH"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature YDSCH - for now optional -->
+    <command source="server" code="15" name="GetYearDayScheduleResponse" disableDefaultResponse="true" optional="true">
+      <description>Returns the year day schedule data for the specified schedule and user indexes.</description>
+      <arg name="YearDayIndex" type="int8u" />
+      <arg name="UserIndex" type="int16u" />
+      <arg name="Status" type="DlStatus" />
+      <arg name="LocalStartTime" type="epoch_s" optional="true" />
+      <arg name="LocalEndTime" type="epoch_s" optional="true" />
+      <mandatoryConform>
+        <feature name="YDSCH"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature YDSCH - for now optional -->
+    <command source="client" code="16" name="ClearYearDaySchedule" optional="true">
+      <description>Clears the specific year day schedule or all year day schedules for the specific user.</description>
+      <access op="invoke" role="administer"/>
+      <arg name="YearDayIndex" type="int8u" />
+      <arg name="UserIndex" type="int16u" />
+      <mandatoryConform>
+        <feature name="YDSCH"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature HDSCH - for now optional -->
+    <command source="client" code="17" name="SetHolidaySchedule" optional="true">
+      <description>Set the holiday Schedule by specifying local start time and local end time with respect to any Lock Operating Mode.</description>
+      <access op="invoke" role="administer"/>
+      <arg name="HolidayIndex" type="int8u" />
+      <arg name="LocalStartTime" type="epoch_s" />
+      <arg name="LocalEndTime" type="epoch_s" />
+      <arg name="OperatingMode" type="OperatingModeEnum" />
+      <mandatoryConform>
+        <feature name="HDSCH"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature HDSCH - for now optional -->
+    <command source="client" code="18" name="GetHolidaySchedule" response="GetHolidayScheduleResponse" optional="true">
+      <description>Get the holiday schedule for the specified index.</description>
+      <access op="invoke" role="administer"/>
+      <arg name="HolidayIndex" type="int8u" />
+      <mandatoryConform>
+        <feature name="HDSCH"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature HDSCH - for now optional -->
+    <command source="server" code="18" name="GetHolidayScheduleResponse" disableDefaultResponse="true" optional="true">
+      <description>Returns the Holiday Schedule Entry for the specified Holiday ID.</description>
+      <arg name="HolidayIndex" type="int8u" />
+      <arg name="Status" type="DlStatus" />
+      <arg name="LocalStartTime" type="epoch_s" optional="true" />
+      <arg name="LocalEndTime" type="epoch_s" optional="true" />
+      <arg name="OperatingMode" type="OperatingModeEnum" optional="true" />
+      <mandatoryConform>
+        <feature name="HDSCH"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature HDSCH - for now optional -->
+    <command source="client" code="19" name="ClearHolidaySchedule" optional="true">
+      <description>Clears the holiday schedule or all holiday schedules.</description>
+      <access op="invoke" role="administer"/>
+      <arg name="HolidayIndex" type="int8u" />
+      <mandatoryConform>
+        <feature name="HDSCH"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature USR - for now optional -->
+    <command source="client" code="26" name="SetUser" mustUseTimedInvoke="true" optional="true">
+      <description>Set User into the lock.</description>
+      <access op="invoke" role="administer"/>
+      <arg name="OperationType" type="DataOperationTypeEnum" />
+      <arg name="UserIndex" type="int16u" />
+      <arg name="UserName" type="char_string" isNullable="true" />
+      <arg name="UserUniqueID" type="int32u" isNullable="true" />
+      <arg name="UserStatus" type="UserStatusEnum" isNullable="true" />
+      <arg name="UserType" type="UserTypeEnum" isNullable="true" />
+      <arg name="CredentialRule" type="CredentialRuleEnum" isNullable="true" />
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature USR - for now optional -->
+    <command source="client" code="27" name="GetUser" response="GetUserResponse" optional="true">
+      <description>Retrieve User.</description>
+      <access op="invoke" role="administer"/>
+      <arg name="UserIndex" type="int16u" />
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature USR - for now optional -->
+    <command source="server" code="28" name="GetUserResponse" disableDefaultResponse="true" optional="true">
+      <description>Returns the User for the specified UserIndex.</description>
+      <arg name="UserIndex" type="int16u" />
+      <arg name="UserName" type="char_string" isNullable="true" />
+      <arg name="UserUniqueID" type="int32u" isNullable="true" />
+      <arg name="UserStatus" type="UserStatusEnum" isNullable="true" />
+      <arg name="UserType" type="UserTypeEnum" isNullable="true" />
+      <arg name="CredentialRule" type="CredentialRuleEnum" isNullable="true" />
+      <arg name="Credentials" type="CredentialStruct" array="true" isNullable="true" />
+      <arg name="CreatorFabricIndex" type="fabric_idx" isNullable="true" />
+      <arg name="LastModifiedFabricIndex" type="fabric_idx" isNullable="true" />
+      <arg name="NextUserIndex" type="int16u" isNullable="true" />
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature USR - for now optional -->
+    <command source="client" code="29" name="ClearUser" mustUseTimedInvoke="true" optional="true">
+      <description>Clears a User or all Users.</description>
+      <access op="invoke" role="administer"/>
+      <arg name="UserIndex" type="int16u" />
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature USR - for now optional -->
+    <command source="client" code="34" name="SetCredential" response="SetCredentialResponse" mustUseTimedInvoke="true" optional="true">
+      <description>Set a credential (e.g. PIN, RFID, Fingerprint, etc.) into the lock for a new user, existing user, or ProgrammingUser.</description>
+      <access op="invoke" role="administer"/>
+      <arg name="OperationType" type="DataOperationTypeEnum" />
+      <arg name="Credential" type="CredentialStruct" />
+      <arg name="CredentialData" type="long_octet_string" />
+      <arg name="UserIndex" type="int16u" isNullable="true" />
+      <arg name="UserStatus" type="UserStatusEnum" isNullable="true" />
+      <arg name="UserType" type="UserTypeEnum" isNullable="true" />
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature USR - for now optional -->
+    <command source="server" code="35" name="SetCredentialResponse" disableDefaultResponse="true" optional="true">
+      <description>Returns the status for setting the specified credential.</description>
+      <arg name="Status" type="DlStatus" />
+      <arg name="UserIndex" type="int16u" isNullable="true" />
+      <arg name="NextCredentialIndex" type="int16u" isNullable="true" />
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature USR - for now optional -->
+    <command source="client" code="36" name="GetCredentialStatus" response="GetCredentialStatusResponse" optional="true">
+      <description>Retrieve the status of a particular credential (e.g. PIN, RFID, Fingerprint, etc.) by index.</description>
+      <access op="invoke" role="administer"/>
+      <arg name="Credential" type="CredentialStruct" />
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature USR - for now optional -->
+    <command source="server" code="37" name="GetCredentialStatusResponse" disableDefaultResponse="true" optional="true">
+      <description>Returns the status for the specified credential.</description>
+      <arg name="CredentialExists" type="boolean" />
+      <arg name="UserIndex" type="int16u" isNullable="true" />
+      <arg name="CreatorFabricIndex" type="fabric_idx" isNullable="true" />
+      <arg name="LastModifiedFabricIndex" type="fabric_idx" isNullable="true" />
+      <arg name="NextCredentialIndex" type="int16u" isNullable="true" />
+      <arg name="CredentialData" type="octet_string" isNullable="true" optional="true" />
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+    </command>
+    <!-- Conformance feature USR - for now optional -->
+    <command source="client" code="38" name="ClearCredential" mustUseTimedInvoke="true" optional="true">
+      <description>Clear one, one type, or all credentials except ProgrammingPIN credential.</description>
+      <access op="invoke" role="administer"/>
+      <arg name="Credential" type="CredentialStruct" isNullable="true" />
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+    </command>
+    <command source="client" code="39" name="UnboltDoor" mustUseTimedInvoke="true" optional="true">
+      <description>This command causes the lock device to unlock the door without pulling the latch.</description>
+      <!-- Conformance feature [COTA & PIN] - for now optional -->
+      <arg name="PINCode" type="octet_string" optional="true" />
+      <mandatoryConform>
+        <feature name="UBOLT"/>
+      </mandatoryConform>
+    </command>
+    <command source="client" code="40" name="SetAliroReaderConfig" mustUseTimedInvoke="true" optional="true" apiMaturity="provisional">
+      <description>This command communicates an Aliro Reader configuration to the lock.</description>
+      <access op="invoke" privilege="administer"/>
+      <arg name="SigningKey" type="octet_string" length="32" />
+      <arg name="VerificationKey" type="octet_string" length="65" />
+      <arg name="GroupIdentifier" type="octet_string" length="16" />
+      <arg name="GroupResolvingKey" type="octet_string" length="16" optional="true" />
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+    </command>
+    <command source="client" code="41" name="ClearAliroReaderConfig" mustUseTimedInvoke="true" optional="true" apiMaturity="provisional">
+      <description>This command clears an existing Aliro Reader configuration for the lock.</description>
+      <access op="invoke" privilege="administer"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+    </command>
 
 
-    <!-- Auxiliary data types -->
-    <!-- LockState Attribute Values -->
-    <enum name="DlLockState" type="enum8">
-        <cluster code="0x0101" />
-        <item value="0" name="Not Fully Locked" />
-        <item value="1" name="Locked" />
-        <item value="2" name="Unlocked" />
-        <item value="3" name="Unlatched" />
-    </enum>
+    <!-- Events -->
+    <event side="server" code="0" name="DoorLockAlarm" priority="critical">
+      <description>The door lock cluster provides several alarms which can be sent when there is a critical state on the door lock.</description>
+      <field id="0" name="AlarmCode" type="AlarmCodeEnum" />
+      <mandatoryConform/>
+    </event>
+    <!-- Conformance feature DPS - for now optional -->
+    <event side="server" code="1" name="DoorStateChange" priority="critical" optional="true">
+      <description>The door lock server sends out a DoorStateChange event when the door lock door state changes.</description>
+      <field id="0" name="DoorState" type="DoorStateEnum" />
+      <mandatoryConform>
+        <feature name="DPS"/>
+      </mandatoryConform>
+    </event>
+    <event side="server" code="2" name="LockOperation" priority="critical">
+      <description>The door lock server sends out a LockOperation event when the event is triggered by the various lock operation sources.</description>
+      <field id="0" name="LockOperationType" type="LockOperationTypeEnum" />
+      <field id="1" name="OperationSource" type="OperationSourceEnum" />
+      <field id="2" name="UserIndex" type="int16u" isNullable="true"/>
+      <field id="3" name="FabricIndex" type="fabric_idx" isNullable="true"/>
+      <field id="4" name="SourceNode" type="node_id" isNullable="true"/>
+      <!-- Conformance feature [USR] - for now optional -->
+      <field id="5" name="Credentials" type="CredentialStruct" array="true" isNullable="true" optional="true" />
+      <mandatoryConform/>
+    </event>
+    <event side="server" code="3" name="LockOperationError" priority="critical">
+      <description>The door lock server sends out a LockOperationError event when a lock operation fails for various reasons.</description>
+      <field id="0" name="LockOperationType" type="LockOperationTypeEnum" />
+      <field id="1" name="OperationSource" type="OperationSourceEnum" />
+      <field id="2" name="OperationError" type="OperationErrorEnum" />
+      <field id="3" name="UserIndex" type="int16u" isNullable="true"/>
+      <field id="4" name="FabricIndex" type="fabric_idx" isNullable="true"/>
+      <field id="5" name="SourceNode" type="node_id" isNullable="true"/>
+      <!-- Conformance feature [USR] - for now optional -->
+      <field id="6" name="Credentials" type="CredentialStruct" array="true" isNullable="true" optional="true" />
+      <mandatoryConform/>
+    </event>
+    <event side="server" code="4" name="LockUserChange" priority="info">
+      <description>The door lock server sends out a LockUserChange event when a lock user, schedule, or credential change has occurred.</description>
+      <field id="0" name="LockDataType" type="LockDataTypeEnum" />
+      <field id="1" name="DataOperationType" type="DataOperationTypeEnum" />
+      <field id="2" name="OperationSource" type="OperationSourceEnum" />
+      <field id="3" name="UserIndex" type="int16u" isNullable="true"/>
+      <field id="4" name="FabricIndex" type="fabric_idx" isNullable="true"/>
+      <field id="5" name="SourceNode" type="node_id" isNullable="true"/>
+      <field id="6" name="DataIndex" type="int16u" isNullable="true"/>
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+    </event>
+  </cluster>
 
-    <!-- LockType Attribute Values -->
-    <enum name="DlLockType" type="enum8">
-        <cluster code="0x0101" />
-        <item value="0" name="Dead bolt" />
-        <item value="1" name="Magnetic" />
-        <item value="2" name="Other" />
-        <item value="3" name="Mortise" />
-        <item value="4" name="Rim" />
-        <item value="5" name="Latch Bolt" />
-        <item value="6" name="Cylindrical Lock" />
-        <item value="7" name="Tubular Lock" />
-        <item value="8" name="Interconnected Lock" />
-        <item value="9" name="Dead Latch" />
-        <item value="10" name="Door Furniture" />
-        <item value="11" name="Eurocylinder" />
-    </enum>
 
-    <!-- CredentialRulesSupport attribute bit meaning set -->
-    <bitmap name="DlCredentialRulesSupport" type="bitmap8">
-        <cluster code="0x0101" />
-        <field mask="0x01" name="Single" />
-        <field mask="0x02" name="Dual" />
-        <field mask="0x04" name="Tri" />
-    </bitmap>
+  <!-- Cluster data types -->
+  <enum name="AlarmCodeEnum" type="enum8">
+    <cluster code="0x0101"/>
+    <item value="0" name="LockJammed"/>
+    <item value="1" name="LockFactoryReset"/>
+    <item value="3" name="LockRadioPowerCycled"/>
+    <item value="4" name="WrongCodeEntryLimit"/>
+    <item value="5" name="FrontEsceutcheonRemoved"/>
+    <item value="6" name="DoorForcedOpen"/>
+    <item value="7" name="DoorAjar"/>
+    <item value="8" name="ForcedUser"/>
+  </enum>
 
-    <!-- SupportedOperatingModes attribute bit meaning set -->
-    <bitmap name="DlSupportedOperatingModes" type="bitmap16">
-        <cluster code="0x0101" />
-        <field mask="0x01" name="Normal" />
-        <field mask="0x02" name="Vacation" /> <!-- Could be optional -->
-        <field mask="0x04" name="Privacy" /> <!-- Could be optional -->
-        <field mask="0x08" name="NoRemoteLockUnlock" />
-        <field mask="0x10" name="Passage" /> <!-- Could be optional -->
-    </bitmap>
+  <enum name="CredentialRuleEnum" type="enum8">
+    <cluster code="0x0101"/>
+    <item value="0" name="Single"/>
+    <item value="1" name="Dual"/>
+    <item value="2" name="Tri"/>
+  </enum>
 
-    <!-- DefaultConfigurationRegister attribute bit meaning set -->
-    <bitmap name="DlDefaultConfigurationRegister" type="bitmap16">
-        <cluster code="0x0101" />
-        <field mask="0x01" name="EnableLocalProgrammingEnabled" />
-        <field mask="0x02" name="KeypadInterfaceDefaultAccessEnabled" />
-        <field mask="0x04" name="RemoteInterfaceDefaultAccessIsEnabled" />
-        <field mask="0x20" name="SoundEnabled" />
-        <field mask="0x40" name="AutoRelockTimeSet" />
-        <field mask="0x80" name="LEDSettingsSet" />
-    </bitmap>
+  <bitmap name="DlCredentialRuleMask" type="bitmap8">
+    <cluster code="0x0101"/>
+    <field mask="0x01" name="Single"/>
+    <field mask="0x02" name="Dual"/>
+    <field mask="0x04" name="Tri"/>
+  </bitmap>
 
-    <!-- LocalProgrammingFeatures attribute bit meaning set -->
-    <bitmap name="DlLocalProgrammingFeatures" type="bitmap8">
-        <cluster code="0x0101" />
-        <field mask="0x01" name="AddUsersCredentialsSchedulesLocally" />
-        <field mask="0x02" name="ModifyUsersCredentialsSchedulesLocally" />
-        <field mask="0x04" name="ClearUsersCredentialsSchedulesLocally" />
-        <field mask="0x08" name="AdjustLockSettingsLocally" />
-    </bitmap>
+  <struct name="CredentialStruct">
+    <cluster code="0x0101"/>
+    <item name="CredentialType" type="CredentialTypeEnum" />
+    <item name="CredentialIndex" type="int16u" />
+  </struct>
 
-    <!-- KeypadOperationEventMask attribute bit meaning set -->
+  <enum name="CredentialTypeEnum" type="enum8">
+    <cluster code="0x0101"/>
+    <item value="0" name="ProgrammingPIN"/>
+    <item value="1" name="PIN"/>
+    <item value="2" name="RFID"/>
+    <item value="3" name="Fingerprint"/>
+    <item value="4" name="FingerVein"/>
+    <item value="5" name="Face"/>
+    <item value="6" name="AliroCredentialIssuerKey"/>
+    <item value="7" name="AliroEvictableEndpointKey"/>
+    <item value="8" name="AliroNonEvictableEndpointKey"/>
+  </enum>
+
+  <enum name="DataOperationTypeEnum" type="enum8">
+    <cluster code="0x0101"/>
+    <item value="0" name="Add"/>
+    <item value="1" name="Clear"/>
+    <item value="2" name="Modify"/>
+  </enum>
+
+  <bitmap name="DaysMaskMap" type="bitmap8">
+    <cluster code="0x0101"/>
+    <field mask="0x01" name="Sunday"/>
+    <field mask="0x02" name="Monday"/>
+    <field mask="0x04" name="Tuesday"/>
+    <field mask="0x08" name="Wednesday"/>
+    <field mask="0x10" name="Thursday"/>
+    <field mask="0x20" name="Friday"/>
+    <field mask="0x40" name="Saturday"/>
+  </bitmap>
+
+  <enum name="DoorStateEnum" type="enum8">
+    <cluster code="0x0101"/>
+    <item value="0" name="DoorOpen"/>
+    <item value="1" name="DoorClosed"/>
+    <item value="2" name="DoorJammed"/>
+    <item value="3" name="DoorForcedOpen"/>
+    <item value="4" name="DoorUnspecifiedError"/>
+    <item value="5" name="DoorAjar"/>
+  </enum>
+
+  <enum name="LockDataTypeEnum" type="enum8">
+    <cluster code="0x0101"/>
+    <item value="0" name="Unspecified"/>
+    <item value="1" name="ProgrammingCode"/>
+    <item value="2" name="UserIndex"/>
+    <item value="3" name="WeekDaySchedule"/>
+    <item value="4" name="YearDaySchedule"/>
+    <item value="5" name="HolidaySchedule"/>
+    <item value="6" name="PIN"/>
+    <item value="7" name="RFID"/>
+    <item value="8" name="Fingerprint"/>
+    <item value="9" name="FingerVein"/>
+    <item value="10" name="Face"/>
+    <item value="11" name="AliroCredentialIssuerKey"/>
+    <item value="12" name="AliroEvictableEndpointKey"/>
+    <item value="13" name="AliroNonEvictableEndpointKey"/>
+  </enum>
+
+  <enum name="LockOperationTypeEnum" type="enum8">
+    <cluster code="0x0101"/>
+    <item value="0" name="Lock"/>
+    <item value="1" name="Unlock"/>
+    <item value="2" name="NonAccessUserEvent"/>
+    <item value="3" name="ForcedUserEvent"/>
+    <item value="4" name="Unlatch"/>
+  </enum>
+
+  <enum name="OperationErrorEnum" type="enum8">
+    <cluster code="0x0101"/>
+    <item value="0" name="Unspecified"/>
+    <item value="1" name="InvalidCredential"/>
+    <item value="2" name="DisabledUserDenied"/>
+    <item value="3" name="Restricted"/>
+    <item value="4" name="InsufficientBattery"/>
+  </enum>
+
+  <enum name="OperatingModeEnum" type="enum8">
+    <cluster code="0x0101"/>
+    <item value="0" name="Normal"/>
+    <item value="1" name="Vacation"/>
+    <item value="2" name="Privacy"/>
+    <item value="3" name="NoRemoteLockUnlock"/>
+    <item value="4" name="Passage"/>
+  </enum>
+
+  <enum name="OperationSourceEnum" type="enum8">
+    <cluster code="0x0101"/>
+    <item value="0" name="Unspecified"/>
+    <item value="1" name="Manual"/>
+    <item value="2" name="ProprietaryRemote"/>
+    <item value="3" name="Keypad"/>
+    <item value="4" name="Auto"/>
+    <item value="5" name="Button"/>
+    <item value="6" name="Schedule"/>
+    <item value="7" name="Remote"/>
+    <item value="8" name="RFID"/>
+    <item value="9" name="Biometric"/>
+    <item value="10" name="Aliro"/>
+  </enum>
+
+  <enum name="UserStatusEnum" type="enum8">
+    <cluster code="0x0101"/>
+    <item value="0" name="Available"/>
+    <item value="1" name="OccupiedEnabled"/>
+    <item value="3" name="OccupiedDisabled"/>
+  </enum>
+
+  <enum name="UserTypeEnum" type="enum8">
+    <cluster code="0x0101"/>
+    <item value="0" name="UnrestrictedUser"/>
+    <item value="1" name="YearDayScheduleUser"/>
+    <item value="2" name="WeekDayScheduleUser"/>
+    <item value="3" name="ProgrammingUser"/>
+    <item value="4" name="NonAccessUser"/>
+    <item value="5" name="ForcedUser"/>
+    <item value="6" name="DisposableUser"/>
+    <item value="7" name="ExpiringUser"/>
+    <item value="8" name="ScheduleRestrictedUser"/>
+    <item value="9" name="RemoteOnlyUser"/>
+  </enum>
+
+
+  <!-- Auxiliary data types -->
+  <!-- LockState Attribute Values -->
+  <enum name="DlLockState" type="enum8">
+    <cluster code="0x0101"/>
+    <item value="0" name="NotFullyLocked"/>
+    <item value="1" name="Locked"/>
+    <item value="2" name="Unlocked"/>
+    <item value="3" name="Unlatched"/>
+  </enum>
+
+  <!-- LockType Attribute Values -->
+  <enum name="DlLockType" type="enum8">
+    <cluster code="0x0101"/>
+    <item value="0" name="Dead bolt" />
+    <item value="1" name="Magnetic"/>
+    <item value="2" name="Other"/>
+    <item value="3" name="Mortise"/>
+    <item value="4" name="Rim"/>
+    <item value="5" name="LatchBolt"/>
+    <item value="6" name="CylindricalLock"/>
+    <item value="7" name="TubularLock"/>
+    <item value="8" name="InterconnectedLock"/>
+    <item value="9" name="DeadLatch"/>
+    <item value="10" name="DoorFurniture"/>
+    <item value="11" name="Eurocylinder"/>
+  </enum>
+
+  <!-- CredentialRulesSupport attribute bit meaning set -->
+  <bitmap name="DlCredentialRulesSupport" type="bitmap8">
+    <cluster code="0x0101" />
+    <field mask="0x01" name="Single" />
+    <field mask="0x02" name="Dual" />
+    <field mask="0x04" name="Tri" />
+  </bitmap>
+
+  <!-- SupportedOperatingModes attribute bit meaning set -->
+  <bitmap name="DlSupportedOperatingModes" type="bitmap16">
+    <cluster code="0x0101"/>
+    <field mask="0x01" name="Normal"/>
+    <field mask="0x02" name="Vacation" /> <!-- Could be optional -->
+    <field mask="0x04" name="Privacy" /> <!-- Could be optional -->
+    <field mask="0x08" name="NoRemoteLockUnlock"/>
+    <field mask="0x10" name="Passage" /> <!-- Could be optional -->
+  </bitmap>
+
+  <!-- DefaultConfigurationRegister attribute bit meaning set -->
+  <bitmap name="DlDefaultConfigurationRegister" type="bitmap16">
+    <cluster code="0x0101"/>
+    <field mask="0x01" name="EnableLocalProgrammingEnabled" />
+    <field mask="0x02" name="KeypadInterfaceDefaultAccessEnabled" />
+    <field mask="0x04" name="RemoteInterfaceDefaultAccessIsEnabled" />
+    <field mask="0x20" name="SoundEnabled" />
+    <field mask="0x40" name="AutoRelockTimeSet" />
+    <field mask="0x80" name="LEDSettingsSet" />
+  </bitmap>
+
+  <!-- LocalProgrammingFeatures attribute bit meaning set -->
+  <bitmap name="DlLocalProgrammingFeatures" type="bitmap8">
+    <cluster code="0x0101"/>
+    <field mask="0x01" name="AddUsersCredentialsSchedulesLocally" />
+    <field mask="0x02" name="ModifyUsersCredentialsSchedulesLocally" />
+    <field mask="0x04" name="ClearUsersCredentialsSchedulesLocally" />
+    <field mask="0x08" name="AdjustLockSettingsLocally" />
+  </bitmap>
+
+  <!-- KeypadOperationEventMask attribute bit meaning set -->
     <bitmap name="DlKeypadOperationEventMask" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="Unknown" />
@@ -796,7 +993,7 @@ limitations under the License.
         <field mask="0x80" name="NonAccessUserOpEvent" />
     </bitmap>
 
-    <!-- RemoteOperationEventMask attribute bit meaning set -->
+  <!-- RemoteOperationEventMask attribute bit meaning set -->
     <bitmap name="DlRemoteOperationEventMask" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="Unknown" />
@@ -808,7 +1005,7 @@ limitations under the License.
         <field mask="0x40" name="UnlockInvalidSchedule" />
     </bitmap>
 
-    <!-- ManualOperationEventMask attribute bit meaning set -->
+  <!-- ManualOperationEventMask attribute bit meaning set -->
     <bitmap name="DlManualOperationEventMask" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x001" name="Unknown" />
@@ -824,7 +1021,7 @@ limitations under the License.
         <field mask="0x400" name="ManualUnlock" />
     </bitmap>
 
-    <!-- RFIDOperationEventMask attribute bit meaning set -->
+  <!-- RFIDOperationEventMask attribute bit meaning set -->
     <bitmap name="DlRFIDOperationEventMask" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="Unknown" />
@@ -836,7 +1033,7 @@ limitations under the License.
         <field mask="0x40" name="UnlockInvalidSchedule" />
     </bitmap>
 
-    <!-- KeypadProgrammingEventMask attribute bit meaning set -->
+  <!-- KeypadProgrammingEventMask attribute bit meaning set -->
     <bitmap name="DlKeypadProgrammingEventMask" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="Unknown" />
@@ -846,7 +1043,7 @@ limitations under the License.
         <field mask="0x10" name="PINChanged" />
     </bitmap>
 
-    <!-- RemoteProgrammingEventMask attribute bit meaning set -->
+  <!-- RemoteProgrammingEventMask attribute bit meaning set -->
      <bitmap name="DlRemoteProgrammingEventMask" type="bitmap16">
          <cluster code="0x0101" />
          <field mask="0x01" name="Unknown" />
@@ -858,7 +1055,7 @@ limitations under the License.
          <field mask="0x40" name="RFIDCodeCleared" />
      </bitmap>
 
-    <!-- RFIDProgrammingEventMask attribute bit meaning set -->
+  <!-- RFIDProgrammingEventMask attribute bit meaning set -->
     <bitmap name="DlRFIDProgrammingEventMask" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="Unknown" />

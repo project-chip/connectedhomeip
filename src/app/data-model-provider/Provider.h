@@ -16,20 +16,19 @@
  */
 #pragma once
 
-#include "access/SubjectDescriptor.h"
-#include "app/EventPathParams.h"
-#include "lib/core/CHIPError.h"
+#include <lib/core/CHIPError.h>
 #include <lib/core/TLVReader.h>
 #include <lib/core/TLVWriter.h>
 
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
+#include <app/EventPathParams.h>
 
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/Context.h>
-#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
+#include <app/data-model-provider/ProviderMetadataTree.h>
 
 namespace chip {
 namespace app {
@@ -59,26 +58,8 @@ public:
     // event emitting, path marking and other operations
     virtual InteractionModelContext CurrentContext() const { return mContext; }
 
-    /// Validates that the given event path is supported, where path may contain wildcards.
-    ///
-    /// If any wild cards exist on the given path, the implementation is expected to validate
-    /// that an accessible event path exists on some wildcard expansion.
-    ///
-    /// At the very minimum this will validate that a valid endpoint/cluster can be expanded
-    /// from the input path and that the given descriptor has access to it.
-    virtual bool EventPathIncludesAccessibleConcretePath(const EventPathParams & path,
-                                                         const Access::SubjectDescriptor & descriptor) = 0;
-
     /// TEMPORARY/TRANSITIONAL requirement for transitioning from ember-specific code
-    ///   ReadAttribute is REQUIRED to perform:
-    ///     - ACL validation (see notes on OperationFlags::kInternal)
-    ///     - Validation of readability/writability (also controlled by OperationFlags::kInternal)
-    ///     - use request.path.mExpanded to skip encoding replies for data according
-    ///       to 8.4.3.2 of the spec:
-    ///         > If the path indicates attribute data that is not readable, then the path SHALL
-    ///           be discarded.
-    ///         > Else if reading from the attribute in the path requires a privilege that is not
-    ///           granted to access the cluster in the path, then the path SHALL be discarded.
+    ///   ReadAttribute is REQUIRED to respond to GlobalAttribute read requests
     ///
     /// Return value notes:
     ///   ActionReturnStatus::IsOutOfSpaceEncodingResponse

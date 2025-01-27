@@ -37,8 +37,9 @@ private:
 
     osTimerId_t mSensorTimer;
 
-    // Reads new generated sensor value, stores it, and updates local temperature attribute
     static void SensorTimerEventHandler(void * arg);
+    // Reads new generated sensor value, stores it, and updates local temperature attribute
+    static void TemperatureUpdateEventHandler(AppEvent * aEvent);
 
     static SensorManager sSensorManager;
 };

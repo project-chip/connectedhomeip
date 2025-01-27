@@ -669,12 +669,18 @@ Davis, CA 95616, USA
     <attribute id="0x003F" name="ExtAddress" type="uint64">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
     </attribute>
     <attribute id="0x0040" name="Rloc16" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
     </attribute>
   </attributes>
   <commands>

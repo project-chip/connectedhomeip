@@ -183,7 +183,9 @@ abstract class PairingCommand(
   override fun onICDRegistrationInfoRequired() {
     logger.log(Level.INFO, "onICDRegistrationInfoRequired")
     currentCommissioner()
-      .updateCommissioningICDRegistrationInfo(ICDRegistrationInfo.newBuilder().build())
+      .updateCommissioningICDRegistrationInfo(
+        ICDRegistrationInfo.newBuilder().setICDStayActiveDurationMsec(30000L).build()
+      )
   }
 
   override fun onICDRegistrationComplete(errorCode: Long, icdDeviceInfo: ICDDeviceInfo) {

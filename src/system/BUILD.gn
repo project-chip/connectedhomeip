@@ -72,6 +72,8 @@ if (chip_device_platform == "cc13x4_26x4") {
   import("//build_overrides/bouffalolab_iot_sdk.gni")
 } else if (chip_device_platform == "bl702l") {
   import("//build_overrides/bouffalolab_iot_sdk.gni")
+} else if (chip_device_platform == "bl616") {
+  import("//build_overrides/bouffalolab_iot_sdk.gni")
 }
 
 buildconfig_header("system_buildconfig") {
@@ -99,7 +101,7 @@ buildconfig_header("system_buildconfig") {
     "CHIP_SYSTEM_CONFIG_USE_LWIP=${chip_system_config_use_lwip}",
     "CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT=${chip_system_config_use_open_thread_inet_endpoints}",
     "CHIP_SYSTEM_CONFIG_USE_SOCKETS=${chip_system_config_use_sockets}",
-    "CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK=false",
+    "CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK=${chip_system_config_use_network_framework}",
     "CHIP_SYSTEM_CONFIG_POSIX_LOCKING=${chip_system_config_posix_locking}",
     "CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING=${chip_system_config_freertos_locking}",
     "CHIP_SYSTEM_CONFIG_MBED_LOCKING=${chip_system_config_mbed_locking}",
@@ -177,7 +179,7 @@ source_set("system_config_header") {
       public_deps += [ "${lwip_root}:lwip" ]
     } else {
       if (chip_device_platform == "efr32") {
-        public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
+        public_deps += [ "${silabs_sdk_build_root}:silabs_sdk" ]
       }
       if (chip_device_platform == "qpg") {
         public_deps += [ "${qpg_sdk_build_root}:qpg_sdk" ]
@@ -196,6 +198,10 @@ source_set("system_config_header") {
       }
       if (chip_device_platform == "bl702l") {
         public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl702l:bl_iot_sdk" ]
+      }
+      if (chip_device_platform == "bl616") {
+        public_deps +=
+            [ "${bouffalolab_iot_sdk_build_root}/bl616:bouffalo_sdk" ]
       }
 
       # Add platform here as needed.
@@ -264,6 +270,10 @@ static_library("system") {
 
   if (chip_system_config_use_sockets) {
     sources += [ "SocketEvents.h" ]
+  }
+
+  if (current_os == "zephyr") {
+    public_deps += [ "${chip_root}/src/inet:inet_zephyr_socket" ]
   }
 
   if (chip_with_nlfaultinjection) {

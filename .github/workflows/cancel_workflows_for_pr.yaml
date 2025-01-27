@@ -12,22 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Cancel workflow on PR
+name: Cancel workflows on failing CI
 on:
     workflow_dispatch:
-      inputs:
-        pull_request_id:
-          description: 'PR number to consider'
-          required: true
-          type: number
-        commit_sha:
-          description: 'Cancel runs for this specific SHA'
-          required: true
-          type: string
+    schedule:
+        - cron: "*/10 * * * *"
 
 jobs:
     cancel_workflow:
-        name: Report on pull requests
+        name: Cancel CI on failing pull requests
 
         runs-on: ubuntu-latest
 
@@ -42,14 +35,19 @@ jobs:
                 python-version: '3.12'
             - name: Setup pip modules we use
               run: |
-                  pip install     \
-                      click       \
-                      coloredlogs \
-                      pygithub    \
-                      && echo "DONE installint python prerequisites"
+                  python3 -m venv venv
+                  venv/bin/pip3 install \
+                      click           \
+                      coloredlogs     \
+                      python-dateutil \
+                      pygithub        \
+                      && echo "DONE installing python prerequisites"
             - name: Cancel runs
               run: |
-                  scripts/tools/cancel_workflows_for_pr.py       \
-                    --pull-request ${{ inputs.pull_request_id }} \
-                    --commit-sha "${{ inputs.commit_sha }}"      \
-                    --gh-api-token "${{ secrets.GITHUB_TOKEN }}"
+                  venv/bin/python3 scripts/tools/cancel_workflows_for_pr.py \
+                    --gh-api-token "${{ secrets.GITHUB_TOKEN }}" \
+                    --require "Restyled"       \
+                    --require "Lint Code Base" \
+                    --require "ZAP"            \
+                    --require "Run misspell"   \
+                    --max-pr-age-minutes 20

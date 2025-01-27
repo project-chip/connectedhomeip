@@ -20,8 +20,8 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <platform/silabs/OTAImageProcessorImpl.h>
 
-#include "wfx_host_events.h"
 #include <platform/silabs/SilabsConfig.h>
+#include <platform/silabs/wifi/WifiInterface.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,7 +36,6 @@ extern "C" {
 #define RPS_HEADER 1
 #define RPS_DATA 2
 
-#define SL_STATUS_FW_UPDATE_DONE SL_STATUS_SI91X_NO_AP_FOUND
 uint8_t flag = RPS_HEADER;
 static chip::OTAImageProcessorImpl gImageProcessor;
 
@@ -51,7 +50,7 @@ uint8_t OTAImageProcessorImpl::writeBuffer[kAlignmentBytes] __attribute__((align
 
 CHIP_ERROR OTAImageProcessorImpl::Init(OTADownloader * downloader)
 {
-    ReturnErrorCodeIf(downloader == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(downloader != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     gImageProcessor.SetOTADownloader(downloader);
 
@@ -186,13 +185,13 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 
         if (status != SL_STATUS_OK)
         {
-            if (status == SL_STATUS_FW_UPDATE_DONE)
+            if (status == SL_STATUS_SI91X_FW_UPDATE_DONE)
             {
                 mReset = true;
             }
             else
             {
-                ChipLogError(SoftwareUpdate, "ERROR: In HandleFinalize for last chunk sl_si91x_fwup_load() error %ld", status);
+                ChipLogError(SoftwareUpdate, "ERROR: In HandleFinalize for last chunk sl_si91x_fwup_load() error 0x%lx", status);
                 imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
                 return;
             }
@@ -238,7 +237,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         // send system reset request to reset the MCU and upgrade the m4 image
         ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
         // Reboots the device
-        sl_si91x_soc_soft_reset();
+        sl_si91x_soc_nvic_reset();
     }
 }
 
@@ -315,13 +314,13 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
                 {
                     // If the last chunk of last block-writeBufOffset length is exactly kAlignmentBytes(64) bytes then mReset value
                     // should be set to true in HandleProcessBlock
-                    if (status == SL_STATUS_FW_UPDATE_DONE)
+                    if (status == SL_STATUS_SI91X_FW_UPDATE_DONE)
                     {
                         mReset = true;
                     }
                     else
                     {
-                        ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock sl_si91x_fwup_load() error %ld", status);
+                        ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock sl_si91x_fwup_load() error 0x%lx", status);
                         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
                         return;
                     }
@@ -342,7 +341,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
         CHIP_ERROR error = mHeaderParser.AccumulateAndDecode(block, header);
 
         // Needs more data to decode the header
-        ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
+        VerifyOrReturnError(error != CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
         ReturnErrorOnFailure(error);
 
         // SL TODO -- store version somewhere

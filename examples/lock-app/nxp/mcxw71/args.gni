@@ -37,8 +37,8 @@ is_debug = false
 
 chip_crypto = "platform"
 chip_openthread_ftd = false
-chip_with_ot_cli = 0
-chip_enable_matter_cli = true
+nxp_enable_ot_cli = false
+nxp_enable_matter_cli = true
 
 chip_with_diag_logs_demo = true
-chip_with_low_power = 0
+nxp_use_low_power = false

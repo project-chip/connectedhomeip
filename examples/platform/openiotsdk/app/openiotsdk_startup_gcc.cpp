@@ -57,7 +57,7 @@ alignas(8) static uint8_t malloc_mutex_obj[80];
 
 // C runtime import: constructor initialization and main
 extern "C" void __libc_init_array(void);
-extern "C" int main(void);
+int main(void);
 
 // IOT SDK serial declarations
 #define STDIN_FILENO 0

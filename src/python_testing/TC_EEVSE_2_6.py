@@ -45,8 +45,8 @@ import time
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from matter_testing_support import (ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest, TestStep,
-                                    async_test_body, default_matter_test_main)
+from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest, TestStep,
+                                         async_test_body, default_matter_test_main)
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
@@ -149,7 +149,7 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
         events_callback = EventChangeCallback(Clusters.EnergyEvse)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
-                                    self.matter_test_config.endpoint)
+                                    self.get_endpoint())
 
         self.step("4")
         await self.check_test_event_triggers_enabled()

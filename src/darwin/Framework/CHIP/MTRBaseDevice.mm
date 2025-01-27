@@ -23,6 +23,7 @@
 #import "MTRCluster.h"
 #import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRCluster_Internal.h"
+#import "MTRDeviceDataValidation.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
@@ -230,11 +231,6 @@ static void LogStringAndReturnError(NSString * errorStr, MTRErrorCode errorCode,
     PurgeCompletedReadClientContainers(_deviceID);
 }
 
-@end
-
-@interface MTRBaseDevice ()
-// Will return nil if our controller is not in fact a concrete controller.
-@property (nullable, nonatomic, strong, readonly) MTRDeviceController_Concrete * concreteController;
 @end
 
 @implementation MTRBaseDevice
@@ -613,7 +609,9 @@ NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV
     }
 }
 
-static CHIP_ERROR MTREncodeTLVFromDataValueDictionaryInternal(id object, chip::TLV::TLVWriter & writer, chip::TLV::Tag tag)
+// writer is allowed to be null to just validate the incoming object without
+// actually encoding.
+static CHIP_ERROR MTREncodeTLVFromDataValueDictionaryInternal(id object, chip::TLV::TLVWriter * writer, chip::TLV::Tag tag)
 {
     if (![object isKindOfClass:[NSDictionary class]]) {
         MTR_LOG_ERROR("Error: Unsupported object to encode: %@", [object class]);
@@ -631,60 +629,62 @@ static CHIP_ERROR MTREncodeTLVFromDataValueDictionaryInternal(id object, chip::T
             MTR_LOG_ERROR("Error: Object to encode has corrupt signed integer type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        return writer.Put(tag, [value longLongValue]);
+        return writer ? writer->Put(tag, [value longLongValue]) : CHIP_NO_ERROR;
     }
     if ([typeName isEqualToString:MTRUnsignedIntegerValueType]) {
         if (![value isKindOfClass:[NSNumber class]]) {
             MTR_LOG_ERROR("Error: Object to encode has corrupt unsigned integer type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        return writer.Put(tag, [value unsignedLongLongValue]);
+        return writer ? writer->Put(tag, [value unsignedLongLongValue]) : CHIP_NO_ERROR;
     }
     if ([typeName isEqualToString:MTRBooleanValueType]) {
         if (![value isKindOfClass:[NSNumber class]]) {
             MTR_LOG_ERROR("Error: Object to encode has corrupt boolean type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        return writer.Put(tag, static_cast<bool>([value boolValue]));
+        return writer ? writer->Put(tag, static_cast<bool>([value boolValue])) : CHIP_NO_ERROR;
     }
     if ([typeName isEqualToString:MTRFloatValueType]) {
         if (![value isKindOfClass:[NSNumber class]]) {
             MTR_LOG_ERROR("Error: Object to encode has corrupt float type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        return writer.Put(tag, [value floatValue]);
+        return writer ? writer->Put(tag, [value floatValue]) : CHIP_NO_ERROR;
     }
     if ([typeName isEqualToString:MTRDoubleValueType]) {
         if (![value isKindOfClass:[NSNumber class]]) {
             MTR_LOG_ERROR("Error: Object to encode has corrupt double type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        return writer.Put(tag, [value doubleValue]);
+        return writer ? writer->Put(tag, [value doubleValue]) : CHIP_NO_ERROR;
     }
     if ([typeName isEqualToString:MTRNullValueType]) {
-        return writer.PutNull(tag);
+        return writer ? writer->PutNull(tag) : CHIP_NO_ERROR;
     }
     if ([typeName isEqualToString:MTRUTF8StringValueType]) {
         if (![value isKindOfClass:[NSString class]]) {
             MTR_LOG_ERROR("Error: Object to encode has corrupt UTF8 string type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        return writer.PutString(tag, AsCharSpan(value));
+        return writer ? writer->PutString(tag, AsCharSpan(value)) : CHIP_NO_ERROR;
     }
     if ([typeName isEqualToString:MTROctetStringValueType]) {
         if (![value isKindOfClass:[NSData class]]) {
             MTR_LOG_ERROR("Error: Object to encode has corrupt octet string type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        return writer.Put(tag, AsByteSpan(value));
+        return writer ? writer->Put(tag, AsByteSpan(value)) : CHIP_NO_ERROR;
     }
     if ([typeName isEqualToString:MTRStructureValueType]) {
         if (![value isKindOfClass:[NSArray class]]) {
             MTR_LOG_ERROR("Error: Object to encode has corrupt structure type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        TLV::TLVType outer;
-        ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
+        TLV::TLVType outer = TLV::kTLVType_NotSpecified;
+        if (writer) {
+            ReturnErrorOnFailure(writer->StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
+        }
         for (id element in value) {
             if (![element isKindOfClass:[NSDictionary class]]) {
                 MTR_LOG_ERROR("Error: Structure element to encode has corrupt type: %@", [element class]);
@@ -713,7 +713,9 @@ static CHIP_ERROR MTREncodeTLVFromDataValueDictionaryInternal(id object, chip::T
             ReturnErrorOnFailure(
                 MTREncodeTLVFromDataValueDictionaryInternal(elementValue, writer, tag));
         }
-        ReturnErrorOnFailure(writer.EndContainer(outer));
+        if (writer) {
+            ReturnErrorOnFailure(writer->EndContainer(outer));
+        }
         return CHIP_NO_ERROR;
     }
     if ([typeName isEqualToString:MTRArrayValueType]) {
@@ -721,8 +723,10 @@ static CHIP_ERROR MTREncodeTLVFromDataValueDictionaryInternal(id object, chip::T
             MTR_LOG_ERROR("Error: Object to encode has corrupt array type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        TLV::TLVType outer;
-        ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Array, outer));
+        TLV::TLVType outer = TLV::kTLVType_NotSpecified;
+        if (writer) {
+            ReturnErrorOnFailure(writer->StartContainer(tag, chip::TLV::kTLVType_Array, outer));
+        }
         for (id element in value) {
             if (![element isKindOfClass:[NSDictionary class]]) {
                 MTR_LOG_ERROR("Error: Array element to encode has corrupt type: %@", [element class]);
@@ -735,14 +739,16 @@ static CHIP_ERROR MTREncodeTLVFromDataValueDictionaryInternal(id object, chip::T
             }
             ReturnErrorOnFailure(MTREncodeTLVFromDataValueDictionaryInternal(elementValue, writer, chip::TLV::AnonymousTag()));
         }
-        ReturnErrorOnFailure(writer.EndContainer(outer));
+        if (writer) {
+            ReturnErrorOnFailure(writer->EndContainer(outer));
+        }
         return CHIP_NO_ERROR;
     }
     MTR_LOG_ERROR("Error: Unsupported type to encode: %@", typeName);
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
-static CHIP_ERROR MTREncodeTLVFromDataValueDictionary(id object, chip::TLV::TLVWriter & writer, chip::TLV::Tag tag)
+static CHIP_ERROR MTREncodeTLVFromDataValueDictionary(id object, chip::TLV::TLVWriter * writer, chip::TLV::Tag tag)
 {
     CHIP_ERROR err = MTREncodeTLVFromDataValueDictionaryInternal(object, writer, tag);
     if (err != CHIP_NO_ERROR) {
@@ -761,7 +767,7 @@ NSData * _Nullable MTREncodeTLVFromDataValueDictionary(NSDictionary<NSString *, 
     TLV::TLVWriter writer;
     writer.Init(buffer);
 
-    CHIP_ERROR err = MTREncodeTLVFromDataValueDictionary(value, writer, TLV::AnonymousTag());
+    CHIP_ERROR err = MTREncodeTLVFromDataValueDictionary(value, &writer, TLV::AnonymousTag());
     if (err != CHIP_NO_ERROR) {
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:err];
@@ -770,6 +776,11 @@ NSData * _Nullable MTREncodeTLVFromDataValueDictionary(NSDictionary<NSString *, 
     }
 
     return AsData(ByteSpan(buffer, writer.GetLengthWritten()));
+}
+
+BOOL MTRDataValueDictionaryIsWellFormed(MTRDeviceDataValueDictionary value)
+{
+    return MTREncodeTLVFromDataValueDictionary(value, nullptr, TLV::AnonymousTag()) == CHIP_NO_ERROR;
 }
 
 // Callback type to pass data value as an NSObject
@@ -798,7 +809,7 @@ public:
 
     CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
     {
-        return MTREncodeTLVFromDataValueDictionary(decodedObj, writer, tag);
+        return MTREncodeTLVFromDataValueDictionary(decodedObj, &writer, tag);
     }
 
     static constexpr bool kIsFabricScoped = false;
@@ -1434,7 +1445,10 @@ exit:
     }
 
     if (logCall) {
-        MTR_LOG("%@ invoke %@ 0x%llx 0x%llx: %@", self, endpointID, clusterID.unsignedLongLongValue, commandID.unsignedLongLongValue, commandFields);
+        MTR_LOG("%@ invoke %@ 0x%llx (%@) 0x%llx (%@): %@", self, endpointID,
+            clusterID.unsignedLongLongValue, MTRClusterNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue)),
+            commandID.unsignedLongLongValue, MTRRequestCommandNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue), static_cast<MTRCommandIDType>(commandID.unsignedLongLongValue)),
+            commandFields);
     }
 
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
@@ -1894,7 +1908,7 @@ NSTimeInterval MTRTimeIntervalForEventTimestampValue(uint64_t timeValue)
     uint64_t eventTimestampValueSeconds = timeValue / chip::kMillisecondsPerSecond;
     uint64_t eventTimestampValueRemainderMilliseconds = timeValue % chip::kMillisecondsPerSecond;
     NSTimeInterval eventTimestampValueRemainder
-        = NSTimeInterval(eventTimestampValueRemainderMilliseconds) / chip::kMillisecondsPerSecond;
+        = NSTimeInterval(eventTimestampValueRemainderMilliseconds) / static_cast<double>(chip::kMillisecondsPerSecond);
     NSTimeInterval eventTimestampValue = eventTimestampValueSeconds + eventTimestampValueRemainder;
 
     return eventTimestampValue;
@@ -2212,7 +2226,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
     // Commands never need chained buffers, since they cannot be chunked.
     writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
 
-    CHIP_ERROR errorCode = MTREncodeTLVFromDataValueDictionary(data, writer, TLV::AnonymousTag());
+    CHIP_ERROR errorCode = MTREncodeTLVFromDataValueDictionary(data, &writer, TLV::AnonymousTag());
     if (errorCode != CHIP_NO_ERROR) {
         LogStringAndReturnError(@"Unable to encode data-value to TLV", errorCode, error);
         return System::PacketBufferHandle();
@@ -3082,7 +3096,7 @@ static bool EncodeDataValueToTLV(System::PacketBufferHandle & buffer, Platform::
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(buffer), /* useChainedBuffers = */ true);
 
-    CHIP_ERROR errorCode = MTREncodeTLVFromDataValueDictionary(data, writer, TLV::AnonymousTag());
+    CHIP_ERROR errorCode = MTREncodeTLVFromDataValueDictionary(data, &writer, TLV::AnonymousTag());
     if (errorCode != CHIP_NO_ERROR) {
         LogStringAndReturnError(@"Unable to encode data-value to TLV", errorCode, error);
         return false;

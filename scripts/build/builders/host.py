@@ -72,6 +72,7 @@ class HostApp(Enum):
     BRIDGE = auto()
     FABRIC_ADMIN = auto()
     FABRIC_BRIDGE = auto()
+    FABRIC_SYNC = auto()
     JAVA_MATTER_CONTROLLER = auto()
     KOTLIN_MATTER_CONTROLLER = auto()
     CONTACT_SENSOR = auto()
@@ -85,6 +86,7 @@ class HostApp(Enum):
     NETWORK_MANAGER = auto()
     ENERGY_MANAGEMENT = auto()
     WATER_LEAK_DETECTOR = auto()
+    TERMS_AND_CONDITIONS = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -131,6 +133,8 @@ class HostApp(Enum):
             return 'fabric-admin'
         elif self == HostApp.FABRIC_BRIDGE:
             return 'fabric-bridge-app/linux'
+        elif self == HostApp.FABRIC_SYNC:
+            return 'fabric-sync'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             return 'java-matter-controller'
         elif self == HostApp.KOTLIN_MATTER_CONTROLLER:
@@ -156,7 +160,9 @@ class HostApp(Enum):
         elif self == HostApp.ENERGY_MANAGEMENT:
             return 'energy-management-app/linux'
         elif self == HostApp.WATER_LEAK_DETECTOR:
-            return 'water-leak-detector/linux'
+            return 'water-leak-detector-app/linux'
+        elif self == HostApp.TERMS_AND_CONDITIONS:
+            return 'terms-and-conditions-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -236,6 +242,9 @@ class HostApp(Enum):
         elif self == HostApp.FABRIC_BRIDGE:
             yield 'fabric-bridge-app'
             yield 'fabric-bridge-app.map'
+        elif self == HostApp.FABRIC_SYNC:
+            yield 'fabric-sync'
+            yield 'fabric-sync.map'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             yield 'java-matter-controller'
             yield 'java-matter-controller.map'
@@ -272,6 +281,9 @@ class HostApp(Enum):
         elif self == HostApp.WATER_LEAK_DETECTOR:
             yield 'water-leak-detector-app'
             yield 'water-leak-detector-app.map'
+        elif self == HostApp.TERMS_AND_CONDITIONS:
+            yield 'terms-and-conditions-app'
+            yield 'terms-and-conditions-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -328,9 +340,9 @@ class HostBuilder(GnBuilder):
                  enable_test_event_triggers=None,
                  enable_dnssd_tests: Optional[bool] = None,
                  chip_casting_simplified: Optional[bool] = None,
-                 data_model_interface: Optional[str] = None,
-                 chip_data_model_check_die_on_failure: Optional[bool] = None,
-                 disable_shell=False
+                 disable_shell=False,
+                 use_googletest=False,
+                 terms_and_conditions_required: Optional[bool] = None,
                  ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -349,6 +361,7 @@ class HostBuilder(GnBuilder):
 
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
+            self.extra_gn_options.append('chip_enable_ble=false')
 
         if not enable_wifi:
             self.extra_gn_options.append('chip_enable_wifi=false')
@@ -367,9 +380,6 @@ class HostBuilder(GnBuilder):
 
         if use_ubsan:
             self.extra_gn_options.append('is_ubsan=true')
-
-        if data_model_interface is not None:
-            self.extra_gn_options.append(f'chip_use_data_model_interface="{data_model_interface}"')
 
         if use_dmalloc:
             self.extra_gn_options.append('chip_config_memory_debug_checks=true')
@@ -430,13 +440,7 @@ class HostBuilder(GnBuilder):
 
         if app == HostApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')
-            self.extra_gn_options.append('chip_data_model_check_die_on_failure=true')
             self.build_command = 'check'
-        elif chip_data_model_check_die_on_failure is not None:
-            if chip_data_model_check_die_on_failure:
-                self.extra_gn_options.append('chip_data_model_check_die_on_failure=true')
-            else:
-                self.extra_gn_options.append('chip_data_model_check_die_on_failure=false')
 
         if app == HostApp.EFR32_TEST_RUNNER:
             self.build_command = 'runner'
@@ -461,6 +465,12 @@ class HostBuilder(GnBuilder):
 
         if chip_casting_simplified is not None:
             self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
+
+        if terms_and_conditions_required is not None:
+            if terms_and_conditions_required:
+                self.extra_gn_options.append('chip_terms_and_conditions_required=true')
+            else:
+                self.extra_gn_options.append('chip_terms_and_conditions_required=false')
 
         if self.board == HostBoard.ARM64:
             if not use_clang:
@@ -489,6 +499,13 @@ class HostBuilder(GnBuilder):
 
         if self.app == HostApp.TESTS and fuzzing_type == HostFuzzingType.PW_FUZZTEST:
             self.build_command = 'pw_fuzz_tests'
+
+        if self.app == HostApp.TESTS and use_googletest:
+            self.extra_gn_options.append('import("//build_overrides/pigweed.gni")')
+            self.extra_gn_options.append('import("//build_overrides/googletest.gni")')
+            self.extra_gn_options.append('pw_unit_test_BACKEND="$dir_pw_unit_test:googletest"')
+            self.extra_gn_options.append('dir_pw_third_party_googletest="$dir_googletest"')
+            self.extra_gn_options.append('chip_build_tests_googletest=true')
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:

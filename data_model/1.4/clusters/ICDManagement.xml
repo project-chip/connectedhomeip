@@ -70,7 +70,6 @@ Davis, CA 95616, USA
   <features>
     <feature bit="0" code="CIP" name="CheckInProtocolSupport" summary="Device supports attributes and commands for the Check-In Protocol support.">
       <otherwiseConform>
-        <provisionalConform/>
         <mandatoryConform>
           <feature name="LITS"/>
         </mandatoryConform>
@@ -79,7 +78,6 @@ Davis, CA 95616, USA
     </feature>
     <feature bit="1" code="UAT" name="UserActiveModeTrigger" summary="Device supports the user active mode trigger feature.">
       <otherwiseConform>
-        <provisionalConform/>
         <mandatoryConform>
           <feature name="LITS"/>
         </mandatoryConform>
@@ -87,18 +85,12 @@ Davis, CA 95616, USA
       </otherwiseConform>
     </feature>
     <feature bit="2" code="LITS" name="LongIdleTimeSupport" summary="Device supports operating as a Long Idle Time ICD.">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </feature>
     <feature bit="3" code="DSLS" name="DynamicSitLitSupport" summary="Device supports dynamic switching from SIT to LIT operating modes.">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform>
-          <feature name="LITS"/>
-        </optionalConform>
-      </otherwiseConform>
+      <optionalConform>
+        <feature name="LITS"/>
+      </optionalConform>
     </feature>
   </features>
   <dataTypes>
@@ -227,12 +219,9 @@ Davis, CA 95616, USA
     <attribute id="0x0006" name="UserActiveModeTriggerHint" type="UserActiveModeTriggerBitmap" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="UAT"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="UAT"/>
+      </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0007" name="UserActiveModeTriggerInstruction" type="string" default="&quot;">
@@ -242,12 +231,9 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0008" name="OperatingMode" type="OperatingModeEnum">
       <access read="true" readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="LITS"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="LITS"/>
+      </mandatoryConform>
     </attribute>
     <attribute id="0x0009" name="MaximumCheckInBackoff" type="uint32" default="1">
       <access read="true" readPrivilege="view"/>

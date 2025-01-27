@@ -20,7 +20,6 @@
 #include <app/util/attribute-storage-detail.h>
 
 #include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/AttributePersistenceProvider.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
@@ -28,6 +27,7 @@
 #include <app/util/ember-strings.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/generic-callbacks.h>
+#include <app/util/persistence/AttributePersistenceProvider.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -72,10 +72,6 @@ static bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttr
 
 // If server == true, returns the number of server clusters,
 // otherwise number of client clusters on the endpoint at the given index.
-static uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * endpointType, bool server);
-
-// If server == true, returns the number of server clusters,
-// otherwise number of client clusters on the endpoint at the given index.
 static uint8_t emberAfClusterCountByIndex(uint16_t endpointIndex, bool server);
 
 // Check whether there is an endpoint defined with the given endpoint id that is
@@ -92,6 +88,11 @@ namespace {
 uint8_t singletonAttributeData[ACTUAL_SINGLETONS_SIZE];
 
 uint16_t emberEndpointCount = 0;
+
+/// Determines a incremental unique index for ember
+/// metadata that is increased whenever a structural change is made to the
+/// ember metadata (e.g. changing dynamic endpoints or enabling/disabling endpoints)
+unsigned emberMetadataStructureGeneration = 0;
 
 // If we have attributes that are more than 4 bytes, then
 // we need this data block for the defaults
@@ -255,7 +256,7 @@ uint16_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
     {
         if (emAfEndpoints[index].endpoint == id)
         {
-            return static_cast<uint8_t>(index - FIXED_ENDPOINT_COUNT);
+            return static_cast<uint16_t>(index - FIXED_ENDPOINT_COUNT);
         }
     }
     return kEmberInvalidEndpointIndex;
@@ -315,6 +316,7 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
     // Now enable the endpoint.
     emberAfEndpointEnableDisable(id, true);
 
+    emberMetadataStructureGeneration++;
     return CHIP_NO_ERROR;
 }
 
@@ -322,7 +324,7 @@ EndpointId emberAfClearDynamicEndpoint(uint16_t index)
 {
     EndpointId ep = 0;
 
-    index = static_cast<uint8_t>(index + FIXED_ENDPOINT_COUNT);
+    index = static_cast<uint16_t>(index + FIXED_ENDPOINT_COUNT);
 
     if ((index < MAX_ENDPOINT_COUNT) && (emAfEndpoints[index].endpoint != kInvalidEndpointId) &&
         (emberAfEndpointIndexIsEnabled(index)))
@@ -332,6 +334,7 @@ EndpointId emberAfClearDynamicEndpoint(uint16_t index)
         emAfEndpoints[index].endpoint = kInvalidEndpointId;
     }
 
+    emberMetadataStructureGeneration++;
     return ep;
 }
 
@@ -944,7 +947,13 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
                                 emberAfGlobalInteractionModelAttributesChangedListener());
     }
 
+    emberMetadataStructureGeneration++;
     return true;
+}
+
+unsigned emberAfMetadataStructureGeneration()
+{
+    return emberMetadataStructureGeneration;
 }
 
 // Returns the index of a given endpoint.  Does not consider disabled endpoints.
@@ -1400,6 +1409,20 @@ bool IsTreeCompositionForEndpoint(EndpointId endpoint)
         return false;
     }
     return emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isTreeComposition);
+}
+
+EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
+{
+    VerifyOrReturnValue(endpointIndex < ArraySize(emAfEndpoints), EndpointComposition::kInvalid);
+    if (emAfEndpoints[endpointIndex].bitmask.Has(EmberAfEndpointOptions::isFlatComposition))
+    {
+        return EndpointComposition::kFullFamily;
+    }
+    if (emAfEndpoints[endpointIndex].bitmask.Has(EmberAfEndpointOptions::isTreeComposition))
+    {
+        return EndpointComposition::kTree;
+    }
+    return EndpointComposition::kInvalid;
 }
 
 } // namespace app

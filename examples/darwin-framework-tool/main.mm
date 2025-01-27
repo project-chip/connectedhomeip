@@ -27,6 +27,7 @@
 #include "commands/delay/Commands.h"
 #include "commands/discover/Commands.h"
 #include "commands/interactive/Commands.h"
+#include "commands/memory/Commands.h"
 #include "commands/pairing/Commands.h"
 #include "commands/payload/Commands.h"
 #include "commands/provider/Commands.h"
@@ -46,6 +47,7 @@ int main(int argc, const char * argv[])
         registerCommandsDelay(commands);
         registerCommandsDiscover(commands);
         registerCommandsInteractive(commands);
+        registerCommandsMemory(commands);
         registerCommandsPayload(commands);
         registerClusterOtaSoftwareUpdateProviderInteractive(commands);
         registerCommandsStorage(commands);

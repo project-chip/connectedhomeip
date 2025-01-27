@@ -22,8 +22,9 @@
 # test-runner-runs:
 #   run1:
 #     app: examples/fabric-admin/scripts/fabric-sync-app.py
-#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --discriminator=1234
 #     app-ready-pattern: "Successfully opened pairing window on the device"
+#     app-stdin-pipe: dut-fsa-stdin
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
@@ -35,6 +36,23 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${FABRIC_SYNC_APP}
+#     app-args: --discriminator=1234
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --bool-arg unified_fabric_sync_app:true
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --string-arg dut_fsa_stdin_pipe:dut-fsa-stdin
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -42,17 +60,18 @@ import hashlib
 import logging
 import os
 import queue
+import random
 import secrets
 import struct
 import tempfile
 import time
-from dataclasses import dataclass
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.testing.apps import AppServerSubprocess
+from chip.testing.matter_testing import (MatterBaseTest, SetupParameters, TestStep, async_test_body, default_matter_test_main,
+                                         type_matches)
 from ecdsa.curves import NIST256p
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator
 
@@ -67,14 +86,6 @@ def _generate_verifier(passcode: int, salt: bytes, iterations: int) -> bytes:
     L = NIST256p.generator * w1
 
     return w0.to_bytes(NIST256p.baselen, byteorder='big') + L.to_bytes('uncompressed')
-
-
-@dataclass
-class _SetupParameters:
-    setup_qr_code: str
-    manual_code: int
-    discriminator: int
-    passcode: int
 
 
 class TC_MCORE_FS_1_2(MatterBaseTest):
@@ -105,11 +116,8 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
             self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
 
         self.th_server_port = th_server_port
-        # These are default testing values.
-        self.th_server_setup_params = _SetupParameters(
-            setup_qr_code="MT:-24J0AFN00KA0648G00",
-            manual_code=34970112332,
-            discriminator=3840,
+        self.th_server_setup_params = SetupParameters(
+            discriminator=random.randint(0, 4095),
             passcode=20202021)
 
         # Start the TH_SERVER app.
@@ -133,12 +141,12 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
             self.storage.cleanup()
         super().teardown_class()
 
-    def _ask_for_vendor_commissioning_ux_operation(self, setup_params: _SetupParameters):
+    def _ask_for_vendor_commissioning_ux_operation(self, setup_params: SetupParameters):
         self.wait_for_user_input(
             prompt_msg=f"Using the DUT vendor's provided interface, commission the ICD device using the following parameters:\n"
             f"- discriminator: {setup_params.discriminator}\n"
             f"- setupPinCode: {setup_params.passcode}\n"
-            f"- setupQRCode: {setup_params.setup_qr_code}\n"
+            f"- setupQRCode: {setup_params.qr_code}\n"
             f"- setupManualCode: {setup_params.manual_code}\n"
             f"If using FabricSync Admin test app, you may type:\n"
             f">>> pairing onnetwork 111 {setup_params.passcode}")
@@ -175,7 +183,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
             nodeid=self.dut_node_id,
             attributes=subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
-            keepSubscriptions=False
+            keepSubscriptions=True
         )
 
         parts_list_queue = queue.Queue()
@@ -191,8 +199,10 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         if not self.is_pics_sdk_ci_only:
             self._ask_for_vendor_commissioning_ux_operation(self.th_server_setup_params)
         else:
-            self.dut_fsa_stdin.write(
-                f"pairing onnetwork 2 {self.th_server_setup_params.passcode}\n")
+            if self.user_params.get("unified_fabric_sync_app"):
+                self.dut_fsa_stdin.write(f"app pair-device 2 {self.th_server_setup_params.qr_code}\n")
+            else:
+                self.dut_fsa_stdin.write(f"pairing onnetwork 2 {self.th_server_setup_params.passcode}\n")
             self.dut_fsa_stdin.flush()
             # Wait for the commissioning to complete.
             await asyncio.sleep(5)
@@ -259,7 +269,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         bridged_info_for_th_server = dut_read[newly_added_endpoint][Clusters.BridgedDeviceBasicInformation]
         basic_info_attr = Clusters.BasicInformation.Attributes
         bridged_device_info_attr = Clusters.BridgedDeviceBasicInformation.Attributes
-        Clusters.BasicInformation.Attributes
+
         asserts.assert_equal(th_server_basic_info[basic_info_attr.VendorName],
                              bridged_info_for_th_server[bridged_device_info_attr.VendorName], "VendorName incorrectly reported by DUT")
         asserts.assert_equal(th_server_basic_info[basic_info_attr.VendorID],

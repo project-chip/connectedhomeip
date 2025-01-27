@@ -25,13 +25,16 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     snprintf(tag, sizeof(tag), "chip[%s]", module);
     tag[sizeof(tag) - 1] = 0;
 
+    // We intentionally added the printf statements to ensure we could apply colors to logs redirected to the console.
+    // The printf statements are not bypassing the log level, rather, they are intentionally designed to print the
+    // initial and later parts of the log.
     switch (category)
     {
     case kLogCategory_Error: {
         {
-            esp_log_write(ESP_LOG_ERROR, tag, LOG_COLOR_E "E (%" PRIu32 ") %s: ", esp_log_timestamp(), tag);
+            printf(LOG_COLOR_E "E (%" PRIu32 ") %s: ", esp_log_timestamp(), tag);
             esp_log_writev(ESP_LOG_ERROR, tag, msg, v);
-            esp_log_write(ESP_LOG_ERROR, tag, LOG_RESET_COLOR "\n");
+            printf(LOG_RESET_COLOR "\n");
         }
     }
     break;
@@ -39,18 +42,18 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     case kLogCategory_Progress:
     default: {
         {
-            esp_log_write(ESP_LOG_INFO, tag, LOG_COLOR_I "I (%" PRIu32 ") %s: ", esp_log_timestamp(), tag);
+            printf(LOG_COLOR_I "I (%" PRIu32 ") %s: ", esp_log_timestamp(), tag);
             esp_log_writev(ESP_LOG_INFO, tag, msg, v);
-            esp_log_write(ESP_LOG_INFO, tag, LOG_RESET_COLOR "\n");
+            printf(LOG_RESET_COLOR "\n");
         }
     }
     break;
 
     case kLogCategory_Detail: {
         {
-            esp_log_write(ESP_LOG_DEBUG, tag, LOG_COLOR_D "D (%" PRIu32 ") %s: ", esp_log_timestamp(), tag);
+            printf(LOG_COLOR_D "D (%" PRIu32 ") %s: ", esp_log_timestamp(), tag);
             esp_log_writev(ESP_LOG_DEBUG, tag, msg, v);
-            esp_log_write(ESP_LOG_DEBUG, tag, LOG_RESET_COLOR "\n");
+            printf(LOG_RESET_COLOR "\n");
         }
     }
     break;

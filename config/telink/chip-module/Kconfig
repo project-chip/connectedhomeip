@@ -22,7 +22,7 @@ if CHIP
 config CHIP_DEVICE_VENDOR_NAME
 	default "Telink Semiconductor"
 
-config CHIP_NFC_COMMISSIONING
+config CHIP_NFC_ONBOARDING_PAYLOAD
 	bool "Share onboarding payload in NFC tag"
 	default n
 	imply I2C
@@ -70,6 +70,27 @@ config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
 config CHIP_OTA_IMAGE_BUILD
 	bool
 	default y if CHIP_OTA_REQUESTOR
+
+config SIGNED_OTA_IMAGE_FILE_NAME
+	string "Zephyr signed image file name"
+	default "zephyr.signed.lzma.signed.bin" if COMPRESS_LZMA
+	default "zephyr.signed.bin"
+	depends on CHIP_OTA_REQUESTOR
+	help
+	  Provides the file name of the generated Zephyr signed image.
+
+config TELINK_OTA_BUTTON_TEST
+	bool "Enable image update initiation via button press"
+	default n
+	depends on CHIP_OTA_REQUESTOR
+	help
+	  Merge the signed binary with the same version as the main into slot-1 of merged.hex.
+	  Pressing the button initiates a forced image update.
+
+config TELINK_OTA_PARTITION_ADDR
+	hex "image-1 partition address"
+	default $(dt_node_reg_addr_hex,$(dt_nodelabel_path,slot1_partition),0)
+	depends on TELINK_OTA_BUTTON_TEST
 
 config CHIP_ROTATING_DEVICE_ID
 	bool "Generate rotating device ID"
@@ -225,6 +246,8 @@ config CHIP_ENABLE_POWER_ON_FACTORY_RESET
 
 config CHIP_TASK_STACK_SIZE
 	int
+	default 6192 if SOC_RISCV_TELINK_TL321X
+	default 5352 if PM
 	default 8192
 
 config CHIP_USE_MARS_SENSOR

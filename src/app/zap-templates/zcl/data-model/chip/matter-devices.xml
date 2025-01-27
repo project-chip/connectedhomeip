@@ -19,7 +19,7 @@ limitations under the License.
     <deviceType>
         <name>MA-orphan</name>
         <domain>CHIP</domain>
-        <typeName>Matter Orphan Clusters</typeName>
+        <typeName>Orphan Clusters</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0xFFF10001</deviceId>
         <clusters lockOthers="true">
@@ -32,7 +32,7 @@ limitations under the License.
     <deviceType>
         <name>MA-rootdevice</name>
         <domain>CHIP</domain>
-        <typeName>Matter Root Node</typeName>
+        <typeName>Root Node</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0016</deviceId>
         <class>Node</class>
@@ -40,7 +40,6 @@ limitations under the License.
         <clusters lockOthers="true">
             <include cluster="Access Control" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>ACL</requireAttribute>
-                <requireAttribute>EXTENSION</requireAttribute>
             </include>
             <include cluster="Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DATA_MODEL_REVISION</requireAttribute>
@@ -103,7 +102,7 @@ limitations under the License.
     <deviceType>
         <name>MA-powersource</name>
         <domain>CHIP</domain>
-        <typeName>Matter Power Source</typeName>
+        <typeName>Power Source</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0011</deviceId>
         <class>Utility</class>
@@ -121,7 +120,7 @@ limitations under the License.
     <deviceType>
         <name>MA-electricalsensor</name>
         <domain>CHIP</domain>
-        <typeName>Matter Electrical Sensor</typeName>
+        <typeName>Electrical Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0510</deviceId>
         <class>Utility</class>
@@ -136,7 +135,7 @@ limitations under the License.
     <deviceType>
         <name>MA-otarequestor</name>
         <domain>CHIP</domain>
-        <typeName>Matter OTA Requestor</typeName>
+        <typeName>OTA Requestor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0012</deviceId>
         <class>Utility</class>
@@ -155,7 +154,7 @@ limitations under the License.
     <deviceType>
         <name>MA-otaprovider</name>
         <domain>CHIP</domain>
-        <typeName>Matter OTA Provider</typeName>
+        <typeName>OTA Provider</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0014</deviceId>
         <class>Utility</class>
@@ -174,10 +173,10 @@ limitations under the License.
     <deviceType>
         <name>MA-aggregator</name>
         <domain>CHIP</domain>
-        <typeName>Matter Aggregator</typeName>
+        <typeName>Aggregator</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x000e</deviceId>
-        <class>Dynamic Utility</class>
+        <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
@@ -190,9 +189,9 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-bridgeddevice</name>
+        <name>MA-bridgednode</name>
         <domain>CHIP</domain>
-        <typeName>Matter Bridged Device</typeName>
+        <typeName>Bridged Node</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0013</deviceId>
         <class>Utility</class>
@@ -204,7 +203,7 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Bridged Device Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Bridged Device Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>REACHABLE</requireAttribute>
             </include>
             <include cluster="Power Source Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
@@ -214,7 +213,7 @@ limitations under the License.
     <deviceType>
         <name>MA-onofflight</name>
         <domain>CHIP</domain>
-        <typeName>Matter On/Off Light</typeName>
+        <typeName>On/Off Light</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0100</deviceId>
         <class>Simple</class>
@@ -293,7 +292,6 @@ limitations under the License.
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireAttribute>OPTIONS</requireAttribute>
                 <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
-                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
                 <requireAttribute>ON_LEVEL</requireAttribute>
                 <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
                 <requireCommand>MoveToLevel</requireCommand>
@@ -311,12 +309,12 @@ limitations under the License.
     <deviceType>
         <name>MA-dimmablelight</name>
         <domain>CHIP</domain>
-        <typeName>Matter Dimmable Light</typeName>
+        <typeName>Dimmable Light</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0101</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
-        <superset>Matter On/Off Light</superset>
+        <superset>On/Off Light</superset>
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
@@ -394,7 +392,6 @@ limitations under the License.
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireAttribute>OPTIONS</requireAttribute>
                 <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
-                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
                 <requireAttribute>ON_LEVEL</requireAttribute>
                 <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
                 <requireCommand>MoveToLevel</requireCommand>
@@ -412,12 +409,12 @@ limitations under the License.
     <deviceType>
         <name>MA-colortemperaturelight</name>
         <domain>CHIP</domain>
-        <typeName>Matter Color Temperature Light</typeName>
+        <typeName>Color Temperature Light</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x010C</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
-        <superset>Matter Dimmable Light</superset>
+        <superset>Dimmable Light</superset>
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
@@ -492,7 +489,6 @@ limitations under the License.
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireAttribute>OPTIONS</requireAttribute>
                 <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
-                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
                 <requireAttribute>ON_LEVEL</requireAttribute>
                 <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
                 <requireCommand>MoveToLevel</requireCommand>
@@ -531,12 +527,12 @@ limitations under the License.
     <deviceType>
         <name>MA-extendedcolorlight</name>
         <domain>CHIP</domain>
-        <typeName>Matter Extended Color Light</typeName>
+        <typeName>Extended Color Light</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x010D</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
-        <superset>Matter Color Temperature Light</superset>
+        <superset>Color Temperature Light</superset>
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
@@ -609,7 +605,6 @@ limitations under the License.
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireAttribute>OPTIONS</requireAttribute>
                 <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
-                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
                 <requireAttribute>ON_LEVEL</requireAttribute>
                 <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
                 <requireCommand>MoveToLevel</requireCommand>
@@ -665,7 +660,7 @@ limitations under the License.
     <deviceType>
         <name>MA-onoffpluginunit</name>
         <domain>CHIP</domain>
-        <typeName>Matter On/Off Plug-in Unit</typeName>
+        <typeName>On/Off Plug-in Unit</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x010A</deviceId>
         <class>Simple</class>
@@ -742,7 +737,6 @@ limitations under the License.
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireAttribute>OPTIONS</requireAttribute>
                 <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
-                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
                 <requireAttribute>ON_LEVEL</requireAttribute>
                 <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
                 <requireCommand>MoveToLevel</requireCommand>
@@ -759,7 +753,7 @@ limitations under the License.
     <deviceType>
         <name>MA-dimmablepluginunit</name>
         <domain>CHIP</domain>
-        <typeName>Matter Dimmable Plug-in Unit</typeName>
+        <typeName>Dimmable Plug-in Unit</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x010B</deviceId>
         <class>Simple</class>
@@ -836,7 +830,6 @@ limitations under the License.
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireAttribute>OPTIONS</requireAttribute>
                 <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
-                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
                 <requireAttribute>ON_LEVEL</requireAttribute>
                 <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
                 <requireCommand>MoveToLevel</requireCommand>
@@ -853,7 +846,7 @@ limitations under the License.
     <deviceType>
         <name>MA-pump</name>
         <domain>CHIP</domain>
-        <typeName>Matter Pump</typeName>
+        <typeName>Pump</typeName>
         <profileId editable="false">0x0999</profileId>
         <deviceId editable="false">0x0303</deviceId>
         <class>Simple</class>
@@ -933,7 +926,7 @@ limitations under the License.
     <deviceType>
         <name>MA-onofflightswitch</name>
         <domain>CHIP</domain>
-        <typeName>Matter On/Off Light Switch</typeName>
+        <typeName>On/Off Light Switch</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0103</deviceId>
         <class>Simple</class>
@@ -993,12 +986,12 @@ limitations under the License.
     <deviceType>
         <name>MA-dimmerswitch</name>
         <domain>CHIP</domain>
-        <typeName>Matter Dimmer Switch</typeName>
+        <typeName>Dimmer Switch</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0104</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
-        <superset>Matter On/Off Light Switch</superset>
+        <superset>On/Off Light Switch</superset>
         <clusters lockOthers="true">
             <include cluster="Identify" client="true" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
@@ -1055,12 +1048,12 @@ limitations under the License.
     <deviceType>
         <name>MA-colordimmerswitch</name>
         <domain>CHIP</domain>
-        <typeName>Matter Color Dimmer Switch</typeName>
+        <typeName>Color Dimmer Switch</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0105</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
-        <superset>Matter Dimmer Switch</superset>
+        <superset>Dimmer Switch</superset>
         <clusters lockOthers="true">
             <include cluster="Identify" client="true" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
@@ -1114,7 +1107,7 @@ limitations under the License.
     <deviceType>
         <name>MA-controlbridge</name>
         <domain>CHIP</domain>
-        <typeName>Matter Control Bridge</typeName>
+        <typeName>Control Bridge</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0840</deviceId>
         <class>Simple</class>
@@ -1150,7 +1143,7 @@ limitations under the License.
     <deviceType>
         <name>MA-pumpcontroller</name>
         <domain>CHIP</domain>
-        <typeName>Matter Pump Controller</typeName>
+        <typeName>Pump Controller</typeName>
         <profileId editable="false">0x0999</profileId>
         <deviceId editable="false">0x0304</deviceId>
         <class>Simple</class>
@@ -1218,7 +1211,7 @@ limitations under the License.
     <deviceType>
         <name>MA-genericswitch</name>
         <domain>CHIP</domain>
-        <typeName>Matter Generic Switch</typeName>
+        <typeName>Generic Switch</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x000f</deviceId>
         <class>Simple</class>
@@ -1245,7 +1238,7 @@ limitations under the License.
     <deviceType>
         <name>MA-contactsensor</name>
         <domain>CHIP</domain>
-        <typeName>Matter Contact Sensor</typeName>
+        <typeName>Contact Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0015</deviceId>
         <class>Simple</class>
@@ -1272,7 +1265,7 @@ limitations under the License.
     <deviceType>
         <name>MA-lightsensor</name>
         <domain>CHIP</domain>
-        <typeName>Matter Light Sensor</typeName>
+        <typeName>Light Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0106</deviceId>
         <class>Simple</class>
@@ -1305,7 +1298,7 @@ limitations under the License.
     <deviceType>
         <name>MA-occupancysensor</name>
         <domain>CHIP</domain>
-        <typeName>Matter Occupancy Sensor</typeName>
+        <typeName>Occupancy Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0107</deviceId>
         <class>Simple</class>
@@ -1337,7 +1330,7 @@ limitations under the License.
     <deviceType>
         <name>MA-tempsensor</name>
         <domain>CHIP</domain>
-        <typeName>Matter Temperature Sensor</typeName>
+        <typeName>Temperature Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0302</deviceId>
         <class>Simple</class>
@@ -1362,7 +1355,7 @@ limitations under the License.
     <deviceType>
         <name>MA-pressuresensor</name>
         <domain>CHIP</domain>
-        <typeName>Matter Pressure Sensor</typeName>
+        <typeName>Pressure Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0305</deviceId>
         <class>Simple</class>
@@ -1387,7 +1380,7 @@ limitations under the License.
     <deviceType>
         <name>MA-flowsensor</name>
         <domain>CHIP</domain>
-        <typeName>Matter Flow Sensor</typeName>
+        <typeName>Flow Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0306</deviceId>
         <class>Simple</class>
@@ -1412,7 +1405,7 @@ limitations under the License.
     <deviceType>
         <name>MA-humiditysensor</name>
         <domain>CHIP</domain>
-        <typeName>Matter Humidity Sensor</typeName>
+        <typeName>Humidity Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0307</deviceId>
         <class>Simple</class>
@@ -1437,7 +1430,7 @@ limitations under the License.
     <deviceType>
         <name>MA-onoffsensor</name>
         <domain>CHIP</domain>
-        <typeName>Matter On/Off Sensor</typeName>
+        <typeName>On/Off Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0850</deviceId>
         <class>Simple</class>
@@ -1469,7 +1462,7 @@ limitations under the License.
     <deviceType>
         <name>MA-doorlock</name>
         <domain>CHIP</domain>
-        <typeName>Matter Door Lock</typeName>
+        <typeName>Door Lock</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x000A</deviceId>
         <class>Simple</class>
@@ -1517,7 +1510,7 @@ limitations under the License.
     <deviceType>
         <name>MA-doorlockcontroller</name>
         <domain>CHIP</domain>
-        <typeName>Matter Door Lock Controller</typeName>
+        <typeName>Door Lock Controller</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x000B</deviceId>
         <class>Simple</class>
@@ -1539,7 +1532,7 @@ limitations under the License.
     <deviceType>
         <name>MA-windowcovering</name>
         <domain>CHIP</domain>
-        <typeName>Matter Window Covering</typeName>
+        <typeName>Window Covering</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0202</deviceId>
         <class>Simple</class>
@@ -1604,7 +1597,7 @@ limitations under the License.
     <deviceType>
         <name>MA-windowcoveringcontroller</name>
         <domain>CHIP</domain>
-        <typeName>Matter Window Covering Controller</typeName>
+        <typeName>Window Covering Controller</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0203</deviceId>
         <class>Simple</class>
@@ -1641,7 +1634,7 @@ limitations under the License.
     <deviceType>
         <name>MA-heatcool</name>
         <domain>CHIP</domain>
-        <typeName>Matter Heating/Cooling Unit</typeName>
+        <typeName>Heating/Cooling Unit</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0300</deviceId>
         <class>Simple</class>
@@ -1705,7 +1698,7 @@ limitations under the License.
     <deviceType>
         <name>MA-thermostat</name>
         <domain>CHIP</domain>
-        <typeName>Matter Thermostat</typeName>
+        <typeName>Thermostat</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0301</deviceId>
         <class>Simple</class>
@@ -1772,7 +1765,7 @@ limitations under the License.
     <deviceType>
         <name>MA-fan</name>
         <domain>CHIP</domain>
-        <typeName>Matter Fan</typeName>
+        <typeName>Fan</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x002B</deviceId>
         <class>Simple</class>
@@ -1809,7 +1802,7 @@ limitations under the License.
     <deviceType>
         <name>MA-casting-videoplayer</name>
         <domain>CHIP</domain>
-        <typeName>Matter Casting Video Player</typeName>
+        <typeName>Casting Video Player</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0023</deviceId>
         <class>Simple</class>
@@ -1844,7 +1837,7 @@ limitations under the License.
     <deviceType>
         <name>MA-basic-videoplayer</name>
         <domain>CHIP</domain>
-        <typeName>Matter Basic Video Player</typeName>
+        <typeName>Basic Video Player</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0028</deviceId>
         <class>Simple</class>
@@ -1870,7 +1863,7 @@ limitations under the License.
     <deviceType>
         <name>MA-casting-videoclient</name>
         <domain>CHIP</domain>
-        <typeName>Matter Casting Video Client</typeName>
+        <typeName>Casting Video Client</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0029</deviceId>
         <class>Simple</class>
@@ -1904,7 +1897,7 @@ limitations under the License.
     <deviceType>
         <name>MA-video-remotecontrol</name>
         <domain>CHIP</domain>
-        <typeName>Matter Video Remote Control</typeName>
+        <typeName>Video Remote Control</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x002A</deviceId>
         <class>Simple</class>
@@ -1937,7 +1930,7 @@ limitations under the License.
     <deviceType>
         <name>MA-speaker</name>
         <domain>CHIP</domain>
-        <typeName>Matter Speaker</typeName>
+        <typeName>Speaker</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0022</deviceId>
         <class>Simple</class>
@@ -1963,7 +1956,7 @@ limitations under the License.
     <deviceType>
         <name>MA-contentapp</name>
         <domain>CHIP</domain>
-        <typeName>Matter Content App</typeName>
+        <typeName>Content App</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0024</deviceId>
         <class>Simple</class>
@@ -2001,7 +1994,7 @@ limitations under the License.
     <deviceType>
         <name>MA-modeselect</name>
         <domain>CHIP</domain>
-        <typeName>Matter Mode Select</typeName>
+        <typeName>Mode Select</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0027</deviceId>
         <class>Simple</class>
@@ -2026,7 +2019,7 @@ limitations under the License.
     <deviceType>
         <name>MA-room-airconditioner</name>
         <domain>CHIP</domain>
-        <typeName>Matter Room Air Conditioner</typeName>
+        <typeName>Room Air Conditioner</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0072</deviceId>
         <class>Simple</class>
@@ -2061,7 +2054,7 @@ limitations under the License.
     <deviceType>
         <name>MA-smokecoalarm</name>
         <domain>CHIP</domain>
-        <typeName>Matter Smoke CO Alarm</typeName>
+        <typeName>Smoke CO Alarm</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0076</deviceId>
         <class>Simple</class>
@@ -2076,7 +2069,7 @@ limitations under the License.
             <include cluster="Smoke CO Alarm" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Relative Humidity Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Carbon Monoxide" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Carbon Monoxide Concentration Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
@@ -2084,7 +2077,7 @@ limitations under the License.
     <deviceType>
         <name>MA-air-purifier</name>
         <domain>CHIP</domain>
-        <typeName>Matter Air Purifier</typeName>
+        <typeName>Air Purifier</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x002D</deviceId>
         <class>Simple</class>
@@ -2105,7 +2098,7 @@ limitations under the License.
     <deviceType>
         <name>MA-air-quality-sensor</name>
         <domain>CHIP</domain>
-        <typeName>Matter Air Quality Sensor</typeName>
+        <typeName>Air Quality Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x002C</deviceId>
         <class>Simple</class>
@@ -2135,7 +2128,7 @@ limitations under the License.
     <deviceType>
         <name>MA-dishwasher</name>
         <domain>CHIP</domain>
-        <typeName>Matter Dishwasher</typeName>
+        <typeName>Dishwasher</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0075</deviceId>
         <class>Simple</class>
@@ -2162,10 +2155,10 @@ limitations under the License.
             <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
-     <deviceType>
+    <deviceType>
         <name>MA-oven</name>
         <domain>CHIP</domain>
-        <typeName>Matter Oven</typeName>
+        <typeName>Oven</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x007B</deviceId>
         <class>Simple</class>
@@ -2178,7 +2171,7 @@ limitations under the License.
     <deviceType>
         <name>MA-microwave-oven</name>
         <domain>CHIP</domain>
-        <typeName>Matter Microwave Oven</typeName>
+        <typeName>Microwave Oven</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0079</deviceId>
         <class>Simple</class>
@@ -2204,7 +2197,7 @@ limitations under the License.
     <deviceType>
         <name>MA-refrigerator</name>
         <domain>CHIP</domain>
-        <typeName>Matter Refrigerator</typeName>
+        <typeName>Refrigerator</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0070</deviceId>
         <class>Simple</class>
@@ -2231,7 +2224,7 @@ limitations under the License.
     <deviceType>
         <name>MA-laundry-washer</name>
         <domain>CHIP</domain>
-        <typeName>Matter Laundry Washer</typeName>
+        <typeName>Laundry Washer</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0073</deviceId>
         <class>Simple</class>
@@ -2258,10 +2251,10 @@ limitations under the License.
             <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
-        <deviceType>
+    <deviceType>
         <name>MA-laundry-dryer</name>
         <domain>CHIP</domain>
-        <typeName>Matter Laundry Dryer</typeName>
+        <typeName>Laundry Dryer</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x007C</deviceId>
         <class>Simple</class>
@@ -2291,7 +2284,7 @@ limitations under the License.
     <deviceType>
         <name>MA-extractor-hood</name>
         <domain>CHIP</domain>
-        <typeName>Matter Extractor Hood</typeName>
+        <typeName>Extractor Hood</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x007A</deviceId>
         <class>Simple</class>
@@ -2319,7 +2312,7 @@ limitations under the License.
     <deviceType>
         <name>MA-robotic-vacuum-cleaner</name>
         <domain>CHIP</domain>
-        <typeName>Matter Robotic Vacuum Cleaner</typeName>
+        <typeName>Robotic Vacuum Cleaner</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0074</deviceId>
         <class>Simple</class>
@@ -2337,7 +2330,7 @@ limitations under the License.
     <deviceType>
         <name>MA-temperature-controlled-cabinet</name>
         <domain>CHIP</domain>
-        <typeName>Matter Temperature Controlled Cabinet</typeName>
+        <typeName>Temperature Controlled Cabinet</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0071</deviceId>
         <class>Simple</class>
@@ -2366,7 +2359,7 @@ limitations under the License.
     <deviceType>
         <name>MA-water-freeze-detector</name>
         <domain>CHIP</domain>
-        <typeName>Matter Water Freeze Detector</typeName>
+        <typeName>Water Freeze Detector</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0041</deviceId>
         <class>Simple</class>
@@ -2381,7 +2374,7 @@ limitations under the License.
     <deviceType>
         <name>MA-water-valve</name>
         <domain>CHIP</domain>
-        <typeName>Matter Water Valve</typeName>
+        <typeName>Water Valve</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0042</deviceId>
         <class>Simple</class>
@@ -2395,7 +2388,7 @@ limitations under the License.
     <deviceType>
         <name>MA-water-leak-detector</name>
         <domain>CHIP</domain>
-        <typeName>Matter Water Leak Detector</typeName>
+        <typeName>Water Leak Detector</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0043</deviceId>
         <class>Simple</class>
@@ -2410,7 +2403,7 @@ limitations under the License.
     <deviceType>
         <name>MA-rain-sensor</name>
         <domain>CHIP</domain>
-        <typeName>Matter Rain Sensor</typeName>
+        <typeName>Rain Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0044</deviceId>
         <class>Simple</class>
@@ -2425,7 +2418,7 @@ limitations under the License.
     <deviceType>
         <name>MA-network-infrastructure-manager</name>
         <domain>CHIP</domain>
-        <typeName>Matter Network Infrastructure Manager</typeName>
+        <typeName>Network Infrastructure Manager</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0090</deviceId>
         <class>Simple</class>
@@ -2440,7 +2433,7 @@ limitations under the License.
     <deviceType>
         <name>MA-thread-border-router</name>
         <domain>CHIP</domain>
-        <typeName>Matter Thread Border Router</typeName>
+        <typeName>Thread Border Router</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0091</deviceId>
         <class>Simple</class>
@@ -2451,11 +2444,10 @@ limitations under the License.
             <include cluster="Thread Border Router Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
-
     <deviceType>
         <name>MA-all-clusters-app</name>
         <domain>CHIP</domain>
-        <typeName>Matter All-clusters-app Server Example</typeName>
+        <typeName>All-clusters-app Server Example</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0xFFF10003</deviceId>
         <clusters lockOthers="true">
@@ -2612,7 +2604,7 @@ limitations under the License.
     <deviceType>
         <name>MA-secondary-network-interface</name>
         <domain>CHIP</domain>
-        <typeName>Matter Secondary Network Interface Device Type</typeName>
+        <typeName>Secondary Network Interface</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0019</deviceId>
         <class>Utility</class>
@@ -2633,7 +2625,7 @@ limitations under the License.
     <deviceType>
         <name>Cooktop</name>
         <domain>CHIP</domain>
-        <typeName>Matter Cooktop</typeName>
+        <typeName>Cooktop</typeName>
         <class>Simple</class>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0078</deviceId>
@@ -2653,7 +2645,7 @@ limitations under the License.
     <deviceType>
         <name>Cook Surface</name>
         <domain>CHIP</domain>
-        <typeName>Matter Cook Surface</typeName>
+        <typeName>Cook Surface</typeName>
         <class>Simple</class>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0077</deviceId>
@@ -2670,10 +2662,10 @@ limitations under the License.
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
-        <deviceType>
+    <deviceType>
         <name>Energy EVSE</name>
         <domain>CHIP</domain>
-        <typeName>Matter EVSE</typeName>
+        <typeName>EVSE</typeName>
         <class>Simple</class>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x050C</deviceId>
@@ -2683,6 +2675,134 @@ limitations under the License.
             <include cluster="Energy EVSE" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Energy EVSE Mode" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>Device Energy Management</name>
+        <domain>CHIP</domain>
+        <typeName>Device Energy Management</typeName>
+        <class>Utility</class>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x050D</deviceId>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Device Energy Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Device Energy Management Mode" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-waterheater</name>
+        <domain>CHIP</domain>
+        <typeName>Water Heater</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x050F</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+            </include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="false">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+            <include cluster="Thermostat" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>CONTROL_SEQUENCE_OF_OPERATION</requireAttribute>
+                <requireAttribute>LOCAL_TEMPERATURE</requireAttribute>
+                <requireAttribute>SYSTEM_MODE</requireAttribute>
+                <requireCommand>SetpointRaiseLower</requireCommand>
+            </include>
+            <include cluster="Water Heater Management" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>BOOST_STATE</requireAttribute>
+                <requireAttribute>HEATER_TYPES</requireAttribute>
+                <requireAttribute>HEAT_DEMAND</requireAttribute>
+                <requireEvent>BoostEnded</requireEvent>
+                <requireEvent>BoostStarted</requireEvent>
+                <requireCommand>Boost</requireCommand>
+                <requireCommand>CancelBoost</requireCommand>
+            </include>
+            <include cluster="Water Heater Mode" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>CURRENT_MODE</requireAttribute>
+                <requireAttribute>SUPPORTED_MODES</requireAttribute>
+                <requireCommand>ChangeToMode</requireCommand>
+                <requireCommand>ChangeToModeResponse</requireCommand>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-heatpump</name>
+        <domain>CHIP</domain>
+        <typeName>Heat Pump</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0309</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+            </include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="false">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+            <include cluster="Thermostat" client="true" server="false" clientLocked="false" serverLocked="true">
+                <requireAttribute>CONTROL_SEQUENCE_OF_OPERATION</requireAttribute>
+                <requireAttribute>LOCAL_TEMPERATURE</requireAttribute>
+                <requireAttribute>SYSTEM_MODE</requireAttribute>
+                <requireCommand>SetpointRaiseLower</requireCommand>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-solarpower</name>
+        <domain>CHIP</domain>
+        <typeName>Solar Power</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0017</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+            </include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="false">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-batterystorage</name>
+        <domain>CHIP</domain>
+        <typeName>Battery Storage</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0018</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+            </include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="false">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
         </clusters>
     </deviceType>
 </configurator>

@@ -199,21 +199,33 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="LOAD_CONTROL_PROGRAMS" type="array" entryType="LoadControlProgramStruct" writable="false">LoadControlPrograms</attribute>
-    <attribute side="server" code="0x0001" define="NUMBER_OF_LOAD_CONTROL_PROGRAMS" type="int8u" min="5" writable="false" default="5">NumberOfLoadControlPrograms</attribute>
-    <attribute side="server" code="0x0002" define="LOAD_CONTROL_EVENTS" type="array" entryType="LoadControlEventStruct" writable="false">Events</attribute>
-    <attribute side="server" code="0x0003" define="LOAD_CONTROL_ACTIVE_EVENTS" type="array" entryType="LoadControlEventStruct" writable="false">ActiveEvents</attribute>
-    <attribute side="server" code="0x0004" define="NUMBER_OF_EVENTS_PER_PROGRAM" type="int8u" min="10" writable="false" default="10">NumberOfEventsPerProgram</attribute>
-    <attribute side="server" code="0x0005" define="NUMBER_OF_TRANSITIONS" type="int8u" min="3" writable="false" default="3">NumberOfTransitions</attribute>
-    <attribute side="server" code="0x0006" define="DEFAULT_RANDOM_START" type="int8u" min="0" max="0x3C" default="0x1E" writable="true">
-      <description>DefaultRandomStart</description>
-      <access op="read" privilege="view"/>
-      <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0000" name="LoadControlPrograms" define="LOAD_CONTROL_PROGRAMS" type="array" entryType="LoadControlProgramStruct">
+      <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0007" define="DEFAULT_RANDOM_DURATION" type="int8u" min="0" max="0x3C" default="0" writable="true">
-      <description>DefaultRandomDuration</description>
+    <attribute side="server" code="0x0001" name="NumberOfLoadControlPrograms" define="NUMBER_OF_LOAD_CONTROL_PROGRAMS" type="int8u" min="5" default="5">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0002" name="Events" define="LOAD_CONTROL_EVENTS" type="array" entryType="LoadControlEventStruct">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0003" name="ActiveEvents" define="LOAD_CONTROL_ACTIVE_EVENTS" type="array" entryType="LoadControlEventStruct">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0004" name="NumberOfEventsPerProgram" define="NUMBER_OF_EVENTS_PER_PROGRAM" type="int8u" min="10" default="10">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0005" name="NumberOfTransitions" define="NUMBER_OF_TRANSITIONS" type="int8u" min="3" default="3">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0006" name="DefaultRandomStart" define="DEFAULT_RANDOM_START" type="int8u" max="0x3C" default="0x1E" writable="true">
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0007" name="DefaultRandomDuration" define="DEFAULT_RANDOM_DURATION" type="int8u" min="0" max="0x3C" default="0" writable="true">
+      <access op="read" privilege="view"/>
+      <access op="write" privilege="manage"/>
+      <mandatoryConform/>
     </attribute>
 
     <command source="client" code="0x00" name="RegisterLoadControlProgramRequest" optional="false">
@@ -221,18 +233,21 @@ limitations under the License.
         Upon receipt, this SHALL insert a new LoadControlProgramStruct into LoadControlPrograms, or if the ProgramID matches an existing LoadControlProgramStruct, then the provider SHALL be updated with the provided values.
       </description>
       <arg name="LoadControlProgram" type="LoadControlProgramStruct"/>
+      <mandatoryConform/>
     </command>
     <command source="client" code="0x01" name="UnregisterLoadControlProgramRequest" optional="false">
       <description>
         Upon receipt, this SHALL remove a the LoadControlProgramStruct from LoadControlPrograms with the matching ProgramID.
       </description>
       <arg name="LoadControlProgramID" type="octet_string" length="16"/>
+      <mandatoryConform/>
     </command>
     <command source="client" code="0x02" name="AddLoadControlEventRequest" optional="false">
       <description>
         On receipt of the AddLoadControlEventsRequest command, the server SHALL add a load control event.
       </description>
       <arg name="Event" type="LoadControlEventStruct"/>
+      <mandatoryConform/>
     </command>
     <command source="client" code="0x03" name="RemoveLoadControlEventRequest" optional="false">
       <description>
@@ -240,6 +255,7 @@ limitations under the License.
       </description>
       <arg name="EventID" type="octet_string" length="16"/>
       <arg name="CancelControl" type="CancelControlBitmap"/>
+      <mandatoryConform/>
     </command>
     <command source="client" code="0x04" name="ClearLoadControlEventsRequest" optional="true">
       <!-- Note: Maybe this command needs to have fields?  Who knows!
@@ -265,6 +281,7 @@ limitations under the License.
       <!-- Spec has an invalid field ID that cannot be used, so not enabling the Signature field for now.  See
            https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/8515 -->
       <!-- <field id="0xFF" name="Signature" type="octet_string" length="48" isNullable="true"/> -->
+      <mandatoryConform/>
     </event>
   </cluster>
 </configurator>

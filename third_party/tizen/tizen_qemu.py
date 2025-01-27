@@ -66,9 +66,11 @@ parser.add_argument(
           "default: $TIZEN_SDK_ROOT/iot-sysdata.img"))
 parser.add_argument(
     '--share', type=str,
-    help=("host directory to share with the guest; if file named 'runner.sh' "
-          "is present at the root of that directory, it will be executed "
-          "automatically after boot"))
+    help=("host directory to share with the guest"))
+parser.add_argument(
+    '--runner', type=str,
+    help=("path to the runner script which will be executed after boot; "
+          "it should be relative to the shared directory"))
 parser.add_argument(
     '--output', metavar='FILE', default="/dev/null",
     help="store the QEMU output in a FILE")
@@ -136,6 +138,9 @@ if args.interactive:
     # Run root shell instead of the runner script.
     kernel_args += " rootshell"
 
+if args.runner:
+    kernel_args += " runner=/mnt/chip/%s" % args.runner
+
 qemu_args += [
     '-kernel', args.kernel,
     '-append', kernel_args,
@@ -153,7 +158,7 @@ with open(args.output, "wb") as output:
         for line in iter(proc.stdout.readline, b''):
 
             # Forward the output to the stdout and the log file.
-            sys.stdout.write(line.decode(sys.stdout.encoding))
+            sys.stdout.write(line.decode(sys.stdout.encoding, errors='ignore'))
             sys.stdout.flush()
             output.write(line)
 

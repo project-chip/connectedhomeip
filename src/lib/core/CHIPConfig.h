@@ -618,13 +618,13 @@
 #define _CHIP_CONFIG_IsPlatformLwIPErrorNonCritical(CODE) 0
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #define _CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE)                                                                         \
     ((CODE) == CHIP_ERROR_POSIX(EHOSTUNREACH) || (CODE) == CHIP_ERROR_POSIX(ENETUNREACH) ||                                        \
      (CODE) == CHIP_ERROR_POSIX(EADDRNOTAVAIL) || (CODE) == CHIP_ERROR_POSIX(EPIPE))
-#else // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#else // !(CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 #define _CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE) 0
-#endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // !(CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 
 #define CHIP_CONFIG_IsPlatformErrorNonCritical(CODE)                                                                               \
     (_CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE) || _CHIP_CONFIG_IsPlatformLwIPErrorNonCritical(CODE))
@@ -1082,7 +1082,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
+ * @def CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC
  *
  * @brief Defines the number of groups key sets supported per fabric, see Group Key Management Cluster in specification.
  *
@@ -1485,11 +1485,12 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @brief The maximum number of clusters per scene, defaults to 3 for a typical usecase (onOff + level control + color control
- * cluster). Needs to be changed in case a greater number of clusters is chosen.
+ * @brief The maximum number of clusters per scene, we recommend using 4 for a typical use case (onOff + level control + color
+ * control cluster + mode selec cluster). Needs to be changed in case a greater number of clusters is chosen. In the event the
+ * device does not need to support the mode select cluster, the maximum number of clusters per scene should be set to 3.
  */
 #ifndef CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE
-#define CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE 3
+#define CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE 4
 #endif
 
 /**
@@ -1843,6 +1844,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
 #define CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS 5
 #endif // CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
+
+/**
+ *  @def CHIP_CONFIG_TEST_GOOGLETEST
+ *
+ *  @brief
+ *    If asserted (1), enable APIs that support unit tests built with the GoogleTest framework
+ *
+ */
+#ifndef CHIP_CONFIG_TEST_GOOGLETEST
+#define CHIP_CONFIG_TEST_GOOGLETEST 0
+#endif // CHIP_CONFIG_TEST_GOOGLETEST
 
 /**
  * @}

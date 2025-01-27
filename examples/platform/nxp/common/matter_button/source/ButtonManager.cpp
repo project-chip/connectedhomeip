@@ -17,7 +17,10 @@
  */
 
 #include "ButtonManager.h"
+
+extern "C" {
 #include "fwk_platform.h"
+}
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>

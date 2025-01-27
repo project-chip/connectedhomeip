@@ -273,6 +273,10 @@ void emberAfInitializeAttributes(chip::EndpointId endpoint);
 // otherwise number of client clusters on this endpoint
 uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server);
 
+// If server == true, returns the number of server clusters,
+// otherwise number of client clusters on the endpoint at the given index.
+uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * endpointType, bool server);
+
 // Returns the cluster of Nth server or client cluster,
 // depending on server toggle.
 const EmberAfCluster * emberAfGetNthCluster(chip::EndpointId endpoint, uint8_t n, bool server);
@@ -311,6 +315,14 @@ void emberAfAttributeChanged(chip::EndpointId endpoint, chip::ClusterId clusterI
 /// Schedules reporting engine to consider the endpoint dirty, however does NOT increase/alter
 /// any cluster data versions.
 void emberAfEndpointChanged(chip::EndpointId endpoint, chip::app::AttributesChangedListener * listener);
+
+/// Maintains a increasing index of structural changes within ember
+/// that determine if existing "indexes" and metadata pointers within ember
+/// are still valid or not.
+///
+/// Changes to metadata structure (e.g. endpoint enable/disable and dynamic endpoint changes)
+/// are reflected in this generation count changing.
+unsigned emberAfMetadataStructureGeneration();
 
 namespace chip {
 namespace app {
@@ -369,6 +381,18 @@ bool IsFlatCompositionForEndpoint(EndpointId endpoint);
  * @brief Returns true is an Endpoint has tree composition
  */
 bool IsTreeCompositionForEndpoint(EndpointId endpoint);
+
+enum class EndpointComposition : uint8_t
+{
+    kFullFamily,
+    kTree,
+    kInvalid,
+};
+
+/**
+ * @brief Returns the composition for a given endpoint index
+ */
+EndpointComposition GetCompositionForEndpointIndex(uint16_t index);
 
 } // namespace app
 } // namespace chip

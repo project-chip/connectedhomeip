@@ -12,17 +12,21 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 
 To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 **EVK**, see the associated
-[README document](../../../docs/guides/nxp/nxp_imx8m_linux_examples.md) for
+[README document](../../../docs/platforms/nxp/nxp_imx8m_linux_examples.md) for
 details.
 
 <hr>
 
--   [CHIP Linux Lighting Example](#chip-linux-lighting-example-data-mode-no-unique-id)
+-   [CHIP Linux Lighting Example (Data Mode, No Unique ID)](#chip-linux-lighting-example-data-mode-no-unique-id)
     -   [Building](#building)
-    -   [Commandline Arguments](#commandline-arguments)
+    -   [Commandline arguments](#commandline-arguments)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
-    -   [Running RPC console](#running-rpc-console)
+    -   [Running RPC Console](#running-rpc-console)
     -   [Device Tracing](#device-tracing)
+    -   [Trigger event using lighting-app event named pipe](#trigger-event-using-lighting-app-event-named-pipe)
+        -   [Trigger `SoftwareFault` events](#trigger-softwarefault-events)
+        -   [Trigger `HardwareFault` events](#trigger-hardwarefault-events)
+        -   [Trigger Switch events](#trigger-switch-events)
 
 <hr>
 

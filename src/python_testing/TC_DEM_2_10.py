@@ -50,8 +50,8 @@ import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from matter_testing_support import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
-                                    default_matter_test_main)
+from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
+                                         default_matter_test_main)
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
 
@@ -162,7 +162,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
         self.step("4")
         sub_handler = ClusterAttributeChangeAccumulator(Clusters.DeviceEnergyManagement)
         await sub_handler.start(self.default_controller, self.dut_node_id,
-                                self.matter_test_config.endpoint,
+                                self.get_endpoint(),
                                 min_interval_sec=0,
                                 max_interval_sec=10, keepSubscriptions=False)
 

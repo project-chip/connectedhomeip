@@ -19,31 +19,19 @@ import json
 import os
 import re
 import subprocess
-import sys
 import xml.etree.ElementTree as ElementTree
 from pathlib import Path
 
 import click
+from chip.testing.spec_parsing import build_xml_clusters
+from paths import get_chip_root, get_documentation_file_path, get_in_progress_defines
 
-DEFAULT_CHIP_ROOT = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..'))
-DEFAULT_OUTPUT_DIR_1_3 = os.path.abspath(
-    os.path.join(DEFAULT_CHIP_ROOT, 'data_model', '1.3'))
-DEFAULT_OUTPUT_DIR_IN_PROGRESS = os.path.abspath(
-    os.path.join(DEFAULT_CHIP_ROOT, 'data_model', 'in_progress'))
-DEFAULT_OUTPUT_DIR_TOT = os.path.abspath(
-    os.path.join(DEFAULT_CHIP_ROOT, 'data_model', 'master'))
-DEFAULT_DOCUMENTATION_FILE = os.path.abspath(
-    os.path.join(DEFAULT_CHIP_ROOT, 'docs', 'spec_clusters.md'))
+# Use the get_in_progress_defines() function to fetch the in-progress defines
+CURRENT_IN_PROGRESS_DEFINES = get_in_progress_defines()
 
-# questions
-# is energy-calendar still in?
-# is heat-pump out? wasn't in 0.7
-# location-cluster - is this define gone now?
-# queuedpreset - is this define gone now?
-CURRENT_IN_PROGRESS_DEFINES = ['aliro', 'atomicwrites', 'battery-storage', 'device-location', 'e2e-jf', 'energy-calendar', 'energy-drlc',
-                               'energy-management', 'heat-pump', 'hrap-1', 'hvac', 'matter-fabric-synchronization', 'metering', 'secondary-net',
-                               'service-area-cluster', 'solar-power', 'tcp', 'water-heater', 'wifiSetup']
+# Replace hardcoded paths with dynamic paths using paths.py functions
+DEFAULT_CHIP_ROOT = get_chip_root()
+DEFAULT_DOCUMENTATION_FILE = get_documentation_file_path()
 
 
 def get_xml_path(filename, output_dir):
@@ -80,6 +68,7 @@ def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run:
     help='Path to the spec root')
 @click.option(
     '--output-dir',
+    required=True,
     help='Path to output xml files')
 @click.option(
     '--dry-run',
@@ -90,10 +79,6 @@ def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run:
     '--include-in-progress',
     type=click.Choice(['All', 'None', 'Current']), default='All')
 def main(scraper, spec_root, output_dir, dry_run, include_in_progress):
-    # Clusters need to be scraped first because the cluster directory is passed to the device type directory
-    if not output_dir:
-        output_dir_map = {'All': DEFAULT_OUTPUT_DIR_TOT, 'None': DEFAULT_OUTPUT_DIR_1_3, 'Current': DEFAULT_OUTPUT_DIR_IN_PROGRESS}
-        output_dir = output_dir_map[include_in_progress]
     scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress)
     scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_progress)
     if not dry_run:
@@ -103,30 +88,28 @@ def main(scraper, spec_root, output_dir, dry_run, include_in_progress):
 
 def scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress):
     src_dir = os.path.abspath(os.path.join(spec_root, 'src'))
-    sdm_clusters_dir = os.path.abspath(
-        os.path.join(src_dir, 'service_device_management'))
+    sdm_clusters_dir = os.path.abspath(os.path.join(src_dir, 'service_device_management'))
     app_clusters_dir = os.path.abspath(os.path.join(src_dir, 'app_clusters'))
     dm_clusters_dir = os.path.abspath(os.path.join(src_dir, 'data_model'))
-    media_clusters_dir = os.path.abspath(
-        os.path.join(app_clusters_dir, 'media'))
-    clusters_output_dir = os.path.abspath(os.path.join(output_dir, 'clusters'))
+    media_clusters_dir = os.path.abspath(os.path.join(app_clusters_dir, 'media'))
+
+    clusters_output_dir = os.path.join(output_dir, 'clusters')
 
     if not os.path.exists(clusters_output_dir):
         os.makedirs(clusters_output_dir)
 
-    print('Generating main spec to get file include list - this make take a few minutes')
+    print('Generating main spec to get file include list - this may take a few minutes')
     main_out = make_asciidoc('pdf', include_in_progress, spec_root, dry_run)
-    print('Generating cluster spec to get file include list - this make take a few minutes')
+    print('Generating cluster spec to get file include list - this may take a few minutes')
     cluster_out = make_asciidoc('pdf-appclusters-book', include_in_progress, spec_root, dry_run)
 
     def scrape_cluster(filename: str) -> None:
         base = Path(filename).stem
         if base not in main_out and base not in cluster_out:
-            print(f'skipping file: {base} as it is not compiled into the asciidoc')
+            print(f'Skipping file: {base} as it is not compiled into the asciidoc')
             return
         xml_path = get_xml_path(filename, clusters_output_dir)
-        cmd = [scraper, 'cluster', '-i', filename, '-o',
-               xml_path, '-nd']
+        cmd = [scraper, 'cluster', '-i', filename, '-o', xml_path, '-nd']
         if include_in_progress == 'All':
             cmd.extend(['--define', 'in-progress'])
         elif include_in_progress == 'Current':
@@ -150,33 +133,29 @@ def scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress
         tree = ElementTree.parse(f'{xml_path}')
         root = tree.getroot()
         cluster = next(root.iter('cluster'))
-        # If there's no cluster ID table, this isn't a cluster
         try:
             next(cluster.iter('clusterIds'))
         except StopIteration:
-            # If there's no cluster ID table, this isn't a cluster just some kind of intro adoc
             print(f'Removing file {xml_path} as it does not include any cluster definitions')
             os.remove(xml_path)
             continue
 
 
 def scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_progress):
-    device_type_dir = os.path.abspath(
-        os.path.join(spec_root, 'src', 'device_types'))
-    device_types_output_dir = os.path.abspath(
-        os.path.join(output_dir, 'device_types'))
+    device_type_dir = os.path.abspath(os.path.join(spec_root, 'src', 'device_types'))
+    device_types_output_dir = os.path.abspath(os.path.join(output_dir, 'device_types'))
     clusters_output_dir = os.path.abspath(os.path.join(output_dir, 'clusters'))
 
     if not os.path.exists(device_types_output_dir):
         os.makedirs(device_types_output_dir)
 
-    print('Generating device type library to get file include list - this make take a few minutes')
+    print('Generating device type library to get file include list - this may take a few minutes')
     device_type_output = make_asciidoc('pdf-devicelibrary-book', include_in_progress, spec_root, dry_run)
 
     def scrape_device_type(filename: str) -> None:
         base = Path(filename).stem
         if base not in device_type_output:
-            print(f'skipping file: {filename} as it is not compiled into the asciidoc')
+            print(f'Skipping file: {filename} as it is not compiled into the asciidoc')
             return
         xml_path = get_xml_path(filename, device_types_output_dir)
         cmd = [scraper, 'devicetype', '-c', '-cls', clusters_output_dir,
@@ -211,18 +190,12 @@ def dump_versions(scraper, spec_root, output_dir):
 
 
 def dump_cluster_ids(output_dir):
-    python_testing_path = os.path.abspath(
-        os.path.join(DEFAULT_CHIP_ROOT, 'src', 'python_testing'))
-    sys.path.insert(0, python_testing_path)
     clusters_output_dir = os.path.abspath(
         os.path.join(output_dir, 'clusters'))
-
-    from spec_parsing_support import build_xml_clusters
-
     header = '# List of currently defined spec clusters\n'
     header += 'This file was **AUTOMATICALLY** generated by `python scripts/generate_spec_xml.py`. DO NOT EDIT BY HAND!\n\n'
 
-    clusters, problems = build_xml_clusters(clusters_output_dir)
+    clusters, problems = build_xml_clusters(Path(clusters_output_dir))
     all_name_lens = [len(c.name) for c in clusters.values()]
     name_len = max(all_name_lens)
     title_id_decimal = ' ID (Decimal) '

@@ -22,15 +22,32 @@
 # test-runner-runs:
 #   run1:
 #     app: examples/fabric-admin/scripts/fabric-sync-app.py
-#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --discriminator=1234
 #     app-ready-pattern: "Successfully opened pairing window on the device"
+#     app-stdin-pipe: dut-fsa-stdin
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --endpoint 0
+#       --endpoint 1
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${FABRIC_SYNC_APP}
+#     app-args: --discriminator=1234
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
 #       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -50,8 +67,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.apps import AppServerSubprocess
-from matter_testing_support import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
-                                    run_if_endpoint_matches)
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
+                                         run_if_endpoint_matches)
 from mobly import asserts
 
 
@@ -122,8 +139,7 @@ class TC_CCTRL_2_3(MatterBaseTest):
                  TestStep(8, "Send CommissionNode command to DUT with CASE session, with valid parameters"),
                  TestStep(9, "Send another CommissionNode command to DUT with CASE session, with with same RequestId as the previous one"),
                  TestStep(10, "Send OpenCommissioningWindow command on Administrator Commissioning Cluster sent to TH_SERVER"),
-                 TestStep(11, "Wait for DUT to successfully commission TH_SERVER, 30 seconds"),
-                 TestStep(12, "Get number of fabrics from TH_SERVER, verify DUT successfully commissioned TH_SERVER")]
+                 TestStep(11, "Get number of fabrics from TH_SERVER, verify DUT successfully commissioned TH_SERVER (up to 30 seconds)")]
 
         return steps
 
@@ -196,11 +212,23 @@ class TC_CCTRL_2_3(MatterBaseTest):
         await self.send_single_cmd(cmd, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, timedRequestTimeoutMs=5000)
 
         self.step(11)
-        time.sleep(5 if self.is_pics_sdk_ci_only else 30)
+        max_wait_time_sec = 30
+        start_time = time.time()
+        elapsed = 0
+        time_remaining = max_wait_time_sec
+        previous_number_th_server_fabrics = len(th_server_fabrics)
 
-        self.step(12)
-        th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
-        asserts.assert_equal(len(th_server_fabrics) + 1, len(th_server_fabrics_new),
+        th_server_fabrics_new = None
+        while time_remaining > 0:
+            time.sleep(2)
+            th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
+            if previous_number_th_server_fabrics != len(th_server_fabrics_new):
+                break
+            elapsed = time.time() - start_time
+            time_remaining = max_wait_time_sec - elapsed
+
+        asserts.assert_not_equal(th_server_fabrics_new, None, "Failed to read Fabrics attribute")
+        asserts.assert_equal(previous_number_th_server_fabrics + 1, len(th_server_fabrics_new),
                              "Unexpected number of fabrics on TH_SERVER")
 
 

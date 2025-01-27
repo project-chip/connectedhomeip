@@ -30,7 +30,6 @@ menuconfig CHIP
 	imply NET_IPV6
 	imply NET_CONFIG_NEED_IPV6
 	imply NET_SOCKETS
-	imply NET_SOCKETS_POSIX_NAMES if !ARCH_POSIX && CHIP_NRF_PLATFORM
 	imply NETWORKING
 	imply HWINFO
 	imply FLASH
@@ -581,11 +580,11 @@ config CHIP_BLE_ADVERTISING_DURATION
 	  If CHIP_BLE_EXT_ADVERTISING is set to false, the maximum duration time is 15 minutes, 
 	  else the maximum duration time can be extended to 2880 minutes (48h).
 
-config USE_CHIP_DATA_MODEL_INTERFACE
-    bool "Use a DataModel::Provider interface for data access"
-    help
-      This enables a level of indiraction in the CHIP interaction model engine in 
-      accessing underlying data and executing operations such as 
-      wildcard-expansion, read, write and invoke.
+endif
 
+if BT
+config CHIP_CUSTOM_BLE_ADV_DATA
+	bool "Use custom BLE advertising data"
+	help
+	  Customization of BLE advertising data at the application layer
 endif

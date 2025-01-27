@@ -165,7 +165,6 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="FQ"/>
       </mandatoryConform>
-      <constraint type="max" value="MaxFrequency"/>
     </attribute>
     <attribute id="0x0006" name="MaxFrequency" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>

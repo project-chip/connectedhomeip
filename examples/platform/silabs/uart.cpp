@@ -16,7 +16,9 @@
  *    limitations under the License.
  */
 #include "AppConfig.h"
-#include "matter_shell.h"
+#ifdef ENABLE_CHIP_SHELL
+#include "MatterShell.h" // nogncheck
+#endif
 #include <cmsis_os2.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <sl_cmsis_os2_common.h>
@@ -38,7 +40,6 @@ extern "C" {
 #include "rsi_board.h"
 #include "rsi_debug.h"
 #include "rsi_rom_egpio.h"
-#include "sl_si91x_usart.h"
 #else // For EFR32
 #if (_SILICON_LABS_32B_SERIES < 3)
 #include "em_core.h"
@@ -52,7 +53,7 @@ extern "C" {
 #endif
 #include "sl_uartdrv_instances.h"
 #if SL_WIFI
-#include "spi_multiplex.h"
+#include <platform/silabs/wifi/ncp/spi_multiplex.h>
 #endif // SL_WIFI
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
 #include "sl_uartdrv_eusart_vcom_config.h"
@@ -63,10 +64,6 @@ extern "C" {
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #include "sl_power_manager.h"
-#endif
-
-#if !defined(MIN)
-#define MIN(A, B) ((A) < (B) ? (A) : (B))
 #endif
 
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
@@ -278,7 +275,7 @@ static uint16_t RetrieveFromFifo(Fifo_t * fifo, uint8_t * pData, uint16_t SizeTo
     VerifyOrDie(pData != nullptr);
     VerifyOrDie(SizeToRead <= fifo->MaxSize);
 
-    uint16_t ReadSize        = MIN(SizeToRead, AvailableDataCount(fifo));
+    uint16_t ReadSize        = std::min(SizeToRead, AvailableDataCount(fifo));
     uint16_t nBytesBeforWrap = (fifo->MaxSize - fifo->Head);
 
     if (ReadSize > nBytesBeforWrap)
@@ -367,7 +364,7 @@ void USART_IRQHandler(void)
 {
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcess();
-#elif !defined(PW_RPC_ENABLED) && !defined(SL_WIFI)
+#elif !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
     otSysEventSignalPending();
 #endif
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
@@ -414,7 +411,7 @@ static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, ui
 
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcess();
-#elif !defined(PW_RPC_ENABLED)
+#elif !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
     otSysEventSignalPending();
 #endif
 }

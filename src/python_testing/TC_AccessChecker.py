@@ -23,13 +23,13 @@ from enum import Enum, auto
 from typing import Optional
 
 import chip.clusters as Clusters
-from basic_composition_support import BasicCompositionTests
 from chip.interaction_model import Status
+from chip.testing.basic_composition import BasicCompositionTests
+from chip.testing.global_attribute_ids import GlobalAttributeIds
+from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, MatterBaseTest, TestStep, async_test_body,
+                                         default_matter_test_main)
+from chip.testing.spec_parsing import XmlCluster, build_xml_clusters
 from chip.tlv import uint
-from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, MatterBaseTest, TestStep, async_test_body,
-                                    default_matter_test_main)
-from spec_parsing_support import XmlCluster, build_xml_clusters
 
 
 class AccessTestType(Enum):

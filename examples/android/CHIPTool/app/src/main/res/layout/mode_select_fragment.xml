@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/addressUpdateFragment"
+        android:name="com.google.chip.chiptool.clusterclient.AddressUpdateFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/flow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:constraint_referenced_ids="descriptionTv, descriptionEd, descriptionEmptyTv,
+                                       standardNamespaceTv, standardNamespaceEd, standardNamespaceEmptyTv,
+                                       supportedModesTv, supportedModesSp, changeToModeBtn,
+                                       currentModeTv, currentModeEd, currentModeEmptyTv,
+                                       startUpModeTv, startUpModeEd, startUpModeWriteBtn,
+                                       onModeTv, onModeEd, onModeWriteBtn"
+        app:flow_horizontalBias="0.0"
+        app:flow_horizontalGap="8dp"
+        app:flow_horizontalStyle="packed"
+        app:flow_maxElementsWrap="3"
+        app:flow_wrapMode="aligned"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/addressUpdateFragment" />
+
+    <TextView
+        android:id="@+id/descriptionTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:text="@string/mode_select_description_text" />
+
+    <EditText
+        android:id="@+id/descriptionEd"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:hint=""
+        android:enabled="false"
+        tools:ignore="LabelFor" />
+
+    <TextView
+        android:id="@+id/descriptionEmptyTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/standardNamespaceTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:text="@string/mode_select_standard_namespace_text" />
+
+    <EditText
+        android:id="@+id/standardNamespaceEd"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:autofillHints=""
+        android:inputType="text"
+        android:digits="01234567890abcdefABCDEF"
+        android:hint=""
+        android:enabled="false"
+        tools:ignore="LabelFor" />
+
+    <TextView
+        android:id="@+id/standardNamespaceEmptyTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/supportedModesTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:text="@string/mode_select_supported_modes_text" />
+
+    <Spinner
+        android:id="@+id/supportedModesSp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:autofillHints=""
+        android:inputType="text"
+        android:hint=""
+        tools:ignore="LabelFor" />
+
+    <TextView
+        android:id="@+id/changeToModeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:background="@android:color/darker_gray"
+        android:text="@string/mode_select_change_to_mode_text" />
+
+    <TextView
+        android:id="@+id/currentModeTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:text="@string/mode_select_current_mode_text" />
+
+    <EditText
+        android:id="@+id/currentModeEd"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:autofillHints=""
+        android:inputType="number"
+        android:hint=""
+        android:enabled="false"
+        tools:ignore="LabelFor" />
+
+    <TextView
+        android:id="@+id/currentModeEmptyTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/startUpModeTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:text="@string/mode_select_start_up_mode_text" />
+
+    <EditText
+        android:id="@+id/startUpModeEd"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:autofillHints=""
+        android:inputType="number"
+        android:hint=""
+        tools:ignore="LabelFor" />
+
+    <TextView
+        android:id="@+id/startUpModeWriteBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:background="@android:color/darker_gray"
+        android:text="@string/mode_select_write_text" />
+
+    <TextView
+        android:id="@+id/onModeTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:text="@string/mode_select_on_mode_text" />
+
+    <EditText
+        android:id="@+id/onModeEd"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:autofillHints=""
+        android:inputType="number"
+        android:hint=""
+        tools:ignore="LabelFor" />
+
+    <TextView
+        android:id="@+id/onModeWriteBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:background="@android:color/darker_gray"
+        android:text="@string/mode_select_write_text" />
+
+    <TextView
+        android:id="@+id/readAttributeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:background="@android:color/darker_gray"
+        android:padding="8dp"
+        android:text="@string/mode_select_read_attribute_text"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/flow" />
+
+    <TextView
+        android:id="@+id/commandStatusTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:minLines="4"
+        android:singleLine="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/readAttributeBtn"
+        android:textSize="16sp" />
+</androidx.constraintlayout.widget.ConstraintLayout>

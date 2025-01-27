@@ -47,7 +47,7 @@ public:
     WriteOperation(const ConcreteDataAttributePath & path)
     {
         mRequest.path              = path;
-        mRequest.subjectDescriptor = kDenySubjectDescriptor;
+        mRequest.subjectDescriptor = &kDenySubjectDescriptor;
     }
 
     WriteOperation(EndpointId endpoint, ClusterId cluster, AttributeId attribute) :
@@ -56,7 +56,7 @@ public:
 
     WriteOperation & SetSubjectDescriptor(const chip::Access::SubjectDescriptor & descriptor)
     {
-        mRequest.subjectDescriptor = descriptor;
+        mRequest.subjectDescriptor = &descriptor;
         return *this;
     }
 
@@ -123,7 +123,11 @@ public:
     AttributeValueDecoder DecoderFor(const T & value)
     {
         mTLVReader = ReadEncodedValue(value);
-        return AttributeValueDecoder(mTLVReader, mRequest.subjectDescriptor.value_or(kDenySubjectDescriptor));
+        if (mRequest.subjectDescriptor == nullptr)
+        {
+            AttributeValueDecoder(mTLVReader, kDenySubjectDescriptor);
+        }
+        return AttributeValueDecoder(mTLVReader, *mRequest.subjectDescriptor);
     }
 
 private:

@@ -52,7 +52,7 @@ import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
 
@@ -181,7 +181,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
         events_callback = EventChangeCallback(Clusters.DeviceEnergyManagement)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
-                                    self.matter_test_config.endpoint)
+                                    self.get_endpoint(default=1))
 
         self.step("4")
         await self.check_test_event_triggers_enabled()

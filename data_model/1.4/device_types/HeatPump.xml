@@ -65,7 +65,7 @@ Davis, CA 95616, USA
     <cluster id="0x0003" name="Identify" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x0301" name="Thermostat" side="client">
+    <cluster id="0x0201" name="Thermostat" side="client">
       <optionalConform/>
     </cluster>
   </clusters>

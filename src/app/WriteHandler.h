@@ -200,10 +200,8 @@ private:
     Optional<ConcreteAttributePath> mProcessingAttributePath;
     Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
 
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     DataModel::Provider * mDataModelProvider = nullptr;
     std::optional<ConcreteAttributePath> mLastSuccessfullyWrittenPath;
-#endif
 
     // This may be a "fake" pointer or a real delegate pointer, depending
     // on CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE setting.

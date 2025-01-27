@@ -75,7 +75,7 @@ CHIP_ERROR ReadDerUnsignedIntegerIntoRaw(Reader & reader, MutableByteSpan raw_in
 
     // Check for pseudo-zero to mark unsigned value
     // This means we have too large an integer (should be at most 1 byte too large), it's invalid
-    ReturnErrorCodeIf(integer_len > (raw_integer_out.size() + 1), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(integer_len <= (raw_integer_out.size() + 1), CHIP_ERROR_INVALID_ARGUMENT);
 
     if (integer_len == (raw_integer_out.size() + 1u))
     {
@@ -330,16 +330,16 @@ CHIP_ERROR Spake2p::BeginVerifier(const uint8_t * my_identity, size_t my_identit
 }
 
 CHIP_ERROR Spake2p::BeginProver(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
-                                size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in,
-                                size_t w1in_len)
+                                size_t peer_identity_len, const uint8_t * w0sin, size_t w0sin_len, const uint8_t * w1sin,
+                                size_t w1sin_len)
 {
     VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::INIT, CHIP_ERROR_INTERNAL);
 
     ReturnErrorOnFailure(InternalHash(my_identity, my_identity_len));
     ReturnErrorOnFailure(InternalHash(peer_identity, peer_identity_len));
     ReturnErrorOnFailure(WriteMN());
-    ReturnErrorOnFailure(FELoad(w0in, w0in_len, w0));
-    ReturnErrorOnFailure(FELoad(w1in, w1in_len, w1));
+    ReturnErrorOnFailure(FELoad(w0sin, w0sin_len, w0));
+    ReturnErrorOnFailure(FELoad(w1sin, w1sin_len, w1));
 
     state = CHIP_SPAKE2P_STATE::STARTED;
     role  = CHIP_SPAKE2P_ROLE::PROVER;
@@ -603,10 +603,10 @@ CHIP_ERROR Spake2pVerifier::ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan &
     uint8_t littleEndianSetupPINCode[sizeof(uint32_t)];
     Encoding::LittleEndian::Put32(littleEndianSetupPINCode, setupPin);
 
-    ReturnErrorCodeIf(salt.size() < kSpake2p_Min_PBKDF_Salt_Length || salt.size() > kSpake2p_Max_PBKDF_Salt_Length,
-                      CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(pbkdf2IterCount < kSpake2p_Min_PBKDF_Iterations || pbkdf2IterCount > kSpake2p_Max_PBKDF_Iterations,
-                      CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length && salt.size() <= kSpake2p_Max_PBKDF_Salt_Length,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(pbkdf2IterCount >= kSpake2p_Min_PBKDF_Iterations && pbkdf2IterCount <= kSpake2p_Max_PBKDF_Iterations,
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
     return pbkdf2.pbkdf2_sha256(littleEndianSetupPINCode, sizeof(littleEndianSetupPINCode), salt.data(), salt.size(),
                                 pbkdf2IterCount, ws_len, ws);
@@ -925,8 +925,8 @@ CHIP_ERROR DeriveGroupOperationalCredentials(const ByteSpan & epoch_key, const B
 CHIP_ERROR ExtractVIDPIDFromAttributeString(DNAttrType attrType, const ByteSpan & attr,
                                             AttestationCertVidPid & vidpidFromMatterAttr, AttestationCertVidPid & vidpidFromCNAttr)
 {
-    ReturnErrorCodeIf(attrType == DNAttrType::kUnspecified, CHIP_NO_ERROR);
-    ReturnErrorCodeIf(attr.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(attrType != DNAttrType::kUnspecified, CHIP_NO_ERROR);
+    VerifyOrReturnError(!attr.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
     if (attrType == DNAttrType::kMatterVID || attrType == DNAttrType::kMatterPID)
     {
@@ -939,13 +939,13 @@ CHIP_ERROR ExtractVIDPIDFromAttributeString(DNAttrType attrType, const ByteSpan 
         if (attrType == DNAttrType::kMatterVID)
         {
             // Not more than one VID attribute can be present.
-            ReturnErrorCodeIf(vidpidFromMatterAttr.mVendorId.HasValue(), CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(!vidpidFromMatterAttr.mVendorId.HasValue(), CHIP_ERROR_WRONG_CERT_DN);
             vidpidFromMatterAttr.mVendorId.SetValue(static_cast<VendorId>(matterAttr));
         }
         else
         {
             // Not more than one PID attribute can be present.
-            ReturnErrorCodeIf(vidpidFromMatterAttr.mProductId.HasValue(), CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(!vidpidFromMatterAttr.mProductId.HasValue(), CHIP_ERROR_WRONG_CERT_DN);
             vidpidFromMatterAttr.mProductId.SetValue(matterAttr);
         }
     }
