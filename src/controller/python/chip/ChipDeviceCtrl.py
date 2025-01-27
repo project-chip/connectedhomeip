@@ -2313,7 +2313,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
     def SetDACRevocationSetPath(self, dacRevocationSetPath: typing.Optional[str]):
         ''' Set the path to the device attestation revocation set JSON file.
-        
+
         Args:
             dacRevocationSetPath: Path to the JSON file containing the device attestation revocation set
         '''
