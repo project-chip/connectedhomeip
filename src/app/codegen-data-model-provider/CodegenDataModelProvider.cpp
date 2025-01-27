@@ -714,6 +714,11 @@ DataModel::CommandEntry CodegenDataModelProvider::FirstAcceptedCommand(const Con
 
 DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const ConcreteCommandPath & before)
 {
+    // As some CommandHandlerInterface commands are registered on wildcard interfaces,
+    // the valid endpoint/cluster check is done BEFORE attempting command handler interface handling
+    const EmberAfCluster * cluster = FindServerCluster(before);
+    VerifyOrReturnValue(cluster != nullptr, DataModel::CommandEntry::kInvalid);
+
     // TODO: `Next` redirecting to a callback is slow O(n^2).
     //       see https://github.com/project-chip/connectedhomeip/issues/35790
     auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
@@ -723,10 +728,6 @@ DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const Conc
     {
         return *handlerInterfaceValue;
     }
-
-    const EmberAfCluster * cluster = FindServerCluster(before);
-
-    VerifyOrReturnValue(cluster != nullptr, DataModel::CommandEntry::kInvalid);
 
     std::optional<CommandId> commandId = mAcceptedCommandsIterator.Next(cluster->acceptedCommandList, before.mCommandId);
     VerifyOrReturnValue(commandId.has_value(), DataModel::CommandEntry::kInvalid);
@@ -780,6 +781,11 @@ ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const Concre
 
 ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const ConcreteCommandPath & before)
 {
+    // As some CommandHandlerInterface commands are registered on wildcard interfaces,
+    // the valid endpoint/cluster check is done BEFORE attempting command handler interface handling
+    const EmberAfCluster * cluster = FindServerCluster(before);
+    VerifyOrReturnValue(cluster != nullptr, kInvalidCommandPath);
+
     // TODO: `Next` redirecting to a callback is slow O(n^2).
     //       see https://github.com/project-chip/connectedhomeip/issues/35790
     auto nextId = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateGeneratedCommands)
@@ -791,9 +797,6 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
                                               : ConcreteCommandPath(before.mEndpointId, before.mClusterId, *nextId);
     }
 
-    const EmberAfCluster * cluster = FindServerCluster(before);
-
-    VerifyOrReturnValue(cluster != nullptr, kInvalidCommandPath);
 
     std::optional<CommandId> commandId = mGeneratedCommandsIterator.Next(cluster->generatedCommandList, before.mCommandId);
     VerifyOrReturnValue(commandId.has_value(), kInvalidCommandPath);
