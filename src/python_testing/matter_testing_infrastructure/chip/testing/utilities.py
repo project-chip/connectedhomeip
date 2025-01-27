@@ -20,7 +20,7 @@ from mobly import asserts
 
 from typing import Any, Iterable, Optional, Tuple
 
-from python_testing.matter_testing_infrastructure.chip.testing.matter.models import AttributeValue
+from python_testing.matter_testing_infrastructure.chip.testing.models import AttributeValue
 
 
 def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib.Path]:
