@@ -3053,9 +3053,8 @@ void EstablishReadOrSubscriptions(const SessionHandle & sessionHandle, size_t nu
 
     for (uint32_t i = 0; i < numSubs; i++)
     {
-        std::unique_ptr<ReadClient> readClient =
-            std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(),
-                                              InteractionModelEngine::GetInstance()->GetExchangeManager(), *callback, type);
+        std::unique_ptr<ReadClient> readClient = std::make_unique<ReadClient>(
+            InteractionModelEngine::GetInstance(), InteractionModelEngine::GetInstance()->GetExchangeManager(), *callback, type);
         EXPECT_EQ(readClient->SendRequest(readParams), CHIP_NO_ERROR);
         readClients.push_back(std::move(readClient));
     }
@@ -3241,7 +3240,7 @@ TEST_F(TestRead, TestReadHandler_KillOverQuotaSubscriptions)
     // Part 2: Testing per fabric minimas.
     // Validate we have more than kMinSupportedSubscriptionsPerFabric subscriptions for testing per fabric minimas.
     EXPECT_GT(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe,
-                                                                                   GetAliceFabricIndex()),
+                                                                              GetAliceFabricIndex()),
               InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
 
     // The following check will trigger the logic in im to kill the read handlers that use more paths than the limit per fabric.
@@ -3291,10 +3290,10 @@ TEST_F(TestRead, TestReadHandler_KillOverQuotaSubscriptions)
               InteractionModelEngine::kMinSupportedPathsPerSubscription *
                   InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
     EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe,
-                                                                                   GetAliceFabricIndex()),
+                                                                              GetAliceFabricIndex()),
               InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
     EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe,
-                                                                                   GetBobFabricIndex()),
+                                                                              GetBobFabricIndex()),
               InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
 
     // Ensure our read transactions are still alive.
@@ -3368,8 +3367,7 @@ TEST_F(TestRead, TestReadHandler_KillOldestSubscriptions)
         // This read handler should evict some existing subscriptions for enough space
         EXPECT_EQ(readCallback.mOnSubscriptionEstablishedCount, 1u);
         EXPECT_EQ(readCallback.mAttributeCount, InteractionModelEngine::kMinSupportedPathsPerSubscription);
-        EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(),
-                  static_cast<size_t>(kExpectedParallelSubs));
+        EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), static_cast<size_t>(kExpectedParallelSubs));
     }
 
     {
@@ -3911,10 +3909,10 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             EXPECT_EQ(readCallback.mAttributeCount, InteractionModelEngine::kMinSupportedPathsPerReadRequest);
             // Should evict one read request from Bob fabric for enough resources.
             EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
-                                                                                           GetAliceFabricIndex()),
+                                                                                      GetAliceFabricIndex()),
                       1u);
             EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
-                                                                                           GetBobFabricIndex()),
+                                                                                      GetBobFabricIndex()),
                       1u);
         });
 
@@ -3962,10 +3960,10 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             EXPECT_EQ(readCallback.mAttributeCount, InteractionModelEngine::kMinSupportedPathsPerReadRequest);
             // Should evict one read request from Bob fabric for enough resources.
             EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
-                                                                                           GetAliceFabricIndex()),
+                                                                                      GetAliceFabricIndex()),
                       1u);
             EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
-                                                                                           GetBobFabricIndex()),
+                                                                                      GetBobFabricIndex()),
                       1u);
         });
 
@@ -4013,10 +4011,10 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             EXPECT_EQ(readCallback.mLastError, CHIP_IM_GLOBAL_STATUS(Busy));
             // Should evict one read request from Bob fabric for enough resources.
             EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
-                                                                                           GetAliceFabricIndex()),
+                                                                                      GetAliceFabricIndex()),
                       2u);
             EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
-                                                                                           GetBobFabricIndex()),
+                                                                                      GetBobFabricIndex()),
                       1u);
         });
 
@@ -4059,10 +4057,10 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             EXPECT_EQ(readCallback.mAttributeCount, InteractionModelEngine::kMinSupportedPathsPerReadRequest);
             // No read transactions should be evicted.
             EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
-                                                                                           GetAliceFabricIndex()),
+                                                                                      GetAliceFabricIndex()),
                       1u);
             EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
-                                                                                           GetBobFabricIndex()),
+                                                                                      GetBobFabricIndex()),
                       1u);
         });
 
@@ -4101,10 +4099,9 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             EXPECT_EQ(readCallback.mOnDone, 1u);
             EXPECT_EQ(readCallback.mAttributeCount, InteractionModelEngine::kMinSupportedPathsPerReadRequest);
             // Should evict the read request on PASE session for enough resources.
-            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read),
-                      1u);
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read), 1u);
             EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
-                                                                                           kUndefinedFabricIndex),
+                                                                                      kUndefinedFabricIndex),
                       0u);
         });
 
@@ -4145,10 +4142,9 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             EXPECT_EQ(readCallback.mOnDone, 1u);
             EXPECT_EQ(readCallback.mAttributeCount, 1u);
             // Should evict the read request on PASE session for enough resources.
-            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read),
-                      1u);
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read), 1u);
             EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
-                                                                                           kUndefinedFabricIndex),
+                                                                                      kUndefinedFabricIndex),
                       0u);
         });
 
@@ -4194,10 +4190,9 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
 
             // The read handler on PASE session should not be evicted since the resources used by all PASE sessions are not
             // exceeding the resources guaranteed to a normal fabric.
-            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read),
-                      2u);
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read), 2u);
             EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
-                                                                                           kUndefinedFabricIndex),
+                                                                                      kUndefinedFabricIndex),
                       1u);
         });
 
@@ -4228,7 +4223,7 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
                 return InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read) == 6;
             });
             EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
-                                                                                           kUndefinedFabricIndex),
+                                                                                      kUndefinedFabricIndex),
                       3u);
 
             // We have to evict one read transaction on PASE session and one read transaction on Alice's fabric.
@@ -4246,10 +4241,9 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             // No more than one read handler on PASE session should be evicted exceeding the resources guaranteed to a normal
             // fabric. Note: We are using ">=" here since it is also acceptable if we choose to evict one read transaction from
             // Alice fabric.
-            EXPECT_GE(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read),
-                      4u);
+            EXPECT_GE(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read), 4u);
             EXPECT_GE(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
-                                                                                           kUndefinedFabricIndex),
+                                                                                      kUndefinedFabricIndex),
                       2u);
         });
 
@@ -4303,10 +4297,9 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
 
             // The read handler on PASE session should be evicted, and the read transactions on a normal fabric should be untouched
             // although it is oversized.
-            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read),
-                      2u);
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read), 2u);
             EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
-                                                                                           kUndefinedFabricIndex),
+                                                                                      kUndefinedFabricIndex),
                       0u);
         });
 
@@ -4607,8 +4600,8 @@ TEST_F(TestRead, TestReadHandler_KeepSubscriptionTest)
 
     readParam.mAttributePathParamsListSize = 0;
     readClient                             = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(),
-                                                   InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
-                                                   ReadClient::InteractionType::Subscribe);
+                                              InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
+                                              ReadClient::InteractionType::Subscribe);
     EXPECT_EQ(readClient->SendRequest(readParam), CHIP_NO_ERROR);
 
     DrainAndServiceIO();
