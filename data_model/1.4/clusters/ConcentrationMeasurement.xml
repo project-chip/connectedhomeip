@@ -187,7 +187,10 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="MEA"/>
       </mandatoryConform>
-      <constraint type="between" from="MinMeasuredValue" to="MaxMeasuredValue"/>
+      <constraint type="between">
+        <from attribute="MinMeasuredValue"/>
+        <to attribute="MaxMeasuredValue"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="MinMeasuredValue" type="single" default="null">
       <access read="true" readPrivilege="view"/>
@@ -202,7 +205,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="MEA"/>
       </mandatoryConform>
-      <constraint type="min" value="MinMeasuredValue"/>
+      <constraint type="min">
+        <value attribute="MinMeasuredValue"/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="PeakMeasuredValue" type="single" default="null">
       <access read="true" readPrivilege="view"/>
@@ -210,7 +215,10 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="PEA"/>
       </mandatoryConform>
-      <constraint type="between" from="MinMeasuredValue" to="MaxMeasuredValue"/>
+      <constraint type="between">
+        <from attribute="MinMeasuredValue"/>
+        <to attribute="MaxMeasuredValue"/>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="PeakMeasuredValueWindow" type="elapsed-s" default="1">
       <access read="true" readPrivilege="view"/>
@@ -226,7 +234,10 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="AVG"/>
       </mandatoryConform>
-      <constraint type="between" from="MinMeasuredValue" to="MaxMeasuredValue"/>
+      <constraint type="between">
+        <from attribute="MinMeasuredValue"/>
+        <to attribute="MaxMeasuredValue"/>
+      </constraint>
     </attribute>
     <attribute id="0x0006" name="AverageMeasuredValueWindow" type="elapsed-s" default="1">
       <access read="true" readPrivilege="view"/>

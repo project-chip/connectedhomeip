@@ -131,7 +131,7 @@ Davis, CA 95616, USA
         <optionalConform/>
         <constraint type="allowed" value="2"/>
       </field>
-      <field id="6" name="RequestorCanConsent" type="bool" default="False">
+      <field id="6" name="RequestorCanConsent" type="bool" default="false">
         <optionalConform/>
       </field>
       <field id="7" name="MetadataForProvider" type="octstr">
@@ -162,7 +162,7 @@ Davis, CA 95616, USA
         <optionalConform/>
         <constraint type="lengthBetween" from="8" to="32"/>
       </field>
-      <field id="6" name="UserConsentNeeded" type="bool" default="False">
+      <field id="6" name="UserConsentNeeded" type="bool" default="false">
         <optionalConform/>
       </field>
       <field id="7" name="MetadataForRequestor" type="octstr">

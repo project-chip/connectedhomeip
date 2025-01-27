@@ -251,7 +251,10 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="CIP"/>
       </mandatoryConform>
-      <constraint type="between" from="IdleModeDuration" to="64800"/>
+      <constraint type="between">
+        <from attribute="IdleModeDuration"/>
+        <to value="64800"/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>

@@ -95,7 +95,9 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="maxCount" value="ThreadNetworkTableSize"/>
+      <constraint type="maxCount">
+        <value attribute="ThreadNetworkTableSize"/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="ThreadNetworkTableSize" type="uint8" default="10">
       <access read="true" readPrivilege="view"/>

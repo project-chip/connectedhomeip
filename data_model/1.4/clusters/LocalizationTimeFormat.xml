@@ -137,7 +137,7 @@ Davis, CA 95616, USA
         <feature name="CALFMT"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0002" name="SupportedCalendarTypes" type="list" default="N/A">
+    <attribute id="0x0002" name="SupportedCalendarTypes" type="list" default="">
       <entry type="CalendarTypeEnum"/>
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>

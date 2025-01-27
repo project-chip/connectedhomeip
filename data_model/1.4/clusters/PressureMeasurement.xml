@@ -77,7 +77,10 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" reportable="true"/>
       <mandatoryConform/>
-      <constraint type="between" from="MinMeasuredValue" to="MaxMeasuredValue"/>
+      <constraint type="between">
+        <from attribute="MinMeasuredValue"/>
+        <to attribute="MaxMeasuredValue"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="MinMeasuredValue" type="int16">
       <access read="true" readPrivilege="view"/>
@@ -102,7 +105,10 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="EXT"/>
       </mandatoryConform>
-      <constraint type="between" from="MinScaledValue" to="MaxScaledValue"/>
+      <constraint type="between">
+        <from attribute="MinScaledValue"/>
+        <to attribute="MaxScaledValue"/>
+      </constraint>
     </attribute>
     <attribute id="0x0011" name="MinScaledValue" type="int16" default="0">
       <access read="true" readPrivilege="view"/>

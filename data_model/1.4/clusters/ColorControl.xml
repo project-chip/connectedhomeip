@@ -263,7 +263,7 @@ Davis, CA 95616, USA
       <optionalConform/>
       <constraint type="max" value="65534"/>
     </attribute>
-    <attribute id="0x0003" name="CurrentX" type="uint16" default="24939 (0.381)">
+    <attribute id="0x0003" name="CurrentX" type="uint16" default="24939">
       <access read="true" readPrivilege="view"/>
       <quality scene="true" persistence="nonVolatile" reportable="true" quieterReporting="true"/>
       <mandatoryConform>
@@ -271,7 +271,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="max" value="65279"/>
     </attribute>
-    <attribute id="0x0004" name="CurrentY" type="uint16" default="24701 (0.377)">
+    <attribute id="0x0004" name="CurrentY" type="uint16" default="24701">
       <access read="true" readPrivilege="view"/>
       <quality scene="true" persistence="nonVolatile" reportable="true" quieterReporting="true"/>
       <mandatoryConform>
@@ -279,16 +279,16 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="max" value="65279"/>
     </attribute>
-    <attribute id="0x0005" name="DriftCompensation" type="DriftCompensationEnum" default="-">
+    <attribute id="0x0005" name="DriftCompensation" type="DriftCompensationEnum" default="">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0006" name="CompensationText" type="string" default="-">
+    <attribute id="0x0006" name="CompensationText" type="string" default="">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint type="maxLength" value="254"/>
     </attribute>
-    <attribute id="0x0007" name="ColorTemperatureMireds" type="uint16" default="250 (4000K)">
+    <attribute id="0x0007" name="ColorTemperatureMireds" type="uint16" default="250">
       <access read="true" readPrivilege="view"/>
       <quality scene="true" persistence="nonVolatile" reportable="true" quieterReporting="true"/>
       <mandatoryConform>
@@ -687,7 +687,10 @@ Davis, CA 95616, USA
           <attribute name="ColorTemperatureMireds"/>
         </orTerm>
       </mandatoryConform>
-      <constraint type="between" from="ColorTempPhysicalMinMireds" to="ColorTemperatureMireds"/>
+      <constraint type="between">
+        <from attribute="ColorTempPhysicalMinMireds"/>
+        <to attribute="ColorTemperatureMireds"/>
+      </constraint>
     </attribute>
     <attribute id="0x4010" name="StartUpColorTemperatureMireds" type="uint16" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>

@@ -84,7 +84,10 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="TN"/>
       </mandatoryConform>
-      <constraint type="between" from="MinTemperature" to="MaxTemperature"/>
+      <constraint type="between">
+        <from attribute="MinTemperature"/>
+        <to attribute="MaxTemperature"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="MinTemperature" type="temperature">
       <access read="true" readPrivilege="view"/>

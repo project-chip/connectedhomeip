@@ -202,7 +202,10 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="CurrentNumberOfPressesCounted" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="2" to="MultiPressMax"/>
+        <constraint type="between">
+          <from value="2"/>
+          <to attribute="MultiPressMax"/>
+        </constraint>
       </field>
     </event>
     <event id="0x06" name="MultiPressComplete" priority="info">
@@ -216,7 +219,9 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="TotalNumberOfPressesCounted" type="uint8">
         <mandatoryConform/>
-        <constraint type="max" value="MultiPressMax"/>
+        <constraint type="max">
+          <value attribute="MultiPressMax"/>
+        </constraint>
       </field>
     </event>
   </events>

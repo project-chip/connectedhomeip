@@ -179,14 +179,20 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="countBetween" from="1" to="NumberOfMeasurementTypes"/>
+      <constraint type="countBetween">
+        <from value="1"/>
+        <to attribute="NumberOfMeasurementTypes"/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="Ranges" type="list" default="empty">
       <entry type="MeasurementRangeStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality quieterReporting="true"/>
       <optionalConform/>
-      <constraint type="countBetween" from="0" to="NumberOfMeasurementTypes"/>
+      <constraint type="countBetween">
+        <from value="0"/>
+        <to attribute="NumberOfMeasurementTypes"/>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="Voltage" type="voltage-mV" default="null">
       <access read="true" readPrivilege="view"/>

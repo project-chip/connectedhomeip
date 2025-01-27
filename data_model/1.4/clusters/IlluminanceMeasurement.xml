@@ -83,7 +83,10 @@ Davis, CA 95616, USA
       <quality nullable="true" reportable="true"/>
       <mandatoryConform/>
       <constraint type="allowed" value="0"/>
-      <constraint type="between" from="MinMeasuredValue" to="MaxMeasuredValue"/>
+      <constraint type="between">
+        <from attribute="MinMeasuredValue"/>
+        <to attribute="MaxMeasuredValue"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="MinMeasuredValue" type="uint16">
       <access read="true" readPrivilege="view"/>

@@ -441,7 +441,10 @@ Davis, CA 95616, USA
           <feature name="ABS"/>
         </andTerm>
       </optionalConform>
-      <constraint type="between" from="InstalledOpenLimitLift" to="InstalledClosedLimitLift"/>
+      <constraint type="between">
+        <from attribute="InstalledOpenLimitLift"/>
+        <to attribute="InstalledClosedLimitLift"/>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="CurrentPositionTilt" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>
@@ -453,7 +456,10 @@ Davis, CA 95616, USA
           <feature name="ABS"/>
         </andTerm>
       </optionalConform>
-      <constraint type="between" from="InstalledOpenLimitTilt" to="InstalledClosedLimitTilt"/>
+      <constraint type="between">
+        <from attribute="InstalledOpenLimitTilt"/>
+        <to attribute="InstalledClosedLimitTilt"/>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="NumberOfActuationsLift" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>

@@ -143,14 +143,18 @@ Davis, CA 95616, USA
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="SubjectsPerAccessControlEntry"/>
+        <constraint type="maxCount">
+          <value attribute="SubjectsPerAccessControlEntry"/>
+        </constraint>
       </field>
       <field id="4" name="Targets" type="list">
         <entry type="AccessControlTargetStruct"/>
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="TargetsPerAccessControlEntry"/>
+        <constraint type="maxCount">
+          <value attribute="TargetsPerAccessControlEntry"/>
+        </constraint>
       </field>
       <access fabricScoped="true"/>
     </struct>

@@ -274,7 +274,9 @@ Davis, CA 95616, USA
       <entry type="NetworkInfoStruct"/>
       <access read="true" readPrivilege="admin"/>
       <mandatoryConform/>
-      <constraint type="maxCount" value="MaxNetworks"/>
+      <constraint type="maxCount">
+        <value attribute="MaxNetworks"/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="ScanMaxTimeSeconds" type="uint8">
       <access read="true" readPrivilege="view"/>

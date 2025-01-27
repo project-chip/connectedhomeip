@@ -328,7 +328,7 @@ Davis, CA 95616, USA
       <field id="3" name="PlaybackPreferences" type="PlaybackPreferencesStruct" default="MS">
         <optionalConform/>
       </field>
-      <field id="4" name="UseCurrentContext" type="bool" default="TRUE">
+      <field id="4" name="UseCurrentContext" type="bool" default="true">
         <optionalConform/>
         <constraint type="desc"/>
       </field>

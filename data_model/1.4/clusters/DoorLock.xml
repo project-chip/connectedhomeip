@@ -1169,7 +1169,10 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="PINSlotIndex" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfPINUsersSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfPINUsersSupported"/>
+        </constraint>
         <constraint type="allowed" value="0xFFFE"/>
       </field>
     </command>
@@ -1247,11 +1250,17 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="WeekDayIndex" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfWeekDaySchedulesSupportedPerUser"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfWeekDaySchedulesSupportedPerUser"/>
+        </constraint>
       </field>
       <field id="1" name="UserIndex" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfTotalUsersSupported"/>
+        </constraint>
       </field>
       <field id="2" name="DaysMask" type="DaysMaskBitmap">
         <mandatoryConform/>
@@ -1280,11 +1289,17 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="WeekDayIndex" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfWeekDaySchedulesSupportedPerUser"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfWeekDaySchedulesSupportedPerUser"/>
+        </constraint>
       </field>
       <field id="1" name="UserIndex" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfTotalUsersSupported"/>
+        </constraint>
       </field>
     </command>
     <command id="0x0C" name="GetWeekDayScheduleResponse" direction="responseFromServer">
@@ -1293,11 +1308,17 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="WeekDayIndex" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfWeekDaySchedulesSupportedPerUser"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfWeekDaySchedulesSupportedPerUser"/>
+        </constraint>
       </field>
       <field id="1" name="UserIndex" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfTotalUsersSupported"/>
+        </constraint>
       </field>
       <field id="2" name="Status" type="enum8" default="SUCCESS">
         <mandatoryConform/>
@@ -1330,12 +1351,18 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="WeekDayIndex" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfWeekDaySchedulesSupportedPerUser"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfWeekDaySchedulesSupportedPerUser"/>
+        </constraint>
         <constraint type="allowed" value="0xFE"/>
       </field>
       <field id="1" name="UserIndex" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfTotalUsersSupported"/>
+        </constraint>
       </field>
     </command>
     <command id="0x0E" name="SetYearDaySchedule" direction="commandToServer" response="Y">
@@ -1345,11 +1372,17 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="YearDayIndex" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfYearDaySchedulesSupportedPerUser"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfYearDaySchedulesSupportedPerUser"/>
+        </constraint>
       </field>
       <field id="1" name="UserIndex" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfTotalUsersSupported"/>
+        </constraint>
       </field>
       <field id="2" name="LocalStartTime" type="epoch-s">
         <mandatoryConform/>
@@ -1365,11 +1398,17 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="YearDayIndex" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfYearDaySchedulesSupportedPerUser"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfYearDaySchedulesSupportedPerUser"/>
+        </constraint>
       </field>
       <field id="1" name="UserIndex" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfTotalUsersSupported"/>
+        </constraint>
       </field>
     </command>
     <command id="0x0F" name="GetYearDayScheduleResponse" direction="responseFromServer">
@@ -1378,11 +1417,17 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="YearDayIndex" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfYearDaySchedulesSupportedPerUser"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfYearDaySchedulesSupportedPerUser"/>
+        </constraint>
       </field>
       <field id="1" name="UserIndex" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfTotalUsersSupported"/>
+        </constraint>
       </field>
       <field id="2" name="Status" type="enum8" default="SUCCESS">
         <mandatoryConform/>
@@ -1399,12 +1444,18 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="YearDayIndex" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfYearDaySchedulesSupportedPerUser"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfYearDaySchedulesSupportedPerUser"/>
+        </constraint>
         <constraint type="allowed" value="0xFE"/>
       </field>
       <field id="1" name="UserIndex" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfTotalUsersSupported"/>
+        </constraint>
       </field>
     </command>
     <command id="0x11" name="SetHolidaySchedule" direction="commandToServer" response="Y">
@@ -1414,7 +1465,10 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="HolidayIndex" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfHolidaySchedulesSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfHolidaySchedulesSupported"/>
+        </constraint>
       </field>
       <field id="1" name="LocalStartTime" type="epoch-s">
         <mandatoryConform/>
@@ -1433,7 +1487,10 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="HolidayIndex" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfHolidaySchedulesSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfHolidaySchedulesSupported"/>
+        </constraint>
       </field>
     </command>
     <command id="0x12" name="GetHolidayScheduleResponse" direction="responseFromServer">
@@ -1442,7 +1499,10 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="HolidayIndex" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfHolidaySchedulesSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfHolidaySchedulesSupported"/>
+        </constraint>
       </field>
       <field id="1" name="Status" type="enum8" default="SUCCESS">
         <mandatoryConform/>
@@ -1468,7 +1528,10 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="HolidayIndex" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfHolidaySchedulesSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfHolidaySchedulesSupported"/>
+        </constraint>
         <constraint type="allowed" value="0xFE"/>
       </field>
     </command>
@@ -1610,7 +1673,10 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="RFIDSlotIndex" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfRFIDUsersSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfRFIDUsersSupported"/>
+        </constraint>
         <constraint type="allowed" value="0xFFFE"/>
       </field>
     </command>
@@ -1637,7 +1703,10 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="UserIndex" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfTotalUsersSupported"/>
+        </constraint>
       </field>
       <field id="2" name="UserName" type="string" default="empty">
         <quality nullable="true"/>
@@ -1677,7 +1746,10 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="UserIndex" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfTotalUsersSupported"/>
+        </constraint>
       </field>
     </command>
     <command id="0x1C" name="GetUserResponse" direction="responseFromServer">
@@ -1686,7 +1758,10 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="UserIndex" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfTotalUsersSupported"/>
+        </constraint>
       </field>
       <field id="1" name="UserName" type="string" default="empty">
         <quality nullable="true"/>
@@ -1714,7 +1789,10 @@ Davis, CA 95616, USA
         <entry type="CredentialStruct"/>
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="countBetween" from="0" to="NumberOfCredentialsSupportedPerUser"/>
+        <constraint type="countBetween">
+          <from value="0"/>
+          <to attribute="NumberOfCredentialsSupportedPerUser"/>
+        </constraint>
       </field>
       <field id="7" name="CreatorFabricIndex" type="fabric-idx">
         <quality nullable="true"/>
@@ -1727,7 +1805,10 @@ Davis, CA 95616, USA
       <field id="9" name="NextUserIndex" type="uint16">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfTotalUsersSupported"/>
+        </constraint>
       </field>
     </command>
     <command id="0x1D" name="ClearUser" direction="commandToServer" response="Y">
@@ -1737,7 +1818,10 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="UserIndex" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfTotalUsersSupported"/>
+        </constraint>
         <constraint type="allowed" value="0xFFFE"/>
       </field>
     </command>
@@ -1761,7 +1845,10 @@ Davis, CA 95616, USA
       <field id="3" name="UserIndex" type="uint16">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfTotalUsersSupported"/>
+        </constraint>
       </field>
       <field id="4" name="UserStatus" type="UserStatusEnum" default="OccupiedEnabled">
         <quality nullable="true"/>
@@ -1792,7 +1879,10 @@ Davis, CA 95616, USA
       <field id="1" name="UserIndex" type="uint16" default="0">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfTotalUsersSupported"/>
+        </constraint>
       </field>
       <field id="2" name="NextCredentialIndex" type="uint16">
         <quality nullable="true"/>
@@ -1819,7 +1909,10 @@ Davis, CA 95616, USA
       <field id="1" name="UserIndex" type="uint16">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
+        <constraint type="between">
+          <from value="1"/>
+          <to attribute="NumberOfTotalUsersSupported"/>
+        </constraint>
       </field>
       <field id="2" name="CreatorFabricIndex" type="fabric-idx">
         <quality nullable="true"/>
@@ -1942,7 +2035,10 @@ Davis, CA 95616, USA
         <optionalConform>
           <feature name="USR"/>
         </optionalConform>
-        <constraint type="countBetween" from="1" to="NumberOfCredentialsSupportedPerUser"/>
+        <constraint type="countBetween">
+          <from value="1"/>
+          <to attribute="NumberOfCredentialsSupportedPerUser"/>
+        </constraint>
       </field>
     </event>
     <event id="0x03" name="LockOperationError" priority="desc">
@@ -1975,7 +2071,10 @@ Davis, CA 95616, USA
         <optionalConform>
           <feature name="USR"/>
         </optionalConform>
-        <constraint type="countBetween" from="1" to="NumberOfCredentialsSupportedPerUser"/>
+        <constraint type="countBetween">
+          <from value="1"/>
+          <to attribute="NumberOfCredentialsSupportedPerUser"/>
+        </constraint>
       </field>
     </event>
     <event id="0x04" name="LockUserChange" priority="info">

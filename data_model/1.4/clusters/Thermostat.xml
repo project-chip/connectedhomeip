@@ -582,7 +582,10 @@ Davis, CA 95616, USA
       <field id="4" name="Transitions" type="list" default="empty">
         <entry type="ScheduleTransitionStruct"/>
         <mandatoryConform/>
-        <constraint type="countBetween" from="1" to="NumberOfScheduleTransitions"/>
+        <constraint type="countBetween">
+          <from value="1"/>
+          <to attribute="NumberOfScheduleTransitions"/>
+        </constraint>
       </field>
       <field id="5" name="BuiltIn" type="bool" default="false">
         <quality nullable="true"/>
@@ -628,7 +631,9 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="NumberOfSchedules" type="uint8" default="0">
         <mandatoryConform/>
-        <constraint type="max" value="NumberOfSchedules"/>
+        <constraint type="max">
+          <value attribute="NumberOfSchedules"/>
+        </constraint>
       </field>
       <field id="2" name="ScheduleTypeFeatures" type="ScheduleTypeFeaturesBitmap" default="0">
         <mandatoryConform/>
@@ -699,7 +704,7 @@ Davis, CA 95616, USA
       </optionalConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0007" name="PICoolingDemand" type="uint8" default="-">
+    <attribute id="0x0007" name="PICoolingDemand" type="uint8" default="">
       <access read="true" readPrivilege="view"/>
       <quality reportable="true"/>
       <optionalConform>
@@ -707,7 +712,7 @@ Davis, CA 95616, USA
       </optionalConform>
       <constraint type="between" from="0" to="100"/>
     </attribute>
-    <attribute id="0x0008" name="PIHeatingDemand" type="uint8" default="-">
+    <attribute id="0x0008" name="PIHeatingDemand" type="uint8" default="">
       <access read="true" readPrivilege="view"/>
       <quality reportable="true"/>
       <optionalConform>
@@ -768,7 +773,8 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0015" name="MinHeatSetpointLimit" type="temperature" default="AbsMinHeatSetpointLimit">
+    <attribute id="0x0015" name="MinHeatSetpointLimit" type="temperature">
+      <default attribute="AbsMinHeatSetpointLimit"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform>
@@ -776,7 +782,8 @@ Davis, CA 95616, USA
       </optionalConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0016" name="MaxHeatSetpointLimit" type="temperature" default="AbsMaxHeatSetpointLimit">
+    <attribute id="0x0016" name="MaxHeatSetpointLimit" type="temperature">
+      <default attribute="AbsMaxHeatSetpointLimit"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform>
@@ -784,7 +791,8 @@ Davis, CA 95616, USA
       </optionalConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0017" name="MinCoolSetpointLimit" type="temperature" default="AbsMinCoolSetpointLimit">
+    <attribute id="0x0017" name="MinCoolSetpointLimit" type="temperature">
+      <default attribute="AbsMinCoolSetpointLimit"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform>
@@ -792,7 +800,8 @@ Davis, CA 95616, USA
       </optionalConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0018" name="MaxCoolSetpointLimit" type="temperature" default="AbsMaxCoolSetpointLimit">
+    <attribute id="0x0018" name="MaxCoolSetpointLimit" type="temperature">
+      <default attribute="AbsMaxCoolSetpointLimit"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform>
@@ -832,7 +841,7 @@ Davis, CA 95616, USA
       </optionalConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0020" name="StartOfWeek" type="StartOfWeekEnum" default="–">
+    <attribute id="0x0020" name="StartOfWeek" type="StartOfWeekEnum" default="">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
@@ -872,7 +881,7 @@ Davis, CA 95616, USA
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0029" name="ThermostatRunningState" type="RelayStateBitmap" default="-">
+    <attribute id="0x0029" name="ThermostatRunningState" type="RelayStateBitmap" default="">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint type="desc"/>
@@ -897,7 +906,10 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="SB"/>
       </mandatoryConform>
-      <constraint type="between" from="OccupiedSetbackMin" to="OccupiedSetbackMax"/>
+      <constraint type="between">
+        <from attribute="OccupiedSetbackMin"/>
+        <to attribute="OccupiedSetbackMax"/>
+      </constraint>
     </attribute>
     <attribute id="0x0035" name="OccupiedSetbackMin" type="uint8" default="null">
       <access read="true" readPrivilege="view"/>
@@ -905,7 +917,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="SB"/>
       </mandatoryConform>
-      <constraint type="max" value="OccupiedSetbackMax"/>
+      <constraint type="max">
+        <value attribute="OccupiedSetbackMax"/>
+      </constraint>
     </attribute>
     <attribute id="0x0036" name="OccupiedSetbackMax" type="uint8" default="null">
       <access read="true" readPrivilege="view"/>
@@ -913,7 +927,10 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="SB"/>
       </mandatoryConform>
-      <constraint type="between" from="OccupiedSetbackMin" to="254"/>
+      <constraint type="between">
+        <from attribute="OccupiedSetbackMin"/>
+        <to value="254"/>
+      </constraint>
     </attribute>
     <attribute id="0x0037" name="UnoccupiedSetback" type="uint8" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
@@ -924,7 +941,10 @@ Davis, CA 95616, USA
           <feature name="OCC"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="between" from="UnoccupiedSetbackMin" to="UnoccupiedSetbackMax"/>
+      <constraint type="between">
+        <from attribute="UnoccupiedSetbackMin"/>
+        <to attribute="UnoccupiedSetbackMax"/>
+      </constraint>
     </attribute>
     <attribute id="0x0038" name="UnoccupiedSetbackMin" type="uint8" default="null">
       <access read="true" readPrivilege="view"/>
@@ -935,7 +955,9 @@ Davis, CA 95616, USA
           <feature name="OCC"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="max" value="UnoccupiedSetbackMax"/>
+      <constraint type="max">
+        <value attribute="UnoccupiedSetbackMax"/>
+      </constraint>
     </attribute>
     <attribute id="0x0039" name="UnoccupiedSetbackMax" type="uint8" default="null">
       <access read="true" readPrivilege="view"/>
@@ -946,7 +968,10 @@ Davis, CA 95616, USA
           <feature name="OCC"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="between" from="UnoccupiedSetbackMin" to="254"/>
+      <constraint type="between">
+        <from attribute="UnoccupiedSetbackMin"/>
+        <to value="254"/>
+      </constraint>
     </attribute>
     <attribute id="0x003A" name="EmergencyHeatDelta" type="uint8" default="255">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
@@ -1066,7 +1091,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="PRES"/>
       </mandatoryConform>
-      <constraint type="maxCount" value="NumberOfPresets"/>
+      <constraint type="maxCount">
+        <value attribute="NumberOfPresets"/>
+      </constraint>
     </attribute>
     <attribute id="0x0051" name="Schedules" type="list" default="empty">
       <entry type="ScheduleStruct"/>

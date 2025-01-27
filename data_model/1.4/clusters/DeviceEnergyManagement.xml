@@ -487,7 +487,9 @@ Davis, CA 95616, USA
     <attribute id="0x0004" name="AbsMaxPower" type="power-mW" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="min" value="AbsMinPower"/>
+      <constraint type="min">
+        <value attribute="AbsMinPower"/>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="PowerAdjustmentCapability" type="PowerAdjustCapabilityStruct" default="null">
       <access read="true" readPrivilege="view"/>

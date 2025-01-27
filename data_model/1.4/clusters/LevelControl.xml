@@ -119,7 +119,10 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" scene="true" persistence="nonVolatile" quieterReporting="true"/>
       <mandatoryConform/>
-      <constraint type="between" from="MinLevel" to="MaxLevel"/>
+      <constraint type="between">
+        <from attribute="MinLevel"/>
+        <to attribute="MaxLevel"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="RemainingTime" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
@@ -147,7 +150,10 @@ Davis, CA 95616, USA
     <attribute id="0x0003" name="MaxLevel" type="uint8" default="254">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
-      <constraint type="between" from="MinLevel" to="254"/>
+      <constraint type="between">
+        <from attribute="MinLevel"/>
+        <to value="254"/>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="CurrentFrequency" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
@@ -155,7 +161,10 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="FQ"/>
       </mandatoryConform>
-      <constraint type="between" from="MinFrequency" to="MaxFrequency"/>
+      <constraint type="between">
+        <from attribute="MinFrequency"/>
+        <to attribute="MaxFrequency"/>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="MinFrequency" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
@@ -168,7 +177,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="FQ"/>
       </mandatoryConform>
-      <constraint type="min" value="MinFrequency"/>
+      <constraint type="min">
+        <value attribute="MinFrequency"/>
+      </constraint>
     </attribute>
     <attribute id="0x000F" name="Options" type="OptionsBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
@@ -183,7 +194,10 @@ Davis, CA 95616, USA
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="between" from="MinLevel" to="MaxLevel"/>
+      <constraint type="between">
+        <from attribute="MinLevel"/>
+        <to attribute="MaxLevel"/>
+      </constraint>
     </attribute>
     <attribute id="0x0012" name="OnTransitionTime" type="uint16" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>

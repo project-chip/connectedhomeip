@@ -100,15 +100,23 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0010" name="MinLevel" type="uint8" default="PhysicalMinLevel">
+    <attribute id="0x0010" name="MinLevel" type="uint8">
+      <default attribute="PhysicalMinLevel"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <mandatoryConform/>
-      <constraint type="between" from="PhysicalMinLevel" to="MaxLevel"/>
+      <constraint type="between">
+        <from attribute="PhysicalMinLevel"/>
+        <to attribute="MaxLevel"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0011" name="MaxLevel" type="uint8" default="PhysicalMaxLevel">
+    <attribute id="0x0011" name="MaxLevel" type="uint8">
+      <default attribute="PhysicalMaxLevel"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <mandatoryConform/>
-      <constraint type="between" from="MinLevel" to="PhysicalMaxLevel"/>
+      <constraint type="between">
+        <from attribute="MinLevel"/>
+        <to attribute="PhysicalMaxLevel"/>
+      </constraint>
     </attribute>
     <attribute id="0x0012" name="PowerOnLevel">
       <deprecateConform/>
