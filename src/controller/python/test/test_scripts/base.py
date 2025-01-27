@@ -181,7 +181,7 @@ class TestTimeout(threading.Thread):
 
 class BaseTestHelper:
     def __init__(self, nodeid: int, paaTrustStorePath: str, testCommissioner: bool = False,
-                 keypair: p256keypair.P256Keypair = None, dacRevocationSetPath: str = ''):
+                 keypair: p256keypair.P256Keypair = None):
         chip.native.Init()
 
         self.chipStack = ChipStack('/tmp/repl_storage.json', enableServerInteractions=True)
@@ -189,7 +189,7 @@ class BaseTestHelper:
         self.certificateAuthority = self.certificateAuthorityManager.NewCertificateAuthority()
         self.fabricAdmin = self.certificateAuthority.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
         self.devCtrl = self.fabricAdmin.NewController(
-            nodeid, paaTrustStorePath, dacRevocationSetPath, testCommissioner, keypair=keypair)
+            nodeid, paaTrustStorePath, testCommissioner, keypair=keypair)
         self.controllerNodeId = nodeid
         self.logger = logger
         self.paaTrustStorePath = paaTrustStorePath

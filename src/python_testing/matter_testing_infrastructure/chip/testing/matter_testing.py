@@ -617,7 +617,6 @@ class MatterTestConfig:
     storage_path: pathlib.Path = pathlib.Path(".")
     logs_path: pathlib.Path = pathlib.Path(".")
     paa_trust_store_path: Optional[pathlib.Path] = None
-    dac_revocation_set_path: Optional[pathlib.Path] = None
     ble_interface_id: Optional[int] = None
     commission_only: bool = False
 
@@ -676,6 +675,8 @@ class MatterTestConfig:
     # Accepted Terms and Conditions if used
     tc_version_to_simulate: int = None
     tc_user_response_to_simulate: int = None
+    # path to device attestation revocation set json file
+    dac_revocation_set_path: Optional[pathlib.Path] = None
 
 
 class ClusterMapper:
@@ -1937,7 +1938,6 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.storage_path = pathlib.Path(_DEFAULT_STORAGE_PATH) if args.storage_path is None else args.storage_path
     config.logs_path = pathlib.Path(_DEFAULT_LOG_PATH) if args.logs_path is None else args.logs_path
     config.paa_trust_store_path = args.paa_trust_store_path
-    config.dac_revocation_set_path = args.dac_revocation_set_path
     config.ble_interface_id = args.ble_interface_id
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
     config.tests = list(chain.from_iterable(args.tests or []))
@@ -1951,6 +1951,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
 
     config.tc_version_to_simulate = args.tc_version_to_simulate
     config.tc_user_response_to_simulate = args.tc_user_response_to_simulate
+    config.dac_revocation_set_path = args.dac_revocation_set_path
 
     # Accumulate all command-line-passed named args
     all_global_args = []
@@ -2510,9 +2511,8 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
             default_controller = stack.certificate_authorities[0].adminList[0].NewController(
                 nodeId=matter_test_config.controller_node_id,
                 paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
-                dacRevocationSetPath=str(
-                    matter_test_config.dac_revocation_set_path) if matter_test_config.dac_revocation_set_path else "",
-                catTags=matter_test_config.controller_cat_tags
+                catTags=matter_test_config.controller_cat_tags,
+                dacRevocationSetPath=str(matter_test_config.dac_revocation_set_path),
             )
         test_config.user_params["default_controller"] = stash_globally(default_controller)
 

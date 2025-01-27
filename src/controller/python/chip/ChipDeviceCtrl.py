@@ -1983,7 +1983,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_GetLogFilter = c_uint8
 
             self._dmLib.pychip_OpCreds_AllocateController.argtypes = [c_void_p, POINTER(
-                c_void_p), POINTER(c_void_p), c_uint64, c_uint64, c_uint16, c_char_p, c_char_p, c_bool, c_bool, POINTER(c_uint32), c_uint32, c_void_p]
+                c_void_p), POINTER(c_void_p), c_uint64, c_uint64, c_uint16, c_char_p, c_bool, c_bool, POINTER(c_uint32), c_uint32, c_void_p]
             self._dmLib.pychip_OpCreds_AllocateController.restype = PyChipError
 
             self._dmLib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow.argtypes = [
@@ -2010,6 +2010,9 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_SetTermsAcknowledgements.restype = PyChipError
             self._dmLib.pychip_DeviceController_SetTermsAcknowledgements.argtypes = [c_uint16, c_uint16]
 
+            self._dmLib.pychip_DeviceController_SetDACRevocationSetPath.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetDACRevocationSetPath.argtypes = [c_char_p]
+
 
 class ChipDeviceController(ChipDeviceControllerBase):
     ''' The ChipDeviceCommissioner binding, named as ChipDeviceController
@@ -2018,7 +2021,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
     '''
 
     def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, nodeId: int, adminVendorId: int, catTags: typing.List[int] = [
-    ], paaTrustStorePath: str = "", dacRevocationSetPath: str = "",  useTestCommissioner: bool = False, fabricAdmin: typing.Optional[FabricAdmin.FabricAdmin] = None, name: str = '', keypair: typing.Optional[p256keypair.P256Keypair] = None):
+    ], paaTrustStorePath: str = "",  useTestCommissioner: bool = False, fabricAdmin: typing.Optional[FabricAdmin.FabricAdmin] = None, name: str = '', keypair: typing.Optional[p256keypair.P256Keypair] = None):
         super().__init__(
             name or
             f"caIndex({fabricAdmin.caIndex:x})/fabricId(0x{fabricId:016X})/nodeId(0x{nodeId:016X})"
@@ -2039,7 +2042,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self._externalKeyPair = keypair
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateController(cast(
-                opCredsContext, c_void_p), pointer(devCtrl), pointer(pairingDelegate), fabricId, nodeId, adminVendorId, c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), c_char_p(None if len(dacRevocationSetPath) == 0 else str.encode(dacRevocationSetPath)), useTestCommissioner, self._ChipStack.enableServerInteractions, c_catTags, len(catTags), None if keypair is None else keypair.native_object)
+                opCredsContext, c_void_p), pointer(devCtrl), pointer(pairingDelegate), fabricId, nodeId, adminVendorId, c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner, self._ChipStack.enableServerInteractions, c_catTags, len(catTags), None if keypair is None else keypair.native_object)
         ).raise_on_error()
 
         self._fabricAdmin = fabricAdmin
@@ -2307,6 +2310,18 @@ class ChipDeviceController(ChipDeviceControllerBase):
             )
 
             return await asyncio.futures.wrap_future(ctx.future)
+
+    def SetDACRevocationSetPath(self, dacRevocationSetPath: typing.Optional[str]):
+        ''' Set the path to the device attestation revocation set JSON file.
+        
+        Args:
+            dacRevocationSetPath: Path to the JSON file containing the device attestation revocation set
+        '''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetDACRevocationSetPath(
+                c_char_p(str.encode(dacRevocationSetPath) if dacRevocationSetPath else None))
+        ).raise_on_error()
 
 
 class BareChipDeviceController(ChipDeviceControllerBase):

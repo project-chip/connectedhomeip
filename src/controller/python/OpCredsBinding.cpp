@@ -62,7 +62,7 @@ const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStor
     return &attestationTrustStore;
 }
 
-chip::Credentials::DeviceAttestationRevocationDelegate * GetAttestationRevocationDelegate(const char * dacRevocationSetPath)
+chip::Credentials::DeviceAttestationRevocationDelegate * GetTestAttestationRevocationDelegate(const char * dacRevocationSetPath)
 {
     VerifyOrReturnValue(dacRevocationSetPath != nullptr, nullptr);
 
@@ -478,9 +478,9 @@ PyChipError pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(
 PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Controller::DeviceCommissioner ** outDevCtrl,
                                               chip::Controller::ScriptDevicePairingDelegate ** outPairingDelegate,
                                               FabricId fabricId, chip::NodeId nodeId, chip::VendorId adminVendorId,
-                                              const char * paaTrustStorePath, const char * dacRevocationSetPath,
-                                              bool useTestCommissioner, bool enableServerInteractions, CASEAuthTag * caseAuthTags,
-                                              uint32_t caseAuthTagLen, chip::python::pychip_P256Keypair * operationalKey)
+                                              const char * paaTrustStorePath, bool useTestCommissioner,
+                                              bool enableServerInteractions, CASEAuthTag * caseAuthTags, uint32_t caseAuthTagLen,
+                                              chip::python::pychip_P256Keypair * operationalKey)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -502,10 +502,7 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
 
     // Initialize device attestation verifier
     const chip::Credentials::AttestationTrustStore * testingRootStore = GetTestFileAttestationTrustStore(paaTrustStorePath);
-    chip::Credentials::DeviceAttestationRevocationDelegate * dacRevocationDelegate =
-        GetAttestationRevocationDelegate(dacRevocationSetPath);
-    chip::Credentials::DeviceAttestationVerifier * dacVerifier =
-        chip::Credentials::GetDefaultDACVerifier(testingRootStore, dacRevocationDelegate);
+    chip::Credentials::DeviceAttestationVerifier * dacVerifier = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
     SetDeviceAttestationVerifier(dacVerifier);
 
     chip::Crypto::P256Keypair ephemeralKey;
@@ -713,4 +710,29 @@ PyChipError pychip_GetCompletionError()
     return ToPyChipError(sTestCommissioner.GetCompletionError());
 }
 
+PyChipError pychip_DeviceController_SetDACRevocationSetPath(const char * dacRevocationSetPath)
+{
+    VerifyOrReturnError(dacRevocationSetPath != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    chip::Credentials::DeviceAttestationRevocationDelegate * dacRevocationDelegate = 
+        GetTestAttestationRevocationDelegate(dacRevocationSetPath);
+    VerifyOrReturnError(dacRevocationDelegate != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    chip::Credentials::DeviceAttestationVerifier * dacVerifier = chip::Credentials::GetDeviceAttestationVerifier();
+    VerifyOrReturnError(dacVerifier != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
+
+    // GetDefaultDACVerifier returns the pointer of type DeviceAttestationVerifier and it does not have the
+    // SetRevocationDelegate method so we are safely downcasting to DefaultDACVerifier, and set the revocation
+    // delegate
+    if (chip::Credentials::DefaultDACVerifier * defaultDACVerifier = dynamic_cast<chip::Credentials::DefaultDACVerifier *>(dacVerifier))
+    {
+        defaultDACVerifier->SetRevocationDelegate(dacRevocationDelegate);
+    }
+    else
+    {
+        ChipLogError(Controller, "DAC verifier is not a DefaultDACVerifier");
+        return ToPyChipError(CHIP_ERROR_INCORRECT_STATE);
+    }
+    return ToPyChipError(CHIP_NO_ERROR);
+}
 } // extern "C"
