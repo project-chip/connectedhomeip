@@ -781,7 +781,7 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDe
         name = d.attrib['name']
         location = DeviceTypePathLocation(device_type_id=0)
 
-        str_id = d.attrib['id']
+        str_id = d.attrib.get('id', "")
         if not str_id:
             if name == "Base Device Type":
                 # Base is special device type, we're going to call it -1 so we can combine and remove it later.
@@ -819,7 +819,13 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDe
         clusters = d.iter('cluster')
         for c in clusters:
             try:
-                cid = uint(int(c.attrib['id'], 0))
+                try:
+                    cid = uint(int(c.attrib['id'], 0))
+                except ValueError:
+                    location = DeviceTypePathLocation(device_type_id=id)
+                    problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                    severity=ProblemSeverity.WARNING, problem=f"Unknown cluster id {c.attrib['id']}"))
+                    continue
                 conformance_xml, tmp_problem = get_conformance(c, cid)
                 if tmp_problem:
                     problems.append(tmp_problem)
