@@ -26,8 +26,32 @@ import click
 from chip.testing.spec_parsing import build_xml_clusters
 from paths import get_chip_root, get_documentation_file_path, get_in_progress_defines
 
-# Use the get_in_progress_defines() function to fetch the in-progress defines
-CURRENT_IN_PROGRESS_DEFINES = get_in_progress_defines()
+
+CURRENT_IN_PROGRESS_DEFINES = [
+    "cameras",
+    "closures",
+    "device-location",
+    "endpointuniqueid",
+    "energy-drlc",
+    "energy-mtrid",
+    "energy-price",
+    "energy-tariff",
+    "hrap-2",
+    "hrap-tbrd",
+    "hvac-preset-suggestions",
+    "hvac-thermostat-events",
+    "irrigation-system",
+    "metering network-recovery",
+    "nfcCommissioning",
+    "paftp",
+    "rvc-direct-mode",
+    "rvc-moreopstates",
+    "rvc-vacthenmop",
+    "soil-sensor",
+    "thermostat-controller",
+    "tls",
+]
+
 
 # Replace hardcoded paths with dynamic paths using paths.py functions
 DEFAULT_CHIP_ROOT = get_chip_root()
