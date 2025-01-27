@@ -1235,7 +1235,6 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceValidity)
         const InvokeRequest kInvokeRequest{ .path = kCommandPath };
         chip::TLV::TLVReader tlvReader;
 
-        // std::nullopt is returned when the command is handled
         ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ &commandHandler),
                   Protocols::InteractionModel::Status::UnsupportedEndpoint);
     }
