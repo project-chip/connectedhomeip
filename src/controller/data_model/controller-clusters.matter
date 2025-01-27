@@ -213,10 +213,10 @@ enum TestGlobalEnum : enum8 {
 }
 
 enum ThreeLevelAutoEnum : enum8 {
-  kLow = 0;
-  kMedium = 1;
-  kHigh = 2;
-  kAutomatic = 3;
+  kAuto = 0;
+  kLow = 1;
+  kMedium = 2;
+  kHigh = 3;
 }
 
 bitmap TestGlobalBitmap : bitmap32 {
@@ -2671,7 +2671,7 @@ cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
@@ -2697,12 +2697,14 @@ cluster OperationalCredentials = 62 {
     fabric_id fabricID = 3;
     node_id nodeID = 4;
     char_string<32> label = 5;
+    optional octet_string<85> vidVerificationStatement = 6;
     fabric_idx fabricIndex = 254;
   }
 
   fabric_scoped struct NOCStruct {
-    fabric_sensitive octet_string noc = 1;
-    nullable fabric_sensitive octet_string icac = 2;
+    long_octet_string<400> noc = 1;
+    nullable long_octet_string<400> icac = 2;
+    optional long_octet_string<400> vvsc = 3;
     fabric_idx fabricIndex = 254;
   }
 
@@ -2724,7 +2726,7 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct AttestationResponse = 1 {
-    octet_string<900> attestationElements = 0;
+    octet_string attestationElements = 0;
     octet_string<64> attestationSignature = 1;
   }
 
@@ -2733,7 +2735,7 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct CertificateChainResponse = 3 {
-    octet_string<600> certificate = 0;
+    long_octet_string<600> certificate = 0;
   }
 
   request struct CSRRequestRequest {
@@ -2743,20 +2745,20 @@ cluster OperationalCredentials = 62 {
 
   response struct CSRResponse = 5 {
     octet_string NOCSRElements = 0;
-    octet_string attestationSignature = 1;
+    octet_string<64> attestationSignature = 1;
   }
 
   request struct AddNOCRequest {
-    octet_string<400> NOCValue = 0;
-    optional octet_string<400> ICACValue = 1;
+    long_octet_string<400> NOCValue = 0;
+    optional long_octet_string<400> ICACValue = 1;
     octet_string<16> IPKValue = 2;
     int64u caseAdminSubject = 3;
     vendor_id adminVendorId = 4;
   }
 
   request struct UpdateNOCRequest {
-    octet_string NOCValue = 0;
-    optional octet_string ICACValue = 1;
+    long_octet_string<400> NOCValue = 0;
+    optional long_octet_string<400> ICACValue = 1;
   }
 
   response struct NOCResponse = 8 {
@@ -2774,25 +2776,46 @@ cluster OperationalCredentials = 62 {
   }
 
   request struct AddTrustedRootCertificateRequest {
-    octet_string rootCACertificate = 0;
+    long_octet_string<400> rootCACertificate = 0;
   }
 
-  /** Sender is requesting attestation information from the receiver. */
+  request struct SetVidVerificationStatementRequest {
+    optional vendor_id vendorID = 0;
+    optional octet_string<85> vidVerificationStatement = 1;
+    optional long_octet_string<400> vvsc = 2;
+  }
+
+  request struct SignVidVerificationRequestRequest {
+    fabric_idx fabricIndex = 0;
+    octet_string<32> clientChallenge = 1;
+  }
+
+  response struct SignVidVerificationResponse = 14 {
+    fabric_idx fabricIndex = 0;
+    int8u fabricBindingVersion = 1;
+    octet_string signature = 2;
+  }
+
+  /** This command SHALL be generated to request the Attestation Information, in the form of an AttestationResponse Command. */
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
-  /** Sender is requesting a device attestation certificate from the receiver. */
+  /** If the CertificateType is not a valid value per CertificateChainTypeEnum then the command SHALL fail with a Status Code of INVALID_COMMAND. */
   command access(invoke: administer) CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
-  /** Sender is requesting a certificate signing request (CSR) from the receiver. */
+  /** This command SHALL be generated to execute the Node Operational CSR Procedure and subsequently return the NOCSR Information, in the form of a CSRResponse Command. */
   command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
-  /** Sender is requesting to add the new node operational certificates. */
+  /** This command SHALL add a new NOC chain to the device and commission a new Fabric association upon successful validation of all arguments and preconditions. */
   command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
-  /** Sender is requesting to update the node operational certificates. */
+  /** This command SHALL replace the NOC and optional associated ICAC (if present) scoped under the accessing fabric upon successful validation of all arguments and preconditions. */
   fabric command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
-  /** This command SHALL be used by an Administrative Node to set the user-visible Label field for a given Fabric, as reflected by entries in the Fabrics attribute. */
+  /** This command SHALL be used by an Administrator to set the user-visible Label field for a given Fabric, as reflected by entries in the Fabrics attribute. */
   fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
-  /** This command is used by Administrative Nodes to remove a given fabric index and delete all associated fabric-scoped data. */
+  /** This command is used by Administrators to remove a given Fabric and delete all associated fabric-scoped data. */
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
-  /** This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation. */
+  /** This command SHALL add a Trusted Root CA Certificate, provided as its Matter Certificate Encoding representation, to the TrustedRootCertificates Attribute list and SHALL ensure the next AddNOC command executed uses the provided certificate as its root of trust. */
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
+  /** This command SHALL be used to one or many of the following: */
+  fabric command access(invoke: administer) SetVidVerificationStatement(SetVidVerificationStatementRequest): DefaultSuccess = 12;
+  /** This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given by generating the response described in Fabric Table Vendor ID Verification Procedure. */
+  command access(invoke: administer) SignVidVerificationRequest(SignVidVerificationRequestRequest): SignVidVerificationResponse = 13;
 }
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
@@ -9963,7 +9986,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
     kUnknownReason = 11;
   }
 
-  bitmap WebRTCMetadataOptions : bitmap8 {
+  bitmap WebRTCMetadataOptionsBitmap : bitmap8 {
     kDataTLV = 0x1;
   }
 
@@ -9981,7 +10004,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
     StreamUsageEnum streamUsage = 4;
     nullable int16u videoStreamID = 5;
     nullable int16u audioStreamID = 6;
-    WebRTCMetadataOptions metadataOptions = 7;
+    WebRTCMetadataOptionsBitmap metadataOptions = 7;
   }
 
   readonly attribute WebRTCSessionStruct currentSessions[] = 0;
@@ -9998,7 +10021,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
     optional nullable int16u audioStreamID = 2;
     optional ICEServerStruct ICEServers[] = 3;
     optional char_string ICETransportPolicy = 4;
-    optional WebRTCMetadataOptions metadataOptions = 5;
+    optional WebRTCMetadataOptionsBitmap metadataOptions = 5;
   }
 
   response struct SolicitOfferResponse = 2 {
@@ -10016,13 +10039,13 @@ provisional cluster WebRTCTransportProvider = 1363 {
     optional nullable int16u audioStreamID = 4;
     optional ICEServerStruct ICEServers[] = 5;
     optional char_string ICETransportPolicy = 6;
-    optional WebRTCMetadataOptions metadataOptions = 7;
+    optional WebRTCMetadataOptionsBitmap metadataOptions = 7;
   }
 
   response struct ProvideOfferResponse = 4 {
     int16u webRTCSessionID = 0;
-    int16u videoStreamID = 1;
-    int16u audioStreamID = 2;
+    optional nullable int16u videoStreamID = 1;
+    optional nullable int16u audioStreamID = 2;
   }
 
   request struct ProvideAnswerRequest {
@@ -10030,9 +10053,9 @@ provisional cluster WebRTCTransportProvider = 1363 {
     char_string sdp = 1;
   }
 
-  request struct ProvideICECandidateRequest {
+  request struct ProvideICECandidatesRequest {
     int16u webRTCSessionID = 0;
-    char_string ICECandidate = 1;
+    char_string ICECandidates[] = 1;
   }
 
   request struct EndSessionRequest {
@@ -10046,8 +10069,8 @@ provisional cluster WebRTCTransportProvider = 1363 {
   command ProvideOffer(ProvideOfferRequest): ProvideOfferResponse = 3;
   /** This command SHALL be initiated from a Node in response to an Offer that was previously received from a remote peer. */
   command ProvideAnswer(ProvideAnswerRequest): DefaultSuccess = 5;
-  /** This command allows for https://www.rfc-editor.org/rfc/rfc8839#section-4.2.1.2 nominated after the initial Offer / Answer exchange to be added to a session during the gathering phase. */
-  command ProvideICECandidate(ProvideICECandidateRequest): DefaultSuccess = 6;
+  /** This command allows for string based https://rfc-editor.org/rfc/rfc8839#section-5.1 generated after the initial Offer / Answer exchange, via a JSEP https://datatracker.ietf.org/doc/html/rfc9429#section-4.1.20 event, a DOM https://www.w3.org/TR/webrtc/#dom-rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase. */
+  command ProvideICECandidates(ProvideICECandidatesRequest): DefaultSuccess = 6;
   /** This command instructs the stream provider to end the WebRTC session. */
   command EndSession(EndSessionRequest): DefaultSuccess = 7;
 }
@@ -10078,7 +10101,7 @@ provisional cluster WebRTCTransportRequestor = 1364 {
     kUnknownReason = 11;
   }
 
-  bitmap WebRTCMetadataOptions : bitmap8 {
+  bitmap WebRTCMetadataOptionsBitmap : bitmap8 {
     kDataTLV = 0x1;
   }
 
@@ -10096,7 +10119,7 @@ provisional cluster WebRTCTransportRequestor = 1364 {
     StreamUsageEnum streamUsage = 4;
     nullable int16u videoStreamID = 5;
     nullable int16u audioStreamID = 6;
-    WebRTCMetadataOptions metadataOptions = 7;
+    WebRTCMetadataOptionsBitmap metadataOptions = 7;
   }
 
   readonly attribute WebRTCSessionStruct currentSessions[] = 0;
@@ -10119,9 +10142,9 @@ provisional cluster WebRTCTransportRequestor = 1364 {
     char_string sdp = 1;
   }
 
-  request struct ICECandidateRequest {
+  request struct ICECandidatesRequest {
     int16u webRTCSessionID = 0;
-    char_string ICECandidate = 1;
+    char_string ICECandidates[] = 1;
   }
 
   request struct EndRequest {
@@ -10129,12 +10152,12 @@ provisional cluster WebRTCTransportRequestor = 1364 {
     WebRTCEndReasonEnum reason = 1;
   }
 
-  /** This command provides the stream requestor with WebRTC session details. It is sent following the receipt of a SolicitOffer command or a re-Offer initiated by the Provider. */
+  /** This command provides the stream requestor with WebRTC session details. */
   command Offer(OfferRequest): DefaultSuccess = 1;
-  /** This command provides the stream requestor with the WebRTC session details (i.e. Session ID and SDP answer). It is the next command in the Offer/Answer flow to the ProvideOffer command. */
+  /** This command provides the stream requestor with the WebRTC session details (i.e. Session ID and SDP answer), It is the next command in the Offer/Answer flow to the ProvideOffer command. */
   command Answer(AnswerRequest): DefaultSuccess = 2;
-  /** This command provides an ICE candidate to the stream requestor in a WebRTC session. */
-  command ICECandidate(ICECandidateRequest): DefaultSuccess = 3;
+  /** This command allows for string based https://rfc-editor.org/rfc/rfc8839#section-5.1 generated after the initial Offer / Answer exchange, via a JSEP https://datatracker.ietf.org/doc/html/rfc9429#section-4.1.20 event, a DOM https://www.w3.org/TR/webrtc/#dom-rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase. */
+  command ICECandidates(ICECandidatesRequest): DefaultSuccess = 3;
   /** This command notifies the stream requestor that the provider has ended the WebRTC session. */
   command End(EndRequest): DefaultSuccess = 4;
 }
@@ -10343,7 +10366,7 @@ provisional cluster Chime = 1366 {
   }
 
   readonly attribute ChimeSoundStruct installedChimeSounds[] = 0;
-  attribute int8u activeChimeID = 1;
+  attribute int8u selectedChime = 1;
   attribute boolean enabled = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -10517,7 +10540,7 @@ provisional cluster TlsCertificateManagement = 2049 {
   }
 
   request struct FindClientCertificateRequest {
-    int16u ccdid = 0;
+    nullable int16u ccdid = 0;
   }
 
   response struct FindClientCertificateResponse = 12 {
@@ -10536,9 +10559,9 @@ provisional cluster TlsCertificateManagement = 2049 {
     int16u ccdid = 0;
   }
 
-  /** This command SHALL provision the provided certificate for the passed in CAID. */
+  /** This command SHALL provision a newly provided certificate, or rotate an existing one, based on the contents of the CAID field. */
   command access(invoke: administer) ProvisionRootCertificate(ProvisionRootCertificateRequest): ProvisionRootCertificateResponse = 0;
-  /** This command SHALL return the TLSCertStruct for the passed in CAID. */
+  /** This command SHALL return the specified TLS root certificate, or all TLS provisioned root certificates, based on the contents of the CAID field. */
   command FindRootCertificate(FindRootCertificateRequest): FindRootCertificateResponse = 2;
   /** This command SHALL return the CAID for the passed in fingerprint. */
   command LookupRootCertificate(LookupRootCertificateRequest): LookupRootCertificateResponse = 4;
@@ -10546,13 +10569,13 @@ provisional cluster TlsCertificateManagement = 2049 {
   command access(invoke: administer) RemoveRootCertificate(RemoveRootCertificateRequest): DefaultSuccess = 6;
   /** This command SHALL be generated to request the Node generates a Certificate Signing Request. */
   command access(invoke: administer) TLSClientCSR(TLSClientCSRRequest): TLSClientCSRResponse = 7;
-  /** This command SHALL be generated to request the Node provisions the provided Client Certificate Details. */
+  /** This command SHALL be generated to request the Node provisions newly provided Client Certificate Details, or rotate an existing client certificate. */
   command access(invoke: administer) ProvisionClientCertificate(ProvisionClientCertificateRequest): ProvisionClientCertificateResponse = 9;
-  /** This command SHALL return the TLSClientCertificateDetailStruct for the passed in CCDID. */
+  /** This command SHALL return the TLSClientCertificateDetailStruct for the passed in CCDID, or all TLS client certificates, based on the contents of the CCDID field. */
   command FindClientCertificate(FindClientCertificateRequest): FindClientCertificateResponse = 11;
   /** This command SHALL return the CCDID for the passed in Fingerprint. */
   command LookupClientCertificate(LookupClientCertificateRequest): LookupClientCertificateResponse = 13;
-  /** This command SHALL be generated to request the Node removes the certificate provisioned to the provided Client Certificate Details ID. */
+  /** This command SHALL be used to request the Node removes all stored information for the provided CCDID. */
   command access(invoke: administer) RemoveClientCertificate(RemoveClientCertificateRequest): DefaultSuccess = 15;
 }
 

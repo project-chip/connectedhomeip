@@ -7220,9 +7220,9 @@ namespace InstalledChimeSounds {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace InstalledChimeSounds
 
-namespace ActiveChimeID {
+namespace SelectedChime {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace ActiveChimeID
+} // namespace SelectedChime
 
 namespace Enabled {
 static constexpr AttributeId Id = 0x00000002;
