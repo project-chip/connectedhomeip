@@ -71,12 +71,6 @@ def str_to_attribute(cluster, str):
 # from matter_testing_infrastructure.chip.testing.spec_parsing import build_xml_clusters
 
 class TC_ACE_1_4(MatterBaseTest):
-# class TC_ACE_1_4(DeviceConformanceTests):
-    # async def setup_class_helper(self):
-    #     await super().setup_class_helper()
-    #     self.xml_clusters, self.problems = build_xml_clusters()
-    #     self.xml_device_types, problems = build_xml_device_types()
-    #     self.problems.extend(problems)
 
     async def write_acl(self, acl):
         # This returns an attribute status
@@ -118,16 +112,11 @@ class TC_ACE_1_4(MatterBaseTest):
 
     @async_test_body
     async def test_TC_ACE_1_4(self):
-        # await super().setup_class_helper()
         self.xml_clusters, self.problems = build_xml_clusters()
         self.xml_device_types, problems = build_xml_device_types()
         self.problems.extend(problems)
         device_ids = sorted(self.xml_device_types.keys())
         read_request = await self.default_controller.Read(self.dut_node_id, [()])
-        
-        # for i in device_ids:
-        #     name = self.xml_device_types[i].name
-        #     print((i, name))
         
         self.device_list = []
         self.endpoint_list = []
@@ -147,7 +136,6 @@ class TC_ACE_1_4(MatterBaseTest):
                 device_type = self.xml_device_types[device_id]
                 server_clusters = device_type.server_clusters
                 for cluster_id in server_clusters:
-                    # print(cluster_id, device_type.server_clusters[cluster_id])
                     if isinstance(device_type.server_clusters[cluster_id].conformance, conformance.mandatory):
                         
                         for attribute in self.xml_clusters[cluster_id].attributes:
@@ -158,25 +146,8 @@ class TC_ACE_1_4(MatterBaseTest):
                             chosen_attribute = None
                         chosen_vars = {"Device": device_id, "Cluster": cluster_id, "Attribute": attribute}
                         break
-        # print(chosen_vars)
-        
-
-        # parse_single_device_type(None)
-        # p vars(self.xml_device_types[2128]).keys()
-        # dict_keys(['name', 'revision', 'server_clusters', 'client_clusters', 'classification_class', 'classification_scope'])
-
-        # xml = self.template.render(device_type_id=self.device_type_id, revision=self.revision, classification_class=self.classification_class,
-        #                            classification_scope=self.classification_scope, clusters=self.clusters)
-        # et = ElementTree.fromstring(xml)
-
-
-    # async def setup_class_helper(self):
-    #     await super().setup_class_helper()
-    #     self.xml_clusters, self.problems = build_xml_clusters()
-    #     self.xml_device_types, problems = build_xml_device_types()
-    #     self.problems.extend(problems)
         # TODO: Guard these on the PICS
-
+        # TODO: Are these asserts relevant if we don't pass CLI arguments anymore?
         # asserts.assert_true('PIXIT.ACE.APPENDPOINT' in self.matter_test_config.global_test_params,
         #                     "PIXIT.ACE.APPENDPOINT must be included on the command line in "
         #                     "the --int-arg flag as PIXIT.ACE.APPENDPOINT:<endpoint>")
@@ -190,16 +161,11 @@ class TC_ACE_1_4(MatterBaseTest):
         #                     "PIXIT.ACE.APPDEVTYPEID must be included on the command line in "
         #                     "the --int-arg flag as PIXIT.ACE.APPDEVTYPEID:<device_type_id>")
         cluster_str = self.xml_clusters[chosen_vars["Cluster"]].name
-        # cluster_str = self.xml_clusters[cluster_id].name
-        # cluster_str = self.matter_test_config.global_test_params['PIXIT.ACE.APPCLUSTER']
         attribute_str = self.xml_clusters[chosen_vars["Cluster"]].attributes[chosen_vars["Attribute"]].name
-        # attribute_str = self.matter_test_config.global_test_params['PIXIT.ACE.APPATTRIBUTE']
         self.cluster = str_to_cluster(cluster_str)
         self.attribute = str_to_attribute(self.cluster, attribute_str)
-        # self.devtype = self.matter_test_config.global_test_params['PIXIT.ACE.APPDEVTYPEID']
         self.devtype = chosen_vars["Device"]
         self.endpoint = next(iter(self.endpoint_list))
-        # self.endpoint = self.matter_test_config.global_test_params['PIXIT.ACE.APPENDPOINT']
 
         asserts.assert_true(self.cluster is not None, "Invalid cluster name")
         asserts.assert_true(self.attribute is not None, "Invalue attribute name")
