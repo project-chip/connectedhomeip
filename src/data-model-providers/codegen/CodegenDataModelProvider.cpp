@@ -159,6 +159,17 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
                                                                               TLV::TLVReader & input_arguments,
                                                                               CommandHandler * handler)
 {
+    // Some commands are registered of ALL endpoints, so make sure first that
+    // the cluster actually exists on this endpoint before trying command handling
+    const EmberAfCluster * cluster = FindServerCluster(request.path);
+    if (cluster == nullptr)
+    {
+        // this is not a valid cluster. Return the right command.
+        std::optional<unsigned> endpoint_index = TryFindEndpointIndex(request.path.mEndpointId);
+        return endpoint_index.has_value() ? Protocols::InteractionModel::Status::UnsupportedCluster
+                                          : Protocols::InteractionModel::Status::UnsupportedEndpoint;
+    }
+
     CommandHandlerInterface * handler_interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
 
