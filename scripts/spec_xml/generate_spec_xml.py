@@ -26,7 +26,6 @@ import click
 from chip.testing.spec_parsing import build_xml_clusters
 from paths import get_chip_root, get_documentation_file_path, get_in_progress_defines
 
-
 CURRENT_IN_PROGRESS_DEFINES = [
     "cameras",
     "closures",
@@ -131,8 +130,9 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
     if include_in_progress == 'All':
         cmd.extend(['-a', 'in-progress'])
     elif include_in_progress == 'Current':
-        cmd.extend(['-a'])
-        cmd.extend(CURRENT_IN_PROGRESS_DEFINES)
+        for d in CURRENT_IN_PROGRESS_DEFINES:
+            cmd.extend(['-a'])
+            cmd.extend([d])
 
     if (dry_run):
         print(cmd)
@@ -248,11 +248,22 @@ def scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_prog
 
 def dump_versions(scraper, spec_root, output_dir, legacy):
     sha_file = os.path.abspath(os.path.join(output_dir, 'spec_sha'))
+    tag_file = os.path.abspath(os.path.join(output_dir, 'spec_tag'))
     out = subprocess.run(['git', 'rev-parse', 'HEAD'],
                          capture_output=True, encoding="utf8", cwd=spec_root)
     sha = out.stdout
     with open(sha_file, 'wt', encoding='utf8') as output:
         output.write(sha)
+    cmd = ['git', 'show-ref',  '--tags']
+    out = subprocess.run(cmd, capture_output=True, encoding="utf-8", cwd=spec_root)
+    tags = out.stdout.splitlines()
+    tag = [t for t in tags if sha.strip() in t]
+    if tag:
+        with open(tag_file, 'wt', encoding='utf8') as output:
+            output.write(f'{tag[0].split("/")[-1]}\n')
+    else:
+        print(f"WARNING: no tag found for sha {sha}")
+        os.remove(tag_file)
 
     scraper_file = os.path.abspath(os.path.join(output_dir, 'scraper_version'))
     version_cmd = 'version'
