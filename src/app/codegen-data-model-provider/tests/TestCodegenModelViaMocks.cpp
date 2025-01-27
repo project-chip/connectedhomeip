@@ -1319,6 +1319,30 @@ TEST(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
     }
 }
 
+TEST(TestCodegenModelViaMocks, AcceptedCommandValidity)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    // register a CHI on ALL endpoints
+    CustomListCommandHandler handler(chip::NullOptional, MockClusterId(1));
+    handler.SetHandleCommands(true);
+
+    handler.SetOverrideAccepted(true);
+    handler.AcceptedVec().push_back(1234);
+    handler.AcceptedVec().push_back(999);
+
+    // Command succeeds on a valid endpoint
+    EXPECT_TRUE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234)).has_value());
+
+    // but not if the command is invalid
+    EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 0x1122)).has_value());
+
+    // Fails on an invalid endpoint (even if the handler is on wildcard endpoint)
+    EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kEndpointIdThatIsMissing, MockClusterId(1), 1234)).has_value());
+    EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kEndpointIdThatIsMissing, MockClusterId(1), 0x1122)).has_value());
+}
+
 TEST(TestCodegenModelViaMocks, CommandHandlerInterfaceValidity)
 {
     UseMockNodeConfig config(gTestNodeConfig);
