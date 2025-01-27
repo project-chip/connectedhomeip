@@ -184,7 +184,7 @@ void BaseApplicationDelegate::OnCommissioningSessionStopped()
 
 void BaseApplicationDelegate::OnCommissioningWindowClosed()
 {
-#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
     if (!BaseApplication::GetProvisionStatus() && !isComissioningStarted)
     {
         int32_t status = wfx_power_save(RSI_SLEEP_MODE_8, DEEP_SLEEP_WITH_RAM_RETENTION);
@@ -261,7 +261,7 @@ CHIP_ERROR BaseApplication::Init()
      * Wait for the WiFi to be initialized
      */
     ChipLogProgress(AppServer, "APP: Wait WiFi Init");
-    while (!wfx_hw_ready())
+    while (!IsStationReady())
     {
         osDelay(pdMS_TO_TICKS(10));
     }

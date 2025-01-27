@@ -16,34 +16,9 @@
 #    limitations under the License.
 #
 
-import string
 import sys
-from dataclasses import dataclass
 
-import chip.clusters as Clusters
-from chip.clusters import Attribute
-from MockTestRunner import MockTestRunner
-
-c = Clusters.IcdManagement
-attr = c.Attributes
-uat = c.Bitmaps.UserActiveModeTriggerBitmap
-
-
-@dataclass
-class ICDMData():
-    FeatureMap: int
-    IdleModeDuration: int
-    ActiveModeDuration: int
-    ActiveModeThreshold: int
-    RegisteredClients: list
-    ICDCounter: int
-    ClientsSupportedPerFabric: int
-    UserActiveModeTriggerHint: int
-    UserActiveModeTriggerInstruction: string
-    OperatingMode: c.Enums.OperatingModeEnum
-    MaximumCheckInBackOff: int
-    expect_pass: bool
-
+from common_icdm_data import ICDMData, c, run_tests, uat
 
 long_string = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut e"
 too_long_string = long_string + "1"
@@ -217,35 +192,11 @@ TEST_CASES = [
 ]
 
 
-def test_spec_to_attribute_cache(test_icdm: ICDMData) -> Attribute.AsyncReadTransaction.ReadResponse:
-    resp = Attribute.AsyncReadTransaction.ReadResponse({}, [], {})
-    resp.attributes = {0: {c: {attr.FeatureMap: test_icdm.FeatureMap, attr.IdleModeDuration: test_icdm.IdleModeDuration, attr.ActiveModeDuration: test_icdm.ActiveModeDuration, attr.ActiveModeThreshold: test_icdm.ActiveModeThreshold,
-                               attr.RegisteredClients: test_icdm.RegisteredClients, attr.ICDCounter: test_icdm.ICDCounter,
-                               attr.ClientsSupportedPerFabric: test_icdm.ClientsSupportedPerFabric, attr.UserActiveModeTriggerHint: test_icdm.UserActiveModeTriggerHint,
-                               attr.UserActiveModeTriggerInstruction: test_icdm.UserActiveModeTriggerInstruction, attr.OperatingMode: test_icdm.OperatingMode, attr.MaximumCheckInBackOff: test_icdm.MaximumCheckInBackOff}}}
-    return resp
-
-
 def main():
     pics = {"ICDM.S.A0000": True, "ICDM.S.A0001": True, "ICDM.S.A0002": True, "ICDM.S.A0003": True, "ICDM.S.A0004": True,
             "ICDM.S.A0005": True, "ICDM.S.A0006": True, "ICDM.S.A0007": True, "ICDM.S.A0008": True, "ICDM.S.A0009": True, }
 
-    test_runner = MockTestRunner(
-        'TC_ICDM_2_1', 'TC_ICDM_2_1', 'test_TC_ICDM_2_1', 0, pics)
-    failures = []
-    for idx, t in enumerate(TEST_CASES):
-        ok = test_runner.run_test_with_mock_read(
-            test_spec_to_attribute_cache(t)) == t.expect_pass
-        if not ok:
-            failures.append(f"Measured test case failure: {idx} {t}")
-
-    test_runner.Shutdown()
-    print(
-        f"Test of tests: run {len(TEST_CASES)}, test response correct: {len(TEST_CASES) - len(failures)} | test response incorrect: {len(failures)}")
-    for f in failures:
-        print(f)
-
-    return 1 if failures else 0
+    return run_tests(pics, 'TC_ICDM_2_1', TEST_CASES, 'test_TC_ICDM_2_1')
 
 
 if __name__ == "__main__":
