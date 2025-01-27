@@ -30,7 +30,7 @@
 #include <lib/support/SafeInt.h>
 #include <platform/internal/NFCCommissioningManager.h>
 
-#include <winscard.h>
+#include <PCSC/winscard.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
 
