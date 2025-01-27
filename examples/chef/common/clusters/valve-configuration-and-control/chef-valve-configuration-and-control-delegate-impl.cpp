@@ -144,7 +144,7 @@ chefValveConfigurationAndControlReadCallback(chip::EndpointId endpointId, chip::
 void emberAfValveConfigurationAndControlClusterInitCallback(chip::EndpointId endpointId)
 {
     // Currently this cluster delegate handles only one endpoint.
-    VerifyOrDieWithMsg(endpointId == 1, DeviceLayer, "ValveConfigurationAndControl cluster is only eabled for endpoint 1.");
+    VerifyOrDieWithMsg(endpointId == 1, DeviceLayer, "ValveConfigurationAndControl cluster is only enabled for endpoint 1.");
 
     // Ensures this is called only once
     VerifyOrDieWithMsg(gValveConfigurationAndControlDelegate == nullptr, DeviceLayer,
