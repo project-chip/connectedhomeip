@@ -190,6 +190,9 @@ jobs:
                     out/telink-tl7218x-light-ota-shell-factory-data/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
             - name: Build example Telink (tl721x retention) Light Switch App with OTA (LZMA), Factory Data
               # Run test for master and all PRs
               run: |
