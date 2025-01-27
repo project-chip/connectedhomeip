@@ -32,16 +32,12 @@ using namespace chip::app::Clusters::Actions;
 using namespace chip::app::Clusters::Actions::Attributes;
 using namespace chip::Protocols::InteractionModel;
 
-static constexpr size_t kActionsDelegateTableSize =
-    MATTER_DM_ACTIONS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-
 namespace {
 Delegate * gDelegateTable[kActionsDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Actions::Id, MATTER_DM_ACTIONS_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kActionsDelegateTableSize ? nullptr : gDelegateTable[ep]);
+    return (endpoint >= kActionsDelegateTableSize ? nullptr : gDelegateTable[endpoint]);
 }
 
 } // namespace
@@ -50,11 +46,9 @@ ActionsServer ActionsServer::sInstance;
 
 void ActionsServer::SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Actions::Id, MATTER_DM_ACTIONS_CLUSTER_SERVER_ENDPOINT_COUNT);
-    // if endpoint is found
-    if (ep < kActionsDelegateTableSize)
+    if (endpoint < kActionsDelegateTableSize)
     {
-        gDelegateTable[ep] = delegate;
+        gDelegateTable[endpoint] = delegate;
     }
 }
 
@@ -92,6 +86,30 @@ void ActionsServer::OnActionFailed(EndpointId endpoint, uint16_t actionId, uint3
     }
 }
 
+CHIP_ERROR ActionsServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    VerifyOrDie(aPath.mClusterId == Actions::Id);
+
+    switch (aPath.mAttributeId)
+    {
+    case ActionList::Id: {
+        // The encoder will automatically create the outer AttributeDataIB container
+        // We just need to encode the array of actions
+        ReturnErrorOnFailure(aEncoder.EncodeList(
+            [this, aPath](const auto & encoder) -> CHIP_ERROR { return this->ReadActionListAttribute(aPath, encoder); }));
+        return CHIP_NO_ERROR;
+    }
+    case EndpointLists::Id: {
+        ReturnErrorOnFailure(aEncoder.EncodeList(
+            [this, aPath](const auto & encoder) -> CHIP_ERROR { return this->ReadEndpointListAttribute(aPath, encoder); }));
+        return CHIP_NO_ERROR;
+    }
+    default:
+        break;
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ActionsServer::ReadActionListAttribute(const ConcreteReadAttributePath & aPath,
                                                   const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
@@ -101,14 +119,19 @@ CHIP_ERROR ActionsServer::ReadActionListAttribute(const ConcreteReadAttributePat
         ChipLogError(Zcl, "Actions delegate is null!!!");
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    for (uint16_t i = 0; i <= kMaxActionListLength; i++)
+
+    for (uint16_t i = 0; i < kMaxActionListLength; i++)
     {
         ActionStructStorage action;
-
         CHIP_ERROR err = delegate->ReadActionAtIndex(i, action);
+
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
             return CHIP_NO_ERROR;
+        }
+        else if (err != CHIP_NO_ERROR)
+        {
+            return err;
         }
 
         ReturnErrorOnFailure(encoder.Encode(action));
@@ -125,7 +148,7 @@ CHIP_ERROR ActionsServer::ReadEndpointListAttribute(const ConcreteReadAttributeP
         ChipLogError(Zcl, "Actions delegate is null!!!");
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    for (uint16_t i = 0; i <= kMaxEndpointListLength; i++)
+    for (uint16_t i = 0; i < kMaxEndpointListLength; i++)
     {
         EndpointListStorage epList;
 
@@ -136,26 +159,6 @@ CHIP_ERROR ActionsServer::ReadEndpointListAttribute(const ConcreteReadAttributeP
         }
 
         ReturnErrorOnFailure(encoder.Encode(epList));
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ActionsServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    VerifyOrDie(aPath.mClusterId == Actions::Id);
-
-    switch (aPath.mAttributeId)
-    {
-    case ActionList::Id: {
-        return aEncoder.EncodeList(
-            [this, aPath](const auto & encoder) -> CHIP_ERROR { return this->ReadActionListAttribute(aPath, encoder); });
-    }
-    case EndpointLists::Id: {
-        return aEncoder.EncodeList(
-            [this, aPath](const auto & encoder) -> CHIP_ERROR { return this->ReadEndpointListAttribute(aPath, encoder); });
-    }
-    default:
-        break;
     }
     return CHIP_NO_ERROR;
 }

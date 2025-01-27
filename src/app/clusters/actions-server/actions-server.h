@@ -22,6 +22,16 @@
 #include <app/CommandHandlerInterface.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+namespace {
+// Zero'th index will be used for unit tests only.
+static constexpr size_t kActionsDelegateTableSize =
+#ifdef ZCL_USING_ACTIONS_CLUSTER_SERVER
+    MATTER_DM_ACTIONS_CLUSTER_SERVER_ENDPOINT_COUNT +
+#endif
+    CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1;
+
+} // namespace
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -97,7 +107,7 @@ struct EndpointListStorage : public Structs::EndpointListStruct::Type
         type              = epListType;
         size_t epListSize = std::min(endpointList.size(), kEndpointListMaxSize);
 
-        for (uint8_t index = 0; index < epListSize; index++)
+        for (size_t index = 0; index < epListSize; index++)
         {
             mEpList[index] = endpointList[index];
         }
@@ -137,12 +147,12 @@ public:
 
     static void SetDefaultDelegate(EndpointId endpointId, Delegate * aDelegate);
 
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
 private:
     static ActionsServer sInstance;
     static constexpr size_t kMaxEndpointListLength = 256u;
     static constexpr size_t kMaxActionListLength   = 256u;
-
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
     CHIP_ERROR ReadActionListAttribute(const ConcreteReadAttributePath & aPath,
                                        const AttributeValueEncoder::ListEncodeHelper & encoder);
