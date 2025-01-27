@@ -217,8 +217,10 @@ CHIP_ERROR BridgeInit(FabricAdminDelegate * delegate)
 {
     MatterEcosystemInformationPluginServerInitCallback();
     ReturnErrorOnFailure(gAdministratorCommissioningCommandHandler.Init());
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gBridgedDeviceInformationCommandHandler));
-    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(&gBridgedDeviceBasicInformationAttributes), CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(
+        CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gBridgedDeviceInformationCommandHandler));
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(&gBridgedDeviceBasicInformationAttributes),
+                        CHIP_ERROR_INTERNAL);
 
     BridgedDeviceManager::Instance().Init();
     FabricBridge::Instance().SetDelegate(delegate);
