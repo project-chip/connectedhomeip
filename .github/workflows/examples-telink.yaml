@@ -200,6 +200,7 @@ jobs:
                     telink tl7218 light-app-ota-shell-factory-data \
                     out/telink-tl7218-light-ota-shell-factory-data/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
+
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
@@ -213,6 +214,9 @@ jobs:
                     telink tl7218_retention light-switch-app-ota-compress-lzma-factory-data \
                     out/telink-tl7218_retention-light-switch-ota-compress-lzma-factory-data/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
 
             - name: Build example Telink (B92) Light Switch App with OTA (LZMA), Shell, Factory Data, 4Mb flash
               # Run test for master and all PRs
@@ -252,8 +256,8 @@ jobs:
             #         out/telink-tlsr9258a-ota-requestor/zephyr/zephyr.elf \
             #         /tmp/bloat_reports/
 
-            - name: clean out build output
-              run: rm -rf ./out
+            # - name: clean out build output
+            #   run: rm -rf ./out
 
             - name: Build example Telink (B91 USB) Pump App
               # Run test for master and s07641069 PRs
