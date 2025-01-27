@@ -1401,14 +1401,20 @@ TEST(TestCodegenModelViaMocks, AcceptedGeneratedCommandsOnInvalidEndpoints)
 
     // Make the lists non-empty som something is returned.
     handler.AcceptedVec().push_back(1234);
+    handler.AcceptedVec().push_back(2345);
     handler.GeneratedVec().push_back(33);
+    handler.GeneratedVec().push_back(44);
 
     EXPECT_TRUE(model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).IsValid());
+    EXPECT_TRUE(model.NextAcceptedCommand(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234)).IsValid());
     EXPECT_TRUE(model.FirstGeneratedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).HasValidIds());
+    EXPECT_TRUE(model.NextGeneratedCommand(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 33)).HasValidIds());
 
     // invalid endpoint
     EXPECT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).IsValid());
+    EXPECT_FALSE(model.NextAcceptedCommand(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234)).IsValid());
     EXPECT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).HasValidIds());
+    EXPECT_FALSE(model.NextGeneratedCommand(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 33)).HasValidIds());
 }
 
 TEST(TestCodegenModelViaMocks, CommandHandlerInterfaceAcceptedCommands)
