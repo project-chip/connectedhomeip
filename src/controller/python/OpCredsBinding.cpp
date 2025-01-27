@@ -712,8 +712,6 @@ PyChipError pychip_GetCompletionError()
 
 PyChipError pychip_DeviceController_SetDACRevocationSetPath(const char * dacRevocationSetPath)
 {
-    VerifyOrReturnError(dacRevocationSetPath != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
-
     chip::Credentials::DeviceAttestationRevocationDelegate * dacRevocationDelegate =
         GetTestAttestationRevocationDelegate(dacRevocationSetPath);
     VerifyOrReturnError(dacRevocationDelegate != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
