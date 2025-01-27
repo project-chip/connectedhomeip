@@ -638,7 +638,7 @@ void ProcessEvent(WifiPlatformEvent event)
     }
 }
 
-sl_status_t InitSiWxWifi(void)
+sl_status_t InitWiFiStack(void)
 {
     int32_t status = sl_matter_wifi_init();
     if (status != RSI_SUCCESS)

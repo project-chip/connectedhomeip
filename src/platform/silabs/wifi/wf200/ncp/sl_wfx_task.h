@@ -38,12 +38,16 @@ extern TaskHandle_t wfx_bus_task_handle;
 extern "C" {
 #endif
 
-/****************************************************************************
- * @fn void wfx_bus_start(void)
+/***************************************************************************
+ * @fn  sl_status_t wfx_bus_start()
  * @brief
- * Start wfx bus communication task.
- *****************************************************************************/
-void wfx_bus_start(void);
+ * Start WFX bus communication task.
+ * @param[in] None
+ * @return sl_status_t SL_STATUS_OK, if the initialization succeeded
+ *                     SL_STATUS_ALLOCATION_FAILED, if there are a memory allocation failure,
+ *                     SL_STATUS_FAILURE, otherwise
+ ******************************************************************************/
+sl_status_t wfx_bus_start(void);
 
 /****************************************************************************
  * @fn  bool wfx_bus_is_receive_processing(void)

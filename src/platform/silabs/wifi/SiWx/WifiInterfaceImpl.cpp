@@ -553,7 +553,7 @@ CHIP_ERROR ResetCounters()
     return CHIP_NO_ERROR;
 }
 
-sl_status_t InitSiWxWifi(void)
+sl_status_t InitWiFiStack(void)
 {
     sl_status_t status = SL_STATUS_OK;
 

@@ -1185,3 +1185,11 @@ void wfx_cancel_scan(void)
     }
     scan_cb = nullptr;
 }
+
+sl_status_t InitWiFiStack(void)
+{
+    // TODO: This function should include sl_wfx_hw_init() and sl_wfx_init() functions. Only done now to make MatterConfig platform
+    // agnostic.
+    // Start wfx bus communication task.
+    return wfx_bus_start();
+}
