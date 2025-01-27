@@ -48,8 +48,9 @@ def extract_runs_args(py_script_path: str) -> Dict[str, Dict[str, str]]:
     runs_arg_lines: Dict[str, Dict[str, str]] = {}
 
     ci_args_section_lines = []
+
     with open(py_script_path, 'r', encoding='utf8') as py_script:
-        for line_idx, line in enumerate(py_script.readlines()):
+        for line in py_script.readlines():
             line = line.strip()
 
             # Append empty line to the line capture, so during YAML parsing
@@ -67,13 +68,15 @@ def extract_runs_args(py_script_path: str) -> Dict[str, Dict[str, str]]:
                 # Update the last line in the line capture.
                 ci_args_section_lines[-1] = " " + line.lstrip("#")
 
-    if not runs_arg_lines:
+    if found_ci_args_section:
         try:
             runs = yaml.safe_load(NamedStringIO("\n".join(ci_args_section_lines), py_script_path))
             for run, args in runs.get("test-runner-runs", {}).items():
                 runs_arg_lines[run] = {}
                 runs_arg_lines[run]['run'] = run
                 runs_arg_lines[run].update(args)
+
+            runs_arg_lines['skip-default-flags'] = runs.get("skip-default-flags", [])
         except yaml.YAMLError as e:
             logging.error(f"Failed to parse CI arguments YAML: {e}")
 
@@ -88,7 +91,7 @@ class MetadataReader:
 
     def __init__(self, env_yaml_file_path: str):
         """
-        Reads the YAML file and Constructs the environment object
+        Reads the YAML file and constructs the environment object
 
         Parameters:
 
@@ -96,7 +99,9 @@ class MetadataReader:
          Path to the environment file that contains the YAML configuration.
         """
         with open(env_yaml_file_path) as stream:
-            self.env: Dict[str, str] = yaml.safe_load(stream)
+            env_yaml = yaml.safe_load(stream)
+            self.env: Dict[str, str] = env_yaml.get("environment", {})
+            self.default_args: Dict[str, str] = env_yaml.get("default-arguments", {})
 
     def __resolve_env_vals__(self, metadata_dict: Dict[str, str]) -> None:
         """
@@ -142,17 +147,28 @@ class MetadataReader:
         runs_args = extract_runs_args(py_script_path)
 
         for run, attr in runs_args.items():
-            self.__resolve_env_vals__(attr)
+            if run == "skip-default-flags":
+                continue
+
+            resolved_args = self.default_args.copy()
+            resolved_args.update(attr)
+
+            skip_flags = runs_args.get("skip-default-flags", [])
+            for flag in skip_flags:
+                resolved_args.pop(flag, None)
+
+            self.__resolve_env_vals__(resolved_args)
+
             runs_metadata.append(Metadata(
                 py_script_path=py_script_path,
                 run=run,
-                app=attr.get("app", ""),
-                app_args=attr.get("app-args"),
-                app_ready_pattern=attr.get("app-ready-pattern"),
-                app_stdin_pipe=attr.get("app-stdin-pipe"),
-                script_args=attr.get("script-args"),
-                factory_reset=attr.get("factory-reset", False),
-                quiet=attr.get("quiet", True),
+                app=resolved_args.get("app", ""),
+                app_args=resolved_args.get("app-args"),
+                app_ready_pattern=resolved_args.get("app-ready-pattern"),
+                app_stdin_pipe=resolved_args.get("app-stdin-pipe"),
+                script_args=resolved_args.get("script-args"),
+                factory_reset=resolved_args.get("factory-reset", False),
+                quiet=resolved_args.get("quiet", True),
             ))
 
         return runs_metadata
