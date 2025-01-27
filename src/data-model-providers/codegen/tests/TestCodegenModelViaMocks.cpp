@@ -253,9 +253,7 @@ public:
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override { return kAdminSubjectDescriptor; }
 
-    Messaging::ExchangeContext * GetExchangeContext() const override {
-        return nullptr;
-    }
+    Messaging::ExchangeContext * GetExchangeContext() const override { return nullptr; }
 };
 
 /// Overrides Enumerate*Commands in the CommandHandlerInterface to allow
