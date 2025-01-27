@@ -70,9 +70,7 @@ class TestInvokeReturnCodes(MatterBaseTest):
                 cmd=Clusters.SoftwareDiagnostics.Commands.ResetWatermarks(),
                 endpoint=invalid_endpoint_id,
             )
-            asserts.assert_true(
-                False, "Unexpected command success on an invalid endpoint"
-            )
+            asserts.fail("Unexpected command success on an invalid endpoint")
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.UnsupportedEndpoint, "Unexpected error returned"
