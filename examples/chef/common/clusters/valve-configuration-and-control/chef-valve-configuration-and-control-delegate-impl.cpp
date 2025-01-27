@@ -79,7 +79,7 @@ chefValveConfigurationAndControlWriteCallback(chip::EndpointId endpointId, chip:
     case Attributes::RemainingDuration::Id: {
         CHIP_ERROR err;
         uint32_t * bufUint32 = reinterpret_cast<uint32_t *>(buffer);
-        if (NumericAttributeTraits<uint32_t>::IsNullValue(*bufUint32)) // Max value is interpreted as NULL
+        if (NumericAttributeTraits<uint32_t>::IsNullValue(*bufUint32))
         {
             ChipLogProgress(DeviceLayer, "Setting RemainingDuration to NULL.");
             err = SetRemainingDurationNull(endpointId);
@@ -129,7 +129,6 @@ chefValveConfigurationAndControlReadCallback(chip::EndpointId endpointId, chip::
             ChipLogError(DeviceLayer, "Unable to read RemainingDuration: %" CHIP_ERROR_FORMAT, err.Format());
             return chip::Protocols::InteractionModel::Status::Failure;
         }
-        // Max value is interpreted as NULL
         uint32_t val = duration.ValueOr(std::numeric_limits<uint32_t>::max());
         std::memcpy(buffer, &val, std::min<size_t>(maxReadLength, sizeof(uint32_t)));
         break;
