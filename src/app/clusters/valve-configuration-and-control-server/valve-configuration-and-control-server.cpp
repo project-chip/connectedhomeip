@@ -190,7 +190,8 @@ static void onValveConfigurationAndControlTick(System::Layer * systemLayer, void
 
     if (rDuration.Value() > 0)
     {
-        ValveConfigurationAndControl::SetRemainingDuration(ep, DataModel::MakeNullable<uint32_t>(--rDuration.Value()));
+        DataModel::Nullable<uint32_t> updatedDuration = DataModel::MakeNullable<uint32_t>(--rDuration.Value());
+        ValveConfigurationAndControl::SetRemainingDuration(ep, updatedDuration);
         startRemainingDurationTick(ep);
     }
     else
@@ -399,7 +400,7 @@ CHIP_ERROR GetRemainingDuration(EndpointId endpoint, DataModel::Nullable<uint32_
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SetRemainingDuration(EndpointId endpoint, DataModel::Nullable<uint32_t> duration)
+CHIP_ERROR SetRemainingDuration(EndpointId endpoint, const DataModel::Nullable<uint32_t> & duration)
 {
     uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
                                                           MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
