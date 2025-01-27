@@ -122,7 +122,7 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
         # Look for these specifically.
         # For 1.5 onward, we should separate these.
         if "Label-Cluster" in filename or "bridge-clusters" in filename:
-          continue
+            continue
         adoc = os.path.basename(filename).replace('.xml', '.adoc')
         if adoc not in cluster_files:
             print(f'Removing {adoc} as it was not in the generated spec document')
