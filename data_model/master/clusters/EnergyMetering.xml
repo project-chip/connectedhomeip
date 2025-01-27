@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,37 +54,38 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0042" name="Proxy Configuration Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Energy Metering Cluster" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial revision"/>
+    <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0042" name="ProxyConfiguration">
-      <provisionalConform/>
-    </clusterId>
+    <clusterId name="Energy Metering"/>
   </clusterIds>
-  <classification hierarchy="base" role="utility" picsCode="PXCFG" scope="Node"/>
+  <classification hierarchy="base" role="application" picsCode="" scope="Endpoint"/>
   <dataTypes>
-    <struct name="ConfigurationStruct">
-      <field id="1" name="ProxyAllNodes" type="bool" default="false">
-        <access read="true" write="true"/>
+    <struct name="MeteredEnergyStruct">
+      <field id="0" name="TariffComponentIDs" type="list">
+        <entry type="uint32"/>
         <mandatoryConform/>
-        <constraint type="desc"/>
       </field>
-      <field id="2" name="SourceList" type="list" default="empty">
-        <entry type="node-id"/>
-        <access read="true" write="true"/>
+      <field id="1" name="Energy" type="energy-mWh">
         <mandatoryConform/>
-        <constraint type="desc"/>
       </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="ConfigurationList" type="list" default="empty">
-      <entry type="ConfigurationStruct"/>
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+    <attribute id="0x0000" name="MeteredEnergy" type="list" default="null">
+      <entry type="MeteredEnergyStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="MeteredEnergyTimestamp" type="epoch-s" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
   </attributes>

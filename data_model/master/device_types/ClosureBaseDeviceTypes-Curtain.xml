@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -55,83 +55,69 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 
-:sectnums:
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0750" name="Ecosystem Information Cluster" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0234" name="Curtain" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
-  <clusterIds>
-    <clusterId id="0x0750" name="Ecosystem Information"/>
-  </clusterIds>
-  <classification hierarchy="base" role="utility" picsCode="ECOINFO" scope="Endpoint"/>
-  <dataTypes>
-    <struct name="EcosystemDeviceStruct">
-      <field id="0" name="DeviceName" type="string" default="empty">
-        <access fabricSensitive="true"/>
+  <classification superset="ClosureBase" class="simple" scope="endpoint"/>
+  <conditions>
+    <condition name="AnyDimension" summary="Availability of at least one Closure Dimension Cluster"/>
+    <condition name="DimensionA" summary="Availability of the Closure 1^st^ Dimension Cluster"/>
+    <condition name="DimensionB" summary="Availability of the Closure 2^nd^ Dimension Cluster"/>
+    <condition name="DimensionC" summary="Availability of the Closure 3^rd^ Dimension Cluster"/>
+    <condition name="DimensionD" summary="Availability of the Closure 4^th^ Dimension Cluster"/>
+  </conditions>
+  <clusters>
+    <cluster id="0x0003" name="Identify" side="server">
+      <mandatoryConform/>
+    </cluster>
+    <cluster id="0x0004" name="Groups" side="server">
+      <otherwiseConform>
+        <mandatoryConform>
+          <condition name="Active"/>
+        </mandatoryConform>
         <optionalConform/>
-        <constraint type="maxLength" value="64"/>
-      </field>
-      <field id="1" name="DeviceNameLastEdit" type="epoch-us" default="0">
-        <access fabricSensitive="true"/>
-      </field>
-      <field id="2" name="BridgedEndpoint" type="endpoint-no">
-        <access fabricSensitive="true"/>
-        <constraint type="desc"/>
-      </field>
-      <field id="3" name="OriginalEndpoint" type="endpoint-no">
-        <access fabricSensitive="true"/>
-        <constraint type="desc"/>
-      </field>
-      <field id="4" name="DeviceTypes" type="list">
-        <entry type="ref_DeviceTypeStruct"/>
-        <access fabricSensitive="true"/>
-        <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
-      <field id="5" name="UniqueLocationIDs" type="list">
-        <entry type="string">
-          <constraint type="maxLength" value="64"/>
-        </entry>
-        <access fabricSensitive="true"/>
-        <mandatoryConform/>
-        <constraint type="maxCount" value="64"/>
-      </field>
-      <field id="6" name="UniqueLocationIDsLastEdit" type="epoch-us" default="0">
-        <access fabricSensitive="true"/>
-        <mandatoryConform/>
-      </field>
-      <access fabricScoped="true"/>
-    </struct>
-    <struct name="EcosystemLocationStruct">
-      <field id="0" name="UniqueLocationID" type="string">
-        <access fabricSensitive="true"/>
-        <mandatoryConform/>
-        <constraint type="maxLength" value="64"/>
-      </field>
-      <field id="1" name="LocationDescriptor" type="locationdesc">
-        <access fabricSensitive="true"/>
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="LocationDescriptorLastEdit" type="epoch-us" default="0">
-        <access fabricSensitive="true"/>
-        <mandatoryConform/>
-      </field>
-      <access fabricScoped="true"/>
-    </struct>
-  </dataTypes>
-  <attributes>
-    <attribute id="0x0000" name="DeviceDirectory" type="list">
-      <entry type="EcosystemDeviceStruct"/>
-      <access read="true" readPrivilege="manage" fabricScoped="true"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      </otherwiseConform>
+    </cluster>
+    <cluster id="0x0062" name="Scenes Management" side="server">
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <andTerm>
+            <condition name="Active"/>
+            <condition name="AnyDimension"/>
+          </andTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </cluster>
+    <cluster id="0x0104" name="Closure Control" side="server">
       <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0001" name="LocationDirectory" type="list">
-      <entry type="EcosystemLocationStruct"/>
-      <access read="true" readPrivilege="manage" fabricScoped="true"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform/>
-    </attribute>
-  </attributes>
-</cluster>
+    </cluster>
+    <cluster id="0x0105" name="Closure 1st Dimension" side="server">
+      <optionalConform/>
+    </cluster>
+    <cluster id="0x0106" name="Closure 2nd Dimension" side="server">
+      <optionalConform>
+        <condition name="DimensionA"/>
+      </optionalConform>
+    </cluster>
+    <cluster id="0x0107" name="Closure 3rd Dimension" side="server">
+      <optionalConform>
+        <condition name="DimensionB"/>
+      </optionalConform>
+    </cluster>
+    <cluster id="0x0108" name="Closure 4th Dimension" side="server">
+      <optionalConform>
+        <condition name="DimensionC"/>
+      </optionalConform>
+    </cluster>
+    <cluster id="0x0109" name="Closure 5th Dimension" side="server">
+      <optionalConform>
+        <condition name="DimensionD"/>
+      </optionalConform>
+    </cluster>
+  </clusters>
+</deviceType>

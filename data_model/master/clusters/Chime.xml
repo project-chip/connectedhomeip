@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,11 +54,61 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x050B" name="Energy Tariff Calendar" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0556" name="Chime Cluster" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial revision"/>
+    <revision revision="1" summary="Initial release"/>
   </revisionHistory>
-  <classification class="simple" scope="endpoint"/>
-  <conditions/>
-</deviceType>
+  <clusterIds>
+    <clusterId id="0x0556" name="Chime"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="CHIME" scope="Endpoint"/>
+  <dataTypes>
+    <struct name="ChimeSoundStruct">
+      <field id="0" name="ChimeID" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Name" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <lengthBetween>
+            <from value="1"/>
+            <to value="48"/>
+          </lengthBetween>
+        </constraint>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="InstalledChimeSounds" type="list">
+      <entry type="ChimeSoundStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <countBetween>
+          <from value="1"/>
+          <to value="255"/>
+        </countBetween>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="SelectedChime" type="uint8" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="Enabled" type="bool" default="true">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="PlayChimeSound" direction="commandToServer" response="N">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+  </commands>
+</cluster>

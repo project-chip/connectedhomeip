@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -57,113 +57,133 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0450" name="Network Identity Management Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0802" name="TLS Client Management Cluster" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial revision"/>
+    <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0450" name="Network Identity Management"/>
+    <clusterId id="0x0802" name="TLS Client Management"/>
   </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="NETIM" scope="Endpoint"/>
+  <classification hierarchy="base" role="utility" picsCode="TLSCLIENT" scope="Node"/>
   <dataTypes>
-    <number name="Client Table" type=""/>
-    <enum name="NetworkIdentityStatus">
-      <item value="2" name="INVALID_SIGNATURE" summary="The provided signature is invalid">
+    <number name="TLSEndpointID" type="uint16"/>
+    <enum name="TLSEndpointStatusEnum">
+      <item value="0" name="Provisioned" summary="The endpoint is provisioned but is not currently in use">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="InUse" summary="The endpoint is provisioned and currently in use">
         <mandatoryConform/>
       </item>
     </enum>
-    <struct name="ClientEndorsementStruct">
-      <field id="0" name="NodeID" type="node-id" default="null">
-        <access fabricSensitive="true"/>
+    <struct name="TLSEndpointStruct">
+      <field id="0" name="EndpointID" type="TLSEndpointID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Hostname" type="octstr">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Port" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="CAID" type="TLSCAID">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="CCDID" type="TLSCCDID" default="null">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
-      <access fabricScoped="true"/>
-    </struct>
-    <struct name="ClientStruct">
-      <field id="0" name="ClientNumber" type="uint16">
+      <field id="5" name="Status" type="TLSEndpointStatusEnum">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="2047"/>
-      </field>
-      <field id="1" name="ClientIdentifier" type="octstr">
-        <mandatoryConform/>
-        <constraint type="maxLength" value="20"/>
-      </field>
-      <field id="2" name="Endorsements" type="list">
-        <entry type="ClientEndorsementStruct"/>
-        <mandatoryConform/>
-        <constraint type="countBetween" from="1" to="SupportedFabrics"/>
       </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="NetworkIdentifier" type="octstr">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+    <attribute id="0x0000" name="MaxProvisioned" type="uint8">
+      <access read="true" readPrivilege="view" fabricSensitive="true"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="maxLength" value="20"/>
     </attribute>
-    <attribute id="0x0001" name="NetworkIdentity" type="octstr" default="desc">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+    <attribute id="0x0001" name="CurrentProvisioned" type="uint8">
+      <access read="true" readPrivilege="view" fabricSensitive="true"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="maxLength" value="140"/>
     </attribute>
-    <attribute id="0x0002" name="Clients" type="list">
-      <entry type="ClientStruct"/>
-      <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+    <attribute id="0x0002" name="CurrentInUse" type="uint8">
+      <access read="true" readPrivilege="view" fabricSensitive="true"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="maxCount" value="ClientTableSize"/>
-    </attribute>
-    <attribute id="0x0003" name="ClientTableSize" type="uint16" default="500">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform/>
-      <constraint type="between" from="500" to="2047"/>
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="AddOrUpdateClient" direction="commandToServer" response="Y">
-      <access invokePrivilege="admin" fabricScoped="true" timed="true"/>
+    <command id="0x00" name="ProvisionEndpoint" direction="commandToServer" response="ProvisionEndpointResponse">
+      <quality largeMessage="true"/>
+      <access invokePrivilege="admin"/>
       <mandatoryConform/>
-      <field id="0" name="ClientIdentity" type="octstr">
+      <field id="0" name="Hostname" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="140"/>
       </field>
-      <field id="1" name="NodeID" type="node-id">
-        <optionalConform/>
+      <field id="1" name="Port" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="CAID" type="TLSCAID">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="CCDID" type="TLSCCDID" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="EndpointID" type="TLSEndpointID" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
       </field>
     </command>
-    <command id="0x01" name="RemoveClient" direction="commandToServer" response="Y">
-      <access invokePrivilege="admin" fabricScoped="true" timed="true"/>
+    <command id="0x01" name="ProvisionEndpointResponse" direction="responseFromServer">
+      <quality largeMessage="true"/>
       <mandatoryConform/>
-      <field id="0" name="ClientNumber" type="uint16">
-        <optionalConform choice="a"/>
-      </field>
-      <field id="1" name="ClientIdentifier" type="octstr">
-        <optionalConform choice="a"/>
-        <constraint type="maxLength" value="20"/>
+      <field id="0" name="EndpointID" type="TLSEndpointID">
+        <mandatoryConform/>
       </field>
     </command>
-    <command id="0x40" name="EndorseNetworkIdentityUpdate" direction="commandToServer" response="Y">
-      <access invokePrivilege="admin" fabricScoped="true" timed="true"/>
+    <command id="0x02" name="FindEndpoint" direction="commandToServer" response="FindEndpointResponse">
+      <quality largeMessage="true"/>
+      <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="NetworkIdentifier" type="octstr">
+      <field id="0" name="EndpointID" type="TLSEndpointID" default="null">
+        <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="20"/>
       </field>
-      <field id="1" name="PreviousNetworkIdentifiers" type="list">
-        <entry type="octstr">
-          <constraint type="maxLength" value="20"/>
-        </entry>
+    </command>
+    <command id="0x03" name="FindEndpointResponse" direction="responseFromServer">
+      <quality largeMessage="true"/>
+      <mandatoryConform/>
+      <field id="0" name="Endpoints" type="list">
+        <entry type="TLSEndpointStruct"/>
         <mandatoryConform/>
-        <constraint type="countBetween" from="1" to="3"/>
       </field>
-      <field id="2" name="Signature" type="octstr">
+    </command>
+    <command id="0x04" name="RemoveEndpoint" direction="commandToServer" response="N">
+      <quality largeMessage="true"/>
+      <access invokePrivilege="admin"/>
+      <mandatoryConform/>
+      <field id="0" name="EndpointID" type="TLSEndpointID">
         <mandatoryConform/>
-        <constraint type="maxLength" value="64"/>
       </field>
     </command>
   </commands>
+  <events>
+    <event id="0x00" name="EndpointProvisioned" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="EndpointID" type="TLSEndpointID">
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x01" name="EndpointRemoved" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="EndpointID" type="TLSEndpointID">
+        <mandatoryConform/>
+      </field>
+    </event>
+  </events>
 </cluster>
