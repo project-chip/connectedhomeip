@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "protocols/interaction_model/StatusCode.h"
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -417,6 +418,17 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
                                                                               TLV::TLVReader & input_arguments,
                                                                               CommandHandler * handler)
 {
+    // As some CommandHandlerInterface commands are registered on wildcard interfaces,
+    // the valid endpoint/cluster check is done BEFORE attemptiong command handler interface handling
+    const EmberAfCluster * cluster = FindServerCluster(request.path);
+    if (cluster == nullptr)
+    {
+        // The path `endpoint/cluster` is not valid. Determine what failed: endpoint id or cluster id.
+        return TryFindEndpointIndex(request.path.mEndpointId).has_value()
+            ? Protocols::InteractionModel::Status::UnsupportedCluster
+            : Protocols::InteractionModel::Status::UnsupportedEndpoint;
+    }
+
     CommandHandlerInterface * handler_interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
 
@@ -723,6 +735,13 @@ DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const Conc
 
 std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
 {
+    // As some CommandHandlerInterface commands are registered on wildcard interfaces,
+    // the valid endpoint/cluster check is done BEFORE attemptiong command handler interface handling
+    const EmberAfCluster * cluster = FindServerCluster(path);
+
+    VerifyOrReturnValue(cluster != nullptr, std::nullopt);
+
+    // This is a valid endpoint/cluster, can use CommandHandlerInterface to check for it.
     auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
                                      .FindCommandEntry(EnumeratorCommandFinder::Operation::kFindExact, path);
 
@@ -731,11 +750,8 @@ std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedComma
         return handlerInterfaceValue->IsValid() ? std::make_optional(handlerInterfaceValue->info) : std::nullopt;
     }
 
-    const EmberAfCluster * cluster = FindServerCluster(path);
-
-    VerifyOrReturnValue(cluster != nullptr, std::nullopt);
+    // CommandHandlerInterface did not handle it, so check within ember.
     VerifyOrReturnValue(mAcceptedCommandsIterator.Exists(cluster->acceptedCommandList, path.mCommandId), std::nullopt);
-
     return CommandEntryFrom(path, path.mCommandId).info;
 }
 
