@@ -65,7 +65,17 @@ constexpr uint8_t kKeyBuffer3a[] = {
     0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f
 };
 
-TEST(TestICDMonitoringTable, TestEntryAssignationOverload)
+struct TestICDMonitoringTable  : public ::testing::Test
+{
+    void SetUp() override
+    {
+#if CHIP_CRYPTO_PSA
+        ASSERT_EQ(psa_crypto_init(), PSA_SUCCESS);
+#endif
+    }
+};
+
+TEST_F(TestICDMonitoringTable, TestEntryAssignationOverload)
 {
     TestSessionKeystoreImpl keystore;
     ICDMonitoringEntry entry(&keystore);
@@ -100,7 +110,7 @@ TEST(TestICDMonitoringTable, TestEntryAssignationOverload)
     EXPECT_TRUE(entry2.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
 }
 
-TEST(TestICDMonitoringTable, TestEntryMaximumSize)
+TEST_F(TestICDMonitoringTable, TestEntryMaximumSize)
 {
     TestPersistentStorageDelegate storage;
     TestSessionKeystoreImpl keystore;
@@ -114,7 +124,7 @@ TEST(TestICDMonitoringTable, TestEntryMaximumSize)
     EXPECT_EQ(CHIP_NO_ERROR, table.Set(0, entry));
 }
 
-TEST(TestICDMonitoringTable, TestEntryKeyFunctions)
+TEST_F(TestICDMonitoringTable, TestEntryKeyFunctions)
 {
     TestSessionKeystoreImpl keystore;
     ICDMonitoringEntry entry(&keystore);
@@ -140,7 +150,7 @@ TEST(TestICDMonitoringTable, TestEntryKeyFunctions)
     EXPECT_EQ(entry.DeleteKey(), CHIP_NO_ERROR);
 }
 
-TEST(TestICDMonitoringTable, TestSaveAndLoadRegistrationValue)
+TEST_F(TestICDMonitoringTable, TestSaveAndLoadRegistrationValue)
 {
     TestPersistentStorageDelegate storage;
     TestSessionKeystoreImpl keystore;
@@ -229,7 +239,7 @@ TEST(TestICDMonitoringTable, TestSaveAndLoadRegistrationValue)
               0);
 }
 
-TEST(TestICDMonitoringTable, TestSaveAllInvalidRegistrationValues)
+TEST_F(TestICDMonitoringTable, TestSaveAllInvalidRegistrationValues)
 {
     TestPersistentStorageDelegate storage;
     TestSessionKeystoreImpl keystore;
@@ -271,7 +281,7 @@ TEST(TestICDMonitoringTable, TestSaveAllInvalidRegistrationValues)
     EXPECT_EQ(CHIP_ERROR_INVALID_ARGUMENT, table.Set(0, entry5));
 }
 
-TEST(TestICDMonitoringTable, TestSaveLoadRegistrationValueForMultipleFabrics)
+TEST_F(TestICDMonitoringTable, TestSaveLoadRegistrationValueForMultipleFabrics)
 {
     TestPersistentStorageDelegate storage;
     TestSessionKeystoreImpl keystore;
@@ -339,7 +349,7 @@ TEST(TestICDMonitoringTable, TestSaveLoadRegistrationValueForMultipleFabrics)
               0);
 }
 
-TEST(TestICDMonitoringTable, TestDeleteValidEntryFromStorage)
+TEST_F(TestICDMonitoringTable, TestDeleteValidEntryFromStorage)
 {
     TestPersistentStorageDelegate storage;
     TestSessionKeystoreImpl keystore;
