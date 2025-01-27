@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "protocols/interaction_model/StatusCode.h"
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -32,6 +31,7 @@
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 // separated out for code-reuse
 #include <app/ember_coupling/EventPathValidity.mixin.h>
