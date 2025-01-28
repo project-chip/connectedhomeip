@@ -35,7 +35,7 @@
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
-                                         async_test_body, default_matter_test_main)
+                                         default_matter_test_main, has_attribute, run_if_endpoint_matches)
 from mobly import asserts
 
 
@@ -75,7 +75,7 @@ class TC_VALCC_3_3(MatterBaseTest):
         ]
         return pics
 
-    @async_test_body
+    @run_if_endpoint_matches(has_attribute(Clusters.ValveConfigurationAndControl.Attributes.DefaultOpenLevel))
     async def test_TC_VALCC_3_3(self):
 
         endpoint = self.get_endpoint(default=1)
