@@ -174,6 +174,6 @@ int main(void)
     err = GetAppTask().StartApp();
 
 exit:
-    LOG_ERR("Exit err %" CHIP_ERROR_FORMAT, err.Format());
+    LOG_ERR("Exit err %d", err.Format());
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
