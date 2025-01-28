@@ -44,7 +44,10 @@ from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
 from chip.clusters import Globals
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.decorators import async_test_body
+from chip.testing.matter_base_test import MatterBaseTest
+from chip.testing.runner import default_matter_test_main
+from chip.testing.models import TestStep
 from mobly import asserts
 
 logger = logging.getLogger(__name__)

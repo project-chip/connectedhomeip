@@ -31,11 +31,15 @@ from chip.interaction_model import InteractionModelError, Status
 from MockTestRunner import AsyncMock, MockTestRunner
 
 try:
-    from chip.testing.matter_testing import MatterTestConfig, get_default_paa_trust_store, run_tests_no_exit
+    from chip.testing.matter_base_test import MatterTestConfig
+    from chip.testing.runner import run_tests_no_exit
+    from chip.testing.utilities import get_default_paa_trust_store
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-    from chip.testing.matter_testing import MatterTestConfig, get_default_paa_trust_store, run_tests_no_exit
+    from chip.testing.matter_base_test import MatterTestConfig
+    from chip.testing.runner import run_tests_no_exit
+    from chip.testing.utilities import get_default_paa_trust_store
 
 invoke_call_count = 0
 event_call_count = 0

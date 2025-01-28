@@ -21,7 +21,9 @@ import xml.etree.ElementTree as ElementTree
 import jinja2
 from chip.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
                                              evaluate_feature_choice_conformance)
-from chip.testing.matter_testing import MatterBaseTest, ProblemNotice, default_matter_test_main
+from chip.testing.matter_base_test import MatterBaseTest
+from chip.testing.runner import default_matter_test_main
+from chip.testing.models import ProblemNotice
 from chip.testing.spec_parsing import XmlCluster, add_cluster_data_from_xml
 from mobly import asserts
 

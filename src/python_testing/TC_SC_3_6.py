@@ -45,7 +45,9 @@ from typing import List
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClustersObjects
 from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.decorators import async_test_body
+from chip.testing.matter_base_test import MatterBaseTest
+from chip.testing.runner import default_matter_test_main
 from chip.utils import CommissioningBuildingBlocks
 from mobly import asserts
 

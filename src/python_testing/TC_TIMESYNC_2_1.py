@@ -41,8 +41,10 @@ from datetime import timedelta
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import (MatterBaseTest, default_matter_test_main, has_attribute, has_cluster,
-                                         run_if_endpoint_matches, utc_time_in_matter_epoch)
+from chip.testing.decorators import run_if_endpoint_matches
+from chip.testing.matter_base_test import MatterBaseTest
+from chip.testing.runner import default_matter_test_main
+from chip.testing.utilities import has_attribute, has_cluster, utc_time_in_matter_epoch
 from mobly import asserts
 
 

@@ -23,7 +23,9 @@ import sys
 from multiprocessing import Process
 from multiprocessing.managers import BaseManager
 
-from chip.testing.matter_testing import MatterTestConfig, get_test_info, run_tests
+from chip.testing.runner import get_test_info, run_tests
+from chip.testing.models import MatterTestConfig
+
 from hello_test import HelloTest
 
 try:

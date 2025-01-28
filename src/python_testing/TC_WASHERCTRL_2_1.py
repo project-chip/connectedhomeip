@@ -40,7 +40,11 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from chip.testing.decorators import run_if_endpoint_matches
+from chip.testing.matter_base_test import MatterBaseTest
+from chip.testing.runner import default_matter_test_main
+from chip.testing.models import TestStep
+from chip.testing.utilities import has_feature
 from mobly import asserts
 
 logger = logging.getLogger(__name__)

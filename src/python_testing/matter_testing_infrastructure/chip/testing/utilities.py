@@ -260,6 +260,23 @@ def root_index(s: str) -> int:
         return root_index
 
 
+class SimpleEventCallback:
+    def __init__(self, name: str, expected_cluster_id: int, expected_event_id: int, output_queue: queue.SimpleQueue):
+        self._name = name
+        self._expected_cluster_id = expected_cluster_id
+        self._expected_event_id = expected_event_id
+        self._output_queue = output_queue
+
+    def __call__(self, event_result: EventReadResult, transaction: SubscriptionTransaction):
+        if (self._expected_cluster_id == event_result.Header.ClusterId and
+                self._expected_event_id == event_result.Header.EventId):
+            self._output_queue.put(event_result)
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+
 class EventChangeCallback:
     def __init__(self, expected_cluster: ClusterObjects.Cluster):
         """This class creates a queue to store received event callbacks, that can be checked by the test script

@@ -521,7 +521,7 @@ def default_matter_test_main():
     In this case, only one test class in a test script is allowed.
     To make your test script executable, add the following to your file:
     .. code-block:: python
-      from chip.testing.matter_testing import default_matter_test_main
+      from chip.testing.runner import default_matter_test_main
       ...
       if __name__ == '__main__':
         default_matter_test_main()

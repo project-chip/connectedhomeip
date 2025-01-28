@@ -20,7 +20,9 @@ import xml.etree.ElementTree as ElementTree
 import chip.clusters as Clusters
 import jinja2
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import MatterBaseTest, ProblemNotice, default_matter_test_main
+from chip.testing.matter_base_test import MatterBaseTest
+from chip.testing.models import ProblemNotice
+from chip.testing.runner import default_matter_test_main
 from chip.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, XmlCluster,
                                        add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
                                        combine_derived_clusters_with_base, get_data_model_directory)

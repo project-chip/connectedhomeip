@@ -40,7 +40,10 @@ import random
 
 import chip.clusters as Clusters
 from chip.bdx import BdxProtocol, BdxTransfer
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.decorators import async_test_body
+from chip.testing.matter_base_test import MatterBaseTest
+from chip.testing.runner import default_matter_test_main
+from chip.testing.models import TestStep
 from mobly import asserts
 
 

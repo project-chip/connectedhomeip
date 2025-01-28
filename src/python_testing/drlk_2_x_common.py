@@ -23,8 +23,9 @@ import time
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import type_matches
+
 from mobly import asserts
+from chip.testing.utilities import type_matches
 
 
 class DRLK_COMMON:

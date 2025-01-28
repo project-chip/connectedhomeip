@@ -85,9 +85,11 @@ import chip.clusters as Clusters
 import test_plan_support
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult
-from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest,
-                                         TestStep, await_sequence_of_reports, default_matter_test_main, has_feature,
-                                         run_if_endpoint_matches)
+from chip.testing.decorators import run_if_endpoint_matches
+from chip.testing.matter_base_test import MatterBaseTest
+from chip.testing.models import TestStep
+from chip.testing.utilities import AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, await_sequence_of_reports, has_feature
+from chip.testing.runner import default_matter_test_main
 from chip.tlv import uint
 from mobly import asserts
 
