@@ -54,13 +54,11 @@
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
-from chip.testing.decorators import run_if_endpoint_matches
+from chip.testing.decorators import has_cluster, run_if_endpoint_matches
 from chip.testing.matter_base_test import MatterBaseTest
 from chip.testing.models import TestStep
 from chip.testing.runner import default_matter_test_main
 from mobly import asserts
-
-from chip.testing.decorators import has_cluster
 
 
 class TC_CCTRL_2_1(MatterBaseTest):

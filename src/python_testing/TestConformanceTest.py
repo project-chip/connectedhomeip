@@ -20,13 +20,13 @@ from typing import Any
 import chip.clusters as Clusters
 from chip.testing.basic_composition import arls_populated
 from chip.testing.conformance import ConformanceDecision
-from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.spec_parsing import build_xml_clusters, build_xml_device_types
 from chip.testing.decorators import async_test_body
+from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.matter_base_test import MatterBaseTest
 from chip.testing.runner import default_matter_test_main
-from TC_DeviceConformance import DeviceConformanceTests
+from chip.testing.spec_parsing import build_xml_clusters, build_xml_device_types
 from mobly import asserts
+from TC_DeviceConformance import DeviceConformanceTests
 
 
 def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]:

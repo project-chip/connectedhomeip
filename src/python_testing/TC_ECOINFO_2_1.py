@@ -68,13 +68,11 @@ from chip.interaction_model import Status
 from chip.testing.apps import AppServerSubprocess
 from chip.testing.decorators import async_test_body
 from chip.testing.matter_base_test import MatterBaseTest
-from chip.testing.models import TestStep
+from chip.testing.models import SetupParameters, TestStep
 from chip.testing.runner import default_matter_test_main
 from chip.testing.utilities import type_matches
 from chip.tlv import uint
 from mobly import asserts
-
-from chip.testing.models import SetupParameters
 
 
 class TC_ECOINFO_2_1(MatterBaseTest):

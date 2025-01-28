@@ -25,15 +25,11 @@ from controller.python.chip.ChipStack import ChipStack
 from controller.python.chip.storage import PersistentStorage
 
 from .commissioning import CommissionDeviceTest
+from .constants import _DEFAULT_ADMIN_VENDOR_ID, _DEFAULT_CONTROLLER_NODE_ID, _DEFAULT_TRUST_ROOT_INDEX
 from .matter_base_test import MatterBaseTest
 from .models import _DEFAULT_DUT_NODE_ID, _DEFAULT_LOG_PATH, _DEFAULT_STORAGE_PATH, MatterTestConfig, TestInfo
 from .utilities import (bool_named_arg, byte_string_from_hex, bytes_as_hex_named_arg, float_named_arg, int_decimal_or_hex,
                         int_named_arg, json_named_arg, root_index, str_from_manual_code, str_named_arg)
-from .constants import (
-    _DEFAULT_ADMIN_VENDOR_ID,
-    _DEFAULT_CONTROLLER_NODE_ID,
-    _DEFAULT_TRUST_ROOT_INDEX,
-)
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks

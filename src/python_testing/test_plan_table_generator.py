@@ -22,7 +22,6 @@ import sys
 from pathlib import Path
 
 import click
-
 from chip.testing.models import MatterTestConfig
 from chip.testing.runner import generate_mobly_test_config
 

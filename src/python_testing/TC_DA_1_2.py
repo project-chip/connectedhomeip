@@ -47,6 +47,7 @@ from chip.testing.decorators import async_test_body
 from chip.testing.matter_base_test import MatterBaseTest
 from chip.testing.models import TestStep
 from chip.testing.runner import default_matter_test_main
+from chip.testing.utilities import hex_from_bytes, type_matches
 from cryptography import x509
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat._oid import ExtensionOID
@@ -60,7 +61,6 @@ from pyasn1.type import univ
 from pyasn1_modules import rfc5652
 
 from controller.python.chip.tlv import TLVReader
-from chip.testing.utilities import hex_from_bytes, type_matches
 
 
 def get_value_for_oid(oid_dotted_str: str, cert: x509.Certificate) -> str:

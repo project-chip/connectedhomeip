@@ -3,22 +3,22 @@
 import asyncio
 import inspect
 import json
+import logging
+import pathlib
+import queue
 import re
 import threading
 import time
 import typing
-import pathlib
-import logging
-import queue
 from binascii import hexlify, unhexlify
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.tlv import float32, uint
-from chip.interaction_model import Status
 from datetime import datetime, timedelta, timezone
-from mobly import asserts
-
 from typing import Any, Iterable, Optional, Tuple
+
+from chip.clusters import ClusterObjects as ClusterObjects
+from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
+from chip.interaction_model import Status
+from chip.tlv import float32, uint
+from mobly import asserts
 
 from python_testing.matter_testing_infrastructure.chip.testing.models import AttributeValue
 

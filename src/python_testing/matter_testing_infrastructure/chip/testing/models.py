@@ -1,21 +1,18 @@
 """Data models for Matter testing infrastructure."""
 
-import chip.clusters as Clusters
+import pathlib
+import typing
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-import pathlib
-import typing
 from typing import Any, List, Optional, Union
 
-from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.setup_payload import SetupPayload
+import chip.clusters as Clusters
 from chip.discovery import FilterType
-from .constants import (
-    _DEFAULT_ADMIN_VENDOR_ID,
-    _DEFAULT_CONTROLLER_NODE_ID,
-    _DEFAULT_TRUST_ROOT_INDEX,
-)
+from chip.setup_payload import SetupPayload
+from chip.testing.global_attribute_ids import GlobalAttributeIds
+
+from .constants import _DEFAULT_ADMIN_VENDOR_ID, _DEFAULT_CONTROLLER_NODE_ID, _DEFAULT_TRUST_ROOT_INDEX
 
 # isort: off
 

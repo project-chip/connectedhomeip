@@ -43,7 +43,8 @@ from chip.interaction_model import InteractionModelError
 from chip.testing.decorators import async_test_body
 from chip.testing.matter_base_test import MatterBaseTest
 from chip.testing.runner import default_matter_test_main
-from chip.testing.utilities import matter_epoch_us_from_utc_datetime, utc_datetime_from_matter_epoch_us, utc_datetime_from_posix_time_ms
+from chip.testing.utilities import (matter_epoch_us_from_utc_datetime, utc_datetime_from_matter_epoch_us,
+                                    utc_datetime_from_posix_time_ms)
 from mobly import asserts
 
 logger = logging.getLogger(__name__)

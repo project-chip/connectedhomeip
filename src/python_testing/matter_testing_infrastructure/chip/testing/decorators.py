@@ -1,9 +1,9 @@
 """Test decorators and related functions for Matter testing infrastructure."""
 
 import asyncio
-from enum import IntFlag
 import logging
 import typing
+from enum import IntFlag
 from functools import partial
 
 from chip.clusters import Attribute, ClusterObjects, Clusters

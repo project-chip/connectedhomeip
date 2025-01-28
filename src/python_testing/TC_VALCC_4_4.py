@@ -39,8 +39,8 @@ from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.decorators import async_test_body
 from chip.testing.matter_base_test import MatterBaseTest
-from chip.testing.runner import default_matter_test_main
 from chip.testing.models import TestStep
+from chip.testing.runner import default_matter_test_main
 from chip.testing.utilities import utc_time_in_matter_epoch
 from mobly import asserts
 

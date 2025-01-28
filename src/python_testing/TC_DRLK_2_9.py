@@ -45,10 +45,9 @@ from chip.testing.decorators import async_test_body
 from chip.testing.matter_base_test import MatterBaseTest
 from chip.testing.models import TestStep
 from chip.testing.runner import default_matter_test_main
+from chip.testing.utilities import type_matches
 from drlk_2_x_common import DRLK_COMMON
 from mobly import asserts
-
-from chip.testing.utilities import type_matches
 
 logger = logging.getLogger(__name__)
 

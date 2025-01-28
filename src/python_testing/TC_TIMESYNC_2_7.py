@@ -46,7 +46,6 @@ from chip.testing.decorators import async_test_body
 from chip.testing.matter_base_test import MatterBaseTest
 from chip.testing.runner import default_matter_test_main
 from chip.testing.utilities import compare_time, type_matches, utc_time_in_matter_epoch
-
 from mobly import asserts
 
 from controller.python.chip.tlv import uint

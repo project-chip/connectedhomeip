@@ -46,9 +46,8 @@ from chip.testing.decorators import async_test_body
 from chip.testing.matter_base_test import MatterBaseTest
 from chip.testing.models import TestStep
 from chip.testing.runner import default_matter_test_main
-from mobly import asserts
-
 from chip.testing.utilities import EventChangeCallback
+from mobly import asserts
 
 
 class TC_DGWIFI_2_2(MatterBaseTest):

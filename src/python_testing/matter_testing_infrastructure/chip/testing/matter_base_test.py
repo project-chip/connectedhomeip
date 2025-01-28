@@ -1,35 +1,34 @@
 """Core test infrastructure for Matter testing."""
 
 import asyncio
-from enum import IntFlag
 import inspect
 import logging
 import random
 import textwrap
-from datetime import datetime, timedelta, timezone
-from typing import List, Optional
-from time import sleep
 import typing
+from datetime import datetime, timedelta, timezone
+from enum import IntFlag
+from time import sleep
+from typing import List, Optional
+
 import chip
 import chip.clusters as Clusters
+from chip import discovery
 from chip.clusters import Attribute, ClusterObjects
 from chip.clusters.Attribute import Status
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError
-from mobly import asserts, base_test, signals
-
-from chip import discovery
 from chip.setup_payload import SetupPayload
+from mobly import asserts, base_test, signals
 
 from controller.python.chip import ChipDeviceCtrl
 from python_testing.matter_testing_infrastructure.chip.testing.global_attribute_ids import GlobalAttributeIds
 
 from .decorators import _has_attribute, _has_command, _has_feature
-
-from .models import (AttributePathLocation, ClusterMapper, CustomCommissioningParameters, DiscoveryFilterType,
-                     ProblemLocation, ProblemNotice, ProblemSeverity, SetupPayloadInfo, TestStep)
+from .models import (AttributePathLocation, ClusterMapper, CustomCommissioningParameters, DiscoveryFilterType, ProblemLocation,
+                     ProblemNotice, ProblemSeverity, SetupPayloadInfo, TestStep)
+from .runner import MatterStackState, MatterTestConfig, TestRunnerHooks, unstash_globally
 from .utilities import type_matches
-from .runner import TestRunnerHooks, MatterTestConfig, MatterStackState, unstash_globally
 
 logger = logging.getLogger("matter.python_testing")
 logger.setLevel(logging.INFO)

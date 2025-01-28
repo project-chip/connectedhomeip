@@ -41,13 +41,12 @@ import time
 
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
-from chip.testing.decorators import run_if_endpoint_matches
+from chip.testing.decorators import has_cluster, run_if_endpoint_matches
 from chip.testing.matter_base_test import MatterBaseTest
 from chip.testing.models import TestStep
 from chip.testing.runner import default_matter_test_main
-from mobly import asserts
-from chip.testing.decorators import has_cluster
 from chip.testing.utilities import ClusterAttributeChangeAccumulator
+from mobly import asserts
 from test_plan_support import commission_if_required, read_attribute, verify_success
 
 
