@@ -122,7 +122,7 @@ class TC_CADMIN(MatterBaseTest):
                 discriminator=1234,
                 option=1
             )
-            
+
         elif commission_type == "BCM":
             obcCmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
             await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
@@ -235,7 +235,7 @@ class TC_CADMIN(MatterBaseTest):
                     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
             except ChipStackError as e:
                 asserts.assert_equal(e.err,  0x0000007E,
-                                    "Expected to return Trying to add NOC for fabric that already exists")
+                                     "Expected to return Trying to add NOC for fabric that already exists")
             """
             expected error:
                 [2024-10-08 11:57:43.144125][TEST][STDOUT][MatterTest] 10-08 11:57:42.777 INFO Device returned status 9 on receiving the NOC
@@ -260,7 +260,6 @@ class TC_CADMIN(MatterBaseTest):
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
-
 
     def pics_TC_CADMIN_1_3(self) -> list[str]:
         return ["CADMIN.S"]
@@ -322,10 +321,10 @@ class TC_CADMIN(MatterBaseTest):
     async def test_TC_CADMIN_1_3(self):
         await self.combined_commission_val_steps(commission_type="ECM")
 
-
     @async_test_body
     async def test_TC_CADMIN_1_4(self):
         await self.combined_commission_val_steps(commission_type="BCM")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
