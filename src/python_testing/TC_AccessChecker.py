@@ -26,10 +26,13 @@ import chip.clusters as Clusters
 from chip.interaction_model import Status
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
 from chip.testing.spec_parsing import XmlCluster, build_xml_clusters
 from chip.tlv import uint
+
+from chip.testing.decorators import async_test_body
+from chip.testing.matter_base_test import MatterBaseTest
+from chip.testing.models import AttributePathLocation, ClusterPathLocation, TestStep
+from chip.testing.runner import default_matter_test_main
 
 
 class AccessTestType(Enum):
