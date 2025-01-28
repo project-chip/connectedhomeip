@@ -1821,6 +1821,7 @@ using CHIP_ERROR = ::chip::ChipError;
 namespace chip {
 
 extern void RegisterCHIPLayerErrorFormatter();
+extern void DeregisterCHIPLayerErrorFormatter();
 extern bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err);
 
 } // namespace chip
