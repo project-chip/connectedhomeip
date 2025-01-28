@@ -267,4 +267,7 @@ public class MatterCastingPlayer implements CastingPlayer {
 
   @Override
   public native void disconnect();
+
+  @Override
+  public native boolean isPendingPasscodeFromUser();
 }
