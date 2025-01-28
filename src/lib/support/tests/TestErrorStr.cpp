@@ -69,7 +69,7 @@ static bool trueFormat(char * buf, uint16_t bufSize, CHIP_ERROR err)
 
 TEST(TestErrorStr, CheckRegisterDeregisterSingleErrorFormatter)
 {
-    static ErrorFormatter falseFormatter  = { falseFormat, nullptr };
+    static ErrorFormatter falseFormatter = { falseFormat, nullptr };
 
     RegisterErrorFormatter(&falseFormatter);
     DeregisterErrorFormatter(&falseFormatter);
