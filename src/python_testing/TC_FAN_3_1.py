@@ -39,10 +39,12 @@ import logging
 import time
 import random
 import queue
+from typing import Any
 
 import chip.clusters as Clusters
+from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, AttributeValue, ClusterAttributeChangeAccumulator, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 from matter_testing_infrastructure.chip.testing.matter_testing import AttributeChangeCallbackFan, AttributeValue, ClusterAttributeChangeAccumulator
@@ -87,6 +89,54 @@ class TC_FAN_3_1(MatterBaseTest):
     async def write_percent_setting(self, endpoint, percent_setting) -> Status:
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.FanControl.Attributes.PercentSetting(percent_setting))])
         return result[0].Status
+    
+    
+    
+    
+    async def read_valcc_attribute_expect_success(self, endpoint, attribute):
+        cluster = Clusters.Objects.ValveConfigurationAndControl
+        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
+
+    
+    
+    
+    
+    
+    
+    def await_sequence_of_reports_fan(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, timeout_sec: float) -> None:
+        start_time = time.time()
+        elapsed = 0.0
+        time_remaining = timeout_sec
+
+        while time_remaining > 0:
+            logging.info(f"Waiting for {timeout_sec:.1f} seconds for attribute.")
+            try:
+                item: AttributeValue = report_queue.get(block=True, timeout=time_remaining)
+
+                # Track arrival of all values for the given attribute.
+                if item.endpoint_id == endpoint_id and item.attribute == attribute:
+
+                    print(f"\n\n\n\n\t\t\t [FANS] Got attr: {item}\n\n\n\n")
+                    
+            except queue.Empty:
+                # No error, we update timeouts and keep going
+                pass
+
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     def pics_TC_FAN_3_1(self) -> list[str]:
         return ["FAN.S"]
@@ -94,6 +144,7 @@ class TC_FAN_3_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_FAN_3_1(self):
+        print(f"\n\n\n\n\t\t\t [FANS] Script Start!\n\n\n\n")
         # pdb.set_trace()
 
         # endpoint = self.get_endpoint(default=1)
@@ -106,64 +157,145 @@ class TC_FAN_3_1(MatterBaseTest):
         # attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-        # Sub info
+        endpoint = self.get_endpoint(default=1)
         TH: ChipDeviceController = self.default_controller
-        min_interval_floor_sec: int = 0
-        max_interval_ceiling_sec: int = 15
 
-        # Define attributes
+        cluster = Clusters.FanControl
+        attr_to_sub = cluster.Attributes.FanMode
+        attr_to_sub_path = [(endpoint, attr_to_sub)]
+        attr_to_write = cluster.Attributes.PercentSetting
+        attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
+        await attribute_subscription.start(TH, self.dut_node_id, endpoint)
+
+        print(f"\n\n\n\n\t\t\t [FANS] Let's loop!\n\n\n\n")
+        
+        for value_to_write in range(1, 101):
+            # value_to_write = value_to_write * 10
+            
+            attribute_subscription.get_last_report()
+            
+            result = await TH.WriteAttribute(
+                self.dut_node_id,
+                [(endpoint, attr_to_write(value=value_to_write))]
+            )
+
+            timeout_sec = 1
+            start_time = time.time()
+            elapsed = 0.0
+            time_remaining = timeout_sec
+
+            print(f"[FANS] Looking for FanMode... {value_to_write}")
+            break_out = False
+            while time_remaining > 0:
+                q: queue.Queue = attribute_subscription.attribute_queue
+
+                for item in list(q.queue):
+                    if item.attribute == attr_to_sub:
+                        print(f"[FANS] item: {item.attribute}, value: {item.value}")
+                        break_out = True
+                        break
+
+                elapsed = time.time() - start_time
+                time_remaining = timeout_sec - elapsed
+                
+                if break_out:
+                    break
+                
+            total_time = time.time() - start_time
+            print(f"[FANS] total_time: {total_time}")
+            
+            
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        # # Sub info
+        # TH: ChipDeviceController = self.default_controller
+        # min_interval_floor_sec: int = 0
+        # max_interval_ceiling_sec: int = 15
+
+        # # Define attributes
         # endpoint = 1
         # attr_to_sub = Clusters.FanControl.Attributes.FanMode
         # attr_to_sub_path = [(endpoint, attr_to_sub)]
         # attr_to_write = Clusters.FanControl.Attributes.PercentSetting
 
-        # Switcharoo to Node Label
-        endpoint = 0
-        attr_to_sub = Clusters.BasicInformation.Attributes.NodeLabel
-        attr_to_sub_path = [(endpoint, attr_to_sub)]
-        attr_to_write = attr_to_sub
+        # # Switcharoo to Node Label
+        # # endpoint = 0
+        # # attr_to_sub = Clusters.BasicInformation.Attributes.NodeLabel
+        # # attr_to_sub_path = [(endpoint, attr_to_sub)]
+        # # attr_to_write = attr_to_sub
 
-        # Subscribe to attribute
-        sub = await TH.ReadAttribute(
-            nodeid=self.dut_node_id,
-            attributes=attr_to_sub_path,
-            reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
-            keepSubscriptions=True
-        )
+        # # Subscribe to attribute
+        # sub = await TH.ReadAttribute(
+        #     nodeid=self.dut_node_id,
+        #     attributes=attr_to_sub_path,
+        #     reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
+        #     keepSubscriptions=True
+        # )
 
-        # Set attribute update callback
-        update_cb = AttributeChangeCallbackFan(attr_to_sub)
-        sub.SetAttributeUpdateCallback(update_cb)
+        # # Set attribute update callback
+        # update_cb = AttributeChangeCallbackFan(attr_to_sub)
+        # sub.SetAttributeUpdateCallback(update_cb)
         
-        # Updates loop
-        for value_to_write in range(1, 11):
+        # # Updates loop
+        # for value_to_write in range(1, 11):
 
-            # Write to attribute
-            result = await TH.WriteAttribute(
-                self.dut_node_id,
-                [(endpoint, attr_to_write(value=value_to_write))]
-            )
-            print(f"\t\t [FANS] write_status: {result[0].Status.name}\n\n\n\n")
+        #     # Write to attribute
+        #     result = await TH.WriteAttribute(
+        #         self.dut_node_id,
+        #         [(endpoint, attr_to_write(value=value_to_write))]
+        #     )
+        #     print(f"\t\t [FANS] write_status: {result[0].Status.name}\n\n\n\n")
 
-            # Wait for update callback and attribute value
-            update_callback_start_time = time.time()
-            attr_value = update_cb.wait_for_report()
-            update_callback_end_time = time.time()
-            update_callback_total_time = update_callback_end_time - update_callback_start_time
-            print(f"\t\t [FANS] ** update_callback_total_time: {update_callback_total_time}, value written: {value_to_write}, attribute value: {attr_value} **")
+        #     # Wait for update callback and attribute value
+        #     update_callback_start_time = time.time()
+        #     attr_value = update_cb.wait_for_report()
+        #     update_callback_end_time = time.time()
+        #     update_callback_total_time = update_callback_end_time - update_callback_start_time
+        #     print(f"\t\t [FANS] ** update_callback_total_time: {update_callback_total_time}, value written: {value_to_write}, attribute value: {attr_value} **")
 
             
 
