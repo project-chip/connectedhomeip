@@ -34,28 +34,50 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import time
+import random
+import queue
+from typing import Any
 
 import chip.clusters as Clusters
+from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, AttributeValue, ClusterAttributeChangeAccumulator, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+from matter_testing_infrastructure.chip.testing.matter_testing import AttributeChangeCallbackFan, AttributeValue, ClusterAttributeChangeAccumulator
+from chip.ChipDeviceCtrl import ChipDeviceController
+from chip.clusters.Attribute import AsyncReadTransaction, AttributePath, SubscriptionTransaction, TypedAttributePath
+
+
+# import chip.clusters as Clusters
+from chip.ChipDeviceCtrl import ChipDeviceController
+from chip.clusters import ClusterObjects as ClusterObjects
+from chip.clusters.Attribute import AsyncReadTransaction, AttributePath, SubscriptionTransaction, TypedAttributePath
+from chip.clusters.enum import MatterIntEnum
+from chip.exceptions import ChipStackError
+from chip.interaction_model import Status
+from chip.testing.basic_composition import BasicCompositionTests
+from chip.testing.matter_testing import (AttributeChangeCallback, EventChangeCallback, MatterBaseTest, TestStep, async_test_body,
+                                         default_matter_test_main)
+
+# import pdb
 
 logger = logging.getLogger(__name__)
 
-
 class TC_FAN_3_1(MatterBaseTest):
-
+    # def steps_TC_FAN_3_1(self):
+    #     return [TestStep("1", "Commissioning already done."),
+    #             TestStep("2", "Action", "Verification"),
+    #             ]
     async def read_fc_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.FanControl
+        cluster = Clusters.Objects.BasicInformation
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     async def read_fan_mode(self, endpoint):
         return await self.read_fc_attribute_expect_success(endpoint, Clusters.FanControl.Attributes.FanMode)
-
-    async def read_percent_setting(self, endpoint):
-        return await self.read_fc_attribute_expect_success(endpoint, Clusters.FanControl.Attributes.PercentSetting)
 
     async def read_percent_current(self, endpoint):
         return await self.read_fc_attribute_expect_success(endpoint, Clusters.FanControl.Attributes.PercentCurrent)
@@ -67,103 +89,275 @@ class TC_FAN_3_1(MatterBaseTest):
     async def write_percent_setting(self, endpoint, percent_setting) -> Status:
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.FanControl.Attributes.PercentSetting(percent_setting))])
         return result[0].Status
+    
+    
+    
+    
+    async def read_valcc_attribute_expect_success(self, endpoint, attribute):
+        cluster = Clusters.Objects.ValveConfigurationAndControl
+        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
+
+    
+    
+    
+    
+    
+    
+    def await_sequence_of_reports_fan(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, timeout_sec: float) -> None:
+        start_time = time.time()
+        elapsed = 0.0
+        time_remaining = timeout_sec
+
+        while time_remaining > 0:
+            logging.info(f"Waiting for {timeout_sec:.1f} seconds for attribute.")
+            try:
+                item: AttributeValue = report_queue.get(block=True, timeout=time_remaining)
+
+                # Track arrival of all values for the given attribute.
+                if item.endpoint_id == endpoint_id and item.attribute == attribute:
+
+                    print(f"\n\n\n\n\t\t\t [FANS] Got attr: {item}\n\n\n\n")
+                    
+            except queue.Empty:
+                # No error, we update timeouts and keep going
+                pass
+
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     def pics_TC_FAN_3_1(self) -> list[str]:
         return ["FAN.S"]
 
+
     @async_test_body
     async def test_TC_FAN_3_1(self):
+        print(f"\n\n\n\n\t\t\t [FANS] Script Start!\n\n\n\n")
+        # pdb.set_trace()
+
+        # endpoint = self.get_endpoint(default=1)
+        # cluster = Clusters.FanControl
+        # fan_mode_off = cluster.Enums.FanModeEnum.kOff
+        # fan_mode_low = cluster.Enums.FanModeEnum.kLow
+        # fan_mode_medium = cluster.Enums.FanModeEnum.kMedium
+        # fan_mode_high = cluster.Enums.FanModeEnum.kHigh
+        # fan_mode_attribute = cluster.Attributes.FanMode
+        # attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
+
+
         endpoint = self.get_endpoint(default=1)
+        TH: ChipDeviceController = self.default_controller
 
-        self.print_step(1, "Commissioning, already done")
+        cluster = Clusters.FanControl
+        attr_to_sub = cluster.Attributes.FanMode
+        attr_to_sub_path = [(endpoint, attr_to_sub)]
+        attr_to_write = cluster.Attributes.PercentSetting
+        attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
+        await attribute_subscription.start(TH, self.dut_node_id, endpoint)
 
-        self.print_step("2a", "Read from the DUT the FanMode attribute and store")
-        existing_fan_mode = await self.read_fan_mode(endpoint=endpoint)
+        print(f"\n\n\n\n\t\t\t [FANS] Let's loop!\n\n\n\n")
+        
+        for value_to_write in range(1, 101):
+            # value_to_write = value_to_write * 10
+            
+            attribute_subscription.get_last_report()
+            
+            result = await TH.WriteAttribute(
+                self.dut_node_id,
+                [(endpoint, attr_to_write(value=value_to_write))]
+            )
 
-        self.print_step("2b", "Write High to FanMode")
-        status = await self.write_fan_mode(endpoint=endpoint, fan_mode=Clusters.FanControl.Enums.FanModeEnum.kHigh)
-        status_ok = (status == Status.Success) or (status == Status.InvalidInState)
-        asserts.assert_true(status_ok, "FanMode write did not return a value of Success or InvalidInState")
+            timeout_sec = 1
+            start_time = time.time()
+            elapsed = 0.0
+            time_remaining = timeout_sec
 
-        self.print_step("2c", "After a few seconds, read from the DUT the FanMode attribute")
-        time.sleep(3)
+            print(f"[FANS] Looking for FanMode... {value_to_write}")
+            break_out = False
+            while time_remaining > 0:
+                q: queue.Queue = attribute_subscription.attribute_queue
 
-        new_fan_mode = await self.read_fan_mode(endpoint=endpoint)
+                for item in list(q.queue):
+                    if item.attribute == attr_to_sub:
+                        print(f"[FANS] item: {item.attribute}, value: {item.value}")
+                        break_out = True
+                        break
 
-        if status == Status.Success:
-            asserts.assert_equal(new_fan_mode, Clusters.FanControl.Enums.FanModeEnum.kHigh, "FanMode is not High")
-        else:
-            asserts.assert_equal(new_fan_mode, existing_fan_mode, "FanMode is not unchanged")
+                elapsed = time.time() - start_time
+                time_remaining = timeout_sec - elapsed
+                
+                if break_out:
+                    break
+                
+            total_time = time.time() - start_time
+            print(f"[FANS] total_time: {total_time}")
+            
+            
+            
 
-        self.print_step("3a", "Read from the DUT the PercentSetting attribute and store")
-        existing_percent_setting = await self.read_percent_setting(endpoint=endpoint)
 
-        self.print_step("3b", "Write Off to Fan Mode")
-        status = await self.write_fan_mode(endpoint=endpoint, fan_mode=Clusters.FanControl.Enums.FanModeEnum.kOff)
-        status_ok = (status == Status.Success) or (status == Status.InvalidInState)
-        asserts.assert_true(status_ok, "FanMode write did not return a value of Success or InvalidInState")
 
-        self.print_step("3c", "After a few seconds, read from the DUT the PercentSetting attribute")
-        time.sleep(3)
 
-        new_percent_setting = await self.read_percent_setting(endpoint=endpoint)
 
-        if status == Status.Success:
-            asserts.assert_equal(new_percent_setting, Clusters.FanControl.Enums.FanModeEnum.kOff, "PercentSetting is not Off")
-        else:
-            asserts.assert_equal(new_percent_setting, existing_percent_setting, "PercentSetting is not unchanged")
 
-        self.print_step("3d", "Read from the DUT the PercentCurrent attribute")
-        percent_current = await self.read_percent_current(endpoint=endpoint)
 
-        if status == Status.Success:
-            asserts.assert_equal(percent_current, 0, "PercentCurrent is not 0")
-        else:
-            asserts.assert_equal(percent_current, existing_percent_setting, "PercentCurrent is not unchanged")
 
-        self.print_step("4a", "Read from the DUT the PercentSetting attribute and store")
-        existing_percent_setting = await self.read_percent_setting(endpoint=endpoint)
 
-        self.print_step("4b", "Write PercentSetting to 30")
-        status = await self.write_percent_setting(endpoint=endpoint, percent_setting=30)
-        status_ok = (status == Status.Success) or (status == Status.InvalidInState)
-        asserts.assert_true(status_ok, "PercentSetting write did not return a value of Success or InvalidInState")
 
-        self.print_step("4c", "After a few seconds, read from the DUT the PercentSetting attribute")
-        time.sleep(3)
 
-        new_percent_setting = await self.read_percent_setting(endpoint=endpoint)
 
-        if status == Status.Success:
-            asserts.assert_equal(new_percent_setting, 30, "PercentSetting is not 30")
-        else:
-            asserts.assert_equal(new_percent_setting, existing_percent_setting, "PercentSetting is not unchanged")
 
-        self.print_step("4d", "Read from the DUT the PercentCurrent attribute")
-        percent_current = await self.read_percent_current(endpoint=endpoint)
 
-        if status == Status.Success:
-            asserts.assert_equal(percent_current, 30, "PercentCurrent is not 30")
-        else:
-            asserts.assert_equal(percent_current, existing_percent_setting, "PercentCurrent is not unchanged")
 
-        self.print_step("5a", "Read from the DUT the FanMode attribute and store")
-        existing_fan_mode = await self.read_fan_mode(endpoint=endpoint)
 
-        self.print_step("5b", "Write PercentSetting to 0")
-        status = await self.write_percent_setting(endpoint=endpoint, percent_setting=0)
-        status_ok = (status == Status.Success) or (status == Status.InvalidInState)
-        asserts.assert_true(status_ok, "PercentSetting write did not return a value of Success or InvalidInState")
 
-        self.print_step("5c", "After a few seconds, read from the DUT the FanMode attribute")
-        time.sleep(3)
 
-        new_fan_mode = await self.read_fan_mode(endpoint=endpoint)
 
-        if status == Status.Success:
-            asserts.assert_equal(new_fan_mode, Clusters.FanControl.Enums.FanModeEnum.kOff, "FanMode is not Off")
-        else:
-            asserts.assert_equal(new_fan_mode, existing_fan_mode, "FanMode is not unchanged")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        # # Sub info
+        # TH: ChipDeviceController = self.default_controller
+        # min_interval_floor_sec: int = 0
+        # max_interval_ceiling_sec: int = 15
+
+        # # Define attributes
+        # endpoint = 1
+        # attr_to_sub = Clusters.FanControl.Attributes.FanMode
+        # attr_to_sub_path = [(endpoint, attr_to_sub)]
+        # attr_to_write = Clusters.FanControl.Attributes.PercentSetting
+
+        # # Switcharoo to Node Label
+        # # endpoint = 0
+        # # attr_to_sub = Clusters.BasicInformation.Attributes.NodeLabel
+        # # attr_to_sub_path = [(endpoint, attr_to_sub)]
+        # # attr_to_write = attr_to_sub
+
+        # # Subscribe to attribute
+        # sub = await TH.ReadAttribute(
+        #     nodeid=self.dut_node_id,
+        #     attributes=attr_to_sub_path,
+        #     reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
+        #     keepSubscriptions=True
+        # )
+
+        # # Set attribute update callback
+        # update_cb = AttributeChangeCallbackFan(attr_to_sub)
+        # sub.SetAttributeUpdateCallback(update_cb)
+        
+        # # Updates loop
+        # for value_to_write in range(1, 11):
+
+        #     # Write to attribute
+        #     result = await TH.WriteAttribute(
+        #         self.dut_node_id,
+        #         [(endpoint, attr_to_write(value=value_to_write))]
+        #     )
+        #     print(f"\t\t [FANS] write_status: {result[0].Status.name}\n\n\n\n")
+
+        #     # Wait for update callback and attribute value
+        #     update_callback_start_time = time.time()
+        #     attr_value = update_cb.wait_for_report()
+        #     update_callback_end_time = time.time()
+        #     update_callback_total_time = update_callback_end_time - update_callback_start_time
+        #     print(f"\t\t [FANS] ** update_callback_total_time: {update_callback_total_time}, value written: {value_to_write}, attribute value: {attr_value} **")
+
+            
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
+        # # Initializa to FanMode Off
+        # write_status = await self.write_fan_mode(endpoint=endpoint, fan_mode=fan_mode_off)
+        # write_status_ok = (write_status == Status.Success) or (write_status == Status.InvalidInState)
+        # asserts.assert_true(write_status_ok, "PercentSetting write did not return a value of Success or InvalidInState")
+
+        # # Set initial conditions
+        # last_fan_mode = fan_mode_off
+        # last_percent_current = 0
+        
+        # for percent_to_write in range(1, 101):
+        #     # Write PercentSetting to DUT
+        #     write_status = await self.write_percent_setting(endpoint=endpoint, percent_setting=percent_to_write)
+        #     write_status_ok = (write_status == Status.Success) or (write_status == Status.InvalidInState)
+        #     asserts.assert_true(write_status_ok, "PercentSetting write did not return a value of Success or InvalidInState")
+
+        #     # Wait
+        #     # await attribute_subscription.start(self.default_controller, self.dut_node_id, endpoint)
+        #     # expected_fan_mode = AttributeValue(endpoint_id=endpoint, attribute=fan_mode_attribute, value=fan_mode_low)
+        #     # attribute_subscription.await_all_final_values_reported(expected_final_values=[expected_fan_mode], timeout_sec=1)
+
+        #     current_fan_mode = await self.read_fan_mode(endpoint=endpoint)
+        #     current_percent_current = await self.read_percent_current(endpoint=endpoint)
+            
+        #     if current_fan_mode != last_fan_mode:
+        #         print(f"\n\n\n\n\t\t\t\t\t [FANS] fan mode has changed to: {current_fan_mode}")
+        #         print(f"\t\t\t\t\t [FANS] read_percent_current: {current_percent_current} \n\n\n\n\t\t\t\t\t")
+        #         asserts.assert_greater(current_percent_current, last_percent_current)
+        #         last_fan_mode = current_fan_mode
+        #         last_percent_current = current_percent_current
+        #     else:
+        #         print(f"\n\n\n\n\t\t\t\t\t [FANS] fan mode is the same: {current_fan_mode}")
+
 
 
 if __name__ == "__main__":
