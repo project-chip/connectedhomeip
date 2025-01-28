@@ -33,7 +33,7 @@
 #
 
 import chip.clusters as Clusters
-from chip.clusters.Types import Nullable, NullValue
+from chip.clusters.Types import NullValue
 from chip.testing.decorators import async_test_body
 from chip.testing.matter_base_test import MatterBaseTest
 from chip.testing.models import TestStep
