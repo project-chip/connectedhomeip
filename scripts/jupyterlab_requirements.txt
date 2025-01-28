@@ -15,3 +15,4 @@ jupyterlab
 ipykernel
 jupyterlab-lsp
 python-lsp-server
+jupyterlab-git
