@@ -716,22 +716,11 @@ PyChipError pychip_DeviceController_SetDACRevocationSetPath(const char * dacRevo
         GetTestAttestationRevocationDelegate(dacRevocationSetPath);
     VerifyOrReturnError(dacRevocationDelegate != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
-    chip::Credentials::DeviceAttestationVerifier * dacVerifier = chip::Credentials::GetDeviceAttestationVerifier();
+    chip::Credentials::DefaultDACVerifier * dacVerifier = chip::Credentials::GetDefaultDACVerifierInstance();
     VerifyOrReturnError(dacVerifier != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
 
-    // GetDefaultDACVerifier returns the pointer of type DeviceAttestationVerifier and it does not have the
-    // SetRevocationDelegate method so we are safely downcasting to DefaultDACVerifier, and set the revocation
-    // delegate
-    if (chip::Credentials::DefaultDACVerifier * defaultDACVerifier =
-            dynamic_cast<chip::Credentials::DefaultDACVerifier *>(dacVerifier))
-    {
-        defaultDACVerifier->SetRevocationDelegate(dacRevocationDelegate);
-    }
-    else
-    {
-        ChipLogError(Controller, "DAC verifier is not a DefaultDACVerifier");
-        return ToPyChipError(CHIP_ERROR_INCORRECT_STATE);
-    }
+    dacVerifier->SetRevocationDelegate(dacRevocationDelegate);
+
     return ToPyChipError(CHIP_NO_ERROR);
 }
 } // extern "C"
