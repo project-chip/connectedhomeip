@@ -148,6 +148,11 @@
  */
 - (void)disconnect;
 
+/**
+ * @return true if this CastingPlayer is still pending pass code from user and therefore is not ready
+ */
+- (bool)isPendingPasscodeFromUser;
+
 - (NSString * _Nonnull)identifier;
 - (NSString * _Nonnull)deviceName;
 - (uint16_t)vendorId;

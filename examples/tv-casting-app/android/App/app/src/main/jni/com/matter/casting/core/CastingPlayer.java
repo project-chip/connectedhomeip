@@ -152,4 +152,10 @@ public interface CastingPlayer {
 
   /** @brief Sets the internal connection state of this CastingPlayer to "disconnected" */
   void disconnect();
+
+  /**
+   * @return true if this CastingPlayer is still pending pass code from user and therefore is not
+   *     ready
+   */
+  boolean isPendingPasscodeFromUser();
 }
