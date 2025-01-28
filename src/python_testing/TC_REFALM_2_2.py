@@ -34,21 +34,22 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
+import json
 import logging
+import queue
+import typing
+from dataclasses import dataclass
 from time import sleep
 from typing import Any
-import queue
-import json
-import chip.clusters as Clusters
-import typing
-from chip.clusters.ClusterObjects import ClusterObjectDescriptor, ClusterCommand, ClusterObjectFieldDescriptor
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, SimpleEventCallback, type_matches
-from mobly import asserts
-from dataclasses import dataclass
-from chip import ChipUtility
-from chip.tlv import uint
 
+import chip.clusters as Clusters
+from chip import ChipUtility
+from chip.clusters.ClusterObjects import ClusterCommand, ClusterObjectDescriptor, ClusterObjectFieldDescriptor
+from chip.interaction_model import InteractionModelError, Status
+from chip.testing.matter_testing import (MatterBaseTest, SimpleEventCallback, TestStep, async_test_body, default_matter_test_main,
+                                         type_matches)
+from chip.tlv import uint
+from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
