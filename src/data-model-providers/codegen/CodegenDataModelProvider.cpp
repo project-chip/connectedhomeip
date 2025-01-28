@@ -159,6 +159,18 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
                                                                               TLV::TLVReader & input_arguments,
                                                                               CommandHandler * handler)
 {
+    // Double-check that the command path is valid at least up to the cluster level:
+    // some CommandHandlerInterface are registered on all endpoints, so they would be found by
+    // `GetCommandHandler` below, however we need to ensure the path makes sense.
+    const EmberAfCluster * cluster = FindServerCluster(request.path);
+    if (cluster == nullptr)
+    {
+        // This is not a valid cluster. Return the right error code depending on what is valid.
+        std::optional<unsigned> endpoint_index = TryFindEndpointIndex(request.path.mEndpointId);
+        return endpoint_index.has_value() ? Protocols::InteractionModel::Status::UnsupportedCluster
+                                          : Protocols::InteractionModel::Status::UnsupportedEndpoint;
+    }
+
     CommandHandlerInterface * handler_interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
 
@@ -324,6 +336,12 @@ const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const Concret
 CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path,
                                                       DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
+    // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
+    // the cluster actually exists on this endpoint before asking the CommandHandlerInterface whether it
+    // supports the command.
+    const EmberAfCluster * serverCluster = FindServerCluster(path);
+    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
+
     CommandHandlerInterface * interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
     if (interface != nullptr)
@@ -377,8 +395,6 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
         VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
 
-    const EmberAfCluster * serverCluster = FindServerCluster(path);
-    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
     VerifyOrReturnError(serverCluster->acceptedCommandList != nullptr, CHIP_NO_ERROR);
 
     const chip::CommandId * endOfList = serverCluster->acceptedCommandList;
@@ -404,6 +420,12 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
 CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path,
                                                        DataModel::ListBuilder<CommandId> & builder)
 {
+    // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
+    // the cluster actually exists on this endpoint before asking the CommandHandlerInterface whether it
+    // supports the command.
+    const EmberAfCluster * serverCluster = FindServerCluster(path);
+    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
+
     CommandHandlerInterface * interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
     if (interface != nullptr)
@@ -454,8 +476,6 @@ CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath
         VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
 
-    const EmberAfCluster * serverCluster = FindServerCluster(path);
-    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
     VerifyOrReturnError(serverCluster->generatedCommandList != nullptr, CHIP_NO_ERROR);
 
     const chip::CommandId * endOfList = serverCluster->generatedCommandList;
