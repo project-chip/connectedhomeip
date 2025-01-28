@@ -178,7 +178,7 @@ extern WfxRsi_t wfx_rsi;
 /* Updated functions */
 
 /**
- * @brief Function initalize the WiFi module before starting WiFi task.
+ * @brief Function initalizes the WiFi module before starting WiFi task.
  *
  * @return CHIP_ERROR CHIP_NO_ERROR, if the initialization succeeded
  */

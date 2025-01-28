@@ -41,7 +41,6 @@ extern "C" {
 /**
  * @brief Start WFX bus communication task.
  *
- * @param[in] None
  * @return sl_status_t SL_STATUS_OK, if the initialization succeeded
  *                     SL_STATUS_ALLOCATION_FAILED, if there are a memory allocation failure.
  */
