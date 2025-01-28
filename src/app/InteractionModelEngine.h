@@ -664,7 +664,7 @@ private:
     bool mSubscriptionResumptionScheduled      = false;
 #endif
 
-    FabricTable * mpFabricTable;
+    FabricTable * mpFabricTable = nullptr;
 
     CASESessionManager * mpCASESessionMgr = nullptr;
 

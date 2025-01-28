@@ -1864,12 +1864,20 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
     });
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
     {
+        // ReadClient::Close may delete the read client so that readClient->GetNextClient() will be use-after-free.
+        // We need save readClient as nextReadClient before closing.
         if (readClient->GetFabricIndex() == fabricIndex)
         {
             ChipLogProgress(InteractionModel, "Fabric removed, deleting obsolete read client with FabricIndex: %u", fabricIndex);
+            auto * nextReadClient = readClient->GetNextClient();
             readClient->Close(CHIP_ERROR_IM_FABRIC_DELETED, false);
+            readClient = nextReadClient;
+        }
+        else
+        {
+            readClient = readClient->GetNextClient();
         }
     }
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
