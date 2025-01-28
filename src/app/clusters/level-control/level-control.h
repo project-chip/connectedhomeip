@@ -50,6 +50,12 @@ void emberAfPluginLevelControlClusterServerPostInitCallback(chip::EndpointId end
  */
 bool LevelControlHasFeature(chip::EndpointId endpoint, chip::app::Clusters::LevelControl::Feature feature);
 
+/**
+ * Check whether the instance of the Level Control cluster on the given endpoint
+ * is currently performing an On/Off transition.
+ */
+bool LevelControlIsOnOffTransitionActive(chip::EndpointId endpoint, bool * const targetState);
+
 namespace LevelControlServer {
 
 chip::Protocols::InteractionModel::Status
