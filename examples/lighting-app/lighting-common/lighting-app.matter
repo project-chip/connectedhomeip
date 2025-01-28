@@ -598,131 +598,6 @@ cluster Descriptor = 29 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Access Control Cluster exposes a data model view of a
-      Node's Access Control List (ACL), which codifies the rules used to manage
-      and enforce Access Control for the Node's endpoints and their associated
-      cluster instances. */
-cluster AccessControl = 31 {
-  revision 2;
-
-  enum AccessControlEntryAuthModeEnum : enum8 {
-    kPASE = 1;
-    kCASE = 2;
-    kGroup = 3;
-  }
-
-  enum AccessControlEntryPrivilegeEnum : enum8 {
-    kView = 1;
-    kProxyView = 2;
-    kOperate = 3;
-    kManage = 4;
-    kAdminister = 5;
-  }
-
-  enum AccessRestrictionTypeEnum : enum8 {
-    kAttributeAccessForbidden = 0;
-    kAttributeWriteForbidden = 1;
-    kCommandForbidden = 2;
-    kEventForbidden = 3;
-  }
-
-  enum ChangeTypeEnum : enum8 {
-    kChanged = 0;
-    kAdded = 1;
-    kRemoved = 2;
-  }
-
-  bitmap Feature : bitmap32 {
-    kExtension = 0x1;
-    kManagedDevice = 0x2;
-  }
-
-  struct AccessRestrictionStruct {
-    AccessRestrictionTypeEnum type = 0;
-    nullable int32u id = 1;
-  }
-
-  struct CommissioningAccessRestrictionEntryStruct {
-    endpoint_no endpoint = 0;
-    cluster_id cluster = 1;
-    AccessRestrictionStruct restrictions[] = 2;
-  }
-
-  fabric_scoped struct AccessRestrictionEntryStruct {
-    fabric_sensitive endpoint_no endpoint = 0;
-    fabric_sensitive cluster_id cluster = 1;
-    fabric_sensitive AccessRestrictionStruct restrictions[] = 2;
-    fabric_idx fabricIndex = 254;
-  }
-
-  struct AccessControlTargetStruct {
-    nullable cluster_id cluster = 0;
-    nullable endpoint_no endpoint = 1;
-    nullable devtype_id deviceType = 2;
-  }
-
-  fabric_scoped struct AccessControlEntryStruct {
-    fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
-    fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
-    nullable fabric_sensitive int64u subjects[] = 3;
-    nullable fabric_sensitive AccessControlTargetStruct targets[] = 4;
-    fabric_idx fabricIndex = 254;
-  }
-
-  fabric_scoped struct AccessControlExtensionStruct {
-    fabric_sensitive octet_string<128> data = 1;
-    fabric_idx fabricIndex = 254;
-  }
-
-  fabric_sensitive info event access(read: administer) AccessControlEntryChanged = 0 {
-    nullable node_id adminNodeID = 1;
-    nullable int16u adminPasscodeID = 2;
-    ChangeTypeEnum changeType = 3;
-    nullable AccessControlEntryStruct latestValue = 4;
-    fabric_idx fabricIndex = 254;
-  }
-
-  fabric_sensitive info event access(read: administer) AccessControlExtensionChanged = 1 {
-    nullable node_id adminNodeID = 1;
-    nullable int16u adminPasscodeID = 2;
-    ChangeTypeEnum changeType = 3;
-    nullable AccessControlExtensionStruct latestValue = 4;
-    fabric_idx fabricIndex = 254;
-  }
-
-  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 2 {
-    int64u token = 0;
-    optional long_char_string instruction = 1;
-    optional long_char_string ARLRequestFlowUrl = 2;
-    fabric_idx fabricIndex = 254;
-  }
-
-  attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
-  attribute access(read: administer, write: administer) optional AccessControlExtensionStruct extension[] = 1;
-  readonly attribute int16u subjectsPerAccessControlEntry = 2;
-  readonly attribute int16u targetsPerAccessControlEntry = 3;
-  readonly attribute int16u accessControlEntriesPerFabric = 4;
-  readonly attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
-  readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct ReviewFabricRestrictionsRequest {
-    CommissioningAccessRestrictionEntryStruct arl[] = 0;
-  }
-
-  response struct ReviewFabricRestrictionsResponse = 1 {
-    int64u token = 0;
-  }
-
-  /** This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric. */
-  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
-}
-
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
@@ -894,84 +769,6 @@ cluster OtaSoftwareUpdateProvider = 41 {
   command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
   /** Notify OTA Provider that an update was applied */
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
-}
-
-/** Provides an interface for downloading and applying OTA software updates */
-cluster OtaSoftwareUpdateRequestor = 42 {
-  revision 1; // NOTE: Default/not specifically set
-
-  enum AnnouncementReasonEnum : enum8 {
-    kSimpleAnnouncement = 0;
-    kUpdateAvailable = 1;
-    kUrgentUpdateAvailable = 2;
-  }
-
-  enum ChangeReasonEnum : enum8 {
-    kUnknown = 0;
-    kSuccess = 1;
-    kFailure = 2;
-    kTimeOut = 3;
-    kDelayByProvider = 4;
-  }
-
-  enum UpdateStateEnum : enum8 {
-    kUnknown = 0;
-    kIdle = 1;
-    kQuerying = 2;
-    kDelayedOnQuery = 3;
-    kDownloading = 4;
-    kApplying = 5;
-    kDelayedOnApply = 6;
-    kRollingBack = 7;
-    kDelayedOnUserConsent = 8;
-  }
-
-  fabric_scoped struct ProviderLocation {
-    node_id providerNodeID = 1;
-    endpoint_no endpoint = 2;
-    fabric_idx fabricIndex = 254;
-  }
-
-  info event StateTransition = 0 {
-    UpdateStateEnum previousState = 0;
-    UpdateStateEnum newState = 1;
-    ChangeReasonEnum reason = 2;
-    nullable int32u targetSoftwareVersion = 3;
-  }
-
-  critical event VersionApplied = 1 {
-    int32u softwareVersion = 0;
-    int16u productID = 1;
-  }
-
-  info event DownloadError = 2 {
-    int32u softwareVersion = 0;
-    int64u bytesDownloaded = 1;
-    nullable int8u progressPercent = 2;
-    nullable int64s platformCode = 3;
-  }
-
-  attribute access(write: administer) ProviderLocation defaultOTAProviders[] = 0;
-  readonly attribute boolean updatePossible = 1;
-  readonly attribute UpdateStateEnum updateState = 2;
-  readonly attribute nullable int8u updateStateProgress = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct AnnounceOTAProviderRequest {
-    node_id providerNodeID = 0;
-    vendor_id vendorID = 1;
-    AnnouncementReasonEnum announcementReason = 2;
-    optional octet_string<512> metadataForNode = 3;
-    endpoint_no endpoint = 4;
-  }
-
-  /** Announce the presence of an OTA Provider */
-  command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
@@ -2093,492 +1890,8 @@ cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** Attributes and commands for scene configuration and manipulation. */
-provisional cluster ScenesManagement = 98 {
-  revision 1;
-
-  bitmap CopyModeBitmap : bitmap8 {
-    kCopyAllScenes = 0x1;
-  }
-
-  bitmap Feature : bitmap32 {
-    kSceneNames = 0x1;
-  }
-
-  struct AttributeValuePairStruct {
-    attrib_id attributeID = 0;
-    optional int8u valueUnsigned8 = 1;
-    optional int8s valueSigned8 = 2;
-    optional int16u valueUnsigned16 = 3;
-    optional int16s valueSigned16 = 4;
-    optional int32u valueUnsigned32 = 5;
-    optional int32s valueSigned32 = 6;
-    optional int64u valueUnsigned64 = 7;
-    optional int64s valueSigned64 = 8;
-  }
-
-  struct ExtensionFieldSet {
-    cluster_id clusterID = 0;
-    AttributeValuePairStruct attributeValueList[] = 1;
-  }
-
-  fabric_scoped struct SceneInfoStruct {
-    int8u sceneCount = 0;
-    fabric_sensitive int8u currentScene = 1;
-    fabric_sensitive group_id currentGroup = 2;
-    fabric_sensitive boolean sceneValid = 3;
-    int8u remainingCapacity = 4;
-    fabric_idx fabricIndex = 254;
-  }
-
-  readonly attribute optional nullable node_id lastConfiguredBy = 0;
-  readonly attribute int16u sceneTableSize = 1;
-  readonly attribute SceneInfoStruct fabricSceneInfo[] = 2;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct AddSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-    int32u transitionTime = 2;
-    char_string sceneName = 3;
-    ExtensionFieldSet extensionFieldSets[] = 4;
-  }
-
-  response struct AddSceneResponse = 0 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct ViewSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct ViewSceneResponse = 1 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-    optional int32u transitionTime = 3;
-    optional char_string sceneName = 4;
-    optional ExtensionFieldSet extensionFieldSets[] = 5;
-  }
-
-  request struct RemoveSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct RemoveSceneResponse = 2 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct RemoveAllScenesRequest {
-    group_id groupID = 0;
-  }
-
-  response struct RemoveAllScenesResponse = 3 {
-    status status = 0;
-    group_id groupID = 1;
-  }
-
-  request struct StoreSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct StoreSceneResponse = 4 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct RecallSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-    optional nullable int32u transitionTime = 2;
-  }
-
-  request struct GetSceneMembershipRequest {
-    group_id groupID = 0;
-  }
-
-  response struct GetSceneMembershipResponse = 6 {
-    status status = 0;
-    nullable int8u capacity = 1;
-    group_id groupID = 2;
-    optional int8u sceneList[] = 3;
-  }
-
-  request struct CopySceneRequest {
-    CopyModeBitmap mode = 0;
-    group_id groupIdentifierFrom = 1;
-    int8u sceneIdentifierFrom = 2;
-    group_id groupIdentifierTo = 3;
-    int8u sceneIdentifierTo = 4;
-  }
-
-  response struct CopySceneResponse = 64 {
-    status status = 0;
-    group_id groupIdentifierFrom = 1;
-    int8u sceneIdentifierFrom = 2;
-  }
-
-  /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}' */
-  fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
-  /** Retrieves the requested scene entry from its Scene table. */
-  fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
-  /** Removes the requested scene entry, corresponding to the value of the GroupID field, from its Scene Table */
-  fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
-  /** Remove all scenes, corresponding to the value of the GroupID field, from its Scene Table */
-  fabric command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
-  /** Adds the scene entry into its Scene Table along with all extension field sets corresponding to the current state of other clusters on the same endpoint */
-  fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
-  /** Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene entry in the Scene Table */
-  fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
-  /** Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group */
-  fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
-  /** Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
-  fabric command access(invoke: manage) CopyScene(CopySceneRequest): CopySceneResponse = 64;
-}
-
-/** Attributes and commands for controlling the color properties of a color-capable light. */
-cluster ColorControl = 768 {
-  revision 7;
-
-  enum ColorLoopActionEnum : enum8 {
-    kDeactivate = 0;
-    kActivateFromColorLoopStartEnhancedHue = 1;
-    kActivateFromEnhancedCurrentHue = 2;
-  }
-
-  enum ColorLoopDirectionEnum : enum8 {
-    kDecrement = 0;
-    kIncrement = 1;
-  }
-
-  enum ColorModeEnum : enum8 {
-    kCurrentHueAndCurrentSaturation = 0;
-    kCurrentXAndCurrentY = 1;
-    kColorTemperatureMireds = 2;
-  }
-
-  enum DirectionEnum : enum8 {
-    kShortest = 0;
-    kLongest = 1;
-    kUp = 2;
-    kDown = 3;
-  }
-
-  enum DriftCompensationEnum : enum8 {
-    kNone = 0;
-    kOtherOrUnknown = 1;
-    kTemperatureMonitoring = 2;
-    kOpticalLuminanceMonitoringAndFeedback = 3;
-    kOpticalColorMonitoringAndFeedback = 4;
-  }
-
-  enum EnhancedColorModeEnum : enum8 {
-    kCurrentHueAndCurrentSaturation = 0;
-    kCurrentXAndCurrentY = 1;
-    kColorTemperatureMireds = 2;
-    kEnhancedCurrentHueAndCurrentSaturation = 3;
-  }
-
-  enum MoveModeEnum : enum8 {
-    kStop = 0;
-    kUp = 1;
-    kDown = 3;
-  }
-
-  enum StepModeEnum : enum8 {
-    kUp = 1;
-    kDown = 3;
-  }
-
-  bitmap ColorCapabilitiesBitmap : bitmap16 {
-    kHueSaturation = 0x1;
-    kEnhancedHue = 0x2;
-    kColorLoop = 0x4;
-    kXY = 0x8;
-    kColorTemperature = 0x10;
-  }
-
-  bitmap Feature : bitmap32 {
-    kHueAndSaturation = 0x1;
-    kEnhancedHue = 0x2;
-    kColorLoop = 0x4;
-    kXY = 0x8;
-    kColorTemperature = 0x10;
-  }
-
-  bitmap OptionsBitmap : bitmap8 {
-    kExecuteIfOff = 0x1;
-  }
-
-  bitmap UpdateFlagsBitmap : bitmap8 {
-    kUpdateAction = 0x1;
-    kUpdateDirection = 0x2;
-    kUpdateTime = 0x4;
-    kUpdateStartHue = 0x8;
-  }
-
-  readonly attribute optional int8u currentHue = 0;
-  readonly attribute optional int8u currentSaturation = 1;
-  readonly attribute optional int16u remainingTime = 2;
-  readonly attribute optional int16u currentX = 3;
-  readonly attribute optional int16u currentY = 4;
-  readonly attribute optional DriftCompensationEnum driftCompensation = 5;
-  readonly attribute optional char_string<254> compensationText = 6;
-  readonly attribute optional int16u colorTemperatureMireds = 7;
-  readonly attribute ColorModeEnum colorMode = 8;
-  attribute OptionsBitmap options = 15;
-  readonly attribute nullable int8u numberOfPrimaries = 16;
-  readonly attribute optional int16u primary1X = 17;
-  readonly attribute optional int16u primary1Y = 18;
-  readonly attribute optional nullable int8u primary1Intensity = 19;
-  readonly attribute optional int16u primary2X = 21;
-  readonly attribute optional int16u primary2Y = 22;
-  readonly attribute optional nullable int8u primary2Intensity = 23;
-  readonly attribute optional int16u primary3X = 25;
-  readonly attribute optional int16u primary3Y = 26;
-  readonly attribute optional nullable int8u primary3Intensity = 27;
-  readonly attribute optional int16u primary4X = 32;
-  readonly attribute optional int16u primary4Y = 33;
-  readonly attribute optional nullable int8u primary4Intensity = 34;
-  readonly attribute optional int16u primary5X = 36;
-  readonly attribute optional int16u primary5Y = 37;
-  readonly attribute optional nullable int8u primary5Intensity = 38;
-  readonly attribute optional int16u primary6X = 40;
-  readonly attribute optional int16u primary6Y = 41;
-  readonly attribute optional nullable int8u primary6Intensity = 42;
-  attribute access(write: manage) optional int16u whitePointX = 48;
-  attribute access(write: manage) optional int16u whitePointY = 49;
-  attribute access(write: manage) optional int16u colorPointRX = 50;
-  attribute access(write: manage) optional int16u colorPointRY = 51;
-  attribute access(write: manage) optional nullable int8u colorPointRIntensity = 52;
-  attribute access(write: manage) optional int16u colorPointGX = 54;
-  attribute access(write: manage) optional int16u colorPointGY = 55;
-  attribute access(write: manage) optional nullable int8u colorPointGIntensity = 56;
-  attribute access(write: manage) optional int16u colorPointBX = 58;
-  attribute access(write: manage) optional int16u colorPointBY = 59;
-  attribute access(write: manage) optional nullable int8u colorPointBIntensity = 60;
-  readonly attribute optional int16u enhancedCurrentHue = 16384;
-  readonly attribute EnhancedColorModeEnum enhancedColorMode = 16385;
-  readonly attribute optional int8u colorLoopActive = 16386;
-  readonly attribute optional int8u colorLoopDirection = 16387;
-  readonly attribute optional int16u colorLoopTime = 16388;
-  readonly attribute optional int16u colorLoopStartEnhancedHue = 16389;
-  readonly attribute optional int16u colorLoopStoredEnhancedHue = 16390;
-  readonly attribute ColorCapabilitiesBitmap colorCapabilities = 16394;
-  readonly attribute optional int16u colorTempPhysicalMinMireds = 16395;
-  readonly attribute optional int16u colorTempPhysicalMaxMireds = 16396;
-  readonly attribute optional int16u coupleColorTempToLevelMinMireds = 16397;
-  attribute access(write: manage) optional nullable int16u startUpColorTemperatureMireds = 16400;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct MoveToHueRequest {
-    int8u hue = 0;
-    DirectionEnum direction = 1;
-    int16u transitionTime = 2;
-    OptionsBitmap optionsMask = 3;
-    OptionsBitmap optionsOverride = 4;
-  }
-
-  request struct MoveHueRequest {
-    MoveModeEnum moveMode = 0;
-    int8u rate = 1;
-    OptionsBitmap optionsMask = 2;
-    OptionsBitmap optionsOverride = 3;
-  }
-
-  request struct StepHueRequest {
-    StepModeEnum stepMode = 0;
-    int8u stepSize = 1;
-    int8u transitionTime = 2;
-    OptionsBitmap optionsMask = 3;
-    OptionsBitmap optionsOverride = 4;
-  }
-
-  request struct MoveToSaturationRequest {
-    int8u saturation = 0;
-    int16u transitionTime = 1;
-    OptionsBitmap optionsMask = 2;
-    OptionsBitmap optionsOverride = 3;
-  }
-
-  request struct MoveSaturationRequest {
-    MoveModeEnum moveMode = 0;
-    int8u rate = 1;
-    OptionsBitmap optionsMask = 2;
-    OptionsBitmap optionsOverride = 3;
-  }
-
-  request struct StepSaturationRequest {
-    StepModeEnum stepMode = 0;
-    int8u stepSize = 1;
-    int8u transitionTime = 2;
-    OptionsBitmap optionsMask = 3;
-    OptionsBitmap optionsOverride = 4;
-  }
-
-  request struct MoveToHueAndSaturationRequest {
-    int8u hue = 0;
-    int8u saturation = 1;
-    int16u transitionTime = 2;
-    OptionsBitmap optionsMask = 3;
-    OptionsBitmap optionsOverride = 4;
-  }
-
-  request struct MoveToColorRequest {
-    int16u colorX = 0;
-    int16u colorY = 1;
-    int16u transitionTime = 2;
-    OptionsBitmap optionsMask = 3;
-    OptionsBitmap optionsOverride = 4;
-  }
-
-  request struct MoveColorRequest {
-    int16s rateX = 0;
-    int16s rateY = 1;
-    OptionsBitmap optionsMask = 2;
-    OptionsBitmap optionsOverride = 3;
-  }
-
-  request struct StepColorRequest {
-    int16s stepX = 0;
-    int16s stepY = 1;
-    int16u transitionTime = 2;
-    OptionsBitmap optionsMask = 3;
-    OptionsBitmap optionsOverride = 4;
-  }
-
-  request struct MoveToColorTemperatureRequest {
-    int16u colorTemperatureMireds = 0;
-    int16u transitionTime = 1;
-    OptionsBitmap optionsMask = 2;
-    OptionsBitmap optionsOverride = 3;
-  }
-
-  request struct EnhancedMoveToHueRequest {
-    int16u enhancedHue = 0;
-    DirectionEnum direction = 1;
-    int16u transitionTime = 2;
-    OptionsBitmap optionsMask = 3;
-    OptionsBitmap optionsOverride = 4;
-  }
-
-  request struct EnhancedMoveHueRequest {
-    MoveModeEnum moveMode = 0;
-    int16u rate = 1;
-    OptionsBitmap optionsMask = 2;
-    OptionsBitmap optionsOverride = 3;
-  }
-
-  request struct EnhancedStepHueRequest {
-    StepModeEnum stepMode = 0;
-    int16u stepSize = 1;
-    int16u transitionTime = 2;
-    OptionsBitmap optionsMask = 3;
-    OptionsBitmap optionsOverride = 4;
-  }
-
-  request struct EnhancedMoveToHueAndSaturationRequest {
-    int16u enhancedHue = 0;
-    int8u saturation = 1;
-    int16u transitionTime = 2;
-    OptionsBitmap optionsMask = 3;
-    OptionsBitmap optionsOverride = 4;
-  }
-
-  request struct ColorLoopSetRequest {
-    UpdateFlagsBitmap updateFlags = 0;
-    ColorLoopActionEnum action = 1;
-    ColorLoopDirectionEnum direction = 2;
-    int16u time = 3;
-    int16u startHue = 4;
-    OptionsBitmap optionsMask = 5;
-    OptionsBitmap optionsOverride = 6;
-  }
-
-  request struct StopMoveStepRequest {
-    OptionsBitmap optionsMask = 0;
-    OptionsBitmap optionsOverride = 1;
-  }
-
-  request struct MoveColorTemperatureRequest {
-    MoveModeEnum moveMode = 0;
-    int16u rate = 1;
-    int16u colorTemperatureMinimumMireds = 2;
-    int16u colorTemperatureMaximumMireds = 3;
-    OptionsBitmap optionsMask = 4;
-    OptionsBitmap optionsOverride = 5;
-  }
-
-  request struct StepColorTemperatureRequest {
-    StepModeEnum stepMode = 0;
-    int16u stepSize = 1;
-    int16u transitionTime = 2;
-    int16u colorTemperatureMinimumMireds = 3;
-    int16u colorTemperatureMaximumMireds = 4;
-    OptionsBitmap optionsMask = 5;
-    OptionsBitmap optionsOverride = 6;
-  }
-
-  /** Move to specified hue. */
-  command MoveToHue(MoveToHueRequest): DefaultSuccess = 0;
-  /** Move hue up or down at specified rate. */
-  command MoveHue(MoveHueRequest): DefaultSuccess = 1;
-  /** Step hue up or down by specified size at specified rate. */
-  command StepHue(StepHueRequest): DefaultSuccess = 2;
-  /** Move to specified saturation. */
-  command MoveToSaturation(MoveToSaturationRequest): DefaultSuccess = 3;
-  /** Move saturation up or down at specified rate. */
-  command MoveSaturation(MoveSaturationRequest): DefaultSuccess = 4;
-  /** Step saturation up or down by specified size at specified rate. */
-  command StepSaturation(StepSaturationRequest): DefaultSuccess = 5;
-  /** Move to hue and saturation. */
-  command MoveToHueAndSaturation(MoveToHueAndSaturationRequest): DefaultSuccess = 6;
-  /** Move to specified color. */
-  command MoveToColor(MoveToColorRequest): DefaultSuccess = 7;
-  /** Moves the color. */
-  command MoveColor(MoveColorRequest): DefaultSuccess = 8;
-  /** Steps the lighting to a specific color. */
-  command StepColor(StepColorRequest): DefaultSuccess = 9;
-  /** Move to a specific color temperature. */
-  command MoveToColorTemperature(MoveToColorTemperatureRequest): DefaultSuccess = 10;
-  /** Command description for EnhancedMoveToHue */
-  command EnhancedMoveToHue(EnhancedMoveToHueRequest): DefaultSuccess = 64;
-  /** Command description for EnhancedMoveHue */
-  command EnhancedMoveHue(EnhancedMoveHueRequest): DefaultSuccess = 65;
-  /** Command description for EnhancedStepHue */
-  command EnhancedStepHue(EnhancedStepHueRequest): DefaultSuccess = 66;
-  /** Command description for EnhancedMoveToHueAndSaturation */
-  command EnhancedMoveToHueAndSaturation(EnhancedMoveToHueAndSaturationRequest): DefaultSuccess = 67;
-  /** Command description for ColorLoopSet */
-  command ColorLoopSet(ColorLoopSetRequest): DefaultSuccess = 68;
-  /** Command description for StopMoveStep */
-  command StopMoveStep(StopMoveStepRequest): DefaultSuccess = 71;
-  /** Command description for MoveColorTemperature */
-  command MoveColorTemperature(MoveColorTemperatureRequest): DefaultSuccess = 75;
-  /** Command description for StepColorTemperature */
-  command StepColorTemperature(StepColorTemperatureRequest): DefaultSuccess = 76;
-}
-
 endpoint 0 {
-  device type ma_rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 3;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2588,19 +1901,6 @@ endpoint 0 {
     callback attribute clientList;
     callback attribute partsList;
     callback attribute featureMap;
-    callback attribute clusterRevision;
-  }
-
-  server cluster AccessControl {
-    emits event AccessControlEntryChanged;
-    emits event AccessControlExtensionChanged;
-    callback attribute acl;
-    callback attribute extension;
-    callback attribute subjectsPerAccessControlEntry;
-    callback attribute targetsPerAccessControlEntry;
-    callback attribute accessControlEntriesPerFabric;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 
@@ -2630,21 +1930,7 @@ endpoint 0 {
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
-  }
-
-  server cluster OtaSoftwareUpdateRequestor {
-    emits event StateTransition;
-    emits event VersionApplied;
-    emits event DownloadError;
-    callback attribute defaultOTAProviders;
-    ram      attribute updatePossible default = 1;
-    ram      attribute updateState default = 0;
-    ram      attribute updateStateProgress default = 0;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-
-    handle command AnnounceOTAProvider;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster GeneralCommissioning {
@@ -2654,7 +1940,7 @@ endpoint 0 {
     callback attribute locationCapability;
     callback attribute supportsConcurrentConnection;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ArmFailSafe;
     handle command ArmFailSafeResponse;
@@ -2667,8 +1953,6 @@ endpoint 0 {
   server cluster NetworkCommissioning {
     ram      attribute maxNetworks;
     callback attribute networks;
-    ram      attribute scanMaxTimeSeconds;
-    ram      attribute connectMaxTimeSeconds;
     ram      attribute interfaceEnabled;
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
@@ -2792,7 +2076,7 @@ endpoint 0 {
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
 
     handle command ResetCounts;
   }
@@ -2837,9 +2121,11 @@ endpoint 0 {
   }
 
   server cluster Switch {
-    emits event SwitchLatched;
     ram      attribute numberOfPositions default = 2;
     ram      attribute currentPosition;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
   }
@@ -2852,7 +2138,6 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
 
     handle command OpenCommissioningWindow;
-    handle command OpenBasicCommissioningWindow;
     handle command RevokeCommissioning;
   }
 
@@ -2909,14 +2194,14 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_dimmablelight = 257, version 1;
+  device type ma_dimmablelight = 257, version 3;
 
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0000;
     ram      attribute identifyType default = 0x0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2946,7 +2231,7 @@ endpoint 1 {
     ram      attribute offWaitTime default = 0x0000;
     persist  attribute startUpOnOff default = 0xFF;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command Off;
     handle command On;
@@ -2961,9 +2246,6 @@ endpoint 1 {
     ram      attribute remainingTime default = 0x0000;
     ram      attribute minLevel default = 0x01;
     ram      attribute maxLevel default = 0xFE;
-    ram      attribute currentFrequency default = 0x0000;
-    ram      attribute minFrequency default = 0x0000;
-    ram      attribute maxFrequency default = 0x0000;
     ram      attribute options default = 0x00;
     ram      attribute onOffTransitionTime default = 0x0000;
     ram      attribute onLevel default = 0xFF;
@@ -2991,78 +2273,6 @@ endpoint 1 {
     callback attribute partsList;
     callback attribute featureMap;
     callback attribute clusterRevision;
-  }
-
-  server cluster ScenesManagement {
-    ram      attribute lastConfiguredBy;
-    ram      attribute sceneTableSize default = 16;
-    callback attribute fabricSceneInfo;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 1;
-
-    handle command AddScene;
-    handle command AddSceneResponse;
-    handle command ViewScene;
-    handle command ViewSceneResponse;
-    handle command RemoveScene;
-    handle command RemoveSceneResponse;
-    handle command RemoveAllScenes;
-    handle command RemoveAllScenesResponse;
-    handle command StoreScene;
-    handle command StoreSceneResponse;
-    handle command RecallScene;
-    handle command GetSceneMembership;
-    handle command GetSceneMembershipResponse;
-    handle command CopyScene;
-  }
-
-  server cluster ColorControl {
-    persist  attribute currentHue default = 0x00;
-    persist  attribute currentSaturation default = 0x00;
-    ram      attribute remainingTime default = 0x0000;
-    persist  attribute currentX default = 0x616B;
-    persist  attribute currentY default = 0x607D;
-    persist  attribute colorTemperatureMireds default = 0x00FA;
-    persist  attribute colorMode default = 0x01;
-    ram      attribute options default = 0x00;
-    ram      attribute numberOfPrimaries;
-    persist  attribute enhancedCurrentHue default = 0x0000;
-    persist  attribute enhancedColorMode default = 0x01;
-    persist  attribute colorLoopActive default = 0x00;
-    persist  attribute colorLoopDirection default = 0x00;
-    persist  attribute colorLoopTime default = 0x0019;
-    ram      attribute colorLoopStartEnhancedHue default = 0x2300;
-    ram      attribute colorLoopStoredEnhancedHue default = 0x0000;
-    ram      attribute colorCapabilities default = 0x1F;
-    ram      attribute colorTempPhysicalMinMireds default = 0x009A;
-    ram      attribute colorTempPhysicalMaxMireds default = 0x01C6;
-    ram      attribute coupleColorTempToLevelMinMireds;
-    persist  attribute startUpColorTemperatureMireds default = 0x00FA;
-    ram      attribute featureMap default = 0x1F;
-    ram      attribute clusterRevision default = 7;
-
-    handle command MoveToHue;
-    handle command MoveHue;
-    handle command StepHue;
-    handle command MoveToSaturation;
-    handle command MoveSaturation;
-    handle command StepSaturation;
-    handle command MoveToHueAndSaturation;
-    handle command MoveToColor;
-    handle command MoveColor;
-    handle command StepColor;
-    handle command MoveToColorTemperature;
-    handle command EnhancedMoveToHue;
-    handle command EnhancedMoveHue;
-    handle command EnhancedStepHue;
-    handle command EnhancedMoveToHueAndSaturation;
-    handle command ColorLoopSet;
-    handle command StopMoveStep;
-    handle command MoveColorTemperature;
-    handle command StepColorTemperature;
   }
 }
 
