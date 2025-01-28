@@ -553,29 +553,31 @@ CHIP_ERROR ResetCounters()
     return CHIP_NO_ERROR;
 }
 
-sl_status_t InitWiFiStack(void)
+CHIP_ERROR InitWiFiStack(void)
 {
     sl_status_t status = SL_STATUS_OK;
 
     status = sl_net_init((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
-    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_UNINITIALIZED,
+                        ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
 
     // Create Sempaphore for scan completion
     sScanCompleteSemaphore = osSemaphoreNew(1, 0, nullptr);
-    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
+    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, CHIP_ERROR_NO_MEMORY);
 
     // Create Semaphore for scan in-progress protection
     sScanInProgressSemaphore = osSemaphoreNew(1, 1, nullptr);
-    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
+    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, CHIP_ERROR_NO_MEMORY);
 
     // Create the message queue
     sWifiEventQueue = osMessageQueueNew(kWfxQueueSize, sizeof(WifiPlatformEvent), nullptr);
-    VerifyOrReturnError(sWifiEventQueue != nullptr, SL_STATUS_ALLOCATION_FAILED);
+    VerifyOrReturnError(sWifiEventQueue != nullptr, CHIP_ERROR_NO_MEMORY);
 
     status = CreateDHCPTimer();
-    VerifyOrReturnError(status == SL_STATUS_OK, status);
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_UNINITIALIZED,
+                        ChipLogError(DeviceLayer, "CreateDHCPTimer failed: %lx", status));
 
-    return status;
+    return CHIP_NO_ERROR;
 }
 
 void HandleDHCPPolling(void)

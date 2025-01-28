@@ -180,12 +180,10 @@ extern WfxRsi_t wfx_rsi;
 /**
  * @brief Function initalize the WiFi module before starting WiFi task.
  *
- * @return sl_status_t SL_STATUS_OK, if the initialization succeeded
- *                     SL_STATUS_ALLOCATION_FAILED, if there are a memory allocation failure,
- *                     SL_STATUS_FAILURE, otherwise
+ * @return CHIP_ERROR CHIP_NO_ERROR, if the initialization succeeded
  */
 
-sl_status_t InitWiFiStack(void);
+CHIP_ERROR InitWiFiStack(void);
 
 /**
  * @brief Function notifies the PlatformManager that an IPv6 event occured on the WiFi interface.

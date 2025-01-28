@@ -638,15 +638,12 @@ void ProcessEvent(WifiPlatformEvent event)
     }
 }
 
-sl_status_t InitWiFiStack(void)
+CHIP_ERROR InitWiFiStack(void)
 {
     int32_t status = sl_matter_wifi_init();
-    if (status != RSI_SUCCESS)
-    {
-        ChipLogError(DeviceLayer, "sl_matter_wifi_init: failed: %ld", status);
-        return SL_STATUS_FAIL;
-    }
-    return SL_STATUS_OK;
+    VerifyOrReturnError(status == RSI_SUCCESS, CHIP_ERROR_UNINITIALIZED,
+                        ChipLogError(DeviceLayer, "sl_matter_wifi_init failed: %lx", status));
+    return CHIP_NO_ERROR;
 }
 
 void MatterWifiTask(void * arg)

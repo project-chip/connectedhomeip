@@ -1186,10 +1186,13 @@ void wfx_cancel_scan(void)
     scan_cb = nullptr;
 }
 
-sl_status_t InitWiFiStack(void)
+CHIP_ERROR InitWiFiStack(void)
 {
     // TODO: This function should include sl_wfx_hw_init() and sl_wfx_init() functions. Only done now to make MatterConfig platform
-    // agnostic.
+    // agnostic. (MATTER-4680)
     // Start wfx bus communication task.
-    return wfx_bus_start();
+    sl_status_t status = wfx_bus_start();
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(DeviceLayer, "wfx_bus_start failed: %lx", status));
+    return CHIP_NO_ERROR;
 }

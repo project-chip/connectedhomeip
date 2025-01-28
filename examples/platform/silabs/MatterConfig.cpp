@@ -27,6 +27,10 @@
 #ifdef SL_WIFI
 #include <platform/silabs/wifi/WifiInterface.h>
 
+// TODO: We shouldn't need any platform specific includes in this file
+#if (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
+#include <platform/silabs/SiWx917/SiWxPlatformInterface.h>
+#endif // (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
 #endif // SL_WIFI
 
 #if PW_RPC_ENABLED
@@ -304,8 +308,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #ifdef SL_WIFI
 CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 {
-    VerifyOrReturnError(InitWiFiStack() == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
-    return CHIP_NO_ERROR;
+    return InitWiFiStack();
 }
 #endif // SL_WIFI
 
