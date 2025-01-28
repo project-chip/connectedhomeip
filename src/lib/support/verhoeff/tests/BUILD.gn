@@ -22,8 +22,6 @@ chip_test_suite("tests") {
 
   test_sources = [ "TestVerhoeff.cpp" ]
 
-  sources = []
-
   public_deps = [ "${chip_root}/src/lib/support:support" ]
 
   cflags = [ "-Wconversion" ]
