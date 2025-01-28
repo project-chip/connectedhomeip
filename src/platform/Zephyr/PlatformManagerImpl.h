@@ -48,6 +48,7 @@ public:
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
     uint32_t GetSavedOperationalHoursSinceBoot() { return mSavedOperationalHoursSinceBoot; }
+    void SetSavedOperationalHoursSinceBoot(uint32_t hours) { mSavedOperationalHoursSinceBoot = hours; }
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
