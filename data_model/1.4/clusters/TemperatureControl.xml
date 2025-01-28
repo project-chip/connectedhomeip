@@ -51,9 +51,11 @@ are the sole property of their respective owners.
 
 This notice and disclaimer must be included on all copies of this document.
 
-Connectivity Standards Alliance +
-508 Second Street, Suite 206 +
+Connectivity Standards Alliance
+508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0056" name="Temperature Control Cluster" revision="1">
   <revisionHistory>
@@ -82,11 +84,14 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="TN"/>
       </mandatoryConform>
-      <constraint type="between" from="MinTemperature" to="MaxTemperature"/>
+      <constraint type="between">
+        <from attribute="MinTemperature"/>
+        <to attribute="MaxTemperature"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="MinTemperature" type="temperature">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="TN"/>
       </mandatoryConform>
@@ -94,7 +99,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="MaxTemperature" type="temperature">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="TN"/>
       </mandatoryConform>
@@ -102,7 +107,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="Step" type="temperature">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="STEP"/>
       </mandatoryConform>

@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0030" name="General Commissioning Cluster" revision="2">
   <revisionHistory>
@@ -74,29 +76,29 @@ Davis, CA 95616, USA
       <item value="0" name="OK" summary="No error">
         <mandatoryConform/>
       </item>
-      <item value="1" name="ValueOutsideRange" summary="[[ref_ValueOutsideRange]] Attempting to set regulatory configuration to a region or indoor/outdoor mode for which the server does not have proper configuration.">
+      <item value="1" name="ValueOutsideRange" summary="Attempting to set regulatory configuration to a region or indoor/outdoor mode for which the server does not have proper configuration.">
         <mandatoryConform/>
       </item>
-      <item value="2" name="InvalidAuthentication" summary="[[ref_InvalidAuthentication]] Executed CommissioningComplete outside CASE session.">
+      <item value="2" name="InvalidAuthentication" summary="Executed CommissioningComplete outside CASE session.">
         <mandatoryConform/>
       </item>
-      <item value="3" name="NoFailSafe" summary="[[ref_NoFailSafe]] Executed CommissioningComplete when there was no active ArmFailSafe Command.">
+      <item value="3" name="NoFailSafe" summary="Executed CommissioningComplete when there was no active Fail-Safe context.">
         <mandatoryConform/>
       </item>
-      <item value="4" name="BusyWithOtherAdmin" summary="[[ref_BusyWithOtherAdmin]] Attempting to arm fail-safe or execute CommissioningComplete from a fabric different than the one associated with the current fail-safe context.">
+      <item value="4" name="BusyWithOtherAdmin" summary="Attempting to arm fail-safe or execute CommissioningComplete from a fabric different than the one associated with the current fail-safe context.">
         <mandatoryConform/>
       </item>
-      <item value="5" name="RequiredTCNotAccepted" summary="[[ref_RequiredTCNotAccepted]] One or more required TC features from the Enhanced Setup Flow were not accepted.">
+      <item value="5" name="RequiredTCNotAccepted" summary="One or more required TC features from the Enhanced Setup Flow were not accepted.">
         <mandatoryConform>
           <feature name="TC"/>
         </mandatoryConform>
       </item>
-      <item value="6" name="TCAcknowledgementsNotReceived" summary="[[ref_TCAcknowledgementsNotReceived, TCAcknowledgementsNotReceived]] No acknowledgements from the user for the TC features were received.">
+      <item value="6" name="TCAcknowledgementsNotReceived" summary="TCAcknowledgementsNotReceived No acknowledgements from the user for the TC features were received.">
         <mandatoryConform>
           <feature name="TC"/>
         </mandatoryConform>
       </item>
-      <item value="7" name="TCMinVersionNotMet" summary="[[ref_TCMinVersionNotMet, TCMinVersionNotMet]] The version of the TC features acknowledged by the user did not meet the minimum required version.">
+      <item value="7" name="TCMinVersionNotMet" summary="TCMinVersionNotMet The version of the TC features acknowledged by the user did not meet the minimum required version.">
         <mandatoryConform>
           <feature name="TC"/>
         </mandatoryConform>
@@ -130,27 +132,28 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="BasicCommissioningInfo" type="BasicCommissioningInfo">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0002" name="RegulatoryConfig" type="RegulatoryLocationTypeEnum" default="LocationCapability">
+    <attribute id="0x0002" name="RegulatoryConfig" type="RegulatoryLocationTypeEnum">
+      <default attribute="LocationCapability"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="LocationCapability" type="RegulatoryLocationTypeEnum" default="IndoorOutdoor">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0004" name="SupportsConcurrentConnection" type="bool" default="true">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0005" name="TCAcceptedVersion" type="uint16">
       <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform>
@@ -160,7 +163,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0006" name="TCMinRequiredVersion" type="uint16">
       <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform>
@@ -170,7 +173,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0007" name="TCAcknowledgements" type="map16">
       <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform>
@@ -180,7 +183,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0008" name="TCAcknowledgementsRequired" type="bool" default="true">
       <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform>
@@ -190,7 +193,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0009" name="TCUpdateDeadline" type="uint32">
       <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform>
@@ -212,12 +215,12 @@ Davis, CA 95616, USA
     </command>
     <command id="0x01" name="ArmFailSafeResponse" direction="responseFromServer">
       <mandatoryConform/>
-      <field id="0" name="ErrorCode" type="CommissioningErrorEnum" default="OK">
+      <field id="0" name="ErrorCode" type="CommissioningErrorEnum" default="SUCCESS">
         <mandatoryConform/>
       </field>
-      <field id="1" name="DebugText" type="String" default="&quot;">
+      <field id="1" name="DebugText" type="string" default="&quot;&quot;">
         <mandatoryConform/>
-        <constraint type="max" value="128"/>
+        <constraint type="maxLength" value="128"/>
       </field>
     </command>
     <command id="0x02" name="SetRegulatoryConfig" direction="commandToServer" response="SetRegulatoryConfigResponse">
@@ -228,7 +231,7 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="CountryCode" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="2"/>
+        <constraint type="allowed" value="2"/>
       </field>
       <field id="2" name="Breadcrumb" type="uint64">
         <mandatoryConform/>
@@ -236,10 +239,10 @@ Davis, CA 95616, USA
     </command>
     <command id="0x03" name="SetRegulatoryConfigResponse" direction="responseFromServer">
       <mandatoryConform/>
-      <field id="0" name="ErrorCode" type="CommissioningErrorEnum" default="OK">
+      <field id="0" name="ErrorCode" type="CommissioningErrorEnum" default="SUCCESS">
         <mandatoryConform/>
       </field>
-      <field id="1" name="DebugText" type="String" default="&quot;">
+      <field id="1" name="DebugText" type="string" default="&quot;&quot;">
         <mandatoryConform/>
       </field>
     </command>
@@ -249,10 +252,10 @@ Davis, CA 95616, USA
     </command>
     <command id="0x05" name="CommissioningCompleteResponse" direction="responseFromServer">
       <mandatoryConform/>
-      <field id="0" name="ErrorCode" type="CommissioningErrorEnum" default="OK">
+      <field id="0" name="ErrorCode" type="CommissioningErrorEnum" default="SUCCESS">
         <mandatoryConform/>
       </field>
-      <field id="1" name="DebugText" type="String" default="&quot;">
+      <field id="1" name="DebugText" type="string" default="&quot;&quot;">
         <mandatoryConform/>
       </field>
     </command>
@@ -278,7 +281,7 @@ Davis, CA 95616, USA
           <feature name="TC"/>
         </mandatoryConform>
       </otherwiseConform>
-      <field id="0" name="ErrorCode" type="CommissioningErrorEnum" default="OK">
+      <field id="0" name="ErrorCode" type="CommissioningErrorEnum" default="SUCCESS">
         <mandatoryConform/>
       </field>
     </command>

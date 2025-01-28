@@ -69,10 +69,10 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="EPREF" scope="Endpoint"/>
   <features>
     <feature bit="0" code="BALA" name="EnergyBalance" summary="Device can balance energy consumption vs. another priority">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="1" code="LPMS" name="LowPowerModeSensitivity" summary="Device can adjust the conditions for entering a low power mode">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
   </features>
   <dataTypes>
@@ -92,9 +92,11 @@ Davis, CA 95616, USA
     </enum>
     <struct name="BalanceStruct">
       <field id="0" name="Step" type="percent" default="MS">
+        <quality persistence="fixed"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="Label" type="string">
+        <quality persistence="fixed"/>
         <optionalConform/>
         <constraint type="maxLength" value="64"/>
       </field>
@@ -104,7 +106,7 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="EnergyBalances" type="list">
       <entry type="BalanceStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="BALA"/>
       </mandatoryConform>
@@ -112,7 +114,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="CurrentEnergyBalance" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="BALA"/>
       </mandatoryConform>
@@ -120,7 +122,7 @@ Davis, CA 95616, USA
     <attribute id="0x0002" name="EnergyPriorities" type="list">
       <entry type="EnergyPriorityEnum"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="BALA"/>
       </mandatoryConform>
@@ -129,7 +131,7 @@ Davis, CA 95616, USA
     <attribute id="0x0003" name="LowPowerModeSensitivities" type="list">
       <entry type="BalanceStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="LPMS"/>
       </mandatoryConform>
@@ -137,7 +139,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="CurrentLowPowerModeSensitivity" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="LPMS"/>
       </mandatoryConform>

@@ -69,12 +69,10 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="DEM" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="PA" name="PowerAdjustment" summary="Allows an EMS to make a temporary power
-                                                                           adjustment (within the limits offered by the ESA).">
+    <feature bit="0" code="PA" name="PowerAdjustment" summary="Allows an EMS to make a temporary power adjustment (within the limits offered by the ESA).">
       <optionalConform/>
     </feature>
-    <feature bit="1" code="PFR" name="PowerForecastReporting" summary="Allows an ESA to advertise its indicative
-                                                                           future power consumption vs time.">
+    <feature bit="1" code="PFR" name="PowerForecastReporting" summary="Allows an ESA to advertise its indicative future power consumption vs time.">
       <otherwiseConform>
         <optionalConform choice="a">
           <notTerm>
@@ -92,33 +90,27 @@ Davis, CA 95616, USA
         <optionalConform/>
       </otherwiseConform>
     </feature>
-    <feature bit="2" code="SFR" name="StateForecastReporting" summary="Allows an ESA to advertise its indicative
-                                                                           future state vs time.">
+    <feature bit="2" code="SFR" name="StateForecastReporting" summary="Allows an ESA to advertise its indicative future state vs time.">
       <optionalConform choice="a">
         <notTerm>
           <feature name="PA"/>
         </notTerm>
       </optionalConform>
     </feature>
-    <feature bit="3" code="STA" name="StartTimeAdjustment" summary="Allows an EMS to delay an ESA's
-                                                                           planned operation.">
+    <feature bit="3" code="STA" name="StartTimeAdjustment" summary="Allows an EMS to delay an ESA&apos;s planned operation.">
       <optionalConform/>
     </feature>
-    <feature bit="4" code="PAU" name="Pausable" summary="Allows an EMS to pause an ESA's
-                                                                           planned operation.">
+    <feature bit="4" code="PAU" name="Pausable" summary="Allows an EMS to pause an ESA&apos;s planned operation.">
       <optionalConform/>
     </feature>
-    <feature bit="5" code="FA" name="ForecastAdjustment" summary="Allows an EMS to adjust an ESA's
-                                                                           planned operation.">
+    <feature bit="5" code="FA" name="ForecastAdjustment" summary="Allows an EMS to adjust an ESA&apos;s planned operation.">
       <optionalConform/>
     </feature>
-    <feature bit="6" code="CON" name="ConstraintBasedAdjustment" summary="Allows an EMS to request constraints to an ESA's
-                                                                           planned operation.">
+    <feature bit="6" code="CON" name="ConstraintBasedAdjustment" summary="Allows an EMS to request constraints to an ESA&apos;s planned operation.">
       <optionalConform/>
     </feature>
   </features>
   <dataTypes>
-    <number name="PowerAdjustCapability" type=""/>
     <enum name="AdjustmentCauseEnum">
       <item value="0" name="LocalOptimization" summary="The adjustment is to optimize the local energy usage">
         <mandatoryConform/>
@@ -137,7 +129,7 @@ Davis, CA 95616, USA
       <item value="2" name="Fault" summary="The ESA has developed a fault could not complete the adjustment">
         <mandatoryConform/>
       </item>
-      <item value="3" name="UserOptOut" summary="The user has disabled the ESA's flexibility capability">
+      <item value="3" name="UserOptOut" summary="The user has disabled the ESA&apos;s flexibility capability">
         <mandatoryConform/>
       </item>
       <item value="4" name="Cancelled" summary="The adjustment was cancelled by a client">
@@ -475,12 +467,12 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="ESAType" type="ESATypeEnum" default="Other">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="ESACanGenerate" type="bool" default="false">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="ESAState" type="ESAStateEnum" default="0">
@@ -495,18 +487,20 @@ Davis, CA 95616, USA
     <attribute id="0x0004" name="AbsMaxPower" type="power-mW" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="min" value="AbsMinPower"/>
+      <constraint type="min">
+        <value attribute="AbsMinPower"/>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="PowerAdjustmentCapability" type="PowerAdjustCapabilityStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="PA"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0006" name="Forecast" type="ForecastStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform>
         <orTerm>
           <feature name="PFR"/>

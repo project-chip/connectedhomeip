@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 
-:sectnums:
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0025" name="Actions Cluster" revision="1">
   <revisionHistory>
@@ -101,7 +101,7 @@ Davis, CA 95616, USA
       <item value="3" name="Automation" summary="Control an automation (e.g. motion sensor controlling lights)">
         <mandatoryConform/>
       </item>
-      <item value="4" name="Exception" summary="Sequence that will run when something doesn't happen">
+      <item value="4" name="Exception" summary="Sequence that will run when something doesn&apos;t happen">
         <mandatoryConform/>
       </item>
       <item value="5" name="Notification" summary="Use the endpoints to send a message to user">
@@ -166,7 +166,8 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Name" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="128{32}"/>
+        <constraint type="maxLength" value="128"/>
+        <constraint type="maxCodePoints" value="32"/>
       </field>
       <field id="2" name="Type" type="ActionTypeEnum">
         <mandatoryConform/>
@@ -184,21 +185,18 @@ Davis, CA 95616, USA
     </struct>
     <struct name="EndpointListStruct">
       <field id="0" name="EndpointListID" type="uint16">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="Name" type="string">
-        <access read="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="128{32}"/>
+        <constraint type="maxLength" value="128"/>
+        <constraint type="maxCodePoints" value="32"/>
       </field>
       <field id="2" name="Type" type="EndpointListTypeEnum">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="3" name="Endpoints" type="list">
         <entry type="endpoint-no"/>
-        <access read="true"/>
         <mandatoryConform/>
         <constraint type="maxCount" value="256"/>
       </field>

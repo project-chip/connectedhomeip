@@ -113,14 +113,14 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="CatalogList" type="list">
       <entry type="uint16"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="AP"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0001" name="CurrentApp" type="ApplicationEPStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
