@@ -696,12 +696,23 @@ const AttestationTrustStore * GetTestAttestationTrustStore()
     return &gTestAttestationTrustStore.get();
 }
 
+namespace {
+// This store's the instance of DefaultDACVerifier
+// This can be used to perform updates on DefaultDACVerifier
+DefaultDACVerifier* gDefaultDACVerifier = nullptr;
+} // namespace
+
 DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore,
                                                   DeviceAttestationRevocationDelegate * revocationDelegate)
 {
     static DefaultDACVerifier defaultDACVerifier{ paaRootStore, revocationDelegate };
-
+    gDefaultDACVerifier = &defaultDACVerifier;
     return &defaultDACVerifier;
+}
+
+DefaultDACVerifier * GetDefaultDACVerifierInstance()
+{
+    return gDefaultDACVerifier;
 }
 
 } // namespace Credentials
