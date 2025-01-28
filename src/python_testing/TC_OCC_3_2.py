@@ -44,8 +44,11 @@ import logging
 import time
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
-                                         async_test_body, await_sequence_of_reports, default_matter_test_main)
+from chip.testing.decorators import async_test_body
+from chip.testing.matter_base_test import MatterBaseTest
+from chip.testing.models import TestStep, AttributeValue
+from chip.testing.runner import default_matter_test_main
+from chip.testing.utilities import ClusterAttributeChangeAccumulator, await_sequence_of_reports
 from mobly import asserts
 
 
