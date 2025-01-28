@@ -15,13 +15,14 @@
 #    limitations under the License.
 #
 
+from mobly import asserts
+
 from chip.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, DeviceTypeIdType, attribute_id_type,
                                                cluster_id_type, command_id_type, device_type_id_type, is_standard_attribute_id,
                                                is_standard_cluster_id, is_standard_command_id, is_standard_device_type_id,
                                                is_valid_attribute_id, is_valid_cluster_id, is_valid_command_id,
                                                is_valid_device_type_id)
 from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from mobly import asserts
 
 
 class TestIdChecks(MatterBaseTest):

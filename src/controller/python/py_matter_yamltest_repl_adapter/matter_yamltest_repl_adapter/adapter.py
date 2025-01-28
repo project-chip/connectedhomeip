@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from chip.yaml.runner import ReplTestRunner
 from matter_yamltests.adapter import TestAdapter
+
+from chip.yaml.runner import ReplTestRunner
 
 
 class Adapter(TestAdapter):

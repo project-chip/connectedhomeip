@@ -44,12 +44,13 @@
 import logging
 import time
 
+from mobly import asserts
+from TC_DEMTestBase import DEMTestBase
+
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
 from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
-from TC_DEMTestBase import DEMTestBase
 
 logger = logging.getLogger(__name__)
 

@@ -20,10 +20,11 @@ from ctypes import CFUNCTYPE, POINTER, c_uint8, c_uint32, c_uint64, c_void_p
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
+from construct import Int8ul, Int16ul, Int32ul, Int64ul, Struct  # type: ignore
+
 import chip.exceptions
 import chip.native
 import chip.tlv
-from construct import Int8ul, Int16ul, Int32ul, Int64ul, Struct  # type: ignore
 
 # The type should match CommandStatus in interaction_model/Delegate.h
 # CommandStatus should not contain padding

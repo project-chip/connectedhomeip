@@ -19,12 +19,13 @@ import logging
 import os
 import re
 
-import chip.interaction_model
 import pytest
-from chip.clusters.Objects import AccessControl
-from chip.clusters.Types import NullValue
 from common.utils import (connect_device, disconnect_device, discover_device, get_setup_payload, read_zcl_attribute,
                           write_zcl_attribute)
+
+import chip.interaction_model
+from chip.clusters.Objects import AccessControl
+from chip.clusters.Types import NullValue
 
 log = logging.getLogger(__name__)
 

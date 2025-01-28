@@ -228,8 +228,6 @@ restylers:
       command:
           - autopep8
           - "--in-place"
-          - "--max-line-length"
-          - "132"
       arguments: []
       include:
           - "**/*.py"

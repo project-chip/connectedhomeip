@@ -41,13 +41,14 @@ import asyncio
 import os
 
 import base
-import chip.logging
 import click
 import coloredlogs
 from base import BaseTestHelper, FailIfNot, SetTestSet, TestFail, TestTimeout, logger
-from chip.tracing import TracingContext
 from cluster_objects import ClusterObjectTests
 from network_commissioning import NetworkCommissioningTests
+
+import chip.logging
+from chip.tracing import TracingContext
 
 # The thread network dataset tlv for testing, splitted into T-L-V.
 

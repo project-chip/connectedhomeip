@@ -41,11 +41,12 @@
 
 import logging
 
+from mobly import asserts
+from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
+
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
-from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
 
 logger = logging.getLogger(__name__)
 

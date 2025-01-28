@@ -66,14 +66,15 @@ import struct
 import tempfile
 import time
 
+from ecdsa.curves import NIST256p
+from mobly import asserts
+from TC_SC_3_6 import AttributeChangeAccumulator
+
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.testing.apps import AppServerSubprocess
 from chip.testing.matter_testing import (MatterBaseTest, SetupParameters, TestStep, async_test_body, default_matter_test_main,
                                          type_matches)
-from ecdsa.curves import NIST256p
-from mobly import asserts
-from TC_SC_3_6 import AttributeChangeAccumulator
 
 # Length of `w0s` and `w1s` elements
 WS_LENGTH = NIST256p.baselen + 8

@@ -21,8 +21,9 @@ from ctypes import (CFUNCTYPE, POINTER, _Pointer, c_bool, c_char, c_size_t, c_ui
                     string_at)
 from typing import TYPE_CHECKING
 
-from chip import native
 from ecdsa import ECDH, NIST256p, SigningKey  # type: ignore
+
+from chip import native
 
 # WORKAROUND: Create a subscriptable pointer type (with square brackets) to ensure compliance of type hinting with ctypes
 if not TYPE_CHECKING:

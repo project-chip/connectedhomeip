@@ -26,6 +26,7 @@ from optparse import OptionParser
 
 import example_python_commissioning_flow
 from base import BaseTestHelper, TestFail, TestTimeout, logger
+
 from chip import ChipDeviceCtrl
 from chip import clusters as Clusters
 from chip import commissioning

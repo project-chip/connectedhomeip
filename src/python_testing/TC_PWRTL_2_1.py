@@ -36,9 +36,10 @@
 
 import logging
 
+from mobly import asserts
+
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from mobly import asserts
 
 
 class TC_PWRTL_2_1(MatterBaseTest):

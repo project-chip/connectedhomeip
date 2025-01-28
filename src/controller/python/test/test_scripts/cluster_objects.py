@@ -20,6 +20,7 @@ import logging
 import pprint
 
 import base
+
 import chip.clusters as Clusters
 import chip.exceptions
 import chip.interaction_model

@@ -37,13 +37,14 @@
 import logging
 import queue
 
+from mobly import asserts
+
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from mobly import asserts
 
 
 class AttributeChangeCallback:
