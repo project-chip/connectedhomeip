@@ -63,7 +63,22 @@ class TC_G_2_2(MatterBaseTest):
                 TestStep("7a", "TH binds GroupId (maxgroups+1) with GroupKeySetID 1"),
                 TestStep("7b", "TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the GroupID set to (maxgroups+1)"),
                 TestStep("8", "TH reads GroupTable attribute from the GroupKeyManagement cluster from DUT on EP0"),
-                TestStep("9", "TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the following fields : GroupID as 0x0000, GroupName as Gp0")]
+                TestStep("9", "TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the following fields : GroupID as 0x0000, GroupName as Gp0"),
+                TestStep("10", "TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the following fields : GroupID as maxgroups+0x0005 GroupName as Gp5"),
+                TestStep("11", "TH sends ViewGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the following fields: GroupID as 0x0001"),
+                TestStep("12", "Verify that the ViewGroupResponse contains GroupName belongs to the GroupID in the ViewGroup command"),
+                TestStep("13", "TH sends ViewGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the following fields: GroupID as 0x0000"),
+                TestStep("14", "TH sends RemoveGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the following field :GroupID as 0x0001"),
+                TestStep("15", "TH sends ViewGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the following field : GroupID as 0x0001"),
+                TestStep("16", "TH reads GroupTable attribute from the GroupKeyManagement cluster from DUT on EP0"),
+                TestStep("17", "TH sends RemoveGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the following field : GroupID as 0x0000"),
+                TestStep("18", "TH sends RemoveGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the following field : GroupID as 0x0001"),
+                TestStep("19", "TH reads GroupTable attribute from the GroupKeyManagement cluster from DUT on EP0"),
+                TestStep("20", "TH sends RemoveAllGroups command to DUT on PIXIT.G.ENDPOINT as unicast method"),
+                TestStep("21", "TH sends ViewGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the following fields: GroupID as 0x0002"),
+                TestStep("22", "TH reads GroupTable attribute from the GroupKeyManagement cluster from DUT on EP0"),
+                TestStep("23", "TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the following fields: GroupID as 0x0001, GroupName as Gp123456789123456 Note: GroupName length > 16"),
+                TestStep("24", "TH reads GroupTable attribute from the GroupKeyManagement cluster from DUT on EP0")]
 
     @async_test_body
     async def test_TC_G_2_2(self):
@@ -242,6 +257,68 @@ class TC_G_2_2(MatterBaseTest):
         kGroupName = "Gp0"
         result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId, kGroupName))
         asserts.assert_equal(result.status, Status.ConstraintError, "GroupId must be not in the range of 0x0001 to 0xffff")
+
+        self.step("10")
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId5, kGroupName5))
+        asserts.assert_equal(result.status, Status.UnsupportedAccess, "Must be get an UNSUPPORTED_ACCESS as groupID in the AddGroup command does not have the security key")
+
+        self.step("11")
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.ViewGroup(kGroupId1))
+        asserts.assert_equal(result.status, Status.Success, "ViewGroup 0x0001 failed")
+
+        self.step("12")
+        asserts.assert_equal(result.groupName, kGroupName1, "Unexpected error GroupName does not match written value")
+
+        self.step("13")
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.ViewGroup(kGroupId))
+        asserts.assert_equal(result.status, Status.ConstraintError, "GroupId must be not in the range of 0x0001 to 0xffff")
+
+        self.step("14")
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.RemoveGroup(kGroupId1))
+        asserts.assert_equal(result.status, Status.Success, "Unexpected error from RemoveGroupResponse")
+
+        self.step("15")
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.ViewGroup(kGroupId1))
+        asserts.assert_equal(result.status, Status.NotFound, "Unexpected error GroupID as 0x0001 must be NOT_FOUND")
+
+        self.step("16")
+        groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
+            dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
+        asserts.assert_is_not(groupTableList[0], kGroupId1, "Unexpected error must not contains GroupID 0x0001")
+
+        self.step("17")
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.RemoveGroup(kGroupId))
+        asserts.assert_equal(result.status, Status.ConstraintError, "Unexpected error from RemoveGroupResponse")
+
+        self.step("18")
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.RemoveGroup(kGroupId1))
+        asserts.assert_equal(result.status, Status.NotFound, "Unexpected error from RemoveGroupResponse")
+
+        self.step("19")
+        groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
+            dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
+        asserts.assert_is_not(groupTableList[0], kGroupId1, "Unexpected error must not contains GroupID 0x0001")
+        self.step("20")
+        await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.RemoveAllGroups())
+
+        self.step("21")
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.ViewGroup(kGroupId2))
+        asserts.assert_equal(result.status, Status.NotFound, "Unexpected error GroupID as 0x0002 must be NOT_FOUND")
+
+        self.step("22")
+        groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
+            dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
+        asserts.assert_equal(groupTableList, [], "Unexpected error must be no there entries associated")
+
+        self.step("23")
+        kGroupNameOverflow = "Gp123456789123456"
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId, kGroupNameOverflow))
+        asserts.assert_equal(result.status, Status.ConstraintError, "Unexpected error status must be CONSTRAINT_ERROR as the groupName is of lenght > 16")
+
+        self.step("24")
+        groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
+            dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
+        asserts.assert_equal(groupTableList, [], "Unexpected error must be no there entries associated")
 
 
 if __name__ == "__main__":
