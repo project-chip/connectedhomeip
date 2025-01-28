@@ -41,10 +41,13 @@ from datetime import timedelta
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import (MatterBaseTest, async_test_body, compare_time, default_matter_test_main, type_matches,
-                                         utc_time_in_matter_epoch)
-from chip.tlv import uint
+from chip.testing.decorators import async_test_body
+from chip.testing.matter_base_test import MatterBaseTest
+from chip.testing.runner import default_matter_test_main
+from chip.testing.utilities import compare_time, type_matches, utc_time_in_matter_epoch
 from mobly import asserts
+
+from controller.python.chip.tlv import uint
 
 
 class TC_TIMESYNC_2_9(MatterBaseTest):

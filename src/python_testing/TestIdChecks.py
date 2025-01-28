@@ -20,7 +20,8 @@ from chip.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, C
                                                is_standard_cluster_id, is_standard_command_id, is_standard_device_type_id,
                                                is_valid_attribute_id, is_valid_cluster_id, is_valid_command_id,
                                                is_valid_device_type_id)
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from chip.testing.matter_base_test import MatterBaseTest
+from chip.testing.runner import default_matter_test_main
 from mobly import asserts
 
 

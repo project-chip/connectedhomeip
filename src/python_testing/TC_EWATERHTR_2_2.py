@@ -47,7 +47,11 @@ import logging
 import time
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.decorators import async_test_body
+from chip.testing.matter_base_test import MatterBaseTest
+from chip.testing.models import TestStep
+from chip.testing.runner import default_matter_test_main
+from chip.testing.utilities import EventChangeCallback
 from mobly import asserts
 from TC_EWATERHTRBase import EWATERHTRBase
 

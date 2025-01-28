@@ -45,7 +45,9 @@ from typing import Any, Dict, List, Set
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status as StatusEnum
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.decorators import async_test_body
+from chip.testing.matter_base_test import MatterBaseTest
+from chip.testing.runner import default_matter_test_main
 from chip.utils import CommissioningBuildingBlocks
 from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator, ResubscriptionCatcher
