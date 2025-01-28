@@ -641,7 +641,7 @@ void ProcessEvent(WifiPlatformEvent event)
 CHIP_ERROR InitWiFiStack(void)
 {
     int32_t status = sl_matter_wifi_init();
-    VerifyOrReturnError(status == RSI_SUCCESS, CHIP_ERROR_UNINITIALIZED,
+    VerifyOrReturnError(status == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "sl_matter_wifi_init failed: %lx", status));
     return CHIP_NO_ERROR;
 }
