@@ -35,7 +35,7 @@ declare_args() {
   # Boards BRD4317A, BRD4316A and BRD4319A disable this explicitly
   use_wstk_leds = true
 
-  # Boards BRD2703A and BRD4319A disable this explicitly
+  # Boards BRD2703A, BRD4350A and BRD4319A disable this explicitly
   use_external_flash = true
 
   # WIFI rcp boards options for wifi apps.
@@ -180,6 +180,12 @@ if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A" ||
 } else if (silabs_board == "BRD4118A") {
   silabs_family = "efr32mg26"
   silabs_mcu = "EFR32MG26B510F3200IL136"
+} else if (silabs_board == "BRD4350A") {
+  silabs_family = "mgm26"
+  silabs_mcu = "MGM260PB22VNA"
+
+  # MGM260 do not have an external flash
+  use_external_flash = false
 } else if (silabs_board == "BRD2608A") {
   silabs_family = "efr32mg26"
   silabs_mcu = "EFR32MG26B510F3200IM68"
