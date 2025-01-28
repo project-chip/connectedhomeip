@@ -282,6 +282,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
 
     totalOperationalHours = static_cast<uint32_t>(totalHours + deltaTime < UINT32_MAX ? totalHours + deltaTime : UINT32_MAX);
 
+    if (deltaTime > 0)
+    {
+        ReturnErrorOnFailure(ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours));
+        PlatformMgrImpl().SetSavedOperationalHoursSinceBoot(upTimeH);
+    }
+
     return CHIP_NO_ERROR;
 }
 
