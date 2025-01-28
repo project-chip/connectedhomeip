@@ -58,28 +58,6 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "gcr.io/cloud-builders/docker"
-      args:
-          [
-              "/workspace/examples/chef/create_docker.py",
-              "--commit_sha",
-              "$COMMIT_SHA",
-              "--short_sha",
-              "$SHORT_SHA",
-              "--revision_id",
-              "$REVISION_ID",
-              "--build_id",
-              "$BUILD_ID",
-              "--image_name",
-              "$_DOCKER_IMAGE_NAME",
-              "--tar_path",
-              "/workspace/artifacts",
-          ]
-      id: DockerAll
-      entrypoint: python3
-      waitFor:
-          - CompileNoip
-
 logsBucket: matter-build-automation-build-logs
 
 # Global timeout for all steps

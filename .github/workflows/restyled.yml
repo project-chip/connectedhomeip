@@ -16,7 +16,9 @@ jobs:
 
       - uses: restyled-io/actions/setup@v4
         with:
-          # Pin the Restyler version to v0.6.0.2
+          # TODO: Pinned to v0.6.0.2 because the latest release does not have a pre-built
+          # 'restyler-linux' asset. This broke our workflow as we rely on the pre-built binary.
+          # Remove this pin once a new release with the 'restyler-linux' asset is available.          
           tag: 'v0.6.0.2'
 
       - id: restyler
