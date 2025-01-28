@@ -363,12 +363,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
 {
-#ifdef CONFIG_WIFI_GET_LOG
-    wlan_pkt_stats_t stats;
-    int ret = wlan_get_log(&stats);
+#if CONFIG_WIFI_GET_LOG
+    wlan_stats_t stats;
+    wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
+
+    int ret = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
-        beaconLostCount = stats.bcn_miss_cnt - mBeaconLostCount;
+        beaconLostCount = stats.sta_mgmt.beacons_miss;
         return CHIP_NO_ERROR;
     }
 #endif /* CONFIG_WIFI_GET_LOG */
@@ -377,12 +379,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconL
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
 {
-#ifdef CONFIG_WIFI_GET_LOG
-    wlan_pkt_stats_t stats;
-    int ret = wlan_get_log(&stats);
+#if CONFIG_WIFI_GET_LOG
+    wlan_stats_t stats;
+    wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
+    int ret = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
-        beaconRxCount = stats.bcn_rcv_cnt - mBeaconRxCount;
+        beaconRxCount = stats.sta_mgmt.beacons_rx;
         return CHIP_NO_ERROR;
     }
 #endif /* CONFIG_WIFI_GET_LOG */
@@ -391,12 +394,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxC
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
 {
-#ifdef CONFIG_WIFI_GET_LOG
-    wlan_pkt_stats_t stats;
-    int ret = wlan_get_log(&stats);
+#if CONFIG_WIFI_GET_LOG
+    wlan_stats_t stats;
+    wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
+    int ret = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
-        packetMulticastRxCount = stats.mcast_rx_frame - mPacketMulticastRxCount;
+        packetMulticastRxCount = stats.multicast.tx;
         return CHIP_NO_ERROR;
     }
 #endif /* CONFIG_WIFI_GET_LOG */
@@ -405,12 +409,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & 
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
 {
-#ifdef CONFIG_WIFI_GET_LOG
-    wlan_pkt_stats_t stats;
-    int ret = wlan_get_log(&stats);
+#if CONFIG_WIFI_GET_LOG
+    wlan_stats_t stats;
+    wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
+    int ret = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
-        packetMulticastTxCount = stats.mcast_tx_frame - mPacketMulticastTxCount;
+        packetMulticastTxCount = stats.multicast.tx;
         return CHIP_NO_ERROR;
     }
 #endif /* CONFIG_WIFI_GET_LOG */
@@ -419,12 +424,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & 
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
 {
-#ifdef CONFIG_WIFI_GET_LOG
-    wlan_pkt_stats_t stats;
-    int ret = wlan_get_log(&stats);
+#if CONFIG_WIFI_GET_LOG
+    wlan_stats_t stats;
+    wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
+    int ret = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
-        packetUnicastTxCount = stats.tx_frame - mPacketUnicastTxCount;
+        packetUnicastTxCount = stats.unicast.tx;
         return CHIP_NO_ERROR;
     }
 #endif /* CONFIG_WIFI_GET_LOG */
@@ -433,12 +439,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & pa
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
 {
-#ifdef CONFIG_WIFI_GET_LOG
-    wlan_pkt_stats_t stats;
-    int ret = wlan_get_log(&stats);
+#if CONFIG_WIFI_GET_LOG
+    wlan_stats_t stats;
+    wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
+    int ret = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
-        packetUnicastRxCount = stats.rx_unicast_cnt - mPacketUnicastRxCount;
+        packetUnicastRxCount = stats.unicast.rx;
         return CHIP_NO_ERROR;
     }
 #endif /* CONFIG_WIFI_GET_LOG */
@@ -447,12 +454,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & pa
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCount)
 {
-#ifdef CONFIG_WIFI_GET_LOG
-    wlan_pkt_stats_t stats;
-    int ret = wlan_get_log(&stats);
+#if CONFIG_WIFI_GET_LOG
+    wlan_stats_t stats;
+    wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
+    int ret = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
-        overrunCount = (stats.tx_overrun_cnt + stats.rx_overrun_cnt) - mOverrunCount;
+        overrunCount = (stats.overrun.tx + stats.overrun.rx);
         return CHIP_NO_ERROR;
     }
 #endif /* CONFIG_WIFI_GET_LOG */
@@ -461,18 +469,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCou
 
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts(void)
 {
-#ifdef CONFIG_WIFI_GET_LOG
-    wlan_pkt_stats_t stats;
-    int ret = wlan_get_log(&stats);
+#if CONFIG_WIFI_GET_LOG
+    wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
+    int ret = wlan_reset_stats(bss_type);
     if (ret == WM_SUCCESS)
     {
-        mPacketUnicastTxCount   = stats.tx_frame;
-        mPacketMulticastTxCount = stats.mcast_tx_frame;
-        mPacketMulticastRxCount = stats.mcast_rx_frame;
-        mBeaconRxCount          = stats.bcn_rcv_cnt;
-        mBeaconLostCount        = stats.bcn_miss_cnt;
-        mPacketUnicastRxCount   = stats.rx_unicast_cnt;
-        mOverrunCount           = stats.tx_overrun_cnt + stats.rx_overrun_cnt;
         return CHIP_NO_ERROR;
     }
 #endif /* CONFIG_WIFI_GET_LOG */
