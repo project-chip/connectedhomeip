@@ -237,6 +237,11 @@ PICS:
       id: MCORE.DD.TXT_KEY_PI
 
     - label:
+          "Does the commissionee support Enhanced Setup Flow Terms and
+          Conditions?"
+      id: MCORE.DD.ESF_TC_COMMISSIONER
+
+    - label:
           "Does device support optional subtype _V in commissionable node
           discovery mDNS?"
       id: MCORE.SC.VENDOR_SUBTYPE
