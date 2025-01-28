@@ -2723,6 +2723,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _label = @"";
 
+        _vidVerificationStatement = nil;
+
         _fabricIndex = @(0);
     }
     return self;
@@ -2737,6 +2739,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.fabricID = self.fabricID;
     other.nodeID = self.nodeID;
     other.label = self.label;
+    other.vidVerificationStatement = self.vidVerificationStatement;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -2744,7 +2747,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rootPublicKey:%@; vendorID:%@; fabricID:%@; nodeID:%@; label:%@; fabricIndex:%@; >", NSStringFromClass([self class]), [_rootPublicKey base64EncodedStringWithOptions:0], _vendorID, _fabricID, _nodeID, _label, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rootPublicKey:%@; vendorID:%@; fabricID:%@; nodeID:%@; label:%@; vidVerificationStatement:%@; fabricIndex:%@; >", NSStringFromClass([self class]), [_rootPublicKey base64EncodedStringWithOptions:0], _vendorID, _fabricID, _nodeID, _label, [_vidVerificationStatement base64EncodedStringWithOptions:0], _fabricIndex];
     return descriptionString;
 }
 
@@ -2795,6 +2798,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _icac = nil;
 
+        _vvsc = nil;
+
         _fabricIndex = @(0);
     }
     return self;
@@ -2806,6 +2811,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.noc = self.noc;
     other.icac = self.icac;
+    other.vvsc = self.vvsc;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -2813,7 +2819,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: noc:%@; icac:%@; fabricIndex:%@; >", NSStringFromClass([self class]), [_noc base64EncodedStringWithOptions:0], [_icac base64EncodedStringWithOptions:0], _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: noc:%@; icac:%@; vvsc:%@; fabricIndex:%@; >", NSStringFromClass([self class]), [_noc base64EncodedStringWithOptions:0], [_icac base64EncodedStringWithOptions:0], [_vvsc base64EncodedStringWithOptions:0], _fabricIndex];
     return descriptionString;
 }
 

@@ -177,12 +177,6 @@ enum class WebRTCEndReasonEnum : uint8_t
 
 // Bitmaps shared across multiple clusters.
 
-// Bitmap for WebRTCMetadataOptions
-enum class WebRTCMetadataOptions : uint8_t
-{
-    kDataTLV = 0x1,
-};
-
 } // namespace detail
 
 namespace Globals {
@@ -451,10 +445,10 @@ enum class TestGlobalEnum : uint8_t
 // Enum for ThreeLevelAutoEnum
 enum class ThreeLevelAutoEnum : uint8_t
 {
-    kLow       = 0x00,
-    kMedium    = 0x01,
-    kHigh      = 0x02,
-    kAutomatic = 0x03,
+    kAuto   = 0x00,
+    kLow    = 0x01,
+    kMedium = 0x02,
+    kHigh   = 0x03,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -5631,7 +5625,11 @@ using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
 
 using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
 
-using WebRTCMetadataOptions = Clusters::detail::WebRTCMetadataOptions;
+// Bitmap for WebRTCMetadataOptionsBitmap
+enum class WebRTCMetadataOptionsBitmap : uint8_t
+{
+    kDataTLV = 0x1,
+};
 } // namespace WebRTCTransportProvider
 
 namespace WebRTCTransportRequestor {
@@ -5639,8 +5637,6 @@ namespace WebRTCTransportRequestor {
 using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
 
 using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
-
-using WebRTCMetadataOptions = Clusters::detail::WebRTCMetadataOptions;
 } // namespace WebRTCTransportRequestor
 
 namespace PushAvStreamTransport {

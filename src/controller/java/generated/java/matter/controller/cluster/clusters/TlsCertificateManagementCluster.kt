@@ -399,7 +399,7 @@ class TlsCertificateManagementCluster(
   }
 
   suspend fun findClientCertificate(
-    ccdid: UShort,
+    ccdid: UShort?,
     timedInvokeTimeout: Duration? = null,
   ): FindClientCertificateResponse {
     val commandId: UInt = 11u
@@ -408,7 +408,7 @@ class TlsCertificateManagementCluster(
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_CCDID_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_CCDID_REQ), ccdid)
+    ccdid?.let { tlvWriter.put(ContextSpecificTag(TAG_CCDID_REQ), ccdid) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
