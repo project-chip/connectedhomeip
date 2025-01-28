@@ -88,6 +88,13 @@ declare_args() {
   # Enable NFC Onboarding Payload support
   chip_enable_nfc_onboarding_payload = false
 
+  # Enable NFC Commissioning support
+  if (chip_device_platform == "android" || chip_device_platform == "linux") {
+    chip_enable_nfc_commissioning = true
+  } else {
+    chip_enable_nfc_commissioning = false
+  }
+
   # Enable OTA requestor support
   chip_enable_ota_requestor = false
 
