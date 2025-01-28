@@ -97,6 +97,14 @@ protected:
 };
 
 /**
+ * @brief Get the instance of DefaultDACVerifier
+ *        This can be used to perform updates on DefaultDACVerifier
+ *
+ * @returns pointer to the instance of DefaultDACVerifier
+ */
+DefaultDACVerifier * GetDefaultDACVerifierInstance();
+
+/**
  * @brief Get implementation of a PAA root store containing a basic set of static PAA roots
  *        sufficient for *testing* only.
  *

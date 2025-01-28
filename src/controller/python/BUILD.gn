@@ -126,6 +126,7 @@ shared_library("ChipDeviceCtrl") {
     "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/server",
     "${chip_root}/src/credentials:default_attestation_verifier",
+    "${chip_root}/src/credentials:test_dac_revocation_delegate",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/dnssd",
