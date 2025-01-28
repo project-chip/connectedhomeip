@@ -406,7 +406,13 @@ CHIP_ERROR SetRemainingDuration(EndpointId endpoint, const DataModel::Nullable<u
                                                           MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     if (epIdx < kValveConfigurationAndControlDelegateTableSize)
     {
-        gRemainingDuration[epIdx].endpoint          = endpoint;
+        gRemainingDuration[epIdx].endpoint = endpoint;
+
+        if (gRemainingDuration[epIdx].remainingDuration == duration)
+        {
+            return CHIP_NO_ERROR;
+        }
+
         gRemainingDuration[epIdx].remainingDuration = duration;
         MatterReportingAttributeChangeCallback(endpoint, ValveConfigurationAndControl::Id, RemainingDuration::Id);
         return CHIP_NO_ERROR;
@@ -416,18 +422,9 @@ CHIP_ERROR SetRemainingDuration(EndpointId endpoint, const DataModel::Nullable<u
 
 CHIP_ERROR SetRemainingDurationNull(EndpointId endpoint)
 {
-    uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
-                                                          MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    if (epIdx < kValveConfigurationAndControlDelegateTableSize)
-    {
-        if (!gRemainingDuration[epIdx].remainingDuration.IsNull())
-        {
-            MatterReportingAttributeChangeCallback(endpoint, ValveConfigurationAndControl::Id, RemainingDuration::Id);
-        }
-        gRemainingDuration[epIdx].remainingDuration.SetNull();
-        return CHIP_NO_ERROR;
-    }
-    return CHIP_ERROR_WRITE_FAILED;
+    DataModel::Nullable<uint32_t> nullDuration;
+    nullDuration.SetNull();
+    return SetRemainingDuration(endpoint, nullDuration);
 }
 } // namespace ValveConfigurationAndControl
 } // namespace Clusters
