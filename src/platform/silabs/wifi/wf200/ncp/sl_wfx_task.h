@@ -43,8 +43,7 @@ extern "C" {
  *
  * @param[in] None
  * @return sl_status_t SL_STATUS_OK, if the initialization succeeded
- *                     SL_STATUS_ALLOCATION_FAILED, if there are a memory allocation failure,
- *                     SL_STATUS_FAILURE, otherwise
+ *                     SL_STATUS_ALLOCATION_FAILED, if there are a memory allocation failure.
  */
 sl_status_t wfx_bus_start(void);
 

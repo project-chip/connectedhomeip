@@ -116,7 +116,6 @@ sl_status_t wfx_bus_start(void)
         xTaskCreateStatic(wfx_bus_task, "wfxbus", BUS_TASK_STACK_SIZE, NULL, WFX_BUS_TASK_PRIORITY, busStack, &busTaskStruct);
     if (wfx_bus_task_handle == NULL)
     {
-        SILABS_LOG("*ERR*WFX BusTask");
         return SL_STATUS_ALLOCATION_FAILED;
     }
     return SL_STATUS_OK;
