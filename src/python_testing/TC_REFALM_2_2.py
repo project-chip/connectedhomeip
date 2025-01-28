@@ -41,21 +41,23 @@ import queue
 import json
 import chip.clusters as Clusters
 import typing
-from  chip.clusters.ClusterObjects import ClusterObjectDescriptor, ClusterCommand, ClusterObjectFieldDescriptor
+from chip.clusters.ClusterObjects import ClusterObjectDescriptor, ClusterCommand, ClusterObjectFieldDescriptor
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, SimpleEventCallback,type_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, SimpleEventCallback, type_matches
 from mobly import asserts
 from dataclasses import dataclass
 from chip import ChipUtility
-from chip.tlv import  uint
+from chip.tlv import uint
 
 
 logger = logging.getLogger(__name__)
 
 # TODO(#37217)  Refactor using generic method.
 # Implement fake commands for the RefrigeratorAlarm Cluster
-# These comands are Disallowed (X) in the spec. 
+# These comands are Disallowed (X) in the spec.
 # When running those commands must return 0x81 (UNSUPPORTED COMMAND)
+
+
 @dataclass
 class FakeReset(ClusterCommand):
     cluster_id: typing.ClassVar[int] = 0x00000057
@@ -71,6 +73,7 @@ class FakeReset(ClusterCommand):
             ])
 
     alarms: uint = 0
+
 
 @dataclass
 class FakeModifyEnabledAlarms(ClusterCommand):
@@ -88,10 +91,11 @@ class FakeModifyEnabledAlarms(ClusterCommand):
 
     mask: uint = 0
 
+
 class TC_REFALM_2_2(MatterBaseTest):
     """Implementation of test case TC_REFALM_2_2."""
 
-    def TC_REFALM_2_2(self) -> str :
+    def TC_REFALM_2_2(self) -> str:
         return "223.2.2. [TC-REFALM-2.2] Primary functionality with DUT as Server"
 
     def pics_TC_REFALM_2_2(self):
@@ -124,24 +128,23 @@ class TC_REFALM_2_2(MatterBaseTest):
 
         return steps
 
-    async def _get_command_status(self,cmd: ClusterCommand,cmd_str:str=""):
+    async def _get_command_status(self, cmd: ClusterCommand, cmd_str: str = ""):
         """Return the status of the executed command. By default the status is 0x0 unless a different 
         status on InteractionModel is returned. For this test we consider the status 0x0 as not succesfull."""
         cmd_status = Status.Success
         if self.is_ci:
             try:
-                await self.default_controller.SendCommand(nodeid=self.dut_node_id,endpoint=self.endpoint,payload=cmd)
+                await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=self.endpoint, payload=cmd)
             except InteractionModelError as uc:
                 cmd_status = uc.status
         else:
             user_response = self.wait_for_user_input(prompt_msg=f"{cmd_str} command is implemented in the DUT?. Enter 'y' or 'n' to confirm.",
-                default_value="n")
+                                                     default_value="n")
             asserts.assert_equal(user_response.lower(), "n")
             if user_response.lower() == "n":
                 cmd_status = Status.UnsupportedCommand
-            
-        return cmd_status
 
+        return cmd_status
 
     def _ask_for_closed_door(self):
         if self.is_ci:
@@ -149,7 +152,7 @@ class TC_REFALM_2_2(MatterBaseTest):
             sleep(1)
         else:
             user_response = self.wait_for_user_input(prompt_msg=f"Ensure that the door on the DUT is closed.",
-                default_value="y")
+                                                     default_value="y")
             asserts.assert_equal(user_response.lower(), "y")
 
     def _ask_for_open_door(self):
@@ -157,7 +160,7 @@ class TC_REFALM_2_2(MatterBaseTest):
             self._send_open_door_command()
         else:
             user_response = self.wait_for_user_input(prompt_msg=f"Manually open the door on the DUT. Enter 'y' or 'n' after completition",
-                default_value="y")
+                                                     default_value="y")
             asserts.assert_equal(user_response.lower(), "y")
 
     async def _read_refalm_state_attribute(self):
@@ -187,11 +190,12 @@ class TC_REFALM_2_2(MatterBaseTest):
         sleep(0.1)
 
     def _send_open_door_command(self):
-        command_dict  = {"Name":"SetRefrigeratorDoorStatus", "EndpointId": self.endpoint, "DoorOpen": Clusters.RefrigeratorAlarm.Bitmaps.AlarmBitmap.kDoorOpen}
+        command_dict = {"Name": "SetRefrigeratorDoorStatus", "EndpointId": self.endpoint,
+                        "DoorOpen": Clusters.RefrigeratorAlarm.Bitmaps.AlarmBitmap.kDoorOpen}
         self._send_named_pipe_command(command_dict)
 
     def _send_close_door_commnad(self):
-        command_dict  = {"Name":"SetRefrigeratorDoorStatus", "EndpointId": self.endpoint, "DoorOpen": 0}
+        command_dict = {"Name": "SetRefrigeratorDoorStatus", "EndpointId": self.endpoint, "DoorOpen": 0}
         self._send_named_pipe_command(command_dict)
 
     @async_test_body
@@ -201,7 +205,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         self.endpoint = self.get_endpoint(default=1)
         cluster = Clusters.RefrigeratorAlarm
-        
+
         logger.info(f"Default endpoint {self.endpoint}")
         self.step(1)
 
@@ -213,8 +217,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         # reads the state attribute , must be a bitMap32 ( list wich values are 32 bits)
         device_state = await self._read_refalm_state_attribute()
         logger.info(f"The device state is {device_state}")
-        asserts.assert_equal(device_state,0)
-
+        asserts.assert_equal(device_state, 0)
 
         # # open the door manually
         self.step(4)
@@ -228,7 +231,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         self.step(6)
         device_state = await self._read_refalm_state_attribute()
         logger.info(f"The device state is {device_state}")
-        asserts.assert_equal(device_state,1)
+        asserts.assert_equal(device_state, 1)
 
         # # # ensure the door is closed
         self.step(7)
@@ -238,17 +241,18 @@ class TC_REFALM_2_2(MatterBaseTest):
         self.step(8)
         device_status = await self._read_refalm_state_attribute()
         logger.info(f"The device state is {device_state}")
-        asserts.assert_equal(device_status,0)
+        asserts.assert_equal(device_status, 0)
 
         self.step(9)
-        cmd_status  = await self._get_command_status(cmd=FakeReset(),cmd_str="Reset")
-        asserts.assert_equal(Status.UnsupportedCommand,cmd_status, msg=f"Command status is not {Status.UnsupportedCommand}, is {cmd_status}")
+        cmd_status = await self._get_command_status(cmd=FakeReset(), cmd_str="Reset")
+        asserts.assert_equal(Status.UnsupportedCommand, cmd_status,
+                             msg=f"Command status is not {Status.UnsupportedCommand}, is {cmd_status}")
 
         self.step(10)
-        cmd_status = await self._get_command_status(cmd=FakeModifyEnabledAlarms(),cmd_str="ModifyEnabledAlarms")
-        asserts.assert_equal(Status.UnsupportedCommand,cmd_status,msg=f"Command status is not {Status.UnsupportedCommand}, is {cmd_status}")
+        cmd_status = await self._get_command_status(cmd=FakeModifyEnabledAlarms(), cmd_str="ModifyEnabledAlarms")
+        asserts.assert_equal(Status.UnsupportedCommand, cmd_status,
+                             msg=f"Command status is not {Status.UnsupportedCommand}, is {cmd_status}")
 
-        
         # Subscribe to Notify Event
         self.step(11)
         self.q = queue.Queue()
@@ -257,7 +261,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         urgent = 1
         subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, notify_event, urgent)], reportInterval=[2, 10])
         subscription.SetEventUpdateCallback(callback=cb)
-        
+
         self.step("12.a")
         self._ask_for_open_door()
 
@@ -269,8 +273,8 @@ class TC_REFALM_2_2(MatterBaseTest):
         try:
             ret = self.q.get(block=True, timeout=5)
             logger.info(f"Event data {ret}")
-            asserts.assert_true(type_matches(ret.Data, cluster.Events.Notify ),"Unexpected event type returned")
-            asserts.assert_equal(ret.Data.state, 1,"Unexpected value for State returned")
+            asserts.assert_true(type_matches(ret.Data, cluster.Events.Notify), "Unexpected event type returned")
+            asserts.assert_equal(ret.Data.state, 1, "Unexpected value for State returned")
         except queue.Empty:
             asserts.fail("Did not receive Notify event")
 
@@ -282,10 +286,11 @@ class TC_REFALM_2_2(MatterBaseTest):
         try:
             ret = self.q.get(block=True, timeout=5)
             logger.info(f"Event data {ret}")
-            asserts.assert_true(type_matches(ret.Data, cluster.Events.Notify ),"Unexpected event type returned")
-            asserts.assert_equal(ret.Data.state, 0,"Unexpected value for State returned")
+            asserts.assert_true(type_matches(ret.Data, cluster.Events.Notify), "Unexpected event type returned")
+            asserts.assert_equal(ret.Data.state, 0, "Unexpected value for State returned")
         except queue.Empty:
             asserts.fail("Did not receive Notify event")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
