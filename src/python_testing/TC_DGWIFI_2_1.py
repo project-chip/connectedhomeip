@@ -34,6 +34,7 @@
 
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
+from chip.testing import matter_asserts
 from chip.testing.decorators import async_test_body
 from chip.testing.matter_base_test import MatterBaseTest
 from chip.testing.models import TestStep
@@ -67,15 +68,10 @@ class TC_DGWIFI_2_1(MatterBaseTest):
         return False
 
     def assert_valid_bssid(self, value, field_name):
-        """Asserts that the value is a valid BSSID (MAC address), None, or NullValue."""
-        if isinstance(value, Nullable):
-            if value == NullValue:
-                return
-            value = value.Value
-
-        if value is not None:
+        """Asserts that the value is a valid BSSID (MAC address), or NullValue."""
+        if value is not NullValue:
             asserts.assert_true(self.is_valid_bssid(value),
-                                f"{field_name} should be a valid BSSID string (e.g., '00:11:22:33:44:55') or None/NullValue.")
+                                f"{field_name} should be a valid BSSID string (e.g., '00:11:22:33:44:55') or NullValue.")
 
     async def read_dgwifi_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.WiFiNetworkDiagnostics
@@ -137,26 +133,19 @@ class TC_DGWIFI_2_1(MatterBaseTest):
         # SecurityType is an enum. If the interface is not operational, it could be NULL.
         # If not NULL, we expect an integer in the SecurityType enum range.
         # Just do a minimal check here; you can refine or extend based on the spec.
-        if security_type is not None:
-            asserts.assert_true(isinstance(security_type, Nullable),
-                                "SecurityType must be of type 'Nullable' when not None.")
+        if security_type is not NullValue:
+            matter_asserts.assert_valid_uint8(security_type, "SecurityType")
 
-            if security_type is not NullValue:
-                security_type_value = security_type.Value
-                self.assert_valid_uint8(security_type_value, "SecurityType")
+            # Check if the security_type is a valid SecurityTypeEnum member
+            matter_asserts.assert_valid_enum(security_type, "SecurityType",
+                                             Clusters.Objects.WiFiNetworkDiagnostics.Enums.SecurityTypeEnum)
 
-                # Check if the security_type is a valid SecurityTypeEnum member
-                self.assert_true(
-                    security_type_value in [item.value for item in Clusters.Objects.WiFiNetworkDiagnostics.Enums.SecurityTypeEnum],
-                    f"SecurityType {security_type_value} is not a valid SecurityTypeEnum value"
-                )
-
-                # Additional check that it's not kUnknownEnumValue:
-                self.assert_true(
-                    security_type_value != Clusters.Objects.WiFiNetworkDiagnostics.Enums.SecurityTypeEnum.kUnknownEnumValue.value,
-                    f"SecurityType should not be kUnknownEnumValue "
-                    f"({Clusters.Objects.WiFiNetworkDiagnostics.Enums.SecurityTypeEnum.kUnknownEnumValue.value})"
-                )
+            # Additional check that it's not kUnknownEnumValue:
+            self.assert_true(
+                security_type != Clusters.Objects.WiFiNetworkDiagnostics.Enums.SecurityTypeEnum.kUnknownEnumValue,
+                f"SecurityType should not be kUnknownEnumValue "
+                f"({Clusters.Objects.WiFiNetworkDiagnostics.Enums.SecurityTypeEnum.kUnknownEnumValue})"
+            )
 
         #
         # STEP 4: TH reads WiFiVersion attribute
@@ -164,21 +153,16 @@ class TC_DGWIFI_2_1(MatterBaseTest):
         self.step(4)
         wifi_version = await self.read_dgwifi_attribute_expect_success(endpoint=endpoint, attribute=attributes.WiFiVersion)
         # WiFiVersion is an enum. If not configured or operational, might be NULL.
-        if wifi_version is not None:
-            asserts.assert_true(isinstance(wifi_version, Nullable),
-                                "WiFiVersion must be of type 'Nullable' when not None.")
+        if wifi_version is not NullValue:
+            matter_asserts.assert_valid_uint8(wifi_version, "WiFiVersion")
 
-            if wifi_version is not NullValue:
-                wifi_version_value = wifi_version.Value
-                self.assert_valid_uint8(wifi_version_value, "WiFiVersion")
+            # Check if the wifi_version is a valid WiFiVersionEnum member
+            matter_asserts.assert_valid_enum(wifi_version, "WiFiVersion",
+                                             Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum)
 
-                # Check if the wifi_version is a valid WiFiVersionEnum member
-                self.assert_true(wifi_version_value in [item.value for item in Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum],
-                                 f"WiFiVersion {wifi_version_value} is not a valid WiFiVersionEnum value")
-
-                # Additional check that it's not kUnknownEnumValue:
-                self.assert_true(wifi_version_value != Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum.kUnknownEnumValue.value,
-                                 f"WiFiVersion should not be kUnknownEnumValue ({Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum.kUnknownEnumValue.value})")
+            # Additional check that it's not kUnknownEnumValue:
+            self.assert_true(wifi_version != Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum.kUnknownEnumValue,
+                             f"WiFiVersion should not be kUnknownEnumValue ({Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum.kUnknownEnumValue})")
 
         #
         # STEP 5: TH reads ChannelNumber attribute
@@ -186,12 +170,8 @@ class TC_DGWIFI_2_1(MatterBaseTest):
         self.step(5)
         channel_number = await self.read_dgwifi_attribute_expect_success(endpoint=endpoint, attribute=attributes.ChannelNumber)
         # If not operational, might be NULL. Else we expect an unsigned integer channel.
-        if channel_number is not None:
-            asserts.assert_true(isinstance(channel_number, Nullable),
-                                "ChannelNumber must be of type 'Nullable' when not None.")
-
-            if channel_number is not NullValue:
-                self.assert_valid_uint16(channel_number.Value, "ChannelNumber")
+        if channel_number is not NullValue:
+            matter_asserts.assert_valid_uint16(channel_number, "ChannelNumber")
 
         #
         # STEP 6: TH reads RSSI attribute
@@ -199,14 +179,9 @@ class TC_DGWIFI_2_1(MatterBaseTest):
         self.step(6)
         rssi = await self.read_dgwifi_attribute_expect_success(endpoint=endpoint, attribute=attributes.Rssi)
         # RSSI is typically a signed integer (dB). If not operational, might be NULL.
-        if rssi is not None:
-            asserts.assert_true(isinstance(rssi, Nullable),
-                                "RSSI must be of type 'Nullable' when not None.")
-
-            if rssi is not NullValue:
-                rssi_value = rssi.Value
-                asserts.assert_true(isinstance(rssi_value, int) and -120 <= rssi_value <= 0,
-                                    "rssi_value is not within valid range.")
+        if rssi is not NullValue:
+            asserts.assert_true(isinstance(rssi, int) and -120 <= rssi <= 0,
+                                "rssi_value is not within valid range.")
 
         #
         # STEP 7: TH reads BeaconLostCount attribute
@@ -219,7 +194,7 @@ class TC_DGWIFI_2_1(MatterBaseTest):
                                 "BeaconLostCount must be of type 'Nullable' when not None.")
 
             if beacon_lost_count is not NullValue:
-                self.assert_valid_uint32(beacon_lost_count.Value, "BeaconLostCount")
+                matter_asserts.assert_valid_uint32(beacon_lost_count, "BeaconLostCount")
 
         #
         # STEP 8: TH reads BeaconRxCount attribute
@@ -227,11 +202,8 @@ class TC_DGWIFI_2_1(MatterBaseTest):
         self.step(8)
         beacon_rx_count = await self.read_dgwifi_attribute_expect_success(endpoint=endpoint, attribute=attributes.BeaconRxCount)
         if beacon_rx_count is not None:
-            asserts.assert_true(isinstance(beacon_rx_count, Nullable),
-                                "BeaconRxCount must be of type 'Nullable' when not None.")
-
             if beacon_rx_count is not NullValue:
-                self.assert_valid_uint32(beacon_rx_count.Value, "BeaconRxCount")
+                matter_asserts.assert_valid_uint32(beacon_rx_count, "BeaconRxCount")
 
         #
         # STEP 9: TH reads PacketMulticastRxCount attribute
@@ -239,11 +211,8 @@ class TC_DGWIFI_2_1(MatterBaseTest):
         self.step(9)
         pkt_multi_rx = await self.read_dgwifi_attribute_expect_success(endpoint=endpoint, attribute=attributes.PacketMulticastRxCount)
         if pkt_multi_rx is not None:
-            asserts.assert_true(isinstance(pkt_multi_rx, Nullable),
-                                "PacketMulticastRxCount must be of type 'Nullable' when not None.")
-
             if pkt_multi_rx is not NullValue:
-                self.assert_valid_uint32(pkt_multi_rx.Value, "PacketMulticastRxCount")
+                matter_asserts.assert_valid_uint32(pkt_multi_rx, "PacketMulticastRxCount")
 
         #
         # STEP 10: TH reads PacketMulticastTxCount attribute
@@ -251,11 +220,8 @@ class TC_DGWIFI_2_1(MatterBaseTest):
         self.step(10)
         pkt_multi_tx = await self.read_dgwifi_attribute_expect_success(endpoint=endpoint, attribute=attributes.PacketMulticastTxCount)
         if pkt_multi_tx is not None:
-            asserts.assert_true(isinstance(pkt_multi_tx, Nullable),
-                                "PacketMulticastTxCount must be of type 'Nullable' when not None.")
-
             if pkt_multi_tx is not NullValue:
-                self.assert_valid_uint32(pkt_multi_tx.Value, "PacketMulticastTxCount")
+                matter_asserts.assert_valid_uint32(pkt_multi_tx, "PacketMulticastTxCount")
 
         #
         # STEP 11: TH reads PacketUnicastRxCount attribute
@@ -263,11 +229,8 @@ class TC_DGWIFI_2_1(MatterBaseTest):
         self.step(11)
         pkt_uni_rx = await self.read_dgwifi_attribute_expect_success(endpoint=endpoint, attribute=attributes.PacketUnicastRxCount)
         if pkt_uni_rx is not None:
-            asserts.assert_true(isinstance(pkt_uni_rx, Nullable),
-                                "PacketUnicastRxCount must be of type 'Nullable' when not None.")
-
             if pkt_uni_rx is not NullValue:
-                self.assert_valid_uint32(pkt_uni_rx.Value, "PacketUnicastRxCount")
+                matter_asserts.assert_valid_uint32(pkt_uni_rx, "PacketUnicastRxCount")
 
         #
         # STEP 12: TH reads PacketUnicastTxCount attribute
@@ -275,11 +238,8 @@ class TC_DGWIFI_2_1(MatterBaseTest):
         self.step(12)
         pkt_uni_tx = await self.read_dgwifi_attribute_expect_success(endpoint=endpoint, attribute=attributes.PacketUnicastTxCount)
         if pkt_uni_tx is not None:
-            asserts.assert_true(isinstance(pkt_uni_tx, Nullable),
-                                "PacketUnicastTxCount must be of type 'Nullable' when not None.")
-
             if pkt_uni_tx is not NullValue:
-                self.assert_valid_uint32(pkt_uni_tx.Value, "PacketUnicastTxCount")
+                matter_asserts.assert_valid_uint32(pkt_uni_tx, "PacketUnicastTxCount")
 
         #
         # STEP 13: TH reads CurrentMaxRate attribute
@@ -288,11 +248,8 @@ class TC_DGWIFI_2_1(MatterBaseTest):
         current_max_rate = await self.read_dgwifi_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentMaxRate)
         # According to the spec, this is bytes per second (uint).
         if current_max_rate is not None:
-            asserts.assert_true(isinstance(current_max_rate, Nullable),
-                                "CurrentMaxRate must be of type 'Nullable' when not None.")
-
             if current_max_rate is not NullValue:
-                self.assert_valid_uint64(current_max_rate.Value, "CurrentMaxRate")
+                matter_asserts.assert_valid_uint64(current_max_rate, "CurrentMaxRate")
 
         #
         # STEP 14: TH reads OverrunCount attribute
@@ -301,11 +258,8 @@ class TC_DGWIFI_2_1(MatterBaseTest):
         overrun_count = await self.read_dgwifi_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverrunCount)
         # This is a uint and may reset to 0 after node reboot.
         if overrun_count is not None:
-            asserts.assert_true(isinstance(overrun_count, Nullable),
-                                "OverrunCount must be of type 'Nullable' when not None.")
-
             if overrun_count is not NullValue:
-                self.assert_valid_uint64(overrun_count.Value, "OverrunCount")
+                matter_asserts.assert_valid_uint64(overrun_count, "OverrunCount")
 
 
 if __name__ == "__main__":

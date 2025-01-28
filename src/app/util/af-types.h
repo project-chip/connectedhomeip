@@ -34,6 +34,7 @@
 
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/Nullable.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Variant.h>
@@ -124,15 +125,7 @@ struct EmberAfCluster
     bool IsClient() const { return (mask & CLUSTER_MASK_CLIENT) != 0; }
 };
 
-/**
- * @brief Struct that represents a logical device type consisting
- * of a DeviceID and its version.
- */
-typedef struct
-{
-    chip::DeviceTypeId deviceId;
-    uint8_t deviceVersion;
-} EmberAfDeviceType;
+using EmberAfDeviceType = chip::app::DataModel::DeviceTypeEntry;
 
 /**
  * @brief Struct used to find an attribute in storage. Together the elements

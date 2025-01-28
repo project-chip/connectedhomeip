@@ -18,10 +18,11 @@
 
 import string
 from dataclasses import dataclass
+from pathlib import Path
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
-from MockTestRunner import MockTestRunner
+from chip.testing.runner import MockTestRunner
 
 c = Clusters.IcdManagement
 attr = c.Attributes
@@ -54,8 +55,8 @@ def test_spec_to_attribute_cache(test_icdm: ICDMData) -> Attribute.AsyncReadTran
 
 
 def run_tests(pics, label, test_cases, test_name):
-    test_runner = MockTestRunner(
-        label, label, test_name, 0, pics)
+    test_runner = MockTestRunner(Path(__file__).parent / f"../{label}.py",
+                                 label, test_name, 0, pics)
     failures = []
     for idx, t in enumerate(test_cases):
         ok = test_runner.run_test_with_mock_read(

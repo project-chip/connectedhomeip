@@ -215,7 +215,9 @@ ALIASED_CLUSTERS = (
     '  </revisionHistory>'
     '  <clusterIds>'
     '    <clusterId id="0xFFFE" name="Test Alias1"/>'
-    '    <clusterId id="0xFFFD" name="Test Alias2"/>'
+    '    <clusterId id="0xFFFD" name="Test Alias2">'
+    '      <provisionalConform/>'
+    '    </clusterId>'
     '  </clusterIds>'
     '  <classification hierarchy="base" role="application" picsCode="BASE" scope="Endpoint"/>'
     '  <commands>'
@@ -397,6 +399,10 @@ class TestSpecParsingSupport(MatterBaseTest):
         ids = [(id, c.name) for id, c in clusters.items()]
         asserts.assert_true((0xFFFE, 'Test Alias1') in ids, "Unable to find Test Alias1 cluster in parsed clusters")
         asserts.assert_true((0xFFFD, 'Test Alias2') in ids, "Unable to find Test Alias2 cluster in parsed clusters")
+
+        # Test Alias2 is marked as provisional, and TestAlias1 is not
+        asserts.assert_false(clusters[0xFFFE].is_provisional, "Test Alias1 is marked as provisional and should not be")
+        asserts.assert_true(clusters[0xFFFD].is_provisional, "Test Alias2 is not marked as provisional and should be")
 
     def test_known_aliased_clusters(self):
         known_aliased_clusters = set([(0x040C, 'Carbon Monoxide Concentration Measurement', 'CMOCONC'),

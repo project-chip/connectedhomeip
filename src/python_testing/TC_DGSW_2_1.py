@@ -36,6 +36,7 @@
 #
 
 import chip.clusters as Clusters
+from chip.testing import matter_asserts
 from chip.testing.decorators import async_test_body
 from chip.testing.matter_base_test import MatterBaseTest
 from chip.testing.models import TestStep
@@ -84,41 +85,41 @@ class TC_DGSW_2_1(MatterBaseTest):
             # Validate each element in the thread_metrics_list
             for metric in thread_metrics_list:
                 # The Id field is mandatory
-                self.assert_valid_uint64(metric.id, "Id")
+                matter_asserts.assert_valid_uint64(metric.id, "Id")
 
                 # Validate the optional Name field
                 if metric.name is not None:
-                    self.assert_valid_str(metric.name, "Name")
+                    matter_asserts.assert_is_string(metric.name, "Name")
 
                 # Validate the optional StackFreeCurrent field
                 if metric.stackFreeCurrent is not None:
-                    self.assert_valid_uint32(metric.stackFreeCurrent, "StackFreeCurrent")
+                    matter_asserts.assert_valid_uint32(metric.stackFreeCurrent, "StackFreeCurrent")
 
                 # Validate the optional StackFreeMinimum field
                 if metric.stackFreeMinimum is not None:
-                    self.assert_valid_uint32(metric.stackFreeMinimum, "StackFreeMinimum")
+                    matter_asserts.assert_valid_uint32(metric.stackFreeMinimum, "StackFreeMinimum")
 
                 # Validate the optional StackSize field
                 if metric.stackSize is not None:
-                    self.assert_valid_uint32(metric.stackSize, "StackSize")
+                    matter_asserts.assert_valid_uint32(metric.stackSize, "StackSize")
 
         # STEP 3: TH reads from the DUT the CurrentHeapFree attribute
         self.step(3)
         if self.pics_guard(attributes.CurrentHeapFree.attribute_id in attribute_list):
             current_heap_free_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapFree)
-            self.assert_valid_uint64(current_heap_free_attr, "CurrentHeapFree")
+            matter_asserts.assert_valid_uint64(current_heap_free_attr, "CurrentHeapFree")
 
         # STEP 4: TH reads from the DUT the CurrentHeapUsed attribute
         self.step(4)
         if self.pics_guard(attributes.CurrentHeapUsed.attribute_id in attribute_list):
             current_heap_used_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
-            self.assert_valid_uint64(current_heap_used_attr, "CurrentHeapUsed")
+            matter_asserts.assert_valid_uint64(current_heap_used_attr, "CurrentHeapUsed")
 
         # STEP 5: TH reads from the DUT the CurrentHeapHighWatermark attribute
         self.step(5)
         if self.pics_guard(attributes.CurrentHeapHighWatermark.attribute_id in attribute_list):
             current_heap_high_watermark_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
-            self.assert_valid_uint64(current_heap_high_watermark_attr, "CurrentHeapHighWatermark")
+            matter_asserts.assert_valid_uint64(current_heap_high_watermark_attr, "CurrentHeapHighWatermark")
 
 
 if __name__ == "__main__":
