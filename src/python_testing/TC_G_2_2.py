@@ -221,7 +221,8 @@ class TC_G_2_2(MatterBaseTest):
         self.step("7a")
         # TH binds GroupID (maxgroups+1) == 13 || 0x000d with GroupKeySetID 1
         kGroupId13 = 0x000D
-        groupKeyMapStructMaxGroup: Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct = [{"groupId": kGroupId13, "groupKeySetID": kGroupKeySetID, "fabricIndex": 1}]
+        groupKeyMapStructMaxGroup: Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct = [
+            {"groupId": kGroupId13, "groupKeySetID": kGroupKeySetID, "fabricIndex": 1}]
         resp = await th1.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(groupKeyMapStructMaxGroup))])
         asserts.assert_equal(resp[0].Status, Status.Success, "GroupKeyMap attribute write failed")
 
