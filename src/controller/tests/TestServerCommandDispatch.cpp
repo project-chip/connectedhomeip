@@ -215,7 +215,7 @@ TEST_F(TestServerCommandDispatch, TestNoHandler)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-static const int kDescriptorAttributeArraySize = 254;
+static const int kDescriptorAttributeArraySize = 8;
 
 // Declare Descriptor cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(descriptorAttrs)
