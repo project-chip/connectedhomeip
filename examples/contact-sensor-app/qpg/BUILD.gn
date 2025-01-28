@@ -1,0 +1,112 @@
+# Copyright(c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/openthread.gni")
+import("//build_overrides/qpg_sdk.gni")
+
+import("${build_root}/config/defaults.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${qpg_sdk_build_root}/qpg_executable.gni")
+import("${qpg_sdk_build_root}/qpg_sdk.gni")
+
+# declares chip_build_libshell = false
+import("${chip_root}/src/lib/lib.gni")
+
+assert(current_os == "freertos")
+
+qpg_project_dir = "${chip_root}/examples/contact-sensor-app/qpg"
+examples_plat_dir = "${chip_root}/examples/platform/qpg"
+
+qpg_sdk("sdk") {
+  include_dirs = [
+    "${chip_root}/src/platform/qpg",
+    "${examples_plat_dir}",
+    "${qpg_project_dir}/include",
+  ]
+}
+
+qpg_executable("contact_sensor_app") {
+  output_name = "chip-${qpg_target_ic}${qpg_flavour}-contact-sensor-example.out"
+
+  sources = [
+    "${examples_plat_dir}/app/battery.cpp",
+    "${examples_plat_dir}/app/main.cpp",
+    "${examples_plat_dir}/ota/ota.cpp",
+    "${qpg_sdk_root}/Applications/Matter/shared/src/application_header.c",
+    "src/AppTask.cpp",
+    "src/DoorWindowManager.cpp",
+    "src/ZclCallbacks.cpp",
+  ]
+
+  deps = [
+    ":sdk",
+    "${chip_root}/examples/contact-sensor-app/qpg/zap/",
+    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
+    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+    "${chip_root}/third_party/qpg_sdk:qpg_doorwindow_factorydata",
+    "${chip_root}/third_party/qpg_sdk:qpg_doorwindow_firmwaredata_lib",
+  ]
+
+  if (chip_openthread_ftd) {
+    deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
+  } else {
+    deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
+  }
+
+  include_dirs = [
+    "include",
+    "${examples_plat_dir}/ota",
+    "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/halCortexM4/inc",
+    "${qpg_sdk_root}/Components/ThirdParty/secure_element/software/esec/libs/common",
+    "${qpg_sdk_root}/Components/ThirdParty/secure_element/software/esec/libs/base/include",  # esec_reatures.h
+    "${qpg_sdk_root}/Libraries/Qorvo/QorvoStack/gen/QorvoStack_qpg6200",  #esec_config.h
+  ]
+
+  defines = [ "GP_APP_DIVERSITY_POWERCYCLECOUNTING" ]
+
+  cflags = [ "-Wconversion" ]
+
+  if (chip_build_libshell) {
+    deps += [ "${examples_plat_dir}:qpg-matter-shell" ]
+  } else {
+    if (chip_openthread_ftd) {
+      deps +=
+          [ "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd" ]
+    } else {
+      deps +=
+          [ "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd" ]
+    }
+  }
+
+  ldscript = "${qpg_sdk_root}/Applications/Matter/base/gen/base_${qpg_target_ic}${qpg_flavour}_development/base_${qpg_target_ic}${qpg_flavour}_development.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  output_dir = root_out_dir
+}
+
+group("qpg") {
+  deps = [ ":contact_sensor_app" ]
+}
+
+group("default") {
+  deps = [ ":qpg" ]
+}
