@@ -42,6 +42,14 @@ import java.util.concurrent.Executors;
 
 /** A {@link Fragment} to Verify or establish a connection with a selected Casting Player. */
 public class ConnectionExampleFragment extends Fragment {
+  enum ConnectionState {
+      PENDING_PASSCODE_CONFIRMATION,
+      CONNECTING,
+      CONNECTED,
+      FAILED,
+      CANCELLED,
+  }
+
   private static final String TAG = ConnectionExampleFragment.class.getSimpleName();
   // Time (in sec) to keep the commissioning window open, if commissioning is required.
   // Must be >= 3 minutes.
@@ -58,6 +66,7 @@ public class ConnectionExampleFragment extends Fragment {
   private TextView commissionerDeclarationErrorTextView;
   private Button connectionFragmentNextButton;
   private AlertDialog passcodeDialog;
+  private ConnectionState connection_state = ConnectionState.PENDING_PASSCODE_CONFIRMATION;
 
   public ConnectionExampleFragment(
       CastingPlayer targetCastingPlayer, boolean useCommissionerGeneratedPasscode) {
@@ -171,6 +180,7 @@ public class ConnectionExampleFragment extends Fragment {
                           getActivity()
                               .runOnUiThread(
                                   () -> {
+                                    connection_state = ConnectionState.CONNECTED;
                                     connectionFragmentStatusTextView.setText(
                                         "Successfully connected to Casting Player with device name: "
                                             + targetCastingPlayer.getDeviceName()
@@ -188,6 +198,7 @@ public class ConnectionExampleFragment extends Fragment {
                           getActivity()
                               .runOnUiThread(
                                   () -> {
+                                    connection_state = ConnectionState.FAILED;
                                     connectionFragmentStatusTextView.setText(
                                         "Casting Player connection failed due to: " + err + "\n\n");
                                   });
@@ -262,6 +273,21 @@ public class ConnectionExampleFragment extends Fragment {
             });
   }
 
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+    Log.i(TAG, "onDestroy(), connection_state: " + connection_state);
+
+    // Only stop connection if we are pending passcode confirmation
+    // We cannot stop connection once continueConnecting() is called
+    if (connection_state == ConnectionState.PENDING_PASSCODE_CONFIRMATION) {
+      MatterError err = targetCastingPlayer.stopConnecting();
+      if (err.hasError()) {
+        Log.e(TAG, "Going back before connection finishes but stopConnecting() failed due to: " + err);
+      }
+    }
+  }
+
   private void displayPasscodeInputDialog(Context context) {
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
@@ -328,7 +354,9 @@ public class ConnectionExampleFragment extends Fragment {
 
             MatterError err = targetCastingPlayer.continueConnecting();
 
-            if (err.hasError()) {
+            if (!err.hasError()) {
+              connection_state = ConnectionState.CONNECTING;
+            } else {
               MatterError finalErr = err;
               getActivity()
                   .runOnUiThread(
@@ -363,7 +391,9 @@ public class ConnectionExampleFragment extends Fragment {
             connectionFragmentStatusTextView.setText(
                 "Connection attempt with Casting Player cancelled by the Casting Client/Commissionee user. \n\nRoute back to exit. \n\n");
             MatterError err = targetCastingPlayer.stopConnecting();
-            if (err.hasError()) {
+            if (!err.hasError()) {
+              connection_state = ConnectionState.CANCELLED;
+            } else {
               MatterError finalErr = err;
               getActivity()
                   .runOnUiThread(
