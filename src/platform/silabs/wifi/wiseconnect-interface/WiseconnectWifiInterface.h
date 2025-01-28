@@ -112,15 +112,3 @@ void PostWifiPlatformEvent(WifiPlatformEvent event);
  * @param[in] arg context pointer
  */
 void MatterWifiTask(void * arg);
-
-/**
- * @brief Function initializes SiWx Wi-Fi interface
- *
- * TODO: This function is specific to the SiWx platform and should not be present in the WiseconnectWifiInterface.
- *       Once the SoC and NCP init sequence are harmonised, remove this API.
- *
- * @return sl_status_t SL_STATUS_OK, if the initialization succeeded
- *                     SL_STATUS_ALLOCATION_FAILED, if there are a memory allocation failure,
- *                     SL_STATUS_FAILURE, otherwise
- */
-sl_status_t InitSiWxWifi();
