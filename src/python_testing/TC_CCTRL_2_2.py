@@ -73,7 +73,7 @@ from chip.testing.models import TestStep
 from chip.testing.runner import default_matter_test_main
 from mobly import asserts
 
-from python_testing.matter_testing_infrastructure.chip.testing.decorators import has_cluster, run_if_endpoint_matches
+from chip.testing.decorators import has_cluster, run_if_endpoint_matches
 
 
 class TC_CCTRL_2_2(MatterBaseTest):

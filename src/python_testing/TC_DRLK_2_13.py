@@ -43,8 +43,13 @@ import chip.clusters as Clusters
 from chip.clusters.Attribute import EventPriority
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from chip.testing.decorators import async_test_body
+from chip.testing.matter_base_test import MatterBaseTest
+from chip.testing.models import TestStep
+from chip.testing.runner import default_matter_test_main
 from mobly import asserts
+
+from chip.testing.utilities import type_matches
 
 logger = logging.getLogger(__name__)
 

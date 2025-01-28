@@ -40,7 +40,10 @@ import random
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, hex_from_bytes, type_matches
+from chip.testing.decorators import async_test_body
+from chip.testing.matter_base_test import MatterBaseTest
+from chip.testing.models import TestStep
+from chip.testing.runner import default_matter_test_main
 from chip.tlv import TLVReader
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes
@@ -50,6 +53,8 @@ from mobly import asserts
 from pyasn1.codec.der.decoder import decode as der_decoder
 from pyasn1.error import PyAsn1Error
 from pyasn1_modules import rfc2986, rfc3279, rfc5480
+
+from chip.testing.utilities import hex_from_bytes, type_matches
 
 
 class TC_DA_1_5(MatterBaseTest):

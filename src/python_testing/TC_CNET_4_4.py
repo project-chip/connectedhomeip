@@ -28,7 +28,7 @@ from chip.testing.models import TestStep
 from chip.testing.runner import default_matter_test_main
 from mobly import asserts
 
-from python_testing.matter_testing_infrastructure.chip.testing.utilities import type_matches
+from chip.testing.utilities import type_matches
 
 
 class TC_CNET_4_4(MatterBaseTest):

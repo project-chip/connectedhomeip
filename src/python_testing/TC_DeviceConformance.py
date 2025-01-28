@@ -45,10 +45,14 @@ from chip.testing.choice_conformance import (evaluate_attribute_choice_conforman
 from chip.testing.conformance import ConformanceDecision, conformance_allowed
 from chip.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type,
                                                device_type_id_type, is_valid_device_type_id)
-from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                         MatterBaseTest, ProblemNotice, ProblemSeverity, async_test_body, default_matter_test_main)
+from chip.testing.models import AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation
+from chip.testing.runner import default_matter_test_main
 from chip.testing.spec_parsing import CommandType, build_xml_clusters, build_xml_device_types
 from chip.tlv import uint
+
+from chip.testing.decorators import async_test_body
+from chip.testing.matter_base_test import MatterBaseTest
+from chip.testing.models import ProblemNotice, ProblemSeverity
 
 
 class DeviceConformanceTests(BasicCompositionTests):

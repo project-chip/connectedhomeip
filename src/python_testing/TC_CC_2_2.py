@@ -46,8 +46,8 @@ from chip.testing.matter_base_test import MatterBaseTest
 from chip.testing.models import TestStep
 from chip.testing.runner import default_matter_test_main
 from mobly import asserts
-from python_testing.matter_testing_infrastructure.chip.testing.decorators import has_cluster
-from python_testing.matter_testing_infrastructure.chip.testing.utilities import ClusterAttributeChangeAccumulator
+from chip.testing.decorators import has_cluster
+from chip.testing.utilities import ClusterAttributeChangeAccumulator
 from test_plan_support import commission_if_required, read_attribute, verify_success
 
 

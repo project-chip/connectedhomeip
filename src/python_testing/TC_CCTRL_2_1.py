@@ -60,7 +60,7 @@ from chip.testing.models import TestStep
 from chip.testing.runner import default_matter_test_main
 from mobly import asserts
 
-from python_testing.matter_testing_infrastructure.chip.testing.decorators import has_cluster
+from chip.testing.decorators import has_cluster
 
 
 class TC_CCTRL_2_1(MatterBaseTest):
