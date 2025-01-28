@@ -206,7 +206,7 @@ endif # BT
 # Cut down the ram cost by matter's change,it can keep ramcode (driver).
 # No need load the ramcode every time in thread mode (retention mode).
 # If the ram is not enough , can change it back , initial setting is n.
-if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9258A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
+if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
 config SOC_SERIES_RISCV_TELINK_B9X_NON_RETENTION_RAM_CODE
     default n if PM
 
@@ -232,7 +232,7 @@ endif
 
 # Board non-retention config
 if  BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1 || \
-    BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D || BOARD_TL3218X || BOARD_TL7218X
+    BOARD_TLSR9528A || BOARD_TLSR9518ADK80D || BOARD_TL3218X || BOARD_TL7218X
 config PWM
     default y
 endif
