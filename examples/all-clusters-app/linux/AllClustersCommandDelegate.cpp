@@ -22,10 +22,10 @@
 #include <app/EventLogging.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
+#include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
 #include <app/clusters/switch-server/switch-server.h>
-#include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
 #include <app/server/Server.h>
 #include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
@@ -312,15 +312,20 @@ void SetRefrigetatorDoorStatusHandler(Json::Value & jsonValue)
     }
     // values to update the door status
     EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
-    bool doorStatus    = static_cast<bool>(jsonValue["DoorOpen"].asBool());
-    ChipLogDetail(NotSpecified, "SetRefrigetatorDoorStatusHandler State -> %d.",doorStatus);
-     if ( !doorStatus  ) {
-        RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId,doorStatus);
+    bool doorStatus       = static_cast<bool>(jsonValue["DoorOpen"].asBool());
+    ChipLogDetail(NotSpecified, "SetRefrigetatorDoorStatusHandler State -> %d.", doorStatus);
+    if (!doorStatus)
+    {
+        RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId, doorStatus);
         ChipLogDetail(NotSpecified, "Refrigeratoralarm status updated to :%d", doorStatus);
-    }else if (doorStatus){
-        RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId,doorStatus);
-        RefrigeratorAlarmServer::Instance().SetStateValue(endpointId,doorStatus);
-    }else {
+    }
+    else if (doorStatus)
+    {
+        RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId, doorStatus);
+        RefrigeratorAlarmServer::Instance().SetStateValue(endpointId, doorStatus);
+    }
+    else
+    {
         ChipLogError(NotSpecified, "Invalid value to set.");
         return;
     }
