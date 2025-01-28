@@ -2,9 +2,9 @@
 
 ## What are PICS
 
-In many Standards Defining Organizations (SDO) including the CSA, the concept of
-a “Protocol Implementation Conformance Statement” or “PICS” code is introduced
-to simplify description of protocol elements.
+In many Standards Defining Organizations including the CSA, the concept of a
+“Protocol Implementation Conformance Statement” or “PICS” code is introduced to
+simplify description of protocol elements.
 
 Each PICS code is a binary value that describes the presence or absence of a
 particular element or capability on a device. Each cluster has a defined PICS
@@ -87,10 +87,10 @@ Matter device with a single set of cluster-based PICS files. Instead, Matter
 devices use a full set of PICS XML files to describe each endpoint.
 
 To create a conformance statement for a Matter device, for each endpoint, load
-the full set of PICS XML files into the PICS tool, and select each of the PICS
-elements present for the endpoint being described. #TODO: Cecille - need to go
-back and check Sander's improvements - are those part of the official release
-now?
+the full set of PICS XML files into the
+[PICS tool](https://picstool.csa-iot.org/), and select each of the PICS elements
+present for the endpoint being described. Documentation on how to use the PICS
+tool can be found in the PICS tool readme in the tool menu.
 
 Many of the full-node MCORE elements really only apply to the root node. For
 example, the entire device is commissionable, but commissioning tests only need
