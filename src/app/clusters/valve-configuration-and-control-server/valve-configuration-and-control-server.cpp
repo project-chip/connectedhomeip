@@ -101,9 +101,11 @@ public:
     {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 
 private:
     CHIP_ERROR ReadRemainingDuration(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteRemainingDuration(EndpointId endpoint, AttributeValueDecoder & aDecoder);
 };
 
 ValveConfigAndControlAttrAccess gAttrAccess;
@@ -138,6 +140,39 @@ CHIP_ERROR ValveConfigAndControlAttrAccess::Read(const ConcreteReadAttributePath
 
     return err;
 }
+
+CHIP_ERROR ValveConfigAndControlAttrAccess::WriteRemainingDuration(EndpointId endpoint, AttributeValueDecoder & aDecoder)
+{
+    DataModel::Nullable<uint32_t> rDuration;
+    CHIP_ERROR res = aDecoder.Decode(rDuration);
+    if (res != CHIP_NO_ERROR)
+        return res;
+    if (rDuration.IsNull() || NumericAttributeTraits<uint32_t>::IsNullValue(rDuration.Value()))
+        return ValveConfigurationAndControl::SetRemainingDurationNull(endpoint);
+    else
+        return ValveConfigurationAndControl::SetRemainingDuration(endpoint, rDuration);
+}
+
+CHIP_ERROR ValveConfigAndControlAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    if (aPath.mClusterId != ValveConfigurationAndControl::Id)
+    {
+        return CHIP_ERROR_INVALID_PATH_LIST;
+    }
+
+    switch (aPath.mAttributeId)
+    {
+    case RemainingDuration::Id: {
+        return WriteRemainingDuration(aPath.mEndpointId, aDecoder);
+    }
+    default: {
+        break;
+    }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace
 
 static void startRemainingDurationTick(EndpointId ep);
