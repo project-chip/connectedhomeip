@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Information read from the commissionee device during commissioning.
  */
 NS_SWIFT_SENDABLE
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @interface MTRCommissioneeInfo : NSObject <NSCopying, NSSecureCoding>
 
 /**
