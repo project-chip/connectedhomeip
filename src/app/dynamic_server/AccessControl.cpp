@@ -63,7 +63,8 @@ class AccessControlDelegate : public Access::AccessControl::Delegate
             return CHIP_ERROR_ACCESS_DENIED;
         }
 
-        if (subjectDescriptor.authMode != AuthMode::kCase && subjectDescriptor.authMode != AuthMode::kPase)
+        if (subjectDescriptor.authMode != AuthMode::kCase && subjectDescriptor.authMode != AuthMode::kPase &&
+            subjectDescriptor.authMode != AuthMode::kInternalDeviceAccess)
         {
             // No idea who is asking; deny for now.
             return CHIP_ERROR_ACCESS_DENIED;
