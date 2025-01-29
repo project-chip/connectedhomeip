@@ -16,12 +16,17 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/access/access.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/app/icd/icd.gni")
+import("${chip_root}/src/platform/device.gni")
 
 config("server_config") {
   defines = []
 
   if (chip_app_use_echo) {
     defines += [ "CHIP_APP_USE_ECHO" ]
+  }
+
+  if (chip_mdns_minimal) {
+    defines += [ "CHIP_MDNS_MINIMAL=1" ]
   }
 }
 
@@ -84,6 +89,11 @@ static_library("server") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
+
+  if (chip_mdns_minimal) {
+    public_deps +=
+        [ "${chip_root}/src/lib/dnssd/minimal_mdns:singleinterface_policy" ]
+  }
 
   if (chip_terms_and_conditions_required) {
     public_deps += [ ":terms_and_conditions" ]

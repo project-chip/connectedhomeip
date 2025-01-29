@@ -25,7 +25,6 @@
 #include "platform/PlatformManager.h"
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
-#include <lib/dnssd/minimal_mdns/AddressPolicy_DefaultImpl.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
 #include <lib/dnssd/minimal_mdns/ResponseSender.h>
@@ -188,8 +187,6 @@ void TestDnssdBrowse_DnssdInitCallback(void * context, CHIP_ERROR error)
 // services by querying for all of these records separately.
 TEST_F(TestDnssd, TestDnssdBrowse)
 {
-    mdns::Minimal::SetDefaultAddressPolicy();
-
     mdns::Minimal::Server<10> server;
     mdns::Minimal::QNamePart serverName[] = { "resolve-tester", "_mock", chip::Dnssd::kCommissionProtocol,
                                               chip::Dnssd::kLocalDomain };

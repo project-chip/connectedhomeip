@@ -25,9 +25,22 @@ namespace {
 AddressPolicy * gAddressPolicy = nullptr;
 } // namespace
 
+// This will be resolved at link time if a default policy is set
+#ifndef CHIP_MINMDNS_NONE_POLICY
+AddressPolicy * GetDefaultAddressPolicy();
+#endif
+
 AddressPolicy * GetAddressPolicy()
 {
-    VerifyOrDie(gAddressPolicy != nullptr);
+#ifndef CHIP_MINMDNS_NONE_POLICY
+    // The GetDefaultAddressPolicy() function should be defined by a compile-defined default policy.
+    if (gAddressPolicy == nullptr)
+    {
+        auto p = GetDefaultAddressPolicy();
+        VerifyOrDie(p != nullptr);
+        SetAddressPolicy(p);
+    }
+#endif
     return gAddressPolicy;
 }
 

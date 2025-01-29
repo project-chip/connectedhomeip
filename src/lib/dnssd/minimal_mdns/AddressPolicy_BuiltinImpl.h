@@ -16,10 +16,12 @@
  */
 #pragma once
 
+#include <lib/dnssd/minimal_mdns/AddressPolicy.h>
+
 namespace mdns {
 namespace Minimal {
 
-void SetDefaultAddressPolicy();
+AddressPolicy * GetDefaultAddressPolicy()
 
 } // namespace Minimal
 } // namespace mdns

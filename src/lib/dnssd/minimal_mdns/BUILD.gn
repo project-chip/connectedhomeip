@@ -36,11 +36,11 @@ declare_args() {
 
   # MinMdns address policy to be compiled in.
   # Supported values:
-  #   - "default" will compile in AddressPolicy_DefaultImpl.h/cpp
+  #   - "builtin" will compile in AddressPolicy_BuiltinImpl.h/cpp
   #   - "libnl" will compile in AddressPolicy_LibNlImpl.h/cpp (linux only)
   #   - "none" will NOT compile any default policy, app is expected to call
   #     SetAddressPolicy apropriately
-  chip_minmdns_default_policy = "default"
+  chip_minmdns_default_policy = "builtin"
 }
 
 config("config") {
@@ -58,20 +58,20 @@ config("config") {
     defines += [ "CHIP_MINMDNS_HIGH_VERBOSITY=0" ]
   }
 
-  if (chip_minmdns_default_policy == "default") {
-    defines += [ "CHIP_MINMDNS_DEFAULT_POLICY=1" ]
+  if (chip_minmdns_default_policy == "builtin") {
+    defines += [ "CHIP_MINMDNS_BUILTIN_POLICY=1" ]
   } else if (chip_minmdns_default_policy == "libnl") {
     assert(current_os == "linux", "LibNL only supported on linux")
     defines += [ "CHIP_MINMDNS_LIBNL_POLICY=1" ]
+  } else if (chip_minmdns_default_policy == "none") {
+    defines += [ "CHIP_MINMDNS_NONE_POLICY=1" ]
   } else {
-    assert(chip_minmdns_default_policy == "none",
-           "minmdns default policy should be a supported value")
+    assert(0 == 1, "minmdns default policy should be a supported value")
   }
 }
 
-source_set("address_policy") {
+source_set("address_policy_headers") {
   sources = [
-    "AddressPolicy.cpp",
     "AddressPolicy.h",
     "ListenIterator.h",
     "ServerIPAddresses.h",
@@ -83,18 +83,30 @@ source_set("address_policy") {
   ]
 }
 
-static_library("default_policy") {
+static_library("builtin_policy") {
   sources = [
-    "AddressPolicy_DefaultImpl.cpp",
-    "AddressPolicy_DefaultImpl.h",
+    "AddressPolicy_BuiltinImpl.cpp",
+    "AddressPolicy_BuiltinImpl.h",
   ]
 
   public_deps = [
-    ":address_policy",
+    ":address_policy_headers",
     "${chip_root}/src/inet",
   ]
 
   cflags = [ "-Wconversion" ]
+}
+
+static_library("singleinterface_policy") {
+  sources = [
+    "AddressPolicy_SingleInterface.cpp",
+    "AddressPolicy_SingleInterface.h",
+  ]
+
+  public_deps = [
+    ":address_policy_headers",
+    "${chip_root}/src/inet",
+  ]
 }
 
 if (current_os == "linux" && chip_minmdns_default_policy == "libnl") {
@@ -114,12 +126,19 @@ if (current_os == "linux" && chip_minmdns_default_policy == "libnl") {
     ]
 
     public_deps = [
-      ":address_policy",
+      ":address_policy_headers",
       "${chip_root}/src/inet",
     ]
 
     public_configs = [ ":libnl_config" ]
   }
+}
+
+static_library("address_policy") {
+  sources = [ "AddressPolicy.cpp" ]
+
+  # this should be ifdef'd
+  public_deps = [ ":address_policy_headers" ]
 }
 
 static_library("minimal_mdns") {
@@ -152,8 +171,8 @@ static_library("minimal_mdns") {
     "${chip_root}/src/platform",
   ]
 
-  if (chip_minmdns_default_policy == "default") {
-    public_deps += [ ":default_policy" ]
+  if (chip_minmdns_default_policy == "builtin") {
+    public_deps += [ ":builtin_policy" ]
   } else if (chip_minmdns_default_policy == "libnl") {
     public_deps += [ ":libnl_policy" ]
   }
