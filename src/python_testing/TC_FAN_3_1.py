@@ -37,17 +37,19 @@
 import logging
 import time
 from enum import Enum
+
 import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, ClusterAttributeChangeAccumulator, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
-from matter_testing_infrastructure.chip.testing.matter_testing import ClusterAttributeChangeAccumulator
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.interaction_model import Status
+from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
+                                         default_matter_test_main)
+from mobly import asserts
+
 
 class OrderEnum(Enum):
     Ascending = 1
     Descending = 2
+
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +92,8 @@ class TC_FAN_3_1(MatterBaseTest):
         # Write initial FanMode
         write_result = await self.write_setting(endpoint, fan_mode_attr, fan_mode_init)
         write_status_success = (write_result == Status.Success) or (write_result == Status.InvalidInState)
-        asserts.assert_true(write_status_success, f"FanMode write did not return a value of either SUCCESS or INVALID_IN_STATE ({write_result.name})")
+        asserts.assert_true(write_status_success,
+                            f"FanMode write did not return a value of either SUCCESS or INVALID_IN_STATE ({write_result.name})")
 
         # Read FanMode back and verify written value
         fan_mode_initial = await self.read_setting(endpoint, fan_mode_attr)
@@ -126,12 +129,14 @@ class TC_FAN_3_1(MatterBaseTest):
 
                         if order == OrderEnum.Ascending:
                             # Verify the current FanMode is greater than the previous FanMode
-                            asserts.assert_greater(fan_mode_current, fan_mode_previous, "Current FanMode must be greater than previous FanMode")
+                            asserts.assert_greater(fan_mode_current, fan_mode_previous,
+                                                   "Current FanMode must be greater than previous FanMode")
                         else:
                             # Verify the current FanMode is less than the previous FanMode
                             asserts.assert_less(fan_mode_current, fan_mode_previous, "Current FanMode must be less than previous FanMode")
-                            
-                        logging.info(f"[FANS] FanMode changed from {fan_mode_previous.name}({fan_mode_previous}) to {fan_mode_current.name}({fan_mode_current})")
+
+                        logging.info(
+                            f"[FANS] FanMode changed from {fan_mode_previous.name}({fan_mode_previous}) to {fan_mode_current.name}({fan_mode_current})")
                         fan_mode_previous = fan_mode_current
                         break_out = True
                         break
@@ -143,7 +148,7 @@ class TC_FAN_3_1(MatterBaseTest):
                     break
 
         await attribute_subscription.cancel()
-        
+
     def pics_TC_FAN_3_1(self) -> list[str]:
         return ["FAN.S"]
 
