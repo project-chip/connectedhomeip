@@ -1,3 +1,7 @@
+---
+orphan: true
+---
+
 # Push AV Server
 
 This tool provide a web server that can be used to implement Matter cameras. The
