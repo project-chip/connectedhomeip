@@ -18,6 +18,7 @@ import os
 from typing import Dict, Optional
 
 import jinja2
+
 from matter.idl.matter_idl_types import Idl
 
 from .filters import RegisterCommonFilters

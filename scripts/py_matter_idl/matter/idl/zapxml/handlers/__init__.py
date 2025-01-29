@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from matter.idl.matter_idl_types import Idl
+
 from .base import BaseHandler
 from .context import Context
 from .handlers import ConfiguratorHandler
-
-from matter.idl.matter_idl_types import Idl
 
 
 class ZapXmlHandler(BaseHandler):

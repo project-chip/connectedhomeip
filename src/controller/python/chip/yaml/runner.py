@@ -31,8 +31,9 @@ from chip.clusters.Attribute import (AttributeStatus, EventReadResult, Subscript
 from chip.exceptions import ChipStackError
 from chip.yaml.data_model_lookup import DataModelLookup
 from chip.yaml.errors import ActionCreationError, UnexpectedActionCreationError
-from matter.idl.generators.filters import to_pascal_case, to_snake_case
 from matter_yamltests.pseudo_clusters.pseudo_clusters import get_default_pseudo_clusters
+
+from matter.idl.generators.filters import to_pascal_case, to_snake_case
 
 from .data_model_lookup import PreDefinedDataModelLookup
 
