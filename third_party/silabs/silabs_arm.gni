@@ -21,7 +21,7 @@ if (silabs_family == "SiWx917-common") {
   arm_float_abi = "softfp"
   arm_fpu = "fpv4-sp-d16"
 } else if (silabs_family == "efr32mg24" || silabs_family == "mgm24" ||
-           silabs_family == "efr32mg26") {
+           silabs_family == "efr32mg26" || silabs_family == "mgm26") {
   arm_arch = "armv8-m.main+dsp"
   arm_abi = "aapcs"
   arm_cpu = "cortex-m33"
