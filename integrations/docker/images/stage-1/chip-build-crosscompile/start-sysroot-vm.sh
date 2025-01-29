@@ -117,6 +117,7 @@ packages:
   - libdbus-1-dev
   - libgirepository1.0-dev
   - libglib2.0-dev
+  - libpcsclite-dev
   - libreadline-dev
   - libsdl2-dev
   - libssl-dev

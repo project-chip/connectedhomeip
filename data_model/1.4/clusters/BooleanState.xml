@@ -68,7 +68,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="StateValue" type="bool">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality reportable="true"/>
       <mandatoryConform/>
     </attribute>
   </attributes>

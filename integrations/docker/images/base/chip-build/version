@@ -1,1 +1,1 @@
-101 : [Silabs] Update Silabs docker to support MG26 Modules.
+103 : Changed sysroot for crosscompile image (new ubuntu version and includes NFC libs)

@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050F" name="Content Control Cluster" revision="1">
   <revisionHistory>
@@ -92,8 +94,39 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
-    <enum name="Status Codes" type="status"/>
-    <bitmap name="DayOfWeekBitmap type">
+    <enum name="StatusCodeEnum">
+      <item value="0x02" name="InvalidPINCode" summary="Provided PIN Code does not match the current PIN code.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="InvalidRating" summary="Provided Rating is out of scope of the corresponding Rating list.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x04" name="InvalidChannel" summary="Provided Channel(s) is invalid.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x05" name="ChannelAlreadyExist" summary="Provided Channel(s) already exists.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x06" name="ChannelNotExist" summary="Provided Channel(s) doesn&apos;t exist in BlockChannelList attribute.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x07" name="UnidentifiableApplication" summary="Provided Application(s) is not identified.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x08" name="ApplicationAlreadyExist" summary="Provided Application(s) already exists.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x09" name="ApplicationNotExist" summary="Provided Application(s) doesn&apos;t exist in BlockApplicationList attribute.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x0A" name="TimeWindowAlreadyExist" summary="Provided time Window already exists in BlockContentTimeWindow attribute.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x0B" name="TimeWindowNotExist" summary="Provided time window doesn&apos;t exist in BlockContentTimeWindow attribute.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <bitmap name="DayOfWeekBitmap">
       <bitfield name="Sunday" bit="0" summary="Sunday">
         <mandatoryConform/>
       </bitfield>
@@ -149,7 +182,7 @@ Davis, CA 95616, USA
         <constraint type="maxLength" value="64"/>
       </field>
     </struct>
-    <struct name="TimePeriodStruct type">
+    <struct name="TimePeriodStruct">
       <field id="0" name="StartHour" type="uint8">
         <mandatoryConform/>
         <constraint type="between" from="0" to="23"/>
@@ -172,12 +205,12 @@ Davis, CA 95616, USA
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
-      <field id="1" name="DayOfWeek" type="DayOfWeekBitmap type">
+      <field id="1" name="DayOfWeek" type="DayOfWeekBitmap">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
       <field id="2" name="TimePeriod" type="list">
-        <entry type="TimePeriodStruct type"/>
+        <entry type="TimePeriodStruct"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
@@ -306,7 +339,7 @@ Davis, CA 95616, USA
         <optionalConform/>
         <constraint type="maxLength" value="6"/>
       </field>
-      <field id="1" name="BonusTime" type="elapsed-s" default="300s">
+      <field id="1" name="BonusTime" type="elapsed-s" default="300">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>

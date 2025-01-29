@@ -94,12 +94,11 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * so the information delivered by this notification should not be trusted.
  */
 - (void)controller:(MTRDeviceController *)controller
-    readCommissioneeInfo:(MTRCommissioneeInfo *)info MTR_NEWLY_AVAILABLE;
+    readCommissioneeInfo:(MTRCommissioneeInfo *)info MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 - (void)controller:(MTRDeviceController *)controller
     readCommissioningInfo:(MTRProductIdentity *)info
-    MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
-        MTR_NEWLY_DEPRECATED("Use controller:readCommissioneeInfo:");
+    MTR_DEPRECATED("Use controller:readCommissioneeInfo:", ios(17.0, 18.4), macos(14.0, 15.4), watchos(10.0, 11.4), tvos(17.0, 18.4));
 
 /**
  * Notify the delegate when the suspended state changed of the controller, after this happens

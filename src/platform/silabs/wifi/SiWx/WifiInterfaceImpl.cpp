@@ -86,7 +86,6 @@ extern "C" {
 #endif
 
 WfxRsi_t wfx_rsi;
-extern osSemaphoreId_t sl_rs_ble_init_sem;
 
 namespace {
 
@@ -310,7 +309,6 @@ sl_status_t sl_wifi_siwx917_init(void)
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 
     wfx_rsi.dev_state.Set(WifiState::kStationInit);
-    osSemaphoreRelease(sl_rs_ble_init_sem);
     return status;
 }
 
@@ -379,16 +377,22 @@ sl_status_t SetWifiConfigurations()
     // Setting the listen interval to 0 which will set it to DTIM interval
     sl_wifi_listen_interval_t sleep_interval = { .listen_interval = 0 };
     status                                   = sl_wifi_set_listen_interval(SL_WIFI_CLIENT_INTERFACE, sleep_interval);
-    VerifyOrReturnError(status == SL_STATUS_OK, status);
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_wifi_set_listen_interval failed: 0x%lx", status));
 
     sl_wifi_advanced_client_configuration_t client_config = { .max_retry_attempts = 5 };
     status = sl_wifi_set_advanced_client_configuration(SL_WIFI_CLIENT_INTERFACE, &client_config);
-    VerifyOrReturnError(status == SL_STATUS_OK, status);
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_wifi_set_advanced_client_configuration failed: 0x%lx", status));
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-    status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID, SL_NET_WIFI_PSK, &wfx_rsi.sec.passkey[0],
-                                   wfx_rsi.sec.passkey_length);
-    VerifyOrReturnError(status == SL_STATUS_OK, status);
+    if (wfx_rsi.sec.passkey_length != 0)
+    {
+        status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID, SL_NET_WIFI_PSK, &wfx_rsi.sec.passkey[0],
+                                       wfx_rsi.sec.passkey_length);
+        VerifyOrReturnError(status == SL_STATUS_OK, status,
+                            ChipLogError(DeviceLayer, "sl_net_set_credential failed: 0x%lx", status));
+    }
 
     sl_net_wifi_client_profile_t profile = {
         .config = {
@@ -404,7 +408,7 @@ sl_status_t SetWifiConfigurations()
             .bssid = {{0}},
             .bss_type = SL_WIFI_BSS_TYPE_INFRASTRUCTURE,
             .security = security,
-            .encryption = SL_WIFI_NO_ENCRYPTION,
+            .encryption = SL_WIFI_DEFAULT_ENCRYPTION,
             .client_options = SL_WIFI_JOIN_WITH_SCAN,
             .credential_id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID,
         },
@@ -419,7 +423,7 @@ sl_status_t SetWifiConfigurations()
     memcpy((char *) &profile.config.ssid.value, wfx_rsi.sec.ssid, wfx_rsi.sec.ssid_length);
 
     status = sl_net_set_profile((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
-    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_set_profile Failed"));
+    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_set_profile failed: 0x%lx", status));
 
     return status;
 }
@@ -555,29 +559,30 @@ CHIP_ERROR ResetCounters()
     return CHIP_NO_ERROR;
 }
 
-sl_status_t InitSiWxWifi(void)
+CHIP_ERROR InitWiFiStack(void)
 {
     sl_status_t status = SL_STATUS_OK;
 
     status = sl_net_init((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
-    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
 
     // Create Sempaphore for scan completion
     sScanCompleteSemaphore = osSemaphoreNew(1, 0, nullptr);
-    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
+    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, CHIP_ERROR_NO_MEMORY);
 
     // Create Semaphore for scan in-progress protection
     sScanInProgressSemaphore = osSemaphoreNew(1, 1, nullptr);
-    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
+    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, CHIP_ERROR_NO_MEMORY);
 
     // Create the message queue
     sWifiEventQueue = osMessageQueueNew(kWfxQueueSize, sizeof(WifiPlatformEvent), nullptr);
-    VerifyOrReturnError(sWifiEventQueue != nullptr, SL_STATUS_ALLOCATION_FAILED);
+    VerifyOrReturnError(sWifiEventQueue != nullptr, CHIP_ERROR_NO_MEMORY);
 
     status = CreateDHCPTimer();
-    VerifyOrReturnError(status == SL_STATUS_OK, status);
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(DeviceLayer, "CreateDHCPTimer failed: %lx", status));
 
-    return status;
+    return CHIP_NO_ERROR;
 }
 
 void HandleDHCPPolling(void)

@@ -178,6 +178,16 @@ extern WfxRsi_t wfx_rsi;
 /* Updated functions */
 
 /**
+ * @brief Function initalizes the WiFi module before starting WiFi task.
+ *
+ * @return CHIP_ERROR CHIP_NO_ERROR, if the initialization succeeded
+ *                    CHIP_ERROR_INTERNAL, if sequence failed due to internal API error
+ *                    CHIP_ERROR_NO_MEMORY, if sequence failed due to unavaliablility of memory
+ */
+
+CHIP_ERROR InitWiFiStack(void);
+
+/**
  * @brief Function notifies the PlatformManager that an IPv6 event occured on the WiFi interface.
  *
  * @param gotIPv6Addr true, got an IPv6 address

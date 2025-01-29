@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021-2024). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0201" name="Thermostat Cluster" revision="8">
   <revisionHistory>
@@ -63,8 +65,7 @@ Davis, CA 95616, USA
     <revision revision="4" summary="All Hubs changes"/>
     <revision revision="5" summary="New data model format and notation, added FeatureMap, collapsed attribute sets, clarified edge cases around limits, default value of xxxSetpointLimit now respects AbsxxxSetpointLimit"/>
     <revision revision="6" summary="Introduced the LTNE feature and adapted text (spec issue #5778)"/>
-    <revision revision="7" summary="Update constraints on local temperature calibration and minimum setpoint deadband and introduced
-             Presets and MatterScheduleConfiguration features"/>
+    <revision revision="7" summary="Update constraints on local temperature calibration and minimum setpoint deadband and introduced Presets and MatterScheduleConfiguration features"/>
     <revision revision="8" summary="Added comment regarding writing to ControlSequenceOfOperation."/>
   </revisionHistory>
   <clusterIds>
@@ -77,7 +78,7 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="AUTO"/>
         </mandatoryConform>
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="a" more="true" min="1"/>
       </otherwiseConform>
     </feature>
     <feature bit="1" code="COOL" name="Cooling" summary="Thermostat is capable of managing a cooling device">
@@ -85,7 +86,7 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="AUTO"/>
         </mandatoryConform>
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="a" more="true" min="1"/>
       </otherwiseConform>
     </feature>
     <feature bit="2" code="OCC" name="Occupancy" summary="Supports Occupied and Unoccupied setpoints">
@@ -116,9 +117,9 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
-    <number name="SignedTemperature" type=""/>
-    <number name="TemperatureDifference" type=""/>
-    <number name="UnsignedTemperature" type=""/>
+    <number name="SignedTemperature" type="int8"/>
+    <number name="TemperatureDifference" type="int16"/>
+    <number name="UnsignedTemperature" type="uint8"/>
     <enum name="ACCapacityFormatEnum">
       <item value="0" name="BTUh" summary="British Thermal Unit per Hour">
         <optionalConform/>
@@ -197,7 +198,7 @@ Davis, CA 95616, USA
           <feature name="COOL"/>
         </optionalConform>
       </item>
-      <item value="2" name="HeatingOnly" summary="Cool and precooling (see ref_HvacTerms) are not possible">
+      <item value="2" name="HeatingOnly" summary="Cool and precooling (see Terms) are not possible">
         <optionalConform>
           <feature name="HEAT"/>
         </optionalConform>
@@ -325,12 +326,12 @@ Davis, CA 95616, USA
           <feature name="HEAT"/>
         </optionalConform>
       </item>
-      <item value="5" name="EmergencyHeat" summary="2 stage heating is in use to achieve desired temperature">
+      <item value="5" name="EmergencyHeat" summary="2nd stage heating is in use to achieve desired temperature">
         <optionalConform>
           <feature name="HEAT"/>
         </optionalConform>
       </item>
-      <item value="6" name="Precooling" summary="(see ref_HvacTerms)">
+      <item value="6" name="Precooling" summary="(see Terms)">
         <optionalConform>
           <feature name="COOL"/>
         </optionalConform>
@@ -397,10 +398,10 @@ Davis, CA 95616, USA
       </bitfield>
     </bitmap>
     <bitmap name="HVACSystemTypeBitmap">
-      <bitfield name="CoolingStage" from="1" to="0" summary="Stage of cooling the HVAC system is using.">
+      <bitfield name="CoolingStage" from="0x00" to="0x01" summary="Stage of cooling the HVAC system is using.">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="HeatingStage" from="3" to="2" summary="Stage of heating the HVAC system is using.">
+      <bitfield name="HeatingStage" from="0x02" to="0x03" summary="Stage of heating the HVAC system is using.">
         <mandatoryConform/>
       </bitfield>
       <bitfield name="HeatingIsHeatPump" bit="4" summary="Is the heating type Heat Pump.">
@@ -444,16 +445,16 @@ Davis, CA 95616, USA
       <bitfield name="Fan" bit="2" summary="Fan Stage On">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="HeatStage2" bit="3" summary="Heat 2 Stage On">
+      <bitfield name="HeatStage2" bit="3" summary="Heat 2nd Stage On">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="CoolStage2" bit="4" summary="Cool 2 Stage On">
+      <bitfield name="CoolStage2" bit="4" summary="Cool 2nd Stage On">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="FanStage2" bit="5" summary="Fan 2 Stage On">
+      <bitfield name="FanStage2" bit="5" summary="Fan 2nd Stage On">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="FanStage3" bit="6" summary="Fan 3 Stage On">
+      <bitfield name="FanStage3" bit="6" summary="Fan 3rd Stage On">
         <mandatoryConform/>
       </bitfield>
     </bitmap>
@@ -504,12 +505,12 @@ Davis, CA 95616, USA
     </bitmap>
     <bitmap name="ScheduleTypeFeaturesBitmap">
       <bitfield name="SupportsPresets" bit="0" summary="Supports presets">
-        <optionalConform choice="b" more="true">
+        <optionalConform choice="b" more="true" min="1">
           <feature name="PRES"/>
         </optionalConform>
       </bitfield>
       <bitfield name="SupportsSetpoints" bit="1" summary="Supports setpoints">
-        <optionalConform choice="b" more="true"/>
+        <optionalConform choice="b" more="true" min="1"/>
       </bitfield>
       <bitfield name="SupportsNames" bit="2" summary="Supports user-provided names">
         <optionalConform/>
@@ -532,13 +533,13 @@ Davis, CA 95616, USA
         <optionalConform/>
         <constraint type="maxLength" value="64"/>
       </field>
-      <field id="3" name="CoolingSetpoint" type="temperature" default="26°C">
+      <field id="3" name="CoolingSetpoint" type="temperature" default="2600">
         <mandatoryConform>
           <feature name="COOL"/>
         </mandatoryConform>
         <constraint type="desc"/>
       </field>
-      <field id="4" name="HeatingSetpoint" type="temperature" default="20°C">
+      <field id="4" name="HeatingSetpoint" type="temperature" default="2000">
         <mandatoryConform>
           <feature name="HEAT"/>
         </mandatoryConform>
@@ -581,7 +582,10 @@ Davis, CA 95616, USA
       <field id="4" name="Transitions" type="list" default="empty">
         <entry type="ScheduleTransitionStruct"/>
         <mandatoryConform/>
-        <constraint type="countBetween" from="1" to="NumberOfScheduleTransitions Attribute"/>
+        <constraint type="countBetween">
+          <from value="1"/>
+          <to attribute="NumberOfScheduleTransitions"/>
+        </constraint>
       </field>
       <field id="5" name="BuiltIn" type="bool" default="false">
         <quality nullable="true"/>
@@ -627,7 +631,9 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="NumberOfSchedules" type="uint8" default="0">
         <mandatoryConform/>
-        <constraint type="max" value="NumberOfSchedules Attribute"/>
+        <constraint type="max">
+          <value attribute="NumberOfSchedules"/>
+        </constraint>
       </field>
       <field id="2" name="ScheduleTypeFeatures" type="ScheduleTypeFeaturesBitmap" default="0">
         <mandatoryConform/>
@@ -652,12 +658,12 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="LocalTemperature" type="temperature" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" reportable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="OutdoorTemperature" type="temperature" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0002" name="Occupancy" type="OccupancyBitmap" default="1">
@@ -666,88 +672,88 @@ Davis, CA 95616, USA
         <feature name="OCC"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0003" name="AbsMinHeatSetpointLimit" type="temperature" default="7°C">
+    <attribute id="0x0003" name="AbsMinHeatSetpointLimit" type="temperature" default="700">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform>
         <feature name="HEAT"/>
       </optionalConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0004" name="AbsMaxHeatSetpointLimit" type="temperature" default="30°C">
+    <attribute id="0x0004" name="AbsMaxHeatSetpointLimit" type="temperature" default="3000">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform>
         <feature name="HEAT"/>
       </optionalConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0005" name="AbsMinCoolSetpointLimit" type="temperature" default="16°C">
+    <attribute id="0x0005" name="AbsMinCoolSetpointLimit" type="temperature" default="1600">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform>
         <feature name="COOL"/>
       </optionalConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0006" name="AbsMaxCoolSetpointLimit" type="temperature" default="32°C">
+    <attribute id="0x0006" name="AbsMaxCoolSetpointLimit" type="temperature" default="3200">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform>
         <feature name="COOL"/>
       </optionalConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0007" name="PICoolingDemand" type="uint8" default="-">
+    <attribute id="0x0007" name="PICoolingDemand" type="uint8" default="">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality reportable="true"/>
       <optionalConform>
         <feature name="COOL"/>
       </optionalConform>
-      <constraint type="between" from="0%" to="100%"/>
+      <constraint type="between" from="0" to="100"/>
     </attribute>
-    <attribute id="0x0008" name="PIHeatingDemand" type="uint8" default="-">
+    <attribute id="0x0008" name="PIHeatingDemand" type="uint8" default="">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality reportable="true"/>
       <optionalConform>
         <feature name="HEAT"/>
       </optionalConform>
-      <constraint type="between" from="0%" to="100%"/>
+      <constraint type="between" from="0" to="100"/>
     </attribute>
     <attribute id="0x0009" name="HVACSystemTypeConfiguration" type="HVACSystemTypeBitmap" default="0">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <deprecateConform/>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0010" name="LocalTemperatureCalibration" type="SignedTemperature" default="0°C">
+    <attribute id="0x0010" name="LocalTemperatureCalibration" type="int8s" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform>
         <notTerm>
           <feature name="LTNE"/>
         </notTerm>
       </optionalConform>
     </attribute>
-    <attribute id="0x0011" name="OccupiedCoolingSetpoint" type="temperature" default="26°C">
+    <attribute id="0x0011" name="OccupiedCoolingSetpoint" type="temperature" default="2600">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="COOL"/>
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0012" name="OccupiedHeatingSetpoint" type="temperature" default="20°C">
+    <attribute id="0x0012" name="OccupiedHeatingSetpoint" type="temperature" default="2000">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="HEAT"/>
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0013" name="UnoccupiedCoolingSetpoint" type="temperature" default="26°C">
+    <attribute id="0x0013" name="UnoccupiedCoolingSetpoint" type="temperature" default="2600">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <andTerm>
           <feature name="COOL"/>
@@ -756,9 +762,9 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0014" name="UnoccupiedHeatingSetpoint" type="temperature" default="20°C">
+    <attribute id="0x0014" name="UnoccupiedHeatingSetpoint" type="temperature" default="2000">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <andTerm>
           <feature name="HEAT"/>
@@ -767,69 +773,65 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0015" name="MinHeatSetpointLimit" type="temperature" default="AbsMinHeatSetpointLimit">
+    <attribute id="0x0015" name="MinHeatSetpointLimit" type="temperature">
+      <default attribute="AbsMinHeatSetpointLimit"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform>
         <feature name="HEAT"/>
       </optionalConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0016" name="MaxHeatSetpointLimit" type="temperature" default="AbsMaxHeatSetpointLimit">
+    <attribute id="0x0016" name="MaxHeatSetpointLimit" type="temperature">
+      <default attribute="AbsMaxHeatSetpointLimit"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform>
         <feature name="HEAT"/>
       </optionalConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0017" name="MinCoolSetpointLimit" type="temperature" default="AbsMinCoolSetpointLimit">
+    <attribute id="0x0017" name="MinCoolSetpointLimit" type="temperature">
+      <default attribute="AbsMinCoolSetpointLimit"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform>
         <feature name="COOL"/>
       </optionalConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0018" name="MaxCoolSetpointLimit" type="temperature" default="AbsMaxCoolSetpointLimit">
+    <attribute id="0x0018" name="MaxCoolSetpointLimit" type="temperature">
+      <default attribute="AbsMaxCoolSetpointLimit"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform>
         <feature name="COOL"/>
       </optionalConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0019" name="MinSetpointDeadBand" type="SignedTemperature" default="2.5°C">
+    <attribute id="0x0019" name="MinSetpointDeadBand" type="int8s" default="25">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="AUTO"/>
       </mandatoryConform>
-      <constraint type="between" from="0" to="12.7°C"/>
+      <constraint type="between" from="0" to="127"/>
     </attribute>
     <attribute id="0x001A" name="RemoteSensing" type="RemoteSensingBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform/>
-      <constraint type="allowed" value="0b0000 0xxx"/>
     </attribute>
     <attribute id="0x001B" name="ControlSequenceOfOperation" type="ControlSequenceOfOperationEnum" default="4">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x001C" name="SystemMode" type="SystemModeEnum" default="1">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
-    </attribute>
-    <attribute id="0x001D" name="AlarmMask" type="AlarmCodeBitmap" default="0">
-      <access read="true" readPrivilege="view"/>
-      <optionalConform>
-        <condition name="Zigbee"/>
-      </optionalConform>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x001E" name="ThermostatRunningMode" type="ThermostatRunningModeEnum" default="0">
@@ -839,9 +841,9 @@ Davis, CA 95616, USA
       </optionalConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0020" name="StartOfWeek" type="StartOfWeekEnum" default="–">
+    <attribute id="0x0020" name="StartOfWeek" type="StartOfWeekEnum" default="">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="SCH"/>
       </mandatoryConform>
@@ -849,37 +851,37 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0021" name="NumberOfWeeklyTransitions" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="SCH"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0022" name="NumberOfDailyTransitions" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="SCH"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0023" name="TemperatureSetpointHold" type="TemperatureSetpointHoldEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0024" name="TemperatureSetpointHoldDuration" type="uint16" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <optionalConform/>
       <constraint type="max" value="1440"/>
     </attribute>
     <attribute id="0x0025" name="ThermostatProgrammingOperationMode" type="ProgrammingOperationModeBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality reportable="true"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0029" name="ThermostatRunningState" type="RelayStateBitmap" default="-">
+    <attribute id="0x0029" name="ThermostatRunningState" type="RelayStateBitmap" default="">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint type="desc"/>
@@ -889,97 +891,113 @@ Davis, CA 95616, USA
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0031" name="SetpointChangeAmount" type="TemperatureDifference" default="null">
+    <attribute id="0x0031" name="SetpointChangeAmount" type="int16s" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0032" name="SetpointChangeSourceTimestamp" type="utc" default="0">
+    <attribute id="0x0032" name="SetpointChangeSourceTimestamp" type="epoch-s" default="0">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0034" name="OccupiedSetback" type="UnsignedTemperature" default="null">
+    <attribute id="0x0034" name="OccupiedSetback" type="uint8" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="SB"/>
       </mandatoryConform>
-      <constraint type="between" from="OccupiedSetbackMin" to="OccupiedSetbackMax"/>
+      <constraint type="between">
+        <from attribute="OccupiedSetbackMin"/>
+        <to attribute="OccupiedSetbackMax"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0035" name="OccupiedSetbackMin" type="UnsignedTemperature" default="null">
+    <attribute id="0x0035" name="OccupiedSetbackMin" type="uint8" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform>
         <feature name="SB"/>
       </mandatoryConform>
-      <constraint type="max" value="OccupiedSetbackMax"/>
+      <constraint type="max">
+        <value attribute="OccupiedSetbackMax"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0036" name="OccupiedSetbackMax" type="UnsignedTemperature" default="null">
+    <attribute id="0x0036" name="OccupiedSetbackMax" type="uint8" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform>
         <feature name="SB"/>
       </mandatoryConform>
-      <constraint type="between" from="OccupiedSetbackMin" to="25.4°C"/>
+      <constraint type="between">
+        <from attribute="OccupiedSetbackMin"/>
+        <to value="254"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0037" name="UnoccupiedSetback" type="UnsignedTemperature" default="null">
+    <attribute id="0x0037" name="UnoccupiedSetback" type="uint8" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <andTerm>
           <feature name="SB"/>
           <feature name="OCC"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="between" from="UnoccupiedSetbackMin" to="UnoccupiedSetbackMax"/>
+      <constraint type="between">
+        <from attribute="UnoccupiedSetbackMin"/>
+        <to attribute="UnoccupiedSetbackMax"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0038" name="UnoccupiedSetbackMin" type="UnsignedTemperature" default="null">
+    <attribute id="0x0038" name="UnoccupiedSetbackMin" type="uint8" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform>
         <andTerm>
           <feature name="SB"/>
           <feature name="OCC"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="max" value="UnoccupiedSetbackMax"/>
+      <constraint type="max">
+        <value attribute="UnoccupiedSetbackMax"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0039" name="UnoccupiedSetbackMax" type="UnsignedTemperature" default="null">
+    <attribute id="0x0039" name="UnoccupiedSetbackMax" type="uint8" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform>
         <andTerm>
           <feature name="SB"/>
           <feature name="OCC"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="between" from="UnoccupiedSetbackMin" to="25.4°C"/>
+      <constraint type="between">
+        <from attribute="UnoccupiedSetbackMin"/>
+        <to value="254"/>
+      </constraint>
     </attribute>
-    <attribute id="0x003A" name="EmergencyHeatDelta" type="UnsignedTemperature" default="25.5°C">
+    <attribute id="0x003A" name="EmergencyHeatDelta" type="uint8" default="255">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0040" name="ACType" type="ACTypeEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0041" name="ACCapacity" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0042" name="ACRefrigerantType" type="ACRefrigerantTypeEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0043" name="ACCompressorType" type="ACCompressorTypeEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
@@ -989,25 +1007,25 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0045" name="ACLouverPosition" type="ACLouverPositionEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0046" name="ACCoilTemperature" type="temperature" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0047" name="ACCapacityFormat" type="ACCapacityFormatEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0048" name="PresetTypes" type="list" default="MS">
       <entry type="PresetTypeStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="PRES"/>
       </mandatoryConform>
@@ -1016,7 +1034,7 @@ Davis, CA 95616, USA
     <attribute id="0x0049" name="ScheduleTypes" type="list" default="MS">
       <entry type="ScheduleTypeStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="MSCH"/>
       </mandatoryConform>
@@ -1024,35 +1042,35 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x004A" name="NumberOfPresets" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="PRES"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x004B" name="NumberOfSchedules" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="MSCH"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x004C" name="NumberOfScheduleTransitions" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="MSCH"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x004D" name="NumberOfScheduleTransitionPerDay" type="uint8" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform>
         <feature name="MSCH"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x004E" name="ActivePresetHandle" type="octstr" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="PRES"/>
       </mandatoryConform>
@@ -1060,7 +1078,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x004F" name="ActiveScheduleHandle" type="octstr" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="MSCH"/>
       </mandatoryConform>
@@ -1069,16 +1087,18 @@ Davis, CA 95616, USA
     <attribute id="0x0050" name="Presets" type="list" default="empty">
       <entry type="PresetStruct"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile" atomicWrite="true"/>
       <mandatoryConform>
         <feature name="PRES"/>
       </mandatoryConform>
-      <constraint type="maxCount" value="NumberOfPresets"/>
+      <constraint type="maxCount">
+        <value attribute="NumberOfPresets"/>
+      </constraint>
     </attribute>
     <attribute id="0x0051" name="Schedules" type="list" default="empty">
       <entry type="ScheduleStruct"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile" atomicWrite="true"/>
       <mandatoryConform>
         <feature name="MSCH"/>
       </mandatoryConform>
@@ -1086,7 +1106,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0052" name="SetpointHoldExpiryTimestamp" type="epoch-s" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <optionalConform/>
     </attribute>
   </attributes>
@@ -1145,34 +1165,6 @@ Davis, CA 95616, USA
         <constraint type="maxCount" value="10"/>
       </field>
     </command>
-    <command id="0x01" name="GetRelayStatusLogResponse" direction="responseFromServer">
-      <mandatoryConform>
-        <command name="GetRelayStatusLog"/>
-      </mandatoryConform>
-      <field id="0" name="TimeOfDay" type="uint16">
-        <mandatoryConform/>
-        <constraint type="max" value="1439"/>
-      </field>
-      <field id="1" name="RelayStatus" type="RelayStateBitmap">
-        <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
-      <field id="2" name="LocalTemperature" type="temperature">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-      </field>
-      <field id="3" name="HumidityInPercentage" type="uint8">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-        <constraint type="between" from="0%" to="100%"/>
-      </field>
-      <field id="4" name="SetPoint" type="temperature">
-        <mandatoryConform/>
-      </field>
-      <field id="5" name="UnreadEntries" type="uint16">
-        <mandatoryConform/>
-      </field>
-    </command>
     <command id="0x02" name="GetWeeklySchedule" direction="commandToServer" response="GetWeeklyScheduleResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
@@ -1192,12 +1184,6 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="SCH"/>
       </mandatoryConform>
-    </command>
-    <command id="0x04" name="GetRelayStatusLog" direction="commandToServer" response="GetRelayStatusLogResponse">
-      <access invokePrivilege="operate"/>
-      <optionalConform>
-        <condition name="Zigbee"/>
-      </optionalConform>
     </command>
     <command id="0x05" name="SetActiveScheduleRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
