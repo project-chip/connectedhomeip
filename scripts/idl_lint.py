@@ -21,10 +21,10 @@ import click
 import coloredlogs
 
 try:
-    from matter_idl import matter_idl_parser
+    from matter.idl import matter_idl_parser
 except ImportError:
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'py_matter_idl')))
-    from matter_idl import matter_idl_parser
+    from matter.idl import matter_idl_parser
 
 # isort: off
 import matter_idl.lint

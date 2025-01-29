@@ -22,7 +22,7 @@ from chip.clusters.enum import MatterIntEnum
 from chip.clusters.Types import Nullable, NullValue
 from chip.tlv import float32, uint
 from chip.yaml.errors import ValidationError
-from matter_idl import matter_idl_types
+from matter.idl import matter_idl_types
 
 
 @dataclass

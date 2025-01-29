@@ -29,37 +29,37 @@ pw_python_package("matter_idl") {
   inputs = matter_idl_generator_templates
   inputs += [
     # Dependency grammar
-    "matter_idl/matter_grammar.lark",
+    "matter/idl/matter_grammar.lark",
 
     #marker file to indicate to mypy that matter_idl is type-annotated
-    "matter_idl/py.typed",
+    "matter/idl/py.typed",
 
     # Unit test data
-    "matter_idl/tests/available_tests.yaml",
-    "matter_idl/tests/inputs/cluster_struct_attribute.matter",
-    "matter_idl/tests/inputs/global_struct_attribute.matter",
-    "matter_idl/tests/inputs/optional_argument.matter",
-    "matter_idl/tests/inputs/several_clusters.matter",
-    "matter_idl/tests/inputs/simple_attribute.matter",
-    "matter_idl/tests/outputs/several_clusters/java/ChipClusters.java",
-    "matter_idl/tests/outputs/several_clusters/java/ChipEventStructs.java",
-    "matter_idl/tests/outputs/several_clusters/java/ChipStructs.java",
-    "matter_idl/tests/outputs/several_clusters/java/ClusterInfoMapping.java",
-    "matter_idl/tests/outputs/several_clusters/java/ClusterIDMapping.java",
-    "matter_idl/tests/outputs/several_clusters/java/ClusterWriteMapping.java",
+    "matter/idl/tests/available_tests.yaml",
+    "matter/idl/tests/inputs/cluster_struct_attribute.matter",
+    "matter/idl/tests/inputs/global_struct_attribute.matter",
+    "matter/idl/tests/inputs/optional_argument.matter",
+    "matter/idl/tests/inputs/several_clusters.matter",
+    "matter/idl/tests/inputs/simple_attribute.matter",
+    "matter/idl/tests/outputs/several_clusters/java/ChipClusters.java",
+    "matter/idl/tests/outputs/several_clusters/java/ChipEventStructs.java",
+    "matter/idl/tests/outputs/several_clusters/java/ChipStructs.java",
+    "matter/idl/tests/outputs/several_clusters/java/ClusterInfoMapping.java",
+    "matter/idl/tests/outputs/several_clusters/java/ClusterIDMapping.java",
+    "matter/idl/tests/outputs/several_clusters/java/ClusterWriteMapping.java",
   ]
 
   sources = matter_idl_generator_sources
 
   tests = [
-    "matter_idl/test_backwards_compatibility.py",
-    "matter_idl/test_case_conversion.py",
-    "matter_idl/test_data_model_xml.py",
-    "matter_idl/test_matter_idl_parser.py",
-    "matter_idl/test_generators.py",
-    "matter_idl/test_idl_generator.py",
-    "matter_idl/test_supported_types.py",
-    "matter_idl/test_zapxml.py",
+    "matter/idl/test_backwards_compatibility.py",
+    "matter/idl/test_case_conversion.py",
+    "matter/idl/test_data_model_xml.py",
+    "matter/idl/test_matter_idl_parser.py",
+    "matter/idl/test_generators.py",
+    "matter/idl/test_idl_generator.py",
+    "matter/idl/test_supported_types.py",
+    "matter/idl/test_zapxml.py",
   ]
 
   # TODO: at a future time consider enabling all (* or missing) here to get
