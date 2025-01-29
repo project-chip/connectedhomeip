@@ -52,8 +52,6 @@ extern "C" {
 #define BLE_TIMEOUT_MS 400
 #define BLE_SEND_INDICATION_TIMER_PERIOD_MS (5000)
 
-osSemaphoreId_t sl_rs_ble_init_sem;
-
 using namespace ::chip;
 using namespace ::chip::Ble;
 using namespace ::chip::DeviceLayer::Internal;
@@ -234,9 +232,6 @@ void BLEManagerImpl::sl_ble_event_handling_task(void * args)
     sl_status_t status;
     SilabsBleWrapper::BleEvent_t bleEvent;
 
-    //! This semaphore is waiting for wifi module initialization.
-    osSemaphoreAcquire(sl_rs_ble_init_sem, osWaitForever);
-
     // This function initialize BLE and start BLE advertisement.
     sInstance.sl_ble_init();
 
@@ -287,8 +282,6 @@ void BLEManagerImpl::sl_ble_init()
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
-
-    sl_rs_ble_init_sem = osSemaphoreNew(1, 0, NULL);
 
     sBleThread = osThreadNew(sInstance.sl_ble_event_handling_task, NULL, &kBleTaskAttr);
 

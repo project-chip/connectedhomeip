@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,22 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-import("${chip_root}/src/crypto/crypto.gni")
+chip_test_suite("tests") {
+  output_name = "libVerhoeffTest"
 
-chip_device_platform = "nrfconnect"
+  test_sources = [ "TestVerhoeff.cpp" ]
 
-chip_build_tests = false
-chip_build_tools = false
+  public_deps = [ "${chip_root}/src/lib/support:support" ]
 
-chip_project_config_include = ""
-chip_system_project_config_include = ""
-chip_ble_project_config_include = ""
-
-chip_crypto = "mbedtls"
-chip_external_mbedtls = true
-
-custom_toolchain = "${chip_root}/config/nrfconnect/chip-gn/toolchain:zephyr"
-
-pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/setup/constraints.txt" ]
+  cflags = [ "-Wconversion" ]
+}

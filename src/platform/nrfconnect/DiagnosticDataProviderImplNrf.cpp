@@ -23,7 +23,7 @@
 
 #include "DiagnosticDataProviderImplNrf.h"
 
-#ifdef CONFIG_WIFI_NRF700X
+#ifdef CONFIG_WIFI_NRF70
 #include <platform/nrfconnect/wifi/WiFiManager.h>
 #endif
 
@@ -41,7 +41,7 @@ DiagnosticDataProviderImplNrf & DiagnosticDataProviderImplNrf::GetDefaultInstanc
     return sInstance;
 }
 
-#ifdef CONFIG_WIFI_NRF700X
+#ifdef CONFIG_WIFI_NRF70
 CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiBssId(MutableByteSpan & value)
 {
     WiFiManager::WiFiInfo info;
