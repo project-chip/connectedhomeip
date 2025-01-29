@@ -437,7 +437,7 @@ class PushAvServer:
     def ui_streams_list(self, request: Request):
         s = self.list_streams()
         return self.templates.TemplateResponse(
-            request=request, name="streams_list.html", context={"streams": s["streams"]}
+            request=request, name="streams_list.jinja2", context={"streams": s["streams"]}
         )
 
     def ui_streams_details(self, request: Request, stream_id: int, file_path: str):
@@ -456,18 +456,18 @@ class PushAvServer:
             context['probe'] = self.ffprobe_check(stream_id, file_path)
             context['pretty_probe'] = json.dumps(context['probe'], sort_keys=True, indent=4)
 
-        return self.templates.TemplateResponse(request=request, name="streams_details.html", context=context)
+        return self.templates.TemplateResponse(request=request, name="streams_details.jinja2", context=context)
 
     def ui_certificates_list(self, request: Request):
         return self.templates.TemplateResponse(
-            request=request, name="certificates_list.html", context={"certs": self.list_certs()}
+            request=request, name="certificates_list.jinja2", context={"certs": self.list_certs()}
         )
 
     def ui_certificates_details(self, request: Request, hierarchy: str, name: str):
         context = self.certificate_details(hierarchy, name)
         context["certs"] = self.list_certs()
 
-        return self.templates.TemplateResponse(request=request, name="certificates_details.html", context=context)
+        return self.templates.TemplateResponse(request=request, name="certificates_details.jinja2", context=context)
 
     # APIs
 
