@@ -16,7 +16,8 @@
  *    limitations under the License.
  */
 
-#include "pw_unit_test/framework.h"
+#include <pw_unit_test/framework.h>
+
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributePathExpandIterator.h>
 #include <app/ConcreteAttributePath.h>
@@ -24,14 +25,12 @@
 #include <app/util/mock/Constants.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/LinkedList.h>
 #include <lib/support/logging/CHIPLogging.h>
-
-#include <lib/core/StringBuilderAdapters.h>
-#include <pw_unit_test/framework.h>
 
 using namespace chip;
 using namespace chip::Test;
@@ -41,7 +40,13 @@ namespace {
 
 using P = app::ConcreteAttributePath;
 
-TEST(TestAttributePathExpandIterator, TestAllWildcard)
+struct TestAttributePathExpandIterator : public ::testing::Test
+{
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+TEST_F(TestAttributePathExpandIterator, TestAllWildcard)
 {
     SingleLinkedListNode<app::AttributePathParams> clusInfo;
 
@@ -128,7 +133,7 @@ TEST(TestAttributePathExpandIterator, TestAllWildcard)
     EXPECT_EQ(index, ArraySize(paths));
 }
 
-TEST(TestAttributePathExpandIterator, TestWildcardEndpoint)
+TEST_F(TestAttributePathExpandIterator, TestWildcardEndpoint)
 {
     SingleLinkedListNode<app::AttributePathParams> clusInfo;
     clusInfo.mValue.mClusterId   = chip::Test::MockClusterId(3);
@@ -160,7 +165,7 @@ TEST(TestAttributePathExpandIterator, TestWildcardEndpoint)
     EXPECT_EQ(index, ArraySize(paths));
 }
 
-TEST(TestAttributePathExpandIterator, TestWildcardCluster)
+TEST_F(TestAttributePathExpandIterator, TestWildcardCluster)
 {
     SingleLinkedListNode<app::AttributePathParams> clusInfo;
     clusInfo.mValue.mEndpointId  = chip::Test::kMockEndpoint3;
@@ -195,7 +200,7 @@ TEST(TestAttributePathExpandIterator, TestWildcardCluster)
     EXPECT_EQ(index, ArraySize(paths));
 }
 
-TEST(TestAttributePathExpandIterator, TestWildcardClusterGlobalAttributeNotInMetadata)
+TEST_F(TestAttributePathExpandIterator, TestWildcardClusterGlobalAttributeNotInMetadata)
 {
     SingleLinkedListNode<app::AttributePathParams> clusInfo;
     clusInfo.mValue.mEndpointId  = chip::Test::kMockEndpoint3;
@@ -231,7 +236,7 @@ TEST(TestAttributePathExpandIterator, TestWildcardClusterGlobalAttributeNotInMet
     EXPECT_EQ(index, ArraySize(paths));
 }
 
-TEST(TestAttributePathExpandIterator, TestWildcardAttribute)
+TEST_F(TestAttributePathExpandIterator, TestWildcardAttribute)
 {
     SingleLinkedListNode<app::AttributePathParams> clusInfo;
     clusInfo.mValue.mEndpointId = chip::Test::kMockEndpoint2;
@@ -271,7 +276,7 @@ TEST(TestAttributePathExpandIterator, TestWildcardAttribute)
     EXPECT_EQ(index, ArraySize(paths));
 }
 
-TEST(TestAttributePathExpandIterator, TestNoWildcard)
+TEST_F(TestAttributePathExpandIterator, TestNoWildcard)
 {
     SingleLinkedListNode<app::AttributePathParams> clusInfo;
     clusInfo.mValue.mEndpointId  = chip::Test::kMockEndpoint2;
@@ -304,7 +309,7 @@ TEST(TestAttributePathExpandIterator, TestNoWildcard)
     EXPECT_EQ(index, ArraySize(paths));
 }
 
-TEST(TestAttributePathExpandIterator, TestFixedPathExpansion)
+TEST_F(TestAttributePathExpandIterator, TestFixedPathExpansion)
 {
     // expansion logic requires that:
     //   - paths for wildcard expansion ARE VALIDATED
@@ -367,7 +372,7 @@ TEST(TestAttributePathExpandIterator, TestFixedPathExpansion)
     }
 }
 
-TEST(TestAttributePathExpandIterator, TestMultipleClusInfo)
+TEST_F(TestAttributePathExpandIterator, TestMultipleClusInfo)
 {
 
     SingleLinkedListNode<app::AttributePathParams> clusInfo1;

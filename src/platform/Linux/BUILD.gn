@@ -70,6 +70,7 @@ static_library("Linux") {
   ]
 
   deps = [
+    "${chip_root}/src/app:app_config",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/setup_payload",
@@ -134,6 +135,7 @@ static_library("Linux") {
       "ThreadStackManagerImpl.h",
     ]
 
+    deps += [ "${chip_root}/src/app:app_config" ]
     public_deps += [ "dbus/openthread" ]
   }
 
