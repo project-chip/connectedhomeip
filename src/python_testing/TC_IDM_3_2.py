@@ -7,7 +7,8 @@ import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.ClusterObjects import ClusterObject
 from chip.clusters.enum import MatterIntEnum
-from chip.clusters.Types import Nullable
+from chip.clusters.Types import Nullable, NullValue
+# from chip.clusters.Types import 
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing import global_attribute_ids
 from chip.tlv import uint
@@ -240,6 +241,8 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             output_1 = await self.default_controller.Read(self.dut_node_id, [chosen_writable_attribute])
             if output_1:
                 endpoint = next(iter(output_1.attributes))
+                # import pdb;pdb.set_trace()
+                # print(f"endpoint: {endpoint}")
                 value = self.pick_writable_value(chosen_writable_attribute)
                 await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, chosen_writable_attribute(value=value))])
                 output_2 = await self.default_controller.Read(self.dut_node_id, [chosen_writable_attribute])
@@ -430,13 +433,13 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             [chosen_nullable_attribute]
         )
         # read_request returns {}?
-        await self.default_controller.WriteAttribute(self.dut_node_id, [(0, chosen_nullable_attribute(value=Nullable))])
+        await self.default_controller.WriteAttribute(self.dut_node_id, [(0, chosen_nullable_attribute(value=NullValue))])
         # Why is this exception happening?: ValueError: Field . expected <class 'bytes'>, but got <class 'type'>
-
-        # read_request_2 = await self.default_controller.ReadAttribute(
-        #         self.dut_node_id,
-        #         [chosen_nullable_attribute]
-        #     )
+        
+        read_request_2 = await self.default_controller.ReadAttribute(
+                self.dut_node_id,
+                [chosen_nullable_attribute]
+            )
         # TODO: Parse once ValueError exception is fixed
 
         # Verify that the DUT sends a WriteResponseMessage with any status except UNSUPPORTED_WRITE or DATA_VERSION_MISMATCH. If the Status is SUCCESS, verify the updated value by sending a ReadRequestMessage for all affected paths. If the status is SUCCESS, send a WriteRequestMessage to set the value back to `original`.
