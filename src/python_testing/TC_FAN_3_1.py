@@ -98,37 +98,38 @@ class TC_FAN_3_1(MatterBaseTest):
         return ["FAN.S"]
 
 
-    @async_test_body
-    async def test_TC_FAN_3_1(self):
 
-        endpoint = self.get_endpoint(default=1)
+
+
+
+    async def verify_fan_mode(self, attr_to_write, endpoint, timeout_sec):
         cluster = Clusters.FanControl
         attr_to_sub = cluster.Attributes.FanMode
-        attr_to_write = cluster.Attributes.PercentSetting
         attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
-        TH: ChipDeviceController = self.default_controller
-        timeout_sec = 0.1
-        
+        # TH: ChipDeviceController = self.default_controller
+
+        await self.write_fan_mode(endpoint, cluster.Enums.FanModeEnum.kOff)
+
         # Read FanMode and verify starting value of Off
         fan_mode_initial = await self.read_fan_mode(endpoint=endpoint)
         asserts.assert_in(fan_mode_initial, cluster.Enums.FanModeEnum, "FanMode read response doesn't contain a FanModeEnum")
 
         print(f"\n\n\n\n\t\t\t [FANS] Start sub...\n\n\n\n")
-        await attribute_subscription.start(TH, self.dut_node_id, endpoint)
+        await attribute_subscription.start(self.default_controller, self.dut_node_id, endpoint)
 
         print(f"\n\n\n\n\t\t\t [FANS] Let's loop!\n\n\n\n")
         fan_mode_current = fan_mode_initial
         fan_mode_previous = fan_mode_initial
-        
+
         # Increment the PercentSetting attribute from 1 to 100, one by one
         for value_to_write in range(1, 11):
             value_to_write = value_to_write * 10
-            
+
             # Clear the queue
             attribute_subscription.get_last_report()
-            
+
             # Write to attribute
-            write_result = await TH.WriteAttribute(
+            write_result = await self.default_controller.WriteAttribute(
                 self.dut_node_id,
                 [(endpoint, attr_to_write(value=value_to_write))]
             )
@@ -163,9 +164,25 @@ class TC_FAN_3_1(MatterBaseTest):
                 if break_out:
                     break
 
-            total_time = time.time() - start_time
-            # print(f"[FANS] total_time: {total_time}")
-            
+        await attribute_subscription.cancel()
+
+
+
+
+    @async_test_body
+    async def test_TC_FAN_3_1(self):
+
+        endpoint = self.get_endpoint(default=1)
+        cluster = Clusters.FanControl
+        attr_to_write = cluster.Attributes.PercentSetting
+        timeout_sec = 0.1
+
+        await self.verify_fan_mode(attr_to_write, endpoint, timeout_sec)
+        await self.verify_fan_mode(attr_to_write, endpoint, timeout_sec)
+        
+        
+        
+        
 
 
 if __name__ == "__main__":
