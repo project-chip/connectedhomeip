@@ -113,7 +113,7 @@ A list of PKI providers can be found on the CSA site:
 The certification declaration is provided by the CSA after a device is
 certified. It is tied to the vendor and product ID (or IDs) of the certified
 device, and is signed by CSA. The public key corresponding to the signing key is
-well known and distributed by the CSA (TOOD: It shows up everywhere, but where's
+well known and distributed by the CSA (TODO: It shows up everywhere, but where's
 the official source for this?)
 
 The certification declaration is NOT a standard x.509 certificate, but is
