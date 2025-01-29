@@ -23,8 +23,9 @@ import platform
 import typing
 from dataclasses import dataclass
 
-import chip.exceptions
 import construct  # type: ignore
+
+import chip.exceptions
 
 
 class Library(enum.Enum):

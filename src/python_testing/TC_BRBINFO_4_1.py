@@ -50,12 +50,13 @@ import queue
 import random
 import tempfile
 
+from mobly import asserts
+
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.apps import IcdAppServerSubprocess
 from chip.testing.matter_testing import MatterBaseTest, SimpleEventCallback, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
 
 logger = logging.getLogger(__name__)
 _ROOT_ENDPOINT_ID = 0

@@ -62,6 +62,8 @@ import os
 import random
 import tempfile
 
+from mobly import asserts
+
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
@@ -69,7 +71,6 @@ from chip.testing.apps import AppServerSubprocess
 from chip.testing.matter_testing import (MatterBaseTest, SetupParameters, TestStep, async_test_body, default_matter_test_main,
                                          type_matches)
 from chip.tlv import uint
-from mobly import asserts
 
 
 class TC_ECOINFO_2_1(MatterBaseTest):

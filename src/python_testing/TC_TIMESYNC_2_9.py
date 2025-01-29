@@ -38,13 +38,14 @@
 import typing
 from datetime import timedelta
 
+from mobly import asserts
+
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
 from chip.testing.matter_testing import (MatterBaseTest, async_test_body, compare_time, default_matter_test_main, type_matches,
                                          utc_time_in_matter_epoch)
 from chip.tlv import uint
-from mobly import asserts
 
 
 class TC_TIMESYNC_2_9(MatterBaseTest):

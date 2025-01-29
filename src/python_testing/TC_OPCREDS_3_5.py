@@ -38,10 +38,11 @@
 import random
 from datetime import timedelta
 
+from mobly import asserts
+
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from chip.utils import CommissioningBuildingBlocks
-from mobly import asserts
 
 
 class TC_OPCREDS_3_5(MatterBaseTest):

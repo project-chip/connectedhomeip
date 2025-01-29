@@ -37,6 +37,8 @@ import copy
 import logging
 import random
 
+from mobly import asserts
+
 import chip.clusters as Clusters
 import chip.discovery as Discovery
 from chip import ChipDeviceCtrl
@@ -44,7 +46,6 @@ from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from chip.tlv import TLVReader, TLVWriter
-from mobly import asserts
 
 
 class TC_OPCREDS_3_1(MatterBaseTest):

@@ -20,6 +20,7 @@ import logging
 import random
 
 import base
+
 import chip.clusters as Clusters
 import chip.interaction_model
 from chip.clusters.Types import NullValue

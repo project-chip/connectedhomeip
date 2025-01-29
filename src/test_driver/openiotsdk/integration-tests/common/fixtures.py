@@ -20,9 +20,10 @@ import os
 import pathlib
 import shutil
 
+import pytest
+
 import chip.CertificateAuthority
 import chip.native
-import pytest
 from chip import exceptions
 
 from .fvp_device import FvpDevice

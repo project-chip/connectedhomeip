@@ -16,6 +16,8 @@
 #
 import math
 
+from mobly import asserts
+
 import chip.clusters as Clusters
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.global_attribute_ids import GlobalAttributeIds
@@ -23,7 +25,6 @@ from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocat
                                          MatterBaseTest, ProblemLocation, TestStep, async_test_body, default_matter_test_main)
 from chip.testing.pics import accepted_cmd_pics_str, attribute_pics_str, feature_pics_str, generated_cmd_pics_str
 from chip.testing.spec_parsing import build_xml_clusters
-from mobly import asserts
 
 
 class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
