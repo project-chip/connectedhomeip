@@ -37,7 +37,7 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
-                                         async_test_body, default_matter_test_main)
+                                         default_matter_test_main, has_feature, run_if_endpoint_matches)
 from mobly import asserts
 
 
@@ -74,7 +74,7 @@ class TC_VALCC_3_2(MatterBaseTest):
         ]
         return pics
 
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(Clusters.ValveConfigurationAndControl, Clusters.ValveConfigurationAndControl.Bitmaps.Feature.kLevel))
     async def test_TC_VALCC_3_2(self):
 
         endpoint = self.get_endpoint(default=1)

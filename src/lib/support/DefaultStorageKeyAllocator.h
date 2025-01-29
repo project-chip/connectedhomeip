@@ -260,6 +260,13 @@ public:
     // Terms and Conditions Acceptance Key
     // Stores the terms and conditions acceptance including terms and conditions revision, TLV encoded
     static StorageKeyName TermsAndConditionsAcceptance() { return StorageKeyName::FromConst("g/tc"); }
+
+    // Valve configuration and control
+    static StorageKeyName VCCDefaultOpenLevel(EndpointId endpoint) { return StorageKeyName::Formatted("g/vcc/dol/%x", endpoint); }
+    static StorageKeyName VCCDefaultOpenDuration(EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("g/vcc/dod/%x", endpoint);
+    }
 };
 
 } // namespace chip
