@@ -26,7 +26,7 @@ using namespace chip::Protocols::InteractionModel;
 
 CHIP_ERROR ActionsDelegateImpl::ReadActionAtIndex(uint16_t index, ActionStructStorage & action)
 {
-    if (index >= ArraySize(kActionList))
+    if (index >= kActionList.size())
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -36,7 +36,7 @@ CHIP_ERROR ActionsDelegateImpl::ReadActionAtIndex(uint16_t index, ActionStructSt
 
 CHIP_ERROR ActionsDelegateImpl::ReadEndpointListAtIndex(uint16_t index, EndpointListStorage & epList)
 {
-    if (index >= ArraySize(kEndpointList))
+    if (index >= kEndpointList.size())
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -46,7 +46,7 @@ CHIP_ERROR ActionsDelegateImpl::ReadEndpointListAtIndex(uint16_t index, Endpoint
 
 bool ActionsDelegateImpl::FindActionIdInActionList(uint16_t actionId)
 {
-    for (uint16_t i = 0; i < kActionListSize; i++)
+    for (size_t i = 0; i < kEndpointList.size(); i++)
     {
         if (kActionList[i].actionID == actionId)
             return true;

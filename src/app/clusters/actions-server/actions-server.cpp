@@ -32,23 +32,29 @@ using namespace chip::app::Clusters::Actions;
 using namespace chip::app::Clusters::Actions::Attributes;
 using namespace chip::Protocols::InteractionModel;
 
+#ifndef MATTER_DM_ACTIONS_CLUSTER_SERVER_ENDPOINT_COUNT
+#define MATTER_DM_ACTIONS_CLUSTER_SERVER_ENDPOINT_COUNT 1
+#endif
+
 namespace {
+static constexpr size_t kActionsDelegateTableSize =
+    MATTER_DM_ACTIONS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 Delegate * gDelegateTable[kActionsDelegateTableSize] = { nullptr };
 
-Delegate * GetDelegate(EndpointId endpoint)
+Delegate * GetDelegate(EndpointId aEndpoint)
 {
-    return (endpoint >= kActionsDelegateTableSize ? nullptr : gDelegateTable[endpoint]);
+    return (aEndpoint >= kActionsDelegateTableSize ? nullptr : gDelegateTable[aEndpoint]);
 }
 
 } // namespace
 
 ActionsServer ActionsServer::sInstance;
 
-void ActionsServer::SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+void ActionsServer::SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate)
 {
-    if (endpoint < kActionsDelegateTableSize)
+    if (aEndpoint < kActionsDelegateTableSize)
     {
-        gDelegateTable[endpoint] = delegate;
+        gDelegateTable[aEndpoint] = aDelegate;
     }
 }
 
@@ -57,30 +63,30 @@ ActionsServer & ActionsServer::Instance()
     return sInstance;
 }
 
-void ActionsServer::OnStateChanged(EndpointId endpoint, uint16_t actionId, uint32_t invokeId, ActionStateEnum actionState)
+void ActionsServer::OnStateChanged(EndpointId aEndpoint, uint16_t aActionId, uint32_t aInvokeId, ActionStateEnum aActionState)
 {
     ChipLogProgress(Zcl, "ActionsServer: OnStateChanged");
 
     // Generate StateChanged event
     EventNumber eventNumber;
-    Events::StateChanged::Type event{ actionId, invokeId, actionState };
+    Events::StateChanged::Type event{ aActionId, aInvokeId, aActionState };
 
-    if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+    if (CHIP_NO_ERROR != LogEvent(event, aEndpoint, eventNumber))
     {
         ChipLogError(Zcl, "ActionsServer: Failed to generate OnStateChanged event");
     }
 }
 
-void ActionsServer::OnActionFailed(EndpointId endpoint, uint16_t actionId, uint32_t invokeId, ActionStateEnum actionState,
-                                   ActionErrorEnum actionError)
+void ActionsServer::OnActionFailed(EndpointId aEndpoint, uint16_t aActionId, uint32_t aInvokeId, ActionStateEnum aActionState,
+                                   ActionErrorEnum aActionError)
 {
     ChipLogProgress(Zcl, "ActionsServer: OnActionFailed");
 
     // Generate ActionFailed event
     EventNumber eventNumber;
-    Events::ActionFailed::Type event{ actionId, invokeId, actionState, actionError };
+    Events::ActionFailed::Type event{ aActionId, aInvokeId, aActionState, aActionError };
 
-    if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+    if (CHIP_NO_ERROR != LogEvent(event, aEndpoint, eventNumber))
     {
         ChipLogError(Zcl, "ActionsServer: Failed to generate OnActionFailed event");
     }
@@ -93,8 +99,6 @@ CHIP_ERROR ActionsServer::Read(const ConcreteReadAttributePath & aPath, Attribut
     switch (aPath.mAttributeId)
     {
     case ActionList::Id: {
-        // The encoder will automatically create the outer AttributeDataIB container
-        // We just need to encode the array of actions
         ReturnErrorOnFailure(aEncoder.EncodeList(
             [this, aPath](const auto & encoder) -> CHIP_ERROR { return this->ReadActionListAttribute(aPath, encoder); }));
         return CHIP_NO_ERROR;
@@ -111,7 +115,7 @@ CHIP_ERROR ActionsServer::Read(const ConcreteReadAttributePath & aPath, Attribut
 }
 
 CHIP_ERROR ActionsServer::ReadActionListAttribute(const ConcreteReadAttributePath & aPath,
-                                                  const AttributeValueEncoder::ListEncodeHelper & encoder)
+                                                  const AttributeValueEncoder::ListEncodeHelper & aEncoder)
 {
     Delegate * delegate = GetDelegate(aPath.mEndpointId);
     if (delegate == nullptr)
@@ -129,18 +133,14 @@ CHIP_ERROR ActionsServer::ReadActionListAttribute(const ConcreteReadAttributePat
         {
             return CHIP_NO_ERROR;
         }
-        else if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
 
-        ReturnErrorOnFailure(encoder.Encode(action));
+        ReturnErrorOnFailure(aEncoder.Encode(action));
     }
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ActionsServer::ReadEndpointListAttribute(const ConcreteReadAttributePath & aPath,
-                                                    const AttributeValueEncoder::ListEncodeHelper & encoder)
+                                                    const AttributeValueEncoder::ListEncodeHelper & aEncoder)
 {
     Delegate * delegate = GetDelegate(aPath.mEndpointId);
     if (delegate == nullptr)
@@ -158,20 +158,20 @@ CHIP_ERROR ActionsServer::ReadEndpointListAttribute(const ConcreteReadAttributeP
             return CHIP_NO_ERROR;
         }
 
-        ReturnErrorOnFailure(encoder.Encode(epList));
+        ReturnErrorOnFailure(aEncoder.Encode(epList));
     }
     return CHIP_NO_ERROR;
 }
 
-bool ActionsServer::FindActionIdInActionList(EndpointId endpointId, uint16_t actionId)
+bool ActionsServer::FindActionIdInActionList(EndpointId aEndpointId, uint16_t aActionId)
 {
-    Delegate * delegate = GetDelegate(endpointId);
+    Delegate * delegate = GetDelegate(aEndpointId);
     if (delegate == nullptr)
     {
         ChipLogError(Zcl, "Actions delegate is null!!!");
         return false;
     }
-    return delegate->FindActionIdInActionList(actionId);
+    return delegate->FindActionIdInActionList(aActionId);
 }
 
 template <typename RequestT, typename FuncT>
@@ -354,6 +354,63 @@ void ActionsServer::InvokeCommand(HandlerContext & handlerContext)
         return;
     }
 }
+
+CHIP_ERROR ActionsServer::SetActionList(EndpointId aEndpoint, const ActionStructStorage & aAction)
+{
+    Delegate * delegate = GetDelegate(aEndpoint);
+    if (delegate == nullptr)
+    {
+        ChipLogError(Zcl, "Actions delegate is null!");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    // Read through the list to find and update the existing action
+    for (uint16_t i = 0; i < kMaxActionListLength; i++)
+    {
+        ActionStructStorage existingAction;
+        ReturnErrorOnFailure(delegate->ReadActionAtIndex(i, existingAction));
+
+        if (existingAction.actionID == aAction.actionID)
+        {
+            existingAction.Set(aAction.actionID, aAction.name, aAction.type, aAction.endpointListID, aAction.supportedCommands,
+                               aAction.state);
+
+            delegate->OnActionListChanged(aEndpoint, aAction);
+            mMatterContext.MarkDirty(aEndpoint, Attributes::ActionList::Id);
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    return CHIP_ERROR_NOT_FOUND;
+}
+
+CHIP_ERROR ActionsServer::SetEndpointList(EndpointId aEndpoint, const EndpointListStorage & aEpList)
+{
+    Delegate * delegate = GetDelegate(aEndpoint);
+    if (delegate == nullptr)
+    {
+        ChipLogError(Zcl, "Actions delegate is null!");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    // Read through the list to find and update the existing endpoint list
+    for (uint16_t i = 0; i < kMaxEndpointListLength; i++)
+    {
+        EndpointListStorage existingEpList;
+        ReturnErrorOnFailure(delegate->ReadEndpointListAtIndex(i, existingEpList));
+
+        if (existingEpList.endpointListID == aEpList.endpointListID)
+        {
+            existingEpList.Set(aEpList.endpointListID, aEpList.name, aEpList.type, aEpList.endpoints);
+            mMatterContext.MarkDirty(aEndpoint, Attributes::EndpointLists::Id);
+            delegate->OnEndpointListChanged(aEndpoint, aEpList);
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    return CHIP_ERROR_NOT_FOUND;
+}
+
 void MatterActionsPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&ActionsServer::Instance());

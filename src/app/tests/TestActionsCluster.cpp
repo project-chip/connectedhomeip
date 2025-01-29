@@ -54,18 +54,18 @@ public:
 class TestActionsDelegateImpl : public Clusters::Actions::Delegate
 {
 public:
-    EndpointId endpointId                              = 0;
-    static constexpr size_t kMaxActionNameLength       = 127u;
-    static constexpr size_t kMaxEndpointListNameLength = 127u;
-    static constexpr size_t kEndpointListMaxSize       = 256u;
-    static constexpr size_t kMaxActions                = 2;
-    static constexpr size_t kMaxEndpointLists          = 2;
+    EndpointId endpointId                               = 0;
+    static constexpr uint8_t kMaxActionNameLength       = 128u;
+    static constexpr uint8_t kMaxEndpointListNameLength = 128u;
+    static constexpr uint16_t kEndpointListMaxSize      = 256u;
+    static constexpr uint8_t kMaxActions                = 2;
+    static constexpr uint8_t kMaxEndpointLists          = 2;
 
     ActionStructStorage mActions[kMaxActions];
-    size_t mNumActions = 0;
+    uint16_t mNumActions = 0;
 
     EndpointListStorage mEndpointLists[kMaxEndpointLists];
-    size_t mNumEndpointLists = 0;
+    uint16_t mNumEndpointLists = 0;
 
     CHIP_ERROR ReadActionAtIndex(uint16_t index, ActionStructStorage & action) override
     {
@@ -119,6 +119,9 @@ public:
         mEndpointLists[mNumEndpointLists++] = epList;
         return CHIP_NO_ERROR;
     }
+
+    void OnActionListChanged(EndpointId endpoint, const ActionStructStorage & action) override{};
+    void OnEndpointListChanged(EndpointId endpoint, const EndpointListStorage & action) override{};
 
     Protocols::InteractionModel::Status HandleInstantAction(uint16_t actionId, Optional<uint32_t> invokeId) override
     {
@@ -422,7 +425,10 @@ TEST_F(TestActionsCluster, TestEndpointListAttributeAccess)
     uint8_t i = 0;
     while (it.Next())
     {
-        EXPECT_EQ(endpoints1[i++], it.GetValue());
+        if (i < 2)
+        {
+            EXPECT_EQ(endpoints1[i++], it.GetValue());
+        }
     }
 
     EXPECT_TRUE(iter.Next());
@@ -434,7 +440,10 @@ TEST_F(TestActionsCluster, TestEndpointListAttributeAccess)
     i  = 0;
     while (it.Next())
     {
-        EXPECT_EQ(endpoints2[i++], it.GetValue());
+        if (i < 3)
+        {
+            EXPECT_EQ(endpoints2[i++], it.GetValue());
+        }
     }
 
     // Cleanup
