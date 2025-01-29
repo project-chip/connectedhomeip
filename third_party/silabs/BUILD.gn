@@ -247,7 +247,9 @@ if (wifi_soc != true) {  # CCP board
       if (silabs_family == "mgm24") {
         # Locally set silabs_family to efr32mg24 as mgm24 doesn't have dedicated libsl_ot_stack lib
         silabs_family = "efr32mg24"
-      }
+      } else if (silabs_family == "mgm26") {
+        # Locally set silabs_family to efr32mg26 as mgm26 doesn't have dedicated libsl_ot_stack lib
+        silabs_family = "efr32mg26"
 
       libs = [ "${sl_ot_libs_path}/libs/libsl_ot_stack_${XTD}_${COAP_API}${silabs_family}_gcc.a" ]
     }

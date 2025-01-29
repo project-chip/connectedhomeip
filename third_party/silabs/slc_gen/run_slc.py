@@ -18,7 +18,7 @@ def isMG24(partnumber):
 
 
 def isMG26(partnumber):
-    return ("EFR32MG26" in partnumber)
+    return ("EFR32MG26" in partnumber or "MGM260" in partnumber)
 
 
 root_path = sys.argv[1]
