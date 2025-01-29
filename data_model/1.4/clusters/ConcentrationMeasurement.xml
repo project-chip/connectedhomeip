@@ -54,8 +54,10 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Concentration Measurement Clusters" revision="3">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Concentration Measurement Clusters" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="CCB 2882"/>
@@ -76,10 +78,10 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="CONC" scope="Endpoint"/>
   <features>
     <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
       <optionalConform>
@@ -181,38 +183,46 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="MeasuredValue" type="single" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" reportable="true"/>
       <mandatoryConform>
         <feature name="MEA"/>
       </mandatoryConform>
-      <constraint type="between" from="MinMeasuredValue" to="MaxMeasuredValue"/>
+      <constraint type="between">
+        <from attribute="MinMeasuredValue"/>
+        <to attribute="MaxMeasuredValue"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="MinMeasuredValue" type="single" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="MEA"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0002" name="MaxMeasuredValue" type="single" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="MEA"/>
       </mandatoryConform>
-      <constraint type="min" value="MinMeasuredValue"/>
+      <constraint type="min">
+        <value attribute="MinMeasuredValue"/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="PeakMeasuredValue" type="single" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" reportable="true"/>
       <mandatoryConform>
         <feature name="PEA"/>
       </mandatoryConform>
-      <constraint type="between" from="MinMeasuredValue" to="MaxMeasuredValue"/>
+      <constraint type="between">
+        <from attribute="MinMeasuredValue"/>
+        <to attribute="MaxMeasuredValue"/>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="PeakMeasuredValueWindow" type="elapsed-s" default="1">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality reportable="true"/>
       <mandatoryConform>
         <feature name="PEA"/>
       </mandatoryConform>
@@ -220,15 +230,18 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0005" name="AverageMeasuredValue" type="single" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" reportable="true"/>
       <mandatoryConform>
         <feature name="AVG"/>
       </mandatoryConform>
-      <constraint type="between" from="MinMeasuredValue" to="MaxMeasuredValue"/>
+      <constraint type="between">
+        <from attribute="MinMeasuredValue"/>
+        <to attribute="MaxMeasuredValue"/>
+      </constraint>
     </attribute>
     <attribute id="0x0006" name="AverageMeasuredValueWindow" type="elapsed-s" default="1">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality reportable="true"/>
       <mandatoryConform>
         <feature name="AVG"/>
       </mandatoryConform>
@@ -243,14 +256,14 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0008" name="MeasurementUnit" type="MeasurementUnitEnum" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="MEA"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0009" name="MeasurementMedium" type="MeasurementMediumEnum" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x000A" name="LevelValue" type="LevelValueEnum" default="0">

@@ -175,7 +175,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Generate a random Matter-valid setup PIN.
  */
-+ (NSUInteger)generateRandomPIN MTR_NEWLY_DEPRECATED("Please use generateRandomSetupPasscode");
++ (NSUInteger)generateRandomPIN MTR_DEPRECATED("Please use generateRandomSetupPasscode", ios(16.1, 18.4), macos(13.0, 15.4), watchos(9.1, 11.4), tvos(16.1, 18.4));
 
 /**
  * Generate a random Matter-valid setup passcode.
@@ -218,7 +218,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Check whether the provided setup passcode (represented as an unsigned
  * integer) is a valid setup passcode.
  */
-+ (BOOL)isValidSetupPasscode:(NSNumber *)setupPasscode MTR_NEWLY_AVAILABLE;
++ (BOOL)isValidSetupPasscode:(NSNumber *)setupPasscode MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 @end
 

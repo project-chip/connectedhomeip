@@ -100,7 +100,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Read device type information from all endpoints during commissioning.
  * Defaults to NO.
  */
-@property (nonatomic, assign) BOOL readEndpointInformation MTR_NEWLY_AVAILABLE;
+@property (nonatomic, assign) BOOL readEndpointInformation MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 @end
 
