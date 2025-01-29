@@ -39,7 +39,7 @@ tests:
       arguments:
           value: 0
 
-    - label: "Step 1b: H sends On command to DUT"
+    - label: "Step 1b: TH sends On command to DUT"
       PICS: OO.S.C01.Rsp
       cluster: "On/Off"
       command: "On"
@@ -98,6 +98,8 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # Values computed from: current_hue + (final_hue - initial_hue) * Wait / TransitionTime
+    # 60 + (120 - 60) * 10 / 30 => 80 +/-15% => (68, 92)
     - label: "Step 2c: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
@@ -116,6 +118,7 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # 80 + (120 - 60) * 10 / 30 => 100 +/- 15% => (85, 115)
     - label: "Step 2d: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
@@ -134,6 +137,7 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # 100 + (120 - 60) * 10 / 30 => 120 +/-15% => (102, 138)
     - label: "Step 2e: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
@@ -152,6 +156,7 @@ tests:
               - name: "ms"
                 value: 5000
 
+    # keeps final_hue
     - label: "Step 2f: H reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
