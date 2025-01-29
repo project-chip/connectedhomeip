@@ -46,20 +46,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Checkout submodules & Bootstrap
-        uses: ./.github/actions/checkout-submodules-and-bootstrap
-        with:
-          platform: linux
+      - name: Setup pip modules we use
+        run: |
+            python3 -m venv out/venv
+            out/venv/bin/pip3 install \
+                jinja2
       - name: Generate build file (data_model_xmls.gni)
-        run: ./scripts/run_in_build_env.sh python3 src/python_testing/matter_testing_infrastructure/generate_data_model_xmls_gni.py
+        run: out/venv/bin/python3 src/python_testing/matter_testing_infrastructure/generate_data_model_xmls_gni.py
       - name: Ensure git works in current working directory
         run: git config --global --add safe.directory `pwd`
       - name: Check for uncommited changes
         run: |
-          git add .
-          # Show the full diff
-          git diff-index -p HEAD --
-          # Also show just the files that are different, to make it easy
-          # to tell at a glance what might be going on.  And throw in
-          # --exit-code to make this job fail if there is a difference.
-          git diff-index --exit-code HEAD --
+          git diff --exit-code HEAD -- src/python_testing/matter_testing_infrastructure/data_model_xmls.gni
