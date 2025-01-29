@@ -14,16 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 from difflib import unified_diff
+from pathlib import Path
 
 try:
     from matter.idl.matter_idl_parser import CreateParser
 except ModuleNotFoundError:
-    import os
-    import sys
-    sys.path.append(os.path.dirname(
-        os.path.dirname(os.path.abspath(__file__))))
-
+    sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
     from matter.idl.matter_idl_parser import CreateParser
 
 import unittest

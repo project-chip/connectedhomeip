@@ -3,6 +3,8 @@
 import dataclasses
 import functools
 import logging
+import sys
+from pathlib import Path
 from typing import Dict, Optional, Set
 
 from lark import Lark
@@ -12,11 +14,7 @@ from lark.visitors import Transformer, v_args
 try:
     from matter.idl.matter_idl_types import AccessPrivilege
 except ModuleNotFoundError:
-    import os
-    import sys
-    sys.path.append(os.path.dirname(
-        os.path.dirname(os.path.abspath(__file__))))
-
+    sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
     from matter.idl.matter_idl_types import AccessPrivilege
 
 from matter.idl.matter_idl_types import (ApiMaturity, Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,

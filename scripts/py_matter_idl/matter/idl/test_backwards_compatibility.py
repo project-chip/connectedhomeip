@@ -14,17 +14,15 @@
 # limitations under the License.
 
 import logging
+import sys
 import unittest
 from enum import Flag, auto
+from pathlib import Path
 
 try:
     from matter.idl.matter_idl_parser import CreateParser
 except ImportError:
-    import os
-    import sys
-
-    sys.path.append(os.path.abspath(
-        os.path.join(os.path.dirname(__file__), '..')))
+    sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
     from matter.idl.matter_idl_parser import CreateParser
 
 from matter.idl.backwards_compatibility import CompatibilityChecker, is_backwards_compatible

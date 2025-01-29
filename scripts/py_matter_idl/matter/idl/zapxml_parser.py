@@ -15,16 +15,14 @@
 # limitations under the License.
 
 import logging
-import os
+import sys
+from pathlib import Path
 from typing import Optional
 
 try:
     from matter.idl.zapxml import ParseSource, ParseXmls
 except ImportError:
-    import sys
-
-    sys.path.append(os.path.abspath(
-        os.path.join(os.path.dirname(__file__), '..')))
+    sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
     from matter.idl.zapxml import ParseSource, ParseXmls
 
 

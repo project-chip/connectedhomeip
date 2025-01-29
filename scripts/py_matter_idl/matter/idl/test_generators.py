@@ -18,6 +18,7 @@ import os
 import sys
 import unittest
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import List
 
 import yaml
@@ -25,9 +26,7 @@ import yaml
 try:
     from matter.idl.matter_idl_parser import CreateParser
 except ImportError:
-
-    sys.path.append(os.path.abspath(
-        os.path.join(os.path.dirname(__file__), '..')))
+    sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
     from matter.idl.matter_idl_parser import CreateParser
 
 from matter.idl.generators import GeneratorStorage

@@ -18,14 +18,13 @@ import os
 import sys
 import unittest
 from difflib import unified_diff
+from pathlib import Path
 from typing import List, Optional
 
 try:
     from matter.idl.matter_idl_parser import CreateParser
 except ImportError:
-
-    sys.path.append(os.path.abspath(
-        os.path.join(os.path.dirname(__file__), '..')))
+    sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
     from matter.idl.matter_idl_parser import CreateParser
 
 from matter.idl.generators import GeneratorStorage

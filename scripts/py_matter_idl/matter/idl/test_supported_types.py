@@ -14,16 +14,15 @@
 # limitations under the License.
 
 import os
+import sys
 import unittest
 import xml.etree.ElementTree as ET
+from pathlib import Path
 
 try:
     from matter.idl.generators.type_definitions import ParseDataType
 except ImportError:
-    import sys
-
-    sys.path.append(os.path.abspath(
-        os.path.join(os.path.dirname(__file__), '..')))
+    sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
     from matter.idl.generators.type_definitions import ParseDataType
 
 from matter.idl.generators.type_definitions import BasicInteger, TypeLookupContext

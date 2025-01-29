@@ -14,17 +14,15 @@
 # limitations under the License.
 
 import io
+import sys
 import unittest
+from pathlib import Path
 from typing import List, Union
 
 try:
     from matter.idl.zapxml import ParseSource, ParseXmls
 except ImportError:
-    import os
-    import sys
-
-    sys.path.append(os.path.abspath(
-        os.path.join(os.path.dirname(__file__), '..')))
+    sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
     from matter.idl.zapxml import ParseSource, ParseXmls
 
 from matter.idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Bitmap, Cluster, Command, ConstantEntry,
