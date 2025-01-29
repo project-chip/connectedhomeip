@@ -51,7 +51,7 @@ jobs:
         with:
           platform: linux
       - name: Generate build file (data_model_xmls.gni)
-        run: ./scripts/run_in_build_env.sh src/python_testing/matter_testing_infrastructure/generate_data_model_xmls_gni.py
+        run: ./scripts/run_in_build_env.sh python3 src/python_testing/matter_testing_infrastructure/generate_data_model_xmls_gni.py
       - name: Ensure git works in current working directory
         run: git config --global --add safe.directory `pwd`
       - name: Check for uncommited changes
