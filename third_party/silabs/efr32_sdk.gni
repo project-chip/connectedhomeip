@@ -354,7 +354,7 @@ template("efr32_sdk") {
       }
 
       defines += [ "MGM26" ]
-
+    }
     if (use_wf200) {
       _include_dirs += [
         "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver",
