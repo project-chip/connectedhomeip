@@ -122,9 +122,9 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-        constraints:
-          minValue: 20
-          maxValue: 28
+          constraints:
+              minValue: 20
+              maxValue: 28
 
     - label: "Wait 5s"
       PICS: CC.S.F00
@@ -141,9 +141,9 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-        constraints:
-          minValue: 20
-          maxValue: 28
+          constraints:
+              minValue: 20
+              maxValue: 28
 
     - label:
           "Step 3a: TH sends MoveToHue command to DUT with Hue=50,
