@@ -22,10 +22,13 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
+#include <app/CommandHandlerInterface.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/Optional.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <zap-generated/gen_config.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -36,11 +39,15 @@ using chip::DeviceLayer::DiagnosticDataProvider;
 
 namespace {
 
-class EthernetDiagosticsAttrAccess : public AttributeAccessInterface
+class EthernetDiagosticsGlobalInstance : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
     // Register for the EthernetNetworkDiagnostics cluster on all endpoints.
-    EthernetDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), EthernetNetworkDiagnostics::Id) {}
+    EthernetDiagosticsGlobalInstance(DiagnosticDataProvider & diagnosticProvider) :
+        AttributeAccessInterface(Optional<EndpointId>::Missing(), EthernetNetworkDiagnostics::Id),
+        CommandHandlerInterface(Optional<EndpointId>::Missing(), EthernetNetworkDiagnostics::Id),
+        mDiagnosticProvider(diagnosticProvider)
+    {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
@@ -51,11 +58,19 @@ private:
     CHIP_ERROR ReadPHYRate(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadFullDuplex(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadCarrierDetect(AttributeValueEncoder & aEncoder);
+
+    void InvokeCommand(HandlerContext & ctx) override;
+
+#ifdef ETHERNET_NETWORK_DIAGNOSTICS_ENABLE_RESET_COUNTS_CMD
+    void HandleResetCounts(HandlerContext & ctx, const Commands::ResetCounts::DecodableType & commandData);
+#endif
+
+    DiagnosticDataProvider & mDiagnosticProvider;
 };
 
 template <typename T>
-CHIP_ERROR EthernetDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &),
-                                                         AttributeValueEncoder & aEncoder)
+CHIP_ERROR EthernetDiagosticsGlobalInstance::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &),
+                                                             AttributeValueEncoder & aEncoder)
 {
     T data;
     CHIP_ERROR err = (DeviceLayer::GetDiagnosticDataProvider().*getter)(data);
@@ -71,7 +86,7 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticD
     return aEncoder.Encode(data);
 }
 
-CHIP_ERROR EthernetDiagosticsAttrAccess::ReadPHYRate(AttributeValueEncoder & aEncoder)
+CHIP_ERROR EthernetDiagosticsGlobalInstance::ReadPHYRate(AttributeValueEncoder & aEncoder)
 {
     Attributes::PHYRate::TypeInfo::Type pHYRate;
     auto value = app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum::kRate10M;
@@ -90,7 +105,7 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::ReadPHYRate(AttributeValueEncoder & aEn
     return aEncoder.Encode(pHYRate);
 }
 
-CHIP_ERROR EthernetDiagosticsAttrAccess::ReadFullDuplex(AttributeValueEncoder & aEncoder)
+CHIP_ERROR EthernetDiagosticsGlobalInstance::ReadFullDuplex(AttributeValueEncoder & aEncoder)
 {
     Attributes::FullDuplex::TypeInfo::Type fullDuplex;
     bool value = false;
@@ -108,7 +123,7 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::ReadFullDuplex(AttributeValueEncoder & 
     return aEncoder.Encode(fullDuplex);
 }
 
-CHIP_ERROR EthernetDiagosticsAttrAccess::ReadCarrierDetect(AttributeValueEncoder & aEncoder)
+CHIP_ERROR EthernetDiagosticsGlobalInstance::ReadCarrierDetect(AttributeValueEncoder & aEncoder)
 {
     Attributes::CarrierDetect::TypeInfo::Type carrierDetect;
     bool value = false;
@@ -127,9 +142,7 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::ReadCarrierDetect(AttributeValueEncoder
     return aEncoder.Encode(carrierDetect);
 }
 
-EthernetDiagosticsAttrAccess gAttrAccess;
-
-CHIP_ERROR EthernetDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR EthernetDiagosticsGlobalInstance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != EthernetNetworkDiagnostics::Id)
     {
@@ -172,19 +185,38 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & 
     }
     return CHIP_NO_ERROR;
 }
-} // anonymous namespace
 
-bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,
-                                                                 const app::ConcreteCommandPath & commandPath,
-                                                                 const Commands::ResetCounts::DecodableType & commandData)
+void EthernetDiagosticsGlobalInstance::InvokeCommand(HandlerContext & handlerContext)
 {
-    DeviceLayer::GetDiagnosticDataProvider().ResetEthNetworkDiagnosticsCounts();
-    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
-
-    return true;
+    switch (handlerContext.mRequestPath.mCommandId)
+    {
+    case Commands::ResetCounts::Id:
+#ifdef ETHERNET_NETWORK_DIAGNOSTICS_ENABLE_RESET_COUNTS_CMD
+        CommandHandlerInterface::HandleCommand<Commands::ResetCounts::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleResetCounts(ctx, commandData); });
+        break;
+#endif
+    default:
+        break; // Make the switch statement syntactically correct if ETHERNET_NETWORK_DIAGNOSTICS_ENABLE_RESET_COUNTS_CMD is not
+               // defined.
+    }
 }
+
+#ifdef ETHERNET_NETWORK_DIAGNOSTICS_ENABLE_RESET_COUNTS_CMD
+void EthernetDiagosticsGlobalInstance::HandleResetCounts(HandlerContext & ctx,
+                                                         const Commands::ResetCounts::DecodableType & commandData)
+{
+    mDiagnosticProvider.ResetEthNetworkDiagnosticsCounts();
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
+}
+#endif
+
+EthernetDiagosticsGlobalInstance gEthernetDiagosticsInstance(DeviceLayer::GetDiagnosticDataProvider());
+
+} // anonymous namespace
 
 void MatterEthernetNetworkDiagnosticsPluginServerInitCallback()
 {
-    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gEthernetDiagosticsInstance);
+    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gEthernetDiagosticsInstance);
 }
