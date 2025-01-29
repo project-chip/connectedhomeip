@@ -100,7 +100,6 @@ class TC_G_2_2(MatterBaseTest):
 
         cmd = Clusters.GroupKeyManagement.Commands.KeySetWrite(groupKey)
         resp = await self.send_single_cmd(dev_ctrl=th1, node_id=self.dut_node_id, cmd=cmd)
-        # await th1.SendCommand(self.dut_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(groupKey))
 
         self.step("1b")
         kGroupId1 = 0x0001
@@ -244,7 +243,6 @@ class TC_G_2_2(MatterBaseTest):
         self.step("7b")
         kGroupName13 = "Gp13"
         result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId13, kGroupName13))
-        print("debugging step 7b: ", result)
         asserts.assert_equal(result.status, Status.ResourceExhausted, "Adding Group 0x000D failed")
 
         self.step("8")
@@ -315,7 +313,7 @@ class TC_G_2_2(MatterBaseTest):
         kGroupNameOverflow = "Gp123456789123456"
         result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId, kGroupNameOverflow))
         asserts.assert_equal(result.status, Status.ConstraintError,
-                             "Unexpected error status must be CONSTRAINT_ERROR as the groupName is of lenght > 16")
+                             "Unexpected error status must be CONSTRAINT_ERROR as the groupName is of length > 16")
 
         self.step("24")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
