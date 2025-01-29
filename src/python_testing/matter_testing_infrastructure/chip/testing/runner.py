@@ -17,18 +17,21 @@
 
 import argparse
 import asyncio
+from binascii import unhexlify
 import builtins
 import importlib
+import json
 import logging
 import os
 import pathlib
+import re
 import sys
 import uuid
 from dataclasses import asdict as dataclass_asdict
 from datetime import datetime, timedelta, timezone
 from itertools import chain
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Tuple
 from unittest.mock import MagicMock
 
 import chip
@@ -40,15 +43,14 @@ from mobly import signals
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
 
-from controller.python.chip.ChipStack import ChipStack
-from controller.python.chip.storage import PersistentStorage
+from chip.ChipStack import ChipStack
+from chip.storage import PersistentStorage
 
 from .commissioning import CommissionDeviceTest
-from .constants import _DEFAULT_ADMIN_VENDOR_ID, _DEFAULT_CONTROLLER_NODE_ID, _DEFAULT_TRUST_ROOT_INDEX
+from .constants import _DEFAULT_ADMIN_VENDOR_ID, _DEFAULT_CONTROLLER_NODE_ID, _DEFAULT_TRUST_ROOT_INDEX, _DEFAULT_DUT_NODE_ID, _DEFAULT_LOG_PATH, _DEFAULT_STORAGE_PATH
 from .matter_base_test import MatterBaseTest
-from .models import _DEFAULT_DUT_NODE_ID, _DEFAULT_LOG_PATH, _DEFAULT_STORAGE_PATH, MatterTestConfig, TestInfo
-from .utilities import (bool_named_arg, byte_string_from_hex, bytes_as_hex_named_arg, float_named_arg, int_decimal_or_hex,
-                        int_named_arg, json_named_arg, root_index, str_from_manual_code, str_named_arg)
+from .models import MatterTestConfig, TestInfo
+from .utilities import (byte_string_from_hex, int_decimal_or_hex, root_index, str_from_manual_code)
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
@@ -722,3 +724,81 @@ class MockTestRunner():
         with asyncio.Runner() as runner:
             return run_tests_no_exit(self.test_class, self.config, runner.get_loop(),
                                      hooks, self.default_controller, self.stack)
+
+
+def int_named_arg(s: str) -> Tuple[str, int]:
+    regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
+    match = re.match(regex, s)
+    if not match:
+        raise ValueError("Invalid int argument format, does not match %s" % regex)
+
+    name = match.group("name")
+    if match.group("hex_value"):
+        value = int(match.group("hex_value"), 0)
+    else:
+        value = int(match.group("decimal_value"), 10)
+    return (name, value)
+
+
+def str_named_arg(s: str) -> Tuple[str, str]:
+    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
+    match = re.match(regex, s)
+    if not match:
+        raise ValueError("Invalid string argument format, does not match %s" % regex)
+
+    return (match.group("name"), match.group("value"))
+
+
+def float_named_arg(s: str) -> Tuple[str, float]:
+    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
+    match = re.match(regex, s)
+    if not match:
+        raise ValueError("Invalid float argument format, does not match %s" % regex)
+
+    name = match.group("name")
+    value = float(match.group("value"))
+
+    return (name, value)
+
+
+def json_named_arg(s: str) -> Tuple[str, object]:
+    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
+    match = re.match(regex, s)
+    if not match:
+        raise ValueError("Invalid JSON argument format, does not match %s" % regex)
+
+    name = match.group("name")
+    value = json.loads(match.group("value"))
+
+    return (name, value)
+
+
+def bool_named_arg(s: str) -> Tuple[str, bool]:
+    regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
+    match = re.match(regex, s.lower())
+    if not match:
+        raise ValueError("Invalid bool argument format, does not match %s" % regex)
+
+    name = match.group("name")
+    if match.group("truth_value"):
+        value = True if match.group("truth_value") == "true" else False
+    else:
+        value = int(match.group("decimal_value")) != 0
+
+    return (name, value)
+
+
+def bytes_as_hex_named_arg(s: str) -> Tuple[str, bytes]:
+    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>[0-9a-fA-F:]+)$"
+    match = re.match(regex, s)
+    if not match:
+        raise ValueError("Invalid bytes as hex argument format, does not match %s" % regex)
+
+    name = match.group("name")
+    value_str = match.group("value")
+    value_str = value_str.replace(":", "")
+    if len(value_str) % 2 != 0:
+        raise ValueError("Byte string argument value needs to be event number of hex chars")
+    value = unhexlify(value_str)
+
+    return (name, value)

@@ -75,6 +75,17 @@ def hex_from_bytes(b: bytes) -> str:
     return hexlify(b).decode("utf-8")
 
 
+def int_decimal_or_hex(s: str) -> int:
+    val = int(s, 0)
+    if val < 0:
+        raise ValueError("Negative values not supported")
+    return val
+
+
+def byte_string_from_hex(s: str) -> bytes:
+    return unhexlify(s.replace(":", "").replace(" ", "").replace("0x", ""))
+
+
 def type_matches(received_value, desired_type):
     """ Checks if the value received matches the expected type.
 
@@ -156,13 +167,6 @@ def str_from_manual_code(s: str) -> str:
         raise ValueError("Invalid manual code format, does not match %s" % regex)
 
     return s
-
-
-def int_decimal_or_hex(s: str) -> int:
-    val = int(s, 0)
-    if val < 0:
-        raise ValueError("Negative values not supported")
-    return val
 
 
 def int_named_arg(s: str) -> Tuple[str, int]:
