@@ -40,9 +40,8 @@ from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
 from functools import partial, wraps
 from itertools import chain
-from typing import Any, Iterable, List, Optional, Tuple, Callable
+from typing import Any, Callable, Iterable, List, Optional, Tuple
 
-from chip.tlv import uint
 from chip.testing.utilities import bytes_from_hex as new_bytes_from_hex
 from chip.testing.utilities import cluster_id_str as new_cluster_id_str
 from chip.testing.utilities import compare_time as new_compare_time
@@ -53,6 +52,7 @@ from chip.testing.utilities import type_matches as new_type_matches
 from chip.testing.utilities import utc_datetime_from_matter_epoch_us as new_utc_datetime_from_matter_epoch_us
 from chip.testing.utilities import utc_datetime_from_posix_time_ms as new_utc_datetime_from_posix_time_ms
 from chip.testing.utilities import utc_time_in_matter_epoch as new_utc_time_in_matter_epoch
+from chip.tlv import uint
 
 # isort: off
 
