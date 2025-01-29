@@ -101,6 +101,11 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
     }
     else if (binding.type == MATTER_UNICAST_BINDING && !data->isGroup)
     {
+        if (peer_device == nullptr)
+        {
+            ChipLogProgress(NotSpecified, "Binding to self");
+            return;
+        }
         switch (data->clusterId)
         {
         case Clusters::OnOff::Id:
