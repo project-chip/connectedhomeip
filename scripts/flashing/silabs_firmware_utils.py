@@ -79,7 +79,7 @@ SILABS_OPTIONS = {
                 """,
         },
         'device': {
-            'help': 'Device family or platform to target (EFR32 or MGM240)',
+            'help': 'Device family or platform to target (EFR32,MG26, MGM260 or MGM240)',
             'default': None,
             'alias': ['-d'],
             'argparse': {

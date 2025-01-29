@@ -336,7 +336,24 @@ template("efr32_sdk") {
       ]
 
       defines += [ "EFR32MG26" ]
-    }
+    } else if (silabs_family == "mgm26") {
+      _include_dirs += [
+        "${efr32_sdk_root}/platform/Device/SiliconLabs/MGM26/Include",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg26",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg26/config",
+      ]
+
+      libs += [
+        "${sdk_support_root}/protocol/bluetooth/bgstack/ll/build/gcc/xg26/release/liblinklayer.a",
+        "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg26_gcc_release.a",
+      ]
+      if (silabs_mcu == "MGM260PB22VNA") {
+        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm260pb22vna_gcc.a" ]
+      } else if (silabs_mcu == "MGM260PB32VNA") {
+        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm260pb32vna_gcc.a" ]
+      }
+
+      defines += [ "MGM26" ]
 
     if (use_wf200) {
       _include_dirs += [
