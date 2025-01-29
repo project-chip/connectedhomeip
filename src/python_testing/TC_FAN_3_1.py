@@ -93,7 +93,7 @@ class TC_FAN_3_1(MatterBaseTest):
         write_result = await self.write_setting(endpoint, fan_mode_attr, fan_mode_init)
         write_status_success = (write_result == Status.Success) or (write_result == Status.InvalidInState)
         asserts.assert_true(write_status_success,
-                            f"FanMode write did not return a value of either SUCCESS or INVALID_IN_STATE ({write_result.name})")
+                            f"FanMode write did not return a result of either SUCCESS or INVALID_IN_STATE ({write_result.name})")
 
         # Read FanMode back and verify written value
         fan_mode_initial = await self.read_setting(endpoint, fan_mode_attr)
@@ -111,7 +111,7 @@ class TC_FAN_3_1(MatterBaseTest):
             # Write to attribute
             write_result = await self.write_setting(endpoint, attr_to_write, value_to_write)
             write_status_success = (write_result == Status.Success) or (write_result == Status.InvalidInState)
-            asserts.assert_true(write_status_success, f"Attribute write did not return a value of either Success or InvalidInState")
+            asserts.assert_true(write_status_success, "Attribute write did not return a result of either SUCCESS or INVALID_IN_STATE")
             logging.info(f"[FANS] Attribute value written: {value_to_write}")
 
             # Wait for the FanMode attribute to appear in the queue until the specified timeout
