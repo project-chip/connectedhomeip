@@ -73,7 +73,7 @@ CHIP_ERROR EthernetDiagosticsGlobalInstance::ReadIfSupported(CHIP_ERROR (Diagnos
                                                              AttributeValueEncoder & aEncoder)
 {
     T data;
-    CHIP_ERROR err = (DeviceLayer::GetDiagnosticDataProvider().*getter)(data);
+    CHIP_ERROR err = (mDiagnosticProvider.*getter)(data);
     if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
         data = 0;
@@ -91,7 +91,7 @@ CHIP_ERROR EthernetDiagosticsGlobalInstance::ReadPHYRate(AttributeValueEncoder &
     Attributes::PHYRate::TypeInfo::Type pHYRate;
     auto value = app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum::kRate10M;
 
-    if (DeviceLayer::GetDiagnosticDataProvider().GetEthPHYRate(value) == CHIP_NO_ERROR)
+    if (mDiagnosticProvider.GetEthPHYRate(value) == CHIP_NO_ERROR)
     {
         pHYRate.SetNonNull(value);
         ChipLogProgress(Zcl, "The current nominal, usable speed at the top of the physical layer of the Node: %d",
@@ -110,7 +110,7 @@ CHIP_ERROR EthernetDiagosticsGlobalInstance::ReadFullDuplex(AttributeValueEncode
     Attributes::FullDuplex::TypeInfo::Type fullDuplex;
     bool value = false;
 
-    if (DeviceLayer::GetDiagnosticDataProvider().GetEthFullDuplex(value) == CHIP_NO_ERROR)
+    if (mDiagnosticProvider.GetEthFullDuplex(value) == CHIP_NO_ERROR)
     {
         fullDuplex.SetNonNull(value);
         ChipLogProgress(Zcl, "The full-duplex operating status of Node: %d", value);
@@ -128,7 +128,7 @@ CHIP_ERROR EthernetDiagosticsGlobalInstance::ReadCarrierDetect(AttributeValueEnc
     Attributes::CarrierDetect::TypeInfo::Type carrierDetect;
     bool value = false;
 
-    if (DeviceLayer::GetDiagnosticDataProvider().GetEthCarrierDetect(value) == CHIP_NO_ERROR)
+    if (mDiagnosticProvider.GetEthCarrierDetect(value) == CHIP_NO_ERROR)
     {
         carrierDetect.SetNonNull(value);
         ChipLogProgress(Zcl, "The status of the Carrier Detect control signal present on the ethernet network interface: %d",
