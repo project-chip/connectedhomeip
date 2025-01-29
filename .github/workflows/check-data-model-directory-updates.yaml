@@ -44,6 +44,12 @@ jobs:
     container:
       image: ghcr.io/project-chip/chip-build
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Checkout submodules & Bootstrap
+        uses: ./.github/actions/checkout-submodules-and-bootstrap
+        with:
+          platform: linux
       - name: Generate build file (data_model_xmls.gni)
         run: ./scripts/run_in_build_env.sh src/python_testing/matter_testing_infrastructure/generate_data_model_xmls_gni.py
       - name: Ensure git works in current working directory
