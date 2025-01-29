@@ -32,16 +32,27 @@ import threading
 import time
 import typing
 import uuid
-from binascii import hexlify, unhexlify
+import warnings
+from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
-from functools import partial
+from functools import partial, wraps
 from itertools import chain
 from typing import Any, Iterable, List, Optional, Tuple
 
-from chip.tlv import float32, uint
+from chip.tlv import uint
+from utilities import bytes_from_hex as _bytes_from_hex
+from utilities import cluster_id_str as _cluster_id_str
+from utilities import compare_time as _compare_time
+from utilities import get_wait_seconds_from_set_time as _get_wait_seconds_from_set_time
+from utilities import hex_from_bytes as _hex_from_bytes
+from utilities import id_str as _id_str
+from utilities import type_matches as _type_matches
+from utilities import utc_datetime_from_matter_epoch_us as _utc_datetime_from_matter_epoch_us
+from utilities import utc_datetime_from_posix_time_ms as _utc_datetime_from_posix_time_ms
+from utilities import utc_time_in_matter_epoch as _utc_time_in_matter_epoch
 
 # isort: off
 
@@ -93,6 +104,23 @@ _DEFAULT_LOG_PATH = "/tmp/matter_testing/logs"
 _DEFAULT_CONTROLLER_NODE_ID = 112233
 _DEFAULT_DUT_NODE_ID = 0x12344321
 _DEFAULT_TRUST_ROOT_INDEX = 1
+
+# Deprecation wrappers
+
+
+def _deprecated(module_name):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            warnings.warn(
+                f"{func.__name__} is deprecated; import from {module_name} instead.",
+                DeprecationWarning,
+                stacklevel=2
+            )
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
 
 # Mobly cannot deal with user config passing of ctypes objects,
 # so we use this dict of uuid -> object to recover items stashed
@@ -149,76 +177,12 @@ def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
         return pathlib.Path.cwd()
 
 
-def type_matches(received_value, desired_type):
-    """ Checks if the value received matches the expected type.
-
-        Handles unpacking Nullable and Optional types and
-        compares list value types for non-empty lists.
-    """
-    if typing.get_origin(desired_type) == typing.Union:
-        return any(type_matches(received_value, t) for t in typing.get_args(desired_type))
-    elif typing.get_origin(desired_type) == list:
-        if isinstance(received_value, list):
-            # Assume an empty list is of the correct type
-            return True if received_value == [] else any(type_matches(received_value[0], t) for t in typing.get_args(desired_type))
-        else:
-            return False
-    elif desired_type == uint:
-        return isinstance(received_value, int) and received_value >= 0
-    elif desired_type == float32:
-        return isinstance(received_value, float)
-    else:
-        return isinstance(received_value, desired_type)
-
-# TODO(#31177): Need to add unit tests for all time conversion methods.
-
-
-def utc_time_in_matter_epoch(desired_datetime: Optional[datetime] = None):
-    """ Returns the time in matter epoch in us.
-
-        If desired_datetime is None, it will return the current time.
-    """
-    if desired_datetime is None:
-        utc_native = datetime.now(tz=timezone.utc)
-    else:
-        utc_native = desired_datetime
-    # Matter epoch is 0 hours, 0 minutes, 0 seconds on Jan 1, 2000 UTC
-    utc_th_delta = utc_native - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)
-    utc_th_us = int(utc_th_delta.total_seconds() * 1000000)
-    return utc_th_us
-
-
-matter_epoch_us_from_utc_datetime = utc_time_in_matter_epoch
-
-
-def utc_datetime_from_matter_epoch_us(matter_epoch_us: int) -> datetime:
-    """Returns the given Matter epoch time as a usable Python datetime in UTC."""
-    delta_from_epoch = timedelta(microseconds=matter_epoch_us)
-    matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)
-
-    return matter_epoch + delta_from_epoch
-
-
-def utc_datetime_from_posix_time_ms(posix_time_ms: int) -> datetime:
-    millis = posix_time_ms % 1000
-    seconds = posix_time_ms // 1000
-    return datetime.fromtimestamp(seconds, timezone.utc) + timedelta(milliseconds=millis)
-
-
-def compare_time(received: int, offset: timedelta = timedelta(), utc: Optional[int] = None, tolerance: timedelta = timedelta(seconds=5)) -> None:
-    if utc is None:
-        utc = utc_time_in_matter_epoch()
-
-    # total seconds includes fractional for microseconds
-    expected = utc + offset.total_seconds() * 1000000
-    delta_us = abs(expected - received)
-    delta = timedelta(microseconds=delta_us)
-    asserts.assert_less_equal(delta, tolerance, "Received time is out of tolerance")
-
-
-def get_wait_seconds_from_set_time(set_time_matter_us: int, wait_seconds: int):
-    seconds_passed = (utc_time_in_matter_epoch() - set_time_matter_us) // 1000000
-    return wait_seconds - seconds_passed
+type_matches = _deprecated("utilities")(_type_matches)
+utc_time_in_matter_epoch = _deprecated("utilities")(_utc_time_in_matter_epoch)
+utc_datetime_from_matter_epoch_us = _deprecated("utilities")(_utc_datetime_from_matter_epoch_us)
+utc_datetime_from_posix_time_ms = _deprecated("utilities")(_utc_datetime_from_posix_time_ms)
+compare_time = _deprecated("utilities")(_compare_time)
+get_wait_seconds_from_set_time = _deprecated("utilities")(_get_wait_seconds_from_set_time)
 
 
 class SimpleEventCallback:
@@ -708,19 +672,8 @@ class ClusterMapper:
                 return f"Attribute {attribute_name} ({attribute_id}, 0x{attribute_id:04X})"
 
 
-def id_str(id):
-    return f'{id} (0x{id:02x})'
-
-
-def cluster_id_str(id):
-    if id in Clusters.ClusterObjects.ALL_CLUSTERS.keys():
-        s = Clusters.ClusterObjects.ALL_CLUSTERS[id].__name__
-    else:
-        s = "Unknown cluster"
-    try:
-        return f'{id_str(id)} {s}'
-    except TypeError:
-        return 'HERE IS THE PROBLEM'
+id_str = _deprecated("utilities")(_id_str)
+cluster_id_str = _deprecated("utilities")(_cluster_id_str)
 
 
 @dataclass
@@ -930,17 +883,8 @@ class MatterStackState:
         return builtins.chipStack
 
 
-def bytes_from_hex(hex: str) -> bytes:
-    """Converts any `hex` string representation including `01:ab:cd` to bytes
-
-    Handles any whitespace including newlines, which are all stripped.
-    """
-    return unhexlify("".join(hex.replace(":", "").replace(" ", "").split()))
-
-
-def hex_from_bytes(b: bytes) -> str:
-    """Converts a bytes object `b` into a hex string (reverse of bytes_from_hex)"""
-    return hexlify(b).decode("utf-8")
+bytes_from_hex = _deprecated("utilities")(_bytes_from_hex)
+hex_from_bytes = _deprecated("utilities")(_hex_from_bytes)
 
 
 @dataclass
