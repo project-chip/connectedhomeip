@@ -69,13 +69,13 @@ Davis, CA 95616, USA
     <struct name="TargetStruct">
       <field id="1" name="Node" type="node-id">
         <mandatoryConform>
-          <attribute name="Endpoint"/>
+          <field name="Endpoint"/>
         </mandatoryConform>
       </field>
       <field id="2" name="Group" type="group-id">
         <mandatoryConform>
           <notTerm>
-            <attribute name="Endpoint"/>
+            <field name="Endpoint"/>
           </notTerm>
         </mandatoryConform>
         <constraint type="min" value="1"/>
@@ -83,7 +83,7 @@ Davis, CA 95616, USA
       <field id="3" name="Endpoint" type="endpoint-no">
         <mandatoryConform>
           <notTerm>
-            <attribute name="Group"/>
+            <field name="Group"/>
           </notTerm>
         </mandatoryConform>
       </field>
@@ -94,10 +94,10 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="Binding" type="list" default="[]">
+    <attribute id="0x0000" name="Binding" type="list" default="empty">
       <entry type="TargetStruct"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage" fabricScoped="true"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
