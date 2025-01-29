@@ -61,7 +61,7 @@ be removed.
 We use the following auto-formatters on code:
 
 | Language    | Formatter          | Style File                         |
-| ----------- | ------------------ | -----------------------------------|
+| ----------- | ------------------ | ---------------------------------- |
 | C++         | clang-format       | [.clang-format][clang_format_link] |
 | Objective-C | clang-format       | [.clang-format][clang_format_link] |
 | java        | google-java-format | N/A                                |
