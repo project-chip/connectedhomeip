@@ -39,7 +39,7 @@ class TestSupportedTypes(unittest.TestCase):
         # ALL types defined in chip-types.xml should be understandable
         # by the generator type parsing
         path = "src/app/zap-templates/zcl/data-model/chip/chip-types.xml"
-        path = os.path.join(os.path.dirname(__file__), "../../..", path)
+        path = os.path.join(os.path.dirname(__file__), "../../../..", path)
         dom = ET.parse(path).getroot()
 
         # Format we expect:

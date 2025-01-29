@@ -125,8 +125,8 @@ class GeneratorTest:
             return TLVMetaDataGenerator(storage, idl, table_name="clusters_meta")
         if self.generator_name.lower() == 'custom-example-proto':
             sys.path.append(os.path.abspath(
-                os.path.join(os.path.dirname(__file__), '../examples')))
-            from matter.idl_plugin import CustomGenerator
+                os.path.join(os.path.dirname(__file__), '../../examples')))
+            from matter_idl_plugin import CustomGenerator
             return CustomGenerator(storage, idl, package='com.matter.example.proto')
         else:
             raise Exception("Unknown generator for testing: %s",

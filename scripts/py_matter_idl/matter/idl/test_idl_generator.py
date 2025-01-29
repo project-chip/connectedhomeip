@@ -49,7 +49,7 @@ class TestCaseStorage(GeneratorStorage):
 
 
 def ReadMatterIdl(repo_path: str) -> str:
-    path = os.path.join(os.path.dirname(__file__), "../../..", repo_path)
+    path = os.path.join(os.path.dirname(__file__), "../../../..", repo_path)
     with open(path, "rt") as stream:
         return stream.read()
 
