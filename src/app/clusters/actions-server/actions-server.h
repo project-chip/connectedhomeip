@@ -20,59 +20,61 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/reporting/reporting.h>
 #include <protocols/interaction_model/StatusCode.h>
-
-namespace {
-// Zero'th index will be used for unit tests only.
-static constexpr size_t kActionsDelegateTableSize =
-#ifdef ZCL_USING_ACTIONS_CLUSTER_SERVER
-    MATTER_DM_ACTIONS_CLUSTER_SERVER_ENDPOINT_COUNT +
-#endif
-    CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1;
-
-} // namespace
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Actions {
 
-// Last byte is reserved of '\0' terminator.
-static constexpr size_t kActionNameMaxSize       = 127u;
-static constexpr size_t kEndpointListNameMaxSize = 127u;
+static constexpr size_t kActionNameMaxSize       = 128u;
+static constexpr size_t kEndpointListNameMaxSize = 128u;
 
 static constexpr size_t kEndpointListMaxSize = 256u;
 
 class Delegate;
 
+class MatterContext
+{
+public:
+    virtual ~MatterContext() = default;
+    // MarkDirty
+    virtual void MarkDirty(EndpointId aEndpointId, AttributeId aAttributeId)
+    {
+        MatterReportingAttributeChangeCallback(aEndpointId, Id, aAttributeId);
+    }
+};
+
 struct ActionStructStorage : public Structs::ActionStruct::Type
 {
     ActionStructStorage() : mActionName(mBuffer, sizeof(mBuffer)){};
 
-    ActionStructStorage(uint16_t action, const CharSpan & actionName, ActionTypeEnum actionType, uint16_t epListID,
-                        BitMask<CommandBits> commands, ActionStateEnum actionState) :
+    ActionStructStorage(uint16_t aAction, const CharSpan & aActionName, ActionTypeEnum aActionType, uint16_t aEpListID,
+                        BitMask<CommandBits> aCommands, ActionStateEnum aActionState) :
         mActionName(mBuffer, sizeof(mBuffer))
     {
-        Set(action, actionName, actionType, epListID, commands, actionState);
+        Set(aAction, aActionName, aActionType, aEpListID, aCommands, aActionState);
     }
 
-    ActionStructStorage(const ActionStructStorage & action) : mActionName(mBuffer, sizeof(mBuffer)) { *this = action; }
+    ActionStructStorage(const ActionStructStorage & aAction) : mActionName(mBuffer, sizeof(mBuffer)) { *this = aAction; }
 
-    ActionStructStorage & operator=(const ActionStructStorage & action)
+    ActionStructStorage & operator=(const ActionStructStorage & aAction)
     {
-        Set(action.actionID, action.name, action.type, action.endpointListID, action.supportedCommands, action.state);
+        Set(aAction.actionID, aAction.name, aAction.type, aAction.endpointListID, aAction.supportedCommands, aAction.state);
         return *this;
     }
 
-    void Set(uint16_t action, const CharSpan & actionName, ActionTypeEnum actionType, uint16_t epListID,
-             BitMask<CommandBits> commands, ActionStateEnum actionState)
+    void Set(uint16_t aAction, const CharSpan & aActionName, ActionTypeEnum aActionType, uint16_t aEpListID,
+             BitMask<CommandBits> aCommands, ActionStateEnum aActionState)
     {
-        actionID          = action;
-        type              = actionType;
-        endpointListID    = epListID;
-        supportedCommands = commands;
-        state             = actionState;
-        CopyCharSpanToMutableCharSpanWithTruncation(actionName, mActionName);
+        actionID          = aAction;
+        type              = aActionType;
+        endpointListID    = aEpListID;
+        supportedCommands = aCommands;
+        state             = aActionState;
+        mActionName       = Span(mBuffer, sizeof(mBuffer));
+        CopyCharSpanToMutableCharSpanWithTruncation(aActionName, mActionName);
         name = mActionName;
     }
 
@@ -85,34 +87,35 @@ struct EndpointListStorage : public Structs::EndpointListStruct::Type
 {
     EndpointListStorage() : mEpListName(mBuffer, sizeof(mBuffer)){};
 
-    EndpointListStorage(uint16_t epListId, const CharSpan & epListName, EndpointListTypeEnum epListType,
-                        const DataModel::List<const EndpointId> & endpointList) :
+    EndpointListStorage(uint16_t aEpListId, const CharSpan & aEpListName, EndpointListTypeEnum aEpListType,
+                        const DataModel::List<const EndpointId> & aEndpointList) :
         mEpListName(mBuffer, sizeof(mBuffer))
     {
-        Set(epListId, epListName, epListType, endpointList);
+        Set(aEpListId, aEpListName, aEpListType, aEndpointList);
     }
 
-    EndpointListStorage(const EndpointListStorage & epList) : mEpListName(mBuffer, sizeof(mBuffer)) { *this = epList; }
+    EndpointListStorage(const EndpointListStorage & aEpList) : mEpListName(mBuffer, sizeof(mBuffer)) { *this = aEpList; }
 
-    EndpointListStorage & operator=(const EndpointListStorage & epList)
+    EndpointListStorage & operator=(const EndpointListStorage & aEpList)
     {
-        Set(epList.endpointListID, epList.name, epList.type, epList.endpoints);
+        Set(aEpList.endpointListID, aEpList.name, aEpList.type, aEpList.endpoints);
         return *this;
     }
 
-    void Set(uint16_t epListId, const CharSpan & epListName, EndpointListTypeEnum epListType,
-             const DataModel::List<const EndpointId> & endpointList)
+    void Set(uint16_t aEpListId, const CharSpan & aEpListName, EndpointListTypeEnum aEpListType,
+             const DataModel::List<const EndpointId> & aEndpointList)
     {
-        endpointListID    = epListId;
-        type              = epListType;
-        size_t epListSize = std::min(endpointList.size(), kEndpointListMaxSize);
+        endpointListID    = aEpListId;
+        type              = aEpListType;
+        size_t epListSize = std::min(aEndpointList.size(), kEndpointListMaxSize);
 
         for (size_t index = 0; index < epListSize; index++)
         {
-            mEpList[index] = endpointList[index];
+            mEpList[index] = aEndpointList[index];
         }
-        endpoints = DataModel::List<const EndpointId>(Span(mEpList, epListSize));
-        CopyCharSpanToMutableCharSpanWithTruncation(epListName, mEpListName);
+        endpoints   = DataModel::List<const EndpointId>(Span(mEpList, epListSize));
+        mEpListName = Span(mBuffer, sizeof(mBuffer));
+        CopyCharSpanToMutableCharSpanWithTruncation(aEpListName, mEpListName);
         name = mEpListName;
     }
 
@@ -122,13 +125,13 @@ private:
     EndpointId mEpList[kEndpointListMaxSize];
 };
 
-class ActionsServer : public AttributeAccessInterface, public CommandHandlerInterface
+class ActionsServer : public AttributeAccessInterface, public CommandHandlerInterface, public MatterContext
 {
 public:
     // Register for the Actions cluster on all endpoints.
     ActionsServer() :
         AttributeAccessInterface(Optional<EndpointId>::Missing(), Actions::Id),
-        CommandHandlerInterface(Optional<EndpointId>::Missing(), Actions::Id)
+        CommandHandlerInterface(Optional<EndpointId>::Missing(), Actions::Id), mMatterContext(*this)
     {}
     static ActionsServer & Instance();
 
@@ -136,29 +139,54 @@ public:
      * @brief
      *   Called when the state of action is changed.
      */
-    void OnStateChanged(EndpointId endpoint, uint16_t actionId, uint32_t invokeId, ActionStateEnum actionState);
+    void OnStateChanged(EndpointId aEndpoint, uint16_t aActionId, uint32_t aInvokeId, ActionStateEnum aActionState);
 
     /**
      * @brief
      *   Called when the action is failed..
      */
-    void OnActionFailed(EndpointId endpoint, uint16_t actionId, uint32_t invokeId, ActionStateEnum actionState,
-                        ActionErrorEnum actionError);
+    void OnActionFailed(EndpointId aEndpoint, uint16_t aActionId, uint32_t aInvokeId, ActionStateEnum aActionState,
+                        ActionErrorEnum aActionError);
 
-    static void SetDefaultDelegate(EndpointId endpointId, Delegate * aDelegate);
+    static void SetDefaultDelegate(EndpointId aEndpointId, Delegate * aDelegate);
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
+    /**
+     * Update an existing action in the action list for the given endpoint.
+     * If the action with the given actionID doesn't exist, returns CHIP_ERROR_NOT_FOUND.
+     *
+     * @param aEndpoint The endpoint ID where the action should be updated
+     * @param aAction The action structure containing the updated action details
+     * @return CHIP_ERROR_INCORRECT_STATE if delegate is null
+     *         CHIP_ERROR_NOT_FOUND if action doesn't exist
+     *         CHIP_NO_ERROR if successful
+     */
+    CHIP_ERROR SetActionList(EndpointId aEndpoint, const ActionStructStorage & aAction);
+
+    /**
+     * Update an existing endpoint list for the given endpoint.
+     * If the endpoint list with the given ID doesn't exist, returns CHIP_ERROR_NOT_FOUND.
+     *
+     * @param aEndpoint The endpoint ID where the endpoint list should be updated
+     * @param aEpList The endpoint list structure containing the updated list details
+     * @return CHIP_ERROR_INCORRECT_STATE if delegate is null
+     *         CHIP_ERROR_NOT_FOUND if endpoint list doesn't exist
+     *         CHIP_NO_ERROR if successful
+     */
+    CHIP_ERROR SetEndpointList(EndpointId aEndpoint, const EndpointListStorage & aEpList);
+
 private:
     static ActionsServer sInstance;
+    MatterContext & mMatterContext;
     static constexpr size_t kMaxEndpointListLength = 256u;
     static constexpr size_t kMaxActionListLength   = 256u;
 
     CHIP_ERROR ReadActionListAttribute(const ConcreteReadAttributePath & aPath,
-                                       const AttributeValueEncoder::ListEncodeHelper & encoder);
+                                       const AttributeValueEncoder::ListEncodeHelper & aEncoder);
     CHIP_ERROR ReadEndpointListAttribute(const ConcreteReadAttributePath & aPath,
-                                         const AttributeValueEncoder::ListEncodeHelper & encoder);
-    bool FindActionIdInActionList(EndpointId endpointId, uint16_t actionId);
+                                         const AttributeValueEncoder::ListEncodeHelper & aEncoder);
+    bool FindActionIdInActionList(EndpointId aEndpointId, uint16_t aActionId);
 
     // Cannot use CommandHandlerInterface::HandleCommand directly because we need to do the FindActionIdInActionList() check before
     // sending a command.
@@ -345,6 +373,22 @@ public:
      */
     virtual Protocols::InteractionModel::Status HandleDisableActionWithDuration(uint16_t actionId, uint32_t duration,
                                                                                 Optional<uint32_t> invokeId) = 0;
+
+    /**
+     * Called when an action list has been updated.
+     *
+     * @param endpoint The endpoint ID where the action list was updated
+     * @param action The updated action details
+     */
+    virtual void OnActionListChanged(EndpointId endpoint, const ActionStructStorage & action) = 0;
+
+    /**
+     * Called when an endpoint list has been updated.
+     *
+     * @param endpoint The endpoint ID where the endpoint list was updated
+     * @param epList The updated endpoint list details
+     */
+    virtual void OnEndpointListChanged(EndpointId endpoint, const EndpointListStorage & epList) = 0;
 };
 
 } // namespace Actions
