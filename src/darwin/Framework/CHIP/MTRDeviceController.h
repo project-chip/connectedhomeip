@@ -273,7 +273,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Forget any information we have about the device with the given node ID.  That
  * includes clearing any information we have stored about it.
  */
-- (void)forgetDeviceWithNodeID:(NSNumber *)nodeID MTR_NEWLY_AVAILABLE;
+- (void)forgetDeviceWithNodeID:(NSNumber *)nodeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 /**
  * Compute a PASE verifier for the desired setup passcode.

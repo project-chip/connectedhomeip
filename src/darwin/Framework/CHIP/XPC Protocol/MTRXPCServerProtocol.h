@@ -71,7 +71,7 @@ MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3))
 // - (oneway void)deviceController:(NSUUID *)controller addServerEndpoint:(MTRServerEndpoint *)endpoint withReply:(void (^)(BOOL success))reply;
 // - (oneway void)deviceController:(NSUUID *)controller removeServerEndpoint:(MTRServerEndpoint *)endpoint;
 
-- (oneway void)deviceController:(NSUUID *)controller deleteNodeID:(NSNumber *)nodeID MTR_NEWLY_AVAILABLE;
+- (oneway void)deviceController:(NSUUID *)controller deleteNodeID:(NSNumber *)nodeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 - (oneway void)deviceController:(NSUUID *)controller registerNodeID:(NSNumber *)nodeID;
 - (oneway void)deviceController:(NSUUID *)controller unregisterNodeID:(NSNumber *)nodeID;

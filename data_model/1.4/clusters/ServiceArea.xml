@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0150" name="Service Area Cluster" revision="1">
   <revisionHistory>
@@ -76,26 +78,49 @@ Davis, CA 95616, USA
   </features>
   <dataTypes>
     <enum name="OperationalStatusEnum">
-      <item value="0x00" name="Pending" summary="The device has not yet started operating at the given area,
-                         or has not finished operating at that area but it is not currently
-                         operating at the area">
+      <item value="0x00" name="Pending" summary="The device has not yet started operating at the given area, or has not finished operating at that area but it is not currently operating at the area">
         <mandatoryConform/>
       </item>
       <item value="0x01" name="Operating" summary="The device is currently operating at the given area">
         <mandatoryConform/>
       </item>
-      <item value="0x02" name="Skipped" summary="The device has skipped the given area, before or during operating at it,
-                         due to a SkipArea command, due an out of band command (e.g. from the vendor's application),
-                         due to a vendor specific reason, such as a time limit used by the device,
-                         or due the device ending operating unsuccessfully">
+      <item value="0x02" name="Skipped" summary="The device has skipped the given area, before or during operating at it, due to a SkipArea command, due an out of band command (e.g. from the vendor&apos;s application), due to a vendor specific reason, such as a time limit used by the device, or due the device ending operating unsuccessfully">
         <mandatoryConform/>
       </item>
       <item value="0x03" name="Completed" summary="The device has completed operating at the given area">
         <mandatoryConform/>
       </item>
     </enum>
+    <enum name="SelectAreasStatus">
+      <item value="0x00" name="Success" summary="Attempting to operate in the areas identified by the entries of the NewAreas field is allowed and possible. The SelectedAreas attribute is set to the value of the NewAreas field.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x01" name="UnsupportedArea" summary="The value of at least one of the entries of the NewAreas field doesn&apos;t match any entries in the SupportedAreas attribute.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x02" name="InvalidInMode" summary="The received request cannot be handled due to the current mode of the device.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="InvalidSet" summary="The set of values is invalid. For example, areas on different floors, that a robot knows it can&apos;t reach on its own.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="SkipAreaStatus">
+      <item value="0x00" name="Success" summary="Skipping the area is allowed and possible, or the device was operating at the last available area and has stopped.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x01" name="InvalidAreaList" summary="The SelectedAreas attribute is empty.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x02" name="InvalidInMode" summary="The received request cannot be handled due to the current mode of the device. For example, the CurrentArea attribute is null or the device is not operating.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="InvalidSkippedArea" summary="The SkippedArea field doesn&apos;t match an entry in the SupportedAreas list.">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <struct name="AreaInfoStruct">
-      <field id="0" name="LocationInfo" type="locationdesc">
+      <field id="0" name="LocationInfo" type="LocationDescriptorStruct">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
@@ -175,12 +200,12 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="CurrentArea" type="uint32" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0004" name="EstimatedEndTime" type="epoch-s" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <optionalConform>
         <attribute name="CurrentArea"/>
       </optionalConform>
