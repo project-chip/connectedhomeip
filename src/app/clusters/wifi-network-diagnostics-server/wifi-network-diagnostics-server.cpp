@@ -66,9 +66,9 @@ private:
 
     void InvokeCommand(HandlerContext & ctx) override;
 
-#ifdef WI_FI_NETWORK_DIAGNOSTICS_ENABLE_RESET_COUNTS_CMD   
+#ifdef WI_FI_NETWORK_DIAGNOSTICS_ENABLE_RESET_COUNTS_CMD
     void HandleResetCounts(HandlerContext & ctx, const Commands::ResetCounts::DecodableType & commandData);
-#endif    
+#endif
 
     DiagnosticDataProvider & mDiagnosticProvider;
 };
@@ -256,16 +256,16 @@ void WiFiDiagosticsGlobalInstance::InvokeCommand(HandlerContext & handlerContext
 {
     switch (handlerContext.mRequestPath.mCommandId)
     {
-#ifdef WI_FI_NETWORK_DIAGNOSTICS_ENABLE_RESET_COUNTS_CMD        
+#ifdef WI_FI_NETWORK_DIAGNOSTICS_ENABLE_RESET_COUNTS_CMD
     case Commands::ResetCounts::Id:
         CommandHandlerInterface::HandleCommand<Commands::ResetCounts::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleResetCounts(ctx, commandData); });
         break;
-#endif        
+#endif
     }
 }
 
-#ifdef WI_FI_NETWORK_DIAGNOSTICS_ENABLE_RESET_COUNTS_CMD   
+#ifdef WI_FI_NETWORK_DIAGNOSTICS_ENABLE_RESET_COUNTS_CMD
 void WiFiDiagosticsGlobalInstance::HandleResetCounts(HandlerContext & ctx, const Commands::ResetCounts::DecodableType & commandData)
 {
     mDiagnosticProvider.ResetWiFiNetworkDiagnosticsCounts();
