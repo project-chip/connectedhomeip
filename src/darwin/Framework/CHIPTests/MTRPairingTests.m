@@ -480,14 +480,15 @@ static MTRTestKeys * sTestKeys = nil;
 - (void)test008_pairingAfterCancellation_DeviceAttestationVerification
 {
     // Cancel pairing while we are waiting for our client to decide what to do
-    // with the attestation information we got.
-    __block BOOL delegateCalled = NO;
-    __auto_type * attestationDelegate = [[NoOpAttestationDelegate alloc] initWithCallback:^{
-        delegateCalled = YES;
-    } blockCommissioning:YES];
+    // with the attestation information we got.  Note that the delegate is
+    // called on some arbitrary queue, so we need to make sure we wait for it to
+    // actually be called; we can't just have it set a boolean that we then
+    // check, because that can race.
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Attestation delegate called"];
+    __auto_type * attestationDelegate = [[NoOpAttestationDelegate alloc] initWithExpectation:expectation blockCommissioning:YES];
 
     [self doPairingTestAfterCancellationAtProgress:@"Successfully extended fail-safe timer to handle DA failure" attestationDelegate:attestationDelegate];
-    XCTAssertTrue(delegateCalled);
+    [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
 }
 
 - (void)test009_PairWithReadingEndpointInformation
