@@ -24,39 +24,40 @@
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <vector>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Actions {
-const uint16_t kActionListSize   = 3;
-const uint16_t kEndpointListSize = 3;
 class ActionsDelegateImpl : public Delegate
 {
 private:
-    const ActionStructStorage kActionList[kActionListSize] = {
+    std::vector<ActionStructStorage> kActionList = {
         ActionStructStorage(0, CharSpan::fromCharString("TurnOnLight"), ActionTypeEnum::kScene, 0, 0, ActionStateEnum::kInactive),
         ActionStructStorage(1, CharSpan::fromCharString("TurnOffLight"), ActionTypeEnum::kScene, 1, 0, ActionStateEnum::kInactive),
-        ActionStructStorage(2, CharSpan::fromCharString("ToggleLight"), ActionTypeEnum::kScene, 2, 0, ActionStateEnum::kInactive),
+        ActionStructStorage(2, CharSpan::fromCharString("ToggleLight"), ActionTypeEnum::kScene, 2, 0, ActionStateEnum::kInactive)
     };
 
-    // Dummy endpoint list.
-    const EndpointId firstEpList[3]  = { 0, 1, 2 };
-    const EndpointId secondEpList[1] = { 0 };
-    const EndpointId thirdEpList[1]  = { 0 };
+    std::vector<EndpointId> firstEpList  = { 0 };
+    std::vector<EndpointId> secondEpList = { 0, 1 };
+    std::vector<EndpointId> thirdEpList  = { 1, 2, 3 };
 
-    const EndpointListStorage kEndpointList[kEndpointListSize] = {
+    std::vector<EndpointListStorage> kEndpointList = {
         EndpointListStorage(0, CharSpan::fromCharString("On"), EndpointListTypeEnum::kOther,
-                            DataModel::List<const EndpointId>(firstEpList)),
+                            DataModel::List<const EndpointId>(firstEpList.data(), firstEpList.size())),
         EndpointListStorage(1, CharSpan::fromCharString("Off"), EndpointListTypeEnum::kOther,
-                            DataModel::List<const EndpointId>(secondEpList)),
+                            DataModel::List<const EndpointId>(secondEpList.data(), secondEpList.size())),
         EndpointListStorage(2, CharSpan::fromCharString("Toggle"), EndpointListTypeEnum::kOther,
-                            DataModel::List<const EndpointId>(thirdEpList)),
+                            DataModel::List<const EndpointId>(thirdEpList.data(), thirdEpList.size()))
     };
 
     CHIP_ERROR ReadActionAtIndex(uint16_t index, ActionStructStorage & action) override;
     CHIP_ERROR ReadEndpointListAtIndex(uint16_t index, EndpointListStorage & epList) override;
     bool FindActionIdInActionList(uint16_t actionId) override;
+
+    void OnActionListChanged(EndpointId endpoint, const ActionStructStorage & action) override{};
+    void OnEndpointListChanged(EndpointId endpoint, const EndpointListStorage & action) override{};
 
     Protocols::InteractionModel::Status HandleInstantAction(uint16_t actionId, Optional<uint32_t> invokeId) override;
     Protocols::InteractionModel::Status HandleInstantActionWithTransition(uint16_t actionId, uint16_t transitionTime,
