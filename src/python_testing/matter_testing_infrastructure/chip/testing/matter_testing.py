@@ -972,18 +972,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         # The named pipe name must be set in the derived classes
         self.app_pipe = None
 
-    async def commission_devices(self) -> bool:
-        conf = self.matter_test_config
-
-        for commission_idx, node_id in enumerate(conf.dut_node_ids):
-            logging.info(
-                f"Starting commissioning for root index {conf.root_of_trust_index}, fabric ID 0x{conf.fabric_id:016X}, node ID 0x{node_id:016X}")
-            logging.info(f"Commissioning method: {conf.commissioning_method}")
-
-            await CommissionDeviceTest.commission_device(self, commission_idx)
-
-        return True
-
     def get_test_steps(self, test: str) -> list[TestStep]:
         ''' Retrieves the test step list for the given test
 
@@ -1142,8 +1130,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.current_step_index = 0
         self.step_start_time = datetime.now(timezone.utc)
         self.step_skipped = False
-        self.global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
-            None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
         # self.stored_global_wildcard stores value of self.global_wildcard after first async call.
         # Because setup_class can be called before commissioning, this variable is lazy-initialized
         # where the read is deferred until the first guard function call that requires global attributes.
@@ -1170,17 +1156,14 @@ class MatterBaseTest(base_test.BaseTestClass):
                 self.step(1)
 
     def teardown_class(self):
-        """Final teardown after all tests: log all problems"""
-        if len(self.problems) == 0:
-            return
-
-        logging.info("###########################################################")
-        logging.info("Problems found:")
-        logging.info("===============")
-        for problem in self.problems:
-            logging.info(str(problem))
-        logging.info("###########################################################")
-
+        """Final teardown after all tests: log all problems."""
+        if len(self.problems) > 0:
+            logging.info("###########################################################")
+            logging.info("Problems found:")
+            logging.info("===============")
+            for problem in self.problems:
+                logging.info(str(problem))
+            logging.info("###########################################################")
         super().teardown_class()
 
     def check_pics(self, pics_key: str) -> bool:
@@ -1479,6 +1462,13 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.mark_current_step_skipped()
         return pics_condition
 
+    async def _populate_wildcard(self):
+        """ Populates self.stored_global_wildcard if not already filled. """
+        if self.stored_global_wildcard is None:
+            global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
+                None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
+            self.stored_global_wildcard = await global_wildcard
+
     async def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
         """Similar to pics_guard above, except checks a condition and if False marks the test step as skipped and
            returns False using attributes against attributes_list, otherwise returns True.
@@ -1492,8 +1482,7 @@ class MatterBaseTest(base_test.BaseTestClass):
               if self.attribute_guard(condition2_needs_to_be_false_to_skip_step):
                   # skip step 2 if condition not met
            """
-        if self.stored_global_wildcard is None:
-            self.stored_global_wildcard = await self.global_wildcard
+        await self._populate_wildcard()
         attr_condition = _has_attribute(wildcard=self.stored_global_wildcard, endpoint=endpoint, attribute=attribute)
         if not attr_condition:
             self.mark_current_step_skipped()
@@ -1512,8 +1501,7 @@ class MatterBaseTest(base_test.BaseTestClass):
               if self.command_guard(condition2_needs_to_be_false_to_skip_step):
                   # skip step 2 if condition not met
            """
-        if self.stored_global_wildcard is None:
-            self.stored_global_wildcard = await self.global_wildcard
+        await self._populate_wildcard()
         cmd_condition = _has_command(wildcard=self.stored_global_wildcard, endpoint=endpoint, command=command)
         if not cmd_condition:
             self.mark_current_step_skipped()
@@ -1532,8 +1520,7 @@ class MatterBaseTest(base_test.BaseTestClass):
               if self.feature_guard(condition2_needs_to_be_false_to_skip_step):
                   # skip step 2 if condition not met
            """
-        if self.stored_global_wildcard is None:
-            self.stored_global_wildcard = await self.global_wildcard
+        await self._populate_wildcard()
         feat_condition = _has_feature(wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster, feature=feature_int)
         if not feat_condition:
             self.mark_current_step_skipped()
@@ -2105,8 +2092,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
     timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
-    runner_with_timeout = asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout)
-    return asyncio.run(runner_with_timeout)
+    return self.event_loop.run_until_complete(asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout))
 
 
 def async_test_body(body):
@@ -2299,7 +2285,7 @@ def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction):
     def run_on_singleton_matching_endpoint_internal(body):
         def matching_runner(self: MatterBaseTest, *args, **kwargs):
             runner_with_timeout = asyncio.wait_for(_get_all_matching_endpoints(self, accept_function), timeout=30)
-            matching = asyncio.run(runner_with_timeout)
+            matching = self.event_loop.run_until_complete(runner_with_timeout)
             asserts.assert_less_equal(len(matching), 1, "More than one matching endpoint found for singleton test.")
             if not matching:
                 logging.info("Test is not applicable to any endpoint - skipping test")
@@ -2346,7 +2332,7 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
     def run_if_endpoint_matches_internal(body):
         def per_endpoint_runner(self: MatterBaseTest, *args, **kwargs):
             runner_with_timeout = asyncio.wait_for(should_run_test_on_endpoint(self, accept_function), timeout=60)
-            should_run_test = asyncio.run(runner_with_timeout)
+            should_run_test = self.event_loop.run_until_complete(runner_with_timeout)
             if not should_run_test:
                 logging.info("Test is not applicable to this endpoint - skipping test")
                 asserts.skip('Endpoint does not match test requirements')
@@ -2365,27 +2351,35 @@ class CommissionDeviceTest(MatterBaseTest):
         self.is_commissioning = True
 
     def test_run_commissioning(self):
-        if not asyncio.run(self.commission_devices()):
-            raise signals.TestAbortAll("Failed to commission node")
+        if not self.event_loop.run_until_complete(self.commission_devices()):
+            raise signals.TestAbortAll("Failed to commission node(s)")
 
-    async def commission_device(instance: MatterBaseTest, i) -> bool:
-        dev_ctrl = instance.default_controller
-        conf = instance.matter_test_config
+    async def commission_devices(self) -> bool:
+        conf = self.matter_test_config
 
-        info = instance.get_setup_payload_info()[i]
+        commissioned = []
+        setup_payloads = self.get_setup_payload_info()
+        for node_id, setup_payload in zip(conf.dut_node_ids, setup_payloads):
+            logging.info(f"Starting commissioning for root index {conf.root_of_trust_index}, "
+                         f"fabric ID 0x{conf.fabric_id:016X}, node ID 0x{node_id:016X}")
+            logging.info(f"Commissioning method: {conf.commissioning_method}")
+            commissioned.append(await self.commission_device(node_id, setup_payload))
+
+        return all(commissioned)
+
+    async def commission_device(self, node_id: int, info: SetupPayloadInfo) -> bool:
+        dev_ctrl = self.default_controller
+        conf = self.matter_test_config
 
         if conf.tc_version_to_simulate is not None and conf.tc_user_response_to_simulate is not None:
             logging.debug(
                 f"Setting TC Acknowledgements to version {conf.tc_version_to_simulate} with user response {conf.tc_user_response_to_simulate}.")
             dev_ctrl.SetTCAcknowledgements(conf.tc_version_to_simulate, conf.tc_user_response_to_simulate)
-            dev_ctrl.SetTCRequired(True)
-        else:
-            dev_ctrl.SetTCRequired(False)
 
         if conf.commissioning_method == "on-network":
             try:
                 await dev_ctrl.CommissionOnNetwork(
-                    nodeId=conf.dut_node_ids[i],
+                    nodeId=node_id,
                     setupPinCode=info.passcode,
                     filterType=info.filter_type,
                     filter=info.filter_value
@@ -2399,7 +2393,7 @@ class CommissionDeviceTest(MatterBaseTest):
                 await dev_ctrl.CommissionWiFi(
                     info.filter_value,
                     info.passcode,
-                    conf.dut_node_ids[i],
+                    node_id,
                     conf.wifi_ssid,
                     conf.wifi_passphrase,
                     isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
@@ -2413,7 +2407,7 @@ class CommissionDeviceTest(MatterBaseTest):
                 await dev_ctrl.CommissionThread(
                     info.filter_value,
                     info.passcode,
-                    conf.dut_node_ids[i],
+                    node_id,
                     conf.thread_operational_dataset,
                     isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
                 )
@@ -2426,7 +2420,8 @@ class CommissionDeviceTest(MatterBaseTest):
                 logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
                 await dev_ctrl.CommissionIP(
                     ipaddr=conf.commissionee_ip_address_just_for_testing,
-                    setupPinCode=info.passcode, nodeid=conf.dut_node_ids[i]
+                    setupPinCode=info.passcode,
+                    nodeid=node_id,
                 )
                 return True
             except ChipStackError as e:
@@ -2442,10 +2437,10 @@ def default_matter_test_main():
     In this case, only one test class in a test script is allowed.
     To make your test script executable, add the following to your file:
     .. code-block:: python
-      from chip.testing.matter_testing.py import default_matter_test_main
+      from chip.testing.matter_testing import default_matter_test_main
       ...
       if __name__ == '__main__':
-        default_matter_test_main.main()
+        default_matter_test_main()
     """
 
     matter_test_config = parse_matter_test_args()
@@ -2474,7 +2469,15 @@ def get_test_info(test_class: MatterBaseTest, matter_test_config: MatterTestConf
     return info
 
 
-def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> bool:
+def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTestConfig,
+                      event_loop: asyncio.AbstractEventLoop, hooks: TestRunnerHooks,
+                      default_controller=None, external_stack=None) -> bool:
+
+    # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
+    #       Mobly deep copies the user params before passing them to the test class and the event
+    #       loop is not serializable. So, we are setting the event loop as a test class member.
+    CommissionDeviceTest.event_loop = event_loop
+    test_class.event_loop = event_loop
 
     get_test_info(test_class, matter_test_config)
 
@@ -2554,9 +2557,13 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
         duration = (datetime.now(timezone.utc) - runner_start_time) / timedelta(microseconds=1)
         hooks.stop(duration=duration)
 
-    # Shutdown the stack when all done
     if not external_stack:
-        stack.Shutdown()
+        async def shutdown():
+            stack.Shutdown()
+        # Shutdown the stack when all done. Use the async runner to ensure that
+        # during the shutdown callbacks can use tha same async context which was used
+        # during the initialization.
+        event_loop.run_until_complete(shutdown())
 
     if ok:
         logging.info("Final result: PASS !")
@@ -2565,6 +2572,9 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
     return ok
 
 
-def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> None:
-    if not run_tests_no_exit(test_class, matter_test_config, hooks, default_controller, external_stack):
-        sys.exit(1)
+def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig,
+              hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> None:
+    with asyncio.Runner() as runner:
+        if not run_tests_no_exit(test_class, matter_test_config, runner.get_loop(),
+                                 hooks, default_controller, external_stack):
+            sys.exit(1)
