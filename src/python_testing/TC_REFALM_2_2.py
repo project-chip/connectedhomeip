@@ -152,7 +152,7 @@ class TC_REFALM_2_2(MatterBaseTest):
             self._send_close_door_commnad()
             sleep(1)
         else:
-            user_response = self.wait_for_user_input(prompt_msg=f"Ensure that the door on the DUT is closed.",
+            user_response = self.wait_for_user_input(prompt_msg="Ensure that the door on the DUT is closed.",
                                                      default_value="y")
             asserts.assert_equal(user_response.lower(), "y")
 
@@ -160,7 +160,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         if self.is_ci:
             self._send_open_door_command()
         else:
-            user_response = self.wait_for_user_input(prompt_msg=f"Manually open the door on the DUT. Enter 'y' or 'n' after completition",
+            user_response = self.wait_for_user_input(prompt_msg="Manually open the door on the DUT. Enter 'y' or 'n' after completition",
                                                      default_value="y")
             asserts.assert_equal(user_response.lower(), "y")
 
