@@ -38,6 +38,19 @@ from mobly import asserts
 
 
 class TCP_Tests(MatterBaseTest):
+    async def send_arm_cmd(self):
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=1)
+        await self.send_single_cmd(cmd=cmd, endpoint=0,
+                                   payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+
+    @async_test_body
+    async def teardown_test(self):
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
+        await self.send_single_cmd(cmd=cmd, endpoint=0,
+                                   payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+
+    def pics_SC_8_1(self):
+        return ['MCORE.SC.TCP']
 
     # TCP Connection Establishment
     @async_test_body
@@ -51,6 +64,9 @@ class TCP_Tests(MatterBaseTest):
         asserts.assert_equal(device.isSessionOverTCPConnection, True, "Session does not have associated TCP connection")
         asserts.assert_equal(device.isActiveSession, True, "Large Payload Session should be active over TCP connection")
 
+    def pics_SC_8_2(self):
+        return ['MCORE.SC.TCP']
+
     # Large Payload Session Establishment
     @async_test_body
     async def test_TC_SC_8_2(self):
@@ -61,6 +77,9 @@ class TCP_Tests(MatterBaseTest):
         except TimeoutError:
             asserts.fail("Unable to establish a CASE session over TCP to the device")
         asserts.assert_equal(device.sessionAllowsLargePayload, True, "Session does not have associated TCP connection")
+
+    def pics_SC_8_3(self):
+        return ['MCORE.SC.TCP']
 
     # Session Inactive After TCP Disconnect
     @async_test_body
@@ -76,6 +95,9 @@ class TCP_Tests(MatterBaseTest):
         device.closeTCPConnectionWithPeer()
         asserts.assert_equal(device.isActiveSession, False,
                              "Large Payload Session should not be active after TCP connection closure")
+
+    def pics_SC_8_4(self):
+        return ['MCORE.SC.TCP']
 
     # TCP Connect, Disconnect, Then Connect Again
     @async_test_body
@@ -101,7 +123,9 @@ class TCP_Tests(MatterBaseTest):
         asserts.assert_equal(device.isSessionOverTCPConnection, True, "Session does not have associated TCP connection")
         asserts.assert_equal(device.isActiveSession, True, "Large Payload Session should be active over TCP connection")
 
-    # OnOff Cluster Toggle Command Over TCP Session
+    def pics_SC_8_5(self):
+        return ['MCORE.SC.TCP']
+
     @async_test_body
     async def test_TC_SC_8_5(self):
 
@@ -114,12 +138,13 @@ class TCP_Tests(MatterBaseTest):
         asserts.assert_equal(device.isActiveSession, True, "Large Payload Session should be active over TCP connection")
         asserts.assert_equal(device.sessionAllowsLargePayload, True, "Session does not have associated TCP connection")
 
-        commands = Clusters.Objects.OnOff.Commands
         try:
-            await self.send_single_cmd(cmd=commands.Toggle(), endpoint=1,
-                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+            await self.send_arm_cmd()
         except InteractionModelError:
             asserts.fail("Unexpected error returned by DUT")
+
+    def pics_SC_8_6(self):
+        return ['MCORE.SC.TCP']
 
     # WildCard Read Over TCP Session
     @async_test_body
@@ -139,6 +164,9 @@ class TCP_Tests(MatterBaseTest):
         except InteractionModelError:
             asserts.fail("Unexpected error returned by DUT")
 
+    def pics_SC_8_7(self):
+        return ['MCORE.SC.TCP']
+
     # Use TCP Session If Available For MRP Interaction
     @async_test_body
     async def test_TC_SC_8_7(self):
@@ -152,10 +180,8 @@ class TCP_Tests(MatterBaseTest):
         asserts.assert_equal(device.isActiveSession, True, "Large Payload Session should be active over TCP connection")
         asserts.assert_equal(device.sessionAllowsLargePayload, True, "Session does not have associated TCP connection")
 
-        commands = Clusters.Objects.OnOff.Commands
         try:
-            await self.send_single_cmd(cmd=commands.Toggle(), endpoint=1,
-                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.MRP_OR_TCP_PAYLOAD)
+            self.send_arm_cmd()
         except InteractionModelError:
             asserts.fail("Unexpected error returned by DUT")
 
