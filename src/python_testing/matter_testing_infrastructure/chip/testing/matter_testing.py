@@ -40,19 +40,19 @@ from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
 from functools import partial, wraps
 from itertools import chain
-from typing import Any, Iterable, List, Optional, Tuple
+from typing import Any, Iterable, List, Optional, Tuple, Callable
 
 from chip.tlv import uint
-from chip.testing.utilities import bytes_from_hex as _bytes_from_hex
-from chip.testing.utilities import cluster_id_str as _cluster_id_str
-from chip.testing.utilities import compare_time as _compare_time
-from chip.testing.utilities import get_wait_seconds_from_set_time as _get_wait_seconds_from_set_time
-from chip.testing.utilities import hex_from_bytes as _hex_from_bytes
-from chip.testing.utilities import id_str as _id_str
-from chip.testing.utilities import type_matches as _type_matches
-from chip.testing.utilities import utc_datetime_from_matter_epoch_us as _utc_datetime_from_matter_epoch_us
-from chip.testing.utilities import utc_datetime_from_posix_time_ms as _utc_datetime_from_posix_time_ms
-from chip.testing.utilities import utc_time_in_matter_epoch as _utc_time_in_matter_epoch
+from chip.testing.utilities import bytes_from_hex as new_bytes_from_hex
+from chip.testing.utilities import cluster_id_str as new_cluster_id_str
+from chip.testing.utilities import compare_time as new_compare_time
+from chip.testing.utilities import get_wait_seconds_from_set_time as new_get_wait_seconds_from_set_time
+from chip.testing.utilities import hex_from_bytes as new_hex_from_bytes
+from chip.testing.utilities import id_str as new_id_str
+from chip.testing.utilities import type_matches as new_type_matches
+from chip.testing.utilities import utc_datetime_from_matter_epoch_us as new_utc_datetime_from_matter_epoch_us
+from chip.testing.utilities import utc_datetime_from_posix_time_ms as new_utc_datetime_from_posix_time_ms
+from chip.testing.utilities import utc_time_in_matter_epoch as new_utc_time_in_matter_epoch
 
 # isort: off
 
@@ -108,13 +108,13 @@ _DEFAULT_TRUST_ROOT_INDEX = 1
 # Deprecation wrappers
 
 
-def _deprecated(module_name):
-    def decorator(func):
+def _deprecated(module_name: str) -> Callable[[Callable], Callable]:
+    def decorator(func: Callable) -> Callable:
         @wraps(func)
         def wrapper(*args, **kwargs):
             warnings.warn(
                 f"{func.__name__} is deprecated; import from {module_name} instead.",
-                DeprecationWarning,
+                UserWarning,
                 stacklevel=2
             )
             return func(*args, **kwargs)
@@ -177,12 +177,40 @@ def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
         return pathlib.Path.cwd()
 
 
-type_matches = _deprecated("utilities")(_type_matches)
-utc_time_in_matter_epoch = _deprecated("utilities")(_utc_time_in_matter_epoch)
-utc_datetime_from_matter_epoch_us = _deprecated("utilities")(_utc_datetime_from_matter_epoch_us)
-utc_datetime_from_posix_time_ms = _deprecated("utilities")(_utc_datetime_from_posix_time_ms)
-compare_time = _deprecated("utilities")(_compare_time)
-get_wait_seconds_from_set_time = _deprecated("utilities")(_get_wait_seconds_from_set_time)
+@_deprecated("utilities")
+def type_matches(received_value, desired_type):
+    """DEPRECATED: Use utilities.type_matches instead"""
+    return new_type_matches(received_value, desired_type)
+
+
+@_deprecated("utilities")
+def utc_time_in_matter_epoch(posix_time_ms: int) -> datetime:
+    """DEPRECATED: Use utilities.utc_time_in_matter_epoch instead"""
+    return new_utc_time_in_matter_epoch(posix_time_ms)
+
+
+@_deprecated("utilities")
+def utc_datetime_from_matter_epoch_us(matter_epoch_us: int) -> datetime:
+    """DEPRECATED: Use utilities.utc_datetime_from_matter_epoch_us instead"""
+    return new_utc_datetime_from_matter_epoch_us(matter_epoch_us)
+
+
+@_deprecated("utilities")
+def utc_datetime_from_posix_time_ms(posix_time_ms: int) -> datetime:
+    """DEPRECATED: Use utilities.utc_datetime_from_posix_time_ms instead"""
+    return new_utc_datetime_from_posix_time_ms(posix_time_ms)
+
+
+@_deprecated("utilities")
+def compare_time(time1: datetime, time2: datetime) -> bool:
+    """DEPRECATED: Use utilities.compare_time instead"""
+    return new_compare_time(time1, time2)
+
+
+@_deprecated("utilities")
+def get_wait_seconds_from_set_time(set_time: datetime) -> float:
+    """DEPRECATED: Use utilities.get_wait_seconds_from_set_time instead"""
+    return new_get_wait_seconds_from_set_time(set_time)
 
 
 class SimpleEventCallback:
@@ -672,8 +700,16 @@ class ClusterMapper:
                 return f"Attribute {attribute_name} ({attribute_id}, 0x{attribute_id:04X})"
 
 
-id_str = _deprecated("utilities")(_id_str)
-cluster_id_str = _deprecated("utilities")(_cluster_id_str)
+@_deprecated("utilities")
+def id_str(id: int) -> str:
+    """DEPRECATED: Use utilities.id_str instead"""
+    return new_id_str(id)
+
+
+@_deprecated("utilities")
+def cluster_id_str(id: int) -> str:
+    """DEPRECATED: Use utilities.cluster_id_str instead"""
+    return new_cluster_id_str(id)
 
 
 @dataclass
@@ -883,8 +919,16 @@ class MatterStackState:
         return builtins.chipStack
 
 
-bytes_from_hex = _deprecated("utilities")(_bytes_from_hex)
-hex_from_bytes = _deprecated("utilities")(_hex_from_bytes)
+@_deprecated("utilities")
+def bytes_from_hex(hex: str) -> bytes:
+    """DEPRECATED: Use utilities.bytes_from_hex instead"""
+    return new_bytes_from_hex
+
+
+@_deprecated("utilities")
+def hex_from_bytes(b: bytes) -> str:
+    """DEPRECATED: Use utilities.hex_from_bytes instead"""
+    return new_hex_from_bytes(bytes)
 
 
 @dataclass
