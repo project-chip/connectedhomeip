@@ -1,1 +1,1 @@
-101 : [Silabs] Update Silabs docker to support MG26 Modules.
+102 : Changed Dockerfile for crosscompile image.
