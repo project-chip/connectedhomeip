@@ -133,7 +133,8 @@ class TC_FAN_3_1(MatterBaseTest):
                                                    "Current FanMode must be greater than previous FanMode")
                         else:
                             # Verify the current FanMode is less than the previous FanMode
-                            asserts.assert_less(fan_mode_current, fan_mode_previous, "Current FanMode must be less than previous FanMode")
+                            asserts.assert_less(fan_mode_current, fan_mode_previous,
+                                                "Current FanMode must be less than previous FanMode")
 
                         logging.info(
                             f"[FANS] FanMode changed from {fan_mode_previous.name}({fan_mode_previous}) to {fan_mode_current.name}({fan_mode_current})")
