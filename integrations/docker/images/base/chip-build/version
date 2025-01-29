@@ -1,1 +1,1 @@
-102 : [nrfconnect] Fix ZEPHYR_SDK_INSTALL_DIR in chip-build-vscode
+103 : Changed sysroot for crosscompile image (new ubuntu version and includes NFC libs)
