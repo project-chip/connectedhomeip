@@ -332,7 +332,6 @@ data_model_XMLS = [
   "${chip_root}/data_model/1.4/device_types/ModeSelectDeviceType.xml",
   "${chip_root}/data_model/1.4/device_types/MountedDimmableLoadControl.xml",
   "${chip_root}/data_model/1.4/device_types/MountedOnOffControl.xml",
-  "${chip_root}/data_model/1.4/device_types/NetworkInfraIntro.xml",
   "${chip_root}/data_model/1.4/device_types/NetworkInfraManager.xml",
   "${chip_root}/data_model/1.4/device_types/OccupancySensor.xml",
   "${chip_root}/data_model/1.4/device_types/OnOffLight.xml",

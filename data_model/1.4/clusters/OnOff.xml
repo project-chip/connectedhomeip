@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021-2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -78,7 +78,7 @@ Davis, CA 95616, USA
         </notTerm>
       </optionalConform>
     </feature>
-    <feature bit="1" code="DF" name="DeadFrontBehavior" summary="Device has DeadFrontBehavior Feature">
+    <feature bit="1" code="DF" name="DeadFrontBehavior" summary="Device has Dead Front behavior">
       <optionalConform>
         <notTerm>
           <feature name="OFFONLY"/>
@@ -128,11 +128,7 @@ Davis, CA 95616, USA
       <item value="1" name="On" summary="Set the OnOff attribute to TRUE">
         <mandatoryConform/>
       </item>
-      <item value="2" name="Toggle" summary="If the previous value of the OnOff attribute is
-                   equal to FALSE, set the OnOff attribute to TRUE.
-                   If the previous value of the OnOff attribute is
-                   equal to TRUE, set the OnOff attribute to FALSE
-                   (toggle).">
+      <item value="2" name="Toggle" summary="If the previous value of the OnOff attribute is equal to FALSE, set the OnOff attribute to TRUE. If the previous value of the OnOff attribute is equal to TRUE, set the OnOff attribute to FALSE (toggle).">
         <mandatoryConform/>
       </item>
     </enum>
@@ -143,12 +139,12 @@ Davis, CA 95616, USA
     </bitmap>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="OnOff" type="bool" default="FALSE">
+    <attribute id="0x0000" name="OnOff" type="bool" default="false">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality scene="true" persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x4000" name="GlobalSceneControl" type="bool" default="TRUE">
+    <attribute id="0x4000" name="GlobalSceneControl" type="bool" default="true">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="LT"/>
@@ -168,7 +164,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x4003" name="StartUpOnOff" type="StartUpOnOffEnum" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
