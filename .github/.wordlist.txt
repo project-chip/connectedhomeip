@@ -85,6 +85,7 @@ ASR
 AssertionError
 AST
 ASYNC
+ATL
 ATLs
 atomics
 att
@@ -120,6 +121,7 @@ backend
 backends
 backticks
 backtrace
+badging
 BallastConfiguration
 BarrierControl
 BasicCHIPRegression
@@ -150,6 +152,7 @@ blocklist
 blockquote
 bluetoothd
 bluez
+BOM
 BOOL
 booleans
 BooleanState
@@ -192,6 +195,7 @@ CBB
 cbd
 CBOR
 Ccache
+CCB
 ccf
 CCMP
 CCS
@@ -662,6 +666,7 @@ HomePod
 HomePods
 hostapd
 hostname
+howtitworks
 href
 HSM
 hsm
@@ -1125,6 +1130,7 @@ preprocessor
 Presetup
 PressureMeasurement
 prj
+productionizing
 ProductID
 ProductLabel
 ProductName

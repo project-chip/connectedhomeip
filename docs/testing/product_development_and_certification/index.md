@@ -208,8 +208,8 @@ needs to be built into the shipping firmware. Update cadence affect the
 certification planning for the product since all updates need to be
 re-certified.
 
-[//]: #(TODO: do we want to talk about FSI / 0-day split? Matter doesn't
-actually have a good solution here)
+[//]: #(TODO: do we want to talk about factory shipping image / 0-day split?
+Matter doesn't actually have a good solution here)
 
 ### Other
 
@@ -280,9 +280,9 @@ harness or locally on a desktop for faster test iteration.
 
 ## OTAs and Re-Certification
 
--   General intro that you need to recertify OTAs
+-   General intro that you need to re-certify OTAs
 
-### Recertification
+### Re-Certification
 
 -   programs, fast track and requirements
 
