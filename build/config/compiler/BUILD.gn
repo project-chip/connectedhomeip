@@ -58,6 +58,9 @@ declare_args() {
 
   # Enable or disable support for C++ exceptions.
   enable_exceptions = false
+
+  # Disable this to allow for overriding built-in defines, such as __FILE__.
+  warn_builtin_macro_redefined = true
 }
 
 if (current_cpu == "arm" || current_cpu == "arm64") {
@@ -239,6 +242,9 @@ config("disabled_warnings") {
       "-Wno-psabi",
       "-Wno-maybe-uninitialized",
     ]
+  }
+  if (!warn_builtin_macro_redefined) {
+    cflags += [ "-Wno-builtin-macro-redefined" ]
   }
 }
 
