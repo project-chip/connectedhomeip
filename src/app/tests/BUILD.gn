@@ -252,7 +252,6 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    ":actions-cluster-test-srcs",
     ":app-test-stubs",
     ":binding-test-srcs",
     ":ecosystem-information-test-srcs",
