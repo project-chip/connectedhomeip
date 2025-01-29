@@ -221,7 +221,6 @@ void LightingAppCommandHandler::OnSoftwareFaultEventHandler(uint32_t eventId)
     Clusters::SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
 }
 
-
 void LightingAppCommandDelegate::OnEventCommandReceived(const char * json)
 {
     auto handler = LightingAppCommandHandler::FromJSON(json);
