@@ -35,6 +35,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
+from enum import Enum
 import logging
 import time
 import random
@@ -65,6 +66,10 @@ from chip.testing.matter_testing import (AttributeChangeCallback, EventChangeCal
 
 # import pdb
 
+class DirectionEnum(Enum):
+    Ascending = 1
+    Descending = 2
+
 logger = logging.getLogger(__name__)
 
 class TC_FAN_3_1(MatterBaseTest):
@@ -86,8 +91,8 @@ class TC_FAN_3_1(MatterBaseTest):
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.FanControl.Attributes.FanMode(fan_mode))])
         return result[0].Status
 
-    async def write_percent_setting(self, endpoint, percent_setting) -> Status:
-        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.FanControl.Attributes.PercentSetting(percent_setting))])
+    async def write_setting(self, endpoint, attr_to_write, value) -> Status:
+        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attr_to_write(value))])
         return result[0].Status
     
     async def read_valcc_attribute_expect_success(self, endpoint, attribute):
@@ -102,59 +107,66 @@ class TC_FAN_3_1(MatterBaseTest):
 
 
 
-    async def verify_fan_mode(self, attr_to_write, endpoint, timeout_sec):
+    async def verify_fan_mode(self, attr_to_write, endpoint, direction, timeout_sec):
+        logging.info(f"[FANS] Monitoring FanMode by writing to {attr_to_write.__name__} in {direction.name} order")
+        
+        # Setup
         cluster = Clusters.FanControl
-        attr_to_sub = cluster.Attributes.FanMode
+        attr_to_monitor = cluster.Attributes.FanMode
         attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
-        # TH: ChipDeviceController = self.default_controller
+        fan_mode_off = cluster.Enums.FanModeEnum.kOff
+        fan_mode_high = cluster.Enums.FanModeEnum.kHigh
 
-        await self.write_fan_mode(endpoint, cluster.Enums.FanModeEnum.kOff)
+        # Determine if values will be written ascending or descending
+        fan_mode_init = fan_mode_off if direction == DirectionEnum.Ascending else fan_mode_high
+        range_loop = range(1, 101) if direction == DirectionEnum.Ascending else range(100, -1, -1)
 
-        # Read FanMode and verify starting value of Off
+        # Write initial FanMode
+        write_result = await self.write_fan_mode(endpoint, fan_mode_init)
+        write_status_success = (write_result == Status.Success) or (write_result == Status.InvalidInState)
+        asserts.assert_true(write_status_success, f"FanMode write did not return a value of either SUCCESS or INVALID_IN_STATE ({write_result.name})")
+
+        # Read FanMode back and verify written value
         fan_mode_initial = await self.read_fan_mode(endpoint=endpoint)
         asserts.assert_in(fan_mode_initial, cluster.Enums.FanModeEnum, "FanMode read response doesn't contain a FanModeEnum")
 
-        print(f"\n\n\n\n\t\t\t [FANS] Start sub...\n\n\n\n")
         await attribute_subscription.start(self.default_controller, self.dut_node_id, endpoint)
 
-        print(f"\n\n\n\n\t\t\t [FANS] Let's loop!\n\n\n\n")
+        # Write to attribute iteratively within a range of 100, one at a time
         fan_mode_current = fan_mode_initial
         fan_mode_previous = fan_mode_initial
-
-        # Increment the PercentSetting attribute from 1 to 100, one by one
-        for value_to_write in range(1, 11):
-            value_to_write = value_to_write * 10
-
+        for value_to_write in range_loop:
             # Clear the queue
             attribute_subscription.get_last_report()
 
             # Write to attribute
-            write_result = await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(endpoint, attr_to_write(value=value_to_write))]
-            )
-            write_status = write_result[0].Status
-            write_status_success = (write_status == Status.Success) or (write_status == Status.InvalidInState)
-            asserts.assert_true(write_status_success, "PercentSetting write did not return a value of either Success or InvalidInState")
-            print(f"[FANS] Wrote value: {value_to_write}")
+            write_result = await self.write_setting(endpoint, attr_to_write, value_to_write)
+            write_status_success = (write_result == Status.Success) or (write_result == Status.InvalidInState)
+            asserts.assert_true(write_status_success, f"Attribute write did not return a value of either Success or InvalidInState")
+            logging.info(f"[FANS] Attribute value written: {value_to_write}")
 
-            # Wait for the FanMode attribute to be present in the queue
-            break_out = False
+            # Wait for the FanMode attribute to appear in the queue until the specified timeout
             start_time = time.time()
             elapsed = 0
             time_remaining = timeout_sec
+            break_out = False
             while time_remaining > 0:
-                q: queue.Queue = attribute_subscription.attribute_queue
+                q = attribute_subscription.attribute_queue
 
+                # Iterate through the queue items to search for the FanMode attribute
                 for q_item in list(q.queue):
-                    if q_item.attribute == attr_to_sub:
+                    if q_item.attribute == attr_to_monitor:
                         fan_mode_current = q_item.value
 
-                        # Verify the current FanMode is greater than the previous FanMode
-                        asserts.assert_greater(fan_mode_current, fan_mode_previous, "Current FanMode must be greater than previous FanMode")
-                        print(f"\t\t\t[FANS] FanMode change from {fan_mode_previous} to {fan_mode_current}")
+                        if direction == DirectionEnum.Ascending:
+                            # Verify the current FanMode is greater than the previous FanMode
+                            asserts.assert_greater(fan_mode_current, fan_mode_previous, "Current FanMode must be greater than previous FanMode")
+                        else:
+                            # Verify the current FanMode is less than the previous FanMode
+                            asserts.assert_less(fan_mode_current, fan_mode_previous, "Current FanMode must be less than previous FanMode")
+                            
+                        logging.info(f"[FANS] FanMode change from {fan_mode_previous.name}({fan_mode_previous}) to {fan_mode_current.name}({fan_mode_current})")
                         fan_mode_previous = fan_mode_current
-
                         break_out = True
                         break
 
@@ -173,12 +185,11 @@ class TC_FAN_3_1(MatterBaseTest):
     async def test_TC_FAN_3_1(self):
 
         endpoint = self.get_endpoint(default=1)
-        cluster = Clusters.FanControl
-        attr_to_write = cluster.Attributes.PercentSetting
-        timeout_sec = 0.1
+        attr_to_write = Clusters.FanControl.Attributes.PercentSetting
+        timeout_sec = 0.2
 
-        await self.verify_fan_mode(attr_to_write, endpoint, timeout_sec)
-        await self.verify_fan_mode(attr_to_write, endpoint, timeout_sec)
+        await self.verify_fan_mode(attr_to_write, endpoint, DirectionEnum.Ascending, timeout_sec)
+        await self.verify_fan_mode(attr_to_write, endpoint, DirectionEnum.Descending, timeout_sec)
         
         
         
