@@ -80,64 +80,13 @@ tests:
               - name: "StepMode"
                 value: 1
               - name: "StepSize"
-                value: 60
+                value: 80
               - name: "TransitionTime"
                 value: 200
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
-
-    - label: "Wait 10s"
-      PICS: CC.S.F00
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 10000
-
-    - label: "Step 2c: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              minValue: 195
-              maxValue: 254
-
-    - label: "Wait 10s"
-      PICS: CC.S.F00
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 10000
-
-    #Tolerance to be computed from the range
-    #Start value 230, expected value 5, 230 - 5 = 225, 225 % 15 = 34 , So 5+/-34 We need two range here as 254 is the max value
-    #Range will be: 230...254...0...39
-    #Multiple range not supported in YAML: https://github.com/project-chip/connectedhomeip/issues/23197
-    - label: "Step 2d: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
-      verification: |
-          ./chip-tool colorcontrol read current-hue 1 1
-
-          After another 10 seconds , Verify that CurrentHue value is 5 On  TH(chip-tool)  Logs and below is the sample log provided for the raspi platform
-
-          [1649662328.012887][8447:8452] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087279986
-          [1649662328.012957][8447:8452] CHIP:TOO:   Current hue: 5
-          [1649662328.013055][8447:8452] CHIP:EM: Sending Standalone Ack for MessageCounter:8634142 on exchange 13871i
-          (Value can vary)
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
 
     - label: "Wait 5s"
       PICS: CC.S.F00
@@ -148,25 +97,53 @@ tests:
               - name: "ms"
                 value: 5000
 
-    #Multiple range not supported in YAML: https://github.com/project-chip/connectedhomeip/issues/23197
-    - label: "Step 2e: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
-      verification: |
-          ./chip-tool colorcontrol read current-hue 1 1
+    - label: "Step 2c: TH reads CurrentHue attribute from DUT" # Expects 220+/-15%
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 187
+              maxValue: 253
 
-          After another 5 seconds , Verify that CurrentHue value is 5 On  TH(chip-tool)  Logs and below is the sample log provided for the raspi platform
-
-          [1649662328.012887][8447:8452] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087279986
-          [1649662328.012957][8447:8452] CHIP:TOO:   Current hue: 5
-          [1649662328.013055][8447:8452] CHIP:EM: Sending Standalone Ack for MessageCounter:8634142 on exchange 13871i
-      cluster: "LogCommands"
-      command: "UserPrompt"
+    - label: "Wait 15s"
+      PICS: CC.S.F00
+      cluster: "DelayCommands"
+      command: "WaitForMs"
       arguments:
           values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+              - name: "ms"
+                value: 15000
+
+    # Start value 220, expected value 24+/-15% (280 mod 256)
+    # Multiple range not supported in YAML: https://github.com/project-chip/connectedhomeip/issues/23197
+    - label: "Step 2d: TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+        constraints:
+          minValue: 20
+          maxValue: 28
+
+    - label: "Wait 5s"
+      PICS: CC.S.F00
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    # Multiple range not supported in YAML: https://github.com/project-chip/connectedhomeip/issues/23197
+    - label: "Step 2e: TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+        constraints:
+          minValue: 20
+          maxValue: 28
 
     - label:
           "Step 3a: TH sends MoveToHue command to DUT with Hue=50,
@@ -205,7 +182,7 @@ tests:
               - name: "StepMode"
                 value: 3
               - name: "StepSize"
-                value: 60
+                value: 100
               - name: "TransitionTime"
                 value: 200
               - name: "OptionsMask"
@@ -213,41 +190,41 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 10s"
+    - label: "Wait 5s"
       PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 10000
+                value: 5000
 
-    - label: "Step 3c: TH reads CurrentHue attribute from DUT"
+    - label: "Step 3c: TH reads CurrentHue attribute from DUT" # Expects 25+/-15%
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 17
-              maxValue: 23
+              minValue: 21
+              maxValue: 29
 
-    - label: "Wait 10s"
+    - label: "Wait 15s"
       PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 10000
+                value: 15000
 
-    - label: "Step 3d: TH reads CurrentHue attribute from DUT"
+    - label: "Step 3d: TH reads CurrentHue attribute from DUT" # Expects 206+/-15%
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 208
-              maxValue: 255
+              minValue: 175
+              maxValue: 237
 
     - label: "Wait 5s"
       PICS: CC.S.F00
@@ -264,8 +241,8 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 208
-              maxValue: 255
+              minValue: 175
+              maxValue: 237
 
     - label: "Step 4a: TH reads ColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0008
