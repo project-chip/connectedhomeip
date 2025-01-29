@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Note: GN does not support file globbing. File list generated as follows:
-# find data_model/1.4.1 -type f | sort | grep xml | awk '{print "\"${chip_root}/" $1 "\","}'
-
 import("//build_overrides/chip.gni")
 
 data_model_XMLS_1_3 = [
