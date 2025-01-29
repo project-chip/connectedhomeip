@@ -1,1 +1,1 @@
-101 : [Silabs] Update Silabs docker to support MG26 Modules.
+102 : [nrfconnect] Fix ZEPHYR_SDK_INSTALL_DIR in chip-build-vscode
