@@ -66,6 +66,7 @@ if (chip_build_tests) {
       "${chip_root}/src/protocols/interaction_model/tests",
       "${chip_root}/src/protocols/secure_channel/tests",
       "${chip_root}/src/protocols/user_directed_commissioning/tests",
+      "${chip_root}/src/lib/support/verhoeff/tests",
       "${chip_root}/src/system/tests",
       "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/transport/tests",
@@ -89,11 +90,11 @@ if (chip_build_tests) {
       # Avoid these items from "one single binary" test executions. Once tests
       # are split, we can re-visit this (and likely many others).
       #
-      # In particular: "app/codegen-data-model-provider/tests" contains
+      # In particular: "data-model-providers/codegen/tests" contains
       # symbols for ember mocks which are used by other tests.
 
       tests += [
-        "${chip_root}/src/app/codegen-data-model-provider/tests",
+        "${chip_root}/src/data-model-providers/codegen/tests",
         "${chip_root}/src/setup_payload/tests",
         "${chip_root}/src/transport/raw/tests",
       ]

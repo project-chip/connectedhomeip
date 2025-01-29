@@ -126,7 +126,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Network commissioning features supported by the device.
  */
-@property (nonatomic, readonly) MTRNetworkCommissioningFeature networkCommissioningFeatures MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly) MTRNetworkCommissioningFeature networkCommissioningFeatures MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 /**
  * Set the delegate to receive asynchronous callbacks about the device.
@@ -220,6 +220,15 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *         MTRAttributePathKey and an MTRDataKey.
  */
 - (NSArray<NSDictionary<NSString *, id> *> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
+
+/**
+ * Read all known attributes from descriptor clusters on all known endpoints.
+ *
+ * @return A dictionary with the paths of the attributes as keys and the
+ *         data-values (as described in the documentation for
+ *         MTRDeviceResponseHandler) as values.
+ */
+- (NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> *)descriptorClusters MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 /**
  * Invoke a command with a designated command path

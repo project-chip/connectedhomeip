@@ -40,5 +40,3 @@ chip_openthread_ftd = false
 nxp_enable_ot_cli = false
 
 chip_with_diag_logs_demo = true
-
-nxp_nvm_component = "nvs"
