@@ -36,7 +36,7 @@ address the common considerations for Matter product development.
 SDK development guides are available to aid in the process of software
 development and system and data model design. Information on Matter
 implementations is available at The SDK documentation is available in the
-[Matter Handbook SDK documentation] (https://handbook.buildwithmatter.com/sdk/).
+[Matter Handbook SDK documentation](https://handbook.buildwithmatter.com/sdk/).
 Information on the CSA open source SDK is available at the
 [Matter SDK documentation site](https://project-chip.github.io/connectedhomeip-doc/index.html).
 
@@ -64,10 +64,10 @@ Matter materials. Please see the documentation for your selected
 Device attestation certificates are used to attest devices as being authentic
 devices that are manufactured by the stated vendor and certified as a Matter
 device. The full attestation procedure and certificate set is described in the
-handbook [Device Attestation]
-(https://handbook.buildwithmatter.com/howitworks/attestation/) section. The
-attestation certificate chain matches the vendor and product IDs declared on the
-device and in the certification declaration.
+handbook
+[Device Attestation](https://handbook.buildwithmatter.com/howitworks/attestation/)
+section. The attestation certificate chain matches the vendor and product IDs
+declared on the device and in the certification declaration.
 
 The device attestation chain consists of the Device Attestation Certificate
 (DAC), which is signed by the Product Attestation Intermediate (PAI), which is
