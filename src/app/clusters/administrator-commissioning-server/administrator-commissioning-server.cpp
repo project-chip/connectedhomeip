@@ -38,6 +38,7 @@
 #include <setup_payload/SetupPayload.h>
 #include <system/SystemClock.h>
 #include <tracing/macros.h>
+#include <zap-generated/gen_config.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -63,8 +64,10 @@ private:
 
     // Methods to handle the various commands this cluster may receive.
     void OpenCommissioningWindow(HandlerContext & context, const Commands::OpenCommissioningWindow::DecodableType & commandData);
+#if ADMINISTRATOR_COMMISSIONING_ENABLE_OPEN_BASIC_COMMISSIONING_WINDOW_CMD
     void OpenBasicCommissioningWindow(HandlerContext & context,
                                       const Commands::OpenBasicCommissioningWindow::DecodableType & commandData);
+#endif
     void RevokeCommissioning(HandlerContext & context, const Commands::RevokeCommissioning::DecodableType & commandData);
 };
 
@@ -100,10 +103,12 @@ void AdministratorCommissioningServer::InvokeCommand(HandlerContext & context)
         HandleCommand<Commands::OpenCommissioningWindow::DecodableType>(
             context, [this](HandlerContext & ctx, const auto & commandData) { OpenCommissioningWindow(ctx, commandData); });
         break;
+#if ADMINISTRATOR_COMMISSIONING_ENABLE_OPEN_BASIC_COMMISSIONING_WINDOW_CMD
     case Commands::OpenBasicCommissioningWindow::Id:
         HandleCommand<Commands::OpenBasicCommissioningWindow::DecodableType>(
             context, [this](HandlerContext & ctx, const auto & commandData) { OpenBasicCommissioningWindow(ctx, commandData); });
         break;
+#endif
     case Commands::RevokeCommissioning::Id:
         HandleCommand<Commands::RevokeCommissioning::DecodableType>(
             context, [this](HandlerContext & ctx, const auto & commandData) { RevokeCommissioning(ctx, commandData); });
@@ -167,6 +172,7 @@ exit:
     }
 }
 
+#if ADMINISTRATOR_COMMISSIONING_ENABLE_OPEN_BASIC_COMMISSIONING_WINDOW_CMD
 void AdministratorCommissioningServer::OpenBasicCommissioningWindow(
     CommandHandlerInterface::HandlerContext & context, const Commands::OpenBasicCommissioningWindow::DecodableType & commandData)
 {
@@ -209,6 +215,7 @@ exit:
         context.mCommandHandler.AddStatus(context.mRequestPath, globalStatus);
     }
 }
+#endif
 
 void AdministratorCommissioningServer::RevokeCommissioning(CommandHandlerInterface::HandlerContext & context,
                                                            const Commands::RevokeCommissioning::DecodableType & commandData)
