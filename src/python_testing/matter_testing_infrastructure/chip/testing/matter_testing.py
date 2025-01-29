@@ -43,16 +43,16 @@ from itertools import chain
 from typing import Any, Iterable, List, Optional, Tuple
 
 from chip.tlv import uint
-from utilities import bytes_from_hex as _bytes_from_hex
-from utilities import cluster_id_str as _cluster_id_str
-from utilities import compare_time as _compare_time
-from utilities import get_wait_seconds_from_set_time as _get_wait_seconds_from_set_time
-from utilities import hex_from_bytes as _hex_from_bytes
-from utilities import id_str as _id_str
-from utilities import type_matches as _type_matches
-from utilities import utc_datetime_from_matter_epoch_us as _utc_datetime_from_matter_epoch_us
-from utilities import utc_datetime_from_posix_time_ms as _utc_datetime_from_posix_time_ms
-from utilities import utc_time_in_matter_epoch as _utc_time_in_matter_epoch
+from chip.testing.utilities import bytes_from_hex as _bytes_from_hex
+from chip.testing.utilities import cluster_id_str as _cluster_id_str
+from chip.testing.utilities import compare_time as _compare_time
+from chip.testing.utilities import get_wait_seconds_from_set_time as _get_wait_seconds_from_set_time
+from chip.testing.utilities import hex_from_bytes as _hex_from_bytes
+from chip.testing.utilities import id_str as _id_str
+from chip.testing.utilities import type_matches as _type_matches
+from chip.testing.utilities import utc_datetime_from_matter_epoch_us as _utc_datetime_from_matter_epoch_us
+from chip.testing.utilities import utc_datetime_from_posix_time_ms as _utc_datetime_from_posix_time_ms
+from chip.testing.utilities import utc_time_in_matter_epoch as _utc_time_in_matter_epoch
 
 # isort: off
 

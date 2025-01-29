@@ -47,6 +47,7 @@ pw_python_package("chip-testing-module") {
     "chip/testing/spec_parsing.py",
     "chip/testing/taglist_and_topology_test.py",
     "chip/testing/tasks.py",
+    "chip/testing/utilities.py",
   ]
   tests = [
     "chip/testing/test_metadata.py",
