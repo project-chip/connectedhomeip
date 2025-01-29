@@ -174,7 +174,7 @@ endpoint 0 {
 
 ## Parsing of IDLs
 
-IDL parsing is done within the `matter_idl` python package (this is the current
+IDL parsing is done within the `matter-idl` python package (this is the current
 directory of this README). Most of the heavy lifting is done by the lark using
 [matter_grammar.lark](./matter_grammar.lark), which is then turned into an AST:
 

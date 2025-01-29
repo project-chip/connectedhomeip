@@ -31,7 +31,7 @@ class ParseHandler(xml.sax.handler.ContentHandler):
        - sets up parsing location within the context
        - keeps track of ParsePath
 
-    Overall converts a python SAX handler into matter_idl.zapxml.handlers
+    Overall converts a python SAX handler into matter.idl.zapxml.handlers
     """
 
     def __init__(self, include_meta_data=True):

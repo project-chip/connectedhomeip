@@ -31,7 +31,7 @@ pw_python_package("matter_idl") {
     # Dependency grammar
     "matter/idl/matter_grammar.lark",
 
-    #marker file to indicate to mypy that matter_idl is type-annotated
+    # Marker file to indicate to mypy that matter_idl is type-annotated
     "matter/idl/py.typed",
 
     # Unit test data

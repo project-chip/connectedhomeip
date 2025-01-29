@@ -68,7 +68,7 @@ exclude:
     - "third_party/android_deps/gradlew" # gradle wrapper generated file
     - "src/controller/python/chip/clusters/Objects.py" # generated file, no point to restyle
     - "src/controller/python/chip/clusters/CHIPClusters.py" # generated file, no point to restyle
-    - "scripts/py_matter_idl/matter_idl/tests/outputs/**/*" # Matches generated output 1:1
+    - "scripts/py_matter_idl/matter/idl/tests/outputs/**/*" # Matches generated output 1:1
     - "scripts/tools/zap/tests/outputs/**/*" # Matches generated output 1:1
     - "examples/chef/sample_app_util/test_files/*.yaml"
     - "examples/chef/zzz_generated/**/*"

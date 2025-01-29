@@ -1,7 +1,7 @@
 
 import unittest
 
-import matter_idl.generators.filters as case_convert
+import matter.idl.generators.filters as case_convert
 
 '''
 This file contains tests for checking five of the case conversion functions, notably: snake_case, CONSTANT_CASE, spinal-case, PascalCase and camelCase.

@@ -126,7 +126,7 @@ def main(log_level, no_print, output, compare, compare_output, filenames):
     such as using:
 
     \b
-       ./scripts/py_matter_idl/matter_idl/data_model_xml_parser.py       \\
+       ./scripts/py_matter_idl/matter/idl/data_model_xml_parser.py       \\
           --compare src/controller/data_model/controller-clusters.matter \\
           --compare-output out/orig.matter                               \\
           --output out/from_xml.matter                                   \\
