@@ -32,13 +32,13 @@ from nrfconnect_generate_partition import PartitionCreator
 
 try:
     import qrcode
-    from SetupPayload import CommissioningFlow, SetupPayload
+    from matter_setup_payload import CommissioningFlow, SetupPayload
 except ImportError:
     SDK_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))
     sys.path.append(os.path.join(SDK_ROOT, "src/setup_payload/python"))
     try:
         import qrcode
-        from SetupPayload import CommissioningFlow, SetupPayload
+        from matter_setup_payload import CommissioningFlow, SetupPayload
     except ModuleNotFoundError or ImportError:
         no_onboarding_modules = True
     else:

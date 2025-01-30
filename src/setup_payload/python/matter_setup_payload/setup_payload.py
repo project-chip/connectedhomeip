@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright (c) 2024 Project CHIP Authors
+# Copyright (c) 2022-2024 Project CHIP Authors
 # All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,12 +17,12 @@
 
 import enum
 
-import Base38
-import click
 from bitarray import bitarray
 from bitarray.util import int2ba, zeros
 from construct import BitsInteger, BitStruct, Enum
 from stdnum.verhoeff import calc_check_digit
+
+from .base38 import Base38
 
 # Format for constructing manualcode
 manualcode_format = BitStruct(
@@ -58,6 +58,25 @@ class CommissioningFlow(enum.IntEnum):
 
 
 class SetupPayload:
+    """
+    Represents a Matter setup payload and provides methods for generating and parsing codes.
+
+    Attributes:
+        long_discriminator (int): The full 12-bit discriminator
+        short_discriminator (int): The 4-bit short discriminator
+        pincode (int): The setup PIN code
+        discovery (int): Rendezvous capabilities
+        flow (CommissioningFlow): The commissioning flow type
+        vid (int): Vendor ID
+        pid (int): Product ID
+
+    Methods:
+        p_print(): Print a formatted representation of the payload
+        generate_qrcode(): Generate a QR code string
+        generate_manualcode(): Generate a manual pairing code string
+        parse(payload): Parse a QR code or manual pairing code string
+    """
+
     def __init__(self, discriminator, pincode, rendezvous=4, flow=CommissioningFlow.Standard, vid=0, pid=0):
         self.long_discriminator = discriminator
         self.short_discriminator = discriminator >> 8
@@ -68,16 +87,16 @@ class SetupPayload:
         self.pid = pid
 
     def p_print(self):
-        print('{:<{}} :{}'.format('Flow', 24, self.flow))
-        print('{:<{}} :{}'.format('Pincode', 24, self.pincode))
-        print('{:<{}} :{}'.format('Short Discriminator', 24, self.short_discriminator))
-        if self.long_discriminator:
-            print('{:<{}} :{}'.format('Long Discriminator', 24, self.long_discriminator))
-        if self.discovery:
-            print('{:<{}} :{}'.format('Discovery Capabilities', 24, self.discovery))
-        if self.vid is not None and self.pid is not None:
-            print('{:<{}} :{:<{}} (0x{:04x})'.format('Vendor Id', 24, self.vid, 6, self.vid))
-            print('{:<{}} :{:<{}} (0x{:04x})'.format('Product Id', 24, self.pid, 6, self.pid))
+        """
+        Print a formatted representation of the payload.
+        """
+        print(f'{"Flow":<24} :{self.flow}')
+        print(f'{"Pincode":<24} :{self.pincode}')
+        print(f'{"Short Discriminator":<24} :{self.short_discriminator}')
+        print(f'{"Long Discriminator":<24} :{self.long_discriminator}')
+        print(f'{"Discovery Capabilities":<24} :{self.discovery}')
+        print(f'{"Vendor Id":<24} :{self.vid:<6} (0x{self.vid:04x})')
+        print(f'{"Product Id":<24} :{self.pid:<6} (0x{self.pid:04x})')
 
     def qrcode_dict(self):
         return {
@@ -104,11 +123,23 @@ class SetupPayload:
         }
 
     def generate_qrcode(self):
+        """
+        Generate a QR code string representation of the payload.
+
+        Returns:
+            str: The QR code string.
+        """
         data = qrcode_format.build(self.qrcode_dict())
         b38_encoded = Base38.encode(data[::-1])  # reversing
         return 'MT:{}'.format(b38_encoded)
 
     def generate_manualcode(self):
+        """
+        Generate a manual pairing code string representation of the payload.
+
+        Returns:
+            str: The manual pairing code string.
+        """
         CHUNK1_START = 0
         CHUNK1_LEN = 4
         CHUNK2_START = CHUNK1_START + CHUNK1_LEN
@@ -130,7 +161,16 @@ class SetupPayload:
 
     @staticmethod
     def from_container(container, is_qrcode):
-        payload = None
+        """
+        Create a SetupPayload instance from a parsed container.
+
+        Args:
+            container (dict): The parsed container with payload data.
+            is_qrcode (bool): True if the container is from a QR code, False for manual code.
+
+        Returns:
+            SetupPayload: A new SetupPayload instance.
+        """
         if is_qrcode:
             payload = SetupPayload(container['discriminator'], container['pincode'],
                                    container['discovery'], CommissioningFlow(container['flow'].__int__()),
@@ -149,6 +189,15 @@ class SetupPayload:
 
     @staticmethod
     def parse_qrcode(payload):
+        """
+        Parse a QR code string into a SetupPayload instance.
+
+        Args:
+            payload (str): The QR code string to parse.
+
+        Returns:
+            SetupPayload: A new SetupPayload instance.
+        """
         payload = payload[3:]  # remove 'MT:'
         b38_decoded = Base38.decode(payload)[::-1]
         container = qrcode_format.parse(b38_decoded)
@@ -156,6 +205,15 @@ class SetupPayload:
 
     @staticmethod
     def parse_manualcode(payload):
+        """
+        Parse a manual pairing code string into a SetupPayload instance.
+
+        Args:
+            payload (str): The manual pairing code string to parse.
+
+        Returns:
+            SetupPayload: A new SetupPayload instance, or None if parsing fails.
+        """
         payload_len = len(payload)
         if payload_len != 11 and payload_len != 21:
             print('Invalid length')
@@ -185,36 +243,16 @@ class SetupPayload:
 
     @staticmethod
     def parse(payload):
+        """
+        Parse either a QR code or manual pairing code string into a SetupPayload instance.
+
+        Args:
+            payload (str): The code string to parse.
+
+        Returns:
+            SetupPayload: A new SetupPayload instance.
+        """
         if payload.startswith('MT:'):
             return SetupPayload.parse_qrcode(payload)
         else:
             return SetupPayload.parse_manualcode(payload)
-
-
-@click.group()
-def cli():
-    pass
-
-
-@cli.command()
-@click.argument('payload')
-def parse(payload):
-    click.echo(f'Parsing payload: {payload}')
-    SetupPayload.parse(payload).p_print()
-
-
-@cli.command()
-@click.option('--discriminator', '-d', required=True, type=click.IntRange(0, 0xFFF), help='Discriminator')
-@click.option('--passcode', '-p', required=True, type=click.IntRange(1, 0x5F5E0FE), help='setup pincode')
-@click.option('--vendor-id', '-vid', type=click.IntRange(0, 0xFFFF), default=0, help='Vendor ID')
-@click.option('--product-id', '-pid', type=click.IntRange(0, 0xFFFF), default=0, help='Product ID')
-@click.option('--discovery-cap-bitmask', '-dm', type=click.IntRange(0, 7), default=4, help='Commissionable device discovery capability bitmask. 0:SoftAP, 1:BLE, 2:OnNetwork. Default: OnNetwork')
-@click.option('--commissioning-flow', '-cf', type=click.IntRange(0, 2), default=0, help='Commissioning flow, 0:Standard, 1:User-Intent, 2:Custom')
-def generate(passcode, discriminator, vendor_id, product_id, discovery_cap_bitmask, commissioning_flow):
-    payload = SetupPayload(discriminator, passcode, discovery_cap_bitmask, commissioning_flow, vendor_id, product_id)
-    print("Manualcode : {}".format(payload.generate_manualcode()))
-    print("QRCode     : {}".format(payload.generate_qrcode()))
-
-
-if __name__ == '__main__':
-    cli()
