@@ -22,8 +22,10 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
 #include <app/MessageDef/StatusIB.h>
+#include <app/RequiredPrivilege.h>
 #include <app/StatusResponse.h>
 #include <app/WriteHandler.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
@@ -43,6 +45,8 @@ namespace chip {
 namespace app {
 
 namespace {
+
+using Protocols::InteractionModel::Status;
 
 /// Wraps a EndpointIterator and ensures that `::Release()` is called
 /// for the iterator (assuming it is non-null)
@@ -754,6 +758,93 @@ void WriteHandler::MoveToState(const State aTargetState)
     ChipLogDetail(DataManagement, "IM WH moving to [%s]", GetStateStr());
 }
 
+DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::SubjectDescriptor & aSubject,
+                                                              const ConcreteDataAttributePath & aPath)
+{
+    // TODO: validate:
+    //   - existence of path (UnsupportedAccess)
+    //   - Read-only requirement (UnsupportedWrite)
+    //   - ACL:
+    //      - use previousSuccessPath
+    //   - timed write
+
+    // TODO: ordering is to check writability/existence BEFORE ACL and this seems wrong, however
+    //       existing unit tests (TC_AcessChecker.py) validate that we get UnsupportedWrite instead of UnsupportedAccess
+    //
+    //       This should likely be fixed in spec (probably already fixed by
+    //       https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/9024)
+    //       and tests and implementation
+    //
+    //       Open issue that needs fixing: https://github.com/project-chip/connectedhomeip/issues/33735
+    std::optional<DataModel::AttributeEntry> attributeEntry;
+    DataModel::AttributeFinder finder(mDataModelProvider);
+
+    attributeEntry = finder.Find(aPath);
+
+    // if path is not valid, return a spec-compliant return code.
+    if (!attributeEntry.has_value())
+    {
+        if (!DataModel::EndpointFinder(mDataModelProvider).Find(aPath.mEndpointId).has_value())
+        {
+            return Status::UnsupportedEndpoint;
+        }
+
+        if (!DataModel::ServerClusterFinder(mDataModelProvider).Find(aPath).has_value())
+        {
+            return Status::UnsupportedCluster;
+        }
+
+        return Status::UnsupportedAttribute;
+    }
+
+    // Allow writes on writable attributes only
+    VerifyOrReturnValue(attributeEntry->writePrivilege.has_value(), Status::UnsupportedWrite);
+
+    bool checkAcl = true;
+    if (mLastSuccessfullyWrittenPath.has_value())
+    {
+        // NOTE: explicit cast/check only for attribute path and nothing else.
+        //
+        //       In particular `request.path` is a DATA path (contains a list index)
+        //       and we do not want request.previousSuccessPath to be auto-cast to a
+        //       data path with a empty list and fail the compare.
+        //
+        //       This could be `request.previousSuccessPath != request.path` (where order
+        //       is important) however that would seem more brittle (relying that a != b
+        //       behaves differently than b != a due to casts). Overall Data paths are not
+        //       the same as attribute paths.
+        //
+        //       Also note that Concrete path have a mExpanded that is not used in compares.
+        const ConcreteAttributePath & attributePathA = aPath;
+        const ConcreteAttributePath & attributePathB = *mLastSuccessfullyWrittenPath;
+
+        checkAcl = (attributePathA != attributePathB);
+    }
+
+    if (checkAcl)
+    {
+        Access::RequestPath requestPath{ .cluster     = aPath.mClusterId,
+                                         .endpoint    = aPath.mEndpointId,
+                                         .requestType = Access::RequestType::kAttributeWriteRequest,
+                                         .entityId    = aPath.mAttributeId };
+        CHIP_ERROR err = Access::GetAccessControl().Check(aSubject, requestPath, RequiredPrivilege::ForWriteAttribute(aPath));
+
+        if (err != CHIP_NO_ERROR)
+        {
+            VerifyOrReturnValue(err != CHIP_ERROR_ACCESS_DENIED, Status::UnsupportedAccess);
+            VerifyOrReturnValue(err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL, Status::AccessRestricted);
+
+            return err;
+        }
+    }
+
+    // validate that timed write is enforced
+    VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->flags.Has(DataModel::AttributeQualityFlags::kTimed),
+                        Status::NeedsTimedInteraction);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & aSubject, const ConcreteDataAttributePath & aPath,
                                           TLV::TLVReader & aData)
 {
@@ -761,16 +852,19 @@ CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & aSub
     // the write is done via the DataModel interface
     VerifyOrReturnError(mDataModelProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    DataModel::WriteAttributeRequest request;
+    DataModel::ActionReturnStatus status = CheckWriteAllowed(aSubject, aPath);
+    if (status.IsSuccess())
+    {
+        DataModel::WriteAttributeRequest request;
 
-    request.path                = aPath;
-    request.subjectDescriptor   = &aSubject;
-    request.previousSuccessPath = mLastSuccessfullyWrittenPath;
-    request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
+        request.path                = aPath;
+        request.subjectDescriptor   = &aSubject;
+        request.previousSuccessPath = mLastSuccessfullyWrittenPath;
+        request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
 
-    AttributeValueDecoder decoder(aData, aSubject);
-
-    DataModel::ActionReturnStatus status = mDataModelProvider->WriteAttribute(request, decoder);
+        AttributeValueDecoder decoder(aData, aSubject);
+        status = mDataModelProvider->WriteAttribute(request, decoder);
+    }
 
     mLastSuccessfullyWrittenPath = status.IsSuccess() ? std::make_optional(aPath) : std::nullopt;
 

@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include "app/InteractionModelEngine.h"
+#include "app/data-model-provider/ActionReturnStatus.h"
 #include <app/AppConfig.h>
 #include <app/AttributeAccessToken.h>
 #include <app/AttributePathParams.h>
@@ -184,6 +186,14 @@ private:
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
+
+    /// Validate that a write is acceptable on the given path.
+    ///
+    /// Validates that ACL, writability and Timed interaction settings are ok.
+    ///
+    /// Returns a success status if all is ok, failure otherwise.
+    DataModel::ActionReturnStatus CheckWriteAllowed(const Access::SubjectDescriptor & aSubject, const ConcreteDataAttributePath & aPath);
+
 
     // Write the given data to the given path
     CHIP_ERROR WriteClusterData(const Access::SubjectDescriptor & aSubject, const ConcreteDataAttributePath & aPath,
