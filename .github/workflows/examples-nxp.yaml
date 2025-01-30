@@ -203,7 +203,6 @@ jobs:
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target nxp-rw61x-freertos-all-clusters-wifi \
-                      --target nxp-rw61x-freertos-all-clusters-wifi-ota-cmake \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "

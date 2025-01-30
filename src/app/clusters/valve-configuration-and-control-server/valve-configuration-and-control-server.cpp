@@ -309,7 +309,6 @@ CHIP_ERROR CloseValve(EndpointId ep)
 CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> openDuration)
 {
     Delegate * delegate        = GetDelegate(ep);
-    Optional<Status> status    = Optional<Status>::Missing();
     CHIP_ERROR attribute_error = CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
 
     if (HasFeature(ep, ValveConfigurationAndControl::Feature::kTimeSync))

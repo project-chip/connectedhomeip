@@ -54,19 +54,21 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0043" name="Proxy Discovery Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0043" name="ProxyDiscovery">
+    <clusterId id="0x0043" name="Proxy Discovery">
       <provisionalConform/>
     </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="PXDSC" scope="Node"/>
   <commands>
-    <command id="0x00" name="ProxyDiscoverRequest" direction="commandToServer">
+    <command id="0x00" name="ProxyDiscoverRequest" direction="commandToServer" response="N">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="SourceNodeId" type="node-id">
@@ -81,8 +83,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x01" name="ProxyDiscoverResponse" direction="commandToClient">
-      <access invokePrivilege="operate"/>
+    <command id="0x01" name="ProxyDiscoverResponse" direction="responseFromServer">
       <mandatoryConform/>
       <field id="0" name="SourceNodeId" type="node-id">
         <mandatoryConform/>

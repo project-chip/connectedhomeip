@@ -363,6 +363,8 @@ jobs:
                   python -m ensurepip --upgrade
                   python -m pip install -r scripts/setup/requirements.setuppayload.txt
                   python3 src/setup_payload/tests/run_python_setup_payload_test.py out/chip-tool
+            - name: Run revocation set generation tests
+              run: scripts/run_in_build_env.sh 'python3 -m unittest -v credentials/generate_revocation_set.py'
 
     build_linux_python_lighting_device:
         name: Build on Linux (python lighting-app)

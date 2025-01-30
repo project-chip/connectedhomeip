@@ -3136,9 +3136,9 @@ endpoint 0 {
     callback attribute clientsSupportedPerFabric;
     ram      attribute userActiveModeTriggerHint default = 0x1115;
     ram      attribute userActiveModeTriggerInstruction default = "Power Cycle";
-    ram      attribute operatingMode default = 0;
+    callback attribute operatingMode;
     callback attribute maximumCheckInBackOff;
-    ram      attribute featureMap default = 15;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
 
     handle command RegisterClient;

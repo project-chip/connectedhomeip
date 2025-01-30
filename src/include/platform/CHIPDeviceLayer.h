@@ -34,8 +34,8 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC
-#include <platform/NFCManager.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD
+#include <platform/NFCOnboardingPayloadManager.h>
 #endif
 
 namespace chip {
