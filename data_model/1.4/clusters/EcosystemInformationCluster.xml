@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 
-:sectnums:
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0750" name="Ecosystem Information Cluster" revision="1">
   <revisionHistory>
@@ -84,7 +84,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
       <field id="4" name="DeviceTypes" type="list">
-        <entry type="ref_DeviceTypeStruct"/>
+        <entry type="DeviceTypeStruct"/>
         <access fabricSensitive="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
@@ -109,7 +109,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="maxLength" value="64"/>
       </field>
-      <field id="1" name="LocationDescriptor" type="locationdesc">
+      <field id="1" name="LocationDescriptor" type="LocationDescriptorStruct">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
@@ -120,4 +120,18 @@ Davis, CA 95616, USA
       <access fabricScoped="true"/>
     </struct>
   </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="DeviceDirectory" type="list">
+      <entry type="EcosystemDeviceStruct"/>
+      <access read="true" readPrivilege="manage" fabricScoped="true"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="LocationDirectory" type="list">
+      <entry type="EcosystemLocationStruct"/>
+      <access read="true" readPrivilege="manage" fabricScoped="true"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+  </attributes>
 </cluster>

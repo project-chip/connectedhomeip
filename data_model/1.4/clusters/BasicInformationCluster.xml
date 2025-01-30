@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0028" name="Basic Information Cluster" revision="4">
   <revisionHistory>
@@ -175,131 +177,131 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="DataModelRevision" type="uint16" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0001" name="VendorName" type="string" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="maxLength" value="32"/>
     </attribute>
     <attribute id="0x0002" name="VendorID" type="vendor-id" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="ProductName" type="string" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="maxLength" value="32"/>
     </attribute>
     <attribute id="0x0004" name="ProductID" type="uint16" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0005" name="NodeLabel" type="string" default="&quot;">
+    <attribute id="0x0005" name="NodeLabel" type="string" default="&quot;&quot;">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
       <constraint type="maxLength" value="32"/>
     </attribute>
     <attribute id="0x0006" name="Location" type="string" default="&quot;XX&quot;">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="maxLength" value="2"/>
+      <constraint type="allowed" value="2"/>
     </attribute>
     <attribute id="0x0007" name="HardwareVersion" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0008" name="HardwareVersionString" type="string" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="lengthBetween" from="1" to="64"/>
     </attribute>
     <attribute id="0x0009" name="SoftwareVersion" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x000A" name="SoftwareVersionString" type="string" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="lengthBetween" from="1" to="64"/>
     </attribute>
     <attribute id="0x000B" name="ManufacturingDate" type="string" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform/>
       <constraint type="lengthBetween" from="8" to="16"/>
     </attribute>
     <attribute id="0x000C" name="PartNumber" type="string" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform/>
       <constraint type="maxLength" value="32"/>
     </attribute>
     <attribute id="0x000D" name="ProductURL" type="string" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform/>
       <constraint type="maxLength" value="256"/>
     </attribute>
     <attribute id="0x000E" name="ProductLabel" type="string" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform/>
       <constraint type="maxLength" value="64"/>
     </attribute>
     <attribute id="0x000F" name="SerialNumber" type="string" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform/>
       <constraint type="maxLength" value="32"/>
     </attribute>
-    <attribute id="0x0010" name="LocalConfigDisabled" type="bool" default="False">
+    <attribute id="0x0010" name="LocalConfigDisabled" type="bool" default="false">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0011" name="Reachable" type="bool" default="True">
+    <attribute id="0x0011" name="Reachable" type="bool" default="true">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0012" name="UniqueID" type="string" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="maxLength" value="32"/>
     </attribute>
     <attribute id="0x0013" name="CapabilityMinima" type="CapabilityMinimaStruct" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0014" name="ProductAppearance" type="ProductAppearanceStruct" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0015" name="SpecificationVersion" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0016" name="MaxPathsPerInvoke" type="uint16" default="1">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="min" value="1"/>
     </attribute>

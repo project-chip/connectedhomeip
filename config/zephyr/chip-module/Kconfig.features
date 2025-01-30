@@ -36,9 +36,9 @@ config MCUMGR_TRANSPORT_BT
 	bool
 	default y
 
-config MCUMGR_TRANSPORT_BT_AUTHEN
-	bool
-	default n
+choice MCUMGR_TRANSPORT_BT_PERM
+	default MCUMGR_TRANSPORT_BT_PERM_RW
+endchoice
 
 config MCUMGR_TRANSPORT_NETBUF_COUNT
 	int

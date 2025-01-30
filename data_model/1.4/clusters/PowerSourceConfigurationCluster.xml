@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002E" name="Power Source Configuration Cluster" revision="1">
   <revisionHistory>
@@ -67,7 +69,7 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="Sources" type="list">
       <entry type="endpoint-no"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
       <constraint type="maxCount" value="6"/>
     </attribute>

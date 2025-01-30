@@ -21,6 +21,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataList.h>
 #include <app/util/af-types.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 
@@ -66,14 +67,15 @@ public:
                                                         CommandHandler * handler) override;
 
     /// attribute tree iteration
-    DataModel::MetadataList<CommandId> GeneratedCommands(const ConcreteClusterPath & path) override;
-    DataModel::MetadataList<DataModel::AcceptedCommandEntry> AcceptedCommands(const ConcreteClusterPath & path) override;
-    DataModel::MetadataList<SemanticTag> SemanticTags(EndpointId endpointId) override;
-    DataModel::MetadataList<DataModel::DeviceTypeEntry> DeviceTypes(EndpointId endpointId) override;
-    DataModel::MetadataList<DataModel::EndpointEntry> Endpoints() override;
-    DataModel::MetadataList<ClusterId> ClientClusters(EndpointId endpointId) override;
-    DataModel::MetadataList<DataModel::ServerClusterEntry> ServerClusters(EndpointId endpointId) override;
-    DataModel::MetadataList<DataModel::AttributeEntry> Attributes(const ConcreteClusterPath & path) override;
+    CHIP_ERROR Endpoints(DataModel::ListBuilder<DataModel::EndpointEntry> & out) override;
+    CHIP_ERROR SemanticTags(EndpointId endpointId, DataModel::ListBuilder<SemanticTag> & builder) override;
+    CHIP_ERROR DeviceTypes(EndpointId endpointId, DataModel::ListBuilder<DataModel::DeviceTypeEntry> & builder) override;
+    CHIP_ERROR ClientClusters(EndpointId endpointId, DataModel::ListBuilder<ClusterId> & builder) override;
+    CHIP_ERROR ServerClusters(EndpointId endpointId, DataModel::ListBuilder<DataModel::ServerClusterEntry> & builder) override;
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, DataModel::ListBuilder<CommandId> & builder) override;
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, DataModel::ListBuilder<DataModel::AttributeEntry> & builder) override;
 
     void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
 

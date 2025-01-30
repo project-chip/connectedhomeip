@@ -42,8 +42,8 @@
 #
 
 import chip.clusters as Clusters
+from chip.testing import matter_asserts
 from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
 
 
 class TC_DGSW_2_2(MatterBaseTest):
@@ -66,22 +66,13 @@ class TC_DGSW_2_2(MatterBaseTest):
         """
 
         # Validate 'Id' field: Ensure it is a uint64 type
-        asserts.assert_true(
-            self.is_valid_uint_value(event_data.id, bit_count=64),
-            "The 'Id' field must be a uint64 type"
-        )
+        matter_asserts.assert_valid_uint64(event_data.id, "Id")
 
         # Validate 'Name' field: Ensure it is a string
-        asserts.assert_true(
-            isinstance(event_data.name, str),
-            "The 'Name' field must be a string type"
-        )
+        matter_asserts.assert_is_string(event_data.name, "Name")
 
         # Validate 'FaultRecording' field: Ensure it is an octet string (bytes or bytearray)
-        asserts.assert_true(
-            self.is_valid_octet_string(event_data.faultRecording),
-            "The 'FaultRecording' field must be an octet string (bytes or bytearray)"
-        )
+        matter_asserts.assert_is_octstr(event_data.faultRecording, "FaultRecording")
 
     def desc_TC_DGSW_2_2(self) -> str:
         """Returns a description of this test"""

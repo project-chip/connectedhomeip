@@ -79,26 +79,26 @@ Davis, CA 95616, USA
     <attribute id="0x0001" name="BorderAgentID" type="octstr">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="maxLength" value="16"/>
+      <constraint type="allowed" value="16"/>
     </attribute>
     <attribute id="0x0002" name="ThreadVersion" type="uint16" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="InterfaceEnabled" type="bool" default="false">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0004" name="ActiveDatasetTimestamp" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0005" name="PendingDatasetTimestamp" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
   </attributes>

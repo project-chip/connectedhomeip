@@ -75,19 +75,22 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="MeasuredValue" type="int16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" reportable="true"/>
       <mandatoryConform/>
-      <constraint type="between" from="MinMeasuredValue" to="MaxMeasuredValue"/>
+      <constraint type="between">
+        <from attribute="MinMeasuredValue"/>
+        <to attribute="MaxMeasuredValue"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="MinMeasuredValue" type="int16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
       <constraint type="max" value="32766"/>
     </attribute>
     <attribute id="0x0002" name="MaxMeasuredValue" type="int16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
       <constraint type="between" from="MinMeasuredValue + 1" to="32767"/>
     </attribute>
@@ -98,15 +101,18 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0010" name="ScaledValue" type="int16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="EXT"/>
       </mandatoryConform>
-      <constraint type="between" from="MinScaledValue" to="MaxScaledValue"/>
+      <constraint type="between">
+        <from attribute="MinScaledValue"/>
+        <to attribute="MaxScaledValue"/>
+      </constraint>
     </attribute>
     <attribute id="0x0011" name="MinScaledValue" type="int16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="EXT"/>
       </mandatoryConform>
@@ -114,7 +120,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0012" name="MaxScaledValue" type="int16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="EXT"/>
       </mandatoryConform>

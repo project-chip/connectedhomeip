@@ -270,19 +270,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetUpTime(uint64_t & upTime)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
 {
-    uint64_t upTimeS;
-
-    ReturnErrorOnFailure(GetUpTime(upTimeS));
-
-    uint64_t totalHours      = 0;
-    const uint32_t upTimeH   = upTimeS / 3600 < UINT32_MAX ? static_cast<uint32_t>(upTimeS / 3600) : UINT32_MAX;
-    const uint64_t deltaTime = upTimeH - PlatformMgrImpl().GetSavedOperationalHoursSinceBoot();
-
-    ReturnErrorOnFailure(ConfigurationMgr().GetTotalOperationalHours(reinterpret_cast<uint32_t &>(totalHours)));
-
-    totalOperationalHours = static_cast<uint32_t>(totalHours + deltaTime < UINT32_MAX ? totalHours + deltaTime : UINT32_MAX);
-
-    return CHIP_NO_ERROR;
+    // Update the total operational hours and get the most recent value.
+    return PlatformMgrImpl().UpdateOperationalHours(&totalOperationalHours);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)

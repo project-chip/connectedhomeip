@@ -25,8 +25,8 @@ RUN wget https://github.com/SiliconLabs/simplicity_sdk/releases/download/v2024.1
     && find /tmp/simplicity_sdk/protocol/openthread -name "*efr32mg21*" -delete \
     && find /tmp/simplicity_sdk \( -name "libsl_platform_ftd_efr32mg2*" -o -name "libsl_ot_stack_mtd_efr32mg2*" \) -type f -delete \
     && find /tmp/simplicity_sdk/hardware/board/config -mindepth 1 -maxdepth 1 -type d ! \( -name '*brd4186c*' -o -name '*brd4187c*' -o -name '*brd4186a*' -o -name '*brd4187a*' -o -name '*brd2601b*' -o -name '*brd2703a*' -o -name '*brd2704a*' -o -name '*component*' \
-    -o -name '*brd4316a*' -o -name '*brd4317a*' -o -name '*brd4318a*' -o -name '*brd4319a*' -o -name '*brd4116a*' -o -name '*brd4117a*' -o -name '*brd4118a*' -o -name '*brd2608a*' \) -exec rm -rf {} + \
-    && find /tmp/simplicity_sdk/platform/Device/SiliconLabs  -mindepth 1 -maxdepth 1 -type d ! \( -name 'EFR32MG24' -o -name 'EFR32MG26' -o -name 'MGM24' \) -exec rm -rf {} + \
+    -o -name '*brd4316a*' -o -name '*brd4317a*' -o -name '*brd4318a*' -o -name '*brd4319a*' -o -name '*brd4116a*' -o -name '*brd4117a*' -o -name '*brd4118a*' -o -name '*brd2608a*' -o -name '*brd4350a*' -o -name '*brd4351a*' -o -name '*brd2709a*' \) -exec rm -rf {} + \
+    && find /tmp/simplicity_sdk/platform/Device/SiliconLabs  -mindepth 1 -maxdepth 1 -type d ! \( -name 'EFR32MG24' -o -name 'EFR32MG26' -o -name 'MGM24' -o -name 'MGM26' \) -exec rm -rf {} + \
     && : # last line
 
 # Clone WiSeConnect Wi-Fi and Bluetooth Software 2.10.3 (b6d6cb5)

@@ -14,32 +14,34 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
 #import <Matter/MTRDefines.h>
+
+@class MTRDeviceTypeRevision;
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * A representation of a "device type revision" in the sense used in the Matter
- * specification.  This has an identifier and a version number.
+ * Meta-data about an endpoint of a Matter node.
  */
 NS_SWIFT_SENDABLE
-MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
-@interface MTRDeviceTypeRevision : NSObject <NSCopying>
+MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
+@interface MTREndpointInfo : NSObject <NSCopying, NSSecureCoding>
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
-/**
- * The provided deviceTypeID must be in the range 0xVVVV0000-0xVVVVBFFF, where
- * VVVV is the vendor identifier (0 for standard device types).
- *
- * The provided deviceTypeRevision must be in the range 1-65535.
- */
-- (nullable instancetype)initWithDeviceTypeID:(NSNumber *)deviceTypeID revision:(NSNumber *)revision;
+@property (nonatomic, copy, readonly) NSNumber * endpointID;
 
-@property (nonatomic, copy, readonly) NSNumber * deviceTypeID;
-@property (nonatomic, copy, readonly) NSNumber * deviceTypeRevision;
+@property (nonatomic, copy, readonly) NSArray<MTRDeviceTypeRevision *> * deviceTypes;
+@property (nonatomic, copy, readonly) NSArray<NSNumber *> * partsList;
+
+/**
+ * The direct children of this endpoint. This excludes indirect descendants
+ * even if they are listed in the PartsList attribute of this endpoint due
+ * to the Full-Family Pattern being used. Refer to Endpoint Composition Patterns
+ * in the Matter specification for details.
+ */
+@property (nonatomic, copy, readonly) NSArray<MTREndpointInfo *> * children;
 
 @end
 

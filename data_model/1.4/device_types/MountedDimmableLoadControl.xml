@@ -54,18 +54,19 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0110" name="Mounted Dimmable Load Control" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
-  <conditions/>
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
       <mandatoryConform/>
       <commands>
-        <command id="" name="TriggerEffect">
+        <command id="0x0040" name="TriggerEffect">
           <mandatoryConform/>
         </command>
       </commands>
@@ -92,13 +93,13 @@ Davis, CA 95616, USA
         </feature>
       </features>
       <attributes>
-        <attribute code="" name="CurrentLevel">
+        <attribute code="0x0000" name="CurrentLevel">
           <constraint type="between" from="1" to="254"/>
         </attribute>
-        <attribute code="" name="MinLevel">
+        <attribute code="0x0002" name="MinLevel">
           <constraint type="allowed" value="1"/>
         </attribute>
-        <attribute code="" name="MaxLevel">
+        <attribute code="0x0003" name="MaxLevel">
           <constraint type="allowed" value="254"/>
         </attribute>
       </attributes>
@@ -109,7 +110,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </otherwiseConform>
       <commands>
-        <command id="" name="CopyScene">
+        <command id="0x0040" name="CopyScene">
           <otherwiseConform>
             <provisionalConform/>
             <mandatoryConform/>

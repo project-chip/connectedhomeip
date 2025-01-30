@@ -42,7 +42,7 @@ COPY --from=telink /opt/telink/zephyr-sdk-0.16.1 /opt/telink/zephyr-sdk-0.16.1
 
 COPY --from=tizen /opt/tizen-sdk /opt/tizen-sdk
 
-COPY --from=crosscompile /opt/ubuntu-22.04.1-aarch64-sysroot /opt/ubuntu-22.04.1-aarch64-sysroot
+COPY --from=crosscompile /opt/ubuntu-24.04-aarch64-sysroot /opt/ubuntu-24.04-aarch64-sysroot
 
 COPY --from=ameba /opt/ameba /opt/ameba
 
@@ -124,12 +124,12 @@ ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools
 ENV OPENOCD_PATH=/opt/openocd/
 ENV QEMU_ESP32=/opt/espressif/qemu/qemu-system-xtensa
 ENV QEMU_ESP32_DIR=/opt/espressif/qemu
-ENV SYSROOT_AARCH64=/opt/ubuntu-22.04.1-aarch64-sysroot
+ENV SYSROOT_AARCH64=/opt/ubuntu-24.04-aarch64-sysroot
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.16.1
 ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.18.1
 ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
-ENV ZEPHYR_SDK_INSTALL_DIR=/opt/NordicSemiconductor/nRF5_tools/zephyr-sdk-0.16.5
+ENV ZEPHYR_SDK_INSTALL_DIR=/opt/NordicSemiconductor/nRF5_tools/zephyr-sdk-0.17.0
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 ENV ZEPHYR_NXP_BASE=/opt/nxp-zephyr/zephyrproject/zephyr
 ENV ZEPHYR_NXP_SDK_INSTALL_DIR=/opt/nxp-zephyr/zephyr-sdk-0.17.0

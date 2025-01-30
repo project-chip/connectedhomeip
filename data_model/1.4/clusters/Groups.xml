@@ -83,7 +83,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="NameSupport" type="NameSupportBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>

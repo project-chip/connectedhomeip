@@ -63,165 +63,6 @@ DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(const ConcreteCommandPat
     return entry;
 }
 
-/// Fills `result` with accepted command data. In case of failures,
-/// returns the first failure (and stops filling the result, which may
-/// be partial)
-CHIP_ERROR FetchAcceptedCommands(const ConcreteClusterPath & path, const EmberAfCluster * serverCluster,
-                                 DataModel::MetadataList<DataModel::AcceptedCommandEntry> & result)
-{
-
-    CommandHandlerInterface * interface =
-        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
-    if (interface != nullptr)
-    {
-        size_t commandCount = 0;
-
-        CHIP_ERROR err = interface->EnumerateAcceptedCommands(
-            path,
-            [](CommandId id, void * context) -> Loop {
-                *reinterpret_cast<size_t *>(context) += 1;
-                return Loop::Continue;
-            },
-            reinterpret_cast<void *>(&commandCount));
-
-        if (err == CHIP_NO_ERROR)
-        {
-            using EnumerationData = struct
-            {
-                ConcreteCommandPath commandPath;
-                DataModel::MetadataList<DataModel::AcceptedCommandEntry> acceptedCommandList;
-                CHIP_ERROR processingError;
-            };
-
-            EnumerationData enumerationData;
-            enumerationData.commandPath     = ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId);
-            enumerationData.processingError = CHIP_NO_ERROR;
-
-            ReturnErrorOnFailure(enumerationData.acceptedCommandList.Reserve(commandCount));
-
-            ReturnErrorOnFailure(interface->EnumerateAcceptedCommands(
-                path,
-                [](CommandId commandId, void * context) -> Loop {
-                    auto input                    = reinterpret_cast<EnumerationData *>(context);
-                    input->commandPath.mCommandId = commandId;
-                    CHIP_ERROR appendError        = input->acceptedCommandList.Append(AcceptedCommandEntryFor(input->commandPath));
-                    if (appendError != CHIP_NO_ERROR)
-                    {
-                        input->processingError = appendError;
-                        return Loop::Break;
-                    }
-                    return Loop::Continue;
-                },
-                reinterpret_cast<void *>(&enumerationData)));
-            ReturnErrorOnFailure(enumerationData.processingError);
-
-            // the two invocations MUST return the same sizes.
-            VerifyOrReturnError(enumerationData.acceptedCommandList.Size() == commandCount, CHIP_ERROR_INTERNAL);
-
-            result = std::move(enumerationData.acceptedCommandList);
-            return CHIP_NO_ERROR;
-        }
-        VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
-    }
-
-    if ((serverCluster == nullptr) || (serverCluster->acceptedCommandList == nullptr))
-    {
-        // No data if cluster does not exist or cluster has no accepted commands
-        return CHIP_NO_ERROR;
-    }
-    const chip::CommandId * endOfList = serverCluster->acceptedCommandList;
-    while (*endOfList != kInvalidCommandId)
-    {
-        endOfList++;
-    }
-    const size_t commandCount = static_cast<size_t>(endOfList - serverCluster->acceptedCommandList);
-
-    ReturnErrorOnFailure(result.Reserve(commandCount));
-
-    ConcreteCommandPath commandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId);
-    for (const chip::CommandId * p = serverCluster->acceptedCommandList; p != endOfList; p++)
-    {
-        commandPath.mCommandId = *p;
-        ReturnErrorOnFailure(result.Append(AcceptedCommandEntryFor(commandPath)));
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-/// Fills `result` with generated command data. In case of failures,
-/// returns the first failure (and stops filling the result, which may
-/// be partial)
-CHIP_ERROR FetchGeneratedCommands(const ConcreteClusterPath & path, const EmberAfCluster * serverCluster,
-                                  DataModel::MetadataList<CommandId> & result)
-{
-    CommandHandlerInterface * interface =
-        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
-    if (interface != nullptr)
-    {
-        size_t commandCount = 0;
-
-        CHIP_ERROR err = interface->EnumerateGeneratedCommands(
-            path,
-            [](CommandId id, void * context) -> Loop {
-                *reinterpret_cast<size_t *>(context) += 1;
-                return Loop::Continue;
-            },
-            reinterpret_cast<void *>(&commandCount));
-
-        if (err == CHIP_NO_ERROR)
-        {
-
-            using EnumerationData = struct
-            {
-                DataModel::MetadataList<CommandId> generatedCommandList;
-                CHIP_ERROR processingError;
-            };
-            EnumerationData enumerationData;
-            enumerationData.processingError = CHIP_NO_ERROR;
-
-            ReturnErrorOnFailure(enumerationData.generatedCommandList.Reserve(commandCount));
-
-            ReturnErrorOnFailure(interface->EnumerateGeneratedCommands(
-                path,
-                [](CommandId id, void * context) -> Loop {
-                    auto input = reinterpret_cast<EnumerationData *>(context);
-
-                    CHIP_ERROR appendError = input->generatedCommandList.Append(id);
-                    if (appendError != CHIP_NO_ERROR)
-                    {
-                        input->processingError = appendError;
-                        return Loop::Break;
-                    }
-                    return Loop::Continue;
-                },
-                reinterpret_cast<void *>(&enumerationData)));
-            ReturnErrorOnFailure(enumerationData.processingError);
-
-            // the two invocations MUST return the same sizes.
-            VerifyOrReturnError(enumerationData.generatedCommandList.Size() == commandCount, CHIP_ERROR_INTERNAL);
-
-            result = std::move(enumerationData.generatedCommandList);
-            return CHIP_NO_ERROR;
-        }
-        VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
-    }
-
-    if ((serverCluster == nullptr) || (serverCluster->generatedCommandList == nullptr))
-    {
-        // No data if cluster does not exist or cluster has no generated commands
-        return CHIP_NO_ERROR;
-    }
-    const chip::CommandId * endOfList = serverCluster->generatedCommandList;
-    while (*endOfList != kInvalidCommandId)
-    {
-        endOfList++;
-    }
-    const size_t commandCount = static_cast<size_t>(endOfList - serverCluster->generatedCommandList);
-    result = DataModel::MetadataList<CommandId>::FromConstSpan({ serverCluster->generatedCommandList, commandCount });
-
-    return CHIP_NO_ERROR;
-}
-
 DataModel::ServerClusterEntry ServerClusterEntryFrom(EndpointId endpointId, const EmberAfCluster & cluster)
 {
     DataModel::ServerClusterEntry entry;
@@ -275,18 +116,6 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
     // entry.flags.Set(DataModel::AttributeQualityFlags::kFabricSensitive)
     // entry.flags.Set(DataModel::AttributeQualityFlags::kChangesOmitted)
     return entry;
-}
-
-// TODO: DeviceTypeEntry content is IDENTICAL to EmberAfDeviceType, so centralizing
-//       to a common type is probably better. Need to figure out dependencies since
-//       this would make ember return datamodel-provider types.
-//       See: https://github.com/project-chip/connectedhomeip/issues/35889
-DataModel::DeviceTypeEntry DeviceTypeEntryFromEmber(const EmberAfDeviceType & other)
-{
-    return DataModel::DeviceTypeEntry{
-        .deviceTypeId       = other.deviceId,
-        .deviceTypeRevision = other.deviceVersion,
-    };
 }
 
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
@@ -350,21 +179,11 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
     return std::nullopt;
 }
 
-DataModel::MetadataList<DataModel::EndpointEntry> CodegenDataModelProvider::Endpoints()
+CHIP_ERROR CodegenDataModelProvider::Endpoints(DataModel::ListBuilder<DataModel::EndpointEntry> & builder)
 {
-    DataModel::MetadataList<DataModel::EndpointEntry> result;
-
     const uint16_t endpointCount = emberAfEndpointCount();
 
-    // allocate the max as some endpoints may be disabled
-    CHIP_ERROR err = result.Reserve(endpointCount);
-    if (err != CHIP_NO_ERROR)
-    {
-#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        ChipLogError(AppServer, "Failed to allocate space for endpoints: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
-        return {};
-    }
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(endpointCount));
 
     for (uint16_t endpointIndex = 0; endpointIndex < endpointCount; endpointIndex++)
     {
@@ -387,18 +206,10 @@ DataModel::MetadataList<DataModel::EndpointEntry> CodegenDataModelProvider::Endp
             entry.compositionPattern = DataModel::EndpointCompositionPattern::kTree;
             break;
         }
-
-        err = result.Append(entry);
-        if (err != CHIP_NO_ERROR)
-        {
-#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-            ChipLogError(AppServer, "Failed to append endpoint data: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
-            break;
-        }
+        ReturnErrorOnFailure(builder.Append(entry));
     }
 
-    return result;
+    return CHIP_NO_ERROR;
 }
 
 std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointId id) const
@@ -421,24 +232,16 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointI
     return std::make_optional<unsigned>(idx);
 }
 
-DataModel::MetadataList<DataModel::ServerClusterEntry> CodegenDataModelProvider::ServerClusters(EndpointId endpointId)
+CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
+                                                    DataModel::ListBuilder<DataModel::ServerClusterEntry> & builder)
 {
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);
 
-    DataModel::MetadataList<DataModel::ServerClusterEntry> result;
+    VerifyOrReturnValue(endpoint != nullptr, CHIP_ERROR_NOT_FOUND);
+    VerifyOrReturnValue(endpoint->clusterCount > 0, CHIP_NO_ERROR);
+    VerifyOrReturnValue(endpoint->cluster != nullptr, CHIP_NO_ERROR);
 
-    VerifyOrReturnValue(endpoint != nullptr, result);
-    VerifyOrReturnValue(endpoint->clusterCount > 0, result);
-    VerifyOrReturnValue(endpoint->cluster != nullptr, result);
-
-    CHIP_ERROR err = result.Reserve(emberAfClusterCountForEndpointType(endpoint, /* server = */ true));
-    if (err != CHIP_NO_ERROR)
-    {
-#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        ChipLogError(AppServer, "Failed to reserve space for client clusters: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
-        return {};
-    }
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(emberAfClusterCountForEndpointType(endpoint, /* server = */ true)));
 
     const EmberAfCluster * begin = endpoint->cluster;
     const EmberAfCluster * end   = endpoint->cluster + endpoint->clusterCount;
@@ -448,74 +251,43 @@ DataModel::MetadataList<DataModel::ServerClusterEntry> CodegenDataModelProvider:
         {
             continue;
         }
-
-        err = result.Append(ServerClusterEntryFrom(endpointId, *cluster));
-        if (err != CHIP_NO_ERROR)
-        {
-#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-            ChipLogError(AppServer, "Failed to append server cluster entry: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
-            break;
-        }
+        ReturnErrorOnFailure(builder.Append(ServerClusterEntryFrom(endpointId, *cluster)));
     }
 
-    return result;
+    return CHIP_NO_ERROR;
 }
 
-DataModel::MetadataList<DataModel::AttributeEntry> CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path)
+CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path,
+                                                DataModel::ListBuilder<DataModel::AttributeEntry> & builder)
 {
     const EmberAfCluster * cluster = FindServerCluster(path);
 
-    DataModel::MetadataList<DataModel::AttributeEntry> result;
+    VerifyOrReturnValue(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
+    VerifyOrReturnValue(cluster->attributeCount > 0, CHIP_NO_ERROR);
+    VerifyOrReturnValue(cluster->attributes != nullptr, CHIP_NO_ERROR);
 
-    VerifyOrReturnValue(cluster != nullptr, result);
-    VerifyOrReturnValue(cluster->attributeCount > 0, result);
-    VerifyOrReturnValue(cluster->attributes != nullptr, result);
-
-    CHIP_ERROR err = result.Reserve(cluster->attributeCount);
-    if (err != CHIP_NO_ERROR)
-    {
-#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        ChipLogError(AppServer, "Failed to reserve space for attributes: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
-        return {};
-    }
+    // TODO: if ember would encode data in AttributeEntry form, we could reference things directly
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(cluster->attributeCount));
 
     Span<const EmberAfAttributeMetadata> attributeSpan(cluster->attributes, cluster->attributeCount);
 
     for (auto & attribute : attributeSpan)
     {
-        err = result.Append(AttributeEntryFrom(path, attribute));
-        if (err != CHIP_NO_ERROR)
-        {
-#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-            ChipLogError(AppServer, "Failed to append attribute entry: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
-            break;
-        }
+        ReturnErrorOnFailure(builder.Append(AttributeEntryFrom(path, attribute)));
     }
 
-    return result;
+    return CHIP_NO_ERROR;
 }
 
-DataModel::MetadataList<ClusterId> CodegenDataModelProvider::ClientClusters(EndpointId endpointId)
+CHIP_ERROR CodegenDataModelProvider::ClientClusters(EndpointId endpointId, DataModel::ListBuilder<ClusterId> & builder)
 {
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);
 
-    DataModel::MetadataList<ClusterId> result;
+    VerifyOrReturnValue(endpoint != nullptr, CHIP_ERROR_NOT_FOUND);
+    VerifyOrReturnValue(endpoint->clusterCount > 0, CHIP_NO_ERROR);
+    VerifyOrReturnValue(endpoint->cluster != nullptr, CHIP_NO_ERROR);
 
-    VerifyOrReturnValue(endpoint != nullptr, result);
-    VerifyOrReturnValue(endpoint->clusterCount > 0, result);
-    VerifyOrReturnValue(endpoint->cluster != nullptr, result);
-
-    CHIP_ERROR err = result.Reserve(emberAfClusterCountForEndpointType(endpoint, /* server = */ false));
-    if (err != CHIP_NO_ERROR)
-    {
-#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        ChipLogError(AppServer, "Failed to reserve space for client clusters: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
-        return {};
-    }
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(emberAfClusterCountForEndpointType(endpoint, /* server = */ false)));
 
     const EmberAfCluster * begin = endpoint->cluster;
     const EmberAfCluster * end   = endpoint->cluster + endpoint->clusterCount;
@@ -525,18 +297,10 @@ DataModel::MetadataList<ClusterId> CodegenDataModelProvider::ClientClusters(Endp
         {
             continue;
         }
-
-        err = result.Append(cluster->clusterId);
-        if (err != CHIP_NO_ERROR)
-        {
-#if CHIP_ERROR_LOGGING && CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-            ChipLogError(AppServer, "Failed to append client cluster id: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
-            break;
-        }
+        ReturnErrorOnFailure(builder.Append(cluster->clusterId));
     }
 
-    return result;
+    return CHIP_NO_ERROR;
 }
 
 const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const ConcreteClusterPath & path)
@@ -557,37 +321,150 @@ const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const Concret
     return cluster;
 }
 
-DataModel::MetadataList<DataModel::AcceptedCommandEntry>
-CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path)
+CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path,
+                                                      DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    DataModel::MetadataList<DataModel::AcceptedCommandEntry> result;
-
-    [[maybe_unused]] CHIP_ERROR err = FetchAcceptedCommands(path, FindServerCluster(path), result);
-
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-    if (err != CHIP_NO_ERROR)
+    CommandHandlerInterface * interface =
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
+    if (interface != nullptr)
     {
-        ChipLogError(DataManagement, "Failed to fetch accepted commands: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-#endif
+        size_t commandCount = 0;
 
-    return result;
+        CHIP_ERROR err = interface->EnumerateAcceptedCommands(
+            path,
+            [](CommandId id, void * context) -> Loop {
+                *reinterpret_cast<size_t *>(context) += 1;
+                return Loop::Continue;
+            },
+            reinterpret_cast<void *>(&commandCount));
+
+        if (err == CHIP_NO_ERROR)
+        {
+            using EnumerationData = struct
+            {
+                ConcreteCommandPath commandPath;
+                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> * acceptedCommandList;
+                CHIP_ERROR processingError;
+            };
+
+            EnumerationData enumerationData;
+            enumerationData.commandPath         = ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId);
+            enumerationData.processingError     = CHIP_NO_ERROR;
+            enumerationData.acceptedCommandList = &builder;
+
+            ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
+
+            ReturnErrorOnFailure(interface->EnumerateAcceptedCommands(
+                path,
+                [](CommandId commandId, void * context) -> Loop {
+                    auto input                    = reinterpret_cast<EnumerationData *>(context);
+                    input->commandPath.mCommandId = commandId;
+                    CHIP_ERROR appendError        = input->acceptedCommandList->Append(AcceptedCommandEntryFor(input->commandPath));
+                    if (appendError != CHIP_NO_ERROR)
+                    {
+                        input->processingError = appendError;
+                        return Loop::Break;
+                    }
+                    return Loop::Continue;
+                },
+                reinterpret_cast<void *>(&enumerationData)));
+            ReturnErrorOnFailure(enumerationData.processingError);
+
+            // the two invocations MUST return the same sizes.
+            VerifyOrReturnError(builder.Size() == commandCount, CHIP_ERROR_INTERNAL);
+            return CHIP_NO_ERROR;
+        }
+        VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
+    }
+
+    const EmberAfCluster * serverCluster = FindServerCluster(path);
+    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
+    VerifyOrReturnError(serverCluster->acceptedCommandList != nullptr, CHIP_NO_ERROR);
+
+    const chip::CommandId * endOfList = serverCluster->acceptedCommandList;
+    while (*endOfList != kInvalidCommandId)
+    {
+        endOfList++;
+    }
+    const auto commandCount = static_cast<size_t>(endOfList - serverCluster->acceptedCommandList);
+
+    // TODO: if ember would store command entries, we could simplify this code to use static data
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
+
+    ConcreteCommandPath commandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId);
+    for (const chip::CommandId * p = serverCluster->acceptedCommandList; p != endOfList; p++)
+    {
+        commandPath.mCommandId = *p;
+        ReturnErrorOnFailure(builder.Append(AcceptedCommandEntryFor(commandPath)));
+    }
+
+    return CHIP_NO_ERROR;
 }
 
-DataModel::MetadataList<CommandId> CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path)
+CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path,
+                                                       DataModel::ListBuilder<CommandId> & builder)
 {
-    DataModel::MetadataList<CommandId> result;
-
-    [[maybe_unused]] CHIP_ERROR err = FetchGeneratedCommands(path, FindServerCluster(path), result);
-
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-    if (err != CHIP_NO_ERROR)
+    CommandHandlerInterface * interface =
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
+    if (interface != nullptr)
     {
-        ChipLogError(DataManagement, "Failed to fetch generated commands: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-#endif
+        size_t commandCount = 0;
 
-    return result;
+        CHIP_ERROR err = interface->EnumerateGeneratedCommands(
+            path,
+            [](CommandId id, void * context) -> Loop {
+                *reinterpret_cast<size_t *>(context) += 1;
+                return Loop::Continue;
+            },
+            reinterpret_cast<void *>(&commandCount));
+
+        if (err == CHIP_NO_ERROR)
+        {
+            ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
+
+            using EnumerationData = struct
+            {
+                DataModel::ListBuilder<CommandId> * generatedCommandList;
+                CHIP_ERROR processingError;
+            };
+            EnumerationData enumerationData;
+            enumerationData.processingError      = CHIP_NO_ERROR;
+            enumerationData.generatedCommandList = &builder;
+
+            ReturnErrorOnFailure(interface->EnumerateGeneratedCommands(
+                path,
+                [](CommandId id, void * context) -> Loop {
+                    auto input = reinterpret_cast<EnumerationData *>(context);
+
+                    CHIP_ERROR appendError = input->generatedCommandList->Append(id);
+                    if (appendError != CHIP_NO_ERROR)
+                    {
+                        input->processingError = appendError;
+                        return Loop::Break;
+                    }
+                    return Loop::Continue;
+                },
+                reinterpret_cast<void *>(&enumerationData)));
+            ReturnErrorOnFailure(enumerationData.processingError);
+
+            // the two invocations MUST return the same sizes.
+            VerifyOrReturnError(builder.Size() == commandCount, CHIP_ERROR_INTERNAL);
+            return CHIP_NO_ERROR;
+        }
+        VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
+    }
+
+    const EmberAfCluster * serverCluster = FindServerCluster(path);
+    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
+    VerifyOrReturnError(serverCluster->generatedCommandList != nullptr, CHIP_NO_ERROR);
+
+    const chip::CommandId * endOfList = serverCluster->generatedCommandList;
+    while (*endOfList != kInvalidCommandId)
+    {
+        endOfList++;
+    }
+    const auto commandCount = static_cast<size_t>(endOfList - serverCluster->generatedCommandList);
+    return builder.ReferenceExisting({ serverCluster->generatedCommandList, commandCount });
 }
 
 void CodegenDataModelProvider::InitDataModelForTesting()
@@ -596,7 +473,8 @@ void CodegenDataModelProvider::InitDataModelForTesting()
     InitDataModelHandler();
 }
 
-DataModel::MetadataList<DataModel::DeviceTypeEntry> CodegenDataModelProvider::DeviceTypes(EndpointId endpointId)
+CHIP_ERROR CodegenDataModelProvider::DeviceTypes(EndpointId endpointId,
+                                                 DataModel::ListBuilder<DataModel::DeviceTypeEntry> & builder)
 {
     std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpointId);
     if (!endpoint_index.has_value())
@@ -604,34 +482,13 @@ DataModel::MetadataList<DataModel::DeviceTypeEntry> CodegenDataModelProvider::De
         return {};
     }
 
-    CHIP_ERROR err                            = CHIP_NO_ERROR;
-    Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    DataModel::MetadataList<DataModel::DeviceTypeEntry> result;
-    err = result.Reserve(deviceTypes.size());
-    if (err != CHIP_NO_ERROR)
-    {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        ChipLogError(AppServer, "Failed to reserve device type buffer space: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
-        return {};
-    }
-    for (auto & entry : deviceTypes)
-    {
-        err = result.Append(DeviceTypeEntryFromEmber(entry));
-        if (err != CHIP_NO_ERROR)
-        {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-            ChipLogError(AppServer, "Failed to append device type entry: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
-            break;
-        }
-    }
-
-    return result;
+    builder.ReferenceExisting(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
+    return CHIP_NO_ERROR;
 }
 
-DataModel::MetadataList<DataModel::Provider::SemanticTag> CodegenDataModelProvider::SemanticTags(EndpointId endpointId)
+CHIP_ERROR CodegenDataModelProvider::SemanticTags(EndpointId endpointId, DataModel::ListBuilder<SemanticTag> & builder)
 {
     DataModel::Provider::SemanticTag semanticTag;
     size_t count = 0;
@@ -640,38 +497,16 @@ DataModel::MetadataList<DataModel::Provider::SemanticTag> CodegenDataModelProvid
     {
         count++;
     }
-    DataModel::MetadataList<DataModel::Provider::SemanticTag> result;
 
-    CHIP_ERROR err = result.Reserve(count);
-    if (err != CHIP_NO_ERROR)
-    {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        ChipLogError(AppServer, "Failed to reserve semantic tag buffer space: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
-        return {};
-    }
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(count));
 
     for (size_t idx = 0; idx < count; idx++)
     {
-        err = GetSemanticTagForEndpointAtIndex(endpointId, idx, semanticTag);
-        if (err != CHIP_NO_ERROR)
-        {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-            ChipLogError(AppServer, "Failed to get semantic tag data: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
-            break;
-        }
-        err = result.Append(semanticTag);
-        if (err != CHIP_NO_ERROR)
-        {
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-            ChipLogError(AppServer, "Failed to append semantic tag: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
-            break;
-        }
+        ReturnErrorOnFailure(GetSemanticTagForEndpointAtIndex(endpointId, idx, semanticTag));
+        ReturnErrorOnFailure(builder.Append(semanticTag));
     }
 
-    return result;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace app

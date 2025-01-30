@@ -64,7 +64,7 @@ struct InternalFlashFactoryData
     // 2) it does not exceed the settings partition start address
     // Note that this block can overlap with app partition but this is not a problem since we do not aim to modify
     // the application code at runtime anyway.
-    constexpr size_t FactoryDataBlockBegin()
+    static constexpr size_t FactoryDataBlockBegin()
     {
         // calculate the nearest multiple of CONFIG_FPROTECT_BLOCK_SIZE smaller than FACTORY_DATA_ADDRESS
         return FACTORY_DATA_ADDRESS & (-CONFIG_FPROTECT_BLOCK_SIZE);
@@ -76,11 +76,19 @@ struct InternalFlashFactoryData
         // and make sure we do not overlap with settings partition
         constexpr size_t kFactoryDataBlockEnd =
             (FACTORY_DATA_ADDRESS + FACTORY_DATA_SIZE + CONFIG_FPROTECT_BLOCK_SIZE - 1) & (-CONFIG_FPROTECT_BLOCK_SIZE);
-        static_assert(kFactoryDataBlockEnd <= PM_SETTINGS_STORAGE_ADDRESS,
+
+        // Only the partition that is protected by fprotect must be aligned to fprotect block size
+        constexpr size_t kSettingsBlockEnd = PM_SETTINGS_STORAGE_ADDRESS + PM_SETTINGS_STORAGE_SIZE;
+
+        constexpr bool kOverlapsCheck =
+            (kSettingsBlockEnd <= FactoryDataBlockBegin()) || (kFactoryDataBlockEnd <= PM_SETTINGS_STORAGE_ADDRESS);
+
+        static_assert(kOverlapsCheck,
                       "FPROTECT memory block, which contains factory data"
                       "partition overlaps with the settings partition."
                       "Probably your settings partition size is not a multiple"
                       "of the atomic FPROTECT block size of " TO_STR(CONFIG_FPROTECT_BLOCK_SIZE) "kB");
+
         return kFactoryDataBlockEnd - FactoryDataBlockBegin();
     }
 #undef TO_STR
