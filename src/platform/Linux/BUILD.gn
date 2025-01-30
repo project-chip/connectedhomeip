@@ -77,7 +77,7 @@ static_library("Linux") {
   ]
 
   cflags = [
-    "-I/tmp/pcsc-lib/include/PCSC",  # Needed for NFCCommissioningManagerImpl
+    "-I/usr/include/PCSC",  # Needed for NFCCommissioningManagerImpl
   ]
 
   libs = [
