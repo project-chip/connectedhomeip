@@ -79,7 +79,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-tizen-qemu:104
+            image: ghcr.io/project-chip/chip-build-tizen-qemu:98
             options: --user root
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
