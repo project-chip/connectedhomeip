@@ -2,11 +2,10 @@
 
 ## Individual size information
 
-`file_size_from_nm.py` is able to build an interactive tree
-map of methods/namespaces sizes within an elf binary.
+`file_size_from_nm.py` is able to build an interactive tree map of
+methods/namespaces sizes within an elf binary.
 
-Use it to determine how much space specific parts of the code
-take. For example:
+Use it to determine how much space specific parts of the code take. For example:
 
 ```
 ./scripts/tools/file_size_from_nm.py \
@@ -20,16 +19,16 @@ could result in a graph like:
 
 ## Determine difference between two binaries
 
-`binary_elf_size_diff` provides the ability to compare two elf files.
-Usually you can build the master branch of a binary and save it somewhere like `./out/master.elf`
-and then re-build with changes and compare.
+`binary_elf_size_diff` provides the ability to compare two elf files. Usually
+you can build the master branch of a binary and save it somewhere like
+`./out/master.elf` and then re-build with changes and compare.
 
 Example runs:
 
 ```
 > ~/devel/chip-scripts/bindiff.py \
   ./out/qpg-qpg6105-light/chip-qpg6105-lighting-example.out \
-  ./out/qpg-master.out 
+  ./out/qpg-master.out
 
 Type       Size  Function
 -------  ------  -----------------------------------------------------------------------------------------------------------------------
