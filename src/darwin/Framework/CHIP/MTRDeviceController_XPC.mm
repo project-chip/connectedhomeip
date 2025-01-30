@@ -60,6 +60,10 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
                                                : (NSDictionary *) controllerState, updateControllerConfiguration
                                                : (NSDictionary *) controllerState)
 
+MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(deleteNodeID
+                                               : (NSNumber *) nodeID, deleteNodeID
+                                               : (NSNumber *) nodeID)
+
 - (void)_updateRegistrationInfo
 {
     NSMutableDictionary * registrationInfo = [NSMutableDictionary dictionary];
@@ -93,6 +97,13 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
 {
     [super removeDevice:device];
     [self _updateRegistrationInfo];
+}
+
+- (void)forgetDeviceWithNodeID:(NSNumber *)nodeID
+{
+    MTR_LOG("%@: Forgetting device with node ID: %@", self, nodeID);
+    [self deleteNodeID:nodeID];
+    [super forgetDeviceWithNodeID:nodeID];
 }
 
 #pragma mark - XPC

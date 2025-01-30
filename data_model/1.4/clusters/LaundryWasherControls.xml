@@ -51,9 +51,11 @@ are the sole property of their respective owners.
 
 This notice and disclaimer must be included on all copies of this document.
 
-Connectivity Standards Alliance +
-508 Second Street, Suite 206 +
+Connectivity Standards Alliance
+508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0053" name="Laundry Washer Controls Cluster" revision="2">
   <revisionHistory>
@@ -66,10 +68,10 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="WASHERCTRL" scope="Endpoint"/>
   <features>
     <feature bit="0" code="SPIN" name="Spin" summary="Multiple spin speeds supported">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="1" code="RINSE" name="Rinse" summary="Multiple rinse cycles supported">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
   </features>
   <dataTypes>
@@ -109,7 +111,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="SpinSpeedCurrent" type="uint8" default="desc">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="SPIN"/>
       </mandatoryConform>

@@ -1193,6 +1193,21 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return deviceToReturn;
 }
 
+- (void)forgetDeviceWithNodeID:(NSNumber *)nodeID
+{
+    MTR_LOG("%@: Forgetting device with node ID: %@", self, nodeID);
+
+    // Tear down any existing MTRDevice for this nodeID first, so we don't run
+    // into issues with it storing data after we have deleted it.
+    [super forgetDeviceWithNodeID:nodeID];
+
+    if (_controllerDataStore) {
+        [_controllerDataStore clearResumptionInfoForNodeID:nodeID];
+        [_controllerDataStore clearDeviceDataForNodeID:nodeID];
+        [_controllerDataStore clearStoredClusterDataForNodeID:nodeID];
+    }
+}
+
 #ifdef DEBUG
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
 {

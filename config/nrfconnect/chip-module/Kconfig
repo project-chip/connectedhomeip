@@ -17,8 +17,12 @@
 rsource "../../zephyr/Kconfig"
 
 config CHIP
-	imply NVS_LOOKUP_CACHE
-	imply NVS_LOOKUP_CACHE_FOR_SETTINGS
+	imply NVS if !SOC_FLASH_NRF_RRAM
+	imply NVS_LOOKUP_CACHE if !SOC_FLASH_NRF_RRAM
+	imply NVS_LOOKUP_CACHE_FOR_SETTINGS if !SOC_FLASH_NRF_RRAM
+	imply ZMS if SOC_FLASH_NRF_RRAM
+	imply ZMS_LOOKUP_CACHE if SOC_FLASH_NRF_RRAM
+	imply ZMS_LOOKUP_CACHE_FOR_SETTINGS if SOC_FLASH_NRF_RRAM
 
 if CHIP
 
@@ -91,8 +95,32 @@ config CHIP_DEBUG_SYMBOLS
 	help
 	  Enables building the application with debug symbols.
 
+config CHIP_LOG_VERIFY_OR_DIE
+	bool "Log source code location on VerifyOrDie failure"
+	help
+	  Enables the feature to log the file name and line number where the Matter
+	  stack calls the VerifyOrDie macro with the condition evaluating to false.
+
+config CHIP_LOG_FILE_NAME
+	bool "Log file name instead of entire file path"
+	default y
+	help
+	  Enables using a file name instead of an entire file path whenever the
+	  source code location needs to be logged. This is achieved by overriding
+	  the __FILE__ macro with __FILE_NAME__.
+	  This reduces the code size in debug configurations that enable verbose
+	  assertion macros.
+
 config CHIP_MALLOC_SYS_HEAP
 	default y if !ARCH_POSIX
+
+config CHIP_TASK_STACK_SIZE
+	int "The CHIP (Matter) thread stack size"
+	default 10240 if (LTO || PSA_CRYPTO_DRIVER_CC3XX)
+	default 9216 if PSA_CRYPTO_DRIVER_CRACEN
+	default 6144
+	help
+	  Configures the stack size available for the CHIP (Matter) thread.
 
 config CHIP_FACTORY_DATA
 	bool "Factory data provider"
@@ -138,7 +166,7 @@ config CHIP_FACTORY_DATA_ROTATING_DEVICE_UID_MAX_LEN
 config CHIP_FACTORY_DATA_WRITE_PROTECT
 	bool "Enable Factory Data write protection"
 	select FPROTECT
-	depends on CHIP_FACTORY_DATA
+	depends on CHIP_FACTORY_DATA && !SOC_SERIES_NRF54LX
 	default y
 	help
 		Enables the write protection of the Factory Data partition in the flash memory.
@@ -239,9 +267,9 @@ config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
 endif # CHIP_FACTORY_DATA_BUILD
 
 # See config/zephyr/Kconfig for full definition
-config CHIP_FACTORY_RESET_ERASE_NVS
-	bool
+config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	default y
+	depends on NVS || ZMS
 
 config CHIP_LOG_SIZE_OPTIMIZATION
 	bool "Disable some detailed logs to decrease flash usage"
@@ -296,6 +324,42 @@ config CHIP_PERSISTENT_SUBSCRIPTIONS
 	default n
 	# selecting experimental for this feature since there is an issue with multiple controllers.
 	select EXPERIMENTAL
+
+config CHIP_MAX_FABRICS
+	int "Maximum number of Matter fabrics"
+	default 5
+	help
+	  The maximum number of Matter fabrics that device can be joined to.
+
+config CHIP_MAX_ACTIVE_CASE_CLIENTS
+	int "Maximum number of outgoing CASE sessions"
+	default CHIP_MAX_FABRICS if CHIP_PERSISTENT_SUBSCRIPTIONS
+	default 2
+	help
+	  The maximum number of outgoing CASE sessions that can be simutaneously handled by the end device.
+
+config CHIP_MAX_ACTIVE_DEVICES
+	int "Maximum number of simultaneous connections over CASE"
+	default CHIP_MAX_FABRICS if CHIP_PERSISTENT_SUBSCRIPTIONS
+	default 4
+	help
+	  The maximum number of devices to which the Server implementers will be able to
+	  concurrently connect over CASE and interact with.
+
+config CHIP_SUBSCRIPTION_RESUMPTION_MIN_RETRY_INTERVAL
+	int "Minimum subscription resumption interval in seconds"
+	default 20
+	depends on CHIP_PERSISTENT_SUBSCRIPTIONS
+	help
+	  The minimum interval in seconds before resuming a subscription that timed out.
+
+config CHIP_SUBSCRIPTION_RESUMPTION_RETRY_MULTIPLIER
+	int "The multiplier for subscription resumption retry in seconds"
+	default 40
+	depends on CHIP_PERSISTENT_SUBSCRIPTIONS
+	help
+	  The multiplier per subscription resumption retry attempt that is multiplied by the index of Fibonacci sequence
+	  and added to CHIP_SUBSCRIPTION_RESUMPTION_MIN_RETRY_INTERVAL to obtain final wait time for next retry.
 
 config CHIP_ENABLE_BDX_LOG_TRANSFER
 	bool "Enable BDX transfer for diagnostic logs"
