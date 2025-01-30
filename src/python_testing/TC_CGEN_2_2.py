@@ -34,11 +34,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
 import random
-import time
-from datetime import datetime
 
 from mobly import asserts
 
@@ -286,7 +283,7 @@ class TC_CGEN_2_2(MatterBaseTest):
 
         # This function bypasses the wait for the FailsafeTimer to expire for TH1 as originally defined in the test plan.
         resp = await self.expire_failsafe_timer(dev_ctrl=self.default_controller, node_id=self.dut_node_id)
-        logger.info(f'Step  # 7 - Failsafe timer expiration bypassed for TH1 by setting expiryLengthSeconds to 0. Test continues without the original wait.')
+        logger.info('Step  # 7 - Failsafe timer expiration bypassed for TH1 by setting expiryLengthSeconds to 0. Test continues without the original wait.')
 
         self.step(8)
         trusted_root_list_original_after_wait = await self.read_single_attribute_check_success(
@@ -308,8 +305,8 @@ class TC_CGEN_2_2(MatterBaseTest):
         asserts.assert_equal(breadcrumb_info, 0, "Breadcrumb value is not 0 after waiting for failsafe timer")
 
         self.step(10)
-        logger.info(f'Step #10 - TH1 repeats steps 3 through 5')
-        logger.info(f'Step #10 repet #3 - TH1 sends ArmFailSafe')
+        logger.info('Step #10 - TH1 repeats steps 3 through 5')
+        logger.info('Step #10 repet #3 - TH1 sends ArmFailSafe')
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe, breadcrumb=1)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
@@ -374,8 +371,8 @@ class TC_CGEN_2_2(MatterBaseTest):
         logger.info(f'Step #11 - ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
 
         self.step(12)
-        logger.info(f'Step #12 - TH1 repeats steps 8 through 9')
-        logger.info(f'Step #12 repet #8 - TH1 reads the TrustedRootCertificates')
+        logger.info('Step #12 - TH1 repeats steps 8 through 9')
+        logger.info('Step #12 repet #8 - TH1 reads the TrustedRootCertificates')
         trusted_root_list_original_updated = await self.read_single_attribute_check_success(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
@@ -387,7 +384,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         asserts.assert_equal(trusted_root_list_original_size_updated, trusted_root_list_original_size,
                              "Step #12 - Unexpected number of entries in the TrustedRootCertificates table after update")
 
-        logger.info(f'Step #12 repet #9 - TH1 reads the Breadcrumb attribute')
+        logger.info('Step #12 repet #9 - TH1 reads the Breadcrumb attribute')
         breadcrumb_info = await self.read_single_attribute_check_success(
             cluster=cluster_cgen,
             attribute=cluster_cgen.Attributes.Breadcrumb)
@@ -426,10 +423,10 @@ class TC_CGEN_2_2(MatterBaseTest):
             longDiscriminator=longDiscriminator,
             setupPinCode=setup_pin_code,
             nodeid=newNodeId)
-        logger.info(f'Step #15 - TH2 successfully establish PASE session completed')
+        logger.info('Step #15 - TH2 successfully establish PASE session completed')
 
         self.step(16)
-        logger.info(f'Step #16 - TH2 Generating a new CSR to update the root certificate...')
+        logger.info('Step #16 - TH2 Generating a new CSR to update the root certificate...')
         # Flow generates a new TrustedRootCertificate - Request CSR (Certificate Signing Request)
         cmd = cluster_opcreds.Commands.CSRRequest(CSRNonce=random.randbytes(32), isForUpdateNOC=False)
         th2_csr = await self.send_single_cmd(dev_ctrl=TH2, node_id=newNodeId, cmd=cmd)
@@ -494,7 +491,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             f'Step #21 - TH2 Commissioning stage SetTestCommissionerPrematureCompleteAfter enum: {kFindOperationalForCommissioningComplete}')
 
         resp = TH2.SetTestCommissionerPrematureCompleteAfter(kFindOperationalForCommissioningComplete)
-        logger.info(f'Step #21 - TH2 Commissioning DOES NOT send the CommissioningComplete command')
+        logger.info('Step #21 - TH2 Commissioning DOES NOT send the CommissioningComplete command')
 
         self.step(22)
         logger.info("Step #22 - TH1 Waiting for PASE session to stabilize...")
@@ -503,7 +500,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             longDiscriminator=longDiscriminator,
             setupPinCode=setup_pin_code,
             nodeid=newNodeId)
-        logger.info(f'Step #22 - TH2 successfully establish PASE session completed')
+        logger.info('Step #22 - TH2 successfully establish PASE session completed')
 
         try:
             # Verify DUT cannot proceed because the session has not been fully commissioned, leading to a timeout error
@@ -554,7 +551,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         basic_commissioning_info = await self.read_single_attribute_check_success(cluster=Clusters.GeneralCommissioning, attribute=Clusters.GeneralCommissioning.Attributes.BasicCommissioningInfo)
         logger.info(f'Step #26 - basic_commissioning_info: {basic_commissioning_info}')
 
-        logger.info(f'Step #26 - Fully commissioned started')
+        logger.info('Step #26 - Fully commissioned started')
         resp = await TH2.CommissionOnNetwork(
             nodeId=newNodeId+1, setupPinCode=setup_pin_code,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=longDiscriminator)
@@ -655,7 +652,7 @@ class TC_CGEN_2_2(MatterBaseTest):
 
         # This function bypasses the wait for the FailsafeTimer to expire for TH2 as originally defined in the test plan.
         resp = await self.expire_failsafe_timer(dev_ctrl=TH2, node_id=newNodeId+1)
-        logger.info(f'Step  # 33 - Failsafe timer expiration bypassed for TH2 by setting expiryLengthSeconds to 0. Test continues without the original wait.')
+        logger.info('Step  # 33 - Failsafe timer expiration bypassed for TH2 by setting expiryLengthSeconds to 0. Test continues without the original wait.')
 
         self.step(34)
         trusted_root_list_original_updated = await self.read_single_attribute_check_success(
@@ -772,7 +769,7 @@ class TC_CGEN_2_2(MatterBaseTest):
 
         # This function bypasses the wait for the FailsafeTimer to expire for TH1 as originally defined in the test plan.
         resp = await self.expire_failsafe_timer(dev_ctrl=self.default_controller, node_id=self.dut_node_id)
-        logger.info(f'Step  # 43 - Failsafe timer expiration bypassed for TH1 by setting expiryLengthSeconds to 0. Test continues without the original wait.')
+        logger.info('Step  # 43 - Failsafe timer expiration bypassed for TH1 by setting expiryLengthSeconds to 0. Test continues without the original wait.')
 
         self.step(44)
         # Remove Fabric from TH2  to ensure it is correctly cleaned up and that the root certificates are aligned with expectations.
