@@ -68,13 +68,9 @@ std::optional<AttributeEntry> AttributeFinder::Find(const ConcreteAttributePath 
 Protocols::InteractionModel::Status ValidateClusterPath(ProviderMetadataTree * provider, const ConcreteClusterPath & path,
                                                         Protocols::InteractionModel::Status successStatus)
 {
-    auto clusters = provider->ServerClustersIgnoreError(path.mEndpointId);
-    for (auto & clusterEntry : clusters)
+    if (ServerClusterFinder(provider).Find(path).has_value())
     {
-        if (clusterEntry.clusterId == path.mClusterId)
-        {
-            return successStatus;
-        }
+        return successStatus;
     }
 
     // if we get here, the path is invalid.
