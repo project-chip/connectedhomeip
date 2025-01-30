@@ -51,7 +51,6 @@
           "label": "MA-rootdevice",
           "name": "MA-rootdevice",
           "deviceTypeOrder": 0
-<<<<<<< HEAD
         },
         {
           "code": 18,
@@ -59,8 +58,6 @@
           "label": "MA-otarequestor",
           "name": "MA-otarequestor",
           "deviceTypeOrder": 1
-=======
->>>>>>> 60ddfeacfd (Run convert/regen scripts)
         }
       ],
       "deviceVersions": [
