@@ -221,12 +221,12 @@ class YamlTestParserGroup(click.Group):
 CONTEXT_SETTINGS = dict(
     default_map={
         'chiptool': {
-            'adapter': 'matter_chip_tool_adapter.adapter',
+            'adapter': 'matter.chip_tool_adapter.adapter',
             'server_name': 'chip-tool',
             'server_arguments': 'interactive server',
         },
         'darwinframeworktool': {
-            'adapter': 'matter_chip_tool_adapter.adapter',
+            'adapter': 'matter.chip_tool_adapter.adapter',
             'server_name': 'darwin-framework-tool',
             'server_arguments': 'interactive server',
         },

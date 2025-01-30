@@ -26,10 +26,10 @@ pw_python_package("matter_chip_tool_adapter") {
   ]
 
   sources = [
-    "matter_chip_tool_adapter/__init__.py",
-    "matter_chip_tool_adapter/adapter.py",
-    "matter_chip_tool_adapter/decoder.py",
-    "matter_chip_tool_adapter/encoder.py",
+    "matter/chip_tool_adapter/__init__.py",
+    "matter/chip_tool_adapter/adapter.py",
+    "matter/chip_tool_adapter/decoder.py",
+    "matter/chip_tool_adapter/encoder.py",
   ]
 
   # TODO: at a future time consider enabling all (* or missing) here to get
