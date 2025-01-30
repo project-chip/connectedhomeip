@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/support/logging/TextOnlyLogging.h"
 #include <access/examples/PermissiveAccessControlDelegate.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/InteractionModelEngine.h>
@@ -191,6 +192,8 @@ public:
     {
         if (status.mStatus == chip::Protocols::InteractionModel::Status::Success)
         {
+            ChipLogProgress(NotSpecified, "Attribute data received 0x%X/0x%X/0x%X Success: LIST: %s", aPath.mEndpointId,
+                            aPath.mClusterId, aPath.mAttributeId, aPath.IsListOperation() ? "true" : "false");
             mReceivedAttributePaths.push_back(aPath);
             mNumAttributeResponse++;
             mGotReport = true;
@@ -209,6 +212,7 @@ public:
                     if (chip::TLV::Utilities::Count(*apData, count, /* aRecurse = */ false) == CHIP_NO_ERROR)
                     {
                         mNumArrayItems += static_cast<int>(count);
+                        ChipLogProgress(NotSpecified, "   List count: %u", static_cast<unsigned>(count));
                     }
                 }
             }
@@ -1314,7 +1318,16 @@ void TestReadInteraction::TestReadWildcard()
         EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
         DrainAndServiceIO();
-        EXPECT_EQ(delegate.mNumAttributeResponse, 5);
+        // Expected attributes:
+        //    - 0xFFFD Cluster revision
+        //    - 0xFFFC Feature map
+        //    - 0xFFF10001
+        //    - 0xFFF10002
+        //    - 0xFFF10003
+        //    - 0xFFF8 / GeneratedCommandList
+        //    - 0xFFF9 / AcceptedCommandList
+        //    - 0xFFFB / AttributeList
+        EXPECT_EQ(delegate.mNumAttributeResponse, 8);
         EXPECT_TRUE(delegate.mGotReport);
         EXPECT_FALSE(delegate.mReadError);
         // By now we should have closed all exchanges and sent all pending acks, so
@@ -2627,33 +2640,40 @@ void TestReadInteraction::TestSubscribeWildcard()
         // Mock attribute storage that is reset and resides in src/app/util/mock/attribute-storage.cpp
         // has the following items:
         // - Endpoint 0xFFFE
-        //    - cluster 0xFFF1'FC01 (2 attributes)
-        //    - cluster 0xFFF1'FC02 (3 attributes)
+        //    - cluster 0xFFF1'FC01 (2 attributes + 3 GlobalNotInMetadata)
+        //    - cluster 0xFFF1'FC02 (3 attributes + 3 GlobalNotInMetadata)
         // - Endpoint 0xFFFD
-        //    - cluster 0xFFF1'FC01 (2 attributes)
-        //    - cluster 0xFFF1'FC02 (4 attributes)
-        //    - cluster 0xFFF1'FC03 (5 attributes)
+        //    - cluster 0xFFF1'FC01 (2 attributes + 3 GlobalNotInMetadata)
+        //    - cluster 0xFFF1'FC02 (4 attributes + 3 GlobalNotInMetadata)
+        //    - cluster 0xFFF1'FC03 (5 attributes + 3 GlobalNotInMetadata)
         // - Endpoint 0xFFFC
-        //    - cluster 0xFFF1'FC01 (3 attributes)
-        //    - cluster 0xFFF1'FC02 (6 attributes)
-        //    - cluster 0xFFF1'FC03 (2 attributes)
-        //    - cluster 0xFFF1'FC04 (2 attributes)
+        //    - cluster 0xFFF1'FC01 (3 attributes + 3 GlobalNotInMetadata)
+        //    - cluster 0xFFF1'FC02 (6 attributes + 3 GlobalNotInMetadata)
+        //    - cluster 0xFFF1'FC03 (2 attributes + 3 GlobalNotInMetadata)
+        //    - cluster 0xFFF1'FC04 (2 attributes + 3 GlobalNotInMetadata)
         //
-        // For at total of 29 attributes. There are two wildcard subscription
-        // paths, for a total of 58 attributes.
+        // For at total of 29 attributes + 27 not in metadata. There are two wildcard subscription
+        // paths, for a total of (29 + 27)*2 attributes.
         //
         // Attribute 0xFFFC::0xFFF1'FC02::0xFFF1'0004 (kMockEndpoint3::MockClusterId(2)::MockAttributeId(4))
         // is a list of kMockAttribute4ListLength elements of size 256 bytes each, which cannot fit in a single
         // packet, so gets list chunking applied to it.
+        //
+        // Actual chunk placement depends on other attributes. The first chunk for Attribute4 is 3 list
+        // elements + the rest.
         //
         // Because delegate.mNumAttributeResponse counts AttributeDataIB instances, not attributes,
         // the count will depend on exactly how the list for attribute
         // 0xFFFC::0xFFF1'FC02::0xFFF1'0004 is chunked.  For each of the two instances of that attribute
         // in the response, there will be one AttributeDataIB for the start of the list (which will include
         // some number of 256-byte elements), then one AttributeDataIB for each of the remaining elements.
-        constexpr size_t kExpectedAttributeResponse = 29 * 2 + (kMockAttribute4ListLength - 4) + (kMockAttribute4ListLength - 4);
+        constexpr size_t kExpectedAttributeResponse =
+            (29 + 27) * 2 + (kMockAttribute4ListLength - 3) + (kMockAttribute4ListLength - 3);
         EXPECT_EQ((unsigned) delegate.mNumAttributeResponse, kExpectedAttributeResponse);
-        EXPECT_EQ(delegate.mNumArrayItems, 12);
+
+        // This is a LOT of list elements, due to `AttributeList`
+        EXPECT_EQ(delegate.mNumArrayItems, 124);
+
         EXPECT_EQ(engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe), 1u);
         ASSERT_NE(engine->ActiveHandlerAt(0), nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
@@ -2678,6 +2698,7 @@ void TestReadInteraction::TestSubscribeWildcard()
         }
 
         // Set a endpoint dirty
+        ChipLogProgress(NotSpecified, "Testing path dirty");
         {
             delegate.mGotReport            = false;
             delegate.mNumAttributeResponse = 0;
@@ -2701,15 +2722,20 @@ void TestReadInteraction::TestSubscribeWildcard()
 
             // Mock endpoint3 has 13 attributes in total, and we subscribed twice.
             // And attribute 3/2/4 is a list with 6 elements and list chunking
-            // is applied to it, but the way the packet boundaries fall we get two of
-            // its items as a single list, followed by 4 more items for one
-            // of our subscriptions, and 3 items as a single list followed by 3
+            // is applied to it, but the way the packet boundaries fall we get 3 of
+            // its items as a single list, followed by 3 more items for one
+            // of our subscriptions, and 2 items as a single list followed by 4
             // more items for the other.
             //
-            // Thus we should receive 13*2 + 4 + 3 = 33 attribute data in total.
+            // We also have 3 global attributes for 4 clusters, so extra
+            // 12 gobal attribes.
+            //
+            // Total count: 13*2 + 12*2 + 3 + 4 = 57 attribute packets in total
             ChipLogError(DataManagement, "RESPO: %d\n", delegate.mNumAttributeResponse);
-            EXPECT_EQ(delegate.mNumAttributeResponse, 33);
-            EXPECT_EQ(delegate.mNumArrayItems, 12);
+            EXPECT_EQ(delegate.mNumAttributeResponse, 57);
+
+            // sum of regular lists and `AttributeList` entries
+            EXPECT_EQ(delegate.mNumArrayItems, 62);
         }
     }
 

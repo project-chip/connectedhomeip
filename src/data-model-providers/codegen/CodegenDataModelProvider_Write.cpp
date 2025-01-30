@@ -113,8 +113,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
                     (*status == Status::UnsupportedCluster) ||  //
                     (*status == Status::UnsupportedAttribute));
 
-        if ((*status == Status::UnsupportedAttribute) &&
-            (IsSupportedGlobalAttributeNotInMetadata(request.path.mAttributeId)))
+        if ((*status == Status::UnsupportedAttribute) && (IsSupportedGlobalAttributeNotInMetadata(request.path.mAttributeId)))
         {
             // return a failure to write a known
             return Status::UnsupportedWrite;
