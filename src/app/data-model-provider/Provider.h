@@ -87,8 +87,9 @@ public:
     ///
     /// Requirements:
     ///    - The method MUST handle any requests and validate them. In particular, in case of invalid
-    ///      paths, a return code of UnsupportedEndpoint/UnsupportedCluster/UnsupporedCommand is
-    ///      expected.
+    ///      paths we expect one of:
+    ///        a) a return code of UnsupportedEndpoint/UnsupportedCluster/UnsupporedCommand OR
+    ///        b) the status above to be placed inside `handler`
     ///
     /// Return value expectations:
     ///   - if a response has been placed into `handler` then std::nullopt MUST be returned. In particular
