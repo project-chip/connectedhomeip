@@ -64,9 +64,6 @@ def utc_time_in_matter_epoch(desired_datetime: Optional[datetime] = None):
     return utc_th_us
 
 
-matter_epoch_us_from_utc_datetime = utc_time_in_matter_epoch
-
-
 def utc_datetime_from_matter_epoch_us(matter_epoch_us: int) -> datetime:
     """ Converts microseconds since Matter epoch to UTC datetime.
 

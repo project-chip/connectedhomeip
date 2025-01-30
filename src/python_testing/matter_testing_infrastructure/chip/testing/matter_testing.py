@@ -190,13 +190,13 @@ def utc_time_in_matter_epoch(desired_datetime: Optional[datetime] = None):
 
 
 @_deprecated("utilities")
-def utc_datetime_from_matter_epoch_us(matter_epoch_us: int) -> datetime:
+def matter_epoch_us_from_utc_datetime(desired_datetime: Optional[datetime] = None):
     """DEPRECATED: Use utilities.utc_datetime_from_matter_epoch_us instead"""
-    return new_utc_datetime_from_matter_epoch_us(matter_epoch_us)
+    return new_utc_time_in_matter_epoch(desired_datetime)
 
 
 @_deprecated("utilities")
-def matter_epoch_us_from_utc_datetime(matter_epoch_us: int) -> datetime:
+def utc_datetime_from_matter_epoch_us(matter_epoch_us: int) -> datetime:
     """DEPRECATED: Use utilities.utc_datetime_from_matter_epoch_us instead"""
     return new_utc_datetime_from_matter_epoch_us(matter_epoch_us)
 
