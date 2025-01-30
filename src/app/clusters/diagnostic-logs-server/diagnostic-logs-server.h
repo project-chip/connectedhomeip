@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
+#include <zap-generated/gen_config.h>
 
 namespace chip {
 namespace app {
@@ -64,7 +65,10 @@ private:
     static DiagnosticLogsServer sInstance;
 
     void InvokeCommand(HandlerContext & ctx) override;
+
+#ifdef MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_CLIENT_ENDPOINT_COUNT
     void HandleRetrieveLogsRequest(HandlerContext & ctx, const Commands::RetrieveLogsRequest::DecodableType & commandData);
+#endif
 };
 
 } // namespace DiagnosticLogs

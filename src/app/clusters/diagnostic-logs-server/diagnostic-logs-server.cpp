@@ -166,14 +166,20 @@ void DiagnosticLogsServer::InvokeCommand(HandlerContext & handlerContext)
 {
     switch (handlerContext.mRequestPath.mCommandId)
     {
+#ifdef MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_CLIENT_ENDPOINT_COUNT
     case Commands::RetrieveLogsRequest::Id:
         CommandHandlerInterface::HandleCommand<Commands::RetrieveLogsRequest::DecodableType>(
             handlerContext,
             [this](HandlerContext & ctx, const auto & commandData) { HandleRetrieveLogsRequest(ctx, commandData); });
         break;
+#endif
+    default:
+        break; // Make the switch statement syntactically correct if MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_CLIENT_ENDPOINT_COUNT is not
+               // defined.
     }
 }
 
+#ifdef MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_CLIENT_ENDPOINT_COUNT
 void DiagnosticLogsServer::HandleRetrieveLogsRequest(HandlerContext & ctx,
                                                      const Commands::RetrieveLogsRequest::DecodableType & commandData)
 {
@@ -197,6 +203,7 @@ void DiagnosticLogsServer::HandleRetrieveLogsRequest(HandlerContext & ctx,
         instance.HandleLogRequestForBdx(&ctx.mCommandHandler, ctx.mRequestPath, intent, commandData.transferFileDesignator);
     }
 }
+#endif
 
 } // namespace DiagnosticLogs
 } // namespace Clusters
