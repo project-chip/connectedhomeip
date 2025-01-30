@@ -184,9 +184,9 @@ def type_matches(received_value, desired_type):
 
 
 @_deprecated("utilities")
-def utc_time_in_matter_epoch(posix_time_ms: int) -> datetime:
+def utc_time_in_matter_epoch(desired_datetime: Optional[datetime] = None):
     """DEPRECATED: Use utilities.utc_time_in_matter_epoch instead"""
-    return new_utc_time_in_matter_epoch(posix_time_ms)
+    return new_utc_time_in_matter_epoch(desired_datetime)
 
 
 @_deprecated("utilities")
@@ -202,15 +202,15 @@ def utc_datetime_from_posix_time_ms(posix_time_ms: int) -> datetime:
 
 
 @_deprecated("utilities")
-def compare_time(time1: datetime, time2: datetime) -> bool:
+def compare_time(received: int, offset: timedelta = timedelta(), utc: Optional[int] = None, tolerance: timedelta = timedelta(seconds=5)) -> None:
     """DEPRECATED: Use utilities.compare_time instead"""
-    return new_compare_time(time1, time2)
+    return new_compare_time(received, offset, utc, tolerance)
 
 
 @_deprecated("utilities")
-def get_wait_seconds_from_set_time(set_time: datetime) -> float:
+def get_wait_seconds_from_set_time(set_time_matter_us: int, wait_seconds: int):
     """DEPRECATED: Use utilities.get_wait_seconds_from_set_time instead"""
-    return new_get_wait_seconds_from_set_time(set_time)
+    return new_get_wait_seconds_from_set_time(set_time_matter_us, wait_seconds)
 
 
 class SimpleEventCallback:
@@ -701,13 +701,13 @@ class ClusterMapper:
 
 
 @_deprecated("utilities")
-def id_str(id: int) -> str:
+def id_str(id):
     """DEPRECATED: Use utilities.id_str instead"""
     return new_id_str(id)
 
 
 @_deprecated("utilities")
-def cluster_id_str(id: int) -> str:
+def cluster_id_str(id):
     """DEPRECATED: Use utilities.cluster_id_str instead"""
     return new_cluster_id_str(id)
 
@@ -922,13 +922,13 @@ class MatterStackState:
 @_deprecated("utilities")
 def bytes_from_hex(hex: str) -> bytes:
     """DEPRECATED: Use utilities.bytes_from_hex instead"""
-    return new_bytes_from_hex
+    return new_bytes_from_hex(hex)
 
 
 @_deprecated("utilities")
 def hex_from_bytes(b: bytes) -> str:
     """DEPRECATED: Use utilities.hex_from_bytes instead"""
-    return new_hex_from_bytes(bytes)
+    return new_hex_from_bytes(b)
 
 
 @dataclass
