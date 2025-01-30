@@ -38,10 +38,9 @@ from mobly import asserts
 
 
 class TCP_Tests(MatterBaseTest):
-    async def send_arm_cmd(self):
+    async def send_arm_cmd(self, payloadCapability: ChipDeviceCtrl.TransportPayloadCapability) -> None:
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=1)
-        await self.send_single_cmd(cmd=cmd, endpoint=0,
-                                   payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+        await self.send_single_cmd(cmd=cmd, endpoint=0, payloadCapability=payloadCapability)
 
     @async_test_body
     async def teardown_test(self):
@@ -139,7 +138,7 @@ class TCP_Tests(MatterBaseTest):
         asserts.assert_equal(device.sessionAllowsLargePayload, True, "Session does not have associated TCP connection")
 
         try:
-            await self.send_arm_cmd()
+            await self.send_arm_cmd(ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         except InteractionModelError:
             asserts.fail("Unexpected error returned by DUT")
 
@@ -181,7 +180,7 @@ class TCP_Tests(MatterBaseTest):
         asserts.assert_equal(device.sessionAllowsLargePayload, True, "Session does not have associated TCP connection")
 
         try:
-            self.send_arm_cmd()
+            self.send_arm_cmd(ChipDeviceCtrl.TransportPayloadCapability.MRP_OR_TCP_PAYLOAD)
         except InteractionModelError:
             asserts.fail("Unexpected error returned by DUT")
 
