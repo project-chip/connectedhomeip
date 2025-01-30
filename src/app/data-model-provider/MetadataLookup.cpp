@@ -95,8 +95,7 @@ Protocols::InteractionModel::Status ValidateClusterPath(ProviderMetadataTree * p
         }
     }
 
-    // if we get here, this is an invalid path. Return the right error
-    // cluster exists, so command is invalid
+    // If we get here, this is an invalid path. Return the right error.
     return DataModel::EndpointFinder(provider).Find(path.mEndpointId).has_value()
         ? Protocols::InteractionModel::Status::UnsupportedCluster
         : Protocols::InteractionModel::Status::UnsupportedEndpoint;
