@@ -788,9 +788,13 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     {
         // NOTE: explicit cast/check only for attribute path and nothing else.
         //
-        //       In particular `request.path` is a DATA path (contains a list index)
-        //       and we do not want mLastSuccessfullyWrittenPath to be auto-cast to a
+        //       Specifically we DO NOT use `operator==` because `aPath` is a
+        //       DATA path (contains a list index) and we do not want
+        //       mLastSuccessfullyWrittenPath to be auto-cast to a
         //       data path with a empty list and fail the compare.
+        //
+        //       This inline endpoint/cluster/attribute compare results in
+        //       smaller code as well.
         if ((aPath.mEndpointId == mLastSuccessfullyWrittenPath->mEndpointId) &&
             (aPath.mClusterId == mLastSuccessfullyWrittenPath->mClusterId) &&
             (aPath.mAttributeId == mLastSuccessfullyWrittenPath->mAttributeId))
