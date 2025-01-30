@@ -163,26 +163,22 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
     // some CommandHandlerInterface are registered on all endpoints, so they would be found by
     // `GetCommandHandler` below, however we need to ensure the path makes sense.
     const EmberAfCluster * cluster = FindServerCluster(request.path);
-    if (cluster == nullptr)
+    if (cluster != nullptr)
     {
-        // This is not a valid cluster. Return the right error code depending on what is valid.
-        std::optional<unsigned> endpoint_index = TryFindEndpointIndex(request.path.mEndpointId);
-        return endpoint_index.has_value() ? Protocols::InteractionModel::Status::UnsupportedCluster
-                                          : Protocols::InteractionModel::Status::UnsupportedEndpoint;
-    }
+        // We can allow CHI, including ones registered on wildcard endpoints.
+        CommandHandlerInterface * handler_interface =
+            CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
 
-    CommandHandlerInterface * handler_interface =
-        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
-
-    if (handler_interface)
-    {
-        CommandHandlerInterface::HandlerContext context(*handler, request.path, input_arguments);
-        handler_interface->InvokeCommand(context);
-
-        // If the command was handled, don't proceed any further and return successfully.
-        if (context.mCommandHandled)
+        if (handler_interface)
         {
-            return std::nullopt;
+            CommandHandlerInterface::HandlerContext context(*handler, request.path, input_arguments);
+            handler_interface->InvokeCommand(context);
+
+            // If the command was handled, don't proceed any further and return successfully.
+            if (context.mCommandHandled)
+            {
+                return std::nullopt;
+            }
         }
     }
 

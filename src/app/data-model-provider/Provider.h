@@ -85,6 +85,11 @@ public:
     ///      This includes cases where command handling and value return will be done asynchronously.
     ///    - returning a value other than Success implies an error reply (error and data are mutually exclusive)
     ///
+    /// Requirements:
+    ///    - command MUST handle any requests and validate them. In particular, in case of invalid
+    ///      paths, a return code of UnsupportedEndpoint/UnsupportedCluster/UnsupporedCommand is
+    ///      expected.
+    ///
     /// Return value expectations:
     ///   - if a response has been placed into `handler` then std::nullopt MUST be returned. In particular
     ///     note that CHIP_NO_ERROR is NOT the same as std::nullopt:
