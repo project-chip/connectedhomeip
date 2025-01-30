@@ -16,7 +16,6 @@
 # src/python_testing/matter_testing_infrastructure/generate_data_model_xmls_gni.py
 #
 # Manually re-generate this file on any changes to the data_model directory.
-# test
 
 import("//build_overrides/chip.gni")
 
