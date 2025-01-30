@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/GlobalAttributes.h"
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -107,9 +108,18 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     // Explicit failure in finding a suitable metadata
     if (const Status * status = std::get_if<Status>(&metadata))
     {
+
         VerifyOrDie((*status == Status::UnsupportedEndpoint) || //
                     (*status == Status::UnsupportedCluster) ||  //
                     (*status == Status::UnsupportedAttribute));
+
+        if ((*status == Status::UnsupportedAttribute) &&
+            (IsSupportedGlobalAttributeNotInMetadata(request.path.mAttributeId)))
+        {
+            // return a failure to write a known
+            return Status::UnsupportedWrite;
+        }
+
         return *status;
     }
 

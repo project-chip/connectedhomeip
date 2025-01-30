@@ -31,11 +31,6 @@ std::variant<const EmberAfAttributeMetadata *, // a specific attribute stored by
              >
 FindAttributeMetadata(const ConcreteAttributePath & aPath)
 {
-    if (IsGlobalAttribute(aPath.mAttributeId))
-    {
-        // global attributes are not stored in metadata, so give up
-        return Status::UnsupportedAttribute;
-    }
     const EmberAfAttributeMetadata * metadata =
         emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 
