@@ -24,6 +24,7 @@
 #include <app/data-model-provider/ProviderMetadataTree.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <optional>
 
@@ -79,6 +80,15 @@ private:
     ProviderMetadataTree * mProvider;
     ReadOnlyBuffer<EndpointEntry> mEndpoints;
 };
+
+/// Validates that `path` exists within the given provider
+///
+/// If `endpointID` is not valid, will return Status::UnsupportedEndpoint
+/// If `clusterId` is not valid, will return Status::UnsupportedCluster
+///
+/// otherwise, it will return successStatus.
+Protocols::InteractionModel::Status ValidateClusterPath(ProviderMetadataTree * provider, const ConcreteClusterPath & path,
+                                                        Protocols::InteractionModel::Status successStatus);
 
 } // namespace DataModel
 } // namespace app

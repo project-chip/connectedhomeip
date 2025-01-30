@@ -761,13 +761,6 @@ void WriteHandler::MoveToState(const State aTargetState)
 DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::SubjectDescriptor & aSubject,
                                                               const ConcreteDataAttributePath & aPath)
 {
-    // TODO: validate:
-    //   - existence of path (UnsupportedAccess)
-    //   - Read-only requirement (UnsupportedWrite)
-    //   - ACL:
-    //      - use previousSuccessPath
-    //   - timed write
-
     // TODO: ordering is to check writability/existence BEFORE ACL and this seems wrong, however
     //       existing unit tests (TC_AcessChecker.py) validate that we get UnsupportedWrite instead of UnsupportedAccess
     //
@@ -784,17 +777,7 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     // if path is not valid, return a spec-compliant return code.
     if (!attributeEntry.has_value())
     {
-        if (!DataModel::EndpointFinder(mDataModelProvider).Find(aPath.mEndpointId).has_value())
-        {
-            return Status::UnsupportedEndpoint;
-        }
-
-        if (!DataModel::ServerClusterFinder(mDataModelProvider).Find(aPath).has_value())
-        {
-            return Status::UnsupportedCluster;
-        }
-
-        return Status::UnsupportedAttribute;
+        return DataModel::ValidateClusterPath(mDataModelProvider, aPath, Status::UnsupportedAttribute);
     }
 
     // Allow writes on writable attributes only
