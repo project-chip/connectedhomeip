@@ -161,7 +161,7 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
                                                                               CommandHandler * handler)
 {
     // Double-check that the command path is valid at least up to the cluster level:
-    // some CommandHandlerInterface are registered on all endpoints, so they would be found by
+    // some CommandHandlerInterface instances are registered on all endpoints, so they would be found by
     // `GetCommandHandler` below, however we need to ensure the path makes sense.
     Protocols::InteractionModel::Status status = Ember::ValidateClusterPath(request.path);
     if (status != Protocols::InteractionModel::Status::Success)
