@@ -1,1 +1,1 @@
-103 : Changed sysroot for crosscompile image (new ubuntu version and includes NFC libs)
+104 : [Telink] Update Docker image (Zephyr update)
