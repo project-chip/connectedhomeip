@@ -86,7 +86,7 @@ public:
     ///    - returning a value other than Success implies an error reply (error and data are mutually exclusive)
     ///
     /// Requirements:
-    ///    - command MUST handle any requests and validate them. In particular, in case of invalid
+    ///    - The method MUST handle any requests and validate them. In particular, in case of invalid
     ///      paths, a return code of UnsupportedEndpoint/UnsupportedCluster/UnsupporedCommand is
     ///      expected.
     ///
