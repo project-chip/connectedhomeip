@@ -64,7 +64,7 @@ private:
 
     // Methods to handle the various commands this cluster may receive.
     void OpenCommissioningWindow(HandlerContext & context, const Commands::OpenCommissioningWindow::DecodableType & commandData);
-#if ADMINISTRATOR_COMMISSIONING_ENABLE_OPEN_BASIC_COMMISSIONING_WINDOW_CMD
+#ifdef ADMINISTRATOR_COMMISSIONING_ENABLE_OPEN_BASIC_COMMISSIONING_WINDOW_CMD
     void OpenBasicCommissioningWindow(HandlerContext & context,
                                       const Commands::OpenBasicCommissioningWindow::DecodableType & commandData);
 #endif
@@ -103,7 +103,7 @@ void AdministratorCommissioningServer::InvokeCommand(HandlerContext & context)
         HandleCommand<Commands::OpenCommissioningWindow::DecodableType>(
             context, [this](HandlerContext & ctx, const auto & commandData) { OpenCommissioningWindow(ctx, commandData); });
         break;
-#if ADMINISTRATOR_COMMISSIONING_ENABLE_OPEN_BASIC_COMMISSIONING_WINDOW_CMD
+#ifdef ADMINISTRATOR_COMMISSIONING_ENABLE_OPEN_BASIC_COMMISSIONING_WINDOW_CMD
     case Commands::OpenBasicCommissioningWindow::Id:
         HandleCommand<Commands::OpenBasicCommissioningWindow::DecodableType>(
             context, [this](HandlerContext & ctx, const auto & commandData) { OpenBasicCommissioningWindow(ctx, commandData); });
@@ -172,7 +172,7 @@ exit:
     }
 }
 
-#if ADMINISTRATOR_COMMISSIONING_ENABLE_OPEN_BASIC_COMMISSIONING_WINDOW_CMD
+#ifdef ADMINISTRATOR_COMMISSIONING_ENABLE_OPEN_BASIC_COMMISSIONING_WINDOW_CMD
 void AdministratorCommissioningServer::OpenBasicCommissioningWindow(
     CommandHandlerInterface::HandlerContext & context, const Commands::OpenBasicCommissioningWindow::DecodableType & commandData)
 {
