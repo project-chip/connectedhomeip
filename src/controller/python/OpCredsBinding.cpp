@@ -44,8 +44,8 @@
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
-#include <cstddef> // Added for size_t
 #include <credentials/attestation_verifier/TestDACRevocationDelegateImpl.h>
+#include <cstddef> // Added for size_t
 
 using namespace chip;
 
