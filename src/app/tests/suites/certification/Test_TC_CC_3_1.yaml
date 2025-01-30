@@ -98,8 +98,9 @@ tests:
               - name: "ms"
                 value: 10000
 
-    # Values computed from: current_hue + (final_hue - initial_hue) * Wait / TransitionTime
-    # 60 + (120 - 60) * 10 / 30 => 80 +/-15% => (68, 92)
+    # Values computed for shortest distance (Direction=0x00): 
+    # current_hue = last_hue + (final_hue - initial_hue) * wait_in_secs / transition_time_in_secs
+    # current_hue = 60 + (120 - 60) * 10 / 30 => 80 +/-15% => (68, 92)
     - label: "Step 2c: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
@@ -118,7 +119,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    # 80 + (120 - 60) * 10 / 30 => 100 +/- 15% => (85, 115)
+    # current_hue = 80 + (120 - 60) * 10 / 30 => 100 +/- 15% => (85, 115)
     - label: "Step 2d: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
@@ -137,7 +138,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    # 100 + (120 - 60) * 10 / 30 => 120 +/-15% => (102, 138)
+    # current_hue = 100 + (120 - 60) * 10 / 30 => 120 +/-15% => (102, 138)
     - label: "Step 2e: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
@@ -156,7 +157,7 @@ tests:
               - name: "ms"
                 value: 5000
 
-    # keeps final_hue
+    # keeps final Hue
     - label: "Step 2f: H reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
@@ -221,23 +222,37 @@ tests:
                 value: 10000
 
     #https://github.com/CHIP-Specifications/chip-test-scripts/issues/416#issuecomment-1228072461
+    # - label: "Step 3c: TH reads CurrentHue attribute from DUT"
+    #   PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
+    #   verification: |
+    #       ./chip-tool colorcontrol read current-hue 1 1
+    #       Verify response contains a CurrentHue value  in  TH(chip-tool)  Logs:
+
+    #       [1649661849.854961][8307:8312] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087274517
+    #       [1649661849.855019][8307:8312] CHIP:TOO:   current hue: 0 (value can vary)
+    #       [1649661849.855097][8307:8312] CHIP:EM: Sending Standalone Ack for MessageCounter:13414799 on exchange 39735i
+    #   cluster: "LogCommands"
+    #   command: "UserPrompt"
+    #   arguments:
+    #       values:
+    #           - name: "message"
+    #             value: "Enter 'y' after success"
+    #           - name: "expectedValue"
+    #             value: "y"
+
+    # Values computed for longest distance (Direction=0x01): 
+    # variation = [initial_hue + (255 - final_hue)] * wait_in_secs / transition_time_in_secs
+    # variation = [60 + (255 - 135)] * 5 / 30 => 30
+    # current_hue = last_hue - variation
+    # current_hue = 60 - 30 = 30 +/-15% => (25, 35)
     - label: "Step 3c: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
-      verification: |
-          ./chip-tool colorcontrol read current-hue 1 1
-          Verify response contains a CurrentHue value  in  TH(chip-tool)  Logs:
-
-          [1649661849.854961][8307:8312] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087274517
-          [1649661849.855019][8307:8312] CHIP:TOO:   current hue: 0 (value can vary)
-          [1649661849.855097][8307:8312] CHIP:EM: Sending Standalone Ack for MessageCounter:13414799 on exchange 39735i
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              # minValue: 25
+              # maxValue: 35
 
     - label: "Wait 10s"
       PICS: CC.S.F00
@@ -249,23 +264,32 @@ tests:
                 value: 10000
 
     #https://github.com/CHIP-Specifications/chip-test-scripts/issues/493#issuecomment-1422075950
+    # - label: "Step 3d: TH reads CurrentHue attribute from DUT"
+    #   PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
+    #   verification: |
+    #       ./chip-tool colorcontrol read current-hue 1 1
+
+    #       After another 10 seconds , Verify that CurrentHue value as 195 On  TH(chip-tool)  Logs:
+    #       [1649661821.298198][8292:8297] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087274517
+    #       [1649661821.298271][8292:8297] CHIP:TOO:   current hue: 195 (value can vary)
+    #       [1649661821.298374][8292:8297] CHIP:EM: Sending Standalone Ack for MessageCounter:13643708 on exchange 28536i
+    #   cluster: "LogCommands"
+    #   command: "UserPrompt"
+    #   arguments:
+    #       values:
+    #           - name: "message"
+    #             value: "Enter 'y' after success"
+    #           - name: "expectedValue"
+    #             value: "y"
+
     - label: "Step 3d: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
-      verification: |
-          ./chip-tool colorcontrol read current-hue 1 1
-
-          After another 10 seconds , Verify that CurrentHue value as 195 On  TH(chip-tool)  Logs:
-          [1649661821.298198][8292:8297] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087274517
-          [1649661821.298271][8292:8297] CHIP:TOO:   current hue: 195 (value can vary)
-          [1649661821.298374][8292:8297] CHIP:EM: Sending Standalone Ack for MessageCounter:13643708 on exchange 28536i
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              # minValue: 25
+              # maxValue: 35
 
     - label: "Wait 10s"
       PICS: CC.S.F00
@@ -277,23 +301,32 @@ tests:
                 value: 10000
 
     #https://github.com/CHIP-Specifications/chip-test-scripts/issues/493#issuecomment-1422075950
-    - label: "Step 3e: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
-      verification: |
-          ./chip-tool colorcontrol read current-hue 1 1
-          After another 10 seconds , Verify that CurrentHue value as 135 On  TH(chip-tool)  Logs:
+    # - label: "Step 3e: TH reads CurrentHue attribute from DUT"
+    #   PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
+    #   verification: |
+    #       ./chip-tool colorcontrol read current-hue 1 1
+    #       After another 10 seconds , Verify that CurrentHue value as 135 On  TH(chip-tool)  Logs:
 
-          [1649661821.298198][8292:8297] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087274517
-          [1649661821.298271][8292:8297] CHIP:TOO:   current hue: 135
-          [1649661821.298374][8292:8297] CHIP:EM: Sending Standalone Ack for MessageCounter:13643708 on exchange 28536i"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+    #       [1649661821.298198][8292:8297] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087274517
+    #       [1649661821.298271][8292:8297] CHIP:TOO:   current hue: 135
+    #       [1649661821.298374][8292:8297] CHIP:EM: Sending Standalone Ack for MessageCounter:13643708 on exchange 28536i"
+    #   cluster: "LogCommands"
+    #   command: "UserPrompt"
+    #   arguments:
+    #       values:
+    #           - name: "message"
+    #             value: "Enter 'y' after success"
+    #           - name: "expectedValue"
+    #             value: "y"
+
+    - label: "Step 3e: TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              # minValue: 25
+              # maxValue: 35
 
     - label: "Wait 5s"
       PICS: CC.S.F00
@@ -367,6 +400,7 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # current_hue = 60 + (120 - 60) * 10 / 30 => 80 +/-15% => (68, 92)
     - label: "Step 4c: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
@@ -385,6 +419,7 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # current_hue = 80 + (120 - 60) * 10 / 30 => 100 +/-15% => (85, 115)
     - label: "Step 4d: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
@@ -403,6 +438,7 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # current_hue = 100 + (120 - 60) * 10 / 30 => 120 +/-15% => (102, 138)
     - label: "Step 4e: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
@@ -421,6 +457,7 @@ tests:
               - name: "ms"
                 value: 5000
 
+    # keeps final Hue
     - label: "Step 4f: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
