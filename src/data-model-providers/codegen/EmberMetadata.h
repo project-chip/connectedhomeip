@@ -43,7 +43,7 @@ std::variant<const EmberAfCluster *,             // global attribute, data from 
              >
 FindAttributeMetadata(const ConcreteAttributePath & aPath);
 
-/// Returns the status for a given path being valud within ember.
+/// Returns the status for a given cluster existing in the ember metadata.
 ///
 /// Return code will be one of:
 ///    - Status::UnsupportedEndpoint if the path endpoint does not exist
