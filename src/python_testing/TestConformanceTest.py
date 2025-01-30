@@ -187,27 +187,31 @@ class TestConformanceSupport(MatterBaseTest, DeviceConformanceTests):
             attr.ServerList,
             attr.ClientList,
             attr.PartsList,
-            attr.AttributeList
         ]
 
         attribute_values = [
-            0,  # FeatureMap
-            [],  # AcceptedCommandList
-            [],  # GeneratedCommandList
-            self.xml_clusters[Clusters.Descriptor.id].revision,  # ClusterRevision
-            [Clusters.Descriptor.Structs.DeviceTypeStruct(
-                deviceType=device_type_id, revision=device_type_revision)],  # DeviceTypeList
-            required_servers,  # ServerList
-            required_clients,  # ClientList
-            [],  # PartsList
-            list(attrs.keys())  # AttributeList
+            (0, 0),  # FeatureMap
+            ([], []),  # AcceptedCommandList
+            ([], []),  # GeneratedCommandList
+            (self.xml_clusters[Clusters.Descriptor.id].revision,
+             self.xml_clusters[Clusters.Descriptor.id].revision),  # ClusterRevision
+            ([{0: device_type_id, 1: device_type_revision}],
+             [Clusters.Descriptor.Structs.DeviceTypeStruct(
+                 deviceType=device_type_id, revision=device_type_revision)]),  # DeviceTypeList
+            (required_servers, required_servers),  # ServerList
+            (required_clients, required_clients),  # ClientList
+            ([], []),  # PartsList
         ]
 
         for attribute_name, attribute_value in zip(attributes, attribute_values):
             key = attribute_name.attribute_id if is_tlv_endpoint else attribute_name
-            attrs[key] = attribute_value
+            attrs[key] = attribute_value[0] if is_tlv_endpoint else attribute_value[1]
+
+        # Append the attribute list now that is populated.
+        attrs[attr.AttributeList.attribute_id if is_tlv_endpoint else attr.AttributeList] = list(attrs.keys())
 
         endpoint_tlv[Clusters.Descriptor.id if is_tlv_endpoint else Clusters.Descriptor] = attrs
+
         return endpoint_tlv
 
     def add_macl(self, root_endpoint: dict[int, dict[int, Any]], populate_arl: bool = False, populate_commissioning_arl: bool = False):
