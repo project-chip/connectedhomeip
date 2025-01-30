@@ -791,17 +791,12 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
         //       In particular `request.path` is a DATA path (contains a list index)
         //       and we do not want mLastSuccessfullyWrittenPath to be auto-cast to a
         //       data path with a empty list and fail the compare.
-        //
-        //       This could be `mLastSuccessfullyWrittenPath != request.path` (where order
-        //       is important) however that would seem more brittle (relying that a != b
-        //       behaves differently than b != a due to casts). Overall Data paths are not
-        //       the same as attribute paths.
-        //
-        //       Also note that Concrete path have a mExpanded that is not used in compares.
-        const ConcreteAttributePath & attributePathA = aPath;
-        const ConcreteAttributePath & attributePathB = *mLastSuccessfullyWrittenPath;
-
-        checkAcl = (attributePathA != attributePathB);
+        if ((aPath.mEndpointId == mLastSuccessfullyWrittenPath->mEndpointId) &&
+            (aPath.mClusterId == mLastSuccessfullyWrittenPath->mClusterId) &&
+            (aPath.mAttributeId == mLastSuccessfullyWrittenPath->mAttributeId))
+        {
+            checkAcl = false;
+        }
     }
 
     if (checkAcl)
