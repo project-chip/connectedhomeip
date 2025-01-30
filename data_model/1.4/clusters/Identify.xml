@@ -74,18 +74,16 @@ Davis, CA 95616, USA
       <item value="0x00" name="Blink" summary="e.g., Light is turned on/off once.">
         <mandatoryConform/>
       </item>
-      <item value="0x0B" name="ChannelChange" summary="e.g., Colored light turns orange for 8 seconds;
-                          non-colored light switches to the maximum brightness for 0.5s and then minimum brightness for 7.5s.">
-        <mandatoryConform/>
-      </item>
       <item value="0x01" name="Breathe" summary="e.g., Light is turned on/off over 1 second and repeated 15 times.">
         <mandatoryConform/>
       </item>
       <item value="0x02" name="Okay" summary="e.g., Colored light turns green for 1 second; non-colored light flashes twice.">
         <mandatoryConform/>
       </item>
-      <item value="0xFE" name="FinishEffect" summary="Complete the current effect sequence before terminating. e.g., if in the middle of a breathe effect
-                          (as above), first complete the current 1s breathe effect and then terminate the effect.">
+      <item value="0x0B" name="ChannelChange" summary="e.g., Colored light turns orange for 8 seconds; non-colored light switches to the maximum brightness for 0.5s and then minimum brightness for 7.5s.">
+        <mandatoryConform/>
+      </item>
+      <item value="0xFE" name="FinishEffect" summary="Complete the current effect sequence before terminating. e.g., if in the middle of a breathe effect (as above), first complete the current 1s breathe effect and then terminate the effect.">
         <mandatoryConform/>
       </item>
       <item value="0xFF" name="StopEffect" summary="Terminate the effect as soon as possible.">
@@ -113,8 +111,7 @@ Davis, CA 95616, USA
       <item value="0x04" name="Display" summary="Presentation will be visible on display screen.">
         <mandatoryConform/>
       </item>
-      <item value="0x05" name="Actuator" summary="Presentation will be conveyed by actuator functionality
-                             such as through a window blind operation or in-wall relay.">
+      <item value="0x05" name="Actuator" summary="Presentation will be conveyed by actuator functionality such as through a window blind operation or in-wall relay.">
         <mandatoryConform/>
       </item>
     </enum>

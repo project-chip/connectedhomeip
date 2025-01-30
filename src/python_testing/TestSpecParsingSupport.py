@@ -21,7 +21,7 @@ import chip.clusters as Clusters
 import jinja2
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.matter_testing import MatterBaseTest, ProblemNotice, default_matter_test_main
-from chip.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, SpecParsingException, XmlCluster,
+from chip.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, XmlCluster,
                                        add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
                                        combine_derived_clusters_with_base, get_data_model_directory)
 from mobly import asserts
@@ -213,7 +213,9 @@ ALIASED_CLUSTERS = (
     '  </revisionHistory>'
     '  <clusterIds>'
     '    <clusterId id="0xFFFE" name="Test Alias1"/>'
-    '    <clusterId id="0xFFFD" name="Test Alias2"/>'
+    '    <clusterId id="0xFFFD" name="Test Alias2">'
+    '      <provisionalConform/>'
+    '    </clusterId>'
     '  </clusterIds>'
     '  <classification hierarchy="base" role="application" picsCode="BASE" scope="Endpoint"/>'
     '  <commands>'
@@ -275,9 +277,6 @@ class TestSpecParsingSupport(MatterBaseTest):
         string_override_check, problems = build_xml_clusters(str_path)
 
         asserts.assert_count_equal(string_override_check.keys(), self.spec_xml_clusters.keys(), "Mismatched cluster generation")
-
-        with asserts.assert_raises(SpecParsingException):
-            build_xml_clusters("baddir")
 
     def test_spec_parsing_access(self):
         strs = [None, 'view', 'operate', 'manage', 'admin']
@@ -398,6 +397,10 @@ class TestSpecParsingSupport(MatterBaseTest):
         ids = [(id, c.name) for id, c in clusters.items()]
         asserts.assert_true((0xFFFE, 'Test Alias1') in ids, "Unable to find Test Alias1 cluster in parsed clusters")
         asserts.assert_true((0xFFFD, 'Test Alias2') in ids, "Unable to find Test Alias2 cluster in parsed clusters")
+
+        # Test Alias2 is marked as provisional, and TestAlias1 is not
+        asserts.assert_false(clusters[0xFFFE].is_provisional, "Test Alias1 is marked as provisional and should not be")
+        asserts.assert_true(clusters[0xFFFD].is_provisional, "Test Alias2 is not marked as provisional and should be")
 
     def test_known_aliased_clusters(self):
         known_aliased_clusters = set([(0x040C, 'Carbon Monoxide Concentration Measurement', 'CMOCONC'),

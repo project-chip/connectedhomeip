@@ -22,11 +22,11 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
 #include <memory>
@@ -38,9 +38,9 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-NodeId GetNodeId(const CommandHandler * commandObj)
+NodeId GetNodeId(const CommandHandler & commandHandler)
 {
-    auto descriptor = commandObj->GetSubjectDescriptor();
+    auto descriptor = commandHandler.GetSubjectDescriptor();
 
     if (descriptor.authMode != Access::AuthMode::kCase)
     {
@@ -49,7 +49,7 @@ NodeId GetNodeId(const CommandHandler * commandObj)
     return descriptor.subject;
 }
 
-void AddReverseOpenCommissioningWindowResponse(CommandHandler * commandObj, const ConcreteCommandPath & path,
+void AddReverseOpenCommissioningWindowResponse(CommandHandler & commandHandler, const ConcreteCommandPath & path,
                                                const Clusters::CommissionerControl::CommissioningWindowParams & params)
 {
     Clusters::CommissionerControl::Commands::ReverseOpenCommissioningWindow::Type response;
@@ -59,30 +59,7 @@ void AddReverseOpenCommissioningWindowResponse(CommandHandler * commandObj, cons
     response.PAKEPasscodeVerifier = params.PAKEPasscodeVerifier;
     response.salt                 = params.salt;
 
-    commandObj->AddResponse(path, response);
-}
-
-void RunDeferredCommissionNode(intptr_t commandArg)
-{
-    auto * params = reinterpret_cast<Clusters::CommissionerControl::CommissioningWindowParams *>(commandArg);
-
-    Clusters::CommissionerControl::Delegate * delegate =
-        Clusters::CommissionerControl::CommissionerControlServer::Instance().GetDelegate();
-
-    if (delegate != nullptr)
-    {
-        CHIP_ERROR err = delegate->HandleCommissionNode(*params);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "HandleCommissionNode error: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-    }
-    else
-    {
-        ChipLogError(Zcl, "No delegate available for HandleCommissionNode");
-    }
-
-    delete params;
+    commandHandler.AddResponse(path, response);
 }
 
 } // namespace
@@ -92,16 +69,20 @@ namespace app {
 namespace Clusters {
 namespace CommissionerControl {
 
-CommissionerControlServer CommissionerControlServer::sInstance;
-
-CommissionerControlServer & CommissionerControlServer::Instance()
+CommissionerControlServer::CommissionerControlServer(Delegate * delegate, EndpointId endpointId, ClusterId clusterId) :
+    CommandHandlerInterface(MakeOptional(endpointId), clusterId)
 {
-    return sInstance;
+    mDelegate = delegate;
 }
 
-CHIP_ERROR CommissionerControlServer::Init(Delegate & delegate)
+CommissionerControlServer::~CommissionerControlServer()
 {
-    mDelegate = &delegate;
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+}
+
+CHIP_ERROR CommissionerControlServer::Init()
+{
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
 }
 
@@ -146,38 +127,53 @@ CommissionerControlServer::GenerateCommissioningRequestResultEvent(EndpointId en
     return error;
 }
 
-} // namespace CommissionerControl
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+void CommissionerControlServer::InvokeCommand(HandlerContext & handlerContext)
+{
+    ChipLogDetail(Zcl, "CommissionerControl: InvokeCommand");
+    switch (handlerContext.mRequestPath.mCommandId)
+    {
+    case Commands::RequestCommissioningApproval::Id:
+        ChipLogDetail(Zcl, "CommissionerControl: Entering RequestCommissioningApproval");
 
-bool emberAfCommissionerControlClusterRequestCommissioningApprovalCallback(
-    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-    const Clusters::CommissionerControl::Commands::RequestCommissioningApproval::DecodableType & commandData)
+        CommandHandlerInterface::HandleCommand<Commands::RequestCommissioningApproval::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleRequestCommissioningApproval(ctx, req); });
+        break;
+
+    case Commands::CommissionNode::Id:
+        ChipLogDetail(Zcl, "CommissionerControl: Entering CommissionNode");
+
+        CommandHandlerInterface::HandleCommand<Commands::CommissionNode::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleCommissionNode(ctx, req); });
+        break;
+    }
+}
+
+void CommissionerControlServer::HandleRequestCommissioningApproval(
+    HandlerContext & ctx, const Commands::RequestCommissioningApproval::DecodableType & req)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Status status  = Status::Success;
 
     ChipLogProgress(Zcl, "Received command to request commissioning approval");
 
-    auto sourceNodeId = GetNodeId(commandObj);
+    auto sourceNodeId = GetNodeId(ctx.mCommandHandler);
 
     // Check if the command is executed via a CASE session
     if (sourceNodeId == kUndefinedNodeId)
     {
         ChipLogError(Zcl, "Commissioning approval request not executed via CASE session, failing with UNSUPPORTED_ACCESS");
-        commandObj->AddStatus(commandPath, Status::UnsupportedAccess);
-        return true;
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::UnsupportedAccess);
+        return;
     }
 
-    auto fabricIndex = commandObj->GetAccessingFabricIndex();
-    auto requestId   = commandData.requestID;
-    auto vendorId    = commandData.vendorID;
-    auto productId   = commandData.productID;
+    auto fabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
+    auto requestId   = req.requestID;
+    auto vendorId    = req.vendorID;
+    auto productId   = req.productID;
 
-    // The label assigned from commandData need to be stored in CommissionerControl::Delegate which ensure that the backing buffer
+    // The label assigned from req need to be stored in CommissionerControl::Delegate which ensure that the backing buffer
     // of it has a valid lifespan during fabric sync setup process.
-    auto & label = commandData.label;
+    auto & label = req.label;
 
     // Create a CommissioningApprovalRequest struct and populate it with the command data
     Clusters::CommissionerControl::CommissioningApprovalRequest request = { .requestId    = requestId,
@@ -187,85 +183,92 @@ bool emberAfCommissionerControlClusterRequestCommissioningApprovalCallback(
                                                                             .fabricIndex  = fabricIndex,
                                                                             .label        = label };
 
-    Clusters::CommissionerControl::Delegate * delegate =
-        Clusters::CommissionerControl::CommissionerControlServer::Instance().GetDelegate();
-
-    VerifyOrExit(delegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     // Handle commissioning approval request
-    err = delegate->HandleCommissioningApprovalRequest(request);
+    err = mDelegate->HandleCommissioningApprovalRequest(request);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfCommissionerControlClusterRequestCommissioningApprovalCallback error: %" CHIP_ERROR_FORMAT,
-                     err.Format());
+        ChipLogError(Zcl, "HandleRequestCommissioningApproval error: %" CHIP_ERROR_FORMAT, err.Format());
         status = StatusIB(err).mStatus;
     }
 
-    commandObj->AddStatus(commandPath, status);
-    return true;
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-bool emberAfCommissionerControlClusterCommissionNodeCallback(
-    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-    const Clusters::CommissionerControl::Commands::CommissionNode::DecodableType & commandData)
+void CommissionerControlServer::HandleCommissionNode(HandlerContext & ctx, const Commands::CommissionNode::DecodableType & req)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(Zcl, "Received command to commission node");
 
-    auto sourceNodeId = GetNodeId(commandObj);
+    auto sourceNodeId = GetNodeId(ctx.mCommandHandler);
 
     // Constraint on responseTimeoutSeconds is [30; 120] seconds
-    if ((commandData.responseTimeoutSeconds < 30) || (commandData.responseTimeoutSeconds > 120))
+    if ((req.responseTimeoutSeconds < 30) || (req.responseTimeoutSeconds > 120))
     {
         ChipLogError(Zcl, "Invalid responseTimeoutSeconds for CommissionNode.");
-        commandObj->AddStatus(commandPath, Status::ConstraintError);
-        return true;
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        return;
     }
 
     // Check if the command is executed via a CASE session
     if (sourceNodeId == kUndefinedNodeId)
     {
         ChipLogError(Zcl, "Commission node request not executed via CASE session, failing with UNSUPPORTED_ACCESS");
-        commandObj->AddStatus(commandPath, Status::UnsupportedAccess);
-        return true;
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::UnsupportedAccess);
+        return;
     }
 
-    auto requestId = commandData.requestID;
-
+    auto requestId                 = req.requestID;
+    auto delegate                  = mDelegate;
     auto commissioningWindowParams = std::make_unique<Clusters::CommissionerControl::CommissioningWindowParams>();
 
-    Clusters::CommissionerControl::Delegate * delegate =
-        Clusters::CommissionerControl::CommissionerControlServer::Instance().GetDelegate();
-
-    VerifyOrExit(delegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     // Validate the commission node command.
-    err = delegate->ValidateCommissionNodeCommand(sourceNodeId, requestId);
+    err = mDelegate->ValidateCommissionNodeCommand(sourceNodeId, requestId);
     SuccessOrExit(err);
 
     // Populate the parameters for the commissioning window
-    err = delegate->GetCommissioningWindowParams(*commissioningWindowParams);
+    err = mDelegate->GetCommissioningWindowParams(*commissioningWindowParams);
     SuccessOrExit(err);
 
     // Add the response for the commissioning window.
-    AddReverseOpenCommissioningWindowResponse(commandObj, commandPath, *commissioningWindowParams);
+    AddReverseOpenCommissioningWindowResponse(ctx.mCommandHandler, ctx.mRequestPath, *commissioningWindowParams);
 
     // Schedule the deferred reverse commission node task
-    DeviceLayer::PlatformMgr().ScheduleWork(RunDeferredCommissionNode,
-                                            reinterpret_cast<intptr_t>(commissioningWindowParams.release()));
+    DeviceLayer::SystemLayer().ScheduleLambda([delegate, params = commissioningWindowParams.release()]() {
+        if (delegate != nullptr)
+        {
+            CHIP_ERROR error = delegate->HandleCommissionNode(*params);
+            if (error != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "HandleCommissionNode error: %" CHIP_ERROR_FORMAT, error.Format());
+            }
+        }
+        else
+        {
+            ChipLogError(Zcl, "No delegate available for HandleCommissionNode");
+        }
+
+        delete params;
+    });
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfCommissionerControlClusterCommissionNodeCallback error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, StatusIB(err).mStatus);
+        ChipLogError(Zcl, "HandleCommissionNode error: %" CHIP_ERROR_FORMAT, err.Format());
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, StatusIB(err).mStatus);
     }
-
-    return true;
 }
+
+} // namespace CommissionerControl
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
 void MatterCommissionerControlPluginServerInitCallback()
 {

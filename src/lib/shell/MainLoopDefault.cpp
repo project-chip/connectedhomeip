@@ -57,6 +57,15 @@ size_t ReadLine(char * buffer, size_t max)
             break;
         }
 
+        // Stop the loop if the input stream is closed.
+        if (ret == 0)
+        {
+            if (line_sz > 0)
+                // Return current buffer if it is not empty.
+                buffer[line_sz++] = '\0';
+            break;
+        }
+
         if (ret != 1)
             continue;
 

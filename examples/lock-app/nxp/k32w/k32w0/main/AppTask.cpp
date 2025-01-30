@@ -23,10 +23,10 @@
 #include <lib/core/ErrorStr.h>
 
 #include <DeviceInfoProviderImpl.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <inet/EndPointStateOpenThread.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -192,7 +192,7 @@ void AppTask::InitServer(intptr_t arg)
 {
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     auto & infoProvider = chip::DeviceLayer::DeviceInfoProviderImpl::GetDefaultInstance();
     infoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
@@ -610,23 +610,23 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
         }
     }
 
-#if CONFIG_CHIP_NFC_COMMISSIONING
+#if CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
     if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange && event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
     {
-        if (!NFCMgr().IsTagEmulationStarted())
+        if (!NFCOnboardingPayloadMgr().IsTagEmulationStarted())
         {
             K32W_LOG("NFC Tag emulation is already stopped!");
         }
         else
         {
-            NFCMgr().StopTagEmulation();
+            NFCOnboardingPayloadMgr().StopTagEmulation();
             K32W_LOG("Stopped NFC Tag Emulation!");
         }
     }
     else if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange &&
              event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
     {
-        if (NFCMgr().IsTagEmulationStarted())
+        if (NFCOnboardingPayloadMgr().IsTagEmulationStarted())
         {
             K32W_LOG("NFC Tag emulation is already started!");
         }

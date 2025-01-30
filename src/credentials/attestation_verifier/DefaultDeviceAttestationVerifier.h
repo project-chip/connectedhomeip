@@ -83,9 +83,10 @@ public:
 
     CsaCdKeysTrustStore * GetCertificationDeclarationTrustStore() override { return &mCdKeysTrustStore; }
 
-    void SetRevocationDelegate(DeviceAttestationRevocationDelegate * revocationDelegate)
+    CHIP_ERROR SetRevocationDelegate(DeviceAttestationRevocationDelegate * revocationDelegate) override
     {
         mRevocationDelegate = revocationDelegate;
+        return CHIP_NO_ERROR;
     }
 
 protected:

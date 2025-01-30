@@ -29,12 +29,16 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/CommandHandler.h>
+#include <app/CommandHandlerInterface.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/ScopedBuffer.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <zap-generated/gen_config.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -86,13 +90,41 @@ void ReportAttributeOnAllEndpoints(AttributeId attribute)
     }
 }
 
-class GeneralDiagosticsAttrAccess : public AttributeAccessInterface
+TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(ByteSpan enableKey)
+{
+    if (enableKey.size() != TestEventTriggerDelegate::kEnableKeyLength)
+    {
+        return nullptr;
+    }
+
+    if (IsByteSpanAllZeros(enableKey))
+    {
+        return nullptr;
+    }
+
+    auto * triggerDelegate = chip::Server::GetInstance().GetTestEventTriggerDelegate();
+
+    if (triggerDelegate == nullptr || !triggerDelegate->DoesEnableKeyMatch(enableKey))
+    {
+        return nullptr;
+    }
+
+    return triggerDelegate;
+}
+
+class GeneralDiagosticsGlobalInstance : public AttributeAccessInterface,
+                                        public CommandHandlerInterface,
+                                        public DeviceLayer::ConnectivityManagerDelegate
 {
 public:
     // Register for the GeneralDiagnostics cluster on all endpoints.
-    GeneralDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralDiagnostics::Id) {}
+    GeneralDiagosticsGlobalInstance() :
+        AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralDiagnostics::Id),
+        CommandHandlerInterface(Optional<EndpointId>::Missing(), GeneralDiagnostics::Id)
+    {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    void InvokeCommand(HandlerContext & handlerContext) override;
 
 private:
     template <typename T>
@@ -102,81 +134,24 @@ private:
     CHIP_ERROR ReadListIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &), AttributeValueEncoder & aEncoder);
 
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
+
+    void HandleTestEventTrigger(HandlerContext & ctx, const Commands::TestEventTrigger::DecodableType & commandData);
+    void HandleTimeSnapshot(HandlerContext & ctx, const Commands::TimeSnapshot::DecodableType & commandData);
+
+#ifdef GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD
+    void HandlePayloadTestRequest(HandlerContext & ctx, const Commands::PayloadTestRequest::DecodableType & commandData);
+#endif
+
+    // Gets called when any network interface on the Node is updated.
+    void OnNetworkInfoChanged() override
+    {
+        ChipLogDetail(Zcl, "GeneralDiagnosticsDelegate: OnNetworkInfoChanged");
+
+        ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::NetworkInterfaces::Id);
+    }
 };
 
-template <typename T>
-CHIP_ERROR GeneralDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &),
-                                                        AttributeValueEncoder & aEncoder)
-{
-    T data;
-    CHIP_ERROR err = (GetDiagnosticDataProvider().*getter)(data);
-    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-    {
-        data = {};
-    }
-    else if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
-
-    return aEncoder.Encode(data);
-}
-
-template <typename T>
-CHIP_ERROR GeneralDiagosticsAttrAccess::ReadListIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &),
-                                                            AttributeValueEncoder & aEncoder)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    T faultList;
-
-    if ((GetDiagnosticDataProvider().*getter)(faultList) == CHIP_NO_ERROR)
-    {
-        err = aEncoder.EncodeList([&faultList](const auto & encoder) -> CHIP_ERROR {
-            for (auto fault : faultList)
-            {
-                ReturnErrorOnFailure(encoder.Encode(fault));
-            }
-
-            return CHIP_NO_ERROR;
-        });
-    }
-    else
-    {
-        err = aEncoder.EncodeEmptyList();
-    }
-
-    return err;
-}
-
-CHIP_ERROR GeneralDiagosticsAttrAccess::ReadNetworkInterfaces(AttributeValueEncoder & aEncoder)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    DeviceLayer::NetworkInterface * netifs;
-
-    if (DeviceLayer::GetDiagnosticDataProvider().GetNetworkInterfaces(&netifs) == CHIP_NO_ERROR)
-    {
-        err = aEncoder.EncodeList([&netifs](const auto & encoder) -> CHIP_ERROR {
-            for (DeviceLayer::NetworkInterface * ifp = netifs; ifp != nullptr; ifp = ifp->Next)
-            {
-                ReturnErrorOnFailure(encoder.Encode(*ifp));
-            }
-
-            return CHIP_NO_ERROR;
-        });
-
-        DeviceLayer::GetDiagnosticDataProvider().ReleaseNetworkInterfaces(netifs);
-    }
-    else
-    {
-        err = aEncoder.EncodeEmptyList();
-    }
-
-    return err;
-}
-
-GeneralDiagosticsAttrAccess gAttrAccess;
-
-CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR GeneralDiagosticsGlobalInstance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != GeneralDiagnostics::Id)
     {
@@ -231,25 +206,190 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
     case ClusterRevision::Id: {
         return aEncoder.Encode(kCurrentClusterRevision);
     }
-
-    default:
-        break;
     }
     return CHIP_NO_ERROR;
 }
 
-class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelegate
+void GeneralDiagosticsGlobalInstance::InvokeCommand(HandlerContext & handlerContext)
 {
-    // Gets called when any network interface on the Node is updated.
-    void OnNetworkInfoChanged() override
+    switch (handlerContext.mRequestPath.mCommandId)
     {
-        ChipLogDetail(Zcl, "GeneralDiagnosticsDelegate: OnNetworkInfoChanged");
+    case Commands::TestEventTrigger::Id:
+        CommandHandlerInterface::HandleCommand<Commands::TestEventTrigger::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleTestEventTrigger(ctx, commandData); });
+        break;
 
-        ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::NetworkInterfaces::Id);
+    case Commands::TimeSnapshot::Id:
+        CommandHandlerInterface::HandleCommand<Commands::TimeSnapshot::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleTimeSnapshot(ctx, commandData); });
+        break;
+
+#ifdef GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD
+    case Commands::PayloadTestRequest::Id:
+        CommandHandlerInterface::HandleCommand<Commands::PayloadTestRequest::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandlePayloadTestRequest(ctx, commandData); });
+        break;
+#endif
     }
-};
+}
 
-GeneralDiagnosticsDelegate gDiagnosticDelegate;
+template <typename T>
+CHIP_ERROR GeneralDiagosticsGlobalInstance::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &),
+                                                            AttributeValueEncoder & aEncoder)
+{
+    T data;
+    CHIP_ERROR err = (GetDiagnosticDataProvider().*getter)(data);
+    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    {
+        data = {};
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+
+    return aEncoder.Encode(data);
+}
+
+template <typename T>
+CHIP_ERROR GeneralDiagosticsGlobalInstance::ReadListIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &),
+                                                                AttributeValueEncoder & aEncoder)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    T faultList;
+
+    if ((GetDiagnosticDataProvider().*getter)(faultList) == CHIP_NO_ERROR)
+    {
+        err = aEncoder.EncodeList([&faultList](const auto & encoder) -> CHIP_ERROR {
+            for (auto fault : faultList)
+            {
+                ReturnErrorOnFailure(encoder.Encode(fault));
+            }
+
+            return CHIP_NO_ERROR;
+        });
+    }
+    else
+    {
+        err = aEncoder.EncodeEmptyList();
+    }
+
+    return err;
+}
+
+CHIP_ERROR GeneralDiagosticsGlobalInstance::ReadNetworkInterfaces(AttributeValueEncoder & aEncoder)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    DeviceLayer::NetworkInterface * netifs;
+
+    if (DeviceLayer::GetDiagnosticDataProvider().GetNetworkInterfaces(&netifs) == CHIP_NO_ERROR)
+    {
+        err = aEncoder.EncodeList([&netifs](const auto & encoder) -> CHIP_ERROR {
+            for (DeviceLayer::NetworkInterface * ifp = netifs; ifp != nullptr; ifp = ifp->Next)
+            {
+                ReturnErrorOnFailure(encoder.Encode(*ifp));
+            }
+
+            return CHIP_NO_ERROR;
+        });
+
+        DeviceLayer::GetDiagnosticDataProvider().ReleaseNetworkInterfaces(netifs);
+    }
+    else
+    {
+        err = aEncoder.EncodeEmptyList();
+    }
+
+    return err;
+}
+
+void GeneralDiagosticsGlobalInstance::HandleTestEventTrigger(HandlerContext & ctx,
+                                                             const Commands::TestEventTrigger::DecodableType & commandData)
+{
+    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
+    if (triggerDelegate == nullptr)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        return;
+    }
+
+    CHIP_ERROR handleEventTriggerResult = triggerDelegate->HandleEventTriggers(commandData.eventTrigger);
+
+    // When HandleEventTrigger fails, we simply convert any error to INVALID_COMMAND
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath,
+                                  (handleEventTriggerResult != CHIP_NO_ERROR) ? Status::InvalidCommand : Status::Success);
+}
+
+void GeneralDiagosticsGlobalInstance::HandleTimeSnapshot(HandlerContext & ctx,
+                                                         const Commands::TimeSnapshot::DecodableType & commandData)
+{
+    ChipLogError(Zcl, "Received TimeSnapshot command!");
+
+    Commands::TimeSnapshotResponse::Type response;
+
+    System::Clock::Microseconds64 posix_time_us{ 0 };
+
+    // Only consider real time if time sync cluster is actually enabled. Avoids
+    // likelihood of frequently reporting unsynced time.
+#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+    CHIP_ERROR posix_time_err = System::SystemClock().GetClock_RealTime(posix_time_us);
+    if (posix_time_err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to get POSIX real time: %" CHIP_ERROR_FORMAT, posix_time_err.Format());
+        posix_time_us = System::Clock::Microseconds64{ 0 };
+    }
+#endif // ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+
+    System::Clock::Milliseconds64 system_time_ms =
+        std::chrono::duration_cast<System::Clock::Milliseconds64>(Server::GetInstance().TimeSinceInit());
+
+    response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
+    if (posix_time_us.count() != 0)
+    {
+        response.posixTimeMs.SetNonNull(
+            static_cast<uint64_t>(std::chrono::duration_cast<System::Clock::Milliseconds64>(posix_time_us).count()));
+    }
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+}
+
+#ifdef GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD
+void GeneralDiagosticsGlobalInstance::HandlePayloadTestRequest(HandlerContext & ctx,
+                                                               const Commands::PayloadTestRequest::DecodableType & commandData)
+{
+    // Max allowed is 2048.
+    if (commandData.count > 2048)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        return;
+    }
+
+    // Ensure Test Event triggers are enabled and key matches.
+    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
+    if (triggerDelegate == nullptr)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        return;
+    }
+
+    Commands::PayloadTestResponse::Type response;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> payload;
+    if (!payload.Calloc(commandData.count))
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
+        return;
+    }
+
+    memset(payload.Get(), commandData.value, payload.AllocatedSize());
+    response.payload = ByteSpan{ payload.Get(), payload.AllocatedSize() };
+
+    if (ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response) != CHIP_NO_ERROR)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
+    }
+}
+#endif // GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD
+
+GeneralDiagosticsGlobalInstance gGeneralDiagosticsInstance;
 
 } // anonymous namespace
 
@@ -373,126 +513,14 @@ void GeneralDiagnosticsServer::OnNetworkFaultsDetect(const GeneralFaults<kMaxNet
 } // namespace app
 } // namespace chip
 
-namespace {
-
-TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(ByteSpan enableKey)
-{
-    if (enableKey.size() != TestEventTriggerDelegate::kEnableKeyLength)
-    {
-        return nullptr;
-    }
-
-    if (IsByteSpanAllZeros(enableKey))
-    {
-        return nullptr;
-    }
-
-    auto * triggerDelegate = chip::Server::GetInstance().GetTestEventTriggerDelegate();
-
-    if (triggerDelegate == nullptr || !triggerDelegate->DoesEnableKeyMatch(enableKey))
-    {
-        return nullptr;
-    }
-
-    return triggerDelegate;
-}
-
-} // namespace
-
-bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                              const Commands::TestEventTrigger::DecodableType & commandData)
-{
-    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
-    if (triggerDelegate == nullptr)
-    {
-        commandObj->AddStatus(commandPath, Status::ConstraintError);
-        return true;
-    }
-
-    CHIP_ERROR handleEventTriggerResult = triggerDelegate->HandleEventTriggers(commandData.eventTrigger);
-
-    // When HandleEventTrigger fails, we simply convert any error to INVALID_COMMAND
-    commandObj->AddStatus(commandPath, (handleEventTriggerResult != CHIP_NO_ERROR) ? Status::InvalidCommand : Status::Success);
-    return true;
-}
-
-bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
-                                                          Commands::TimeSnapshot::DecodableType const & commandData)
-{
-    ChipLogError(Zcl, "Received TimeSnapshot command!");
-
-    Commands::TimeSnapshotResponse::Type response;
-
-    System::Clock::Microseconds64 posix_time_us{ 0 };
-
-    // Only consider real time if time sync cluster is actually enabled. Avoids
-    // likelihood of frequently reporting unsynced time.
-#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
-    CHIP_ERROR posix_time_err = System::SystemClock().GetClock_RealTime(posix_time_us);
-    if (posix_time_err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to get POSIX real time: %" CHIP_ERROR_FORMAT, posix_time_err.Format());
-        posix_time_us = System::Clock::Microseconds64{ 0 };
-    }
-#endif // ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
-
-    System::Clock::Milliseconds64 system_time_ms =
-        std::chrono::duration_cast<System::Clock::Milliseconds64>(Server::GetInstance().TimeSinceInit());
-
-    response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
-    if (posix_time_us.count() != 0)
-    {
-        response.posixTimeMs.SetNonNull(
-            static_cast<uint64_t>(std::chrono::duration_cast<System::Clock::Milliseconds64>(posix_time_us).count()));
-    }
-    commandObj->AddResponse(commandPath, response);
-    return true;
-}
-
-bool emberAfGeneralDiagnosticsClusterPayloadTestRequestCallback(CommandHandler * commandObj,
-                                                                const ConcreteCommandPath & commandPath,
-                                                                const Commands::PayloadTestRequest::DecodableType & commandData)
-{
-    // Max allowed is 2048.
-    if (commandData.count > 2048)
-    {
-        commandObj->AddStatus(commandPath, Status::ConstraintError);
-        return true;
-    }
-
-    // Ensure Test Event triggers are enabled and key matches.
-    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
-    if (triggerDelegate == nullptr)
-    {
-        commandObj->AddStatus(commandPath, Status::ConstraintError);
-        return true;
-    }
-
-    Commands::PayloadTestResponse::Type response;
-    Platform::ScopedMemoryBufferWithSize<uint8_t> payload;
-    if (!payload.Calloc(commandData.count))
-    {
-        commandObj->AddStatus(commandPath, Status::ResourceExhausted);
-        return true;
-    }
-
-    memset(payload.Get(), commandData.value, payload.AllocatedSize());
-    response.payload = ByteSpan{ payload.Get(), payload.AllocatedSize() };
-
-    if (commandObj->AddResponseData(commandPath, response) != CHIP_NO_ERROR)
-    {
-        commandObj->AddStatus(commandPath, Status::ResourceExhausted);
-    }
-
-    return true;
-}
-
 void MatterGeneralDiagnosticsPluginServerInitCallback()
 {
     BootReasonEnum bootReason;
 
-    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
-    ConnectivityMgr().SetDelegate(&gDiagnosticDelegate);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gGeneralDiagosticsInstance);
+    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gGeneralDiagosticsInstance);
+
+    ConnectivityMgr().SetDelegate(&gGeneralDiagosticsInstance);
 
     if (GetDiagnosticDataProvider().GetBootReason(bootReason) == CHIP_NO_ERROR)
     {

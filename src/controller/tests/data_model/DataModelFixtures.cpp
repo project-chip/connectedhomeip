@@ -26,8 +26,8 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/InteractionModelEngine.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/TextOnlyLogging.h>
 #include <optional>
@@ -39,6 +39,9 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitTesting;
 using namespace chip::Protocols;
+
+// Mock function for linking
+void InitDataModelHandler() {}
 
 namespace chip {
 namespace app {
@@ -472,108 +475,6 @@ std::optional<ActionReturnStatus> CustomDataModel::Invoke(const InvokeRequest & 
 {
     DispatchSingleClusterCommand(request.path, input_arguments, handler);
     return std::nullopt; // handler status is set by the dispatch
-}
-
-DataModel::EndpointEntry CustomDataModel::FirstEndpoint()
-{
-    return CodegenDataModelProviderInstance()->FirstEndpoint();
-}
-
-DataModel::EndpointEntry CustomDataModel::NextEndpoint(EndpointId before)
-{
-    return CodegenDataModelProviderInstance()->NextEndpoint(before);
-}
-
-std::optional<DataModel::EndpointInfo> CustomDataModel::GetEndpointInfo(EndpointId endpoint)
-{
-    return CodegenDataModelProviderInstance()->GetEndpointInfo(endpoint);
-}
-
-std::optional<DataModel::DeviceTypeEntry> CustomDataModel::FirstDeviceType(EndpointId endpoint)
-{
-    return std::nullopt;
-}
-
-std::optional<DataModel::DeviceTypeEntry> CustomDataModel::NextDeviceType(EndpointId endpoint,
-                                                                          const DataModel::DeviceTypeEntry & previous)
-{
-    return std::nullopt;
-}
-
-std::optional<DataModel::Provider::SemanticTag> CustomDataModel::GetFirstSemanticTag(EndpointId endpoint)
-{
-    return std::nullopt;
-}
-
-std::optional<DataModel::Provider::SemanticTag> CustomDataModel::GetNextSemanticTag(EndpointId endpoint,
-                                                                                    const SemanticTag & previous)
-{
-    return std::nullopt;
-}
-
-ClusterEntry CustomDataModel::FirstServerCluster(EndpointId endpoint)
-{
-    return CodegenDataModelProviderInstance()->FirstServerCluster(endpoint);
-}
-
-ClusterEntry CustomDataModel::NextServerCluster(const ConcreteClusterPath & before)
-{
-    return CodegenDataModelProviderInstance()->NextServerCluster(before);
-}
-
-std::optional<ClusterInfo> CustomDataModel::GetServerClusterInfo(const ConcreteClusterPath & path)
-{
-    return CodegenDataModelProviderInstance()->GetServerClusterInfo(path);
-}
-
-ConcreteClusterPath CustomDataModel::FirstClientCluster(EndpointId endpoint)
-{
-    return CodegenDataModelProviderInstance()->FirstClientCluster(endpoint);
-}
-
-ConcreteClusterPath CustomDataModel::NextClientCluster(const ConcreteClusterPath & before)
-{
-    return CodegenDataModelProviderInstance()->NextClientCluster(before);
-}
-
-AttributeEntry CustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)
-{
-    return CodegenDataModelProviderInstance()->FirstAttribute(cluster);
-}
-
-AttributeEntry CustomDataModel::NextAttribute(const ConcreteAttributePath & before)
-{
-    return CodegenDataModelProviderInstance()->NextAttribute(before);
-}
-
-std::optional<AttributeInfo> CustomDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
-{
-    return CodegenDataModelProviderInstance()->GetAttributeInfo(path);
-}
-
-CommandEntry CustomDataModel::FirstAcceptedCommand(const ConcreteClusterPath & cluster)
-{
-    return CodegenDataModelProviderInstance()->FirstAcceptedCommand(cluster);
-}
-
-CommandEntry CustomDataModel::NextAcceptedCommand(const ConcreteCommandPath & before)
-{
-    return CodegenDataModelProviderInstance()->NextAcceptedCommand(before);
-}
-
-std::optional<CommandInfo> CustomDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
-{
-    return CodegenDataModelProviderInstance()->GetAcceptedCommandInfo(path);
-}
-
-ConcreteCommandPath CustomDataModel::FirstGeneratedCommand(const ConcreteClusterPath & cluster)
-{
-    return CodegenDataModelProviderInstance()->FirstGeneratedCommand(cluster);
-}
-
-ConcreteCommandPath CustomDataModel::NextGeneratedCommand(const ConcreteCommandPath & before)
-{
-    return CodegenDataModelProviderInstance()->NextGeneratedCommand(before);
 }
 
 } // namespace app

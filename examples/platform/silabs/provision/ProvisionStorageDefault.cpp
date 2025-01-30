@@ -70,14 +70,35 @@ CHIP_ERROR ErasePage(uint32_t addr)
     return chip::DeviceLayer::Silabs::GetPlatform().FlashErasePage(addr);
 }
 
-CHIP_ERROR WritePage(uint32_t addr, const uint8_t * data, size_t size)
-{
-    return chip::DeviceLayer::Silabs::GetPlatform().FlashWritePage(addr, data, size);
-}
-
 size_t RoundNearest(size_t n, size_t multiple)
 {
     return (n % multiple) > 0 ? n + (multiple - n % multiple) : n;
+}
+
+/**
+ * Writes "size" bytes to the flash page. The data is padded with 0xff
+ * up to the nearest 32-bit boundary.
+ */
+CHIP_ERROR WritePage(uint32_t addr, const uint8_t * data, size_t size)
+{
+    // The flash driver fails if the size is not a multiple of 4 (32-bits)
+    size_t size_32 = RoundNearest(size, 4);
+    if (size_32 == size)
+    {
+        // The given data is already aligned to 32-bit
+        return chip::DeviceLayer::Silabs::GetPlatform().FlashWritePage(addr, data, size);
+    }
+    else
+    {
+        // Create a temporary buffer, and pad it with "0xff"
+        uint8_t * p = static_cast<uint8_t *>(Platform::MemoryAlloc(size_32));
+        VerifyOrReturnError(p != nullptr, CHIP_ERROR_INTERNAL);
+        memcpy(p, data, size);
+        memset(p + size, 0xff, size_32 - size);
+        CHIP_ERROR err = chip::DeviceLayer::Silabs::GetPlatform().FlashWritePage(addr, p, size_32);
+        Platform::MemoryFree(p);
+        return err;
+    }
 }
 
 CHIP_ERROR WriteFile(Storage & store, SilabsConfig::Key offset_key, SilabsConfig::Key size_key, const ByteSpan & value)
@@ -89,17 +110,7 @@ CHIP_ERROR WriteFile(Storage & store, SilabsConfig::Key offset_key, SilabsConfig
         ReturnErrorOnFailure(ErasePage(base_addr));
     }
 
-    memcpy(Storage::aux_buffer, value.data(), value.size());
-    if (value.size() < Storage::kArgumentSizeMax)
-    {
-        memset(Storage::aux_buffer + value.size(), 0xff, Storage::kArgumentSizeMax - value.size());
-    }
-
-    ChipLogProgress(DeviceLayer, "WriteFile, addr:0x%06x+%03u, size:%u", (unsigned) base_addr, (unsigned) sCredentialsOffset,
-                    (unsigned) value.size());
-    // ChipLogByteSpan(DeviceLayer, ByteSpan(value.data(), value.size() < kDebugLength ? value.size() : kDebugLength));
-
-    ReturnErrorOnFailure(WritePage(base_addr + sCredentialsOffset, Storage::aux_buffer, Storage::kArgumentSizeMax));
+    ReturnErrorOnFailure(WritePage(base_addr + sCredentialsOffset, value.data(), value.size()));
 
     // Store file offset
     ReturnErrorOnFailure(SilabsConfig::WriteConfigValue(offset_key, (uint32_t) sCredentialsOffset));
@@ -119,7 +130,6 @@ CHIP_ERROR ReadFileByOffset(Storage & store, const char * description, uint32_t 
     ByteSpan span(address, size);
     ChipLogProgress(DeviceLayer, "%s, addr:0x%06x+%03u, size:%u", description, (unsigned) base_addr, (unsigned) offset,
                     (unsigned) size);
-    // ChipLogByteSpan(DeviceLayer, ByteSpan(span.data(), span.size() < kDebugLength ? span.size() : kDebugLength));
     return CopySpanToMutableSpan(span, value);
 }
 

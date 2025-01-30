@@ -44,7 +44,7 @@ extern "C" {
 #endif // (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #endif // WF200_WIFI
 
-#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
+#include <platform/silabs/wifi/WifiInterface.h>
 #ifdef WF200_WIFI
 #include "sl_wfx.h"
 #endif
@@ -88,16 +88,8 @@ static void low_level_init(struct netif * netif)
     netif->hwaddr_len = ETH_HWADDR_LEN;
 
     /* Set netif MAC hardware address */
-    sl_wfx_mac_address_t mac_addr;
-
-    wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &mac_addr);
-
-    netif->hwaddr[0] = mac_addr.octet[0];
-    netif->hwaddr[1] = mac_addr.octet[1];
-    netif->hwaddr[2] = mac_addr.octet[2];
-    netif->hwaddr[3] = mac_addr.octet[3];
-    netif->hwaddr[4] = mac_addr.octet[4];
-    netif->hwaddr[5] = mac_addr.octet[5];
+    chip::MutableByteSpan byteSpan(netif->hwaddr, ETH_HWADDR_LEN);
+    GetMacAddress(SL_WFX_STA_INTERFACE, byteSpan);
 
     /* Set netif maximum transfer unit */
     netif->mtu = 1500;
@@ -342,8 +334,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
 {
 #if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
     UNUSED_PARAMETER(netif);
-    sl_status_t status;
-    status = sl_wifi_send_raw_data_frame(SL_WIFI_CLIENT_INTERFACE, (uint8_t *) p->payload, p->len);
+    sl_status_t status = sl_wifi_send_raw_data_frame(SL_WIFI_CLIENT_INTERFACE, (uint8_t *) p->payload, p->len);
     if (status != SL_STATUS_OK)
     {
         return ERR_IF;
@@ -375,14 +366,14 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
 #endif
     if ((netif->flags & (NETIF_FLAG_LINK_UP | NETIF_FLAG_UP)) != (NETIF_FLAG_LINK_UP | NETIF_FLAG_UP))
     {
-        ChipLogProgress(DeviceLayer, "EN-RSI:NOT UP");
+        ChipLogError(DeviceLayer, "EN-RSI:NOT UP");
         xSemaphoreGive(ethout_sem);
         return ERR_IF;
     }
     packet = wfx_rsi_alloc_pkt();
     if (!packet)
     {
-        ChipLogProgress(DeviceLayer, "EN-RSI:No buf");
+        ChipLogError(DeviceLayer, "EN-RSI:No buf");
         xSemaphoreGive(ethout_sem);
         return ERR_IF;
     }
@@ -410,9 +401,10 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     /* forward the generated packet to RSI to
      * send the data over wifi network
      */
-    if (wfx_rsi_send_data(packet, datalength))
+    int32_t status = wfx_rsi_send_data(packet, datalength);
+    if (status != 0)
     {
-        ChipLogProgress(DeviceLayer, "*ERR*EN-RSI:Send fail");
+        ChipLogError(DeviceLayer, "*ERR*EN-RSI:Send fail: %ld", status);
         xSemaphoreGive(ethout_sem);
         return ERR_IF;
     }

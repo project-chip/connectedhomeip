@@ -41,6 +41,7 @@ static_library("BL702") {
     "../common/DiagnosticDataProviderImpl.cpp",
     "../common/KeyValueStoreManagerImpl.cpp",
     "../common/PlatformManagerImpl.cpp",
+    "../common/SystemTimeSupport.cpp",
   ]
 
   if (chip_enable_ota_requestor) {
@@ -57,8 +58,6 @@ static_library("BL702") {
     ]
   }
 
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
-
   if (chip_enable_factory_data) {
     sources += [
       "../common/FactoryDataProvider.cpp",
@@ -71,6 +70,11 @@ static_library("BL702") {
   } else {
     sources += [ "../common/BLConfig_littlefs.cpp" ]
   }
+
+  deps = [
+    "${chip_root}/src/credentials:credentials_header",
+    "${chip_root}/src/platform/logging:headers",
+  ]
 
   if (chip_enable_wifi) {
     sources += [
@@ -88,7 +92,10 @@ static_library("BL702") {
 
     import("//build_overrides/bouffalolab_iot_sdk.gni")
     import("${bouffalolab_iot_sdk_build_root}/bl702/bl_iot_sdk.gni")
-    deps += [ "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk" ]
+    deps += [
+      "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk",
+      "${chip_root}/src/app:app_config",
+    ]
 
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
@@ -112,9 +119,11 @@ static_library("BL702") {
       "EthernetInterface.c",
     ]
 
-    deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+    deps += [
+      "${chip_root}/src/app:app_config",
+      "${chip_root}/src/lib/dnssd:platform_header",
+    ]
   }
 
-  deps += [ "${chip_root}/src/credentials:credentials_header" ]
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 }

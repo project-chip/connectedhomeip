@@ -45,6 +45,7 @@
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 #include <cstddef> // Added for size_t
+#include <credentials/attestation_verifier/TestDACRevocationDelegateImpl.h>
 
 using namespace chip;
 
@@ -60,6 +61,15 @@ const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStor
     static chip::Credentials::FileAttestationTrustStore attestationTrustStore{ paaTrustStorePath };
 
     return &attestationTrustStore;
+}
+
+Credentials::DeviceAttestationRevocationDelegate * GetTestAttestationRevocationDelegate(const char * dacRevocationSetPath)
+{
+    VerifyOrReturnValue(dacRevocationSetPath != nullptr, nullptr);
+
+    static Credentials::TestDACRevocationDelegateImpl testDacRevocationDelegate;
+    testDacRevocationDelegate.SetDeviceAttestationRevocationSetPath(dacRevocationSetPath);
+    return &testDacRevocationDelegate;
 }
 
 chip::Python::PlaceholderOperationalCredentialsIssuer sPlaceholderOperationalCredentialsIssuer;
@@ -83,6 +93,8 @@ public:
     }
 
     void SetMaximallyLargeCertsUsed(bool enabled) { mExampleOpCredsIssuer.SetMaximallyLargeCertsUsed(enabled); }
+
+    void SetCertificateValidityPeriod(uint32_t validity) { mExampleOpCredsIssuer.SetCertificateValidityPeriod(validity); }
 
 private:
     CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
@@ -189,7 +201,7 @@ public:
                 mCompletionError = err;
             }
         }
-        if (report.stageCompleted == chip::Controller::CommissioningStage::kReadCommissioningInfo2)
+        if (report.stageCompleted == chip::Controller::CommissioningStage::kReadCommissioningInfo)
         {
             mReadCommissioningInfo = report.Get<chip::Controller::ReadCommissioningInfo>();
         }
@@ -523,7 +535,8 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
 
     // Initialize device attestation verifier
     const chip::Credentials::AttestationTrustStore * testingRootStore = GetTestFileAttestationTrustStore(paaTrustStorePath);
-    SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+    chip::Credentials::DeviceAttestationVerifier * dacVerifier        = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
+    SetDeviceAttestationVerifier(dacVerifier);
 
     chip::Crypto::P256Keypair ephemeralKey;
     chip::Crypto::P256Keypair * controllerKeyPair;
@@ -577,6 +590,7 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     initParams.controllerVendorId                   = adminVendorId;
     initParams.permitMultiControllerFabrics         = true;
     initParams.hasExternallyOwnedOperationalKeypair = operationalKey != nullptr;
+    initParams.deviceAttestationVerifier            = dacVerifier;
 
     if (useTestCommissioner)
     {
@@ -634,6 +648,15 @@ PyChipError pychip_OpCreds_SetMaximallyLargeCertsUsed(OpCredsContext * context, 
     VerifyOrReturnError(context != nullptr && context->mAdapter != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
 
     context->mAdapter->SetMaximallyLargeCertsUsed(enabled);
+
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_OpCreds_SetCertificateValidityPeriod(OpCredsContext * context, uint32_t validity)
+{
+    VerifyOrReturnError(context != nullptr && context->mAdapter != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
+
+    context->mAdapter->SetCertificateValidityPeriod(validity);
 
     return ToPyChipError(CHIP_NO_ERROR);
 }
@@ -720,6 +743,18 @@ PyChipError pychip_GetCompletionError()
     return ToPyChipError(sTestCommissioner.GetCompletionError());
 }
 
+PyChipError pychip_DeviceController_SetDACRevocationSetPath(const char * dacRevocationSetPath)
+{
+    Credentials::DeviceAttestationRevocationDelegate * dacRevocationDelegate =
+        GetTestAttestationRevocationDelegate(dacRevocationSetPath);
+    VerifyOrReturnError(dacRevocationDelegate != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    Credentials::DeviceAttestationVerifier * dacVerifier = Credentials::GetDeviceAttestationVerifier();
+    VerifyOrReturnError(dacVerifier != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
+
+    return ToPyChipError(dacVerifier->SetRevocationDelegate(dacRevocationDelegate));
+}
+
 extern "C" {
 // Function to get the RCAC data from the sTestCommissioner
 void pychip_GetCommissioningRCACData(uint8_t * rcacDataPtr, size_t * rcacSize)
@@ -739,6 +774,5 @@ void pychip_GetCommissioningRCACData(uint8_t * rcacDataPtr, size_t * rcacSize)
 
     // Copy the data from C++ to Python's allocated memory
     std::memcpy(rcacDataPtr, rcacData.data(), *rcacSize);
-}
 }
 } // extern "C"

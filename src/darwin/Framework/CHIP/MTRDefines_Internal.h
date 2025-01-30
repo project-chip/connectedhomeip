@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,8 +30,12 @@
 
 #ifdef DEBUG
 #define MTR_TESTABLE MTR_EXPORT
+#define MTR_TESTABLE_DIRECT
+#define MTR_TESTABLE_DIRECT_MEMBERS
 #else
 #define MTR_TESTABLE
+#define MTR_TESTABLE_DIRECT MTR_DIRECT
+#define MTR_TESTABLE_DIRECT_MEMBERS MTR_DIRECT_MEMBERS
 #endif
 
 // clang-format off

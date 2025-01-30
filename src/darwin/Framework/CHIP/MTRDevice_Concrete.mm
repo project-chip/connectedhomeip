@@ -814,6 +814,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         if ([self _deviceUsesThread]) {
             MTR_LOG(" => %@ - device is a thread device, scheduling in pool", self);
             mtr_weakify(self);
+            NSString * description = [NSString stringWithFormat:@"MTRDevice setDelegate first subscription / controller resume (%p)", self];
             [self _scheduleSubscriptionPoolWork:^{
                 mtr_strongify(self);
                 VerifyOrReturn(self);
@@ -821,8 +822,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                 [self->_deviceController asyncDispatchToMatterQueue:^{
                     std::lock_guard lock(self->_lock);
                     [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and scheduled subscription is happening", reason]];
-                } errorHandler:nil];
-            } inNanoseconds:0 description:@"MTRDevice setDelegate first subscription"];
+                } errorHandler:^(NSError * _Nonnull error) {
+                    // If controller is not running, clear work item from the subscription queue
+                    MTR_LOG_ERROR("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
+                    std::lock_guard lock(self->_lock);
+                    [self _clearSubscriptionPoolWork];
+                }];
+            } inNanoseconds:0 description:description];
         } else {
             [_deviceController asyncDispatchToMatterQueue:^{
                 std::lock_guard lock(self->_lock);
@@ -844,11 +850,18 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     os_unfair_lock_lock(&self->_lock);
 
+    // Flush unstored attributes if any
+    [self _persistClusterData];
+
     _state = MTRDeviceStateUnknown;
 
     // Make sure we don't try to resubscribe if we have a pending resubscribe
     // attempt, since we now have no delegate.
     _reattemptingSubscription = NO;
+
+    // Clear subscription pool work item if it's in progress, to avoid forever
+    // taking up a slot in the controller's work queue.
+    [self _clearSubscriptionPoolWork];
 
     [_deviceController asyncDispatchToMatterQueue:^{
         MTR_LOG("%@ invalidate disconnecting ReadClient and SubscriptionCallback", self);
@@ -858,13 +871,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         // tear down the subscription.  We will get no more callbacks from
         // the subscription after this point.
         std::lock_guard lock(self->_lock);
-        self->_currentReadClient = nullptr;
-        if (self->_currentSubscriptionCallback) {
-            delete self->_currentSubscriptionCallback;
-        }
-        self->_currentSubscriptionCallback = nullptr;
-
-        [self _changeInternalState:MTRInternalDeviceStateUnsubscribed];
+        [self _resetSubscription];
     }
                                      errorHandler:nil];
 
@@ -925,8 +932,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         }
         readClientToResubscribe->TriggerResubscribeIfScheduled(reason.UTF8String);
     } else if (_internalDeviceState == MTRInternalDeviceStateSubscribing && nodeLikelyReachable) {
-        // If we have reason to suspect that the node is now reachable and we haven’t established a
-        // CASE session yet, let’s consider it to be stalled and invalidate the pairing session.
+        // If we have reason to suspect that the node is now reachable and we haven't established a
+        // CASE session yet, let's consider it to be stalled and invalidate the pairing session.
         [self._concreteController asyncGetCommissionerOnMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
             auto caseSessionMgr = commissioner->CASESessionMgr();
             VerifyOrDie(caseSessionMgr != nullptr);
@@ -1151,7 +1158,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _doHandleSubscriptionError:error];
 }
 
-- (void)_doHandleSubscriptionError:(NSError *)error
+- (void)_doHandleSubscriptionError:(nullable NSError *)error
 {
     assertChipStackLockedByCurrentThread();
 
@@ -1292,7 +1299,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // Change our state before going async.
     [self _changeState:MTRDeviceStateUnknown];
-    [self _changeInternalState:MTRInternalDeviceStateResubscribing];
+
+    // If we have never had a subscription established, stay in the Subscribing
+    // state; don't transition to Resubscribing just because our attempt at
+    // subscribing failed.
+    if (HadSubscriptionEstablishedOnce(self->_internalDeviceState)) {
+        [self _changeInternalState:MTRInternalDeviceStateResubscribing];
+    }
 
     dispatch_async(self.queue, ^{
         [self _handleResubscriptionNeededWithDelayOnDeviceQueue:resubscriptionDelayMs];
@@ -1341,7 +1354,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if (deviceUsesThread) {
         std::lock_guard lock(_lock);
         // For Thread-enabled devices, schedule the _triggerResubscribeWithReason call to run in the subscription pool
-        [self _scheduleSubscriptionPoolWork:resubscriptionBlock inNanoseconds:resubscriptionDelayNs description:@"ReadClient resubscription"];
+        NSString * description = [NSString stringWithFormat:@"ReadClient resubscription (%p)", self];
+        [self _scheduleSubscriptionPoolWork:resubscriptionBlock inNanoseconds:resubscriptionDelayNs description:description];
     } else {
         // For non-Thread-enabled devices, just call the resubscription block after the specified time
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, resubscriptionDelayNs), self.queue, resubscriptionBlock);
@@ -1380,6 +1394,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     if (self.suspended) {
         MTR_LOG("%@ ignoring expected subscription reset on controller suspend", self);
+        [self _clearSubscriptionPoolWork];
         return;
     }
 
@@ -1397,6 +1412,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if (![self _delegateExists]) {
         // NOTE: Do not log anything here: we have been invalidated, and the
         // Matter stack might already be torn down.
+        [self _clearSubscriptionPoolWork];
         return;
     }
 
@@ -1445,13 +1461,19 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             std::lock_guard lock(self->_lock);
             [self _reattemptSubscriptionNowIfNeededWithReason:@"got subscription reset"];
         }
-                                               errorHandler:nil];
+            errorHandler:^(NSError * _Nonnull error) {
+                // If controller is not running, clear work item from the subscription queue
+                MTR_LOG_ERROR("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
+                std::lock_guard lock(self->_lock);
+                [self _clearSubscriptionPoolWork];
+            }];
     };
 
     int64_t resubscriptionDelayNs = static_cast<int64_t>(secondsToWait * NSEC_PER_SEC);
     if ([self _deviceUsesThread]) {
         // For Thread-enabled devices, schedule the _reattemptSubscriptionNowIfNeededWithReason call to run in the subscription pool
-        [self _scheduleSubscriptionPoolWork:resubscriptionBlock inNanoseconds:resubscriptionDelayNs description:@"MTRDevice resubscription"];
+        NSString * description = [NSString stringWithFormat:@"MTRDevice resubscription (%p)", self];
+        [self _scheduleSubscriptionPoolWork:resubscriptionBlock inNanoseconds:resubscriptionDelayNs description:description];
     } else {
         // For non-Thread-enabled devices, just call the resubscription block after the specified time
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, resubscriptionDelayNs), self.queue, resubscriptionBlock);
@@ -1465,6 +1487,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     os_unfair_lock_assert_owner(&self->_lock);
     if (!self.reattemptingSubscription) {
+        [self _clearSubscriptionPoolWork];
         return;
     }
 
@@ -2422,17 +2445,27 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         MTR_LOG("%@ subscription reset disconnecting ReadClient and SubscriptionCallback", self);
 
         std::lock_guard lock(self->_lock);
-        self->_currentReadClient = nullptr;
-        if (self->_currentSubscriptionCallback) {
-            delete self->_currentSubscriptionCallback;
-        }
-        self->_currentSubscriptionCallback = nullptr;
 
-        [self _doHandleSubscriptionError:nil];
+        [self _resetSubscription];
+
         // Use nil reset delay so that this keeps existing backoff timing
         [self _doHandleSubscriptionReset:nil];
     }
                                      errorHandler:nil];
+}
+
+- (void)_resetSubscription
+{
+    assertChipStackLockedByCurrentThread();
+    os_unfair_lock_assert_owner(&_lock);
+
+    _currentReadClient = nullptr;
+    if (_currentSubscriptionCallback) {
+        delete _currentSubscriptionCallback;
+        _currentSubscriptionCallback = nullptr;
+    }
+
+    [self _doHandleSubscriptionError:nil];
 }
 
 #ifdef DEBUG
@@ -2456,6 +2489,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     if (![self _subscriptionsAllowed]) {
         MTR_LOG("%@ _setupSubscription: Subscriptions not allowed. Do not set up subscription (reason: %@)", self, reason);
+        [self _clearSubscriptionPoolWork];
         return;
     }
 
@@ -2475,6 +2509,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // for now just subscribe once
     if (!NeedToStartSubscriptionSetup(_internalDeviceState)) {
         MTR_LOG("%@ setupSubscription: no need to subscribe due to internal state %lu (reason: %@)", self, static_cast<unsigned long>(_internalDeviceState), reason);
+        [self _clearSubscriptionPoolWork];
         return;
     }
 
@@ -3231,6 +3266,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             if ([now compare:cutoffTime] == NSOrderedDescending) {
                 // Our timed invoke timeout has expired already.  Command
                 // was queued for too long.  Do not send it out.
+                MTR_LOG("Invoke work item [%llu] timed out its timed invoke timeout before being dispatched", workItemID);
                 workDone(nil, [MTRError errorForIMStatusCode:Status::Timeout]);
                 return;
             }
@@ -4298,11 +4334,31 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)_deviceMayBeReachable
 {
-    MTR_LOG("%@ _deviceMayBeReachable called", self);
+    MTR_LOG("%@ _deviceMayBeReachable called, resetting subscription", self);
     // TODO: This should only be allowed for thread devices
-    [_deviceController asyncDispatchToMatterQueue:^{
-        [self _triggerResubscribeWithReason:@"SPI client indicated the device may now be reachable"
-                        nodeLikelyReachable:YES];
+    [self._concreteController asyncGetCommissionerOnMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
+        // Reset all of our subscription/session state and re-establish it all
+        // from the start.  Reset our subscription first, before tearing
+        // down the session, so we don't have to worry about the
+        // notifications from the latter coming through async and
+        // complicating the situation.  Unfortunately, we do not want to
+        // hold the lock when destroying the session, just in case it still
+        // ends up calling into us somehow, so we have to break the work up
+        // into two separate locked sections...
+        {
+            std::lock_guard lock(self->_lock);
+            [self _clearSubscriptionPoolWork];
+            [self _resetSubscription];
+        }
+
+        auto caseSessionMgr = commissioner->CASESessionMgr();
+        VerifyOrDie(caseSessionMgr != nullptr);
+        caseSessionMgr->ReleaseSession(commissioner->GetPeerScopedId(self->_nodeID.unsignedLongLongValue));
+
+        std::lock_guard lock(self->_lock);
+        // Use _ensureSubscriptionForExistingDelegates so that the subscriptions
+        // will go through the pool as needed, not necessarily happen immediately.
+        [self _ensureSubscriptionForExistingDelegates:@"SPI client indicated the device may now be reachable"];
     } errorHandler:nil];
 }
 
