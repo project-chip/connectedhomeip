@@ -1072,13 +1072,33 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
         return;
     }
 
-    if (!userExists(endpointId, userIndex))
+    EmberAfPluginDoorLockUserInfo user;
+    if (!emberAfPluginDoorLockGetUser(endpointId, userIndex, user))
+    {
+        ChipLogError(Zcl, "[SetWeekDaySchedule] Unable to get the user - internal error [endpointId=%d,userIndex=%d]", endpointId,
+                     userIndex);
+        commandObj->AddStatus(commandPath, Status::Failure);
+        return;
+    }
+
+    if (UserStatusEnum::kAvailable == user.userStatus)
     {
         ChipLogProgress(Zcl,
                         "[SetWeekDaySchedule] Unable to add schedule - user does not exist "
                         "[endpointId=%d,weekDayIndex=%d,userIndex=%d]",
                         endpointId, weekDayIndex, userIndex);
         commandObj->AddStatus(commandPath, Status::Failure);
+        return;
+    }
+
+    // Return INVALID_COMMAND if accessing FabricIndex does not match CreatorFabricIndex of User
+    if (user.createdBy != fabricIdx)
+    {
+        ChipLogProgress(Zcl,
+                        "[SetWeekDaySchedule] Unable to add schedule to user created by different fabric "
+                        "[endpointId=%d,userIndex=%d,creatorIdx=%d,fabricIdx=%d]",
+                        endpointId, userIndex, user.createdBy, fabricIdx);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -1132,6 +1152,8 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
                     "[SetWeekDaySchedule] Successfully created new schedule "
                     "[endpointId=%d,weekDayIndex=%d,userIndex=%d,daysMask=%d,startTime=\"%d:%d\",endTime=\"%d:%d\"]",
                     endpointId, weekDayIndex, userIndex, daysMask.Raw(), startHour, startMinute, endHour, endMinute);
+
+    updateLastModifiedFabricIndexOfUser(endpointId, userIndex, user, fabricIdx);
 
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kWeekDaySchedule, DataOperationTypeEnum::kAdd, sourceNodeId, fabricIdx,
                              userIndex, static_cast<uint16_t>(weekDayIndex));
@@ -1297,13 +1319,33 @@ void DoorLockServer::setYearDayScheduleCommandHandler(chip::app::CommandHandler 
         return;
     }
 
-    if (!userExists(endpointId, userIndex))
+    EmberAfPluginDoorLockUserInfo user;
+    if (!emberAfPluginDoorLockGetUser(endpointId, userIndex, user))
+    {
+        ChipLogError(Zcl, "[SetYearDaySchedule] Unable to get the user - internal error [endpointId=%d,userIndex=%d]", endpointId,
+                     userIndex);
+        commandObj->AddStatus(commandPath, Status::Failure);
+        return;
+    }
+
+    if (UserStatusEnum::kAvailable == user.userStatus)
     {
         ChipLogProgress(Zcl,
                         "[SetYearDaySchedule] Unable to add schedule - user does not exist "
                         "[endpointId=%d,yearDayIndex=%d,userIndex=%d]",
                         endpointId, yearDayIndex, userIndex);
         commandObj->AddStatus(commandPath, Status::Failure);
+        return;
+    }
+
+    // Return INVALID_COMMAND if accessing FabricIndex does not match CreatorFabricIndex of User
+    if (user.createdBy != fabricIdx)
+    {
+        ChipLogProgress(Zcl,
+                        "[SetYearDaySchedule] Unable to add schedule to user created by different fabric "
+                        "[endpointId=%d,userIndex=%d,creatorIdx=%d,fabricIdx=%d]",
+                        endpointId, userIndex, user.createdBy, fabricIdx);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
 
@@ -1333,6 +1375,8 @@ void DoorLockServer::setYearDayScheduleCommandHandler(chip::app::CommandHandler 
                     "[SetYearDaySchedule] Successfully created new schedule "
                     "[endpointId=%d,yearDayIndex=%d,userIndex=%d,localStartTime=%" PRIu32 ",endTime=%" PRIu32 "]",
                     endpointId, yearDayIndex, userIndex, localStartTime, localEndTime);
+
+    updateLastModifiedFabricIndexOfUser(endpointId, userIndex, user, fabricIdx);
 
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kYearDaySchedule, DataOperationTypeEnum::kAdd, sourceNodeId, fabricIdx,
                              userIndex, static_cast<uint16_t>(yearDayIndex));
@@ -1944,6 +1988,18 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Cred
     }
 
     return false;
+}
+
+void DoorLockServer::updateLastModifiedFabricIndexOfUser(chip::EndpointId endpointId, uint16_t userIndex,
+                                                         EmberAfPluginDoorLockUserInfo & userInfo, chip::FabricIndex fabricIndex)
+{
+    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, userInfo.createdBy, fabricIndex, userInfo.userName,
+                                      userInfo.userUniqueId, userInfo.userStatus, userInfo.userType, userInfo.credentialRule,
+                                      userInfo.credentials.data(), userInfo.credentials.size()))
+    {
+        ChipLogError(Zcl, "Unable to update user's fabric index - internal error [endpointId=%d,fabricIndex=%d,userIndex=%d]",
+                     endpointId, fabricIndex, userIndex);
+    }
 }
 
 ClusterStatusCode DoorLockServer::createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx,
