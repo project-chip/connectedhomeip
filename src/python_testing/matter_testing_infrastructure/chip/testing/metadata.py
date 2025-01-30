@@ -101,7 +101,8 @@ class MetadataReader:
         with open(env_yaml_file_path) as stream:
             env_yaml = yaml.safe_load(stream)
             self.env: Dict[str, str] = env_yaml.get("environment", {})
-            self.default_args: Dict[str, str] = env_yaml.get("default-arguments", {})
+            self.app_args: Dict[str, str] = env_yaml.get("app-args", {})
+            self.script_args: Dict[str, str] = env_yaml.get("script-args", {})
 
     def __resolve_env_vals__(self, metadata_dict: Dict[str, str]) -> None:
         """
@@ -150,25 +151,33 @@ class MetadataReader:
             if run == "skip-default-flags":
                 continue
 
-            resolved_args = self.default_args.copy()
-            resolved_args.update(attr)
+            resolved_app_args = self.app_args.copy()
+            resolved_script_args = self.script_args.copy()
+
+            for key, value in attr.items():
+                if key in self.app_args:
+                    resolved_app_args[key] = value
+                elif key in self.script_args:
+                    resolved_script_args[key] = value
 
             skip_flags = runs_args.get("skip-default-flags", [])
             for flag in skip_flags:
-                resolved_args.pop(flag, None)
+                resolved_app_args.pop(flag, None)
+                resolved_script_args.pop(flag, None)
 
-            self.__resolve_env_vals__(resolved_args)
+            self.__resolve_env_vals__(resolved_app_args)
+            self.__resolve_env_vals__(resolved_script_args)
 
             runs_metadata.append(Metadata(
                 py_script_path=py_script_path,
                 run=run,
-                app=resolved_args.get("app", ""),
-                app_args=resolved_args.get("app-args"),
-                app_ready_pattern=resolved_args.get("app-ready-pattern"),
-                app_stdin_pipe=resolved_args.get("app-stdin-pipe"),
-                script_args=resolved_args.get("script-args"),
-                factory_reset=resolved_args.get("factory-reset", False),
-                quiet=resolved_args.get("quiet", True),
+                app=attr.get("app", ""),
+                app_args=resolved_app_args,
+                app_ready_pattern=attr.get("app-ready-pattern"),
+                app_stdin_pipe=attr.get("app-stdin-pipe"),
+                script_args=resolved_script_args,
+                factory_reset=attr.get("factory-reset", False),
+                quiet=attr.get("quiet", True),
             ))
 
         return runs_metadata
