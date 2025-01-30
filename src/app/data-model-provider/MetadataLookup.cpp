@@ -65,25 +65,6 @@ std::optional<AttributeEntry> AttributeFinder::Find(const ConcreteAttributePath 
     return std::nullopt;
 }
 
-EndpointFinder::EndpointFinder(ProviderMetadataTree * provider) : mProvider(provider)
-{
-    VerifyOrReturn(mProvider != nullptr);
-    mEndpoints = mProvider->EndpointsIgnoreError();
-}
-
-std::optional<EndpointEntry> EndpointFinder::Find(EndpointId endpointId)
-{
-    for (auto & endpointEntry : mEndpoints)
-    {
-        if (endpointEntry.id == endpointId)
-        {
-            return endpointEntry;
-        }
-    }
-
-    return std::nullopt;
-}
-
 Protocols::InteractionModel::Status ValidateClusterPath(ProviderMetadataTree * provider, const ConcreteClusterPath & path,
                                                         Protocols::InteractionModel::Status successStatus)
 {
