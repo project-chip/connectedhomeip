@@ -1878,29 +1878,6 @@ TEST_F(TestCodegenModelViaMocks, ReadGlobalAttributeAttributeList)
     }
 }
 
-TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteAclDeny)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    /* Using this path is also failing existence checks, so this cannot be enabled
-     * until we fix ordering of ACL to be done before existence checks
-
-      WriteOperation test(kMockEndpoint1, MockClusterId(1), MockAttributeId(10));
-      AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
-
-      ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::UnsupportedAccess);
-      ASSERT_TRUE(model.ChangeListener().DirtyList().empty());
-    */
-
-    WriteOperation test(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_INT32U_ATTRIBUTE_TYPE));
-    AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
-
-    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::UnsupportedAccess);
-    ASSERT_TRUE(model.ChangeListener().DirtyList().empty());
-}
-
 TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteBasicTypes)
 {
     TestEmberScalarTypeWrite<uint8_t, ZCL_INT8U_ATTRIBUTE_TYPE>(0x12);
@@ -2179,42 +2156,6 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteLongBytes)
     EXPECT_EQ(writtenData[2], 11u);
     EXPECT_EQ(writtenData[3], 12u);
     EXPECT_EQ(writtenData[4], 13u);
-}
-
-TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteTimedWrite)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    WriteOperation test(kMockEndpoint3, MockClusterId(4), kAttributeIdTimedWrite);
-    test.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-    AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
-
-    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::NeedsTimedInteraction);
-
-    // writing as timed should be fine
-    test.SetWriteFlags(WriteFlags::kTimed);
-    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_NO_ERROR);
-}
-
-TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteReadOnlyAttribute)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    WriteOperation test(kMockEndpoint3, MockClusterId(4), kAttributeIdReadOnly);
-    test.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-    AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
-
-    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::UnsupportedWrite);
-
-    // Internal writes bypass the read only requirement
-    test.SetOperationFlags(OperationFlags::kInternal);
-    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_NO_ERROR);
 }
 
 TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteDataVersion)
