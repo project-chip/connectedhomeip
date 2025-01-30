@@ -108,22 +108,13 @@ tests:
     #242...254...0...4
     #Multiple range not supported in YAML: https://github.com/project-chip/connectedhomeip/issues/23197
     - label: "Step 2d: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.A0000 && CC.S.C01.Rsp && PICS_SKIP_SAMPLE_APP
-      verification: |
-          ./chip-tool colorcontrol read current-hue 1 1
-
-          Verify CurrentHue attribute is 250 on TH(chip-tool) Log and below is the sample log provided for the raspi platform
-
-          [1686057413.567938][20912:20914] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 1835932678
-          [1686057413.567958][20912:20914] CHIP:TOO:   CurrentHue: 250
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: CC.S.A0000 && CC.S.C01.Rsp
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 200
+              maxValue: 250
 
     - label: "Wait 2s"
       cluster: "DelayCommands"
@@ -135,22 +126,13 @@ tests:
 
     #Multiple range not supported in YAML: https://github.com/project-chip/connectedhomeip/issues/23197
     - label: "Step 2e: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.A0000 && CC.S.C01.Rsp && PICS_SKIP_SAMPLE_APP
-      verification: |
-          ./chip-tool colorcontrol read current-hue 1 1
-
-          After another 2 seconds, Verify CurrentHue value is stabilized at 250 on TH(chip-tool) Log and below is the sample log provided for the raspi platform
-
-          [1686057413.567938][20912:20914] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 1835932678
-          [1686057413.567958][20912:20914] CHIP:TOO:   CurrentHue: 250
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: CC.S.A0000 && CC.S.C01.Rsp
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 200
+              maxValue: 250
 
     - label:
           "Step 3a: TH sends MoveToSaturation command to DUT with Saturation=150
