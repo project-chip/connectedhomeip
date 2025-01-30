@@ -66,6 +66,7 @@ static_library("BL616") {
   }
 
   deps = [
+    "${chip_root}/src/app:app_config",
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/platform/logging:headers",
   ]
@@ -86,7 +87,10 @@ static_library("BL616") {
 
     import("//build_overrides/bouffalolab_iot_sdk.gni")
     import("${bouffalolab_iot_sdk_build_root}/bl616/bouffalo_sdk.gni")
-    deps += [ "${bouffalolab_iot_sdk_build_root}/bl616:bouffalo_sdk" ]
+    deps += [
+      "${bouffalolab_iot_sdk_build_root}/bl616:bouffalo_sdk",
+      "${chip_root}/src/app:app_config",
+    ]
 
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",

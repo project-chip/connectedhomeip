@@ -190,8 +190,8 @@ void PSASessionKeystore::DestroyKey(HkdfKeyHandle & key)
 CHIP_ERROR PSASessionKeystore::PersistICDKey(Symmetric128BitsKeyHandle & key)
 {
     CHIP_ERROR err;
-    psa_key_id_t newKeyId = PSA_KEY_ID_NULL;
-    psa_key_attributes_t attrs;
+    psa_key_id_t newKeyId      = PSA_KEY_ID_NULL;
+    psa_key_attributes_t attrs = PSA_KEY_ATTRIBUTES_INIT;
 
     psa_get_key_attributes(key.As<psa_key_id_t>(), &attrs);
 

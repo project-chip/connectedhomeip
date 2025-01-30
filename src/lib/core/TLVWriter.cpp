@@ -290,12 +290,26 @@ CHIP_ERROR TLVWriter::PutBytes(Tag tag, const uint8_t * buf, uint32_t len)
 
 CHIP_ERROR TLVWriter::PutString(Tag tag, const char * buf)
 {
-    size_t len = strlen(buf);
-    if (!CanCastTo<uint32_t>(len))
-    {
+    if (buf == nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    return PutString(tag, buf, static_cast<uint32_t>(len));
+    if (mMaxLen == 0)
+        return CHIP_ERROR_INCORRECT_STATE;
+
+    // Calculate length with a hard limit to prevent unbounded reads.
+    // Use mMaxLen instead of mRemainingLen to account for CircularTLVWriter.
+    // Note: Overrun is still possible if buf is not null-terminated, and this
+    // check cannot prevent all invalid memory reads.
+    size_t len = strnlen(buf, mMaxLen);
+
+    if (!CanCastTo<uint32_t>(len))
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
+    uint32_t stringLen = static_cast<uint32_t>(len);
+
+    // Null terminator was not found within the allocated space.
+    if (stringLen == mMaxLen)
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    return PutString(tag, buf, stringLen);
 }
 
 CHIP_ERROR TLVWriter::PutString(Tag tag, const char * buf, uint32_t len)

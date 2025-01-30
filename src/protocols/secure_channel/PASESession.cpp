@@ -372,7 +372,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
 
     if (tlvReader.Next() != CHIP_END_OF_TLV)
     {
-        SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
+        SuccessOrExit(err = DecodeSessionParametersIfPresent(TLV::ContextTag(5), tlvReader, mRemoteSessionParams));
         mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
             GetRemoteSessionParameters());
     }
@@ -493,7 +493,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
     {
         if (tlvReader.Next() != CHIP_END_OF_TLV)
         {
-            SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
+            SuccessOrExit(err = DecodeSessionParametersIfPresent(TLV::ContextTag(5), tlvReader, mRemoteSessionParams));
             mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
                 GetRemoteSessionParameters());
         }
@@ -519,7 +519,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
 
         if (tlvReader.Next() != CHIP_END_OF_TLV)
         {
-            SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
+            SuccessOrExit(err = DecodeSessionParametersIfPresent(TLV::ContextTag(5), tlvReader, mRemoteSessionParams));
             mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
                 GetRemoteSessionParameters());
         }

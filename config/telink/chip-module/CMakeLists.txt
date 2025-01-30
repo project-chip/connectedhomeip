@@ -69,7 +69,7 @@ matter_add_flags(-DMBEDTLS_USER_CONFIG_FILE=<telink-mbedtls-config.h>)
 # Set up custom OpenThread configuration
 
 if (CONFIG_CHIP_OPENTHREAD_CONFIG)
-    get_filename_component(CHIP_OPENTHREAD_CONFIG 
+    get_filename_component(CHIP_OPENTHREAD_CONFIG
         ${CONFIG_CHIP_OPENTHREAD_CONFIG}
         REALPATH
         BASE_DIR ${CMAKE_SOURCE_DIR}
@@ -96,7 +96,7 @@ matter_add_gn_arg_bool  ("chip_enable_openthread"                 CONFIG_NET_L2_
 matter_add_gn_arg_bool  ("chip_openthread_ftd"                    CONFIG_OPENTHREAD_FTD)
 matter_add_gn_arg_bool  ("chip_config_network_layer_ble"          CONFIG_BT)
 matter_add_gn_arg_bool  ("chip_inet_config_enable_ipv4"           CONFIG_CHIP_IPV4)
-matter_add_gn_arg_bool  ("chip_enable_nfc"                        CONFIG_CHIP_NFC_COMMISSIONING)
+matter_add_gn_arg_bool  ("chip_enable_nfc_onboarding_payload"     CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD)
 matter_add_gn_arg_bool  ("chip_enable_ota_requestor"              CONFIG_CHIP_OTA_REQUESTOR)
 matter_add_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   FALSE)
 matter_add_gn_arg_bool  ("chip_error_logging"                     CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 1)

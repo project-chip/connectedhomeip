@@ -61577,6 +61577,630 @@ public class ChipClusters {
     }
   }
 
+  public static class CameraAvSettingsUserLevelManagementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1362L;
+
+    private static final long MPTZ_POSITION_ATTRIBUTE_ID = 0L;
+    private static final long MAX_PRESETS_ATTRIBUTE_ID = 1L;
+    private static final long MPTZ_PRESETS_ATTRIBUTE_ID = 2L;
+    private static final long DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID = 3L;
+    private static final long ZOOM_MAX_ATTRIBUTE_ID = 4L;
+    private static final long TILT_MIN_ATTRIBUTE_ID = 5L;
+    private static final long TILT_MAX_ATTRIBUTE_ID = 6L;
+    private static final long PAN_MIN_ATTRIBUTE_ID = 7L;
+    private static final long PAN_MAX_ATTRIBUTE_ID = 8L;
+    private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
+    private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
+    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
+    private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
+    private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
+    private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
+
+    public CameraAvSettingsUserLevelManagementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId, CLUSTER_ID);
+    }
+
+    @Override
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
+
+    public void MPTZSetPosition(DefaultClusterCallback callback, Optional<Integer> pan, Optional<Integer> tilt, Optional<Integer> zoom) {
+      MPTZSetPosition(callback, pan, tilt, zoom, 0);
+    }
+
+    public void MPTZSetPosition(DefaultClusterCallback callback, Optional<Integer> pan, Optional<Integer> tilt, Optional<Integer> zoom, int timedInvokeTimeoutMs) {
+      final long commandId = 0L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long panFieldID = 0L;
+      BaseTLVType pantlvValue = pan.<BaseTLVType>map((nonOptionalpan) -> new IntType(nonOptionalpan)).orElse(new EmptyType());
+      elements.add(new StructElement(panFieldID, pantlvValue));
+
+      final long tiltFieldID = 1L;
+      BaseTLVType tilttlvValue = tilt.<BaseTLVType>map((nonOptionaltilt) -> new IntType(nonOptionaltilt)).orElse(new EmptyType());
+      elements.add(new StructElement(tiltFieldID, tilttlvValue));
+
+      final long zoomFieldID = 2L;
+      BaseTLVType zoomtlvValue = zoom.<BaseTLVType>map((nonOptionalzoom) -> new UIntType(nonOptionalzoom)).orElse(new EmptyType());
+      elements.add(new StructElement(zoomFieldID, zoomtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void MPTZRelativeMove(DefaultClusterCallback callback, Optional<Integer> panDelta, Optional<Integer> tiltDelta, Optional<Integer> zoomDelta) {
+      MPTZRelativeMove(callback, panDelta, tiltDelta, zoomDelta, 0);
+    }
+
+    public void MPTZRelativeMove(DefaultClusterCallback callback, Optional<Integer> panDelta, Optional<Integer> tiltDelta, Optional<Integer> zoomDelta, int timedInvokeTimeoutMs) {
+      final long commandId = 1L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long panDeltaFieldID = 0L;
+      BaseTLVType panDeltatlvValue = panDelta.<BaseTLVType>map((nonOptionalpanDelta) -> new IntType(nonOptionalpanDelta)).orElse(new EmptyType());
+      elements.add(new StructElement(panDeltaFieldID, panDeltatlvValue));
+
+      final long tiltDeltaFieldID = 1L;
+      BaseTLVType tiltDeltatlvValue = tiltDelta.<BaseTLVType>map((nonOptionaltiltDelta) -> new IntType(nonOptionaltiltDelta)).orElse(new EmptyType());
+      elements.add(new StructElement(tiltDeltaFieldID, tiltDeltatlvValue));
+
+      final long zoomDeltaFieldID = 2L;
+      BaseTLVType zoomDeltatlvValue = zoomDelta.<BaseTLVType>map((nonOptionalzoomDelta) -> new IntType(nonOptionalzoomDelta)).orElse(new EmptyType());
+      elements.add(new StructElement(zoomDeltaFieldID, zoomDeltatlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void MPTZMoveToPreset(DefaultClusterCallback callback, Integer presetID) {
+      MPTZMoveToPreset(callback, presetID, 0);
+    }
+
+    public void MPTZMoveToPreset(DefaultClusterCallback callback, Integer presetID, int timedInvokeTimeoutMs) {
+      final long commandId = 2L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long presetIDFieldID = 0L;
+      BaseTLVType presetIDtlvValue = new UIntType(presetID);
+      elements.add(new StructElement(presetIDFieldID, presetIDtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void MPTZSavePreset(DefaultClusterCallback callback, Optional<Integer> presetID, String name) {
+      MPTZSavePreset(callback, presetID, name, 0);
+    }
+
+    public void MPTZSavePreset(DefaultClusterCallback callback, Optional<Integer> presetID, String name, int timedInvokeTimeoutMs) {
+      final long commandId = 3L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long presetIDFieldID = 0L;
+      BaseTLVType presetIDtlvValue = presetID.<BaseTLVType>map((nonOptionalpresetID) -> new UIntType(nonOptionalpresetID)).orElse(new EmptyType());
+      elements.add(new StructElement(presetIDFieldID, presetIDtlvValue));
+
+      final long nameFieldID = 1L;
+      BaseTLVType nametlvValue = new StringType(name);
+      elements.add(new StructElement(nameFieldID, nametlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void MPTZRemovePreset(DefaultClusterCallback callback, Integer presetID) {
+      MPTZRemovePreset(callback, presetID, 0);
+    }
+
+    public void MPTZRemovePreset(DefaultClusterCallback callback, Integer presetID, int timedInvokeTimeoutMs) {
+      final long commandId = 4L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long presetIDFieldID = 0L;
+      BaseTLVType presetIDtlvValue = new UIntType(presetID);
+      elements.add(new StructElement(presetIDFieldID, presetIDtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void DPTZSetViewport(DefaultClusterCallback callback, Integer videoStreamID, ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct viewport) {
+      DPTZSetViewport(callback, videoStreamID, viewport, 0);
+    }
+
+    public void DPTZSetViewport(DefaultClusterCallback callback, Integer videoStreamID, ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct viewport, int timedInvokeTimeoutMs) {
+      final long commandId = 5L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long videoStreamIDFieldID = 0L;
+      BaseTLVType videoStreamIDtlvValue = new UIntType(videoStreamID);
+      elements.add(new StructElement(videoStreamIDFieldID, videoStreamIDtlvValue));
+
+      final long viewportFieldID = 1L;
+      BaseTLVType viewporttlvValue = viewport.encodeTlv();
+      elements.add(new StructElement(viewportFieldID, viewporttlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void DPTZRelativeMove(DefaultClusterCallback callback, Integer videoStreamID, Optional<Integer> deltaX, Optional<Integer> deltaY, Optional<Integer> zoomDelta) {
+      DPTZRelativeMove(callback, videoStreamID, deltaX, deltaY, zoomDelta, 0);
+    }
+
+    public void DPTZRelativeMove(DefaultClusterCallback callback, Integer videoStreamID, Optional<Integer> deltaX, Optional<Integer> deltaY, Optional<Integer> zoomDelta, int timedInvokeTimeoutMs) {
+      final long commandId = 6L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long videoStreamIDFieldID = 0L;
+      BaseTLVType videoStreamIDtlvValue = new UIntType(videoStreamID);
+      elements.add(new StructElement(videoStreamIDFieldID, videoStreamIDtlvValue));
+
+      final long deltaXFieldID = 1L;
+      BaseTLVType deltaXtlvValue = deltaX.<BaseTLVType>map((nonOptionaldeltaX) -> new IntType(nonOptionaldeltaX)).orElse(new EmptyType());
+      elements.add(new StructElement(deltaXFieldID, deltaXtlvValue));
+
+      final long deltaYFieldID = 2L;
+      BaseTLVType deltaYtlvValue = deltaY.<BaseTLVType>map((nonOptionaldeltaY) -> new IntType(nonOptionaldeltaY)).orElse(new EmptyType());
+      elements.add(new StructElement(deltaYFieldID, deltaYtlvValue));
+
+      final long zoomDeltaFieldID = 3L;
+      BaseTLVType zoomDeltatlvValue = zoomDelta.<BaseTLVType>map((nonOptionalzoomDelta) -> new IntType(nonOptionalzoomDelta)).orElse(new EmptyType());
+      elements.add(new StructElement(zoomDeltaFieldID, zoomDeltatlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public interface MPTZPositionAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct value);
+    }
+
+    public interface MPTZPresetsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct> value);
+    }
+
+    public interface DPTZRelativeMoveAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Integer> value);
+    }
+
+    public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface EventListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AttributeListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public void readMPTZPositionAttribute(
+        MPTZPositionAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MPTZ_POSITION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MPTZ_POSITION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMPTZPositionAttribute(
+        MPTZPositionAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MPTZ_POSITION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MPTZ_POSITION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMaxPresetsAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_PRESETS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAX_PRESETS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMaxPresetsAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_PRESETS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAX_PRESETS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMPTZPresetsAttribute(
+        MPTZPresetsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MPTZ_PRESETS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MPTZ_PRESETS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMPTZPresetsAttribute(
+        MPTZPresetsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MPTZ_PRESETS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MPTZ_PRESETS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readDPTZRelativeMoveAttribute(
+        DPTZRelativeMoveAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeDPTZRelativeMoveAttribute(
+        DPTZRelativeMoveAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readZoomMaxAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ZOOM_MAX_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ZOOM_MAX_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeZoomMaxAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ZOOM_MAX_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ZOOM_MAX_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readTiltMinAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TILT_MIN_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TILT_MIN_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeTiltMinAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TILT_MIN_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TILT_MIN_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readTiltMaxAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TILT_MAX_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TILT_MAX_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeTiltMaxAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TILT_MAX_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TILT_MAX_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readPanMinAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PAN_MIN_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PAN_MIN_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribePanMinAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PAN_MIN_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PAN_MIN_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readPanMaxAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PAN_MAX_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PAN_MAX_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribePanMaxAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PAN_MAX_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PAN_MAX_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(
+        EventListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(
+        AttributeListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FEATURE_MAP_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FEATURE_MAP_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+  }
+
   public static class WebRTCTransportProviderCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1363L;
 
@@ -62193,6 +62817,462 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, CURRENT_SESSIONS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(
+        EventListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(
+        AttributeListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FEATURE_MAP_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FEATURE_MAP_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+  }
+
+  public static class PushAvStreamTransportCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1365L;
+
+    private static final long SUPPORTED_CONTAINER_FORMATS_ATTRIBUTE_ID = 0L;
+    private static final long SUPPORTED_INGEST_METHODS_ATTRIBUTE_ID = 1L;
+    private static final long CURRENT_CONNECTIONS_ATTRIBUTE_ID = 2L;
+    private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
+    private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
+    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
+    private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
+    private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
+    private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
+
+    public PushAvStreamTransportCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId, CLUSTER_ID);
+    }
+
+    @Override
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
+
+    public void allocatePushTransport(AllocatePushTransportResponseCallback callback, ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct transportOptions) {
+      allocatePushTransport(callback, transportOptions, 0);
+    }
+
+    public void allocatePushTransport(AllocatePushTransportResponseCallback callback, ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct transportOptions, int timedInvokeTimeoutMs) {
+      final long commandId = 0L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long transportOptionsFieldID = 0L;
+      BaseTLVType transportOptionstlvValue = transportOptions.encodeTlv();
+      elements.add(new StructElement(transportOptionsFieldID, transportOptionstlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long connectionIDFieldID = 0L;
+          Integer connectionID = null;
+          final long transportOptionsFieldID = 1L;
+          ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct transportOptions = null;
+          final long transportStatusFieldID = 2L;
+          Integer transportStatus = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == connectionIDFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                connectionID = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == transportOptionsFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+                StructType castingValue = element.value(StructType.class);
+                transportOptions = ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct.decodeTlv(castingValue);
+              }
+            } else if (element.contextTagNum() == transportStatusFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                transportStatus = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(connectionID, transportOptions, transportStatus);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void deallocatePushTransport(DefaultClusterCallback callback, Integer connectionID) {
+      deallocatePushTransport(callback, connectionID, 0);
+    }
+
+    public void deallocatePushTransport(DefaultClusterCallback callback, Integer connectionID, int timedInvokeTimeoutMs) {
+      final long commandId = 2L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long connectionIDFieldID = 0L;
+      BaseTLVType connectionIDtlvValue = new UIntType(connectionID);
+      elements.add(new StructElement(connectionIDFieldID, connectionIDtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void modifyPushTransport(DefaultClusterCallback callback, Integer connectionID, ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct transportOptions) {
+      modifyPushTransport(callback, connectionID, transportOptions, 0);
+    }
+
+    public void modifyPushTransport(DefaultClusterCallback callback, Integer connectionID, ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct transportOptions, int timedInvokeTimeoutMs) {
+      final long commandId = 3L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long connectionIDFieldID = 0L;
+      BaseTLVType connectionIDtlvValue = new UIntType(connectionID);
+      elements.add(new StructElement(connectionIDFieldID, connectionIDtlvValue));
+
+      final long transportOptionsFieldID = 1L;
+      BaseTLVType transportOptionstlvValue = transportOptions.encodeTlv();
+      elements.add(new StructElement(transportOptionsFieldID, transportOptionstlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void setTransportStatus(DefaultClusterCallback callback, Integer connectionID, Integer transportStatus) {
+      setTransportStatus(callback, connectionID, transportStatus, 0);
+    }
+
+    public void setTransportStatus(DefaultClusterCallback callback, Integer connectionID, Integer transportStatus, int timedInvokeTimeoutMs) {
+      final long commandId = 4L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long connectionIDFieldID = 0L;
+      BaseTLVType connectionIDtlvValue = new UIntType(connectionID);
+      elements.add(new StructElement(connectionIDFieldID, connectionIDtlvValue));
+
+      final long transportStatusFieldID = 1L;
+      BaseTLVType transportStatustlvValue = new UIntType(transportStatus);
+      elements.add(new StructElement(transportStatusFieldID, transportStatustlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void manuallyTriggerTransport(DefaultClusterCallback callback, Integer connectionID, Integer activationReason, Optional<ChipStructs.PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct> timeControl) {
+      manuallyTriggerTransport(callback, connectionID, activationReason, timeControl, 0);
+    }
+
+    public void manuallyTriggerTransport(DefaultClusterCallback callback, Integer connectionID, Integer activationReason, Optional<ChipStructs.PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct> timeControl, int timedInvokeTimeoutMs) {
+      final long commandId = 5L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long connectionIDFieldID = 0L;
+      BaseTLVType connectionIDtlvValue = new UIntType(connectionID);
+      elements.add(new StructElement(connectionIDFieldID, connectionIDtlvValue));
+
+      final long activationReasonFieldID = 1L;
+      BaseTLVType activationReasontlvValue = new UIntType(activationReason);
+      elements.add(new StructElement(activationReasonFieldID, activationReasontlvValue));
+
+      final long timeControlFieldID = 2L;
+      BaseTLVType timeControltlvValue = timeControl.<BaseTLVType>map((nonOptionaltimeControl) -> nonOptionaltimeControl.encodeTlv()).orElse(new EmptyType());
+      elements.add(new StructElement(timeControlFieldID, timeControltlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void findTransport(FindTransportResponseCallback callback, @Nullable Optional<Integer> connectionID) {
+      findTransport(callback, connectionID, 0);
+    }
+
+    public void findTransport(FindTransportResponseCallback callback, @Nullable Optional<Integer> connectionID, int timedInvokeTimeoutMs) {
+      final long commandId = 6L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long connectionIDFieldID = 0L;
+      BaseTLVType connectionIDtlvValue = connectionID != null ? connectionID.<BaseTLVType>map((nonOptionalconnectionID) -> new UIntType(nonOptionalconnectionID)).orElse(new EmptyType()) : new NullType();
+      elements.add(new StructElement(connectionIDFieldID, connectionIDtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long streamConfigurationsFieldID = 0L;
+          ArrayList<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> streamConfigurations = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == streamConfigurationsFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+                ArrayType castingValue = element.value(ArrayType.class);
+                streamConfigurations = castingValue.map((elementcastingValue) -> ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct.decodeTlv(elementcastingValue));
+              }
+            }
+          }
+          callback.onSuccess(streamConfigurations);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public interface AllocatePushTransportResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer connectionID, ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct transportOptions, Integer transportStatus);
+    }
+
+    public interface FindTransportResponseCallback extends BaseClusterCallback {
+      void onSuccess(ArrayList<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> streamConfigurations);
+    }
+
+    public interface CurrentConnectionsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Integer> value);
+    }
+
+    public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface EventListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AttributeListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public void readSupportedContainerFormatsAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_CONTAINER_FORMATS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_CONTAINER_FORMATS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeSupportedContainerFormatsAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_CONTAINER_FORMATS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_CONTAINER_FORMATS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSupportedIngestMethodsAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_INGEST_METHODS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_INGEST_METHODS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeSupportedIngestMethodsAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_INGEST_METHODS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_INGEST_METHODS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readCurrentConnectionsAttribute(
+        CurrentConnectionsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_CONNECTIONS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CURRENT_CONNECTIONS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeCurrentConnectionsAttribute(
+        CurrentConnectionsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_CONNECTIONS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CURRENT_CONNECTIONS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -63088,6 +64168,607 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, SUPPORTED_DEVICE_CATEGORIES_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(
+        EventListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(
+        AttributeListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FEATURE_MAP_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FEATURE_MAP_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+  }
+
+  public static class TlsCertificateManagementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 2049L;
+
+    private static final long MAX_ROOT_CERTIFICATES_ATTRIBUTE_ID = 0L;
+    private static final long CURRENT_ROOT_CERTIFICATES_ATTRIBUTE_ID = 1L;
+    private static final long MAX_CLIENT_CERTIFICATES_ATTRIBUTE_ID = 2L;
+    private static final long CURRENT_CLIENT_CERTIFICATES_ATTRIBUTE_ID = 3L;
+    private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
+    private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
+    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
+    private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
+    private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
+    private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
+
+    public TlsCertificateManagementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId, CLUSTER_ID);
+    }
+
+    @Override
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
+
+    public void provisionRootCertificate(ProvisionRootCertificateResponseCallback callback, byte[] certificate, @Nullable Integer caid) {
+      provisionRootCertificate(callback, certificate, caid, 0);
+    }
+
+    public void provisionRootCertificate(ProvisionRootCertificateResponseCallback callback, byte[] certificate, @Nullable Integer caid, int timedInvokeTimeoutMs) {
+      final long commandId = 0L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long certificateFieldID = 0L;
+      BaseTLVType certificatetlvValue = new ByteArrayType(certificate);
+      elements.add(new StructElement(certificateFieldID, certificatetlvValue));
+
+      final long caidFieldID = 1L;
+      BaseTLVType caidtlvValue = caid != null ? new UIntType(caid) : new NullType();
+      elements.add(new StructElement(caidFieldID, caidtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long caidFieldID = 0L;
+          Integer caid = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == caidFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                caid = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(caid);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void findRootCertificate(FindRootCertificateResponseCallback callback, @Nullable Integer caid) {
+      findRootCertificate(callback, caid, 0);
+    }
+
+    public void findRootCertificate(FindRootCertificateResponseCallback callback, @Nullable Integer caid, int timedInvokeTimeoutMs) {
+      final long commandId = 2L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long caidFieldID = 0L;
+      BaseTLVType caidtlvValue = caid != null ? new UIntType(caid) : new NullType();
+      elements.add(new StructElement(caidFieldID, caidtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long certificateDetailsFieldID = 0L;
+          ArrayList<ChipStructs.TlsCertificateManagementClusterTLSCertStruct> certificateDetails = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == certificateDetailsFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+                ArrayType castingValue = element.value(ArrayType.class);
+                certificateDetails = castingValue.map((elementcastingValue) -> ChipStructs.TlsCertificateManagementClusterTLSCertStruct.decodeTlv(elementcastingValue));
+              }
+            }
+          }
+          callback.onSuccess(certificateDetails);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void lookupRootCertificate(LookupRootCertificateResponseCallback callback, byte[] fingerprint) {
+      lookupRootCertificate(callback, fingerprint, 0);
+    }
+
+    public void lookupRootCertificate(LookupRootCertificateResponseCallback callback, byte[] fingerprint, int timedInvokeTimeoutMs) {
+      final long commandId = 4L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long fingerprintFieldID = 0L;
+      BaseTLVType fingerprinttlvValue = new ByteArrayType(fingerprint);
+      elements.add(new StructElement(fingerprintFieldID, fingerprinttlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long caidFieldID = 0L;
+          Integer caid = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == caidFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                caid = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(caid);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void removeRootCertificate(DefaultClusterCallback callback, Integer caid) {
+      removeRootCertificate(callback, caid, 0);
+    }
+
+    public void removeRootCertificate(DefaultClusterCallback callback, Integer caid, int timedInvokeTimeoutMs) {
+      final long commandId = 6L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long caidFieldID = 0L;
+      BaseTLVType caidtlvValue = new UIntType(caid);
+      elements.add(new StructElement(caidFieldID, caidtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void TLSClientCSR(TLSClientCSRResponseCallback callback, byte[] nonce) {
+      TLSClientCSR(callback, nonce, 0);
+    }
+
+    public void TLSClientCSR(TLSClientCSRResponseCallback callback, byte[] nonce, int timedInvokeTimeoutMs) {
+      final long commandId = 7L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long nonceFieldID = 0L;
+      BaseTLVType noncetlvValue = new ByteArrayType(nonce);
+      elements.add(new StructElement(nonceFieldID, noncetlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long ccdidFieldID = 0L;
+          Integer ccdid = null;
+          final long csrFieldID = 1L;
+          byte[] csr = null;
+          final long nonceFieldID = 2L;
+          byte[] nonce = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == ccdidFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                ccdid = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == csrFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+                ByteArrayType castingValue = element.value(ByteArrayType.class);
+                csr = castingValue.value(byte[].class);
+              }
+            } else if (element.contextTagNum() == nonceFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+                ByteArrayType castingValue = element.value(ByteArrayType.class);
+                nonce = castingValue.value(byte[].class);
+              }
+            }
+          }
+          callback.onSuccess(ccdid, csr, nonce);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void provisionClientCertificate(ProvisionClientCertificateResponseCallback callback, Integer ccdid, ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct clientCertificateDetails) {
+      provisionClientCertificate(callback, ccdid, clientCertificateDetails, 0);
+    }
+
+    public void provisionClientCertificate(ProvisionClientCertificateResponseCallback callback, Integer ccdid, ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct clientCertificateDetails, int timedInvokeTimeoutMs) {
+      final long commandId = 9L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long ccdidFieldID = 0L;
+      BaseTLVType ccdidtlvValue = new UIntType(ccdid);
+      elements.add(new StructElement(ccdidFieldID, ccdidtlvValue));
+
+      final long clientCertificateDetailsFieldID = 1L;
+      BaseTLVType clientCertificateDetailstlvValue = clientCertificateDetails.encodeTlv();
+      elements.add(new StructElement(clientCertificateDetailsFieldID, clientCertificateDetailstlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long ccdidFieldID = 0L;
+          Integer ccdid = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == ccdidFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                ccdid = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(ccdid);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void findClientCertificate(FindClientCertificateResponseCallback callback, Integer ccdid) {
+      findClientCertificate(callback, ccdid, 0);
+    }
+
+    public void findClientCertificate(FindClientCertificateResponseCallback callback, Integer ccdid, int timedInvokeTimeoutMs) {
+      final long commandId = 11L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long ccdidFieldID = 0L;
+      BaseTLVType ccdidtlvValue = new UIntType(ccdid);
+      elements.add(new StructElement(ccdidFieldID, ccdidtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long certificateDetailsFieldID = 0L;
+          ArrayList<ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct> certificateDetails = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == certificateDetailsFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+                ArrayType castingValue = element.value(ArrayType.class);
+                certificateDetails = castingValue.map((elementcastingValue) -> ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct.decodeTlv(elementcastingValue));
+              }
+            }
+          }
+          callback.onSuccess(certificateDetails);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void lookupClientCertificate(LookupClientCertificateResponseCallback callback, byte[] fingerprint) {
+      lookupClientCertificate(callback, fingerprint, 0);
+    }
+
+    public void lookupClientCertificate(LookupClientCertificateResponseCallback callback, byte[] fingerprint, int timedInvokeTimeoutMs) {
+      final long commandId = 13L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long fingerprintFieldID = 0L;
+      BaseTLVType fingerprinttlvValue = new ByteArrayType(fingerprint);
+      elements.add(new StructElement(fingerprintFieldID, fingerprinttlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long ccdidFieldID = 0L;
+          Integer ccdid = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == ccdidFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                ccdid = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(ccdid);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void removeClientCertificate(DefaultClusterCallback callback, Integer ccdid) {
+      removeClientCertificate(callback, ccdid, 0);
+    }
+
+    public void removeClientCertificate(DefaultClusterCallback callback, Integer ccdid, int timedInvokeTimeoutMs) {
+      final long commandId = 15L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long ccdidFieldID = 0L;
+      BaseTLVType ccdidtlvValue = new UIntType(ccdid);
+      elements.add(new StructElement(ccdidFieldID, ccdidtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public interface ProvisionRootCertificateResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer caid);
+    }
+
+    public interface FindRootCertificateResponseCallback extends BaseClusterCallback {
+      void onSuccess(ArrayList<ChipStructs.TlsCertificateManagementClusterTLSCertStruct> certificateDetails);
+    }
+
+    public interface LookupRootCertificateResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer caid);
+    }
+
+    public interface TLSClientCSRResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer ccdid, byte[] csr, byte[] nonce);
+    }
+
+    public interface ProvisionClientCertificateResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer ccdid);
+    }
+
+    public interface FindClientCertificateResponseCallback extends BaseClusterCallback {
+      void onSuccess(ArrayList<ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct> certificateDetails);
+    }
+
+    public interface LookupClientCertificateResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer ccdid);
+    }
+
+    public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface EventListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AttributeListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public void readMaxRootCertificatesAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_ROOT_CERTIFICATES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAX_ROOT_CERTIFICATES_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMaxRootCertificatesAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_ROOT_CERTIFICATES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAX_ROOT_CERTIFICATES_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readCurrentRootCertificatesAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_ROOT_CERTIFICATES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CURRENT_ROOT_CERTIFICATES_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeCurrentRootCertificatesAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_ROOT_CERTIFICATES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CURRENT_ROOT_CERTIFICATES_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMaxClientCertificatesAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_CLIENT_CERTIFICATES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAX_CLIENT_CERTIFICATES_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMaxClientCertificatesAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_CLIENT_CERTIFICATES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAX_CLIENT_CERTIFICATES_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readCurrentClientCertificatesAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_CLIENT_CERTIFICATES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CURRENT_CLIENT_CERTIFICATES_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeCurrentClientCertificatesAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_CLIENT_CERTIFICATES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CURRENT_CLIENT_CERTIFICATES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

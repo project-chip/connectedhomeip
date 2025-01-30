@@ -29,17 +29,18 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: 3.12
           cache-dependency-path: matter/docs/requirements.txt
           cache: pip
       - name: Install base dependencies
         working-directory: matter
         run: |
-          sudo pip3 install -U pip
-          pip3 install -r docs/requirements.txt
+          python3 -m venv venv
+          venv/bin/pip3 install -r docs/requirements.txt
       - name: Build documentation
         working-directory: matter/docs
         run: |
+          source ../venv/bin/activate
           mkdir -p _build/src
           make html
           touch _build/html/.nojekyll
