@@ -68,8 +68,8 @@ private:
 
 /// Validates that `path` exists within the given provider
 ///
-/// If `endpointID` is not valid, will return Status::UnsupportedEndpoint
-/// If `clusterId` is not valid, will return Status::UnsupportedCluster
+/// If the endpoint identified by the path does not exist, will return Status::UnsupportedEndpoint.
+/// If the endpoint exists but does not have the cluster identified by the path, will return Status::UnsupportedCluster.
 ///
 /// otherwise, it will return successStatus.
 Protocols::InteractionModel::Status ValidateClusterPath(ProviderMetadataTree * provider, const ConcreteClusterPath & path,
