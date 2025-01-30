@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "app/ConcreteClusterPath.h"
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -41,6 +42,14 @@ std::variant<const EmberAfCluster *,             // global attribute, data from 
              Protocols::InteractionModel::Status // one of Status::Unsupported*
              >
 FindAttributeMetadata(const ConcreteAttributePath & aPath);
+
+/// Returns the status for a given path being valud within ember.
+///
+/// Return code will be one of:
+///    - Status::UnsupportedEndpoint if the path endpoint does not exist
+///    - Status::UnsupportedCluster if the cluster does not exist on the given endpoint
+///    - Status::Success if the path is valid within Ember
+Protocols::InteractionModel::Status ValidateClusterPath(const ConcreteClusterPath &path);
 
 } // namespace Ember
 } // namespace app

@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "data-model-providers/codegen/EmberMetadata.h"
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -162,23 +163,24 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
     // Double-check that the command path is valid at least up to the cluster level:
     // some CommandHandlerInterface are registered on all endpoints, so they would be found by
     // `GetCommandHandler` below, however we need to ensure the path makes sense.
-    const EmberAfCluster * cluster = FindServerCluster(request.path);
-    if (cluster != nullptr)
+    Protocols::InteractionModel::Status status = Ember::ValidateClusterPath(request.path);
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        // We can allow CHI, including ones registered on wildcard endpoints.
-        CommandHandlerInterface * handler_interface =
-            CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
+        return status;
+    }
 
-        if (handler_interface)
+    CommandHandlerInterface * handler_interface =
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
+
+    if (handler_interface)
+    {
+        CommandHandlerInterface::HandlerContext context(*handler, request.path, input_arguments);
+        handler_interface->InvokeCommand(context);
+
+        // If the command was handled, don't proceed any further and return successfully.
+        if (context.mCommandHandled)
         {
-            CommandHandlerInterface::HandlerContext context(*handler, request.path, input_arguments);
-            handler_interface->InvokeCommand(context);
-
-            // If the command was handled, don't proceed any further and return successfully.
-            if (context.mCommandHandled)
-            {
-                return std::nullopt;
-            }
+            return std::nullopt;
         }
     }
 
