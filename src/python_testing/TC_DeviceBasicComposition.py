@@ -22,7 +22,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
@@ -33,28 +33,27 @@
 #     quiet: true
 #   run2:
 #     app: ${CHIP_LOCK_APP}
-#     app-args: --discriminator 1234 --KVS kvs1
+#     app-args: --KVS kvs1
 #     script-args: --storage-path admin_storage.json --manual-code 10054912339
 #     factory-reset: true
 #     quiet: true
 #   run3:
 #     app: ${CHIP_LOCK_APP}
-#     app-args: --discriminator 1234 --KVS kvs1
+#     app-args: --KVS kvs1
 #     script-args: --storage-path admin_storage.json --qr-code MT:-24J0Q1212-10648G00
 #     factory-reset: true
 #     quiet: true
 #   run4:
 #     app: ${CHIP_LOCK_APP}
-#     app-args: --discriminator 1234 --KVS kvs1
+#     app-args: --KVS kvs1
 #     script-args: >
 #       --storage-path admin_storage.json
-#       --discriminator 1234
 #       --passcode 20202021
 #     factory-reset: true
 #     quiet: true
 #   run5:
 #     app: ${CHIP_LOCK_APP}
-#     app-args: --discriminator 1234 --KVS kvs1
+#     app-args: --KVS kvs1
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
@@ -63,7 +62,7 @@
 #     quiet: true
 #   run6:
 #     app: ${CHIP_LOCK_APP}
-#     app-args: --discriminator 1234 --KVS kvs1
+#     app-args: --KVS kvs1
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --qr-code MT:-24J0Q1212-10648G00
@@ -72,23 +71,22 @@
 #     quiet: true
 #   run7:
 #     app: ${CHIP_LOCK_APP}
-#     app-args: --discriminator 1234 --KVS kvs1
+#     app-args: --KVS kvs1
 #     script-args: >
 #       --storage-path admin_storage.json
-#       --discriminator 1234
 #       --passcode 20202021
 #       --commissioning-method on-network
 #     factory-reset: true
 #     quiet: true
 #   run8:
 #     app: ${CHIP_LOCK_APP}
-#     app-args: --discriminator 1234 --KVS kvs1
+#     app-args: --KVS kvs1
 #     script-args: --storage-path admin_storage.json
 #     factory-reset: false
 #     quiet: true
 #   run9:
 #     app: ${ENERGY_MANAGEMENT_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
@@ -99,7 +97,7 @@
 #     quiet: true
 #   run10:
 #     app: ${LIT_ICD_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
@@ -110,7 +108,7 @@
 #     quiet: true
 #   run11:
 #     app: ${CHIP_MICROWAVE_OVEN_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
@@ -121,7 +119,7 @@
 #     quiet: true
 #   run12:
 #     app: ${CHIP_RVC_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
@@ -132,7 +130,7 @@
 #     quiet: true
 #   run13:
 #     app: ${NETWORK_MANAGEMENT_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
@@ -143,7 +141,7 @@
 #     quiet: true
 #   run14:
 #     app: ${LIGHTING_APP_NO_UNIQUE_ID}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339

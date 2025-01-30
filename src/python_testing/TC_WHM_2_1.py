@@ -23,14 +23,12 @@
 #   run1:
 #     app: ${ENERGY_MANAGEMENT_APP}
 #     app-args: >
-#       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
 #       --application water-heater
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
-#       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 2
 #       --trace-to json:${TRACE_TEST_JSON}.json

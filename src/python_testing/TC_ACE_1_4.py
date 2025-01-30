@@ -22,11 +22,10 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
-#       --discriminator 1234
 #       --passcode 20202021
 #       --int-arg PIXIT.ACE.APPENDPOINT:1
 #       --int-arg PIXIT.ACE.APPDEVTYPEID:0x0100
