@@ -84,7 +84,7 @@ def generate_gni_file():
     output_content_per_dir = []
 
     # Step 1: Find all files and create the sorted file list
-    dirs = sorted([d for d in os.listdir(data_model_dir, ) if os.path.isdir(os.path.join(data_model_dir, d))])
+    dirs = sorted([d for d in os.listdir(data_model_dir) if os.path.isdir(os.path.join(data_model_dir, d))])
     for directory in dirs:
         file_list = get_data_model_file_names(os.path.join(data_model_dir, directory))
         # Step 2: Render the template with the file list
