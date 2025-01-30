@@ -1,4 +1,4 @@
-# ELF binary size informational
+# ELF binary size information
 
 ## Individual size information
 
