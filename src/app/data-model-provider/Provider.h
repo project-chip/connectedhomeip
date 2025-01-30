@@ -72,7 +72,7 @@ public:
     ///
     /// When this is invoked, caller is expected to have already done some validations:
     ///    - cluster `data version` has been checked for the incoming request if applicable
-    ///    - validation of ACL/timed interaction flags/writability
+    ///    - validation of ACL/timed interaction flags/writability, if those checks are desired.
     virtual ActionReturnStatus WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder) = 0;
 
     /// `handler` is used to send back the reply.
