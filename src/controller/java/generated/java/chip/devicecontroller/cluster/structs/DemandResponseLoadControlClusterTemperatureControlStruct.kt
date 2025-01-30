@@ -27,7 +27,7 @@ class DemandResponseLoadControlClusterTemperatureControlStruct(
   val coolingTempOffset: Optional<UInt>?,
   val heatingtTempOffset: Optional<UInt>?,
   val coolingTempSetpoint: Optional<Int>?,
-  val heatingTempSetpoint: Optional<Int>?,
+  val heatingTempSetpoint: Optional<Int>?
 ) {
   override fun toString(): String = buildString {
     append("DemandResponseLoadControlClusterTemperatureControlStruct {\n")
@@ -85,7 +85,7 @@ class DemandResponseLoadControlClusterTemperatureControlStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): DemandResponseLoadControlClusterTemperatureControlStruct {
       tlvReader.enterStructure(tlvTag)
       val coolingTempOffset =
@@ -139,7 +139,7 @@ class DemandResponseLoadControlClusterTemperatureControlStruct(
         coolingTempOffset,
         heatingtTempOffset,
         coolingTempSetpoint,
-        heatingTempSetpoint,
+        heatingTempSetpoint
       )
     }
   }

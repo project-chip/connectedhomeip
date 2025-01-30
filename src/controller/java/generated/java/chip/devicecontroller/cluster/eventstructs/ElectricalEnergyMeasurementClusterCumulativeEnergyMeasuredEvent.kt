@@ -31,7 +31,7 @@ class ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent(
   val energyExported:
     Optional<
       chip.devicecontroller.cluster.structs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct
-    >,
+    >
 ) {
   override fun toString(): String = buildString {
     append("ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent {\n")
@@ -61,7 +61,7 @@ class ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent {
       tlvReader.enterStructure(tlvTag)
       val energyImported =
@@ -89,7 +89,7 @@ class ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent(
 
       return ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent(
         energyImported,
-        energyExported,
+        energyExported
       )
     }
   }

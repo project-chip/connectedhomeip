@@ -30,7 +30,7 @@ class PushAvStreamTransportClusterTransportTriggerOptionsStruct(
   val motionSensitivity: Optional<UInt>?,
   val motionTimeControl:
     Optional<PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct>,
-  val maxPreRollLen: Optional<UInt>,
+  val maxPreRollLen: Optional<UInt>
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterTransportTriggerOptionsStruct {\n")
@@ -87,7 +87,7 @@ class PushAvStreamTransportClusterTransportTriggerOptionsStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): PushAvStreamTransportClusterTransportTriggerOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val triggerType = tlvReader.getUInt(ContextSpecificTag(TAG_TRIGGER_TYPE))
@@ -101,7 +101,7 @@ class PushAvStreamTransportClusterTransportTriggerOptionsStruct(
                   add(
                     PushAvStreamTransportClusterTransportZoneOptionsStruct.fromTlv(
                       AnonymousTag,
-                      tlvReader,
+                      tlvReader
                     )
                   )
                 }
@@ -131,7 +131,7 @@ class PushAvStreamTransportClusterTransportTriggerOptionsStruct(
           Optional.of(
             PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct.fromTlv(
               ContextSpecificTag(TAG_MOTION_TIME_CONTROL),
-              tlvReader,
+              tlvReader
             )
           )
         } else {
@@ -151,7 +151,7 @@ class PushAvStreamTransportClusterTransportTriggerOptionsStruct(
         motionZones,
         motionSensitivity,
         motionTimeControl,
-        maxPreRollLen,
+        maxPreRollLen
       )
     }
   }

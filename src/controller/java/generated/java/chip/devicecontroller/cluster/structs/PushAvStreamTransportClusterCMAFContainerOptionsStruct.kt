@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
   val chunkDuration: UInt,
-  val CENCKey: Optional<ByteArray>,
+  val CENCKey: Optional<ByteArray>
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterCMAFContainerOptionsStruct {\n")
@@ -52,7 +52,7 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): PushAvStreamTransportClusterCMAFContainerOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val chunkDuration = tlvReader.getUInt(ContextSpecificTag(TAG_CHUNK_DURATION))

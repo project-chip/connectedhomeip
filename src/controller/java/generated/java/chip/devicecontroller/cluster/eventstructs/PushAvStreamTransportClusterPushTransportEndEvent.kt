@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class PushAvStreamTransportClusterPushTransportEndEvent(
   val connectionID: UInt,
   val triggerType: UInt,
-  val activationReason: Optional<UInt>,
+  val activationReason: Optional<UInt>
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterPushTransportEndEvent {\n")
@@ -56,7 +56,7 @@ class PushAvStreamTransportClusterPushTransportEndEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): PushAvStreamTransportClusterPushTransportEndEvent {
       tlvReader.enterStructure(tlvTag)
       val connectionID = tlvReader.getUInt(ContextSpecificTag(TAG_CONNECTION_ID))
@@ -73,7 +73,7 @@ class PushAvStreamTransportClusterPushTransportEndEvent(
       return PushAvStreamTransportClusterPushTransportEndEvent(
         connectionID,
         triggerType,
-        activationReason,
+        activationReason
       )
     }
   }

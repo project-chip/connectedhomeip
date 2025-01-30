@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class DeviceEnergyManagementClusterPowerAdjustEndEvent(
   val cause: UInt,
   val duration: ULong,
-  val energyUse: Long,
+  val energyUse: Long
 ) {
   override fun toString(): String = buildString {
     append("DeviceEnergyManagementClusterPowerAdjustEndEvent {\n")
@@ -52,7 +52,7 @@ class DeviceEnergyManagementClusterPowerAdjustEndEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): DeviceEnergyManagementClusterPowerAdjustEndEvent {
       tlvReader.enterStructure(tlvTag)
       val cause = tlvReader.getUInt(ContextSpecificTag(TAG_CAUSE))

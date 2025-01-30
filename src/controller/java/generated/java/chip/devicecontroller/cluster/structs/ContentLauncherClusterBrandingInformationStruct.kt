@@ -29,7 +29,7 @@ class ContentLauncherClusterBrandingInformationStruct(
   val logo: Optional<ContentLauncherClusterStyleInformationStruct>,
   val progressBar: Optional<ContentLauncherClusterStyleInformationStruct>,
   val splash: Optional<ContentLauncherClusterStyleInformationStruct>,
-  val waterMark: Optional<ContentLauncherClusterStyleInformationStruct>,
+  val waterMark: Optional<ContentLauncherClusterStyleInformationStruct>
 ) {
   override fun toString(): String = buildString {
     append("ContentLauncherClusterBrandingInformationStruct {\n")
@@ -80,7 +80,7 @@ class ContentLauncherClusterBrandingInformationStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): ContentLauncherClusterBrandingInformationStruct {
       tlvReader.enterStructure(tlvTag)
       val providerName = tlvReader.getString(ContextSpecificTag(TAG_PROVIDER_NAME))
@@ -89,7 +89,7 @@ class ContentLauncherClusterBrandingInformationStruct(
           Optional.of(
             ContentLauncherClusterStyleInformationStruct.fromTlv(
               ContextSpecificTag(TAG_BACKGROUND),
-              tlvReader,
+              tlvReader
             )
           )
         } else {
@@ -100,7 +100,7 @@ class ContentLauncherClusterBrandingInformationStruct(
           Optional.of(
             ContentLauncherClusterStyleInformationStruct.fromTlv(
               ContextSpecificTag(TAG_LOGO),
-              tlvReader,
+              tlvReader
             )
           )
         } else {
@@ -111,7 +111,7 @@ class ContentLauncherClusterBrandingInformationStruct(
           Optional.of(
             ContentLauncherClusterStyleInformationStruct.fromTlv(
               ContextSpecificTag(TAG_PROGRESS_BAR),
-              tlvReader,
+              tlvReader
             )
           )
         } else {
@@ -122,7 +122,7 @@ class ContentLauncherClusterBrandingInformationStruct(
           Optional.of(
             ContentLauncherClusterStyleInformationStruct.fromTlv(
               ContextSpecificTag(TAG_SPLASH),
-              tlvReader,
+              tlvReader
             )
           )
         } else {
@@ -133,7 +133,7 @@ class ContentLauncherClusterBrandingInformationStruct(
           Optional.of(
             ContentLauncherClusterStyleInformationStruct.fromTlv(
               ContextSpecificTag(TAG_WATER_MARK),
-              tlvReader,
+              tlvReader
             )
           )
         } else {
@@ -148,7 +148,7 @@ class ContentLauncherClusterBrandingInformationStruct(
         logo,
         progressBar,
         splash,
-        waterMark,
+        waterMark
       )
     }
   }

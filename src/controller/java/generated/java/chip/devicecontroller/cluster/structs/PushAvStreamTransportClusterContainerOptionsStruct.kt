@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class PushAvStreamTransportClusterContainerOptionsStruct(
   val containerType: UInt,
-  val CMAFContainerOptions: Optional<PushAvStreamTransportClusterCMAFContainerOptionsStruct>,
+  val CMAFContainerOptions: Optional<PushAvStreamTransportClusterCMAFContainerOptionsStruct>
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterContainerOptionsStruct {\n")
@@ -52,7 +52,7 @@ class PushAvStreamTransportClusterContainerOptionsStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): PushAvStreamTransportClusterContainerOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val containerType = tlvReader.getUInt(ContextSpecificTag(TAG_CONTAINER_TYPE))
@@ -61,7 +61,7 @@ class PushAvStreamTransportClusterContainerOptionsStruct(
           Optional.of(
             PushAvStreamTransportClusterCMAFContainerOptionsStruct.fromTlv(
               ContextSpecificTag(TAG_CMAF_CONTAINER_OPTIONS),
-              tlvReader,
+              tlvReader
             )
           )
         } else {

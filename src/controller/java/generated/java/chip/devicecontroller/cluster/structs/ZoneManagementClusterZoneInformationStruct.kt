@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class ZoneManagementClusterZoneInformationStruct(
   val zoneID: UInt,
   val zoneType: UInt,
-  val zoneSource: UInt,
+  val zoneSource: UInt
 ) {
   override fun toString(): String = buildString {
     append("ZoneManagementClusterZoneInformationStruct {\n")

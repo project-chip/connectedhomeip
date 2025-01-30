@@ -42,7 +42,7 @@ class DemandResponseLoadControlClusterDutyCycleControlStruct(val dutyCycle: UInt
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): DemandResponseLoadControlClusterDutyCycleControlStruct {
       tlvReader.enterStructure(tlvTag)
       val dutyCycle = tlvReader.getUInt(ContextSpecificTag(TAG_DUTY_CYCLE))

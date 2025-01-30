@@ -30,7 +30,7 @@ class CameraAvStreamManagementClusterSnapshotStreamStruct(
   val minResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
   val maxResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
   val quality: UInt,
-  val referenceCount: UInt,
+  val referenceCount: UInt
 ) {
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterSnapshotStreamStruct {\n")
@@ -72,7 +72,7 @@ class CameraAvStreamManagementClusterSnapshotStreamStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): CameraAvStreamManagementClusterSnapshotStreamStruct {
       tlvReader.enterStructure(tlvTag)
       val snapshotStreamID = tlvReader.getUInt(ContextSpecificTag(TAG_SNAPSHOT_STREAM_ID))
@@ -82,12 +82,12 @@ class CameraAvStreamManagementClusterSnapshotStreamStruct(
       val minResolution =
         CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(
           ContextSpecificTag(TAG_MIN_RESOLUTION),
-          tlvReader,
+          tlvReader
         )
       val maxResolution =
         CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(
           ContextSpecificTag(TAG_MAX_RESOLUTION),
-          tlvReader,
+          tlvReader
         )
       val quality = tlvReader.getUInt(ContextSpecificTag(TAG_QUALITY))
       val referenceCount = tlvReader.getUInt(ContextSpecificTag(TAG_REFERENCE_COUNT))
@@ -102,7 +102,7 @@ class CameraAvStreamManagementClusterSnapshotStreamStruct(
         minResolution,
         maxResolution,
         quality,
-        referenceCount,
+        referenceCount
       )
     }
   }

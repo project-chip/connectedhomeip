@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class ScenesManagementClusterExtensionFieldSet(
   val clusterID: ULong,
-  val attributeValueList: List<ScenesManagementClusterAttributeValuePairStruct>,
+  val attributeValueList: List<ScenesManagementClusterAttributeValuePairStruct>
 ) {
   override fun toString(): String = buildString {
     append("ScenesManagementClusterExtensionFieldSet {\n")

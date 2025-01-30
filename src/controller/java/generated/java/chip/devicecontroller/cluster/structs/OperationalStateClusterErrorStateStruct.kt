@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class OperationalStateClusterErrorStateStruct(
   val errorStateID: UInt,
   val errorStateLabel: Optional<String>,
-  val errorStateDetails: Optional<String>,
+  val errorStateDetails: Optional<String>
 ) {
   override fun toString(): String = buildString {
     append("OperationalStateClusterErrorStateStruct {\n")
@@ -78,7 +78,7 @@ class OperationalStateClusterErrorStateStruct(
       return OperationalStateClusterErrorStateStruct(
         errorStateID,
         errorStateLabel,
-        errorStateDetails,
+        errorStateDetails
       )
     }
   }

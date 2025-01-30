@@ -27,7 +27,7 @@ class DemandResponseLoadControlClusterLoadControlProgramStruct(
   val name: String,
   val enrollmentGroup: UInt?,
   val randomStartMinutes: UInt?,
-  val randomDurationMinutes: UInt?,
+  val randomDurationMinutes: UInt?
 ) {
   override fun toString(): String = buildString {
     append("DemandResponseLoadControlClusterLoadControlProgramStruct {\n")
@@ -72,7 +72,7 @@ class DemandResponseLoadControlClusterLoadControlProgramStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): DemandResponseLoadControlClusterLoadControlProgramStruct {
       tlvReader.enterStructure(tlvTag)
       val programID = tlvReader.getByteArray(ContextSpecificTag(TAG_PROGRAM_ID))
@@ -106,7 +106,7 @@ class DemandResponseLoadControlClusterLoadControlProgramStruct(
         name,
         enrollmentGroup,
         randomStartMinutes,
-        randomDurationMinutes,
+        randomDurationMinutes
       )
     }
   }

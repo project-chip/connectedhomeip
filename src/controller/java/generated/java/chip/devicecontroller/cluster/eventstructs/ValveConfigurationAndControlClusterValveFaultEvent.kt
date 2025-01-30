@@ -42,7 +42,7 @@ class ValveConfigurationAndControlClusterValveFaultEvent(val valveFault: UInt) {
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): ValveConfigurationAndControlClusterValveFaultEvent {
       tlvReader.enterStructure(tlvTag)
       val valveFault = tlvReader.getUInt(ContextSpecificTag(TAG_VALVE_FAULT))

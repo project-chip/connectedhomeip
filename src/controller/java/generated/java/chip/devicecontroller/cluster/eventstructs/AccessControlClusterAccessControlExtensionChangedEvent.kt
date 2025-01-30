@@ -28,7 +28,7 @@ class AccessControlClusterAccessControlExtensionChangedEvent(
   val changeType: UInt,
   val latestValue:
     chip.devicecontroller.cluster.structs.AccessControlClusterAccessControlExtensionStruct?,
-  val fabricIndex: UInt,
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
     append("AccessControlClusterAccessControlExtensionChangedEvent {\n")
@@ -73,7 +73,7 @@ class AccessControlClusterAccessControlExtensionChangedEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): AccessControlClusterAccessControlExtensionChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val adminNodeID =
@@ -108,7 +108,7 @@ class AccessControlClusterAccessControlExtensionChangedEvent(
         adminPasscodeID,
         changeType,
         latestValue,
-        fabricIndex,
+        fabricIndex
       )
     }
   }

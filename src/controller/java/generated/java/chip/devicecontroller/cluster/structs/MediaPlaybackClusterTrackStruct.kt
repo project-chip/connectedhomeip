@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class MediaPlaybackClusterTrackStruct(
   val id: String,
-  val trackAttributes: MediaPlaybackClusterTrackAttributesStruct?,
+  val trackAttributes: MediaPlaybackClusterTrackAttributesStruct?
 ) {
   override fun toString(): String = buildString {
     append("MediaPlaybackClusterTrackStruct {\n")
@@ -57,7 +57,7 @@ class MediaPlaybackClusterTrackStruct(
         if (!tlvReader.isNull()) {
           MediaPlaybackClusterTrackAttributesStruct.fromTlv(
             ContextSpecificTag(TAG_TRACK_ATTRIBUTES),
-            tlvReader,
+            tlvReader
           )
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_TRACK_ATTRIBUTES))

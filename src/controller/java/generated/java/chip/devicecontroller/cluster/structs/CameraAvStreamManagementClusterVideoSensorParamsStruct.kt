@@ -27,7 +27,7 @@ class CameraAvStreamManagementClusterVideoSensorParamsStruct(
   val sensorHeight: UInt,
   val HDRCapable: Boolean,
   val maxFPS: UInt,
-  val maxHDRFPS: UInt,
+  val maxHDRFPS: UInt
 ) {
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterVideoSensorParamsStruct {\n")
@@ -60,7 +60,7 @@ class CameraAvStreamManagementClusterVideoSensorParamsStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): CameraAvStreamManagementClusterVideoSensorParamsStruct {
       tlvReader.enterStructure(tlvTag)
       val sensorWidth = tlvReader.getUInt(ContextSpecificTag(TAG_SENSOR_WIDTH))
@@ -76,7 +76,7 @@ class CameraAvStreamManagementClusterVideoSensorParamsStruct(
         sensorHeight,
         HDRCapable,
         maxFPS,
-        maxHDRFPS,
+        maxHDRFPS
       )
     }
   }

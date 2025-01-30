@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
   val associationFailureCause: UInt,
-  val status: UInt,
+  val status: UInt
 ) {
   override fun toString(): String = buildString {
     append("WiFiNetworkDiagnosticsClusterAssociationFailureEvent {\n")
@@ -48,7 +48,7 @@ class WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
       tlvReader.enterStructure(tlvTag)
       val associationFailureCause =

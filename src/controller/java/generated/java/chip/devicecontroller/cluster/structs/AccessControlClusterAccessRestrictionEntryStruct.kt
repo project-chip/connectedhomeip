@@ -27,7 +27,7 @@ class AccessControlClusterAccessRestrictionEntryStruct(
   val endpoint: UInt,
   val cluster: ULong,
   val restrictions: List<AccessControlClusterAccessRestrictionStruct>,
-  val fabricIndex: UInt,
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
     append("AccessControlClusterAccessRestrictionEntryStruct {\n")
@@ -61,7 +61,7 @@ class AccessControlClusterAccessRestrictionEntryStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): AccessControlClusterAccessRestrictionEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val endpoint = tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT))
@@ -82,7 +82,7 @@ class AccessControlClusterAccessRestrictionEntryStruct(
         endpoint,
         cluster,
         restrictions,
-        fabricIndex,
+        fabricIndex
       )
     }
   }

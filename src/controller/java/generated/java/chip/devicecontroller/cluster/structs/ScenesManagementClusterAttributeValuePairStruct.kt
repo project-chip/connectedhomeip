@@ -32,7 +32,7 @@ class ScenesManagementClusterAttributeValuePairStruct(
   val valueUnsigned32: Optional<ULong>,
   val valueSigned32: Optional<Long>,
   val valueUnsigned64: Optional<ULong>,
-  val valueSigned64: Optional<Long>,
+  val valueSigned64: Optional<Long>
 ) {
   override fun toString(): String = buildString {
     append("ScenesManagementClusterAttributeValuePairStruct {\n")
@@ -101,7 +101,7 @@ class ScenesManagementClusterAttributeValuePairStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): ScenesManagementClusterAttributeValuePairStruct {
       tlvReader.enterStructure(tlvTag)
       val attributeID = tlvReader.getULong(ContextSpecificTag(TAG_ATTRIBUTE_ID))
@@ -165,7 +165,7 @@ class ScenesManagementClusterAttributeValuePairStruct(
         valueUnsigned32,
         valueSigned32,
         valueUnsigned64,
-        valueSigned64,
+        valueSigned64
       )
     }
   }

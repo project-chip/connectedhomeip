@@ -28,7 +28,7 @@ class ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct(
   val measured: Boolean,
   val minMeasuredValue: Long,
   val maxMeasuredValue: Long,
-  val accuracyRanges: List<ElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct>,
+  val accuracyRanges: List<ElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct>
 ) {
   override fun toString(): String = buildString {
     append("ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct {\n")
@@ -65,7 +65,7 @@ class ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct {
       tlvReader.enterStructure(tlvTag)
       val measurementType = tlvReader.getUInt(ContextSpecificTag(TAG_MEASUREMENT_TYPE))
@@ -79,7 +79,7 @@ class ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct(
             add(
               ElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct.fromTlv(
                 AnonymousTag,
-                tlvReader,
+                tlvReader
               )
             )
           }
@@ -93,7 +93,7 @@ class ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct(
         measured,
         minMeasuredValue,
         maxMeasuredValue,
-        accuracyRanges,
+        accuracyRanges
       )
     }
   }

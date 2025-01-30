@@ -36,7 +36,7 @@ class CameraAvStreamManagementClusterSnapshotStreamChangedEvent(
     Optional<
       chip.devicecontroller.cluster.structs.CameraAvStreamManagementClusterVideoResolutionStruct
     >,
-  val quality: Optional<UInt>,
+  val quality: Optional<UInt>
 ) {
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterSnapshotStreamChangedEvent {\n")
@@ -93,7 +93,7 @@ class CameraAvStreamManagementClusterSnapshotStreamChangedEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): CameraAvStreamManagementClusterSnapshotStreamChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val snapshotStreamID = tlvReader.getUInt(ContextSpecificTag(TAG_SNAPSHOT_STREAM_ID))
@@ -151,7 +151,7 @@ class CameraAvStreamManagementClusterSnapshotStreamChangedEvent(
         bitRate,
         minResolution,
         maxResolution,
-        quality,
+        quality
       )
     }
   }

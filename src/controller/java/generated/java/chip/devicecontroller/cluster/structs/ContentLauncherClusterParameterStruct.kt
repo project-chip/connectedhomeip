@@ -27,7 +27,7 @@ import matter.tlv.TlvWriter
 class ContentLauncherClusterParameterStruct(
   val type: UInt,
   val value: String,
-  val externalIDList: Optional<List<ContentLauncherClusterAdditionalInfoStruct>>,
+  val externalIDList: Optional<List<ContentLauncherClusterAdditionalInfoStruct>>
 ) {
   override fun toString(): String = buildString {
     append("ContentLauncherClusterParameterStruct {\n")

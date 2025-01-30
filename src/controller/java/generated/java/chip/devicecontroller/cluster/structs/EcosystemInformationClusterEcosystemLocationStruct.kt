@@ -26,7 +26,7 @@ class EcosystemInformationClusterEcosystemLocationStruct(
   val uniqueLocationID: String,
   val locationDescriptor: EcosystemInformationClusterLocationDescriptorStruct,
   val locationDescriptorLastEdit: ULong,
-  val fabricIndex: UInt,
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
     append("EcosystemInformationClusterEcosystemLocationStruct {\n")
@@ -56,14 +56,14 @@ class EcosystemInformationClusterEcosystemLocationStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): EcosystemInformationClusterEcosystemLocationStruct {
       tlvReader.enterStructure(tlvTag)
       val uniqueLocationID = tlvReader.getString(ContextSpecificTag(TAG_UNIQUE_LOCATION_ID))
       val locationDescriptor =
         EcosystemInformationClusterLocationDescriptorStruct.fromTlv(
           ContextSpecificTag(TAG_LOCATION_DESCRIPTOR),
-          tlvReader,
+          tlvReader
         )
       val locationDescriptorLastEdit =
         tlvReader.getULong(ContextSpecificTag(TAG_LOCATION_DESCRIPTOR_LAST_EDIT))
@@ -75,7 +75,7 @@ class EcosystemInformationClusterEcosystemLocationStruct(
         uniqueLocationID,
         locationDescriptor,
         locationDescriptorLastEdit,
-        fabricIndex,
+        fabricIndex
       )
     }
   }

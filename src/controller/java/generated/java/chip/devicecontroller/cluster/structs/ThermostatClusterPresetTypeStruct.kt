@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class ThermostatClusterPresetTypeStruct(
   val presetScenario: UInt,
   val numberOfPresets: UInt,
-  val presetTypeFeatures: UInt,
+  val presetTypeFeatures: UInt
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterPresetTypeStruct {\n")

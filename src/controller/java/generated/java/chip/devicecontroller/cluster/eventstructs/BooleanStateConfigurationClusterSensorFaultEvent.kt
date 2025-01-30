@@ -42,7 +42,7 @@ class BooleanStateConfigurationClusterSensorFaultEvent(val sensorFault: UInt) {
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): BooleanStateConfigurationClusterSensorFaultEvent {
       tlvReader.enterStructure(tlvTag)
       val sensorFault = tlvReader.getUInt(ContextSpecificTag(TAG_SENSOR_FAULT))

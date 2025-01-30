@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class OvenCavityOperationalStateClusterOperationalStateStruct(
   val operationalStateID: UInt,
-  val operationalStateLabel: Optional<String>,
+  val operationalStateLabel: Optional<String>
 ) {
   override fun toString(): String = buildString {
     append("OvenCavityOperationalStateClusterOperationalStateStruct {\n")
@@ -52,7 +52,7 @@ class OvenCavityOperationalStateClusterOperationalStateStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): OvenCavityOperationalStateClusterOperationalStateStruct {
       tlvReader.enterStructure(tlvTag)
       val operationalStateID = tlvReader.getUInt(ContextSpecificTag(TAG_OPERATIONAL_STATE_ID))
@@ -67,7 +67,7 @@ class OvenCavityOperationalStateClusterOperationalStateStruct(
 
       return OvenCavityOperationalStateClusterOperationalStateStruct(
         operationalStateID,
-        operationalStateLabel,
+        operationalStateLabel
       )
     }
   }

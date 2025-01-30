@@ -28,7 +28,7 @@ class ZoneManagementClusterZoneTriggerControlStruct(
   val augmentationDuration: UInt,
   val maxDuration: ULong,
   val blindDuration: UInt,
-  val sensitivity: Optional<UInt>,
+  val sensitivity: Optional<UInt>
 ) {
   override fun toString(): String = buildString {
     append("ZoneManagementClusterZoneTriggerControlStruct {\n")
@@ -82,7 +82,7 @@ class ZoneManagementClusterZoneTriggerControlStruct(
         augmentationDuration,
         maxDuration,
         blindDuration,
-        sensitivity,
+        sensitivity
       )
     }
   }

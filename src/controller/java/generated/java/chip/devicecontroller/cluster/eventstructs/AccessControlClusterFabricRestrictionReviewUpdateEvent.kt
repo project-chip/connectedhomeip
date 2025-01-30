@@ -27,7 +27,7 @@ class AccessControlClusterFabricRestrictionReviewUpdateEvent(
   val token: ULong,
   val instruction: Optional<String>,
   val ARLRequestFlowUrl: Optional<String>,
-  val fabricIndex: UInt,
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
     append("AccessControlClusterFabricRestrictionReviewUpdateEvent {\n")
@@ -63,7 +63,7 @@ class AccessControlClusterFabricRestrictionReviewUpdateEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): AccessControlClusterFabricRestrictionReviewUpdateEvent {
       tlvReader.enterStructure(tlvTag)
       val token = tlvReader.getULong(ContextSpecificTag(TAG_TOKEN))
@@ -87,7 +87,7 @@ class AccessControlClusterFabricRestrictionReviewUpdateEvent(
         token,
         instruction,
         ARLRequestFlowUrl,
-        fabricIndex,
+        fabricIndex
       )
     }
   }

@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct(
   val presetID: UInt,
   val name: String,
-  val settings: CameraAvSettingsUserLevelManagementClusterMPTZStruct,
+  val settings: CameraAvSettingsUserLevelManagementClusterMPTZStruct
 ) {
   override fun toString(): String = buildString {
     append("CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct {\n")
@@ -52,7 +52,7 @@ class CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct {
       tlvReader.enterStructure(tlvTag)
       val presetID = tlvReader.getUInt(ContextSpecificTag(TAG_PRESET_ID))
@@ -60,7 +60,7 @@ class CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct(
       val settings =
         CameraAvSettingsUserLevelManagementClusterMPTZStruct.fromTlv(
           ContextSpecificTag(TAG_SETTINGS),
-          tlvReader,
+          tlvReader
         )
 
       tlvReader.exitContainer()

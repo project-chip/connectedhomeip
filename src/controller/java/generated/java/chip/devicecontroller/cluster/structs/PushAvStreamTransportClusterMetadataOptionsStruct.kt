@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class PushAvStreamTransportClusterMetadataOptionsStruct(
   val multiplexing: UInt,
   val includeMotionZones: Boolean,
-  val enableMetadataPrivacySensitive: Boolean,
+  val enableMetadataPrivacySensitive: Boolean
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterMetadataOptionsStruct {\n")
@@ -52,7 +52,7 @@ class PushAvStreamTransportClusterMetadataOptionsStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): PushAvStreamTransportClusterMetadataOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val multiplexing = tlvReader.getUInt(ContextSpecificTag(TAG_MULTIPLEXING))
@@ -65,7 +65,7 @@ class PushAvStreamTransportClusterMetadataOptionsStruct(
       return PushAvStreamTransportClusterMetadataOptionsStruct(
         multiplexing,
         includeMotionZones,
-        enableMetadataPrivacySensitive,
+        enableMetadataPrivacySensitive
       )
     }
   }

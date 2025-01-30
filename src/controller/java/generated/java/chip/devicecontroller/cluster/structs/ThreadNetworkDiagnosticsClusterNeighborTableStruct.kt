@@ -36,7 +36,7 @@ class ThreadNetworkDiagnosticsClusterNeighborTableStruct(
   val rxOnWhenIdle: Boolean,
   val fullThreadDevice: Boolean,
   val fullNetworkData: Boolean,
-  val isChild: Boolean,
+  val isChild: Boolean
 ) {
   override fun toString(): String = buildString {
     append("ThreadNetworkDiagnosticsClusterNeighborTableStruct {\n")
@@ -104,7 +104,7 @@ class ThreadNetworkDiagnosticsClusterNeighborTableStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): ThreadNetworkDiagnosticsClusterNeighborTableStruct {
       tlvReader.enterStructure(tlvTag)
       val extAddress = tlvReader.getULong(ContextSpecificTag(TAG_EXT_ADDRESS))
@@ -150,7 +150,7 @@ class ThreadNetworkDiagnosticsClusterNeighborTableStruct(
         rxOnWhenIdle,
         fullThreadDevice,
         fullNetworkData,
-        isChild,
+        isChild
       )
     }
   }

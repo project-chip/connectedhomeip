@@ -34,7 +34,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
   val containerFormat: UInt,
   val containerOptions: PushAvStreamTransportClusterContainerOptionsStruct,
   val metadataOptions: Optional<PushAvStreamTransportClusterMetadataOptionsStruct>,
-  val expiryTime: Optional<ULong>,
+  val expiryTime: Optional<ULong>
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterTransportOptionsStruct {\n")
@@ -97,7 +97,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): PushAvStreamTransportClusterTransportOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val streamUsage = tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_USAGE))
@@ -118,21 +118,21 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
       val triggerOptions =
         PushAvStreamTransportClusterTransportTriggerOptionsStruct.fromTlv(
           ContextSpecificTag(TAG_TRIGGER_OPTIONS),
-          tlvReader,
+          tlvReader
         )
       val ingestMethod = tlvReader.getUInt(ContextSpecificTag(TAG_INGEST_METHOD))
       val containerFormat = tlvReader.getUInt(ContextSpecificTag(TAG_CONTAINER_FORMAT))
       val containerOptions =
         PushAvStreamTransportClusterContainerOptionsStruct.fromTlv(
           ContextSpecificTag(TAG_CONTAINER_OPTIONS),
-          tlvReader,
+          tlvReader
         )
       val metadataOptions =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_METADATA_OPTIONS))) {
           Optional.of(
             PushAvStreamTransportClusterMetadataOptionsStruct.fromTlv(
               ContextSpecificTag(TAG_METADATA_OPTIONS),
-              tlvReader,
+              tlvReader
             )
           )
         } else {
@@ -158,7 +158,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
         containerFormat,
         containerOptions,
         metadataOptions,
-        expiryTime,
+        expiryTime
       )
     }
   }

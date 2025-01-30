@@ -47,7 +47,7 @@ class OperationalStateClusterOperationalErrorEvent(
       val errorState =
         chip.devicecontroller.cluster.structs.OperationalStateClusterErrorStateStruct.fromTlv(
           ContextSpecificTag(TAG_ERROR_STATE),
-          tlvReader,
+          tlvReader
         )
 
       tlvReader.exitContainer()

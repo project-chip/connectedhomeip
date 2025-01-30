@@ -42,7 +42,7 @@ class DemandResponseLoadControlClusterHeatingSourceControlStruct(val heatingSour
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): DemandResponseLoadControlClusterHeatingSourceControlStruct {
       tlvReader.enterStructure(tlvTag)
       val heatingSource = tlvReader.getUInt(ContextSpecificTag(TAG_HEATING_SOURCE))

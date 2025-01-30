@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class AccessControlClusterCommissioningAccessRestrictionEntryStruct(
   val endpoint: UInt,
   val cluster: ULong,
-  val restrictions: List<AccessControlClusterAccessRestrictionStruct>,
+  val restrictions: List<AccessControlClusterAccessRestrictionStruct>
 ) {
   override fun toString(): String = buildString {
     append("AccessControlClusterCommissioningAccessRestrictionEntryStruct {\n")
@@ -57,7 +57,7 @@ class AccessControlClusterCommissioningAccessRestrictionEntryStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): AccessControlClusterCommissioningAccessRestrictionEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val endpoint = tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT))
@@ -76,7 +76,7 @@ class AccessControlClusterCommissioningAccessRestrictionEntryStruct(
       return AccessControlClusterCommissioningAccessRestrictionEntryStruct(
         endpoint,
         cluster,
-        restrictions,
+        restrictions
       )
     }
   }

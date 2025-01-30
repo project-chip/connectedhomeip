@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class ActivatedCarbonFilterMonitoringClusterReplacementProductStruct(
   val productIdentifierType: UInt,
-  val productIdentifierValue: String,
+  val productIdentifierValue: String
 ) {
   override fun toString(): String = buildString {
     append("ActivatedCarbonFilterMonitoringClusterReplacementProductStruct {\n")
@@ -48,7 +48,7 @@ class ActivatedCarbonFilterMonitoringClusterReplacementProductStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): ActivatedCarbonFilterMonitoringClusterReplacementProductStruct {
       tlvReader.enterStructure(tlvTag)
       val productIdentifierType = tlvReader.getUInt(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_TYPE))
@@ -59,7 +59,7 @@ class ActivatedCarbonFilterMonitoringClusterReplacementProductStruct(
 
       return ActivatedCarbonFilterMonitoringClusterReplacementProductStruct(
         productIdentifierType,
-        productIdentifierValue,
+        productIdentifierValue
       )
     }
   }

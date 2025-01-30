@@ -45,7 +45,7 @@ class CameraAvStreamManagementClusterVideoResolutionStruct(val width: UInt, val 
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): CameraAvStreamManagementClusterVideoResolutionStruct {
       tlvReader.enterStructure(tlvTag)
       val width = tlvReader.getUInt(ContextSpecificTag(TAG_WIDTH))

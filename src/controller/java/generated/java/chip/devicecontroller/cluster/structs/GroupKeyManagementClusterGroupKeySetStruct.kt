@@ -30,7 +30,7 @@ class GroupKeyManagementClusterGroupKeySetStruct(
   val epochKey1: ByteArray?,
   val epochStartTime1: ULong?,
   val epochKey2: ByteArray?,
-  val epochStartTime2: ULong?,
+  val epochStartTime2: ULong?
 ) {
   override fun toString(): String = buildString {
     append("GroupKeyManagementClusterGroupKeySetStruct {\n")
@@ -152,7 +152,7 @@ class GroupKeyManagementClusterGroupKeySetStruct(
         epochKey1,
         epochStartTime1,
         epochKey2,
-        epochStartTime2,
+        epochStartTime2
       )
     }
   }

@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
   val ccdid: UInt,
   val clientCertificate: ByteArray,
-  val intermediateCertificates: List<ByteArray>,
+  val intermediateCertificates: List<ByteArray>
 ) {
   override fun toString(): String = buildString {
     append("TlsCertificateManagementClusterTLSClientCertificateDetailStruct {\n")
@@ -57,7 +57,7 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): TlsCertificateManagementClusterTLSClientCertificateDetailStruct {
       tlvReader.enterStructure(tlvTag)
       val ccdid = tlvReader.getUInt(ContextSpecificTag(TAG_CCDID))
@@ -76,7 +76,7 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
       return TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
         ccdid,
         clientCertificate,
-        intermediateCertificates,
+        intermediateCertificates
       )
     }
   }

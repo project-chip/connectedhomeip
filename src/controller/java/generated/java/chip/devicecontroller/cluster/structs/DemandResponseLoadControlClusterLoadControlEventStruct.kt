@@ -32,7 +32,7 @@ class DemandResponseLoadControlClusterLoadControlEventStruct(
   val enrollmentGroup: Optional<UInt>,
   val criticality: UInt,
   val startTime: ULong?,
-  val transitions: List<DemandResponseLoadControlClusterLoadControlEventTransitionStruct>,
+  val transitions: List<DemandResponseLoadControlClusterLoadControlEventTransitionStruct>
 ) {
   override fun toString(): String = buildString {
     append("DemandResponseLoadControlClusterLoadControlEventStruct {\n")
@@ -89,7 +89,7 @@ class DemandResponseLoadControlClusterLoadControlEventStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): DemandResponseLoadControlClusterLoadControlEventStruct {
       tlvReader.enterStructure(tlvTag)
       val eventID = tlvReader.getByteArray(ContextSpecificTag(TAG_EVENT_ID))
@@ -123,7 +123,7 @@ class DemandResponseLoadControlClusterLoadControlEventStruct(
             add(
               DemandResponseLoadControlClusterLoadControlEventTransitionStruct.fromTlv(
                 AnonymousTag,
-                tlvReader,
+                tlvReader
               )
             )
           }
@@ -140,7 +140,7 @@ class DemandResponseLoadControlClusterLoadControlEventStruct(
         enrollmentGroup,
         criticality,
         startTime,
-        transitions,
+        transitions
       )
     }
   }

@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class OperationalStateClusterOperationalStateStruct(
   val operationalStateID: UInt,
-  val operationalStateLabel: Optional<String>,
+  val operationalStateLabel: Optional<String>
 ) {
   override fun toString(): String = buildString {
     append("OperationalStateClusterOperationalStateStruct {\n")
@@ -64,7 +64,7 @@ class OperationalStateClusterOperationalStateStruct(
 
       return OperationalStateClusterOperationalStateStruct(
         operationalStateID,
-        operationalStateLabel,
+        operationalStateLabel
       )
     }
   }

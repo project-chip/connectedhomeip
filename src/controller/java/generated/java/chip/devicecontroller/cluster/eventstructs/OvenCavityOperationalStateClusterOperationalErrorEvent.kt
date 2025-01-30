@@ -45,7 +45,7 @@ class OvenCavityOperationalStateClusterOperationalErrorEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): OvenCavityOperationalStateClusterOperationalErrorEvent {
       tlvReader.enterStructure(tlvTag)
       val errorState =

@@ -42,7 +42,7 @@ class WiFiNetworkDiagnosticsClusterDisconnectionEvent(val reasonCode: UInt) {
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): WiFiNetworkDiagnosticsClusterDisconnectionEvent {
       tlvReader.enterStructure(tlvTag)
       val reasonCode = tlvReader.getUInt(ContextSpecificTag(TAG_REASON_CODE))

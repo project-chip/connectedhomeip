@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class MediaPlaybackClusterTrackAttributesStruct(
   val languageCode: String,
-  val displayName: Optional<String>?,
+  val displayName: Optional<String>?
 ) {
   override fun toString(): String = buildString {
     append("MediaPlaybackClusterTrackAttributesStruct {\n")

@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class PushAvStreamTransportClusterTransportConfigurationStruct(
   val connectionID: UInt,
   val transportStatus: UInt,
-  val transportOptions: PushAvStreamTransportClusterTransportOptionsStruct,
+  val transportOptions: PushAvStreamTransportClusterTransportOptionsStruct
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterTransportConfigurationStruct {\n")
@@ -52,7 +52,7 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): PushAvStreamTransportClusterTransportConfigurationStruct {
       tlvReader.enterStructure(tlvTag)
       val connectionID = tlvReader.getUInt(ContextSpecificTag(TAG_CONNECTION_ID))
@@ -60,7 +60,7 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
       val transportOptions =
         PushAvStreamTransportClusterTransportOptionsStruct.fromTlv(
           ContextSpecificTag(TAG_TRANSPORT_OPTIONS),
-          tlvReader,
+          tlvReader
         )
 
       tlvReader.exitContainer()
@@ -68,7 +68,7 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
       return PushAvStreamTransportClusterTransportConfigurationStruct(
         connectionID,
         transportStatus,
-        transportOptions,
+        transportOptions
       )
     }
   }

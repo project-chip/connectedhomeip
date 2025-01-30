@@ -30,7 +30,7 @@ class CameraAvStreamManagementClusterAudioStreamChangedEvent(
   val channelCount: Optional<UInt>,
   val sampleRate: Optional<ULong>,
   val bitRate: Optional<ULong>,
-  val bitDepth: Optional<UInt>,
+  val bitDepth: Optional<UInt>
 ) {
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterAudioStreamChangedEvent {\n")
@@ -87,7 +87,7 @@ class CameraAvStreamManagementClusterAudioStreamChangedEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): CameraAvStreamManagementClusterAudioStreamChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val audioStreamID = tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
@@ -137,7 +137,7 @@ class CameraAvStreamManagementClusterAudioStreamChangedEvent(
         channelCount,
         sampleRate,
         bitRate,
-        bitDepth,
+        bitDepth
       )
     }
   }

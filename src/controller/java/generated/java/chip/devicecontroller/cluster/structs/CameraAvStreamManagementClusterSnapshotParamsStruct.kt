@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class CameraAvStreamManagementClusterSnapshotParamsStruct(
   val resolution: CameraAvStreamManagementClusterVideoResolutionStruct,
   val maxFrameRate: UInt,
-  val imageCodec: UInt,
+  val imageCodec: UInt
 ) {
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterSnapshotParamsStruct {\n")
@@ -52,13 +52,13 @@ class CameraAvStreamManagementClusterSnapshotParamsStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): CameraAvStreamManagementClusterSnapshotParamsStruct {
       tlvReader.enterStructure(tlvTag)
       val resolution =
         CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(
           ContextSpecificTag(TAG_RESOLUTION),
-          tlvReader,
+          tlvReader
         )
       val maxFrameRate = tlvReader.getUInt(ContextSpecificTag(TAG_MAX_FRAME_RATE))
       val imageCodec = tlvReader.getUInt(ContextSpecificTag(TAG_IMAGE_CODEC))
@@ -68,7 +68,7 @@ class CameraAvStreamManagementClusterSnapshotParamsStruct(
       return CameraAvStreamManagementClusterSnapshotParamsStruct(
         resolution,
         maxFrameRate,
-        imageCodec,
+        imageCodec
       )
     }
   }

@@ -40,7 +40,7 @@ class CameraAvStreamManagementClusterVideoStreamChangedEvent(
   val minBitRate: Optional<ULong>,
   val maxBitRate: Optional<ULong>,
   val minFragmentLen: Optional<UInt>,
-  val maxFragmentLen: Optional<UInt>,
+  val maxFragmentLen: Optional<UInt>
 ) {
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterVideoStreamChangedEvent {\n")
@@ -121,7 +121,7 @@ class CameraAvStreamManagementClusterVideoStreamChangedEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): CameraAvStreamManagementClusterVideoStreamChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val videoStreamID = tlvReader.getUInt(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
@@ -207,7 +207,7 @@ class CameraAvStreamManagementClusterVideoStreamChangedEvent(
         minBitRate,
         maxBitRate,
         minFragmentLen,
-        maxFragmentLen,
+        maxFragmentLen
       )
     }
   }
