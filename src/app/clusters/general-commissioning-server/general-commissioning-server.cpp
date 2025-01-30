@@ -107,6 +107,14 @@ CHIP_ERROR GeneralCommissioningGlobalInstance::Read(const ConcreteReadAttributeP
 
     switch (aPath.mAttributeId)
     {
+    case FeatureMap::Id: {
+        BitFlags<GeneralCommissioning::Feature> features;
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        features.Set(GeneralCommissioning::Feature::kTermsAndConditions);
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        return aEncoder.Encode(features);
+    }
+
     case RegulatoryConfig::Id: {
         return ReadIfSupported(&ConfigurationManager::GetRegulatoryLocation, aEncoder);
     }
