@@ -66,7 +66,7 @@ private:
 
     void InvokeCommand(HandlerContext & ctx) override;
 
-#ifdef MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_CLIENT_ENDPOINT_COUNT
+#ifdef DIAGNOSTIC_LOGS_ENABLE_RETRIEVE_LOGS_REQUEST_CMD
     void HandleRetrieveLogsRequest(HandlerContext & ctx, const Commands::RetrieveLogsRequest::DecodableType & commandData);
 #endif
 };
