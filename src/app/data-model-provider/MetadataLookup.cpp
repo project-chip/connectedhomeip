@@ -73,7 +73,7 @@ Protocols::InteractionModel::Status ValidateClusterPath(ProviderMetadataTree * p
         return successStatus;
     }
 
-    // if we get here, the path is invalid.
+    // If we get here, the cluster identified by the path does not exist.
     auto endpoints = provider->EndpointsIgnoreError();
     for (auto & endpointEntry : endpoints)
     {
