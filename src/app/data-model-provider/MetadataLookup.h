@@ -66,7 +66,7 @@ private:
     ReadOnlyBuffer<AttributeEntry> mAttributes;
 };
 
-/// Validates that `path` exists within the given provider
+/// Validates that the cluster identified by `path` exists within the given provider.
 ///
 /// If the endpoint identified by the path does not exist, will return Status::UnsupportedEndpoint.
 /// If the endpoint exists but does not have the cluster identified by the path, will return Status::UnsupportedCluster.
