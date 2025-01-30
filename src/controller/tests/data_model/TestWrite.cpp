@@ -60,6 +60,7 @@ const MockNodeConfig & TestMockNodeConfig()
                 ClusterRevision::Id, FeatureMap::Id,
                 Clusters::UnitTesting::Attributes::Boolean::Id,
                 Clusters::UnitTesting::Attributes::Int16u::Id,
+                Clusters::UnitTesting::Attributes::Int8u::Id,
                 Clusters::UnitTesting::Attributes::ListFabricScoped::Id,
                 Clusters::UnitTesting::Attributes::ListStructOctetString::Id,
             }),
