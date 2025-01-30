@@ -719,6 +719,6 @@ PyChipError pychip_DeviceController_SetDACRevocationSetPath(const char * dacRevo
     Credentials::DeviceAttestationVerifier * dacVerifier = Credentials::GetDeviceAttestationVerifier();
     VerifyOrReturnError(dacVerifier != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
 
-    return ToPyChipError(dacVerifier->TrySettingRevocationDelegate(dacRevocationDelegate));
+    return ToPyChipError(dacVerifier->SetRevocationDelegate(dacRevocationDelegate));
 }
 } // extern "C"

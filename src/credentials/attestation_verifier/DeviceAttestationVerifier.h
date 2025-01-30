@@ -420,7 +420,7 @@ public:
      *
      * @return CHIP_NO_ERROR on success, CHIP_ERROR_NOT_IMPLEMENTED if the revocation delegate is not supported.
      */
-    virtual CHIP_ERROR TrySettingRevocationDelegate(DeviceAttestationRevocationDelegate * revocationDelegate)
+    virtual CHIP_ERROR SetRevocationDelegate(DeviceAttestationRevocationDelegate * revocationDelegate)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
