@@ -49,7 +49,7 @@ FindAttributeMetadata(const ConcreteAttributePath & aPath);
 ///    - Status::UnsupportedEndpoint if the path endpoint does not exist
 ///    - Status::UnsupportedCluster if the cluster does not exist on the given endpoint
 ///    - Status::Success if the path is valid within Ember
-Protocols::InteractionModel::Status ValidateClusterPath(const ConcreteClusterPath &path);
+Protocols::InteractionModel::Status ValidateClusterPath(const ConcreteClusterPath & path);
 
 } // namespace Ember
 } // namespace app

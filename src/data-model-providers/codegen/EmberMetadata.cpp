@@ -58,7 +58,8 @@ FindAttributeMetadata(const ConcreteAttributePath & aPath)
     {
         Status status = ValidateClusterPath(aPath);
 
-        if (status != Status::Success) {
+        if (status != Status::Success)
+        {
             return status;
         }
 
@@ -70,21 +71,22 @@ FindAttributeMetadata(const ConcreteAttributePath & aPath)
     return metadata;
 }
 
-Status ValidateClusterPath(const ConcreteClusterPath &path) {
+Status ValidateClusterPath(const ConcreteClusterPath & path)
+{
 
-        const EmberAfEndpointType * type = emberAfFindEndpointType(path.mEndpointId);
-        if (type == nullptr)
-        {
-            return Status::UnsupportedEndpoint;
-        }
+    const EmberAfEndpointType * type = emberAfFindEndpointType(path.mEndpointId);
+    if (type == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
 
-        const EmberAfCluster * cluster = emberAfFindClusterInType(type, path.mClusterId, CLUSTER_MASK_SERVER);
-        if (cluster == nullptr)
-        {
-            return Status::UnsupportedCluster;
-        }
+    const EmberAfCluster * cluster = emberAfFindClusterInType(type, path.mClusterId, CLUSTER_MASK_SERVER);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedCluster;
+    }
 
-        return Status::Success;
+    return Status::Success;
 }
 
 } // namespace Ember
