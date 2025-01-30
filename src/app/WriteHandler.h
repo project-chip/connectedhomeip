@@ -192,8 +192,8 @@ private:
     /// Validates that ACL, writability and Timed interaction settings are ok.
     ///
     /// Returns a success status if all is ok, failure otherwise.
-    DataModel::ActionReturnStatus CheckWriteAllowed(const Access::SubjectDescriptor & aSubject, const ConcreteDataAttributePath & aPath);
-
+    DataModel::ActionReturnStatus CheckWriteAllowed(const Access::SubjectDescriptor & aSubject,
+                                                    const ConcreteDataAttributePath & aPath);
 
     // Write the given data to the given path
     CHIP_ERROR WriteClusterData(const Access::SubjectDescriptor & aSubject, const ConcreteDataAttributePath & aPath,
