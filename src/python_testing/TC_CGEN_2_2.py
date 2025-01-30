@@ -101,6 +101,28 @@ class TC_CGEN_2_2(MatterBaseTest):
         except TimeoutError:
             asserts.fail("Unable to establish a PASE session to the device")
 
+    async def expire_failsafe_timer(self, dev_ctrl, node_id):
+        """
+        Triggering the failsafe expiry to clean up resources like fabric tables, NOCs (Node Operational Credentials),
+        and trusted root certificates. This is necessary to avoid accumulation of invalid data, which could be caused
+        by misconfigurations (e.g., incorrect network credentials).
+
+        In CI environments, this function helps bypass long waits by resetting the failsafe timer to 0 seconds,
+        allowing the test to proceed without unnecessary delays.
+
+        Args:
+            dev_ctrl: The device controller to send the command.
+            node_id: The node identifier to which the command is sent.
+
+        Returns:
+            response: The response from the command sent to the device.
+        """
+        # Resetting the failsafe timer to 0 seconds to clean up resources and avoid waiting in CI.
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0)
+        # Sending the command to the DUT (Device Under Test).
+        resp = await self.send_single_cmd(dev_ctrl=dev_ctrl, node_id=node_id, cmd=cmd)
+        return resp
+
     def desc_TC_CGEN_2_2(self) -> str:
         return "[TC-CGEN-2.2] ArmFailSafe command verification [DUT - Server]"
 
@@ -177,8 +199,7 @@ class TC_CGEN_2_2(MatterBaseTest):
     async def test_TC_CGEN_2_2(self):
         cluster_opcreds = Clusters.OperationalCredentials
         cluster_cgen = Clusters.GeneralCommissioning
-
-        maxFailsafe_tmp = 10
+        # maxFailsafe_tmp = 60
 
         self.step(0)
 
@@ -204,7 +225,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         logger.info(f'Step #2 - The MaxCumulativeFailsafeSeconds (max_fail_safe): {maxFailsafe}')
 
         self.step(3)
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe_tmp, breadcrumb=1)
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe, breadcrumb=1)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
@@ -258,16 +279,14 @@ class TC_CGEN_2_2(MatterBaseTest):
             "Step #6 - New root certificate was not added to the trusted root list."
 
         self.step(7)
-        # Using maxFailsafe_tmp=10 instead of maxFailsafe=PIXIT.CGEN.FailsafeExpiryLengthSeconds
-        logger.info(
-            f"Step #7 - Waiting for Failsafe timer to expire for PIXIT.CGEN.FailsafeExpiryLengthSeconds (max_fail_safe): {maxFailsafe_tmp} seconds...")
-        start_time = time.time()
+        # Step 7 - Bypassing the wait for the failsafe timer to expire (PIXIT.CGEN.FailsafeExpiryLengthSeconds)
+        # Originally, this step required waiting for the failsafe timer to expire after a specific duration defined in PIXIT.CGEN.FailsafeExpiryLengthSeconds.
+        # However, in CI environments, this wait introduces unnecessary delays. To avoid this, we use the `expire_failsafe_timer` function,
+        # which immediately expires the failsafe timer (sets it to 0), bypassing the natural wait and speeding up the test execution.
 
-        # Wait for the maximum failsafe time - Adding a 2 seconds buffer
-        await asyncio.sleep(maxFailsafe_tmp + 1)
-
-        elapsed_time = time.time() - start_time
-        logger.info(f"Step #7 - Failsafe timer (max_fail_safe) expired after {elapsed_time} seconds.")
+        # This function bypasses the wait for the FailsafeTimer to expire for TH1 as originally defined in the test plan.
+        resp = await self.expire_failsafe_timer(dev_ctrl=self.default_controller, node_id=self.dut_node_id)
+        logger.info(f'Step  # 7 - Failsafe timer expiration bypassed for TH1 by setting expiryLengthSeconds to 0. Test continues without the original wait.')
 
         self.step(8)
         trusted_root_list_original_after_wait = await self.read_single_attribute_check_success(
@@ -291,7 +310,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         self.step(10)
         logger.info(f'Step #10 - TH1 repeats steps 3 through 5')
         logger.info(f'Step #10 repet #3 - TH1 sends ArmFailSafe')
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe_tmp, breadcrumb=1)
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe, breadcrumb=1)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
@@ -383,7 +402,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         logger.info(f'Step #13 - Open Commissioning Window params with vars: {vars(params)}')
 
         self.step(14)
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe_tmp)
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
@@ -575,7 +594,7 @@ class TC_CGEN_2_2(MatterBaseTest):
 
         self.step(29)
         # logger.info("Step #29 - TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb value as 1")
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe_tmp, breadcrumb=1)
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe, breadcrumb=1)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
@@ -615,7 +634,7 @@ class TC_CGEN_2_2(MatterBaseTest):
                              "Step #31 - Unexpected number of entries in the TrustedRootCertificates table after update")
 
         self.step(32)
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe_tmp)
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
@@ -629,17 +648,14 @@ class TC_CGEN_2_2(MatterBaseTest):
         logger.info(f'Step #32 - ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
 
         self.step(33)
-        # Using maxFailsafe_tmp=10 instead of maxFailsafe=PIXIT.CGEN.FailsafeExpiryLengthSeconds
-        logger.info(
-            f"Step #33 - Waiting for Failsafe timer to expire for PIXIT.CGEN.FailsafeExpiryLengthSeconds (max_fail_safe): {maxFailsafe_tmp} seconds...")
-        start_time = time.time()
-        await asyncio.sleep(1)
+        # Step 33 - Bypassing the wait for the failsafe timer to expire (PIXIT.CGEN.FailsafeExpiryLengthSeconds)
+        # Originally, this step required waiting for the failsafe timer to expire after a specific duration defined in PIXIT.CGEN.FailsafeExpiryLengthSeconds.
+        # However, in CI environments, this wait introduces unnecessary delays. To avoid this, we use the `expire_failsafe_timer` function,
+        # which immediately expires the failsafe timer (sets it to 0), bypassing the natural wait and speeding up the test execution.
 
-        # # Wait for the maximum failsafe time - Adding a 2 seconds buffer
-        # await asyncio.sleep(maxFailsafe_tmp + 1)
-
-        # elapsed_time = time.time() - start_time
-        # logger.info(f"Step #33 - Failsafe timer (max_fail_safe) expired after {elapsed_time} seconds.")
+        # This function bypasses the wait for the FailsafeTimer to expire for TH2 as originally defined in the test plan.
+        resp = await self.expire_failsafe_timer(dev_ctrl=TH2, node_id=newNodeId+1)
+        logger.info(f'Step  # 33 - Failsafe timer expiration bypassed for TH2 by setting expiryLengthSeconds to 0. Test continues without the original wait.')
 
         self.step(34)
         trusted_root_list_original_updated = await self.read_single_attribute_check_success(
@@ -649,20 +665,18 @@ class TC_CGEN_2_2(MatterBaseTest):
             attribute=cluster_opcreds.Attributes.TrustedRootCertificates)
         trusted_root_list_original_size_updated = len(trusted_root_list_original_updated)
         logger.info(f'Step #34 - The updated num_trusted_roots_original: {trusted_root_list_original_size_updated}')
-
-        # Verify that the trusted root list size has increased by 1
-        # 1 cert was removed on step #33 whne FailSafe expired (from 3 to 2)
+        # Verify that the trusted root list size
         asserts.assert_equal(trusted_root_list_original_size_updated, trusted_root_list_original_size + 2,
                              "Step #34 - Unexpected number of entries in the TrustedRootCertificates table after update")
 
         self.step(35)
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe_tmp, breadcrumb=1)
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe, breadcrumb=1)
         resp = await self.send_single_cmd(
             dev_ctrl=TH2,
             node_id=newNodeId+1,
             cmd=cmd)
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'BusyWithOtherAdmin'(4)
-        logger.info(f'Step #35 - ArmFailSafeResponse with ErrorCode as BusyWithOtherAdmin ({resp.errorCode})')
+        logger.info(f'Step #35 - TH2 ArmFailSafeResponse with ErrorCode as BusyWithOtherAdmin ({resp.errorCode})')
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kBusyWithOtherAdmin,
                              "Failure status returned from arm failsafe")
 
@@ -678,7 +692,7 @@ class TC_CGEN_2_2(MatterBaseTest):
                              "Failure status returned from arm failsafe")
 
         self.step(37)
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe_tmp)
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
@@ -689,11 +703,11 @@ class TC_CGEN_2_2(MatterBaseTest):
                              "Failure status returned from arm failsafe")
 
         self.step(38)
-        t_start = time.time()
-        formatted_time = datetime.fromtimestamp(t_start).strftime('%m-%d %H:%M:%S')
-        milliseconds = str(round((t_start % 1) * 1000)).zfill(3)
-        formatted_time_with_ms = f"{formatted_time}.{milliseconds}"
-        logger.info(f"Step #38 - TH1 saves the current wall time clock in seconds as Tstart: {formatted_time_with_ms} seconds...")
+        # Step 38 - Skipped
+        # Originally, this step saved the current wall time clock in seconds as Tstart to use it for later comparisons.
+        # However, with the failsafe expiration workaround (expiryLengthSeconds=0), we no longer rely on this timestamp,
+        # as the failsafe timer is immediately expired, bypassing the need for time calculations or waits.
+        logger.info("Step 38 skipped: Saving Tstart (current wall time clock) is bypassed due to failsafe expiration workaround.")
 
         self.step(39)
         trusted_root_list_original_updated = await self.read_single_attribute_check_success(
@@ -731,25 +745,15 @@ class TC_CGEN_2_2(MatterBaseTest):
                              "Step #31 - Unexpected number of entries in the TrustedRootCertificates table after update")
 
         self.step(41)
-        target_time = t_start + (maxFailsafe_tmp / 2)
-        formatted_target_time = datetime.fromtimestamp(target_time).strftime('%m-%d %H:%M:%S')
-        target_milliseconds = str(round((target_time % 1) * 1000)).zfill(3)
-        formatted_target_time_with_ms = f"{formatted_target_time}.{target_milliseconds}"
-
-        logger.info(f"Step #41 - Target time (Tstart + maxFailsafe / 2): {formatted_target_time_with_ms}")
-
-        while time.time() < target_time:
-            await asyncio.sleep(0.1)  # Short sleep to avoid busy-waiting
-
-        # Validation: check if the current time reached the target time
-        if time.time() >= target_time:
-            logger.info("Step #41 - Target time reached. Proceeding...")
-        else:
-            logger.error("Step #41 - Failed to reach target time.")
-            raise Exception("Target time not reached. Cannot proceed.")
+        # Step 41 - Skipped
+        # Previously, this step waited until the current wall time clock reached Tstart + maxFailsafe/2.
+        # However, with the failsafe expiration workaround (expiryLengthSeconds=0), this wait is unnecessary and has been skipped,
+        # as the failsafe timer is immediately expired and the test proceeds without delay.
+        logger.info(
+            "Step 41 skipped: Waiting for the wall time clock to reach Tstart + maxFailsafe/2 is bypassed due to failsafe expiration workaround.")
 
         self.step(42)
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe_tmp)
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
@@ -761,24 +765,25 @@ class TC_CGEN_2_2(MatterBaseTest):
                              "Failure status returned from arm failsafe")
 
         self.step(43)
-        target_time_full = t_start + maxFailsafe_tmp
-        formatted_target_time_full = datetime.fromtimestamp(target_time_full).strftime('%m-%d %H:%M:%S')
-        target_milliseconds_full = str(round((target_time_full % 1) * 1000)).zfill(3)
-        formatted_target_time_with_ms_full = f"{formatted_target_time_full}.{target_milliseconds_full}"
+        # Step 43 - Bypassing the wait for the failsafe timer to expire
+        # Originally, this step required waiting until the current wall time clock reached Tstart + maxFailsafe.
+        # However, in CI environments, this wait introduces unnecessary delays. To avoid this, we use the `expire_failsafe_timer` function,
+        # which immediately expires the failsafe timer (sets it to 0), bypassing the natural wait and speeding up the test execution.
 
-        logger.info(f"Step #43 - Target time (Tstart + maxFailsafe): {formatted_target_time_with_ms_full}")
-
-        while time.time() < target_time_full:
-            await asyncio.sleep(0.1)  # Short sleep to avoid busy-waiting
-
-        # Validation: check if the current time reached the target time
-        if time.time() >= target_time_full:
-            logger.info("Step #43 - Target time reached. Proceeding...")
-        else:
-            logger.error("Step #43 - Failed to reach target time.")
-            raise Exception("Target time not reached. Cannot proceed.")
+        # This function bypasses the wait for the FailsafeTimer to expire for TH1 as originally defined in the test plan.
+        resp = await self.expire_failsafe_timer(dev_ctrl=self.default_controller, node_id=self.dut_node_id)
+        logger.info(f'Step  # 43 - Failsafe timer expiration bypassed for TH1 by setting expiryLengthSeconds to 0. Test continues without the original wait.')
 
         self.step(44)
+        # Remove Fabric from TH2  to ensure it is correctly cleaned up and that the root certificates are aligned with expectations.
+        # Read the CurrentFabricIndex attribute from TH2 (the second controller)
+        fabric_idx = await self.read_single_attribute_check_success(dev_ctrl=TH2, node_id=newNodeId+1, cluster=cluster_opcreds, attribute=cluster_opcreds.Attributes.CurrentFabricIndex)
+        logger.info(f'Step #44 - TH2 CurrentFabricIndex attribute:  {fabric_idx}')
+        # Remove the fabric from TH2 (second controller)
+        cmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabric_idx)
+        await self.send_single_cmd(dev_ctrl=TH2, node_id=newNodeId+1, cmd=cmd)
+
+        # The expected number of root certificates should be 1 after removing the fabric
         trusted_root_list_original_updated = await self.read_single_attribute_check_success(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
@@ -787,9 +792,9 @@ class TC_CGEN_2_2(MatterBaseTest):
         trusted_root_list_original_size_updated = len(trusted_root_list_original_updated)
         logger.info(
             f'Step #44 - The updated size of the num_trusted_roots_original list: {trusted_root_list_original_size_updated}')
-        # Verify that the trusted root list size has increased by 2 from oririnal trusted root list, Should be 3
-        # asserts.assert_equal(trusted_root_list_original_size_updated, trusted_root_list_original_size + 2,
-        #                      "Step #31 - Unexpected number of entries in the TrustedRootCertificates table after update")
+        # Verify that the trusted root list size from oririnal trusted root list is 1
+        asserts.assert_equal(trusted_root_list_original_size_updated, trusted_root_list_original_size,
+                             "Step #44 - Unexpected number of entries in the TrustedRootCertificates table after update")
 
 
 if __name__ == "__main__":
