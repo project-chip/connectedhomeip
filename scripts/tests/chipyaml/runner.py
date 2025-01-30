@@ -232,13 +232,13 @@ CONTEXT_SETTINGS = dict(
         },
         'app1': {
             'configuration_directory': 'examples/placeholder/linux/apps/app1',
-            'adapter': 'matter_placeholder_adapter.adapter',
+            'adapter': 'matter.placeholder_adapter.adapter',
             'server_name': 'chip-app1',
             'server_arguments': '--interactive',
         },
         'app2': {
             'configuration_directory': 'examples/placeholder/linux/apps/app2',
-            'adapter': 'matter_placeholder_adapter.adapter',
+            'adapter': 'matter.placeholder_adapter.adapter',
             'server_name': 'chip-app2',
             'server_arguments': '--interactive',
         },
