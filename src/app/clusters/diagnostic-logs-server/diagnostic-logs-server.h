@@ -28,10 +28,12 @@ namespace Clusters {
 namespace DiagnosticLogs {
 
 /// A reference implementation for DiagnosticLogs source.
-class DiagnosticLogsServer
+class DiagnosticLogsServer : public CommandHandlerInterface
 {
 public:
     static DiagnosticLogsServer & Instance();
+
+    DiagnosticLogsServer() : CommandHandlerInterface(Optional<EndpointId>::Missing(), DiagnosticLogs::Id) {}
 
     /**
      * Set the default delegate of the diagnostic logs cluster for the specified endpoint
@@ -60,6 +62,9 @@ public:
 
 private:
     static DiagnosticLogsServer sInstance;
+
+    void InvokeCommand(HandlerContext & ctx) override;
+    void HandleRetrieveLogsRequest(HandlerContext & ctx, const Commands::RetrieveLogsRequest::DecodableType & commandData);
 };
 
 } // namespace DiagnosticLogs
