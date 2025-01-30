@@ -87,18 +87,27 @@ std::optional<EndpointEntry> EndpointFinder::Find(EndpointId endpointId)
 Protocols::InteractionModel::Status ValidateClusterPath(ProviderMetadataTree * provider, const ConcreteClusterPath & path,
                                                         Protocols::InteractionModel::Status successStatus)
 {
+    auto clusters = provider->ServerClustersIgnoreError(path.mEndpointId);
+    for (auto & clusterEntry : clusters)
     {
-        DataModel::ServerClusterFinder finder(provider);
-        if (finder.Find(path).has_value())
+        if (clusterEntry.clusterId == path.mClusterId)
         {
             return successStatus;
         }
     }
 
-    // If we get here, this is an invalid path. Return the right error.
-    return DataModel::EndpointFinder(provider).Find(path.mEndpointId).has_value()
-        ? Protocols::InteractionModel::Status::UnsupportedCluster
-        : Protocols::InteractionModel::Status::UnsupportedEndpoint;
+    // if we get here, the path is invalid.
+    auto endpoints = provider->EndpointsIgnoreError();
+    for (auto & endpointEntry : endpoints)
+    {
+        if (endpointEntry.id == path.mEndpointId)
+        {
+            // endpoint is valid
+            return Protocols::InteractionModel::Status::UnsupportedCluster;
+        }
+    }
+
+    return Protocols::InteractionModel::Status::UnsupportedEndpoint;
 }
 
 } // namespace DataModel
