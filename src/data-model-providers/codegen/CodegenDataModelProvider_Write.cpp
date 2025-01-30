@@ -91,9 +91,6 @@ std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteDataAttribute
 DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                        AttributeValueDecoder & decoder)
 {
-    ChipLogDetail(DataManagement, "Writing attribute: Cluster=" ChipLogFormatMEI " Endpoint=0x%x AttributeId=" ChipLogFormatMEI,
-                  ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId));
-
     auto metadata = Ember::FindAttributeMetadata(request.path);
 
     // Explicit failure in finding a suitable metadata

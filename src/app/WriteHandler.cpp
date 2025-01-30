@@ -834,6 +834,9 @@ CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & aSub
     // the write is done via the DataModel interface
     VerifyOrReturnError(mDataModelProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+    ChipLogDetail(DataManagement, "Writing attribute: Cluster=" ChipLogFormatMEI " Endpoint=0x%x AttributeId=" ChipLogFormatMEI,
+                  ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId));
+
     DataModel::ActionReturnStatus status = CheckWriteAllowed(aSubject, aPath);
     if (status.IsSuccess())
     {
