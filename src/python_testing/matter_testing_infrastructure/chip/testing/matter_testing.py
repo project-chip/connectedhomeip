@@ -196,6 +196,12 @@ def utc_datetime_from_matter_epoch_us(matter_epoch_us: int) -> datetime:
 
 
 @_deprecated("utilities")
+def matter_epoch_us_from_utc_datetime(matter_epoch_us: int) -> datetime:
+    """DEPRECATED: Use utilities.utc_datetime_from_matter_epoch_us instead"""
+    return new_utc_datetime_from_matter_epoch_us(matter_epoch_us)
+
+
+@_deprecated("utilities")
 def utc_datetime_from_posix_time_ms(posix_time_ms: int) -> datetime:
     """DEPRECATED: Use utilities.utc_datetime_from_posix_time_ms instead"""
     return new_utc_datetime_from_posix_time_ms(posix_time_ms)
