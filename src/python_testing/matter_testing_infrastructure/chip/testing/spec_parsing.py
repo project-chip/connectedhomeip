@@ -63,6 +63,9 @@ class XmlFeature:
     name: str
     conformance: ConformanceCallable
 
+    def __str__(self):
+        return f'{self.code}: {self.name} conformance {str(self.conformance)}'
+
 
 @dataclass
 class XmlAttribute:
@@ -89,6 +92,8 @@ class XmlCommand:
     id: int
     name: str
     conformance: ConformanceCallable
+    def __str__(self):
+        return f'{self.name} id:0x{self.id:02X} {self.id} conformance: {str(self.conformance)}'
 
 
 @dataclass
