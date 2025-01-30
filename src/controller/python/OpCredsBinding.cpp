@@ -775,4 +775,5 @@ void pychip_GetCommissioningRCACData(uint8_t * rcacDataPtr, size_t * rcacSize)
     // Copy the data from C++ to Python's allocated memory
     std::memcpy(rcacDataPtr, rcacData.data(), *rcacSize);
 }
+}
 } // extern "C"
