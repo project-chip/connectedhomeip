@@ -789,10 +789,10 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
         // NOTE: explicit cast/check only for attribute path and nothing else.
         //
         //       In particular `request.path` is a DATA path (contains a list index)
-        //       and we do not want request.previousSuccessPath to be auto-cast to a
+        //       and we do not want mLastSuccessfullyWrittenPath to be auto-cast to a
         //       data path with a empty list and fail the compare.
         //
-        //       This could be `request.previousSuccessPath != request.path` (where order
+        //       This could be `mLastSuccessfullyWrittenPath != request.path` (where order
         //       is important) however that would seem more brittle (relying that a != b
         //       behaves differently than b != a due to casts). Overall Data paths are not
         //       the same as attribute paths.
@@ -842,7 +842,6 @@ CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & aSub
 
         request.path                = aPath;
         request.subjectDescriptor   = &aSubject;
-        request.previousSuccessPath = mLastSuccessfullyWrittenPath;
         request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
 
         AttributeValueDecoder decoder(aData, aSubject);
