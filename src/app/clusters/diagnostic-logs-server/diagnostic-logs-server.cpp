@@ -17,6 +17,7 @@
 
 #include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <lib/support/ScopedBuffer.h>
@@ -30,6 +31,7 @@ static constexpr size_t kDiagnosticLogsDiagnosticLogsProviderDelegateTableSize =
 static_assert(kDiagnosticLogsDiagnosticLogsProviderDelegateTableSize < kEmberInvalidEndpointIndex,
               "DiagnosticLogs: log provider delegate table size error");
 
+using namespace chip::app;
 using namespace chip::app::Clusters::DiagnosticLogs;
 using chip::Protocols::InteractionModel::Status;
 
@@ -160,14 +162,26 @@ void DiagnosticLogsServer::HandleLogRequestForBdx(CommandHandler * commandObj, c
 #endif // CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
 }
 
-} // namespace DiagnosticLogs
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+void DiagnosticLogsServer::InvokeCommand(HandlerContext & handlerContext)
+{
+    switch (handlerContext.mRequestPath.mCommandId)
+    {
+#ifdef DIAGNOSTIC_LOGS_ENABLE_RETRIEVE_LOGS_REQUEST_CMD
+    case Commands::RetrieveLogsRequest::Id:
+        CommandHandlerInterface::HandleCommand<Commands::RetrieveLogsRequest::DecodableType>(
+            handlerContext,
+            [this](HandlerContext & ctx, const auto & commandData) { HandleRetrieveLogsRequest(ctx, commandData); });
+        break;
+#endif
+    default:
+        break; // Make the switch statement syntactically correct if MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_CLIENT_ENDPOINT_COUNT is not
+               // defined.
+    }
+}
 
-bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(chip::app::CommandHandler * commandObj,
-                                                             const chip::app::ConcreteCommandPath & commandPath,
-                                                             const Commands::RetrieveLogsRequest::DecodableType & commandData)
+#ifdef DIAGNOSTIC_LOGS_ENABLE_RETRIEVE_LOGS_REQUEST_CMD
+void DiagnosticLogsServer::HandleRetrieveLogsRequest(HandlerContext & ctx,
+                                                     const Commands::RetrieveLogsRequest::DecodableType & commandData)
 {
     // If the Intent and/or the RequestedProtocol arguments contain invalid (out of range) values the command SHALL fail with a
     // Status Code of INVALID_COMMAND.
@@ -175,22 +189,30 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(chip::app::CommandH
     auto protocol = commandData.requestedProtocol;
     if (intent == IntentEnum::kUnknownEnumValue || protocol == TransferProtocolEnum::kUnknownEnumValue)
     {
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
-        return true;
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        return;
     }
 
     auto instance = DiagnosticLogsServer::Instance();
     if (protocol == TransferProtocolEnum::kResponsePayload)
     {
-        instance.HandleLogRequestForResponsePayload(commandObj, commandPath, intent);
+        instance.HandleLogRequestForResponsePayload(&ctx.mCommandHandler, ctx.mRequestPath, intent);
     }
     else
     {
-        instance.HandleLogRequestForBdx(commandObj, commandPath, intent, commandData.transferFileDesignator);
+        instance.HandleLogRequestForBdx(&ctx.mCommandHandler, ctx.mRequestPath, intent, commandData.transferFileDesignator);
     }
+}
+#endif // #ifdef DIAGNOSTIC_LOGS_ENABLE_RETRIEVE_LOGS_REQUEST_CMD
 
-    return true;
+} // namespace DiagnosticLogs
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+void MatterDiagnosticLogsPluginServerInitCallback()
+{
+    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&DiagnosticLogsServer::Instance());
 }
 
-void MatterDiagnosticLogsPluginServerInitCallback() {}
 #endif // #ifdef MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT
