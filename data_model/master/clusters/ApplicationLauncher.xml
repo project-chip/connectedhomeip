@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -113,16 +113,18 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="CatalogList" type="list">
       <entry type="uint16"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="AP"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0001" name="CurrentApp" type="ApplicationEPStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -133,7 +135,9 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="AP"/>
         </mandatoryConform>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="Data" type="octstr" default="MS">
         <optionalConform/>
@@ -146,7 +150,9 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="AP"/>
         </mandatoryConform>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x02" name="HideApp" direction="commandToServer" response="LauncherResponse">
@@ -156,7 +162,9 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="AP"/>
         </mandatoryConform>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x03" name="LauncherResponse" direction="responseFromServer">

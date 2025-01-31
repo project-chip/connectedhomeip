@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -68,7 +68,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="StateValue" type="bool">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality reportable="true"/>
       <mandatoryConform/>
     </attribute>
   </attributes>

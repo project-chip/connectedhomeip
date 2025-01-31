@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x005E" name="Microwave Oven Mode Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x005E" name="Microwave Oven Mode Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Set OnOff feature as disallowed"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x005E" name="Microwave Oven Mode"/>
@@ -70,13 +71,25 @@ Davis, CA 95616, USA
       <disallowConform/>
     </feature>
   </features>
+  <dataTypes>
+    <enum name="ModeTag">
+      <item value="0x00" name="Auto"/>
+      <item value="0x01" name="Quick"/>
+      <item value="0x02" name="Quiet"/>
+      <item value="0x03" name="LowNoise"/>
+      <item value="0x04" name="LowEnergy"/>
+      <item value="0x05" name="Vacation"/>
+      <item value="0x06" name="Min"/>
+      <item value="0x07" name="Max"/>
+      <item value="0x08" name="Night"/>
+      <item value="0x09" name="Day"/>
+      <item value="0x4000" name="Normal"/>
+      <item value="0x4001" name="Defrost"/>
+    </enum>
+  </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="SupportedModes">
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0001" name="CurrentMode">
-      <mandatoryConform/>
-    </attribute>
+    <attribute id="0x0000" name="SupportedModes"/>
+    <attribute id="0x0001" name="CurrentMode"/>
     <attribute id="0x0002" name="StartUpMode">
       <disallowConform/>
     </attribute>
