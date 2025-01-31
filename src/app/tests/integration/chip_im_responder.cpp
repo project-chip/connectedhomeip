@@ -79,7 +79,7 @@ public:
 //   every data version compare is the same etc.".
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
-                                  CommandHandler * apCommandObj)
+                                  CommandHandler * apCommandObj, bool aClusterIsValid)
 {
     static bool statusCodeFlipper = false;
 

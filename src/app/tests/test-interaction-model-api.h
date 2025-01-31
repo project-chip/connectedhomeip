@@ -85,7 +85,7 @@ namespace app {
 bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion);
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
-                                  CommandHandler * apCommandObj);
+                                  CommandHandler * apCommandObj, bool aClusterIsValid = false);
 
 /// A customized class for read/write/invoke that matches functionality
 /// with the ember-compatibility-functions functionality here.

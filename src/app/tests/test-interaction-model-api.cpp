@@ -62,7 +62,8 @@ private:
 
 // strong defintion in TestCommandInteraction.cpp
 __attribute__((weak)) void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath,
-                                                        chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj)
+                                                        chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj,
+                                                        bool aClusterIsValid)
 {}
 
 // Used by the code in TestReadInteraction.cpp (and generally tests that interact with the Reporting Engine may need this).

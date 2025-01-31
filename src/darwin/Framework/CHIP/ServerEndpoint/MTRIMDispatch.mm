@@ -62,7 +62,7 @@ Protocols::InteractionModel::Status emberAfWriteAttribute(const ConcreteAttribut
 namespace chip {
 namespace app {
 
-    void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj)
+    void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj, bool aClusterIsValid)
     {
         // TODO: Consider having MTRServerCluster register a
         // CommandHandlerInterface for command dispatch.  But OTA would need
