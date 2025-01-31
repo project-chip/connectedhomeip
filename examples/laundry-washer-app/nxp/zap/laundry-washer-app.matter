@@ -2076,6 +2076,7 @@ endpoint 0 {
     callback attribute lastNetworkingStatus;
     callback attribute lastNetworkID;
     callback attribute lastConnectErrorValue;
+    callback attribute supportedWiFiBands;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2380,3 +2381,5 @@ endpoint 1 {
     handle command OperationalCommandResponse;
   }
 }
+
+

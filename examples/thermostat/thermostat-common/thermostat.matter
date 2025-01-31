@@ -2525,6 +2525,9 @@ endpoint 0 {
     callback attribute lastNetworkingStatus;
     callback attribute lastNetworkID;
     callback attribute lastConnectErrorValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2843,3 +2846,5 @@ endpoint 1 {
     ram      attribute clusterRevision default = 2;
   }
 }
+
+
