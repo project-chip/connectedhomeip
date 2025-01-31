@@ -116,6 +116,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mUserDirectedCommissioningPort = initParams.userDirectedCommissioningPort;
     mInterfaceId                   = initParams.interfaceId;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    auto tcpListenParams = TcpListenParameters(DeviceLayer::TCPEndPointManager())
+                               .SetAddressType(IPAddressType::kIPv6)
+                               .SetListenPort(mOperationalServicePort);
+#endif
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(initParams.persistentStorageDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -214,7 +220,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(mOperationalServicePort)
                                .SetNativeParams(initParams.endpointNativeParams)
-
 #if INET_CONFIG_ENABLE_IPV4
                                ,
                            UdpListenParameters(DeviceLayer::UDPEndPointManager())
@@ -227,12 +232,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                ,
-                           TcpListenParameters(DeviceLayer::TCPEndPointManager())
-                               .SetAddressType(IPAddressType::kIPv6)
-                               .SetListenPort(mOperationalServicePort)
+                           tcpListenParams
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-                               ,
+                           ,
                            Transport::WiFiPAFListenParameters(DeviceLayer::ConnectivityMgr().GetWiFiPAF())
 #endif
     );
@@ -284,9 +287,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             { &sCritEventBuffer[0], sizeof(sCritEventBuffer), app::PriorityLevel::Critical }
         };
 
-        app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
-                                                 &logStorageResources[0], &sGlobalEventIdCounter,
-                                                 std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp));
+        err = app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
+                                                       &logStorageResources[0], &sGlobalEventIdCounter,
+                                                       std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp),
+                                                       &app::InteractionModelEngine::GetInstance()->GetReportingEngine());
+
+        SuccessOrExit(err);
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
@@ -329,6 +335,11 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // init is called.
     app::DnssdServer::Instance().SetICDManager(&mICDManager);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // Enable the TCP Server based on the TCPListenParameters setting.
+    app::DnssdServer::Instance().SetTCPServerEnabled(tcpListenParams.IsServerListenEnabled());
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     if (GetFabricTable().FabricCount() != 0)
     {

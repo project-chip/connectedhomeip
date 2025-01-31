@@ -212,8 +212,13 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
     ReturnLogErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router));
 #else
-    ReturnLogErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice));
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice));
+#else
+    ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice));
 #endif
+#endif
+
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI

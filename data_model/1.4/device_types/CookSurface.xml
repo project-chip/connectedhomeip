@@ -51,16 +51,17 @@ are the sole property of their respective owners.
 
 This notice and disclaimer must be included on all copies of this document.
 
-Connectivity Standards Alliance +
-508 Second Street, Suite 206 +
+Connectivity Standards Alliance
+508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0077" name="Cook Surface" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
-  <conditions/>
   <clusters>
     <cluster id="0x0006" name="On/Off" side="server">
       <optionalConform/>
@@ -71,10 +72,10 @@ Davis, CA 95616, USA
       </features>
     </cluster>
     <cluster id="0x0056" name="Temperature Control" side="server">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </cluster>
     <cluster id="0x0402" name="Temperature Measurement" side="server">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </cluster>
   </clusters>
 </deviceType>
