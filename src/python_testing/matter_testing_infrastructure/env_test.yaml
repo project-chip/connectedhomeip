@@ -17,7 +17,7 @@
 default-arguments:
 
 app-args:
-  discriminator: "1234"
+    discriminator: "1234"
 
 script-args:
-  discriminator: "1234"
+    discriminator: "1234"
