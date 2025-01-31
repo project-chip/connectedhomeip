@@ -2960,7 +2960,7 @@
 // clang-format on
 
 // This is an array of EmberAfCluster structures.
-#define GENERATED_CLUSTER_COUNT 107
+#define GENERATED_CLUSTER_COUNT 108
 // clang-format off
 #define GENERATED_CLUSTERS { \
   { \
@@ -4225,6 +4225,19 @@
       .eventCount = 0, \
     },\
   { \
+      /* Endpoint: 1, Cluster: Chime (client) */ \
+      .clusterId = 0x00000556, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(882), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
       /* Endpoint: 1, Cluster: Unit Testing (server) */ \
       .clusterId = 0xFFF1FC05, \
       .attributes = ZAP_ATTRIBUTE_INDEX(882), \
@@ -4364,9 +4377,9 @@
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
         { ZAP_CLUSTER_INDEX(0), 28, 340 },                                                                                         \
-        { ZAP_CLUSTER_INDEX(28), 70, 3457 },                                                                                       \
-        { ZAP_CLUSTER_INDEX(98), 7, 122 },                                                                                         \
-        { ZAP_CLUSTER_INDEX(105), 2, 0 },                                                                                          \
+        { ZAP_CLUSTER_INDEX(28), 71, 3457 },                                                                                       \
+        { ZAP_CLUSTER_INDEX(99), 7, 122 },                                                                                         \
+        { ZAP_CLUSTER_INDEX(106), 2, 0 },                                                                                          \
     }
 
 // Largest attribute size is needed for various buffers
