@@ -675,6 +675,8 @@ class MatterTestConfig:
     # Accepted Terms and Conditions if used
     tc_version_to_simulate: int = None
     tc_user_response_to_simulate: int = None
+    # path to device attestation revocation set json file
+    dac_revocation_set_path: Optional[pathlib.Path] = None
 
 
 class ClusterMapper:
@@ -971,46 +973,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.is_commissioning = False
         # The named pipe name must be set in the derived classes
         self.app_pipe = None
-
-    @staticmethod
-    def is_valid_uint_value(value, bit_count=64):
-        """
-        Checks if 'value' is a non-negative integer fitting into 'bit_count' bits.
-        For example, bit_count=32 => must fit within 0 <= value <= 0xFFFFFFFF
-        """
-        if not isinstance(value, int):
-            return False
-        if value < 0:
-            return False
-        return value < 2**bit_count
-
-    @staticmethod
-    def is_valid_str_value(value):
-        return isinstance(value, str) and len(value) > 0
-
-    def assert_valid_uint64(self, value, field_name):
-        """Asserts that the value is a valid uint64."""
-        asserts.assert_true(self.is_valid_uint_value(value, bit_count=64),
-                            f"{field_name} should be a uint64 or NULL.")
-
-    def assert_valid_uint32(self, value, field_name):
-        """Asserts that the value is a valid uint32."""
-        asserts.assert_true(self.is_valid_uint_value(value, bit_count=32),
-                            f"{field_name} should be a uint32 or NULL.")
-
-    def assert_valid_uint16(self, value, field_name):
-        """Asserts that the value is a valid uint16."""
-        asserts.assert_true(self.is_valid_uint_value(value, bit_count=16),
-                            f"{field_name} should be a uint16 or NULL.")
-
-    def assert_valid_uint8(self, value, field_name):
-        """Asserts that the value is a valid uint16."""
-        asserts.assert_true(self.is_valid_uint_value(value, bit_count=8),
-                            f"{field_name} should be a uint8 or NULL.")
-
-    def assert_valid_str(self, value, field_name):
-        """Asserts that the value is a non-empty string."""
-        asserts.assert_true(self.is_valid_str_value(value), f"{field_name} field should be a non-empty string")
 
     def get_test_steps(self, test: str) -> list[TestStep]:
         ''' Retrieves the test step list for the given test
@@ -1989,6 +1951,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
 
     config.tc_version_to_simulate = args.tc_version_to_simulate
     config.tc_user_response_to_simulate = args.tc_user_response_to_simulate
+    config.dac_revocation_set_path = args.dac_revocation_set_path
 
     # Accumulate all command-line-passed named args
     all_global_args = []
@@ -2024,6 +1987,8 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
     paa_path_default = get_default_paa_trust_store(pathlib.Path.cwd())
     basic_group.add_argument('--paa-trust-store-path', action="store", type=pathlib.Path, metavar="PATH", default=paa_path_default,
                              help="PAA trust store path (default: %s)" % str(paa_path_default))
+    basic_group.add_argument('--dac-revocation-set-path', action="store", type=pathlib.Path, metavar="PATH",
+                             help="Path to JSON file containing the device attestation revocation set.")
     basic_group.add_argument('--ble-interface-id', action="store", type=int,
                              metavar="INTERFACE_ID", help="ID of BLE adapter (from hciconfig)")
     basic_group.add_argument('-N', '--controller-node-id', type=int_decimal_or_hex,
@@ -2546,7 +2511,8 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
             default_controller = stack.certificate_authorities[0].adminList[0].NewController(
                 nodeId=matter_test_config.controller_node_id,
                 paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
-                catTags=matter_test_config.controller_cat_tags
+                catTags=matter_test_config.controller_cat_tags,
+                dacRevocationSetPath=str(matter_test_config.dac_revocation_set_path),
             )
         test_config.user_params["default_controller"] = stash_globally(default_controller)
 

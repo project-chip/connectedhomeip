@@ -38,6 +38,7 @@
 import logging
 
 import chip.clusters as Clusters
+from chip.testing import matter_asserts
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -94,31 +95,31 @@ class TC_DGSW_2_3(MatterBaseTest):
             # Iterate over all items in the list and validate each one
             for metric in thread_metrics_original:
                 # The Id field is mandatory
-                self.assert_valid_uint64(metric.id, "Id")
+                matter_asserts.assert_valid_uint64(metric.id, "Id")
 
                 if metric.name is not None:
-                    self.assert_valid_str(metric.name, "Name")
+                    matter_asserts.assert_is_string(metric.name, "Name")
 
                 if metric.stackFreeCurrent is not None:
-                    self.assert_valid_uint32(metric.stackFreeCurrent, "StackFreeCurrent")
+                    matter_asserts.assert_valid_uint32(metric.stackFreeCurrent, "StackFreeCurrent")
 
                 if metric.stackFreeMinimum is not None:
-                    self.assert_valid_uint32(metric.stackFreeMinimum, "StackFreeMinimum")
+                    matter_asserts.assert_valid_uint32(metric.stackFreeMinimum, "StackFreeMinimum")
 
                 if metric.stackSize is not None:
-                    self.assert_valid_uint32(metric.stackSize, "StackSize")
+                    matter_asserts.assert_valid_uint32(metric.stackSize, "StackSize")
 
         # STEP 4: TH reads from the DUT the CurrentHeapHighWatermark attribute
         self.step(4)
         if self.pics_guard(attributes.CurrentHeapHighWatermark.attribute_id in attribute_list):
             high_watermark_original = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
-            self.assert_valid_uint64(high_watermark_original, "CurrentHeapHighWatermark")
+            matter_asserts.assert_valid_uint64(high_watermark_original, "CurrentHeapHighWatermark")
 
         # STEP 5: TH reads from the DUT the CurrentHeapUsed attribute
         self.step(5)
         if self.pics_guard(attributes.CurrentHeapUsed.attribute_id in attribute_list):
             current_heap_used_original = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
-            self.assert_valid_uint64(current_heap_used_original, "CurrentHeapUsed")
+            matter_asserts.assert_valid_uint64(current_heap_used_original, "CurrentHeapUsed")
 
             if high_watermark_original is not None:
                 asserts.assert_true(current_heap_used_original <= high_watermark_original,
@@ -133,7 +134,7 @@ class TC_DGSW_2_3(MatterBaseTest):
         self.step(7)
         if self.pics_guard(attributes.CurrentHeapHighWatermark.attribute_id in attribute_list):
             current_heap_high_watermark = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
-            self.assert_valid_uint64(current_heap_high_watermark, "CurrentHeapHighWatermark")
+            matter_asserts.assert_valid_uint64(current_heap_high_watermark, "CurrentHeapHighWatermark")
 
             # Verify that the returned value is <= high_watermark_original
             asserts.assert_true(current_heap_high_watermark <= high_watermark_original,
@@ -152,19 +153,19 @@ class TC_DGSW_2_3(MatterBaseTest):
 
             # Validate all elements in the list
             for metric in thread_metrics_reset:
-                self.assert_valid_uint64(metric.id, "Id")
+                matter_asserts.assert_valid_uint64(metric.id, "Id")
 
                 if metric.name is not None:
-                    self.assert_valid_str(metric.name, "Name")
+                    matter_asserts.assert_is_string(metric.name, "Name")
 
                 if metric.stackFreeCurrent is not None:
-                    self.assert_valid_uint32(metric.stackFreeCurrent, "StackFreeCurrent")
+                    matter_asserts.assert_valid_uint32(metric.stackFreeCurrent, "StackFreeCurrent")
 
                 if metric.stackFreeMinimum is not None:
-                    self.assert_valid_uint32(metric.stackFreeMinimum, "StackFreeMinimum")
+                    matter_asserts.assert_valid_uint32(metric.stackFreeMinimum, "StackFreeMinimum")
 
                 if metric.stackSize is not None:
-                    self.assert_valid_uint32(metric.stackSize, "StackSize")
+                    matter_asserts.assert_valid_uint32(metric.stackSize, "StackSize")
 
             # Ensure the list length matches thread_metrics_original to simplify matching
             asserts.assert_equal(len(thread_metrics_reset), len(thread_metrics_original),

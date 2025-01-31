@@ -19,16 +19,16 @@
 import asyncio
 import base64
 import os
-import pathlib
 import sys
 import typing
+from pathlib import Path
 
 import chip.clusters as Clusters
 import click
 from chip import ChipDeviceCtrl
 from chip.clusters import Attribute
 from chip.interaction_model import InteractionModelError, Status
-from MockTestRunner import AsyncMock, MockTestRunner
+from chip.testing.runner import AsyncMock, MockTestRunner
 
 try:
     from chip.testing.matter_testing import MatterTestConfig, get_default_paa_trust_store, run_tests_no_exit
@@ -175,13 +175,14 @@ class MyMock(MockTestRunner):
 @click.command()
 @click.argument('th_server_app', type=click.Path(exists=True))
 def main(th_server_app: str):
-    root = os.path.abspath(os.path.join(pathlib.Path(__file__).resolve().parent, '..', '..', '..'))
+    root = os.path.abspath(os.path.join(Path(__file__).resolve().parent, '..', '..', '..'))
     print(f'root = {root}')
     paa_path = get_default_paa_trust_store(root)
     print(f'paa = {paa_path}')
 
     pics = {"PICS_SDK_CI_ONLY": True}
-    test_runner = MyMock('TC_CCTRL_2_2', 'TC_CCTRL_2_2', 'test_TC_CCTRL_2_2', paa_trust_store_path=paa_path, pics=pics)
+    test_runner = MyMock(Path(__file__).parent / '../TC_CCTRL_2_2.py',
+                         'TC_CCTRL_2_2', 'test_TC_CCTRL_2_2', paa_trust_store_path=paa_path, pics=pics)
     config = MatterTestConfig()
     config.global_test_params = {'th_server_app_path': th_server_app}
     test_runner.set_test_config(config)

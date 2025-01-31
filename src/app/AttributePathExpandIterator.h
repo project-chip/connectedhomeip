@@ -121,13 +121,13 @@ private:
     DataModel::Provider * mDataModelProvider;
     Position & mPosition;
 
-    DataModel::MetadataList<DataModel::EndpointEntry> mEndpoints; // all endpoints
+    DataModel::ReadOnlyBuffer<DataModel::EndpointEntry> mEndpoints; // all endpoints
     size_t mEndpointIndex = kInvalidIndex;
 
-    DataModel::MetadataList<DataModel::ServerClusterEntry> mClusters; // all clusters ON THE CURRENT endpoint
+    DataModel::ReadOnlyBuffer<DataModel::ServerClusterEntry> mClusters; // all clusters ON THE CURRENT endpoint
     size_t mClusterIndex = kInvalidIndex;
 
-    DataModel::MetadataList<DataModel::AttributeEntry> mAttributes; // all attributes ON THE CURRENT cluster
+    DataModel::ReadOnlyBuffer<DataModel::AttributeEntry> mAttributes; // all attributes ON THE CURRENT cluster
     size_t mAttributeIndex = kInvalidIndex;
 
     /// Move to the next endpoint/cluster/attribute triplet that is valid given
