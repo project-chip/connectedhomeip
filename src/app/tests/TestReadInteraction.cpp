@@ -15,13 +15,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/ConcreteAttributePath.h"
-#include "lib/core/DataModelTypes.h"
-#include "lib/support/Span.h"
-#include "lib/support/StringBuilder.h"
-#include "lib/support/logging/TextOnlyLogging.h"
 #include <access/examples/PermissiveAccessControlDelegate.h>
 #include <app/AttributeValueEncoder.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/InteractionModelHelper.h>
 #include <app/MessageDef/AttributeReportIBs.h>
@@ -35,6 +31,7 @@
 #include <app/util/mock/Functions.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLV.h>
@@ -42,6 +39,9 @@
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/Span.h>
+#include <lib/support/StringBuilder.h>
+#include <lib/support/logging/TextOnlyLogging.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
