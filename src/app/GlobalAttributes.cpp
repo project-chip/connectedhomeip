@@ -52,10 +52,10 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
         }
         auto buffer = builder.TakeBuffer();
 
-        return encoder.EncodeList([&buffer](const auto & encoder) {
+        return encoder.EncodeList([&buffer](const auto & listEncodeHelper) {
             for (auto id : buffer)
             {
-                ReturnErrorOnFailure(encoder.Encode(id));
+                ReturnErrorOnFailure(listEncodeHelper.Encode(id));
             }
             return CHIP_NO_ERROR;
         });
@@ -69,10 +69,10 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
         }
         auto buffer = builder.TakeBuffer();
 
-        return encoder.EncodeList([&buffer](const auto & encoder) {
+        return encoder.EncodeList([&buffer](const auto & listEncodeHelper) {
             for (auto entry : buffer)
             {
-                ReturnErrorOnFailure(encoder.Encode(entry.commandId));
+                ReturnErrorOnFailure(listEncodeHelper.Encode(entry.commandId));
             }
             return CHIP_NO_ERROR;
         });
@@ -86,7 +86,7 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
         }
         auto buffer = builder.TakeBuffer();
 
-        return encoder.EncodeList([&buffer](const auto & encoder) {
+        return encoder.EncodeList([&buffer](const auto & listEncodeHelper) {
             bool addedExtraGlobals      = false;
             constexpr auto lastGlobalId = GlobalAttributesNotInMetadata[ArraySize(GlobalAttributesNotInMetadata) - 1];
             // If EventList is not supported. The GlobalAttributesNotInMetadata is missing one id here.
@@ -99,18 +99,18 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
                 {
                     for (const auto & globalId : GlobalAttributesNotInMetadata)
                     {
-                        ReturnErrorOnFailure(encoder.Encode(globalId));
+                        ReturnErrorOnFailure(listEncodeHelper.Encode(globalId));
                     }
                     addedExtraGlobals = true;
                 }
-                ReturnErrorOnFailure(encoder.Encode(entry.attributeId));
+                ReturnErrorOnFailure(listEncodeHelper.Encode(entry.attributeId));
             }
 
             if (!addedExtraGlobals)
             {
                 for (auto id : GlobalAttributesNotInMetadata)
                 {
-                    ReturnErrorOnFailure(encoder.Encode(id));
+                    ReturnErrorOnFailure(listEncodeHelper.Encode(id));
                 }
             }
             return CHIP_NO_ERROR;
