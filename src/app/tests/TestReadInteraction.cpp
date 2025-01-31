@@ -1524,11 +1524,14 @@ void TestReadInteraction::TestReadChunking()
 
         DrainAndServiceIO();
 
-        // We get one chunk with 4 array elements, and then one chunk per
-        // element, and the total size of the array is
-        // kMockAttribute4ListLength.
-        EXPECT_EQ(delegate.mNumAttributeResponse, 1 + (kMockAttribute4ListLength - 4));
-        EXPECT_EQ(delegate.mNumArrayItems, 6);
+        delegate.LogCaptures("TestReadChunking:");
+
+        constexpr AttributeCaptureAssertion kExpectedResponses[] = {
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10004, /* listSize = */ 4),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10004, /* listSize = */ 1),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10004, /* listSize = */ 1),
+        };
+        ASSERT_TRUE(delegate.CapturesMatchExactly(chip::Span<const AttributeCaptureAssertion>(kExpectedResponses)));
         EXPECT_TRUE(delegate.mGotReport);
         EXPECT_FALSE(delegate.mReadError);
         // By now we should have closed all exchanges and sent all pending acks, so
