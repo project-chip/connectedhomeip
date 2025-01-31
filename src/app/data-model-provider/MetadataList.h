@@ -47,7 +47,7 @@ public:
     /// Ensure that at least the specified number of elements
     /// can be appended to the internal buffer;
     ///
-    /// This will cause the internal buffer to become and allocated buffer
+    /// This will cause the internal buffer to become an allocated buffer
     CHIP_ERROR EnsureAppendCapacity(size_t numElements);
 
     bool IsEmpty() const { return mElementCount == 0; }
@@ -96,7 +96,11 @@ private:
 
 /// Represents a RAII instance owning a buffer.
 ///
-/// It auto-frees the owned buffer on destruction
+/// It auto-frees the owned buffer on destruction via `Platform::MemoryFree`.
+///
+/// This class is designed to be a storage class for `GenericAppendOnlyBuffer` and
+/// its subclasses (i.e. GenericAppendOnlyBuffer uses PlatformMemory and this class
+/// does the same. They MUST be kept in sync.)
 class ScopedBuffer
 {
 public:
