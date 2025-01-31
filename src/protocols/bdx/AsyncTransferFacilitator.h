@@ -73,9 +73,7 @@ protected:
     virtual void DestroySelf() = 0;
 
     /**
-     * Calling ProcessOutputEvents can destroy this object before the call returns for certain cases
-     * where the state machine either receives a message indicating termination of the transfer session
-     * or some error cases where the state machine goes to a bad, unrecoverable state.
+     * Calling ProcessOutputEvents can destroy this object before the call returns.
      */
     void ProcessOutputEvents();
 

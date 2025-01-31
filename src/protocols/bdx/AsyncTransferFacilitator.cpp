@@ -190,16 +190,16 @@ void AsyncResponder::NotifyEventHandled(const TransferSession::OutputEventType e
     // are not supposed to reply with a StatusReport.  And for kInternalError the state machine
     // is in an unrecoverable state of some sort, and we should stop trying to make use of it.
     if (eventType == TransferSession::OutputEventType::kAckEOFReceived ||
-        eventType == TransferSession::OutputEventType::kStatusReceived ||
         eventType == TransferSession::OutputEventType::kInternalError ||
-        eventType == TransferSession::OutputEventType::kTransferTimeout)
+        eventType == TransferSession::OutputEventType::kTransferTimeout ||
+        eventType == TransferSession::OutputEventType::kStatusReceived)
     {
         mDestroySelfAfterProcessingEvents = true;
     }
-    // If there was an error handling the output event, this should notify the transfer object to abort transfer so it can send a
-    // status report across the exchange when we call ProcessOutputEvents below.
     else if (status != CHIP_NO_ERROR)
     {
+        // If there was an error handling the output event, this should notify the transfer object to abort transfer
+        // so it can send a status report across the exchange when we call ProcessOutputEvents below.
         mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(status));
     }
 
