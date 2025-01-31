@@ -15,6 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <pw_unit_test/framework.h>
+
 #include <access/examples/PermissiveAccessControlDelegate.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/ConcreteAttributePath.h>
@@ -45,9 +47,9 @@
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
-#include <optional>
 #include <protocols/interaction_model/Constants.h>
-#include <pw_unit_test/framework.h>
+
+#include <optional>
 
 namespace {
 uint8_t gDebugEventBuffer[128];
