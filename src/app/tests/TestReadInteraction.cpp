@@ -181,8 +181,7 @@ class AttributeCaptureAssertion
 public:
     constexpr AttributeCaptureAssertion(chip::EndpointId ep, chip::ClusterId cl, chip::AttributeId at,
                                         std::optional<unsigned> listSize = std::nullopt) :
-        mEndpoint(ep),
-        mCluster(cl), mAttribute(at), mListSize(listSize)
+        mEndpoint(ep), mCluster(cl), mAttribute(at), mListSize(listSize)
     {}
 
     chip::app::ConcreteAttributePath Path() const { return chip::app::ConcreteAttributePath(mEndpoint, mCluster, mAttribute); }
@@ -331,9 +330,10 @@ public:
                 argsBuffer.AddFormat("%lu", static_cast<unsigned long>(path.mAttributeId));
             }
 
-            if (mReceivedListSizes[i].has_value())
+            auto listSize = mReceivedListSizes[i];
+            if (listSize.has_value())
             {
-                argsBuffer.AddFormat(", /* listSize = */ %u", mReceivedListSizes[i].value());
+                argsBuffer.AddFormat(", /* listSize = */ %u", listSize.value());
             }
 
             ChipLogProgress(Test, "  AttributeCaptureAssertion(%s),", argsBuffer.c_str());
@@ -376,9 +376,10 @@ public:
             chip::StringBuilder<128> buffer;
             buffer.AddFormat("0x%X/" ChipLogFormatMEI "/" ChipLogFormatMEI "", captures[i].Endpoint(),
                              ChipLogValueMEI(captures[i].Cluster()), ChipLogValueMEI(captures[i].Attribute()));
-            if (captures[i].ListSize().has_value())
+            auto listSize = captures[i].ListSize();
+            if (listSize.has_value())
             {
-                buffer.AddFormat(" - list of %u items", captures[i].ListSize().value());
+                buffer.AddFormat(" - list of %u items", *listSize);
             }
 
             ChipLogError(Test, "  Expected: %s", buffer.c_str());
@@ -386,9 +387,10 @@ public:
             buffer.AddFormat("0x%X/" ChipLogFormatMEI "/" ChipLogFormatMEI "", mReceivedAttributePaths[i].mEndpointId,
                              ChipLogValueMEI(mReceivedAttributePaths[i].mClusterId),
                              ChipLogValueMEI(mReceivedAttributePaths[i].mEndpointId));
-            if (mReceivedListSizes[i].has_value())
+            listSize = mReceivedListSizes[i];
+            if (listSize.has_value())
             {
-                buffer.AddFormat(" - list of %u items", mReceivedListSizes[i].value());
+                buffer.AddFormat(" - list of %u items", *listSize);
             }
             ChipLogError(Test, "  Actual: %s", buffer.c_str());
             return false;
@@ -1582,8 +1584,7 @@ void TestReadInteraction::TestSetDirtyBetweenChunks()
         public:
             DirtyingMockDelegate(AttributePathParams (&aReadPaths)[2], int & aNumAttributeResponsesWhenSetDirty,
                                  int & aNumArrayItemsWhenSetDirty) :
-                mReadPaths(aReadPaths),
-                mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
+                mReadPaths(aReadPaths), mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
                 mNumArrayItemsWhenSetDirty(aNumArrayItemsWhenSetDirty)
             {}
 
