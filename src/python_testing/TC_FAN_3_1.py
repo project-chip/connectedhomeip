@@ -144,6 +144,163 @@ class TC_FAN_3_1(MatterBaseTest):
 
         await attribute_subscription.cancel()
 
+    async def verify_fan_mode_spaz(self, endpoint, attr_to_write, order, timeout_sec):
+        logging.info(f"\n[F] Updating {attr_to_write.__name__} {order.name}, verifying PercentSetting and SpeedSetting (if supported)")
+
+        # Setup
+        cluster = Clusters.FanControl
+        fan_mode_attr = cluster.Attributes.FanMode
+        
+        percent_setting_attr = cluster.Attributes.PercentSetting
+        speed_setting_attr = cluster.Attributes.SpeedSetting
+        speed_max_attr = cluster.Attributes.SpeedMax
+        attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
+        fan_mode_off = cluster.Enums.FanModeEnum.kOff
+        fan_mode_high = cluster.Enums.FanModeEnum.kHigh
+        percent_setting_max_value = 100 # PercentSetting max value is 100 as per the spec
+        
+        maxfan = 3
+
+        # Determine if PercentSetting values will be written in ascending or descending order
+        # fan_mode_init = fan_mode_off if order == OrderEnum.Ascending else fan_mode_high
+        percent_setting_init = 0 if order == OrderEnum.Ascending else 100
+        speed_max = await self.read_setting(endpoint, speed_max_attr)
+        speed_setting_init = 0 if order == OrderEnum.Ascending else speed_max
+        range_loop = range(1, maxfan + 1) if order == OrderEnum.Ascending else range(maxfan -1, -1, -1)
+
+        # Write and read back the initialization value for PercentSetting
+        # Verify that the write status is either SUCCESS or INVALID_IN_STATE
+        # Verify written and read value match
+        percent_setting_read = await self.write_and_verify_attribute(endpoint, percent_setting_attr, percent_setting_init)
+
+        # Write and read back the initialization value for SpeedSetting (if supported)
+        # Verify that the write status is either SUCCESS or INVALID_IN_STATE
+        # Verify written and read value match
+        if self.supports_speed:
+            speed_setting_read = await self.write_and_verify_attribute(endpoint, speed_setting_attr, speed_setting_init)
+
+        fm = await self.read_setting(endpoint, fan_mode_attr)
+        logging.info(f"\n[F] Initial state: ps({percent_setting_read}) ss({speed_setting_read}) fm({fm})")
+
+        # Start subscription
+        await attribute_subscription.start(self.default_controller, self.dut_node_id, endpoint)
+
+        # Write to attribute iteratively within a range of 100, one at a time
+        percent_setting_current = percent_setting_read
+        percent_setting_previous = percent_setting_read
+        speed_setting_current = speed_setting_read
+        speed_setting_previous = speed_setting_read
+        for value_to_write in range_loop:
+            # Clear the queue
+            attribute_subscription.get_last_report()
+
+            # Write to attribute
+            value_to_write = cluster.Enums.FanModeEnum(value_to_write)
+            write_result = await self.write_setting(endpoint, fan_mode_attr, value_to_write)
+            write_status_success = (write_result == Status.Success) or (write_result == Status.InvalidInState)
+            asserts.assert_true(write_status_success,
+                                "Attribute write did not return a result of either SUCCESS or INVALID_IN_STATE")
+            logging.info(f"\n[F] Value written: {value_to_write}")
+
+            # Get the subscription queue
+            queue = attribute_subscription.attribute_queue.queue
+
+            # Verifying PercentSetting
+            percent_setting_current = await self.get_attribute_value_from_queue(queue, percent_setting_attr, timeout_sec)
+            if percent_setting_current is not None:
+                self.verify_attribute_progression(percent_setting_attr, percent_setting_current, percent_setting_previous, order)
+                percent_setting_previous = percent_setting_current
+
+            # Verifying SpeedSetting (if supported)
+            if self.supports_speed:
+                speed_setting_current = await self.get_attribute_value_from_queue(queue, speed_setting_attr, timeout_sec)
+                if speed_setting_current is not None:
+                    self.verify_attribute_progression(speed_setting_attr, speed_setting_current, speed_setting_previous, order)
+                    speed_setting_previous = speed_setting_current
+
+        await attribute_subscription.cancel()
+
+    async def verify_fan_control_attribute_values(self, endpoint, attr_to_write, order, timeout_sec):
+        # Setup
+        cluster = Clusters.FanControl
+        fan_mode_attr = cluster.Attributes.FanMode
+        percent_setting_attr = cluster.Attributes.PercentSetting
+        speed_setting_attr = cluster.Attributes.SpeedSetting
+        speed_max_attr = cluster.Attributes.SpeedMax
+        attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
+        fan_mode_off = cluster.Enums.FanModeEnum.kOff
+        fan_mode_high = cluster.Enums.FanModeEnum.kHigh
+        percent_setting_max_value = 100 # PercentSetting max value is 100 as per the spec
+
+        # Sets the 'for loop' range based on the attribute that will be written to
+        # and the specified order (ascending or descending)
+        # Sets which mandatory attribute is to be verified (FanMode or PercentSetting)
+        speed_max = await self.read_setting(endpoint, speed_max_attr)
+        speed_setting_init = 0 if order == OrderEnum.Ascending else speed_max
+        range_loop = range(1, percent_setting_max_value + 1) if order == OrderEnum.Ascending else range(percent_setting_max_value -1, -1, -1)
+        value_init = fan_mode_off if order == OrderEnum.Ascending else fan_mode_high
+        attr_to_verify = fan_mode_attr
+        if attr_to_write == fan_mode_attr:
+            range_loop = range(1, fan_mode_high.value + 1) if order == OrderEnum.Ascending else range(fan_mode_high.value -1, -1, -1)
+            value_init = 0 if order == OrderEnum.Ascending else percent_setting_max_value
+            attr_to_verify = percent_setting_attr
+
+        logging.info(f"\n[F] Updating {attr_to_write.__name__} {order.name}, verifying {attr_to_verify.__name__} and SpeedSetting (if supported)")
+
+        # Write and read back the initialization value for the attribute to verify
+        # Verify that the write status is either SUCCESS or INVALID_IN_STATE
+        # Verify written and read value match
+        attr_value_read = await self.write_and_verify_attribute(endpoint, attr_to_verify, value_init)
+
+        # Write and read back the initialization value for SpeedSetting (if supported)
+        # Verify that the write status is either SUCCESS or INVALID_IN_STATE
+        # Verify written and read value match
+        if self.supports_speed:
+            speed_setting_read = await self.write_and_verify_attribute(endpoint, speed_setting_attr, speed_setting_init)
+
+        # Start subscription
+        await attribute_subscription.start(self.default_controller, self.dut_node_id, endpoint)
+
+        # Log FanMode, PercentSetting, and SpeedSetting initialization values
+        fm = await self.read_setting(endpoint, fan_mode_attr)
+        ps = await self.read_setting(endpoint, percent_setting_attr)
+        logging.info(f"\n[F] Initialization state: FanMode({fm}) PercentSetting({ps}) SpeedSetting({speed_setting_read})")
+
+        # Write to attribute iteratively within a range of 100, one at a time
+        attr_value_current = attr_value_read
+        attr_value_previous = attr_value_read
+        speed_setting_current = speed_setting_read
+        speed_setting_previous = speed_setting_read
+        for value_to_write in range_loop:
+            # Clear the queue
+            attribute_subscription.get_last_report()
+
+            # Write to attribute
+            value_to_write = self.get_enum(value_to_write)
+            write_result = await self.write_setting(endpoint, attr_to_write, value_to_write)
+            write_status_success = (write_result == Status.Success) or (write_result == Status.InvalidInState)
+            asserts.assert_true(write_status_success,
+                                f"{attr_to_write.__name__} write did not return a result of either SUCCESS or INVALID_IN_STATE")
+            logging.info(f"\n[F] {attr_to_write.__name__} written: {value_to_write}")
+
+            # Get the subscription queue
+            queue = attribute_subscription.attribute_queue.queue
+
+            # Verifying PercentSetting
+            attr_value_current = await self.get_attribute_value_from_queue(queue, attr_to_verify, timeout_sec)
+            if attr_value_current is not None:
+                self.verify_attribute_progression(attr_to_verify, attr_value_current, attr_value_previous, order)
+                attr_value_previous = attr_value_current
+
+            # Verifying SpeedSetting (if supported)
+            if self.supports_speed:
+                speed_setting_current = await self.get_attribute_value_from_queue(queue, speed_setting_attr, timeout_sec)
+                if speed_setting_current is not None:
+                    self.verify_attribute_progression(speed_setting_attr, speed_setting_current, speed_setting_previous, order)
+                    speed_setting_previous = speed_setting_current
+
+        await attribute_subscription.cancel()
+
     async def write_and_verify_attribute(self, endpoint, attribute, value_init):
         value_init = self.get_enum(value_init)
 
@@ -208,21 +365,49 @@ class TC_FAN_3_1(MatterBaseTest):
         # Setup
         endpoint = self.get_endpoint(default=1)
         percent_setting_attr = Clusters.FanControl.Attributes.PercentSetting
+        fan_mode_attr = Clusters.FanControl.Attributes.FanMode
         self.supports_speed = await self._supports_speed()
-
         timeout_sec = 0.333
 
-        # TH writes to the DUT the PercentSetting iteratively within a range of 1 to 100 one at a time in ascending order
-        await self.verify_fan_mode(endpoint, percent_setting_attr, OrderEnum.Ascending, timeout_sec)
+        # TH writes to the DUT the PercentSetting attribute iteratively within
+        # a range of 1 to 100 one at a time in ascending order
+        # Verifies that FanMode and SpeedSetting values (if supported) are being
+        # updated accordingly (greater or less than the previous values)
+        await self.verify_fan_control_attribute_values(
+            endpoint=endpoint,
+            attr_to_write=percent_setting_attr,
+            order=OrderEnum.Ascending,
+            timeout_sec=timeout_sec)
 
-        # TH writes to the DUT the PercentSetting iteratively within a range of 1 to 100 one at a time in descending order
-        await self.verify_fan_mode(endpoint, percent_setting_attr, OrderEnum.Descending, timeout_sec)
+        # TH writes to the DUT the PercentSetting attribute iteratively within
+        # a range of 1 to 100 one at a time in descending order
+        # Verifies that FanMode and SpeedSetting values (if supported) are being
+        # updated accordingly (greater or less than the previous values)
+        await self.verify_fan_control_attribute_values(
+            endpoint=endpoint,
+            attr_to_write=percent_setting_attr,
+            order=OrderEnum.Descending,
+            timeout_sec=timeout_sec)
 
-        # # TH writes to the DUT the SpeedSetting iteratively within a range of 1 to SpeedMax one at a time in ascending order
-        # await self.verify_fan_mode(endpoint, speed_setting_attr, OrderEnum.Ascending, timeout_sec)
+        # TH writes to the DUT the FanMode attribute iteratively within a range of
+        # the number of available fan modes one at a time in ascending order
+        # Verifies that PercentSetting and SpeedSetting values (if supported) are being
+        # updated accordingly (greater or less than the previous values)
+        await self.verify_fan_control_attribute_values(
+            endpoint=endpoint,
+            attr_to_write=fan_mode_attr,
+            order=OrderEnum.Ascending,
+            timeout_sec=timeout_sec)
 
-        # # TH writes to the DUT the SpeedSetting iteratively within a range of 1 to SpeedMax one at a time in descending order
-        # await self.verify_fan_mode(endpoint, speed_setting_attr, OrderEnum.Descending, timeout_sec)
+        # TH writes to the DUT the FanMode attribute iteratively within a range of
+        # the number of available fan modes one at a time in descending order
+        # Verifies that PercentSetting and SpeedSetting values (if supported) are being
+        # updated accordingly (greater or less than the previous values)
+        await self.verify_fan_control_attribute_values(
+            endpoint=endpoint,
+            attr_to_write=fan_mode_attr,
+            order=OrderEnum.Descending,
+            timeout_sec=timeout_sec)
 
 
 if __name__ == "__main__":
