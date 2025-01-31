@@ -37,3 +37,10 @@ int main(int argc, char * argv[])
     vTaskStartScheduler();
 }
 #endif
+
+#if (defined(configCHECK_FOR_STACK_OVERFLOW) && (configCHECK_FOR_STACK_OVERFLOW > 0))
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
+{
+    assert(0);
+}
+#endif

@@ -22,6 +22,10 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <map>
 
+#ifndef CHIP_DEVICE_CONFIG_MAX_DIAG_LOG_SIZE
+#define CHIP_DEVICE_CONFIG_MAX_DIAG_LOG_SIZE 1024
+#endif
+
 namespace chip {
 namespace app {
 namespace Clusters {

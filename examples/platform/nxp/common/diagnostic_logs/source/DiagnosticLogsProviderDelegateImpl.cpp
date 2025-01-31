@@ -18,8 +18,8 @@
 
 #include "DiagnosticLogsProviderDelegateImpl.h"
 
-#include <src/app/server/Server.h>
-#include <src/lib/support/SafeInt.h>
+#include <app/server/Server.h>
+#include <lib/support/SafeInt.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::DiagnosticLogs;
