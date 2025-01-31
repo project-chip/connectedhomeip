@@ -609,6 +609,29 @@ TEST_F(TestTCP, HandleConnCloseCalledTest6)
     HandleConnCloseTest(addr);
 }
 
+TEST_F(TestTCP, CheckTCPEndpointAfterCloseTest)
+{
+    TCPImpl tcp;
+
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
+    gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
+    gMockTransportMgrDelegate.ConnectTest(tcp, addr);
+
+    Transport::PeerAddress lPeerAddress = Transport::PeerAddress::TCP(addr, gChipTCPPort);
+    void * state                        = TestAccess::FindActiveConnection(tcp, lPeerAddress);
+    ASSERT_NE(state, nullptr);
+    TCPEndPoint * lEndPoint = TestAccess::GetEndpoint(state);
+    ASSERT_NE(lEndPoint, nullptr);
+
+    // Call Close and check the TCPEndpoint
+    tcp.Close();
+    lEndPoint = TestAccess::GetEndpoint(state);
+    ASSERT_EQ(lEndPoint, nullptr);
+}
+
 TEST_F(TestTCP, CheckProcessReceivedBuffer)
 {
     TCPImpl tcp;
