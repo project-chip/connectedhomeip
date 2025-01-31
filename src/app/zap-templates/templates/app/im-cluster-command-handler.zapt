@@ -91,7 +91,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
     {{/unless}}
     {{/all_user_clusters_with_incoming_commands}}
     default:
-        // If we already validated that the cluster does indeed exist in our CHI,
+        // If we already validated that the cluster does indeed exist (e.g. when dispatching to CommandHandlerInterface for that cluster).
         if (aClusterIsValid)
         {
             errorStatus = Protocols::InteractionModel::Status::UnsupportedCommand;
