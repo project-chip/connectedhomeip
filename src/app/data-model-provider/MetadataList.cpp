@@ -82,7 +82,7 @@ CHIP_ERROR GenericAppendOnlyBuffer::EnsureAppendCapacity(size_t numElements)
 
     if (mBuffer == nullptr)
     {
-        mBuffer            = static_cast<uint8_t *>(Platform::MemoryCalloc(numElements, mElementSize));
+        mBuffer = static_cast<uint8_t *>(Platform::MemoryCalloc(numElements, mElementSize));
         VerifyOrReturnError(mBuffer != nullptr, CHIP_ERROR_NO_MEMORY);
         mCapacity          = numElements;
         mBufferIsAllocated = true;
@@ -101,7 +101,7 @@ CHIP_ERROR GenericAppendOnlyBuffer::EnsureAppendCapacity(size_t numElements)
     else
     {
         // this is NOT an allocated buffer, but it should become one
-        auto new_buffer    = static_cast<uint8_t *>(Platform::MemoryCalloc(mElementCount + numElements, mElementSize));
+        auto new_buffer = static_cast<uint8_t *>(Platform::MemoryCalloc(mElementCount + numElements, mElementSize));
         VerifyOrReturnError(new_buffer != nullptr, CHIP_ERROR_NO_MEMORY);
         mBufferIsAllocated = true;
         memcpy(new_buffer, mBuffer, mElementCount * mElementSize);
