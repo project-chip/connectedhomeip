@@ -101,10 +101,11 @@ class TC_FAN_3_1(MatterBaseTest):
         # Verify written and read value match
         fan_mode_read = await self.write_and_verify_attribute(endpoint, fan_mode_attr, fan_mode_init)
 
-        # Write and read back the initialization value for SpeedSetting
+        # Write and read back the initialization value for SpeedSetting (if supported)
         # Verify that the write status is either SUCCESS or INVALID_IN_STATE
         # Verify written and read value match
-        speed_setting_read = await self.write_and_verify_attribute(endpoint, speed_setting_attr, speed_setting_init)
+        if self.supports_speed:
+            speed_setting_read = await self.write_and_verify_attribute(endpoint, speed_setting_attr, speed_setting_init)
 
         # Start subscription
         await attribute_subscription.start(self.default_controller, self.dut_node_id, endpoint)
