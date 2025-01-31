@@ -163,7 +163,7 @@ CHIP_ERROR ActionsServer::ReadEndpointListAttribute(const ConcreteReadAttributeP
     return CHIP_NO_ERROR;
 }
 
-bool ActionsServer::FindActionIdInActionList(EndpointId aEndpointId, uint16_t aActionId)
+bool ActionsServer::HaveActionWithId(EndpointId aEndpointId, uint16_t aActionId)
 {
     Delegate * delegate = GetDelegate(aEndpointId);
     if (delegate == nullptr)
@@ -171,7 +171,7 @@ bool ActionsServer::FindActionIdInActionList(EndpointId aEndpointId, uint16_t aA
         ChipLogError(Zcl, "Actions delegate is null!!!");
         return false;
     }
-    return delegate->FindActionIdInActionList(aActionId);
+    return delegate->HaveActionWithId(aActionId);
 }
 
 template <typename RequestT, typename FuncT>
@@ -195,7 +195,7 @@ void ActionsServer::HandleCommand(HandlerContext & handlerContext, FuncT func)
             return;
         }
 
-        if (FindActionIdInActionList(handlerContext.mRequestPath.mEndpointId, requestPayload.actionID))
+        if (HaveActionWithId(handlerContext.mRequestPath.mEndpointId, requestPayload.actionID))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::NotFound);
             return;
@@ -208,7 +208,11 @@ void ActionsServer::HandleCommand(HandlerContext & handlerContext, FuncT func)
 void ActionsServer::HandleInstantAction(HandlerContext & ctx, const Commands::InstantAction::DecodableType & commandData)
 {
     Delegate * delegate = GetDelegate(ctx.mRequestPath.mEndpointId);
-    Status status       = delegate->HandleInstantAction(commandData.actionID, commandData.invokeID);
+    Status status       = Status::InvalidInState;
+    if (delegate != nullptr)
+    {
+        status = delegate->HandleInstantAction(commandData.actionID, commandData.invokeID);
+    }
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
@@ -216,15 +220,23 @@ void ActionsServer::HandleInstantActionWithTransition(HandlerContext & ctx,
                                                       const Commands::InstantActionWithTransition::DecodableType & commandData)
 {
     Delegate * delegate = GetDelegate(ctx.mRequestPath.mEndpointId);
-    Status status =
-        delegate->HandleInstantActionWithTransition(commandData.actionID, commandData.transitionTime, commandData.invokeID);
+    Status status       = Status::InvalidInState;
+    if (delegate != nullptr)
+    {
+        status =
+            delegate->HandleInstantActionWithTransition(commandData.actionID, commandData.transitionTime, commandData.invokeID);
+    }
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void ActionsServer::HandleStartAction(HandlerContext & ctx, const Commands::StartAction::DecodableType & commandData)
 {
     Delegate * delegate = GetDelegate(ctx.mRequestPath.mEndpointId);
-    Status status       = delegate->HandleStartAction(commandData.actionID, commandData.invokeID);
+    Status status       = Status::InvalidInState;
+    if (delegate != nullptr)
+    {
+        status = delegate->HandleStartAction(commandData.actionID, commandData.invokeID);
+    }
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
@@ -232,21 +244,33 @@ void ActionsServer::HandleStartActionWithDuration(HandlerContext & ctx,
                                                   const Commands::StartActionWithDuration::DecodableType & commandData)
 {
     Delegate * delegate = GetDelegate(ctx.mRequestPath.mEndpointId);
-    Status status       = delegate->HandleStartActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
+    Status status       = Status::InvalidInState;
+    if (delegate != nullptr)
+    {
+        status = delegate->HandleStartActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
+    }
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void ActionsServer::HandleStopAction(HandlerContext & ctx, const Commands::StopAction::DecodableType & commandData)
 {
     Delegate * delegate = GetDelegate(ctx.mRequestPath.mEndpointId);
-    Status status       = delegate->HandleStopAction(commandData.actionID, commandData.invokeID);
+    Status status       = Status::InvalidInState;
+    if (delegate != nullptr)
+    {
+        status = delegate->HandleStopAction(commandData.actionID, commandData.invokeID);
+    }
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void ActionsServer::HandlePauseAction(HandlerContext & ctx, const Commands::PauseAction::DecodableType & commandData)
 {
     Delegate * delegate = GetDelegate(ctx.mRequestPath.mEndpointId);
-    Status status       = delegate->HandlePauseAction(commandData.actionID, commandData.invokeID);
+    Status status       = Status::InvalidInState;
+    if (delegate != nullptr)
+    {
+        status = delegate->HandlePauseAction(commandData.actionID, commandData.invokeID);
+    }
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
@@ -254,21 +278,33 @@ void ActionsServer::HandlePauseActionWithDuration(HandlerContext & ctx,
                                                   const Commands::PauseActionWithDuration::DecodableType & commandData)
 {
     Delegate * delegate = GetDelegate(ctx.mRequestPath.mEndpointId);
-    Status status       = delegate->HandlePauseActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
+    Status status       = Status::InvalidInState;
+    if (delegate != nullptr)
+    {
+        status = delegate->HandlePauseActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
+    }
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void ActionsServer::HandleResumeAction(HandlerContext & ctx, const Commands::ResumeAction::DecodableType & commandData)
 {
     Delegate * delegate = GetDelegate(ctx.mRequestPath.mEndpointId);
-    Status status       = delegate->HandleResumeAction(commandData.actionID, commandData.invokeID);
+    Status status       = Status::InvalidInState;
+    if (delegate != nullptr)
+    {
+        status = delegate->HandleResumeAction(commandData.actionID, commandData.invokeID);
+    }
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void ActionsServer::HandleEnableAction(HandlerContext & ctx, const Commands::EnableAction::DecodableType & commandData)
 {
     Delegate * delegate = GetDelegate(ctx.mRequestPath.mEndpointId);
-    Status status       = delegate->HandleEnableAction(commandData.actionID, commandData.invokeID);
+    Status status       = Status::InvalidInState;
+    if (delegate != nullptr)
+    {
+        status = delegate->HandleEnableAction(commandData.actionID, commandData.invokeID);
+    }
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
@@ -276,14 +312,22 @@ void ActionsServer::HandleEnableActionWithDuration(HandlerContext & ctx,
                                                    const Commands::EnableActionWithDuration::DecodableType & commandData)
 {
     Delegate * delegate = GetDelegate(ctx.mRequestPath.mEndpointId);
-    Status status = delegate->HandleEnableActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
+    Status status       = Status::InvalidInState;
+    if (delegate != nullptr)
+    {
+        status = delegate->HandleEnableActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
+    }
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void ActionsServer::HandleDisableAction(HandlerContext & ctx, const Commands::DisableAction::DecodableType & commandData)
 {
     Delegate * delegate = GetDelegate(ctx.mRequestPath.mEndpointId);
-    Status status       = delegate->HandleDisableAction(commandData.actionID, commandData.invokeID);
+    Status status       = Status::InvalidInState;
+    if (delegate != nullptr)
+    {
+        status = delegate->HandleDisableAction(commandData.actionID, commandData.invokeID);
+    }
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
@@ -291,7 +335,11 @@ void ActionsServer::HandleDisableActionWithDuration(HandlerContext & ctx,
                                                     const Commands::DisableActionWithDuration::DecodableType & commandData)
 {
     Delegate * delegate = GetDelegate(ctx.mRequestPath.mEndpointId);
-    Status status = delegate->HandleDisableActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
+    Status status       = Status::InvalidInState;
+    if (delegate != nullptr)
+    {
+        status = delegate->HandleDisableActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
+    }
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
