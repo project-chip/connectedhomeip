@@ -25,6 +25,8 @@ class MCConnectionExampleViewModel: ObservableObject {
 
     var passcodeAlertController: UIAlertController?
     
+    var pendingPasscodeConfirmation: Bool = true;
+    
     // VendorId of the MCEndpoint on the MCCastingPlayer that the MCCastingApp desires to interact with after connection
     let kDesiredEndpointVendorId: UInt16 = 65521;
 
@@ -42,6 +44,25 @@ class MCConnectionExampleViewModel: ObservableObject {
 
     @Published var errorCodeDescription: String?
 
+    func cancelConnectionAttempt(selectedCastingPlayer: MCCastingPlayer?) {
+        DispatchQueue.main.async {
+            // Only stop connection if we are pending passcode confirmation
+            // We cannot stop connection once continueConnecting() is called
+            if self.pendingPasscodeConfirmation {
+                self.Log.info("MCConnectionExampleViewModel cancelConnect(). User navigating back from ConnectionView")
+                let err = selectedCastingPlayer?.stopConnecting()
+                if err == nil {
+                    self.pendingPasscodeConfirmation = false;
+                    self.connectionStatus = "User cancelled the connection attempt with CastingPlayer.stopConnecting()."
+                    self.Log.info("MCConnectionExampleViewModel cancelConnect() MCCastingPlayer.stopConnecting() succeeded.")
+                } else {
+                    self.connectionStatus = "Cancel connection failed due to: \(String(describing: err))."
+                    self.Log.error("MCConnectionExampleViewModel cancelConnect() MCCastingPlayer.stopConnecting() failed due to: \(err)")
+                }
+            }
+        }
+    }
+
     func connect(selectedCastingPlayer: MCCastingPlayer?, useCommissionerGeneratedPasscode: Bool) {
         self.Log.info("MCConnectionExampleViewModel.connect() useCommissionerGeneratedPasscode: \(String(describing: useCommissionerGeneratedPasscode))")
 
@@ -49,6 +70,7 @@ class MCConnectionExampleViewModel: ObservableObject {
             self.Log.error("MCConnectionExampleViewModel connect() completed with: \(err)")
             DispatchQueue.main.async {
                 if err == nil {
+                    self.pendingPasscodeConfirmation = false;
                     self.connectionSuccess = true
                     if useCommissionerGeneratedPasscode {
                         self.connectionStatus = "Successfully connected to Casting Player using the Casting Player/Commissioner-Generated passcode!"
@@ -125,6 +147,7 @@ class MCConnectionExampleViewModel: ObservableObject {
                             self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, calling MCCastingPlayer.continueConnecting()")
                             let errContinue = selectedCastingPlayer?.continueConnecting()
                             if errContinue == nil {
+                                self.pendingPasscodeConfirmation = false;
                                 self.connectionStatus = "Continuing to connect with user entered passcode: \(userEnteredPasscode)"
                             } else {
                                 self.connectionStatus = "Continue Connecting to Casting Player failed with: \(String(describing: errContinue)) \n\nRoute back and try again."
@@ -142,6 +165,7 @@ class MCConnectionExampleViewModel: ObservableObject {
                             self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, Connection attempt cancelled by the user, calling MCCastingPlayer.stopConnecting()")
                             let err = selectedCastingPlayer?.stopConnecting()
                             self.connectionSuccess = false
+                            self.pendingPasscodeConfirmation = false;
                             if err == nil {
                                 self.connectionStatus = "User cancelled the connection attempt with CastingPlayer. \n\nRoute back to exit."
                                 self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, User cancelled the connection attempt with MCCastingPlayer, MCCastingPlayer.stopConnecting() succeeded.")
@@ -180,7 +204,10 @@ class MCConnectionExampleViewModel: ObservableObject {
 
         self.Log.info("MCConnectionExampleViewModel.connect() calling MCCastingPlayer.verifyOrEstablishConnection()")
         let err = selectedCastingPlayer?.verifyOrEstablishConnection(with: connectionCallbacks, identificationDeclarationOptions: identificationDeclarationOptions)
-        if err != nil {
+        if err == nil {
+            self.pendingPasscodeConfirmation = true;
+        } else {
+            self.pendingPasscodeConfirmation = false;
             self.Log.error("MCConnectionExampleViewModel connect(), MCCastingPlayer.verifyOrEstablishConnection() failed due to: \(err)")
         }
     }
