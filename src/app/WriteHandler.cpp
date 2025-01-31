@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "app/ConcreteAttributePath.h"
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeValueDecoder.h>
@@ -759,7 +760,7 @@ void WriteHandler::MoveToState(const State aTargetState)
 }
 
 DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::SubjectDescriptor & aSubject,
-                                                              const ConcreteDataAttributePath & aPath)
+                                                              const ConcreteAttributePath & aPath)
 {
     // TODO: ordering is to check writability/existence BEFORE ACL and this seems wrong, however
     //       existing unit tests (TC_AcessChecker.py) validate that we get UnsupportedWrite instead of UnsupportedAccess
@@ -786,21 +787,8 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     bool checkAcl = true;
     if (mLastSuccessfullyWrittenPath.has_value())
     {
-        // NOTE: explicit cast/check only for attribute path and nothing else.
-        //
-        //       Specifically we DO NOT use `operator==` because `aPath` is a
-        //       DATA path (contains a list index) and we do not want
-        //       mLastSuccessfullyWrittenPath to be auto-cast to a
-        //       data path with a empty list and fail the compare.
-        //
-        //       This inline endpoint/cluster/attribute compare results in
-        //       smaller code as well.
-        if ((aPath.mEndpointId == mLastSuccessfullyWrittenPath->mEndpointId) &&
-            (aPath.mClusterId == mLastSuccessfullyWrittenPath->mClusterId) &&
-            (aPath.mAttributeId == mLastSuccessfullyWrittenPath->mAttributeId))
-        {
-            checkAcl = false;
-        }
+        // only validate ACL if path has changed
+        checkAcl = (aPath != mLastSuccessfullyWrittenPath);
     }
 
     if (checkAcl)

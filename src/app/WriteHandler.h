@@ -192,7 +192,7 @@ private:
     ///
     /// Returns a success status if all is ok, failure otherwise.
     DataModel::ActionReturnStatus CheckWriteAllowed(const Access::SubjectDescriptor & aSubject,
-                                                    const ConcreteDataAttributePath & aPath);
+                                                    const ConcreteAttributePath & aPath);
 
     // Write the given data to the given path
     CHIP_ERROR WriteClusterData(const Access::SubjectDescriptor & aSubject, const ConcreteDataAttributePath & aPath,
