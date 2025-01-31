@@ -83,9 +83,10 @@ CHIP_ERROR GenericAppendOnlyBuffer::EnsureAppendCapacity(size_t numElements)
     if (mBuffer == nullptr)
     {
         mBuffer            = static_cast<uint8_t *>(Platform::MemoryCalloc(numElements, mElementSize));
+        VerifyOrReturnError(mBuffer != nullptr, CHIP_ERROR_NO_MEMORY);
         mCapacity          = numElements;
         mBufferIsAllocated = true;
-        return mBuffer != nullptr ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+        return CHIP_NO_ERROR;
     }
 
     // we already have the data in buffer. we have two choices:
@@ -101,8 +102,8 @@ CHIP_ERROR GenericAppendOnlyBuffer::EnsureAppendCapacity(size_t numElements)
     {
         // this is NOT an allocated buffer, but it should become one
         auto new_buffer    = static_cast<uint8_t *>(Platform::MemoryCalloc(mElementCount + numElements, mElementSize));
-        mBufferIsAllocated = true;
         VerifyOrReturnError(new_buffer != nullptr, CHIP_ERROR_NO_MEMORY);
+        mBufferIsAllocated = true;
         memcpy(new_buffer, mBuffer, mElementCount * mElementSize);
         mBuffer = new_buffer;
     }
@@ -119,7 +120,7 @@ CHIP_ERROR GenericAppendOnlyBuffer::AppendSingleElementRaw(const void * buffer)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GenericAppendOnlyBuffer::AppendElementArrayRaw(const void * buffer, size_t numElements)
+CHIP_ERROR GenericAppendOnlyBuffer::AppendElementArrayRaw(const void * __restrict__ buffer, size_t numElements)
 {
     ReturnErrorOnFailure(EnsureAppendCapacity(numElements));
 

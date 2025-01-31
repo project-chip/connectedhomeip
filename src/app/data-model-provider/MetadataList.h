@@ -66,7 +66,10 @@ protected:
     ///
     /// This ALWAYS COPIES the elements internally.
     /// Additional capacity is AUTOMATICALLY ADDED.
-    CHIP_ERROR AppendElementArrayRaw(const void * buffer, size_t numElements);
+    ///
+    /// buffer MUST NOT point inside "own" buffer as mBuffer may be reallocated
+    /// as part of the appending.
+    CHIP_ERROR AppendElementArrayRaw(const void * __restrict__ buffer, size_t numElements);
 
     /// Appends a list of elements from a raw array.
     ///
@@ -165,6 +168,10 @@ public:
     ///
     /// Automatically attempts to allocate sufficient space to fulfill the element
     /// requirements.
+    ///
+    /// `span` MUST NOT point inside "own" buffer (and generally will not
+    /// as this class does not expose buffer access except by releasing ownership
+    /// via `Take`)
     CHIP_ERROR AppendElements(SpanType span) { return AppendElementArrayRaw(span.data(), span.size()); }
 
     /// Append a single element.
