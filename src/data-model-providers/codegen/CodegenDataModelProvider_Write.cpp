@@ -14,13 +14,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/GlobalAttributes.h"
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/reporting/reporting.h>
