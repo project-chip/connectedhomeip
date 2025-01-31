@@ -214,7 +214,7 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 10s"
+    - label: "Wait 5s"
       PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
@@ -237,7 +237,7 @@ tests:
               minValue: 25
               maxValue: 35
 
-    - label: "Wait 10s"
+    - label: "Wait 15s"
       PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
