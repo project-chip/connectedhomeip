@@ -290,7 +290,7 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
  * Named pipe handler for simulating a Door Opening.
  *
  * Usage example:
- *   echo '{"Name":"SetRefDoorStatus", "EndpointId": 1, "Status": 1}' > /tmp/chip_all_clusters_fifo_1146610
+ *   echo '{"Name":"SetRefrigeratorDoorStatus", "EndpointId": 1, "DoorOpen": 1}' > /tmp/chip_all_clusters_fifo_1146610
  *
  * JSON Arguments:
  *   - "Name": Must be "SetRefDoorStatus"
@@ -319,15 +319,11 @@ void SetRefrigetatorDoorStatusHandler(Json::Value & jsonValue)
         RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId, doorStatus);
         ChipLogDetail(NotSpecified, "Refrigeratoralarm status updated to :%d", doorStatus);
     }
-    else if (doorStatus)
-    {
-        RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId, doorStatus);
-        RefrigeratorAlarmServer::Instance().SetStateValue(endpointId, doorStatus);
-    }
     else
     {
-        ChipLogError(NotSpecified, "Invalid value to set.");
-        return;
+        ChipLogDetail(NotSpecified, "Refrigeratoralarm status updated to :%d", doorStatus);
+        RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId, doorStatus);
+        RefrigeratorAlarmServer::Instance().SetStateValue(endpointId, doorStatus);
     }
 }
 
