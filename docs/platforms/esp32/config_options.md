@@ -20,7 +20,7 @@ you want to place the `app_main()` function in a different component.
 For required changes in the executable component, please refer to the
 [esp-idf documentation](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-guides/build-system.html#renaming-main-component).
 
-You need to list the required components in `idf_component_register()`.
-If this module contains Matter related code, you may need to include
+You need to list the required components in `idf_component_register()`. If this
+module contains Matter related code, you may need to include
 `chip, app_update, spi_flash, and nvs_flash` as `PRIV_REQUIRES`, along with any
 other necessary dependencies.
