@@ -78,7 +78,7 @@ class TC_FAN_3_1(MatterBaseTest):
         return True
 
     async def verify_fan_mode(self, endpoint, attr_to_write, order, timeout_sec):
-        logging.info(f"[FANS] Monitoring FanMode by writing to {attr_to_write.__name__} in {order.name} order")
+        logging.info(f"\n[F] Updating {attr_to_write.__name__} {order.name}, verifying FanMode and SpeedSetting (if supported)")
 
         # Setup
         cluster = Clusters.FanControl
@@ -99,24 +99,14 @@ class TC_FAN_3_1(MatterBaseTest):
         # Write and read back the initialization value for FanMode
         # Verify that the write status is either SUCCESS or INVALID_IN_STATE
         # Verify written and read value match
-        write_result = await self.write_setting(endpoint, fan_mode_attr, fan_mode_init)
-        write_status_success = (write_result == Status.Success) or (write_result == Status.InvalidInState)
-        asserts.assert_true(write_status_success,
-                            f"FanMode write did not return a result of either SUCCESS or INVALID_IN_STATE ({write_result.name})")
-        fan_mode_read = await self.read_setting(endpoint, fan_mode_attr)
-        asserts.assert_in(fan_mode_read, cluster.Enums.FanModeEnum, "FanMode read response doesn't contain a FanModeEnum")
+        fan_mode_read = await self.write_and_verify_attribute(endpoint, fan_mode_attr, fan_mode_init)
 
         # Write and read back the initialization value for SpeedSetting
         # Verify that the write status is either SUCCESS or INVALID_IN_STATE
         # Verify written and read value match
-        write_result = await self.write_setting(endpoint, speed_setting_attr, speed_setting_init)
-        write_status_success = (write_result == Status.Success) or (write_result == Status.InvalidInState)
-        asserts.assert_true(write_status_success,
-                            f"SpeedSetting write did not return a result of either SUCCESS or INVALID_IN_STATE ({write_result.name})")
-        speed_setting_read = await self.read_setting(endpoint, speed_setting_attr)
-        asserts.assert_equal(speed_setting_read, speed_setting_init,
-                             "Mismatch between written and read SpeedSetting")
+        speed_setting_read = await self.write_and_verify_attribute(endpoint, speed_setting_attr, speed_setting_init)
 
+        # Start subscription
         await attribute_subscription.start(self.default_controller, self.dut_node_id, endpoint)
 
         # Write to attribute iteratively within a range of 100, one at a time
@@ -133,7 +123,7 @@ class TC_FAN_3_1(MatterBaseTest):
             write_status_success = (write_result == Status.Success) or (write_result == Status.InvalidInState)
             asserts.assert_true(write_status_success,
                                 "Attribute write did not return a result of either SUCCESS or INVALID_IN_STATE")
-            logging.info(f"[FANS] Attribute value written: {value_to_write}")
+            logging.info(f"\n[F] Value written: {value_to_write}")
 
             # Get the subscription queue
             queue = attribute_subscription.attribute_queue.queue
@@ -141,36 +131,49 @@ class TC_FAN_3_1(MatterBaseTest):
             # Verifying FanMode
             fan_mode_current = await self.get_attribute_value_from_queue(queue, fan_mode_attr, timeout_sec)
             if fan_mode_current is not None:
-                fan_mode_current = cluster.Enums.FanModeEnum(fan_mode_current)
-                if order == OrderEnum.Ascending:
-                    # Verify the current FanMode is greater than the previous FanMode
-                    asserts.assert_greater(fan_mode_current, fan_mode_previous,
-                                        "Current FanMode must be greater than previous FanMode")
-                else:
-                    # Verify the current FanMode is less than the previous FanMode
-                    asserts.assert_less(fan_mode_current, fan_mode_previous,
-                                        "Current FanMode must be less than previous FanMode")
-                logging.info(
-                    f"[FANS] FanMode changed from {fan_mode_previous.name}({fan_mode_previous}) to {fan_mode_current.name}({fan_mode_current})")
+                self.verify_attribute_progression(fan_mode_attr, fan_mode_current, fan_mode_previous, order)
                 fan_mode_previous = fan_mode_current
 
             # Verifying SpeedSetting (if supported)
             if self.supports_speed:
                 speed_setting_current = await self.get_attribute_value_from_queue(queue, speed_setting_attr, timeout_sec)
                 if speed_setting_current is not None:
-                    if order == OrderEnum.Ascending:
-                        # Verify the current SpeedSetting is greater than the previous SpeedSetting
-                        asserts.assert_greater(speed_setting_current, speed_setting_previous,
-                                            "Current SpeedSetting must be greater than previous SpeedSetting")
-                    else:
-                        # Verify the current SpeedSetting is less than the previous SpeedSetting
-                        asserts.assert_less(speed_setting_current, speed_setting_previous,
-                                            "Current SpeedSetting must be less than previous SpeedSetting")
-                    logging.info(
-                        f"[FANS] SpeedSetting changed from {speed_setting_previous} to {speed_setting_current}")
+                    self.verify_attribute_progression(speed_setting_attr, speed_setting_current, speed_setting_previous, order)
                     speed_setting_previous = speed_setting_current
 
         await attribute_subscription.cancel()
+
+    async def write_and_verify_attribute(self, endpoint, attribute, value_init):
+        value_init = self.get_enum(value_init)
+
+        write_result = await self.write_setting(endpoint, attribute, value_init)
+        write_status_success = (write_result == Status.Success) or (write_result == Status.InvalidInState)
+        asserts.assert_true(write_status_success,
+                            f"{attribute.__name__} write did not return a result of either SUCCESS or INVALID_IN_STATE ({write_result.name})")
+        value_read = await self.read_setting(endpoint, attribute)
+        asserts.assert_equal(value_read, value_init,
+                             f"Mismatch between written and read {attribute.__name__}")
+        return value_read
+
+    def verify_attribute_progression(self, attribute, value_current, value_previous, order):
+        value_current = self.get_enum(value_current)
+        if order == OrderEnum.Ascending:
+            # Verify the current FanMode is greater than the previous FanMode
+            asserts.assert_greater(value_current, value_previous,
+                                f"Current {attribute.__name__} must be greater than previous {attribute.__name__}")
+        else:
+            # Verify the current FanMode is less than the previous FanMode
+            asserts.assert_less(value_current, value_previous,
+                                f"Current {attribute.__name__} must be less than previous {attribute.__name__}")
+        logging.info(
+            f"\n\t[F] {attribute.__name__} changed from ({value_previous}) to ({value_current})")
+
+    @staticmethod
+    def get_enum(value):
+        if isinstance(value, enum.Enum):
+            enum_type = type(value)
+            value = enum_type(value)
+        return value
 
     @staticmethod
     async def get_attribute_value_from_queue(queue, attribute, timeout_sec) -> Any:
@@ -206,7 +209,7 @@ class TC_FAN_3_1(MatterBaseTest):
         percent_setting_attr = Clusters.FanControl.Attributes.PercentSetting
         self.supports_speed = await self._supports_speed()
 
-        timeout_sec = 0.25
+        timeout_sec = 0.333
 
         # TH writes to the DUT the PercentSetting iteratively within a range of 1 to 100 one at a time in ascending order
         await self.verify_fan_mode(endpoint, percent_setting_attr, OrderEnum.Ascending, timeout_sec)
