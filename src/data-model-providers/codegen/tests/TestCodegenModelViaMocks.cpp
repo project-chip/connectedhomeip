@@ -1208,48 +1208,6 @@ TEST_F(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
     ASSERT_TRUE(cmds.data_equal(Span<const CommandId>(expectedCommands3)));
 }
 
-TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceValidity)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-
-    // register a CHI on ALL endpoints
-    CustomListCommandHandler handler(chip::NullOptional, MockClusterId(1));
-    handler.SetHandleCommands(true);
-
-    MockCommandHandler commandHandler;
-
-    // Command succeeds on a valid endpoint
-    {
-        const ConcreteCommandPath kCommandPath(kMockEndpoint1, MockClusterId(1), kMockCommandId1);
-        const InvokeRequest kInvokeRequest{ .path = kCommandPath };
-        chip::TLV::TLVReader tlvReader;
-
-        // std::nullopt is returned when the command is handled
-        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ &commandHandler), std::nullopt);
-    }
-
-    // Command fails on an invalid endpoint
-    {
-        const ConcreteCommandPath kCommandPath(kEndpointIdThatIsMissing, MockClusterId(1), kMockCommandId1);
-        const InvokeRequest kInvokeRequest{ .path = kCommandPath };
-        chip::TLV::TLVReader tlvReader;
-
-        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ &commandHandler),
-                  Protocols::InteractionModel::Status::UnsupportedEndpoint);
-    }
-
-    // Command fails on an invalid cluster
-    {
-        const ConcreteCommandPath kCommandPath(kMockEndpoint1, MockClusterId(0x1123), kMockCommandId1);
-        const InvokeRequest kInvokeRequest{ .path = kCommandPath };
-        chip::TLV::TLVReader tlvReader;
-
-        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ &commandHandler),
-                  Protocols::InteractionModel::Status::UnsupportedCluster);
-    }
-}
-
 TEST_F(TestCodegenModelViaMocks, AcceptedGeneratedCommandsOnInvalidEndpoints)
 {
     UseMockNodeConfig config(gTestNodeConfig);

@@ -85,11 +85,15 @@ public:
     ///      This includes cases where command handling and value return will be done asynchronously.
     ///    - returning a value other than Success implies an error reply (error and data are mutually exclusive)
     ///
-    /// Requirements:
-    ///    - The method MUST handle any requests and validate them. In particular, in case of invalid
-    ///      paths we expect one of:
-    ///        a) a return code of UnsupportedEndpoint/UnsupportedCluster/UnsupporedCommand OR
-    ///        b) the status above to be placed inside `handler`
+    /// Preconditions:
+    ///    - `request.path` MUST be valid: Invoke` is only guaranteed to function correctly for
+    ///      VALID paths (i.e. use `ProviderMetadataTree::AcceptedCommands` to check). This is
+    ///      because we assume ACL or flags (like timed invoke) have to happen before invoking
+    ///      this command.
+    ///    - TODO: as interfaces are updated, we may want to make the above requirement more
+    ///            relaxed, as it seems desirable for users of this interface to have guaranteed
+    ///            behavior (like error on invalid paths) where as today this seems unclear as some
+    ///            command intercepts do not validate if the path is valid per endpoints.
     ///
     /// Return value expectations:
     ///   - if a response has been placed into `handler` then std::nullopt MUST be returned. In particular
