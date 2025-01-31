@@ -38,7 +38,7 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: ghcr.io/project-chip/chip-build-bouffalolab:98
+      image: ghcr.io/project-chip/chip-build-bouffalolab:104
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:

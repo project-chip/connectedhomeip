@@ -675,6 +675,8 @@ class MatterTestConfig:
     # Accepted Terms and Conditions if used
     tc_version_to_simulate: int = None
     tc_user_response_to_simulate: int = None
+    # path to device attestation revocation set json file
+    dac_revocation_set_path: Optional[pathlib.Path] = None
 
 
 class ClusterMapper:
@@ -1949,6 +1951,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
 
     config.tc_version_to_simulate = args.tc_version_to_simulate
     config.tc_user_response_to_simulate = args.tc_user_response_to_simulate
+    config.dac_revocation_set_path = args.dac_revocation_set_path
 
     # Accumulate all command-line-passed named args
     all_global_args = []
@@ -1984,6 +1987,8 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
     paa_path_default = get_default_paa_trust_store(pathlib.Path.cwd())
     basic_group.add_argument('--paa-trust-store-path', action="store", type=pathlib.Path, metavar="PATH", default=paa_path_default,
                              help="PAA trust store path (default: %s)" % str(paa_path_default))
+    basic_group.add_argument('--dac-revocation-set-path', action="store", type=pathlib.Path, metavar="PATH",
+                             help="Path to JSON file containing the device attestation revocation set.")
     basic_group.add_argument('--ble-interface-id', action="store", type=int,
                              metavar="INTERFACE_ID", help="ID of BLE adapter (from hciconfig)")
     basic_group.add_argument('-N', '--controller-node-id', type=int_decimal_or_hex,
@@ -2506,7 +2511,8 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
             default_controller = stack.certificate_authorities[0].adminList[0].NewController(
                 nodeId=matter_test_config.controller_node_id,
                 paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
-                catTags=matter_test_config.controller_cat_tags
+                catTags=matter_test_config.controller_cat_tags,
+                dacRevocationSetPath=str(matter_test_config.dac_revocation_set_path),
             )
         test_config.user_params["default_controller"] = stash_globally(default_controller)
 
