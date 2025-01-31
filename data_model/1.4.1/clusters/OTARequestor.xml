@@ -139,13 +139,16 @@ Davis, CA 95616, USA
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin" fabricScoped="true"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="UpdatePossible" type="bool" default="true">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0002" name="UpdateState" type="UpdateStateEnum" default="Unknown">
+    <attribute id="0x0002" name="UpdateState" type="UpdateStateEnum">
+      <enum default="Unknown"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
@@ -153,7 +156,12 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="100"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="100"/>
+        </between>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -171,7 +179,9 @@ Davis, CA 95616, USA
       </field>
       <field id="3" name="MetadataForNode" type="octstr">
         <optionalConform/>
-        <constraint type="maxLength" value="512"/>
+        <constraint>
+          <maxLength value="512"/>
+        </constraint>
       </field>
       <field id="4" name="Endpoint" type="endpoint-no">
         <mandatoryConform/>
@@ -218,7 +228,12 @@ Davis, CA 95616, USA
       <field id="2" name="ProgressPercent" type="uint8" default="null">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="0" to="100"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="100"/>
+          </between>
+        </constraint>
       </field>
       <field id="3" name="PlatformCode" type="int64" default="null">
         <quality nullable="true"/>

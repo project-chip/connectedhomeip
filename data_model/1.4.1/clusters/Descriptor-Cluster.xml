@@ -76,7 +76,9 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Revision" type="uint16">
         <mandatoryConform/>
-        <constraint type="min" value="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
       </field>
     </struct>
   </dataTypes>
@@ -86,7 +88,9 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="minCount" value="1"/>
+      <constraint>
+        <minCount value="1"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="ServerList" type="list" default="empty">
       <entry type="cluster-id"/>
@@ -112,7 +116,12 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="TAGLIST"/>
       </mandatoryConform>
-      <constraint type="countBetween" from="1" to="6"/>
+      <constraint>
+        <countBetween>
+          <from value="1"/>
+          <to value="6"/>
+        </countBetween>
+      </constraint>
     </attribute>
   </attributes>
 </cluster>
