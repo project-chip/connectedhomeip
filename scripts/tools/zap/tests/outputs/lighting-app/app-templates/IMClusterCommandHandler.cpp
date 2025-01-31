@@ -971,7 +971,8 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
 
 } // namespace Clusters
 
-void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader, CommandHandler * apCommandObj)
+void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader, CommandHandler * apCommandObj,
+                                  bool aClusterIsValid)
 {
     Protocols::InteractionModel::Status errorStatus = Protocols::InteractionModel::Status::Success;
 
@@ -1014,8 +1015,17 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
         errorStatus = Clusters::ThreadNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     default:
-        ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
-        errorStatus = Protocols::InteractionModel::Status::UnsupportedCluster;
+        // If we already validated that the cluster does indeed exist in our CHI,
+        if (aClusterIsValid)
+        {
+            errorStatus = Protocols::InteractionModel::Status::UnsupportedCommand;
+        }
+        else
+        {
+            ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
+            errorStatus = Protocols::InteractionModel::Status::UnsupportedCluster;
+        }
+
         break;
     }
 

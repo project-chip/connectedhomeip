@@ -159,11 +159,13 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
                                                                               TLV::TLVReader & input_arguments,
                                                                               CommandHandler * handler)
 {
+    bool clusterRecognizedByCHI = false;
     CommandHandlerInterface * handler_interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
 
     if (handler_interface)
     {
+        clusterRecognizedByCHI = true;
         CommandHandlerInterface::HandlerContext context(*handler, request.path, input_arguments);
         handler_interface->InvokeCommand(context);
 
@@ -172,15 +174,10 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
         {
             return std::nullopt;
         }
-
-        // If we reach here, it means this particular CommandHandlerInterface recognized the cluster but the command is invalid
-        // or cannot be processed.
-        handler->AddStatus(request.path, Protocols::InteractionModel::Status::InvalidCommand);
-        return std::nullopt;
     }
 
     // Ember always sets the return in the handler
-    DispatchSingleClusterCommand(request.path, input_arguments, handler);
+    DispatchSingleClusterCommand(request.path, input_arguments, handler, clusterRecognizedByCHI);
     return std::nullopt;
 }
 
