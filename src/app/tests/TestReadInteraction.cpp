@@ -360,7 +360,6 @@ public:
 
             ChipLogProgress(Test, "  AttributeCaptureAssertion(%s),", argsBuffer.c_str());
         }
-        // TODO
     }
 
     void Reset()
