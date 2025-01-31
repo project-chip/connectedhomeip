@@ -119,6 +119,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     }
 
     const EmberAfAttributeMetadata ** attributeMetadata = std::get_if<const EmberAfAttributeMetadata *>(&metadata);
+    VerifyOrDie(*attributeMetadata != nullptr);
 
     // All the global attributes that we do not have metadata for are
     // read-only. Specifically only the following list-based attributes match the
@@ -129,7 +130,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     //   - GeneratedCommands
     //
     // Given the above, UnsupportedWrite should be correct (attempt to write to a read-only list)
-    bool isReadOnly = (attributeMetadata == nullptr) || (*attributeMetadata)->IsReadOnly();
+    bool isReadOnly = (*attributeMetadata)->IsReadOnly();
 
     // Internal is allowed to bypass timed writes and read-only.
     if (!request.operationFlags.Has(DataModel::OperationFlags::kInternal))
@@ -188,10 +189,6 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         VerifyOrReturnError(!(*attributeMetadata)->MustUseTimedWrite() || request.writeFlags.Has(DataModel::WriteFlags::kTimed),
                             Status::NeedsTimedInteraction);
     }
-
-    // Extra check: internal requests can bypass the read only check, however global attributes
-    // have no underlying storage, so write still cannot be done
-    VerifyOrReturnError(attributeMetadata != nullptr, Status::UnsupportedWrite);
 
     if (request.path.mDataVersion.HasValue())
     {
