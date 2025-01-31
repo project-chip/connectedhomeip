@@ -20,7 +20,7 @@ import chip.clusters as Clusters
 from chip.clusters import Attribute
 from chip.testing.conformance import conformance_allowed
 from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing.spec_parsing import build_xml_clusters, build_xml_device_types, parse_single_device_type
+from chip.testing.spec_parsing import build_xml_clusters, build_xml_device_types, parse_single_device_type, PrebuiltDataModelDirectory
 from chip.tlv import uint
 from jinja2 import Template
 from mobly import asserts
@@ -244,6 +244,30 @@ class TestSpecParsingDeviceType(MatterBaseTest):
                 print(problems)
             asserts.assert_equal(len(problems), expected_problems, "Unexpected number of problems")
             asserts.assert_false(success, "Unexpected success running test that should fail")
+
+    def test_spec_files(self):
+        one_three, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_3)
+        one_four, one_four_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4)
+        one_four_one, one_four_one_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4_1)
+        tot, tot_problems = build_xml_device_types(PrebuiltDataModelDirectory.kMaster)
+
+        asserts.assert_equal(len(one_four_problems), 0, "Problems found when parsing 1.4 spec")
+        asserts.assert_equal(len(one_four_one_problems), 0, "Problems found when parsing 1.4.1 spec")
+
+        asserts.assert_greater(len(set(tot.keys()) - set(one_three.keys())),
+                               0, "Master dir does not contain any device types not in 1.3")
+        asserts.assert_greater(len(set(tot.keys()) - set(one_four.keys())),
+                               0, "Master dir does not contain any device types not in 1.4")
+        asserts.assert_greater(len(set(one_four.keys()) - set(one_three.keys())),
+                               0, "1.4 dir does not contain any clusters not in 1.3")
+        asserts.assert_equal(len(one_four.keys()), len(one_four_one.keys()),
+                             "Number of device types in 1.4 and 1.4.1 does not match")
+        asserts.assert_equal(set(one_three.keys()) - set(one_four.keys()),
+                             set(), "There are some 1.3 device types that are unexpectedly not included in the 1.4 spec")
+        asserts.assert_equal(set(one_four.keys())-set(tot.keys()),
+                             set(), "There are some 1.4 device types that are unexpectedly not included in the TOT spec")
+        asserts.assert_equal(set(one_three.keys())-set(tot.keys()),
+                             set(), "There are some 1.3 device types that are unexpectedly not included in the TOT spec")
 
 
 if __name__ == "__main__":
