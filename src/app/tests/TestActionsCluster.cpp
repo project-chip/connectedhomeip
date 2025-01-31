@@ -87,7 +87,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    bool FindActionIdInActionList(uint16_t actionId) override
+    bool HaveActionWithId(uint16_t actionId) override
     {
         for (uint16_t i = 0; i < mNumActions; i++)
         {

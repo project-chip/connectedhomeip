@@ -54,7 +54,7 @@ private:
 
     CHIP_ERROR ReadActionAtIndex(uint16_t index, ActionStructStorage & action) override;
     CHIP_ERROR ReadEndpointListAtIndex(uint16_t index, EndpointListStorage & epList) override;
-    bool FindActionIdInActionList(uint16_t actionId) override;
+    bool HaveActionWithId(uint16_t actionId) override;
 
     void OnActionListChanged(EndpointId endpoint, const ActionStructStorage & action) override{};
     void OnEndpointListChanged(EndpointId endpoint, const EndpointListStorage & action) override{};
