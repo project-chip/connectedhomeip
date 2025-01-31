@@ -1015,7 +1015,8 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
         errorStatus = Clusters::ThreadNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     default:
-        // If we already validated that the cluster does indeed exist in our CHI,
+        // If we already validated that the cluster does indeed exist (e.g. when dispatching to CommandHandlerInterface for that
+        // cluster).
         if (aClusterIsValid)
         {
             errorStatus = Protocols::InteractionModel::Status::UnsupportedCommand;
