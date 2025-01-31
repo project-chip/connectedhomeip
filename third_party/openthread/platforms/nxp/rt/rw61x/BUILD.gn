@@ -17,12 +17,16 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
+import("${chip_root}/src/platform/device.gni")
 
 #allows to get common NXP SDK gn options
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
-# Allows to get various RT gn options
-import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+if (!nxp_external_sdk) {
+  # Allows to get various RT gn options
+  import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+}
+
 openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 
 config("openthread_rw61x_config") {
@@ -32,16 +36,14 @@ config("openthread_rw61x_config") {
     "${openthread_nxp_root}/src/common/br",
     "${openthread_nxp_root}/src/common/lwip",
     "${openthread_nxp_root}/src/rw/rw612",
-    "${openthread_nxp_root}/third_party/mbedtls/configs",
-    "${openthread_root}/third_party/mbedtls",
     "${openthread_root}/examples/platforms",
     "${openthread_nxp_root}/examples/utils/cli_addons",
     "${openthread_nxp_root}/examples/utils/cli_addons/ephemeral_key",
     "${openthread_nxp_root}/examples/utils/cli_addons/lwip",
   ]
-  if (spinel_interface_rpmsg) {
-    include_dirs += [ "${openthread_nxp_root}/src/common/spinel" ]
-  }
+  
+  include_dirs += [ "${openthread_nxp_root}/src/common/spinel" ]
+
   if (chip_enable_wifi && chip_enable_openthread) {
     defines += [
       "OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE=1",
@@ -78,16 +80,26 @@ config("openthread_rw61x_config") {
 
   # ot cli configs
   defines += [ "OPENTHREAD_CONFIG_PING_SENDER_ENABLE=1" ]
+
+  cflags = [
+    "-Wno-shadow",
+    "-Wno-sign-compare",
+    "-Wno-implicit-fallthrough",
+  ]
 }
 
 #Config used by the openthread stack to get the path to OpenthreadConfig.h
 source_set("openthread_core_config_rw61x") {
   public_configs = [ ":openthread_rw61x_config" ]
-  public_deps = [ nxp_sdk_target ]
+  if (!nxp_external_sdk) {
+    public_deps = [ nxp_sdk_target ]
+  }
 }
 
 source_set("libopenthread-rw61x") {
+  output_name = "libOpenthread_NXP_Port_RW61x"
   deps = []
+  public_deps = []
   sources = [
     "${openthread_nxp_root}/src/common/alarm_freertos.c",
     "${openthread_nxp_root}/src/common/diag.c",
@@ -121,7 +133,7 @@ source_set("libopenthread-rw61x") {
 
     deps += [ "${nxp_sdk_build_root}:nxp_lwip" ]
   }
-  if (spinel_interface_rpmsg) {
+
     sources += [
       "${openthread_nxp_root}/src/common/spinel/misc.c",
       "${openthread_nxp_root}/src/common/spinel/radio.cpp",
@@ -130,14 +142,7 @@ source_set("libopenthread-rw61x") {
       "${openthread_root}/src/lib/hdlc/hdlc.cpp",
       "${openthread_root}/src/lib/url/url.cpp",
     ]
-  } else {
-    sources += [
-      "${openthread_nxp_root}/src/rw/rw612/platform/misc.c",
-      "${openthread_nxp_root}/src/rw/rw612/platform/radio.c",
-      "${openthread_nxp_root}/src/rw/rw612/platform/system.c",
-    ]
-  }
-
+  
   if (nxp_nvm_component == "nvm_fwk") {
     sources += [ "${openthread_nxp_root}/src/common/flash_nvm.c" ]
   } else if (nxp_nvm_component == "littlefs") {
@@ -149,7 +154,7 @@ source_set("libopenthread-rw61x") {
   }
 
   defines = [
-    "OPENTHREAD_FTD",
+    "OPENTHREAD_FTD=1",
     "OT_PLAT_UART_INSTANCE=3",
   ]
 
@@ -158,11 +163,12 @@ source_set("libopenthread-rw61x") {
   deps += [
     "${nxp_sdk_build_root}:nxp_mbedtls",
     "../../..:libopenthread-platform-utils",
-    nxp_sdk_target,
   ]
 
-  if (spinel_interface_rpmsg) {
-    defines += [ "OT_PLAT_SPINEL_OVER_HDLC" ]
-    deps += [ "${openthread_root}:libopenthread-spinel-rcp" ]
+  if (!nxp_external_sdk) {
+    deps += [ nxp_sdk_target ]
   }
+
+  defines += [ "OT_PLAT_SPINEL_OVER_HDLC" ]
+  deps += [ "${openthread_root}:libopenthread-spinel-rcp" ]
 }

@@ -344,8 +344,6 @@ CHIP_ERROR FactoryDataProviderImpl::ELS_ConvertDacKey()
     uint32_t factoryDataAddress = (uint32_t) __FACTORY_DATA_START_OFFSET;
     uint32_t factoryDataSize    = (uint32_t) __FACTORY_DATA_SIZE;
 
-    VerifyOrReturnError(factoryDataRamBuffer != nullptr, CHIP_ERROR_INTERNAL);
-
     uint8_t * data = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(newSize));
     /* Import pain DAC key and generate the blob */
     ReturnErrorOnFailure(ELS_ExportBlob(blob, &blobSize, KeyAddr));
