@@ -170,13 +170,6 @@ class TC_FAN_3_1(MatterBaseTest):
             f"\n\t[F] {attribute.__name__} changed from ({value_previous}) to ({value_current})")
 
     @staticmethod
-    def get_enum(value):
-        if isinstance(value, enum.Enum):
-            enum_type = type(value)
-            value = enum_type(value)
-        return value
-
-    @staticmethod
     async def get_attribute_value_from_queue(queue, attribute, timeout_sec) -> Any:
         start_time = time.time()
         elapsed = 0
@@ -198,6 +191,13 @@ class TC_FAN_3_1(MatterBaseTest):
             if break_out:
                 break
 
+        return value
+
+    @staticmethod
+    def get_enum(value):
+        if isinstance(value, enum.Enum):
+            enum_type = type(value)
+            value = enum_type(value)
         return value
 
     def pics_TC_FAN_3_1(self) -> list[str]:
