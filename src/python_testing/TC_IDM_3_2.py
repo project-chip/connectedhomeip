@@ -89,7 +89,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
             for cluster, clusterdata in self.endpoints[endpoint].items():
                 all_types = await self.all_type_attributes_for_cluster(cluster, desired_attribute_type)
-                all_types = list(set(all_types) & self.device_attributes)
+                all_types = list(set(all_types) & set(self.writable_attributes))
                 attributes_of_type = set(all_types)
                 attributes_of_type_on_device = attributes_of_type.intersection(set(clusterdata.keys()))
 
@@ -240,9 +240,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         if chosen_writable_cluster in self.device_clusters and chosen_writable_attribute in self.device_attributes:
             output_1 = await self.default_controller.Read(self.dut_node_id, [chosen_writable_attribute])
             if output_1:
-                endpoint = next(iter(output_1.attributes))
-                # import pdb;pdb.set_trace()
-                # print(f"endpoint: {endpoint}")
+                endpoint = next(iter(output_1.attributes))\
                 value = self.pick_writable_value(chosen_writable_attribute)
                 await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, chosen_writable_attribute(value=value))])
                 output_2 = await self.default_controller.Read(self.dut_node_id, [chosen_writable_attribute])
