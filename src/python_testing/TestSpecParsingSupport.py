@@ -272,7 +272,8 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_equal(set(one_three_clusters.keys()) - set(one_four_clusters.keys()),
                              one_four_removed, "There are some 1.3 clusters that are unexpectedly not included in the 1.4 spec")
         # Ballast and all the proxy clusters are being removed in 1.5
-        one_five_removed = set([Clusters.BallastConfiguration.id, Clusters.ProxyConfiguration.id, Clusters.ProxyDiscovery.id, Clusters.ProxyValid.id])
+        one_five_removed = set([Clusters.BallastConfiguration.id, Clusters.ProxyConfiguration.id,
+                               Clusters.ProxyDiscovery.id, Clusters.ProxyValid.id])
         asserts.assert_equal(set(one_four_clusters.keys())-set(tot_xml_clusters.keys()),
                              one_five_removed, "There are some 1.4 clusters that are unexpectedly not included in the TOT spec")
         asserts.assert_equal(set(one_three_clusters.keys())-set(tot_xml_clusters.keys()),
