@@ -29,7 +29,7 @@ if (chip_enable_openthread) {
 
 if (chip_enable_nfc_commissioning) {
   pkg_config("nfc_commissioning_config") {
-      packages = [ "libpcsclite" ]
+    packages = [ "libpcsclite" ]
   }
 }
 
