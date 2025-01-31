@@ -48,16 +48,15 @@ public:
 
 struct ActionStructStorage : public Structs::ActionStruct::Type
 {
-    ActionStructStorage() : mActionName(mBuffer, sizeof(mBuffer)){};
+    ActionStructStorage(){};
 
     ActionStructStorage(uint16_t aAction, const CharSpan & aActionName, ActionTypeEnum aActionType, uint16_t aEpListID,
-                        BitMask<CommandBits> aCommands, ActionStateEnum aActionState) :
-        mActionName(mBuffer, sizeof(mBuffer))
+                        BitMask<CommandBits> aCommands, ActionStateEnum aActionState)
     {
         Set(aAction, aActionName, aActionType, aEpListID, aCommands, aActionState);
     }
 
-    ActionStructStorage(const ActionStructStorage & aAction) : mActionName(mBuffer, sizeof(mBuffer)) { *this = aAction; }
+    ActionStructStorage(const ActionStructStorage & aAction) { *this = aAction; }
 
     ActionStructStorage & operator=(const ActionStructStorage & aAction)
     {
@@ -68,33 +67,31 @@ struct ActionStructStorage : public Structs::ActionStruct::Type
     void Set(uint16_t aAction, const CharSpan & aActionName, ActionTypeEnum aActionType, uint16_t aEpListID,
              BitMask<CommandBits> aCommands, ActionStateEnum aActionState)
     {
-        actionID          = aAction;
-        type              = aActionType;
-        endpointListID    = aEpListID;
-        supportedCommands = aCommands;
-        state             = aActionState;
-        mActionName       = Span(mBuffer, sizeof(mBuffer));
+        actionID                    = aAction;
+        type                        = aActionType;
+        endpointListID              = aEpListID;
+        supportedCommands           = aCommands;
+        state                       = aActionState;
+        MutableCharSpan mActionName = Span(mBuffer, sizeof(mBuffer));
         CopyCharSpanToMutableCharSpanWithTruncation(aActionName, mActionName);
         name = mActionName;
     }
 
 private:
     char mBuffer[kActionNameMaxSize];
-    MutableCharSpan mActionName;
 };
 
 struct EndpointListStorage : public Structs::EndpointListStruct::Type
 {
-    EndpointListStorage() : mEpListName(mBuffer, sizeof(mBuffer)){};
+    EndpointListStorage(){};
 
     EndpointListStorage(uint16_t aEpListId, const CharSpan & aEpListName, EndpointListTypeEnum aEpListType,
-                        const DataModel::List<const EndpointId> & aEndpointList) :
-        mEpListName(mBuffer, sizeof(mBuffer))
+                        const DataModel::List<const EndpointId> & aEndpointList)
     {
         Set(aEpListId, aEpListName, aEpListType, aEndpointList);
     }
 
-    EndpointListStorage(const EndpointListStorage & aEpList) : mEpListName(mBuffer, sizeof(mBuffer)) { *this = aEpList; }
+    EndpointListStorage(const EndpointListStorage & aEpList) { *this = aEpList; }
 
     EndpointListStorage & operator=(const EndpointListStorage & aEpList)
     {
@@ -107,31 +104,30 @@ struct EndpointListStorage : public Structs::EndpointListStruct::Type
     {
         endpointListID    = aEpListId;
         type              = aEpListType;
-        size_t epListSize = std::min(aEndpointList.size(), kEndpointListMaxSize);
+        size_t epListSize = std::min(aEndpointList.size(), ArraySize(mEpList));
 
         for (size_t index = 0; index < epListSize; index++)
         {
             mEpList[index] = aEndpointList[index];
         }
-        endpoints   = DataModel::List<const EndpointId>(Span(mEpList, epListSize));
-        mEpListName = Span(mBuffer, sizeof(mBuffer));
+        endpoints                   = DataModel::List<const EndpointId>(Span(mEpList, epListSize));
+        MutableCharSpan mEpListName = Span(mBuffer, sizeof(mBuffer));
         CopyCharSpanToMutableCharSpanWithTruncation(aEpListName, mEpListName);
         name = mEpListName;
     }
 
 private:
     char mBuffer[kEndpointListNameMaxSize];
-    MutableCharSpan mEpListName;
     EndpointId mEpList[kEndpointListMaxSize];
 };
 
-class ActionsServer : public AttributeAccessInterface, public CommandHandlerInterface, public MatterContext
+class ActionsServer : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
     // Register for the Actions cluster on all endpoints.
     ActionsServer() :
         AttributeAccessInterface(Optional<EndpointId>::Missing(), Actions::Id),
-        CommandHandlerInterface(Optional<EndpointId>::Missing(), Actions::Id), mMatterContext(*this)
+        CommandHandlerInterface(Optional<EndpointId>::Missing(), Actions::Id)
     {}
     static ActionsServer & Instance();
 
@@ -148,7 +144,7 @@ public:
     void OnActionFailed(EndpointId aEndpoint, uint16_t aActionId, uint32_t aInvokeId, ActionStateEnum aActionState,
                         ActionErrorEnum aActionError);
 
-    static void SetDefaultDelegate(EndpointId aEndpointId, Delegate * aDelegate);
+    void SetDefaultDelegate(EndpointId aEndpointId, Delegate * aDelegate);
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
@@ -178,7 +174,7 @@ public:
 
 private:
     static ActionsServer sInstance;
-    MatterContext & mMatterContext;
+    MatterContext mMatterContext;
     static constexpr size_t kMaxEndpointListLength = 256u;
     static constexpr size_t kMaxActionListLength   = 256u;
 
@@ -186,9 +182,9 @@ private:
                                        const AttributeValueEncoder::ListEncodeHelper & aEncoder);
     CHIP_ERROR ReadEndpointListAttribute(const ConcreteReadAttributePath & aPath,
                                          const AttributeValueEncoder::ListEncodeHelper & aEncoder);
-    bool FindActionIdInActionList(EndpointId aEndpointId, uint16_t aActionId);
+    bool HaveActionWithId(EndpointId aEndpointId, uint16_t aActionId);
 
-    // Cannot use CommandHandlerInterface::HandleCommand directly because we need to do the FindActionIdInActionList() check before
+    // Cannot use CommandHandlerInterface::HandleCommand directly because we need to do the HaveActionWithId() check before
     // sending a command.
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
@@ -222,7 +218,7 @@ public:
      * @param index The index of the action to be returned. It is assumed that actions are indexable from 0 and with no gaps.
      * @param action A reference to the ActionStructStorage which should be initialized via copy/assignments or calling Set().
      * @return Returns a CHIP_NO_ERROR if there was no error and the action was returned successfully.
-     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index in beyond the list of available actions.
+     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is past the end of the list of actionList.
      */
     virtual CHIP_ERROR ReadActionAtIndex(uint16_t index, ActionStructStorage & action) = 0;
 
@@ -231,16 +227,16 @@ public:
      * @param index The index of the endpointList to be returned. It is assumed that actions are indexable from 0 and with no gaps.
      * @param action A reference to the EndpointListStorage which should be initialized via copy/assignments or calling Set().
      * @return Returns a CHIP_NO_ERROR if there was no error and the epList was returned successfully.
-     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index in beyond the list of available endpointList.
+     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is past the end of the list of endpointLists.
      */
     virtual CHIP_ERROR ReadEndpointListAtIndex(uint16_t index, EndpointListStorage & epList) = 0;
 
     /**
-     * Find the action with matching actionId in the list of action.
-     * @param actionId The action to be find in the list of action.
+     * Check whether there is an action with the given actionId in the list of actions.
+     * @param actionId The action ID to search for.
      * @return Returns a true if matching action is found otherwise false.
      */
-    virtual bool FindActionIdInActionList(uint16_t actionId) = 0;
+    virtual bool HaveActionWithId(uint16_t actionId) = 0;
 
     /**
      * On receipt of each and every command,
@@ -255,7 +251,7 @@ public:
      * When an InstantAction command is received, an action (state change) on the involved endpoints shall trigger,
      * in a "fire and forget" manner. Afterwards, the action’s state SHALL be Inactive.
      *
-     * @param actionId The id of an action on which an action shall takes place.
+     * @param actionId The actionId of an action.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
     virtual Protocols::InteractionModel::Status HandleInstantAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
@@ -265,7 +261,7 @@ public:
      * with a specified time to transition from the current state to the new state. During the transition, the action’s state SHALL
      * be Active. Afterwards, the action’s state SHALL be Inactive.
      *
-     * @param actionId The id of an action on which an action shall takes place.
+     * @param actionId The actionId of an action.
      * @param transitionTime The time for transition from the current state to the new state.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
@@ -276,7 +272,7 @@ public:
      * When a StartAction command is received, the commencement of an action on the involved endpoints shall trigger. Afterwards,
      * the action’s state SHALL be Inactive.
      *
-     * @param actionId The id of an action on which an action shall takes place.
+     * @param actionId The actionId of an action.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
     virtual Protocols::InteractionModel::Status HandleStartAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
@@ -286,7 +282,7 @@ public:
      * and SHALL change the action’s state to Active. After the specified Duration, the action will stop, and the action’s state
      * SHALL change to Inactive.
      *
-     * @param actionId The id of an action on which an action shall takes place.
+     * @param actionId The actionId of an action.
      * @param duration The time for which an action shall be in start state.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
@@ -297,7 +293,7 @@ public:
      * When a StopAction command is received, the ongoing action on the involved endpoints shall stop. Afterwards, the action’s
      * state SHALL be Inactive.
      *
-     * @param actionId The id of an action on which an action shall takes place.
+     * @param actionId The actionId of an action.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
     virtual Protocols::InteractionModel::Status HandleStopAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
@@ -306,7 +302,7 @@ public:
      * When a PauseAction command is received, the ongoing action on the involved endpoints shall pause and SHALL change the
      * action’s state to Paused.
      *
-     * @param actionId The id of an action on which an action shall takes place.
+     * @param actionId The actionId of an action.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
     virtual Protocols::InteractionModel::Status HandlePauseAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
@@ -316,7 +312,7 @@ public:
      * After the specified Duration, the ongoing action will be automatically resumed. which SHALL change the action’s state to
      * Active.
      *
-     * @param actionId The id of an action on which an action shall takes place.
+     * @param actionId The actionId of an action.
      * @param duration The time for which an action shall be in pause state.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
@@ -327,7 +323,7 @@ public:
      * When a ResumeAction command is received, the previously paused action shall resume and SHALL change the action’s state to
      * Active.
      *
-     * @param actionId The id of an action on which an action shall takes place.
+     * @param actionId The actionId of an action.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
     virtual Protocols::InteractionModel::Status HandleResumeAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
@@ -336,7 +332,7 @@ public:
      * When an EnableAction command is received, it enables a certain action or automation. Afterwards, the action’s state SHALL be
      * Active.
      *
-     * @param actionId The id of an action on which an action shall takes place.
+     * @param actionId The actionId of an action.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
     virtual Protocols::InteractionModel::Status HandleEnableAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
@@ -346,7 +342,7 @@ public:
      * action’s state to be Active. After the specified Duration, the action or automation will stop, and the action’s state SHALL
      * change to Disabled.
      *
-     * @param actionId The id of an action on which an action shall takes place.
+     * @param actionId The actionId of an action.
      * @param duration The time for which an action shall be in active state.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
@@ -357,7 +353,7 @@ public:
      * When a DisableAction command is received, it disables a certain action or automation, and SHALL change the action’s state to
      * Inactive.
      *
-     * @param actionId The id of an action on which an action shall takes place.
+     * @param actionId The actionId of an action.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
     virtual Protocols::InteractionModel::Status HandleDisableAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
@@ -367,7 +363,7 @@ public:
      * action’s state to Disabled. After the specified Duration, the action or automation will re-start, and the action’s state
      * SHALL change to either Inactive or Active, depending on the actions.
      *
-     * @param actionId The id of an action on which an action shall takes place.
+     * @param actionId The actionId of an action.
      * @param duration The time for which an action shall be in disable state.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */

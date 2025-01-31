@@ -344,7 +344,7 @@ void emberAfThermostatClusterInitCallback(EndpointId endpoint)
 
 void emberAfActionsClusterInitCallback(EndpointId endpoint)
 {
-    Clusters::Actions::ActionsServer::SetDefaultDelegate(endpoint, &sActionsDelegateImpl);
+    Clusters::Actions::ActionsServer::Instance().SetDefaultDelegate(endpoint, &sActionsDelegateImpl);
 }
 
 Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
