@@ -19,6 +19,18 @@
 # when reading UniqueID from BasicInformation Cluster. Please specify the app
 # location with --string-arg th_server_no_uid_app_path:<path_to_app>
 
+import asyncio
+import logging
+import os
+import random
+import tempfile
+
+import chip.clusters as Clusters
+from chip import ChipDeviceCtrl
+from chip.interaction_model import Status
+from chip.testing.apps import AppServerSubprocess
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from chip.testing.tasks import Subprocess
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
@@ -34,17 +46,7 @@
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 from mobly import asserts
-from chip.testing.tasks import Subprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
-from chip.testing.apps import AppServerSubprocess
-from chip.interaction_model import Status
-from chip import ChipDeviceCtrl
-import chip.clusters as Clusters
-import tempfile
-import random
-import os
-import logging
-import asyncio
+
 --passcode 20202021
 #       --string-arg th_fsa_app_path:examples/fabric-admin/scripts/fabric-sync-app.py th_fsa_admin_path:${FABRIC_ADMIN_APP} th_fsa_bridge_path:${FABRIC_BRIDGE_APP} th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID} dut_fsa_stdin_pipe:dut-fsa-stdin
 #       --trace-to json:${TRACE_TEST_JSON}.json
