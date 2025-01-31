@@ -98,12 +98,20 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
                 asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
             self.app_pipe = self.app_pipe + str(app_pid)
 
-        asserts.assert_true(self.check_pics("RVCCLEANM.S.A0000"), "RVCCLEANM.S.A0000 must be supported")
-        asserts.assert_true(self.check_pics("RVCCLEANM.S.A0001"), "RVCCLEANM.S.A0001 must be supported")
-        asserts.assert_true(self.check_pics("RVCCLEANM.S.C00.Rsp"), "RVCCLEANM.S.C00.Rsp must be supported")
-        asserts.assert_true(self.check_pics("RVCCLEANM.S.C01.Tx"), "RVCCLEANM.S.C01.Tx must be supported")
+        RVCClean_cluster = Clusters.RvcCleanMode
+        attributes = RVCClean_cluster.Attributes
 
-        attributes = Clusters.RvcCleanMode.Attributes
+        # Gathering Accepted and Generated Commands and associated ids
+        commands = RVCClean_cluster.Commands
+        RVCClean_gencmd_list = attributes.GeneratedCommandList
+        generated_cmd_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCClean_cluster, attribute=RVCClean_gencmd_list)
+        chg_rsp_cmd_id = commands.ChangeToModeResponse.command_id
+
+        if not await self.command_guard(endpoint=self.endpoint, command=commands.ChangeToMode):
+            asserts.fail("Change To Mode receiving commands needs to be supported")
+
+        if chg_rsp_cmd_id not in generated_cmd_list:
+            asserts.fail("Change To Mode Response to transmit commands needs to be supported")
 
         self.print_step(1, "Commissioning, already done")
 
