@@ -181,8 +181,7 @@ class AttributeCaptureAssertion
 public:
     constexpr AttributeCaptureAssertion(chip::EndpointId ep, chip::ClusterId cl, chip::AttributeId at,
                                         std::optional<unsigned> listSize = std::nullopt) :
-        mEndpoint(ep),
-        mCluster(cl), mAttribute(at), mListSize(listSize)
+        mEndpoint(ep), mCluster(cl), mAttribute(at), mListSize(listSize)
     {}
 
     chip::app::ConcreteAttributePath Path() const { return chip::app::ConcreteAttributePath(mEndpoint, mCluster, mAttribute); }
@@ -315,20 +314,20 @@ public:
 
             if (path.mClusterId >= 0xff)
             {
-                argsBuffer.AddFormat("0x%X, ", path.mClusterId);
+                argsBuffer.AddFormat("0x%lX, ", static_cast<unsigned long>(path.mClusterId));
             }
             else
             {
-                argsBuffer.AddFormat("%u, ", path.mClusterId);
+                argsBuffer.AddFormat("%lu, ", static_cast<unsigned long>(path.mClusterId));
             }
 
             if (path.mAttributeId >= 0xff)
             {
-                argsBuffer.AddFormat("0x%X", path.mAttributeId);
+                argsBuffer.AddFormat("0x%lX", static_cast<unsigned long>(path.mAttributeId));
             }
             else
             {
-                argsBuffer.AddFormat("%u", path.mAttributeId);
+                argsBuffer.AddFormat("%lu", static_cast<unsigned long>(path.mAttributeId));
             }
 
             if (mReceivedListSizes[i].has_value())
@@ -1582,8 +1581,7 @@ void TestReadInteraction::TestSetDirtyBetweenChunks()
         public:
             DirtyingMockDelegate(AttributePathParams (&aReadPaths)[2], int & aNumAttributeResponsesWhenSetDirty,
                                  int & aNumArrayItemsWhenSetDirty) :
-                mReadPaths(aReadPaths),
-                mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
+                mReadPaths(aReadPaths), mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
                 mNumArrayItemsWhenSetDirty(aNumArrayItemsWhenSetDirty)
             {}
 
