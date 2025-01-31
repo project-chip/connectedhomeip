@@ -168,7 +168,9 @@ def get_all_provisional_device_types(new_revision: PrebuiltDataModelDirectory):
 
 
 REVISIONS = {'1.3': PrebuiltDataModelDirectory.k1_3,
-             '1.4': PrebuiltDataModelDirectory.k1_4, 'master': PrebuiltDataModelDirectory.kMaster}
+             '1.4': PrebuiltDataModelDirectory.k1_4,
+             '1.4.1': PrebuiltDataModelDirectory.k1_4_1,
+             'master': PrebuiltDataModelDirectory.kMaster}
 
 
 @click.command()
