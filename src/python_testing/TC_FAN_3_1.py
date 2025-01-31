@@ -72,7 +72,7 @@ class TC_FAN_3_1(MatterBaseTest):
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attr_to_write(value))])
         return result[0].Status
 
-    async def supports_speed(self) -> bool:
+    async def _supports_speed(self) -> bool:
         # TODO: Implement
         time.sleep(0.1)
         return True
@@ -89,7 +89,6 @@ class TC_FAN_3_1(MatterBaseTest):
         fan_mode_off = cluster.Enums.FanModeEnum.kOff
         fan_mode_high = cluster.Enums.FanModeEnum.kHigh
         percent_setting_max_value = 100 # PercentSetting max value is 100 as per the spec
-        supports_speed = await self.supports_speed()
 
         # Determine if PercentSetting values will be written in ascending or descending order
         fan_mode_init = fan_mode_off if order == OrderEnum.Ascending else fan_mode_high
@@ -156,7 +155,7 @@ class TC_FAN_3_1(MatterBaseTest):
                 fan_mode_previous = fan_mode_current
 
             # Verifying SpeedSetting (if supported)
-            if supports_speed:
+            if self.supports_speed:
                 speed_setting_current = await self.get_attribute_value_from_queue(queue, speed_setting_attr, timeout_sec)
                 if speed_setting_current is not None:
                     if order == OrderEnum.Ascending:
@@ -205,6 +204,8 @@ class TC_FAN_3_1(MatterBaseTest):
         # Setup
         endpoint = self.get_endpoint(default=1)
         percent_setting_attr = Clusters.FanControl.Attributes.PercentSetting
+        self.supports_speed = await self._supports_speed()
+
         timeout_sec = 0.25
 
         # TH writes to the DUT the PercentSetting iteratively within a range of 1 to 100 one at a time in ascending order
