@@ -757,7 +757,7 @@ PyChipError pychip_DeviceController_SetDACRevocationSetPath(const char * dacRevo
 
 extern "C" {
 // Function to get the RCAC data from the sTestCommissioner
-void pychip_GetCommissioningRCACData(uint8_t * rcacDataPtr, size_t * rcacSize)
+void pychip_GetCommissioningRCACData(uint8_t * rcacDataPtr, size_t * rcacSize, size_t bufferSize)
 {
     // Attempting to get Python RCAC data in C++
     const auto & rcacData = sTestCommissioner.GetCHIPRCACData();
@@ -769,8 +769,8 @@ void pychip_GetCommissioningRCACData(uint8_t * rcacDataPtr, size_t * rcacSize)
         return;
     }
 
-    // Ensure the size is passed back to Python
-    *rcacSize = rcacData.size();
+    // Ensure we do not exceed bufferSize
+    *rcacSize = std::min(rcacData.size(), bufferSize);
 
     // Copy the data from C++ to Python's allocated memory
     std::memcpy(rcacDataPtr, rcacData.data(), *rcacSize);

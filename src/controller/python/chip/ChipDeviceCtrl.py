@@ -1962,7 +1962,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_GetCompletionError.argtypes = []
             self._dmLib.pychip_GetCompletionError.restype = PyChipError
 
-            self._dmLib.pychip_GetCommissioningRCACData.argtypes = [ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_size_t)]
+            self._dmLib.pychip_GetCommissioningRCACData.argtypes = [ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_size_t), ctypes.c_size_t]
             self._dmLib.pychip_GetCommissioningRCACData.restype = None
 
             self._dmLib.pychip_DeviceController_IssueNOCChain.argtypes = [
@@ -2260,15 +2260,20 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return await asyncio.futures.wrap_future(ctx.future)
 
     def get_rcac(self):
-        # Passes captured RCAC data back to python test modules to be used for validation
+        # Passes captured RCAC data back to Python test modules for validation
         try:
-            rcac_size = 400
-            rcac_buffer = (ctypes.c_uint8 * rcac_size)()
+            # Setting buffer size to max size acceptable by TLV as mentioned in spec
+            rcac_size = 400  
+            rcac_buffer = (ctypes.c_uint8 * rcac_size)()  # Allocate buffer
 
             actual_rcac_size = ctypes.c_size_t()
 
-            self._dmLib.pychip_GetCommissioningRCACData(ctypes.cast(
-                rcac_buffer, ctypes.POINTER(ctypes.c_uint8)), ctypes.byref(actual_rcac_size))
+            # Now calling the C++ function with the buffer size set as an additional parameter
+            self._dmLib.pychip_GetCommissioningRCACData(
+                ctypes.cast(rcac_buffer, ctypes.POINTER(ctypes.c_uint8)),
+                ctypes.byref(actual_rcac_size),
+                ctypes.c_size_t(rcac_size)  # Pass the buffer size
+            )
 
             # Check if data is available
             if actual_rcac_size.value > 0:
@@ -2280,6 +2285,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         except Exception as e:
             LOGGER.error(f"Error during RCAC data fetching: {e}")
+            return None
 
         return rcac_bytes
 
