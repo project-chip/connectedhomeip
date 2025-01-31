@@ -458,16 +458,16 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
         // character of an option group (e.g. 'a' or 'b' in "-abc"), or [prevOptIndex, optind) if it's the final character of an
         // option group or not a group at all.  Walk through those elements knowing that all elements we encounter before reaching
         // the option must be nonoptions.  Store the range of those nonoptions in firstNonoptionNew and lastNonoptionPlus1New.  If
-        // this is the final iteration (getopt_long returned -1) then prevOptIndex == optind == argc, which means firstNonoptionNew ==
-        // lastNonoptionPlus1New == argc, the following for loop will be skipped, and all the nonoptions we had already found will
-        // get moved to the end of argv.
+        // this is the final iteration (getopt_long returned -1) then prevOptIndex == optind == argc, which means firstNonoptionNe
+        // == lastNonoptionPlus1New == argc, the following for loop will be skipped, and all the nonoptions we had already found
+        // will get moved to the end of argv.
         firstNonoptionNew     = prevOptIndex;
         lastNonoptionPlus1New = prevOptIndex;
         for (nonoptionToMove = prevOptIndex; nonoptionToMove <= optind; nonoptionToMove++)
         {
-            // Note that this loop INCLUDES nonoptionToMove=optind since the option that just got processed might be part of a group of short
-            // options all sharing a single '-', in which case optind is going to land on that same element several times in a row
-            // before it moves past it.
+            // Note that this loop INCLUDES nonoptionToMove=optind since the option that just got processed might be part of a group
+            // of short options all sharing a single '-', in which case optind is going to land on that same element several times
+            // in a row before it moves past it.
             if (argv[nonoptionToMove] && argv[nonoptionToMove][0] == '-')
             {
                 lastNonoptionPlus1New = nonoptionToMove;
@@ -487,7 +487,7 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
                 for (indexToSwap = nonoptionToMove; indexToSwap < moveNonoptionToHere; indexToSwap++)
                 {
                     // Swap element indexToSwap with element indexToSwap + 1.
-                    tempSwap                 = permutableArgv[indexToSwap];
+                    tempSwap                        = permutableArgv[indexToSwap];
                     permutableArgv[indexToSwap]     = permutableArgv[indexToSwap + 1];
                     permutableArgv[indexToSwap + 1] = tempSwap;
                 }
