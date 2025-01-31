@@ -104,19 +104,19 @@
             }
         },
         {
-            "label": "Build ESP32 Unit Tests (QEMU)",
+            "label": "Build esp32-qemu unit tests",
             "type": "shell",
             "command": "source scripts/activate.sh; src/test_driver/esp32/clean.sh; scripts/build/build_examples.py --target esp32-qemu-tests build",
             "problemMatcher": []
         },
         {
-            "label": "Clean ESP32 Unit Tests (QEMU)",
+            "label": "Clean esp32-qemu unit tests",
             "type": "shell",
             "command": "src/test_driver/esp32/clean.sh",
             "problemMatcher": []
         },
         {
-            "label": "Run ESP32 Unit Tests (QEMU)",
+            "label": "Run esp32-qemu unit tests",
             "type": "shell",
             "command": "src/test_driver/esp32/run_qemu_image.py --verbose --file-image-list ./out/esp32-qemu-tests/test_images.txt",
             "problemMatcher": []

@@ -331,18 +331,23 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
     int currentElement = 0;
     int currentCharacter;
     // The value of optind after the last time getopt_long was called.
-    int prevOptind = 1;
+    int prevOptIndex = 1;
     // All the nonoptions we have found so far will be in range [firstNonoption, lastNonoptionPlus1).
     int firstNonoption     = 1;
     int lastNonoptionPlus1 = 1;
+
     // Temporary variables used When finding a new set of nonoptions.
     int firstNonoptionNew;
     int lastNonoptionPlus1New;
-    // Temporary variable used when mergeing existing nonoptions with new ones.
+
+    // Temporary variables used when moving already-found nonoptions later in the array so that they
+    // will be contiguous with the new non-options that were just found.
+    // Index the nonoption is being moved to.
     int moveNonoptionToHere;
-    // Index variables used in permuting argv.
-    int idx;
-    int idx2;
+    // Initial index of the nonoption being moved.
+    int nonoptionToMove;
+    // Index of the next pair of elements to swap in argv (indexToSwap and indexToSwap+1).
+    int indexToSwap;
     // Temporary variable for swapping elements of argv.
     char * tempSwap;
     // Permutable version of argv.  Needed to move the nonoptions to the end.
@@ -449,23 +454,23 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
         // elements of argv during the execution of this loop may not always match what they would be with the POSIX version.  It is
         // only guaranteed to match at the end.
 
-        // The elements that just now got processed by getopt_long are [prevOptind, optind] if the new option is the non-final
-        // character of an option group (e.g. 'a' or 'b' in "-abc"), or [prevOptind, optind) if it's the final character of an
+        // The elements that just now got processed by getopt_long are [prevOptIndex, optind] if the new option is the non-final
+        // character of an option group (e.g. 'a' or 'b' in "-abc"), or [prevOptIndex, optind) if it's the final character of an
         // option group or not a group at all.  Walk through those elements knowing that all elements we encounter before reaching
         // the option must be nonoptions.  Store the range of those nonoptions in firstNonoptionNew and lastNonoptionPlus1New.  If
-        // this is the final iteration (getopt_long returned -1) then prevOptind == optind == argc, which means firstNonoptionNew ==
+        // this is the final iteration (getopt_long returned -1) then prevOptIndex == optind == argc, which means firstNonoptionNew ==
         // lastNonoptionPlus1New == argc, the following for loop will be skipped, and all the nonoptions we had already found will
         // get moved to the end of argv.
-        firstNonoptionNew     = prevOptind;
-        lastNonoptionPlus1New = prevOptind;
-        for (idx = prevOptind; idx <= optind; idx++)
+        firstNonoptionNew     = prevOptIndex;
+        lastNonoptionPlus1New = prevOptIndex;
+        for (nonoptionToMove = prevOptIndex; nonoptionToMove <= optind; nonoptionToMove++)
         {
-            // Note that this loop INCLUDES idx=optind since the option that just got processed might be part of a group of short
+            // Note that this loop INCLUDES nonoptionToMove=optind since the option that just got processed might be part of a group of short
             // options all sharing a single '-', in which case optind is going to land on that same element several times in a row
             // before it moves past it.
-            if (argv[idx] && argv[idx][0] == '-')
+            if (argv[nonoptionToMove] && argv[nonoptionToMove][0] == '-')
             {
-                lastNonoptionPlus1New = idx;
+                lastNonoptionPlus1New = nonoptionToMove;
                 break;
             }
         }
@@ -476,15 +481,15 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
             // Move the old set of nonoptions we had already found so that they abut the new set of nonoptions we just now found,
             // thus giving us a single contiguous block of nonoptions.
             moveNonoptionToHere = firstNonoptionNew - 1;
-            for (idx = lastNonoptionPlus1 - 1; idx >= firstNonoption; idx--)
+            for (nonoptionToMove = lastNonoptionPlus1 - 1; nonoptionToMove >= firstNonoption; nonoptionToMove--)
             {
-                // Move element idx (the last nonoption we haven't moved yet) into the slot moveNonoptionToHere.
-                for (idx2 = idx; idx2 < moveNonoptionToHere; idx2++)
+                // Move element nonoptionToMove (the last nonoption we haven't moved yet) into the slot moveNonoptionToHere.
+                for (indexToSwap = nonoptionToMove; indexToSwap < moveNonoptionToHere; indexToSwap++)
                 {
-                    // Swap element idx2 with element idx2 + 1.
-                    tempSwap                 = permutableArgv[idx2];
-                    permutableArgv[idx2]     = permutableArgv[idx2 + 1];
-                    permutableArgv[idx2 + 1] = tempSwap;
+                    // Swap element indexToSwap with element indexToSwap + 1.
+                    tempSwap                 = permutableArgv[indexToSwap];
+                    permutableArgv[indexToSwap]     = permutableArgv[indexToSwap + 1];
+                    permutableArgv[indexToSwap + 1] = tempSwap;
                 }
                 // Decrement moveNonoptionToHere so the next nonoption we move will go into the slot before it.
                 moveNonoptionToHere--;
@@ -495,7 +500,7 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
         }
 
         // Store the value of optind so we'll know which elements getopt_long processes the next time it is called.
-        prevOptind = optind;
+        prevOptIndex = optind;
 
 #endif // CONFIG_NON_POSIX_GETOPT_LONG
 
@@ -588,7 +593,7 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
     if (nonOptArgHandler != nullptr)
     {
 #ifdef CONFIG_NON_POSIX_GETOPT_LONG
-        // On a POSIX implementation, on the final interation when getopt_long returns -1 indicating it has nothing left to do,
+        // On a POSIX implementation, on the final iteration when getopt_long returns -1 indicating it has nothing left to do,
         // optind would be set to the location of the first nonoption (all of which by now would have been moved to the end of
         // argv).  On some non-POSIX implementations this is not true -- it simply sets optind to the location of argv's terminal
         // NULL (i.e. optind == argc).  So we have to alter optind here to simulate the POSIX behavior.
