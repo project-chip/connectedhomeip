@@ -290,8 +290,8 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithVersionOnlyCache)
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         DrainAndServiceIO();
-        // There are supported 2 global and 3 non-global attributes in E2C2A* and  1 E3C2A2
-        EXPECT_EQ(delegate.mNumAttributeResponse, 6);
+        // There are supported 5 global and 3 non-global attributes in E2C2A* and  1 E3C2A2
+        EXPECT_EQ(delegate.mNumAttributeResponse, 9);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
         ConcreteClusterPath clusterPath1(kMockEndpoint2, MockClusterId(3));
@@ -374,7 +374,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         DrainAndServiceIO();
-        EXPECT_EQ(delegate.mNumAttributeResponse, 6);
+        EXPECT_EQ(delegate.mNumAttributeResponse, 9);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
         ConcreteClusterPath clusterPath1(kMockEndpoint2, MockClusterId(3));
@@ -535,8 +535,8 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         DrainAndServiceIO();
-        // There are supported 2 global and 3 non-global attributes in E2C2A* and  1 E3C2A2
-        EXPECT_EQ(delegate.mNumAttributeResponse, 6);
+        // There are supported 5 global and 3 non-global attributes in E2C2A* and  1 E3C2A2
+        EXPECT_EQ(delegate.mNumAttributeResponse, 9);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
         ConcreteClusterPath clusterPath1(kMockEndpoint2, MockClusterId(3));
@@ -877,7 +877,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         DrainAndServiceIO();
-        EXPECT_EQ(delegate.mNumAttributeResponse, 6);
+        EXPECT_EQ(delegate.mNumAttributeResponse, 9);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
         ConcreteClusterPath clusterPath1(kMockEndpoint2, MockClusterId(3));
@@ -956,7 +956,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         DrainAndServiceIO();
-        EXPECT_EQ(delegate.mNumAttributeResponse, 6);
+        EXPECT_EQ(delegate.mNumAttributeResponse, 9);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
         ConcreteClusterPath clusterPath1(kMockEndpoint2, MockClusterId(3));
@@ -1232,7 +1232,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         DrainAndServiceIO();
-        EXPECT_EQ(delegate.mNumAttributeResponse, 6);
+        EXPECT_EQ(delegate.mNumAttributeResponse, 9);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
         ConcreteClusterPath clusterPath(kMockEndpoint3, MockClusterId(2));
