@@ -150,48 +150,6 @@ def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
         return pathlib.Path.cwd()
 
 
-# @_deprecated("utilities")
-# def type_matches(received_value, desired_type):
-#     """DEPRECATED: Use utilities.type_matches instead"""
-#     return new_type_matches(received_value, desired_type)
-
-
-# @_deprecated("utilities")
-# def utc_time_in_matter_epoch(desired_datetime: Optional[datetime] = None):
-#     """DEPRECATED: Use utilities.utc_time_in_matter_epoch instead"""
-#     return new_utc_time_in_matter_epoch(desired_datetime)
-
-
-# @_deprecated("utilities")
-# def matter_epoch_us_from_utc_datetime(desired_datetime: Optional[datetime] = None):
-#     """DEPRECATED: Use utilities.utc_datetime_from_matter_epoch_us instead"""
-#     return new_utc_time_in_matter_epoch(desired_datetime)
-
-
-# @_deprecated("utilities")
-# def utc_datetime_from_matter_epoch_us(matter_epoch_us: int) -> datetime:
-#     """DEPRECATED: Use utilities.utc_datetime_from_matter_epoch_us instead"""
-#     return new_utc_datetime_from_matter_epoch_us(matter_epoch_us)
-
-
-# @_deprecated("utilities")
-# def utc_datetime_from_posix_time_ms(posix_time_ms: int) -> datetime:
-#     """DEPRECATED: Use utilities.utc_datetime_from_posix_time_ms instead"""
-#     return new_utc_datetime_from_posix_time_ms(posix_time_ms)
-
-
-# @_deprecated("utilities")
-# def compare_time(received: int, offset: timedelta = timedelta(), utc: Optional[int] = None, tolerance: timedelta = timedelta(seconds=5)) -> None:
-#     """DEPRECATED: Use utilities.compare_time instead"""
-#     return new_compare_time(received, offset, utc, tolerance)
-
-
-# @_deprecated("utilities")
-# def get_wait_seconds_from_set_time(set_time_matter_us: int, wait_seconds: int):
-#     """DEPRECATED: Use utilities.get_wait_seconds_from_set_time instead"""
-#     return new_get_wait_seconds_from_set_time(set_time_matter_us, wait_seconds)
-
-
 class SimpleEventCallback:
     def __init__(self, name: str, expected_cluster_id: int, expected_event_id: int, output_queue: queue.SimpleQueue):
         self._name = name
@@ -679,18 +637,6 @@ class ClusterMapper:
                 return f"Attribute {attribute_name} ({attribute_id}, 0x{attribute_id:04X})"
 
 
-# @_deprecated("utilities")
-# def id_str(id):
-#     """DEPRECATED: Use utilities.id_str instead"""
-#     return new_id_str(id)
-
-
-# @_deprecated("utilities")
-# def cluster_id_str(id):
-#     """DEPRECATED: Use utilities.cluster_id_str instead"""
-#     return new_cluster_id_str(id)
-
-
 @dataclass
 class CustomCommissioningParameters:
     commissioningParameters: CommissioningParameters
@@ -896,18 +842,6 @@ class MatterStackState:
     @property
     def stack(self) -> ChipStack:
         return builtins.chipStack
-
-
-# @_deprecated("utilities")
-# def bytes_from_hex(hex: str) -> bytes:
-#     """DEPRECATED: Use utilities.bytes_from_hex instead"""
-#     return new_bytes_from_hex(hex)
-
-
-# @_deprecated("utilities")
-# def hex_from_bytes(b: bytes) -> str:
-#     """DEPRECATED: Use utilities.hex_from_bytes instead"""
-#     return new_hex_from_bytes(b)
 
 
 @dataclass
