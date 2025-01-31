@@ -2834,7 +2834,7 @@ void TestReadInteraction::TestSubscribeWildcard()
         // in a single packet, so chunking is applied (we get a list and then individual elements as
         // single items)
         //
-        // The assertions below expect a secific order verified as ok (updates should  verify
+        // The assertions below expect a specific order verified as ok (updates should verify
         // that the updates make sense)
 
         delegate.LogCaptures("TestSubscribeWildcard: initial subscription");
