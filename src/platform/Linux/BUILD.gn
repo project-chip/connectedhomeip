@@ -27,8 +27,10 @@ if (chip_enable_openthread) {
   import("//build_overrides/ot_br_posix.gni")
 }
 
-pkg_config("nfc_commissioning_config") {
-    packages = [ "libpcsclite" ]
+if (chip_enable_nfc_commissioning) {
+  pkg_config("nfc_commissioning_config") {
+      packages = [ "libpcsclite" ]
+  }
 }
 
 if (chip_mdns == "platform") {
