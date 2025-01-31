@@ -11,9 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# 
-# SPECS:
-# https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/cluster/colorcontrol.adoc
 
 name: 25.3.1. [TC-CC-3.1] Hue MoveTo functionality with server as DUT
 
@@ -102,9 +99,6 @@ tests:
                 value: 10000
 
     - label: "Step 2c: TH reads CurrentHue attribute from DUT"
-    # Values computed for shortest distance (Direction=0x00): 
-    # current_hue = last_hue + (final_hue - initial_hue) * wait_in_secs / transition_time_in_secs
-    # current_hue = 60 + (120 - 60) * 10 / 30 => 80 +/-15% => (68, 92)
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -123,7 +117,6 @@ tests:
                 value: 10000
 
     - label: "Step 2d: TH reads CurrentHue attribute from DUT"
-    # current_hue = 80 + (120 - 60) * 10 / 30 => 100 +/- 15% => (85, 115)
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -142,7 +135,6 @@ tests:
                 value: 10000
 
     - label: "Step 2e: TH reads CurrentHue attribute from DUT"
-    # current_hue = 100 + (120 - 60) * 10 / 30 => 120 +/-15% => (102, 138)
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -161,7 +153,6 @@ tests:
                 value: 5000
 
     - label: "Step 2f: H reads CurrentHue attribute from DUT"
-    # keeps final Hue
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -225,11 +216,6 @@ tests:
                 value: 5000
 
     - label: "Step 3c: TH reads CurrentHue attribute from DUT"
-    # Values computed for longest distance (Direction=0x01): 
-    # variation = [initial_hue + (255 - final_hue)] * wait_in_secs / transition_time_in_secs
-    # variation = [60 + (255 - 135)] * 5 / 30 => 30
-    # current_hue = last_hue - variation
-    # current_hue = 60 - 30 = 30 +/-15% => (25, 35)
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -248,11 +234,6 @@ tests:
                 value: 15000
 
     - label: "Step 3d: TH reads CurrentHue attribute from DUT"
-    # Values computed for longest distance (Direction=0x01): 
-    # variation = [initial_hue + (255 - final_hue)] * wait_in_secs / transition_time_in_secs
-    # variation = [60 + (255 - 135)] * 15 / 30 => 90
-    # current_hue = last_hue - variation
-    # current_hue = 30 - 90 (underflow) => 255 - 60 = 195 +/-15% => (165, 225)
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -271,11 +252,6 @@ tests:
                 value: 10000
 
     - label: "Step 3e: TH reads CurrentHue attribute from DUT"
-    # Values computed for longest distance (Direction=0x01): 
-    # variation = [initial_hue + (255 - final_hue)] * wait_in_secs / transition_time_in_secs
-    # variation = [60 + (255 - 135)] * 10 / 30 => 60
-    # current_hue = last_hue - variation
-    # current_hue = 195 - 60 = 135 +/-15% => (115, 155)
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -357,7 +333,6 @@ tests:
                 value: 10000
 
     - label: "Step 4c: TH reads CurrentHue attribute from DUT"
-    # current_hue = 60 + (120 - 60) * 10 / 30 => 80 +/-15% => (68, 92)
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -376,7 +351,6 @@ tests:
                 value: 10000
 
     - label: "Step 4d: TH reads CurrentHue attribute from DUT"
-    # current_hue = 80 + (120 - 60) * 10 / 30 => 100 +/-15% => (85, 115)
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -395,7 +369,6 @@ tests:
                 value: 10000
 
     - label: "Step 4e: TH reads CurrentHue attribute from DUT"
-    # current_hue = 100 + (120 - 60) * 10 / 30 => 120 +/-15% => (102, 138)
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -414,7 +387,6 @@ tests:
                 value: 5000
 
     - label: "Step 4f: TH reads CurrentHue attribute from DUT"
-    # keeps final Hue
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -478,7 +450,6 @@ tests:
                 value: 10000
 
     - label: "Step 5c: TH reads CurrentHue attribute from DUT"
-    # current_hue = 120 - (120 - 60) * 10 / 30 => 100 +/-15% => (85, 115)
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -497,7 +468,6 @@ tests:
                 value: 10000
 
     - label: "Step 5d: TH reads CurrentHue attribute from DUT"
-    # current_hue = 100 - (120 - 60) * 10 / 30 => 80 +/-15% => (68, 92)
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -516,7 +486,6 @@ tests:
                 value: 10000
 
     - label: "Step 5e: TH reads CurrentHue attribute from DUT"
-    # current_hue = 80 - (120 - 60) * 10 / 30 => 60 +/-15% => (51, 69)
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -535,7 +504,6 @@ tests:
                 value: 5000
 
     - label: "Step 5f: TH reads CurrentHue attribute from DUT"
-    # keeps final Hue
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
