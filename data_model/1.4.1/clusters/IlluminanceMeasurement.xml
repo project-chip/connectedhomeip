@@ -82,28 +82,41 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" reportable="true"/>
       <mandatoryConform/>
-      <constraint type="allowed" value="0"/>
-      <constraint type="between">
-        <from attribute="MinMeasuredValue"/>
-        <to attribute="MaxMeasuredValue"/>
+      <constraint>
+        <allowed value="0"/>
+      </constraint>
+      <constraint>
+        <between>
+          <attribute name="MinMeasuredValue"/>
+          <attribute name="MaxMeasuredValue"/>
+        </between>
       </constraint>
     </attribute>
     <attribute id="0x0001" name="MinMeasuredValue" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="between" from="1" to="65533"/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="65533"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="MaxMeasuredValue" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="min" value="MinMeasuredValue + 1"/>
+      <constraint>
+        <min value="MinMeasuredValue + 1"/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="Tolerance" type="uint16">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
-      <constraint type="max" value="2048"/>
+      <constraint>
+        <max value="2048"/>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="LightSensorType" type="LightSensorTypeEnum" default="null">
       <access read="true" readPrivilege="view"/>
