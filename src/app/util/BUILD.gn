@@ -29,7 +29,6 @@ source_set("nullable-primitives") {
   public_configs = [ "${chip_root}/src:includes" ]
 }
 
-# These headers/cpp only depend on core/common
 source_set("types") {
   sources = [
     "att-storage.h",
@@ -52,7 +51,6 @@ source_set("types") {
   public_configs = [ "${chip_root}/src:includes" ]
 }
 
-# This source set also depends on data-model
 source_set("af-types") {
   sources = [ "af-types.h" ]
   deps = [
@@ -62,6 +60,7 @@ source_set("af-types") {
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/data-model-provider:metadata",
     "${chip_root}/src/messaging",
+    "${chip_root}/src/platform:platform_config_header",
     "${chip_root}/src/protocols/interaction_model",
   ]
 }
