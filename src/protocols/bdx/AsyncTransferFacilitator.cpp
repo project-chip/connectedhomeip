@@ -183,8 +183,12 @@ void AsyncResponder::NotifyEventHandled(const TransferSession::OutputEventType e
 
     // If this is the end of the transfer (whether a clean end, or some sort of error condition), ensure
     // that we destroy ourselves after unwinding the processing loop in the ProcessOutputEvents API.
-    // We can ignore the status for these messages since the state machine is in a bad, unrecoverable
-    // state and we should stop processing events and clean up.
+    // We can ignore the status for output events because none of them are supposed to result in
+    // us sending a StatusReport, and that's all we use the status for.
+    //
+    // In particular, for kTransferTimeout, kAckEOFReceived, and kStatusReceived per spec we
+    // are not supposed to reply with a StatusReport.  And for kInternalError the state machine
+    // is in an unrecoverable state of some sort, and we should stop trying to make use of it.
     if (eventType == TransferSession::OutputEventType::kAckEOFReceived ||
         eventType == TransferSession::OutputEventType::kStatusReceived ||
         eventType == TransferSession::OutputEventType::kInternalError ||
