@@ -2828,7 +2828,7 @@ void TestReadInteraction::TestSubscribeWildcard()
         //    - cluster 0xFFF1'FC04 (2 attributes)
         //
         //
-        // Acutal chunk placement is execution defined, however generally
+        // Actual chunk placement is execution defined, however generally
         // Attribute 0xFFFC::0xFFF1'FC02::0xFFF1'0004 (kMockEndpoint3::MockClusterId(2)::MockAttributeId(4))
         // is a list of kMockAttribute4ListLength of size 256 bytes each, which cannot fit
         // in a single packet, so chunking is applied (we get a list and then individual elements as
