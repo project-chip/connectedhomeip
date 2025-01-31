@@ -214,19 +214,20 @@ private:
 
     enum class Flags : uint16_t
     {
-        kAsyncInitCompleted       = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
-        kESPBLELayerInitialized   = 0x0002, /**< The ESP BLE layer has been initialized. */
-        kAppRegistered            = 0x0004, /**< The CHIPoBLE application has been registered with the ESP BLE layer. */
-        kAttrsRegistered          = 0x0008, /**< The CHIPoBLE GATT attributes have been registered with the ESP BLE layer. */
-        kGATTServiceStarted       = 0x0010, /**< The CHIPoBLE GATT service has been started. */
-        kAdvertisingConfigured    = 0x0020, /**< CHIPoBLE advertising has been configured in the ESP BLE layer. */
-        kAdvertising              = 0x0040, /**< The system is currently CHIPoBLE advertising. */
-        kControlOpInProgress      = 0x0080, /**< An async control operation has been issued to the ESP BLE layer. */
-        kAdvertisingEnabled       = 0x0100, /**< The application has enabled CHIPoBLE advertising. */
-        kFastAdvertisingEnabled   = 0x0200, /**< The application has enabled fast advertising. */
-        kUseCustomDeviceName      = 0x0400, /**< The application has configured a custom BLE device name. */
-        kAdvertisingRefreshNeeded = 0x0800, /**< The advertising configuration/state in ESP BLE layer needs to be updated. */
-        kExtAdvertisingEnabled    = 0x1000, /**< The application has enabled Extended BLE announcement. */
+        kAsyncInitCompleted          = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
+        kESPBLELayerInitialized      = 0x0002, /**< The ESP BLE layer has been initialized. */
+        kAppRegistered               = 0x0004, /**< The CHIPoBLE application has been registered with the ESP BLE layer. */
+        kAttrsRegistered             = 0x0008, /**< The CHIPoBLE GATT attributes have been registered with the ESP BLE layer. */
+        kGATTServiceStarted          = 0x0010, /**< The CHIPoBLE GATT service has been started. */
+        kAdvertisingConfigured       = 0x0020, /**< CHIPoBLE advertising has been configured in the ESP BLE layer. */
+        kAdvertising                 = 0x0040, /**< The system is currently CHIPoBLE advertising. */
+        kControlOpInProgress         = 0x0080, /**< An async control operation has been issued to the ESP BLE layer. */
+        kAdvertisingEnabled          = 0x0100, /**< The application has enabled CHIPoBLE advertising. */
+        kFastAdvertisingEnabled      = 0x0200, /**< The application has enabled fast advertising. */
+        kUseCustomDeviceName         = 0x0400, /**< The application has configured a custom BLE device name. */
+        kAdvertisingRefreshNeeded    = 0x0800, /**< The advertising configuration/state in ESP BLE layer needs to be updated. */
+        kExtAdvertisingEnabled       = 0x1000, /**< The application has enabled Extended BLE announcement. */
+        kBleDeinitializedMemReleased = 0x2000, /**< The ble is deinitialized and memory is reclaimed. */
     };
 
     enum
