@@ -24,6 +24,8 @@
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
+#       --endpoint 0
+#       --networkID ens4
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
@@ -39,6 +41,7 @@ import chip.clusters as Clusters
 import test_plan_support
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
+from chip.testing import matter_asserts
 
 
 class TC_CNET_4_3(MatterBaseTest):
@@ -56,7 +59,9 @@ class TC_CNET_4_3(MatterBaseTest):
     def steps_TC_CNET_4_3(self) -> list[TestStep]:
         steps = [
             TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
-            TestStep(2, "TH reads Descriptor Cluster from the DUT with EP0 TH reads ServerList from the DUT")
+            TestStep(2, "TH reads Descriptor Cluster from the DUT with EP0 TH reads ServerList from the DUT"),
+            TestStep(3, "TH reads the MaxNetworks attribute from the DUT"),
+            TestStep(4, "TH reads the Networks attribute list from the DUT")
         ]
         return steps
 
@@ -71,6 +76,19 @@ class TC_CNET_4_3(MatterBaseTest):
             cluster=Clusters.Descriptor,
             attribute=Clusters.Descriptor.Attributes.ServerList)
         asserts.assert_true(49 in server_list, msg="Verify for the presence of an element with value 49 (0x0031) in the ServerList")
+
+        self.step(3)
+        max_networks = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.MaxNetworks)
+        matter_asserts.assert_int_in_range(max_networks, min_value=1, max_value=255, description="MaxNetworks")
+
+        self.step(4)
+        networks = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.Networks)
+        # [NetworkCommissioning.Structs.NetworkInfoStruct(networkID=b'ens4', connected=True, networkIdentifier=None, clientIdentifier=None)]
+        print(networks)
 
 
 if __name__ == "__main__":
