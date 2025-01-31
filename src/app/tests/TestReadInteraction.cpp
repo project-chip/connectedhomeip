@@ -192,8 +192,9 @@ public:
     {
         if (status.mStatus == chip::Protocols::InteractionModel::Status::Success)
         {
-            ChipLogProgress(NotSpecified, "Attribute data received 0x%X/0x%X/0x%X Success: LIST: %s", aPath.mEndpointId,
-                            aPath.mClusterId, aPath.mAttributeId, aPath.IsListOperation() ? "true" : "false");
+            ChipLogProgress(NotSpecified, "Attribute data received 0x%X/0x%lX/0x%lX Success: LIST: %s", aPath.mEndpointId,
+                            static_cast<unsigned long>(aPath.mClusterId), static_cast<unsigned long>(aPath.mAttributeId),
+                            aPath.IsListOperation() ? "true" : "false");
             mReceivedAttributePaths.push_back(aPath);
             mNumAttributeResponse++;
             mGotReport = true;
@@ -1432,8 +1433,7 @@ void TestReadInteraction::TestSetDirtyBetweenChunks()
         public:
             DirtyingMockDelegate(AttributePathParams (&aReadPaths)[2], int & aNumAttributeResponsesWhenSetDirty,
                                  int & aNumArrayItemsWhenSetDirty) :
-                mReadPaths(aReadPaths),
-                mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
+                mReadPaths(aReadPaths), mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
                 mNumArrayItemsWhenSetDirty(aNumArrayItemsWhenSetDirty)
             {}
 
