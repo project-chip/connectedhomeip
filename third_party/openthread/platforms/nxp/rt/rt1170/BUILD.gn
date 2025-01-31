@@ -16,12 +16,16 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
+import("${chip_root}/src/platform/device.gni")
 
 #allows to get common NXP SDK gn options
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
-# Allows to get various RT gn options
-import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+if (!nxp_external_sdk) {
+  # Allows to get various RT gn options
+  import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+}
+
 openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 
 config("openthread_rt1170_config") {
@@ -30,8 +34,6 @@ config("openthread_rt1170_config") {
     "${openthread_nxp_root}/src/common/br",
     "${openthread_nxp_root}/src/common/lwip",
     "${openthread_nxp_root}/src/imx_rt/rt1170",
-    "${openthread_nxp_root}/third_party/mbedtls/configs",
-    "${openthread_root}/third_party/mbedtls",
     "${openthread_root}/examples/platforms",
     "${openthread_nxp_root}/examples/utils/cli_addons",
     "${openthread_nxp_root}/examples/utils/cli_addons/ephemeral_key",
@@ -75,16 +77,26 @@ config("openthread_rt1170_config") {
 
   # ot cli configs
   defines += [ "OPENTHREAD_CONFIG_PING_SENDER_ENABLE=1" ]
+
+  cflags = [
+    "-Wno-shadow",
+    "-Wno-sign-compare",
+    "-Wno-implicit-fallthrough",
+  ]
 }
 
 #Config used by the openthread stack to get the path to OpenthreadConfig.h
 source_set("openthread_core_config_rt1170") {
   public_configs = [ ":openthread_rt1170_config" ]
-  public_deps = [ nxp_sdk_target ]
+  if (!nxp_external_sdk) {
+    public_deps = [ nxp_sdk_target ]
+  }
 }
 
 source_set("libopenthread-rt1170") {
+  output_name = "libOpenthread_NXP_Port_RT1170"
   deps = []
+  public_deps = []
   sources = [
     "${openthread_nxp_root}/src/common/alarm_freertos.c",
     "${openthread_nxp_root}/src/common/diag.c",
@@ -130,9 +142,9 @@ source_set("libopenthread-rt1170") {
     sources += [ "${openthread_nxp_root}/src/common/flash_littlefs.c" ]
   }
 
-  defines = [ "OPENTHREAD_FTD" ]
+  defines = [ "OPENTHREAD_FTD=1" ]
 
-  if (hci_spinel_single_uart) {
+  if (nxp_ot_spinel_interface_link == "hci_spinel_single_uart") {
     defines += [ "OT_PLAT_SPINEL_HCI_OVER_HDLC" ]
     sources += [
       "${openthread_nxp_root}/src/common/spinel/spinel_hci_hdlc.cpp",
@@ -149,6 +161,9 @@ source_set("libopenthread-rt1170") {
     "${nxp_sdk_build_root}:nxp_mbedtls",
     "${openthread_root}:libopenthread-spinel-rcp",
     "../../..:libopenthread-platform-utils",
-    nxp_sdk_target,
   ]
+
+  if (!nxp_external_sdk) {
+    deps += [ nxp_sdk_target ]
+  }
 }
