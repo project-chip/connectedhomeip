@@ -77,6 +77,7 @@ MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3))
 - (oneway void)deviceController:(NSUUID *)controller unregisterNodeID:(NSNumber *)nodeID;
 - (oneway void)deviceController:(NSUUID *)controller updateControllerConfiguration:(NSDictionary *)controllerState MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 
+- (oneway void)deviceController:(NSUUID *)controller getNodesWithStoredDataWithReply:(void (^)(NSArray<NSNumber *> *))reply MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 @end
 
 MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3))
