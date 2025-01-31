@@ -1962,7 +1962,8 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_GetCompletionError.argtypes = []
             self._dmLib.pychip_GetCompletionError.restype = PyChipError
 
-            self._dmLib.pychip_GetCommissioningRCACData.argtypes = [ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_size_t), ctypes.c_size_t]
+            self._dmLib.pychip_GetCommissioningRCACData.argtypes = [ctypes.POINTER(
+                ctypes.c_uint8), ctypes.POINTER(ctypes.c_size_t), ctypes.c_size_t]
             self._dmLib.pychip_GetCommissioningRCACData.restype = None
 
             self._dmLib.pychip_DeviceController_IssueNOCChain.argtypes = [
@@ -2263,7 +2264,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         # Passes captured RCAC data back to Python test modules for validation
         try:
             # Setting buffer size to max size acceptable by TLV as mentioned in spec
-            rcac_size = 400  
+            rcac_size = 400
             rcac_buffer = (ctypes.c_uint8 * rcac_size)()  # Allocate buffer
 
             actual_rcac_size = ctypes.c_size_t()
