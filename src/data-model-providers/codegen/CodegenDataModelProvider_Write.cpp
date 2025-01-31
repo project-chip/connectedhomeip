@@ -103,6 +103,10 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     //       and tests and implementation
     //
     //       Open issue that needs fixing: https://github.com/project-chip/connectedhomeip/issues/33735
+
+    // First check things that are not even in metadata. These are read.only.
+    VerifyOrReturnValue(!IsSupportedGlobalAttributeNotInMetadata(request.path.mAttributeId), Status::UnsupportedWrite);
+
     auto metadata = Ember::FindAttributeMetadata(request.path);
 
     // Explicit failure in finding a suitable metadata
@@ -112,12 +116,6 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         VerifyOrDie((*status == Status::UnsupportedEndpoint) || //
                     (*status == Status::UnsupportedCluster) ||  //
                     (*status == Status::UnsupportedAttribute));
-
-        if ((*status == Status::UnsupportedAttribute) && (IsSupportedGlobalAttributeNotInMetadata(request.path.mAttributeId)))
-        {
-            // return a failure to write a known
-            return Status::UnsupportedWrite;
-        }
 
         return *status;
     }
