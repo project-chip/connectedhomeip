@@ -166,7 +166,7 @@
         "BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER": [
             "bridged-device-basic-information-server"
         ],
-        "CAMERA_AV_SETTINGS_USER_LEVEL_MANAGEMENT_CLUSTER": [],
+        "CAMERA_AV_SETTINGS_USER_LEVEL_MANAGEMENT_CLUSTER": ["camera-av-settings-user-level-management-server"],
         "CAMERA_AV_STREAM_MANAGEMENT_CLUSTER": [],
         "CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
