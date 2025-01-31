@@ -199,7 +199,7 @@ public:
     }
 
 private:
-    // this split out because ConcreteAttributePath is NOT constexpr
+    // this is split out because ConcreteAttributePath is NOT constexpr
     const chip::EndpointId mEndpoint;
     const chip::ClusterId mCluster;
     const chip::AttributeId mAttribute;
