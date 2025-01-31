@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "app/GlobalAttributes.h"
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeValueDecoder.h>
@@ -762,6 +763,7 @@ void WriteHandler::MoveToState(const State aTargetState)
 DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::SubjectDescriptor & aSubject,
                                                               const ConcreteAttributePath & aPath)
 {
+
     // TODO: ordering is to check writability/existence BEFORE ACL and this seems wrong, however
     //       existing unit tests (TC_AcessChecker.py) validate that we get UnsupportedWrite instead of UnsupportedAccess
     //
@@ -770,6 +772,10 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     //       and tests and implementation
     //
     //       Open issue that needs fixing: https://github.com/project-chip/connectedhomeip/issues/33735
+
+    // First check things that are not even in metadata. These are read.only.
+    VerifyOrReturnValue(!IsSupportedGlobalAttributeNotInMetadata(aPath.mAttributeId), Status::UnsupportedWrite);
+
     std::optional<DataModel::AttributeEntry> attributeEntry;
     DataModel::AttributeFinder finder(mDataModelProvider);
 
