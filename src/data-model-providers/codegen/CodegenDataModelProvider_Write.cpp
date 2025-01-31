@@ -112,11 +112,9 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     // Explicit failure in finding a suitable metadata
     if (const Status * status = std::get_if<Status>(&metadata))
     {
-
         VerifyOrDie((*status == Status::UnsupportedEndpoint) || //
                     (*status == Status::UnsupportedCluster) ||  //
                     (*status == Status::UnsupportedAttribute));
-
         return *status;
     }
 
