@@ -16,10 +16,10 @@
  *    limitations under the License.
  */
 
-#include "app/ConcreteAttributePath.h"
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeValueDecoder.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
 #include <app/MessageDef/StatusIB.h>
@@ -788,7 +788,15 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     if (mLastSuccessfullyWrittenPath.has_value())
     {
         // only validate ACL if path has changed
-        checkAcl = (aPath != mLastSuccessfullyWrittenPath);
+        //
+        // Note that this is NOT operator==: we could do `checkAcl == (aPath != *mLastSuccessfullyWrittenPath)`
+        // however that seems to use more flash.
+        if ((aPath.mEndpointId == mLastSuccessfullyWrittenPath->mEndpointId) &&
+            (aPath.mClusterId == mLastSuccessfullyWrittenPath->mClusterId) &&
+            (aPath.mAttributeId == mLastSuccessfullyWrittenPath->mAttributeId))
+        {
+            checkAcl = false;
+        }
     }
 
     if (checkAcl)
