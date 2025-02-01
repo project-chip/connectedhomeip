@@ -39,7 +39,7 @@ import logging
 import re
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_function_runner, async_test_body, default_matter_test_main
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -135,6 +135,8 @@ class TC_ICDM_2_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_ICDM_2_1(self):
+        self.endpoint = self.get_endpoint()
+        self.timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
 
         cluster = Clusters.Objects.IcdManagement
         attributes = cluster.Attributes
@@ -148,53 +150,39 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate ActiveModeThreshold
         self.step(2)
-        if self.check_pics("ICDM.S.A0002"):
+        activeModeThreshold = await self._read_icdm_attribute_expect_success(
+            attributes.ActiveModeThreshold)
+        # Verify ActiveModeThreshold is not bigger than uint16
+        asserts.assert_true(self.is_valid_uint16_value(activeModeThreshold),
+                            "ActiveModeThreshold attribute does not fit in a uint16.")
 
-            activeModeThreshold = await self._read_icdm_attribute_expect_success(
-                attributes.ActiveModeThreshold)
-            # Verify ActiveModeThreshold is not bigger than uint16
-            asserts.assert_true(self.is_valid_uint16_value(activeModeThreshold),
-                                "ActiveModeThreshold attribute does not fit in a uint16.")
-
-            if featureMap > 0 and features.kLongIdleTimeSupport in features(featureMap):
-                asserts.assert_greater_equal(
-                    activeModeThreshold, 5000, "Minimum ActiveModeThreshold is 5s for a LIT ICD.")
-
-        else:
-            asserts.assert_true(
-                False, "ActiveModeThreshold is a mandatory attribute and must be present in the PICS file")
+        if featureMap > 0 and features.kLongIdleTimeSupport in features(featureMap):
+            asserts.assert_greater_equal(
+                activeModeThreshold, 5000, "Minimum ActiveModeThreshold is 5s for a LIT ICD.")
 
         # Validate ActiveModeDuration
         self.step(3)
-        if self.check_pics("ICDM.S.A0001"):
-            activeModeDuration = await self._read_icdm_attribute_expect_success(
-                attributes.ActiveModeDuration)
-            # Verify ActiveModeDuration is not bigger than uint32
-            asserts.assert_true(self.is_valid_uint32_value(activeModeDuration),
-                                "ActiveModeDuration attribute does not fit in a uint32")
-        else:
-            asserts.assert_true(
-                False, "ActiveModeDuration is a mandatory attribute and must be present in the PICS file")
+        activeModeDuration = await self._read_icdm_attribute_expect_success(
+            attributes.ActiveModeDuration)
+        # Verify ActiveModeDuration is not bigger than uint32
+        asserts.assert_true(self.is_valid_uint32_value(activeModeDuration),
+                            "ActiveModeDuration attribute does not fit in a uint32")
 
         # Validate IdleModeDuration
         self.step(4)
-        if self.check_pics("ICDM.S.A0000"):
-            idleModeDuration = await self._read_icdm_attribute_expect_success(
-                attributes.IdleModeDuration)
-            # Verify IdleModeDuration is not bigger than uint32
-            asserts.assert_greater_equal(
-                idleModeDuration, 1, "IdleModeDuration attribute is smaller than minimum value (1).")
-            asserts.assert_less_equal(
-                idleModeDuration, 64800, "IdleModeDuration attribute is greater than maximum value (64800).")
-            asserts.assert_greater_equal(idleModeDuration * 1000, activeModeDuration,
-                                         "ActiveModeDuration attribute is greater than the IdleModeDuration attrbiute.")
-        else:
-            asserts.assert_true(
-                False, "IdleModeDuration is a mandatory attribute and must be present in the PICS file")
+        idleModeDuration = await self._read_icdm_attribute_expect_success(
+            attributes.IdleModeDuration)
+        # Verify IdleModeDuration is not bigger than uint32
+        asserts.assert_greater_equal(
+            idleModeDuration, 1, "IdleModeDuration attribute is smaller than minimum value (1).")
+        asserts.assert_less_equal(
+            idleModeDuration, 64800, "IdleModeDuration attribute is greater than maximum value (64800).")
+        asserts.assert_greater_equal(idleModeDuration * 1000, activeModeDuration,
+                                     "ActiveModeDuration attribute is greater than the IdleModeDuration attrbiute.")
 
         # Validate ClientsSupportedPerFabric
         self.step(5)
-        if self.pics_guard(self.check_pics("ICDM.S.A0005")):
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.ClientsSupportedPerFabric), timeout=self.timeout):
             clientsSupportedPerFabric = await self._read_icdm_attribute_expect_success(
                 attributes.ClientsSupportedPerFabric)
 
@@ -207,7 +195,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate RegisteredClients
         self.step(6)
-        if self.pics_guard(self.check_pics("ICDM.S.A0003")):
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.RegisteredClients), timeout=self.timeout):
             registeredClients = await self._read_icdm_attribute_expect_success(
                 attributes.RegisteredClients)
 
@@ -216,8 +204,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate ICDCounter
         self.step(7)
-        if self.pics_guard(self.check_pics("ICDM.S.A0004")):
-
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.ICDCounter), timeout=self.timeout):
             icdCounter = await self._read_icdm_attribute_expect_success(
                 attributes.ICDCounter)
             # Verify ICDCounter is not bigger than uint32
@@ -226,7 +213,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate UserActiveModeTriggerHint
         self.step(8)
-        if self.pics_guard(self.check_pics("ICDM.S.A0006")):
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.UserActiveModeTriggerHint), timeout=self.timeout):
             userActiveModeTriggerHint = await self._read_icdm_attribute_expect_success(
                 attributes.UserActiveModeTriggerHint)
 
@@ -243,7 +230,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Valdate UserActiveModeTriggerInstruction
         self.step(9)
-        if self.check_pics("ICDM.S.A0007"):
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.UserActiveModeTriggerInstruction), timeout=self.timeout):
             userActiveModeTriggerInstruction = await self._read_icdm_attribute_expect_success(
                 attributes.UserActiveModeTriggerInstruction)
 
@@ -268,14 +255,15 @@ class TC_ICDM_2_1(MatterBaseTest):
                 pattern = re.compile(r'^[0-9A-F]{6}$')
                 asserts.assert_true(pattern.match(userActiveModeTriggerInstruction),
                                     "UserActiveModeTriggerInstruction is not in the correct format for the associated UserActiveModeTriggerHint")
-        elif self.check_pics("ICDM.S.A0006"):
+
+        elif async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.UserActiveModeTriggerHint), timeout=self.timeout):
             # Check if the UserActiveModeTriggerInstruction was required
             asserts.assert_false(uatHintInstructionDepedentBitmap in kUatInstructionMandatoryBitMask,
                                  "UserActiveModeTriggerHint requires the UserActiveModeTriggerInstruction")
 
         # Verify OperatingMode
         self.step(10)
-        if self.pics_guard(self.check_pics("ICDM.S.A0008")):
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OperatingMode), timeout=self.timeout):
             operatingMode = await self._read_icdm_attribute_expect_success(
                 attributes.OperatingMode)
 
@@ -284,8 +272,9 @@ class TC_ICDM_2_1(MatterBaseTest):
 
             asserts.assert_less(
                 operatingMode, modes.kUnknownEnumValue, "OperatingMode can only have 0 and 1 as valid values")
+
         self.step(11)
-        if self.pics_guard(self.check_pics("ICDM.S.A0009")):
+        if async_function_runner(self.attribute_guard(endpoint=self.endpoint, attribute=attributes.MaximumCheckInBackOff), timeout=self.timeout):
             maximumCheckInBackOff = await self._read_icdm_attribute_expect_success(attributes.MaximumCheckInBackOff)
 
             asserts.assert_true(self.is_valid_uint32_value(maximumCheckInBackOff),
