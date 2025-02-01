@@ -25,7 +25,6 @@
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --endpoint 0
-#       --networkID ens4
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
@@ -43,6 +42,7 @@ from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter
     run_if_endpoint_matches
 from mobly import asserts
 from chip.testing import matter_asserts
+from chip.clusters.Types import NullValue
 
 
 class TC_CNET_4_3(MatterBaseTest):
@@ -63,7 +63,8 @@ class TC_CNET_4_3(MatterBaseTest):
             TestStep(2, "TH reads Descriptor Cluster from the DUT with EP0 TH reads ServerList from the DUT"),
             TestStep(3, "TH reads the MaxNetworks attribute from the DUT"),
             TestStep(4, "TH reads the Networks attribute list from the DUT"),
-            TestStep(5, "TH reads InterfaceEnabled attribute from the DUT")
+            TestStep(5, "TH reads InterfaceEnabled attribute from the DUT"),
+            TestStep(6, "TH reads LastNetworkingStatus attribute from the DUT")
         ]
         return steps
 
@@ -103,7 +104,13 @@ class TC_CNET_4_3(MatterBaseTest):
         interface_enabled = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.InterfaceEnabled)
-        asserts.assert_true(interface_enabled, "InterfaceEnabled")
+        asserts.assert_true(interface_enabled, "Verify that InterfaceEnabled attribute value is true")
+
+        self.step(6)
+        last_networking_status = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkingStatus)
+        asserts.assert_is(last_networking_status, NullValue, "Verify that LastNetworkingStatus attribute value is null")
 
 
 if __name__ == "__main__":
