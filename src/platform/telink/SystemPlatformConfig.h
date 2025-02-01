@@ -62,3 +62,6 @@ struct ChipDeviceEvent;
 #endif
 
 // ========== Platform-specific Configuration Overrides =========
+
+// Disable Zephyr Socket extensions module, as the Zephyr RTOS now implements recvmsg()
+#define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS 0
