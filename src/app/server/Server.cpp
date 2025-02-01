@@ -821,7 +821,7 @@ SimpleSessionResumptionStorage CommonCaseDeviceServerInitParams::sSessionResumpt
 app::SimpleSubscriptionResumptionStorage CommonCaseDeviceServerInitParams::sSubscriptionResumptionStorage;
 #endif
 app::DefaultAclStorage CommonCaseDeviceServerInitParams::sAclStorage;
-Crypto::DefaultSessionKeystore CommonCaseDeviceServerInitParams::sSessionKeystore;
+Crypto::DefaultSessionKeystore CommonCaseDeviceServerInitParams::sDefaultSessionKeystore;
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 app::DefaultICDCheckInBackOffStrategy CommonCaseDeviceServerInitParams::sDefaultICDCheckInBackOffStrategy;
 #endif
