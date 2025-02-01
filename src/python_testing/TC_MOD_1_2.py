@@ -37,6 +37,7 @@ from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_bod
 from chip.tlv import uint
 from mobly import asserts
 
+
 class TC_MOD_1_2(MatterBaseTest):
 
     def steps_TC_MOD_1_2(self) -> list[TestStep]:
