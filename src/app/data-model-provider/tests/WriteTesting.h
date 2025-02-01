@@ -60,12 +60,6 @@ public:
         return *this;
     }
 
-    WriteOperation & SetPreviousSuccessPath(std::optional<ConcreteAttributePath> path)
-    {
-        mRequest.previousSuccessPath = path;
-        return *this;
-    }
-
     WriteOperation & SetDataVersion(Optional<DataVersion> version)
     {
         mRequest.path.mDataVersion = version;
