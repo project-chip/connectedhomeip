@@ -65,7 +65,8 @@ class TC_CNET_4_3(MatterBaseTest):
             TestStep(4, "TH reads the Networks attribute list from the DUT"),
             TestStep(5, "TH reads InterfaceEnabled attribute from the DUT"),
             TestStep(6, "TH reads LastNetworkingStatus attribute from the DUT"),
-            TestStep(7, "TH reads the LastNetworkID attribute from the DUT")
+            TestStep(7, "TH reads the LastNetworkID attribute from the DUT"),
+            TestStep(8, "TH reads the LastConnectErrorValue attribute from the DUT")
         ]
         return steps
 
@@ -124,6 +125,12 @@ class TC_CNET_4_3(MatterBaseTest):
         else:
             asserts.assert_is(last_network_id, NullValue,
                               "Verify if the Networks attribute list is Empty, then LastNetworkID attribute value is null")
+
+        self.step(8)
+        last_connect_error_value = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.LastConnectErrorValue)
+        asserts.assert_is(last_connect_error_value, NullValue, "Verify that LastConnectErrorValue attribute value is null")
 
 
 if __name__ == "__main__":
