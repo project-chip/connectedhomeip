@@ -1343,10 +1343,6 @@ cluster MicrowaveOvenMode = 94 {
     kDefrost = 16385;
   }
 
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
-  }
-
   struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
