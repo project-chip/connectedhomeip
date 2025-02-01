@@ -203,6 +203,9 @@ struct TestFabricTable : public ::testing::Test
     {
         DeviceLayer::SetConfigurationMgr(&DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance());
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+#if CHIP_CRYPTO_PSA
+        ASSERT_EQ(psa_crypto_init(), PSA_SUCCESS);
+#endif
     }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
