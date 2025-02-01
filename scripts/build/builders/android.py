@@ -164,9 +164,9 @@ class AndroidBuilder(Builder):
             os.environ["ANDROID_HOME"], "tools", "bin", "sdkmanager"
         )
 
-        # New SDK manager at cmdline-tools/bin/
+        # New SDK manager at cmdline-tools/latest/bin/
         new_sdk_manager = os.path.join(
-            os.environ["ANDROID_HOME"], "cmdline-tools", "bin", "sdkmanager"
+            os.environ["ANDROID_HOME"], "cmdline-tools", "latest", "bin", "sdkmanager"
         )
         if not (
             os.path.isfile(sdk_manager) and os.access(sdk_manager, os.X_OK)
@@ -413,6 +413,7 @@ class AndroidBuilder(Builder):
             new_sdk_manager = os.path.join(
                 os.environ["ANDROID_HOME"],
                 "cmdline-tools",
+                "latest",
                 "bin",
                 "sdkmanager",
             )
