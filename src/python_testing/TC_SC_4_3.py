@@ -152,6 +152,14 @@ class TC_SC_4_3(MatterBaseTest):
                 return True, f"T value ({t_value}) is valid and bit 0 is clear."
             else:
                 return False, f"Bit 0 is not clear. T value ({t_value})"
+
+            # Check that the value can be either 2, 4 or 6 depending on whether
+            # DUT is a TCPClient, TCPServer or both.
+            if T_int & 2 == 1 or T_int & 4 == 1
+                return True, f"T value ({t_value}) represents valid TCP support info."
+            else:
+                return False, f"Invalid T value ({t_value})"
+
         except ValueError:
             return False, f"T value ({t_value}) is not a valid integer"
 
