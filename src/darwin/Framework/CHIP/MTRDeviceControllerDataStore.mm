@@ -615,6 +615,20 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
         [self _pruneEmptyStoredClusterDataBranches];
     });
 }
+
+- (void)unitTestRereadNodeIndex
+{
+    dispatch_sync(_storageDelegateQueue, ^{
+        auto * newIndex = [self _fetchNodeIndex];
+
+        std::lock_guard lock(self->_nodeArrayLock);
+        if (newIndex != nil) {
+            self->_nodesWithAttributeInfo = [newIndex mutableCopy];
+        } else {
+            self->_nodesWithAttributeInfo = [[NSMutableArray alloc] init];
+        }
+    });
+}
 #endif
 
 - (void)_pruneEmptyStoredClusterDataBranches

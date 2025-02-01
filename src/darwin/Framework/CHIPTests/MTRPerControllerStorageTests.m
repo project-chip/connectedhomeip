@@ -1521,6 +1521,8 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     dispatch_sync(_storageQueue, ^{
         [storageDelegate controller:controller storeValues:testBulkValues securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
     });
+    // Since we messed with the node index, tell the data store to re-sync it's cache.
+    [controller.controllerDataStore unitTestRereadNodeIndex];
     // Verify that the store resulted in the correct values
     NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:@(3001)];
     XCTAssertEqualObjects(dataStoreClusterData, bulkTestClusterDataDictionary);

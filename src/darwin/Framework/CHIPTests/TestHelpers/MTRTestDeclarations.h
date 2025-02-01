@@ -36,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)clearStoredClusterDataForNodeID:(NSNumber *)nodeID;
 - (void)clearAllStoredClusterData;
 - (void)unitTestPruneEmptyStoredClusterDataBranches;
+- (void)unitTestRereadNodeIndex;
 - (NSString *)_endpointIndexKeyForNodeID:(NSNumber *)nodeID;
 - (NSString *)_clusterIndexKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID;
 - (NSString *)_clusterDataKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
