@@ -72,7 +72,9 @@ protected:
      */
     virtual void DestroySelf() = 0;
 
-    // Calling ProcessOutputEvents can destroy this object before the call returns.
+    /**
+     * Calling ProcessOutputEvents can destroy this object before the call returns.
+     */
     void ProcessOutputEvents();
 
     // The transfer session corresponding to this AsyncTransferFacilitator object.
