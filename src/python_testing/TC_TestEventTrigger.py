@@ -23,7 +23,6 @@
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: >
-#       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
 #       --enable-key 000102030405060708090a0b0c0d0e0f
@@ -31,7 +30,6 @@
 #       --storage-path admin_storage.json
 #       --bool-arg allow_sdk_dac:true
 #       --commissioning-method on-network
-#       --discriminator 1234
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
