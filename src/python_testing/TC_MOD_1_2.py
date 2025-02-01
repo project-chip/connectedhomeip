@@ -32,20 +32,10 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-import random
-from time import sleep
-
 import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.ChipDeviceCtrl import CommissioningParameters
-from chip.clusters.Types import Nullable
-from chip.exceptions import ChipStackError
-from chip.native import PyChipError
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from chip.tlv import uint
 from mobly import asserts
-
 
 class TC_MOD_1_2(MatterBaseTest):
 
