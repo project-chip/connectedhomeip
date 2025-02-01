@@ -98,7 +98,7 @@ class TC_CNET_4_3(MatterBaseTest):
         matter_asserts.assert_all(networks, lambda x: isinstance(x.networkID, bytes) and 1 <= len(x.networkID) <= 32,
                                   "NetworkID field is an octet string within a length range 1 to 32")
         connected_networks_count = sum(map(lambda x: x.connected, networks))
-        asserts.assert_less_equal(connected_networks_count, 1, "Verify that only one entry has connected status as TRUE")
+        asserts.assert_equal(connected_networks_count, 1, "Verify that only one entry has connected status as TRUE")
         asserts.assert_less_equal(len(networks), max_networks_count,
                                   "Number of entries in the Networks attribute is less than or equal to 'MaxNetworksValue'")
 
