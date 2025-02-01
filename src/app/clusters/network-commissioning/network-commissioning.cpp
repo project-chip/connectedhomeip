@@ -540,18 +540,14 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         });
 
     case Attributes::ScanMaxTimeSeconds::Id:
-        if (mpWirelessDriver != nullptr)
-        {
-            return aEncoder.Encode(mpWirelessDriver->GetScanNetworkTimeoutSeconds());
-        }
-        return CHIP_NO_ERROR;
+        // We must have a WirelessDriver. If we don't something is misconfigured on the device
+        VerifyOrDie(mpWirelessDriver != nullptr);
+        return aEncoder.Encode(mpWirelessDriver->GetScanNetworkTimeoutSeconds());
 
     case Attributes::ConnectMaxTimeSeconds::Id:
-        if (mpWirelessDriver != nullptr)
-        {
-            return aEncoder.Encode(mpWirelessDriver->GetConnectNetworkTimeoutSeconds());
-        }
-        return CHIP_NO_ERROR;
+        // We must have a WirelessDriver. If we don't something is misconfigured on the device
+        VerifyOrDie(mpWirelessDriver != nullptr);
+        return aEncoder.Encode(mpWirelessDriver->GetConnectNetworkTimeoutSeconds());
 
     case Attributes::InterfaceEnabled::Id:
         return aEncoder.Encode(mpBaseDriver->GetEnabled());
@@ -631,7 +627,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     }
     break;
     case Attributes::ThreadVersion::Id: {
-        // TODO https://github.com/project-chip/connectedhomeip/issues/31431ß
+        // TODO https://github.com/project-chip/connectedhomeip/issues/31431
         uint16_t threadVersion = 0;
 #if (CHIP_DEVICE_CONFIG_ENABLE_THREAD)
         // This is a case of shared zap config where mandatory thread attributes are enabled for a wifi platform (e.g
