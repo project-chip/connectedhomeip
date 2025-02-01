@@ -210,7 +210,7 @@ void AndroidLogDownloadFromNode::FinishLogDownloadFromNode(void * context, CHIP_
     JniLocalReferenceScope scope(env);
 
     jobject jCallback   = self->mJavaCallback.ObjectRef();
-    jint jFabricIndex   = self->mController->GetFabricIndex();
+    jint jFabricIndex   = static_cast<jint>(self->mController->GetFabricIndex());
     jlong jremoteNodeId = static_cast<jlong>(self->mRemoteNodeId);
 
     VerifyOrExit(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
