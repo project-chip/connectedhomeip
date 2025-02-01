@@ -152,7 +152,7 @@ void AndroidLogDownloadFromNode::OnResponseRetrieveLogs(void * context,
     using namespace chip::app::Clusters::DiagnosticLogs;
     if (data.status == StatusEnum::kSuccess)
     {
-        ChipLogProgress(Controller, "Success. Will receive log from BDX protocol.")
+        ChipLogProgress(Controller, "Success. Will receive log from BDX protocol.");
     }
     else if (data.status == StatusEnum::kExhausted)
     {
@@ -210,8 +210,8 @@ void AndroidLogDownloadFromNode::FinishLogDownloadFromNode(void * context, CHIP_
     JniLocalReferenceScope scope(env);
 
     jobject jCallback   = self->mJavaCallback.ObjectRef();
-    jint jFabricIndex   = self->mController->GetFabricIndex();
-    jlong jremoteNodeId = self->mRemoteNodeId;
+    jint jFabricIndex   = static_cast<jint>(self->mController->GetFabricIndex());
+    jlong jremoteNodeId = static_cast<jlong>(self->mRemoteNodeId);
 
     VerifyOrExit(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
 
@@ -274,7 +274,8 @@ void AndroidLogDownloadFromNode::OnTransferCallback(FabricIndex fabricIndex, Nod
 
     if (ret != JNI_TRUE)
     {
-        ChipLogError(Controller, "Transfer will be rejected.") * errInfoOnFailure = CHIP_ERROR_INTERNAL;
+        ChipLogError(Controller, "Transfer will be rejected.");
+        *errInfoOnFailure = CHIP_ERROR_INTERNAL;
     }
 }
 
