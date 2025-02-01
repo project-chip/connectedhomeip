@@ -64,7 +64,8 @@ class TC_CNET_4_3(MatterBaseTest):
             TestStep(3, "TH reads the MaxNetworks attribute from the DUT"),
             TestStep(4, "TH reads the Networks attribute list from the DUT"),
             TestStep(5, "TH reads InterfaceEnabled attribute from the DUT"),
-            TestStep(6, "TH reads LastNetworkingStatus attribute from the DUT")
+            TestStep(6, "TH reads LastNetworkingStatus attribute from the DUT"),
+            TestStep(7, "TH reads the LastNetworkID attribute from the DUT")
         ]
         return steps
 
@@ -96,8 +97,8 @@ class TC_CNET_4_3(MatterBaseTest):
         matter_asserts.assert_all(networks, lambda x: isinstance(x.networkID, bytes) and 1 <= len(x.networkID) <= 32,
                                   "NetworkID field is an octet string within a length range 1 to 32")
         connected_networks_count = sum(map(lambda x: x.connected, networks))
-        # asserts.assert_equal(connected_networks_count, 1, "Verify that only one entry has connected status as TRUE")
-        asserts.assert_less_equal(connected_networks_count, max_networks_count,
+        asserts.assert_less_equal(connected_networks_count, 1, "Verify that only one entry has connected status as TRUE")
+        asserts.assert_less_equal(len(networks), max_networks_count,
                                   "Number of entries in the Networks attribute is less than or equal to 'MaxNetworksValue'")
 
         self.step(5)
@@ -111,6 +112,18 @@ class TC_CNET_4_3(MatterBaseTest):
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkingStatus)
         asserts.assert_is(last_networking_status, NullValue, "Verify that LastNetworkingStatus attribute value is null")
+
+        self.step(7)
+        last_network_id = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkID)
+        if networks:
+            matching_networks_count = sum(map(lambda x: x.networkID == last_network_id, networks))
+            asserts.assert_equal(matching_networks_count, 1,
+                                 "Verify that LastNetworkID attribute matches the NetworkID value of one of the entries")
+        else:
+            asserts.assert_is(last_network_id, NullValue,
+                              "Verify if the Networks attribute list is Empty, then LastNetworkID attribute value is null")
 
 
 if __name__ == "__main__":
