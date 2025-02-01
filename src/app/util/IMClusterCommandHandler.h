@@ -30,9 +30,10 @@ namespace app {
  * aCommandPath - the path that is invoked
  * aReader      - the input TLV data for this command
  * apCommandObj - how to send back the reply
+ * aClusterIsValid - boolean that tracks if a CHI handler exists for this cluster
  */
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
-                                  CommandHandler * apCommandObj);
+                                  CommandHandler * apCommandObj, bool aClusterIsValid = false);
 
 } // namespace app
 } // namespace chip

@@ -45,7 +45,7 @@ namespace chip {
 namespace app {
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
-                                  CommandHandler * apCommandObj)
+                                  CommandHandler * apCommandObj, bool aClusterIsValid)
 {
     gLastDispatchPath = aRequestCommandPath;
     gDispatchCount++;
