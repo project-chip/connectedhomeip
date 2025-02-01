@@ -773,7 +773,7 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     //
     //       Open issue that needs fixing: https://github.com/project-chip/connectedhomeip/issues/33735
 
-    // First check things that are not even in metadata. These are read.only.
+    // First check things that are not even in metadata. These are readonly.
     VerifyOrReturnValue(!IsSupportedGlobalAttributeNotInMetadata(aPath.mAttributeId), Status::UnsupportedWrite);
 
     std::optional<DataModel::AttributeEntry> attributeEntry;
