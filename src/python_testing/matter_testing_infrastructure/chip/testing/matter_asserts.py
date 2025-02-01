@@ -2,7 +2,7 @@
 Matter-specific assertions building on top of Mobly asserts.
 """
 
-from typing import Any, List, Optional, Type, TypeVar
+from typing import Any, List, Optional, Type, TypeVar, Callable
 
 from mobly import asserts
 
@@ -134,7 +134,8 @@ def assert_int_in_range(value: Any, min_value: int, max_value: int, description:
 
 # List assertions
 
-def assert_list(value: Any, description: str, min_length: Optional[int] = None, max_length: Optional[int] = None) -> None:
+def assert_list(value: Any, description: str, min_length: Optional[int] = None,
+                max_length: Optional[int] = None) -> None:
     """
     Asserts that the value is a list with optional length constraints.
 
@@ -158,22 +159,36 @@ def assert_list(value: Any, description: str, min_length: Optional[int] = None, 
                                   f"{description} must not exceed {max_length} elements")
 
 
-def assert_list_element_type(value: List[Any], description: str, expected_type: Type[T]) -> None:
+def assert_all(value: List[T], condition: Callable[[T], bool], description: str) -> None:
+    """
+    Asserts that all elements in the list satisfy the provided condition.
+
+    Args:
+        value (List[T]): The list of elements to check.
+        condition (Callable[[T], bool]): A function that takes an element from value and returns True if it meets the condition, False otherwise.
+        description: User-defined description for error messages
+
+    Raises:
+        AssertionError: If any element in the list does not satisfy the condition.
+    """
+    assert_list(value, description)
+    for i, item in enumerate(value):
+        asserts.assert_true(condition(item), f"Element at index {i} does not satisfy the condition: {description}")
+
+
+def assert_list_element_type(value: List[Any], expected_type: Type[T], description: str) -> None:
     """
     Asserts that all elements in the list are of the expected type.
 
     Args:
         value: The list to validate
-        description: User-defined description for error messages
         expected_type: The type that all elements should match
+         description: User-defined description for error messages
 
     Raises:
         AssertionError: If value is not a list or contains elements of wrong type
     """
-    assert_list(value, description)
-    for i, item in enumerate(value):
-        asserts.assert_true(isinstance(item, expected_type),
-                            f"{description}[{i}] must be of type {expected_type.__name__}")
+    assert_all(value, lambda x: isinstance(x, expected_type), f"{description} must be of type {expected_type.__name__}")
 
 
 # String assertions
@@ -192,7 +207,8 @@ def assert_is_string(value: Any, description: str) -> None:
     asserts.assert_true(isinstance(value, str), f"{description} must be a string")
 
 
-def assert_string_length(value: Any, description: str, min_length: Optional[int] = None, max_length: Optional[int] = None) -> None:
+def assert_string_length(value: Any, description: str, min_length: Optional[int] = None,
+                         max_length: Optional[int] = None) -> None:
     """
     Asserts that the string length is within the specified bounds.
 

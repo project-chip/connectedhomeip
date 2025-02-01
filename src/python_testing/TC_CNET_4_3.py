@@ -39,7 +39,8 @@
 
 import chip.clusters as Clusters
 import test_plan_support
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, \
+    run_if_endpoint_matches
 from mobly import asserts
 from chip.testing import matter_asserts
 
@@ -68,27 +69,33 @@ class TC_CNET_4_3(MatterBaseTest):
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning,
                                          Clusters.NetworkCommissioning.Bitmaps.Feature.kEthernetNetworkInterface))
     async def test_TC_CNET_4_3(self):
-        # Comissioning already done
+        # Commissioning already done
         self.step(1)
 
         self.step(2)
         server_list = await self.read_single_attribute_check_success(
             cluster=Clusters.Descriptor,
             attribute=Clusters.Descriptor.Attributes.ServerList)
-        asserts.assert_true(49 in server_list, msg="Verify for the presence of an element with value 49 (0x0031) in the ServerList")
+        asserts.assert_true(49 in server_list,
+                            msg="Verify for the presence of an element with value 49 (0x0031) in the ServerList")
 
         self.step(3)
-        max_networks = await self.read_single_attribute_check_success(
+        max_networks_count = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.MaxNetworks)
-        matter_asserts.assert_int_in_range(max_networks, min_value=1, max_value=255, description="MaxNetworks")
+        matter_asserts.assert_int_in_range(max_networks_count, min_value=1, max_value=255, description="MaxNetworks")
 
         self.step(4)
         networks = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks)
-        # [NetworkCommissioning.Structs.NetworkInfoStruct(networkID=b'ens4', connected=True, networkIdentifier=None, clientIdentifier=None)]
-        print(networks)
+        matter_asserts.assert_list_element_type(networks, Clusters.NetworkCommissioning.Structs.NetworkInfoStruct,
+                                                "All elements in list are of type NetworkInfoStruct")
+        matter_asserts.assert_all(networks, lambda x: isinstance(x, bytes) and 1 <= len(x.networkID) <= 32,
+                                  "NetworkID field is an octet string within a length range 1 to 32")
+        connected_networks_count = sum(map(lambda x: x.connected, networks))
+        asserts.assert_equal(connected_networks_count, 1, "Verify that only one entry has connected status as TRUE")
+        asserts.assert_less_equal(connected_networks_count, max_networks_count)
 
 
 if __name__ == "__main__":
