@@ -46,16 +46,22 @@ from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_bod
 from chip.tlv import uint
 from mobly import asserts
 
+
 class TC_MOD_1_2(MatterBaseTest):
 
     def steps_TC_MOD_1_2(self) -> list[TestStep]:
         return [
             TestStep(1, "TH reads the SupportedModes attribute from DUT", is_commissioning=True),
-            TestStep(2, "TH reads the CurrentMode attribute from the DUT", "Verify that the DUT response is an integer that is in the list of modes returned in step 1"),
-            TestStep(3, "TH reads the OnMode attribute from the DUT", "Verify that the DUT response is an integer that is in the list of modes returned in step 1 ()"),
-            TestStep(4, "TH reads the StartUpMode attribute from the DUT", "Verify that the DUT response is an integer that is in the list of modes returned in step 1"),
-            TestStep(5, "TH reads the Description attribute from the DUT", "Verify that the DUT response provides human readable text string that describes the purpose of the mode select server."),
-            TestStep(6, "TH reads the StandardNamespace attribute from the DUT", "Verify that the DUT response provides a 16 bit enum (null is also acceptable)."),
+            TestStep(2, "TH reads the CurrentMode attribute from the DUT",
+                     "Verify that the DUT response is an integer that is in the list of modes returned in step 1"),
+            TestStep(3, "TH reads the OnMode attribute from the DUT",
+                     "Verify that the DUT response is an integer that is in the list of modes returned in step 1 ()"),
+            TestStep(4, "TH reads the StartUpMode attribute from the DUT",
+                     "Verify that the DUT response is an integer that is in the list of modes returned in step 1"),
+            TestStep(5, "TH reads the Description attribute from the DUT",
+                     "Verify that the DUT response provides human readable text string that describes the purpose of the mode select server."),
+            TestStep(6, "TH reads the StandardNamespace attribute from the DUT",
+                     "Verify that the DUT response provides a 16 bit enum (null is also acceptable)."),
         ]
 
     def pics_TC_MOD_1_2(self) -> list[str]:
@@ -68,41 +74,42 @@ class TC_MOD_1_2(MatterBaseTest):
         self.endpoint = self.get_endpoint()
         self.th1 = self.default_controller
         MOD_cluster = Clusters.ModeSelect
-        attributes = MOD_cluster.Attributes        
+        attributes = MOD_cluster.Attributes
 
         if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.SupportedModes):
-            mode_options = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.SupportedModes)            
+            mode_options = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.SupportedModes)
             modes = [option.mode for option in mode_options]
 
         self.step(2)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.CurrentMode):
-            Current_Mode_ID = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.CurrentMode)            
+            Current_Mode_ID = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.CurrentMode)
             asserts.assert_in(Current_Mode_ID, modes, "Current Mode ID should have been in supported modes")
 
         self.step(3)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OnMode):
-            # This returns Nullable and not an int 
-            # yaml script shows that this is expected to return a null value as the default value according to spec 
-            On_Mode_ID = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.OnMode)            
+            # This returns Nullable and not an int
+            # yaml script shows that this is expected to return a null value as the default value according to spec
+            On_Mode_ID = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.OnMode)
             self.print_step("On Mode ID", f"On Mode ID is of {type(On_Mode_ID)} and its value is {On_Mode_ID}")
             if not isinstance(On_Mode_ID, (Clusters.Types.Nullable, int)):
                 raise ValueError("Invalid return value: must be Nullable or an int")
 
         self.step(4)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.StartUpMode):
-            Start_Up_Mode_ID = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.StartUpMode)            
+            Start_Up_Mode_ID = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.StartUpMode)
             asserts.assert_in(Start_Up_Mode_ID, modes, "Current Mode ID should have been in supported modes")
 
         self.step(5)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.Description):
-            Description = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.Description)            
+            Description = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.Description)
             assert isinstance(Description, str), "Description was not a human readable string"
 
         self.step(6)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.StandardNamespace):
-            Standard_Namespace = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.StandardNamespace)            
+            Standard_Namespace = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.StandardNamespace)
             if not isinstance(Standard_Namespace, (uint, int)):
                 raise ValueError("Standard Namespace value: must be of type uint or an int")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
