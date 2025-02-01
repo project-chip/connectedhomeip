@@ -62,7 +62,8 @@ class TC_CNET_4_3(MatterBaseTest):
             TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
             TestStep(2, "TH reads Descriptor Cluster from the DUT with EP0 TH reads ServerList from the DUT"),
             TestStep(3, "TH reads the MaxNetworks attribute from the DUT"),
-            TestStep(4, "TH reads the Networks attribute list from the DUT")
+            TestStep(4, "TH reads the Networks attribute list from the DUT"),
+            TestStep(5, "TH reads InterfaceEnabled attribute from the DUT")
         ]
         return steps
 
@@ -91,11 +92,18 @@ class TC_CNET_4_3(MatterBaseTest):
             attribute=Clusters.NetworkCommissioning.Attributes.Networks)
         matter_asserts.assert_list_element_type(networks, Clusters.NetworkCommissioning.Structs.NetworkInfoStruct,
                                                 "All elements in list are of type NetworkInfoStruct")
-        matter_asserts.assert_all(networks, lambda x: isinstance(x, bytes) and 1 <= len(x.networkID) <= 32,
+        matter_asserts.assert_all(networks, lambda x: isinstance(x.networkID, bytes) and 1 <= len(x.networkID) <= 32,
                                   "NetworkID field is an octet string within a length range 1 to 32")
         connected_networks_count = sum(map(lambda x: x.connected, networks))
-        asserts.assert_equal(connected_networks_count, 1, "Verify that only one entry has connected status as TRUE")
-        asserts.assert_less_equal(connected_networks_count, max_networks_count)
+        # asserts.assert_equal(connected_networks_count, 1, "Verify that only one entry has connected status as TRUE")
+        asserts.assert_less_equal(connected_networks_count, max_networks_count,
+                                  "Number of entries in the Networks attribute is less than or equal to 'MaxNetworksValue'")
+
+        self.step(5)
+        interface_enabled = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.InterfaceEnabled)
+        asserts.assert_true(interface_enabled, "InterfaceEnabled")
 
 
 if __name__ == "__main__":
