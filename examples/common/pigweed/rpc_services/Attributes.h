@@ -38,6 +38,7 @@
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>
 #include <platform/PlatformManager.h>
+#include <src/data-model-providers/codegen/CodegenDataModelProvider.h>
 
 namespace chip {
 namespace rpc {
