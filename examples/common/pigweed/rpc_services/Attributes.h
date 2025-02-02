@@ -34,11 +34,11 @@
 #include <app/data-model-provider/Provider.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>
 #include <platform/PlatformManager.h>
-#include <src/data-model-providers/codegen/CodegenDataModelProvider.h>
 
 namespace chip {
 namespace rpc {
