@@ -51,12 +51,15 @@ config INIT_STACKS
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
     default 2560 if CHIP_WIFI
+    default 2048 if CHIP_ICD_LIT_SUPPORT
 
 config HEAP_MEM_POOL_SIZE
-    default 80000 if CHIP_WIFI
+    default 110720 if CHIP_WIFI
+
+config HEAP_MEM_POOL_IGNORE_MIN
+    default y if CHIP_WIFI
 
 config CHIP_MALLOC_SYS_HEAP_SIZE
-    default 30720 if CHIP_WIFI
     default 8192 if NET_L2_OPENTHREAD
 
 # We use sys_heap based allocators, so make sure we don't reserve unused libc heap anyway
@@ -64,7 +67,10 @@ config COMMON_LIBC_MALLOC_ARENA_SIZE
     default -1
 
 config NVS_LOOKUP_CACHE_SIZE
-    default 512
+    default 512 if NVS
+
+config ZMS_LOOKUP_CACHE_SIZE
+    default 512 if ZMS
 
 # ==============================================================================
 # Zephyr networking configuration
@@ -201,12 +207,12 @@ config CHIP_QSPI_NOR
 
 # nRF7002DK uses SPI NOR external flash
 
-if BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF7001_NRF5340_CPUAPP || BOARD_NRF54L15PDK_NRF54L15_CPUAPP
+if BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF7001_NRF5340_CPUAPP || BOARD_NRF54L15DK
 
 config CHIP_SPI_NOR
     default y
 
-endif # BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF7001_NRF5340_CPUAPP || BOARD_NRF54L15PDK_NRF54L15_CPUAPP
+endif # BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF7001_NRF5340_CPUAPP || BOARD_NRF54L15DK
 
 config BOOT_IMAGE_ACCESS_HOOKS
     default y if SOC_SERIES_NRF53X
@@ -226,7 +232,7 @@ config NRF_WIFI_FW_PATCH_DFU
 # ==============================================================================
 
 config NET_L2_OPENTHREAD
-    default y if !WIFI_NRF700X
+    default y if !WIFI_NRF70
 
 if NET_L2_OPENTHREAD
 
@@ -235,7 +241,7 @@ config IEEE802154_NRF5_RX_STACK_SIZE
     default 1024
 
 config OPENTHREAD_THREAD_STACK_SIZE
-    default 6144 if PSA_CRYPTO_DRIVER_CC3XX && PSA_CRYPTO_DRIVER_OBERON
+    default 6144 if (PSA_CRYPTO_DRIVER_CC3XX && PSA_CRYPTO_DRIVER_OBERON) || PSA_CRYPTO_DRIVER_CRACEN
     default 4096
 
 config OPENTHREAD_DEFAULT_TX_POWER
@@ -251,35 +257,35 @@ endif # NET_L2_OPENTHREAD
 
 if CHIP_WIFI
 
-choice WPA_SUPP_LOG_LEVEL_CHOICE
-    default WPA_SUPP_LOG_LEVEL_ERR
+choice WIFI_NM_WPA_SUPPLICANT_LOG_LEVEL_CHOICE
+    default WIFI_NM_WPA_SUPPLICANT_LOG_LEVEL_ERR
 endchoice
 
 # it saves us 20kB of FLASH
-config WPA_SUPP_NO_DEBUG
+config WIFI_NM_WPA_SUPPLICANT_NO_DEBUG
     default y
 
-config NRF700X_LOG_VERBOSE
+config NRF70_LOG_VERBOSE
     default n
 
-choice WIFI_NRF700X_LOG_LEVEL_CHOICE
-    default WIFI_NRF700X_LOG_LEVEL_OFF
+choice WIFI_NRF70_LOG_LEVEL_CHOICE
+    default WIFI_NRF70_LOG_LEVEL_OFF
 endchoice
 
 config NRF_WIFI_LOW_POWER
     default n
 
-config NRF700X_RX_NUM_BUFS
+config NRF70_RX_NUM_BUFS
     default 16
 
-config NRF700X_MAX_TX_TOKENS
+config NRF70_MAX_TX_TOKENS
     default 10
 
-config NRF700X_MAX_TX_AGGREGATION
+config NRF70_MAX_TX_AGGREGATION
     default 1
 
 # it saves 25kB of FLASH
-config WPA_SUPP_ADVANCED_FEATURES
+config WIFI_NM_WPA_SUPPLICANT_ADVANCED_FEATURES
     default n
 
 endif # CHIP_WIFI
@@ -298,15 +304,13 @@ choice RNG_GENERATOR_CHOICE
     default XOSHIRO_RANDOM_GENERATOR if SOC_SERIES_NRF53X
 endchoice
 
-config OBERON_BACKEND
-    default y
-
 config MBEDTLS_ENABLE_HEAP
-    default y
+    default y if !BUILD_WITH_TFM
+    default n
 
 config MBEDTLS_HEAP_SIZE
     default 8192
-    
+
 # Enable PSA Crypto dependencies for Matter
 
 config CHIP_CRYPTO_PSA
@@ -315,8 +319,14 @@ config CHIP_CRYPTO_PSA
 
 if CHIP_CRYPTO_PSA
 
+config PSA_CRYPTO_DRIVER_OBERON
+    default y if (SOC_SERIES_NRF52X || SOC_SERIES_NRF53X)
+
 config PSA_CRYPTO_DRIVER_CC3XX
     default n
+
+config PSA_CRYPTO_DRIVER_CRACEN
+    default y if SOC_SERIES_NRF54LX
 
 config PSA_WANT_ALG_SHA_224
     default n
@@ -333,13 +343,12 @@ config PSA_USE_CC3XX_HASH_DRIVER
 
 endif # PSA_CRYPTO_DRIVER_CC3XX && PSA_CRYPTO_DRIVER_OBERON
 
-# Spake2+ support
-config MBEDTLS_MD_C
-    default y
-
 endif # CHIP_CRYPTO_PSA
 
 if !CHIP_CRYPTO_PSA
+
+config OBERON_BACKEND
+    default y
 
 config NRF_SECURITY_ADVANCED
     default y
@@ -351,6 +360,9 @@ config MBEDTLS_CTR_DRBG_C
     default y
 
 config MBEDTLS_CIPHER_MODE_CTR
+    default y
+
+config MBEDTLS_MD_C
     default y
 
 config MBEDTLS_SHA1_C
@@ -471,6 +483,9 @@ config SHELL_MINIMAL
 config KERNEL_SHELL
     default n if !CHIP_MEMORY_PROFILING
 
+config SHELL_WILDCARD
+	default n
+
 config SENSOR_SHELL
     default n
 
@@ -497,6 +512,9 @@ config HWINFO_SHELL
 
 config OPENTHREAD_SHELL
     default n if !CHIP_MEMORY_PROFILING
+
+config SHELL_CMD_BUFF_SIZE
+    default 512 if CHIP_MEMORY_PROFILING
 
 endif # SHELL
 

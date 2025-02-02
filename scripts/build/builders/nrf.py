@@ -220,7 +220,7 @@ class NrfConnectBuilder(Builder):
             # Note: running zephyr/zephyr.elf has the same result except it creates
             # a flash.bin in the current directory. ctest has more options and does not
             # pollute the source directory
-            self._Execute(['ctest', '--build-nocmake', '-V', '--output-on-failure', '--test-dir', self.output_dir],
+            self._Execute(['ctest', '--build-nocmake', '-V', '--output-on-failure', '--test-dir', os.path.join(self.output_dir, 'nrfconnect')],
                           title='Run Tests ' + self.identifier)
 
     def _bundle(self):
