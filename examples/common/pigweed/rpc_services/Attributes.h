@@ -243,7 +243,7 @@ public:
             }
             else
             {
-                ChipLogError(Support, "Failed to write data: %" CHIP_ERROR_FORMAT, *aaiResult.Format());
+                ChipLogError(Support, "Failed to write data: %" CHIP_ERROR_FORMAT, (*aaiResult).Format());
                 return ::pw::Status::Internal();
             }
         }
