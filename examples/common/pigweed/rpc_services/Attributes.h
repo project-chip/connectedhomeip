@@ -24,6 +24,7 @@
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/AppConfig.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
@@ -40,6 +41,25 @@
 
 namespace chip {
 namespace rpc {
+
+/** @brief
+ *    This class is specifically meant for registering custom Attribute Access Interfaces that
+ *    allow to read/modify the state of an attribute at its raw storage location. This should
+ *    not be used in code paths that need to be matter spec compliant. It is meant to be used
+ *    by Pw RPC to add device simulation for tests.
+ */
+class RawAttributeAccessInterfaceRegistry : public chip::app::AttributeAccessInterfaceRegistry
+{
+public:
+    /**
+     *  Get the singleton instance.
+     */
+    static RawAttributeAccessInterfaceRegistry & Instance()
+    {
+        static RawAttributeAccessInterfaceRegistry instance;
+        return instance;
+    }
+};
 
 // Implementation class for chip.rpc.Attributes.
 class Attributes : public pw_rpc::nanopb::Attributes::Service<Attributes>
@@ -207,6 +227,30 @@ public:
         }
 
         app::AttributeValueDecoder decoder(tlvReader.value(), subjectDescriptor);
+
+        // Try to write using a custom AAI first
+        chip::app::AttributeAccessInterface * customAai =
+            RawAttributeAccessInterfaceRegistry::Instance().Get(write_request.path.mEndpointId, write_request.path.mClusterId);
+        std::optional<CHIP_ERROR> aaiResult = chip::app::TryWriteViaAccessInterface(write_request.path, customAai, decoder);
+        if (aaiResult.has_value())
+        {
+            if (*aaiResult == CHIP_NO_ERROR)
+            {
+                // TODO: Call emberAfAttributeChanged here or let AAI decide?
+                return pw::OkStatus();
+            }
+            else
+            {
+                ChipLogError(Support, "Failed to write data: %" CHIP_ERROR_FORMAT, *aaiResult.Format());
+                return ::pw::Status::Internal();
+            }
+        }
+        else
+        {
+            ChipLogProgress(Support, "No custom AAI Write registration found for: endpoint=%u cluster=%u",
+                            write_request.path.mEndpointId, write_request.path.mClusterId);
+        }
+
         app::DataModel::ActionReturnStatus result = provider->WriteAttribute(write_request, decoder);
 
         if (!result.IsSuccess())
