@@ -18,6 +18,7 @@
 
 #include <app/data-model-provider/Provider.h>
 
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
