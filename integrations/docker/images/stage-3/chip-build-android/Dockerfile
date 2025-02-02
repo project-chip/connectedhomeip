@@ -28,11 +28,11 @@ RUN set -x \
 
 # Download and install android command line tool (for installing `sdkmanager`)
 RUN set -x \
-    && wget -O /tmp/android-tools.zip https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip \
+    && wget -O /tmp/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip \
     && cd /opt/android/sdk \
-    && unzip /tmp/android-tools.zip \
-    && rm -f /tmp/android-tools.zip \
-    && test -d /opt/android/sdk/tools \
+    && unzip /tmp/cmdline-tools.zip \
+    && rm -f /tmp/cmdline-tools.zip \
+    && test -d /opt/android/sdk/cmdline-tools \
     && : # last line
 
 # Download and install android NDK
