@@ -31,10 +31,7 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
     async def setup_class(self):
         super().setup_class()
         await self.setup_class_helper(False)
-        # build_xml_cluster returns a list of issues found when paring the XML
-        # Problems in the XML shouldn't cause test failure, but we want them recorded
-        # so they are added to the list of problems that get output when the test set completes.
-        self.xml_clusters, self.problems = build_xml_clusters()
+        self.build_spec_xmls()
 
     def _check_and_record_errors(self, location, required, pics):
         if required and not self.check_pics(pics):

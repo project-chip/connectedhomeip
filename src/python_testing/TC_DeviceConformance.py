@@ -42,21 +42,20 @@ import chip.clusters as Clusters
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
                                              evaluate_feature_choice_conformance)
-from chip.testing.conformance import ConformanceDecision, conformance_allowed
+from chip.testing.conformance import ConformanceDecision, ConformanceException, conformance_allowed
 from chip.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type,
                                                device_type_id_type, is_valid_device_type_id)
 from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                          MatterBaseTest, ProblemNotice, ProblemSeverity, async_test_body, default_matter_test_main)
-from chip.testing.spec_parsing import CommandType, build_xml_clusters, build_xml_device_types
+from chip.testing.spec_parsing import CommandType
 from chip.tlv import uint
+from mobly import asserts
 
 
 class DeviceConformanceTests(BasicCompositionTests):
     async def setup_class_helper(self):
         await super().setup_class_helper()
-        self.xml_clusters, self.problems = build_xml_clusters()
-        self.xml_device_types, problems = build_xml_device_types()
-        self.problems.extend(problems)
+        self.build_spec_xmls()
 
     def _get_device_type_id(self, device_type_name: str) -> int:
         id = [id for id, dt in self.xml_device_types.items() if dt.name.lower() == device_type_name.lower()]
