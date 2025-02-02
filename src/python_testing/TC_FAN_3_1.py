@@ -72,10 +72,9 @@ class TC_FAN_3_1(MatterBaseTest):
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attr_to_write(value))])
         return result[0].Status
 
-    async def _supports_speed(self) -> bool:
-        # TODO: Implement
-        time.sleep(0.1)
-        return True
+    @staticmethod
+    def _supports_speed(feature_map) -> bool:
+        return feature_map & Clusters.FanControl.Bitmaps.Feature.kMultiSpeed
 
     async def verify_fan_control_attribute_values(self, endpoint, attr_to_write, order, timeout_sec):
         # Setup
@@ -102,7 +101,9 @@ class TC_FAN_3_1(MatterBaseTest):
             value_init = 0 if order == OrderEnum.Ascending else percent_setting_max_value
             attr_to_verify = percent_setting_attr
 
-        logging.info(f"\n[F] Updating {attr_to_write.__name__} {order.name}, verifying {attr_to_verify.__name__} and SpeedSetting (if supported)")
+        # Logging exactly what is being tested
+        if_speed_supported = " and SpeedSetting" if self.supports_speed else ""
+        logging.info(f"\n[F] Updating {attr_to_write.__name__} {order.name}, verifying {attr_to_verify.__name__}{if_speed_supported}")
 
         # Write and read back the initialization value for the attribute to verify
         # Verify that the write status is either SUCCESS or INVALID_IN_STATE
@@ -223,9 +224,11 @@ class TC_FAN_3_1(MatterBaseTest):
         endpoint = self.get_endpoint(default=1)
         percent_setting_attr = Clusters.FanControl.Attributes.PercentSetting
         fan_mode_attr = Clusters.FanControl.Attributes.FanMode
-        self.supports_speed = await self._supports_speed()
+        feature_map_attr = Clusters.FanControl.Attributes.FeatureMap
+        feature_map = await self.read_fc_attribute_expect_success(endpoint=endpoint, attribute=feature_map_attr)
+        self.supports_speed = self._supports_speed(feature_map)
         timeout_sec = 0.333
-
+        
         # TH writes to the DUT the PercentSetting attribute iteratively within
         # a range of 1 to 100 one at a time in ascending order
         # Verifies that FanMode and SpeedSetting values (if supported) are being
