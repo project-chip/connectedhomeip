@@ -236,6 +236,7 @@ public:
         {
             if (*aaiResult == CHIP_NO_ERROR)
             {
+                ChipLogProgress(Support, "Successfully changed attribute value using custom AAI Write.");
                 // TODO: Call emberAfAttributeChanged here or let AAI decide?
                 return pw::OkStatus();
             }
