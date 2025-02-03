@@ -717,7 +717,7 @@ tests:
 
     # This list should be expanded as we expand the TH to support more specification revisions
     - label:
-          "Step 62: SpecificationVersion value should be set to an appropriate
+          "Step 62: SpecificationVersion value should be set to a valid
            Major, Minor, and Dot version with the lower 8 bits set to zero."
       command: "readAttribute"
       attribute: "SpecificationVersion"
