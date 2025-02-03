@@ -225,15 +225,7 @@ config CHIP_ENABLE_PM_DURING_BLE
 	help
 	  Enable PM during BLE operation.
 
-config CHIP_OPENTHREAD_TX_POWER
-	int "OpenThread Transmission power"
-	range -30 9
-	default 0
-	help
-	  OpenThread Transmission power in dBm.
-
 config SHELL_BACKEND_SERIAL_RX_RING_BUFFER_SIZE
-	int
 	default 255 if SHELL_BACKEND_SERIAL
 
 config CHIP_ENABLE_POWER_ON_FACTORY_RESET
