@@ -1,1 +1,1 @@
-97 : [Telink] Update Docker image (Zephyr update)
+106 : Upgrade android docker with java 17 and adjust the location for android cmdline tool

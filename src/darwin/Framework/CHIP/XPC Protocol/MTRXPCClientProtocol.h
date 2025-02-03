@@ -38,7 +38,7 @@ MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 //- (oneway void)controller:(NSUUID *)controller commissioningComplete:(NSError * _Nullable)error nodeID:(NSNumber * _Nullable)nodeID metrics:(MTRMetrics * _Nullable)metrics;
 //- (oneway void)controller:(NSUUID *)controller readCommissioningInfo:(MTRProductIdentity *)info;
 @optional
-- (oneway void)controller:(NSUUID *)controller controllerConfigurationUpdated:(NSDictionary *)configuration;
+- (oneway void)controller:(NSUUID *)controller controllerConfigurationUpdated:(NSDictionary *)configuration MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 @end
 
 MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))

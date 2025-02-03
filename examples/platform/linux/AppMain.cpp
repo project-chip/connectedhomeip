@@ -73,6 +73,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_DIAGNOSTIC_TRIGGER
 #include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsTestEventTriggerHandler.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_DIAGNOSTIC_TRIGGER
+#include <app/clusters/wifi-network-diagnostics-server/WiFiDiagnosticsTestEventTriggerHandler.h>
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #endif
@@ -106,6 +109,10 @@
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 #include "ExampleAccessRestrictionProvider.h"
+#endif
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+#include <app/server/TermsAndConditionsManager.h> // nogncheck
 #endif
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
@@ -539,6 +546,16 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    if (LinuxDeviceOptions::GetInstance().tcVersion.HasValue() && LinuxDeviceOptions::GetInstance().tcRequired.HasValue())
+    {
+        uint16_t version  = LinuxDeviceOptions::GetInstance().tcVersion.Value();
+        uint16_t required = LinuxDeviceOptions::GetInstance().tcRequired.Value();
+        Optional<app::TermsAndConditions> requiredAcknowledgements(app::TermsAndConditions(required, version));
+        app::TermsAndConditionsManager::GetInstance()->Init(initParams.persistentStorageDelegate, requiredAcknowledgements);
+    }
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+
 #if defined(ENABLE_CHIP_SHELL)
     Engine::Root().Init();
     Shell::RegisterCommissioneeCommands();
@@ -591,6 +608,10 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_DIAGNOSTIC_TRIGGER
     static SoftwareDiagnosticsTestEventTriggerHandler sSoftwareDiagnosticsTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sSoftwareDiagnosticsTestEventTriggerHandler);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_DIAGNOSTIC_TRIGGER
+    static WiFiDiagnosticsTestEventTriggerHandler sWiFiDiagnosticsTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sWiFiDiagnosticsTestEventTriggerHandler);
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     // We want to allow triggering OTA queries if OTA requestor is enabled

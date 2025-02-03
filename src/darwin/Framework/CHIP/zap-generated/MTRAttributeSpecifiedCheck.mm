@@ -5819,6 +5819,39 @@ static BOOL AttributeIsSpecifiedInWebRTCTransportRequestorCluster(AttributeId aA
     }
     }
 }
+static BOOL AttributeIsSpecifiedInPushAVStreamTransportCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::PushAvStreamTransport;
+    switch (aAttributeId) {
+    case Attributes::SupportedContainerFormats::Id: {
+        return YES;
+    }
+    case Attributes::SupportedIngestMethods::Id: {
+        return YES;
+    }
+    case Attributes::CurrentConnections::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInChimeCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Chime;
@@ -5887,6 +5920,42 @@ static BOOL AttributeIsSpecifiedInCommissionerControlCluster(AttributeId aAttrib
     using namespace Clusters::CommissionerControl;
     switch (aAttributeId) {
     case Attributes::SupportedDeviceCategories::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInTLSCertificateManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::TlsCertificateManagement;
+    switch (aAttributeId) {
+    case Attributes::MaxRootCertificates::Id: {
+        return YES;
+    }
+    case Attributes::CurrentRootCertificates::Id: {
+        return YES;
+    }
+    case Attributes::MaxClientCertificates::Id: {
+        return YES;
+    }
+    case Attributes::CurrentClientCertificates::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6588,6 +6657,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::WebRTCTransportRequestor::Id: {
         return AttributeIsSpecifiedInWebRTCTransportRequestorCluster(aAttributeId);
     }
+    case Clusters::PushAvStreamTransport::Id: {
+        return AttributeIsSpecifiedInPushAVStreamTransportCluster(aAttributeId);
+    }
     case Clusters::Chime::Id: {
         return AttributeIsSpecifiedInChimeCluster(aAttributeId);
     }
@@ -6596,6 +6668,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::CommissionerControl::Id: {
         return AttributeIsSpecifiedInCommissionerControlCluster(aAttributeId);
+    }
+    case Clusters::TlsCertificateManagement::Id: {
+        return AttributeIsSpecifiedInTLSCertificateManagementCluster(aAttributeId);
     }
     case Clusters::UnitTesting::Id: {
         return AttributeIsSpecifiedInUnitTestingCluster(aAttributeId);

@@ -23,7 +23,7 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
 #if SL_WIFI
-#include <platform/silabs/wifi/wf200/platform/spi_multiplex.h>
+#include <platform/silabs/wifi/ncp/spi_multiplex.h>
 #endif // SL_WIFI
 
 extern "C" {

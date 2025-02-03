@@ -78,6 +78,12 @@ source_set("impl_header") {
   public_deps = [ "${chip_root}/src/system:system_config_header" ]
 }
 
+source_set("inet_zephyr_socket") {
+  sources = [ "ZephyrSocket.h" ]
+  public_configs = [ "${chip_root}/src:includes" ]
+  public_deps = [ "${chip_root}/src/system:system_config_header" ]
+}
+
 static_library("inet") {
   output_name = "libInetLayer"
 
@@ -167,12 +173,10 @@ static_library("inet") {
     } else {
       sources += [ "UDPEndPointImpl${chip_system_config_inet}.cpp" ]
     }
+  }
 
-    if (chip_system_config_inet == "Sockets") {
-      # TODO: dependency on this one is not clear as it is only ever
-      #       enabled through CMakeLists.txt. Added here for completeness
-      sources += [ "ZephyrSocket.h" ]
-    }
+  if (current_os == "zephyr") {
+    public_deps += [ ":inet_zephyr_socket" ]
   }
 
   if (chip_with_nlfaultinjection) {
