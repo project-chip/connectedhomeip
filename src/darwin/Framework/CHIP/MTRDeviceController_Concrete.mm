@@ -1720,6 +1720,16 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return nil;
 }
 
+- (NSArray<NSNumber *> *)nodesWithStoredData
+{
+    if (!self.controllerDataStore) {
+        // We have nothing stored, if we have no way to store.
+        return @[];
+    }
+
+    return [self.controllerDataStore nodesWithStoredData];
+}
+
 @end
 
 /**
