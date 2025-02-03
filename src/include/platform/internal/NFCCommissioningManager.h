@@ -84,7 +84,6 @@ extern NFCCommissioningManagerImpl & NFCCommissioningMgrImpl();
 } // namespace DeviceLayer
 } // namespace chip
 
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
