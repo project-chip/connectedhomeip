@@ -18,6 +18,7 @@
 
 #include <app/data-model-provider/Provider.h>
 
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
@@ -121,5 +122,7 @@ private:
     std::optional<unsigned> TryFindEndpointIndex(EndpointId id) const;
 };
 
+std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteDataAttributePath & path, AttributeAccessInterface * aai,
+                                                     AttributeValueDecoder & decoder);
 } // namespace app
 } // namespace chip
