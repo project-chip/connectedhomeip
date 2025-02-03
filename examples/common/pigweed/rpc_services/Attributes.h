@@ -43,11 +43,14 @@
 namespace chip {
 namespace rpc {
 
-/** @brief
+/** @brief Custom write interception handler registry.
+ *
  *    This class is specifically meant for registering custom Attribute Access Interfaces that
- *    allow to read/modify the state of an attribute at its raw storage location. This should
- *    not be used in code paths that need to be matter spec compliant. It is meant to be used
- *    by Pw RPC to add device simulation for tests.
+ *    allow mini-AAI-handlers to process PigweedRPC read/writes separately from the cluster
+ *    code. It is meant to be used by samples using this PigweedRPC Attributes service to
+ *    allow the RPC interface to be used in more ways than simply simulating writes from a Matter
+ *    client at the IM level. Handlers registered here by applications will be attempted before any
+ *    standard processing of read/write would take place.
  */
 class RawAttributeAccessInterfaceRegistry : public chip::app::AttributeAccessInterfaceRegistry
 {
