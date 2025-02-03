@@ -80,6 +80,13 @@ private:
     ReadOnlyBuffer<EndpointEntry> mEndpoints;
 };
 
+/// Validates that the cluster identified by `path` exists within the given provider.
+/// If the endpoint exists but does not have the cluster identified by the path, will return Status::UnsupportedCluster.
+///
+/// otherwise, it will return successStatus.
+Protocols::InteractionModel::Status ValidateClusterPath(ProviderMetadataTree * provider, const ConcreteClusterPath & path,
+                                                        Protocols::InteractionModel::Status successStatus);
+
 } // namespace DataModel
 } // namespace app
 } // namespace chip

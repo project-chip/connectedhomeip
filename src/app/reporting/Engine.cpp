@@ -37,6 +37,7 @@
 #include <lib/support/CodeUtils.h>
 #include <optional>
 #include <protocols/interaction_model/StatusCode.h>
+#include <regex.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck
@@ -177,8 +178,15 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     {
         status = *access_status;
     }
+    else if (IsSupportedGlobalAttributeNotInMetadata(readRequest.path.mAttributeId))
+    {
+        // Global attributes are NOT directly handled by datamodel providers, instead
+        // the are routed through metadata.
+        status = ReadGlobalAttributeFromMetadata(dataModel, readRequest.path, attributeValueEncoder);
+    }
     else
     {
+
         status = dataModel->ReadAttribute(readRequest, attributeValueEncoder);
     }
 
