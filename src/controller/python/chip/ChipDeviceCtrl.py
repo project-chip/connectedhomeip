@@ -2263,7 +2263,8 @@ class ChipDeviceController(ChipDeviceControllerBase):
     def get_rcac(self):
         # Passes captured RCAC data back to Python test modules for validation
         try:
-            # Setting buffer size to max size acceptable by TLV as mentioned in spec
+            # Setting buffer size to max size mentioned in spec:
+            # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/policies/matter_certificate_policy.adoc#615-key-sizes
             rcac_size = 400
             rcac_buffer = (ctypes.c_uint8 * rcac_size)()  # Allocate buffer
 
