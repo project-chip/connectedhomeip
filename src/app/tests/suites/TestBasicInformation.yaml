@@ -116,11 +116,11 @@ tests:
                   20,
                   21,
                   22,
+                  0xFFFC, # FeatureMap
+                  0xFFFD, # ClusterRevision
                   0xFFF8, # GeneratedCommandList
                   0xFFF9, # AcceptedCommandList
                   0xFFFB, # AttributeList
-                  0xFFFC, # FeatureMap
-                  0xFFFD, # ClusterRevision
               ]
 
     - label: "Read NodeLabel"
