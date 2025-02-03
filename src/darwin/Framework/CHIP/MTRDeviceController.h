@@ -310,6 +310,13 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (void)resume MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 
 /**
+ * Returns the list of node IDs for which this controller has stored
+ * information.  Returns empty list if the controller does not have any
+ * information stored.
+ */
+- (NSArray<NSNumber *> *)nodesWithStoredData MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+/**
  * Shut down the controller. Calls to shutdown after the first one are NO-OPs.
  * This must be called, either directly or via shutting down the
  * MTRDeviceControllerFactory, to avoid leaking the controller.

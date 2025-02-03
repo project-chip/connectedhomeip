@@ -105,6 +105,12 @@ typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNu
  */
 - (void)synchronouslyPerformBlock:(void (^_Nullable)(void))block;
 
+/**
+ * Returns the list of node IDs for which this data store has stored data of
+ * some sort.
+ */
+- (NSArray<NSNumber *> *)nodesWithStoredData;
+
 @end
 
 NS_ASSUME_NONNULL_END
