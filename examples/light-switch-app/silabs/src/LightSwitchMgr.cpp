@@ -56,7 +56,7 @@ AppEvent LightSwitchMgr::CreateNewEvent(AppEvent::AppEventTypes type)
 void LightSwitchMgr::Timer::Start()
 {
     // Starts or restarts the function timer
-    if (osTimerStart(mHandler, pdMS_TO_TICKS(100)) != osOK)
+    if (osTimerStart(mHandler, pdMS_TO_TICKS(LONG_PRESS_TIMEOUT)) != osOK)
     {
         SILABS_LOG("Timer start() failed");
         appError(CHIP_ERROR_INTERNAL);
@@ -80,7 +80,7 @@ void LightSwitchMgr::HandleLongPress()
     event.Handler             = AppEventHandler;
     LightSwitchMgr * lightSwitch  = &LightSwitchMgr::GetInstance();
     event.LightSwitchEvent.Context  = lightSwitch;
-    if (mDownPressed)
+    if (mFunctionButtonPressed)
     {
         if (!mResetWarning)
         {
@@ -88,6 +88,13 @@ void LightSwitchMgr::HandleLongPress()
             event.Type = AppEvent::kEventType_ResetWarning;
             AppTask::GetAppTask().PostEvent(&event);
         }
+    }
+    else if (mActionButtonPressed)
+    {
+        mActionButtonSuppressed = true;
+        // Long press button up : Trigger Level Control Action
+        event.Type = AppEvent::kEventType_TriggerLevelControlAction;
+        AppTask::GetAppTask().PostEvent(&event);
     }
 }
 
@@ -201,6 +208,10 @@ void LightSwitchMgr::GenericSwitchOnShortRelease()
     DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
+StepModeEnum LightSwitchMgr::getStepMode(){
+    return stepDirection;
+}
+
 void LightSwitchMgr::TriggerLightSwitchAction(LightSwitchAction action, bool isGroupCommand)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
@@ -290,11 +301,11 @@ void LightSwitchMgr::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     AppEvent event = {};
     if (btnAction == to_underlying(SilabsPlatform::ButtonAction::ButtonPressed))
     {
-        event = LightSwitchMgr::GetInstance().CreateNewEvent(button ? AppEvent::kEventType_UpPressed : AppEvent::kEventType_DownPressed);
+        event = LightSwitchMgr::GetInstance().CreateNewEvent(button ? AppEvent::kEventType_ActionButtonPressed : AppEvent::kEventType_FunctionButtonPressed);
     }
     else
     {
-        event = LightSwitchMgr::GetInstance().CreateNewEvent(button ? AppEvent::kEventType_UpReleased : AppEvent::kEventType_DownReleased);
+        event = LightSwitchMgr::GetInstance().CreateNewEvent(button ? AppEvent::kEventType_ActionButtonReleased : AppEvent::kEventType_FunctionButtonReleased);
     }
     AppTask::GetAppTask().PostEvent(&event);
 }
@@ -312,17 +323,21 @@ void LightSwitchMgr::AppEventHandler(AppEvent * aEvent)
         lightSwitch->mResetWarning = false;
         AppTask::GetAppTask().CancelFactoryResetSequence();
         break;
-    case AppEvent::kEventType_DownPressed:
-        aEvent->Handler = LightSwitchMgr::SwitchActionEventHandler;
-        AppTask::GetAppTask().PostEvent(aEvent);
-        lightSwitch->mDownPressed = true;
+    case AppEvent::kEventType_FunctionButtonPressed:
+        lightSwitch->mFunctionButtonPressed = true;
         if (lightSwitch->mLongPressTimer)
         {
             lightSwitch->mLongPressTimer->Start();
         }
+        if (lightSwitch->mActionButtonPressed)
+        {
+            lightSwitch->mActionButtonSuppressed = true;
+            lightSwitch->stepDirection = (lightSwitch->stepDirection == StepModeEnum::kUp) ? StepModeEnum::kDown : StepModeEnum::kUp;
+            ChipLogProgress(AppServer, "Step direction changed. Current Step Direction : %s", ((lightSwitch->stepDirection == StepModeEnum::kUp) ? "kUp" : "kDown"));
+        }
         break;
-    case AppEvent::kEventType_DownReleased:
-        lightSwitch->mDownPressed = false;
+    case AppEvent::kEventType_FunctionButtonReleased:
+        lightSwitch->mFunctionButtonPressed = false;
         if (lightSwitch->mLongPressTimer)
         {
             lightSwitch->mLongPressTimer->Stop();
@@ -333,11 +348,44 @@ void LightSwitchMgr::AppEventHandler(AppEvent * aEvent)
             AppTask::GetAppTask().PostEvent(aEvent);
         }
         break;
-    case AppEvent::kEventType_UpPressed:
-    case AppEvent::kEventType_UpReleased:
+    case AppEvent::kEventType_ActionButtonPressed:
+        lightSwitch->mActionButtonPressed = true;
+        aEvent->Handler = LightSwitchMgr::SwitchActionEventHandler;
+        AppTask::GetAppTask().PostEvent(aEvent);
+        if (lightSwitch->mLongPressTimer)
+        {
+            lightSwitch->mLongPressTimer->Start();
+        }
+        if (lightSwitch->mFunctionButtonPressed)
+        {
+            lightSwitch->mActionButtonSuppressed = true;
+            lightSwitch->stepDirection = (lightSwitch->stepDirection == StepModeEnum::kUp) ? StepModeEnum::kDown : StepModeEnum::kUp;
+            ChipLogProgress(AppServer, "Step direction changed. Current Step Direction : %s", ((lightSwitch->stepDirection == StepModeEnum::kUp) ? "kUp" : "kDown"));
+        }
+        break;
+    case AppEvent::kEventType_ActionButtonReleased:
+        lightSwitch->mActionButtonPressed = false;
+        if (lightSwitch->mLongPressTimer)
+        {
+            lightSwitch->mLongPressTimer->Stop();
+        }
+        if (lightSwitch->mActionButtonSuppressed)
+        {
+            lightSwitch->mActionButtonSuppressed = false;
+        }
+        else
+        {
+            aEvent->Type = AppEvent::kEventType_TriggerToggle;
+            aEvent->Handler = LightSwitchMgr::SwitchActionEventHandler;
+            AppTask::GetAppTask().PostEvent(aEvent);
+        }
+        aEvent->Type = AppEvent::kEventType_ActionButtonReleased;
         aEvent->Handler = LightSwitchMgr::SwitchActionEventHandler;
         AppTask::GetAppTask().PostEvent(aEvent);
         break;
+    case AppEvent::kEventType_TriggerLevelControlAction:
+        aEvent->Handler = LightSwitchMgr::SwitchActionEventHandler;
+        AppTask::GetAppTask().PostEvent(aEvent);
     default:
         break;
     }
@@ -347,20 +395,18 @@ void LightSwitchMgr::SwitchActionEventHandler(AppEvent * aEvent)
 {
     switch(aEvent->Type)
     {
-    case AppEvent::kEventType_UpPressed: {
-        LightSwitchMgr::GetInstance().TriggerLightSwitchAction(LightSwitchMgr::LightSwitchAction::Toggle);
+    case AppEvent::kEventType_ActionButtonPressed:
         LightSwitchMgr::GetInstance().GenericSwitchOnInitialPress();
-        }
         break;
-    case AppEvent::kEventType_UpReleased:
+    case AppEvent::kEventType_ActionButtonReleased:
         LightSwitchMgr::GetInstance().GenericSwitchOnShortRelease();
         break;
-#if 0
-    // TODO: Fix the button handling for the btn0 and btn1
-    case AppEvent::kEventType_DownPressed:
-        LightSwitchMgr::GetInstance().TriggerLevelControlAction(LevelControl::StepModeEnum::kDown);
+    case AppEvent::kEventType_TriggerLevelControlAction:
+        LightSwitchMgr::GetInstance().TriggerLevelControlAction(LightSwitchMgr::GetInstance().getStepMode());
         break;
-#endif
+    case AppEvent::kEventType_TriggerToggle:
+        LightSwitchMgr::GetInstance().TriggerLightSwitchAction(LightSwitchMgr::LightSwitchAction::Toggle);
+        break;
     default:
         break;
     }
