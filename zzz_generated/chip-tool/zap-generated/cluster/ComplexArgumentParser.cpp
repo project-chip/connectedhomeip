@@ -2212,14 +2212,6 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.label, value["label"]));
     valueCopy.removeMember("label");
 
-    if (value.isMember("vidVerificationStatement"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "vidVerificationStatement");
-        ReturnErrorOnFailure(
-            ComplexArgumentParser::Setup(labelWithMember, request.vidVerificationStatement, value["vidVerificationStatement"]));
-    }
-    valueCopy.removeMember("vidVerificationStatement");
-
     if (value.isMember("fabricIndex"))
     {
         snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
@@ -2237,7 +2229,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::OperationalCredentials
     ComplexArgumentParser::Finalize(request.fabricID);
     ComplexArgumentParser::Finalize(request.nodeID);
     ComplexArgumentParser::Finalize(request.label);
-    ComplexArgumentParser::Finalize(request.vidVerificationStatement);
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
@@ -2262,13 +2253,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.icac, value["icac"]));
     valueCopy.removeMember("icac");
 
-    if (value.isMember("vvsc"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "vvsc");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.vvsc, value["vvsc"]));
-    }
-    valueCopy.removeMember("vvsc");
-
     if (value.isMember("fabricIndex"))
     {
         snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
@@ -2283,7 +2267,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::OperationalCredentials
 {
     ComplexArgumentParser::Finalize(request.noc);
     ComplexArgumentParser::Finalize(request.icac);
-    ComplexArgumentParser::Finalize(request.vvsc);
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 

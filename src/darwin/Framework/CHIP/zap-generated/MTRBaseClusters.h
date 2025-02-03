@@ -3705,65 +3705,51 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command AttestationRequest
  *
- * This command SHALL be generated to request the Attestation Information, in the form of an AttestationResponse Command.
+ * Sender is requesting attestation information from the receiver.
  */
 - (void)attestationRequestWithParams:(MTROperationalCredentialsClusterAttestationRequestParams *)params completion:(void (^)(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command CertificateChainRequest
  *
- * If the CertificateType is not a valid value per CertificateChainTypeEnum then the command SHALL fail with a Status Code of INVALID_COMMAND.
+ * Sender is requesting a device attestation certificate from the receiver.
  */
 - (void)certificateChainRequestWithParams:(MTROperationalCredentialsClusterCertificateChainRequestParams *)params completion:(void (^)(MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command CSRRequest
  *
- * This command SHALL be generated to execute the Node Operational CSR Procedure and subsequently return the NOCSR Information, in the form of a CSRResponse Command.
+ * Sender is requesting a certificate signing request (CSR) from the receiver.
  */
 - (void)CSRRequestWithParams:(MTROperationalCredentialsClusterCSRRequestParams *)params completion:(void (^)(MTROperationalCredentialsClusterCSRResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command AddNOC
  *
- * This command SHALL add a new NOC chain to the device and commission a new Fabric association upon successful validation of all arguments and preconditions.
+ * Sender is requesting to add the new node operational certificates.
  */
 - (void)addNOCWithParams:(MTROperationalCredentialsClusterAddNOCParams *)params completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command UpdateNOC
  *
- * This command SHALL replace the NOC and optional associated ICAC (if present) scoped under the accessing fabric upon successful validation of all arguments and preconditions.
+ * Sender is requesting to update the node operational certificates.
  */
 - (void)updateNOCWithParams:(MTROperationalCredentialsClusterUpdateNOCParams *)params completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command UpdateFabricLabel
  *
- * This command SHALL be used by an Administrator to set the user-visible Label field for a given Fabric, as reflected by entries in the Fabrics attribute.
+ * This command SHALL be used by an Administrative Node to set the user-visible Label field for a given Fabric, as reflected by entries in the Fabrics attribute.
  */
 - (void)updateFabricLabelWithParams:(MTROperationalCredentialsClusterUpdateFabricLabelParams *)params completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command RemoveFabric
  *
- * This command is used by Administrators to remove a given Fabric and delete all associated fabric-scoped data.
+ * This command is used by Administrative Nodes to remove a given fabric index and delete all associated fabric-scoped data.
  */
 - (void)removeFabricWithParams:(MTROperationalCredentialsClusterRemoveFabricParams *)params completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command AddTrustedRootCertificate
  *
- * This command SHALL add a Trusted Root CA Certificate, provided as its Matter Certificate Encoding representation, to the TrustedRootCertificates Attribute list and SHALL ensure the next AddNOC command executed uses the provided certificate as its root of trust.
+ * This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation.
  */
 - (void)addTrustedRootCertificateWithParams:(MTROperationalCredentialsClusterAddTrustedRootCertificateParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-/**
- * Command SetVidVerificationStatement
- *
- * This command SHALL be used to one or many of the following:
- */
-- (void)setVidVerificationStatementWithParams:(MTROperationalCredentialsClusterSetVidVerificationStatementParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)setVidVerificationStatementWithCompletion:(MTRStatusCompletion)completion
-    MTR_PROVISIONALLY_AVAILABLE;
-/**
- * Command SignVidVerificationRequest
- *
- * This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given by generating the response described in Fabric Table Vendor ID Verification Procedure.
- */
-- (void)signVidVerificationRequestWithParams:(MTROperationalCredentialsClusterSignVidVerificationRequestParams *)params completion:(void (^)(MTROperationalCredentialsClusterSignVidVerificationResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeNOCsWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeNOCsWithParams:(MTRSubscribeParams *)params

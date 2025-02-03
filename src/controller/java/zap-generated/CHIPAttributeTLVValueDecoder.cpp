@@ -9847,22 +9847,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                             reinterpret_cast<const jbyte *>(entry_0.icac.Value().data()));
                     newElement_0_icac = newElement_0_icacByteArray;
                 }
-                jobject newElement_0_vvsc;
-                if (!entry_0.vvsc.HasValue())
-                {
-                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_vvsc);
-                }
-                else
-                {
-                    jobject newElement_0_vvscInsideOptional;
-                    jbyteArray newElement_0_vvscInsideOptionalByteArray =
-                        env->NewByteArray(static_cast<jsize>(entry_0.vvsc.Value().size()));
-                    env->SetByteArrayRegion(newElement_0_vvscInsideOptionalByteArray, 0,
-                                            static_cast<jsize>(entry_0.vvsc.Value().size()),
-                                            reinterpret_cast<const jbyte *>(entry_0.vvsc.Value().data()));
-                    newElement_0_vvscInsideOptional = newElement_0_vvscInsideOptionalByteArray;
-                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_vvscInsideOptional, newElement_0_vvsc);
-                }
                 jobject newElement_0_fabricIndex;
                 std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
                 std::string newElement_0_fabricIndexCtorSignature = "(I)V";
@@ -9883,8 +9867,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     jmethodID NOCStructStructCtor_1;
                     err = chip::JniReferences::GetInstance().FindMethod(env, NOCStructStructClass_1, "<init>",
-                                                                        "([B[BLjava/util/Optional;Ljava/lang/Integer;)V",
-                                                                        &NOCStructStructCtor_1);
+                                                                        "([B[BLjava/lang/Integer;)V", &NOCStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || NOCStructStructCtor_1 == nullptr)
                     {
                         ChipLogError(Zcl, "Could not find ChipStructs$OperationalCredentialsClusterNOCStruct constructor");
@@ -9892,7 +9875,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     newElement_0 = env->NewObject(NOCStructStructClass_1, NOCStructStructCtor_1, newElement_0_noc,
-                                                  newElement_0_icac, newElement_0_vvsc, newElement_0_fabricIndex);
+                                                  newElement_0_icac, newElement_0_fabricIndex);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -9943,24 +9926,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                             jninewElement_0_nodeID, newElement_0_nodeID);
                 jobject newElement_0_label;
                 LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.label, newElement_0_label));
-                jobject newElement_0_vidVerificationStatement;
-                if (!entry_0.vidVerificationStatement.HasValue())
-                {
-                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_vidVerificationStatement);
-                }
-                else
-                {
-                    jobject newElement_0_vidVerificationStatementInsideOptional;
-                    jbyteArray newElement_0_vidVerificationStatementInsideOptionalByteArray =
-                        env->NewByteArray(static_cast<jsize>(entry_0.vidVerificationStatement.Value().size()));
-                    env->SetByteArrayRegion(newElement_0_vidVerificationStatementInsideOptionalByteArray, 0,
-                                            static_cast<jsize>(entry_0.vidVerificationStatement.Value().size()),
-                                            reinterpret_cast<const jbyte *>(entry_0.vidVerificationStatement.Value().data()));
-                    newElement_0_vidVerificationStatementInsideOptional =
-                        newElement_0_vidVerificationStatementInsideOptionalByteArray;
-                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_vidVerificationStatementInsideOptional,
-                                                                      newElement_0_vidVerificationStatement);
-                }
                 jobject newElement_0_fabricIndex;
                 std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
                 std::string newElement_0_fabricIndexCtorSignature = "(I)V";
@@ -9981,11 +9946,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     jmethodID fabricDescriptorStructStructCtor_1;
-                    err =
-                        chip::JniReferences::GetInstance().FindMethod(env, fabricDescriptorStructStructClass_1, "<init>",
-                                                                      "([BLjava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/"
-                                                                      "lang/String;Ljava/util/Optional;Ljava/lang/Integer;)V",
-                                                                      &fabricDescriptorStructStructCtor_1);
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, fabricDescriptorStructStructClass_1, "<init>",
+                        "([BLjava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Integer;)V",
+                        &fabricDescriptorStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || fabricDescriptorStructStructCtor_1 == nullptr)
                     {
                         ChipLogError(Zcl,
@@ -9995,8 +9959,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     newElement_0 = env->NewObject(fabricDescriptorStructStructClass_1, fabricDescriptorStructStructCtor_1,
                                                   newElement_0_rootPublicKey, newElement_0_vendorID, newElement_0_fabricID,
-                                                  newElement_0_nodeID, newElement_0_label, newElement_0_vidVerificationStatement,
-                                                  newElement_0_fabricIndex);
+                                                  newElement_0_nodeID, newElement_0_label, newElement_0_fabricIndex);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

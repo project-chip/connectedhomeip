@@ -3333,23 +3333,6 @@ class ChipClusters:
                     "rootCACertificate": "bytes",
                 },
             },
-            0x0000000C: {
-                "commandId": 0x0000000C,
-                "commandName": "SetVidVerificationStatement",
-                "args": {
-                    "vendorID": "int",
-                    "vidVerificationStatement": "bytes",
-                    "vvsc": "bytes",
-                },
-            },
-            0x0000000D: {
-                "commandId": 0x0000000D,
-                "commandName": "SignVidVerificationRequest",
-                "args": {
-                    "fabricIndex": "int",
-                    "clientChallenge": "bytes",
-                },
-            },
         },
         "attributes": {
             0x00000000: {

@@ -9274,14 +9274,6 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"AddTrustedRootCertificate";
             break;
 
-        case MTRCommandIDTypeClusterOperationalCredentialsCommandSetVidVerificationStatementID:
-            result = @"SetVidVerificationStatement";
-            break;
-
-        case MTRCommandIDTypeClusterOperationalCredentialsCommandSignVidVerificationRequestID:
-            result = @"SignVidVerificationRequest";
-            break;
-
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -11698,10 +11690,6 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
 
         case MTRCommandIDTypeClusterOperationalCredentialsCommandNOCResponseID:
             result = @"NOCResponse";
-            break;
-
-        case MTRCommandIDTypeClusterOperationalCredentialsCommandSignVidVerificationResponseID:
-            result = @"SignVidVerificationResponse";
             break;
 
         default:
