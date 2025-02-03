@@ -729,6 +729,7 @@ SWTCH.C.AO-READ=0
 SWTCH.C.AO-WRITE=0
 
 # General Commissioning Cluster
+CGEN.C=1
 CGEN.S=1
 CGEN.S.A0000=1
 CGEN.S.A0001=1
@@ -742,7 +743,13 @@ CGEN.S.C03.Tx=1
 CGEN.S.C04.Rsp=1
 CGEN.S.C05.Tx=1
 
-CGEN.C=1
+#Feature
+CGEN.S.F00(TC)=1
+
+#PIXIT
+PIXIT.CGEN.FailsafeExpiryLengthSeconds=0
+PIXIT.CGEN.RequiredTCAcknowledgements=1
+PIXIT.CGEN.TCRevision=1
 
 # LAUNDRY WASHER MODE CLUSTER
 LWM.S=1

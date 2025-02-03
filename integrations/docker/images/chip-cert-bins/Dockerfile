@@ -168,6 +168,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-fabric-admin-rpc-ipv6only \
     --target linux-x64-light-data-model-no-unique-id-ipv6only \
     --target linux-x64-network-manager-ipv6only \
+    --target linux-x64-terms-and-conditions \
     build \
     && mv out/linux-x64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
     && mv out/linux-x64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
@@ -192,6 +193,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-x64-fabric-admin-rpc-ipv6only/fabric-admin out/fabric-admin \
     && mv out/linux-x64-light-data-model-no-unique-id-ipv6only/chip-lighting-app out/chip-lighting-data-model-no-unique-id-app \
     && mv out/linux-x64-network-manager-ipv6only/matter-network-manager-app out/matter-network-manager-app \
+    && mv out/linux-x64-terms-and-conditions/chip-terms-and-conditions-app out/chip-terms-and-conditions-app \
     ;; \
     "linux/arm64")\
     set -x \
@@ -220,6 +222,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-fabric-admin-rpc-ipv6only \
     --target linux-arm64-light-data-model-no-unique-id-ipv6only \
     --target linux-arm64-network-manager-ipv6only \
+    --target linux-arm64-terms-and-conditions \
     build \
     && mv out/linux-arm64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
     && mv out/linux-arm64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
@@ -244,6 +247,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-arm64-fabric-admin-rpc-ipv6only/fabric-admin out/fabric-admin \
     && mv out/linux-arm64-light-data-model-no-unique-id-ipv6only/chip-lighting-app out/chip-lighting-data-model-no-unique-id-app \
     && mv out/linux-arm64-network-manager-ipv6only/matter-network-manager-app out/matter-network-manager-app \
+    && mv out/linux-arm64-terms-and-conditions/chip-terms-and-conditions-app out/chip-terms-and-conditions-app \
     ;; \
     *) ;; \
     esac
@@ -283,6 +287,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/fabric-bridge-app app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/fabric-admin apps/fabric-admin
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lighting-data-model-no-unique-id-app apps/chip-lighting-data-model-no-unique-id-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/matter-network-manager-app apps/matter-network-manager-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-terms-and-conditions-app apps/chip-terms-and-conditions-app
 
 # Create symbolic links for now since this allows users to use existing configurations
 # for running just `app-name` instead of `apps/app-name`
