@@ -183,7 +183,7 @@ void AsyncResponder::NotifyEventHandled(const TransferSession::OutputEventType e
 
     // If this is the end of the transfer (whether a clean end, or some sort of error condition), ensure
     // that we destroy ourselves after unwinding the processing loop in the ProcessOutputEvents API.
-    // We can ignore the status for output events because none of them are supposed to result in
+    // We can ignore the status for these output events because none of them are supposed to result in
     // us sending a StatusReport, and that's all we use the status for.
     //
     // In particular, for kTransferTimeout, kAckEOFReceived, and kStatusReceived per spec we
