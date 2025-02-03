@@ -104,9 +104,6 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     //
     //       Open issue that needs fixing: https://github.com/project-chip/connectedhomeip/issues/33735
 
-    // First check things that are not even in metadata. These are read.only.
-    VerifyOrReturnValue(!IsSupportedGlobalAttributeNotInMetadata(request.path.mAttributeId), Status::UnsupportedWrite);
-
     auto metadata = Ember::FindAttributeMetadata(request.path);
 
     // Explicit failure in finding a suitable metadata
@@ -115,6 +112,18 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         VerifyOrDie((*status == Status::UnsupportedEndpoint) || //
                     (*status == Status::UnsupportedCluster) ||  //
                     (*status == Status::UnsupportedAttribute));
+
+        // Check if this is an attribute that ember does not know about but is valid after all and
+        // adjust the return code. All these global attributes are `read only` hence the return
+        // of unsupported write.
+        //
+        // If the path was not valid though, keep that return code.
+        if ((*status == Protocols::InteractionModel::Status::UnsupportedAttribute) &&
+            IsSupportedGlobalAttributeNotInMetadata(request.path.mAttributeId))
+        {
+            return Status::UnsupportedWrite;
+        }
+
         return *status;
     }
 
