@@ -188,7 +188,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFWriteDone");
         WiFiPAF::WiFiPAFSession TxInfo;
         memcpy(&TxInfo, &event->CHIPoWiFiPAFReceived.SessionInfo, sizeof(WiFiPAF::WiFiPAFSession));
-        _GetWiFiPAF()->HandleWriteConfirmed(TxInfo);
+        _GetWiFiPAF()->HandleWriteConfirmed(TxInfo, event->CHIPoWiFiPAFReceived.result);
         break;
     }
     }
@@ -916,6 +916,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
 
     ChipLogProgress(DeviceLayer, "WiFi-PAF: publish_id: %u ! ", publish_id);
     _GetWiFiPAF()->AddPafSession(publish_id);
+    InArgs.publish_id = publish_id;
 
     g_signal_connect(mWpaSupplicant.iface, "nanreplied",
                      G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
@@ -1780,6 +1781,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSend(const WiFiPAF::WiFiPAFSession &
     // Post an event to the Chip queue to deliver the data into the Chip stack.
     ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoWiFiPAFWriteDone };
     memcpy(&event.CHIPoWiFiPAFReceived.SessionInfo, &TxInfo, sizeof(chip::WiFiPAF::WiFiPAFSession));
+    event.CHIPoWiFiPAFReceived.result = result;
     PlatformMgr().PostEventOrDie(&event);
     return ret;
 }
