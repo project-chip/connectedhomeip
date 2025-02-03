@@ -89,7 +89,7 @@ constexpr const char * kErrorDigestMismatch      = "The response digest does not
 class HTTPSSessionHolder
 {
 public:
-    HTTPSSessionHolder() {};
+    HTTPSSessionHolder(){};
 
     ~HTTPSSessionHolder()
     {
