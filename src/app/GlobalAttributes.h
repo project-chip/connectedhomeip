@@ -44,6 +44,13 @@ static_assert(ArrayIsSorted(GlobalAttributesNotInMetadata), "Array of global att
 
 bool IsSupportedGlobalAttributeNotInMetadata(AttributeId attributeId);
 
+/**
+ * Reads a `IsSupportedGlobalAttributeNotInMetadata` atribute into `encoder`.
+ *
+ * Preconditions:
+ *   - `path` MUST be a valid cluster path inside `provider` and its mAttributeID
+ *     MUST be `IsSupportedGlobalAttributeNotInMetadata`
+ */
 DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provider * provider, const ConcreteAttributePath & path,
                                                               AttributeValueEncoder & encoder);
 

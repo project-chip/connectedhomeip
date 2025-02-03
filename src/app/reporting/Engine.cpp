@@ -35,9 +35,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
-#include <optional>
 #include <protocols/interaction_model/StatusCode.h>
-#include <regex.h>
+
+#include <optional>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck

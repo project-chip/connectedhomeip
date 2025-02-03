@@ -123,6 +123,14 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
     // if we get here, the path was NOT valid
     if (err == CHIP_ERROR_NOT_FOUND)
     {
+        // The `Failure` here is arbitrary: we expect ReadGlobalAttributeFromMetadata to be
+        // an internal API used for global attributes only and call preconditions say that
+        // should never happen.
+        //
+        // Code only takes this path if one of
+        // `GeneratedCommands`/`AcceptedCommands`/`Attreibutes` return a NOT_FOUND and
+        // that would indicate an invalid cluster (which should have been pre-validated by
+        // the caller).
         return DataModel::ValidateClusterPath(provider, path, Status::Failure);
     }
     return err;
