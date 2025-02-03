@@ -120,9 +120,6 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void OnActionListChanged(EndpointId endpoint, const ActionStructStorage & action) override{};
-    void OnEndpointListChanged(EndpointId endpoint, const EndpointListStorage & action) override{};
-
     Protocols::InteractionModel::Status HandleInstantAction(uint16_t actionId, Optional<uint32_t> invokeId) override
     {
         return Status::NotFound;

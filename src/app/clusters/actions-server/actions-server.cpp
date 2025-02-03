@@ -425,7 +425,6 @@ CHIP_ERROR ActionsServer::ModifyActionList(EndpointId aEndpoint, const ActionStr
             existingAction.Set(aAction.actionID, aAction.name, aAction.type, aAction.endpointListID, aAction.supportedCommands,
                                aAction.state);
 
-            delegate->OnActionListChanged(aEndpoint, aAction);
             mMatterContext.MarkDirty(aEndpoint, Attributes::ActionList::Id);
             return CHIP_NO_ERROR;
         }
@@ -457,7 +456,6 @@ CHIP_ERROR ActionsServer::ModifyEndpointList(EndpointId aEndpoint, const Endpoin
         {
             existingEpList.Set(aEpList.endpointListID, aEpList.name, aEpList.type, aEpList.endpoints);
             mMatterContext.MarkDirty(aEndpoint, Attributes::EndpointLists::Id);
-            delegate->OnEndpointListChanged(aEndpoint, aEpList);
             return CHIP_NO_ERROR;
         }
     }
