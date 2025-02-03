@@ -180,13 +180,12 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     }
     else if (IsSupportedGlobalAttributeNotInMetadata(readRequest.path.mAttributeId))
     {
-        // Global attributes are NOT directly handled by datamodel providers, instead
+        // Global attributes are NOT directly handled by data model providers, instead
         // the are routed through metadata.
         status = ReadGlobalAttributeFromMetadata(dataModel, readRequest.path, attributeValueEncoder);
     }
     else
     {
-
         status = dataModel->ReadAttribute(readRequest, attributeValueEncoder);
     }
 
