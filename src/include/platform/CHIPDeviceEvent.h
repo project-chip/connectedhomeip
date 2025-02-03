@@ -506,6 +506,7 @@ struct ChipDeviceEvent final
         {
             chip::System::PacketBuffer * Data;
             chip::WiFiPAF::WiFiPAFSession SessionInfo;
+            bool result;
         } CHIPoWiFiPAFReceived;
 #endif
         struct

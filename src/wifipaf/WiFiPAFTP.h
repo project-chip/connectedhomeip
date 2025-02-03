@@ -56,6 +56,16 @@ typedef enum
 } PacketType_t; // PAFTP packet types
 #define CHIP_PAFTP_RXHIST_SIZE 8u
 
+inline SequenceNumber_t IncSeqNum(SequenceNumber_t & a_seq_num)
+{
+    return static_cast<SequenceNumber_t>(0xff & ((a_seq_num) + 1));
+}
+
+/*
+    Offset from "tgtSeqNum" to "baseSeqNum"
+*/
+SequenceNumber_t OffsetSeqNum(SequenceNumber_t & tgtSeqNum, SequenceNumber_t & baseSeqNum);
+
 class WiFiPAFTP // PAFTP Engine
 {
 public:
@@ -92,6 +102,7 @@ public:
 
     SequenceNumber_t GetAndIncrementNextTxSeqNum();
     SequenceNumber_t GetAndRecordRxAckSeqNum();
+    inline SequenceNumber_t GetRxNextSeqNum() const { return mRxNextSeqNum; }
 
     inline SequenceNumber_t GetLastReceivedSequenceNumber() const { return mRxNewestUnackedSeqNum; }
     inline SequenceNumber_t GetNewestUnackedSentSequenceNumber() const { return mTxNewestUnackedSeqNum; }

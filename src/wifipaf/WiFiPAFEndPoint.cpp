@@ -181,6 +181,16 @@ void WiFiPAFEndPoint::DoClose(uint8_t flags, CHIP_ERROR err)
             StopConnectTimer();
         }
 
+        // Free the packets in re-order queue if ones exist
+        for (uint8_t qidx = 0; qidx < PAFTP_REORDER_QUEUE_SIZE; qidx++)
+        {
+            if (ReorderQueue[qidx] != nullptr)
+            {
+                ReorderQueue[qidx] = nullptr;
+                ItemsInReorderQueue--;
+            }
+        }
+
         // If transmit buffer is empty or a transmission abort was specified...
         if (mPafTP.TxState() == WiFiPAFTP::kState_Idle || (flags & kWiFiPAFCloseFlag_AbortTransmission))
         {
@@ -469,7 +479,7 @@ CHIP_ERROR WiFiPAFEndPoint::HandleHandshakeConfirmationReceived()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WiFiPAFEndPoint::HandleFragmentConfirmationReceived()
+CHIP_ERROR WiFiPAFEndPoint::HandleFragmentConfirmationReceived(bool result)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -483,6 +493,15 @@ CHIP_ERROR WiFiPAFEndPoint::HandleFragmentConfirmationReceived()
         // If confirmation was received for stand-alone ack, free its tx buffer.
         mAckToSend = nullptr;
         mConnStateFlags.Clear(ConnectionStateFlag::kStandAloneAckInFlight);
+    }
+
+    if (result != true)
+    {
+        // Something wrong in writing packets
+        ChipLogError(WiFiPAF, "Failed to send PAF packet");
+        err = CHIP_ERROR_SENDING_BLOCKED;
+        StopAckReceivedTimer();
+        SuccessOrExit(err);
     }
 
     // If local receive window size has shrunk to or below immediate ack threshold, AND a message fragment is not
@@ -512,7 +531,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR WiFiPAFEndPoint::HandleSendConfirmationReceived()
+CHIP_ERROR WiFiPAFEndPoint::HandleSendConfirmationReceived(bool result)
 {
     ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "entered HandleSendConfirmationReceived");
 
@@ -526,7 +545,7 @@ CHIP_ERROR WiFiPAFEndPoint::HandleSendConfirmationReceived()
         return HandleHandshakeConfirmationReceived();
     }
 
-    return HandleFragmentConfirmationReceived();
+    return HandleFragmentConfirmationReceived(result);
 }
 
 CHIP_ERROR WiFiPAFEndPoint::DriveStandAloneAck()
@@ -792,6 +811,34 @@ SequenceNumber_t WiFiPAFEndPoint::AdjustRemoteReceiveWindow(SequenceNumber_t las
     return static_cast<uint8_t>(newRemoteWindowBoundary - newestUnackedSentSeqNum);
 }
 
+CHIP_ERROR WiFiPAFEndPoint::GetPktSn(Encoding::LittleEndian::Reader & reader, uint8_t * pHead, SequenceNumber_t & seqNum)
+{
+    CHIP_ERROR err;
+    BitFlags<WiFiPAFTP::HeaderFlags> rx_flags;
+    uint8_t SnOffset = 0;
+    SequenceNumber_t * pSn;
+    err = reader.Read8(rx_flags.RawStorage()).StatusCode();
+    if (rx_flags.Has(WiFiPAFTP::HeaderFlags::kHankshake))
+    {
+        // Handkshake message => No ack/sn
+        return CHIP_ERROR_INTERNAL;
+    }
+    // Always has header flag
+    SnOffset += kTransferProtocolHeaderFlagsSize;
+    if (rx_flags.Has(WiFiPAFTP::HeaderFlags::kManagementOpcode)) // Has Mgmt_Op
+    {
+        SnOffset += kTransferProtocolMgmtOpSize;
+    }
+    if (rx_flags.Has(WiFiPAFTP::HeaderFlags::kFragmentAck)) // Has ack
+    {
+        SnOffset += kTransferProtocolAckSize;
+    }
+    pSn    = pHead + SnOffset;
+    seqNum = *pSn;
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR WiFiPAFEndPoint::DebugPktAckSn(const PktDirect_t PktDirect, Encoding::LittleEndian::Reader & reader, uint8_t * pHead)
 {
 #ifdef CHIP_WIFIPAF_END_POINT_DEBUG_LOGGING_ENABLED
@@ -845,6 +892,80 @@ exit:
 }
 
 CHIP_ERROR WiFiPAFEndPoint::Receive(PacketBufferHandle && data)
+{
+    SequenceNumber_t ExpRxNextSeqNum = mPafTP.GetRxNextSeqNum();
+    SequenceNumber_t seqNum;
+    Encoding::LittleEndian::Reader reader(data->Start(), data->DataLength());
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = GetPktSn(reader, data->Start(), seqNum);
+    if (err != CHIP_NO_ERROR)
+    {
+        // Failed to get SeqNum. => Pass down to PAFTP engine directly
+        return _Receive(std::move(data));
+    }
+    /*
+        If reorder-queue is not empty => Need to queue the packet whose SeqNum is the next one at
+        offset 0 to fill the hole.
+    */
+    if ((ExpRxNextSeqNum == seqNum) && (ItemsInReorderQueue == 0))
+        return _Receive(std::move(data));
+
+    ChipLogError(WiFiPAF, "Reorder the packet: [%u, %u]", ExpRxNextSeqNum, seqNum);
+    // Start reordering packets
+    SequenceNumber_t offset = OffsetSeqNum(seqNum, ExpRxNextSeqNum);
+    if (offset >= PAFTP_REORDER_QUEUE_SIZE)
+    {
+        // Offset is too big
+        // => It may be the unexpected packet or duplicate packet => drop it
+        ChipLogError(WiFiPAF, "Offset (%u) is too big => drop the packet", offset);
+        ChipLogDebugBufferWiFiPAFEndPoint(WiFiPAF, data);
+        return CHIP_NO_ERROR;
+    }
+
+    // Save the packet to the reorder-queue
+    if (ReorderQueue[offset] == nullptr)
+    {
+        ReorderQueue[offset] = std::move(data).UnsafeRelease();
+        ItemsInReorderQueue++;
+    }
+
+    // Consume the packets in the reorder queue if no hole exists
+    if (ReorderQueue[0] == nullptr)
+    {
+        // The hole still exists => Can't continue
+        ChipLogError(WiFiPAF, "The hole still exists. Packets in reorder-queue: %u", ItemsInReorderQueue);
+        return CHIP_NO_ERROR;
+    }
+    uint8_t qidx;
+    for (qidx = 0; qidx < PAFTP_REORDER_QUEUE_SIZE; qidx++)
+    {
+        // The head slots should have been filled. => Do rx processing
+        if (ReorderQueue[qidx] == nullptr)
+        {
+            // Stop consuming packets until the hole or no packets
+            break;
+        }
+        // Consume the saved packets
+        ChipLogProgress(WiFiPAF, "Rx processing from the re-order queue [%u]", qidx);
+        err                = _Receive(System::PacketBufferHandle::Adopt(ReorderQueue[qidx]));
+        ReorderQueue[qidx] = nullptr;
+        ItemsInReorderQueue--;
+    }
+    // Has reached the 1st hole in the queue => move the rest items forward
+    // Note: It's to continue => No need to reinit "i"
+    for (uint8_t newId = 0; qidx < PAFTP_REORDER_QUEUE_SIZE; qidx++, newId++)
+    {
+        if (ReorderQueue[qidx] != nullptr)
+        {
+            ReorderQueue[newId] = ReorderQueue[qidx];
+            ReorderQueue[qidx]  = nullptr;
+        }
+    }
+    return err;
+}
+
+CHIP_ERROR WiFiPAFEndPoint::_Receive(PacketBufferHandle && data)
 {
     ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "+++++++++++++++++++++ entered receive");
     ChipLogDebugBufferWiFiPAFEndPoint(WiFiPAF, data);

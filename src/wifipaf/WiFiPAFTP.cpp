@@ -53,10 +53,11 @@
 
 namespace chip {
 namespace WiFiPAF {
-
-static inline void IncSeqNum(SequenceNumber_t & a_seq_num)
+SequenceNumber_t OffsetSeqNum(SequenceNumber_t & tgtSeqNum, SequenceNumber_t & baseSeqNum)
 {
-    a_seq_num = static_cast<SequenceNumber_t>(0xff & ((a_seq_num) + 1));
+    if (tgtSeqNum >= baseSeqNum)
+        return static_cast<SequenceNumber_t>(tgtSeqNum - baseSeqNum);
+    return static_cast<SequenceNumber_t>((0xff - baseSeqNum) + tgtSeqNum + 1);
 }
 
 static inline bool DidReceiveData(BitFlags<WiFiPAFTP::HeaderFlags> rx_flags)
@@ -118,7 +119,7 @@ SequenceNumber_t WiFiPAFTP::GetAndIncrementNextTxSeqNum()
     mTxNewestUnackedSeqNum = mTxNextSeqNum;
 
     // Increment mTxNextSeqNum.
-    IncSeqNum(mTxNextSeqNum);
+    mTxNextSeqNum = IncSeqNum(mTxNextSeqNum);
 
     return ret;
 }
@@ -177,7 +178,7 @@ CHIP_ERROR WiFiPAFTP::HandleAckReceived(SequenceNumber_t ack_num)
     {
         // Update newest unacknowledged fragment to one past that which was just acknowledged.
         mTxOldestUnackedSeqNum = ack_num;
-        IncSeqNum(mTxOldestUnackedSeqNum);
+        mTxOldestUnackedSeqNum = IncSeqNum(mTxOldestUnackedSeqNum);
     }
 
     return CHIP_NO_ERROR;
@@ -258,7 +259,7 @@ CHIP_ERROR WiFiPAFTP::HandleCharacteristicReceived(System::PacketBufferHandle &&
                 SuccessOrExit(err);
                 ChipLogDebugWiFiPAFTP(WiFiPAF, "Update the seq_n: %u", mRxNewestUnackedSeqNum);
                 mRxNextSeqNum = mRxNewestUnackedSeqNum;
-                IncSeqNum(mRxNextSeqNum);
+                mRxNextSeqNum = IncSeqNum(mRxNextSeqNum);
                 LogState();
                 return CHIP_NO_ERROR;
             }
@@ -282,7 +283,7 @@ CHIP_ERROR WiFiPAFTP::HandleCharacteristicReceived(System::PacketBufferHandle &&
         VerifyOrExit(mRxNewestUnackedSeqNum == mRxNextSeqNum, err = WIFIPAF_ERROR_INVALID_PAFTP_SEQUENCE_NUMBER);
 
         // Increment next expected rx sequence number.
-        IncSeqNum(mRxNextSeqNum);
+        mRxNextSeqNum = IncSeqNum(mRxNextSeqNum);
 
         // If fragment was stand-alone ack, we're done here; no payload for message reassembler.
         if (!DidReceiveData(rx_flags))
