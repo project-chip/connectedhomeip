@@ -186,7 +186,6 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     }
     else
     {
-
         status = dataModel->ReadAttribute(readRequest, attributeValueEncoder);
     }
 
