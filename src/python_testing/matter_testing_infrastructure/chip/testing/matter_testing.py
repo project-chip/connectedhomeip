@@ -41,7 +41,16 @@ from functools import partial
 from itertools import chain
 from typing import Any, Iterable, List, Optional, Tuple
 
-from chip.testing.utilities import cluster_id_str, id_str, type_matches
+from chip.testing.utilities import bytes_from_hex as bytes_from_hex
+from chip.testing.utilities import cluster_id_str as cluster_id_str
+from chip.testing.utilities import compare_time as compare_time
+from chip.testing.utilities import get_wait_seconds_from_set_time as get_wait_seconds_from_set_time
+from chip.testing.utilities import hex_from_bytes as hex_from_bytes
+from chip.testing.utilities import id_str as id_str
+from chip.testing.utilities import type_matches as type_matches
+from chip.testing.utilities import utc_datetime_from_matter_epoch_us as utc_datetime_from_matter_epoch_us
+from chip.testing.utilities import utc_datetime_from_posix_time_ms as utc_datetime_from_posix_time_ms
+from chip.testing.utilities import utc_time_in_matter_epoch as utc_time_in_matter_epoch
 from chip.tlv import uint
 
 # isort: off
@@ -2479,3 +2488,15 @@ def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig,
         if not run_tests_no_exit(test_class, matter_test_config, runner.get_loop(),
                                  hooks, default_controller, external_stack):
             sys.exit(1)
+
+
+type_matches = type_matches
+utc_time_in_matter_epoch = utc_time_in_matter_epoch
+utc_datetime_from_matter_epoch_us = utc_datetime_from_matter_epoch_us
+utc_datetime_from_posix_time_ms = utc_datetime_from_posix_time_ms
+compare_time = compare_time
+get_wait_seconds_from_set_time = get_wait_seconds_from_set_time
+bytes_from_hex = bytes_from_hex
+hex_from_bytes = hex_from_bytes
+id_str = id_str
+cluster_id_str = cluster_id_str
