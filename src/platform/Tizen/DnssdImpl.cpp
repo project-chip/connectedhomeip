@@ -383,17 +383,27 @@ CHIP_ERROR ResolveAsync(chip::Dnssd::ResolveContext * rCtx)
     else
     {
         char iface[IF_NAMESIZE + 1] = "";
-        VerifyOrReturnValue(if_indextoname(rCtx->mInterfaceId, iface) != nullptr, CHIP_ERROR_POSIX(errno),
-                            ChipLogError(DeviceLayer, "if_indextoname() failed: %s", strerror(errno)));
+        if (if_indextoname(rCtx->mInterfaceId, iface) == nullptr)
+        {
+            ChipLogError(DeviceLayer, "if_indextoname() failed: %s", strerror(errno));
+            return CHIP_ERROR_POSIX(errno);
+        }
+
         ret = dnssd_create_remote_service(rCtx->mType, rCtx->mName, iface, &rCtx->mServiceHandle);
     }
 
-    VerifyOrReturnValue(ret == DNSSD_ERROR_NONE, TizenToChipError(ret),
-                        ChipLogError(DeviceLayer, "dnssd_create_remote_service() failed: %s", get_error_message(ret)));
+    if (ret != DNSSD_ERROR_NONE)
+    {
+        ChipLogError(DeviceLayer, "dnssd_create_remote_service() failed: %s", get_error_message(ret));
+        return TizenToChipError(ret);
+    }
 
     ret = dnssd_resolve_service(rCtx->mServiceHandle, OnResolve, rCtx);
-    VerifyOrReturnValue(ret == DNSSD_ERROR_NONE, TizenToChipError(ret),
-                        ChipLogError(DeviceLayer, "dnssd_resolve_service() failed: %s", get_error_message(ret)));
+    if (ret != DNSSD_ERROR_NONE)
+    {
+        ChipLogError(DeviceLayer, "dnssd_resolve_service() failed: %s", get_error_message(ret));
+        return TizenToChipError(ret);
+    }
 
     rCtx->mIsResolving = true;
     return CHIP_NO_ERROR;
