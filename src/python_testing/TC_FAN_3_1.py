@@ -211,48 +211,36 @@ class TC_FAN_3_1(MatterBaseTest):
     @async_test_body
     async def test_TC_FAN_3_1(self):
         # Setup
-        endpoint = self.get_endpoint(default=1)
+        ep = self.get_endpoint(default=1)
         percent_setting_attr = Clusters.FanControl.Attributes.PercentSetting
         fan_mode_attr = Clusters.FanControl.Attributes.FanMode
         feature_map_attr = Clusters.FanControl.Attributes.FeatureMap
-        feature_map = await self.read_fc_attribute_expect_success(endpoint=endpoint, attribute=feature_map_attr)
+        feature_map = await self.read_fc_attribute_expect_success(endpoint=ep, attribute=feature_map_attr)
         self.supports_speed = self._supports_speed(feature_map)
         
         # TH writes to the DUT the PercentSetting attribute iteratively within
         # a range of 1 to 100 one at a time in ascending order
         # Verifies that FanMode and SpeedSetting values (if supported) are being
         # updated accordingly (greater or less than the previous values)
-        await self.verify_fan_control_attribute_values(
-            endpoint=endpoint,
-            attr_to_write=percent_setting_attr,
-            order=OrderEnum.Ascending)
+        await self.verify_fan_control_attribute_values(ep, percent_setting_attr, OrderEnum.Ascending)
 
         # TH writes to the DUT the PercentSetting attribute iteratively within
         # a range of 1 to 100 one at a time in descending order
         # Verifies that FanMode and SpeedSetting values (if supported) are being
         # updated accordingly (greater or less than the previous values)
-        await self.verify_fan_control_attribute_values(
-            endpoint=endpoint,
-            attr_to_write=percent_setting_attr,
-            order=OrderEnum.Descending)
+        await self.verify_fan_control_attribute_values(ep, percent_setting_attr, OrderEnum.Descending)
 
         # TH writes to the DUT the FanMode attribute iteratively within a range of
         # the number of available fan modes one at a time in ascending order
         # Verifies that PercentSetting and SpeedSetting values (if supported) are being
         # updated accordingly (greater or less than the previous values)
-        await self.verify_fan_control_attribute_values(
-            endpoint=endpoint,
-            attr_to_write=fan_mode_attr,
-            order=OrderEnum.Ascending)
+        await self.verify_fan_control_attribute_values(ep, fan_mode_attr, OrderEnum.Ascending)
 
         # TH writes to the DUT the FanMode attribute iteratively within a range of
         # the number of available fan modes one at a time in descending order
         # Verifies that PercentSetting and SpeedSetting values (if supported) are being
         # updated accordingly (greater or less than the previous values)
-        await self.verify_fan_control_attribute_values(
-            endpoint=endpoint,
-            attr_to_write=fan_mode_attr,
-            order=OrderEnum.Descending)
+        await self.verify_fan_control_attribute_values(ep, fan_mode_attr, OrderEnum.Descending)
 
 
 if __name__ == "__main__":
