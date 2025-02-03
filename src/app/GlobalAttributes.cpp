@@ -87,32 +87,16 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
         auto buffer = builder.TakeBuffer();
 
         return encoder.EncodeList([&buffer](const auto & listEncodeHelper) {
-            bool addedExtraGlobals      = false;
-            constexpr auto lastGlobalId = GlobalAttributesNotInMetadata[ArraySize(GlobalAttributesNotInMetadata) - 1];
-            // If EventList is not supported. The GlobalAttributesNotInMetadata is missing one id here.
-            static_assert(lastGlobalId - GlobalAttributesNotInMetadata[0] == ArraySize(GlobalAttributesNotInMetadata),
-                          "Ids in GlobalAttributesNotInMetadata not consecutive (except EventList)");
-
             for (auto entry : buffer)
             {
-                if (!addedExtraGlobals && entry.attributeId > lastGlobalId)
-                {
-                    for (const auto & globalId : GlobalAttributesNotInMetadata)
-                    {
-                        ReturnErrorOnFailure(listEncodeHelper.Encode(globalId));
-                    }
-                    addedExtraGlobals = true;
-                }
                 ReturnErrorOnFailure(listEncodeHelper.Encode(entry.attributeId));
             }
 
-            if (!addedExtraGlobals)
+            for (auto id : GlobalAttributesNotInMetadata)
             {
-                for (auto id : GlobalAttributesNotInMetadata)
-                {
-                    ReturnErrorOnFailure(listEncodeHelper.Encode(id));
-                }
+                ReturnErrorOnFailure(listEncodeHelper.Encode(id));
             }
+
             return CHIP_NO_ERROR;
         });
     }
