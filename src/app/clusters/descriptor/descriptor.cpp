@@ -15,10 +15,7 @@
  *    limitations under the License.
  */
 
-/****************************************************************************
- * @file
- * @brief Implementation for the Descriptor Server Cluster
- ***************************************************************************/
+#include "descriptor.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -26,13 +23,15 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
+#include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model/List.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-
-#include "descriptor.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -41,6 +40,38 @@ using namespace chip::app::Clusters::Descriptor;
 using namespace chip::app::Clusters::Descriptor::Attributes;
 
 namespace {
+
+/// Figures out if `childId` is a descendant of `parentId` given some specific endpoint entries
+bool IsDescendantOf(const DataModel::EndpointEntry * __restrict__ childEndpoint, const EndpointId parentId,
+                    Span<const DataModel::EndpointEntry> allEndpoints)
+{
+    // NOTE: this is not very efficient as we loop through all endpoints for each parent search
+    //       however endpoint depth should not be as large.
+    while (true)
+    {
+
+        VerifyOrReturnValue(childEndpoint != nullptr, false);
+        VerifyOrReturnValue(childEndpoint->parentId != parentId, true);
+
+        // Parent endpoint id 0 is never here: EndpointEntry::parentId uses
+        // kInvalidEndpointId to reference no explicit endpoint. See `EndpointEntry`
+        // comments.
+        VerifyOrReturnValue(childEndpoint->parentId != kInvalidEndpointId, false);
+
+        const auto lookupId = childEndpoint->parentId;
+        childEndpoint       = nullptr; // we will look it up again
+
+        // find the requested value in the array to get its parent
+        for (const auto & ep : allEndpoints)
+        {
+            if (ep.id == lookupId)
+            {
+                childEndpoint = &ep;
+                break;
+            }
+        }
+    }
+}
 
 class DescriptorAttrAccess : public AttributeAccessInterface
 {
@@ -54,7 +85,8 @@ private:
     CHIP_ERROR ReadTagListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadClientServerAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder, bool server);
+    CHIP_ERROR ReadClientClusters(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadServerClusters(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadFeatureMap(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 };
@@ -74,12 +106,13 @@ CHIP_ERROR DescriptorAttrAccess::ReadFeatureMap(EndpointId endpoint, AttributeVa
 
 CHIP_ERROR DescriptorAttrAccess::ReadTagListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
-        auto tag = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetFirstSemanticTag(endpoint);
-        while (tag.has_value())
+    DataModel::ListBuilder<DataModel::Provider::SemanticTag> semanticTagsList;
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->SemanticTags(endpoint, semanticTagsList));
+
+    return aEncoder.EncodeList([&semanticTagsList](const auto & encoder) -> CHIP_ERROR {
+        for (const auto & tag : semanticTagsList.TakeBuffer())
         {
-            ReturnErrorOnFailure(encoder.Encode(tag.value()));
-            tag = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetNextSemanticTag(endpoint, tag.value());
+            ReturnErrorOnFailure(encoder.Encode(tag));
         }
         return CHIP_NO_ERROR;
     });
@@ -87,84 +120,89 @@ CHIP_ERROR DescriptorAttrAccess::ReadTagListAttribute(EndpointId endpoint, Attri
 
 CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    auto endpointInfo = InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetEndpointInfo(endpoint);
+    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->Endpoints(endpointsList));
+    auto endpoints = endpointsList.TakeBuffer();
     if (endpoint == 0x00)
     {
-        err = aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-            auto endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstEndpoint();
-            while (endpointEntry.IsValid())
+        return aEncoder.EncodeList([&endpoints](const auto & encoder) -> CHIP_ERROR {
+            for (const auto & ep : endpoints)
             {
-                if (endpointEntry.id != 0)
+                if (ep.id == 0)
                 {
-                    ReturnErrorOnFailure(encoder.Encode(endpointEntry.id));
+                    continue;
                 }
-                endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextEndpoint(endpointEntry.id);
-            }
-            return CHIP_NO_ERROR;
-        });
-    }
-    else if (endpointInfo.has_value() && endpointInfo->compositionPattern == DataModel::EndpointCompositionPattern::kFullFamily)
-    {
-        err = aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
-            auto endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstEndpoint();
-            while (endpointEntry.IsValid())
-            {
-                EndpointId parentEndpointId = endpointEntry.info.parentId;
-                while (parentEndpointId != chip::kInvalidEndpointId)
-                {
-                    if (parentEndpointId == endpoint)
-                    {
-                        ReturnErrorOnFailure(encoder.Encode(endpointEntry.id));
-                        break;
-                    }
-                    auto parentEndpointInfo =
-                        InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetEndpointInfo(parentEndpointId);
-                    if (!parentEndpointInfo.has_value())
-                    {
-                        break;
-                    }
-                    parentEndpointId = parentEndpointInfo->parentId;
-                }
-                endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextEndpoint(endpointEntry.id);
-            }
-
-            return CHIP_NO_ERROR;
-        });
-    }
-    else if (endpointInfo.has_value() && endpointInfo->compositionPattern == DataModel::EndpointCompositionPattern::kTree)
-    {
-        err = aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
-            auto endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstEndpoint();
-            while (endpointEntry.IsValid())
-            {
-                if (endpointEntry.info.parentId == endpoint)
-                {
-                    ReturnErrorOnFailure(encoder.Encode(endpointEntry.id));
-                }
-                endpointEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextEndpoint(endpointEntry.id);
+                ReturnErrorOnFailure(encoder.Encode(ep.id));
             }
             return CHIP_NO_ERROR;
         });
     }
 
-    return err;
+    // find the given endpoint
+    unsigned idx = 0;
+    while (idx < endpoints.size())
+    {
+        if (endpoints[idx].id == endpoint)
+        {
+            break;
+        }
+        idx++;
+    }
+    if (idx >= endpoints.size())
+    {
+        // not found
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    auto & endpointInfo = endpoints[idx];
+
+    switch (endpointInfo.compositionPattern)
+    {
+    case DataModel::EndpointCompositionPattern::kFullFamily:
+        // encodes ALL endpoints that have the specified endpoint as a descendant
+        return aEncoder.EncodeList([&endpoints, endpoint](const auto & encoder) -> CHIP_ERROR {
+            for (const auto & ep : endpoints)
+            {
+                if (IsDescendantOf(&ep, endpoint, endpoints))
+                {
+                    ReturnErrorOnFailure(encoder.Encode(ep.id));
+                }
+            }
+            return CHIP_NO_ERROR;
+        });
+
+    case DataModel::EndpointCompositionPattern::kTree:
+        return aEncoder.EncodeList([&endpoints, endpoint](const auto & encoder) -> CHIP_ERROR {
+            for (const auto & ep : endpoints)
+            {
+                if (ep.parentId != endpoint)
+                {
+                    continue;
+                }
+                ReturnErrorOnFailure(encoder.Encode(ep.id));
+            }
+            return CHIP_NO_ERROR;
+        });
+    }
+    // not actually reachable and compiler will validate we
+    // handle all switch cases above
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
+    DataModel::ListBuilder<DataModel::DeviceTypeEntry> deviceTypesList;
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->DeviceTypes(endpoint, deviceTypesList));
+
+    auto deviceTypes = deviceTypesList.TakeBuffer();
+
+    CHIP_ERROR err = aEncoder.EncodeList([&deviceTypes](const auto & encoder) -> CHIP_ERROR {
         Descriptor::Structs::DeviceTypeStruct::Type deviceStruct;
-
-        auto deviceType = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstDeviceType(endpoint);
-
-        while (deviceType.has_value())
+        for (const auto & type : deviceTypes)
         {
-            deviceStruct.deviceType = deviceType->deviceTypeId;
-            deviceStruct.revision   = deviceType->deviceTypeRevision;
+            deviceStruct.deviceType = type.deviceTypeId;
+            deviceStruct.revision   = type.deviceTypeRevision;
             ReturnErrorOnFailure(encoder.Encode(deviceStruct));
-            deviceType = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextDeviceType(endpoint, *deviceType);
         }
 
         return CHIP_NO_ERROR;
@@ -173,33 +211,30 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
     return err;
 }
 
-CHIP_ERROR DescriptorAttrAccess::ReadClientServerAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder, bool server)
+CHIP_ERROR DescriptorAttrAccess::ReadServerClusters(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = aEncoder.EncodeList([&endpoint, server](const auto & encoder) -> CHIP_ERROR {
-        if (server)
+    DataModel::ListBuilder<DataModel::ServerClusterEntry> builder;
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->ServerClusters(endpoint, builder));
+    return aEncoder.EncodeList([&builder](const auto & encoder) -> CHIP_ERROR {
+        for (const auto & cluster : builder.TakeBuffer())
         {
-            auto clusterEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstServerCluster(endpoint);
-            while (clusterEntry.IsValid())
-            {
-                ReturnErrorOnFailure(encoder.Encode(clusterEntry.path.mClusterId));
-                clusterEntry = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextServerCluster(clusterEntry.path);
-            }
+            ReturnErrorOnFailure(encoder.Encode(cluster.clusterId));
         }
-        else
-        {
-            ConcreteClusterPath clusterPath =
-                InteractionModelEngine::GetInstance()->GetDataModelProvider()->FirstClientCluster(endpoint);
-            while (clusterPath.HasValidIds())
-            {
-                ReturnErrorOnFailure(encoder.Encode(clusterPath.mClusterId));
-                clusterPath = InteractionModelEngine::GetInstance()->GetDataModelProvider()->NextClientCluster(clusterPath);
-            }
-        }
-
         return CHIP_NO_ERROR;
     });
+}
 
-    return err;
+CHIP_ERROR DescriptorAttrAccess::ReadClientClusters(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    DataModel::ListBuilder<ClusterId> clusterIdList;
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->ClientClusters(endpoint, clusterIdList));
+    return aEncoder.EncodeList([&clusterIdList](const auto & encoder) -> CHIP_ERROR {
+        for (const auto & id : clusterIdList.TakeBuffer())
+        {
+            ReturnErrorOnFailure(encoder.Encode(id));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 CHIP_ERROR DescriptorAttrAccess::ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder)
@@ -219,10 +254,10 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         return ReadDeviceAttribute(aPath.mEndpointId, aEncoder);
     }
     case ServerList::Id: {
-        return ReadClientServerAttribute(aPath.mEndpointId, aEncoder, true);
+        return ReadServerClusters(aPath.mEndpointId, aEncoder);
     }
     case ClientList::Id: {
-        return ReadClientServerAttribute(aPath.mEndpointId, aEncoder, false);
+        return ReadClientClusters(aPath.mEndpointId, aEncoder);
     }
     case PartsList::Id: {
         return ReadPartsAttribute(aPath.mEndpointId, aEncoder);
@@ -242,6 +277,7 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     }
     return CHIP_NO_ERROR;
 }
+
 } // anonymous namespace
 
 void MatterDescriptorPluginServerInitCallback()

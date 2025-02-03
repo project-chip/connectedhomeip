@@ -128,8 +128,7 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMod
 {
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
-        wifi_mode_t curWiFiMode = wfx_get_wifi_mode();
-        if ((curWiFiMode == WIFI_MODE_STA) || (curWiFiMode == WIFI_MODE_APSTA))
+        if (IsStationModeEnabled())
         {
             mWiFiStationMode = kWiFiStationMode_Enabled;
         }
@@ -138,6 +137,7 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMod
             mWiFiStationMode = kWiFiStationMode_Disabled;
         }
     }
+
     return mWiFiStationMode;
 }
 
@@ -259,14 +259,9 @@ void ConnectivityManagerImpl::DriveStationState()
             (mWiFiStationMode != kWiFiStationMode_Enabled && !IsWiFiStationProvisioned()))
         {
             ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
-            sl_status_t status = sl_matter_wifi_disconnect();
-            if (status != SL_STATUS_OK)
-            {
-                ChipLogError(DeviceLayer, "wfx_wifi_disconnect() failed: %lx", status);
 
-                // TODO: Clean the function up to remove the usage of goto
-                goto exit;
-            }
+            CHIP_ERROR error = TriggerDisconnection();
+            SuccessOrExitAction(error, ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %s", ErrorStr(error)));
 
             ChangeWiFiStationState(kWiFiStationState_Disconnecting);
         }
@@ -344,7 +339,6 @@ exit:
 
 void ConnectivityManagerImpl::OnStationConnected()
 {
-    wfx_setup_ip6_link_local(SL_WFX_STA_INTERFACE);
     NetworkCommissioning::SlWiFiDriver::GetInstance().OnConnectWiFiNetwork();
 
     UpdateInternetConnectivityState();

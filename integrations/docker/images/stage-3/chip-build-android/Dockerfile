@@ -8,7 +8,7 @@ LABEL org.opencontainers.image.source https://github.com/project-chip/connectedh
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
-    openjdk-8-jdk \
+    openjdk-11-jdk \
     rsync \
     swig \
     && rm -rf /var/lib/apt/lists/ \
@@ -27,12 +27,17 @@ RUN set -x \
     && : # last line
 
 # Download and install android command line tool (for installing `sdkmanager`)
+# We need create latest folder inide cmdline-tools, since latest android commandline tool looks for this latest folder
+# when running sdkmanager --licenses
 RUN set -x \
-    && wget -O /tmp/android-tools.zip https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip \
+    && wget -O /tmp/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip \
     && cd /opt/android/sdk \
-    && unzip /tmp/android-tools.zip \
-    && rm -f /tmp/android-tools.zip \
-    && test -d /opt/android/sdk/tools \
+    && mkdir -p temp \
+    && unzip /tmp/cmdline-tools.zip -d temp \
+    && mkdir -p cmdline-tools/latest \
+    && cp -rf temp/cmdline-tools/* cmdline-tools/latest \
+    && rm -rf temp \
+    && test -d /opt/android/sdk/cmdline-tools \
     && : # last line
 
 # Download and install android NDK

@@ -15,11 +15,8 @@
  */
 #pragma once
 
-#include <app/icd/server/ICDServerConfig.h>
-#include <cmsis_os2.h>
-#include <lib/support/BitFlags.h>
 #include <platform/silabs/wifi/WifiInterface.h>
-#include <sl_cmsis_os2_common.h>
+#include <sl_status.h>
 
 #define WFX_RSI_DHCP_POLL_INTERVAL (250) /* Poll interval in ms for DHCP */
 
@@ -36,18 +33,82 @@ enum class WifiPlatformEvent : uint8_t
     kStationDhcpPoll   = 8,
 };
 
-void sl_matter_wifi_task(void * arg);
+/**
+ * @brief Function calls the underlying platforms disconnection API.
+ *
+ * @note This abstraction layer here is used to reduce the duplication for wiseconnect platforms.
+ *       Since the only difference is the disconnection API, the common implementation is in the WiseconnectWifiInterface
+ *       which calls this abstraction function that is implemented by the different platforms.
+ *
+ * @return sl_status_t SL_STATUS_OK, the Wi-Fi disconnection was succesfully triggered
+ *                     SL_STATUS_FAILURE, otherwise
+ */
+sl_status_t TriggerPlatformWifiDisconnection();
 
-int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap);
-int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
-int32_t wfx_rsi_reset_count();
-int32_t sl_wifi_platform_disconnect();
+/**
+ * @brief Callback function for the DHCP timer event.
+ *
+ * TODO: Once the class structure is done, move this to the protected section. Should not be public.
+ */
+void DHCPTimerEventHandler(void * arg);
 
-sl_status_t sl_matter_wifi_platform_init(void);
+/**
+ * @brief Function cancels the DHCP timer if it is running.
+ *        If the timer isn't running, function doesn't do anything.
+ *
+ * TODO: Once the class structure is done, move this to the protected section. Should not be public.
+ */
+void CancelDHCPTimer(void);
+
+/**
+ * @brief Function starts the DHCP timer with the given timeout.
+ *
+ * TODO: Once the class structure is done, move this to the protected section. Should not be public.
+ *
+ * @param timeout timer duration in milliseconds
+ */
+void StartDHCPTimer(uint32_t timeout);
+
+/**
+ * @brief Reset the flags that are used to notify the application about DHCP connectivity
+ *        and emits a WifiPlatformEvent::kStationDoDhcp event to trigger DHCP polling checks.
+ *
+ * TODO: This function should be moved to the protected section once the class structure is done.
+ */
+void ResetDHCPNotificationFlags();
+
+/**
+ * @brief Function creates the DHCP timer
+ *
+ * @note This function is necessary for the time being since the WifiInterface don't leverage inheritance for the time being and as
+ *       such don't have access to all data structures. Once the class structure is done, this function will not be necessary
+ *       anymore.
+ *
+ * @return sl_status_t SL_STATUS_OK, the timer was successfully created
+ */
+sl_status_t CreateDHCPTimer();
+
+/**
+ * @brief Notify the application about the connectivity status if it has not been notified yet.
+ *
+ * TODO: This function should be moved to the protected section once the class structure is done.
+ */
+void NotifyConnectivity(void);
 
 /**
  * @brief Posts an event to the Wi-Fi task
  *
+ * TODO: Once the class structure is in place, the function implementation can be in the protected section of this class instead of
+ *       implemented twice.
+ *
  * @param[in] event Event to process.
  */
-void sl_matter_wifi_post_event(WifiPlatformEvent event);
+void PostWifiPlatformEvent(WifiPlatformEvent event);
+
+/**
+ * @brief Main worker function for the Matter Wi-Fi task responsible of processing Wi-Fi platform events.
+ *        Function is used in the StartWifiTask.
+ *
+ * @param[in] arg context pointer
+ */
+void MatterWifiTask(void * arg);

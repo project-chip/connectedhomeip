@@ -32,9 +32,6 @@ static_library("Beken") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-
-    #"DeviceInfoProviderImpl.cpp",
-    #"DeviceInfoProviderImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "KeyValueStoreManagerImpl.cpp",
@@ -50,6 +47,7 @@ static_library("Beken") {
   ]
 
   deps = [
+    "${chip_root}/src/app:app_config",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",

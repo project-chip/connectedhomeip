@@ -207,7 +207,6 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
         "Test_TC_DGTHREAD_2_2",  # Thread Network Diagnostics is not implemented under darwin.
         "Test_TC_DGTHREAD_2_3",  # Thread Network Diagnostics is not implemented under darwin.
         "Test_TC_DGTHREAD_2_4",  # Thread Network Diagnostics is not implemented under darwin.
-        "Test_TC_FLABEL_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_GRPKEY_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_LCFG_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_OPCREDS_3_7",  # darwin-framework-tool does not support the GetCommissionerRootCertificate command.

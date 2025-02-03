@@ -100,15 +100,23 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0010" name="MinLevel" type="uint8" default="PhysicalMinLevel">
+    <attribute id="0x0010" name="MinLevel" type="uint8">
+      <default attribute="PhysicalMinLevel"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <mandatoryConform/>
-      <constraint type="between" from="PhysicalMinLevel" to="MaxLevel"/>
+      <constraint type="between">
+        <from attribute="PhysicalMinLevel"/>
+        <to attribute="MaxLevel"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0011" name="MaxLevel" type="uint8" default="PhysicalMaxLevel">
+    <attribute id="0x0011" name="MaxLevel" type="uint8">
+      <default attribute="PhysicalMaxLevel"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <mandatoryConform/>
-      <constraint type="between" from="MinLevel" to="PhysicalMaxLevel"/>
+      <constraint type="between">
+        <from attribute="MinLevel"/>
+        <to attribute="PhysicalMaxLevel"/>
+      </constraint>
     </attribute>
     <attribute id="0x0012" name="PowerOnLevel">
       <deprecateConform/>
@@ -118,12 +126,12 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0014" name="IntrinsicBallastFactor" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0015" name="BallastFactorAdjustment" type="uint8" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
       <constraint type="between" from="100" to="MS"/>
     </attribute>
@@ -131,24 +139,24 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0030" name="LampType" type="string" default="&quot;">
+    <attribute id="0x0030" name="LampType" type="string" default="&quot;&quot;">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
       <constraint type="maxLength" value="16"/>
     </attribute>
-    <attribute id="0x0031" name="LampManufacturer" type="string" default="&quot;">
+    <attribute id="0x0031" name="LampManufacturer" type="string" default="&quot;&quot;">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
       <constraint type="maxLength" value="16"/>
     </attribute>
     <attribute id="0x0032" name="LampRatedHours" type="uint24" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0033" name="LampBurnHours" type="uint24" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0034" name="LampAlarmMode" type="LampAlarmModeBitmap" default="0">
@@ -157,7 +165,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0035" name="LampBurnHoursTripPoint" type="uint24" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
   </attributes>
