@@ -55,7 +55,7 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
         return encoder.EncodeList([&buffer](const auto & listEncodeHelper) {
             for (auto id : buffer)
             {
-                ReturnErrorOnFailure(listEncodeHelper.Encode(id));
+                ReturnErrorOnFailure(listEncodeHelper.Encode(static_cast<uint64_t>(id)));
             }
             return CHIP_NO_ERROR;
         });
@@ -72,7 +72,7 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
         return encoder.EncodeList([&buffer](const auto & listEncodeHelper) {
             for (auto entry : buffer)
             {
-                ReturnErrorOnFailure(listEncodeHelper.Encode(entry.commandId));
+                ReturnErrorOnFailure(listEncodeHelper.Encode(static_cast<uint64_t>(entry.commandId)));
             }
             return CHIP_NO_ERROR;
         });
@@ -89,12 +89,12 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
         return encoder.EncodeList([&buffer](const auto & listEncodeHelper) {
             for (auto entry : buffer)
             {
-                ReturnErrorOnFailure(listEncodeHelper.Encode(entry.attributeId));
+                ReturnErrorOnFailure(listEncodeHelper.Encode(static_cast<uint64_t>(entry.attributeId)));
             }
 
             for (auto id : GlobalAttributesNotInMetadata)
             {
-                ReturnErrorOnFailure(listEncodeHelper.Encode(id));
+                ReturnErrorOnFailure(listEncodeHelper.Encode(static_cast<uint64_t>(id)));
             }
 
             return CHIP_NO_ERROR;
