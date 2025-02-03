@@ -90,7 +90,6 @@ tests:
                   0xFFFD, # ClusterRevision
               }
 
-
     - label: "Read AttributeList value"
       PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
