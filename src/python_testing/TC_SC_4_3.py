@@ -404,4 +404,5 @@ class TC_SC_4_3(MatterBaseTest):
 
 
 if __name__ == "__main__":
+    print("CI Trigger")
     default_matter_test_main()
