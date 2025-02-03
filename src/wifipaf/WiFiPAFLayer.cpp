@@ -248,6 +248,11 @@ void WiFiPAFLayer::Shutdown(OnCancelDeviceHandle OnCancelDevice)
         }
         ChipLogProgress(WiFiPAF, "WiFiPAF: Canceling id: %u", PafInfoElm.id);
         OnCancelDevice(PafInfoElm.id, PafInfoElm.role);
+        WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(&PafInfoElm));
+        if (endPoint != nullptr)
+        {
+            endPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
+        }
     }
     PafInfoVect.clear();
 }
@@ -288,11 +293,11 @@ CHIP_ERROR WiFiPAFLayer::SendMessage(WiFiPAF::WiFiPAFSession & TxInfo, chip::Sys
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WiFiPAFLayer::HandleWriteConfirmed(WiFiPAF::WiFiPAFSession & TxInfo)
+CHIP_ERROR WiFiPAFLayer::HandleWriteConfirmed(WiFiPAF::WiFiPAFSession & TxInfo, bool result)
 {
     WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(&TxInfo));
     VerifyOrReturnError(endPoint != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogDetail(WiFiPAF, "No endpoint to send packets"));
-    CHIP_ERROR err = endPoint->HandleSendConfirmationReceived();
+    CHIP_ERROR err = endPoint->HandleSendConfirmationReceived(result);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(WiFiPAF, "Write_Confirm, Send pakets failed, err = %" CHIP_ERROR_FORMAT, err.Format()));
 

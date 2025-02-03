@@ -170,7 +170,7 @@ public:
     State GetWiFiPAFState() { return mAppState; };
     void SetWiFiPAFState(State state);
     CHIP_ERROR SendMessage(WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msg);
-    CHIP_ERROR HandleWriteConfirmed(WiFiPAF::WiFiPAFSession & TxInfo);
+    CHIP_ERROR HandleWriteConfirmed(WiFiPAF::WiFiPAFSession & TxInfo, bool result);
     CHIP_ERROR NewEndPoint(WiFiPAFEndPoint ** retEndPoint, WiFiPAFSession & SessionInfo, WiFiPafRole role);
     typedef void (*OnSubscribeCompleteFunct)(void * appState);
     typedef void (*OnSubscribeErrorFunct)(void * appState, CHIP_ERROR err);

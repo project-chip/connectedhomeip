@@ -89,15 +89,21 @@ public:
     ~WiFiPAFEndPoint() = default;
 
 private:
+    CHIP_ERROR _Receive(PacketBufferHandle && data);
     enum class PktDirect_t : uint8_t
     {
         kTx,
         kRx
     };
     CHIP_ERROR DebugPktAckSn(const PktDirect_t PktDirect, Encoding::LittleEndian::Reader & reader, uint8_t * pHead);
+    CHIP_ERROR GetPktSn(Encoding::LittleEndian::Reader & reader, uint8_t * pHead, SequenceNumber_t & seqNum);
 
     WiFiPAFLayer * mWiFiPafLayer; ///< [READ-ONLY] Pointer to the WiFiPAFLayer object that owns this object.
     WiFiPAFSession mSessionInfo;
+    SequenceNumber_t mRxAck;
+#define PAFTP_REORDER_QUEUE_SIZE PAF_MAX_RECEIVE_WINDOW_SIZE
+    System::PacketBuffer * ReorderQueue[PAFTP_REORDER_QUEUE_SIZE];
+    uint8_t ItemsInReorderQueue;
 
     enum class ConnectionStateFlag : uint8_t
     {
@@ -148,9 +154,9 @@ private:
 
     // Receive path:
     CHIP_ERROR HandleConnectComplete();
-    CHIP_ERROR HandleSendConfirmationReceived();
+    CHIP_ERROR HandleSendConfirmationReceived(bool result);
     CHIP_ERROR HandleHandshakeConfirmationReceived();
-    CHIP_ERROR HandleFragmentConfirmationReceived();
+    CHIP_ERROR HandleFragmentConfirmationReceived(bool result);
     CHIP_ERROR HandleCapabilitiesRequestReceived(PacketBufferHandle && data);
     CHIP_ERROR HandleCapabilitiesResponseReceived(PacketBufferHandle && data);
     SequenceNumber_t AdjustRemoteReceiveWindow(SequenceNumber_t lastReceivedAck, SequenceNumber_t maxRemoteWindowSize,

@@ -541,15 +541,16 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     if (LinuxDeviceOptions::GetInstance().mWiFi && LinuxDeviceOptions::GetInstance().mWiFiPAF)
     {
-        ChipLogProgress(NotSpecified, "WiFi-PAF: initialzing");
+        ChipLogProgress(WiFiPAF, "WiFi-PAF: initialzing");
         if (EnsureWiFiIsStarted())
         {
-            ChipLogProgress(NotSpecified, "Wi-Fi Management started");
+            ChipLogProgress(WiFiPAF, "Wi-Fi Management started");
             DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
 
             args.enable        = LinuxDeviceOptions::GetInstance().mWiFiPAF;
             args.freq_list_len = WiFiPAFGet_FreqList(LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds, args.freq_list);
             DeviceLayer::ConnectivityMgr().WiFiPAFPublish(args);
+            LinuxDeviceOptions::GetInstance().mPublishId = args.publish_id;
         }
     }
 #endif
@@ -722,6 +723,14 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     {
         // This example use of the ARL feature proactively installs the provided entries on fabric index 1
         exampleAccessRestrictionProvider->SetEntries(1, LinuxDeviceOptions::GetInstance().arlEntries.Value());
+    }
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if (Server::GetInstance().GetFabricTable().FabricCount() != 0)
+    {
+        ChipLogProgress(AppServer, "Fabric already commissioned. Canceling publishing");
+        DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(LinuxDeviceOptions::GetInstance().mPublishId,
+                                                       chip::WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher);
     }
 #endif
 

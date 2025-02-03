@@ -299,6 +299,7 @@ struct ConnectivityManager::WiFiPAFAdvertiseParam
     /* Frequency list */
     uint16_t freq_list_len;
     std::unique_ptr<uint16_t[]> freq_list;
+    uint32_t publish_id;
 };
 #endif
 
