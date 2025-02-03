@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "data-model-providers/codegen/EmberMetadata.h"
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -37,6 +36,7 @@
 #include <app/util/endpoint-config-api.h>
 #include <app/util/persistence/AttributePersistenceProvider.h>
 #include <app/util/persistence/DefaultAttributePersistenceProvider.h>
+#include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
