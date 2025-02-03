@@ -369,22 +369,6 @@ public:
      */
     virtual Protocols::InteractionModel::Status HandleDisableActionWithDuration(uint16_t actionId, uint32_t duration,
                                                                                 Optional<uint32_t> invokeId) = 0;
-
-    /**
-     * Called when an action list has been updated.
-     *
-     * @param endpoint The endpoint ID where the action list was updated
-     * @param action The updated action details
-     */
-    virtual void OnActionListChanged(EndpointId endpoint, const ActionStructStorage & action) = 0;
-
-    /**
-     * Called when an endpoint list has been updated.
-     *
-     * @param endpoint The endpoint ID where the endpoint list was updated
-     * @param epList The updated endpoint list details
-     */
-    virtual void OnEndpointListChanged(EndpointId endpoint, const EndpointListStorage & epList) = 0;
 };
 
 } // namespace Actions
