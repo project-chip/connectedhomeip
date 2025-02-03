@@ -1,1 +1,1 @@
-105 : Upgrade android docker with new kotlin/gradle
+106 : Upgrade android docker with java 17 and adjust the location for android cmdline tool
