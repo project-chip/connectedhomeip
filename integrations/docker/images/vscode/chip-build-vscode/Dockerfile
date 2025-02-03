@@ -38,7 +38,7 @@ COPY --from=android /usr/lib/kotlinc /usr/lib/kotlinc
 COPY --from=psoc6 /opt/Tools/ModusToolbox /opt/Tools/ModusToolbox
 
 COPY --from=telink /opt/telink/zephyrproject /opt/telink/zephyrproject
-COPY --from=telink /opt/telink/zephyr-sdk-0.16.1 /opt/telink/zephyr-sdk-0.16.1
+COPY --from=telink /opt/telink/zephyr-sdk-0.17.0 /opt/telink/zephyr-sdk-0.17.0
 
 COPY --from=tizen /opt/tizen-sdk /opt/tizen-sdk
 
@@ -126,7 +126,7 @@ ENV QEMU_ESP32=/opt/espressif/qemu/qemu-system-xtensa
 ENV QEMU_ESP32_DIR=/opt/espressif/qemu
 ENV SYSROOT_AARCH64=/opt/ubuntu-24.04-aarch64-sysroot
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
-ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.16.1
+ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.17.0
 ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.18.1
 ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
 ENV ZEPHYR_SDK_INSTALL_DIR=/opt/NordicSemiconductor/nRF5_tools/zephyr-sdk-0.17.0
