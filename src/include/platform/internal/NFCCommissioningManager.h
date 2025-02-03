@@ -84,15 +84,6 @@ extern NFCCommissioningManagerImpl & NFCCommissioningMgrImpl();
 } // namespace DeviceLayer
 } // namespace chip
 
-/* Include a header file containing the implementation of the NFCCommissioningManager
- * object for the selected platform.
- */
-#ifdef EXTERNAL_NFC_COMMISSIONING_MANAGER_IMPL_HEADER
-#include EXTERNAL_NFC_COMMISSIONING_MANAGER_IMPL_HEADER
-#elif defined(CHIP_DEVICE_LAYER_TARGET)
-#define NFC_COMMISSIONING_MANAGER_IMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/NFCCommissioningManagerImpl.h>
-#include NFC_COMMISSIONING_MANAGER_IMPL_HEADER
-#endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
 namespace chip {
 namespace DeviceLayer {
