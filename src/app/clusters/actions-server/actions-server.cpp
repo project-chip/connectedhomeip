@@ -32,13 +32,11 @@ using namespace chip::app::Clusters::Actions;
 using namespace chip::app::Clusters::Actions::Attributes;
 using namespace chip::Protocols::InteractionModel;
 
-#ifndef MATTER_DM_ACTIONS_CLUSTER_SERVER_ENDPOINT_COUNT
-#define MATTER_DM_ACTIONS_CLUSTER_SERVER_ENDPOINT_COUNT 1
-#endif
-
 namespace {
 static constexpr size_t kActionsDelegateTableSize =
     MATTER_DM_ACTIONS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kActionsDelegateTableSize <= kEmberInvalidEndpointIndex, "Actions Delegate table size error");
+
 Delegate * gDelegateTable[kActionsDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId aEndpoint)
@@ -403,7 +401,7 @@ void ActionsServer::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
-CHIP_ERROR ActionsServer::SetActionList(EndpointId aEndpoint, const ActionStructStorage & aAction)
+CHIP_ERROR ActionsServer::ModifyActionList(EndpointId aEndpoint, const ActionStructStorage & aAction)
 {
     Delegate * delegate = GetDelegate(aEndpoint);
     if (delegate == nullptr)
@@ -412,11 +410,15 @@ CHIP_ERROR ActionsServer::SetActionList(EndpointId aEndpoint, const ActionStruct
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    // Read through the list to find and update the existing action
+    // Read through the list to find and update the existing action that matches the passed-in action's ID.
     for (uint16_t i = 0; i < kMaxActionListLength; i++)
     {
         ActionStructStorage existingAction;
-        ReturnErrorOnFailure(delegate->ReadActionAtIndex(i, existingAction));
+        CHIP_ERROR err = delegate->ReadActionAtIndex(i, existingAction);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            break;
+        }
 
         if (existingAction.actionID == aAction.actionID)
         {
@@ -432,7 +434,7 @@ CHIP_ERROR ActionsServer::SetActionList(EndpointId aEndpoint, const ActionStruct
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR ActionsServer::SetEndpointList(EndpointId aEndpoint, const EndpointListStorage & aEpList)
+CHIP_ERROR ActionsServer::ModifyEndpointList(EndpointId aEndpoint, const EndpointListStorage & aEpList)
 {
     Delegate * delegate = GetDelegate(aEndpoint);
     if (delegate == nullptr)
@@ -441,11 +443,15 @@ CHIP_ERROR ActionsServer::SetEndpointList(EndpointId aEndpoint, const EndpointLi
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    // Read through the list to find and update the existing endpoint list
+    // Read through the list to find and update the existing action that matches the passed-in endpoint-list's ID
     for (uint16_t i = 0; i < kMaxEndpointListLength; i++)
     {
         EndpointListStorage existingEpList;
-        ReturnErrorOnFailure(delegate->ReadEndpointListAtIndex(i, existingEpList));
+        CHIP_ERROR err = delegate->ReadEndpointListAtIndex(i, existingEpList);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            break;
+        }
 
         if (existingEpList.endpointListID == aEpList.endpointListID)
         {

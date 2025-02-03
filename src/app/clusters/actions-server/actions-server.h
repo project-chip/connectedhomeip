@@ -67,12 +67,12 @@ struct ActionStructStorage : public Structs::ActionStruct::Type
     void Set(uint16_t aAction, const CharSpan & aActionName, ActionTypeEnum aActionType, uint16_t aEpListID,
              BitMask<CommandBits> aCommands, ActionStateEnum aActionState)
     {
-        actionID                    = aAction;
-        type                        = aActionType;
-        endpointListID              = aEpListID;
-        supportedCommands           = aCommands;
-        state                       = aActionState;
-        MutableCharSpan mActionName = Span(mBuffer, sizeof(mBuffer));
+        actionID          = aAction;
+        type              = aActionType;
+        endpointListID    = aEpListID;
+        supportedCommands = aCommands;
+        state             = aActionState;
+        MutableCharSpan mActionName(mBuffer);
         CopyCharSpanToMutableCharSpanWithTruncation(aActionName, mActionName);
         name = mActionName;
     }
@@ -158,7 +158,7 @@ public:
      *         CHIP_ERROR_NOT_FOUND if action doesn't exist
      *         CHIP_NO_ERROR if successful
      */
-    CHIP_ERROR SetActionList(EndpointId aEndpoint, const ActionStructStorage & aAction);
+    CHIP_ERROR ModifyActionList(EndpointId aEndpoint, const ActionStructStorage & aAction);
 
     /**
      * Update an existing endpoint list for the given endpoint.
@@ -170,7 +170,7 @@ public:
      *         CHIP_ERROR_NOT_FOUND if endpoint list doesn't exist
      *         CHIP_NO_ERROR if successful
      */
-    CHIP_ERROR SetEndpointList(EndpointId aEndpoint, const EndpointListStorage & aEpList);
+    CHIP_ERROR ModifyEndpointList(EndpointId aEndpoint, const EndpointListStorage & aEpList);
 
 private:
     static ActionsServer sInstance;
@@ -243,8 +243,8 @@ public:
      * if the InvokeID data field is provided by the client when invoking a command, the server SHALL generate a StateChanged event
      * when the action changes to a new state or an ActionFailed event when execution of the action fails.
      *
-     * @return If the command refers to an action which currently is not in a state where the command applies, a response SHALL be
-     * generated with the StatusCode INVALID_COMMAND.
+     * If the command refers to an action which currently is not in a state where the command applies, a response SHALL be
+     * generated with the Status::InvalidCommand.
      */
 
     /**
@@ -252,7 +252,7 @@ public:
      * in a "fire and forget" manner. Afterwards, the action’s state SHALL be Inactive.
      *
      * @param actionId The actionId of an action.
-     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     * It should report Status::Success if successful and may report other Status codes if it fails
      */
     virtual Protocols::InteractionModel::Status HandleInstantAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
@@ -263,7 +263,7 @@ public:
      *
      * @param actionId The actionId of an action.
      * @param transitionTime The time for transition from the current state to the new state.
-     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     * It should report Status::Success if successful and may report other Status codes if it fails
      */
     virtual Protocols::InteractionModel::Status HandleInstantActionWithTransition(uint16_t actionId, uint16_t transitionTime,
                                                                                   Optional<uint32_t> invokeId) = 0;
@@ -273,7 +273,7 @@ public:
      * the action’s state SHALL be Inactive.
      *
      * @param actionId The actionId of an action.
-     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     * It should report Status::Success if successful and may report other Status codes if it fails
      */
     virtual Protocols::InteractionModel::Status HandleStartAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
@@ -284,7 +284,7 @@ public:
      *
      * @param actionId The actionId of an action.
      * @param duration The time for which an action shall be in start state.
-     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     * It should report Status::Success if successful and may report other Status codes if it fails
      */
     virtual Protocols::InteractionModel::Status HandleStartActionWithDuration(uint16_t actionId, uint32_t duration,
                                                                               Optional<uint32_t> invokeId) = 0;
@@ -294,7 +294,7 @@ public:
      * state SHALL be Inactive.
      *
      * @param actionId The actionId of an action.
-     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     * It should report Status::Success if successful and may report other Status codes if it fails
      */
     virtual Protocols::InteractionModel::Status HandleStopAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
@@ -303,7 +303,7 @@ public:
      * action’s state to Paused.
      *
      * @param actionId The actionId of an action.
-     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     * It should report Status::Success if successful and may report other Status codes if it fails
      */
     virtual Protocols::InteractionModel::Status HandlePauseAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
@@ -314,7 +314,7 @@ public:
      *
      * @param actionId The actionId of an action.
      * @param duration The time for which an action shall be in pause state.
-     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     * It should report Status::Success if successful and may report other Status codes if it fails
      */
     virtual Protocols::InteractionModel::Status HandlePauseActionWithDuration(uint16_t actionId, uint32_t duration,
                                                                               Optional<uint32_t> invokeId) = 0;
@@ -324,7 +324,7 @@ public:
      * Active.
      *
      * @param actionId The actionId of an action.
-     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     * It should report Status::Success if successful and may report other Status codes if it fails
      */
     virtual Protocols::InteractionModel::Status HandleResumeAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
@@ -333,7 +333,7 @@ public:
      * Active.
      *
      * @param actionId The actionId of an action.
-     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     * It should report Status::Success if successful and may report other Status codes if it fails
      */
     virtual Protocols::InteractionModel::Status HandleEnableAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
@@ -344,7 +344,7 @@ public:
      *
      * @param actionId The actionId of an action.
      * @param duration The time for which an action shall be in active state.
-     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     * It should report Status::Success if successful and may report other Status codes if it fails
      */
     virtual Protocols::InteractionModel::Status HandleEnableActionWithDuration(uint16_t actionId, uint32_t duration,
                                                                                Optional<uint32_t> invokeId) = 0;
@@ -354,7 +354,7 @@ public:
      * Inactive.
      *
      * @param actionId The actionId of an action.
-     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     * It should report Status::Success if successful and may report other Status codes if it fails
      */
     virtual Protocols::InteractionModel::Status HandleDisableAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
@@ -365,7 +365,7 @@ public:
      *
      * @param actionId The actionId of an action.
      * @param duration The time for which an action shall be in disable state.
-     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     * It should report Status::Success if successful and may report other Status codes if it fails
      */
     virtual Protocols::InteractionModel::Status HandleDisableActionWithDuration(uint16_t actionId, uint32_t duration,
                                                                                 Optional<uint32_t> invokeId) = 0;
