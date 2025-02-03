@@ -508,6 +508,12 @@ using namespace chip::Tracing::DarwinFramework;
 }
 #endif // DEBUG
 
+- (NSArray<NSNumber *> *)nodesWithStoredData
+{
+    MTR_ABSTRACT_METHOD();
+    return @[];
+}
+
 #pragma mark - MTRDeviceControllerDelegate management
 
 // Note these are implemented in the base class so that XPC subclass can use it as well

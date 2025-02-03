@@ -64,6 +64,11 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(deleteNodeID
                                                : (NSNumber *) nodeID, deleteNodeID
                                                : (NSNumber *) nodeID)
 
+MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
+    NSArray<NSNumber *> *,
+    @[], // Default return value
+    getNodesWithStoredDataWithReply)
+
 - (void)_updateRegistrationInfo
 {
     NSMutableDictionary * registrationInfo = [NSMutableDictionary dictionary];
