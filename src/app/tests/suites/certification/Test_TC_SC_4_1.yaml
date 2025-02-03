@@ -93,6 +93,16 @@ tests:
                     isUpperCase: true
                     isHexString: true
 
+    - label:
+          "Step 2aa: If (ICDM.S.A0002) TH reads from
+           the DUT the ActiveModeThreshold attribute"
+      PICS: ICDM.S.A0002
+      cluster: "ICDManagement"
+      command: "readAttribute"
+      attribute: "ActiveModeThreshold"
+      response:
+          saveAs: ActiveModeThresholdValue
+
     - label: "Step 2b: Service type must be _matterc._udp"
       verification: |
           Run the below commands within the mentioned time interval used in open-commissioning-window in step-1.
@@ -119,6 +129,7 @@ tests:
             port = [5540]
             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "VP=65521+32769"]
 
+          If "ICDM.S.A0002" check "SAT=ActiveModeThreshold Value"
 
           If we use Thread setup, then the Service Domain will be 422F10CDC290A406.local
           verify CM flag is 1
@@ -450,6 +461,16 @@ tests:
                     isHexString: true
                     notValue: deviceInstanceNameBeforeReboot
 
+    - label:
+          "Step 4aa: If (ICDM.S.A0002) TH reads from
+           the DUT the ActiveModeThreshold attribute"
+      PICS: ICDM.S.A0002
+      cluster: "ICDManagement"
+      command: "readAttribute"
+      attribute: "ActiveModeThreshold"
+      response:
+          saveAs: ActiveModeThresholdValue
+
     - label: "Step 4b: service type must be _matterc._udp"
       verification: |
           Run the below avahi browse command in  TH terminal
@@ -471,6 +492,7 @@ tests:
             port = [5540]
             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "VP=65521+32769"]
 
+          If "ICDM.S.A0002" check "SAT=ActiveModeThreshold Value"
 
           Service Domain 422F10CDC290A406.local
           verify CM flag is 1
@@ -1113,6 +1135,16 @@ tests:
                     maxLength: 16
                     isUpperCase: true
                     isHexString: true
+
+    - label:
+          "Step 10aa: If ( && ICDM.S.A0002) TH reads from
+           the DUT the ActiveModeThreshold attribute"
+      PICS: ICDM.S.A0002
+      cluster: "ICDManagement"
+      command: "readAttribute"
+      attribute: "ActiveModeThreshold"
+      response:
+          saveAs: ActiveModeThresholdValue
 
     - label: "Step 10b: service type must be _matterc._udp"
       verification: |
