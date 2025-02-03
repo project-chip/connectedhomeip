@@ -94,8 +94,8 @@ tests:
                     isHexString: true
 
     - label:
-          "Step 2aa: If (ICDM.S.A0002) TH reads from
-           the DUT the ActiveModeThreshold attribute"
+          "Step 2aa: If (ICDM.S.A0002) TH reads from the DUT the
+          ActiveModeThreshold attribute"
       PICS: ICDM.S.A0002
       cluster: "ICDManagement"
       command: "readAttribute"
@@ -462,8 +462,8 @@ tests:
                     notValue: deviceInstanceNameBeforeReboot
 
     - label:
-          "Step 4aa: If (ICDM.S.A0002) TH reads from
-           the DUT the ActiveModeThreshold attribute"
+          "Step 4aa: If (ICDM.S.A0002) TH reads from the DUT the
+          ActiveModeThreshold attribute"
       PICS: ICDM.S.A0002
       cluster: "ICDManagement"
       command: "readAttribute"
@@ -1137,8 +1137,8 @@ tests:
                     isHexString: true
 
     - label:
-          "Step 10aa: If ( && ICDM.S.A0002) TH reads from
-           the DUT the ActiveModeThreshold attribute"
+          "Step 10aa: If ( && ICDM.S.A0002) TH reads from the DUT the
+          ActiveModeThreshold attribute"
       PICS: ICDM.S.A0002
       cluster: "ICDManagement"
       command: "readAttribute"
