@@ -61,7 +61,7 @@ public:
     virtual CHIP_ERROR ServerClusters(EndpointId endpointId, ListBuilder<ServerClusterEntry> & builder) = 0;
 
     /// Attribute lists contain all attributes EXCEPT the list attributes that
-    /// are part of metadata. This method MUST NOT contain:
+    /// are part of metadata. The output from this method MUST NOT contain:
     ///    - AttributeList::Id
     ///    - AcceptedCommandList::Id
     ///    - GeneratedCommandList::Id
