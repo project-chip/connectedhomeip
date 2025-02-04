@@ -339,8 +339,8 @@ void ApplicationInit()
     ChipLogProgress(NotSpecified, "Chef Application Init !!!");
 
 #ifdef MATTER_DM_PLUGIN_REFRIGERATOR_ALARM_SERVER
-        // set Parent Endpoint and Composition Type for an Endpoint
-        EndpointId kRefEndpointId       = 1;
+    // set Parent Endpoint and Composition Type for an Endpoint
+    EndpointId kRefEndpointId           = 1;
     EndpointId kColdCabinetEndpointId   = 2;
     EndpointId kFreezeCabinetEndpointId = 3;
     SetTreeCompositionForEndpoint(kRefEndpointId);
