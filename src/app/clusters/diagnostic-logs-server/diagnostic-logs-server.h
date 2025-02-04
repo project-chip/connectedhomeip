@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
+#include <zap-generated/gen_config.h>
 
 namespace chip {
 namespace app {
@@ -28,10 +29,12 @@ namespace Clusters {
 namespace DiagnosticLogs {
 
 /// A reference implementation for DiagnosticLogs source.
-class DiagnosticLogsServer
+class DiagnosticLogsServer : public CommandHandlerInterface
 {
 public:
     static DiagnosticLogsServer & Instance();
+
+    DiagnosticLogsServer() : CommandHandlerInterface(Optional<EndpointId>::Missing(), DiagnosticLogs::Id) {}
 
     /**
      * Set the default delegate of the diagnostic logs cluster for the specified endpoint
@@ -60,6 +63,12 @@ public:
 
 private:
     static DiagnosticLogsServer sInstance;
+
+    void InvokeCommand(HandlerContext & ctx) override;
+
+#ifdef DIAGNOSTIC_LOGS_ENABLE_RETRIEVE_LOGS_REQUEST_CMD
+    void HandleRetrieveLogsRequest(HandlerContext & ctx, const Commands::RetrieveLogsRequest::DecodableType & commandData);
+#endif
 };
 
 } // namespace DiagnosticLogs
