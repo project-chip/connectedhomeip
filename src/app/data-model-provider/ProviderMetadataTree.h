@@ -91,7 +91,11 @@ public:
     virtual void Temporary_ReportAttributeChanged(const AttributePathParams & path) = 0;
 
     // "convenience" functions that just return the data and ignore the error
-    // This returns the builder as-is even after the error (e.g. not found would return empty data)
+    // This returns the `ListBuilder<..>::TakeBuffer` from their equivalent fuctions as-is,
+    // even after an error (e.g. not found would return empty data).
+    //
+    // Usage of these indicates no error handling (not even logging) and code should
+    // consider handling errors instead.
     ReadOnlyBuffer<EndpointEntry> EndpointsIgnoreError();
     ReadOnlyBuffer<ServerClusterEntry> ServerClustersIgnoreError(EndpointId endpointId);
     ReadOnlyBuffer<AttributeEntry> AttributesIgnoreError(const ConcreteClusterPath & path);

@@ -326,8 +326,8 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
                                                       DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
-    // the cluster actually exists on this endpoint before asking the CommandHandlerInterface whether it
-    // supports the command.
+    // the cluster actually exists on this endpoint before asking the CommandHandlerInterface what commands
+    // it claims to support.
     const EmberAfCluster * serverCluster = FindServerCluster(path);
     VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
 
@@ -410,8 +410,8 @@ CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath
                                                        DataModel::ListBuilder<CommandId> & builder)
 {
     // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
-    // the cluster actually exists on this endpoint before asking the CommandHandlerInterface whether it
-    // supports the command.
+    // the cluster actually exists on this endpoint before asking the CommandHandlerInterface what commands
+    // it claims to support.
     const EmberAfCluster * serverCluster = FindServerCluster(path);
     VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
 
