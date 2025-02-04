@@ -34,22 +34,6 @@ assert(!nxp_use_low_power || (nxp_use_low_power && !nxp_enable_ot_cli),
        "Please disable low power if openthread CLI is needed!")
 
 source_set("nxp_factory_data") {
-  sources = [
-    "../common/factory_data/legacy/FactoryDataDriver.cpp",
-    "../common/factory_data/legacy/FactoryDataDriverImpl.cpp",
-    "../common/factory_data/legacy/FactoryDataProvider.cpp",
-    "../common/factory_data/legacy/FactoryDataProviderImpl.cpp",
-  ]
-
-  public = [
-    "${chip_root}/src/credentials/CHIPCert.h",
-    "${chip_root}/src/credentials/CertificationDeclaration.h",
-  ]
-
-  deps = [
-    ":nxp_platform",
-    "${chip_root}/src/credentials:credentials",
-  ]
 }
 
 source_set("nxp_ota") {
@@ -67,6 +51,7 @@ config("nxp_platform_config") {
   defines = []
   include_dirs = [
     ".",
+    "../common",
     "../common/ble",
     "../common/crypto",
     "../common/factory_data/legacy",
@@ -207,6 +192,17 @@ static_library("nxp_platform") {
     }
   }
 
+  if (nxp_use_factory_data) {
+    sources += [
+      "../common/factory_data/legacy/FactoryDataDriver.cpp",
+      "../common/factory_data/legacy/FactoryDataDriverImpl.cpp",
+      "../common/factory_data/legacy/FactoryDataProvider.cpp",
+      "../common/factory_data/legacy/FactoryDataProviderImpl.cpp",
+    ]
+
+    defines += [ "PLATFORM_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProviderImpl.h\"" ]
+  }
+
   deps += [ "${nxp_sdk_build_root}:nxp_sdk" ]
 
   public_deps += [
@@ -214,6 +210,7 @@ static_library("nxp_platform") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:syscalls_stub",
     "${chip_root}/src/platform/logging:headers",
+    "${chip_root}/src/credentials:credentials_header",
   ]
 
   public_configs = [ ":nxp_platform_config" ]
