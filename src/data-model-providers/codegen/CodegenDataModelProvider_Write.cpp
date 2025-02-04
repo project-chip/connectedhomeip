@@ -117,7 +117,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         // adjust the return code. All these global attributes are `read only` hence the return
         // of unsupported write.
         //
-        // If the path was not valid though, keep that return code.
+        // If the cluster or endpoint does not exist, though, keep that return code.
         if ((*status == Protocols::InteractionModel::Status::UnsupportedAttribute) &&
             IsSupportedGlobalAttributeNotInMetadata(request.path.mAttributeId))
         {
