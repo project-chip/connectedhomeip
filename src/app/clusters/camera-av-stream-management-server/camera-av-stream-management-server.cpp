@@ -1421,18 +1421,18 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
     Status status = Status::Success;
 
     Commands::VideoStreamAllocateResponse::Type response;
-    auto & streamUsage      = commandData.streamUsage;
-    auto & videoCodec       = commandData.videoCodec;
-    auto & minFrameRate     = commandData.minFrameRate;
-    auto & maxFrameRate     = commandData.maxFrameRate;
-    auto & minResolution    = commandData.minResolution;
-    auto & maxResolution    = commandData.maxResolution;
-    auto & minBitRate       = commandData.minBitRate;
-    auto & maxBitRate       = commandData.maxBitRate;
-    auto & minFragmentLen   = commandData.minFragmentLen;
-    auto & maxFragmentLen   = commandData.maxFragmentLen;
-    bool isWaterMarkEnabled = false;
-    bool isOSDEnabled       = false;
+    auto & streamUsage        = commandData.streamUsage;
+    auto & videoCodec         = commandData.videoCodec;
+    auto & minFrameRate       = commandData.minFrameRate;
+    auto & maxFrameRate       = commandData.maxFrameRate;
+    auto & minResolution      = commandData.minResolution;
+    auto & maxResolution      = commandData.maxResolution;
+    auto & minBitRate         = commandData.minBitRate;
+    auto & maxBitRate         = commandData.maxBitRate;
+    auto & minFragmentLen     = commandData.minFragmentLen;
+    auto & maxFragmentLen     = commandData.maxFragmentLen;
+    auto & isWaterMarkEnabled = commandData.watermarkEnabled;
+    auto & isOSDEnabled       = commandData.OSDEnabled;
     uint16_t videoStreamID  = 0;
 
     // If Watermark feature is supported, then command should have the
@@ -1441,7 +1441,6 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
     VerifyOrReturn((HasFeature(Feature::kWatermark) && commandData.watermarkEnabled.HasValue()) ||
                        (!HasFeature(Feature::kWatermark) && !commandData.watermarkEnabled.HasValue()),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
-    isWaterMarkEnabled = commandData.watermarkEnabled.ValueOr(false);
 
     // If OSD feature is supported, then command should have the
     // isOSDEnabled param. Or, if it is not supported, then command should
@@ -1449,7 +1448,6 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
     VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) && commandData.OSDEnabled.HasValue()) ||
                        (!HasFeature(Feature::kOnScreenDisplay) && !commandData.OSDEnabled.HasValue()),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
-    isOSDEnabled = commandData.OSDEnabled.ValueOr(false);
 
     // Call the delegate
     status =
@@ -1470,10 +1468,10 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
 void CameraAVStreamMgmtServer::HandleVideoStreamModify(HandlerContext & ctx,
                                                        const Commands::VideoStreamModify::DecodableType & commandData)
 {
-    Status status           = Status::Success;
-    bool isWaterMarkEnabled = false;
-    bool isOSDEnabled       = false;
-    auto & videoStreamID    = commandData.videoStreamID;
+    Status status             = Status::Success;
+    auto & isWaterMarkEnabled = commandData.watermarkEnabled;
+    auto & isOSDEnabled       = commandData.OSDEnabled;
+    auto & videoStreamID      = commandData.videoStreamID;
 
     // VideoStreamModify should have either the WMARK or OSD feature supported
     VerifyOrReturn(HasFeature(Feature::kWatermark) || HasFeature(Feature::kOnScreenDisplay),
@@ -1485,7 +1483,6 @@ void CameraAVStreamMgmtServer::HandleVideoStreamModify(HandlerContext & ctx,
     VerifyOrReturn((HasFeature(Feature::kWatermark) && commandData.watermarkEnabled.HasValue()) ||
                        (!HasFeature(Feature::kWatermark) && !commandData.watermarkEnabled.HasValue()),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
-    isWaterMarkEnabled = commandData.watermarkEnabled.ValueOr(false);
 
     // If OSD feature is supported, then command should have the
     // isOSDEnabled param. Or, if it is not supported, then command should
@@ -1493,7 +1490,6 @@ void CameraAVStreamMgmtServer::HandleVideoStreamModify(HandlerContext & ctx,
     VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) && commandData.OSDEnabled.HasValue()) ||
                        (!HasFeature(Feature::kOnScreenDisplay) && !commandData.OSDEnabled.HasValue()),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
-    isOSDEnabled = commandData.OSDEnabled.ValueOr(false);
 
     // Call the delegate
     status = mDelegate.VideoStreamModify(videoStreamID, isWaterMarkEnabled, isOSDEnabled);

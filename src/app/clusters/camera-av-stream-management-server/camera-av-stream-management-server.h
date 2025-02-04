@@ -114,7 +114,8 @@ public:
     VideoStreamAllocate(StreamUsageEnum streamUsage, VideoCodecEnum videoCodec, const uint16_t minFrameRate,
                         const uint16_t maxFrameRate, const VideoResolutionStruct & minResolution,
                         const VideoResolutionStruct & maxResolution, const uint32_t minBitRate, const uint32_t maxBitRate,
-                        const uint16_t minFragmentLen, const uint16_t maxFragmentLen, bool waterMarkEnabled, bool osdEnabled,
+                        const uint16_t minFragmentLen, const uint16_t maxFragmentLen,
+                        const chip::Optional<bool> waterMarkEnabled, const chip::Optional<bool> osdEnabled,
                         uint16_t & outStreamID) = 0;
 
     /**
@@ -131,8 +132,8 @@ public:
      *   @return Success if the stream modification is successful; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
-    virtual Protocols::InteractionModel::Status VideoStreamModify(const uint16_t streamID, bool waterMarkEnabled,
-                                                                  bool osdEnabled) = 0;
+    virtual Protocols::InteractionModel::Status VideoStreamModify(const uint16_t streamID, const chip::Optional<bool> waterMarkEnabled,
+                                                                  const chip::Optional<bool> osdEnabled) = 0;
 
     /**
      *   @brief Handle Command Delegate for Video stream deallocation for the
