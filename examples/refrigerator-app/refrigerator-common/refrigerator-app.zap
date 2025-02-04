@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 103,
+  "featureLevel": 106,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -41,14 +41,16 @@
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
-        "name": "MA-rootdevice"
+        "name": "MA-rootdevice",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice"
+          "name": "MA-rootdevice",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -2662,14 +2664,16 @@
         "code": 112,
         "profileId": 259,
         "label": "MA-refrigerator",
-        "name": "MA-refrigerator"
+        "name": "MA-refrigerator",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 112,
           "profileId": 259,
           "label": "MA-refrigerator",
-          "name": "MA-refrigerator"
+          "name": "MA-refrigerator",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -2845,14 +2849,16 @@
         "code": 113,
         "profileId": 259,
         "label": "MA-temperature-controlled-cabinet",
-        "name": "MA-temperature-controlled-cabinet"
+        "name": "MA-temperature-controlled-cabinet",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 113,
           "profileId": 259,
           "label": "MA-temperature-controlled-cabinet",
-          "name": "MA-temperature-controlled-cabinet"
+          "name": "MA-temperature-controlled-cabinet",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -3176,14 +3182,16 @@
         "code": 113,
         "profileId": 259,
         "label": "MA-temperature-controlled-cabinet",
-        "name": "MA-temperature-controlled-cabinet"
+        "name": "MA-temperature-controlled-cabinet",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 113,
           "profileId": 259,
           "label": "MA-temperature-controlled-cabinet",
-          "name": "MA-temperature-controlled-cabinet"
+          "name": "MA-temperature-controlled-cabinet",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
