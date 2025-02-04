@@ -39,11 +39,7 @@ namespace rpc {
 class AttributeAccessor
 {
 public:
-    /**
-     * aEndpointId can be Missing to indicate that this object is meant to be
-     * used with all endpoints.
-     */
-    AttributeAccessor(Optional<EndpointId> aEndpointId, ClusterId aClusterId) : mEndpointId(aEndpointId), mClusterId(aClusterId) {}
+    AttributeAccessor() = default;
     virtual ~AttributeAccessor() {}
 
     /**
@@ -56,15 +52,18 @@ public:
      * The implementation can do one of three things:
      *
      * 1) Return a failure.  This is treated as a failed read and the error is
-     *    returned to the client, by converting it to a StatusIB.
-     * 2) Return success and attempt to encode data using aEncoder.  The data is
-     *    returned to the client.
-     * 3) Return success and not attempt to encode any data using aEncoder.  In
-     *    this case, Ember attribute access will happen for the read. This may
-     *    involve reading from the attribute store or external attribute
-     *    callbacks.
+     *    returned to the client. Caller will not look for alternatives
+     *    paths to read when any of the accessors returns a failure.
+     * 2) Return not found. This implies the accessor does not handle read to
+     *    the specified attribute. Caller can look for another accessor or
+     *    use the fallback path in when a "not found" is returned.
+     * 3) Return success and attempt to encode data using aEncoder.  The data is
+     *    returned to the client. Fallback path will not be taken.
      */
-    virtual ::pw::Status Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) = 0;
+    virtual ::pw::Status Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder)
+    {
+        return ::pw::Status::NotFound();
+    }
 
     /**
      * Callback for writing attributes.
@@ -75,26 +74,20 @@ public:
      *
      * The implementation can do one of three things:
      *
-     * 1) Return a failure.  This is treated as a failed write and the error is
-     *    sent to the client, by converting it to a StatusIB.
-     * 2) Return success and attempt to decode from aDecoder.  This is
-     *    treated as a successful write.
-     * 3) Return success and not attempt to decode from aDecoder.  In
-     *    this case, Ember attribute access will happen for the write. This may
-     *    involve writing to the attribute store or external attribute
-     *    callbacks.
+     * 1) Return a failure. This is treated as a failed write and the error is
+     *    sent to the client. Caller will not look for alternatives
+     *    paths to write when any of the accessors returns a failure.
+     * 2) Return not found. This implies the accessor does not handle write to
+     *    the specified attribute. Caller can look for another accessor or
+     *    use the fallback path in when a "not found" is returned.
+     * 3) Return success and attempt to decode from aDecoder.  This is
+     *    treated as a successful write. Caller will treat this as a successful
+     *    write and report to client. Fallback path will not be taken.
      */
     virtual ::pw::Status Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder)
     {
-        return ::pw::Status::PermissionDenied();
+        return ::pw::Status::NotFound();
     }
-
-    Optional<EndpointId> GetEndpointId() { return mEndpointId; }
-    ClusterId GetClusterId() { return mClusterId; }
-
-private:
-    Optional<EndpointId> mEndpointId;
-    ClusterId mClusterId;
 };
 
 } // namespace rpc

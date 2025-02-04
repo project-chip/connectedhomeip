@@ -40,30 +40,25 @@
 #include <pigweed/rpc_services/AttributeAccessor.h>
 #include <pigweed/rpc_services/AttributeAccessorRegistry.h>
 #include <platform/PlatformManager.h>
+#include <set>
 
 namespace chip {
 namespace rpc {
 
-std::optional<::pw::Status> TryWriteViaAccessor(const chip::app::ConcreteDataAttributePath & path, AttributeAccessor * attrAccess,
-                                                chip::app::AttributeValueDecoder & decoder)
+::pw::Status TryWriteViaAccessor(const chip::app::ConcreteDataAttributePath & path, chip::app::AttributeValueDecoder & decoder)
 {
-    // Processing can happen only if an attribute access interface actually exists..
-    if (attrAccess == nullptr)
+    std::set<AttributeAccessor *> accessors = AttributeAccessorRegistry::Instance().GetAllAccessors();
+
+    for (AttributeAccessor * accessor : accessors)
     {
-        return std::nullopt;
+        ::pw::Status result = accessor->Write(path, decoder);
+        if (result != ::pw::Status::NotFound()) // Write was either a success or failure.
+        {
+            return result;
+        }
     }
 
-    ::pw::Status status = attrAccess->Write(path, decoder);
-
-    if (status != ::pw::OkStatus())
-    {
-        return std::make_optional(status);
-    }
-
-    // If the decoder tried to decode, then a value should have been read for processing.
-    //   - if decoding was done, assume DONE (i.e. final pw::OkStatus())
-    //   -  otherwise, if no decoding done, return that processing must continue via nullopt
-    return decoder.TriedDecode() ? std::make_optional(::pw::OkStatus()) : std::nullopt;
+    return ::pw::Status::NotFound();
 }
 
 // Implementation class for chip.rpc.Attributes.
@@ -234,20 +229,16 @@ public:
         app::AttributeValueDecoder decoder(tlvReader.value(), subjectDescriptor);
 
         // Try to write using a custom Accessor first
-        AttributeAccessor * customAttrAccess =
-            AttributeAccessorRegistry::Instance().Get(write_request.path.mEndpointId, write_request.path.mClusterId);
-        if (!customAttrAccess) // If endpoint specific registration not found, look for cluster level registration.
+        ::pw::Status interceptResult =
+            TryWriteViaAccessor(write_request.path, decoder) if (interceptResult != ::pw::Status::NotFound())
         {
-            customAttrAccess = AttributeAccessorRegistry::Instance().Get(write_request.path.mClusterId);
-        }
-        std::optional<::pw::Status> attrAccessResult = TryWriteViaAccessor(write_request.path, customAttrAccess, decoder);
-        if (attrAccessResult.has_value())
-        {
-            return attrAccessResult.value();
+            return interceptResult;
         }
 
-        ChipLogProgress(Support, "No custom Attribute Accessor Write registration found for: endpoint=%u cluster=%u",
-                        write_request.path.mEndpointId, write_request.path.mClusterId);
+        ChipLogProgress(
+            Support,
+            "No custom PigweedRPC Attribute Accessor registration found for: endpoint=%u cluster=%u, using fake write access.",
+            write_request.path.mEndpointId, write_request.path.mClusterId);
 
         app::DataModel::ActionReturnStatus result = provider->WriteAttribute(write_request, decoder);
 

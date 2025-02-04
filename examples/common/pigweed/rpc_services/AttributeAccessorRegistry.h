@@ -19,12 +19,8 @@
 #pragma once
 
 #include "pw_status/status.h"
-#include <app/AttributeReportBuilder.h>
-#include <app/AttributeValueDecoder.h>
-#include <app/AttributeValueEncoder.h>
-#include <map>
 #include <pigweed/rpc_services/AttributeAccessor.h>
-#include <vector>
+#include <set>
 
 namespace chip {
 namespace rpc {
@@ -42,46 +38,9 @@ class AttributeAccessorRegistry
 {
 public:
     /**
-     * Register an attribute access override. If the accessor objects EndpointId
-     * id NULL, the registration happens at cluster level, i.e. all endpoints
-     * can use this accessor. Registrations can be unregistered via one of the
-     * Unregister* calls.
-     * Registration will fail if there is an already-registered override for the
-     * same set of attributes.
-     *
-     * @return false if there is an existing override that the new one would
-     *               conflict with.  In this case the override is not registered.
-     * @return true if registration was successful.
+     * Register an attribute access override.
      */
-    bool Register(AttributeAccessor * attrOverride)
-    {
-        Optional<EndpointId> endpointId = attrOverride->GetEndpointId();
-        ClusterId clusterId             = attrOverride->GetClusterId();
-        if (endpointId.HasValue())
-        {
-            std::pair<EndpointId, ClusterId> endpointClusterPair = std::make_pair(endpointId.Value(), clusterId);
-            if (perEndpointClusterAccessors.find(endpointClusterPair) != perEndpointClusterAccessors.end())
-            {
-                ChipLogError(Support, "Duplicate attribute override registration failed. endpointId: %u , clusterId: %u",
-                             endpointId.Value(), clusterId);
-                return false;
-            }
-            ChipLogProgress(Support, "Registering attribute accessor for endpointId: %u , clusterId: %u", endpointId.Value(),
-                            clusterId);
-            perEndpointClusterAccessors.insert(std::make_pair(endpointClusterPair, attrOverride));
-        }
-        else
-        {
-            if (perClusterAccessors.find(clusterId) != perClusterAccessors.end())
-            {
-                ChipLogError(Support, "Duplicate attribute override registration failed. clusterId: %u", clusterId);
-                return false;
-            }
-            ChipLogProgress(Support, "Registering attribute accessor for clusterId: %u", clusterId);
-            perClusterAccessors.insert(std::make_pair(clusterId, attrOverride));
-        }
-        return true;
-    }
+    void Register(AttributeAccessor * attrOverride) { mAccessors.insert(attrOverride); }
 
     /**
      * Unregister an attribute access override (for example if the object
@@ -89,86 +48,18 @@ public:
      */
     void Unregister(AttributeAccessor * attrOverride)
     {
-        Optional<EndpointId> endpointId = attrOverride->GetEndpointId();
-        ClusterId clusterId             = attrOverride->GetClusterId();
-        if (endpointId.HasValue())
+        if (mAccessors.find(attrOverride) == mAccessors.end())
         {
-            std::pair<EndpointId, ClusterId> endpointClusterPair = std::make_pair(endpointId.Value(), clusterId);
-            if (perEndpointClusterAccessors.find(endpointClusterPair) == perEndpointClusterAccessors.end())
-            {
-                ChipLogError(Support, "Unregistration failed. No registration found for endpointId: %u , clusterId: %u",
-                             endpointId.Value(), clusterId);
-                return;
-            }
-            perEndpointClusterAccessors.erase(endpointClusterPair);
+            ChipLogError(Support, "Attempt to unregister accessor that is not registered.");
+            return;
         }
-        else
-        {
-            if (perClusterAccessors.find(clusterId) == perClusterAccessors.end())
-            {
-                ChipLogError(Support, "Unregistration failed. No registration found for clusterId: %u", clusterId);
-                return;
-            }
-            perClusterAccessors.erase(clusterId);
-        }
+        mAccessors.erase(attrOverride);
     }
 
     /**
-     * Unregister all attribute accessors that match this given endpoint.
-     * Cluster level attribute accessors do not get unregistered.
+     *  Get all registered accessors.
      */
-    void UnregisterAllForEndpoint(EndpointId endpointId)
-    {
-        std::vector<std::pair<EndpointId, ClusterId>> removeRegistrations;
-        for (std::map<std::pair<EndpointId, ClusterId>, AttributeAccessor *>::iterator it = perEndpointClusterAccessors.begin();
-             it != perEndpointClusterAccessors.end(); ++it)
-        {
-            if ((it->first).first == endpointId)
-            {
-                removeRegistrations.push_back(it->first);
-            }
-        }
-        for (std::pair<EndpointId, ClusterId> endpointClusterPair : removeRegistrations)
-        {
-            ChipLogProgress(Support, "Removing attribute accessor registration for endpointId: %u , clusterId: %u",
-                            endpointClusterPair.first, endpointClusterPair.second);
-            perEndpointClusterAccessors.erase(endpointClusterPair);
-        }
-    }
-
-    /**
-     * Unregisters all attribute accessors.
-     */
-    void UnregisterAll()
-    {
-        perClusterAccessors.clear();
-        perEndpointClusterAccessors.clear();
-    }
-
-    /**
-     *  Get the registered attribute access override that is cluster-endpoint specific.
-     */
-    AttributeAccessor * Get(EndpointId aEndpointId, ClusterId aClusterId)
-    {
-        std::pair<EndpointId, ClusterId> endpointClusterPair = std::make_pair(aEndpointId, aClusterId);
-        if (perEndpointClusterAccessors.find(endpointClusterPair) != perEndpointClusterAccessors.end())
-        {
-            return perEndpointClusterAccessors.at(endpointClusterPair);
-        }
-        return nullptr;
-    }
-
-    /**
-     * Get the registered attribute access override that is cluster specific (Global to all endpoints)
-     */
-    AttributeAccessor * Get(ClusterId aClusterId)
-    {
-        if (perClusterAccessors.find(aClusterId) != perClusterAccessors.end())
-        {
-            return perClusterAccessors.at(aClusterId);
-        }
-        return nullptr;
-    }
+    std::set<AttributeAccessor *> GetAllAccessors() { return mAccessors; }
 
     /**
      * Returns the singleton instance of the attribute accessor registory.
@@ -180,8 +71,7 @@ public:
     }
 
 private:
-    std::map<ClusterId, AttributeAccessor *> perClusterAccessors;
-    std::map<std::pair<EndpointId, ClusterId>, AttributeAccessor *> perEndpointClusterAccessors;
+    std::set<AttributeAccessor *> mAccessors;
 };
 
 } // namespace rpc
