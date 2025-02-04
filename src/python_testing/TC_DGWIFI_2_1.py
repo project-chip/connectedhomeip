@@ -159,7 +159,7 @@ class TC_DGWIFI_2_1(MatterBaseTest):
 
             # Additional check that it's not kUnknownEnumValue:
             asserts.assert_true(wifi_version != Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum.kUnknownEnumValue,
-                             f"WiFiVersion should not be kUnknownEnumValue ({Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum.kUnknownEnumValue})")
+                                f"WiFiVersion should not be kUnknownEnumValue ({Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum.kUnknownEnumValue})")
 
         #
         # STEP 5: TH reads ChannelNumber attribute
