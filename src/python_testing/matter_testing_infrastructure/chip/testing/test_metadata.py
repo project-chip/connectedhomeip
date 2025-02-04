@@ -15,7 +15,6 @@
 import os
 import tempfile
 import unittest
-import yaml
 
 from metadata import Metadata, MetadataReader
 
