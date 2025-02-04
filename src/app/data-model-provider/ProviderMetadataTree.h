@@ -60,7 +60,7 @@ public:
     virtual CHIP_ERROR ClientClusters(EndpointId endpointId, ListBuilder<ClusterId> & builder)          = 0;
     virtual CHIP_ERROR ServerClusters(EndpointId endpointId, ListBuilder<ServerClusterEntry> & builder) = 0;
 
-    /// Attribute lists contains all attributes EXCEPT the list attributes that
+    /// Attribute lists contain all attributes EXCEPT the list attributes that
     /// are part of metadata. This method MUST NOT contain:
     ///    - AttributeList::Id
     ///    - AcceptedCommandList::Id
