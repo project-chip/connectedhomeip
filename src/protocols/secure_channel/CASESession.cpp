@@ -1222,23 +1222,23 @@ CHIP_ERROR CASESession::PrepareSigma2(EncodeSigma2Inputs & outSigma2Data)
     ReturnErrorOnFailure(DeriveSigmaKey(saltSpan, ByteSpan(kKDFSR2Info), sr2k));
 
     // Construct Sigma2 TBS Data
-    size_t msgR2SignedLen = EstimateStructOverhead(kMaxCHIPCertLength,     // responderNoc
-                                                   kMaxCHIPCertLength,     // responderICAC
-                                                   kP256_PublicKey_Length, // responderEphPubKey
-                                                   kP256_PublicKey_Length  // InitiatorEphPubKey
-    );
-
     P256ECDSASignature tbsData2Signature;
     {
+        size_t msgR2SignedLen = EstimateStructOverhead(kMaxCHIPCertLength,     // responderNoc
+                                                       kMaxCHIPCertLength,     // responderICAC
+                                                       kP256_PublicKey_Length, // responderEphPubKey
+                                                       kP256_PublicKey_Length  // InitiatorEphPubKey
+        );
+
         chip::Platform::ScopedMemoryBuffer<uint8_t> msgR2Signed;
         VerifyOrReturnError(msgR2Signed.Alloc(msgR2SignedLen), CHIP_ERROR_NO_MEMORY);
+        MutableByteSpan msgR2SignedSpan{ msgR2Signed.Get(), msgR2SignedLen };
 
         ReturnErrorOnFailure(ConstructTBSData(nocCert, icaCert, ByteSpan(mEphemeralKey->Pubkey(), mEphemeralKey->Pubkey().Length()),
-                                              ByteSpan(mRemotePubKey, mRemotePubKey.Length()), msgR2Signed.Get(), msgR2SignedLen));
+                                              ByteSpan(mRemotePubKey, mRemotePubKey.Length()), msgR2SignedSpan));
 
         // Generate a Signature
-        ReturnErrorOnFailure(
-            mFabricsTable->SignWithOpKeypair(mFabricIndex, ByteSpan{ msgR2Signed.Get(), msgR2SignedLen }, tbsData2Signature));
+        ReturnErrorOnFailure(mFabricsTable->SignWithOpKeypair(mFabricIndex, msgR2SignedSpan, tbsData2Signature));
     }
     // Construct Sigma2 TBE Data
     size_t msgR2SignedEncLen = EstimateStructOverhead(nocCert.size(),                             // responderNoc
@@ -1549,14 +1549,15 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> msgR2Signed;
     VerifyOrReturnError(msgR2Signed.Alloc(msgR2SignedLen), CHIP_ERROR_NO_MEMORY);
+    MutableByteSpan msgR2SignedSpan{ msgR2Signed.Get(), msgR2SignedLen };
 
-    ReturnErrorOnFailure(ConstructTBSData(
-        parsedSigma2TBEData.responderNOC, parsedSigma2TBEData.responderICAC, ByteSpan(mRemotePubKey, mRemotePubKey.Length()),
-        ByteSpan(mEphemeralKey->Pubkey(), mEphemeralKey->Pubkey().Length()), msgR2Signed.Get(), msgR2SignedLen));
+    ReturnErrorOnFailure(ConstructTBSData(parsedSigma2TBEData.responderNOC, parsedSigma2TBEData.responderICAC,
+                                          ByteSpan(mRemotePubKey, mRemotePubKey.Length()),
+                                          ByteSpan(mEphemeralKey->Pubkey(), mEphemeralKey->Pubkey().Length()), msgR2SignedSpan));
 
     // Validate signature
-    ReturnErrorOnFailure(
-        responderPublicKey.ECDSA_validate_msg_signature(msgR2Signed.Get(), msgR2SignedLen, parsedSigma2TBEData.tbsData2Signature));
+    ReturnErrorOnFailure(responderPublicKey.ECDSA_validate_msg_signature(msgR2SignedSpan.data(), msgR2SignedSpan.size(),
+                                                                         parsedSigma2TBEData.tbsData2Signature));
 
     ChipLogDetail(SecureChannel, "Peer assigned session ID %d", parsedSigma2.responderSessionId);
     SetPeerSessionId(parsedSigma2.responderSessionId);
@@ -1728,14 +1729,18 @@ CHIP_ERROR CASESession::SendSigma3a()
         ReturnErrorOnFailure(mFabricsTable->FetchNOCCert(mFabricIndex, data.nocCert));
 
         // Prepare Sigma3 TBS Data Blob
-        data.msg_r3_signed_len =
-            EstimateStructOverhead(data.icaCert.size(), data.nocCert.size(), kP256_PublicKey_Length, kP256_PublicKey_Length);
+        size_t msgR3SignedLen = EstimateStructOverhead(data.nocCert.size(),    // initiatorNOC
+                                                       data.icaCert.size(),    // initiatorICAC
+                                                       kP256_PublicKey_Length, // initiatorEphPubKey
+                                                       kP256_PublicKey_Length  // responderEphPubKey
+        );
 
-        VerifyOrReturnError(data.msg_R3_Signed.Alloc(data.msg_r3_signed_len), CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(data.msgR3Signed.Alloc(msgR3SignedLen), CHIP_ERROR_NO_MEMORY);
+        data.msgR3SignedSpan = MutableByteSpan{ data.msgR3Signed.Get(), msgR3SignedLen };
 
-        ReturnErrorOnFailure(
-            ConstructTBSData(data.nocCert, data.icaCert, ByteSpan(mEphemeralKey->Pubkey(), mEphemeralKey->Pubkey().Length()),
-                             ByteSpan(mRemotePubKey, mRemotePubKey.Length()), data.msg_R3_Signed.Get(), data.msg_r3_signed_len));
+        ReturnErrorOnFailure(ConstructTBSData(data.nocCert, data.icaCert,
+                                              ByteSpan(mEphemeralKey->Pubkey(), mEphemeralKey->Pubkey().Length()),
+                                              ByteSpan(mRemotePubKey, mRemotePubKey.Length()), data.msgR3SignedSpan));
 
         if (data.keystore != nullptr)
         {
@@ -1759,14 +1764,12 @@ CHIP_ERROR CASESession::SendSigma3b(SendSigma3Data & data, bool & cancel)
     if (data.keystore != nullptr)
     {
         // Recommended case: delegate to operational keystore
-        ReturnErrorOnFailure(data.keystore->SignWithOpKeypair(
-            data.fabricIndex, ByteSpan{ data.msg_R3_Signed.Get(), data.msg_r3_signed_len }, data.tbsData3Signature));
+        ReturnErrorOnFailure(data.keystore->SignWithOpKeypair(data.fabricIndex, data.msgR3SignedSpan, data.tbsData3Signature));
     }
     else
     {
         // Legacy case: delegate to fabric table fabric info
-        ReturnErrorOnFailure(data.fabricTable->SignWithOpKeypair(
-            data.fabricIndex, ByteSpan{ data.msg_R3_Signed.Get(), data.msg_r3_signed_len }, data.tbsData3Signature));
+        ReturnErrorOnFailure(data.fabricTable->SignWithOpKeypair(data.fabricIndex, data.msgR3SignedSpan, data.tbsData3Signature));
     }
 
     // Prepare Sigma3 TBE Data Blob
@@ -1950,17 +1953,18 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
         SuccessOrExit(err = ParseSigma3TBEData(decryptedDataTlvReader, data));
 
         // Step 3 - Construct Sigma3 TBS Data
-        data.msgR3SignedLen = TLV::EstimateStructOverhead(data.initiatorNOC.size(),  // initiatorNOC
-                                                          data.initiatorICAC.size(), // initiatorICAC
-                                                          kP256_PublicKey_Length,    // initiatorEphPubKey
-                                                          kP256_PublicKey_Length     // responderEphPubKey
+        size_t msgR3SignedLen = TLV::EstimateStructOverhead(data.initiatorNOC.size(),  // initiatorNOC
+                                                            data.initiatorICAC.size(), // initiatorICAC
+                                                            kP256_PublicKey_Length,    // initiatorEphPubKey
+                                                            kP256_PublicKey_Length     // responderEphPubKey
         );
 
-        VerifyOrExit(data.msgR3Signed.Alloc(data.msgR3SignedLen), err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrExit(data.msgR3Signed.Alloc(msgR3SignedLen), err = CHIP_ERROR_NO_MEMORY);
+        data.msgR3SignedSpan = MutableByteSpan{ data.msgR3Signed.Get(), msgR3SignedLen };
 
         SuccessOrExit(err = ConstructTBSData(data.initiatorNOC, data.initiatorICAC, ByteSpan(mRemotePubKey, mRemotePubKey.Length()),
                                              ByteSpan(mEphemeralKey->Pubkey(), mEphemeralKey->Pubkey().Length()),
-                                             data.msgR3Signed.Get(), data.msgR3SignedLen));
+                                             data.msgR3SignedSpan));
 
         // Prepare for Step 4/5
         {
@@ -1977,9 +1981,9 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
 
             // initiatorNOC and initiatorICAC are spans into msgR3Encrypted
             // which is going away, so to save memory, redirect them to their
-            // copies in msg_R3_signed, which is staying around
+            // copies in msgR3Signed, which is staying around
             TLV::ContiguousBufferTLVReader signedDataTlvReader;
-            signedDataTlvReader.Init(data.msgR3Signed.Get(), data.msgR3SignedLen);
+            signedDataTlvReader.Init(data.msgR3SignedSpan);
             SuccessOrExit(err = signedDataTlvReader.Next(containerType, AnonymousTag()));
             SuccessOrExit(err = signedDataTlvReader.EnterContainer(containerType));
 
@@ -2095,8 +2099,8 @@ CHIP_ERROR CASESession::HandleSigma3b(HandleSigma3Data & data, bool & cancel)
     //        current flow of code, a malicious node can trigger a DoS style attack on the device.
     //        The same change should be made in Sigma2 processing.
     // Step 7 - Validate Signature
-    ReturnErrorOnFailure(
-        initiatorPublicKey.ECDSA_validate_msg_signature(data.msgR3Signed.Get(), data.msgR3SignedLen, data.tbsData3Signature));
+    ReturnErrorOnFailure(initiatorPublicKey.ECDSA_validate_msg_signature(data.msgR3SignedSpan.data(), data.msgR3SignedSpan.size(),
+                                                                         data.tbsData3Signature));
 
     return CHIP_NO_ERROR;
 }
@@ -2241,12 +2245,12 @@ CHIP_ERROR CASESession::ValidateSigmaResumeMIC(const ByteSpan & resumeMIC, const
 }
 
 CHIP_ERROR CASESession::ConstructTBSData(const ByteSpan & senderNOC, const ByteSpan & senderICAC, const ByteSpan & senderPubKey,
-                                         const ByteSpan & receiverPubKey, uint8_t * tbsData, size_t & tbsDataLen)
+                                         const ByteSpan & receiverPubKey, MutableByteSpan & outTbsData)
 {
     TLVWriter tlvWriter;
     TLVType outerContainerType = kTLVType_NotSpecified;
 
-    tlvWriter.Init(tbsData, tbsDataLen);
+    tlvWriter.Init(outTbsData);
     ReturnErrorOnFailure(tlvWriter.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(TBSDataTags::kSenderNOC), senderNOC));
     if (!senderICAC.empty())
@@ -2257,7 +2261,7 @@ CHIP_ERROR CASESession::ConstructTBSData(const ByteSpan & senderNOC, const ByteS
     ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(TBSDataTags::kReceiverPubKey), receiverPubKey));
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize());
-    tbsDataLen = static_cast<size_t>(tlvWriter.GetLengthWritten());
+    outTbsData.reduce_size(static_cast<size_t>(tlvWriter.GetLengthWritten()));
 
     return CHIP_NO_ERROR;
 }

@@ -297,8 +297,8 @@ protected:
         const FabricTable * fabricTable;
         const Crypto::OperationalKeystore * keystore;
 
-        chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Signed;
-        size_t msg_r3_signed_len;
+        chip::Platform::ScopedMemoryBuffer<uint8_t> msgR3Signed;
+        MutableByteSpan msgR3SignedSpan;
 
         chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Encrypted;
         size_t msg_r3_encrypted_len;
@@ -315,7 +315,7 @@ protected:
     struct HandleSigma3Data
     {
         chip::Platform::ScopedMemoryBuffer<uint8_t> msgR3Signed;
-        size_t msgR3SignedLen;
+        MutableByteSpan msgR3SignedSpan;
 
         // Below ByteSpans are Backed by: msgR3Encrypted Buffer, local to the HandleSigma3a() method,
         // The Spans are later modified to point to the msgR3Signed member of this struct.
@@ -513,7 +513,7 @@ private:
     CHIP_ERROR ConstructSaltSigma2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                    MutableByteSpan & salt);
     CHIP_ERROR ConstructTBSData(const ByteSpan & senderNOC, const ByteSpan & senderICAC, const ByteSpan & senderPubKey,
-                                const ByteSpan & receiverPubKey, uint8_t * tbsData, size_t & tbsDataLen);
+                                const ByteSpan & receiverPubKey, MutableByteSpan & outTbsData);
     CHIP_ERROR ConstructSaltSigma3(const ByteSpan & ipk, MutableByteSpan & salt);
 
     CHIP_ERROR ConstructSigmaResumeKey(const ByteSpan & initiatorRandom, const ByteSpan & resumptionID, const ByteSpan & skInfo,
