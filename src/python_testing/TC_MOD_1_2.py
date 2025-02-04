@@ -46,7 +46,7 @@ class TC_MOD_1_2(MatterBaseTest):
             TestStep(2, "TH reads the CurrentMode attribute from the DUT",
                      "Verify that the DUT response is an integer that is in the list of modes returned in step 1"),
             TestStep(3, "TH reads the OnMode attribute from the DUT",
-                     "Verify that the DUT response is an integer that is in the list of modes returned in step 1 ()"),
+                     "Verify that the DUT response is an integer that is in the list of modes returned in step 1"),
             TestStep(4, "TH reads the StartUpMode attribute from the DUT",
                      "Verify that the DUT response is an integer that is in the list of modes returned in step 1"),
             TestStep(5, "TH reads the Description attribute from the DUT",
@@ -78,8 +78,8 @@ class TC_MOD_1_2(MatterBaseTest):
 
         self.step(3)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OnMode):
-            # This returns Nullable and not an int
-            # yaml script shows that this is expected to return a null value as the default value according to spec
+            # This default returns Nullable and not an int according to spec ref below and according to yaml script
+            # Ref link: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/app_clusters/ModeSelect.adoc#66-onmode-attribute
             On_Mode_ID = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.OnMode)
             self.print_step("On Mode ID", f"On Mode ID is of {type(On_Mode_ID)} and its value is {On_Mode_ID}")
             if not isinstance(On_Mode_ID, (Clusters.Types.Nullable, int)):
@@ -97,6 +97,8 @@ class TC_MOD_1_2(MatterBaseTest):
 
         self.step(6)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.StandardNamespace):
+            # Currently appears to return a 0 by default, need to check on this to make sure it is acceptable
+            #Ref Link: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/app_clusters/ModeSelect.adoc#62-standardnamespace-attribute
             Standard_Namespace = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.StandardNamespace)
             if not isinstance(Standard_Namespace, (uint, int)):
                 raise ValueError("Standard Namespace value: must be of type uint or an int")
