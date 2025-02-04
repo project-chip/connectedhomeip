@@ -138,7 +138,7 @@ class TC_DGWIFI_2_1(MatterBaseTest):
                                              Clusters.Objects.WiFiNetworkDiagnostics.Enums.SecurityTypeEnum)
 
             # Additional check that it's not kUnknownEnumValue:
-            self.assert_true(
+            asserts.assert_true(
                 security_type != Clusters.Objects.WiFiNetworkDiagnostics.Enums.SecurityTypeEnum.kUnknownEnumValue,
                 f"SecurityType should not be kUnknownEnumValue "
                 f"({Clusters.Objects.WiFiNetworkDiagnostics.Enums.SecurityTypeEnum.kUnknownEnumValue})"
@@ -158,7 +158,7 @@ class TC_DGWIFI_2_1(MatterBaseTest):
                                              Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum)
 
             # Additional check that it's not kUnknownEnumValue:
-            self.assert_true(wifi_version != Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum.kUnknownEnumValue,
+            asserts.assert_true(wifi_version != Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum.kUnknownEnumValue,
                              f"WiFiVersion should not be kUnknownEnumValue ({Clusters.Objects.WiFiNetworkDiagnostics.Enums.WiFiVersionEnum.kUnknownEnumValue})")
 
         #
