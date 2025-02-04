@@ -63,7 +63,7 @@ public:
     ///
     ///       Users of DataModel::Provider are expected to get these lists
     ///       from ProviderMetadataTree (in particular IM Reads of these
-    ///       attributes will the automatically filled from metadata)
+    ///       attributes will the automatically filled from metadata).
     ///
     /// Return value notes:
     ///   ActionReturnStatus::IsOutOfSpaceEncodingResponse
