@@ -490,6 +490,131 @@ cluster OnOff = 6 {
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
 }
 
+/** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
+cluster LevelControl = 8 {
+  revision 6;
+
+  enum MoveModeEnum : enum8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  enum StepModeEnum : enum8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  bitmap Feature : bitmap32 {
+    kOnOff = 0x1;
+    kLighting = 0x2;
+    kFrequency = 0x4;
+  }
+
+  bitmap OptionsBitmap : bitmap8 {
+    kExecuteIfOff = 0x1;
+    kCoupleColorTempToLevel = 0x2;
+  }
+
+  readonly attribute nullable int8u currentLevel = 0;
+  readonly attribute optional int16u remainingTime = 1;
+  readonly attribute optional int8u minLevel = 2;
+  readonly attribute optional int8u maxLevel = 3;
+  readonly attribute optional int16u currentFrequency = 4;
+  readonly attribute optional int16u minFrequency = 5;
+  readonly attribute optional int16u maxFrequency = 6;
+  attribute OptionsBitmap options = 15;
+  attribute optional int16u onOffTransitionTime = 16;
+  attribute nullable int8u onLevel = 17;
+  attribute optional nullable int16u onTransitionTime = 18;
+  attribute optional nullable int16u offTransitionTime = 19;
+  attribute optional nullable int8u defaultMoveRate = 20;
+  attribute access(write: manage) optional nullable int8u startUpCurrentLevel = 16384;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct MoveToLevelRequest {
+    int8u level = 0;
+    nullable int16u transitionTime = 1;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
+  }
+
+  request struct MoveRequest {
+    MoveModeEnum moveMode = 0;
+    nullable int8u rate = 1;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
+  }
+
+  request struct StepRequest {
+    StepModeEnum stepMode = 0;
+    int8u stepSize = 1;
+    nullable int16u transitionTime = 2;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
+  }
+
+  request struct StopRequest {
+    OptionsBitmap optionsMask = 0;
+    OptionsBitmap optionsOverride = 1;
+  }
+
+  request struct MoveToLevelWithOnOffRequest {
+    int8u level = 0;
+    nullable int16u transitionTime = 1;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
+  }
+
+  request struct MoveWithOnOffRequest {
+    MoveModeEnum moveMode = 0;
+    nullable int8u rate = 1;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
+  }
+
+  request struct StepWithOnOffRequest {
+    StepModeEnum stepMode = 0;
+    int8u stepSize = 1;
+    nullable int16u transitionTime = 2;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
+  }
+
+  request struct StopWithOnOffRequest {
+    OptionsBitmap optionsMask = 0;
+    OptionsBitmap optionsOverride = 1;
+  }
+
+  request struct MoveToClosestFrequencyRequest {
+    int16u frequency = 0;
+  }
+
+  /** Command description for MoveToLevel */
+  command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
+  /** Command description for Move */
+  command Move(MoveRequest): DefaultSuccess = 1;
+  /** Command description for Step */
+  command Step(StepRequest): DefaultSuccess = 2;
+  /** Command description for Stop */
+  command Stop(StopRequest): DefaultSuccess = 3;
+  /** Command description for MoveToLevelWithOnOff */
+  command MoveToLevelWithOnOff(MoveToLevelWithOnOffRequest): DefaultSuccess = 4;
+  /** Command description for MoveWithOnOff */
+  command MoveWithOnOff(MoveWithOnOffRequest): DefaultSuccess = 5;
+  /** Command description for StepWithOnOff */
+  command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
+  /** Command description for StopWithOnOff */
+  command StopWithOnOff(StopWithOnOffRequest): DefaultSuccess = 7;
+  /** Change the currrent frequency to the provided one, or a close
+        approximation if the exact provided one is not possible. */
+  command MoveToClosestFrequency(MoveToClosestFrequencyRequest): DefaultSuccess = 8;
+}
+
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 cluster Descriptor = 29 {
   revision 2;
@@ -3136,10 +3261,11 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_onofflightswitch = 259, version 1;
+  device type ma_dimmerswitch = 260, version 1;
 
   binding cluster Identify;
   binding cluster OnOff;
+  binding cluster LevelControl;
   binding cluster ScenesManagement;
   binding cluster ColorControl;
 
