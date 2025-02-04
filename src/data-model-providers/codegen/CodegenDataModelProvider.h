@@ -18,7 +18,6 @@
 
 #include <app/data-model-provider/Provider.h>
 
-#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
@@ -121,5 +120,6 @@ private:
     /// Find the index of the given endpoint id
     std::optional<unsigned> TryFindEndpointIndex(EndpointId id) const;
 };
+
 } // namespace app
 } // namespace chip
