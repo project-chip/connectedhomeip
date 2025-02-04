@@ -408,7 +408,9 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
     @try {
         [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
             MTR_LOG_ERROR("Invoke error: %@", error);
-            completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+            dispatch_async(queue, ^{
+                completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+            });
         }] deviceController:[[self deviceController] uniqueIdentifier]
                                  nodeID:[self nodeID]
             invokeCommandWithEndpointID:endpointID
@@ -420,36 +422,76 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
                      timedInvokeTimeout:timeout
             serverSideProcessingTimeout:serverSideProcessingTimeout
                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                 if (values == nil && error == nil) {
-                                     MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) without values or error", self, endpointID, clusterID, commandID);
-                                     completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
-                                     return;
-                                 }
+                                 dispatch_async(queue, ^{
+                                     if (values == nil && error == nil) {
+                                         MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) without values or error", self, endpointID, clusterID, commandID);
+                                         completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+                                         return;
+                                     }
 
-                                 if (error != nil && !MTR_SAFE_CAST(error, NSError)) {
-                                     MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) that has invalid error object: %@", self, endpointID, clusterID, commandID, error);
-                                     completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
-                                     return;
-                                 }
+                                     if (error != nil && !MTR_SAFE_CAST(error, NSError)) {
+                                         MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) that has invalid error object: %@", self, endpointID, clusterID, commandID, error);
+                                         completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+                                         return;
+                                     }
 
-                                 if (values != nil && !MTRInvokeResponseIsWellFormed(values)) {
-                                     MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) that has invalid data: %@", self, clusterID, commandID, values, values);
-                                     completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
-                                     return;
-                                 }
+                                     if (values != nil && !MTRInvokeResponseIsWellFormed(values)) {
+                                         MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) that has invalid data: %@", self, clusterID, commandID, values, values);
+                                         completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+                                         return;
+                                     }
 
-                                 if (values != nil && error != nil) {
-                                     MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) with both values and error: %@, %@", self, endpointID, clusterID, commandID, values, error);
-                                     // Just propagate through the error.
-                                     completion(nil, error);
-                                     return;
-                                 }
+                                     if (values != nil && error != nil) {
+                                         MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) with both values and error: %@, %@", self, endpointID, clusterID, commandID, values, error);
+                                         // Just propagate through the error.
+                                         completion(nil, error);
+                                         return;
+                                     }
 
-                                 completion(values, error);
+                                     completion(values, error);
+                                 });
                              }];
     } @catch (NSException * exception) {
         MTR_LOG_ERROR("Exception sending XPC message: %@", exception);
-        completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+        dispatch_async(queue, ^{
+            completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+        });
+    }
+}
+
+- (void)invokeCommands:(NSArray<NSArray<MTRCommandWithExpectedResult *> *> *)commands
+                 queue:(dispatch_queue_t)queue
+            completion:(void (^)(NSArray<MTRDeviceResponseValueDictionary> *))completion
+{
+    NSXPCConnection * xpcConnection = [(MTRDeviceController_XPC *) [self deviceController] xpcConnection];
+
+    @try {
+        [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+            MTR_LOG_ERROR("Error: %@", error);
+            dispatch_async(queue, ^{
+                // Should the error cases here synthesize errors for everything in the first group?
+                completion(@[]);
+            });
+        }] deviceController:[[self deviceController] uniqueIdentifier]
+                     nodeID:[self nodeID]
+             invokeCommands:commands
+                 completion:^(NSArray<MTRDeviceResponseValueDictionary> * responses) {
+                     dispatch_async(queue, ^{
+                         if (!MTRInvokeResponseIsWellFormed(responses)) {
+                             MTR_LOG_ERROR("%@ got non-well-formed response for invokeCommands:queue:completion: %@", self, responses);
+                             completion(@[]);
+                             return;
+                         }
+
+                         completion(responses);
+                     });
+                 }];
+    } @catch (NSException * exception) {
+        MTR_LOG_ERROR("Exception sending XPC message: %@", exception);
+        // Should the error cases here synthesize errors for everything in the first group?
+        dispatch_async(queue, ^{
+            completion(@[]);
+        });
     }
 }
 
