@@ -1731,29 +1731,6 @@ endpoint 1 {
     callback attribute clusterRevision;
   }
 
-  server cluster BasicInformation {
-    callback attribute dataModelRevision;
-    callback attribute vendorName;
-    callback attribute vendorID;
-    callback attribute productName;
-    callback attribute productID;
-    ram      attribute nodeLabel;
-    callback attribute location;
-    callback attribute hardwareVersion;
-    callback attribute hardwareVersionString;
-    callback attribute softwareVersion;
-    callback attribute softwareVersionString;
-    callback attribute uniqueID;
-    callback attribute capabilityMinima;
-    callback attribute specificationVersion;
-    callback attribute maxPathsPerInvoke;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-  }
-
   server cluster MicrowaveOvenMode {
     callback attribute supportedModes;
     callback attribute currentMode;
