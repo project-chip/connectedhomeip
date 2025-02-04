@@ -57,7 +57,6 @@ public:
 private:
     DataModel::ProviderChangeListener * mListener;
 };
-} // namespace
 
 /// Attempts to write via an attribute access interface (AAI)
 ///
@@ -86,6 +85,7 @@ std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteDataAttribute
     //   -  otherwise, if no decoding done, return that processing must continue via nullopt
     return decoder.TriedDecode() ? std::make_optional(CHIP_NO_ERROR) : std::nullopt;
 }
+} // namespace
 
 DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                        AttributeValueDecoder & decoder)

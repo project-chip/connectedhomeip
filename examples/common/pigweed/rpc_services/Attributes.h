@@ -22,9 +22,10 @@
 #include "attributes_service/attributes_service.rpc.pb.h"
 #include "pigweed/rpc_services/internal/StatusUtils.h"
 
+#include <AttributeAccessor.h>
+#include <AttributeAccessorRegistry.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/AppConfig.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
@@ -43,27 +44,27 @@
 namespace chip {
 namespace rpc {
 
-/** @brief Custom write interception handler registry.
- *
- *    This class is specifically meant for registering custom Attribute Access Interfaces that
- *    allow mini-AAI-handlers to process PigweedRPC read/writes separately from the cluster
- *    code. It is meant to be used by samples using this PigweedRPC Attributes service to
- *    allow the RPC interface to be used in more ways than simply simulating writes from a Matter
- *    client at the IM level. Handlers registered here by applications will be attempted before any
- *    standard processing of read/write would take place.
- */
-class RawAttributeAccessInterfaceRegistry : public chip::app::AttributeAccessInterfaceRegistry
+std::Optional<::pw::Status> TryWriteViaAccessor(const ConcreteDataAttributePath & path, AttributeAccessor * attrAccess,
+                                                AttributeValueDecoder & decoder)
 {
-public:
-    /**
-     *  Get the singleton instance.
-     */
-    static RawAttributeAccessInterfaceRegistry & Instance()
+    // Processing can happen only if an attribute access interface actually exists..
+    if (attrAccess == nullptr)
     {
-        static RawAttributeAccessInterfaceRegistry instance;
-        return instance;
+        return std::nullopt;
     }
-};
+
+    ::pw::Status status = attrAccess->Write(path, decoder);
+
+    if (status != ::pw::OkStatus())
+    {
+        return std::make_optional(status);
+    }
+
+    // If the decoder tried to decode, then a value should have been read for processing.
+    //   - if decoding was done, assume DONE (i.e. final pw::OkStatus())
+    //   -  otherwise, if no decoding done, return that processing must continue via nullopt
+    return decoder.TriedDecode() ? std::make_optional(::pw::OkStatus()) : std::nullopt;
+}
 
 // Implementation class for chip.rpc.Attributes.
 class Attributes : public pw_rpc::nanopb::Attributes::Service<Attributes>
@@ -232,29 +233,21 @@ public:
 
         app::AttributeValueDecoder decoder(tlvReader.value(), subjectDescriptor);
 
-        // Try to write using a custom AAI first
-        chip::app::AttributeAccessInterface * customAai =
-            RawAttributeAccessInterfaceRegistry::Instance().Get(write_request.path.mEndpointId, write_request.path.mClusterId);
-        std::optional<CHIP_ERROR> aaiResult = chip::app::TryWriteViaAccessInterface(write_request.path, customAai, decoder);
-        if (aaiResult.has_value())
+        // Try to write using a custom Accessor first
+        AttributeAccessor * customAttrAccess =
+            AttributeAccessorRegistry::Instance().Get(write_request.path.mEndpointId, write_request.path.mClusterId);
+        if (!customAttrAccess) // If endpoint specific registration not found, look for cluster level registration.
         {
-            if (*aaiResult == CHIP_NO_ERROR)
-            {
-                ChipLogProgress(Support, "Successfully changed attribute value using custom AAI Write.");
-                // TODO: Call emberAfAttributeChanged here or let AAI decide?
-                return pw::OkStatus();
-            }
-            else
-            {
-                ChipLogError(Support, "Failed to write data: %" CHIP_ERROR_FORMAT, (*aaiResult).Format());
-                return ::pw::Status::Internal();
-            }
+            customAttrAccess = AttributeAccessorRegistry::Instance().Get(write_request.path.mClusterId);
         }
-        else
+        std::optional<::pw::Status> attrAccessResult = TryWriteViaAccessor(write_request.path, customAttrAccess, decoder);
+        if (attrAccessResult.has_value())
         {
-            ChipLogProgress(Support, "No custom AAI Write registration found for: endpoint=%u cluster=%u",
-                            write_request.path.mEndpointId, write_request.path.mClusterId);
+            return attrAccessResult.Value();
         }
+
+        ChipLogProgress(Support, "No custom Attribute Accessor Write registration found for: endpoint=%u cluster=%u",
+                        write_request.path.mEndpointId, write_request.path.mClusterId);
 
         app::DataModel::ActionReturnStatus result = provider->WriteAttribute(write_request, decoder);
 

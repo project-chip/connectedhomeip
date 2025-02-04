@@ -121,8 +121,5 @@ private:
     /// Find the index of the given endpoint id
     std::optional<unsigned> TryFindEndpointIndex(EndpointId id) const;
 };
-
-std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteDataAttributePath & path, AttributeAccessInterface * aai,
-                                                     AttributeValueDecoder & decoder);
 } // namespace app
 } // namespace chip
