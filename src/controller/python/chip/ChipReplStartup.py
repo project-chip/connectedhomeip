@@ -6,6 +6,7 @@ import os
 import pathlib
 
 import chip.CertificateAuthority
+import chip.clusters as Clusters  # noqa: F401
 import chip.FabricAdmin
 import chip.logging
 import chip.native
@@ -163,7 +164,7 @@ or run `os.chdir` to the root of your CHIP repository checkout.
     console.print(
         '''\t[red]certificateAuthorityManager[blue]:\tManages a list of CertificateAuthority instances.
     \t[red]caList[blue]:\t\t\t\tThe list of CertificateAuthority instances.
-    \t[red]caList[n][m][blue]:\t\t\tA specific FabricAdmin object at index m for the nth CertificateAuthority instance.''')
+    \t[red]caList\[n].adminList\[m][blue]:\t\tA specific FabricAdmin object at index m for the nth CertificateAuthority instance.''')
 
     console.print(
         f'\n\n[blue]Default CHIP Device Controller (NodeId: {devCtrl.nodeId}): '
