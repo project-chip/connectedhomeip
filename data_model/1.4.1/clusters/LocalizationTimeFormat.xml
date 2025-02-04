@@ -1,0 +1,152 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002C" name="Time Format Localization Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x002C" name="Time Format Localization"/>
+  </clusterIds>
+  <classification hierarchy="base" role="utility" picsCode="LTIME" scope="Node"/>
+  <features>
+    <feature bit="0" code="CALFMT" name="CalendarFormat" summary="The Node can be configured to use different calendar formats when conveying values to a user.">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="CalendarTypeEnum">
+      <item value="0" name="Buddhist" summary="Dates conveyed using the Buddhist calendar">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="1" name="Chinese" summary="Dates conveyed using the Chinese calendar">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="2" name="Coptic" summary="Dates conveyed using the Coptic calendar">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="3" name="Ethiopian" summary="Dates conveyed using the Ethiopian calendar">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="4" name="Gregorian" summary="Dates conveyed using the Gregorian calendar">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="5" name="Hebrew" summary="Dates conveyed using the Hebrew calendar">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="6" name="Indian" summary="Dates conveyed using the Indian calendar">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="7" name="Islamic" summary="Dates conveyed using the Islamic calendar">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="8" name="Japanese" summary="Dates conveyed using the Japanese calendar">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="9" name="Korean" summary="Dates conveyed using the Korean calendar">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="10" name="Persian" summary="Dates conveyed using the Persian calendar">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="11" name="Taiwanese" summary="Dates conveyed using the Taiwanese calendar">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="255" name="UseActiveLocale" summary="calendar implied from active locale">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+    </enum>
+    <enum name="HourFormatEnum">
+      <item value="0" name="12hr" summary="Time conveyed with a 12-hour clock">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="24hr" summary="Time conveyed with a 24-hour clock">
+        <mandatoryConform/>
+      </item>
+      <item value="255" name="UseActiveLocale" summary="Use active locale clock">
+        <mandatoryConform/>
+      </item>
+    </enum>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="HourFormat" type="HourFormatEnum">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="ActiveCalendarType" type="CalendarTypeEnum">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="CALFMT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0002" name="SupportedCalendarTypes" type="list" default="">
+      <entry type="CalendarTypeEnum"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="CALFMT"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+  </attributes>
+</cluster>
