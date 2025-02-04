@@ -94,6 +94,10 @@ function download() {
     for PKG in "${@:2}"; do
         PKGS+=("-A" "$PKG")
     done
+
+    # Skip downloading if no packages are specified
+    [[ ${#PKGS[@]} -eq 0 ]] && return
+
     wget -r -nd --no-parent -e robots=off --progress=dot:mega "${PKGS[@]}" "$1"
 
     # Check if the files have been downloaded
@@ -205,9 +209,17 @@ function install_tizen_sdk() {
         'app-core-common-*.rpm'
         'aul-0*.armv7l.rpm'
         'aul-devel-*.armv7l.rpm'
+        'bluetooth-frwk-0*.armv7l.rpm'
         'bundle-0*.armv7l.rpm'
         'bundle-devel-*.armv7l.rpm'
         'buxton2-*.armv7l.rpm'
+        'capi-network-bluetooth-0*.armv7l.rpm'
+        'capi-network-bluetooth-devel-*.armv7l.rpm'
+        'capi-network-nsd-*.armv7l.rpm'
+        'capi-network-thread-*.armv7l.rpm'
+        'capi-system-peripheral-io-*.armv7l.rpm'
+        'capi-system-peripheral-io-devel-*.armv7l.rpm'
+        'capi-system-resource-1*.armv7l.rpm'
         'cynara-devel-*.armv7l.rpm'
         'dbus-1*.armv7l.rpm'
         'dbus-devel-*.armv7l.rpm'
@@ -220,12 +232,14 @@ function install_tizen_sdk() {
         'libcynara-commons-*.armv7l.rpm'
         'libdns_sd-*.armv7l.rpm'
         'libjson-glib-*.armv7l.rpm'
+        'libnsd-dns-sd-*.armv7l.rpm'
         'libsessiond-0*.armv7l.rpm'
         'libsystemd-*.armv7l.rpm'
         'libtzplatform-config-*.armv7l.rpm'
         'parcel-0*.armv7l.rpm'
         'parcel-devel-*.armv7l.rpm'
         'pkgmgr-info-*.armv7l.rpm'
+        'sensord-*.armv7l.rpm'
         'sensord-devel-*.armv7l.rpm'
         'sensord-dummy-*.armv7l.rpm'
         'vconf-compat-*.armv7l.rpm'
@@ -234,17 +248,7 @@ function install_tizen_sdk() {
 
     # Unified packages (snapshots)
     URL="http://download.tizen.org/snapshots/TIZEN/Tizen/Tizen-Unified/latest/repos/standard/packages/armv7l/"
-    PKG_ARR=(
-        'bluetooth-frwk-0*.armv7l.rpm'
-        'capi-network-bluetooth-0*.armv7l.rpm'
-        'capi-network-bluetooth-devel-*.armv7l.rpm'
-        'capi-network-nsd-*.armv7l.rpm'
-        'capi-network-thread-*.armv7l.rpm'
-        'capi-system-peripheral-io-*.armv7l.rpm'
-        'capi-system-peripheral-io-devel-*.armv7l.rpm'
-        'capi-system-resource-1*.armv7l.rpm'
-        'libnsd-dns-sd-*.armv7l.rpm'
-        'sensord-*.armv7l.rpm')
+    PKG_ARR=()
     download "$URL" "${PKG_ARR[@]}"
 
     # Tizen Developer Platform Certificate
