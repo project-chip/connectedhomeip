@@ -44,8 +44,9 @@
 namespace chip {
 namespace rpc {
 
-std::optional<::pw::Status> TryWriteViaAccessor(const ConcreteDataAttributePath & path, AttributeAccessor * attrAccess,
-                                                AttributeValueDecoder & decoder)
+std::optional<::pw::Status> TryWriteViaAccessor(const chip::app::ConcreteDataAttributePath & path,
+                                                chip::app::AttributeAccessor * attrAccess,
+                                                chip::app::AttributeValueDecoder & decoder)
 {
     // Processing can happen only if an attribute access interface actually exists..
     if (attrAccess == nullptr)
