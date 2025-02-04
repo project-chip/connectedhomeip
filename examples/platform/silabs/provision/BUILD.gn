@@ -40,6 +40,9 @@ source_set("storage") {
       libs = [ "${sdk_support_root}/matter/provision/lib/libProvision_si917.a" ]
     }
   } else {
+    if (silabs_family == "mgm26") {
+      silabs_family = "efr32mg26"
+    }
     if (use_provision_flash_storage) {
       libs = [ "${sdk_support_root}/matter/provision/lib/libProvisionFlash_${silabs_family}.a" ]
     } else {
