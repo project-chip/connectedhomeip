@@ -22,8 +22,6 @@
 #include "attributes_service/attributes_service.rpc.pb.h"
 #include "pigweed/rpc_services/internal/StatusUtils.h"
 
-#include <AttributeAccessor.h>
-#include <AttributeAccessorRegistry.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/AppConfig.h>
 #include <app/AttributeValueEncoder.h>
@@ -39,12 +37,14 @@
 #include <lib/core/TLV.h>
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>
+#include <pigweed/rpc_services/AttributeAccessor.h>
+#include <pigweed/rpc_services/AttributeAccessorRegistry.h>
 #include <platform/PlatformManager.h>
 
 namespace chip {
 namespace rpc {
 
-std::Optional<::pw::Status> TryWriteViaAccessor(const ConcreteDataAttributePath & path, AttributeAccessor * attrAccess,
+std::optional<::pw::Status> TryWriteViaAccessor(const ConcreteDataAttributePath & path, AttributeAccessor * attrAccess,
                                                 AttributeValueDecoder & decoder)
 {
     // Processing can happen only if an attribute access interface actually exists..
@@ -243,7 +243,7 @@ public:
         std::optional<::pw::Status> attrAccessResult = TryWriteViaAccessor(write_request.path, customAttrAccess, decoder);
         if (attrAccessResult.has_value())
         {
-            return attrAccessResult.Value();
+            return attrAccessResult.value();
         }
 
         ChipLogProgress(Support, "No custom Attribute Accessor Write registration found for: endpoint=%u cluster=%u",
