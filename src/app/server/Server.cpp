@@ -122,7 +122,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #if CHIP_MDNS_MINIMAL
     if (mInterfaceId != chip::Inet::InterfaceId::Null())
     {
-        ChipLogProgress(AppServer, "Selecting interface %d for mDNS address policy", mInterfaceId.GetPlatformInterface());
         static mdns::Minimal::SingleInterfaceAddressPolicy policy(mdns::Minimal::GetAddressPolicy(), mInterfaceId);
         mdns::Minimal::SetAddressPolicy(&policy);
     }
