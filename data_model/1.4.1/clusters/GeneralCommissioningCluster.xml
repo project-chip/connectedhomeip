@@ -68,7 +68,7 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="utility" picsCode="CGEN" scope="Node"/>
   <features>
     <feature bit="0" code="TC" name="TermsAndConditions" summary="Supports Terms &amp; Conditions acknowledgement">
-      <provisionalConform/>
+      <optionalConform/>
     </feature>
   </features>
   <dataTypes>
@@ -159,52 +159,37 @@ Davis, CA 95616, USA
     <attribute id="0x0005" name="TCAcceptedVersion" type="uint16">
       <access read="true" readPrivilege="admin"/>
       <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TC"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
     </attribute>
     <attribute id="0x0006" name="TCMinRequiredVersion" type="uint16">
       <access read="true" readPrivilege="admin"/>
       <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TC"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
     </attribute>
     <attribute id="0x0007" name="TCAcknowledgements" type="map16">
       <access read="true" readPrivilege="admin"/>
       <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TC"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
     </attribute>
     <attribute id="0x0008" name="TCAcknowledgementsRequired" type="bool" default="true">
       <access read="true" readPrivilege="admin"/>
       <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TC"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
     </attribute>
     <attribute id="0x0009" name="TCUpdateDeadline" type="uint32">
       <access read="true" readPrivilege="admin"/>
       <quality nullable="true" persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TC"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
     </attribute>
   </attributes>
   <commands>
@@ -270,12 +255,9 @@ Davis, CA 95616, USA
     </command>
     <command id="0x06" name="SetTCAcknowledgements" direction="commandToServer" response="SetTCAcknowledgementsResponse">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TC"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
       <field id="0" name="TCVersion" type="uint16">
         <mandatoryConform/>
       </field>
@@ -284,12 +266,9 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x07" name="SetTCAcknowledgementsResponse" direction="responseFromServer">
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TC"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
       <field id="0" name="ErrorCode" type="CommissioningErrorEnum" default="SUCCESS">
         <mandatoryConform/>
       </field>
