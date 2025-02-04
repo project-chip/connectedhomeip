@@ -1509,7 +1509,8 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
         ReturnErrorOnFailure(ConstructSaltSigma2(parsedSigma2.responderRandom, mRemotePubKey, ByteSpan(mIPK), saltSpan));
         ReturnErrorOnFailure(DeriveSigmaKey(saltSpan, ByteSpan(kKDFSR2Info), sr2k));
     }
-    // Msg2 should only be added to MessageDigest after we construct SaltSigma2 that is used to derive S2K
+    // Msg2 should only be added to MessageDigest after we construct SaltSigma2 that is used to derive S2K,
+    // Because constructing SaltSigma2 uses the MessageDigest at a point when it should only include Msg1.
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ buf, buflen }));
 
     ReturnErrorOnFailure(AES_CCM_decrypt(parsedSigma2.msgR2EncryptedPayload.data(), parsedSigma2.msgR2EncryptedPayload.size(),
