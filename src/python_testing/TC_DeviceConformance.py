@@ -60,9 +60,9 @@ class DeviceConformanceTests(BasicCompositionTests):
         # Currently this is just NIM. We may later be able to pull this from the device type scrape using the ManagedAclAllowed condition,
         # but these are not currently exposed directly by the device.
         allowed_ids = [self._get_device_type_id('network infrastructure manager')]
-        for endpoint in self.endpoints_tlv.values():
+        for endpoint in self.endpoints.values():
             desc = Clusters.Descriptor
-            device_types = [dt.deviceType for dt in endpoint[desc.id][desc.Attributes.DeviceTypeList.attribute_id]]
+            device_types = [dt.deviceType for dt in endpoint[desc][desc.Attributes.DeviceTypeList]]
             if set(allowed_ids).intersection(set(device_types)):
                 # TODO: it's unclear if this needs to be present on every endpoint. Right now, this assumes one is sufficient.
                 return True
