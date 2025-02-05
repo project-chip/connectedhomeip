@@ -619,7 +619,7 @@ namespace chip {
 namespace app {
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
-                                  CommandHandler * apCommandObj)
+                                  CommandHandler * apCommandObj, bool aClusterIsValid)
 {
     // Nothing todo.
 }
