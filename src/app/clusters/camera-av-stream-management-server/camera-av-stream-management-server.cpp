@@ -98,6 +98,34 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
     }
 
     // Ensure Optional attribute bits have been correctly passed.
+    if (SupportsOptAttr(OptionalAttribute::kSupportsHDRModeEnabled))
+    {
+        VerifyOrReturnError(
+            HasFeature(Feature::kVideo), CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(Zcl, "CameraAVStreamMgmt: Feature configuration error. if HDRModeEnabled, then Video feature required"));
+    }
+
+    if (SupportsOptAttr(OptionalAttribute::kSupportsNightVision) || SupportsOptAttr(OptionalAttribute::kSupportsNightVisionIllum))
+    {
+        VerifyOrReturnError(
+            HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot), CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(Zcl, "CameraAVStreamMgmt: Feature configuration error. if NIghtVision is enabled, then Video|Snapshot feature required"));
+    }
+
+    if (SupportsOptAttr(OptionalAttribute::kSupportsMicrophoneAGCEnabled))
+    {
+        VerifyOrReturnError(
+            HasFeature(Feature::kAudio), CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(Zcl, "CameraAVStreamMgmt: Feature configuration error. if MicrophoneAGCEnabled, then Audio feature required"));
+    }
+
+    if (SupportsOptAttr(OptionalAttribute::kSupportsImageFlipHorizontal) || SupportsOptAttr(OptionalAttribute::kSupportsImageFlipVertical) ||
+        SupportsOptAttr(OptionalAttribute::kSupportsImageRotation))
+    {
+        VerifyOrReturnError(
+            HasFeature(Feature::kImageControl), CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(Zcl, "CameraAVStreamMgmt: Feature configuration error. if ImageFlip or Rotation enabled, then ImageControl feature required"));
+    }
 
     LoadPersistentAttributes();
 
@@ -111,9 +139,9 @@ bool CameraAVStreamMgmtServer::HasFeature(Feature feature) const
     return mFeature.Has(feature);
 }
 
-bool CameraAVStreamMgmtServer::SupportsOptAttr(OptionalAttribute aOptionalAttrs) const
+bool CameraAVStreamMgmtServer::SupportsOptAttr(OptionalAttribute aOptionalAttr) const
 {
-    return mOptionalAttrs.Has(aOptionalAttrs);
+    return mOptionalAttrs.Has(aOptionalAttr);
 }
 
 bool CameraAVStreamMgmtServer::IsLocalVideoRecordingEnabled() const
