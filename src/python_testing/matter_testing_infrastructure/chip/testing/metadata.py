@@ -74,7 +74,7 @@ def extract_runs_args(py_script_path: str) -> Dict[str, Dict[str, str]]:
                 runs_arg_lines[run].update(args)
 
             for key, value in runs.items():
-                if isinstance(value, str):  
+                if isinstance(value, str):
                     variables[key] = value
 
             runs_arg_lines['variables'] = variables
@@ -174,7 +174,6 @@ class MetadataReader:
             self.__resolve_env_vals__(resolved_script_args)
 
             app = attr.get("app", "")
-
 
             for name, value in test_script_vars.items():
                 app = app.replace(f'${{{name}}}', value)
