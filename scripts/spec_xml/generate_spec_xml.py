@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import contextlib
 import glob
 import json
 import os
@@ -89,16 +90,62 @@ def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run:
 @click.option(
     '--include-in-progress',
     type=click.Choice(['All', 'None', 'Current']), default='All')
-def main(scraper, spec_root, output_dir, dry_run, include_in_progress):
-    # Clusters need to be scraped first because the cluster directory is passed to the device type directory
-    if not output_dir:
-        output_dir_map = {'All': DEFAULT_OUTPUT_DIR_TOT, 'None': DEFAULT_OUTPUT_DIR_1_3, 'Current': DEFAULT_OUTPUT_DIR_IN_PROGRESS}
-        output_dir = output_dir_map[include_in_progress]
-    scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress)
-    scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_progress)
+@click.option(
+    '--legacy',
+    default=False,
+    is_flag=True,
+    help='Use the DM editor spec scraper (legacy) rather than alchemy')
+def main(scraper, spec_root, output_dir, dry_run, include_in_progress, legacy):
+    if legacy:
+        scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress)
+        scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_progress)
+    else:
+        scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress)
     if not dry_run:
-        dump_versions(scraper, spec_root, output_dir)
+        dump_versions(scraper, spec_root, output_dir, legacy)
         dump_cluster_ids(output_dir)
+
+
+def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
+    print('Generating main spec to get file include list - this may take a few minutes')
+    main_out = make_asciidoc('pdf', include_in_progress, spec_root, dry_run)
+    print('Generating cluster spec to get file include list - this may take a few minutes')
+    cluster_out = make_asciidoc('pdf-appclusters-book', include_in_progress, spec_root, dry_run)
+    print('Generating device type library to get file include list - this may take a few minutes')
+    device_type_files = make_asciidoc('pdf-devicelibrary-book', include_in_progress, spec_root, dry_run)
+
+    cluster_files = main_out + cluster_out
+    cmd = [scraper, 'dm', '--dmRoot', output_dir, '--specRoot', spec_root]
+    if include_in_progress == 'All':
+        cmd.extend(['-a', 'in-progress'])
+    elif include_in_progress == 'Current':
+        for d in CURRENT_IN_PROGRESS_DEFINES:
+            cmd.extend(['-a'])
+            cmd.extend([d])
+
+    if (dry_run):
+        print(cmd)
+        return
+    subprocess.run(cmd)
+    # Remove all the files that weren't compiled into the spec
+    clusters_output_dir = os.path.join(output_dir, 'clusters')
+    device_types_output_dir = os.path.abspath(os.path.join(output_dir, 'device_types'))
+    for filename in os.listdir(clusters_output_dir):
+        # There are a couple of clusters that appear in the same adoc file and they have prefixes.
+        # Look for these specifically.
+        # For 1.5 onward, we should separate these.
+        if "Label-Cluster" in filename or "bridge-clusters" in filename:
+            continue
+        adoc = os.path.basename(filename).replace('.xml', '.adoc')
+        if adoc not in cluster_files:
+            print(f'Removing {adoc} as it was not in the generated spec document')
+            os.remove(os.path.join(clusters_output_dir, filename))
+
+    for filename in os.listdir(device_types_output_dir):
+        adoc = os.path.basename(filename).replace('.xml', '.adoc')
+        if adoc not in device_type_files:
+            print(f'Removing {adoc} as it was not in the generated spec document')
+            os.remove(os.path.join(device_types_output_dir, filename))
 
 
 def scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress):
@@ -194,20 +241,38 @@ def scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_prog
                 scrape_device_type(filename)
 
 
-def dump_versions(scraper, spec_root, output_dir):
+def dump_versions(scraper, spec_root, output_dir, legacy):
     sha_file = os.path.abspath(os.path.join(output_dir, 'spec_sha'))
+    tag_file = os.path.abspath(os.path.join(output_dir, 'spec_tag'))
     out = subprocess.run(['git', 'rev-parse', 'HEAD'],
                          capture_output=True, encoding="utf8", cwd=spec_root)
     sha = out.stdout
     with open(sha_file, 'wt', encoding='utf8') as output:
         output.write(sha)
+    cmd = ['git', 'show-ref',  '--tags']
+    out = subprocess.run(cmd, capture_output=True, encoding="utf-8", cwd=spec_root)
+    tags = out.stdout.splitlines()
+    tag = [t for t in tags if sha.strip() in t]
+    if tag:
+        with open(tag_file, 'wt', encoding='utf8') as output:
+            output.write(f'{tag[0].split("/")[-1]}\n')
+    else:
+        print(f"WARNING: no tag found for sha {sha}")
+        with contextlib.suppress(FileNotFoundError):
+            os.remove(tag_file)
 
     scraper_file = os.path.abspath(os.path.join(output_dir, 'scraper_version'))
-    out = subprocess.run([scraper, '--version'],
+    version_cmd = 'version'
+    if legacy:
+        version_cmd = '--version'
+    out = subprocess.run([scraper, version_cmd],
                          capture_output=True, encoding="utf8")
     version = out.stdout
     with open(scraper_file, "wt", encoding='utf8') as output:
-        output.write(version)
+        if legacy:
+            output.write(version)
+        else:
+            output.write(f'alchemy {version}')
 
 
 def dump_cluster_ids(output_dir):
