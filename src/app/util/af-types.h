@@ -24,6 +24,8 @@
  */
 
 #include "att-storage.h"
+#include <platform/CHIPDeviceConfig.h> // For CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
+
 #include <stdbool.h> // For bool
 #include <stdint.h>  // For various uint*_t types
 
@@ -48,6 +50,15 @@
  * @brief Type for the cluster mask
  */
 typedef uint8_t EmberAfClusterMask;
+
+/**
+ * @brief Type for specifiying cluster including mask, to differentiate server & client
+ */
+typedef struct
+{
+    chip::ClusterId clusterId;
+    EmberAfClusterMask mask;
+} EmberAfClusterSpec;
 
 /**
  * @brief Generic function type, used for either of the cluster function.
@@ -175,7 +186,7 @@ typedef struct
      */
     uint8_t clusterCount;
     /**
-     * Size of all non-external, non-singlet attribute in this endpoint type.
+     * Size of all non-external, non-singleton attributes in this endpoint type.
      */
     uint16_t endpointSize;
 } EmberAfEndpointType;
@@ -215,6 +226,17 @@ struct EmberAfDefinedEndpoint
      * endpoint
      */
     chip::DataVersion * dataVersions = nullptr;
+
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
+    /**
+     * Span describing a memory block to be used for automatic attribute storage if
+     * this is a dynamic endpoint. If not empty, the Span must have
+     * a size at least equal to endpointType->endpointSize (which is
+     * the sum of all endpointType->clusters[*].clustersize).
+     */
+    chip::Span<uint8_t> dynamicAttributeStorage;
+
+#endif
 
     /**
      * Root endpoint id for composed device type.
