@@ -343,10 +343,10 @@ CHIP_ERROR TransferSession::PrepareBlock(const BlockData & inData)
 
     if (msgType == MessageType::BlockEOF)
     {
-        #if CHIP_AUTOMATION_LOGGING
-            ChipLogAutomation("Sending BDX Message");
-            blockMsg.LogMessage(msgType);
-        #endif // CHIP_AUTOMATION_LOGGING
+#if CHIP_AUTOMATION_LOGGING
+        ChipLogAutomation("Sending BDX Message");
+        blockMsg.LogMessage(msgType);
+#endif // CHIP_AUTOMATION_LOGGING
         mState = TransferState::kAwaitingEOFAck;
     }
 
@@ -383,10 +383,10 @@ CHIP_ERROR TransferSession::PrepareBlockAck()
     }
     else if (mState == TransferState::kReceivedEOF)
     {
-        #if CHIP_AUTOMATION_LOGGING
-            ChipLogAutomation("Sending BDX Message");
-            ackMsg.LogMessage(msgType);
-        #endif // CHIP_AUTOMATION_LOGGING
+#if CHIP_AUTOMATION_LOGGING
+        ChipLogAutomation("Sending BDX Message");
+        ackMsg.LogMessage(msgType);
+#endif // CHIP_AUTOMATION_LOGGING
         mState            = TransferState::kTransferDone;
         mAwaitingResponse = false;
     }
@@ -467,21 +467,21 @@ CHIP_ERROR TransferSession::HandleBdxMessage(const PayloadHeader & header, Syste
     {
     case MessageType::SendInit:
     case MessageType::ReceiveInit:
-        #if CHIP_AUTOMATION_LOGGING
-            ChipLogAutomation("Handling received BDX Message");
-        #endif // CHIP_AUTOMATION_LOGGING
+#if CHIP_AUTOMATION_LOGGING
+        ChipLogAutomation("Handling received BDX Message");
+#endif // CHIP_AUTOMATION_LOGGING
         HandleTransferInit(msgType, std::move(msg));
         break;
     case MessageType::SendAccept:
-        #if CHIP_AUTOMATION_LOGGING
-            ChipLogAutomation("Handling received BDX Message");
-        #endif // CHIP_AUTOMATION_LOGGING
+#if CHIP_AUTOMATION_LOGGING
+        ChipLogAutomation("Handling received BDX Message");
+#endif // CHIP_AUTOMATION_LOGGING
         HandleSendAccept(std::move(msg));
         break;
     case MessageType::ReceiveAccept:
-        #if CHIP_AUTOMATION_LOGGING
-            ChipLogAutomation("Handling received BDX Message");
-        #endif // CHIP_AUTOMATION_LOGGING
+#if CHIP_AUTOMATION_LOGGING
+        ChipLogAutomation("Handling received BDX Message");
+#endif // CHIP_AUTOMATION_LOGGING
         HandleReceiveAccept(std::move(msg));
         break;
     case MessageType::BlockQuery:

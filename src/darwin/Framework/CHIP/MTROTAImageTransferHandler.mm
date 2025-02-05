@@ -310,8 +310,7 @@ void MTROTAImageTransferHandler::HandleTransferSessionOutput(TransferSession::Ou
 
     TransferSession::OutputEventType eventType = event.EventType;
 
-    if (eventType != TransferSession::OutputEventType::kNone)
-    {
+    if (eventType != TransferSession::OutputEventType::kNone) {
         ChipLogError(BDX, "OutputEvent type: %s", event.ToString(eventType));
     }
 

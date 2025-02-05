@@ -192,7 +192,7 @@ void AsyncResponder::NotifyEventHandled(const TransferSession::OutputEventType e
         eventType == TransferSession::OutputEventType::kStatusReceived)
     {
         ChipLogDetail(BDX, "NotifyEventHandled : Event %s Error %" CHIP_ERROR_FORMAT,
-                  TransferSession::OutputEvent::TypeToString(eventType), status.Format());
+                      TransferSession::OutputEvent::TypeToString(eventType), status.Format());
         mDestroySelfAfterProcessingEvents = true;
     }
     else if (status != CHIP_NO_ERROR)
