@@ -69,6 +69,7 @@ class TC_MOD_1_2(MatterBaseTest):
         mode_options = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.SupportedModes)
         modes = [option.mode for option in mode_options]
 
+        self.step(2)
         Current_Mode_ID = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.CurrentMode)
         asserts.assert_in(Current_Mode_ID, modes, "Current Mode ID should have been in supported modes")
 
@@ -86,9 +87,11 @@ class TC_MOD_1_2(MatterBaseTest):
             Start_Up_Mode_ID = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.StartUpMode)
             asserts.assert_in(Start_Up_Mode_ID, modes, "Current Mode ID should have been in supported modes")
 
+        self.step(5)
         Description = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.Description)
         assert isinstance(Description, str), "Description was not a human readable string"
 
+        self.step(6)
         # Currently appears to return a 0 by default, need to check on this to make sure it is acceptable
         # Ref Link: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/app_clusters/ModeSelect.adoc#62-standardnamespace-attribute
         standard_namespace = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.StandardNamespace)
