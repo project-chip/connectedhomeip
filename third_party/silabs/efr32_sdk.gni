@@ -99,7 +99,7 @@ silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
 silabs_platform_dir = "${chip_root}/src/platform/silabs"
 
 is_series_2 = silabs_family == "mgm24" || silabs_family == "efr32mg24" ||
-              silabs_family == "efr32mg26"
+              silabs_family == "efr32mg26" || silabs_family == "mgm26"
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
 
@@ -336,6 +336,24 @@ template("efr32_sdk") {
       ]
 
       defines += [ "EFR32MG26" ]
+    } else if (silabs_family == "mgm26") {
+      _include_dirs += [
+        "${efr32_sdk_root}/platform/Device/SiliconLabs/MGM26/Include",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg26",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg26/config",
+      ]
+
+      libs += [
+        "${sdk_support_root}/protocol/bluetooth/bgstack/ll/build/gcc/xg26/release/liblinklayer.a",
+        "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg26_gcc_release.a",
+      ]
+      if (silabs_mcu == "MGM260PB22VNA") {
+        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm260pb22vna_gcc.a" ]
+      } else if (silabs_mcu == "MGM260PB32VNA") {
+        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm260pb32vna_gcc.a" ]
+      }
+
+      defines += [ "MGM26" ]
     }
 
     if (use_wf200) {
@@ -1055,6 +1073,14 @@ template("efr32_sdk") {
       sources += [
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG26/Source/startup_efr32mg26.c",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG26/Source/system_efr32mg26.c",
+        "${efr32_sdk_root}/platform/service/device_manager/clocks/sl_device_clock_efr32xg26.c",
+        "${efr32_sdk_root}/platform/service/device_manager/devices/sl_device_peripheral_hal_efr32xg26.c",
+      ]
+    } else if (silabs_family == "mgm26") {
+      sources += [
+        "${efr32_sdk_root}/platform/Device/SiliconLabs/MGM26/Source/startup_mgm26.c",
+        "${efr32_sdk_root}/platform/Device/SiliconLabs/MGM26/Source/system_mgm26.c",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/fem_util/sl_fem_util.c",
         "${efr32_sdk_root}/platform/service/device_manager/clocks/sl_device_clock_efr32xg26.c",
         "${efr32_sdk_root}/platform/service/device_manager/devices/sl_device_peripheral_hal_efr32xg26.c",
       ]
