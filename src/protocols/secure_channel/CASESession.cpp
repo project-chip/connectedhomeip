@@ -1517,12 +1517,15 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
                                          nullptr, 0, parsedSigma2.msgR2MIC.data(), parsedSigma2.msgR2MIC.size(), sr2k.KeyHandle(),
                                          kTBEData2_Nonce, kTBEDataNonceLength, parsedSigma2.msgR2EncryptedPayload.data()));
 
+    parsedSigma2.msgR2Decrypted = std::move(parsedSigma2.msgR2Encrypted);
+    size_t msgR2DecryptedLength = parsedSigma2.msgR2EncryptedPayload.size();
+
     ContiguousBufferTLVReader decryptedDataTlvReader;
-    decryptedDataTlvReader.Init(parsedSigma2.msgR2EncryptedPayload.data(), parsedSigma2.msgR2EncryptedPayload.size());
+    decryptedDataTlvReader.Init(parsedSigma2.msgR2Decrypted.Get(), msgR2DecryptedLength);
     ParsedSigma2TBEData parsedSigma2TBEData;
     ReturnErrorOnFailure(ParseSigma2TBEData(decryptedDataTlvReader, parsedSigma2TBEData));
 
-    // Validate responder identity located in msgR2Encrypted
+    // Validate responder identity located in msgR2Decrypted
     // Constructing responder identity
     P256PublicKey responderPublicKey;
     {
@@ -1540,7 +1543,7 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
         VerifyOrReturnError(mPeerNodeId == responderNodeId, CHIP_ERROR_INVALID_CASE_PARAMETER);
     }
 
-    // Construct msgR2Signed and validate the signature in msgR2Encrypted.
+    // Construct msgR2Signed and validate the signature in msgR2Decrypted.
     size_t msgR2SignedLen = EstimateStructOverhead(parsedSigma2TBEData.responderNOC.size(),  // resonderNOC
                                                    parsedSigma2TBEData.responderICAC.size(), // responderICAC
                                                    kP256_PublicKey_Length,                   // responderEphPubKey

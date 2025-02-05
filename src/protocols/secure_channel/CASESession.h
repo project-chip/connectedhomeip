@@ -249,6 +249,7 @@ protected:
         ByteSpan responderEphPubKey;
 
         Platform::ScopedMemoryBufferWithSize<uint8_t> msgR2Encrypted;
+        Platform::ScopedMemoryBufferWithSize<uint8_t> msgR2Decrypted;
         // Below ByteSpans are Backed by: msgR2Encrypted buffer
         // Lifetime: Valid as long as msgR2Encrypted is not released
         MutableByteSpan msgR2EncryptedPayload;
@@ -260,8 +261,8 @@ protected:
 
     struct ParsedSigma2TBEData
     {
-        // Below ByteSpans are Backed by: msgR2Encrypted Buffer, member of ParsedSigma2 struct
-        // Lifetime: Valid for the lifetime of the instance of ParsedSigma2 that contains the msgR2Encrypted Buffer.
+        // Below ByteSpans are Backed by: msgR2Decrypted Buffer, member of ParsedSigma2 struct
+        // Lifetime: Valid for the lifetime of the instance of ParsedSigma2 that contains the msgR2Decrypted Buffer.
         ByteSpan responderNOC;
         ByteSpan responderICAC;
         ByteSpan resumptionId;
@@ -382,9 +383,9 @@ protected:
      * Parse a decrypted TBEData2Encrypted message. This function will return success only if the message passes schema checks.
      *
      * @param tlvReader a reference to the TLVReader that points to the decrypted TBEData2Encrypted buffer (i.e.
-     *                  msgR2Encrypted member of ParsedSigma2 struct)
+     *                  msgR2Decrypted member of ParsedSigma2 struct)
      * @param outParsedSigma2TBEData a reference to ParsedSigma2TBEData. All members of parsedMessage will stay valid as long
-     *                               as the msgR2Encrypted member of ParsedSigma2 is valid
+     *                               as the msgR2Decrypted member of ParsedSigma2 is valid
      *
      * @note Calls to this function must always be made with a newly created and fresh ParsedSigma2TBEData parameter.
      **/
