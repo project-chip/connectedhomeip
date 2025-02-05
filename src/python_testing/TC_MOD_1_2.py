@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -99,7 +99,7 @@ class TC_MOD_1_2(MatterBaseTest):
         if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.StandardNamespace):
             # Currently appears to return a 0 by default, need to check on this to make sure it is acceptable
             #Ref Link: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/app_clusters/ModeSelect.adoc#62-standardnamespace-attribute
-            Standard_Namespace = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.StandardNamespace)
+            standard_namespace = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.StandardNamespace)
             if not isinstance(Standard_Namespace, (uint, int)):
                 raise ValueError("Standard Namespace value: must be of type uint or an int")
 
