@@ -2337,7 +2337,16 @@ limitations under the License.
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Temperature Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Temperature Control" client="false" server="true" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="TN" name="TemperatureNumber">
+                        <mandatoryConform/>
+                    </feature>
+                    <feature code="TL" name="TemperatureLevel">
+                        <disallowConform/>
+                    </feature>
+                </features>
+            </include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Refrigerator And Temperature Controlled Cabinet Mode" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
@@ -2354,6 +2363,7 @@ limitations under the License.
                 </features>
             </include>
             <include cluster="Oven Cavity Operational State" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+
         </clusters>
     </deviceType>
     <deviceType>
@@ -2658,8 +2668,17 @@ limitations under the License.
                 </features>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Temperature Control" client="false" server="true" clientLocked="true" serverLocked="false"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Temperature Control" client="false" server="true" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="TN" name="TemperatureNumber">
+                        <disallowConform/>
+                    </feature>
+                    <feature code="TL" name="TemperatureLevel">
+                        <mandatoryConform/>
+                    </feature>
+                </features>
+            </include>
         </clusters>
     </deviceType>
     <deviceType>
