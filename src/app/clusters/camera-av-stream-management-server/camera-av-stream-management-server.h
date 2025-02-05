@@ -54,8 +54,9 @@ constexpr size_t kViewportStructMaxSerializedSize =
 // The number of possible values of use case types for the streams, as specified in StreamUsageEnum.
 constexpr size_t kNumOfStreamUsageTypes = 4;
 
-// StreamUsageEnum(using a uint8_t) + Anonymous tag(1 byte).
-constexpr size_t kStreamUsageTlvSize = sizeof(uint8_t) + 1;
+// StreamUsageEnum + Anonymous tag(1 byte).
+// Assumes min-size encoding(1 byte) for the integer.
+constexpr size_t kStreamUsageTlvSize = sizeof(StreamUsageEnum) + 1;
 
 // 1 control byte + end-of-array marker
 constexpr size_t kArrayTlvOverhead = 2;

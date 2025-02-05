@@ -97,6 +97,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
             ChipLogError(Zcl, "CameraAVStreamMgmt: Feature configuration error. if Watermark or OSD, then Video feature required"));
     }
 
+    // Ensure Optional attribute bits have been correctly passed.
+
     LoadPersistentAttributes();
 
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
