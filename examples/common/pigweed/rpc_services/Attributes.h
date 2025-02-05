@@ -37,28 +37,29 @@
 #include <lib/core/TLV.h>
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>
-#include <pigweed/rpc_services/AttributeAccessor.h>
-#include <pigweed/rpc_services/AttributeAccessorRegistry.h>
+#include <pigweed/rpc_services/AccessInterceptor.h>
+#include <pigweed/rpc_services/AccessInterceptorRegistry.h>
 #include <platform/PlatformManager.h>
 #include <set>
 
 namespace chip {
 namespace rpc {
 
-::pw::Status TryWriteViaAccessor(const chip::app::ConcreteDataAttributePath & path, chip::app::AttributeValueDecoder & decoder)
+std::optional<::pw::Status> TryWriteViaAccessor(const chip::app::ConcreteDataAttributePath & path,
+                                                chip::app::AttributeValueDecoder & decoder)
 {
-    std::set<AttributeAccessor *> accessors = AttributeAccessorRegistry::Instance().GetAllAccessors();
+    std::set<PigweedDebugAccessInterceptor *> accessors = PigweedDebugAccessInterceptorRegistry::Instance().GetAllAccessors();
 
-    for (AttributeAccessor * accessor : accessors)
+    for (PigweedDebugAccessInterceptor * accessor : accessors)
     {
-        ::pw::Status result = accessor->Write(path, decoder);
-        if (result != ::pw::Status::NotFound()) // Write was either a success or failure.
+        std::optional<::pw::Status> result = accessor->Write(path, decoder);
+        if (result.has_value()) // Write was either a success or failure.
         {
             return result;
         }
     }
 
-    return ::pw::Status::NotFound();
+    return std::nullopt;
 }
 
 // Implementation class for chip.rpc.Attributes.
@@ -229,8 +230,8 @@ public:
         app::AttributeValueDecoder decoder(tlvReader.value(), subjectDescriptor);
 
         // Try to write using a custom Accessor first
-        ::pw::Status interceptResult = TryWriteViaAccessor(write_request.path, decoder);
-        if (interceptResult != ::pw::Status::NotFound())
+        std::optional<::pw::Status> interceptResult = TryWriteViaAccessor(write_request.path, decoder);
+        if (interceptResult.has_value())
         {
             return interceptResult;
         }

@@ -19,7 +19,7 @@
 #pragma once
 
 #include "pw_status/status.h"
-#include <pigweed/rpc_services/AttributeAccessor.h>
+#include <pigweed/rpc_services/AccessInterceptor.h>
 #include <set>
 
 namespace chip {
@@ -34,19 +34,19 @@ namespace rpc {
  *    client at the IM level. Handlers registered here by applications will be attempted before any
  *    standard processing of read/write would take place.
  */
-class AttributeAccessorRegistry
+class PigweedDebugAccessInterceptorRegistry
 {
 public:
     /**
      * Register an attribute access override.
      */
-    void Register(AttributeAccessor * attrOverride) { mAccessors.insert(attrOverride); }
+    void Register(PigweedDebugAccessInterceptor * attrOverride) { mAccessors.insert(attrOverride); }
 
     /**
      * Unregister an attribute access override (for example if the object
-     * implementing AttributeAccessor is being destroyed).
+     * implementing PigweedDebugAccessInterceptor is being destroyed).
      */
-    void Unregister(AttributeAccessor * attrOverride)
+    void Unregister(PigweedDebugAccessInterceptor * attrOverride)
     {
         if (mAccessors.find(attrOverride) == mAccessors.end())
         {
@@ -59,19 +59,19 @@ public:
     /**
      *  Get all registered accessors.
      */
-    std::set<AttributeAccessor *> GetAllAccessors() { return mAccessors; }
+    std::set<PigweedDebugAccessInterceptor *> GetAllAccessors() { return mAccessors; }
 
     /**
      * Returns the singleton instance of the attribute accessor registory.
      */
-    static AttributeAccessorRegistry & Instance()
+    static PigweedDebugAccessInterceptorRegistry & Instance()
     {
-        static AttributeAccessorRegistry instance;
+        static PigweedDebugAccessInterceptorRegistry instance;
         return instance;
     }
 
 private:
-    std::set<AttributeAccessor *> mAccessors;
+    std::set<PigweedDebugAccessInterceptor *> mAccessors;
 };
 
 } // namespace rpc
