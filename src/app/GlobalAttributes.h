@@ -45,7 +45,7 @@ static_assert(ArrayIsSorted(GlobalAttributesNotInMetadata), "Array of global att
 bool IsSupportedGlobalAttributeNotInMetadata(AttributeId attributeId);
 
 /**
- * Reads a `IsSupportedGlobalAttributeNotInMetadata` atribute into `encoder`.
+ * Reads a `IsSupportedGlobalAttributeNotInMetadata` attribute into `encoder`.
  *
  * Preconditions:
  *   - `path` MUST be a valid cluster path inside `provider` and its mAttributeID
