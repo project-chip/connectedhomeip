@@ -21,7 +21,7 @@
 namespace mdns {
 namespace Minimal {
 
-AddressPolicy * GetDefaultAddressPolicy()
+AddressPolicy * GetDefaultAddressPolicy();
 
 } // namespace Minimal
 } // namespace mdns

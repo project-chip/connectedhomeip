@@ -53,7 +53,7 @@
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 #ifdef CHIP_MDNS_MINIMAL
-#include <lib/dnssd/minimal_mdns/AddressPolicy_SingleInterface.h>
+#include <lib/dnssd/minimal_mdns/AddressPolicy_SingleInterface.h> // nogncheck
 #endif
 #include <setup_payload/SetupPayload.h>
 #include <sys/param.h>
