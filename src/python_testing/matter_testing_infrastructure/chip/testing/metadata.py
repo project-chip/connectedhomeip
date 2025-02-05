@@ -42,10 +42,11 @@ class NamedStringIO(StringIO):
 
 
 def extract_runs_args(py_script_path: str) -> Dict[str, Dict[str, str]]:
-    """Extract the run arguments from the CI test arguments blocks."""
+    """Extracts the run arguments and variable definitions from the test script."""
 
     found_ci_args_section = False
     runs_arg_lines: Dict[str, Dict[str, str]] = {}
+    variables = {}
 
     ci_args_section_lines = []
 
@@ -53,11 +54,8 @@ def extract_runs_args(py_script_path: str) -> Dict[str, Dict[str, str]]:
         for line in py_script.readlines():
             line = line.strip()
 
-            # Append empty line to the line capture, so during YAML parsing
-            # line numbers will match the original file.
             ci_args_section_lines.append("")
 
-            # Detect the single CI args section, to skip the lines otherwise.
             if line.startswith("# === BEGIN CI TEST ARGUMENTS ==="):
                 found_ci_args_section = True
                 continue
@@ -65,7 +63,6 @@ def extract_runs_args(py_script_path: str) -> Dict[str, Dict[str, str]]:
                 break
 
             if found_ci_args_section:
-                # Update the last line in the line capture.
                 ci_args_section_lines[-1] = " " + line.lstrip("#")
 
     if found_ci_args_section:
@@ -76,7 +73,13 @@ def extract_runs_args(py_script_path: str) -> Dict[str, Dict[str, str]]:
                 runs_arg_lines[run]['run'] = run
                 runs_arg_lines[run].update(args)
 
+            for key, value in runs.items():
+                if isinstance(value, str):  
+                    variables[key] = value
+
+            runs_arg_lines['variables'] = variables
             runs_arg_lines['skip-default-flags'] = runs.get("skip-default-flags", [])
+
         except yaml.YAMLError as e:
             logging.error(f"Failed to parse CI arguments YAML: {e}")
 
@@ -147,8 +150,10 @@ class MetadataReader:
         runs_metadata: List[Metadata] = []
         runs_args = extract_runs_args(py_script_path)
 
+        test_script_vars = runs_args.get("variables", {})  # 🔹 Get script-defined variables
+
         for run, attr in runs_args.items():
-            if run == "skip-default-flags":
+            if run in ["skip-default-flags", "variables"]:
                 continue
 
             resolved_app_args = self.app_args.copy()
@@ -169,7 +174,10 @@ class MetadataReader:
             self.__resolve_env_vals__(resolved_script_args)
 
             app = attr.get("app", "")
-            self.__resolve_env_vals__({"app": app})
+
+
+            for name, value in test_script_vars.items():
+                app = app.replace(f'${{{name}}}', value)
 
             runs_metadata.append(Metadata(
                 py_script_path=py_script_path,
