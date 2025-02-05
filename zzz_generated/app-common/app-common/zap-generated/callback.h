@@ -6007,24 +6007,6 @@ bool emberAfBridgedDeviceBasicInformationClusterKeepActiveCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::BridgedDeviceBasicInformation::Commands::KeepActive::DecodableType & commandData);
 /**
- * @brief Administrator Commissioning Cluster OpenCommissioningWindow Command callback (from client)
- */
-bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::DecodableType & commandData);
-/**
- * @brief Administrator Commissioning Cluster OpenBasicCommissioningWindow Command callback (from client)
- */
-bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::DecodableType & commandData);
-/**
- * @brief Administrator Commissioning Cluster RevokeCommissioning Command callback (from client)
- */
-bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType & commandData);
-/**
  * @brief Operational Credentials Cluster AttestationRequest Command callback (from client)
  */
 bool emberAfOperationalCredentialsClusterAttestationRequestCallback(

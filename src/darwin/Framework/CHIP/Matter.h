@@ -34,6 +34,7 @@
 #import <Matter/MTRClusterStateCacheContainer.h>
 #import <Matter/MTRClusters.h>
 #import <Matter/MTRCommandPayloadsObjc.h>
+#import <Matter/MTRCommandWithExpectedResult.h>
 #import <Matter/MTRCommissionableBrowserDelegate.h>
 #import <Matter/MTRCommissionableBrowserResult.h>
 #import <Matter/MTRCommissioneeInfo.h>

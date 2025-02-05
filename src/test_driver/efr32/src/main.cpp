@@ -21,10 +21,10 @@
 #include <AppConfig.h>
 #include <PigweedLogger.h>
 #include <PigweedLoggerMutex.h>
-#include <ProvisionManager.h>
 #include <cmsis_os2.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <cstring>
+#include <headers/ProvisionManager.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <lib/support/UnitTest.h>

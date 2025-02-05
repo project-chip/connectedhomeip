@@ -85,6 +85,19 @@ public:
     ///      This includes cases where command handling and value return will be done asynchronously.
     ///    - returning a value other than Success implies an error reply (error and data are mutually exclusive)
     ///
+    /// Preconditions:
+    ///    - `request.path` MUST refer to a command that actually exists.  This is because in practice
+    ///       callers must do ACL and flag checks (e.g. for timed invoke) before calling this function.
+    ///
+    ///       Callers that do not care about those checks should use `ProviderMetadataTree::AcceptedCommands`
+    ///       to check for command existence.
+    ///
+    ///    - TODO: as interfaces are updated, we may want to make the above requirement more
+    ///            relaxed, as it seems desirable for users of this interface to have guaranteed
+    ///            behavior (like error on invalid paths) whereas today this seems unclear as some
+    ///            command intercepts do not validate that the command is in fact accepted on the
+    ///            endpoint provided.
+    ///
     /// Return value expectations:
     ///   - if a response has been placed into `handler` then std::nullopt MUST be returned. In particular
     ///     note that CHIP_NO_ERROR is NOT the same as std::nullopt:
