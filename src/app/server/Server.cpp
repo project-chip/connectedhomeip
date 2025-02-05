@@ -52,7 +52,7 @@
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
-#ifdef CHIP_MDNS_MINIMAL
+#if defined(CHIP_MDNS_MINIMAL)
 #include <lib/dnssd/minimal_mdns/AddressPolicy_SingleInterface.h> // nogncheck
 #endif
 #include <setup_payload/SetupPayload.h>
@@ -119,7 +119,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mUserDirectedCommissioningPort = initParams.userDirectedCommissioningPort;
     mInterfaceId                   = initParams.interfaceId;
 
-#ifdef CHIP_MDNS_MINIMAL
+#if defined(CHIP_MDNS_MINIMAL)
     if (mInterfaceId != chip::Inet::InterfaceId::Null())
     {
         static mdns::Minimal::SingleInterfaceAddressPolicy policy(mdns::Minimal::GetAddressPolicy(), mInterfaceId);

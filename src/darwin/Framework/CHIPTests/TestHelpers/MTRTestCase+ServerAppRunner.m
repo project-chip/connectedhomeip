@@ -51,9 +51,6 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
     __auto_type * appTask = [self createTaskForPath:executable];
 
     __auto_type * forcedArguments = @[
-        // Make sure we only advertise on the local interface.
-        @"--interface-id",
-        @"-1",
         @"--secured-device-port",
         [NSString stringWithFormat:@"%u", kBasePort + discriminator.unsignedShortValue],
         @"--discriminator",
