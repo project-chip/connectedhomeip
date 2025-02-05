@@ -3348,13 +3348,13 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)invokeCommands:(NSArray<NSArray<MTRCommandWithExpectedResult *> *> *)commands
                  queue:(dispatch_queue_t)queue
-            completion:(void (^)(NSArray<MTRDeviceResponseValueDictionary> *))completion
+            completion:(MTRDeviceResponseHandler)completion
 {
     // We will generally do our work on self.queue, and just dispatch to the provided queue when
     // calling the provided completion.
     auto nextCompletion = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * responses) {
         dispatch_async(queue, ^{
-            completion(responses);
+            completion(responses, nil);
         });
     };
 
@@ -3412,7 +3412,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 // dispatch to the correct queue.
                 MTR_LOG_ERROR("%@ failed a preceding command, not invoking command group %@ or later ones", self, commandGroup);
                 dispatch_async(queue, ^{
-                    completion(previousResponses);
+                    completion(previousResponses, nil);
                 });
                 return;
             }

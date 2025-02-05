@@ -318,7 +318,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  */
 - (void)invokeCommands:(NSArray<NSArray<MTRCommandWithExpectedResult *> *> *)commands
                  queue:(dispatch_queue_t)queue
-            completion:(void (^)(NSArray<NSDictionary<NSString *, id> *> *))completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+            completion:(MTRDeviceResponseHandler)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 /**
  * Open a commissioning window on the device.

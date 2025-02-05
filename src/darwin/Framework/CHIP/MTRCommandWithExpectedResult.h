@@ -23,7 +23,6 @@ NS_ASSUME_NONNULL_BEGIN
  * An object representing a single command to be invoked and the expected
  * result of invoking it.
  */
-// TODO: Maybe MTRCommandToInvoke?  What's a good name here?
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @interface MTRCommandWithExpectedResult : NSObject <NSCopying, NSSecureCoding>
 

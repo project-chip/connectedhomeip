@@ -525,11 +525,11 @@ MTR_DIRECT_MEMBERS
 
 - (void)invokeCommands:(NSArray<NSArray<MTRCommandWithExpectedResult *> *> *)commands
                  queue:(dispatch_queue_t)queue
-            completion:(void (^)(NSArray<MTRDeviceResponseValueDictionary> *))completion
+            completion:(MTRDeviceResponseHandler)completion
 {
     MTR_ABSTRACT_METHOD();
     dispatch_async(queue, ^{
-        completion(@[]);
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
     });
 }
 

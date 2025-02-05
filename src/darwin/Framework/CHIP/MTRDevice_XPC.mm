@@ -461,7 +461,7 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
 
 - (void)invokeCommands:(NSArray<NSArray<MTRCommandWithExpectedResult *> *> *)commands
                  queue:(dispatch_queue_t)queue
-            completion:(void (^)(NSArray<MTRDeviceResponseValueDictionary> *))completion
+            completion:(MTRDeviceResponseHandler)completion
 {
     NSXPCConnection * xpcConnection = [(MTRDeviceController_XPC *) [self deviceController] xpcConnection];
 
@@ -469,28 +469,45 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
         [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
             MTR_LOG_ERROR("Error: %@", error);
             dispatch_async(queue, ^{
-                // Should the error cases here synthesize errors for everything in the first group?
-                completion(@[]);
+                completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
             });
         }] deviceController:[[self deviceController] uniqueIdentifier]
                      nodeID:[self nodeID]
              invokeCommands:commands
-                 completion:^(NSArray<MTRDeviceResponseValueDictionary> * responses) {
+                 completion:^(NSArray<MTRDeviceResponseValueDictionary> * _Nullable responses, NSError * _Nullable error) {
                      dispatch_async(queue, ^{
-                         if (!MTRInvokeResponseIsWellFormed(responses)) {
-                             MTR_LOG_ERROR("%@ got non-well-formed response for invokeCommands:queue:completion: %@", self, responses);
-                             completion(@[]);
+                         if (responses == nil && error == nil) {
+                             MTR_LOG_ERROR("%@ got invoke responses for %@ without values or error", self, commands);
+                             completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
                              return;
                          }
 
-                         completion(responses);
+                         if (error != nil && !MTR_SAFE_CAST(error, NSError)) {
+                             MTR_LOG_ERROR("%@ got invoke responses for %@ that has invalid error object: %@", self, commands, error);
+                             completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+                             return;
+                         }
+
+                         if (responses != nil && !MTRInvokeResponseIsWellFormed(responses)) {
+                             MTR_LOG_ERROR("%@ got invoke responses for %@ that has invalid data: %@", self, commands, responses);
+                             completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+                             return;
+                         }
+
+                         if (responses != nil && error != nil) {
+                             MTR_LOG_ERROR("%@ got invoke responses for %@ with both responses and error: %@, %@", self, commands, responses, error);
+                             // Just propagate through the error.
+                             completion(nil, error);
+                             return;
+                         }
+
+                         completion(responses, nil);
                      });
                  }];
     } @catch (NSException * exception) {
         MTR_LOG_ERROR("Exception sending XPC message: %@", exception);
-        // Should the error cases here synthesize errors for everything in the first group?
         dispatch_async(queue, ^{
-            completion(@[]);
+            completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
         });
     }
 }
