@@ -25,7 +25,7 @@
 namespace chip {
 namespace rpc {
 
-/** @brief Custom write interception handler registry.
+/** @brief Custom debug request interceptors.
  *
  *    This class is specifically meant for registering custom Attribute Accessors that
  *    allow mini-AAI-handlers to process PigweedRPC read/writes separately from the cluster
