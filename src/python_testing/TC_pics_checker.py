@@ -20,7 +20,7 @@ import chip.clusters as Clusters
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, FeaturePathLocation,
-                                         MatterBaseTest, ProblemLocation, TestStep, async_test_body, default_matter_test_main)
+                                         MatterBaseTest, TestStep, UnknownProblemLocation, async_test_body, default_matter_test_main)
 from chip.testing.pics import accepted_cmd_pics_str, attribute_pics_str, feature_pics_str, generated_cmd_pics_str
 from mobly import asserts
 
@@ -174,7 +174,7 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
 
         self.step(7)
         if self.is_pics_sdk_ci_only:
-            self.record_error("PICS check", location=ProblemLocation(),
+            self.record_error("PICS check", location=UnknownProblemLocation(),
                               problem="PICS PICS_SDK_CI_ONLY found in PICS list. This PICS is disallowed for certification.")
             self.success = False
 
