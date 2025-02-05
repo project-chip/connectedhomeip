@@ -112,7 +112,7 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
         // should never happen.
         //
         // Code only takes this path if one of
-        // `GeneratedCommands`/`AcceptedCommands`/`Attreibutes` return a NOT_FOUND and
+        // `GeneratedCommands`/`AcceptedCommands`/`Attribute` return a NOT_FOUND and
         // that would indicate an invalid cluster (which should have been pre-validated by
         // the caller).
         return DataModel::ValidateClusterPath(provider, path, Status::Failure);
