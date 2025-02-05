@@ -128,16 +128,17 @@ class TC_CGEN_2_8(MatterBaseTest):
             "First CommissioningComplete failed",
         )
 
-        # Step 5: Factory reset is handled by test runner configuration
+        # Step 5: Factory reset is handled by test operator
         self.step(5)
+        if not self.check_pics('PICS_USER_PROMPT'):
+            self.skip_all_remaining_steps(6)
+            return
+
+        self.wait_for_user_input(prompt_msg="Manually trigger factory reset on the DUT, then continue")
 
         # Step 6: Put device in commissioning mode (requiring user input, so skip in CI)
         self.step(6)
-        if not self.check_pics('PICS_USER_PROMPT'):
-            self.skip_all_remaining_steps(7)
-            return
-
-        self.wait_for_user_input(prompt_msg="Set the DUT into commissioning mode")
+        self.wait_for_user_input(prompt_msg="Manually set the DUT into commissioning mode, then continue")
 
         # Step 7: Commission without TC acknowledgements
         self.step(7)

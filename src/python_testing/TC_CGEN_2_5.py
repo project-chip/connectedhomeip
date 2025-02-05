@@ -40,6 +40,7 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Attribute import ValueDecodeFailure
 from chip.commissioning import ROOT_ENDPOINT_ID
+from chip.testing import matter_asserts
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -120,7 +121,7 @@ class TC_CGEN_2_5(MatterBaseTest):
         if isinstance(tc_update_deadline, ValueDecodeFailure):
             asserts.assert_is_none(tc_update_deadline.TLVValue)
         else:
-            asserts.assert_less(tc_update_deadline, 2**32, "TCUpdateDeadline exceeds uint32 range")
+            matter_asserts.assert_valid_uint32(tc_update_deadline, "TCUpdateDeadline exceeds uint32 range")
 
         # Step 4: Verify TC feature flag in FeatureMap
         self.step(4)
@@ -129,7 +130,7 @@ class TC_CGEN_2_5(MatterBaseTest):
             attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.FeatureMap)],
         )
         feature_map = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.FeatureMap]
-        asserts.assert_equal(feature_map & 0x1, 0x1, "TC feature flag is not set.")
+        asserts.assert_equal(feature_map & Clusters.GeneralCommissioning.Bitmaps.Feature.kTermsAndConditions, Clusters.GeneralCommissioning.Bitmaps.Feature.kTermsAndConditions, "TC feature flag is not set.")
 
         # Step 5: Send SetTCAcknowledgements
         self.step(5)
@@ -184,7 +185,7 @@ class TC_CGEN_2_5(MatterBaseTest):
         self.step(11)
         response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCMinRequiredVersion)])
         min_required_version = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCMinRequiredVersion]
-        asserts.assert_is_instance(min_required_version, int, "TCMinRequiredVersion is not a uint16 type.")
+        matter_asserts.assert_valid_uint16(min_required_version, "TCMinRequiredVersion is not a uint16 type.")
 
         # Step 12: Verify TCAcknowledgementsRequired is False again
         self.step(12)
