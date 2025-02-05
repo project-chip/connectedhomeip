@@ -1,1 +1,1 @@
-105 : Upgrade android docker with new kotlin/gradle
+108 : Update vscode docker with java17 and fix java_home in java docker
