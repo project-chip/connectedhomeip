@@ -14,6 +14,7 @@
 
 import logging
 import os
+import shutil
 import shlex
 from enum import Enum, auto
 from typing import Optional
@@ -219,6 +220,7 @@ class TelinkBuilder(Builder):
 
         if self.compress_lzma_config:
             flags.append("-DCONFIG_COMPRESS_LZMA=y")
+            self._copy_lzma_patch_files()
 
         if self.thread_analyzer_config:
             flags.append("-DCONFIG_THREAD_ANALYZER=y")
@@ -240,6 +242,53 @@ class TelinkBuilder(Builder):
         self._Execute(['bash', '-c', cmd],
                       title='Generating ' + self.identifier)
 
+    def _copy_lzma_patch_files(self):
+        try:
+            telink_zephyr_base = os.environ['TELINK_ZEPHYR_BASE']
+        except KeyError:
+            logging.error("Environment variable 'TELINK_ZEPHYR_BASE' is not set.")
+            return
+
+        patch_dir_path = os.path.join(telink_zephyr_base, 'modules', 'lzma', 'lzma_lib_patch', 'zephyr')
+        patch_dest_path = os.path.join(telink_zephyr_base, 'modules', 'lzma', 'lib', 'zephyr')
+
+        # Check if the source directory exists
+        if not os.path.isdir(patch_dir_path):
+            logging.error(f"Lzma patch source directory '{patch_dir_path}' does not exist.")
+            return
+
+        # Create the destination directory if it does not exist
+        os.makedirs(os.path.dirname(patch_dest_path), exist_ok=True)
+
+        try:
+            # Remove existing directory if it exists
+            if os.path.isdir(patch_dest_path):
+                shutil.rmtree(patch_dest_path)
+                logging.info(f"Remove previously copied lzma patch directory '{patch_dest_path}'.")
+            shutil.copytree(patch_dir_path, patch_dest_path)
+            logging.info(f"Copy lzma patch files from '{patch_dir_path}' to '{patch_dest_path}'.")
+        except Exception as e:
+            logging.error(f"An error occurred while copying lzma patch files: {e}")
+
+    def _clean_lzma_patch_files(self):
+        try:
+            telink_zephyr_base = os.environ['TELINK_ZEPHYR_BASE']
+        except KeyError:
+            logging.error("Environment variable 'TELINK_ZEPHYR_BASE' is not set.")
+            return
+
+        patch_copied_path = os.path.join(telink_zephyr_base, 'modules', 'lzma', 'lib', 'zephyr')
+
+        if not os.path.isdir(patch_copied_path):
+            logging.error(f"Copied lzma patch folder '{patch_copied_path}' does not exist.")
+            return
+
+        try:
+            shutil.rmtree(patch_copied_path)
+            logging.info(f"Cleanup lzma patch files: '{patch_copied_path}'.")
+        except Exception as e:
+            logging.error(f"An error occurred while deleting the directory: {e}")
+
     def _build(self):
         logging.info('Compiling Telink at %s', self.output_dir)
 
@@ -249,6 +298,9 @@ class TelinkBuilder(Builder):
             cmd += " -j%s" % str(self.ninja_jobs)
 
         self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
+
+        if self.compress_lzma_config:
+            self._clean_lzma_patch_files()
 
     def build_outputs(self):
         yield BuilderOutput(
