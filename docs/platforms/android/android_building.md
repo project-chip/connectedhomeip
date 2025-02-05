@@ -15,18 +15,18 @@ There are following Apps on Android
 
 <hr>
 
-- [Building Android](#building-android)
-  - [Source files](#source-files)
-  - [Requirements for building](#requirements-for-building)
-    - [Linux](#linux)
-    - [MacOS](#macos)
-    - [ABIs and TARGET\_CPU](#abis-and-target_cpu)
-    - [Gradle \& JDK Version](#gradle--jdk-version)
-    - [Kotlin Version](#kotlin-version)
-  - [Preparing for build](#preparing-for-build)
-  - [Building Android CHIPTool from scripts](#building-android-chiptool-from-scripts)
-  - [Building Android CHIPTool from Android Studio](#building-android-chiptool-from-android-studio)
-  - [Building Android CHIPTest from scripts](#building-android-chiptest-from-scripts)
+-   [Building Android](#building-android)
+    -   [Source files](#source-files)
+    -   [Requirements for building](#requirements-for-building)
+        -   [Linux](#linux)
+        -   [MacOS](#macos)
+        -   [ABIs and TARGET_CPU](#abis-and-target_cpu)
+        -   [Gradle \& JDK Version](#gradle--jdk-version)
+        -   [Kotlin Version](#kotlin-version)
+    -   [Preparing for build](#preparing-for-build)
+    -   [Building Android CHIPTool from scripts](#building-android-chiptool-from-scripts)
+    -   [Building Android CHIPTool from Android Studio](#building-android-chiptool-from-android-studio)
+    -   [Building Android CHIPTest from scripts](#building-android-chiptest-from-scripts)
 
 <hr>
 
@@ -119,7 +119,7 @@ export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
 ### Kotlin Version
 
-The build requires `kotlinc` to be in your `$PATH`. 
+The build requires `kotlinc` to be in your `$PATH`.
 
 For Linux:
 
@@ -132,10 +132,12 @@ rm -f kotlinc/bin/*.bat
 export PATH=$PATH:/usr/lib/kotlinc/bin
 ```
 
-For MacOS: 
+For MacOS:
+
 ```
 sdk install kotlin 2.1.10
 ```
+
 <hr>
 
 <a name="preparing"></a>
