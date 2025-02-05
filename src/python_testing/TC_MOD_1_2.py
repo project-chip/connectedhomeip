@@ -39,7 +39,6 @@ from mobly import asserts
 
 
 class TC_MOD_1_2(MatterBaseTest):
-
     def steps_TC_MOD_1_2(self) -> list[TestStep]:
         return [
             TestStep(1, "TH reads the SupportedModes attribute from DUT", is_commissioning=True),
@@ -67,14 +66,11 @@ class TC_MOD_1_2(MatterBaseTest):
         MOD_cluster = Clusters.ModeSelect
         attributes = MOD_cluster.Attributes
 
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.SupportedModes):
-            mode_options = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.SupportedModes)
-            modes = [option.mode for option in mode_options]
+        mode_options = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.SupportedModes)
+        modes = [option.mode for option in mode_options]
 
-        self.step(2)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.CurrentMode):
-            Current_Mode_ID = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.CurrentMode)
-            asserts.assert_in(Current_Mode_ID, modes, "Current Mode ID should have been in supported modes")
+        Current_Mode_ID = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        asserts.assert_in(Current_Mode_ID, modes, "Current Mode ID should have been in supported modes")
 
         self.step(3)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OnMode):
@@ -90,19 +86,14 @@ class TC_MOD_1_2(MatterBaseTest):
             Start_Up_Mode_ID = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.StartUpMode)
             asserts.assert_in(Start_Up_Mode_ID, modes, "Current Mode ID should have been in supported modes")
 
-        self.step(5)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.Description):
-            Description = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.Description)
-            assert isinstance(Description, str), "Description was not a human readable string"
+        Description = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.Description)
+        assert isinstance(Description, str), "Description was not a human readable string"
 
-        self.step(6)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.StandardNamespace):
-            # Currently appears to return a 0 by default, need to check on this to make sure it is acceptable
-            #Ref Link: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/app_clusters/ModeSelect.adoc#62-standardnamespace-attribute
-            standard_namespace = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.StandardNamespace)
-            if not isinstance(Standard_Namespace, (uint, int)):
-                raise ValueError("Standard Namespace value: must be of type uint or an int")
-
+        # Currently appears to return a 0 by default, need to check on this to make sure it is acceptable
+        #Ref Link: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/app_clusters/ModeSelect.adoc#62-standardnamespace-attribute
+        standard_namespace = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.StandardNamespace)
+        if not isinstance(standard_namespace, (uint, int)):
+            raise ValueError("Standard Namespace value: must be of type uint or an int")
 
 if __name__ == "__main__":
     default_matter_test_main()
