@@ -48,10 +48,10 @@ class TCP_Tests(MatterBaseTest):
         await self.send_single_cmd(cmd=cmd, endpoint=0,
                                    payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
 
-    def pics_SC_8_1(self):
+    def pics_TC_SC_8_1(self):
         return ['MCORE.SC.TCP']
 
-    def steps_SC_8_1(self) -> list[TestStep]:
+    def steps_TC_SC_8_1(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH initiates a CASE session establishment with DUT, requesting a session supporting large payloads."),
@@ -75,10 +75,10 @@ class TCP_Tests(MatterBaseTest):
         asserts.assert_equal(device.isSessionOverTCPConnection, True, "Session does not have associated TCP connection")
         asserts.assert_equal(device.isActiveSession, True, "Large Payload Session should be active over TCP connection")
 
-    def pics_SC_8_2(self):
+    def pics_TC_SC_8_2(self):
         return ['MCORE.SC.TCP']
 
-    def steps_SC_8_2(self) -> list[TestStep]:
+    def steps_TC_SC_8_2(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH initiates a CASE session establishment with DUT, requesting a session supporting large payloads."),
@@ -101,10 +101,10 @@ class TCP_Tests(MatterBaseTest):
         self.step(3)
         asserts.assert_equal(device.sessionAllowsLargePayload, True, "Session does not have associated TCP connection")
 
-    def pics_SC_8_3(self):
+    def pics_TC_SC_8_3(self):
         return ['MCORE.SC.TCP']
 
-    def steps_SC_8_3(self) -> list[TestStep]:
+    def steps_TC_SC_8_3(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH initiates a CASE session establishment with DUT, requesting a session supporting large payloads."),
@@ -136,10 +136,10 @@ class TCP_Tests(MatterBaseTest):
         asserts.assert_equal(device.isActiveSession, False,
                              "Large Payload Session should not be active after TCP connection closure")
 
-    def pics_SC_8_4(self):
+    def pics_TC_SC_8_4(self):
         return ['MCORE.SC.TCP']
 
-    def steps_SC_8_4(self) -> list[TestStep]:
+    def steps_TC_SC_8_4(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH initiates a CASE session establishment with DUT, requesting a session supporting large payloads."),
@@ -188,10 +188,10 @@ class TCP_Tests(MatterBaseTest):
         self.step(8)
         asserts.assert_equal(device.isActiveSession, True, "Large Payload Session should be active over TCP connection")
 
-    def pics_SC_8_5(self):
+    def pics_TC_SC_8_5(self):
         return ['MCORE.SC.TCP']
 
-    def steps_SC_8_5(self) -> list[TestStep]:
+    def steps_TC_SC_8_5(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH initiates a CASE session establishment with DUT, requesting a session supporting large payloads."),
@@ -227,10 +227,10 @@ class TCP_Tests(MatterBaseTest):
             asserts.fail("Unexpected error returned by DUT")
         self.step(6)
 
-    def pics_SC_8_6(self):
+    def pics_TC_SC_8_6(self):
         return ['MCORE.SC.TCP']
 
-    def steps_SC_8_6(self) -> list[TestStep]:
+    def steps_TC_SC_8_6(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH initiates a CASE session establishment with DUT, requesting a session supporting large payloads."),
@@ -267,10 +267,10 @@ class TCP_Tests(MatterBaseTest):
             asserts.fail("Unexpected error returned by DUT")
         self.step(6)
 
-    def pics_SC_8_7(self):
+    def pics_TC_SC_8_7(self):
         return ['MCORE.SC.TCP']
 
-    def steps_SC_8_7(self) -> list[TestStep]:
+    def steps_TC_SC_8_7(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH initiates a CASE session establishment with DUT, requesting a session supporting large payloads."),
