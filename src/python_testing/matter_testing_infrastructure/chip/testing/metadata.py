@@ -168,10 +168,13 @@ class MetadataReader:
             self.__resolve_env_vals__(resolved_app_args)
             self.__resolve_env_vals__(resolved_script_args)
 
+            app = attr.get("app", "")
+            self.__resolve_env_vals__({"app": app})
+
             runs_metadata.append(Metadata(
                 py_script_path=py_script_path,
                 run=run,
-                app=attr.get("app", ""),
+                app=app,
                 app_args=resolved_app_args,
                 app_ready_pattern=attr.get("app-ready-pattern"),
                 app_stdin_pipe=attr.get("app-stdin-pipe"),
