@@ -229,8 +229,8 @@ public:
         app::AttributeValueDecoder decoder(tlvReader.value(), subjectDescriptor);
 
         // Try to write using a custom Accessor first
-        ::pw::Status interceptResult =
-            TryWriteViaAccessor(write_request.path, decoder) if (interceptResult != ::pw::Status::NotFound())
+        ::pw::Status interceptResult = TryWriteViaAccessor(write_request.path, decoder);
+        if (interceptResult != ::pw::Status::NotFound())
         {
             return interceptResult;
         }
