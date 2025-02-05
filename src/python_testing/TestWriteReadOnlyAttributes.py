@@ -37,19 +37,13 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+from typing import cast
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import (
-    MatterBaseTest,
-    TestStep,
-    default_matter_test_main,
-    has_feature,
-    run_if_endpoint_matches,
-    async_test_body,
-)
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_feature,
+                                         run_if_endpoint_matches)
 from mobly import asserts
-from typing import cast
 
 logger = logging.getLogger(__name__)
 
