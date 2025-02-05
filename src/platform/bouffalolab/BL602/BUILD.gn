@@ -70,6 +70,7 @@ static_library("BL602") {
   }
 
   deps = [
+    "${chip_root}/src/app:app_config",
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",

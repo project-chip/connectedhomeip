@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2020-2023 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -34,6 +33,7 @@
 #import "MTRDeviceController_Concrete.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
+#import "MTREndpointInfo_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
 #import "MTRLogging_Internal.h"
@@ -961,6 +961,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
     auto block = ^BOOL {
         chip::Controller::CommissioningParameters params;
+        if (commissioningParams.readEndpointInformation) {
+            params.SetExtraReadPaths(MTREndpointInfo.requiredAttributePaths);
+        }
         if (commissioningParams.csrNonce) {
             params.SetCSRNonce(AsByteSpan(commissioningParams.csrNonce));
         }
@@ -1188,6 +1191,21 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     [deviceToReturn setStorageBehaviorConfiguration:_storageBehaviorConfiguration];
 
     return deviceToReturn;
+}
+
+- (void)forgetDeviceWithNodeID:(NSNumber *)nodeID
+{
+    MTR_LOG("%@: Forgetting device with node ID: %@", self, nodeID);
+
+    // Tear down any existing MTRDevice for this nodeID first, so we don't run
+    // into issues with it storing data after we have deleted it.
+    [super forgetDeviceWithNodeID:nodeID];
+
+    if (_controllerDataStore) {
+        [_controllerDataStore clearResumptionInfoForNodeID:nodeID];
+        [_controllerDataStore clearDeviceDataForNodeID:nodeID];
+        [_controllerDataStore clearStoredClusterDataForNodeID:nodeID];
+    }
 }
 
 #ifdef DEBUG
@@ -1700,6 +1718,16 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
 
     return nil;
+}
+
+- (NSArray<NSNumber *> *)nodesWithStoredData
+{
+    if (!self.controllerDataStore) {
+        // We have nothing stored, if we have no way to store.
+        return @[];
+    }
+
+    return [self.controllerDataStore nodesWithStoredData];
 }
 
 @end

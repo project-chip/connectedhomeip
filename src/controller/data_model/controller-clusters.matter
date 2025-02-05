@@ -9823,7 +9823,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   command access(invoke: manage) AudioStreamDeallocate(AudioStreamDeallocateRequest): DefaultSuccess = 2;
   /** This command SHALL allocate a video stream on the camera and return an allocated video stream identifier. */
   command access(invoke: manage) VideoStreamAllocate(VideoStreamAllocateRequest): VideoStreamAllocateResponse = 3;
-  /** This command SHALL be used to modify the resolution of a stream specified by the VideoStreamID. */
+  /** This command SHALL be used to modify a stream specified by the VideoStreamID. */
   command access(invoke: manage) VideoStreamModify(VideoStreamModifyRequest): DefaultSuccess = 5;
   /** This command SHALL deallocate a video stream on the camera, corresponding to the given video stream identifier. */
   command access(invoke: manage) VideoStreamDeallocate(VideoStreamDeallocateRequest): DefaultSuccess = 6;

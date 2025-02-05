@@ -85,14 +85,6 @@ mcxw71_k32w1_sdk("sdk") {
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
   ]
 
-  if (nxp_nvm_component == "littlefs") {
-    include_dirs += [ "${example_platform_dir}/board" ]
-    sources += [
-      "${example_platform_dir}/board/peripherals.c",
-      "${example_platform_dir}/board/peripherals.h",
-    ]
-  }
-
   if (nxp_multiple_ble_connections) {
     include_dirs += [ "${example_platform_dir}/app_ble/include" ]
     defines += [

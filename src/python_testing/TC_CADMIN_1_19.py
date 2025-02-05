@@ -137,8 +137,8 @@ class TC_CADMIN_1_19(MatterBaseTest):
         fids_fa_dir[next_fabric] = fids_ca_dir[current_fabrics +
                                                1].NewFabricAdmin(vendorId=0xFFF1, fabricId=next_fabric)
         try:
-            fids[next_fabric] = fids_fa_dir[next_fabric].NewController(nodeId=next_fabric)
-            await fids[next_fabric].CommissionOnNetwork(
+            next_fabric_controller = fids_fa_dir[next_fabric].NewController(nodeId=next_fabric)
+            await next_fabric_controller.CommissionOnNetwork(
                 nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator)
 
