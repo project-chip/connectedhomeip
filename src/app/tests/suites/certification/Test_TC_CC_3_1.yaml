@@ -98,7 +98,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    # In 10s, the value will have changed by (120-60)*10/30 = 20. A 15% tolerance is 3, so value must be 80+/-3 => (77, 83)
+    # In 10s, the value will have changed by (120-60)*10/30 = 20. A 15% tolerance is 3, so value must be in range 80+/-3 => [77, 83]
     - label: "Step 2c: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
@@ -117,7 +117,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    # In 20s, the value will have changed by (120-60)*20/30 = 40. A 15% tolerance is 6, so value must be 100+/-6 => (94, 106)
+    # In 20s, the value will have changed by (120-60)*20/30 = 40. A 15% tolerance is 6, so value must be in range 100+/-6 => [94, 106]
     - label: "Step 2d: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
@@ -136,7 +136,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    # In 30s, the value will have changed by (120-60)*30/30 = 60. A 15% tolerance is 9, so value must be 120+/-9 => (111, 129)
+    # In 30s, the value will have changed by (120-60)*30/30 = 60. A 15% tolerance is 9, so value must be in range 120+/-9 => [111, 129]
     - label: "Step 2e: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
@@ -219,7 +219,7 @@ tests:
                 value: 5000
 
     # In 30s, the value will have changed by 180 (total change)
-    # In 5s, the value will have changed by 180*5/30 = 30. A 15% tolerance is 4.5, so ~5, and value must be 30+/-5 => (25, 35)
+    # In 5s, the value will have changed by 180*5/30 = 30. A 15% tolerance is 4.5, so ~5, and value must be in range 30+/-5 => [25, 35]
     - label: "Step 3c: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
@@ -238,8 +238,8 @@ tests:
               - name: "ms"
                 value: 15000
 
-    # In 20s, the value will have changed by 180*20/30 = 120. A 15% tolerance is 18, so value must be
-    # 60-120 = 255-60 = 195+/-18 => (177, 213)
+    # In 20s, the value will have changed by 180*20/30 = 120. A 15% tolerance is 18, so value must be in range
+    # 60-120 = 255-60 = 195+/-18 => [177, 213]
     - label: "Step 3d: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
@@ -258,8 +258,8 @@ tests:
               - name: "ms"
                 value: 10000
 
-    # In 30s, the value will have changed by 180*30/30 = 180. A 15% tolerance is 27, so value must be
-    # 60-180 = 255-120 = 135+/-27 => (108, 162)
+    # In 30s, the value will have changed by 180*30/30 = 180. A 15% tolerance is 27, so value must be in range
+    # 60-180 = 255-120 = 135+/-27 => [108, 162]
     - label: "Step 3e: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
@@ -341,14 +341,15 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # In 10s, the value will have changed by (120-60)*10/30 = 20. A 15% tolerance is 3, so value must be in range 80+/-3 => [77, 83]
     - label: "Step 4c: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 68
-              maxValue: 92
+              minValue: 77
+              maxValue: 83
 
     - label: "Wait 10s"
       PICS: CC.S.F00
@@ -359,14 +360,15 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # In 20s, the value will have changed by (120-60)*20/30 = 40. A 15% tolerance is 6, so value must be in range 100+/-6 => [94, 106]
     - label: "Step 4d: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 85
-              maxValue: 115
+              minValue: 94
+              maxValue: 106
 
     - label: "Wait 10s"
       PICS: CC.S.F00
@@ -377,14 +379,15 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # In 30s, the value will have changed by (120-60)*30/30 = 60. A 15% tolerance is 9, so value must be in range 120+/-9 => [111, 129]
     - label: "Step 4e: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 102
-              maxValue: 138
+              minValue: 111
+              maxValue: 129
 
     - label: "Wait 5s"
       PICS: CC.S.F00
@@ -401,8 +404,8 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 102
-              maxValue: 138
+              minValue: 111
+              maxValue: 129
 
     - label:
           "Step 5a: TH sends MoveToHue command to DUT with Hue=120,
@@ -458,14 +461,15 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # In 10s, the value will have changed by (120-60)*10/30 = 20. A 15% tolerance is 3, so value must be in range 100+/-3 => [97, 103]
     - label: "Step 5c: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 85
-              maxValue: 115
+              minValue: 97
+              maxValue: 103
 
     - label: "Wait 10s"
       PICS: CC.S.F00
@@ -476,14 +480,15 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # In 20s, the value will have changed by (120-60)*20/30 = 40. A 15% tolerance is 6, so value must be in range 80+/-6 => [74, 86]
     - label: "Step 5d: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 68
-              maxValue: 92
+              minValue: 74
+              maxValue: 86
 
     - label: "Wait 10s"
       PICS: CC.S.F00
@@ -494,6 +499,7 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # In 30s, the value will have changed by (120-60)*30/30 = 60. A 15% tolerance is 9, so value must be in range 60+/-9 => [51, 69]
     - label: "Step 5e: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
