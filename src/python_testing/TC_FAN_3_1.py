@@ -62,22 +62,70 @@ class TC_FAN_3_1(MatterBaseTest):
     #     return [TestStep("1", "Commissioning already done."),
     #             TestStep("2", "Action", "Verification"),
     #             ]
-    async def read_fc_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.FanControl
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
-    async def read_setting(self, endpoint, attribute):
-        return await self.read_fc_attribute_expect_success(endpoint, attribute)
+    @staticmethod
+    async def get_attribute_value_from_queue(queue, attribute, timeout_sec: float) -> Any:
+        start_time = time.time()
+        while time.time() - start_time < timeout_sec:
+            for q in list(queue):
+                if q.attribute == attribute:
+                    return q.value
+            await asyncio.sleep(0.01)
+        return None
 
-    async def write_setting(self, endpoint, attr_to_write, value) -> Status:
-        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attr_to_write(value))])
-        return result[0].Status
+    @staticmethod
+    def get_enum(value):
+        if isinstance(value, enum.Enum):
+            enum_type = type(value)
+            value = enum_type(value)
+        return value
 
     @staticmethod
     def _supports_speed(feature_map) -> bool:
         return feature_map & Clusters.FanControl.Bitmaps.Feature.kMultiSpeed
 
-    async def verify_fan_control_attribute_values(self, endpoint, attr_to_write, order):
+    async def read_setting(self, endpoint, attribute):
+        cluster = Clusters.Objects.FanControl
+        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
+
+    async def write_setting(self, endpoint, attribute, value) -> Status:
+        value = self.get_enum(value)
+        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attribute(value))])
+        write_status = result[0].Status
+        write_status_success = (write_status == Status.Success) or (write_status == Status.InvalidInState)
+        asserts.assert_true(write_status_success,
+                            f"{attribute.__name__} write did not return a result of either SUCCESS or INVALID_IN_STATE ({write_status.name})")
+        return write_status
+
+    async def write_and_verify_attribute(self, endpoint, attribute, value) -> Any:
+        await self.write_setting(endpoint, attribute, value)
+        value_read = await self.read_setting(endpoint, attribute)
+        asserts.assert_equal(value_read, value,
+                             f"Mismatch between written and read {attribute.__name__}")
+        return value_read
+    
+    def verify_attribute_transition(self, attribute, value_current, value_previous, status, order) -> None:
+        if status == Status.Success:
+            if order == OrderEnum.Ascending:
+                # Verify the current attribute value is greater than the previous attribute value
+                asserts.assert_greater(value_current, value_previous,
+                                    f"Current {attribute.__name__} must be greater than previous {attribute.__name__}")
+            else:
+                # Verify the current attribute value is less than the previous attribute value
+                asserts.assert_less(value_current, value_previous,
+                                    f"Current {attribute.__name__} must be less than previous {attribute.__name__}")
+        elif status == Status.InvalidInState:
+            # Verify the current attribute value is the same than the previous attribute value
+            asserts.assert_equal(value_current, value_previous,
+                                f"Current {attribute.__name__} must be equal to previous {attribute.__name__}")
+
+        # Logging attribute value change details
+        if_fan_mode = f"({value_previous}) to ({value_current})"
+        if attribute == Clusters.FanControl.Attributes.FanMode:
+            if_fan_mode = f"({value_previous}:{value_previous.name}) to ({value_current}:{value_current.name})"
+        logging.info(f"\t\t[FC] {attribute.__name__} changed from {if_fan_mode}")
+
+    async def verify_fan_control_attribute_values(self, endpoint, attr_to_write, order) -> None:
         # Setup
         cluster = Clusters.FanControl
         fan_mode_attr = cluster.Attributes.FanMode
@@ -136,11 +184,7 @@ class TC_FAN_3_1(MatterBaseTest):
             attribute_subscription.get_last_report()
 
             # Write to attribute
-            value_to_write = self.get_enum(value_to_write)
-            write_result = await self.write_setting(endpoint, attr_to_write, value_to_write)
-            write_status_success = (write_result == Status.Success) or (write_result == Status.InvalidInState)
-            asserts.assert_true(write_status_success,
-                                f"{attr_to_write.__name__} write did not return a result of either SUCCESS or INVALID_IN_STATE")
+            write_status = await self.write_setting(endpoint, attr_to_write, value_to_write)
             logging.info(f"[FC] {attr_to_write.__name__} written: {value_to_write}")
 
             # Get the subscription queue
@@ -149,61 +193,17 @@ class TC_FAN_3_1(MatterBaseTest):
             # Verifying PercentSetting
             attr_value_current = await self.get_attribute_value_from_queue(queue, attr_to_verify, timeout_sec)
             if attr_value_current is not None:
-                self.verify_attribute_transition(attr_to_verify, attr_value_current, attr_value_previous, order)
+                self.verify_attribute_transition(attr_to_verify, attr_value_current, attr_value_previous, write_status, order)
                 attr_value_previous = attr_value_current
 
             # Verifying SpeedSetting (if supported)
             if self.supports_speed:
                 speed_setting_current = await self.get_attribute_value_from_queue(queue, speed_setting_attr, timeout_sec)
                 if speed_setting_current is not None:
-                    self.verify_attribute_transition(speed_setting_attr, speed_setting_current, speed_setting_previous, order)
+                    self.verify_attribute_transition(speed_setting_attr, speed_setting_current, speed_setting_previous, write_status, order)
                     speed_setting_previous = speed_setting_current
 
         await attribute_subscription.cancel()
-
-    async def write_and_verify_attribute(self, endpoint, attribute, value_init):
-        value_init = self.get_enum(value_init)
-        write_result = await self.write_setting(endpoint, attribute, value_init)
-        write_status_success = (write_result == Status.Success) or (write_result == Status.InvalidInState)
-        asserts.assert_true(write_status_success,
-                            f"{attribute.__name__} write did not return a result of either SUCCESS or INVALID_IN_STATE ({write_result.name})")
-        value_read = await self.read_setting(endpoint, attribute)
-        asserts.assert_equal(value_read, value_init,
-                             f"Mismatch between written and read {attribute.__name__}")
-        return value_read
-
-    def verify_attribute_transition(self, attribute, value_current, value_previous, order):
-        if order == OrderEnum.Ascending:
-            # Verify the current FanMode is greater than the previous FanMode
-            asserts.assert_greater(value_current, value_previous,
-                                f"Current {attribute.__name__} must be greater than previous {attribute.__name__}")
-        else:
-            # Verify the current FanMode is less than the previous FanMode
-            asserts.assert_less(value_current, value_previous,
-                                f"Current {attribute.__name__} must be less than previous {attribute.__name__}")
-        
-        # Logging attribute value change details
-        if_fan_mode = f"({value_previous}) to ({value_current})"
-        if attribute == Clusters.FanControl.Attributes.FanMode:
-            if_fan_mode = f"({value_previous}:{value_previous.name}) to ({value_current}:{value_current.name})"
-        logging.info(f"\t\t[FC] {attribute.__name__} changed from {if_fan_mode}")
-
-    @staticmethod
-    async def get_attribute_value_from_queue(queue, attribute, timeout_sec: float) -> Any:
-        start_time = time.time()
-        while time.time() - start_time < timeout_sec:
-            for q in list(queue):
-                if q.attribute == attribute:
-                    return q.value
-            await asyncio.sleep(0.01)
-        return None
-
-    @staticmethod
-    def get_enum(value):
-        if isinstance(value, enum.Enum):
-            enum_type = type(value)
-            value = enum_type(value)
-        return value
 
     def pics_TC_FAN_3_1(self) -> list[str]:
         return ["FAN.S"]
@@ -215,7 +215,7 @@ class TC_FAN_3_1(MatterBaseTest):
         percent_setting_attr = Clusters.FanControl.Attributes.PercentSetting
         fan_mode_attr = Clusters.FanControl.Attributes.FanMode
         feature_map_attr = Clusters.FanControl.Attributes.FeatureMap
-        feature_map = await self.read_fc_attribute_expect_success(endpoint=ep, attribute=feature_map_attr)
+        feature_map = await self.read_setting(endpoint=ep, attribute=feature_map_attr)
         self.supports_speed = self._supports_speed(feature_map)
         
         # TH writes to the DUT the PercentSetting attribute iteratively within
