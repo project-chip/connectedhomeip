@@ -90,10 +90,11 @@ class TC_MOD_1_2(MatterBaseTest):
         assert isinstance(Description, str), "Description was not a human readable string"
 
         # Currently appears to return a 0 by default, need to check on this to make sure it is acceptable
-        #Ref Link: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/app_clusters/ModeSelect.adoc#62-standardnamespace-attribute
+        # Ref Link: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/app_clusters/ModeSelect.adoc#62-standardnamespace-attribute
         standard_namespace = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=self.endpoint, attribute=attributes.StandardNamespace)
         if not isinstance(standard_namespace, (uint, int)):
             raise ValueError("Standard Namespace value: must be of type uint or an int")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
