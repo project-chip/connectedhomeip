@@ -99,6 +99,10 @@ private:
     bool mEncryptedOTAEnabled                 = false;
     esp_decrypt_handle_t mOTADecryptionHandle = nullptr;
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
+
+#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
+    esp_err_t ProcessRcpImage(esp_ota_handle_t handle, const uint8_t * buffer, uint32_t bufLengthen);
+#endif
 };
 
 } // namespace chip
