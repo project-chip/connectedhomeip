@@ -1777,8 +1777,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_powersource = 66, version 1;
-  device type ma_water_valve = 17, version 1;
+  device type ma_powersource = 17, version 1;
+  device type ma_water_valve = 66, version 1;
 
 
   server cluster Identify {
