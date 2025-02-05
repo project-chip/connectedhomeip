@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0031" name="Network Commissioning Cluster" revision="2">
   <revisionHistory>
@@ -80,61 +82,61 @@ Davis, CA 95616, USA
       <item value="0" name="Success" summary="OK, no error">
         <mandatoryConform/>
       </item>
-      <item value="1" name="OutOfRange" summary="[[ref_OutOfRange]] Value Outside Range">
+      <item value="1" name="OutOfRange" summary="Value Outside Range">
         <mandatoryConform/>
       </item>
-      <item value="2" name="BoundsExceeded" summary="[[ref_BoundsExceeded]] A collection would exceed its size limit">
+      <item value="2" name="BoundsExceeded" summary="A collection would exceed its size limit">
         <mandatoryConform/>
       </item>
-      <item value="3" name="NetworkIDNotFound" summary="[[ref_NetworkIdNotFound]] The NetworkID is not among the collection of added networks">
+      <item value="3" name="NetworkIDNotFound" summary="The NetworkID is not among the collection of added networks">
         <mandatoryConform/>
       </item>
-      <item value="4" name="DuplicateNetworkID" summary="[[ref_DuplicateNetworkId]] The NetworkID is already among the collection of added networks">
+      <item value="4" name="DuplicateNetworkID" summary="The NetworkID is already among the collection of added networks">
         <mandatoryConform/>
       </item>
-      <item value="5" name="NetworkNotFound" summary="[[ref_NetworkNotFound]] Cannot find AP: SSID Not found">
+      <item value="5" name="NetworkNotFound" summary="Cannot find AP: SSID Not found">
         <mandatoryConform/>
       </item>
-      <item value="6" name="RegulatoryError" summary="[[ref_RegulatoryError]] Cannot find AP: Mismatch on band/channels/regulatory domain / 2.4GHz vs 5GHz">
+      <item value="6" name="RegulatoryError" summary="Cannot find AP: Mismatch on band/channels/regulatory domain / 2.4GHz vs 5GHz">
         <mandatoryConform/>
       </item>
-      <item value="7" name="AuthFailure" summary="[[ref_AuthFailure]] Cannot associate due to authentication failure">
+      <item value="7" name="AuthFailure" summary="Cannot associate due to authentication failure">
         <mandatoryConform/>
       </item>
-      <item value="8" name="UnsupportedSecurity" summary="[[ref_UnsupportedSecurity]] Cannot associate due to unsupported security mode">
+      <item value="8" name="UnsupportedSecurity" summary="Cannot associate due to unsupported security mode">
         <mandatoryConform/>
       </item>
-      <item value="9" name="OtherConnectionFailure" summary="[[ref_OtherConnectionFailure]] Other association failure">
+      <item value="9" name="OtherConnectionFailure" summary="Other association failure">
         <mandatoryConform/>
       </item>
-      <item value="10" name="IPV6Failed" summary="[[ref_Ipv6Failed]] Failure to generate an IPv6 address">
+      <item value="10" name="IPV6Failed" summary="Failure to generate an IPv6 address">
         <mandatoryConform/>
       </item>
-      <item value="11" name="IPBindFailed" summary="[[ref_IpBindFailed]] Failure to bind Wi-Fi +&lt;-&gt;+ IP interfaces">
+      <item value="11" name="IPBindFailed" summary="Failure to bind Wi-Fi +&lt;-&gt;+ IP interfaces">
         <mandatoryConform/>
       </item>
-      <item value="12" name="UnknownError" summary="[[ref_UnknownError]] Unknown error">
+      <item value="12" name="UnknownError" summary="Unknown error">
         <mandatoryConform/>
       </item>
     </enum>
     <enum name="WiFiBandEnum">
       <item value="0" name="2G4" summary="2.4GHz - 2.401GHz to 2.495GHz (802.11b/g/n/ax)">
-        <optionalConform choice="b" more="true"/>
+        <optionalConform choice="b" more="true" min="1"/>
       </item>
       <item value="1" name="3G65" summary="3.65GHz - 3.655GHz to 3.695GHz (802.11y)">
-        <optionalConform choice="b" more="true"/>
+        <optionalConform choice="b" more="true" min="1"/>
       </item>
       <item value="2" name="5G" summary="5GHz - 5.150GHz to 5.895GHz (802.11a/n/ac/ax)">
-        <optionalConform choice="b" more="true"/>
+        <optionalConform choice="b" more="true" min="1"/>
       </item>
       <item value="3" name="6G" summary="6GHz - 5.925GHz to 7.125GHz (802.11ax / Wi-Fi 6E)">
-        <optionalConform choice="b" more="true"/>
+        <optionalConform choice="b" more="true" min="1"/>
       </item>
       <item value="4" name="60G" summary="60GHz - 57.24GHz to 70.20GHz (802.11ad/ay)">
-        <optionalConform choice="b" more="true"/>
+        <optionalConform choice="b" more="true" min="1"/>
       </item>
       <item value="5" name="1G" summary="Sub-1GHz - 755MHz to 931MHz (802.11ah)">
-        <optionalConform choice="b" more="true"/>
+        <optionalConform choice="b" more="true" min="1"/>
       </item>
     </enum>
     <bitmap name="ThreadCapabilitiesBitmap">
@@ -212,6 +214,8 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="TH"/>
         </mandatoryConform>
+        <constraint type="allowed" value="6"/>
+        <constraint type="allowed" value="8"/>
       </field>
       <field id="6" name="RSSI" type="int8">
         <mandatoryConform>
@@ -240,7 +244,7 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="WI"/>
         </mandatoryConform>
-        <constraint type="maxLength" value="6"/>
+        <constraint type="allowed" value="6"/>
       </field>
       <field id="3" name="Channel" type="uint16">
         <mandatoryConform>
@@ -262,7 +266,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="MaxNetworks" type="uint8">
       <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="min" value="1"/>
     </attribute>
@@ -270,11 +274,13 @@ Davis, CA 95616, USA
       <entry type="NetworkInfoStruct"/>
       <access read="true" readPrivilege="admin"/>
       <mandatoryConform/>
-      <constraint type="maxCount" value="MaxNetworks"/>
+      <constraint type="maxCount">
+        <value attribute="MaxNetworks"/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="ScanMaxTimeSeconds" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <orTerm>
           <feature name="WI"/>
@@ -285,7 +291,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="ConnectMaxTimeSeconds" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <orTerm>
           <feature name="WI"/>
@@ -296,29 +302,29 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="InterfaceEnabled" type="bool" default="true">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0005" name="LastNetworkingStatus" type="NetworkCommissioningStatusEnum" default="null">
       <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0006" name="LastNetworkID" type="octstr" default="null">
       <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
       <constraint type="lengthBetween" from="1" to="32"/>
     </attribute>
     <attribute id="0x0007" name="LastConnectErrorValue" type="int32" default="null">
       <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0008" name="SupportedWiFiBands" type="list" default="MS">
       <entry type="WiFiBandEnum"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="WI"/>
       </mandatoryConform>
@@ -326,14 +332,14 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0009" name="SupportedThreadFeatures" type="ThreadCapabilitiesBitmap" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="TH"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x000A" name="ThreadVersion" type="uint16" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="TH"/>
       </mandatoryConform>

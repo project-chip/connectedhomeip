@@ -31,7 +31,7 @@ namespace Revision {
  * See section 8.1.1. "Revision History" in the "Interaction Model
  * Specification" chapter of the core Matter specification.
  */
-inline constexpr InteractionModelRevision kInteractionModelRevision = 11;
+inline constexpr InteractionModelRevision kInteractionModelRevision = 12;
 inline constexpr uint8_t kInteractionModelRevisionTag               = 0xFF;
 
 /**
@@ -50,7 +50,7 @@ inline constexpr uint16_t kDataModelRevision = 18;
  * See section 11.1.5.22. "SpecificationVersion Attribute" in "Service and
  * Device Management" chapter of the core Matter specification.
  */
-inline constexpr uint32_t kSpecificationVersion = 0x01040000;
+inline constexpr uint32_t kSpecificationVersion = 0x01040100;
 
 } // namespace Revision
 } // namespace chip

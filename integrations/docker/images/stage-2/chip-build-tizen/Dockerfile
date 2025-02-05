@@ -7,9 +7,9 @@ LABEL org.opencontainers.image.source https://github.com/project-chip/connectedh
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
+    7zip \
     cpio \
     libncurses6 \
-    obs-build \
     openjdk-8-jre-headless \
     wget \
     zip \
