@@ -233,7 +233,7 @@ public:
         std::optional<::pw::Status> interceptResult = TryWriteViaAccessor(write_request.path, decoder);
         if (interceptResult.has_value())
         {
-            return interceptResult;
+            return *interceptResult;
         }
 
         ChipLogProgress(
