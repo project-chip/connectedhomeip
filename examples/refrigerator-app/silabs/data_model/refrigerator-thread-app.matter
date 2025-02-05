@@ -2010,7 +2010,7 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type ma_temperature_controlled_cabinet = 113, version 1;
+  device type ma_temperature_controlled_cabinet = 113, version 2;
 
 
   server cluster Descriptor {
@@ -2026,9 +2026,9 @@ endpoint 2 {
   }
 
   server cluster TemperatureControl {
-    ram      attribute temperatureSetpoint;
-    ram      attribute minTemperature default = -18;
-    ram      attribute maxTemperature default = -15;
+    ram      attribute temperatureSetpoint default = -1800;
+    ram      attribute minTemperature default = -2000;
+    ram      attribute maxTemperature default = -1500;
     ram      attribute step;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -2040,7 +2040,7 @@ endpoint 2 {
   }
 }
 endpoint 3 {
-  device type ma_temperature_controlled_cabinet = 113, version 1;
+  device type ma_temperature_controlled_cabinet = 113, version 2;
 
 
   server cluster Descriptor {
@@ -2056,9 +2056,9 @@ endpoint 3 {
   }
 
   server cluster TemperatureControl {
-    ram      attribute temperatureSetpoint;
+    ram      attribute temperatureSetpoint default = 200;
     ram      attribute minTemperature default = 0;
-    ram      attribute maxTemperature default = 4;
+    ram      attribute maxTemperature default = 400;
     ram      attribute step;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
