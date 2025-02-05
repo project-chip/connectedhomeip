@@ -55,6 +55,8 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
         return encoder.EncodeList([&buffer](const auto & listEncodeHelper) {
             for (auto id : buffer)
             {
+                // NOTE: cast to u64 because TLV encodes all numbers the same (no TLV sideffects)
+                //       and this reduces template variants for Encode, saving flash.
                 ReturnErrorOnFailure(listEncodeHelper.Encode(static_cast<uint64_t>(id)));
             }
             return CHIP_NO_ERROR;
@@ -72,6 +74,8 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
         return encoder.EncodeList([&buffer](const auto & listEncodeHelper) {
             for (auto entry : buffer)
             {
+                // NOTE: cast to u64 because TLV encodes all numbers the same (no TLV sideffects)
+                //       and this reduces template variants for Encode, saving flash.
                 ReturnErrorOnFailure(listEncodeHelper.Encode(static_cast<uint64_t>(entry.commandId)));
             }
             return CHIP_NO_ERROR;
@@ -89,11 +93,15 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
         return encoder.EncodeList([&buffer](const auto & listEncodeHelper) {
             for (auto entry : buffer)
             {
+                // NOTE: cast to u64 because TLV encodes all numbers the same (no TLV sideffects)
+                //       and this reduces template variants for Encode, saving flash.
                 ReturnErrorOnFailure(listEncodeHelper.Encode(static_cast<uint64_t>(entry.attributeId)));
             }
 
             for (auto id : GlobalAttributesNotInMetadata)
             {
+                // NOTE: cast to u64 because TLV encodes all numbers the same (no TLV sideffects)
+                //       and this reduces template variants for Encode, saving flash.
                 ReturnErrorOnFailure(listEncodeHelper.Encode(static_cast<uint64_t>(id)));
             }
 
