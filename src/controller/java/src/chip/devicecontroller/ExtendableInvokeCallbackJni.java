@@ -19,6 +19,7 @@ package chip.devicecontroller;
 
 import chip.devicecontroller.model.InvokeResponseData;
 import chip.devicecontroller.model.NoInvokeResponseData;
+import java.lang.ref.Cleaner;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
@@ -27,9 +28,22 @@ public final class ExtendableInvokeCallbackJni {
   private final ExtendableInvokeCallback wrappedExtendableInvokeCallback;
   private long callbackHandle;
 
+  private final Cleaner.Cleanable cleanable;
+
   public ExtendableInvokeCallbackJni(ExtendableInvokeCallback wrappedExtendableInvokeCallback) {
     this.wrappedExtendableInvokeCallback = wrappedExtendableInvokeCallback;
     this.callbackHandle = newCallback();
+
+    this.cleanable =
+        Cleaner.create()
+            .register(
+                this,
+                () -> {
+                  if (callbackHandle != 0) {
+                    deleteCallback(callbackHandle);
+                    callbackHandle = 0;
+                  }
+                });
   }
 
   long getCallbackHandle() {
@@ -79,16 +93,5 @@ public final class ExtendableInvokeCallbackJni {
 
   private void onDone() {
     wrappedExtendableInvokeCallback.onDone();
-  }
-
-  // TODO(#8578): Replace finalizer with PhantomReference.
-  @SuppressWarnings("deprecation")
-  protected void finalize() throws Throwable {
-    super.finalize();
-
-    if (callbackHandle != 0) {
-      deleteCallback(callbackHandle);
-      callbackHandle = 0;
-    }
   }
 }
