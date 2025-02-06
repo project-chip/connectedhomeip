@@ -329,15 +329,15 @@ jobs:
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink (W91) Window Covering App
+            - name: Build example Telink (tl721x) Window Covering App
               # Run test for master and s07641069 PRs
               if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9118bdk40d-window-covering' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl7218x-window-covering' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9118bdk40d window-covering \
-                    out/telink-tlsr9118bdk40d-window-covering/zephyr/zephyr.elf \
+                    telink tl7218x window-covering \
+                    out/telink-tl7218x-window-covering/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output
