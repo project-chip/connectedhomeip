@@ -331,6 +331,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 @property (nonatomic) NSDate * estimatedStartTimeFromGeneralDiagnosticsUpTime;
 
+@property (nonatomic) NSDate * lastDeviceBecameActiveCallbackTime;
+
 /**
  * If currentReadClient is non-null, that means that we successfully
  * called SendAutoResubscribeRequest on the ReadClient and have not yet gotten
@@ -1634,12 +1636,25 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     [self _changeState:MTRDeviceStateReachable];
 
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
-        if ([delegate respondsToSelector:@selector(deviceBecameActive:)]) {
-            [delegate deviceBecameActive:self];
+    // Given the framework requests a minimum subscription keep alive time of devices, this callback is not expected to happen more often than that
+    BOOL shouldCallDelegate = NO;
+    if (self.lastDeviceBecameActiveCallbackTime) {
+        NSTimeInterval intervalSinceLastCallback = -[self.lastDeviceBecameActiveCallbackTime timeIntervalSinceNow];
+        if (intervalSinceLastCallback > MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN) {
+            shouldCallDelegate = YES;
         }
-    }];
-    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
+    } else {
+        shouldCallDelegate = YES;
+    }
+
+    if (shouldCallDelegate) {
+        [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+            if ([delegate respondsToSelector:@selector(deviceBecameActive:)]) {
+                [delegate deviceBecameActive:self];
+            }
+        }];
+        self.lastDeviceBecameActiveCallbackTime = [NSDate now];
+    }
 
     // in case this is called during exponential back off of subscription
     // reestablishment, this starts the attempt right away
