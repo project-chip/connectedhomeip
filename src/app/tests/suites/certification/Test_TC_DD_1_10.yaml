@@ -64,7 +64,7 @@ tests:
           To advertise the TH, press Button 4 on the nRF52840-DK board (only for QA validation). When validating with real devices, use the equivalent button to advertise the TH.
 
           Power on the TH Device, put it in Commissioning mode, and verify that it is in a state to be commissioned by the DUT.
-    
+
           I: 355 [DL]Device Configuration:
           I: 358 [DL]  Serial Number: 11223344556677889900
           I: 362 [DL]  Vendor Id: 65521 (0xFFF1)
