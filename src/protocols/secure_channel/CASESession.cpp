@@ -1054,7 +1054,7 @@ CASESession::NextStep CASESession::HandleSigma1(System::PacketBufferHandle && ms
 
     ReturnErrorVariantOnFailure(NextStep, ParseSigma1(tlvReader, parsedSigma1));
 
-    ChipLogDetail(SecureChannel, "Peer (Initiator) assigned session key ID %d", parsedSigma1.initiatorSessionId);
+    ChipLogDetail(SecureChannel, "Peer (Initiator) assigned session ID %d", parsedSigma1.initiatorSessionId);
     SetPeerSessionId(parsedSigma1.initiatorSessionId);
 
     // Set the Session parameters provided in the Sigma1 message
@@ -1381,7 +1381,7 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
             GetRemoteSessionParameters());
     }
 
-    ChipLogDetail(SecureChannel, "Peer with NodeID 0x" ChipLogFormatX64 " assigned session key ID %d", ChipLogValueX64(mPeerNodeId),
+    ChipLogDetail(SecureChannel, "Peer " ChipLogFormatScopedNodeId " assigned session ID %d", ChipLogValueScopedNodeId(GetPeer()),
                   parsedSigma2Resume.responderSessionId);
     SetPeerSessionId(parsedSigma2Resume.responderSessionId);
 
@@ -1563,7 +1563,7 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     ReturnErrorOnFailure(responderPublicKey.ECDSA_validate_msg_signature(msgR2SignedSpan.data(), msgR2SignedSpan.size(),
                                                                          parsedSigma2TBEData.tbsData2Signature));
 
-    ChipLogDetail(SecureChannel, "Peer with NodeID 0x" ChipLogFormatX64 " assigned session key ID %d", ChipLogValueX64(mPeerNodeId),
+    ChipLogDetail(SecureChannel, "Peer " ChipLogFormatScopedNodeId " assigned session ID %d", ChipLogValueScopedNodeId(GetPeer()),
                   parsedSigma2.responderSessionId);
     SetPeerSessionId(parsedSigma2.responderSessionId);
 
