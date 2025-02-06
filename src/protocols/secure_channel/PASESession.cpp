@@ -324,6 +324,23 @@ CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR PASESession::ReadSessionParamsIfPresent(const TLV::Tag & expectedSessionParamsTag,
+                                                   System::PacketBufferTLVReader & tlvReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = tlvReader.Next();
+    if (err == CHIP_NO_ERROR && tlvReader.GetTag() == expectedSessionParamsTag)
+    {
+        ReturnErrorOnFailure(DecodeSessionParametersIfPresent(expectedSessionParamsTag, tlvReader, mRemoteSessionParams));
+        mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
+            GetRemoteSessionParameters());
+
+        err = tlvReader.Next();
+    }
+    return err;
+}
+
 CHIP_ERROR PASESession::SendPBKDFParamRequest()
 {
     MATTER_TRACE_SCOPE("SendPBKDFParamRequest", "PASESession");
@@ -418,23 +435,16 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
     SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(PBKDFParamRequestTags::kHasPBKDFParameters)));
     SuccessOrExit(err = tlvReader.Get(hasPBKDFParameters));
 
-    err = tlvReader.Next();
-    if (err == CHIP_NO_ERROR && tlvReader.GetTag() == AsTlvContextTag(PBKDFParamRequestTags::kInitiatorSessionParams))
-    {
-        SuccessOrExit(err = DecodeSessionParametersIfPresent(AsTlvContextTag(PBKDFParamRequestTags::kInitiatorSessionParams),
-                                                             tlvReader, mRemoteSessionParams));
-        mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
-            GetRemoteSessionParameters());
+    err = ReadSessionParamsIfPresent(AsTlvContextTag(PBKDFParamRequestTags::kInitiatorSessionParams), tlvReader);
 
-        err = tlvReader.Next();
-    }
+    // Future-proofing: CHIP_NO_ERROR will be returned by Next() within ReadSessionParamsIfPresent() if we have additional
+    // non-parsed TLV Elements, which could happen in the future if additional elements are added to the specification.
+    VerifyOrExit(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, /* No Action */);
 
-    // Future-proofing: CHIP_NO_ERROR will be returned by Next() if we have additional non-parsed TLV Elements, which could
-    // happen in the future if additional elements are added to the specification.
-    VerifyOrExit(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, );
-
-    // Exit Container will fail (return CHIP_END_OF_TLV) if the received encoded message is not properly terminated with an
-    // EndOfContainer TLV Element.
+    // ExitContainer() acts as a safeguard to ensure that the received encoded message is properly terminated with an EndOfContainer
+    // TLV element. It is called as an extra validation step to enforce input data structure integrity. Without it, the message may
+    // still parse correctly, but malformed or incomplete data might go undetected.
+    // ExitContainer() will return CHIP_END_OF_TLV if the EndOfContainer TLV element terminator is missing.
     SuccessOrExit(err = tlvReader.ExitContainer(containerType));
 
     err = SendPBKDFParamResponse(ByteSpan(initiatorRandom), hasPBKDFParameters);
@@ -551,16 +561,11 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
 
     if (mHavePBKDFParameters)
     {
-        err = tlvReader.Next();
-        if (err == CHIP_NO_ERROR && tlvReader.GetTag() == AsTlvContextTag(PBKDFParamResponseTags::kResponderSessionParams))
-        {
-            SuccessOrExit(err = DecodeSessionParametersIfPresent(AsTlvContextTag(PBKDFParamResponseTags::kResponderSessionParams),
-                                                                 tlvReader, mRemoteSessionParams));
-            mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
-                GetRemoteSessionParameters());
+        err = ReadSessionParamsIfPresent(AsTlvContextTag(PBKDFParamResponseTags::kResponderSessionParams), tlvReader);
 
-            err = tlvReader.Next();
-        }
+        // Future-proofing: CHIP_NO_ERROR will be returned by Next() within ReadSessionParamsIfPresent() if we have additional
+        // non-parsed TLV Elements, which could happen in the future if additional elements are added to the specification.
+        VerifyOrExit(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, /* No Action */);
 
         // TODO - Add a unit test that exercises mHavePBKDFParameters path
         salt = ByteSpan(mSalt, mSaltLength);
@@ -581,23 +586,17 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
 
         SuccessOrExit(err = tlvReader.ExitContainer(containerType));
 
-        err = tlvReader.Next();
-        if (err == CHIP_NO_ERROR && tlvReader.GetTag() == AsTlvContextTag(PBKDFParamResponseTags::kResponderSessionParams))
-        {
-            SuccessOrExit(err = DecodeSessionParametersIfPresent(AsTlvContextTag(PBKDFParamResponseTags::kResponderSessionParams),
-                                                                 tlvReader, mRemoteSessionParams));
-            mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
-                GetRemoteSessionParameters());
+        err = ReadSessionParamsIfPresent(AsTlvContextTag(PBKDFParamResponseTags::kResponderSessionParams), tlvReader);
 
-            err = tlvReader.Next();
-        }
+        // Future-proofing: CHIP_NO_ERROR will be returned by Next() within ReadSessionParamsIfPresent() if we have additional
+        // non-parsed TLV Elements, which could happen in the future if additional elements are added to the specification.
+        VerifyOrExit(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, /* No Action */);
     }
-    // Future-proofing: CHIP_NO_ERROR will be returned by Next() if we have additional non-parsed TLV Elements, which could
-    // happen in the future if additional elements are added to the specification.
-    VerifyOrExit(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, );
 
-    // Exit Container will fail (return CHIP_END_OF_TLV) if the received encoded message is not properly terminated with an
-    // EndOfContainer TLV Element.
+    // ExitContainer() acts as a safeguard to ensure that the received encoded message is properly terminated with an EndOfContainer
+    // TLV element. It is called as an extra validation step to enforce input data structure integrity. Without it, the message may
+    // still parse correctly, but malformed or incomplete data might go undetected.
+    // ExitContainer() will return CHIP_END_OF_TLV if the EndOfContainer TLV element terminator is missing.
     SuccessOrExit(err = tlvReader.ExitContainer(containerType));
 
     err = SetupSpake2p();
@@ -761,8 +760,10 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
     VerifyOrExit(peer_verifier_len == kMAX_Hash_Length, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
     SuccessOrExit(err = tlvReader.GetDataPtr(peer_verifier));
 
-    // Exit Container will fail (return CHIP_END_OF_TLV) if the received encoded message is not properly terminated with an
-    // EndOfContainer TLV Element.
+    // ExitContainer() acts as a safeguard to ensure that the received encoded message is properly terminated with an EndOfContainer
+    // TLV element. It is called as an extra validation step to enforce input data structure integrity. Without it, the message may
+    // still parse correctly, but malformed or incomplete data might go undetected.
+    // ExitContainer() will return CHIP_END_OF_TLV if the EndOfContainer TLV element terminator is missing.
     SuccessOrExit(err = tlvReader.ExitContainer(containerType));
 
     SuccessOrExit(err = mSpake2p.ComputeRoundTwo(Y, Y_len, verifier, &verifier_len));
@@ -827,8 +828,10 @@ CHIP_ERROR PASESession::HandleMsg3(System::PacketBufferHandle && msg)
     VerifyOrExit(peer_verifier_len == kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     SuccessOrExit(err = tlvReader.GetDataPtr(peer_verifier));
 
-    // Exit Container will fail (return CHIP_END_OF_TLV) if the received encoded message is not properly terminated with an
-    // EndOfContainer TLV Element.
+    // ExitContainer() acts as a safeguard to ensure that the received encoded message is properly terminated with an EndOfContainer
+    // TLV element. It is called as an extra validation step to enforce input data structure integrity. Without it, the message may
+    // still parse correctly, but malformed or incomplete data might go undetected.
+    // ExitContainer() will return CHIP_END_OF_TLV if the EndOfContainer TLV element terminator is missing.
     SuccessOrExit(err = tlvReader.ExitContainer(containerType));
 
     SuccessOrExit(err = mSpake2p.KeyConfirm(peer_verifier, peer_verifier_len));
