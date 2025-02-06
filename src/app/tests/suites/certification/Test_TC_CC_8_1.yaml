@@ -108,13 +108,13 @@ tests:
     #242...254...0...4
     #Multiple range not supported in YAML: https://github.com/project-chip/connectedhomeip/issues/23197
     - label: "Step 2d: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.A0000 && CC.S.C01.Rsp
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 200
-              maxValue: 250
+              minValue: 212
+              maxValue: 288
 
     - label: "Wait 2s"
       cluster: "DelayCommands"
@@ -126,13 +126,13 @@ tests:
 
     #Multiple range not supported in YAML: https://github.com/project-chip/connectedhomeip/issues/23197
     - label: "Step 2e: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.A0000 && CC.S.C01.Rsp
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 200
-              maxValue: 250
+              minValue: 212
+              maxValue: 288
 
     - label:
           "Step 3a: TH sends MoveToSaturation command to DUT with Saturation=150
