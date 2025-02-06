@@ -20,11 +20,11 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * An object representing a single command to be invoked and the expected
- * result of invoking it.
+ * An object representing a single command to be invoked and the response
+ * required for the invoke to be considered successful.
  */
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
-@interface MTRCommandWithExpectedResult : NSObject <NSCopying, NSSecureCoding>
+@interface MTRCommandWithRequiredResponse : NSObject <NSCopying, NSSecureCoding>
 
 /**
  * The path of the command being invoked.
@@ -39,22 +39,22 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @property (nonatomic, retain, nullable) NSDictionary<NSString *, id> * commandFields;
 
 /**
- * The expected result of invoking the command.
+ * The response that represents this command succeeding.
  *
  * If this is nil, that indicates that the invoke is considered successful if it
  * does not result in an error status response.
  *
- * If this is is not nil, then invoke is considered successful if
- * it results in a data response and for each entry in the provided
- * expectedResult the field whose field ID matches the key of the entry has a
+ * If this is is not nil, then the invoke is considered successful if
+ * the response is a data response and for each entry in the provided
+ * requiredResponse the field whose field ID matches the key of the entry has a
  * value that equals the value of the entry.  Values of entries are data-value
  * dictionaries.
  */
-@property (nonatomic, copy, nullable) NSDictionary<NSNumber *, NSDictionary<NSString *, id> *> * expectedResult;
+@property (nonatomic, copy, nullable) NSDictionary<NSNumber *, NSDictionary<NSString *, id> *> * requiredResponse;
 
 - (instancetype)initWithPath:(MTRCommandPath *)path
                commandFields:(nullable NSDictionary<NSString *, id> *)commandFields
-              expectedResult:(nullable NSDictionary<NSNumber *, NSDictionary<NSString *, id> *> *)expectedResult;
+            requiredResponse:(nullable NSDictionary<NSNumber *, NSDictionary<NSString *, id> *> *)requiredResponse;
 
 @end
 

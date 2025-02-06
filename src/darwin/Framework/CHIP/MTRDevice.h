@@ -19,7 +19,7 @@
 #import <Matter/MTRAttributeValueWaiter.h>
 #import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRBaseDevice.h>
-#import <Matter/MTRCommandWithExpectedResult.h>
+#import <Matter/MTRCommandWithRequiredResponse.h>
 #import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -316,7 +316,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *    response.  In this case the data-value representing the response will be
  *    the value of this field.
  */
-- (void)invokeCommands:(NSArray<NSArray<MTRCommandWithExpectedResult *> *> *)commands
+- (void)invokeCommands:(NSArray<NSArray<MTRCommandWithRequiredResponse *> *> *)commands
                  queue:(dispatch_queue_t)queue
             completion:(MTRDeviceResponseHandler)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
