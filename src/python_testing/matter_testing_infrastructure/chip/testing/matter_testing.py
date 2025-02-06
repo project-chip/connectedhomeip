@@ -805,7 +805,7 @@ class DeviceTypePathLocation:
 
 class UnknownProblemLocation:
     def __str__(self):
-        return f'\n      Unknown Locations - see message for more details'
+        return '\n      Unknown Locations - see message for more details'
 
 
 ProblemLocation = typing.Union[ClusterPathLocation, DeviceTypePathLocation, UnknownProblemLocation]
