@@ -83,17 +83,16 @@ private:
 class WiFiManager
 {
 public:
-    enum WiFiRequestStatus : int
-    {
-        SUCCESS    = 0,
-        FAILURE    = 1,
-        TERMINATED = 2
-    };
+    /* No copy, nor move. */
+    WiFiManager(const WiFiManager &)             = delete;
+    WiFiManager & operator=(const WiFiManager &) = delete;
+    WiFiManager(WiFiManager &&)                  = delete;
+    WiFiManager & operator=(WiFiManager &&)      = delete;
 
     using ScanDoneStatus     = decltype(wifi_status::status);
     using ScanResultCallback = void (*)(const NetworkCommissioning::WiFiScanResponse &);
     using ScanDoneCallback   = void (*)(const ScanDoneStatus &);
-    using ConnectionCallback = void (*)();
+    using ConnectionCallback = void (*)(const wifi_conn_status &);
 
     enum class StationStatus : uint8_t
     {
@@ -108,6 +107,15 @@ public:
         UNKNOWN
     };
 
+    enum class WlanReason : uint8_t
+    {
+        UNSPECIFIED = 1,
+        PREV_AUTH_NOT_VALID,
+        DEAUTH_LEAVING,
+        DISASSOC_DUE_TO_INACTIVITY,
+        DISASSOC_AP_BUSY
+    };
+
     static WiFiManager & Instance()
     {
         static WiFiManager sInstance;
@@ -116,8 +124,7 @@ public:
 
     struct ConnectionHandling
     {
-        ConnectionCallback mOnConnectionSuccess{};
-        ConnectionCallback mOnConnectionFailed{};
+        ConnectionCallback mOnConnectionDone{};
         System::Clock::Seconds32 mConnectionTimeout{};
     };
 
@@ -182,9 +189,14 @@ public:
     CHIP_ERROR GetNetworkStatistics(NetworkStatistics & stats) const;
     void AbortConnectionRecovery();
     CHIP_ERROR SetLowPowerMode(bool onoff);
+    void SetLastDisconnectReason(uint16_t reason);
+    uint16_t GetLastDisconnectReason();
 
 private:
     using NetEventHandler = void (*)(Platform::UniquePtr<uint8_t>, size_t);
+
+    WiFiManager()  = default;
+    ~WiFiManager() = default;
 
     struct ConnectionParams
     {
@@ -224,6 +236,8 @@ private:
     net_if * mNetIf{ nullptr };
     ConnectionParams mWiFiParams{};
     ConnectionHandling mHandling{};
+    wifi_scan_params mScanParams{};
+    char mScanSsidBuffer[DeviceLayer::Internal::kMaxWiFiSSIDLength + 1] = { 0 };
     wifi_iface_state mWiFiState;
     wifi_iface_state mCachedWiFiState;
     net_mgmt_event_callback mWiFiMgmtClbk{};
@@ -237,6 +251,7 @@ private:
     uint32_t mConnectionRecoveryCounter{ 0 };
     uint32_t mConnectionRecoveryTimeMs{ kConnectionRecoveryMinIntervalMs };
     bool mApplicationDisconnectRequested{ false };
+    uint16_t mLastDisconnectedReason = static_cast<uint16_t>(WlanReason::UNSPECIFIED);
 
     static const Map<wifi_iface_state, StationStatus, 10> sStatusMap;
     static const Map<uint32_t, NetEventHandler, 5> sEventHandlerMap;
