@@ -968,7 +968,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     mtr_weakify(self);
     [_deviceController asyncDispatchToMatterQueue:^{
         mtr_strongify(self);
-        VerifyOrReturn(self, MTR_LOG_DEBUG("invalids asyncDispatchToMatterQueue called back with nil MTRDevice"));
+        VerifyOrReturn(self, MTR_LOG_DEBUG("invalidate asyncDispatchToMatterQueue called back with nil MTRDevice"));
 
         MTR_LOG("%@ invalidate disconnecting ReadClient and SubscriptionCallback", self);
 
