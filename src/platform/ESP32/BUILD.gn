@@ -65,6 +65,7 @@ static_library("ESP32") {
   ]
 
   deps = [
+    "${chip_root}/src/app:app_config",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
@@ -166,6 +167,7 @@ static_library("ESP32") {
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
+    deps += [ "${chip_root}/src/app:app_config" ]
     if (chip_mdns == "platform") {
       sources += [
         "../OpenThread/OpenThreadDnssdImpl.cpp",
@@ -202,6 +204,14 @@ static_library("ESP32") {
     sources += [
       "ESP32SecureCertDACProvider.cpp",
       "ESP32SecureCertDACProvider.h",
+    ]
+  }
+
+  if (chip_use_factory_data_provider && chip_use_secure_cert_dac_provider) {
+    # These files have no dependency on chip_use_secure_cert_dac_provider, but if we are reading the commissionable data from the secure cert, we should expect the attestation data to be present there as well.
+    sources += [
+      "ESP32SecureCertDataProvider.cpp",
+      "ESP32SecureCertDataProvider.h",
     ]
   }
 

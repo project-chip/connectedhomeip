@@ -49,6 +49,9 @@ DOTFILE=".gn"
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
 USAGE="./scripts/examples/gn_silabs_example.sh <AppRootFolder> <outputFolder> <silabs_board_name> [<Build options>]"
 
+PROTOCOL_DIR_SUFFIX="thread"
+NCP_DIR_SUFFIX=""
+
 if [ "$#" == "0" ]; then
     echo "Build script for EFR32 Matter apps
     Format:
@@ -118,7 +121,7 @@ if [ "$#" == "0" ]; then
             (default: /third_party/silabs/slc_gen/<board>/)
         sl_pre_gen_path
             Allow users to define a path to pre-generated board files
-            (default: /third_party/silabs/matter_support/matter/<family>/<board>/)
+            (default: third_party/silabs/matter_support/board-support/<family>/<board>/)
         sl_matter_version
             Use provided software version at build time
         sl_matter_version_str
@@ -188,6 +191,7 @@ else
                     echo "--wifi requires rs9116 or SiWx917 or wf200"
                     exit 1
                 fi
+
                 if [ "$2" = "rs9116" ]; then
                     optArgs+="use_rs9116=true "
                 elif [ "$2" = "SiWx917" ]; then
@@ -198,8 +202,10 @@ else
                     echo "Wifi usage: --wifi rs9116|SiWx917|wf200"
                     exit 1
                 fi
+
+                NCP_DIR_SUFFIX="/"$2
                 USE_WIFI=true
-                optArgs+="chip_device_platform =\"efr32\" "
+                optArgs+="chip_device_platform =\"efr32\" chip_crypto_keystore=\"psa\" "
                 shift
                 shift
                 ;;
@@ -302,7 +308,7 @@ else
     fi
 
     # 917 exception. TODO find a more generic way
-    if [ "$SILABS_BOARD" == "BRD4338A" ] || [ "$SILABS_BOARD" == "BRD2605A" ]; then
+    if [ "$SILABS_BOARD" == "BRD4338A" ] || [ "$SILABS_BOARD" == "BRD2605A" ] || [ "$SILABS_BOARD" == "BRD4343A" ] || [ "$SILABS_BOARD" == "BRD4342A" ]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
     fi
@@ -321,18 +327,19 @@ else
         source "$CHIP_ROOT/scripts/activate.sh"
     fi
 
+    if [ "$USE_WIFI" == true ]; then
+        DOTFILE="$ROOT/build_for_wifi_gnfile.gn"
+        PROTOCOL_DIR_SUFFIX="wifi"
+    else
+        DOTFILE="$ROOT/openthread.gn"
+    fi
+
     PYTHON_PATH="$(which python3)"
-    BUILD_DIR=$OUTDIR/$SILABS_BOARD
+    BUILD_DIR=$OUTDIR/$PROTOCOL_DIR_SUFFIX/$SILABS_BOARD$NCP_DIR_SUFFIX
     echo BUILD_DIR="$BUILD_DIR"
 
     if [ "$DIR_CLEAN" == true ]; then
         rm -rf "$BUILD_DIR"
-    fi
-
-    if [ "$USE_WIFI" == true ]; then
-        DOTFILE="$ROOT/build_for_wifi_gnfile.gn"
-    else
-        DOTFILE="$ROOT/openthread.gn"
     fi
 
     if [ "$USE_DOCKER" == true ] && [ "$USE_WIFI" == false ]; then
@@ -340,7 +347,7 @@ else
         optArgs+="openthread_root=\"$GSDK_ROOT/util/third_party/openthread\" "
     fi
 
-    "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$DOTFILE" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
+    "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --add-export-compile-commands=* --root="$ROOT" --dotfile="$DOTFILE" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
 
     if [ "$USE_SLC" == true ]; then
         # Activation needs to be after SLC generation which is done in gn gen.
@@ -372,7 +379,7 @@ else
         fi
 
         # search bootloader directory for the respective bootloaders for the input board
-        bootloaderFiles=("$(find "$MATTER_ROOT/third_party/silabs/matter_support/matter/efr32/bootloader_binaries/" -maxdepth 1 -name "*$SILABS_BOARD*" | tr '\n' ' ')")
+        bootloaderFiles=("$(find "$MATTER_ROOT/third_party/silabs/matter_support/board-support/efr32/bootloader_binaries/" -maxdepth 1 -name "*$SILABS_BOARD*" | tr '\n' ' ')")
 
         if [ "${#bootloaderFiles[@]}" -gt 1 ]; then
             for i in "${!bootloaderFiles[@]}"; do

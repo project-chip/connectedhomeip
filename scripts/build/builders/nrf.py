@@ -141,13 +141,11 @@ class NrfConnectBuilder(Builder):
                  app: NrfApp = NrfApp.LIGHT,
                  board: NrfBoard = NrfBoard.NRF52840DK,
                  enable_rpcs: bool = False,
-                 use_data_model_interface: Optional[bool] = None,
                  ):
         super(NrfConnectBuilder, self).__init__(root, runner)
         self.app = app
         self.board = board
         self.enable_rpcs = enable_rpcs
-        self.use_data_model_interface = use_data_model_interface
 
     def generate(self):
         if not os.path.exists(self.output_dir):
@@ -191,10 +189,6 @@ class NrfConnectBuilder(Builder):
             if self.options.pregen_dir:
                 flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
 
-            if self.use_data_model_interface is not None:
-                value = 'y' if self.use_data_model_interface else 'n'
-                flags.append(f"-DCONFIG_USE_CHIP_DATA_MODEL_INTERFACE={value}")
-
             build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 
             cmd = 'source "$ZEPHYR_BASE/zephyr-env.sh";\nexport ZEPHYR_TOOLCHAIN_VARIANT=zephyr;'
@@ -226,7 +220,7 @@ class NrfConnectBuilder(Builder):
             # Note: running zephyr/zephyr.elf has the same result except it creates
             # a flash.bin in the current directory. ctest has more options and does not
             # pollute the source directory
-            self._Execute(['ctest', '--build-nocmake', '-V', '--output-on-failure', '--test-dir', self.output_dir],
+            self._Execute(['ctest', '--build-nocmake', '-V', '--output-on-failure', '--test-dir', os.path.join(self.output_dir, 'nrfconnect')],
                           title='Run Tests ' + self.identifier)
 
     def _bundle(self):

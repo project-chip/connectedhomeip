@@ -23,15 +23,6 @@ Git: 0.9-fall2024-234-gf4d359001
 <configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
   <domain name="General"/>
 
-  <enum name="StreamTypeEnum" type="enum8">
-    <cluster code="0x0553"/>
-    <cluster code="0x0554"/>
-    <item name="Internal" value="0x00"/>
-    <item name="Recording" value="0x01"/>
-    <item name="Analysis" value="0x02"/>
-    <item name="LiveView" value="0x03"/>
-  </enum>
-
   <bitmap name="WebRTCMetadataOptions" type="bitmap8">
     <cluster code="0x0553"/>
     <cluster code="0x0554"/>
@@ -70,7 +61,7 @@ Git: 0.9-fall2024-234-gf4d359001
     <item fieldId="1" name="ID" type="int16u"/>
     <item fieldId="2" name="PeerNodeID" type="node_id"/>
     <item fieldId="3" name="PeerFabricIndex" type="fabric_idx"/>
-    <item fieldId="4" name="StreamType" type="StreamTypeEnum" min="0x00" max="0x03"/>
+    <item fieldId="4" name="StreamUsage" type="StreamUsageEnum" min="0x00" max="0x03"/>
     <item fieldId="5" name="VideoStreamID" type="int16u" isNullable="true"/>
     <item fieldId="6" name="AudioStreamID" type="int16u" isNullable="true"/>
     <item fieldId="7" name="MetadataOptions" type="WebRTCMetadataOptions" default="0x00" min="0x00" max="0x01"/>
@@ -88,7 +79,7 @@ Git: 0.9-fall2024-234-gf4d359001
     <attribute code="0x0000" side="server" define="CURRENT_SESSIONS" type="array" entryType="WebRTCSessionStruct">CurrentSessions</attribute>
     <command code="0x01" source="client" name="SolicitOffer" optional="false" response="SolicitOfferResponse">
       <description>Requests that the Provider initiates a new session with the Offer / Answer flow in a way that allows for options to be passed and work with devices needing the standby flow.</description>
-      <arg id="1" name="StreamType" type="StreamTypeEnum" min="0x00" max="0x03"/>
+      <arg id="1" name="StreamUsage" type="StreamUsageEnum" min="0x00" max="0x03"/>
       <arg id="2" name="VideoStreamID" type="int16u" optional="true" isNullable="true"/>
       <arg id="3" name="AudioStreamID" type="int16u" optional="true" isNullable="true"/>
       <arg id="4" name="ICEServers" array="true" type="ICEServerStruct" optional="true"/>
@@ -108,7 +99,7 @@ Git: 0.9-fall2024-234-gf4d359001
       <description>This command allows an SDP Offer to be set and start a new session.</description>
       <arg id="1" name="WebRTCSessionID" type="int16u" isNullable="true"/>
       <arg id="2" name="SDP" type="char_string"/>
-      <arg id="3" name="StreamType" type="StreamTypeEnum" min="0x00" max="0x03"/>
+      <arg id="3" name="StreamUsage" type="StreamUsageEnum" min="0x00" max="0x03"/>
       <arg id="4" name="VideoStreamID" type="int16u" optional="true" isNullable="true"/>
       <arg id="5" name="AudioStreamID" type="int16u" optional="true" isNullable="true"/>
       <arg id="6" name="ICEServers" array="true" type="ICEServerStruct" optional="true"/>

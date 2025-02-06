@@ -19,28 +19,36 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${CHIP_LOCK_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --manual-code 10054912339 --bool-arg ignore_in_progress:True allow_provisional:True --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --tests test_TC_IDM_10_2
+# test-runner-runs:
+#   run1:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --bool-arg ignore_in_progress:True allow_provisional:True
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --tests test_TC_IDM_10_2 test_TC_IDM_10_6
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 # TODO: Enable 10.5 in CI once the door lock OTA requestor problem is sorted.
 from typing import Callable
 
 import chip.clusters as Clusters
-from basic_composition_support import BasicCompositionTests
+from chip.testing.basic_composition import BasicCompositionTests
+from chip.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
+                                             evaluate_feature_choice_conformance)
+from chip.testing.conformance import ConformanceDecision, conformance_allowed
+from chip.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type,
+                                               device_type_id_type, is_valid_device_type_id)
+from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
+                                         MatterBaseTest, ProblemNotice, ProblemSeverity, async_test_body, default_matter_test_main)
+from chip.testing.spec_parsing import CommandType, build_xml_clusters, build_xml_device_types
 from chip.tlv import uint
-from choice_conformance_support import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
-                                        evaluate_feature_choice_conformance)
-from conformance_support import ConformanceDecision, conformance_allowed
-from global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type, device_type_id_type,
-                                  is_valid_device_type_id)
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                    MatterBaseTest, ProblemNotice, ProblemSeverity, async_test_body, default_matter_test_main)
-from spec_parsing_support import CommandType, build_xml_clusters, build_xml_device_types
 
 
 class DeviceConformanceTests(BasicCompositionTests):
@@ -60,9 +68,9 @@ class DeviceConformanceTests(BasicCompositionTests):
         # Currently this is just NIM. We may later be able to pull this from the device type scrape using the ManagedAclAllowed condition,
         # but these are not currently exposed directly by the device.
         allowed_ids = [self._get_device_type_id('network infrastructure manager')]
-        for endpoint in self.endpoints_tlv.values():
+        for endpoint in self.endpoints.values():
             desc = Clusters.Descriptor
-            device_types = [dt.deviceType for dt in endpoint[desc.id][desc.Attributes.DeviceTypeList.attribute_id]]
+            device_types = [dt.deviceType for dt in endpoint[desc][desc.Attributes.DeviceTypeList]]
             if set(allowed_ids).intersection(set(device_types)):
                 # TODO: it's unclear if this needs to be present on every endpoint. Right now, this assumes one is sufficient.
                 return True
@@ -265,6 +273,35 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         return success, problems
 
+    def check_device_type_revisions(self) -> tuple[bool, list[ProblemNotice]]:
+        success = True
+        problems = []
+
+        def record_error(location, problem):
+            nonlocal success
+            problems.append(ProblemNotice("IDM-10.6", location, ProblemSeverity.ERROR, problem, ""))
+            success = False
+
+        for endpoint_id, endpoint in self.endpoints.items():
+            if Clusters.Descriptor not in endpoint:
+                # Descriptor cluster presence checked in 10.5
+                continue
+
+            standard_device_types = [x for x in endpoint[Clusters.Descriptor]
+                                     [Clusters.Descriptor.Attributes.DeviceTypeList] if device_type_id_type(x.deviceType) == DeviceTypeIdType.kStandard]
+            for device_type in standard_device_types:
+                device_type_id = device_type.deviceType
+                if device_type_id not in self.xml_device_types.keys():
+                    # problem recorded in 10.5
+                    continue
+                expected_revision = self.xml_device_types[device_type_id].revision
+                actual_revision = device_type.revision
+                if expected_revision != actual_revision:
+                    location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=Clusters.Descriptor.id)
+                    record_error(
+                        location, f"Expected Device type revision for device type {device_type_id} {self.xml_device_types[device_type_id].name} on endpoint {endpoint_id} does not match revision on DUT. Expected: {expected_revision} DUT: {actual_revision}")
+        return success, problems
+
     def check_device_type(self, fail_on_extra_clusters: bool = True, allow_provisional: bool = False) -> tuple[bool, list[ProblemNotice]]:
         success = True
         problems = []
@@ -287,7 +324,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                 continue
 
             device_type_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
-            invalid_device_types = [x for x in device_type_list if not is_valid_device_type_id(device_type_id_type(x.deviceType))]
+            invalid_device_types = [x for x in device_type_list if not is_valid_device_type_id(x.deviceType)]
             standard_device_types = [x for x in endpoint[Clusters.Descriptor]
                                      [Clusters.Descriptor.Attributes.DeviceTypeList] if device_type_id_type(x.deviceType) == DeviceTypeIdType.kStandard]
             endpoint_clusters = []
@@ -302,13 +339,6 @@ class DeviceConformanceTests(BasicCompositionTests):
                 if device_type_id not in self.xml_device_types.keys():
                     record_error(location=location, problem='Unknown device type ID in standard range')
                     continue
-
-                if device_type_id not in self.xml_device_types.keys():
-                    location = DeviceTypePathLocation(device_type_id=device_type_id)
-                    record_error(location=location, problem='Unknown device type')
-                    continue
-
-                # TODO: check revision. Possibly in another test?
 
                 xml_device = self.xml_device_types[device_type_id]
                 # IDM 10.1 checks individual clusters for validity,
@@ -376,6 +406,12 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with Device type conformance on one or more endpoints")
+
+    def test_TC_IDM_10_6(self):
+        success, problems = self.check_device_type_revisions()
+        self.problems.extend(problems)
+        if not success:
+            self.fail_current_test("Problems with Device type revisions on one or more endpoints")
 
 
 if __name__ == "__main__":

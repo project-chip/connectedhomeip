@@ -1,0 +1,91 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Thermostat basic functionality tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Thermostat"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read current SystemMode value"
+      command: "readAttribute"
+      attribute: "SystemMode"
+      response:
+          saveAs: originalSystemMode
+
+    - label: "Try to set SystemMode to Sleep"
+      command: "writeAttribute"
+      attribute: "SystemMode"
+      arguments:
+          value: SystemModeEnum.Sleep
+
+    - label: "Check that the new value is set now"
+      command: "readAttribute"
+      attribute: "SystemMode"
+      response:
+          value: SystemModeEnum.Sleep
+
+    - label: "Try to set SystemMode to an invalid value"
+      # Have to use WriteById, because normal write enforces valid values for enums.
+      cluster: "AnyCommands"
+      command: "WriteById"
+      attribute: "SystemMode"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: 0x0201 # Thermostat
+              - name: "AttributeId"
+                value: 0x001C # SystemMode
+              - name: "Value"
+                # Note: At some point this might become a valid value,
+                # and then this test will need to be adjusted, but that
+                # seems fairly low-probability.
+                value: 254
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Verify that WriteById would work correctly with a valid value"
+      cluster: "AnyCommands"
+      command: "WriteById"
+      attribute: "SystemMode"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: 0x0201 # Thermostat
+              - name: "AttributeId"
+                value: 0x001C # SystemMode
+              - name: "Value"
+                value: 8 # SystemModeEnum.Dry
+
+    - label: "Check that the new value is set by id"
+      command: "readAttribute"
+      attribute: "SystemMode"
+      response:
+          value: SystemModeEnum.Dry
+
+    - label: "reset SystemMode to original value"
+      command: "writeAttribute"
+      attribute: "SystemMode"
+      arguments:
+          value: originalSystemMode

@@ -85,14 +85,6 @@ mcxw71_k32w1_sdk("sdk") {
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
   ]
 
-  if (chip_key_storage == "littlefs") {
-    include_dirs += [ "${example_platform_dir}/board" ]
-    sources += [
-      "${example_platform_dir}/board/peripherals.c",
-      "${example_platform_dir}/board/peripherals.h",
-    ]
-  }
-
   if (nxp_multiple_ble_connections) {
     include_dirs += [ "${example_platform_dir}/app_ble/include" ]
     defines += [
@@ -124,7 +116,7 @@ mcxw71_k32w1_executable("lock_app") {
     defines += [ "CONFIG_DIAG_LOGS_DEMO=1" ]
   }
 
-  if (chip_with_low_power == 1) {
+  if (nxp_use_low_power) {
     defines += [ "CONFIG_LOW_POWER=1" ]
   } else {
     defines += [
@@ -168,17 +160,17 @@ mcxw71_k32w1_executable("lock_app") {
     "${example_platform_dir}/factory_data/source/AppFactoryDataExample.cpp",
   ]
 
-  if (chip_with_low_power == 1) {
+  if (nxp_use_low_power) {
     sources += [ "${common_example_dir}/low_power/source/LowPower.cpp" ]
   }
 
-  if (chip_with_factory_data == 1) {
+  if (nxp_use_factory_data) {
     include_dirs +=
         [ "${chip_root}/src/platform/nxp/common/factory_data/legacy" ]
     deps += [ "${chip_root}/src/platform/nxp:nxp_factory_data" ]
   }
 
-  if (chip_enable_matter_cli) {
+  if (nxp_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]
     deps += [
       "${chip_root}/examples/shell/shell_common:shell_common",
@@ -248,7 +240,7 @@ mcxw71_k32w1_executable("lock_app") {
     "../common/main/main.cpp",
   ]
 
-  if (chip_with_low_power == 0) {
+  if (!nxp_use_low_power) {
     sources += [
       "${common_example_dir}/ui_feedback/source/LedManager.cpp",
       "${example_platform_dir}/util/LedOnOff.cpp",
@@ -291,7 +283,7 @@ mcxw71_k32w1_executable("lock_app") {
     "-T" + rebase_path(ldscript, root_build_dir),
   ]
 
-  if (chip_with_factory_data == 1) {
+  if (nxp_use_factory_data) {
     ldflags += [ "-Wl,--defsym=gUseFactoryData_d=1" ]
   }
 

@@ -28,7 +28,7 @@
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
+#include <platform/internal/GenericPlatformManagerImpl_CMSISOS.ipp>
 #include <platform/silabs/DiagnosticDataProviderImpl.h>
 
 #if defined(SL_MBEDTLS_USE_TINYCRYPT)
@@ -84,10 +84,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
     SuccessOrExit(err);
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !defined(SLI_SI91X_MCU_INTERFACE) && !defined(EXP_BOARD)
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !defined(SLI_SI91X_MCU_INTERFACE) && !defined(EXP_BOARD)
 
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 
@@ -104,7 +104,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
+    err = Internal::GenericPlatformManagerImpl_CMSISOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
     // Start timer to increment TotalOperationalHours every hour
@@ -129,79 +129,62 @@ void PlatformManagerImpl::UpdateOperationalHours(System::Layer * systemLayer, vo
 
     SystemLayer().StartTimer(System::Clock::Seconds32(kSecondsPerHour), UpdateOperationalHours, NULL);
 }
+
 void PlatformManagerImpl::_Shutdown()
 {
-    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
+    Internal::GenericPlatformManagerImpl_CMSISOS<PlatformManagerImpl>::_Shutdown();
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-void PlatformManagerImpl::HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wfx_generic_message_t * eventData)
-{
-    ChipDeviceEvent event;
-    memset(&event, 0, sizeof(event));
-    event.Type                              = DeviceEventType::kWFXSystemEvent;
-    event.Platform.WFXSystemEvent.eventBase = eventBase;
-
-    if (eventBase == WIFI_EVENT)
-    {
-        switch (eventData->header.id)
-        {
-        case SL_WFX_STARTUP_IND_ID:
-            memcpy(&event.Platform.WFXSystemEvent.data.startupEvent, eventData,
-                   sizeof(event.Platform.WFXSystemEvent.data.startupEvent));
-            break;
-        case SL_WFX_CONNECT_IND_ID:
-            memcpy(&event.Platform.WFXSystemEvent.data.connectEvent, eventData,
-                   sizeof(event.Platform.WFXSystemEvent.data.connectEvent));
-            break;
-        case SL_WFX_DISCONNECT_IND_ID:
-            memcpy(&event.Platform.WFXSystemEvent.data.disconnectEvent, eventData,
-                   sizeof(event.Platform.WFXSystemEvent.data.disconnectEvent));
-            break;
-        // case SL_WFX_RECEIVED_IND_ID:
-        //     memcpy(&event.Platform.WFXSystemEvent.data.receivedEvent, eventData,
-        //            sizeof(event.Platform.WFXSystemEvent.data.receivedEvent));
-        //     break;
-        // case SL_WFX_GENERIC_IND_ID:
-        //     memcpy(&event.Platform.WFXSystemEvent.data.genericEvent, eventData,
-        //            sizeof(event.Platform.WFXSystemEvent.data.genericEvent));
-        //     break;
-        // case SL_WFX_EXCEPTION_IND_ID:
-        //     memcpy(&event.Platform.WFXSystemEvent.data.exceptionEvent, eventData,
-        //            sizeof(event.Platform.WFXSystemEvent.data.exceptionEvent));
-        //     break;
-        // case SL_WFX_ERROR_IND_ID:
-        //     memcpy(&event.Platform.WFXSystemEvent.data.errorEvent, eventData,
-        //            sizeof(event.Platform.WFXSystemEvent.data.errorEvent));
-        //     break;
-        default:
-            break;
-        }
-    }
-    else if (eventBase == IP_EVENT)
-    {
-        switch (eventData->header.id)
-        {
-        case IP_EVENT_STA_GOT_IP:
-            memcpy(&event.Platform.WFXSystemEvent.data.genericMsgEvent, eventData,
-                   sizeof(event.Platform.WFXSystemEvent.data.genericMsgEvent));
-            break;
-        case IP_EVENT_GOT_IP6:
-            memcpy(&event.Platform.WFXSystemEvent.data.genericMsgEvent, eventData,
-                   sizeof(event.Platform.WFXSystemEvent.data.genericMsgEvent));
-            break;
-        case IP_EVENT_STA_LOST_IP:
-            memcpy(&event.Platform.WFXSystemEvent.data.genericMsgEvent, eventData,
-                   sizeof(event.Platform.WFXSystemEvent.data.genericMsgEvent));
-            break;
-        default:
-            break;
-        }
-    }
-
-    (void) sInstance.PostEvent(&event);
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 
 } // namespace DeviceLayer
 } // namespace chip
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+// This function needs to be global so it can be used from the platform implementation without depending on the platfrom itself.
+// This is a workaround to avoid a circular dependency.
+void HandleWFXSystemEvent(sl_wfx_generic_message_t * eventData)
+{
+    using namespace chip;
+    using namespace chip::DeviceLayer;
+
+    ChipDeviceEvent event;
+    memset(&event, 0, sizeof(event));
+    event.Type = DeviceEventType::kWFXSystemEvent;
+
+    switch (eventData->header.id)
+    {
+// TODO: Work around until we unify the data structures behind a Matter level common structure
+#if WF200_WIFI
+    case SL_WFX_STARTUP_IND_ID:
+#endif
+    case to_underlying(WifiEvent::kStartUp):
+        memcpy(&event.Platform.WFXSystemEvent.data.startupEvent, eventData,
+               sizeof(event.Platform.WFXSystemEvent.data.startupEvent));
+        // TODO: This is a workaround until we unify the Matter Data structures
+        event.Platform.WFXSystemEvent.data.startupEvent.header.id = to_underlying(WifiEvent::kStartUp);
+        break;
+
+    case to_underlying(WifiEvent::kConnect):
+        memcpy(&event.Platform.WFXSystemEvent.data.connectEvent, eventData,
+               sizeof(event.Platform.WFXSystemEvent.data.connectEvent));
+        break;
+
+    case to_underlying(WifiEvent::kDisconnect):
+        memcpy(&event.Platform.WFXSystemEvent.data.disconnectEvent, eventData,
+               sizeof(event.Platform.WFXSystemEvent.data.disconnectEvent));
+        break;
+
+    case to_underlying(WifiEvent::kGotIPv4):
+    case to_underlying(WifiEvent::kLostIP):
+    case to_underlying(WifiEvent::kGotIPv6):
+        memcpy(&event.Platform.WFXSystemEvent.data.genericMsgEvent, eventData,
+               sizeof(event.Platform.WFXSystemEvent.data.genericMsgEvent));
+        break;
+
+    default:
+        break;
+    }
+
+    // TODO: We should add error processing here
+    (void) PlatformMgr().PostEvent(&event);
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION

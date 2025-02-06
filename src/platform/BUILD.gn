@@ -148,14 +148,15 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     if (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
         chip_device_platform == "tizen" || chip_device_platform == "android" ||
         chip_device_platform == "webos" || chip_device_platform == "bl602" ||
-        chip_device_platform == "bl702" || chip_device_platform == "bl702l") {
+        chip_device_platform == "bl702" || chip_device_platform == "bl702l" ||
+        chip_device_platform == "bl616") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 
-    if (chip_enable_nfc) {
+    if (chip_enable_nfc_onboarding_payload) {
       defines += [
-        "CHIP_DEVICE_CONFIG_ENABLE_NFC=1",
-        "CONFIG_CHIP_NFC_COMMISSIONING=1",
+        "CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD=1",
+        "CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD=1",
       ]
     }
 
@@ -245,6 +246,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       ]
     } else if (chip_device_platform == "bl602") {
       device_layer_target_define = "BL602"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=bouffalolab/common",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+    } else if (chip_device_platform == "bl616") {
+      device_layer_target_define = "BL616"
       defines += [
         "CHIP_DEVICE_LAYER_TARGET=bouffalolab/common",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
@@ -346,6 +353,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "TELINK",
       "MBED",
       "BL602",
+      "BL616",
       "BL702",
       "BL702L",
       "FAKE",
@@ -496,6 +504,8 @@ if (chip_device_platform != "none") {
       "../include/platform/internal/GenericDeviceInstanceInfoProvider.ipp",
       "../include/platform/internal/GenericPlatformManagerImpl.h",
       "../include/platform/internal/GenericPlatformManagerImpl.ipp",
+      "../include/platform/internal/GenericPlatformManagerImpl_CMSISOS.h",
+      "../include/platform/internal/GenericPlatformManagerImpl_CMSISOS.ipp",
       "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h",
       "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp",
       "../include/platform/internal/GenericPlatformManagerImpl_POSIX.h",
@@ -529,7 +539,8 @@ if (chip_device_platform != "none") {
 
     public_deps = [
       ":platform_base",
-      "${chip_root}/src/app/common:cluster-objects",
+      "${chip_root}/src/app/common:ids",
+      "${chip_root}/src/app/util:types",
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
     ]
@@ -574,6 +585,8 @@ if (chip_device_platform != "none") {
       _platform_target = "webos"
     } else if (chip_device_platform == "bl602") {
       _platform_target = "bouffalolab/BL602"
+    } else if (chip_device_platform == "bl616") {
+      _platform_target = "bouffalolab/BL616"
     } else if (chip_device_platform == "bl702") {
       _platform_target = "bouffalolab/BL702"
     } else if (chip_device_platform == "bl702l") {

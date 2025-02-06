@@ -15,12 +15,20 @@
 #    limitations under the License.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --PICS src/app/tests/suites/certification/ci-pics-values
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -32,7 +40,7 @@ from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
 from chip.native import PyChipError
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -97,7 +105,9 @@ class TC_CADMIN_1_9(MatterBaseTest):
             errcode = await self.CommissionOnNetwork(setupPinCode)
             logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
-            asserts.assert_true(errcode.sdk_code == expectedErrCode, 'Unexpected error code returned from CommissioningComplete')
+            # TODO: Adding try or except clause here as the errcode code be either 50 for timeout or 3 for incorrect state at this time
+            # until issue mentioned in https://github.com/project-chip/connectedhomeip/issues/34383 can be resolved
+            asserts.assert_in(errcode.sdk_code, [expectedErrCode, 3], 'Unexpected error code returned from CommissioningComplete')
 
     def pics_TC_CADMIN_1_9(self) -> list[str]:
         return ["CADMIN.S"]
@@ -119,9 +129,6 @@ class TC_CADMIN_1_9(MatterBaseTest):
 
         self.step(3)
         await self.CommissionAttempt(setupPinCode, expectedErrCode=0x03)
-        # TODO: Found if we don't add sleep time after test completes that we get unexpected error code and response after the 21st iteration.
-        # Link to Bug Filed: https://github.com/project-chip/connectedhomeip/issues/34383
-        sleep(1)
 
         self.step(4)
         await self.CommissionAttempt(setupPinCode, expectedErrCode=0x32)

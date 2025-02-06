@@ -28,6 +28,8 @@
 
 using namespace chip;
 
+namespace admin {
+
 namespace {
 
 // Constants
@@ -57,7 +59,7 @@ CHIP_ERROR WaitForResponse(CallType & call)
     }
     else
     {
-        fprintf(stderr, "RPC Response timed out!");
+        fprintf(stderr, "RPC Response timed out!\n");
         return CHIP_ERROR_TIMEOUT;
     }
 }
@@ -205,3 +207,27 @@ CHIP_ERROR AdminCommissioningAttributeChanged(const chip_rpc_AdministratorCommis
 
     return WaitForResponse(call);
 }
+
+CHIP_ERROR DeviceReachableChanged(const chip_rpc_ReachabilityChanged & data)
+{
+    ChipLogProgress(NotSpecified, "DeviceReachableChanged");
+    // TODO(#35333): When there is some sort of device manager in fabric-admin that handles all the devices we
+    // are currently connected to (and not just device on the remote bridge), we should notify that manager
+    // so that it can properly handle any sort of reconnection logic. This can either be done here when
+    // `data.reachability == false`, or more control can be given wherever DeviceReachableChanged is currently
+    // called
+
+    // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
+    // function and the call will complete.
+    auto call = fabricBridgeClient.DeviceReachableChanged(data, RpcCompletedWithEmptyResponse);
+
+    if (!call.active())
+    {
+        // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return WaitForResponse(call);
+}
+
+} // namespace admin

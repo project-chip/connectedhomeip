@@ -26,11 +26,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
-    <attribute side="server" code="0x0000" define="STATE_VALUE" type="boolean" writable="false" reportable="true" optional="false">StateValue</attribute>
-
+    <attribute side="server" code="0x0000" name="StateValue" define="STATE_VALUE" type="boolean" reportable="true">
+      <mandatoryConform/>
+    </attribute>
+    
     <event code="0x0000" name="StateChange" priority="info" side="server">
       <description>This event SHALL be generated when the StateValue attribute changes.</description>
       <field id="0" name="StateValue" type="boolean"/>
+      <optionalConform/>
     </event>
   </cluster>
 </configurator>

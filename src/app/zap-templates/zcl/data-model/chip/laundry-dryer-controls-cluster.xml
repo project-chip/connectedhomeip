@@ -36,9 +36,13 @@ limitations under the License.
         <description>This cluster provides a way to access options associated with the operation of
             a laundry dryer device type.</description>
 
-        <globalAttribute side="either" code="0xFFFD" value="1" />
-
-        <attribute side="server" code="0x0000" define="SUPPORTED_DRYNESS_LEVELS" type="array" entryType="DrynessLevelEnum" writable="false" isNullable="false" optional="false" min="0x01" max="0x04">SupportedDrynessLevels</attribute>
-        <attribute side="server" code="0x0001" define="SELECTED_DRYNESS_LEVEL" type="DrynessLevelEnum"      writable="true"  isNullable="true"   optional="false">SelectedDrynessLevel</attribute>
-    </cluster>
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
+    
+    <attribute side="server" code="0x0000" name="SupportedDrynessLevels" define="SUPPORTED_DRYNESS_LEVELS" type="array" entryType="DrynessLevelEnum" min="0x01" max="0x04">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="SelectedDrynessLevel" define="SELECTED_DRYNESS_LEVEL" type="DrynessLevelEnum" writable="true" isNullable="true">
+      <mandatoryConform/>
+    </attribute>
+  </cluster>
 </configurator>

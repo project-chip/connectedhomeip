@@ -31,13 +31,13 @@ jobs:
         name: Smoke Run - Android
 
         env:
-            JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/
+            JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64/
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-android:81
+            image: ghcr.io/project-chip/chip-build-android:108
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"

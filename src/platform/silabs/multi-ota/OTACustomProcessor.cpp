@@ -22,12 +22,13 @@
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
+#if SL_WIFI
+#include <platform/silabs/wifi/ncp/spi_multiplex.h>
+#endif // SL_WIFI
+
 extern "C" {
 #include "btl_interface.h"
 #include "sl_core.h"
-#if SL_WIFI
-#include "spi_multiplex.h"
-#endif // SL_WIFI
 }
 
 /// No error, operation OK
@@ -43,7 +44,7 @@ uint8_t OTACustomProcessor::writeBuffer[kAlignmentBytes] __attribute__((aligned(
 
 CHIP_ERROR OTACustomProcessor::Init()
 {
-    ReturnErrorCodeIf(mCallbackProcessDescriptor == nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
+    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
     mAccumulator.Init(sizeof(Descriptor));
 
     return CHIP_NO_ERROR;

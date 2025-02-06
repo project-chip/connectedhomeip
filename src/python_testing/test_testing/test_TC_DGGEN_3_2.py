@@ -18,10 +18,11 @@
 
 import sys
 from dataclasses import dataclass
+from pathlib import Path
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
-from MockTestRunner import MockTestRunner
+from chip.testing.runner import MockTestRunner
 
 
 @dataclass
@@ -51,7 +52,8 @@ def test_spec_to_attribute_cache(test_spec: TestSpec) -> Attribute.AsyncReadTran
 
 
 def main():
-    test_runner = MockTestRunner('TC_DGGEN_3_2', 'TC_DGGEN_3_2', 'test_TC_DGGEN_3_2', 0)
+    test_runner = MockTestRunner(Path(__file__).parent / '../TC_DGGEN_3_2.py',
+                                 'TC_DGGEN_3_2', 'test_TC_DGGEN_3_2', 0)
     failures = []
     for idx, t in enumerate(TEST_CASES):
         ok = test_runner.run_test_with_mock_read(test_spec_to_attribute_cache(t)) == t.expect_pass

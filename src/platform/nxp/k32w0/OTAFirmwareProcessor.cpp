@@ -28,12 +28,12 @@ namespace chip {
 
 CHIP_ERROR OTAFirmwareProcessor::Init()
 {
-    ReturnErrorCodeIf(mCallbackProcessDescriptor == nullptr, CHIP_ERROR_OTA_PROCESSOR_CB_NOT_REGISTERED);
+    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_ERROR_OTA_PROCESSOR_CB_NOT_REGISTERED);
     mAccumulator.Init(sizeof(Descriptor));
 #if OTA_ENCRYPTION_ENABLE
     mUnalignmentNum = 0;
 #endif
-    ReturnErrorCodeIf(gOtaSuccess_c != OTA_ClientInit(), CHIP_ERROR_OTA_PROCESSOR_CLIENT_INIT);
+    VerifyOrReturnError(gOtaSuccess_c == OTA_ClientInit(), CHIP_ERROR_OTA_PROCESSOR_CLIENT_INIT);
 
     auto offset = OTA_GetCurrentEepromAddressOffset();
     if (offset != 0)
@@ -41,8 +41,8 @@ CHIP_ERROR OTAFirmwareProcessor::Init()
         offset += 1;
     }
 
-    ReturnErrorCodeIf(OTA_UTILS_IMAGE_INVALID_ADDR == OTA_SetStartEepromOffset(offset), CHIP_ERROR_OTA_PROCESSOR_EEPROM_OFFSET);
-    ReturnErrorCodeIf(gOtaSuccess_c != OTA_StartImage(mLength - sizeof(Descriptor)), CHIP_ERROR_OTA_PROCESSOR_START_IMAGE);
+    VerifyOrReturnError(OTA_UTILS_IMAGE_INVALID_ADDR != OTA_SetStartEepromOffset(offset), CHIP_ERROR_OTA_PROCESSOR_EEPROM_OFFSET);
+    VerifyOrReturnError(gOtaSuccess_c == OTA_StartImage(mLength - sizeof(Descriptor)), CHIP_ERROR_OTA_PROCESSOR_START_IMAGE);
 
     return CHIP_NO_ERROR;
 }

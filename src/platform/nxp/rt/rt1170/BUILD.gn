@@ -1,0 +1,193 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/nxp_sdk.gni")
+import("//build_overrides/openthread.gni")
+import("${chip_root}/src/platform/device.gni")
+
+# If external SDK is used, do not import ${nxp_sdk_name}.gni
+if (!nxp_external_sdk) {
+  import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+}
+
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+assert(chip_device_platform == "nxp")
+
+source_set("nxp_factory_data") {
+}
+source_set("nxp_ota") {
+}
+
+config("nxp_platform_config") {
+  defines = [ "EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/common/ble_zephyr/BLEManagerImpl.h\"" ]
+  include_dirs = [
+    ".",
+    "../../common",
+  ]
+  if (nxp_use_factory_data) {
+    include_dirs += [
+      ".",
+      "../../common/factory_data",
+    ]
+    defines += [
+      "CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA=1",
+      "CONFIG_CHIP_ENCRYPTED_FACTORY_DATA=1",
+    ]
+    defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/FactoryDataProviderFwkImpl.h\"" ]
+  }
+
+  # When OTBR is enabled Thread network commissioning cluster is enabled using chip_enable_secondary_nwk_if
+  if (chip_enable_wifi && chip_enable_openthread &&
+      !chip_enable_secondary_nwk_if) {
+    defines += [ "_NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_" ]
+  }
+}
+
+static_library("nxp_platform") {
+  output_name = "libCHIP_NXP_Port_RT1170"
+  cflags = [
+    "-Wno-conversion",
+    "-Wno-sign-compare",
+  ]
+  defines = []
+  sources = [
+    "../../../FreeRTOS/SystemTimeSupport.cpp",
+    "../../../SingletonConfigurationManager.cpp",
+    "../../common/CHIPDevicePlatformEvent.h",
+    "../../common/ConfigurationManagerImpl.cpp",
+    "../../common/ConfigurationManagerImpl.h",
+    "../../common/ConnectivityManagerImpl.cpp",
+    "../../common/ConnectivityManagerImpl.h",
+    "../../common/DiagnosticDataProviderImpl.cpp",
+    "../../common/DiagnosticDataProviderImpl.h",
+    "../../common/KeyValueStoreManagerImpl.cpp",
+    "../../common/KeyValueStoreManagerImpl.h",
+    "../../common/Logging.cpp",
+    "../../common/NXPConfig.cpp",
+    "../../common/NXPConfig.h",
+    "../../common/NetworkProvisioningServerImpl.h",
+    "../../common/PlatformManagerImpl.h",
+    "../../common/SoftwareUpdateManagerImpl.h",
+    "../../common/ram_storage.c",
+    "../../common/ram_storage.h",
+    "CHIPDevicePlatformConfig.h",
+    "PlatformManagerImpl.cpp",
+  ]
+  deps = [ "${chip_root}/src/app:app_config" ]
+
+  if (chip_enable_ble) {
+    sources += [
+      # Adding random file which defines the function sys_csrand_get which is called by BLEManagerImpl from Zephyr
+      "${nxp_sdk_build_root}/rt_sdk/sdk_hook/zephyr/random/random.cpp",
+      "../../common/ble_zephyr/BLEAdvertisingArbiter.cpp",
+      "../../common/ble_zephyr/BLEManagerImpl.cpp",
+      "../../common/ble_zephyr/BLEManagerImpl.h",
+    ]
+  }
+
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+
+  deps += [
+    "${chip_root}/src/lib/dnssd:constants",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+
+  # define CHIP_PLAT_NVM_SUPPORT - See NXPConfig.cpp for definition
+  if (nxp_nvm_component == "nvm_fwk") {
+    defines += [ "CHIP_PLAT_NVM_SUPPORT=1" ]
+  } else if (nxp_nvm_component == "littlefs") {
+    defines += [ "CHIP_PLAT_NVM_SUPPORT=2" ]
+  }
+
+  if (chip_enable_wifi) {
+    sources += [
+      "../../common/NetworkCommissioningDriver.h",
+      "../../common/NetworkCommissioningWiFiDriver.cpp",
+    ]
+  }
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "../../common/OTAImageProcessorImpl.cpp",
+      "../../common/OTAImageProcessorImpl.h",
+    ]
+  }
+
+  if (chip_enable_openthread) {
+    sources += [
+      # Temporary fix, to be revert once PR #34662 is merged, build issue when using GN check argument
+      "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
+      "../../../OpenThread/GenericThreadBorderRouterDelegate.cpp",
+      "../../../OpenThread/GenericThreadBorderRouterDelegate.h",
+      "../../../OpenThread/OpenThreadUtils.cpp",
+      "../../common/ThreadStackManagerImpl.cpp",
+      "../../common/ThreadStackManagerImpl.h",
+    ]
+
+    deps += [
+      "${chip_root}/src/app:app_config",
+      "${chip_root}/src/app/common:ids",
+    ]
+
+    if (!nxp_build_matter_standalone_lib) {
+      deps += [ "${chip_root}/third_party/openthread:openthread" ]
+      public_deps +=
+          [ "${chip_root}/third_party/openthread:openthread-platform" ]
+    }
+
+    # dep required to include 'lib/spinel/spinel.h' in PlatformManagerImpl.cpp
+    deps += [ "${openthread_root}:libopenthread-spinel-rcp" ]
+
+    if (chip_mdns == "platform") {
+      if (chip_enable_wifi) {
+        sources += [
+          "../../../OpenThread/OpenThreadDnssdImpl.cpp",
+          "../../../OpenThread/OpenThreadDnssdImpl.h",
+          "../../common/DnssdImpl.cpp",
+          "../../common/DnssdImplBr.cpp",
+          "../../common/DnssdImplBr.h",
+        ]
+      } else {
+        sources += [
+          "../../../OpenThread/DnssdImpl.cpp",
+          "../../../OpenThread/OpenThreadDnssdImpl.cpp",
+          "../../../OpenThread/OpenThreadDnssdImpl.h",
+        ]
+      }
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+    }
+  }
+
+  if (nxp_use_factory_data) {
+    sources += [
+      "../../common/factory_data/FactoryDataProvider.cpp",
+      "../../common/factory_data/FactoryDataProvider.h",
+      "../../common/factory_data/FactoryDataProviderFwkImpl.cpp",
+      "../../common/factory_data/FactoryDataProviderFwkImpl.h",
+    ]
+
+    deps += [ "${chip_root}/src/credentials:credentials_header" ]
+  }
+
+  deps += [ "${nxp_sdk_build_root}:nxp_sdk" ]
+
+  public_deps += [
+    "${chip_root}/examples/platform/nxp/common/app/support:freertos_memory_utils",
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/platform:syscalls_stub",
+  ]
+  public_configs = [ ":nxp_platform_config" ]
+}

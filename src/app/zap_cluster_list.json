@@ -16,6 +16,8 @@
         "BOOLEAN_STATE_CLUSTER": [],
         "BOOLEAN_STATE_CONFIGURATION_CLUSTER": [],
         "BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER": [],
+        "CAMERA_AV_SETTINGS_USER_LEVEL_MANAGEMENT_CLUSTER": [],
+        "CAMERA_AV_STREAM_MANAGEMENT_CLUSTER": [],
         "CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "CHANNEL_CLUSTER": [],
@@ -67,6 +69,7 @@
         "MESSAGES_CLUSTER": [],
         "MODE_SELECT_CLUSTER": [],
         "NETWORK_COMMISSIONING_CLUSTER": [],
+        "PUSH_AV_STREAM_TRANSPORT_CLUSTER": [],
         "SAMPLE_MEI_CLUSTER": [],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "OCCUPANCY_SENSING_CLUSTER": [],
@@ -120,6 +123,7 @@
         "TIME_FORMAT_LOCALIZATION_CLUSTER": [],
         "TIME_SYNCHRONIZATION_CLUSTER": [],
         "TIMER_CLUSTER": [],
+        "TLS_CERTIFICATE_MANAGEMENT_CLUSTER": [],
         "TRUSTED_ROOT_CERTIFICATES_CLUSTER": [],
         "UNIT_LOCALIZATION_CLUSTER": [],
         "UNIT_TESTING_CLUSTER": [],
@@ -134,7 +138,8 @@
         "WEB_RTC_PROVIDER_CLUSTER": [],
         "WEBRTC_REQUESTOR_CLUSTER": [],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": [],
-        "WINDOW_COVERING_CLUSTER": []
+        "WINDOW_COVERING_CLUSTER": [],
+        "ZONE_MANAGEMENT_CLUSTER": []
     },
     "ServerDirectories": {
         "ACCESS_CONTROL_CLUSTER": ["access-control-server"],
@@ -161,6 +166,8 @@
         "BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER": [
             "bridged-device-basic-information-server"
         ],
+        "CAMERA_AV_SETTINGS_USER_LEVEL_MANAGEMENT_CLUSTER": [],
+        "CAMERA_AV_STREAM_MANAGEMENT_CLUSTER": [],
         "CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
@@ -168,7 +175,7 @@
             "concentration-measurement-server"
         ],
         "CHANNEL_CLUSTER": ["channel-server"],
-        "CHIME_CLUSTER": [],
+        "CHIME_CLUSTER": ["chime-server"],
         "COLOR_CONTROL_CLUSTER": ["color-control-server"],
         "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
         "COMMISSIONING_CLUSTER": [],
@@ -228,6 +235,7 @@
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
+        "PUSH_AV_STREAM_TRANSPORT_CLUSTER": [],
         "SAMPLE_MEI_CLUSTER": ["sample-mei-server"],
         "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
         "ON_OFF_CLUSTER": ["on-off-server"],
@@ -300,6 +308,7 @@
         "TIME_FORMAT_LOCALIZATION_CLUSTER": ["time-format-localization-server"],
         "TIME_SYNCHRONIZATION_CLUSTER": ["time-synchronization-server"],
         "TIMER_CLUSTER": ["timer-server"],
+        "TLS_CERTIFICATE_MANAGEMENT_CLUSTER": [],
         "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
@@ -318,6 +327,7 @@
         "WIFI_NETWORK_MANAGEMENT_CLUSTER": ["wifi-network-management-server"],
         "WINDOW_COVERING_CLUSTER": ["window-covering-server"],
         "WATER_HEATER_MANAGEMENT_CLUSTER": ["water-heater-management-server"],
-        "WATER_HEATER_MODE_CLUSTER": ["mode-base-server"]
+        "WATER_HEATER_MODE_CLUSTER": ["mode-base-server"],
+        "ZONE_MANAGEMENT_CLUSTER": []
     }
 }

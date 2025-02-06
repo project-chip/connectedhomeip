@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 
 #import <Matter/MTRAccessGrant.h>
+#import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
 #import <Matter/MTRDeviceControllerFactory.h>
@@ -25,7 +26,9 @@
 #import <Matter/MTRDeviceStorageBehaviorConfiguration.h>
 #import <Matter/MTROTAProviderDelegate.h>
 
+#import "MTRAsyncWorkQueue.h"
 #import "MTRDeviceConnectionBridge.h"
+#import "MTRDeviceControllerDataStore.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 
 #include <credentials/FabricTable.h>
@@ -120,11 +123,45 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)clearPendingShutdown;
 
 /**
+ * Ensure we have a CASE session to the given node ID and then call the provided
+ * connection callback.  This may be called on any queue (including the Matter
+ * event queue) and on success will always call the provided connection callback
+ * on the Matter queue, asynchronously.  Consumers must be prepared to run on
+ * the Matter queue (an in particular must not use any APIs that will try to do
+ * sync dispatch to the Matter queue).
+ *
+ * If the controller is not running when this function is called, it will
+ * synchronously invoke the completion with an error, on whatever queue
+ * getSessionForNode was called on.
+ *
+ * If the controller is not running when the async dispatch on the Matter queue
+ * happens, the completion will be invoked with an error on the Matter queue.
+ */
+- (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
+
+/**
  * Since getSessionForNode now enqueues by the subscription pool for Thread
  * devices, MTRDevice_Concrete needs a direct non-queued access because it already
  * makes use of the subscription pool.
  */
 - (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
+
+/**
+ * Get a session for the commissionee device with the given device id.  This may
+ * be called on any queue (including the Matter event queue) and on success will
+ * always call the provided connection callback on the Matter queue,
+ * asynchronously.  Consumers must be prepared to run on the Matter queue (an in
+ * particular must not use any APIs that will try to do sync dispatch to the
+ * Matter queue).
+ *
+ * If the controller is not running when this function is called, it will
+ * synchronously invoke the completion with an error, on whatever queue
+ * getSessionForCommissioneeDevice was called on.
+ *
+ * If the controller is not running when the async dispatch on the Matter queue
+ * happens, the completion will be invoked with an error on the Matter queue.
+ */
+- (void)getSessionForCommissioneeDevice:(chip::NodeId)deviceID completion:(MTRInternalDeviceConnectionCallback)completion;
 
 /**
  * Notify the controller that a new operational instance with the given node id
@@ -148,6 +185,59 @@ NS_ASSUME_NONNULL_BEGIN
  * Only called on the Matter queue.
  */
 - (nullable NSNumber *)neededReadPrivilegeForClusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID;
+
+/**
+ * Try to asynchronously dispatch the given block on the Matter queue.  If the
+ * controller is not running either at call time or when the block would be
+ * about to run, the provided error handler will be called with an error.  Note
+ * that this means the error handler might be called on an arbitrary queue, and
+ * might be called before this function returns or after it returns.
+ *
+ * The DeviceCommissioner pointer passed to the callback should only be used
+ * synchronously during the callback invocation.
+ *
+ * If the error handler is nil, failure to run the block will be silent.
+ */
+- (void)asyncGetCommissionerOnMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
+                             errorHandler:(nullable MTRDeviceErrorHandler)errorHandler;
+
+/**
+ * Returns the transport used by the current session with the given device,
+ * or `MTRTransportTypeUndefined` if no session is currently active.
+ */
+- (MTRTransportType)sessionTransportTypeForDevice:(MTRBaseDevice *)device;
+
+/**
+ * Invalidate the CASE session for the given node ID.  This is a temporary thing
+ * just to support MTRBaseDevice's invalidateCASESession.  Must not be called on
+ * the Matter event queue.
+ */
+- (void)invalidateCASESessionForNode:(NSNumber *)nodeID;
+
+/**
+ * Download log of the desired type from the device.
+ */
+- (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
+                             type:(MTRDiagnosticLogType)type
+                          timeout:(NSTimeInterval)timeout
+                            queue:(dispatch_queue_t)queue
+                       completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
+
+/**
+ * Will return chip::kUndefinedFabricIndex if we do not have a fabric index.
+ */
+@property (readonly) chip::FabricIndex fabricIndex;
+
+/**
+ * A queue with a fixed width that allows a number of MTRDevice objects to perform
+ * subscription at the same time.
+ */
+@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
+
+/**
+ * The per-controller data store this controller was initialized with, if any.
+ */
+@property (nonatomic, readonly, nullable) MTRDeviceControllerDataStore * controllerDataStore;
 
 @end
 

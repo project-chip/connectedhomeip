@@ -57,9 +57,9 @@ class TestDriver:
         cmd = self.get_base_run_python_cmd(self.run_python_test_path, self.app_path, app_args,
                                            self.script_path, script_args)
         if factory_reset_all:
-            cmd = cmd + ' --factoryreset'
+            cmd = cmd + ' --factory-reset'
         if factory_reset_app:
-            cmd = cmd + ' --factoryreset-app-only'
+            cmd = cmd + ' --factory-reset-app-only'
 
         logging.info(f'Running cmd {cmd}')
 

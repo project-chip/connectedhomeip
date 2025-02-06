@@ -18,24 +18,33 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import copy
 import logging
 import random
+from collections import namedtuple
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
 from chip.clusters import Globals
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -244,7 +253,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
     @ async_test_body
     async def test_TC_TSTAT_4_2(self):
-        endpoint = self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else 1
+        endpoint = self.get_endpoint()
 
         self.step("1")
         # Commission DUT - already done
@@ -409,11 +418,6 @@ class TC_TSTAT_4_2(MatterBaseTest):
             else:
                 logger.info(
                     "Couldn't run test step 4 since there were no built-in presets")
-
-            # Send the SetActivePresetRequest command
-            await self.send_set_active_preset_handle_request_command(value=b'\x03')
-
-            activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
 
         self.step("5")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
@@ -705,6 +709,28 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
         self.step("18")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+
+            ScenarioHeadroom = namedtuple("ScenarioHeadroom", "presetScenario remaining")
+            # Generate list of tuples of scenarios and number of remaining presets per scenario allowed
+            presetScenarioHeadrooms = list(ScenarioHeadroom(presetType.presetScenario,
+                                           presetType.numberOfPresets - presetScenarioCounts.get(presetType.presetScenario, 0)) for presetType in presetTypes)
+
+            if presetScenarioHeadrooms:
+                # Find the preset scenario with the smallest number of remaining allowed presets
+                presetScenarioHeadrooms = sorted(presetScenarioHeadrooms, key=lambda psh: psh.remaining)
+                presetScenarioHeadroom = presetScenarioHeadrooms[0]
+
+                # Add one more preset than is allowed by the preset type
+                test_presets = copy.deepcopy(current_presets)
+                test_presets.extend([cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=presetScenarioHeadroom.presetScenario,
+                                                                  coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=False)] * (presetScenarioHeadroom.remaining + 1))
+
+                await self.send_atomic_request_begin_command()
+
+                await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ResourceExhausted)
+
+                # Clear state for next test.
+                await self.send_atomic_request_rollback_command()
 
             # Calculate the length of the Presets list that could be created using the preset scenarios in PresetTypes and numberOfPresets supported for each scenario.
             totalExpectedPresetsLength = sum(presetType.numberOfPresets for presetType in presetTypes)

@@ -154,11 +154,10 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     VendorId vendorId        = commandData.vendorID;
     uint16_t productId       = commandData.productID;
     uint32_t softwareVersion = commandData.softwareVersion;
-    DataModel::DecodableList<OTADownloadProtocol> protocolsSupported = commandData.protocolsSupported;
-    Optional<uint16_t> hardwareVersion                               = commandData.hardwareVersion;
-    Optional<chip::CharSpan> location                                = commandData.location;
-    Optional<bool> requestorCanConsent                               = commandData.requestorCanConsent;
-    Optional<chip::ByteSpan> metadataForProvider                     = commandData.metadataForProvider;
+    Optional<uint16_t> hardwareVersion           = commandData.hardwareVersion;
+    Optional<chip::CharSpan> location            = commandData.location;
+    Optional<bool> requestorCanConsent           = commandData.requestorCanConsent;
+    Optional<chip::ByteSpan> metadataForProvider = commandData.metadataForProvider;
 
     bool isBDXProtocolSupported = false;
 

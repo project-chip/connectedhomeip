@@ -24,10 +24,18 @@
 
 #include <memory>
 
+namespace bridge {
+
 class BridgedDeviceManager
 {
 public:
     BridgedDeviceManager() = default;
+
+    static BridgedDeviceManager & Instance()
+    {
+        static BridgedDeviceManager instance;
+        return instance;
+    }
 
     /**
      * @brief Initializes the BridgedDeviceManager.
@@ -110,8 +118,6 @@ public:
     BridgedDevice * GetDeviceByUniqueId(const std::string & id);
 
 private:
-    friend BridgedDeviceManager & BridgeDeviceMgr();
-
     /**
      * Creates a new unique ID that is not used by any other mDevice
      */
@@ -124,13 +130,4 @@ private:
     std::unique_ptr<BridgedDevice> mDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1];
 };
 
-/**
- * Returns the public interface of the BridgedDeviceManager singleton object.
- *
- * Applications should use this to access features of the BridgedDeviceManager
- * object.
- */
-inline BridgedDeviceManager & BridgeDeviceMgr()
-{
-    return BridgedDeviceManager::sInstance;
-}
+} // namespace bridge

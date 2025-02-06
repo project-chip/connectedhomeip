@@ -41,7 +41,7 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: ghcr.io/project-chip/chip-build-efr32:81
+      image: ghcr.io/project-chip/chip-build-efr32:104
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:
@@ -68,8 +68,7 @@ jobs:
           ./scripts/run_in_build_env.sh \
              "./scripts/build/build_examples.py \
                 --enable-flashbundle \
-                --target efr32-brd4187c-thermostat-openthread-mtd \
-                --target efr32-brd4187c-air-quality-sensor-app-openthread-mtd \
+                --target efr32-brd4187c-thermostat-use-ot-lib \
                 --target efr32-brd4187c-switch-shell-use-ot-coap-lib \
                 --target efr32-brd4187c-unit-test \
                 build \
@@ -82,29 +81,17 @@ jobs:
           ./scripts/run_in_build_env.sh \
              "./scripts/build/build_examples.py \
                 --enable-flashbundle \
-                --target efr32-brd4187c-light-use-ot-lib \
-                --target efr32-brd4187c-pump \
-                --target efr32-brd4187c-lock-shell-heap-monitoring \
-                build \
-                --copy-artifacts-to out/artifacts \
-             "
-      - name: Clean out build output
-        run: rm -rf ./out
-      - name: Build BRD4187C variants (3)
-        run: |
-          ./scripts/run_in_build_env.sh \
-             "./scripts/build/build_examples.py \
-                --enable-flashbundle \
+                --target efr32-brd4187c-lock-rpc \
+                --target efr32-brd4187c-air-quality-sensor-app-shell-heap-monitoring \
                 --target efr32-brd4187c-window-covering-additional-data-advertising \
-                --target efr32-brd4187c-light-rpc \
                 build \
                 --copy-artifacts-to out/artifacts \
              "
       - name: Prepare some bloat report from the previous builds
         run: |
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-             efr32 BRD4187C lighting-app \
-             out/efr32-brd4187c-light-rpc/matter-silabs-lighting-example.out \
+             efr32 BRD4187C lock-app \
+             out/efr32-brd4187c-lock-rpc/matter-silabs-lock-example.out \
              /tmp/bloat_reports/
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py  \
              efr32 BRD4187C window-app \
@@ -112,12 +99,12 @@ jobs:
              /tmp/bloat_reports/
       - name: Clean out build output
         run: rm -rf ./out
-      - name: Build BRD4338A WiFi Soc variants
+      - name: Build some WiFi Soc variants
         run: |
           ./scripts/run_in_build_env.sh \
              "./scripts/build/build_examples.py \
                 --enable-flashbundle \
-                --target efr32-brd4338a-light-skip-rps-generation \
+                --target efr32-brd2605a-light-skip-rps-generation \
                 --target efr32-brd4338a-lock-skip-rps-generation \
                 build \
                 --copy-artifacts-to out/artifacts \
@@ -127,24 +114,6 @@ jobs:
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
             efr32 BRD4338a lock-app \
             out/efr32-brd4338a-lock-skip-rps-generation/matter-silabs-lock-example.out \
-            /tmp/bloat_reports/
-      - name: Clean out build output
-        run: rm -rf ./out
-      - name: Build BRD2605A WiFi Soc variants
-        run: |
-          ./scripts/run_in_build_env.sh \
-             "./scripts/build/build_examples.py \
-                --enable-flashbundle \
-                --target efr32-brd2605a-light-skip-rps-generation \
-                --target efr32-brd2605a-lock-skip-rps-generation \
-                build \
-                --copy-artifacts-to out/artifacts \
-             "
-      - name: Prepare bloat report for brd2605a lock app
-        run: |
-          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-            efr32 BRD2605a lock-app \
-            out/efr32-brd2605a-lock-skip-rps-generation/matter-silabs-lock-example.out \
             /tmp/bloat_reports/
       - name: Clean out build output
         run: rm -rf ./out

@@ -1,0 +1,466 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0406" name="Occupancy Sensing Cluster" revision="5">
+  <revisionHistory>
+    <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
+    <revision revision="2" summary="Physical Contact Occupancy feature with mandatory OccupancySensorTypeBitmap"/>
+    <revision revision="3" summary="New data model format and notation"/>
+    <revision revision="4" summary="Remove nullable from PhysicalContact delay attributes and ability to not report transitions"/>
+    <revision revision="5" summary="Rework to add modalities: radar-, ambient-sensing- and vision-based sensors; add sensitivity setting (via co-located BooleanStateConfiguration cluster on same endpoint); add new attribute for tuning the sensor&apos;s reporting; add event OccupancyChanged; add N quality for HoldTime and other timing attributes; describe how to accommodate legacy clients"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0406" name="Occupancy Sensing"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="OCC" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="OTHER" name="Other" summary="Supports sensing using a modality not listed in the other bits">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="1" code="PIR" name="PassiveInfrared" summary="Supports sensing using PIR (Passive InfraRed)">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="2" code="US" name="Ultrasonic" summary="Supports sensing using UltraSound">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="3" code="PHY" name="PhysicalContact" summary="Supports sensing using a physical contact">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="4" code="AIR" name="ActiveInfrared" summary="Supports sensing using Active InfraRed measurement (e.g. time-of-flight or transflective/reflective IR sensing)">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="5" code="RAD" name="Radar" summary="Supports sensing using radar waves (microwave)">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="6" code="RFS" name="RFSensing" summary="Supports sensing based on RF signal analysis">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="7" code="VIS" name="Vision" summary="Supports sensing based on analyzing images">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="OccupancySensorTypeEnum">
+      <item value="0" name="PIR" summary="Indicates a passive infrared sensor.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Ultrasonic" summary="Indicates a ultrasonic sensor.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="PIRAndUltrasonic" summary="Indicates a passive infrared and ultrasonic sensor.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="PhysicalContact" summary="Indicates a physical contact sensor.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <bitmap name="OccupancyBitmap">
+      <bitfield name="Occupied" bit="0" summary="Indicates the sensed occupancy state">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="OccupancySensorTypeBitmap">
+      <bitfield name="PIR" bit="0" summary="Indicates a passive infrared sensor.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Ultrasonic" bit="1" summary="Indicates a ultrasonic sensor.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="PhysicalContact" bit="2" summary="Indicates a physical contact sensor.">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <struct name="HoldTimeLimitsStruct">
+      <field id="0" name="HoldTimeMin" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="1" name="HoldTimeMax" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min>
+            <field name="HoldTimeMin"/>
+          </min>
+        </constraint>
+        <constraint>
+          <min value="10"/>
+        </constraint>
+      </field>
+      <field id="2" name="HoldTimeDefault" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <field name="HoldTimeMin"/>
+            <field name="HoldTimeMax"/>
+          </between>
+        </constraint>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="Occupancy" type="OccupancyBitmap">
+      <access read="true" readPrivilege="view"/>
+      <quality reportable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="1"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="OccupancySensorType" type="OccupancySensorTypeEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform/>
+        <deprecateConform/>
+      </otherwiseConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="OccupancySensorTypeBitmap" type="OccupancySensorTypeBitmap">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform/>
+        <deprecateConform/>
+      </otherwiseConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="7"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="HoldTime" type="uint16">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="HoldTimeLimits" type="HoldTimeLimitsStruct">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <attribute name="HoldTime"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0010" name="PIROccupiedToUnoccupiedDelay" type="uint16" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <optionalConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <orTerm>
+              <feature name="PIR"/>
+              <andTerm>
+                <notTerm>
+                  <feature name="PIR"/>
+                </notTerm>
+                <notTerm>
+                  <feature name="US"/>
+                </notTerm>
+                <notTerm>
+                  <feature name="PHY"/>
+                </notTerm>
+              </andTerm>
+            </orTerm>
+          </andTerm>
+        </optionalConform>
+        <deprecateConform/>
+      </otherwiseConform>
+    </attribute>
+    <attribute id="0x0011" name="PIRUnoccupiedToOccupiedDelay" type="uint16" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <andTerm>
+              <attribute name="HoldTime"/>
+              <orTerm>
+                <feature name="PIR"/>
+                <andTerm>
+                  <notTerm>
+                    <feature name="PIR"/>
+                  </notTerm>
+                  <notTerm>
+                    <feature name="US"/>
+                  </notTerm>
+                  <notTerm>
+                    <feature name="PHY"/>
+                  </notTerm>
+                </andTerm>
+              </orTerm>
+            </andTerm>
+            <attribute name="PIRUnoccupiedToOccupiedThreshold"/>
+          </andTerm>
+        </mandatoryConform>
+        <optionalConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <orTerm>
+              <feature name="PIR"/>
+              <andTerm>
+                <notTerm>
+                  <feature name="PIR"/>
+                </notTerm>
+                <notTerm>
+                  <feature name="US"/>
+                </notTerm>
+                <notTerm>
+                  <feature name="PHY"/>
+                </notTerm>
+              </andTerm>
+            </orTerm>
+          </andTerm>
+        </optionalConform>
+        <deprecateConform/>
+      </otherwiseConform>
+    </attribute>
+    <attribute id="0x0012" name="PIRUnoccupiedToOccupiedThreshold" type="uint8" default="1">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <andTerm>
+              <attribute name="HoldTime"/>
+              <orTerm>
+                <feature name="PIR"/>
+                <andTerm>
+                  <notTerm>
+                    <feature name="PIR"/>
+                  </notTerm>
+                  <notTerm>
+                    <feature name="US"/>
+                  </notTerm>
+                  <notTerm>
+                    <feature name="PHY"/>
+                  </notTerm>
+                </andTerm>
+              </orTerm>
+            </andTerm>
+            <attribute name="PIRUnoccupiedToOccupiedDelay"/>
+          </andTerm>
+        </mandatoryConform>
+        <optionalConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <orTerm>
+              <feature name="PIR"/>
+              <andTerm>
+                <notTerm>
+                  <feature name="PIR"/>
+                </notTerm>
+                <notTerm>
+                  <feature name="US"/>
+                </notTerm>
+                <notTerm>
+                  <feature name="PHY"/>
+                </notTerm>
+              </andTerm>
+            </orTerm>
+          </andTerm>
+        </optionalConform>
+        <deprecateConform/>
+      </otherwiseConform>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="254"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0020" name="UltrasonicOccupiedToUnoccupiedDelay" type="uint16" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <optionalConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="US"/>
+          </andTerm>
+        </optionalConform>
+        <deprecateConform/>
+      </otherwiseConform>
+    </attribute>
+    <attribute id="0x0021" name="UltrasonicUnoccupiedToOccupiedDelay" type="uint16" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="US"/>
+            <attribute name="UltrasonicUnoccupiedToOccupiedThreshold"/>
+          </andTerm>
+        </mandatoryConform>
+        <optionalConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="US"/>
+          </andTerm>
+        </optionalConform>
+        <deprecateConform/>
+      </otherwiseConform>
+    </attribute>
+    <attribute id="0x0022" name="UltrasonicUnoccupiedToOccupiedThreshold" type="uint8" default="1">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="US"/>
+            <attribute name="UltrasonicUnoccupiedToOccupiedDelay"/>
+          </andTerm>
+        </mandatoryConform>
+        <optionalConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="US"/>
+          </andTerm>
+        </optionalConform>
+        <deprecateConform/>
+      </otherwiseConform>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="254"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0030" name="PhysicalContactOccupiedToUnoccupiedDelay" type="uint16" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <optionalConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="PHY"/>
+          </andTerm>
+        </optionalConform>
+        <deprecateConform/>
+      </otherwiseConform>
+    </attribute>
+    <attribute id="0x0031" name="PhysicalContactUnoccupiedToOccupiedDelay" type="uint16" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="PHY"/>
+            <attribute name="PhysicalContactUnoccupiedToOccupiedThreshold"/>
+          </andTerm>
+        </mandatoryConform>
+        <optionalConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="PHY"/>
+          </andTerm>
+        </optionalConform>
+        <deprecateConform/>
+      </otherwiseConform>
+    </attribute>
+    <attribute id="0x0032" name="PhysicalContactUnoccupiedToOccupiedThreshold" type="uint8" default="1">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="PHY"/>
+            <attribute name="PhysicalContactUnoccupiedToOccupiedDelay"/>
+          </andTerm>
+        </mandatoryConform>
+        <optionalConform>
+          <andTerm>
+            <attribute name="HoldTime"/>
+            <feature name="PHY"/>
+          </andTerm>
+        </optionalConform>
+        <deprecateConform/>
+      </otherwiseConform>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="254"/>
+        </between>
+      </constraint>
+    </attribute>
+  </attributes>
+  <events>
+    <event id="0x00" name="OccupancyChanged" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+      <field id="0" name="Occupancy" type="OccupancyBitmap">
+        <mandatoryConform/>
+      </field>
+    </event>
+  </events>
+</cluster>

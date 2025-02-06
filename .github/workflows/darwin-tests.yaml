@@ -73,6 +73,10 @@ jobs:
                 platform: darwin
                 bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}
 
+            - name: Build iOS Darwin Framework Tool Build Debug
+              working-directory: src/darwin/Framework
+              run: xcodebuild -target "darwin-framework-tool" -sdk iphoneos -configuration Debug AD_HOC_CODE_SIGNING_ALLOWED=YES
+
             - name: Run macOS Darwin Framework Tool Build Debug
               working-directory: src/darwin/Framework
               run: xcodebuild -target "darwin-framework-tool" -sdk macosx -configuration Debug

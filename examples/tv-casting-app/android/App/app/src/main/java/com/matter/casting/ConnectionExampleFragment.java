@@ -29,6 +29,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import com.R;
 import com.matter.casting.core.CastingPlayer;
 import com.matter.casting.support.CommissionerDeclaration;
@@ -208,36 +209,41 @@ public class ConnectionExampleFragment extends Fragment {
                       Log.i(TAG, "CastingPlayer CommissionerDeclaration message received: ");
                       cd.logDetail();
 
-                      getActivity()
-                          .runOnUiThread(
-                              () -> {
+                      FragmentActivity activity = getActivity();
+                      // Prevent possible NullPointerException. This callback could be called when
+                      // this fragment is not attached to its host activity or when the fragment's
+                      // lifecycle is not in a valid state for interacting with the activity.
+                      if (activity != null && !activity.isFinishing()) {
+                        activity.runOnUiThread(
+                            () -> {
+                              connectionFragmentStatusTextView.setText(
+                                  "CommissionerDeclaration message received from Casting Player: \n\n");
+                              if (cd.getCommissionerPasscode()) {
+
+                                displayPasscodeInputDialog(activity);
+
                                 connectionFragmentStatusTextView.setText(
-                                    "CommissionerDeclaration message received from Casting Player: \n\n");
-                                if (cd.getCommissionerPasscode()) {
-
-                                  displayPasscodeInputDialog(getActivity());
-
+                                    "CommissionerDeclaration message received from Casting Player: A passcode is now displayed for the user by the Casting Player. \n\n");
+                              }
+                              if (cd.getCancelPasscode()) {
+                                if (useCommissionerGeneratedPasscode) {
                                   connectionFragmentStatusTextView.setText(
-                                      "CommissionerDeclaration message received from Casting Player: A passcode is now displayed for the user by the Casting Player. \n\n");
+                                      "CastingPlayer/Commissioner-Generated passcode connection attempt cancelled by the CastingPlayer/Commissioner user. \n\nRoute back to exit. \n\n");
+                                } else {
+                                  connectionFragmentStatusTextView.setText(
+                                      "Connection attempt cancelled by the CastingPlayer/Commissioner user. \n\nRoute back to exit. \n\n");
                                 }
-                                if (cd.getCancelPasscode()) {
-                                  if (useCommissionerGeneratedPasscode) {
-                                    connectionFragmentStatusTextView.setText(
-                                        "CastingPlayer/Commissioner-Generated passcode connection attempt cancelled by the CastingPlayer/Commissioner user. \n\nRoute back to exit. \n\n");
-                                  } else {
-                                    connectionFragmentStatusTextView.setText(
-                                        "Connection attempt cancelled by the CastingPlayer/Commissioner user. \n\nRoute back to exit. \n\n");
-                                  }
-                                  if (passcodeDialog != null && passcodeDialog.isShowing()) {
-                                    passcodeDialog.dismiss();
-                                  }
+                                if (passcodeDialog != null && passcodeDialog.isShowing()) {
+                                  passcodeDialog.dismiss();
                                 }
-                                if (cd.getErrorCode() != CommissionerDeclaration.CdError.noError) {
-                                  commissionerDeclarationErrorTextView.setText(
-                                      "CommissionerDeclaration error from CastingPlayer: "
-                                          + cd.getErrorCode().getDescription());
-                                }
-                              });
+                              }
+                              if (cd.getErrorCode() != CommissionerDeclaration.CdError.noError) {
+                                commissionerDeclarationErrorTextView.setText(
+                                    "CommissionerDeclaration error from CastingPlayer: "
+                                        + cd.getErrorCode().getDescription());
+                              }
+                            });
+                      }
                     }
                   };
 

@@ -70,12 +70,6 @@ if(CONFIG_CHIP)
         zephyr_set_openthread_config(${CHIP_OPENTHREAD_CONFIG})
     endif()
 
-    if (CONFIG_USE_CHIP_DATA_MODEL_INTERFACE)
-        set(DATA_MODEL_INTERFACE "enabled")
-    else()
-        set(DATA_MODEL_INTERFACE "disabled")
-    endif()
-
     # ==============================================================================
     # Generate configuration for CHIP GN build system
     # ==============================================================================
@@ -84,7 +78,6 @@ if(CONFIG_CHIP)
         LIB_SHELL CONFIG_CHIP_LIB_SHELL
         LIB_TESTS CONFIG_CHIP_BUILD_TESTS
         PROJECT_CONFIG ${CONFIG_CHIP_PROJECT_CONFIG}
-        DATA_MODEL_INTERFACE ${DATA_MODEL_INTERFACE}
     )
 
     matter_add_gn_arg_string("zephyr_ar" ${CMAKE_AR})

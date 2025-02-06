@@ -683,6 +683,52 @@ static constexpr EventId Id = 0x00000000;
 } // namespace Events
 } // namespace ContentControl
 
+namespace ZoneManagement {
+namespace Events {
+
+namespace ZoneTriggered {
+static constexpr EventId Id = 0x00000000;
+} // namespace ZoneTriggered
+
+namespace ZoneStopped {
+static constexpr EventId Id = 0x00000001;
+} // namespace ZoneStopped
+
+} // namespace Events
+} // namespace ZoneManagement
+
+namespace CameraAvStreamManagement {
+namespace Events {
+
+namespace VideoStreamChanged {
+static constexpr EventId Id = 0x00000000;
+} // namespace VideoStreamChanged
+
+namespace AudioStreamChanged {
+static constexpr EventId Id = 0x00000001;
+} // namespace AudioStreamChanged
+
+namespace SnapshotStreamChanged {
+static constexpr EventId Id = 0x00000002;
+} // namespace SnapshotStreamChanged
+
+} // namespace Events
+} // namespace CameraAvStreamManagement
+
+namespace PushAvStreamTransport {
+namespace Events {
+
+namespace PushTransportBegin {
+static constexpr EventId Id = 0x00000000;
+} // namespace PushTransportBegin
+
+namespace PushTransportEnd {
+static constexpr EventId Id = 0x00000001;
+} // namespace PushTransportEnd
+
+} // namespace Events
+} // namespace PushAvStreamTransport
+
 namespace CommissionerControl {
 namespace Events {
 

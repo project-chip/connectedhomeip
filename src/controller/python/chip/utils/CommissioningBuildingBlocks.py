@@ -20,7 +20,7 @@ import os
 import typing
 
 import chip.clusters as Clusters
-from chip.ChipDeviceCtrl import ChipDeviceController as ChipDeviceController
+from chip.ChipDeviceCtrl import ChipDeviceController, NOCChain
 from chip.clusters import GeneralCommissioning as generalCommissioning
 from chip.clusters import OperationalCredentials as opCreds
 from chip.clusters.Types import NullValue
@@ -144,7 +144,7 @@ async def CreateControllersOnFabric(fabricAdmin: FabricAdmin,
     return controllerList
 
 
-async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, existingNodeId, newNodeId):
+async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, existingNodeId, newNodeId) -> tuple[bool, typing.Optional[Clusters.OperationalCredentials.Commands.NOCResponse], typing.Optional[NOCChain]]:
     ''' Perform sequence to commission new fabric using existing commissioned fabric.
 
     Args:
@@ -156,7 +156,7 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
         newNodeId (int): Node ID to use for the target node on the new fabric.
 
     Return:
-        tuple:  (bool, Optional[nocResp], Optional[rcacResp]: True if successful, False otherwise, along with nocResp, rcacResp value.
+        tuple:  (bool, Optional[nocResp], Optional[NOCChain]: True if successful, False otherwise, along with nocResp, rcacResp value.
 
     '''
     nocResp = None
@@ -173,7 +173,7 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
             chainForAddNOC.nocBytes is None or chainForAddNOC.ipkBytes is None):
         # Expiring the failsafe timer in an attempt to clean up.
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
-        return False, nocResp
+        return False, nocResp, None
 
     await commissionerDevCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.AddTrustedRootCertificate(chainForAddNOC.rcacBytes))
     nocResp = await commissionerDevCtrl.SendCommand(existingNodeId,
@@ -183,8 +183,6 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
                                                                             chainForAddNOC.ipkBytes,
                                                                             newFabricDevCtrl.nodeId,
                                                                             newFabricDevCtrl.fabricAdmin.vendorId))
-
-    rcacResp = chainForAddNOC.rcacBytes
 
     if nocResp.statusCode is not opCreds.Enums.NodeOperationalCertStatusEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
@@ -196,12 +194,12 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
     if resp.errorCode is not generalCommissioning.Enums.CommissioningErrorEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
-        return False, nocResp
+        return False, nocResp, chainForAddNOC
 
     if not await _IsNodeInFabricList(newFabricDevCtrl, newNodeId):
-        return False, nocResp
+        return False, nocResp, chainForAddNOC
 
-    return True, nocResp, rcacResp
+    return True, nocResp, chainForAddNOC
 
 
 async def UpdateNOC(devCtrl, existingNodeId, newNodeId):

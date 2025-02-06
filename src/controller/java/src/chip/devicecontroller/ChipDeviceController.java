@@ -26,6 +26,7 @@ import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
 import chip.devicecontroller.model.DataVersionFilter;
 import chip.devicecontroller.model.InvokeElement;
+import java.lang.ref.Cleaner;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -43,6 +44,8 @@ public class ChipDeviceController {
   private CompletionListener completionListener;
   private ScanNetworksListener scanNetworksListener;
   private NOCChainIssuer nocChainIssuer;
+
+  private final Cleaner.Cleanable cleanable;
 
   /**
    * To load class and jni, we need to new AndroidChipPlatform after jni load but before new
@@ -67,6 +70,17 @@ public class ChipDeviceController {
       throw new NullPointerException("params cannot be null");
     }
     deviceControllerPtr = newDeviceController(params);
+
+    this.cleanable =
+        Cleaner.create()
+            .register(
+                this,
+                () -> {
+                  if (deviceControllerPtr != 0) {
+                    deleteDeviceController(deviceControllerPtr);
+                    deviceControllerPtr = 0;
+                  }
+                });
   }
 
   public void setCompletionListener(CompletionListener listener) {
@@ -881,6 +895,20 @@ public class ChipDeviceController {
       OpenCommissioningCallback callback) {
     return openPairingWindowWithPINCallback(
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode, callback);
+  }
+
+  /**
+   * This function is used for downloading logs from the device.
+   *
+   * @param deviceId The 64-bit node ID of the device.
+   * @param type The log type being downloaded. See detailed in {@link DiagnosticLogType}.
+   * @param timeout This function sets the timeout. If set to 0, there will be no timeout.
+   * @param callback The callback is registered to convey the status during log downloads. See
+   *     detailed in {@link DownloadLogCallback}.
+   */
+  public boolean downloadLogFromNode(
+      long deviceId, DiagnosticLogType type, long timeout, DownloadLogCallback callback) {
+    return downloadLogFromNode(deviceControllerPtr, deviceId, type.getValue(), timeout, callback);
   }
 
   public int getFabricIndex() {
@@ -1727,6 +1755,13 @@ public class ChipDeviceController {
       @Nullable Long setupPinCode,
       OpenCommissioningCallback callback);
 
+  private native boolean downloadLogFromNode(
+      long deviceControllerPtr,
+      long deviceId,
+      int typeEnum,
+      long timeout,
+      DownloadLogCallback callback);
+
   private native byte[] getAttestationChallenge(long deviceControllerPtr, long devicePtr);
 
   private native void setUseJavaCallbackForNOCRequest(
@@ -1750,16 +1785,6 @@ public class ChipDeviceController {
 
   static {
     System.loadLibrary("CHIPController");
-  }
-
-  @SuppressWarnings("deprecation")
-  protected void finalize() throws Throwable {
-    super.finalize();
-
-    if (deviceControllerPtr != 0) {
-      deleteDeviceController(deviceControllerPtr);
-      deviceControllerPtr = 0;
-    }
   }
 
   /** Interface to implement custom operational credentials issuer (NOC chain generation). */

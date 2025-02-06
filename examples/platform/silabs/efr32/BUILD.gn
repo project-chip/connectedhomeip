@@ -18,27 +18,18 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${efr32_sdk_build_root}/efr32_sdk.gni")
-import("${efr32_sdk_build_root}/silabs_board.gni")
+import("${silabs_sdk_build_root}/efr32_sdk.gni")
+import("${silabs_sdk_build_root}/silabs_board.gni")
 
+import("${matter_support_root}/provision/args.gni")  # Seperate import since the
+                                                     # matter_support_root is
+                                                     # defined in the
+                                                     # ef32_sdk.gni
 declare_args() {
   enable_heap_monitoring = false
 
   # OTA timeout in seconds
   ota_periodic_query_timeout_sec = 86400
-
-  # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
-  sl_wfx_config_softap = false
-  sl_wfx_config_scan = true
-
-  # Argument to force enable WPA3 security on rs91x
-  rs91x_wpa3_transition = true
-
-  #default WiFi SSID
-  chip_default_wifi_ssid = ""
-
-  #default Wifi Password
-  chip_default_wifi_psk = ""
 
   # The EnableKey in hex string format used by TestEventTrigger command in
   # GeneralDiagnostics cluster. The length of the string should be 16 bytes.
@@ -52,20 +43,6 @@ assert(!(chip_enable_wifi && chip_enable_openthread))
 assert(!(use_rs9116 && chip_enable_openthread))
 assert(!(use_SiWx917 && chip_enable_openthread))
 assert(!(use_wf200 && chip_enable_openthread))
-
-if (chip_enable_wifi) {
-  assert(use_rs9116 || use_wf200 || use_SiWx917)
-  import("${chip_root}/src/platform/silabs/wifi_args.gni")
-
-  if (use_rs9116) {
-    import("rs911x/rs911x.gni")
-  } else if (use_SiWx917) {
-    import("rs911x/rs9117.gni")
-  }
-  if (use_wf200) {
-    import("wf200/wf200.gni")
-  }
-}
 
 config("chip_examples_project_config") {
   include_dirs = [ "project_include" ]
@@ -98,7 +75,7 @@ source_set("test-event-trigger") {
     "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.h",
   ]
 
-  deps = [ "${chip_root}/src/platform/silabs/provision:provision-headers" ]
+  deps = [ "${sl_provision_root}:headers" ]
   public_configs = [ ":test-event-trigger-config" ]
   public_deps = [
     "${chip_root}/src/app:test-event-trigger",
@@ -111,10 +88,10 @@ source_set("openthread_core_config_efr32_chip_examples") {
   if (chip_enable_openthread) {
     sources = [ "project_include/OpenThreadConfig.h" ]
 
-    public_deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
+    public_deps = [ "${silabs_sdk_build_root}:silabs_sdk" ]
 
     if (use_silabs_thread_lib) {
-      public_deps += [ "${efr32_sdk_build_root}:openthread_core_config_efr32" ]
+      public_deps += [ "${silabs_sdk_build_root}:openthread_core_config_efr32" ]
     } else {
       public_deps += [ "${chip_root}/third_party/openthread/platforms/efr32:openthread_core_config_efr32" ]
     }
@@ -123,22 +100,20 @@ source_set("openthread_core_config_efr32_chip_examples") {
   }
 }
 
-source_set("efr-matter-shell") {
-  if (chip_build_libshell) {
-    defines = [ "ENABLE_CHIP_SHELL" ]
+source_set("matter-shell") {
+  defines = [ "ENABLE_CHIP_SHELL" ]
 
-    sources = [ "${silabs_common_plat_dir}/matter_shell.cpp" ]
-    include_dirs = [
-      ".",
-      "${silabs_common_plat_dir}",
-    ]
+  sources = [ "${silabs_common_plat_dir}/MatterShell.cpp" ]
+  include_dirs = [
+    ".",
+    "${silabs_common_plat_dir}",
+  ]
 
-    public_deps = [
-      "${chip_root}/examples/shell/shell_common:shell_common",
-      "${chip_root}/src/lib/shell:shell",
-      "${chip_root}/src/lib/shell:shell_core",
-    ]
-  }
+  public_deps = [
+    "${chip_root}/examples/shell/shell_common:shell_common",
+    "${chip_root}/src/lib/shell:shell",
+    "${chip_root}/src/lib/shell:shell_core",
+  ]
 }
 
 config("efr32-common-config") {
@@ -166,41 +141,10 @@ config("efr32-common-config") {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MULTI_OTA_REQUESTOR=1" ]
   }
 
-  ldflags = [ "-Wl,--no-warn-rwx-segment" ]
-}
-
-config("silabs-wifi-config") {
-  defines = []
-  include_dirs = []
-
-  if (chip_default_wifi_ssid != "") {
-    defines += [
-      "SL_ONNETWORK_PAIRING=1",
-      "SL_WIFI_SSID=\"${chip_default_wifi_ssid}\"",
-    ]
-  }
-  if (chip_default_wifi_psk != "") {
-    assert(chip_default_wifi_ssid != "",
-           "ssid can't be null if psk is provided")
-    defines += [ "SL_WIFI_PSK=\"${chip_default_wifi_psk}\"" ]
-  }
-
-  if (sl_wfx_config_softap) {
-    defines += [ "SL_WFX_CONFIG_SOFTAP" ]
-  }
-
-  if (sl_wfx_config_scan) {
-    defines += [ "SL_WFX_CONFIG_SCAN" ]
-  }
-
-  if (chip_enable_wifi_ipv4) {
-    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
-  }
-
-  if (rs91x_wpa3_transition) {
-    # TODO: Change this macro once WF200 support is provided
-    defines += [ "WIFI_ENABLE_SECURITY_WPA3_TRANSITION=1" ]
-  }
+  ldflags = [
+    "-Wl,--no-warn-rwx-segment",
+    "-fno-lto",
+  ]
 }
 
 source_set("efr32-common") {
@@ -209,7 +153,7 @@ source_set("efr32-common") {
   public_deps = []
   public_configs = [
     ":efr32-common-config",
-    "${efr32_sdk_build_root}:silabs_config",
+    "${silabs_sdk_build_root}:silabs_config",
     ":chip_examples_project_config",
   ]
 
@@ -237,7 +181,8 @@ source_set("efr32-common") {
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
   ]
 
-  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
+      sl_uart_log_output) {
     sources += [ "${silabs_common_plat_dir}/uart.cpp" ]
   }
 
@@ -267,45 +212,31 @@ source_set("efr32-common") {
     ]
   }
 
-  if (chip_enable_wifi) {
-    if (use_rs9116) {
-      sources += rs911x_src_plat
-
-      # All the stuff from wiseconnect
-      sources += rs911x_src_sapi
-      include_dirs += rs911x_inc_plat
-
-      #add compilation flags for rs991x build. This will be addressed directly in wiseconnect sdk in the next version release of that sdk
-      cflags = rs911x_cflags
-    } else if (use_SiWx917) {
-      sources += rs911x_src_plat
-
-      # All the stuff from wiseconnect
-      sources += rs9117_src_sapi
-      include_dirs += rs9117_inc_plat
-
-      #add compilation flags for rs991x build. This will be addressed directly in wiseconnect sdk in the next version release of that sdk
-    } else if (use_wf200) {
-      sources += wf200_plat_src
-      include_dirs += wf200_plat_incs
-    }
-
-    public_configs += [ ":silabs-wifi-config" ]
-  }
-
   if (chip_build_libshell) {
-    deps += [ ":efr-matter-shell" ]
+    deps += [ ":matter-shell" ]
+
+    if (chip_enable_icd_server) {
+      deps += [ "${silabs_common_plat_dir}/shell:icd" ]
+    }
   }
 
   public_deps += [
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/app/server",
+    "${chip_root}/src/data-model-providers/codegen:instance-header",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]
 
   if (sl_enable_test_event_trigger) {
     public_deps += [ ":test-event-trigger" ]
+  }
+
+  if (sl_enable_si70xx_sensor) {
+    sources += [
+      "${silabs_common_plat_dir}/Si70xxSensor.cpp",
+      "${silabs_common_plat_dir}/Si70xxSensor.h",
+    ]
   }
 
   if (app_data_model != "") {

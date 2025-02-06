@@ -476,6 +476,17 @@ MTR_DIRECT_MEMBERS
     return [self qrCodeStringSkippingValidation:NO];
 }
 
++ (BOOL)isValidSetupPasscode:(NSNumber *)setupPasscode
+{
+    using namespace chip;
+
+    uint64_t passCode = setupPasscode.unsignedLongLongValue;
+    if (!CanCastTo<uint32_t>(passCode)) {
+        return NO;
+    }
+    return SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(passCode));
+}
+
 - (nullable NSString *)qrCodeStringSkippingValidation:(BOOL)allowInvalid
 {
     chip::QRCodeSetupPayloadGenerator generator(_payload);
@@ -607,7 +618,7 @@ static NSString * const MTRSetupPayloadCodingKeyQRCode = @"qr";
             return setupPIN;
         }
 
-        // We got pretty unlikely with our random number generation.  Just try
+        // We got pretty unlucky with our random number generation.  Just try
         // again.  The chance that this loop does not terminate in a reasonable
         // amount of time is astronomically low, assuming arc4random_uniform is not
         // broken.

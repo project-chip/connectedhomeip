@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2020-2023 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,20 +13,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#import <Matter/MTRCommissionableBrowserResult.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerParameters.h>
 
 #import "MTRDeviceController_Internal.h"
 
 #import "MTRAsyncWorkQueue.h"
-#import "MTRAttestationTrustStoreBridge.h"
 #import "MTRBaseDevice_Internal.h"
-#import "MTRCommissionableBrowser.h"
-#import "MTRCommissionableBrowserResult_Internal.h"
 #import "MTRCommissioningParameters.h"
 #import "MTRConversion.h"
 #import "MTRDefines_Internal.h"
-#import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceControllerStartupParams.h"
@@ -43,51 +39,23 @@
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
-#import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
-#import "MTRServerEndpoint_Internal.h"
 #import "MTRSetupPayload.h"
 #import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
 #import "MTRUtilities.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
-#import <setup_payload/ManualSetupPayloadGenerator.h>
-#import <setup_payload/SetupPayload.h>
-#import <zap-generated/MTRBaseClusters.h>
 
-#import "MTRDeviceAttestationDelegateBridge.h"
-#import "MTRDeviceConnectionBridge.h"
-
-#include <platform/CHIPDeviceConfig.h>
-
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/data-model/List.h>
 #include <app/server/Dnssd.h>
-#include <controller/CHIPDeviceController.h>
-#include <controller/CHIPDeviceControllerFactory.h>
-#include <controller/CommissioningWindowOpener.h>
-#include <credentials/FabricTable.h>
-#include <credentials/GroupDataProvider.h>
-#include <credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.h>
-#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
-#include <inet/InetInterface.h>
-#include <lib/core/CHIPVendorIdentifiers.hpp>
-#include <platform/LockTracker.h>
-#include <platform/PlatformManager.h>
-#include <setup_payload/ManualSetupPayloadGenerator.h>
-#include <system/SystemClock.h>
+#include <crypto/CHIPCryptoPAL.h>
 
 #include <atomic>
 #include <dns_sd.h>
-#include <optional>
 #include <string>
 
 #import <os/lock.h>
 
-// TODO: These strings and their consumers in this file should probably go away,
-// since none of them really apply to all controllers.
-static NSString * const kErrorNotRunning = @"Controller is not running. Call startup first.";
 static NSString * const kErrorSpake2pVerifierGenerationFailed = @"PASE verifier generation failed";
 static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifier serialization failed";
 
@@ -119,23 +87,7 @@ using namespace chip::Tracing::DarwinFramework;
 @end
 
 @implementation MTRDeviceController {
-    chip::Controller::DeviceCommissioner * _cppCommissioner;
-    chip::Credentials::PartialDACVerifier * _partialDACVerifier;
-    chip::Credentials::DefaultDACVerifier * _defaultDACVerifier;
-    MTRDeviceControllerDelegateBridge * _deviceControllerDelegateBridge;
-    MTRDeviceAttestationDelegateBridge * _deviceAttestationDelegateBridge;
     os_unfair_lock _underlyingDeviceMapLock;
-    MTRCommissionableBrowser * _commissionableBrowser;
-    MTRAttestationTrustStoreBridge * _attestationTrustStoreBridge;
-
-    // _serverEndpoints is only touched on the Matter queue.
-    NSMutableArray<MTRServerEndpoint *> * _serverEndpoints;
-
-    MTRDeviceStorageBehaviorConfiguration * _storageBehaviorConfiguration;
-    std::atomic<chip::FabricIndex> _storedFabricIndex;
-    std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
-    MTRP256KeypairBridge _signingKeypairBridge;
-    MTRP256KeypairBridge _operationalKeypairBridge;
 
     // For now, we just ensure that access to _suspended is atomic, but don't
     // guarantee atomicity of the the entire suspend/resume operation.  The
@@ -206,7 +158,8 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (BOOL)isRunning
 {
-    return _cppCommissioner != nullptr;
+    MTR_ABSTRACT_METHOD();
+    return NO;
 }
 
 #pragma mark - Suspend/resume support
@@ -313,7 +266,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (void)shutdown
 {
-    // Subclass hook; nothing to do.
+    [self _clearDeviceControllerDelegates];
 }
 
 - (nullable NSNumber *)controllerNodeID
@@ -417,15 +370,32 @@ using namespace chip::Tracing::DarwinFramework;
     return [[MTRDevice alloc] initForSubclassesWithNodeID:nodeID controller:self];
 }
 
-- (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
+- (MTRDevice * _Nullable)_deviceForNodeID:(NSNumber *)nodeID createIfNeeded:(BOOL)createIfNeeded
 {
     std::lock_guard lock(*self.deviceMapLock);
     MTRDevice * deviceToReturn = [_nodeIDToDeviceMap objectForKey:nodeID];
-    if (!deviceToReturn) {
+    if (!deviceToReturn && createIfNeeded) {
         deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
     }
 
     return deviceToReturn;
+}
+
+- (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
+{
+    return [self _deviceForNodeID:nodeID createIfNeeded:YES];
+}
+
+- (void)forgetDeviceWithNodeID:(NSNumber *)nodeID
+{
+    MTRDevice * deviceToRemove;
+    {
+        std::lock_guard lock(*self.deviceMapLock);
+        deviceToRemove = [_nodeIDToDeviceMap objectForKey:nodeID];
+    }
+    if (deviceToRemove != nil) {
+        [self removeDevice:deviceToRemove];
+    }
 }
 
 - (void)removeDevice:(MTRDevice *)device
@@ -516,140 +486,17 @@ using namespace chip::Tracing::DarwinFramework;
     return YES;
 }
 
-- (BOOL)checkIsRunning
-{
-    return [self checkIsRunning:nil];
-}
-
-- (BOOL)checkIsRunning:(NSError * __autoreleasing *)error
-{
-    if ([self isRunning]) {
-        return YES;
-    }
-
-    MTR_LOG_ERROR("%@: %@ Error: %s", NSStringFromClass(self.class), self, [kErrorNotRunning UTF8String]);
-    if (error) {
-        *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-    }
-
-    return NO;
-}
-
-- (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
-{
-    MTR_ABSTRACT_METHOD();
-    completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
-}
-
-- (void)getSessionForCommissioneeDevice:(chip::NodeId)deviceID completion:(MTRInternalDeviceConnectionCallback)completion
-{
-    MTR_ABSTRACT_METHOD();
-    completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
-}
-
-- (MTRTransportType)sessionTransportTypeForDevice:(MTRBaseDevice *)device
-{
-    VerifyOrReturnValue([self checkIsRunning], MTRTransportTypeUndefined);
-
-    __block MTRTransportType result = MTRTransportTypeUndefined;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning]);
-
-        if (device.isPASEDevice) {
-            chip::CommissioneeDeviceProxy * deviceProxy;
-            VerifyOrReturn(CHIP_NO_ERROR == self->_cppCommissioner->GetDeviceBeingCommissioned(device.nodeID, &deviceProxy));
-            result = MTRMakeTransportType(deviceProxy->GetDeviceTransportType());
-        } else {
-            auto scopedNodeID = self->_cppCommissioner->GetPeerScopedId(device.nodeID);
-            auto sessionHandle = self->_cppCommissioner->SessionMgr()->FindSecureSessionForNode(scopedNodeID);
-            VerifyOrReturn(sessionHandle.HasValue());
-            result = MTRMakeTransportType(sessionHandle.Value()->AsSecureSession()->GetPeerAddress().GetTransportType());
-        }
-    });
-    return result;
-}
-
-- (void)asyncGetCommissionerOnMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
-                             errorHandler:(nullable MTRDeviceErrorHandler)errorHandler
-{
-    MTR_ABSTRACT_METHOD();
-    errorHandler([MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
-}
-
 - (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler
 {
+    // TODO: Figure out how to get callsites to have an MTRDeviceController_Concrete.
     MTR_ABSTRACT_METHOD();
     errorHandler([MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
-}
-
-- (void)syncRunOnWorkQueue:(SyncWorkQueueBlock)block error:(NSError * __autoreleasing *)error
-{
-    VerifyOrDie(!chip::DeviceLayer::PlatformMgrImpl().IsWorkQueueCurrentQueue());
-    VerifyOrReturn([self checkIsRunning:error]);
-
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-        block();
-    });
-}
-
-- (id)syncRunOnWorkQueueWithReturnValue:(SyncWorkQueueBlockWithReturnValue)block error:(NSError * __autoreleasing *)error
-{
-    __block id rv = nil;
-    auto adapter = ^{
-        rv = block();
-    };
-
-    [self syncRunOnWorkQueue:adapter error:error];
-
-    return rv;
-}
-
-- (BOOL)syncRunOnWorkQueueWithBoolReturnValue:(SyncWorkQueueBlockWithBoolReturnValue)block error:(NSError * __autoreleasing *)error
-{
-    __block BOOL success = NO;
-    auto adapter = ^{
-        success = block();
-    };
-    [self syncRunOnWorkQueue:adapter error:error];
-
-    return success;
-}
-
-- (chip::FabricIndex)fabricIndex
-{
-    return _storedFabricIndex;
 }
 
 - (nullable NSNumber *)compressedFabricID
 {
-    auto storedValue = _storedCompressedFabricID.load();
-    return storedValue.has_value() ? @(storedValue.value()) : nil;
-}
-
-- (void)invalidateCASESessionForNode:(chip::NodeId)nodeID;
-{
-    auto block = ^{
-        auto sessionMgr = self->_cppCommissioner->SessionMgr();
-        VerifyOrDie(sessionMgr != nullptr);
-
-        sessionMgr->MarkSessionsAsDefunct(
-            self->_cppCommissioner->GetPeerScopedId(nodeID), chip::MakeOptional(chip::Transport::SecureSession::Type::kCASE));
-    };
-
-    [self syncRunOnWorkQueue:block error:nil];
-}
-
-- (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
-                             type:(MTRDiagnosticLogType)type
-                          timeout:(NSTimeInterval)timeout
-                            queue:(dispatch_queue_t)queue
-                       completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
-{
     MTR_ABSTRACT_METHOD();
-    dispatch_async(queue, ^{
-        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
-    });
+    return nil;
 }
 
 #ifdef DEBUG
@@ -660,6 +507,12 @@ using namespace chip::Tracing::DarwinFramework;
     chip::app::DnssdServer::Instance().SetInterfaceId(interfaceId);
 }
 #endif // DEBUG
+
+- (NSArray<NSNumber *> *)nodesWithStoredData
+{
+    MTR_ABSTRACT_METHOD();
+    return @[];
+}
 
 #pragma mark - MTRDeviceControllerDelegate management
 
@@ -724,6 +577,14 @@ using namespace chip::Tracing::DarwinFramework;
     }
 }
 
+- (void)_clearDeviceControllerDelegates
+{
+    @synchronized(self) {
+        _strongDelegateForSetDelegateAPI = nil;
+        [_delegates removeAllObjects];
+    }
+}
+
 // Iterates the delegates, and remove delegate info objects if the delegate object has dealloc'ed
 // Returns number of delegates called
 - (NSUInteger)_iterateDelegateInfoWithBlock:(void (^_Nullable)(MTRDeviceControllerDelegateInfo * delegateInfo))block
@@ -759,7 +620,7 @@ using namespace chip::Tracing::DarwinFramework;
     }
 }
 
-- (void)_callDelegatesWithBlock:(void (^_Nullable)(id<MTRDeviceControllerDelegate> delegate))block logString:(const char *)logString;
+- (void)_callDelegatesWithBlock:(void (^_Nullable)(id<MTRDeviceControllerDelegate> delegate))block logString:(const char *)logString
 {
     NSUInteger delegatesCalled = [self _iterateDelegateInfoWithBlock:^(MTRDeviceControllerDelegateInfo * delegateInfo) {
         id<MTRDeviceControllerDelegate> strongDelegate = delegateInfo.delegate;
@@ -812,11 +673,13 @@ using namespace chip::Tracing::DarwinFramework;
     } logString:__PRETTY_FUNCTION__];
 }
 
-- (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(MTRProductIdentity *)info
+- (void)controller:(MTRDeviceController *)controller readCommissioneeInfo:(MTRCommissioneeInfo *)info
 {
     [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
-        if ([delegate respondsToSelector:@selector(controller:readCommissioningInfo:)]) {
-            [delegate controller:controller readCommissioningInfo:info];
+        if ([delegate respondsToSelector:@selector(controller:readCommissioneeInfo:)]) {
+            [delegate controller:controller readCommissioneeInfo:info];
+        } else if ([delegate respondsToSelector:@selector(controller:readCommissioningInfo:)]) {
+            [delegate controller:controller readCommissioningInfo:info.productIdentity];
         }
     } logString:__PRETTY_FUNCTION__];
 }

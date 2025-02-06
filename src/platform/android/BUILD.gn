@@ -64,8 +64,6 @@ static_library("android") {
     "BleConnectCallback-JNI.cpp",
     "BlePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
-    "CHIPP256KeypairBridge.cpp",
-    "CHIPP256KeypairBridge.h",
     "CommissionableDataProviderImpl.cpp",
     "CommissionableDataProviderImpl.h",
     "ConfigurationManagerImpl.cpp",
@@ -86,6 +84,7 @@ static_library("android") {
 
   deps = [
     ":tracing",
+    "${chip_root}/src/app:app_config",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/setup_payload",
   ]

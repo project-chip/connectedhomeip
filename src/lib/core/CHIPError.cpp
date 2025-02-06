@@ -22,14 +22,22 @@
 
 namespace chip {
 
+static ErrorFormatter sCHIPErrorFormatter = { FormatCHIPError, nullptr };
+
 /**
  * Register a text error formatter for CHIP core errors.
  */
 void RegisterCHIPLayerErrorFormatter()
 {
-    static ErrorFormatter sCHIPErrorFormatter = { FormatCHIPError, nullptr };
-
     RegisterErrorFormatter(&sCHIPErrorFormatter);
+}
+
+/**
+ * Deregister a text error formatter for CHIP core errors.
+ */
+void DeregisterCHIPLayerErrorFormatter()
+{
+    DeregisterErrorFormatter(&sCHIPErrorFormatter);
 }
 
 /**

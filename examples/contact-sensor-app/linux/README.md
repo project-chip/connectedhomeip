@@ -7,7 +7,7 @@ document is tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and
 
 To cross-compile this example on an x64 host and run it on **NXP i.MX 8M Mini**
 **EVK**, see the associated
-[README document](../../../docs/guides/nxp/nxp_imx8m_linux_examples.md) for
+[README document](../../../docs/platforms/nxp/nxp_imx8m_linux_examples.md) for
 details.
 
 <hr>

@@ -13,20 +13,11 @@
 # limitations under the License.
 
 import logging
-import re
 from dataclasses import dataclass
 from io import StringIO
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 import yaml
-
-
-# TODO #35787: Remove support for non-YAML format
-def cast_to_bool(value: Any) -> bool:
-    """Convert True/true/False/false strings to bool."""
-    if isinstance(value, str):
-        return value.strip().lower() == "true"
-    return bool(value)
 
 
 @dataclass
@@ -36,6 +27,7 @@ class Metadata:
     app: str = ""
     app_args: Optional[str] = None
     app_ready_pattern: Optional[str] = None
+    app_stdin_pipe: Optional[str] = None
     script_args: Optional[str] = None
     factory_reset: bool = False
     factory_reset_app_only: bool = False
@@ -53,51 +45,27 @@ def extract_runs_args(py_script_path: str) -> Dict[str, Dict[str, str]]:
     """Extract the run arguments from the CI test arguments blocks."""
 
     found_ci_args_section = False
-    done_ci_args_section = False
-
-    runs_def_ptrn = re.compile(r'^\s*#\s*test-runner-runs:\s*(?P<run_id>.*)$')
-    arg_def_ptrn = re.compile(
-        r'^\s*#\s*test-runner-run/(?P<run_id>[a-zA-Z0-9_]+)/(?P<arg_name>[a-zA-Z0-9_\-]+):\s*(?P<arg_val>.*)$')
-
     runs_arg_lines: Dict[str, Dict[str, str]] = {}
 
     ci_args_section_lines = []
     with open(py_script_path, 'r', encoding='utf8') as py_script:
         for line_idx, line in enumerate(py_script.readlines()):
             line = line.strip()
-            line_num = line_idx + 1
 
             # Append empty line to the line capture, so during YAML parsing
             # line numbers will match the original file.
             ci_args_section_lines.append("")
 
             # Detect the single CI args section, to skip the lines otherwise.
-            if not done_ci_args_section and line.startswith("# === BEGIN CI TEST ARGUMENTS ==="):
+            if line.startswith("# === BEGIN CI TEST ARGUMENTS ==="):
                 found_ci_args_section = True
                 continue
-            elif found_ci_args_section and line.startswith("# === END CI TEST ARGUMENTS ==="):
-                done_ci_args_section = True
-                found_ci_args_section = False
-                continue
+            if line.startswith("# === END CI TEST ARGUMENTS ==="):
+                break
 
             if found_ci_args_section:
                 # Update the last line in the line capture.
                 ci_args_section_lines[-1] = " " + line.lstrip("#")
-
-            runs_match = runs_def_ptrn.match(line)
-            args_match = arg_def_ptrn.match(line)
-
-            if not found_ci_args_section and (runs_match or args_match):
-                logging.warning(f"{py_script_path}:{line_num}: Found CI args outside of CI TEST ARGUMENTS block")
-                continue
-
-            if runs_match:
-                for run in runs_match.group("run_id").strip().split():
-                    runs_arg_lines[run] = {}
-                    runs_arg_lines[run]['run'] = run
-
-            elif args_match:
-                runs_arg_lines[args_match.group("run_id")][args_match.group("arg_name")] = args_match.group("arg_val")
 
     if not runs_arg_lines:
         try:
@@ -181,9 +149,10 @@ class MetadataReader:
                 app=attr.get("app", ""),
                 app_args=attr.get("app-args"),
                 app_ready_pattern=attr.get("app-ready-pattern"),
+                app_stdin_pipe=attr.get("app-stdin-pipe"),
                 script_args=attr.get("script-args"),
-                factory_reset=cast_to_bool(attr.get("factoryreset", False)),
-                quiet=cast_to_bool(attr.get("quiet", True))
+                factory_reset=attr.get("factory-reset", False),
+                quiet=attr.get("quiet", True),
             ))
 
         return runs_metadata

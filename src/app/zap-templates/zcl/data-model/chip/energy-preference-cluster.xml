@@ -34,26 +34,43 @@ limitations under the License.
     </features>
 
     <!--Conformance feature BALA - for now optional-->
-    <attribute code="0x0000" side="server" type="array" entryType="BalanceStruct" define="ENERGY_PREFERENCE_ENERGY_BALANCES" isNullable="false" min="2" max="10" writable="false" optional="true">EnergyBalances</attribute>
-
+    <attribute code="0x0000" side="server" name="EnergyBalances" type="array" entryType="BalanceStruct" define="ENERGY_PREFERENCE_ENERGY_BALANCES" min="2" max="10" optional="true">
+      <mandatoryConform>
+        <feature name="BALA"/>
+      </mandatoryConform>
+    </attribute>
+    
     <!--Conformance feature BALA - for now optional-->
-    <attribute code="0x0001" side="server" type="int8u" define="ENERGY_PREFERENCE_CURRENT_ENERGY_BALANCE" isNullable="false" writable="true" optional="true">
+    <attribute code="0x0001" side="server" name="CurrentEnergyBalance" type="int8u" define="ENERGY_PREFERENCE_CURRENT_ENERGY_BALANCE" writable="true" optional="true">
       <access op="read" privilege="view"/>
       <access op="write" privilege="operate"/>
-      <description>CurrentEnergyBalance</description>
+      <mandatoryConform>
+        <feature name="BALA"/>
+      </mandatoryConform>
     </attribute>
 
     <!--Conformance feature BALA - for now optional-->
-    <attribute code="0x0002" side="server" type="array" entryType="EnergyPriorityEnum" define="ENERGY_PREFERENCE_ENERGY_PRIORITIES" isNullable="false" max="2" writable="false" optional="true">EnergyPriorities</attribute>
+    <attribute code="0x0002" side="server" name="EnergyPriorities" type="array" entryType="EnergyPriorityEnum" define="ENERGY_PREFERENCE_ENERGY_PRIORITIES" max="2" optional="true">
+      <mandatoryConform>
+        <feature name="BALA"/>
+      </mandatoryConform>
+    </attribute>
 
     <!--Conformance feature LPMS - for now optional-->
-    <attribute code="0x0003" side="server" type="array" entryType="BalanceStruct" define="ENERGY_PREFERENCE_LOW_POWER_MODE_SENSITIVITIES" isNullable="false" min="2" max="10" writable="false" optional="true">LowPowerModeSensitivities</attribute>
+    <attribute code="0x0003" side="server" name="LowPowerModeSensitivities" type="array" entryType="BalanceStruct" define="ENERGY_PREFERENCE_LOW_POWER_MODE_SENSITIVITIES" min="2" max="10" optional="true">
+      <mandatoryConform>
+        <feature name="LPMS"/>
+      </mandatoryConform>
+    </attribute>
 
     <!--Conformance feature LPMS - for now optional-->
-    <attribute code="0x0004" side="server" type="int8u" define="ENERGY_PREFERENCE_CURRENT_LOW_POWER_MODE_SENSITIVITY" isNullable="false" writable="true" optional="true">
+    <attribute code="0x0004" side="server" type="int8u" define="ENERGY_PREFERENCE_CURRENT_LOW_POWER_MODE_SENSITIVITY" writable="true" optional="true">
       <access op="read" privilege="view"/>
       <access op="write" privilege="operate"/>
       <description>CurrentLowPowerModeSensitivity</description>
+      <mandatoryConform>
+        <feature name="LPMS"/>
+      </mandatoryConform>
     </attribute>
 
   </cluster>

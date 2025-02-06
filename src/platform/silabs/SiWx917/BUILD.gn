@@ -18,9 +18,10 @@ import("${chip_root}/src/platform/device.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/crypto/crypto.gni")
-import("${chip_root}/src/platform/silabs/wifi_args.gni")
+import("${chip_root}/src/platform/silabs/wifi/args.gni")
 import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
+import("${matter_support_root}/provision/args.gni")
 
 silabs_platform_dir = "${chip_root}/src/platform/silabs"
 
@@ -30,10 +31,14 @@ if (chip_crypto == "platform") {
   import("//build_overrides/mbedtls.gni")
 }
 
-config("siwx917-platform-wifi-config") {
-  include_dirs = [ "wifi" ]
-  defines = []
+source_set("logging") {
+  sources = [ "${chip_root}/src/platform/silabs/Logging.cpp" ]
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
 }
+
 static_library("SiWx917") {
   sources = [
     "${silabs_platform_dir}/BLEManagerImpl.h",
@@ -45,6 +50,7 @@ static_library("SiWx917") {
     "${silabs_platform_dir}/ConfigurationManagerImpl.cpp",
     "${silabs_platform_dir}/ConfigurationManagerImpl.h",
     "${silabs_platform_dir}/ConnectivityManagerImpl.h",
+    "${silabs_platform_dir}/ConnectivityManagerImpl_WIFI.cpp",
     "${silabs_platform_dir}/DiagnosticDataProviderImpl.cpp",
     "${silabs_platform_dir}/DiagnosticDataProviderImpl.h",
     "${silabs_platform_dir}/InetPlatformConfig.h",
@@ -52,6 +58,8 @@ static_library("SiWx917") {
     "${silabs_platform_dir}/KeyValueStoreManagerImpl.h",
     "${silabs_platform_dir}/MigrationManager.cpp",
     "${silabs_platform_dir}/MigrationManager.h",
+    "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.cpp",
+    "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.h",
     "${silabs_platform_dir}/PlatformManagerImpl.cpp",
     "${silabs_platform_dir}/PlatformManagerImpl.h",
     "${silabs_platform_dir}/SilabsConfig.cpp",
@@ -66,6 +74,7 @@ static_library("SiWx917") {
     "../rs911x/rsi_ble_config.h",
     "../rs911x/wfx_sl_ble_init.cpp",
     "../rs911x/wfx_sl_ble_init.h",
+    "SiWxPlatformInterface.h",
   ]
 
   if (chip_enable_ota_requestor) {
@@ -79,7 +88,10 @@ static_library("SiWx917") {
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/platform:platform_base",
   ]
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  deps = [
+    "${chip_root}/src/platform/logging:headers",
+    "${sl_provision_root}:headers",
+  ]
 
   # Add platform crypto implementation
   if (chip_crypto == "platform") {
@@ -93,25 +105,7 @@ static_library("SiWx917") {
 
     public_deps += [
       "${chip_root}/src/crypto",
-      "${mbedtls_root}:mbedtls",
+      "${silabs_platform_dir}/wifi:wifi-platform",
     ]
   }
-
-  sources += [
-    "${silabs_platform_dir}/ConnectivityManagerImpl_WIFI.cpp",
-    "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.cpp",
-    "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.h",
-    "${silabs_platform_dir}/wifi/wfx_host_events.h",
-    "wifi/wfx_msgs.h",
-    "wifi/wifi_config.h",
-  ]
-  public_configs = [ ":siwx917-platform-wifi-config" ]
-}
-
-source_set("logging") {
-  sources = [ "${chip_root}/src/platform/silabs/Logging.cpp" ]
-  deps = [
-    "${chip_root}/src/platform:platform_base",
-    "${chip_root}/src/platform/logging:headers",
-  ]
 }

@@ -14,10 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "AttestationKey.h"
-#include "ProvisionStorage.h"
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <em_device.h>
+#include <headers/AttestationKey.h>
+#include <headers/ProvisionStorage.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
@@ -28,20 +27,17 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/silabs/MigrationManager.h>
 #include <platform/silabs/SilabsConfig.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <silabs_creds.h>
+#ifndef NDEBUG
+#if defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && (SL_MATTER_GN_BUILD == 0)
+#include <sl_matter_test_event_trigger_config.h>
+#endif // defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && (SL_MATTER_GN_BUILD == 0)
+#endif // NDEBUG
 #ifdef OTA_ENCRYPTION_ENABLE
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #endif // OTA_ENCRYPTION_ENABLE
-#ifdef SLI_SI91X_MCU_INTERFACE
-#include <sl_si91x_common_flash_intf.h>
-#else
-#ifdef _SILICON_LABS_32B_SERIES_2
-#include <em_msc.h>
-#elif defined(_SILICON_LABS_32B_SERIES_3)
-#include "sl_se_manager.h"
-#include "sl_se_manager_types.h"
-#include <sl_se_manager_extmem.h>
-#endif // _SILICON_LABS_32B_SERIES_2
+#ifndef SLI_SI91X_MCU_INTERFACE
 #include <psa/crypto.h>
 #endif
 
@@ -50,16 +46,6 @@ extern void setNvm3End(uint32_t addr);
 #elif !SL_MATTER_GN_BUILD
 #include <sl_matter_provision_config.h>
 #endif
-
-#if defined(_SILICON_LABS_32B_SERIES_3)
-// To remove any ambiguities regarding the Flash aliases, use the below macro to ignore the 8 MSB.
-#define FLASH_GENERIC_MASK 0x00FFFFFF
-#define GENERIC_ADDRESS(addr) ((addr) &FLASH_GENERIC_MASK)
-
-// Transforms any address into an address using the same alias as FLASH_BASE from the CMSIS.
-#define CMSIS_CONVERTED_ADDRESS(addr) (GENERIC_ADDRESS(addr) | FLASH_BASE)
-sl_se_command_context_t cmd_ctx;
-#endif // _SILICON_LABS_32B_SERIES_3
 
 extern uint8_t linker_nvm_end[];
 
@@ -81,47 +67,38 @@ size_t sCredentialsOffset     = 0;
 
 CHIP_ERROR ErasePage(uint32_t addr)
 {
-#ifdef SLI_SI91X_MCU_INTERFACE
-    rsi_flash_erase_sector((uint32_t *) addr);
-#elif defined(_SILICON_LABS_32B_SERIES_2)
-    MSC_ErasePage((uint32_t *) addr);
-#elif defined(_SILICON_LABS_32B_SERIES_3)
-    sl_status_t status;
-    uint32_t * data_start = NULL;
-    size_t data_size;
-
-    status = sl_se_data_region_get_location(&cmd_ctx, (void **) &data_start, &data_size);
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR(status));
-    VerifyOrReturnError(GENERIC_ADDRESS(addr) > GENERIC_ADDRESS((uint32_t) data_start), CHIP_ERROR_INVALID_ADDRESS);
-    status = sl_se_data_region_erase(&cmd_ctx, (void *) addr, 1); // Erase one page
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR(status));
-#endif
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR WritePage(uint32_t addr, const uint8_t * data, size_t size)
-{
-#ifdef SLI_SI91X_MCU_INTERFACE
-    rsi_flash_write((uint32_t *) addr, (unsigned char *) data, size);
-#elif defined(_SILICON_LABS_32B_SERIES_2)
-    MSC_WriteWord((uint32_t *) addr, data, size);
-#elif defined(_SILICON_LABS_32B_SERIES_3)
-    sl_status_t status;
-    uint32_t * data_start = NULL;
-    size_t data_size;
-
-    status = sl_se_data_region_get_location(&cmd_ctx, (void **) &data_start, &data_size);
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR(status));
-    VerifyOrReturnError(GENERIC_ADDRESS(addr) > GENERIC_ADDRESS((uint32_t) data_start), CHIP_ERROR_INVALID_ADDRESS);
-    status = sl_se_data_region_write(&cmd_ctx, (void *) addr, data, size);
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR(status));
-#endif
-    return CHIP_NO_ERROR;
+    return chip::DeviceLayer::Silabs::GetPlatform().FlashErasePage(addr);
 }
 
 size_t RoundNearest(size_t n, size_t multiple)
 {
     return (n % multiple) > 0 ? n + (multiple - n % multiple) : n;
+}
+
+/**
+ * Writes "size" bytes to the flash page. The data is padded with 0xff
+ * up to the nearest 32-bit boundary.
+ */
+CHIP_ERROR WritePage(uint32_t addr, const uint8_t * data, size_t size)
+{
+    // The flash driver fails if the size is not a multiple of 4 (32-bits)
+    size_t size_32 = RoundNearest(size, 4);
+    if (size_32 == size)
+    {
+        // The given data is already aligned to 32-bit
+        return chip::DeviceLayer::Silabs::GetPlatform().FlashWritePage(addr, data, size);
+    }
+    else
+    {
+        // Create a temporary buffer, and pad it with "0xff"
+        uint8_t * p = static_cast<uint8_t *>(Platform::MemoryAlloc(size_32));
+        VerifyOrReturnError(p != nullptr, CHIP_ERROR_INTERNAL);
+        memcpy(p, data, size);
+        memset(p + size, 0xff, size_32 - size);
+        CHIP_ERROR err = chip::DeviceLayer::Silabs::GetPlatform().FlashWritePage(addr, p, size_32);
+        Platform::MemoryFree(p);
+        return err;
+    }
 }
 
 CHIP_ERROR WriteFile(Storage & store, SilabsConfig::Key offset_key, SilabsConfig::Key size_key, const ByteSpan & value)
@@ -133,17 +110,7 @@ CHIP_ERROR WriteFile(Storage & store, SilabsConfig::Key offset_key, SilabsConfig
         ReturnErrorOnFailure(ErasePage(base_addr));
     }
 
-    memcpy(Storage::aux_buffer, value.data(), value.size());
-    if (value.size() < Storage::kArgumentSizeMax)
-    {
-        memset(Storage::aux_buffer + value.size(), 0xff, Storage::kArgumentSizeMax - value.size());
-    }
-
-    ChipLogProgress(DeviceLayer, "WriteFile, addr:0x%06x+%03u, size:%u", (unsigned) base_addr, (unsigned) sCredentialsOffset,
-                    (unsigned) value.size());
-    // ChipLogByteSpan(DeviceLayer, ByteSpan(value.data(), value.size() < kDebugLength ? value.size() : kDebugLength));
-
-    ReturnErrorOnFailure(WritePage(base_addr + sCredentialsOffset, Storage::aux_buffer, Storage::kArgumentSizeMax));
+    ReturnErrorOnFailure(WritePage(base_addr + sCredentialsOffset, value.data(), value.size()));
 
     // Store file offset
     ReturnErrorOnFailure(SilabsConfig::WriteConfigValue(offset_key, (uint32_t) sCredentialsOffset));
@@ -163,7 +130,6 @@ CHIP_ERROR ReadFileByOffset(Storage & store, const char * description, uint32_t 
     ByteSpan span(address, size);
     ChipLogProgress(DeviceLayer, "%s, addr:0x%06x+%03u, size:%u", description, (unsigned) base_addr, (unsigned) offset,
                     (unsigned) size);
-    // ChipLogByteSpan(DeviceLayer, ByteSpan(span.data(), span.size() < kDebugLength ? span.size() : kDebugLength));
     return CopySpanToMutableSpan(span, value);
 }
 
@@ -198,16 +164,8 @@ CHIP_ERROR Storage::Initialize(uint32_t flash_addr, uint32_t flash_size)
     {
 #ifndef SLI_SI91X_MCU_INTERFACE
         base_addr = (flash_addr + flash_size - FLASH_PAGE_SIZE);
-
-#ifdef _SILICON_LABS_32B_SERIES_2
-        MSC_Init();
-#elif defined(_SILICON_LABS_32B_SERIES_3)
-        sl_status_t status;
-        status = sl_se_init();
-        VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
-        status = sl_se_init_command_context(&cmd_ctx);
-#endif // _SILICON_LABS_32B_SERIES
 #endif // SLI_SI91X_MCU_INTERFACE
+        chip::DeviceLayer::Silabs::GetPlatform().FlashInit();
 #ifdef SL_PROVISION_GENERATOR
         setNvm3End(base_addr);
 #endif
@@ -398,14 +356,14 @@ CHIP_ERROR Storage::GetManufacturingDate(uint8_t * value, size_t max, size_t & s
     return SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_ManufacturingDate, (char *) value, max, size);
 }
 
-CHIP_ERROR Storage::SetUniqueId(const uint8_t * value, size_t size)
+CHIP_ERROR Storage::SetPersistentUniqueId(const uint8_t * value, size_t size)
 {
-    return SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_UniqueId, value, size);
+    return SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_PersistentUniqueId, value, size);
 }
 
-CHIP_ERROR Storage::GetUniqueId(uint8_t * value, size_t max, size_t & size)
+CHIP_ERROR Storage::GetPersistentUniqueId(uint8_t * value, size_t max, size_t & size)
 {
-    return SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_UniqueId, value, max, size);
+    return SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_PersistentUniqueId, value, max, size);
 }
 
 //

@@ -53,6 +53,12 @@ declare_args() {
 
   # Self-provision enabled
   use_provision_channel = false
+
+  # Temperature Sensor support
+  sl_enable_si70xx_sensor = false
+
+  # RGB LED support
+  sl_enable_rgb_led = false
 }
 
 declare_args() {
@@ -63,6 +69,13 @@ declare_args() {
   chip_enable_ble_rs911x = use_rs9116 || use_SiWx917
 }
 
+# TODO - This needs to be removed once multiplexing issues resolved
+if (use_SiWx917) {
+  disable_lcd = true
+  show_qr_code = false
+  use_external_flash = false
+}
+
 if (silabs_board == "") {
   silabs_board = getenv("SILABS_BOARD")
 }
@@ -70,10 +83,17 @@ if (silabs_board == "") {
 assert(silabs_board != "", "silabs_board must be specified")
 
 # Si917 WIFI board ----------
-if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A") {
+if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A" ||
+    silabs_board == "BRD4343A" || silabs_board == "BRD4342A") {
+  if (silabs_board == "BRD2605A") {
+    sl_enable_rgb_led = true
+  }
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
   wifi_soc = true
+
+  assert(!sl_enable_si70xx_sensor,
+         "${silabs_board} does not support the si90xx sensor!")
 
   # EFR32 MG24 series ----------
 } else if (silabs_board == "BRD4186A" || silabs_board == "BRD4187A") {
@@ -104,6 +124,9 @@ if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A") {
   show_qr_code = false
   disable_lcd = true
 
+  assert(!sl_enable_si70xx_sensor,
+         "${silabs_board} does not support the si90xx sensor!")
+
   # EFR32 MG24 Modules series ----------
 } else if (silabs_board == "BRD4316A") {
   silabs_family = "mgm24"
@@ -128,6 +151,9 @@ if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A") {
   use_external_flash = false
   show_qr_code = false
   disable_lcd = true
+
+  assert(!sl_enable_si70xx_sensor,
+         "${silabs_board} does not support the si90xx sensor!")
 } else if (silabs_board == "BRD2704A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240PB32VNA"
@@ -137,6 +163,9 @@ if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A") {
   use_external_flash = false
   show_qr_code = false
   disable_lcd = true
+
+  assert(!sl_enable_si70xx_sensor,
+         "${silabs_board} does not support the si90xx sensor!")
 } else if (silabs_board == "BRD4318A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240SD22VNA"

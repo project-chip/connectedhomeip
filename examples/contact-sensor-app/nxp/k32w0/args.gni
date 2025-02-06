@@ -35,6 +35,6 @@ is_debug = false
 
 chip_crypto = "platform"
 chip_crypto_flavor = "NXP-Ultrafast-P256"
-chip_with_ot_cli = 0
+nxp_enable_ot_cli = false
 chip_with_OM15082 = 1
 chip_pw_tokenizer_logging = true
