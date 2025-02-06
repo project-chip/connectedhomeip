@@ -172,7 +172,7 @@ private:
             MTR_LOG_ERROR("%@: setReadClient:subscriptionCallback: readClient set when current value not null %p %p", self, readClient, _readClient);
         }
         if (((subscriptionCallback != nullptr)) && (_subscriptionCallback != nullptr)) {
-            MTR_LOG_ERROR("%@: setReadClient:subscriptionCallback: readClient and subscriptionCallback must both be valid or both be null %p %p", self, readClient, subscriptionCallback);
+            MTR_LOG_ERROR("%@: setReadClient:subscriptionCallback: subscriptionCallback set when current value not null %p %p", self, subscriptionCallback, _subscriptionCallback);
         }
 
         _readClient = readClient;
