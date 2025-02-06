@@ -260,13 +260,21 @@ class TestSpecParsingSupport(MatterBaseTest):
         # checks that the 1.3 spec (default) does not contain in-progress clusters and the TOT does
         tot_xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.kMaster)
         one_three_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
-        one_four_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
+        one_four_clusters, one_four_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
+        one_four_one_clusters, one_four_one_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
+
+        # We know 1.4 and 1.4.1 are clear of errors, ensure it stays that way.
+        asserts.assert_equal(len(one_four_problems), 0, "Unexpected problems found on 1.4 cluster parsing")
+        asserts.assert_equal(len(one_four_one_problems), 0, "Unexpected problems found on 1.4.1 cluster parsing")
+
         asserts.assert_greater(len(set(tot_xml_clusters.keys()) - set(one_three_clusters.keys())),
                                0, "Master dir does not contain any clusters not in 1.3")
         asserts.assert_greater(len(set(tot_xml_clusters.keys()) - set(one_four_clusters.keys())),
                                0, "Master dir does not contain any clusters not in 1.4")
         asserts.assert_greater(len(set(one_four_clusters.keys()) - set(one_three_clusters.keys())),
                                0, "1.4 dir does not contain any clusters not in 1.3")
+        asserts.assert_equal(len(one_four_clusters.keys()), len(one_four_one_clusters.keys()),
+                             "1.4 and 1.4.1 do not contain the same clusters")
         # only the pulse width modulation cluster was removed post 1.3
         asserts.assert_equal(set(one_three_clusters.keys()) - set(tot_xml_clusters.keys()),
                              set([Clusters.PulseWidthModulation.id]), "There are some 1.3 clusters that are not included in the TOT spec")
