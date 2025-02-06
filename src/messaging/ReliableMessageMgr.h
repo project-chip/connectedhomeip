@@ -256,7 +256,7 @@ private:
     // ReliableMessageProtocol Global tables for timer context
     ObjectPool<RetransTableEntry, CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE> mRetransTable;
 
-    SessionUpdateDelegate * mSessionUpdateDelegate = nullptr;
+    SessionUpdateDelegate * mSessionUpdateDelegate        = nullptr;
     ReliableMessageAnalyticsDelegate * mAnalyticsDelegate = nullptr;
 
     static System::Clock::Timeout sAdditionalMRPBackoffTime;
