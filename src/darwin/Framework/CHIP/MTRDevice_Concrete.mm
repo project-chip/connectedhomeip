@@ -1720,20 +1720,22 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     return _persistedClusterData != nil;
 }
 
-// Need an inner method for dealloc to call, so unit test callbacks don't re-capture self
-- (void)_doPersistClusterData
+// Need an inner method for dealloc to call, so unit test callbacks don't re-capture self.
+//
+// Returns whether persistence actually happened.
+- (BOOL)_doPersistClusterData
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
     // Sanity check
     if (![self _dataStoreExists]) {
         MTR_LOG_ERROR("%@ storage behavior: no data store in _persistClusterData!", self);
-        return;
+        return NO;
     }
 
     // Nothing to persist
     if (!_clusterDataToPersist.count) {
-        return;
+        return NO;
     }
 
     MTR_LOG("%@ Storing cluster information (data version and attributes) count: %lu", self, static_cast<unsigned long>(_clusterDataToPersist.count));
@@ -1757,11 +1759,16 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // then re-subscribe at that point, which would cause the relevant data
     // to be sent to us via the priming read.
     _clusterDataToPersist = nil;
+
+    return YES;
 }
 
 - (void)_persistClusterData
 {
-    [self _doPersistClusterData];
+    if ([self _doPersistClusterData] == NO) {
+        // Don't notify delegates if we did not actually persist anything.
+        return;
+    }
 
 #ifdef DEBUG
     [self _callDelegatesWithBlock:^(id testDelegate) {
