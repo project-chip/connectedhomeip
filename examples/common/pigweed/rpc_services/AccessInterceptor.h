@@ -38,7 +38,7 @@ class PigweedDebugAccessInterceptor
 {
 public:
     PigweedDebugAccessInterceptor() = default;
-    virtual ~PigweedDebugAccessInterceptor() {}
+    virtual ~PigweedDebugAccessInterceptor() = default;
 
     /**
      * Callback for writing attributes.
