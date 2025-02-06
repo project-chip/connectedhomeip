@@ -185,7 +185,6 @@ gboolean DBusInterface::OnCurrentLevelChanged(LightAppLevelControl * levelContro
     return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
 
-
 void DBusInterface::InitOnOff()
 {
     bool isOn   = false;
