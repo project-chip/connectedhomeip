@@ -111,7 +111,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
-                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --app-args "--discriminator 3840" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "discover" \
                      --tool-args "commissionables" \
@@ -124,7 +124,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
-                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --app-args "--discriminator 3840" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
                      --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
@@ -137,7 +137,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
-                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --app-args "--discriminator 3840" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
@@ -150,7 +150,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
-                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --app-args "--discriminator 3840" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-extendable-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
@@ -163,7 +163,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
-                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --app-args "--discriminator 3840" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-read --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
@@ -176,7 +176,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
-                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --app-args "--discriminator 3840" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-write --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
@@ -189,7 +189,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
-                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --app-args "--discriminator 3840" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-subscribe --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
@@ -202,7 +202,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
-                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --app-args "--discriminator 3840" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
                      --tool-args "already-discovered --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 1000" \
@@ -215,7 +215,7 @@ jobs:
                  scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
-                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --app-args "--discriminator 3840" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
                      --tool-args "address-paseonly --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 1000" \
@@ -228,7 +228,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
-                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --app-args "--discriminator 3840" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
                      --tool-args "code --nodeid 1 --setup-payload MT:-24J0AFN00KA0648G00 --discover-once 1 --use-only-onnetwork-discovery 0 -t 1000" \
@@ -241,7 +241,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
-                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --app-args "--discriminator 3840" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
                      --tool-args "code --nodeid 1 --setup-payload 34970112332 --discover-once 1 --use-only-onnetwork-discovery 0 -t 1000" \
@@ -254,7 +254,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-lit-icd-ipv6only/lit-icd-app \
-                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --app-args "--discriminator 3840" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
                      --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
@@ -267,7 +267,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-ota-requestor/chip-ota-requestor-app \
-                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --app-args "--discriminator 3840" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "ota" \
                      --tool-args "onnetwork-long-ota-over-bdx  --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
@@ -278,7 +278,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
-                     --app-args "--discriminator 3840 --interface-id -1 --crash_log ./crashLog.log --end_user_support_log ./enduser.log --network_diagnostics_log ./network.log" \
+                     --app-args "--discriminator 3840 --crash_log ./crashLog.log --end_user_support_log ./enduser.log --network_diagnostics_log ./network.log" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "bdx" \
                      --tool-args "onnetwork-long-downloadLog --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000 --logType CrashLogs --fileName ./crashLog.log" \
@@ -291,7 +291,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_kotlin_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
-                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --app-args "--discriminator 3840" \
                      --tool-path out/linux-x64-kotlin-matter-controller \
                      --tool-cluster "pairing" \
                      --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
@@ -304,7 +304,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_kotlin_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
-                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --app-args "--discriminator 3840" \
                      --tool-path out/linux-x64-kotlin-matter-controller \
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
@@ -317,7 +317,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_kotlin_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
-                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --app-args "--discriminator 3840" \
                      --tool-path out/linux-x64-kotlin-matter-controller \
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-read --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
@@ -330,7 +330,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_kotlin_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
-                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --app-args "--discriminator 3840" \
                      --tool-path out/linux-x64-kotlin-matter-controller \
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-write --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
@@ -343,7 +343,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_kotlin_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
-                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --app-args "--discriminator 3840" \
                      --tool-path out/linux-x64-kotlin-matter-controller \
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-subscribe --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
