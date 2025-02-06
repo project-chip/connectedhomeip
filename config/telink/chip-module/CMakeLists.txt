@@ -174,7 +174,7 @@ add_dependencies(process_binaries ${ZEPHYR_FINAL_EXECUTABLE})
 # Define 'build_mcuboot' target for building the MCUBoot bootloader
 # ==============================================================================
 
-if (CONFIG_BOOTLOADER_MCUBOOT AND (CONFIG_SOC_SERIES_RISCV_TELINK_B9X OR CONFIG_SOC_SERIES_RISCV_TELINK_TLX))
+if (CONFIG_BOOTLOADER_MCUBOOT AND (CONFIG_SOC_RISCV_TELINK_B9X OR CONFIG_SOC_RISCV_TELINK_TLX))
     add_custom_target(build_mcuboot ALL
         COMMAND
         west build -b ${BASE_BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr

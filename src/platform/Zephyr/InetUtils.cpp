@@ -45,7 +45,7 @@ net_if * GetWiFiInterface()
 {
 // TODO: Remove dependency after Telink Zephyr update
 // net_if_get_first_wifi() is not available in Zephyr 3.3.99
-#if !defined(CONFIG_SOC_SERIES_RISCV_TELINK_W91)
+#if !defined(CONFIG_SOC_RISCV_TELINK_W91)
     return net_if_get_first_wifi();
 #else
     return GetInterface();
