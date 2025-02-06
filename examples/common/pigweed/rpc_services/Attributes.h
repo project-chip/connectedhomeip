@@ -57,7 +57,14 @@ std::optional<::pw::Status> TryWriteViaAccessor(const chip::app::ConcreteDataAtt
         {
             return result;
         }
+        else if (decoder.TriedDecode())
+        {
+            ChipLogError(Support, "Interceptor tried decode but did not return status.");
+            return ::pw::Status::FailedPrecondition();
+        }
     }
+
+    VerifyOrReturnError(!decoder.TriedDecode(), ::pw::Status::FailedPrecondition());
 
     return std::nullopt;
 }
@@ -229,7 +236,6 @@ public:
 
         app::AttributeValueDecoder decoder(tlvReader.value(), subjectDescriptor);
 
-        // Try to write using a custom Accessor first
         std::optional<::pw::Status> interceptResult = TryWriteViaAccessor(write_request.path, decoder);
         if (interceptResult.has_value())
         {

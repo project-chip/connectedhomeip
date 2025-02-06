@@ -23,47 +23,32 @@
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 
-/**
- * Callback class that clusters can implement in order to interpose custom
- * attribute-handling logic.
- *
- * Instances of PigweedDebugAccessInterceptor that are registered via
- * PigweedDebugAccessInterceptorRegistry::Instance().Register will be consulted before taking the
- * fallback path.
- */
 namespace chip {
 namespace rpc {
 
+/**
+ * Callback class that clusters can implement in order to interpose custom
+ * interception logic.
+ */
 class PigweedDebugAccessInterceptor
 {
 public:
-    PigweedDebugAccessInterceptor() = default;
+    PigweedDebugAccessInterceptor()          = default;
     virtual ~PigweedDebugAccessInterceptor() = default;
 
     /**
      * Callback for writing attributes.
      *
-     * @param [in] aPath indicates which exact data is being written.
-     * @param [in] aDecoder the AttributeValueDecoder to use for decoding the
-     *             data.
-     *
      * The implementation can do one of three things:
      *
-     * 1) Return a failure. This is treated as a failed write and the error is
-     *    sent to the client. Caller will not look for alternatives
-     *    paths to write when any of the accessors returns a failure.
-     * 2) Return nullopt. This implies the accessor does not handle write to
-     *    the specified attribute. Caller can look for another accessor or
-     *    use the fallback path in when a nullopt is returned.
-     * 3) Return success and attempt to decode from aDecoder.  This is
-     *    treated as a successful write. Caller will treat this as a successful
-     *    write and report to client. Fallback path will not be taken.
+     * Returns:
+     *   - `std::nullopt` if the `path` was not handled by this Interceptor.
+     *     Interceptor MUST NOT have attepted to decode aDecoder.
+     *   - A `::pw::Status` value that is considered the FINAL result of the
+     *     write (i.e. write handled) either with success or failure.
      */
     virtual std::optional<::pw::Status> Write(const chip::app::ConcreteDataAttributePath & path,
-                                              chip::app::AttributeValueDecoder & decoder)
-    {
-        return std::nullopt;
-    }
+                                              chip::app::AttributeValueDecoder & decoder) = 0;
 };
 
 } // namespace rpc

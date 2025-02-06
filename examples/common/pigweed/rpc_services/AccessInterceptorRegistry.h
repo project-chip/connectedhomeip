@@ -27,25 +27,23 @@ namespace rpc {
 
 /** @brief Custom debug request interceptors.
  *
- *    This class is specifically meant for registering custom Attribute Accessors that
- *    allow mini-AAI-handlers to process PigweedRPC read/writes separately from the cluster
- *    code. It is meant to be used by samples using this PigweedRPC Attributes service to
- *    allow the RPC interface to be used in more ways than simply simulating writes from a Matter
- *    client at the IM level. Handlers registered here by applications will be attempted before any
- *    standard processing of read/write would take place.
+ *    This class is specifically meant for registering custom Accessors that
+ *    allow mini-handlers to process PigweedRPC read/writes separately from the cluster
+ *    code. It is meant to be used by samples using this PigweedRPC services to allow the RPC
+ *    interface to be used in more ways than simply for example, simulating writes from a Matter
+ *    client at the IM level. Handlers registered here by applications should be attempted before any
+ *    standard processing.
  */
 class PigweedDebugAccessInterceptorRegistry
 {
 public:
     /**
-     * Register an attribute access override.
+     * Registers an attribute access inteceptor within this registry. Use `Unregister` to
+     * unregister an interceptor that was previously registered.
+     * @param attrOverride - the interceptor to be registered.
      */
     void Register(PigweedDebugAccessInterceptor * attrOverride) { mAccessors.insert(attrOverride); }
 
-    /**
-     * Unregister an attribute access override (for example if the object
-     * implementing PigweedDebugAccessInterceptor is being destroyed).
-     */
     void Unregister(PigweedDebugAccessInterceptor * attrOverride)
     {
         if (mAccessors.find(attrOverride) == mAccessors.end())
@@ -56,7 +54,7 @@ public:
         mAccessors.erase(attrOverride);
     }
 
-    std::set<PigweedDebugAccessInterceptor *> GetAllAccessors() { return mAccessors; }
+    const std::set<PigweedDebugAccessInterceptor *> & GetAllAccessors() const { return mAccessors; }
 
     /**
      * Returns the singleton instance of the attribute accessor registory.
