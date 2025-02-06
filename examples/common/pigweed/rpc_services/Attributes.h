@@ -235,11 +235,7 @@ public:
         {
             return *interceptResult;
         }
-
-        ChipLogProgress(
-            Support,
-            "No custom PigweedRPC Attribute Accessor registration found for: endpoint=%u cluster=%u, using fake write access.",
-            write_request.path.mEndpointId, write_request.path.mClusterId);
+        ChipLogProgress(Support, "No custom PigweedRPC Attribute Accessor registration found, using fake write access.");
 
         app::DataModel::ActionReturnStatus result = provider->WriteAttribute(write_request, decoder);
 
