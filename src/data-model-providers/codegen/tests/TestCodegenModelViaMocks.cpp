@@ -1905,63 +1905,6 @@ TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceListIncrementalRead)
     }
 }
 
-<<<<<<< HEAD
-TEST_F(TestCodegenModelViaMocks, ReadGlobalAttributeAttributeList)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    ReadOperation testRequest(kMockEndpoint2, MockClusterId(3), AttributeList::Id);
-    testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-    // Data read via the encoder
-    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
-    ASSERT_EQ(model.ReadAttribute(testRequest.GetRequest(), *encoder), CHIP_NO_ERROR);
-    ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
-
-    // Validate after read
-    std::vector<DecodedAttributeData> attribute_data;
-    ASSERT_EQ(testRequest.GetEncodedIBs().Decode(attribute_data), CHIP_NO_ERROR);
-    ASSERT_EQ(attribute_data.size(), 1u);
-
-    DecodedAttributeData & encodedData = attribute_data[0];
-    ASSERT_EQ(encodedData.attributePath, testRequest.GetRequest().path);
-
-    ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_Array);
-
-    std::vector<AttributeId> items;
-    ASSERT_EQ(DecodeList(encodedData.dataReader, items), CHIP_NO_ERROR);
-
-    // Mock data contains ClusterRevision and FeatureMap.
-    // After this, Global attributes are auto-added
-    std::vector<AttributeId> expected;
-
-    // Encoding in global-attribute-access-interface has a logic of:
-    //   - Append global attributes in front of the first specified
-    //     large number global attribute.
-    // Since ClusterRevision and FeatureMap are
-    // global attributes, the order here is reversed for them
-    for (AttributeId id : GlobalAttributesNotInMetadata)
-    {
-        expected.push_back(id);
-    }
-    expected.push_back(ClusterRevision::Id);
-    expected.push_back(FeatureMap::Id);
-    expected.push_back(MockAttributeId(1));
-    expected.push_back(MockAttributeId(2));
-    expected.push_back(MockAttributeId(3));
-
-    ASSERT_EQ(items.size(), expected.size());
-
-    // Since we have no std::vector formatter, comparing element by element is somewhat
-    // more readable in case of failure.
-    for (unsigned i = 0; i < items.size(); i++)
-    {
-        EXPECT_EQ(items[i], expected[i]);
-    }
-}
-
 TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteBasicTypes)
 {
     TestEmberScalarTypeWrite<uint8_t, ZCL_INT8U_ATTRIBUTE_TYPE>(0x12);
