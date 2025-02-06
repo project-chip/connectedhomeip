@@ -39,11 +39,6 @@
 
 static_assert(LWIP_VERSION_MAJOR > 1, "CHIP requires LwIP 2.0 or later");
 
-static_assert(!CHIP_SYSTEM_CONFIG_NO_LOCKING,
-              "CHIP_SYSTEM_CONFIG_NO_LOCKING not supported along with using LwIP for TCP, because handling incoming connection "
-              "attempts needs to be done synchronously in LwIP, but part of the work for it needs to happen in the Matter context. "
-              " If support for this configuration is needed, this part needs to be figured out.");
-
 namespace chip {
 namespace Inet {
 
@@ -92,13 +87,21 @@ CHIP_ERROR TCPEndPointImplLwIP::BindImpl(IPAddressType addrType, const IPAddress
 CHIP_ERROR TCPEndPointImplLwIP::ListenImpl(uint16_t backlog)
 {
     mLwIPEndPointType = LwIPEndPointType::TCP;
-    RunOnTCPIP([this]() {
-        // Start listening for incoming connections.
-        mTCP = tcp_listen(mTCP);
-        tcp_arg(mTCP, this);
-        tcp_accept(mTCP, LwIPHandleIncomingConnection);
-    });
-    return CHIP_NO_ERROR;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    if (!mPreAllocatedConnectEP)
+    {
+        err =  GetEndPointManager().NewEndPoint(&mPreAllocatedConnectEP);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        RunOnTCPIP([this]() {
+            // Start listening for incoming connections.
+            mTCP = tcp_listen(mTCP);
+            tcp_arg(mTCP, this);
+            tcp_accept(mTCP, LwIPHandleIncomingConnection);
+        });
+    }
+    return err;
 }
 
 CHIP_ERROR TCPEndPointImplLwIP::ConnectImpl(const IPAddress & addr, uint16_t port, InterfaceId intfId)
@@ -800,7 +803,8 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
         // Tell LwIP we've accepted the connection so it can decrement the listen PCB's pending_accepts counter.
         tcp_accepted(listenEP->mTCP);
 
-        // If we did in fact receive a connection, rather than an error, attempt to allocate an end point object.
+        // If we did in fact receive a connection, rather than an error, use the pre-allocated end point object for the incoming
+        // connection.
         //
         // NOTE: Although most of the LwIP callbacks defer the real work to happen on the endpoint's thread
         // (by posting events to the thread's event queue) we can't do that here because as soon as this
@@ -809,10 +813,12 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
         //
         if (err == CHIP_NO_ERROR)
         {
-            TCPEndPoint * connectEndPoint = nullptr;
-            err                           = lSystemLayer.RunWithMatterContextLock(
-                [&listenEP, &connectEndPoint]() { return listenEP->GetEndPointManager().NewEndPoint(&connectEndPoint); });
-            conEP = static_cast<TCPEndPointImplLwIP *>(connectEndPoint);
+            conEP = static_cast<TCPEndPointImplLwIP *>(listenEP->mPreAllocatedConnectEP);
+            if (conEP == nullptr)
+            {
+                // The listen endpoint receives a new incomming connection before it pre-allocates a new connection endpoint.
+                err = CHIP_ERROR_BUSY;
+            }
         }
 
         // Ensure that TCP timers have been started
@@ -854,7 +860,24 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
                 listenEP->Release();
                 err = CHIP_ERROR_CONNECTION_ABORTED;
                 conEP->Release(); // for the Retain() above
-                conEP->Release(); // for the implied Retain() on construction
+            }
+            else
+            {
+                // Pre-allocate another endpoint for next connection
+                listenEP->mPreAllocatedConnectEP = nullptr;
+                listenEP->Retain();
+                err = lSystemLayer.ScheduleLambda([listenEP]() {
+                    CHIP_ERROR error = listenEP->GetEndPointManager().NewEndPoint(&listenEP->mPreAllocatedConnectEP);
+                    if (error != CHIP_NO_ERROR)
+                    {
+                        listenEP->HandleError(error);
+                    }
+                    listenEP->Release();
+                });
+                if (err != CHIP_NO_ERROR)
+                {
+                    listenEP->Release();
+                }
             }
         }
 

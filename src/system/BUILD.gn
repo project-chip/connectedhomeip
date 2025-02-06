@@ -256,10 +256,6 @@ static_library("system") {
     ]
   }
 
-  if (chip_system_config_locking != "none") {
-    sources += [ "PlatformLockSupport.h" ]
-  }
-
   cflags = [ "-Wconversion" ]
 
   public_deps = [
