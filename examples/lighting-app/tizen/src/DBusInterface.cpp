@@ -185,26 +185,6 @@ gboolean DBusInterface::OnCurrentLevelChanged(LightAppLevelControl * levelContro
     return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
 
-{
-    // Do not handle on-change event if it was triggered by internal set
-    VerifyOrReturnValue(!self->mInternalSet, G_DBUS_METHOD_INVOCATION_HANDLED);
-
-    // TODO: creating such a complex object seems odd here
-    //       as handler seems not used to send back any response back anywhere.
-    CommandHandlerImplCallback callback;
-    CommandHandlerImpl handler(&callback);
-
-    ConcreteCommandPath path{ self->mEndpointId, Clusters::ColorControl::Id, 0 };
-
-    Clusters::ColorControl::Commands::MoveToColorTemperature::DecodableType data;
-    data.colorTemperatureMireds = light_app_color_control_get_color_temperature_mireds(colorControl);
-
-    chip::DeviceLayer::StackLock lock;
-    auto status = ColorControlServer::Instance().moveToColorTempCommand(self->mEndpointId, data);
-    handler.AddStatus(path, status);
-
-    return G_DBUS_METHOD_INVOCATION_HANDLED;
-}
 
 void DBusInterface::InitOnOff()
 {
