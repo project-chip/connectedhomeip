@@ -37,23 +37,7 @@ tests:
                 value: nodeId
 
     - label:
-          "Step 1: Factory Reset DUT (to ensure NOC list is empty at the
-          beginning of the following steps)"
-      # verification: ""
-      # Disabling this step, because the test starts with a DUT device that has just been commissioned by the TH1 commissioner
-      disabled: true
-
-    - label:
-          "Step 2: Start the commissioning process of DUT by TH1 on the first
-          Fabric."
-      # PICS: ""
-      # verification: "Verify that TH1 successfully completes commissioning, including establishing a CASE session on the operational network and issuing a CommissioningComplete command."
-      # Disabling this step, because the test starts with a DUT device that has just been commissioned by the TH1 commissioner
-
-      disabled: true
-
-    - label:
-          "Step 3.1: Save the FabricIndex for TH1 as TH1_Fabric_Index for future
+          "Step 1.1: Save the FabricIndex for TH1 as TH1_Fabric_Index for future
           use."
       identity: "alpha"
       command: "readAttribute"
@@ -63,7 +47,7 @@ tests:
           saveAs: TH1_Fabric_Index
 
     - label:
-          "Step 3.2: TH1 does a fabric-filtered read of the Fabrics attribute
+          "Step 1.2: TH1 does a fabric-filtered read of the Fabrics attribute
           from the Node Operational Credentials cluster. Save the FabricIndex
           for TH1 as TH1_Fabric_Index for future use."
       identity: "alpha"
@@ -78,7 +62,7 @@ tests:
 
       # verification: "Verify that there is a single entry in the list and the FabricIndex for that entry matches TH1_Fabric_Index."
     - label:
-          "Step 4: TH1 sends ArmFailSafe command to the DUT with the
+          "Step 2: TH1 sends ArmFailSafe command to the DUT with the
           ExpiryLengthSeconds field set to 60 seconds"
       identity: "alpha"
       cluster: "General Commissioning"
@@ -95,7 +79,7 @@ tests:
                 value: 0 # OK
 
       # verification: "Verify that the DUT sends ArmFailSafeResponse command to TH1 with field ErrorCode as OK(0)"
-    - label: "Step 5: TH1 Sends CSRRequest command with a random 32-byte nonce."
+    - label: "Step 3: TH1 Sends CSRRequest command with a random 32-byte nonce."
       identity: "alpha"
       command: "CSRRequest"
       cluster: "Operational Credentials"
@@ -110,23 +94,10 @@ tests:
               - name: "AttestationSignature"
                 saveAs: attestationSignature
 
-      # verification: "Step 5: Verify that the DUT responds with the CSRResponse command."
     - label:
-          "Step 6.1: Read the commissioner root certificate from TH2's fabric.
-          Save RCAC as Root_CA_Certificate_TH2"
-      identity: "beta"
-      cluster: "CommissionerCommands"
-      command: "GetCommissionerRootCertificate"
-      response:
-          values:
-              - name: "RCAC"
-                saveAs: Root_CA_Certificate_TH2
-
-      # verification: ""
-    - label:
-          "Step 6.2: TH2 generates the NOC, the Root CA Certificate and ICAC
-          using the CSR elements from Step 5 and selects an IPK, all for use by
-          TH2. Save ICAC as Intermediate_Certificate_TH2. Save NOC as
+          "Step 4: TH2 generates the NOC, the Root CA Certificate and ICAC using
+          the CSR elements from Step 3. Save ICAC as
+          Intermediate_Certificate_TH2. Save NOC as
           Node_Operational_Certificate_TH2. Save IPK as IPK_TH2. Extract the
           RCAC public key and save as Root_Public_Key_TH2."
       identity: "beta"
@@ -147,20 +118,20 @@ tests:
               - name: "IPK"
                 saveAs: IPK_TH2
 
-      # verification: ""
-    - label: "Step 7.1: Read the commissioner node ID from TH2"
+    - label:
+          "StepN 5: Retrieve the the commissioner root certificate from TH2.
+          Save RCAC as Root_CA_Certificate_TH2"
       identity: "beta"
       cluster: "CommissionerCommands"
-      command: "GetCommissionerNodeId"
+      command: "GetCommissionerRootCertificate"
       response:
           values:
-              - name: "nodeId"
-                saveAs: Commissioner_Node_Id_TH2
+              - name: "RCAC"
+                saveAs: Root_CA_Certificate_TH2
 
-      # verification: ""
     - label:
-          "Step 7.2: TH1 sends AddTrustedRootCertificate command to DUT with
-          RootCACertificate set to Root_CA_Certificate_TH2"
+          "Step 5.1: TH1 sends TH2 root certificate to DUT in the
+          AddTrustedRootCertificate chain."
       identity: "alpha"
       command: "AddTrustedRootCertificate"
       cluster: "Operational Credentials"
@@ -169,9 +140,18 @@ tests:
               - name: "RootCACertificate"
                 value: Root_CA_Certificate_TH2
 
-      # verification: "Verify that AddTrustedRootCertificate command succeeds by sending the status code as SUCCESS"
+    - label: "Step 6: Retrieve the commissioner node ID from TH2"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: Commissioner_Node_Id_TH2
+
+      # verification: "Verify AddNOC command is sent to DUT with the correct NOC, ICAC, and IPK certificates. Verify status code is 0 (OK)"
     - label:
-          "Step 8: TH1 sends the AddNOC command to DUT with the following
+          "Step 6.1: TH1 sends the AddNOC command to DUT with the following
           fields: NOCValue as Node_Operational_Certificate_TH2. ICACValue as
           Intermediate_Certificate_TH2. IpkValue as IPK_TH2. CaseAdminSubject as
           the NodeID of TH2. AdminVendorId as the Vendor ID of TH2."
@@ -196,13 +176,13 @@ tests:
                 value: 0
 
       # verification: "Verify that DUT responds with NOCResponse with status code OK"
-    - label: "Step 9: TH2 starts discovery of DUT using Operational Discovery"
+    - label: "Step 7: TH2 starts discovery of DUT using Operational Discovery"
       # verification: ""
       # Disabling this step as this occurs from the AddNOC command being run
       disabled: true
 
     - label:
-          "Step 10: TH2 opens a CASE session with DUT over operational network."
+          "Step 8: TH2 opens a CASE session with DUT over operational network."
       identity: "beta"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -212,7 +192,7 @@ tests:
                 value: 0x43211234
 
       # verification: "DUT is able to open the CASE session with TH2"
-    - label: "Step 11: TH2 sends CommissioningComplete command"
+    - label: "Step 9: TH2 sends CommissioningComplete command"
       nodeId: 0x43211234
       identity: "beta"
       cluster: "General Commissioning"
@@ -224,7 +204,7 @@ tests:
 
       # verification: "DUT respond with SUCCESS at CommissioningComplete command sent by TH2"
     - label:
-          "Step 12: TH2 reads the Current Fabric Index attribute from the Node
+          "Step 10: TH2 reads the Current Fabric Index attribute from the Node
           Operational Credentials cluster. Save the FabricIndex for TH2 as
           TH2_Fabric_Index."
       identity: "beta"
@@ -237,7 +217,7 @@ tests:
 
       # verification: ""
     - label:
-          "Step 13a: TH1 does a fabric-filtered read of the Fabrics attribute
+          "Step 11a: TH1 does a fabric-filtered read of the Fabrics attribute
           from the Node Operational Credentials cluster"
       nodeId: 0x43211234
       command: "readAttribute"
@@ -251,7 +231,7 @@ tests:
 
       # verification: ""
     - label:
-          "Step 13b: TH2 does a fabric-filtered read of the Fabrics attribute
+          "Step 11b: TH2 does a fabric-filtered read of the Fabrics attribute
           from the Node Operational Credentials cluster"
       identity: "beta"
       nodeId: 0x43211234
@@ -266,7 +246,7 @@ tests:
 
       # verification: "Verify that there are 2 entries in the list where one entry matches TH1_Fabric_Index and the other matches TH2_Fabric_Index."
     - label:
-          "Step 14: TH1 sends RemoveFabric command to DUT with the FabricIndex
+          "Step 12: TH1 sends RemoveFabric command to DUT with the FabricIndex
           field set to TH2_Fabric_Index."
       identity: "alpha"
       command: "RemoveFabric"

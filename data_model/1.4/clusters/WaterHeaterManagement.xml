@@ -105,8 +105,19 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="min" value="1"/>
       </field>
-      <field id="1" name="OneShot" type="bool" default="False"/>
-      <field id="2" name="EmergencyBoost" type="bool" default="False">
+      <field id="1" name="OneShot" type="bool" default="false">
+        <otherwiseConform>
+          <optionalConform>
+            <notTerm>
+              <feature name="TP"/>
+            </notTerm>
+          </optionalConform>
+          <optionalConform choice="a" max="1">
+            <feature name="TP"/>
+          </optionalConform>
+        </otherwiseConform>
+      </field>
+      <field id="2" name="EmergencyBoost" type="bool" default="false">
         <optionalConform/>
       </field>
       <field id="3" name="TemporarySetpoint" type="temperature">
@@ -116,7 +127,7 @@ Davis, CA 95616, USA
       <field id="4" name="TargetPercentage" type="percent">
         <otherwiseConform>
           <mandatoryConform>
-            <attribute name="TargetReheat"/>
+            <field name="TargetReheat"/>
           </mandatoryConform>
           <optionalConform>
             <feature name="TP"/>
@@ -124,6 +135,9 @@ Davis, CA 95616, USA
         </otherwiseConform>
       </field>
       <field id="5" name="TargetReheat" type="percent">
+        <optionalConform choice="a" max="1">
+          <feature name="TP"/>
+        </optionalConform>
         <constraint type="max" value="TargetPercentage"/>
       </field>
     </struct>
@@ -131,7 +145,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="HeaterTypes" type="WaterHeaterHeatSourceBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="HeatDemand" type="WaterHeaterHeatSourceBitmap" default="0">

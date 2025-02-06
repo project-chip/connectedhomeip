@@ -20899,6 +20899,160 @@ public class ClusterInfoMapping {
     }
   }
 
+
+  public static class DelegatedPushAvStreamTransportClusterAllocatePushTransportResponseCallback implements ChipClusters.PushAvStreamTransportCluster.AllocatePushTransportResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer connectionID, ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct transportOptions, Integer transportStatus) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo connectionIDResponseValue = new CommandResponseInfo("connectionID", "Integer");
+      responseValues.put(connectionIDResponseValue, connectionID);
+      // transportOptions: Struct TransportOptionsStruct
+      // Conversion from this type to Java is not properly implemented yet
+      CommandResponseInfo transportStatusResponseValue = new CommandResponseInfo("transportStatus", "Integer");
+      responseValues.put(transportStatusResponseValue, transportStatus);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedPushAvStreamTransportClusterFindTransportResponseCallback implements ChipClusters.PushAvStreamTransportCluster.FindTransportResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ArrayList<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> streamConfigurations) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      // streamConfigurations: TransportConfigurationStruct
+      // Conversion from this type to Java is not properly implemented yet
+
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedPushAvStreamTransportClusterCurrentConnectionsAttributeCallback implements ChipClusters.PushAvStreamTransportCluster.CurrentConnectionsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPushAvStreamTransportClusterGeneratedCommandListAttributeCallback implements ChipClusters.PushAvStreamTransportCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPushAvStreamTransportClusterAcceptedCommandListAttributeCallback implements ChipClusters.PushAvStreamTransportCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPushAvStreamTransportClusterEventListAttributeCallback implements ChipClusters.PushAvStreamTransportCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPushAvStreamTransportClusterAttributeListAttributeCallback implements ChipClusters.PushAvStreamTransportCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedChimeClusterInstalledChimeSoundsAttributeCallback implements ChipClusters.ChimeCluster.InstalledChimeSoundsAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -21224,6 +21378,250 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedCommissionerControlClusterAttributeListAttributeCallback implements ChipClusters.CommissionerControlCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+
+  public static class DelegatedTlsCertificateManagementClusterProvisionRootCertificateResponseCallback implements ChipClusters.TlsCertificateManagementCluster.ProvisionRootCertificateResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer caid) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo caidResponseValue = new CommandResponseInfo("caid", "Integer");
+      responseValues.put(caidResponseValue, caid);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedTlsCertificateManagementClusterFindRootCertificateResponseCallback implements ChipClusters.TlsCertificateManagementCluster.FindRootCertificateResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ArrayList<ChipStructs.TlsCertificateManagementClusterTLSCertStruct> certificateDetails) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      // certificateDetails: TLSCertStruct
+      // Conversion from this type to Java is not properly implemented yet
+
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedTlsCertificateManagementClusterLookupRootCertificateResponseCallback implements ChipClusters.TlsCertificateManagementCluster.LookupRootCertificateResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer caid) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo caidResponseValue = new CommandResponseInfo("caid", "Integer");
+      responseValues.put(caidResponseValue, caid);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedTlsCertificateManagementClusterTLSClientCSRResponseCallback implements ChipClusters.TlsCertificateManagementCluster.TLSClientCSRResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer ccdid, byte[] csr, byte[] nonce) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo ccdidResponseValue = new CommandResponseInfo("ccdid", "Integer");
+      responseValues.put(ccdidResponseValue, ccdid);
+      CommandResponseInfo csrResponseValue = new CommandResponseInfo("csr", "byte[]");
+      responseValues.put(csrResponseValue, csr);
+      CommandResponseInfo nonceResponseValue = new CommandResponseInfo("nonce", "byte[]");
+      responseValues.put(nonceResponseValue, nonce);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedTlsCertificateManagementClusterProvisionClientCertificateResponseCallback implements ChipClusters.TlsCertificateManagementCluster.ProvisionClientCertificateResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer ccdid) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo ccdidResponseValue = new CommandResponseInfo("ccdid", "Integer");
+      responseValues.put(ccdidResponseValue, ccdid);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedTlsCertificateManagementClusterFindClientCertificateResponseCallback implements ChipClusters.TlsCertificateManagementCluster.FindClientCertificateResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ArrayList<ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct> certificateDetails) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      // certificateDetails: TLSClientCertificateDetailStruct
+      // Conversion from this type to Java is not properly implemented yet
+
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedTlsCertificateManagementClusterLookupClientCertificateResponseCallback implements ChipClusters.TlsCertificateManagementCluster.LookupClientCertificateResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer ccdid) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo ccdidResponseValue = new CommandResponseInfo("ccdid", "Integer");
+      responseValues.put(ccdidResponseValue, ccdid);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedTlsCertificateManagementClusterGeneratedCommandListAttributeCallback implements ChipClusters.TlsCertificateManagementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedTlsCertificateManagementClusterAcceptedCommandListAttributeCallback implements ChipClusters.TlsCertificateManagementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedTlsCertificateManagementClusterEventListAttributeCallback implements ChipClusters.TlsCertificateManagementCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedTlsCertificateManagementClusterAttributeListAttributeCallback implements ChipClusters.TlsCertificateManagementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -23360,6 +23758,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.WebRTCTransportRequestorCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("webRTCTransportRequestor", webRTCTransportRequestorClusterInfo);
 
+    ClusterInfo pushAvStreamTransportClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.PushAvStreamTransportCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("pushAvStreamTransport", pushAvStreamTransportClusterInfo);
+
     ClusterInfo chimeClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.ChimeCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("chime", chimeClusterInfo);
@@ -23371,6 +23773,10 @@ public class ClusterInfoMapping {
     ClusterInfo commissionerControlClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.CommissionerControlCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("commissionerControl", commissionerControlClusterInfo);
+
+    ClusterInfo tlsCertificateManagementClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.TlsCertificateManagementCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("tlsCertificateManagement", tlsCertificateManagementClusterInfo);
 
     ClusterInfo unitTestingClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.UnitTestingCluster(ptr, endpointId), new HashMap<>());
@@ -23510,9 +23916,11 @@ public class ClusterInfoMapping {
     destination.get("cameraAvSettingsUserLevelManagement").combineCommands(source.get("cameraAvSettingsUserLevelManagement"));
     destination.get("webRTCTransportProvider").combineCommands(source.get("webRTCTransportProvider"));
     destination.get("webRTCTransportRequestor").combineCommands(source.get("webRTCTransportRequestor"));
+    destination.get("pushAvStreamTransport").combineCommands(source.get("pushAvStreamTransport"));
     destination.get("chime").combineCommands(source.get("chime"));
     destination.get("ecosystemInformation").combineCommands(source.get("ecosystemInformation"));
     destination.get("commissionerControl").combineCommands(source.get("commissionerControl"));
+    destination.get("tlsCertificateManagement").combineCommands(source.get("tlsCertificateManagement"));
     destination.get("unitTesting").combineCommands(source.get("unitTesting"));
     destination.get("faultInjection").combineCommands(source.get("faultInjection"));
     destination.get("sampleMei").combineCommands(source.get("sampleMei"));
@@ -30477,6 +30885,128 @@ public class ClusterInfoMapping {
 
     commandMap.put("webRTCTransportRequestor", webRTCTransportRequestorClusterInteractionInfoMap);
 
+    Map<String, InteractionInfo> pushAvStreamTransportClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportallocatePushTransportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo pushAvStreamTransportallocatePushTransportInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+          .allocatePushTransport((ChipClusters.PushAvStreamTransportCluster.AllocatePushTransportResponseCallback) callback
+           , (ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct)
+             commandArguments.get("transportOptions")
+
+            );
+        },
+        () -> new DelegatedPushAvStreamTransportClusterAllocatePushTransportResponseCallback(),
+        pushAvStreamTransportallocatePushTransportCommandParams
+      );
+    pushAvStreamTransportClusterInteractionInfoMap.put("allocatePushTransport", pushAvStreamTransportallocatePushTransportInteractionInfo);
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportdeallocatePushTransportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo pushAvStreamTransportdeallocatePushTransportconnectionIDCommandParameterInfo = new CommandParameterInfo("connectionID", Integer.class, Integer.class);
+    pushAvStreamTransportdeallocatePushTransportCommandParams.put("connectionID",pushAvStreamTransportdeallocatePushTransportconnectionIDCommandParameterInfo);
+    InteractionInfo pushAvStreamTransportdeallocatePushTransportInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+        .deallocatePushTransport((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("connectionID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        pushAvStreamTransportdeallocatePushTransportCommandParams
+    );
+    pushAvStreamTransportClusterInteractionInfoMap.put("deallocatePushTransport", pushAvStreamTransportdeallocatePushTransportInteractionInfo);
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportmodifyPushTransportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo pushAvStreamTransportmodifyPushTransportconnectionIDCommandParameterInfo = new CommandParameterInfo("connectionID", Integer.class, Integer.class);
+    pushAvStreamTransportmodifyPushTransportCommandParams.put("connectionID",pushAvStreamTransportmodifyPushTransportconnectionIDCommandParameterInfo);
+
+    InteractionInfo pushAvStreamTransportmodifyPushTransportInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+        .modifyPushTransport((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("connectionID")
+        , (ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct)
+        commandArguments.get("transportOptions")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        pushAvStreamTransportmodifyPushTransportCommandParams
+    );
+    pushAvStreamTransportClusterInteractionInfoMap.put("modifyPushTransport", pushAvStreamTransportmodifyPushTransportInteractionInfo);
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportsetTransportStatusCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo pushAvStreamTransportsetTransportStatusconnectionIDCommandParameterInfo = new CommandParameterInfo("connectionID", Integer.class, Integer.class);
+    pushAvStreamTransportsetTransportStatusCommandParams.put("connectionID",pushAvStreamTransportsetTransportStatusconnectionIDCommandParameterInfo);
+
+    CommandParameterInfo pushAvStreamTransportsetTransportStatustransportStatusCommandParameterInfo = new CommandParameterInfo("transportStatus", Integer.class, Integer.class);
+    pushAvStreamTransportsetTransportStatusCommandParams.put("transportStatus",pushAvStreamTransportsetTransportStatustransportStatusCommandParameterInfo);
+    InteractionInfo pushAvStreamTransportsetTransportStatusInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+        .setTransportStatus((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("connectionID")
+        , (Integer)
+        commandArguments.get("transportStatus")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        pushAvStreamTransportsetTransportStatusCommandParams
+    );
+    pushAvStreamTransportClusterInteractionInfoMap.put("setTransportStatus", pushAvStreamTransportsetTransportStatusInteractionInfo);
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportmanuallyTriggerTransportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo pushAvStreamTransportmanuallyTriggerTransportconnectionIDCommandParameterInfo = new CommandParameterInfo("connectionID", Integer.class, Integer.class);
+    pushAvStreamTransportmanuallyTriggerTransportCommandParams.put("connectionID",pushAvStreamTransportmanuallyTriggerTransportconnectionIDCommandParameterInfo);
+
+    CommandParameterInfo pushAvStreamTransportmanuallyTriggerTransportactivationReasonCommandParameterInfo = new CommandParameterInfo("activationReason", Integer.class, Integer.class);
+    pushAvStreamTransportmanuallyTriggerTransportCommandParams.put("activationReason",pushAvStreamTransportmanuallyTriggerTransportactivationReasonCommandParameterInfo);
+
+    InteractionInfo pushAvStreamTransportmanuallyTriggerTransportInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+        .manuallyTriggerTransport((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("connectionID")
+        , (Integer)
+        commandArguments.get("activationReason")
+        , (Optional<ChipStructs.PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct>)
+        commandArguments.get("timeControl")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        pushAvStreamTransportmanuallyTriggerTransportCommandParams
+    );
+    pushAvStreamTransportClusterInteractionInfoMap.put("manuallyTriggerTransport", pushAvStreamTransportmanuallyTriggerTransportInteractionInfo);
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportfindTransportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo pushAvStreamTransportfindTransportconnectionIDCommandParameterInfo = new CommandParameterInfo("connectionID", Optional.class, Integer.class);
+    pushAvStreamTransportfindTransportCommandParams.put("connectionID",pushAvStreamTransportfindTransportconnectionIDCommandParameterInfo);
+    InteractionInfo pushAvStreamTransportfindTransportInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+          .findTransport((ChipClusters.PushAvStreamTransportCluster.FindTransportResponseCallback) callback
+           , (Optional<Integer>)
+             commandArguments.get("connectionID")
+
+            );
+        },
+        () -> new DelegatedPushAvStreamTransportClusterFindTransportResponseCallback(),
+        pushAvStreamTransportfindTransportCommandParams
+      );
+    pushAvStreamTransportClusterInteractionInfoMap.put("findTransport", pushAvStreamTransportfindTransportInteractionInfo);
+
+    commandMap.put("pushAvStreamTransport", pushAvStreamTransportClusterInteractionInfoMap);
+
     Map<String, InteractionInfo> chimeClusterInteractionInfoMap = new LinkedHashMap<>();
 
     Map<String, CommandParameterInfo> chimeplayChimeSoundCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
@@ -30556,6 +31086,180 @@ public class ClusterInfoMapping {
     commissionerControlClusterInteractionInfoMap.put("commissionNode", commissionerControlcommissionNodeInteractionInfo);
 
     commandMap.put("commissionerControl", commissionerControlClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> tlsCertificateManagementClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> tlsCertificateManagementprovisionRootCertificateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsCertificateManagementprovisionRootCertificatecertificateCommandParameterInfo = new CommandParameterInfo("certificate", byte[].class, byte[].class);
+    tlsCertificateManagementprovisionRootCertificateCommandParams.put("certificate",tlsCertificateManagementprovisionRootCertificatecertificateCommandParameterInfo);
+
+    CommandParameterInfo tlsCertificateManagementprovisionRootCertificatecaidCommandParameterInfo = new CommandParameterInfo("caid", Integer.class, Integer.class);
+    tlsCertificateManagementprovisionRootCertificateCommandParams.put("caid",tlsCertificateManagementprovisionRootCertificatecaidCommandParameterInfo);
+    InteractionInfo tlsCertificateManagementprovisionRootCertificateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsCertificateManagementCluster) cluster)
+          .provisionRootCertificate((ChipClusters.TlsCertificateManagementCluster.ProvisionRootCertificateResponseCallback) callback
+           , (byte[])
+             commandArguments.get("certificate")
+
+           , (Integer)
+             commandArguments.get("caid")
+
+            );
+        },
+        () -> new DelegatedTlsCertificateManagementClusterProvisionRootCertificateResponseCallback(),
+        tlsCertificateManagementprovisionRootCertificateCommandParams
+      );
+    tlsCertificateManagementClusterInteractionInfoMap.put("provisionRootCertificate", tlsCertificateManagementprovisionRootCertificateInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsCertificateManagementfindRootCertificateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsCertificateManagementfindRootCertificatecaidCommandParameterInfo = new CommandParameterInfo("caid", Integer.class, Integer.class);
+    tlsCertificateManagementfindRootCertificateCommandParams.put("caid",tlsCertificateManagementfindRootCertificatecaidCommandParameterInfo);
+    InteractionInfo tlsCertificateManagementfindRootCertificateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsCertificateManagementCluster) cluster)
+          .findRootCertificate((ChipClusters.TlsCertificateManagementCluster.FindRootCertificateResponseCallback) callback
+           , (Integer)
+             commandArguments.get("caid")
+
+            );
+        },
+        () -> new DelegatedTlsCertificateManagementClusterFindRootCertificateResponseCallback(),
+        tlsCertificateManagementfindRootCertificateCommandParams
+      );
+    tlsCertificateManagementClusterInteractionInfoMap.put("findRootCertificate", tlsCertificateManagementfindRootCertificateInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsCertificateManagementlookupRootCertificateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsCertificateManagementlookupRootCertificatefingerprintCommandParameterInfo = new CommandParameterInfo("fingerprint", byte[].class, byte[].class);
+    tlsCertificateManagementlookupRootCertificateCommandParams.put("fingerprint",tlsCertificateManagementlookupRootCertificatefingerprintCommandParameterInfo);
+    InteractionInfo tlsCertificateManagementlookupRootCertificateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsCertificateManagementCluster) cluster)
+          .lookupRootCertificate((ChipClusters.TlsCertificateManagementCluster.LookupRootCertificateResponseCallback) callback
+           , (byte[])
+             commandArguments.get("fingerprint")
+
+            );
+        },
+        () -> new DelegatedTlsCertificateManagementClusterLookupRootCertificateResponseCallback(),
+        tlsCertificateManagementlookupRootCertificateCommandParams
+      );
+    tlsCertificateManagementClusterInteractionInfoMap.put("lookupRootCertificate", tlsCertificateManagementlookupRootCertificateInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsCertificateManagementremoveRootCertificateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsCertificateManagementremoveRootCertificatecaidCommandParameterInfo = new CommandParameterInfo("caid", Integer.class, Integer.class);
+    tlsCertificateManagementremoveRootCertificateCommandParams.put("caid",tlsCertificateManagementremoveRootCertificatecaidCommandParameterInfo);
+    InteractionInfo tlsCertificateManagementremoveRootCertificateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsCertificateManagementCluster) cluster)
+        .removeRootCertificate((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("caid")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        tlsCertificateManagementremoveRootCertificateCommandParams
+    );
+    tlsCertificateManagementClusterInteractionInfoMap.put("removeRootCertificate", tlsCertificateManagementremoveRootCertificateInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsCertificateManagementTLSClientCSRCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsCertificateManagementTLSClientCSRnonceCommandParameterInfo = new CommandParameterInfo("nonce", byte[].class, byte[].class);
+    tlsCertificateManagementTLSClientCSRCommandParams.put("nonce",tlsCertificateManagementTLSClientCSRnonceCommandParameterInfo);
+    InteractionInfo tlsCertificateManagementTLSClientCSRInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsCertificateManagementCluster) cluster)
+          .TLSClientCSR((ChipClusters.TlsCertificateManagementCluster.TLSClientCSRResponseCallback) callback
+           , (byte[])
+             commandArguments.get("nonce")
+
+            );
+        },
+        () -> new DelegatedTlsCertificateManagementClusterTLSClientCSRResponseCallback(),
+        tlsCertificateManagementTLSClientCSRCommandParams
+      );
+    tlsCertificateManagementClusterInteractionInfoMap.put("TLSClientCSR", tlsCertificateManagementTLSClientCSRInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsCertificateManagementprovisionClientCertificateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsCertificateManagementprovisionClientCertificateccdidCommandParameterInfo = new CommandParameterInfo("ccdid", Integer.class, Integer.class);
+    tlsCertificateManagementprovisionClientCertificateCommandParams.put("ccdid",tlsCertificateManagementprovisionClientCertificateccdidCommandParameterInfo);
+
+    InteractionInfo tlsCertificateManagementprovisionClientCertificateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsCertificateManagementCluster) cluster)
+          .provisionClientCertificate((ChipClusters.TlsCertificateManagementCluster.ProvisionClientCertificateResponseCallback) callback
+           , (Integer)
+             commandArguments.get("ccdid")
+
+           , (ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct)
+             commandArguments.get("clientCertificateDetails")
+
+            );
+        },
+        () -> new DelegatedTlsCertificateManagementClusterProvisionClientCertificateResponseCallback(),
+        tlsCertificateManagementprovisionClientCertificateCommandParams
+      );
+    tlsCertificateManagementClusterInteractionInfoMap.put("provisionClientCertificate", tlsCertificateManagementprovisionClientCertificateInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsCertificateManagementfindClientCertificateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsCertificateManagementfindClientCertificateccdidCommandParameterInfo = new CommandParameterInfo("ccdid", Integer.class, Integer.class);
+    tlsCertificateManagementfindClientCertificateCommandParams.put("ccdid",tlsCertificateManagementfindClientCertificateccdidCommandParameterInfo);
+    InteractionInfo tlsCertificateManagementfindClientCertificateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsCertificateManagementCluster) cluster)
+          .findClientCertificate((ChipClusters.TlsCertificateManagementCluster.FindClientCertificateResponseCallback) callback
+           , (Integer)
+             commandArguments.get("ccdid")
+
+            );
+        },
+        () -> new DelegatedTlsCertificateManagementClusterFindClientCertificateResponseCallback(),
+        tlsCertificateManagementfindClientCertificateCommandParams
+      );
+    tlsCertificateManagementClusterInteractionInfoMap.put("findClientCertificate", tlsCertificateManagementfindClientCertificateInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsCertificateManagementlookupClientCertificateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsCertificateManagementlookupClientCertificatefingerprintCommandParameterInfo = new CommandParameterInfo("fingerprint", byte[].class, byte[].class);
+    tlsCertificateManagementlookupClientCertificateCommandParams.put("fingerprint",tlsCertificateManagementlookupClientCertificatefingerprintCommandParameterInfo);
+    InteractionInfo tlsCertificateManagementlookupClientCertificateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsCertificateManagementCluster) cluster)
+          .lookupClientCertificate((ChipClusters.TlsCertificateManagementCluster.LookupClientCertificateResponseCallback) callback
+           , (byte[])
+             commandArguments.get("fingerprint")
+
+            );
+        },
+        () -> new DelegatedTlsCertificateManagementClusterLookupClientCertificateResponseCallback(),
+        tlsCertificateManagementlookupClientCertificateCommandParams
+      );
+    tlsCertificateManagementClusterInteractionInfoMap.put("lookupClientCertificate", tlsCertificateManagementlookupClientCertificateInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsCertificateManagementremoveClientCertificateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsCertificateManagementremoveClientCertificateccdidCommandParameterInfo = new CommandParameterInfo("ccdid", Integer.class, Integer.class);
+    tlsCertificateManagementremoveClientCertificateCommandParams.put("ccdid",tlsCertificateManagementremoveClientCertificateccdidCommandParameterInfo);
+    InteractionInfo tlsCertificateManagementremoveClientCertificateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsCertificateManagementCluster) cluster)
+        .removeClientCertificate((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("ccdid")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        tlsCertificateManagementremoveClientCertificateCommandParams
+    );
+    tlsCertificateManagementClusterInteractionInfoMap.put("removeClientCertificate", tlsCertificateManagementremoveClientCertificateInteractionInfo);
+
+    commandMap.put("tlsCertificateManagement", tlsCertificateManagementClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> unitTestingClusterInteractionInfoMap = new LinkedHashMap<>();
 

@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 103,
+  "featureLevel": 106,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -41,14 +41,16 @@
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
-        "name": "MA-rootdevice"
+        "name": "MA-rootdevice",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice"
+          "name": "MA-rootdevice",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -2291,14 +2293,16 @@
         "code": 770,
         "profileId": 259,
         "label": "MA-tempsensor",
-        "name": "MA-tempsensor"
+        "name": "MA-tempsensor",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 770,
           "profileId": 259,
           "label": "MA-tempsensor",
-          "name": "MA-tempsensor"
+          "name": "MA-tempsensor",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [

@@ -26,7 +26,7 @@ SECRET_TOOL=false
 
 SCRIPT_NAME=$(basename -- "$(readlink -f "${BASH_SOURCE:?}")")
 SCRIPT_DIR=$(dirname -- "$(readlink -f "${BASH_SOURCE:?}")")
-DEPENDENCIES=('cpio' 'openjdk-8-jre-headless' 'obs-build' 'wget' 'zip')
+DEPENDENCIES=('7zip' 'cpio' 'openjdk-8-jre-headless' 'wget' 'zip')
 
 # If color is available use colors
 if which tput >/dev/null 2>&1 && [[ $(tput -T $TERM colors) -ge 8 ]]; then
@@ -45,16 +45,18 @@ function show_help() {
     echo
     echo "Options:"
     echo "  -h, --help                 Display this information"
-    echo "  --tizen-sdk-path           Set directory where Tizen will be installed. Default is $TIZEN_SDK_ROOT"
-    echo "  --tizen-sdk-data-path      Set directory where Tizen have data. Default is $TIZEN_SDK_DATA_PATH"
-    echo "  --install-dependencies     This options install all dependencies."
+    echo "  --tizen-sdk-path           Set directory for Tizen SDK installation. Default is $TIZEN_SDK_ROOT"
+    echo "  --tizen-sdk-data-path      Set directory for Tizen SDK runtime data. Default is $TIZEN_SDK_DATA_PATH"
+    echo "  --install-dependencies     This option installs all required dependencies"
     echo "  --tizen-version            Select Tizen version. Default is $TIZEN_VERSION"
-    echo "  --override-secret-tool     Circumvent the requirement of having functional D-Bus Secrets service."
+    echo "  --override-secret-tool     Circumvent the requirement of having functional D-Bus Secrets service"
     echo
     echo "Note:"
-    echo "The script should run fully with ubuntu. For other distributions you may have to manually"
-    echo "install all needed dependencies. Use the script specifying --tizen-sdk-path with or"
-    echo "without --tizen-version. The script will only install Tizen platform for Matter."
+    echo "This script does not install full Tizen SDK. It installs only the necessary"
+    echo "parts for Matter SDK to be able to build Tizen applications."
+    echo "The option '--install-dependencies' should be able to install all required"
+    echo "dependencies on any Debian-based distribution. For other distributions the"
+    echo "dependencies should be installed manually."
 }
 
 # ------------------------------------------------------------------------------
@@ -78,12 +80,12 @@ function warning() {
 # ------------------------------------------------------------------------------
 # Show dependencies
 function show_dependencies() {
-    warning "Need dependencies for use this script installation SDK: cpio unrpm unzip wget"
-    warning "Need dependencies for Tizen SDK: JAVA JRE >=8.0"
+    warning "Required dependencies for Tizen SDK installation: 7z cpio unzip wget"
+    warning "Required dependencies for Tizen SDK: JAVA JRE >=8.0"
 }
 
 # ------------------------------------------------------------------------------
-# Function helper massive download
+# Helper function for downloading packages.
 # Usage: download "url_dir_package" ${package_array[@]}
 function download() {
     echo "$COLOR_BLUE"
@@ -92,6 +94,10 @@ function download() {
     for PKG in "${@:2}"; do
         PKGS+=("-A" "$PKG")
     done
+
+    # Skip downloading if no packages are specified
+    [[ ${#PKGS[@]} -eq 0 ]] && return
+
     wget -r -nd --no-parent -e robots=off --progress=dot:mega "${PKGS[@]}" "$1"
 
     # Check if the files have been downloaded
@@ -106,7 +112,7 @@ function download() {
 }
 
 # ------------------------------------------------------------------------------
-# Function install all dependencies.
+# Function for installing all dependencies.
 function install_dependencies() {
     if ! command -v apt-get &>/dev/null; then
         show_dependencies
@@ -120,13 +126,22 @@ function install_dependencies() {
 }
 
 # ------------------------------------------------------------------------------
-# Function clean on EXIT
+# Function for unpacking RPM packages.
+function unrpm() {
+    for PKG in "${@}"; do
+        echo "Extracting $PKG..."
+        7z x -so "$PKG" | cpio -idmv
+    done
+}
+
+# ------------------------------------------------------------------------------
+# Function for cleaning up temporary files on exit.
 function cleanup() {
     rm -rf "${TMP_DIR:?}"
 }
 
 # ------------------------------------------------------------------------------
-# Function install tizen sdk.
+# Function for installing Tizen SDK.
 function install_tizen_sdk() {
 
     mkdir -p "$TIZEN_SDK_ROOT" || return
@@ -194,9 +209,17 @@ function install_tizen_sdk() {
         'app-core-common-*.rpm'
         'aul-0*.armv7l.rpm'
         'aul-devel-*.armv7l.rpm'
+        'bluetooth-frwk-0*.armv7l.rpm'
         'bundle-0*.armv7l.rpm'
         'bundle-devel-*.armv7l.rpm'
         'buxton2-*.armv7l.rpm'
+        'capi-network-bluetooth-0*.armv7l.rpm'
+        'capi-network-bluetooth-devel-*.armv7l.rpm'
+        'capi-network-nsd-*.armv7l.rpm'
+        'capi-network-thread-*.armv7l.rpm'
+        'capi-system-peripheral-io-*.armv7l.rpm'
+        'capi-system-peripheral-io-devel-*.armv7l.rpm'
+        'capi-system-resource-1*.armv7l.rpm'
         'cynara-devel-*.armv7l.rpm'
         'dbus-1*.armv7l.rpm'
         'dbus-devel-*.armv7l.rpm'
@@ -209,12 +232,14 @@ function install_tizen_sdk() {
         'libcynara-commons-*.armv7l.rpm'
         'libdns_sd-*.armv7l.rpm'
         'libjson-glib-*.armv7l.rpm'
+        'libnsd-dns-sd-*.armv7l.rpm'
         'libsessiond-0*.armv7l.rpm'
         'libsystemd-*.armv7l.rpm'
         'libtzplatform-config-*.armv7l.rpm'
         'parcel-0*.armv7l.rpm'
         'parcel-devel-*.armv7l.rpm'
         'pkgmgr-info-*.armv7l.rpm'
+        'sensord-*.armv7l.rpm'
         'sensord-devel-*.armv7l.rpm'
         'sensord-dummy-*.armv7l.rpm'
         'vconf-compat-*.armv7l.rpm'
@@ -223,22 +248,13 @@ function install_tizen_sdk() {
 
     # Unified packages (snapshots)
     URL="http://download.tizen.org/snapshots/TIZEN/Tizen/Tizen-Unified/latest/repos/standard/packages/armv7l/"
-    PKG_ARR=(
-        'bluetooth-frwk-0*.armv7l.rpm'
-        'capi-network-bluetooth-0*.armv7l.rpm'
-        'capi-network-bluetooth-devel-*.armv7l.rpm'
-        'capi-network-nsd-*.armv7l.rpm'
-        'capi-network-thread-*.armv7l.rpm'
-        'capi-system-peripheral-io-*.armv7l.rpm'
-        'capi-system-peripheral-io-devel-*.armv7l.rpm'
-        'capi-system-resource-1*.armv7l.rpm'
-        'libnsd-dns-sd-*.armv7l.rpm'
-        'sensord-*.armv7l.rpm')
+    PKG_ARR=()
     download "$URL" "${PKG_ARR[@]}"
 
     # Tizen Developer Platform Certificate
     URL="http://download.tizen.org/sdk/extensions/Tizen_IoT_Headless/binary/"
-    # Tizen site do not has this package available in version 8.0. Certificates are the same for 7.0 and 8.0.
+    # Tizen site does not have this package available in version 8.0.
+    # Certificates are the same for 7.0 and 8.0, though.
     PKG_ARR=(
         "7.0-iot-things-add-ons_*_ubuntu-64.zip")
     download "$URL" "${PKG_ARR[@]}"
@@ -255,8 +271,7 @@ function install_tizen_sdk() {
     # Install secret tool or not
     if ("$SECRET_TOOL"); then
         info "Overriding secret tool..."
-        cp "$SCRIPT_DIR/secret-tool.py" "$TIZEN_SDK_ROOT/tools/certificate-encryptor/secret-tool"
-        chmod 0755 "$TIZEN_SDK_ROOT/tools/certificate-encryptor/secret-tool"
+        install "$SCRIPT_DIR/secret-tool.py" "$TIZEN_SDK_ROOT/tools/certificate-encryptor/secret-tool"
     fi
 
     # Configure Tizen CLI
@@ -331,7 +346,7 @@ info "Created tmp directory $TMP_DIR"
 # Checks if the user need install dependencies
 if [ "$INSTALL_DEPENDENCIES" = true ]; then
     if ! install_dependencies; then
-        error "Cannot install dependencies, please use this script as sudo user or root. Use --help"
+        error "Cannot install dependencies, please use this script as sudo user or root."
         show_dependencies
         exit 1
     fi
@@ -339,8 +354,8 @@ fi
 
 # ------------------------------------------------------------------------------
 # Checking dependencies needed to install Tizen platform
-info "Checking required tools: cpio, java, unrpm, unzip, wget"
-for PKG in 'cpio' 'java' 'unrpm' 'unzip' 'wget'; do
+info "Checking required tools: 7z, cpio, java, unzip, wget"
+for PKG in '7z' 'cpio' 'java' 'unzip' 'wget'; do
     if ! command -v "$PKG" &>/dev/null; then
         error "Required tool not found: $PKG"
         dep_lost=1

@@ -69,6 +69,7 @@
         "MESSAGES_CLUSTER": [],
         "MODE_SELECT_CLUSTER": [],
         "NETWORK_COMMISSIONING_CLUSTER": [],
+        "PUSH_AV_STREAM_TRANSPORT_CLUSTER": [],
         "SAMPLE_MEI_CLUSTER": [],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "OCCUPANCY_SENSING_CLUSTER": [],
@@ -122,6 +123,7 @@
         "TIME_FORMAT_LOCALIZATION_CLUSTER": [],
         "TIME_SYNCHRONIZATION_CLUSTER": [],
         "TIMER_CLUSTER": [],
+        "TLS_CERTIFICATE_MANAGEMENT_CLUSTER": [],
         "TRUSTED_ROOT_CERTIFICATES_CLUSTER": [],
         "UNIT_LOCALIZATION_CLUSTER": [],
         "UNIT_TESTING_CLUSTER": [],
@@ -233,6 +235,7 @@
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
+        "PUSH_AV_STREAM_TRANSPORT_CLUSTER": [],
         "SAMPLE_MEI_CLUSTER": ["sample-mei-server"],
         "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
         "ON_OFF_CLUSTER": ["on-off-server"],
@@ -305,6 +308,7 @@
         "TIME_FORMAT_LOCALIZATION_CLUSTER": ["time-format-localization-server"],
         "TIME_SYNCHRONIZATION_CLUSTER": ["time-synchronization-server"],
         "TIMER_CLUSTER": ["timer-server"],
+        "TLS_CERTIFICATE_MANAGEMENT_CLUSTER": [],
         "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],

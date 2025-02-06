@@ -40,7 +40,7 @@ function(chip_ota_image TARGET_NAME)
             "--version"
             ${APPVERSION}
             "--version-str"
-            ${APP_VERSION_TWEAK_STRING}
+            ${APP_VERSION_EXTENDED_STRING}
             "--digest-algorithm"
             "sha256"
         )

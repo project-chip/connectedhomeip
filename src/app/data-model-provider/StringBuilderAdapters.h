@@ -34,6 +34,7 @@
 /// which is not as helpful as a full formatted output.
 
 #include <pw_string/string_builder.h>
+#include <pw_unit_test/framework.h>
 
 #include <app/data-model-provider/ActionReturnStatus.h>
 
@@ -44,3 +45,11 @@ StatusWithSize ToString<chip::app::DataModel::ActionReturnStatus>(const chip::ap
                                                                   pw::span<char> buffer);
 
 } // namespace pw
+
+#if CHIP_CONFIG_TEST_GOOGLETEST
+namespace chip {
+
+void PrintTo(const chip::app::DataModel::ActionReturnStatus & status, std::ostream * os);
+
+} // namespace chip
+#endif // CHIP_CONFIG_TEST_GOOGLETEST

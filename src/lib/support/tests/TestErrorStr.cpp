@@ -67,6 +67,14 @@ static bool trueFormat(char * buf, uint16_t bufSize, CHIP_ERROR err)
     return true; // means I handled it
 }
 
+TEST(TestErrorStr, CheckRegisterDeregisterSingleErrorFormatter)
+{
+    static ErrorFormatter falseFormatter = { falseFormat, nullptr };
+
+    RegisterErrorFormatter(&falseFormatter);
+    DeregisterErrorFormatter(&falseFormatter);
+}
+
 TEST(TestErrorStr, CheckRegisterDeregisterErrorFormatter)
 {
     static ErrorFormatter falseFormatter  = { falseFormat, nullptr };
@@ -114,6 +122,8 @@ TEST(TestErrorStr, CheckRegisterDeregisterErrorFormatter)
 
     // verify this doesn't crash
     DeregisterErrorFormatter(&trueFormatter);
+    DeregisterErrorFormatter(&falseFormatter);
+    DeregisterErrorFormatter(&falseFormatter2);
 }
 
 TEST(TestErrorStr, CheckNoError)

@@ -124,7 +124,7 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
         return 'sdkconfig.defaults'
 
     rpc = "_rpc" if enable_rpcs else ""
-    if board == Esp32Board.DevKitC:
+    if board == Esp32Board.DevKitC or board == Esp32Board.C3DevKit:
         return 'sdkconfig{}.defaults'.format(rpc)
     elif board == Esp32Board.M5Stack:
         # a subset of apps have m5stack specific configurations. However others
@@ -139,8 +139,6 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
             return 'sdkconfig_m5stack{}.defaults'.format(rpc)
         else:
             return 'sdkconfig{}.defaults'.format(rpc)
-    elif board == Esp32Board.C3DevKit:
-        return 'sdkconfig{}.defaults.esp32c3'.format(rpc)
     else:
         raise Exception('Unknown board type')
 
@@ -174,6 +172,20 @@ class Esp32Builder(Builder):
             title=title)
 
     @property
+    def TargetName(self):
+        if self.board == Esp32Board.C3DevKit:
+            return 'esp32c3'
+        else:
+            return 'esp32'
+
+    @property
+    def TargetFileName(self) -> Optional[str]:
+        if self.board == Esp32Board.C3DevKit:
+            return 'sdkconfig.defaults.esp32c3'
+        else:
+            return None
+
+    @property
     def ExamplePath(self):
         return os.path.join(self.app.ExamplePath, 'esp32')
 
@@ -194,6 +206,11 @@ class Esp32Builder(Builder):
         self._Execute(['cp', defaults, defaults_out])
         self._Execute(
             ['rm', '-f', os.path.join(self.ExamplePath, 'sdkconfig')])
+
+        if self.TargetFileName is not None:
+            target_defaults = os.path.join(self.ExamplePath, self.TargetFileName)
+            if os.path.exists(target_defaults):
+                self._Execute(['cp', target_defaults, os.path.join(self.output_dir, self.TargetFileName)])
 
         if not self.enable_ipv4:
             self._Execute(
@@ -221,8 +238,9 @@ class Esp32Builder(Builder):
 
         cmake_args = " ".join(cmake_args)
         defaults = shlex.quote(defaults_out)
+        target = shlex.quote(self.TargetName)
 
-        cmd = f"\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py {cmake_args} reconfigure"
+        cmd = f"\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py {cmake_args} -DIDF_TARGET={target} reconfigure"
 
         # This will do a 'cmake reconfigure' which will create ninja files without rebuilding
         self._IdfEnvExecute(cmd)

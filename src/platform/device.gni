@@ -85,8 +85,8 @@ declare_args() {
     chip_enable_ble = chip_config_network_layer_ble
   }
 
-  # Enable NFC support
-  chip_enable_nfc = false
+  # Enable NFC Onboarding Payload support
+  chip_enable_nfc_onboarding_payload = false
 
   # Enable OTA requestor support
   chip_enable_ota_requestor = false

@@ -24,6 +24,7 @@
 #include <app/MessageDef/StatusIB.h>
 #include <app/StatusResponse.h>
 #include <app/WriteHandler.h>
+#include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/reporting/Engine.h>
@@ -110,7 +111,9 @@ std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePat
         return std::nullopt;
     }
 
-    auto info = mDataModelProvider->GetAttributeInfo(path);
+    DataModel::AttributeFinder finder(mDataModelProvider);
+    std::optional<DataModel::AttributeEntry> info = finder.Find(path);
+
     if (!info.has_value())
     {
         return std::nullopt;

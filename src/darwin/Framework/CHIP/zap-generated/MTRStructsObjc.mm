@@ -9746,6 +9746,360 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRPushAVStreamTransportClusterTransportMotionTriggerTimeControlStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _initialDuration = @(0);
+
+        _augmentationDuration = @(0);
+
+        _maxDuration = @(0);
+
+        _blindDuration = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterTransportMotionTriggerTimeControlStruct alloc] init];
+
+    other.initialDuration = self.initialDuration;
+    other.augmentationDuration = self.augmentationDuration;
+    other.maxDuration = self.maxDuration;
+    other.blindDuration = self.blindDuration;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: initialDuration:%@; augmentationDuration:%@; maxDuration:%@; blindDuration:%@; >", NSStringFromClass([self class]), _initialDuration, _augmentationDuration, _maxDuration, _blindDuration];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterTransportZoneOptionsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _zone = nil;
+
+        _sensitivity = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterTransportZoneOptionsStruct alloc] init];
+
+    other.zone = self.zone;
+    other.sensitivity = self.sensitivity;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; sensitivity:%@; >", NSStringFromClass([self class]), _zone, _sensitivity];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterMetadataOptionsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _multiplexing = @(0);
+
+        _includeMotionZones = @(0);
+
+        _enableMetadataPrivacySensitive = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterMetadataOptionsStruct alloc] init];
+
+    other.multiplexing = self.multiplexing;
+    other.includeMotionZones = self.includeMotionZones;
+    other.enableMetadataPrivacySensitive = self.enableMetadataPrivacySensitive;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: multiplexing:%@; includeMotionZones:%@; enableMetadataPrivacySensitive:%@; >", NSStringFromClass([self class]), _multiplexing, _includeMotionZones, _enableMetadataPrivacySensitive];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterTransportTriggerOptionsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _triggerType = @(0);
+
+        _motionZones = nil;
+
+        _motionSensitivity = nil;
+
+        _motionTimeControl = nil;
+
+        _maxPreRollLen = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterTransportTriggerOptionsStruct alloc] init];
+
+    other.triggerType = self.triggerType;
+    other.motionZones = self.motionZones;
+    other.motionSensitivity = self.motionSensitivity;
+    other.motionTimeControl = self.motionTimeControl;
+    other.maxPreRollLen = self.maxPreRollLen;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: triggerType:%@; motionZones:%@; motionSensitivity:%@; motionTimeControl:%@; maxPreRollLen:%@; >", NSStringFromClass([self class]), _triggerType, _motionZones, _motionSensitivity, _motionTimeControl, _maxPreRollLen];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterCMAFContainerOptionsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _chunkDuration = @(0);
+
+        _cencKey = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterCMAFContainerOptionsStruct alloc] init];
+
+    other.chunkDuration = self.chunkDuration;
+    other.cencKey = self.cencKey;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chunkDuration:%@; cencKey:%@; >", NSStringFromClass([self class]), _chunkDuration, [_cencKey base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterContainerOptionsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _containerType = @(0);
+
+        _cmafContainerOptions = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterContainerOptionsStruct alloc] init];
+
+    other.containerType = self.containerType;
+    other.cmafContainerOptions = self.cmafContainerOptions;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: containerType:%@; cmafContainerOptions:%@; >", NSStringFromClass([self class]), _containerType, _cmafContainerOptions];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterTransportOptionsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _streamUsage = @(0);
+
+        _videoStreamID = nil;
+
+        _audioStreamID = nil;
+
+        _endpointID = @(0);
+
+        _url = @"";
+
+        _triggerOptions = [MTRPushAVStreamTransportClusterTransportTriggerOptionsStruct new];
+
+        _ingestMethod = @(0);
+
+        _containerFormat = @(0);
+
+        _containerOptions = [MTRPushAVStreamTransportClusterContainerOptionsStruct new];
+
+        _metadataOptions = nil;
+
+        _expiryTime = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterTransportOptionsStruct alloc] init];
+
+    other.streamUsage = self.streamUsage;
+    other.videoStreamID = self.videoStreamID;
+    other.audioStreamID = self.audioStreamID;
+    other.endpointID = self.endpointID;
+    other.url = self.url;
+    other.triggerOptions = self.triggerOptions;
+    other.ingestMethod = self.ingestMethod;
+    other.containerFormat = self.containerFormat;
+    other.containerOptions = self.containerOptions;
+    other.metadataOptions = self.metadataOptions;
+    other.expiryTime = self.expiryTime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; endpointID:%@; url:%@; triggerOptions:%@; ingestMethod:%@; containerFormat:%@; containerOptions:%@; metadataOptions:%@; expiryTime:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _endpointID, _url, _triggerOptions, _ingestMethod, _containerFormat, _containerOptions, _metadataOptions, _expiryTime];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterTransportConfigurationStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _connectionID = @(0);
+
+        _transportStatus = @(0);
+
+        _transportOptions = [MTRPushAVStreamTransportClusterTransportOptionsStruct new];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterTransportConfigurationStruct alloc] init];
+
+    other.connectionID = self.connectionID;
+    other.transportStatus = self.transportStatus;
+    other.transportOptions = self.transportOptions;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; transportStatus:%@; transportOptions:%@; >", NSStringFromClass([self class]), _connectionID, _transportStatus, _transportOptions];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterPushTransportBeginEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _connectionID = @(0);
+
+        _triggerType = @(0);
+
+        _activationReason = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterPushTransportBeginEvent alloc] init];
+
+    other.connectionID = self.connectionID;
+    other.triggerType = self.triggerType;
+    other.activationReason = self.activationReason;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; triggerType:%@; activationReason:%@; >", NSStringFromClass([self class]), _connectionID, _triggerType, _activationReason];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterPushTransportEndEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _connectionID = @(0);
+
+        _triggerType = @(0);
+
+        _activationReason = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterPushTransportEndEvent alloc] init];
+
+    other.connectionID = self.connectionID;
+    other.triggerType = self.triggerType;
+    other.activationReason = self.activationReason;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; triggerType:%@; activationReason:%@; >", NSStringFromClass([self class]), _connectionID, _triggerType, _activationReason];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRChimeClusterChimeSoundStruct
 - (instancetype)init
 {
@@ -9921,6 +10275,69 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestID:%@; clientNodeID:%@; statusCode:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _requestID, _clientNodeID, _statusCode, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRTLSCertificateManagementClusterTLSCertStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _caid = @(0);
+
+        _certificate = [NSData data];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRTLSCertificateManagementClusterTLSCertStruct alloc] init];
+
+    other.caid = self.caid;
+    other.certificate = self.certificate;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: caid:%@; certificate:%@; >", NSStringFromClass([self class]), _caid, [_certificate base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRTLSCertificateManagementClusterTLSClientCertificateDetailStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _ccdid = @(0);
+
+        _clientCertificate = [NSData data];
+
+        _intermediateCertificates = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRTLSCertificateManagementClusterTLSClientCertificateDetailStruct alloc] init];
+
+    other.ccdid = self.ccdid;
+    other.clientCertificate = self.clientCertificate;
+    other.intermediateCertificates = self.intermediateCertificates;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ccdid:%@; clientCertificate:%@; intermediateCertificates:%@; >", NSStringFromClass([self class]), _ccdid, [_clientCertificate base64EncodedStringWithOptions:0], _intermediateCertificates];
     return descriptionString;
 }
 

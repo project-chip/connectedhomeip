@@ -20,8 +20,8 @@ import("${chip_root}/src/lib/lib.gni")
 declare_args() {
   bl_iot_sdk_root = "${chip_root}/third_party/bouffalolab/repo"
 
-  enable_debug_frame_ptr = false
-  debug_output_file = ""
+  enable_debug_coredump = false
+  coredump_binary_id = 0
 }
 
 assert(bl_iot_sdk_root != "", "bl_iot_sdk_root must be specified")
@@ -63,11 +63,6 @@ template("bl_iot_sdk") {
       "-include",
       rebase_path("${invoker.freertos_config}", root_build_dir),
     ]
-
-    if (defined(invoker.enable_debug_frame_ptr) &&
-        invoker.enable_debug_frame_ptr) {
-      cflags += [ "-fno-omit-frame-pointer" ]
-    }
   }
 
   source_set("${sdk_target_name}_soc") {
@@ -162,14 +157,6 @@ template("bl_iot_sdk") {
   source_set("${sdk_target_name}_bl602_freertos") {
     defines = [ "portasmHANDLE_INTERRUPT=interrupt_entry" ]
 
-    if (defined(invoker.enable_debug_frame_ptr) &&
-        invoker.enable_debug_frame_ptr) {
-      defines += [
-        "CONF_ENABLE_FRAME_PTR=1",
-        "CONF_ENABLE_FUNC_BACKTRACE_ELF=${invoker.debug_output_file}",
-      ]
-    }
-
     include_dirs = [ "${bl_iot_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/portable/GCC/RISC-V/chip_specific_extensions/RV32F_float_abi_single" ]
 
     sources = [
@@ -210,10 +197,18 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_hosal") {
-    defines = [
-      "CFG_BLE_ENABLE",
-      "CONF_BL602_USE_1M_FLASH=0",
-    ]
+    defines = [ "CONF_BL602_USE_1M_FLASH=0" ]
+
+    if (defined(invoker.chip_config_network_layer_ble) &&
+        invoker.chip_config_network_layer_ble) {
+      defines += [ "CFG_BLE_ENABLE" ]
+    }
+
+    if (defined(invoker.enable_debug_coredump) &&
+        invoker.enable_debug_coredump) {
+      defines += [ "SYS_ENABLE_COREDUMP" ]
+    }
+
     sources = [
       "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_adc.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_boot2.c",
@@ -368,13 +363,15 @@ template("bl_iot_sdk") {
           [ "${bl_iot_sdk_root}/components/stage/littlefs/littlefs" ]
       include_dirs += [ "${bl_iot_sdk_root}/components/stage/littlefs/port" ]
     }
+
+    if (defined(invoker.enable_debug_coredump) &&
+        invoker.enable_debug_coredump) {
+      include_dirs += [ "${bl_iot_sdk_root}/components/stage/coredump/inc" ]
+    }
   }
 
   source_set("${sdk_target_name}_stage") {
-    defines = [
-      "EF_ENV_CACHE_TABLE_SIZE=64",
-      "RHINO_CONFIG_WORKQUEUE=0",
-    ]
+    defines = [ "RHINO_CONFIG_WORKQUEUE=0" ]
 
     sources = [
       "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt.c",
@@ -394,6 +391,13 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/stage/yloop/src/yloop.c",
     ]
 
+    if (defined(invoker.enable_debug_coredump) &&
+        invoker.enable_debug_coredump) {
+      defines += [ "BFLB_COREDUMP_BINARY_ID=${invoker.coredump_binary_id}" ]
+      sources +=
+          [ "${bl_iot_sdk_root}/components/stage/coredump/bl_coredump.c" ]
+    }
+
     cflags_c = [ "-Wno-sign-compare" ]
     configs += [
       ":${sdk_target_name}_config",
@@ -402,10 +406,12 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_fs",
       ":${sdk_target_name}_config_sys",
       ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_hosal",
     ]
 
     if (defined(invoker.bouffalo_sdk_component_easyflash_enabled) &&
         invoker.bouffalo_sdk_component_easyflash_enabled) {
+      defines += [ "EF_ENV_CACHE_TABLE_SIZE=64" ]
       sources += [
         "${bl_iot_sdk_root}/components/stage/easyflash4/src/easyflash.c",
         "${bl_iot_sdk_root}/components/stage/easyflash4/src/ef_env.c",
@@ -423,7 +429,6 @@ template("bl_iot_sdk") {
         "${bl_iot_sdk_root}/components/stage/littlefs/littlefs/lfs_util.c",
         "${bl_iot_sdk_root}/components/stage/littlefs/port/lfs_xip_flash.c",
       ]
-      configs += [ ":${sdk_target_name}_config_hosal" ]
     }
 
     public_configs = [ ":${sdk_target_name}_config_stage" ]

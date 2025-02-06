@@ -153,10 +153,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 
-    if (chip_enable_nfc) {
+    if (chip_enable_nfc_onboarding_payload) {
       defines += [
-        "CHIP_DEVICE_CONFIG_ENABLE_NFC=1",
-        "CONFIG_CHIP_NFC_COMMISSIONING=1",
+        "CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD=1",
+        "CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD=1",
       ]
     }
 
@@ -539,7 +539,8 @@ if (chip_device_platform != "none") {
 
     public_deps = [
       ":platform_base",
-      "${chip_root}/src/app/common:cluster-objects",
+      "${chip_root}/src/app/common:ids",
+      "${chip_root}/src/app/util:types",
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
     ]

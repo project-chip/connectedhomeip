@@ -187,8 +187,6 @@ public:
     // and release from the pool.
     void TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = false) override;
 
-    bool IsServerListenEnabled() override;
-
     bool CanSendToPeer(const PeerAddress & address) override
     {
         return (mState == TCPState::kInitialized) && (address.GetTransportType() == Type::kTcp) &&
@@ -312,7 +310,6 @@ private:
     Inet::TCPEndPoint * mListenSocket = nullptr;                       ///< TCP socket used by the transport
     Inet::IPAddressType mEndpointType = Inet::IPAddressType::kUnknown; ///< Socket listening type
     TCPState mState                   = TCPState::kNotReady;           ///< State of the TCP transport
-    bool mIsServerListenEnabled       = true;                          ///< TCP Server mode enabled
 
     // The configured timeout for the connection attempt to the peer, before
     // giving up.

@@ -420,8 +420,9 @@ tests:
       command: "WaitForMs"
       arguments:
           values:
+              # Wait one second longer to make sure the DUT had time to end the commissioning window
               - name: "ms"
-                value: PIXIT.CADMIN.CwDuration * 1000
+                value: (PIXIT.CADMIN.CwDuration + 1 ) * 1000
 
     - label:
           "Step 11: TH_CR2 reads the window status to verify the DUT_CE window

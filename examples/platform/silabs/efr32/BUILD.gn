@@ -21,6 +21,10 @@ import("${chip_root}/src/platform/device.gni")
 import("${silabs_sdk_build_root}/efr32_sdk.gni")
 import("${silabs_sdk_build_root}/silabs_board.gni")
 
+import("${matter_support_root}/provision/args.gni")  # Seperate import since the
+                                                     # matter_support_root is
+                                                     # defined in the
+                                                     # ef32_sdk.gni
 declare_args() {
   enable_heap_monitoring = false
 
@@ -71,7 +75,7 @@ source_set("test-event-trigger") {
     "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.h",
   ]
 
-  deps = [ "${chip_root}/src/platform/silabs/provision:provision-headers" ]
+  deps = [ "${sl_provision_root}:headers" ]
   public_configs = [ ":test-event-trigger-config" ]
   public_deps = [
     "${chip_root}/src/app:test-event-trigger",
@@ -137,7 +141,10 @@ config("efr32-common-config") {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MULTI_OTA_REQUESTOR=1" ]
   }
 
-  ldflags = [ "-Wl,--no-warn-rwx-segment" ]
+  ldflags = [
+    "-Wl,--no-warn-rwx-segment",
+    "-fno-lto",
+  ]
 }
 
 source_set("efr32-common") {

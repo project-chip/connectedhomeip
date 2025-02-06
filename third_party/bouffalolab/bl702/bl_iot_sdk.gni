@@ -21,8 +21,8 @@ import("${chip_root}/src/lib/lib.gni")
 declare_args() {
   bl_iot_sdk_root = "${chip_root}/third_party/bouffalolab/repo"
 
-  enable_debug_frame_ptr = true
-  debug_output_file = ""
+  enable_debug_coredump = false
+  coredump_binary_id = 0
 }
 
 assert(bl_iot_sdk_root != "", "bl_iot_sdk_root must be specified")
@@ -63,11 +63,6 @@ template("bl_iot_sdk") {
       "-include",
       rebase_path("${invoker.freertos_config}", root_build_dir),
     ]
-
-    if (defined(invoker.enable_debug_frame_ptr) &&
-        invoker.enable_debug_frame_ptr) {
-      cflags += [ "-fno-omit-frame-pointer" ]
-    }
   }
 
   config("${sdk_target_name}_config_soc") {
@@ -97,6 +92,7 @@ template("bl_iot_sdk") {
 
   config("${sdk_target_name}_config_BSP_Driver") {
     include_dirs = [
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver",
       "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/inc",
       "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/regs",
       "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/startup",
@@ -171,13 +167,6 @@ template("bl_iot_sdk") {
 
   source_set("${sdk_target_name}_bl702_freertos") {
     defines = [ "portasmHANDLE_INTERRUPT=interrupt_entry" ]
-    if (defined(invoker.enable_debug_frame_ptr) &&
-        invoker.enable_debug_frame_ptr) {
-      defines += [
-        "CONF_ENABLE_FRAME_PTR=1",
-        "CONF_ENABLE_FUNC_BACKTRACE_ELF=${invoker.debug_output_file}",
-      ]
-    }
 
     include_dirs = [ "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/portable/GCC/RISC-V/chip_specific_extensions/RV32F_float_abi_single" ]
 
@@ -201,14 +190,6 @@ template("bl_iot_sdk") {
       "-Wno-sign-compare",
       "-Wno-old-style-declaration",
     ]
-
-    if (defined(invoker.enable_debug_frame_ptr) &&
-        invoker.enable_debug_frame_ptr) {
-      cflags_c += [
-        "-Wno-incompatible-pointer-types",
-        "-Wno-int-conversion",
-      ]
-    }
 
     public_configs = [
       ":${sdk_target_name}_config",
@@ -267,6 +248,11 @@ template("bl_iot_sdk") {
       defines += [ "CFG_BLE_ENABLE" ]
     }
 
+    if (defined(invoker.enable_debug_coredump) &&
+        invoker.enable_debug_coredump) {
+      defines += [ "SYS_ENABLE_COREDUMP" ]
+    }
+
     sources = [
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_adc.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_boot2.c",
@@ -281,6 +267,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_irq.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_pds.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_psram.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_psram_sp.S",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_pwm.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_rtc.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_sec.c",
@@ -413,6 +400,11 @@ template("bl_iot_sdk") {
       include_dirs += [ "${bl_iot_sdk_root}/components/stage/littlefs/port" ]
     }
 
+    if (defined(invoker.enable_debug_coredump) &&
+        invoker.enable_debug_coredump) {
+      include_dirs += [ "${bl_iot_sdk_root}/components/stage/coredump/inc" ]
+    }
+
     if (defined(invoker.enable_cdc_module) && invoker.enable_cdc_module) {
       cflags_cc = [ "-Wno-shadow" ]
     }
@@ -441,6 +433,13 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/stage/yloop/src/yloop.c",
     ]
 
+    if (defined(invoker.enable_debug_coredump) &&
+        invoker.enable_debug_coredump) {
+      defines += [ "BFLB_COREDUMP_BINARY_ID=${invoker.coredump_binary_id}" ]
+      sources +=
+          [ "${bl_iot_sdk_root}/components/stage/coredump/bl_coredump.c" ]
+    }
+
     cflags_c = [ "-Wno-sign-compare" ]
     configs += [
       ":${sdk_target_name}_config",
@@ -449,10 +448,12 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_fs",
       ":${sdk_target_name}_config_sys",
       ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_hosal",
     ]
 
     if (defined(invoker.bouffalo_sdk_component_easyflash_enabled) &&
         invoker.bouffalo_sdk_component_easyflash_enabled) {
+      defines += [ "EF_ENV_CACHE_TABLE_SIZE=64" ]
       sources += [
         "${bl_iot_sdk_root}/components/stage/easyflash4/src/easyflash.c",
         "${bl_iot_sdk_root}/components/stage/easyflash4/src/ef_env.c",
@@ -470,7 +471,6 @@ template("bl_iot_sdk") {
         "${bl_iot_sdk_root}/components/stage/littlefs/littlefs/lfs_util.c",
         "${bl_iot_sdk_root}/components/stage/littlefs/port/lfs_xip_flash.c",
       ]
-      configs += [ ":${sdk_target_name}_config_hosal" ]
     }
 
     public_configs = [ ":${sdk_target_name}_config_stage" ]
@@ -742,7 +742,10 @@ template("bl_iot_sdk") {
   }
 
   config("${sdk_target_name}_config_openthread_port") {
-    defines = [ "OT_FREERTOS_ENABLE=1" ]
+    defines = [
+      "OT_FREERTOS_ENABLE=1",
+      "CONFIG_LMAC154_LOG=0",
+    ]
 
     include_dirs = [
       "${openthread_root}/src/core",
@@ -779,6 +782,7 @@ template("bl_iot_sdk") {
         invoker.bouffalo_sdk_component_easyflash_enabled) {
       sources += [ "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_settings_easyflash.c" ]
     } else {
+      defines += [ "BL_LITTLEFS_PARTITION_NAME" ]
       sources += [ "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_settings_littlefs.c" ]
     }
 

@@ -92,10 +92,6 @@ static wfx_wifi_scan_result_t ap_info;
 #define STA_IP_FAIL (0)
 #define WLAN_TASK_PRIORITY (1)
 
-#define WE_ST_STARTED 1
-#define WE_ST_STA_CONN 2
-#define WE_ST_HW_STARTED 4
-
 #ifdef SL_WFX_CONFIG_SOFTAP
 // Connection parameters
 char softap_ssid[32]                   = SOFTAP_SSID_DEFAULT;
@@ -109,8 +105,6 @@ struct netif * sta_netif;
 wfx_wifi_provision_t wifi_provision;
 #define PUT_COUNTER(name) ChipLogDetail(DeviceLayer, "%-24s %lu", #name, (unsigned long) counters->body.count_##name);
 
-bool hasNotifiedIPV6             = false;
-bool hasNotifiedIPV4             = false;
 bool hasNotifiedWifiConnectivity = false;
 static uint8_t retryJoin         = 0;
 bool retryInProgress             = false;
@@ -120,12 +114,14 @@ static struct scan_result_holder
     struct scan_result_holder * next;
     wfx_wifi_scan_result scan;
 } * scan_save;
+
 static uint8_t scan_count = 0;
 static ScanCallback scan_cb;              /* user-callback - when scan is done */
 static uint8_t * scan_ssid     = nullptr; /* Which one are we scanning for */
 static size_t scan_ssid_length = 0;
 static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_result);
 static void sl_wfx_scan_complete_callback(uint32_t status);
+static sl_status_t wfx_wifi_hw_start(void);
 
 static void wfx_events_task(void * p_arg);
 
@@ -148,7 +144,7 @@ namespace {
 
 // wfx_fmac_driver context
 sl_wfx_context_t wifiContext;
-uint8_t wifi_extra;
+chip::BitFlags<WifiState> wifi_extra;
 
 typedef struct __attribute__((__packed__)) sl_wfx_get_counters_cnf_body_s
 {
@@ -334,6 +330,105 @@ CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback)
     scan_cb = callback;
 
     xEventGroupSetBits(sl_wfx_event_group, SL_WFX_SCAN_START);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR StartWifiTask()
+{
+    if (wifi_extra.Has(WifiState::kStationInit))
+    {
+        ChipLogDetail(DeviceLayer, "WIFI: Already started");
+        return CHIP_NO_ERROR;
+    }
+    wifi_extra.Set(WifiState::kStationInit);
+
+    VerifyOrReturnError(wfx_soft_init() == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "Failed to execute the WFX software init."));
+    VerifyOrReturnError(wfx_wifi_hw_start() == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "Failed to execute the WFX HW start."));
+
+    return CHIP_NO_ERROR;
+}
+
+void ConfigureStationMode()
+{
+    wifi_extra.Set(WifiState::kStationMode);
+}
+
+bool IsStationModeEnabled(void)
+{
+    return wifi_extra.Has(WifiState::kStationMode);
+}
+
+bool IsStationConnected()
+{
+    return wifi_extra.Has(WifiState::kStationConnected);
+}
+
+bool IsStationReady()
+{
+    return wifi_extra.Has(WifiState::kStationInit);
+}
+
+CHIP_ERROR TriggerDisconnection(void)
+{
+    ChipLogProgress(DeviceLayer, "STA-Disconnecting");
+
+    sl_status_t status = sl_wfx_send_disconnect_command();
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
+
+    wifi_extra.Clear(WifiState::kStationConnected);
+
+    xEventGroupSetBits(sl_wfx_event_group, SL_WFX_RETRY_CONNECT);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GetAccessPointInfo(wfx_wifi_scan_result_t & info)
+{
+    uint32_t signal_strength = 0;
+
+    // TODO: The ap_info.ssid isn't populated anywhere. The returned value is always 0.
+    chip::ByteSpan apSsidSpan(ap_info.ssid, ap_info.ssid_length);
+    chip::MutableByteSpan apSsidMutableSpan(info.ssid, WFX_MAX_SSID_LENGTH);
+    chip::CopySpanToMutableSpan(apSsidSpan, apSsidMutableSpan);
+    info.ssid_length = apSsidMutableSpan.size();
+
+    // TODO: The ap_info.bssid isn't populated anywhere. The returned value is always 0.
+    chip::ByteSpan apBssidSpan(ap_info.bssid, kWifiMacAddressLength);
+    chip::MutableByteSpan apBssidMutableSpan(info.bssid, kWifiMacAddressLength);
+    chip::CopySpanToMutableSpan(apBssidSpan, apBssidMutableSpan);
+
+    info.security = ap_info.security;
+    info.chan     = ap_info.chan;
+
+    sl_status_t status = sl_wfx_get_signal_strength(&signal_strength);
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
+
+    info.rssi = (signal_strength - 220) / 2;
+
+    ChipLogDetail(DeviceLayer, "WIFI:SSID     : %s", ap_info.ssid);
+    ChipLogDetail(DeviceLayer, "WIFI:BSSID    : %02x:%02x:%02x:%02x:%02x:%02x", ap_info.bssid[0], ap_info.bssid[1],
+                  ap_info.bssid[2], ap_info.bssid[3], ap_info.bssid[4], ap_info.bssid[5]);
+    ChipLogDetail(DeviceLayer, "WIFI:security : %d", info.security);
+    ChipLogDetail(DeviceLayer, "WIFI:channel  :  %d", info.chan);
+    ChipLogDetail(DeviceLayer, "signal_strength: %ld", signal_strength);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & info)
+{
+    sl_status_t status = get_all_counters();
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "Failed to get the couters"));
+
+    info.beacon_lost_count = counters->body.count_miss_beacon;
+    info.beacon_rx_count   = counters->body.count_rx_beacon;
+    info.mcast_rx_count    = counters->body.count_rx_multicast_frames;
+    info.mcast_tx_count    = counters->body.count_tx_multicast_frames;
+    info.ucast_rx_count    = counters->body.count_rx_packets;
+    info.ucast_tx_count    = counters->body.count_tx_packets;
+    info.overrun_count     = gOverrunCount;
+
     return CHIP_NO_ERROR;
 }
 
@@ -558,8 +653,8 @@ static void sl_wfx_connect_callback(sl_wfx_connect_ind_body_t connect_indication
     case WFM_STATUS_SUCCESS: {
         ChipLogProgress(DeviceLayer, "STA-Connected");
         memcpy(ap_mac.data(), mac, kWifiMacAddressLength);
-        sl_wfx_context->state =
-            static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) | static_cast<int>(SL_WFX_STA_INTERFACE_CONNECTED));
+
+        wifi_extra.Set(WifiState::kStationConnected);
         xEventGroupSetBits(sl_wfx_event_group, SL_WFX_CONNECT);
         break;
     }
@@ -593,8 +688,7 @@ static void sl_wfx_connect_callback(sl_wfx_connect_ind_body_t connect_indication
         retryJoin += 1;
         retryInProgress = false;
         ChipLogProgress(DeviceLayer, "Retry to connect to network count: %d", retryJoin);
-        sl_wfx_context->state =
-            static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) & ~static_cast<int>(SL_WFX_STARTED));
+
         wfx_retry_connection(retryJoin);
     }
 }
@@ -609,8 +703,8 @@ static void sl_wfx_disconnect_callback(uint8_t * mac, uint16_t reason)
 {
     (void) (mac);
     ChipLogProgress(DeviceLayer, "Disconnected %d", reason);
-    sl_wfx_context->state =
-        static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) & ~static_cast<int>(SL_WFX_STA_INTERFACE_CONNECTED));
+    wifi_extra.Clear(WifiState::kStationConnected);
+
     retryInProgress = false;
     wfx_retry_connection(retryJoin);
 }
@@ -624,8 +718,8 @@ static void sl_wfx_disconnect_callback(uint8_t * mac, uint16_t reason)
 static void sl_wfx_start_ap_callback(uint32_t status)
 {
     VerifyOrReturnLogError(status == AP_START_SUCCESS, CHIP_ERROR_INTERNAL);
-    sl_wfx_context->state =
-        static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) | static_cast<int>(SL_WFX_AP_INTERFACE_UP));
+    wifi_extra.Set(WifiState::kAPReady);
+
     xEventGroupSetBits(sl_wfx_event_group, SL_WFX_START_AP);
 }
 
@@ -638,8 +732,8 @@ static void sl_wfx_stop_ap_callback(void)
     // TODO
     // dhcpserver_clear_stored_mac();
     ChipLogProgress(DeviceLayer, "SoftAP stopped");
-    sl_wfx_context->state =
-        static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) & ~static_cast<int>(SL_WFX_AP_INTERFACE_UP));
+    wifi_extra.Clear(WifiState::kAPReady);
+
     xEventGroupSetBits(sl_wfx_event_group, SL_WFX_STOP_AP);
 }
 
@@ -717,17 +811,17 @@ static void wfx_events_task(void * p_arg)
             wfx_connect_to_ap();
         }
 
-        if (wifi_extra & WE_ST_STA_CONN)
+        if (wifi_extra.Has(WifiState::kStationConnected))
         {
             if ((now = xTaskGetTickCount()) > (last_dhcp_poll + pdMS_TO_TICKS(250)))
             {
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
                 uint8_t dhcp_state = dhcpclient_poll(sta_netif);
 
-                if ((dhcp_state == DHCP_ADDRESS_ASSIGNED) && !hasNotifiedIPV4)
+                if ((dhcp_state == DHCP_ADDRESS_ASSIGNED) && !HasNotifiedIPv4Change())
                 {
                     wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
-                    hasNotifiedIPV4 = true;
+                    NotifyIPv4Change(true);
                     if (!hasNotifiedWifiConnectivity)
                     {
                         ChipLogProgress(DeviceLayer, "will notify WiFi connectivity");
@@ -738,13 +832,11 @@ static void wfx_events_task(void * p_arg)
                 else if (dhcp_state == DHCP_OFF)
                 {
                     NotifyIPv4Change(false);
-                    hasNotifiedIPV4 = false;
                 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
-                if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !hasNotifiedIPV6)
+                if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !HasNotifiedIPv6Change())
                 {
                     NotifyIPv6Change(true);
-                    hasNotifiedIPV6 = true;
                     if (!hasNotifiedWifiConnectivity)
                     {
                         NotifyConnection(ap_mac);
@@ -759,17 +851,15 @@ static void wfx_events_task(void * p_arg)
         {
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
             NotifyIPv4Change(false);
-            hasNotifiedIPV4 = false;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
             NotifyIPv6Change(false);
-            hasNotifiedIPV6             = false;
             hasNotifiedWifiConnectivity = false;
             ChipLogProgress(DeviceLayer, "connected to AP");
-            wifi_extra |= WE_ST_STA_CONN;
+            wifi_extra.Set(WifiState::kStationConnected);
             retryJoin = 0;
             wfx_lwip_set_sta_link_up();
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-            if (!(wifiContext.state & SL_WFX_AP_INTERFACE_UP))
+            if (!(wifi_extra.Has(WifiState::kAPReady)))
             {
                 // Enable the power save
                 ChipLogProgress(DeviceLayer, "WF200 going to DTIM based sleep");
@@ -784,12 +874,10 @@ static void wfx_events_task(void * p_arg)
 
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
             NotifyIPv4Change(false);
-            hasNotifiedIPV4 = false;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
             NotifyIPv6Change(false);
-            hasNotifiedIPV6             = false;
             hasNotifiedWifiConnectivity = false;
-            wifi_extra &= ~WE_ST_STA_CONN;
+            wifi_extra.Clear(WifiState::kStationConnected);
             wfx_lwip_set_sta_link_down();
         }
 
@@ -875,7 +963,7 @@ static sl_status_t wfx_init(void)
                         wifiContext.mac_addr_0.octet[4], wifiContext.mac_addr_0.octet[5]);
         ChipLogProgress(DeviceLayer, "WF200 Init OK");
 
-        if (wifiContext.state == SL_WFX_STA_INTERFACE_CONNECTED)
+        if (wifi_extra.Has(WifiState::kStationConnected))
         {
             sl_wfx_send_disconnect_command();
         }
@@ -906,144 +994,37 @@ static sl_status_t wfx_init(void)
  * @return
  *    sl_status_t Shows init succes or error.
  ******************************************************************************/
-static void wfx_wifi_hw_start(void)
+static sl_status_t wfx_wifi_hw_start(void)
 {
-    sl_status_t status;
+    sl_status_t status = SL_STATUS_OK;
 
-    if (wifi_extra & WE_ST_HW_STARTED)
-        return;
-    ChipLogDetail(DeviceLayer, "STARTING WF200");
-    wifi_extra |= WE_ST_HW_STARTED;
-
-    sl_wfx_host_gpio_init();
-    if ((status = wfx_init()) == SL_STATUS_OK)
+    if (wifi_extra.Has(WifiState::kStationStarted))
     {
-        /* Initialize the LwIP stack */
-        ChipLogDetail(DeviceLayer, "WF200:Start LWIP");
-        sl_matter_lwip_start();
-        sl_matter_wifi_task_started();
-        wifiContext.state = SL_WFX_STARTED; /* Really this is a bit mask */
-        ChipLogDetail(DeviceLayer, "WF200:ready..");
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "WF200:init failed");
-    }
-}
-
-/***********************************************************************
- * @brief
- * Get AP info
- * @param[in]  ap: access point information
- * @return returns -1
- **************************************************************************/
-int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap)
-{
-    uint32_t signal_strength = 0;
-
-    chip::ByteSpan apSsidSpan(ap_info.ssid, ap_info.ssid_length);
-    chip::MutableByteSpan apSsidMutableSpan(ap->ssid, WFX_MAX_SSID_LENGTH);
-    chip::CopySpanToMutableSpan(apSsidSpan, apSsidMutableSpan);
-    ap->ssid_length = apSsidMutableSpan.size();
-
-    chip::ByteSpan apBssidSpan(ap_info.bssid, kWifiMacAddressLength);
-    chip::MutableByteSpan apBssidMutableSpan(ap->bssid, kWifiMacAddressLength);
-    chip::CopySpanToMutableSpan(apBssidSpan, apBssidMutableSpan);
-
-    ap->security = ap_info.security;
-    ap->chan     = ap_info.chan;
-
-    sl_status_t status = sl_wfx_get_signal_strength(&signal_strength);
-    VerifyOrReturnError(status == SL_STATUS_OK, status);
-    ap->rssi = (signal_strength - 220) / 2;
-
-    ChipLogDetail(DeviceLayer, "WIFI:SSID     : %s", ap_info.ssid);
-    ChipLogDetail(DeviceLayer, "WIFI:BSSID    : %02x:%02x:%02x:%02x:%02x:%02x", ap_info.bssid[0], ap_info.bssid[1],
-                  ap_info.bssid[2], ap_info.bssid[3], ap_info.bssid[4], ap_info.bssid[5]);
-    ChipLogDetail(DeviceLayer, "WIFI:security : %d", ap->security);
-    ChipLogDetail(DeviceLayer, "WIFI:channel  :  %d", ap->chan);
-    ChipLogDetail(DeviceLayer, "signal_strength: %ld", signal_strength);
-
-    return status;
-}
-
-/************************************************************************
- * @brief
- * Get AP extra info
- * @param[in]  extra_info: access point extra information
- * @return returns -1
- **************************************************************************/
-int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
-{
-    int32_t status;
-    status = get_all_counters();
-    if (status != SL_STATUS_OK)
-    {
-        ChipLogError(DeviceLayer, "Failed to get the couters");
-    }
-    else
-    {
-        extra_info->beacon_lost_count = counters->body.count_miss_beacon;
-        extra_info->beacon_rx_count   = counters->body.count_rx_beacon;
-        extra_info->mcast_rx_count    = counters->body.count_rx_multicast_frames;
-        extra_info->mcast_tx_count    = counters->body.count_tx_multicast_frames;
-        extra_info->ucast_rx_count    = counters->body.count_rx_packets;
-        extra_info->ucast_tx_count    = counters->body.count_tx_packets;
-        extra_info->overrun_count     = gOverrunCount;
-    }
-    return status;
-}
-
-/************************************************************************
- * @brief
- *    reset the count
- * @return returns -1
- **************************************************************************/
-int32_t wfx_reset_counts(void)
-{
-    /* TODO */
-    return -1;
-}
-
-/*************************************************************************
- * @brief
- * I think that this is getting called before FreeRTOS threads are ready
- * @return  returns SL_STATUS_OK
- **************************************************************************/
-sl_status_t wfx_wifi_start(void)
-{
-    if (wifi_extra & WE_ST_STARTED)
-    {
-        ChipLogDetail(DeviceLayer, "WIFI: Already started");
         return SL_STATUS_OK;
     }
-    wifi_extra |= WE_ST_STARTED;
-    wfx_soft_init();
-    wfx_wifi_hw_start();
+
+    ChipLogDetail(DeviceLayer, "STARTING WF200");
+
+    sl_wfx_host_gpio_init();
+
+    status = wfx_init();
+    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "WF200:init failed"));
+
+    /* Initialize the LwIP stack */
+    ChipLogDetail(DeviceLayer, "WF200:Start LWIP");
+    sl_matter_lwip_start();
+    sl_matter_wifi_task_started();
+
+    ChipLogDetail(DeviceLayer, "WF200:ready.");
+    wifi_extra.Set(WifiState::kStationStarted);
 
     return SL_STATUS_OK;
 }
 
-/****************************************************************************
- * @brief
- *      getnetif using interface
- * @param[in]  interface:
- * @return returns selectedNetif
- *****************************************************************************/
-struct netif * wfx_GetNetif(sl_wfx_interface_t interface)
+CHIP_ERROR ResetCounters()
 {
-    struct netif * SelectedNetif = nullptr;
-    if (interface == SL_WFX_STA_INTERFACE)
-    {
-        SelectedNetif = sta_netif;
-    }
-#ifdef SL_WFX_CONFIG_SOFTAP
-    else if (interface == SL_WFX_SOFTAP_INTERFACE)
-    {
-        // no ap currently
-    }
-#endif
-    return SelectedNetif;
+    // TODO: Implement the function
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 /****************************************************************************
@@ -1152,78 +1133,7 @@ bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
 bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
 {
     VerifyOrReturnError(which_if == SL_WFX_STA_INTERFACE, false);
-    return wfx_is_sta_connected();
-}
-
-/****************************************************************************
- * @brief
- * Disconnect station mode from connected AP
- * @returns Returns SL_STATUS_OK if successful,
- *             SL_STATUS_FAIL otherwise
- *****************************************************************************/
-sl_status_t sl_matter_wifi_disconnect(void)
-{
-    ChipLogProgress(DeviceLayer, "STA-Disconnecting");
-    int32_t status = sl_wfx_send_disconnect_command();
-    wifi_extra &= ~WE_ST_STA_CONN;
-    xEventGroupSetBits(sl_wfx_event_group, SL_WFX_RETRY_CONNECT);
-    return status;
-}
-
-/****************************************************************************
- * @brief
- *     enable the STA mode
- * @return returns true
- *****************************************************************************/
-bool wfx_is_sta_mode_enabled(void)
-{
-    return true; /* It always is */
-}
-
-/****************************************************************************
- * @brief
- *     fuction called when driver is STA connected
- * @return returns true if sucessful,
- *         false otherwise
- *****************************************************************************/
-bool wfx_is_sta_connected(void)
-{
-    bool val;
-    val = (wifi_extra & WE_ST_STA_CONN) ? true : false;
-    return val;
-}
-
-/****************************************************************************
- * @brief
- *      It is automatically done when lwip link up
- * @return returns true if sucessful,
- *         false otherwise
- *****************************************************************************/
-void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif) {}
-
-/****************************************************************************
- * @brief
- *      get the wifi mode
- * @return returns WIFI_MODE_NULL if sucessful,
- *         WIFI_MODE_STA otherwise
- *****************************************************************************/
-wifi_mode_t wfx_get_wifi_mode(void)
-{
-    if (wifiContext.state & SL_WFX_STARTED)
-        return WIFI_MODE_STA;
-    return WIFI_MODE_NULL;
-}
-
-/*****************************************************************************
- * @brief
- * This is called from the context of AppTask
- * For WF200 - Start WIFI here
- * @return returns true if sucessful,
- *         false otherwise
- ******************************************************************************/
-bool wfx_hw_ready(void)
-{
-    return (wifiContext.state & SL_WFX_STARTED) ? true : false;
+    return IsStationConnected();
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
@@ -1251,16 +1161,6 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
-/*****************************************************************************
- * @brief
- *    function called from connectivityManager
- ******************************************************************************/
-void wfx_enable_sta_mode(void)
-{
-    /* Nothing to do - default is that it is
-       place holder */
-}
-
 /****************************************************************************
  * @brief
  * driver scan cancelation
@@ -1284,4 +1184,15 @@ void wfx_cancel_scan(void)
         scan_ssid = nullptr;
     }
     scan_cb = nullptr;
+}
+
+CHIP_ERROR InitWiFiStack(void)
+{
+    // TODO: This function should include sl_wfx_hw_init() and sl_wfx_init() functions. Only done now to make MatterConfig platform
+    // agnostic. (MATTER-4680)
+    // Start wfx bus communication task.
+    sl_status_t status = wfx_bus_start();
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(DeviceLayer, "wfx_bus_start failed: %lx", status));
+    return CHIP_NO_ERROR;
 }

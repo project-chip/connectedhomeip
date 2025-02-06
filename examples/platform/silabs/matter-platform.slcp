@@ -73,7 +73,6 @@ component:
 - {id: mbedtls_base64}
 - {id: ot_psa_crypto}
 - {id: ot_platform_abstraction}
-- {id: ot_rtos_wrappers_real}
 - {id: sl_ot_custom_cli}
 # Necessary componenets for ot coap cert lib
 # - {id: mbedtls_dtls} # Requried by COAP lib

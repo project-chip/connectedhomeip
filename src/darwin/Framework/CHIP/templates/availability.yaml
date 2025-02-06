@@ -161,18 +161,6 @@
               - AttributeList
               - FeatureMap
               - ClusterRevision
-          Scenes:
-              - SceneCount
-              - CurrentScene
-              - CurrentGroup
-              - SceneValid
-              - NameSupport
-              - LastConfiguredBy
-              - GeneratedCommandList
-              - AcceptedCommandList
-              - AttributeList
-              - FeatureMap
-              - ClusterRevision
           OnOff:
               - OnOff
               - GlobalSceneControl
@@ -1312,26 +1300,6 @@
               - RemoveGroupResponse
               - RemoveAllGroups
               - AddGroupIfIdentifying
-          Scenes:
-              - AddScene
-              - AddSceneResponse
-              - ViewScene
-              - ViewSceneResponse
-              - RemoveScene
-              - RemoveSceneResponse
-              - RemoveAllScenes
-              - RemoveAllScenesResponse
-              - StoreScene
-              - StoreSceneResponse
-              - RecallScene
-              - GetSceneMembership
-              - GetSceneMembershipResponse
-              - EnhancedAddScene
-              - EnhancedAddSceneResponse
-              - EnhancedViewScene
-              - EnhancedViewSceneResponse
-              - CopyScene
-              - CopySceneResponse
           OnOff:
               - Off
               - On
@@ -1611,87 +1579,6 @@
               AddGroupIfIdentifying:
                   - groupId
                   - groupName
-          Scenes:
-              AddScene:
-                  - groupId
-                  - sceneId
-                  - transitionTime
-                  - sceneName
-                  - extensionFieldSets
-              AddSceneResponse:
-                  - status
-                  - groupId
-                  - sceneId
-              ViewScene:
-                  - groupId
-                  - sceneId
-              ViewSceneResponse:
-                  - status
-                  - groupId
-                  - sceneId
-                  - transitionTime
-                  - sceneName
-                  - extensionFieldSets
-              RemoveScene:
-                  - groupId
-                  - sceneId
-              RemoveSceneResponse:
-                  - status
-                  - groupId
-                  - sceneId
-              RemoveAllScenes:
-                  - groupId
-              RemoveAllScenesResponse:
-                  - status
-                  - groupId
-              StoreScene:
-                  - groupId
-                  - sceneId
-              StoreSceneResponse:
-                  - status
-                  - groupId
-                  - sceneId
-              RecallScene:
-                  - groupId
-                  - sceneId
-                  - transitionTime
-              GetSceneMembership:
-                  - groupId
-              GetSceneMembershipResponse:
-                  - status
-                  - capacity
-                  - groupId
-                  - sceneList
-              EnhancedAddScene:
-                  - groupId
-                  - sceneId
-                  - transitionTime
-                  - sceneName
-                  - extensionFieldSets
-              EnhancedAddSceneResponse:
-                  - status
-                  - groupId
-                  - sceneId
-              EnhancedViewScene:
-                  - groupId
-                  - sceneId
-              EnhancedViewSceneResponse:
-                  - status
-                  - groupId
-                  - sceneId
-                  - transitionTime
-                  - sceneName
-                  - extensionFieldSets
-              CopyScene:
-                  - mode
-                  - groupIdFrom
-                  - sceneIdFrom
-                  - groupIdTo
-                  - sceneIdTo
-              CopySceneResponse:
-                  - status
-                  - groupIdFrom
-                  - sceneIdFrom
           OnOff:
               OffWithEffect:
                   - effectId
@@ -2419,9 +2306,6 @@
                   - id
                   - percentage
       structs:
-          Scenes:
-              - AttributeValuePair
-              - ExtensionFieldSet
           Descriptor:
               - DeviceType
           Binding:
@@ -2509,13 +2393,6 @@
               - DoubleNestedStructList
               - TestListStructOctet
       struct fields:
-          Scenes:
-              AttributeValuePair:
-                  - attributeId
-                  - attributeValue
-              ExtensionFieldSet:
-                  - clusterId
-                  - attributeValueList
           Descriptor:
               DeviceType:
                   - type
@@ -4222,8 +4099,6 @@
       bitmaps:
           Groups:
               - GroupClusterFeature
-          Scenes:
-              - ScenesCopyMode
           OnOff:
               - OnOffControl
               # Feature was originally named OnOffFeature, but we generate the
@@ -4360,9 +4235,6 @@
           Groups:
               GroupClusterFeature:
                   - GroupNames
-          Scenes:
-              ScenesCopyMode:
-                  - CopyAllScenes
           OnOff:
               OnOffControl:
                   - AcceptOnlyWhenOn
@@ -4785,9 +4657,6 @@
       clusters:
           # PulseWidthModulation is not in the Matter specification.
           - PulseWidthModulation
-          # TimeSynchronization provisional until spec and SDK are aligned.
-          # See https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/10707
-          - TimeSynchronization
 
 - release: "FD8D09B4-6CF7-4EBA-BD4F-7EDE872E3098"
   versions:
@@ -5285,62 +5154,6 @@
               LauncherResponse:
                   - status
                   - data
-          Scenes:
-              AddScene:
-                  - groupID
-                  - sceneID
-              ViewScene:
-                  - groupID
-                  - sceneID
-              RemoveScene:
-                  - groupID
-                  - sceneID
-              RemoveAllScenes:
-                  - groupID
-              StoreScene:
-                  - groupID
-                  - sceneID
-              RecallScene:
-                  - groupID
-                  - sceneID
-              GetSceneMembership:
-                  - groupID
-              EnhancedAddScene:
-                  - groupID
-                  - sceneID
-              EnhancedViewScene:
-                  - groupID
-                  - sceneID
-              CopyScene:
-                  - groupIdentifierFrom
-                  - sceneIdentifierFrom
-                  - groupIdentifierTo
-                  - sceneIdentifierTo
-              AddSceneResponse:
-                  - groupID
-                  - sceneID
-              ViewSceneResponse:
-                  - groupID
-                  - sceneID
-              RemoveSceneResponse:
-                  - groupID
-                  - sceneID
-              RemoveAllScenesResponse:
-                  - groupID
-              StoreSceneResponse:
-                  - groupID
-                  - sceneID
-              GetSceneMembershipResponse:
-                  - groupID
-              EnhancedAddSceneResponse:
-                  - groupID
-                  - sceneID
-              EnhancedViewSceneResponse:
-                  - groupID
-                  - sceneID
-              CopySceneResponse:
-                  - groupIdentifierFrom
-                  - sceneIdentifierFrom
       structs:
           OTASoftwareUpdateRequestor:
               - ProviderLocation
@@ -5578,11 +5391,6 @@
                   # introduced them in this release.
                   - catalogVendorId
                   - applicationId
-          Scenes:
-              AttributeValuePair:
-                  - attributeID
-              ExtensionFieldSet:
-                  - clusterID
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -6137,62 +5945,6 @@
               AnnounceOTAProvider:
                   - providerNodeId
                   - vendorId
-          Scenes:
-              AddScene:
-                  - groupId
-                  - sceneId
-              ViewScene:
-                  - groupId
-                  - sceneId
-              RemoveScene:
-                  - groupId
-                  - sceneId
-              RemoveAllScenes:
-                  - groupId
-              StoreScene:
-                  - groupId
-                  - sceneId
-              RecallScene:
-                  - groupId
-                  - sceneId
-              GetSceneMembership:
-                  - groupId
-              EnhancedAddScene:
-                  - groupId
-                  - sceneId
-              EnhancedViewScene:
-                  - groupId
-                  - sceneId
-              CopyScene:
-                  - groupIdFrom
-                  - sceneIdFrom
-                  - groupIdTo
-                  - sceneIdTo
-              AddSceneResponse:
-                  - groupId
-                  - sceneId
-              ViewSceneResponse:
-                  - groupId
-                  - sceneId
-              RemoveSceneResponse:
-                  - groupId
-                  - sceneId
-              RemoveAllScenesResponse:
-                  - groupId
-              StoreSceneResponse:
-                  - groupId
-                  - sceneId
-              GetSceneMembershipResponse:
-                  - groupId
-              EnhancedAddSceneResponse:
-                  - groupId
-                  - sceneId
-              EnhancedViewSceneResponse:
-                  - groupId
-                  - sceneId
-              CopySceneResponse:
-                  - groupIdFrom
-                  - sceneIdFrom
       structs:
           Descriptor:
               - DeviceType
@@ -6256,11 +6008,6 @@
               ApplicationStruct:
                   - catalogVendorId
                   - applicationId
-          Scenes:
-              AttributeValuePair:
-                  - attributeId
-              ExtensionFieldSet:
-                  - clusterId
       event fields:
           Switch:
               MultiPressComplete:
@@ -6530,62 +6277,6 @@
           ColorControl:
               MoveToColorTemperature:
                   colorTemperatureMireds: colorTemperature
-          Scenes:
-              AddScene:
-                  groupID: groupId
-                  sceneID: sceneId
-              ViewScene:
-                  groupID: groupId
-                  sceneID: sceneId
-              RemoveScene:
-                  groupID: groupId
-                  sceneID: sceneId
-              RemoveAllScenes:
-                  groupID: groupId
-              StoreScene:
-                  groupID: groupId
-                  sceneID: sceneId
-              RecallScene:
-                  groupID: groupId
-                  sceneID: sceneId
-              GetSceneMembership:
-                  groupID: groupId
-              EnhancedAddScene:
-                  groupID: groupId
-                  sceneID: sceneId
-              EnhancedViewScene:
-                  groupID: groupId
-                  sceneID: sceneId
-              CopyScene:
-                  groupIdentifierFrom: groupIdFrom
-                  sceneIdentifierFrom: sceneIdFrom
-                  groupIdentifierTo: groupIdTo
-                  sceneIdentifierTo: sceneIdTo
-              AddSceneResponse:
-                  groupID: groupId
-                  sceneID: sceneId
-              ViewSceneResponse:
-                  groupID: groupId
-                  sceneID: sceneId
-              RemoveSceneResponse:
-                  groupID: groupId
-                  sceneID: sceneId
-              RemoveAllScenesResponse:
-                  groupID: groupId
-              StoreSceneResponse:
-                  groupID: groupId
-                  sceneID: sceneId
-              GetSceneMembershipResponse:
-                  groupID: groupId
-              EnhancedAddSceneResponse:
-                  groupID: groupId
-                  sceneID: sceneId
-              EnhancedViewSceneResponse:
-                  groupID: groupId
-                  sceneID: sceneId
-              CopySceneResponse:
-                  groupIdentifierFrom: groupIdFrom
-                  sceneIdentifierFrom: sceneIdFrom
       structs:
           AccessControl:
               AccessControlEntryStruct: AccessControlEntry
@@ -6643,11 +6334,6 @@
               ApplicationStruct:
                   catalogVendorID: catalogVendorId
                   applicationID: applicationId
-          Scenes:
-              AttributeValuePair:
-                  attributeID: attributeId
-              ExtensionFieldSet:
-                  clusterID: clusterId
       event fields:
           Switch:
               MultiPressComplete:
@@ -7307,8 +6993,6 @@
               - Feature
           PumpConfigurationAndControl:
               - Feature
-          Scenes:
-              - Feature
           FanControl:
               - RockBitmap
               - WindBitmap
@@ -7348,9 +7032,6 @@
                   - ConstantTemperature
                   - Automatic
                   - LocalOperation
-          Scenes:
-              Feature:
-                  - SceneNames
           Thermostat:
               Feature:
                   - LocalTemperatureNotExposed
@@ -7474,48 +7155,6 @@
       clusters:
           # SDK example, not part of the specification.
           - SampleMEI
-      attributes:
-          Scenes:
-              # New scenes bits not stable yet.
-              - SceneTableSize
-      enum values:
-          TimeSynchronization:
-              TimeSourceEnum:
-                  - NonMatterSNTP
-                  - NonMatterNTP
-                  - MatterSNTP
-                  - MatterNTP
-                  - MixedNTP
-                  - NonMatterSNTPNTS
-                  - NonMatterNTPNTS
-                  - MatterSNTPNTS
-                  - MatterNTPNTS
-                  - MixedNTPNTS
-                  - PTP
-                  - GNSS
-      # Once we actually unmark TimeSynchronization as provisional, all these bits should go away too, and we should instead
-      # mark things as introduced/deprecated as needed.  The "ids" entries should go away, in particular.
-      ids:
-          attributes:
-              TimeSynchronization:
-                  - TimeZoneListMaxSize
-                  - DSTOffsetListMaxSize
-                  - SupportsDNSResolve
-          commands:
-              TimeSynchronization:
-                  - SetUTCTime
-                  - SetTrustedTimeSource
-                  - SetTimeZone
-                  - SetTimeZoneResponse
-                  - SetDSTOffset
-                  - SetDefaultNTP
-          events:
-              TimeSynchronization:
-                  - DSTTableEmpty
-                  - DSTStatus
-                  - TimeZoneStatus
-                  - TimeFailure
-                  - MissingTrustedTimeSource
 
 - release: "F7CA8603-6336-4E63-A216-30EE3F77CE8B"
   versions:
@@ -7572,12 +7211,6 @@
           GroupKeyManagement:
               Feature:
                   - CacheAndSync
-          # Scenes are generally provisional for now.
-          Scenes:
-              Feature:
-                  - Explicit
-                  - TableSize
-                  - FabricScenes
   removed:
       clusters:
           # Clusters that really should just not be exposed, even if they're in our XML.
@@ -8089,8 +7722,6 @@
                   - Cool
                   - Both
       bitmaps:
-          Scenes:
-              - CopyModeBitmap
           AdministratorCommissioning:
               - Feature
           ContentLauncher:
@@ -8108,9 +7739,6 @@
           PumpConfigurationAndControl:
               PumpStatusBitmap:
                   - SupplyFault
-          Scenes:
-              CopyModeBitmap:
-                  - CopyAllScenes
           SoftwareDiagnostics:
               Feature:
                   - Watermarks
@@ -8160,8 +7788,6 @@
                   - OffOnAuto
                   - OffOn
       bitmaps:
-          Scenes:
-              - ScenesCopyMode
           ContentLauncher:
               - SupportedStreamingProtocol
           LevelControl:
@@ -8178,60 +7804,22 @@
                   - WaterMarks
   provisional:
       clusters:
-          # DemandResponseLoadControl not finalized as of Fall 2024 Matter release.
+          # DemandResponseLoadControl not finalized as of Matter 1.4 (Fall 2024).
           - DemandResponseLoadControl
           # Timer does not seem to exist in the Matter specification.
           - Timer
-          # Targeting Spring 2024 Matter release
-          - EnergyEVSE
+          # ContentControl is provisional in Matter 1.4 (Fall 2024).
           - ContentControl
-          - ContentAppObserver
-          # Energy Preference is provisional in the Fall 2024 Matter release.
+          # Energy Preference is provisional in Matter 1.4 (Fall 2024).
           - EnergyPreference
-          # Scenes Management is provisional in the Fall 2024 Matter release.
+          # Scenes Management is provisional in Matter 1.4 (Fall 2024).
           - ScenesManagement
-      attributes:
-          NetworkCommissioning:
-              # Targeting Spring 2024 Matter release
-              - SupportedWiFiBands
-              - SupportedThreadFeatures
-              - ThreadVersion
-          WakeOnLAN:
-              # Targeting Spring 2024 Matter release
-              - LinkLocalAddress
-          BasicInformation:
-              # Targeting Spring 2024 Matter release
-              - SpecificationVersion
-              - MaxPathsPerInvoke
-          Scenes:
-              # Targeting Spring 2024 Matter release
-              - FabricSceneInfo
-          MediaPlayback:
-              # Targeting Spring 2024 Matter release
-              - ActiveAudioTrack
-              - AvailableAudioTracks
-              - ActiveTextTrack
-              - AvailableTextTracks
       commands:
-          GeneralDiagnostics:
-              # Targeting Spring 2024 Matter release
-              - TimeSnapshot
-              - TimeSnapshotResponse
           NetworkCommissioning:
-              # Targeting Spring 2024 Matter release
+              # QueryIdentity and QueryIdentityResponse not finalized as of Matter 1.4 (Fall 2024)
+              # Part of the HRAP feature.
               - QueryIdentity
               - QueryIdentityResponse
-          Channel:
-              # Targeting Spring 2024 Matter release
-              - GetProgramGuide
-              - ProgramGuideResponse
-              - RecordProgram
-              - CancelRecordProgram
-          MediaPlayback:
-              # Targeting Spring 2024 Matter release
-              - ActivateAudioTrack
-              - ActivateTextTrack
-              - DeactivateTextTrack
           UnitTesting:
               # Ideally none of UnitTesting would be exposed as public API, but
               # for now just start doing that for new additions to it.
@@ -8240,7 +7828,7 @@
               - TestSecondBatchHelperRequest
       command fields:
           NetworkCommissioning:
-              # Targeting Spring 2024 Matter release
+              # New command fields for HRAP not finalized as of Matter 1.4 (Fall 2024)
               AddOrUpdateWiFiNetwork:
                   - networkIdentity
                   - clientIdentifier
@@ -8254,147 +7842,24 @@
               QueryIdentityResponse:
                   - identity
                   - possessionSignature
-          MediaPlayback:
-              # Targeting Spring 2024 Matter release
-              Rewind:
-                  - audioAdvanceUnmuted
-              FastForward:
-                  - audioAdvanceUnmuted
-          ContentLauncher:
-              # Targeting Spring 2024 Matter release
-              LaunchContent:
-                  - playbackPreferences
-                  - useCurrentContext
-          AccountLogin:
-              # Targeting Spring 2024 Matter release
-              Login:
-                  - node
-              Logout:
-                  - node
-      structs:
-          Scenes:
-              # Targeting Spring 2024 Matter release
-              - SceneInfoStruct
-          Channel:
-              # Targeting Spring 2024 Matter release
-              - ProgramStruct
-              - SeriesInfoStruct
-              - ProgramCategoryStruct
-              - ProgramCastStruct
-              - PageTokenStruct
-              - ChannelPagingStruct
-              - AdditionalInfoStruct
-          MediaPlayback:
-              # Targeting Spring 2024 Matter release
-              - TrackStruct
-              - TrackAttributesStruct
-          ContentLauncher:
-              # Targeting Spring 2024 Matter release
-              - PlaybackPreferencesStruct
-              - TrackPreferenceStruct
       struct fields:
           NetworkCommissioning:
-              # Targeting Spring 2024 Matter release
+              # New struct fields for HRAP not finalized as of Matter 1.4 (Fall 2024)
               NetworkInfoStruct:
                   - networkIdentifier
                   - clientIdentifier
-          Channel:
-              # Targeting Spring 2024 Matter release
-              ChannelInfoStruct:
-                  - identifier
-                  - type
-      events:
-          MediaPlayback:
-              # Targeting Spring 2024 Matter release
-              - StateChanged
-          AccountLogin:
-              # Targeting Spring 2024 Matter release
-              - LoggedOut
-          TargetNavigator:
-              # Targeting Spring 2024 Matter release
-              - TargetUpdated
-      enums:
-          Thermostat:
-              # Targeting Spring 2024 Matter release
-              - StartOfWeekEnum
-              - TemperatureSetpointHoldEnum
-              - ACCapacityFormatEnum
-              - ACCompressorTypeEnum
-              - ACLouverPositionEnum
-              - ACRefrigerantTypeEnum
-              - ACTypeEnum
-              - SetpointChangeSourceEnum
-          Channel:
-              # Targeting Spring 2024 Matter release
-              - ChannelTypeEnum
-          MediaPlayback:
-              # Targeting Spring 2024 Matter release
-              - CharacteristicEnum
-          ContentLauncher:
-              # Targeting Spring 2024 Matter release
-              - CharacteristicEnum
-      enum values:
-          ContentLauncher:
-              # Targeting Spring 2024 Matter release
-              ParameterEnum:
-                  - Season
-                  - Episode
-                  - Any
-              StatusEnum:
-                  - TextTrackNotAvailable
-                  - AudioTrackNotAvailable
-          TimeFormatLocalization:
-              CalendarTypeEnum:
-                  - UseActiveLocale
-              HourFormatEnum:
-                  - UseActiveLocale
-      bitmaps:
-          NetworkCommissioning:
-              # Targeting Spring 2024 Matter release
-              - ThreadCapabilitiesBitmap
-          Scenes:
-              # Targeting Spring 2024 Matter release
-              - NameSupportBitmap
-          Thermostat:
-              # Targeting Spring 2024 Matter release
-              - ACErrorCodeBitmap
-              - HVACSystemTypeBitmap
-              - ProgrammingOperationModeBitmap
-              - RelayStateBitmap
-              - RemoteSensingBitmap
-          Channel:
-              # Targeting Spring 2024 Matter release
-              - RecordingFlagBitmap
       bitmap values:
-          OnOff:
-              Feature:
-                  # Targeting Spring 2024 Matter release
-                  - OffOnly
           NetworkCommissioning:
-              # Targeting Spring 2024 Matter release
               Feature:
+                  # New feature for HRAP not finalized as of Matter 1.4 (Fall 2024)
                   - PerDeviceCredentials
               WiFiSecurityBitmap:
+                  # New bit for HRAP not finalized as of Matter 1.4 (Fall 2024)
                   - WPA3MatterPDC
-          Channel:
-              # Targeting Spring 2024 Matter release
-              Feature:
-                  - ElectronicGuide
-                  - RecordProgram
-          MediaPlayback:
-              # Targeting Spring 2024 Matter release
-              Feature:
-                  - TextTracks
-                  - AudioTracks
-                  - AudioAdvance
           ContentLauncher:
-              # Targeting Spring 2024 Matter release
               SupportedProtocolsBitmap:
+                  # Not present in Matter 1.4 (Fall 2024)
                   - WebRTC
-              Feature:
-                  - AdvancedSeek
-                  - TextTracks
-                  - AudioTracks
   renames:
       structs:
           Thermostat:
@@ -8430,8 +7895,6 @@
                   OffHighAuto: OffOnAuto
                   OffHigh: OffOn
       bitmaps:
-          Scenes:
-              CopyModeBitmap: ScenesCopyMode
           ContentLauncher:
               SupportedProtocolsBitmap: SupportedStreamingProtocol
           LevelControl:
@@ -9489,81 +8952,22 @@
                   - ShortCircuit
                   - CurrentExceeded
   provisional:
-      clusters:
-          # Targeting Spring 2024 Matter release
-          - EnergyEVSEMode
-          - Messages
-          - PowerTopology
       attributes:
-          Thermostat:
-              # Targeting Spring 2024 Matter release
-              - PresetTypes
-              - ScheduleTypes
-              - NumberOfPresets
-              - NumberOfSchedules
-              - NumberOfScheduleTransitions
-              - NumberOfScheduleTransitionPerDay
-              - ActivePresetHandle
-              - Presets
-              - Schedules
-              - TemperatureSetpointHoldPolicy
-              - SetpointHoldExpiryTimestamp
-              - ActiveScheduleHandle
           UnitTesting:
               # Ideally none of UnitTesting would be exposed as public API, but
               # for now just start doing that for new additions to it.
               - MeiInt8u
       commands:
-          Thermostat:
-              # Targeting Spring 2024 Matter release
-              - SetActiveScheduleRequest
-              - SetActivePresetRequest
-              - StartPresetsSchedulesEditRequest
-              - CancelPresetsSchedulesEditRequest
-              - CommitPresetsSchedulesRequest
-              - SetTemperatureSetpointHoldPolicy
           UnitTesting:
               # Ideally none of UnitTesting would be exposed as public API, but
               # for now just start doing that for new additions to it.
               - TestDifferentVendorMeiRequest
               - TestDifferentVendorMeiResponse
-          GeneralDiagnostics:
-              # Targeting Spring 2024 Matter release
-              - PayloadTestRequest
-              - PayloadTestResponse
-      structs:
-          Thermostat:
-              # Targeting Spring 2024 Matter release
-              - ScheduleTransitionStruct
-              - ScheduleStruct
-              - PresetStruct
-              - PresetTypeStruct
-              - ScheduleTypeStruct
       events:
           UnitTesting:
               # Ideally none of UnitTesting would be exposed as public API, but
               # for now just start doing that for new additions to it.
               - TestDifferentVendorMeiEvent
-      enums:
-          Thermostat:
-              # Targeting Spring 2024 Matter release
-              - PresetScenarioEnum
-      bitmaps:
-          Thermostat:
-              # Targeting Spring 2024 Matter release
-              - PresetTypeFeaturesBitmap
-              - ScheduleTypeFeaturesBitmap
-              - TemperatureSetpointHoldPolicyBitmap
-          GeneralDiagnostics:
-              # Targeting Spring 2024 Matter release
-              - Feature
-      bitmap values:
-          Thermostat:
-              Feature:
-                  # Targeting Spring 2024 Matter release
-                  - Setpoints
-                  - Presets
-                  - MatterScheduleConfiguration
 
 - release: "6C44AB2F-2F6B-4B57-B523-5CD89584986F"
   versions:
@@ -9698,40 +9102,23 @@
           - WindowCoveringController
   provisional:
       clusters:
-          # Targeting 1.4
-          - CommissionerControl
+          # Outstanding issue at https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/10854
+          # needs to be addressed to expose this EcosystemInformation.
           - EcosystemInformation
-          - ServiceArea
-          - ThreadBorderRouterManagement
-          - ThreadNetworkDirectory
-          - WaterHeaterManagement
-          - WaterHeaterMode
-          - WiFiNetworkManagement
-          # Targeting Camera enablement
+          # Targeting Camera enablement, not part of Matter 1.4
           - CameraAVStreamManagement
           - Chime
           - WebRTCTransportProvider
           - WebRTCTransportRequestor
           - ZoneManagement
       attributes:
-          AccessControl:
-              # Targeting 1.4
-              - CommissioningARL
-              - ARL
-          BridgedDeviceBasicInformation:
-              # Targeting 1.4
-              - ProductID
           GeneralCommissioning:
-              # Targeting 1.4
+              # The TermsAndConditions feature is provisional in Matter 1.4
               - TCAcceptedVersion
               - TCMinRequiredVersion
               - TCAcknowledgements
               - TCAcknowledgementsRequired
               - TCUpdateDeadline
-          OccupancySensing:
-              # Targeting 1.4
-              - HoldTime
-              - HoldTimeLimits
           UnitTesting:
               # Ideally none of UnitTesting would be exposed as public API, but
               # for now just start doing that for new additions to it.
@@ -9742,21 +9129,10 @@
               - ReadFailureCode
               - FailureInt32U
       commands:
-          AccessControl:
-              # Targeting 1.4
-              - ReviewFabricRestrictions
-              - ReviewFabricRestrictionsResponse
-          BridgedDeviceBasicInformation:
-              # Targeting 1.4
-              - KeepActive
           GeneralCommissioning:
-              # Targeting 1.4
+              # The TermsAndConditions feature is provisional in Matter 1.4
               - SetTCAcknowledgements
               - SetTCAcknowledgementsResponse
-          Thermostat:
-              # Targeting 1.4
-              - AtomicRequest
-              - AtomicResponse
           UnitTesting:
               # Ideally none of UnitTesting would be exposed as public API, but
               # for now just start doing that for new additions to it.
@@ -9764,25 +9140,10 @@
               - GlobalEchoResponse
               - StringEchoRequest
               - StringEchoResponse
-      command fields:
-          DoorLock:
-              GetCredentialStatusResponse:
-                  - credentialData
       structs:
-          AccessControl:
-              # Targeting 1.4
-              - AccessRestrictionEntryStruct
-              - AccessRestrictionStruct
-              - CommissioningAccessRestrictionEntryStruct
           Globals:
-              # Test-only value
+              # Test-only value, not to be exposed
               - TestGlobalStruct
-              # Targeting 1.4
-              - AtomicAttributeStatusStruct
-              - LocationDescriptorStruct
-          OccupancySensing:
-              # Targeting 1.4
-              - HoldTimeLimitsStruct
       struct fields:
           UnitTesting:
               # Ideally none of UnitTesting would be exposed as public API, but
@@ -9791,74 +9152,37 @@
                   - i
               NestedStruct:
                   - d
-      events:
-          AccessControl:
-              # Targeting 1.4
-              - AccessRestrictionEntryChanged
-              - FabricRestrictionReviewUpdate
-          BridgedDeviceBasicInformation:
-              # Targeting 1.4
-              - ActiveChanged
-          OccupancySensing:
-              # Targeting 1.4
-              - OccupancyChanged
       enums:
-          AccessControl:
-              # Targeting 1.4
-              - AccessRestrictionTypeEnum
           Globals:
               # Test-only value
               - TestGlobalEnum
-              # Targeting 1.4
-              - AreaTypeTag
-              - AtomicRequestTypeEnum
+              # Not part of the Matter 1.4 specification.
               - FloorSurfaceTag
-              - LandmarkTag
-              - PositionTag
-              - RelativePositionTag
-              # Targeting Camera enablement
+              # The naming of AreaTypeTag does not match other namespace enum names,
+              # and the value set does not match the 1.4 specification.
+              # Those issues need to be sorted out.
+              - AreaTypeTag
+              # Targeting Camera enablement, not part of Matter 1.4.
               - ThreeLevelAutoEnum
       enum values:
-          ApplicationLauncher:
-              StatusEnum:
-                  # Targeting 1.4
-                  - Downloading
-                  - Installing
-                  - PendingUserApproval
           GeneralCommissioning:
               CommissioningErrorEnum:
-                  # Targeting 1.4
+                  # The TermsAndConditions feature is provisional in Matter 1.4
                   - RequiredTCNotAccepted
                   - TCAcknowledgementsNotReceived
                   - TCMinVersionNotMet
       bitmaps:
-          AccessControl:
-              # Targeting 1.4
-              - Feature
-          BridgedDeviceBasicInformation:
-              # Targeting 1.4
-              - Feature
           GeneralCommissioning:
-              # Targeting 1.4
+              # The only bit (TermsAndConditions) is provisional in Matter 1.4.
               - Feature
-          OccupancySensing:
-              # Targeting 1.4
-              - Feature
-          Thermostat:
-              # Targeting 1.4
-              - OccupancyBitmap
       bitmap values:
-          Switch:
-              Feature:
-                  # Targeting 1.4
-                  - ActionSwitch
           RVCCleanMode:
               Feature:
-                  # Targeting 1.4
+                  # Targeting Summer 2025 Matter release
                   - DirectModeChange
           RVCRunMode:
               Feature:
-                  # Targeting 1.4
+                  # Targeting Summer 2025 Matter release
                   - DirectModeChange
   renames:
       enums:
@@ -9935,22 +9259,56 @@
       tvOS: "18.4"
   introduced:
       clusters:
+          - CommissionerControl
+          - ContentAppObserver
           - DeviceEnergyManagement
           - DeviceEnergyManagementMode
           - DishwasherAlarm
           - DishwasherMode
+          - EnergyEVSE
+          - EnergyEVSEMode
           - ICDManagement
           - LaundryDryerControls
           - LaundryWasherControls
           - LaundryWasherMode
+          - Messages
           - MicrowaveOvenControl
           - MicrowaveOvenMode
           - OvenMode
           - OvenCavityOperationalState
+          - PowerTopology
           - RefrigeratorAlarm
           - RefrigeratorAndTemperatureControlledCabinetMode
+          - ServiceArea
           - TemperatureControl
+          - ThreadBorderRouterManagement
+          - ThreadNetworkDirectory
+          - TimeSynchronization
+          - WaterHeaterManagement
+          - WaterHeaterMode
+          - WiFiNetworkManagement
       attributes:
+          AccessControl:
+              - CommissioningARL
+              - ARL
+          BasicInformation:
+              - SpecificationVersion
+              - MaxPathsPerInvoke
+          BridgedDeviceBasicInformation:
+              - ProductID
+          CommissionerControl:
+              - SupportedDeviceCategories
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ContentAppObserver:
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
           DeviceEnergyManagement:
               - ESAType
               - ESACanGenerate
@@ -10001,6 +9359,37 @@
               - AliroBLEAdvertisingVersion
               - NumberOfAliroCredentialIssuerKeysSupported
               - NumberOfAliroEndpointKeysSupported
+          EnergyEVSE:
+              - State
+              - SupplyState
+              - FaultState
+              - ChargingEnabledUntil
+              - CircuitCapacity
+              - MinimumChargeCurrent
+              - MaximumChargeCurrent
+              - UserMaximumChargeCurrent
+              - RandomizationDelayWindow
+              - NextChargeStartTime
+              - NextChargeTargetTime
+              - NextChargeRequiredEnergy
+              - NextChargeTargetSoC
+              - ApproximateEVEfficiency
+              - SessionID
+              - SessionDuration
+              - SessionEnergyCharged
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          EnergyEVSEMode:
+              - SupportedModes
+              - CurrentMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
           ICDManagement:
               - IdleModeDuration
               - ActiveModeDuration
@@ -10043,6 +9432,14 @@
               - AttributeList
               - FeatureMap
               - ClusterRevision
+          Messages:
+              - Messages
+              - ActiveMessageIDs
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
           MicrowaveOvenControl:
               - CookTime
               - MaxCookTime
@@ -10065,6 +9462,13 @@
               - AttributeList
               - FeatureMap
               - ClusterRevision
+          NetworkCommissioning:
+              - SupportedWiFiBands
+              - SupportedThreadFeatures
+              - ThreadVersion
+          OccupancySensing:
+              - HoldTime
+              - HoldTimeLimits
           OvenMode:
               - SupportedModes
               - CurrentMode
@@ -10080,6 +9484,14 @@
               - OperationalStateList
               - OperationalState
               - OperationalError
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          PowerTopology:
+              - AvailableEndpoints
+              - ActiveEndpoints
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
@@ -10102,6 +9514,18 @@
               - AttributeList
               - FeatureMap
               - ClusterRevision
+          ServiceArea:
+              - SupportedAreas
+              - SupportedMaps
+              - SelectedAreas
+              - CurrentArea
+              - EstimatedEndTime
+              - Progress
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
           TemperatureControl:
               - TemperatureSetpoint
               - MinTemperature
@@ -10114,7 +9538,106 @@
               - AttributeList
               - FeatureMap
               - ClusterRevision
+          Thermostat:
+              - PresetTypes
+              - ScheduleTypes
+              - NumberOfPresets
+              - NumberOfSchedules
+              - NumberOfScheduleTransitions
+              - NumberOfScheduleTransitionPerDay
+              - ActivePresetHandle
+              - ActiveScheduleHandle
+              - Presets
+              - Schedules
+              - SetpointHoldExpiryTimestamp
+          ThreadBorderRouterManagement:
+              - BorderRouterName
+              - BorderAgentID
+              - ThreadVersion
+              - InterfaceEnabled
+              - ActiveDatasetTimestamp
+              - PendingDatasetTimestamp
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ThreadNetworkDirectory:
+              - PreferredExtendedPanID
+              - ThreadNetworks
+              - ThreadNetworkTableSize
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          TimeSynchronization:
+              - TimeZoneListMaxSize
+              - DSTOffsetListMaxSize
+              - SupportsDNSResolve
+              - UTCTime
+              - Granularity
+              - TimeSource
+              - TrustedTimeSource
+              - DefaultNTP
+              - TimeZone
+              - DSTOffset
+              - LocalTime
+              - TimeZoneDatabase
+              - NTPServerAvailable
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          WakeOnLAN:
+              - LinkLocalAddress
+          WaterHeaterManagement:
+              - HeaterTypes
+              - HeatDemand
+              - TankVolume
+              - EstimatedHeatRequired
+              - TankPercentage
+              - BoostState
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          WaterHeaterMode:
+              - SupportedModes
+              - CurrentMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          WiFiNetworkManagement:
+              - SSID
+              - PassphraseSurrogate
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
       commands:
+          AccessControl:
+              - ReviewFabricRestrictions
+              - ReviewFabricRestrictionsResponse
+          BridgedDeviceBasicInformation:
+              - KeepActive
+          Channel:
+              - GetProgramGuide
+              - ProgramGuideResponse
+              - RecordProgram
+              - CancelRecordProgram
+          CommissionerControl:
+              - RequestCommissioningApproval
+              - CommissionNode
+              - ReverseOpenCommissioningWindow
+          ContentAppObserver:
+              - ContentAppMessage
+              - ContentAppMessageResponse
           DeviceEnergyManagement:
               - PowerAdjustRequest
               - CancelPowerAdjustRequest
@@ -10137,6 +9660,22 @@
               - UnboltDoor
               - SetAliroReaderConfig
               - ClearAliroReaderConfig
+          EnergyEVSE:
+              - Disable
+              - EnableCharging
+              - StartDiagnostics
+              - SetTargets
+              - GetTargets
+              - ClearTargets
+              - GetTargetsResponse
+          EnergyEVSEMode:
+              - ChangeToMode
+              - ChangeToModeResponse
+          GeneralDiagnostics:
+              - TimeSnapshot
+              - TimeSnapshotResponse
+              - PayloadTestRequest
+              - PayloadTestResponse
           ICDManagement:
               - RegisterClient
               - RegisterClientResponse
@@ -10146,6 +9685,13 @@
           LaundryWasherMode:
               - ChangeToMode
               - ChangeToModeResponse
+          MediaPlayback:
+              - ActivateAudioTrack
+              - ActivateTextTrack
+              - DeactivateTextTrack
+          Messages:
+              - PresentMessagesRequest
+              - CancelMessagesRequest
           MicrowaveOvenControl:
               - SetCookingParameters
               - AddMoreTime
@@ -10161,9 +9707,105 @@
               - ChangeToModeResponse
           RVCOperationalState:
               - GoHome
+          ServiceArea:
+              - SelectAreas
+              - SelectAreasResponse
+              - SkipArea
+              - SkipAreaResponse
           TemperatureControl:
               - SetTemperature
+          Thermostat:
+              - SetActiveScheduleRequest
+              - SetActivePresetRequest
+              - AtomicRequest
+              - AtomicResponse
+          ThreadBorderRouterManagement:
+              - GetActiveDatasetRequest
+              - GetPendingDatasetRequest
+              - DatasetResponse
+              - SetActiveDatasetRequest
+              - SetPendingDatasetRequest
+          ThreadNetworkDirectory:
+              - AddNetwork
+              - RemoveNetwork
+              - GetOperationalDataset
+              - OperationalDatasetResponse
+          TimeSynchronization:
+              - SetTrustedTimeSource
+              - SetTimeZone
+              - SetTimeZoneResponse
+              - SetDSTOffset
+              - SetDefaultNTP
+              - SetUTCTime
+          WaterHeaterManagement:
+              - Boost
+              - CancelBoost
+          WaterHeaterMode:
+              - ChangeToMode
+              - ChangeToModeResponse
+          WiFiNetworkManagement:
+              - NetworkPassphraseRequest
+              - NetworkPassphraseResponse
       command fields:
+          AccessControl:
+              ReviewFabricRestrictions:
+                  - arl
+              ReviewFabricRestrictionsResponse:
+                  - token
+          AccountLogin:
+              Login:
+                  - node
+              Logout:
+                  - node
+          BridgedDeviceBasicInformation:
+              KeepActive:
+                  - stayActiveDuration
+                  - timeoutMs
+          Channel:
+              GetProgramGuide:
+                  - startTime
+                  - endTime
+                  - channelList
+                  - pageToken
+                  - recordingFlag
+                  - data
+              ProgramGuideResponse:
+                  - paging
+                  - programList
+              RecordProgram:
+                  - programIdentifier
+                  - shouldRecordSeries
+                  - data
+              CancelRecordProgram:
+                  - programIdentifier
+                  - shouldRecordSeries
+                  - data
+          CommissionerControl:
+              RequestCommissioningApproval:
+                  - requestID
+                  - vendorID
+                  - productID
+                  - label
+              CommissionNode:
+                  - requestID
+                  - responseTimeoutSeconds
+              ReverseOpenCommissioningWindow:
+                  - commissioningTimeout
+                  - pakePasscodeVerifier
+                  - discriminator
+                  - iterations
+                  - salt
+          ContentLauncher:
+              LaunchContent:
+                  - useCurrentContext
+          ContentAppObserver:
+              ContentAppMessage:
+                  - data
+                  - encodingHint
+              ContentAppMessageResponse:
+                  - status
+                  - data
+                  - encodingHint
           DeviceEnergyManagement:
               PowerAdjustRequest:
                   - power
@@ -10207,6 +9849,33 @@
                   - verificationKey
                   - groupIdentifier
                   - groupResolvingKey
+              GetCredentialStatusResponse:
+                  - credentialData
+          EnergyEVSE:
+              EnableCharging:
+                  - chargingEnabledUntil
+                  - minimumChargeCurrent
+                  - maximumChargeCurrent
+              SetTargets:
+                  - chargingTargetSchedules
+              GetTargetsResponse:
+                  - chargingTargetSchedules
+          EnergyEVSEMode:
+              ChangeToMode:
+                  - newMode
+              ChangeToModeResponse:
+                  - status
+                  - statusText
+          GeneralDiagnostics:
+              TimeSnapshotResponse:
+                  - systemTimeMs
+                  - posixTimeMs
+              PayloadTestRequest:
+                  - enableKey
+                  - value
+                  - count
+              PayloadTestResponse:
+                  - payload
           ICDManagement:
               RegisterClient:
                   - checkInNodeID
@@ -10229,6 +9898,27 @@
               ChangeToModeResponse:
                   - status
                   - statusText
+          MediaPlayback:
+              ActivateAudioTrack:
+                  - trackID
+                  - audioOutputIndex
+              ActivateTextTrack:
+                  - trackID
+              Rewind:
+                  - audioAdvanceUnmuted
+              FastForward:
+                  - audioAdvanceUnmuted
+          Messages:
+              PresentMessagesRequest:
+                  - messageID
+                  - priority
+                  - messageControl
+                  - startTime
+                  - duration
+                  - messageText
+                  - responses
+              CancelMessagesRequest:
+                  - messageIDs
           MicrowaveOvenControl:
               SetCookingParameters:
                   - cookMode
@@ -10253,11 +9943,87 @@
               ChangeToModeResponse:
                   - status
                   - statusText
+          ServiceArea:
+              SelectAreas:
+                  - newAreas
+              SelectAreasResponse:
+                  - status
+                  - statusText
+              SkipArea:
+                  - skippedArea
+              SkipAreaResponse:
+                  - status
+                  - statusText
           TemperatureControl:
               SetTemperature:
                   - targetTemperature
                   - targetTemperatureLevel
+          Thermostat:
+              SetActiveScheduleRequest:
+                  - scheduleHandle
+              SetActivePresetRequest:
+                  - presetHandle
+              AtomicRequest:
+                  - requestType
+                  - attributeRequests
+                  - timeout
+              AtomicResponse:
+                  - statusCode
+                  - attributeStatus
+                  - timeout
+          ThreadBorderRouterManagement:
+              DatasetResponse:
+                  - dataset
+              SetActiveDatasetRequest:
+                  - activeDataset
+                  - breadcrumb
+              SetPendingDatasetRequest:
+                  - pendingDataset
+          ThreadNetworkDirectory:
+              AddNetwork:
+                  - operationalDataset
+              RemoveNetwork:
+                  - extendedPanID
+              GetOperationalDataset:
+                  - extendedPanID
+              OperationalDatasetResponse:
+                  - operationalDataset
+          TimeSynchronization:
+              # NOTE: SetUTCTime fields were introduced earlier.
+              SetTrustedTimeSource:
+                  - trustedTimeSource
+              SetTimeZone:
+                  - timeZone
+              SetTimeZoneResponse:
+                  - dstOffsetRequired
+              SetDSTOffset:
+                  - dstOffset
+              SetDefaultNTP:
+                  - defaultNTP
+          WaterHeaterManagement:
+              Boost:
+                  - boostInfo
+          WaterHeaterMode:
+              ChangeToMode:
+                  - newMode
+              ChangeToModeResponse:
+                  - status
+                  - statusText
+          WiFiNetworkManagement:
+              NetworkPassphraseResponse:
+                  - passphrase
       structs:
+          AccessControl:
+              - AccessRestrictionEntryStruct
+              - AccessRestrictionStruct
+              - CommissioningAccessRestrictionEntryStruct
+          Channel:
+              - ProgramStruct
+              - SeriesInfoStruct
+              - ProgramCategoryStruct
+              - ProgramCastStruct
+              - PageTokenStruct
+              - ChannelPagingStruct
           DeviceEnergyManagement:
               - CostStruct
               - PowerAdjustStruct
@@ -10274,14 +10040,28 @@
               - ModeTagStruct
           ElectricalEnergyMeasurement:
               - MeasurementAccuracyRangeStruct
+          EnergyEVSE:
+              - ChargingTargetStruct
+              - ChargingTargetScheduleStruct
+          EnergyEVSEMode:
+              - ModeOptionStruct
+              - ModeTagStruct
+          Globals:
+              - AtomicAttributeStatusStruct
+              - LocationDescriptorStruct
           ICDManagement:
               - MonitoringRegistrationStruct
           LaundryWasherMode:
               - ModeOptionStruct
               - ModeTagStruct
+          Messages:
+              - MessageStruct
+              - MessageResponseOptionStruct
           MicrowaveOvenMode:
               - ModeTagStruct
               - ModeOptionStruct
+          OccupancySensing:
+              - HoldTimeLimitsStruct
           OvenMode:
               - ModeTagStruct
               - ModeOptionStruct
@@ -10291,7 +10071,78 @@
           RefrigeratorAndTemperatureControlledCabinetMode:
               - ModeOptionStruct
               - ModeTagStruct
+          ServiceArea:
+              - LandmarkInfoStruct
+              - AreaInfoStruct
+              - MapStruct
+              - AreaStruct
+              - ProgressStruct
+          Thermostat:
+              - ScheduleTransitionStruct
+              - ScheduleStruct
+              - PresetStruct
+              - PresetTypeStruct
+              - ScheduleTypeStruct
+          ThreadNetworkDirectory:
+              - ThreadNetworkStruct
+          TimeSynchronization:
+              - FabricScopedTrustedTimeSourceStruct
+              - TrustedTimeSourceStruct
+          WaterHeaterManagement:
+              - WaterHeaterBoostInfoStruct
+          WaterHeaterMode:
+              - ModeOptionStruct
+              - ModeTagStruct
       struct fields:
+          AccessControl:
+              AccessRestrictionEntryStruct:
+                  - endpoint
+                  - cluster
+                  - restrictions
+                  - fabricIndex
+              AccessRestrictionStruct:
+                  - type
+                  - id
+              CommissioningAccessRestrictionEntryStruct:
+                  - endpoint
+                  - cluster
+                  - restrictions
+          Channel:
+              ChannelInfoStruct:
+                  - identifier
+                  - type
+              ProgramStruct:
+                  - identifier
+                  - channel
+                  - startTime
+                  - endTime
+                  - title
+                  - subtitle
+                  - descriptionString
+                  - audioLanguages
+                  - ratings
+                  - releaseDate
+                  - parentalGuidanceText
+                  - recordingFlag
+                  - seriesInfo
+                  - categoryList
+                  - castList
+              ProgramCategoryStruct:
+                  - category
+                  - subCategory
+              SeriesInfoStruct:
+                  - season
+                  - episode
+              ProgramCastStruct:
+                  - name
+                  - role
+              PageTokenStruct:
+                  - limit
+                  - after
+                  - before
+              ChannelPagingStruct:
+                  - previousToken
+                  - nextToken
           DeviceEnergyManagement:
               CostStruct:
                   - costType
@@ -10371,6 +10222,30 @@
                   - fixedMax
                   - fixedMin
                   - fixedTypical
+          EnergyEVSE:
+              ChargingTargetStruct:
+                  - targetTimeMinutesPastMidnight
+                  - targetSoC
+                  - addedEnergy
+              ChargingTargetScheduleStruct:
+                  - dayOfWeekForSequence
+                  - chargingTargets
+          EnergyEVSEMode:
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - modeTags
+              ModeTagStruct:
+                  - mfgCode
+                  - value
+          Globals:
+              AtomicAttributeStatusStruct:
+                  - attributeID
+                  - statusCode
+              LocationDescriptorStruct:
+                  - locationName
+                  - floorNumber
+                  - areaType
           ICDManagement:
               MonitoringRegistrationStruct:
                   - checkInNodeID
@@ -10385,6 +10260,18 @@
               ModeTagStruct:
                   - mfgCode
                   - value
+          Messages:
+              MessageStruct:
+                  - messageID
+                  - priority
+                  - messageControl
+                  - startTime
+                  - duration
+                  - messageText
+                  - responses
+              MessageResponseOptionStruct:
+                  - messageResponseID
+                  - label
           MicrowaveOvenMode:
               ModeTagStruct:
                   - mfgCode
@@ -10401,6 +10288,11 @@
                   - label
                   - mode
                   - modeTags
+          OccupancySensing:
+              HoldTimeLimitsStruct:
+                  - holdTimeMin
+                  - holdTimeMax
+                  - holdTimeDefault
           OvenCavityOperationalState:
               ErrorStateStruct:
                   - errorStateID
@@ -10417,7 +10309,93 @@
               ModeTagStruct:
                   - mfgCode
                   - value
+          ServiceArea:
+              LandmarkInfoStruct:
+                  - landmarkTag
+                  - relativePositionTag
+              AreaInfoStruct:
+                  - locationInfo
+                  - landmarkInfo
+              MapStruct:
+                  - mapID
+                  - name
+              AreaStruct:
+                  - areaID
+                  - mapID
+                  - areaInfo
+              ProgressStruct:
+                  - areaID
+                  - status
+                  - totalOperationalTime
+          Thermostat:
+              ScheduleTransitionStruct:
+                  - dayOfWeek
+                  - transitionTime
+                  - presetHandle
+                  - systemMode
+                  - coolingSetpoint
+                  - heatingSetpoint
+              ScheduleStruct:
+                  - scheduleHandle
+                  - systemMode
+                  - name
+                  - presetHandle
+                  - transitions
+                  - builtIn
+              PresetStruct:
+                  - presetHandle
+                  - presetScenario
+                  - name
+                  - coolingSetpoint
+                  - heatingSetpoint
+                  - builtIn
+              PresetTypeStruct:
+                  - presetScenario
+                  - numberOfPresets
+                  - presetTypeFeatures
+              ScheduleTypeStruct:
+                  - systemMode
+                  - numberOfSchedules
+                  - scheduleTypeFeatures
+          ThreadNetworkDirectory:
+              ThreadNetworkStruct:
+                  - extendedPanID
+                  - networkName
+                  - channel
+                  - activeTimestamp
+          TimeSynchronization:
+              FabricScopedTrustedTimeSourceStruct:
+                  - nodeID
+                  - endpoint
+              TrustedTimeSourceStruct:
+                  - fabricIndex
+                  - nodeID
+                  - endpoint
+          WaterHeaterManagement:
+              WaterHeaterBoostInfoStruct:
+                  - duration
+                  - oneShot
+                  - emergencyBoost
+                  - temporarySetpoint
+                  - targetPercentage
+                  - targetReheat
+          WaterHeaterMode:
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - modeTags
+              ModeTagStruct:
+                  - mfgCode
+                  - value
       events:
+          AccessControl:
+              - FabricRestrictionReviewUpdate
+          AccountLogin:
+              - LoggedOut
+          CommissionerControl:
+              - CommissioningRequestResult
+          BridgedDeviceBasicInformation:
+              - ActiveChanged
           DeviceEnergyManagement:
               - PowerAdjustStart
               - PowerAdjustEnd
@@ -10425,12 +10403,55 @@
               - Resumed
           DishwasherAlarm:
               - Notify
+          EnergyEVSE:
+              - EVConnected
+              - EVNotDetected
+              - EnergyTransferStarted
+              - EnergyTransferStopped
+              - Fault
+              - RFID
+          MediaPlayback:
+              - StateChanged
+          Messages:
+              - MessageQueued
+              - MessagePresented
+              - MessageComplete
+          OccupancySensing:
+              - OccupancyChanged
           OvenCavityOperationalState:
               - OperationalError
               - OperationCompletion
           RefrigeratorAlarm:
               - Notify
+          TargetNavigator:
+              - TargetUpdated
+          TimeSynchronization:
+              - DSTTableEmpty
+              - DSTStatus
+              - TimeZoneStatus
+              - TimeFailure
+              - MissingTrustedTimeSource
+          WaterHeaterManagement:
+              - BoostStarted
+              - BoostEnded
       event fields:
+          AccessControl:
+              FabricRestrictionReviewUpdate:
+                  - token
+                  - instruction
+                  - fabricIndex
+          AccountLogin:
+              LoggedOut:
+                  - node
+          BridgedDeviceBasicInformation:
+              ActiveChanged:
+                  - promisedActiveDuration
+          CommissionerControl:
+              CommissioningRequestResult:
+                  - requestID
+                  - clientNodeID
+                  - statusCode
+                  - fabricIndex
           DeviceEnergyManagement:
               PowerAdjustEnd:
                   - cause
@@ -10444,6 +10465,54 @@
                   - inactive
                   - state
                   - mask
+          EnergyEVSE:
+              EVConnected:
+                  - sessionID
+              EVNotDetected:
+                  - sessionID
+                  - state
+                  - sessionDuration
+                  - sessionEnergyCharged
+              EnergyTransferStarted:
+                  - sessionID
+                  - state
+                  - maximumCurrent
+              EnergyTransferStopped:
+                  - sessionID
+                  - state
+                  - reason
+                  - energyTransferred
+              Fault:
+                  - sessionID
+                  - state
+                  - faultStatePreviousState
+                  - faultStateCurrentState
+              RFID:
+                  - uid
+          MediaPlayback:
+              StateChanged:
+                  - currentState
+                  - startTime
+                  - duration
+                  - sampledPosition
+                  - playbackSpeed
+                  - seekRangeEnd
+                  - seekRangeStart
+                  - data
+                  - audioAdvanceUnmuted
+          Messages:
+              MessageQueued:
+                  - messageID
+              MessagePresented:
+                  - messageID
+              MessageComplete:
+                  - messageID
+                  - responseID
+                  - reply
+                  - futureMessagesPreference
+          OccupancySensing:
+              OccupancyChanged:
+                  - occupancy
           OvenCavityOperationalState:
               OperationalError:
                   - errorState
@@ -10457,7 +10526,27 @@
                   - inactive
                   - state
                   - mask
+          TargetNavigator:
+              TargetUpdated:
+                  - targetList
+                  - currentTarget
+                  - data
+          TimeSynchronization:
+              DSTStatus:
+                  - dstOffsetActive
+              TimeZoneStatus:
+                  - offset
+                  - name
+          WaterHeaterManagement:
+              BoostStarted:
+                  - boostInfo
       enums:
+          AccessControl:
+              - AccessRestrictionTypeEnum
+          Channel:
+              - ChannelTypeEnum
+          ContentAppObserver:
+              - StatusEnum
           DeviceEnergyManagement:
               - CostTypeEnum
               - ESATypeEnum
@@ -10473,9 +10562,26 @@
               - ModeTag
           ElectricalEnergyMeasurement:
               - MeasurementTypeEnum
+          EnergyEVSE:
+              - StateEnum
+              - SupplyStateEnum
+              - FaultStateEnum
+              - EnergyTransferStoppedReasonEnum
+          EnergyEVSEMode:
+              - ModeTag
+          Globals:
+              - AtomicRequestTypeEnum
+              - LandmarkTag
+              - PositionTag
+              - RelativePositionTag
           ICDManagement:
               - ClientTypeEnum
               - OperatingModeEnum
+          MediaPlayback:
+              - CharacteristicEnum
+          Messages:
+              - FutureMessagePreferenceEnum
+              - MessagePriorityEnum
           MicrowaveOvenMode:
               - ModeTag
           OvenMode:
@@ -10491,7 +10597,57 @@
               - OperationalStateEnum
           RefrigeratorAndTemperatureControlledCabinetMode:
               - ModeTag
+          ServiceArea:
+              - OperationalStatusEnum
+              - SelectAreasStatus
+              - SkipAreaStatus
+          Thermostat:
+              - StartOfWeekEnum
+              - TemperatureSetpointHoldEnum
+              - ACCapacityFormatEnum
+              - ACCompressorTypeEnum
+              - ACLouverPositionEnum
+              - ACRefrigerantTypeEnum
+              - ACTypeEnum
+              - SetpointChangeSourceEnum
+              - PresetScenarioEnum
+          TimeSynchronization:
+              - StatusCode
+              - TimeZoneDatabaseEnum
+          WaterHeaterManagement:
+              - BoostStateEnum
+          WaterHeaterMode:
+              - ModeTag
       enum values:
+          AccessControl:
+              AccessRestrictionTypeEnum:
+                  - AttributeAccessForbidden
+                  - AttributeWriteForbidden
+                  - CommandForbidden
+                  - EventForbidden
+          ApplicationLauncher:
+              StatusEnum:
+                  - PendingUserApproval
+                  - Downloading
+                  - Installing
+          Channel:
+              ChannelTypeEnum:
+                  - Satellite
+                  - Cable
+                  - Terrestrial
+                  - OTT
+          ContentAppObserver:
+              StatusEnum:
+                  - Success
+                  - UnexpectedData
+          ContentLauncher:
+              ParameterEnum:
+                  - Season
+                  - Episode
+                  - Any
+              StatusEnum:
+                  - TextTrackNotAvailable
+                  - AudioTrackNotAvailable
           DeviceEnergyManagement:
               CostTypeEnum:
                   - Financial
@@ -10607,6 +10763,130 @@
                   - PowerFactor
                   - NeutralCurrent
                   - ElectricalEnergy
+          EnergyEVSE:
+              StateEnum:
+                  - NotPluggedIn
+                  - PluggedInNoDemand
+                  - PluggedInDemand
+                  - PluggedInCharging
+                  - SessionEnding
+                  - Fault
+              SupplyStateEnum:
+                  - Disabled
+                  - ChargingEnabled
+                  - DisabledError
+                  - DisabledDiagnostics
+              FaultStateEnum:
+                  - NoError
+                  - MeterFailure
+                  - OverVoltage
+                  - UnderVoltage
+                  - OverCurrent
+                  - ContactWetFailure
+                  - ContactDryFailure
+                  - GroundFault
+                  - PowerLoss
+                  - PowerQuality
+                  - PilotShortCircuit
+                  - EmergencyStop
+                  - EVDisconnected
+                  - WrongPowerSupply
+                  - LiveNeutralSwap
+                  - OverTemperature
+                  - Other
+              EnergyTransferStoppedReasonEnum:
+                  - EVStopped
+                  - EVSEStopped
+                  - Other
+          EnergyEVSEMode:
+              ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  - Manual
+                  - TimeOfUse
+                  - SolarCharging
+                  - V2X
+          Globals:
+              AtomicRequestTypeEnum:
+                  - BeginWrite
+                  - CommitWrite
+                  - RollbackWrite
+              LandmarkTag:
+                  - AirConditioner
+                  - AirPurifier
+                  - BackDoor
+                  - BarStool
+                  - BathMat
+                  - Bathtub
+                  - Bed
+                  - Bookshelf
+                  - Chair
+                  - ChristmasTree
+                  - CoatRack
+                  - CoffeeTable
+                  - CookingRange
+                  - Couch
+                  - Countertop
+                  - Cradle
+                  - Crib
+                  - Desk
+                  - DiningTable
+                  - Dishwasher
+                  - Door
+                  - Dresser
+                  - LaundryDryer
+                  - Fan
+                  - Fireplace
+                  - Freezer
+                  - FrontDoor
+                  - HighChair
+                  - KitchenIsland
+                  - Lamp
+                  - LitterBox
+                  - Mirror
+                  - Nightstand
+                  - Oven
+                  - PetBed
+                  - PetBowl
+                  - PetCrate
+                  - Refrigerator
+                  - ScratchingPost
+                  - ShoeRack
+                  - Shower
+                  - SideDoor
+                  - Sink
+                  - Sofa
+                  - Stove
+                  - Table
+                  - Toilet
+                  - TrashCan
+                  - LaundryWasher
+                  - Window
+                  - WineCooler
+              PositionTag:
+                  - Left
+                  - Right
+                  - Top
+                  - Bottom
+                  - Middle
+                  - Row
+                  - Column
+              RelativePositionTag:
+                  - Under
+                  - NextTo
+                  - Around
+                  - On
+                  - Above
+                  - FrontOf
+                  - Behind
           ICDManagement:
               ClientTypeEnum:
                   - Permanent
@@ -10642,6 +10922,38 @@
                   - Delicate
                   - Heavy
                   - Whites
+          MediaPlayback:
+              CharacteristicEnum:
+                  - ForcedSubtitles
+                  - DescribesVideo
+                  - EasyToRead
+                  - FrameBased
+                  - MainProgram
+                  - OriginalContent
+                  - VoiceOverTranslation
+                  - Caption
+                  - Subtitle
+                  - Alternate
+                  - Supplementary
+                  - Commentary
+                  - DubbedTranslation
+                  - Description
+                  - Metadata
+                  - EnhancedAudioIntelligibility
+                  - Emergency
+                  - Karaoke
+          Messages:
+              FutureMessagePreferenceEnum:
+                  - Allowed
+                  - Increased
+                  - Reduced
+                  - Disallowed
+                  - Banned
+              MessagePriorityEnum:
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
           MicrowaveOvenMode:
               ModeTag:
                   - Auto
@@ -10739,24 +11051,195 @@
                   - Night
                   - Day
                   - Mapping
+          ServiceArea:
+              OperationalStatusEnum:
+                  - Pending
+                  - Operating
+                  - Skipped
+                  - Completed
+              SelectAreasStatus:
+                  - Success
+                  - UnsupportedArea
+                  - InvalidInMode
+                  - InvalidSet
+              SkipAreaStatus:
+                  - Success
+                  - InvalidAreaList
+                  - InvalidInMode
+                  - InvalidSkippedArea
+          Thermostat:
+              StartOfWeekEnum:
+                  - Sunday
+                  - Monday
+                  - Tuesday
+                  - Wednesday
+                  - Thursday
+                  - Friday
+                  - Saturday
+              TemperatureSetpointHoldEnum:
+                  - SetpointHoldOff
+                  - SetpointHoldOn
+              ACCapacityFormatEnum:
+                  - BTUh
+              ACCompressorTypeEnum:
+                  - Unknown
+                  - T1
+                  - T2
+                  - T3
+              ACLouverPositionEnum:
+                  - Closed
+                  - Open
+                  - Quarter
+                  - Half
+                  - ThreeQuarters
+              ACRefrigerantTypeEnum:
+                  - Unknown
+                  - R22
+                  - R410a
+                  - R407c
+              ACTypeEnum:
+                  - Unknown
+                  - CoolingFixed
+                  - HeatPumpFixed
+                  - CoolingInverter
+                  - HeatPumpInverter
+              SetpointChangeSourceEnum:
+                  - Manual
+                  - Schedule
+                  - External
+              PresetScenarioEnum:
+                  - Occupied
+                  - Unoccupied
+                  - Sleep
+                  - Wake
+                  - Vacation
+                  - GoingToSleep
+                  - UserDefined
+          TimeFormatLocalization:
+              CalendarTypeEnum:
+                  - UseActiveLocale
+              HourFormatEnum:
+                  - UseActiveLocale
+          TimeSynchronization:
+              TimeSourceEnum:
+                  - NonMatterSNTP
+                  - NonMatterNTP
+                  - MatterSNTP
+                  - MatterNTP
+                  - MixedNTP
+                  - NonMatterSNTPNTS
+                  - NonMatterNTPNTS
+                  - MatterSNTPNTS
+                  - MatterNTPNTS
+                  - MixedNTPNTS
+                  - PTP
+                  - GNSS
+              StatusCode:
+                  - TimeNotAccepted
+              TimeZoneDatabaseEnum:
+                  - Full
+                  - Partial
+                  - None
+          WaterHeaterManagement:
+              BoostStateEnum:
+                  - Inactive
+                  - Active
+          WaterHeaterMode:
+              ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Vacation
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  - Off
+                  - Manual
+                  - Timed
       bitmaps:
+          AccessControl:
+              - Feature
+          BridgedDeviceBasicInformation:
+              - Feature
+          Channel:
+              - RecordingFlagBitmap
+          CommissionerControl:
+              - SupportedDeviceCategoryBitmap
           DeviceEnergyManagement:
               - Feature
           DishwasherAlarm:
               - AlarmBitmap
+              - Feature
+          EnergyEVSE:
+              - TargetDayOfWeekBitmap
+              - Feature
+          GeneralDiagnostics:
               - Feature
           ICDManagement:
               - UserActiveModeTriggerBitmap
               - Feature
           LaundryWasherControls:
               - Feature
+          Messages:
+              - MessageControlBitmap
+              - Feature
           MicrowaveOvenControl:
+              - Feature
+          NetworkCommissioning:
+              - ThreadCapabilitiesBitmap
+          OccupancySensing:
+              - Feature
+          PowerTopology:
               - Feature
           RefrigeratorAlarm:
               - AlarmBitmap
+          ServiceArea:
+              - Feature
           TemperatureControl:
               - Feature
+          Thermostat:
+              - ACErrorCodeBitmap
+              - HVACSystemTypeBitmap
+              - ProgrammingOperationModeBitmap
+              - RelayStateBitmap
+              - RemoteSensingBitmap
+              - PresetTypeFeaturesBitmap
+              - ScheduleTypeFeaturesBitmap
+              - OccupancyBitmap
+          ThreadBorderRouterManagement:
+              - Feature
+          TimeSynchronization:
+              - Feature
+          WaterHeaterManagement:
+              - WaterHeaterHeatSourceBitmap
+              - Feature
       bitmap values:
+          AccessControl:
+              Feature:
+                  - Extension
+                  - ManagedDevice
+          BridgedDeviceBasicInformation:
+              Feature:
+                  - BridgedICDSupport
+          Channel:
+              RecordingFlagBitmap:
+                  - Scheduled
+                  - RecordSeries
+                  - Recorded
+              Feature:
+                  - ElectronicGuide
+                  - RecordProgram
+          CommissionerControl:
+              SupportedDeviceCategoryBitmap:
+                  - FabricSynchronization
+          ContentLauncher:
+              Feature:
+                  - AdvancedSeek
+                  - TextTracks
+                  - AudioTracks
           DeviceEnergyManagement:
               Feature:
                   - PowerAdjustment
@@ -10776,6 +11259,21 @@
                   - Unbolt
                   - AliroProvisioning
                   - AliroBLEUWB
+          EnergyEVSE:
+              TargetDayOfWeekBitmap:
+                  - Sunday
+                  - Monday
+                  - Tuesday
+                  - Wednesday
+                  - Thursday
+                  - Friday
+                  - Saturday
+              Feature:
+                  - ChargingPreferences
+                  - RFID
+          GeneralDiagnostics:
+              Feature:
+                  - DataModelTest
           ICDManagement:
               UserActiveModeTriggerBitmap:
                   - PowerCycle
@@ -10804,30 +11302,241 @@
               Feature:
                   - Spin
                   - Rinse
+          Messages:
+              MessageControlBitmap:
+                  - ConfirmationRequired
+                  - ResponseRequired
+                  - ReplyMessage
+                  - MessageConfirmed
+                  - MessageProtected
+              Feature:
+                  - ReceivedConfirmation
+                  - ConfirmationResponse
+                  - ConfirmationReply
+                  - ProtectedMessages
+          MediaPlayback:
+              Feature:
+                  - TextTracks
+                  - AudioTracks
+                  - AudioAdvance
           MicrowaveOvenControl:
               Feature:
                   - PowerAsNumber
                   # PowerInWatts is provisional because WATTS is provisional in Matter 1.4
                   - PowerNumberLimits
+          NetworkCommissioning:
+              ThreadCapabilitiesBitmap:
+                  - IsBorderRouterCapable
+                  - IsRouterCapable
+                  - IsSleepyEndDeviceCapable
+                  - IsFullThreadDevice
+                  - IsSynchronizedSleepyEndDeviceCapable
+          OccupancySensing:
+              Feature:
+                  - Other
+                  - PassiveInfrared
+                  - Ultrasonic
+                  - PhysicalContact
+                  - ActiveInfrared
+                  - Radar
+                  - RFSensing
+                  - Vision
+          OnOff:
+              Feature:
+                  - OffOnly
+          PowerTopology:
+              Feature:
+                  - NodeTopology
+                  - TreeTopology
+                  - SetTopology
+                  - DynamicPowerFlow
           RefrigeratorAlarm:
               AlarmBitmap:
                   - DoorOpen
+          ServiceArea:
+              Feature:
+                  - SelectWhileRunning
+                  - ProgressReporting
+                  - Maps
+          Switch:
+              Feature:
+                  - ActionSwitch
           TemperatureControl:
               Feature:
                   - TemperatureNumber
                   - TemperatureLevel
                   - TemperatureStep
+          Thermostat:
+              ACErrorCodeBitmap:
+                  - CompressorFail
+                  - RoomSensorFail
+                  - OutdoorSensorFail
+                  - CoilSensorFail
+                  - FanFail
+              HVACSystemTypeBitmap:
+                  - CoolingStage
+                  - HeatingStage
+                  - HeatingIsHeatPump
+                  - HeatingUsesFuel
+              ProgrammingOperationModeBitmap:
+                  - ScheduleActive
+                  - AutoRecovery
+                  - Economy
+              RelayStateBitmap:
+                  - Heat
+                  - Cool
+                  - Fan
+                  - HeatStage2
+                  - CoolStage2
+                  - FanStage2
+                  - FanStage3
+              RemoteSensingBitmap:
+                  - LocalTemperature
+                  - OutdoorTemperature
+                  - Occupancy
+              PresetTypeFeaturesBitmap:
+                  - Automatic
+                  - SupportsNames
+              ScheduleTypeFeaturesBitmap:
+                  - SupportsPresets
+                  - SupportsSetpoints
+                  - SupportsNames
+                  - SupportsOff
+              OccupancyBitmap:
+                  - Occupied
+              Feature:
+                  - Presets
+                  - MatterScheduleConfiguration
+          ThreadBorderRouterManagement:
+              Feature:
+                  - PANChange
+          TimeSynchronization:
+              Feature:
+                  - TimeZone
+                  - NTPClient
+                  - NTPServer
+                  - TimeSyncClient
+          WaterHeaterManagement:
+              WaterHeaterHeatSourceBitmap:
+                  - ImmersionElement1
+                  - ImmersionElement2
+                  - HeatPump
+                  - Boiler
+                  - Other
+              Feature:
+                  - EnergyManagement
+                  - TankPercent
   provisional:
+      clusters:
+          # Targeting camera enablement, not part of Matter 1.4.
+          - CameraAVSettingsUserLevelManagement
+          - PushAVStreamTransport
+          - TLSCertificateManagement
       attributes:
+          EnergyEVSE:
+              # Depend on the V2X feature, which is provisional in Matter 1.4.
+              - DischargingEnabledUntil
+              - MaximumDischargeCurrent
+              - SessionEnergyDischarged
+              # Depend on the SoCReporting feature, which is provisional in Matter 1.4.
+              - StateOfCharge
+              - BatteryCapacity
+              # Depends on the PlugAndCharge feature, which is provisional in Matter 1.4.
+              - VehicleID
+          MediaPlayback:
+              # These attributes need to stay provisional while TrackStruct is provisional
+              - ActiveAudioTrack
+              - AvailableAudioTracks
+              - ActiveTextTrack
+              - AvailableTextTracks
           MicrowaveOvenControl:
               # SupportedWatts and SelectedWattIndex are provisional because WATTS is provisional in Matter 1.4
               - SupportedWatts
               - SelectedWattIndex
+      commands:
+          EnergyEVSE:
+              # Depends on the V2X feature, which is provisional in Matter 1.4.
+              - EnableDischarging
       command fields:
           MicrowaveOvenControl:
               SetCookingParameters:
                   # wattSettingIndex is provisional because WATTS is provisional in Matter 1.4
                   - wattSettingIndex
+          Channel:
+              GetProgramGuide:
+                  # Needs to stay provisional until AdditionalInfoStruct becomes non-provisional.
+                  - externalIDList
+              RecordProgram:
+                  # Needs to stay provisional until AdditionalInfoStruct becomes non-provisional.
+                  - externalIDList
+              CancelRecordProgram:
+                  # Needs to stay provisional until AdditionalInfoStruct becomes non-provisional.
+                  - externalIDList
+          ContentLauncher:
+              LaunchContent:
+                  # Needs to stay provisional as long as PlaybackPreferencesStruct is provisional.
+                  - playbackPreferences
+      structs:
+          Channel:
+              # SDK does not match spec here: spec is trying to use a struct from the Content Launcher cluster.
+              # Tracked in https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/10841
+              - AdditionalInfoStruct
+          ContentLauncher:
+              # Needs to stay provisional as long as CharacteristicEnum is provisional.
+              - TrackPreferenceStruct
+              # Needs to stay provisional as long as TrackPreferenceStruct is provisional.
+              - PlaybackPreferencesStruct
+          MediaPlayback:
+              # SDK does not match spec: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/10844
+              - TrackAttributesStruct
+              # Needs to stay provisional while TrackAttributesStruct is provisional
+              - TrackStruct
+      struct fields:
+          Channel:
+              ProgramStruct:
+                  # Naming of fields ending in "Url" might change, breaking compat.
+                  # See https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/10842
+                  - thumbnailUrl
+                  - posterArtUrl
+                  - dvbiUrl
+                  # Needs to stay provisional until AdditionalInfoStruct becomes non-provisional.
+                  - externalIDList
+          ServiceArea:
+              ProgressStruct:
+                  # Spec has a different name for this field.
+                  # See https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/10855
+                  - estimatedTime
+      event fields:
+          AccessControl:
+              FabricRestrictionReviewUpdate:
+                  # There's an outstanding spec issue on the naming of this field.
+                  # See https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/10389
+                  # See https://github.com/project-chip/connectedhomeip/issues/35418
+                  - arlRequestFlowUrl
+          EnergyEVSE:
+              EVNotDetected:
+                  # Depends on the V2X feature, which is provisional in Matter 1.4.
+                  - sessionEnergyDischarged
+              EnergyTransferStarted:
+                  # Depends on the V2X feature, which is provisional in Matter 1.4.
+                  - maximumDischargeCurrent
+              EnergyTransferStopped:
+                  # Depends on the V2X feature, which is provisional in Matter 1.4.
+                  - energyDischarged
+      enums:
+          ContentLauncher:
+              # SDK does not match spec here: spec is trying to use an enum from Media Playback cluster.
+              # Tracked in https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/10843
+              - CharacteristicEnum
+      enum values:
+          EnergyEVSE:
+              StateEnum:
+                  # Depends on the V2X feature, which is provisional in Matter 1.4.
+                  - PluggedInDischarging
+              SupplyStateEnum:
+                  # Depend on the V2X feature, which is provisional in Matter 1.4.
+                  - DischargingEnabled
+                  - Enabled
       bitmap values:
           DishwasherAlarm:
               AlarmBitmap:
@@ -10841,6 +11550,12 @@
               Feature:
                   # PowerInWatts is provisional because WATTS is provisional in Matter 1.4
                   - PowerInWatts
+          EnergyEVSE:
+              Feature:
+                  # These features are provisional in Matter 1.4
+                  - SoCReporting
+                  - PlugAndCharge
+                  - V2X
       device types:
           - BatteryStorage
           - HeatPump
@@ -10878,6 +11593,10 @@
               # The one bit in this bitmap is marked X in the spec, but we can't have
               # an empty bitmap.
               - Feature
+          EnergyEVSEMode:
+              # The one bit in this bitmap is marked X in the spec, but we can't have
+              # an empty bitmap.
+              - Feature
           LaundryWasherMode:
               # The one bit in this bitmap is marked X in the spec, but we can't have
               # an empty bitmap.
@@ -10891,6 +11610,10 @@
               # an empty bitmap.
               - Feature
           RefrigeratorAndTemperatureControlledCabinetMode:
+              # The one bit in this bitmap is marked X in the spec, but we can't have
+              # an empty bitmap.
+              - Feature
+          WaterHeaterMode:
               # The one bit in this bitmap is marked X in the spec, but we can't have
               # an empty bitmap.
               - Feature

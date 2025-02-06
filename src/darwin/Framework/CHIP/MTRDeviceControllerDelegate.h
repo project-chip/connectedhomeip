@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2020-2023 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,6 +19,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class MTRCommissioneeInfo;
+@class MTRDeviceController;
+@class MTRDeviceTypeRevision;
+@class MTREndpointInfo;
+@class MTRMetrics;
+@class MTRProductIdentity;
+
 typedef NS_ENUM(NSInteger, MTRCommissioningStatus) {
     MTRCommissioningStatusUnknown = 0,
     MTRCommissioningStatusSuccess = 1,
@@ -28,22 +34,6 @@ typedef NS_ENUM(NSInteger, MTRCommissioningStatus) {
         ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 3,
 } MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-
-/**
- * A representation of a (vendor, product) pair that identifies a specific product.
- */
-MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
-@interface MTRProductIdentity : NSObject
-
-@property (nonatomic, copy, readonly) NSNumber * vendorID;
-
-@property (nonatomic, copy, readonly) NSNumber * productID;
-
-- (instancetype)initWithVendorID:(NSNumber *)vendorID productID:(NSNumber *)productID;
-@end
-
-@class MTRDeviceController;
-@class MTRMetrics;
 
 /**
  * The protocol definition for the MTRDeviceControllerDelegate.
@@ -98,14 +88,17 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
                   metrics:(MTRMetrics *)metrics MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
- * Notify the delegate when commissioning infomation has been read from the Basic
- * Information cluster of the commissionee.
+ * Notify the delegate when commissioning infomation has been read from the commissionee.
  *
- * At the point when this notification happens, device attestation has not been performed yet,
+ * Note that this notification happens before device attestation is performed,
  * so the information delivered by this notification should not be trusted.
  */
 - (void)controller:(MTRDeviceController *)controller
-    readCommissioningInfo:(MTRProductIdentity *)info MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+    readCommissioneeInfo:(MTRCommissioneeInfo *)info MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+- (void)controller:(MTRDeviceController *)controller
+    readCommissioningInfo:(MTRProductIdentity *)info
+    MTR_DEPRECATED("Use controller:readCommissioneeInfo:", ios(17.0, 18.4), macos(14.0, 15.4), watchos(10.0, 11.4), tvos(17.0, 18.4));
 
 /**
  * Notify the delegate when the suspended state changed of the controller, after this happens

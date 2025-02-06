@@ -18,11 +18,14 @@
 
 #pragma once
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributePathParams.h>
+#include <app/ClusterStateCache.h>
 #include <app/OperationalSessionSetup.h>
 #include <controller/CommissioneeDeviceProxy.h>
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/Span.h>
 #include <lib/support/Variant.h>
 #include <matter/tracing/build_config.h>
 #include <system/SystemClock.h>
@@ -173,8 +176,6 @@ public:
 
     // The country code to be used for the node, if set.
     Optional<CharSpan> GetCountryCode() const { return mCountryCode; }
-
-    bool GetRequireTermsAndConditionsAcknowledgement() const { return mRequireTermsAndConditionsAcknowledgement; }
 
     Optional<TermsAndConditionsAcknowledgement> GetTermsAndConditionsAcknowledgement() const
     {
@@ -350,12 +351,6 @@ public:
     CommissioningParameters & SetCountryCode(CharSpan countryCode)
     {
         mCountryCode.SetValue(countryCode);
-        return *this;
-    }
-
-    CommissioningParameters & SetRequireTermsAndConditionsAcknowledgement(bool requireTermsAndConditionsAcknowledgement)
-    {
-        mRequireTermsAndConditionsAcknowledgement = requireTermsAndConditionsAcknowledgement;
         return *this;
     }
 
@@ -599,6 +594,18 @@ public:
     }
     void ClearICDStayActiveDurationMsec() { mICDStayActiveDurationMsec.ClearValue(); }
 
+    Span<const app::AttributePathParams> GetExtraReadPaths() const { return mExtraReadPaths; }
+
+    // Additional attribute paths to read as part of the kReadCommissioningInfo stage.
+    // These values read from the device will be available in ReadCommissioningInfo.attributes.
+    // Clients should avoid requesting paths that are already read internally by the commissioner
+    // as no consolidation of internally read and extra paths provided here will be performed.
+    CommissioningParameters & SetExtraReadPaths(Span<const app::AttributePathParams> paths)
+    {
+        mExtraReadPaths = paths;
+        return *this;
+    }
+
     // Clear all members that depend on some sort of external buffer.  Can be
     // used to make sure that we are not holding any dangling pointers.
     void ClearExternalBufferDependentValues()
@@ -621,6 +628,7 @@ public:
         mDSTOffsets.ClearValue();
         mDefaultNTP.ClearValue();
         mICDSymmetricKey.ClearValue();
+        mExtraReadPaths = decltype(mExtraReadPaths)();
     }
 
 private:
@@ -670,7 +678,7 @@ private:
     Optional<uint32_t> mICDStayActiveDurationMsec;
     ICDRegistrationStrategy mICDRegistrationStrategy = ICDRegistrationStrategy::kIgnore;
     bool mCheckForMatchingFabric                     = false;
-    bool mRequireTermsAndConditionsAcknowledgement   = false;
+    Span<const app::AttributePathParams> mExtraReadPaths;
 };
 
 struct RequestedCertificate
@@ -771,6 +779,9 @@ struct ICDManagementClusterInfo
 
 struct ReadCommissioningInfo
 {
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
+    app::ClusterStateCache const * attributes = nullptr;
+#endif
     NetworkClusters network;
     BasicClusterInfo basic;
     GeneralCommissioningInfo general;

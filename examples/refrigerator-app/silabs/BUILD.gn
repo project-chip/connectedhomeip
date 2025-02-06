@@ -154,7 +154,7 @@ silabs_executable("refrigerator_app") {
       "${efr32_sdk_root}/platform/driver/i2cspm/src/sl_i2cspm.c",
       "${efr32_sdk_root}/platform/emlib/src/em_i2c.c",
       "${examples_common_plat_dir}/TemperatureSensor.cpp",
-      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_i2cspm_init.c",
+      "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}/autogen/sl_i2cspm_init.c",
     ]
   }
 

@@ -68,13 +68,13 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="SSID" type="octstr" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform/>
       <constraint type="lengthBetween" from="1" to="32"/>
     </attribute>
     <attribute id="0x0001" name="PassphraseSurrogate" type="uint64" default="null">
       <access read="true" readPrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
   </attributes>

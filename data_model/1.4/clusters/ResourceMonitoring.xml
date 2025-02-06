@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Resource Monitoring Clusters" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Resource Monitoring Clusters" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
@@ -137,7 +137,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="DegradationDirection" type="DegradationDirectionEnum">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="CON"/>
       </mandatoryConform>
@@ -153,13 +153,13 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="LastChangedTime" type="epoch-s" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0005" name="ReplacementProductList" type="list">
       <entry type="ReplacementProductStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="REP"/>
       </mandatoryConform>

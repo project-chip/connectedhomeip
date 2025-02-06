@@ -1581,8 +1581,7 @@ class ChipDeviceControllerBase():
 
         if result := transaction.GetSubscriptionHandler():
             return result
-        else:
-            return transaction.GetReadResponse()
+        return transaction.GetReadResponse()
 
     async def ReadAttribute(
         self,
@@ -2008,11 +2007,11 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_SetSkipCommissioningComplete.restype = PyChipError
             self._dmLib.pychip_DeviceController_SetSkipCommissioningComplete.argtypes = [c_bool]
 
-            self._dmLib.pychip_DeviceController_SetRequireTermsAndConditionsAcknowledgement.restype = PyChipError
-            self._dmLib.pychip_DeviceController_SetRequireTermsAndConditionsAcknowledgement.argtypes = [c_bool]
-
             self._dmLib.pychip_DeviceController_SetTermsAcknowledgements.restype = PyChipError
             self._dmLib.pychip_DeviceController_SetTermsAcknowledgements.argtypes = [c_uint16, c_uint16]
+
+            self._dmLib.pychip_DeviceController_SetDACRevocationSetPath.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetDACRevocationSetPath.argtypes = [c_char_p]
 
 
 class ChipDeviceController(ChipDeviceControllerBase):
@@ -2140,13 +2139,6 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetDSTOffset(offset, validStarting, validUntil)
-        ).raise_on_error()
-
-    def SetTCRequired(self, tcRequired: bool):
-        ''' Set whether TC Acknowledgements should be set during commissioning'''
-        self.CheckIsActive()
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_SetRequireTermsAndConditionsAcknowledgement(tcRequired)
         ).raise_on_error()
 
     def SetTCAcknowledgements(self, tcAcceptedVersion: int, tcUserResponse: int):
@@ -2318,6 +2310,18 @@ class ChipDeviceController(ChipDeviceControllerBase):
             )
 
             return await asyncio.futures.wrap_future(ctx.future)
+
+    def SetDACRevocationSetPath(self, dacRevocationSetPath: typing.Optional[str]):
+        ''' Set the path to the device attestation revocation set JSON file.
+
+        Args:
+            dacRevocationSetPath: Path to the JSON file containing the device attestation revocation set
+        '''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetDACRevocationSetPath(
+                c_char_p(str.encode(dacRevocationSetPath) if dacRevocationSetPath else None))
+        ).raise_on_error()
 
 
 class BareChipDeviceController(ChipDeviceControllerBase):

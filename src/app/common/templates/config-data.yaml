@@ -50,7 +50,10 @@ CommandHandlerInterfaceOnlyClusters:
     - Water Heater Management
     - Water Heater Mode
     - General Commissioning
+    - General Diagnostics
     - Software Diagnostics
+    - Wi-Fi Network Diagnostics
+    - Administrator Commissioning
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369

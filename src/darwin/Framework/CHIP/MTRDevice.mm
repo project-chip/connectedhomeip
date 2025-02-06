@@ -523,6 +523,16 @@ MTR_DIRECT_MEMBERS
                             completion:responseHandler];
 }
 
+- (void)invokeCommands:(NSArray<NSArray<MTRCommandWithRequiredResponse *> *> *)commands
+                 queue:(dispatch_queue_t)queue
+            completion:(MTRDeviceResponseHandler)completion
+{
+    MTR_ABSTRACT_METHOD();
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+    });
+}
+
 - (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
                                    discriminator:(NSNumber *)discriminator
                                         duration:(NSNumber *)duration

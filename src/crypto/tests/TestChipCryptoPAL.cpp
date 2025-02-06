@@ -73,6 +73,10 @@
 
 #if CHIP_CRYPTO_PSA
 #include <psa/crypto.h>
+extern "C" {
+psa_status_t psa_initialize_key_slots(void);
+void psa_wipe_all_key_slots(void);
+}
 #endif
 
 using namespace chip;
@@ -289,14 +293,17 @@ static void TestAES_CTR_128_Decrypt(const AesCtrTestEntry * vector)
 
 struct TestChipCryptoPAL : public ::testing::Test
 {
-    static void SetUpTestSuite()
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
+    void SetUp() override
     {
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
 #if CHIP_CRYPTO_PSA
         psa_crypto_init();
+        psa_wipe_all_key_slots();
+        psa_initialize_key_slots();
 #endif
     }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
 TEST_F(TestChipCryptoPAL, TestAES_CTR_128CryptTestVectors)

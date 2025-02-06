@@ -114,8 +114,6 @@ public:
      * Disconnect on the active connection that is passed in.
      */
     virtual void TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = 0) {}
-
-    virtual bool IsServerListenEnabled() { return true; }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     /**
