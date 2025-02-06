@@ -119,6 +119,15 @@ tests:
       response:
           saveAs: UnoccupiedCoolingSetpointValue
 
+- label:
+          "Saving value for comparision in step 58 read NumberOfPresets
+          attribute"
+      PICS: TSTAT.S.F08
+      command: "readAttribute"
+      attribute: "NumberOfPresets"
+      response:
+          saveAs: NumberOfPresetsValue
+
     - label: "Step 2: TH reads the LocalTemperature attribute from the DUT"
       command: "readAttribute"
       attribute: "LocalTemperature"
@@ -806,6 +815,7 @@ tests:
       response:
           constraints:
               type: list
+              maxLength: NumberOfPresetsValue
 
     - label: "Step 59: TH reads the Schedules attribute from the DUT"
       PICS: TSTAT.S.F07
