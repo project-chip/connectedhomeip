@@ -38,6 +38,7 @@
 #include <protocols/secure_channel/PairingSession.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
 #include <transport/CryptoContext.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -200,6 +201,8 @@ private:
     void OnSuccessStatusReport() override;
     CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode,
                                      Optional<uintptr_t> protocolData) override;
+
+    CHIP_ERROR ReadSessionParamsIfPresent(const TLV::Tag & SessionParamsTag, System::PacketBufferTLVReader & tlvReader);
 
     void Finish();
 
