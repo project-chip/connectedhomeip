@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#include "SilabsTestEventTriggerDelegate.h"
-#include <headers/ProvisionManager.h>
+#include <SilabsTestEventTriggerDelegate.h>
 #include <lib/core/ErrorStr.h>
 
 using namespace ::chip::DeviceLayer;
