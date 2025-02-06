@@ -52,7 +52,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
         steps = [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Test Harness Client reads  attribute OccupiedCoolingSetpoint from the DUT"),
-            TestStep("2b", "Test Harness Client then attempts  Writes OccupiedCoolingSetpoint to value below the MinCoolSetpointLimit"),
+            TestStep("2b", "Test Harness Client then attempts Writes OccupiedCoolingSetpoint to a value below the MinCoolSetpointLimit"),
             TestStep("2c", "Test Harness Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint attribute"),
             TestStep("3a", "Test Harness Reads OccupiedHeatingSetpoint attribute from Server DUT and verifies that the value is within range"),
             TestStep("3b", "Test Harness Writes OccupiedHeatingSetpoint to value below the MinHeatSetpointLimit"),
