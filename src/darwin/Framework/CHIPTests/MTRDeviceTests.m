@@ -5742,9 +5742,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                                             clusterID:@(MTRClusterIDTypeOnOffID)
                                                             commandID:@(MTRCommandIDTypeClusterOnOffCommandOffID)];
 
-    __auto_type * onCommand = [[MTRCommandWithExpectedResult alloc] initWithPath:onPath commandFields:nil expectedResult:nil];
-    __auto_type * toggleCommand = [[MTRCommandWithExpectedResult alloc] initWithPath:togglePath commandFields:nil expectedResult:nil];
-    __auto_type * offCommand = [[MTRCommandWithExpectedResult alloc] initWithPath:offPath commandFields:nil expectedResult:nil];
+    __auto_type * onCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:onPath commandFields:nil requiredResponse:nil];
+    __auto_type * toggleCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:togglePath commandFields:nil requiredResponse:nil];
+    __auto_type * offCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:offPath commandFields:nil requiredResponse:nil];
 
     XCTestExpectation * simpleInvokeDone = [self expectationWithDescription:@"Invoke of a single 3-command group done"];
     [device invokeCommands:@[ @[ onCommand, toggleCommand, offCommand ] ]
@@ -5773,7 +5773,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type * failingTogglePath = [MTRCommandPath commandPathWithEndpointID:@(1000) // No such endpoint
                                                                       clusterID:@(MTRClusterIDTypeOnOffID)
                                                                       commandID:@(MTRCommandIDTypeClusterOnOffCommandToggleID)];
-    __auto_type * failingToggleCommand = [[MTRCommandWithExpectedResult alloc] initWithPath:failingTogglePath commandFields:nil expectedResult:nil];
+    __auto_type * failingToggleCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:failingTogglePath commandFields:nil requiredResponse:nil];
 
     XCTestExpectation * failingWithStatusInvokeDone = [self expectationWithDescription:@"Invoke of commands where one fails with a status done"];
     [device invokeCommands:@[ @[ failingToggleCommand, offCommand ], @[ onCommand, toggleCommand ], @[ failingToggleCommand ] ]
@@ -5801,7 +5801,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Third test: Do an invoke with three groups.  One of the commands in the
     // first group expects a data response but gets a status, which should be
     // treated as a failure.
-    __auto_type * onCommandExpectingData = [[MTRCommandWithExpectedResult alloc] initWithPath:onPath commandFields:nil expectedResult:@{
+    __auto_type * onCommandExpectingData = [[MTRCommandWithRequiredResponse alloc] initWithPath:onPath commandFields:nil requiredResponse:@{
         @(0) : @ {
             MTRTypeKey : MTRUnsignedIntegerValueType,
             MTRValueKey : @(0),
@@ -5850,7 +5850,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             },
         ]
     };
-    __auto_type * updateFabricLabelNotExpectingFailureCommand = [[MTRCommandWithExpectedResult alloc] initWithPath:updateFabricLabelPath commandFields:updateFabricLabelFields expectedResult:nil];
+    __auto_type * updateFabricLabelNotExpectingFailureCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:updateFabricLabelPath commandFields:updateFabricLabelFields requiredResponse:nil];
 
     XCTestExpectation * updateFabricLabelNotExpectingFailureExpectation = [self expectationWithDescription:@"Invoke of commands where no failure is expected and data response is received done"];
     [device invokeCommands:@[ @[ updateFabricLabelNotExpectingFailureCommand, onCommand ], @[ offCommand ] ]
@@ -5889,7 +5889,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Fifth test: do an invoke with two groups.  One of the commands in the
     // first group expects to get a data response and gets it, which should be
     // treated as success.
-    __auto_type * updateFabricLabelExpectingOKCommand = [[MTRCommandWithExpectedResult alloc] initWithPath:updateFabricLabelPath commandFields:updateFabricLabelFields expectedResult:@{
+    __auto_type * updateFabricLabelExpectingOKCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:updateFabricLabelPath commandFields:updateFabricLabelFields requiredResponse:@{
         @(0) : @ {
             MTRTypeKey : MTRUnsignedIntegerValueType,
             MTRValueKey : @(MTROperationalCredentialsNodeOperationalCertStatusOK),
@@ -5933,7 +5933,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Sixth test: do an invoke with two groups.  One of the commands in the
     // first group expects to get a data response with a field that it does not get, which should be
     // treated as failure.
-    __auto_type * updateFabricLabelExpectingNonexistentFieldCommand = [[MTRCommandWithExpectedResult alloc] initWithPath:updateFabricLabelPath commandFields:updateFabricLabelFields expectedResult:@{
+    __auto_type * updateFabricLabelExpectingNonexistentFieldCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:updateFabricLabelPath commandFields:updateFabricLabelFields requiredResponse:@{
         @(20) : @ {
             MTRTypeKey : MTRUnsignedIntegerValueType,
             MTRValueKey : @(MTROperationalCredentialsNodeOperationalCertStatusOK),
@@ -5975,7 +5975,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Seventh test: do an invoke with two groups.  One of the commands in the    // first group expects to get a data response with a field value that does
     // not match what it gets, which should be treated as a failure.
-    __auto_type * updateFabricLabelExpectingWrongValueCommand = [[MTRCommandWithExpectedResult alloc] initWithPath:updateFabricLabelPath commandFields:updateFabricLabelFields expectedResult:@{
+    __auto_type * updateFabricLabelExpectingWrongValueCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:updateFabricLabelPath commandFields:updateFabricLabelFields requiredResponse:@{
         @(0) : @ {
             MTRTypeKey : MTRUnsignedIntegerValueType,
             MTRValueKey : @(MTROperationalCredentialsNodeOperationalCertStatusFabricConflict),

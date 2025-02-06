@@ -18,15 +18,15 @@
 #import "MTRLogging_Internal.h"
 #import <Matter/Matter.h>
 
-@implementation MTRCommandWithExpectedResult
+@implementation MTRCommandWithRequiredResponse
 - (instancetype)initWithPath:(MTRCommandPath *)path
                commandFields:(nullable NSDictionary<NSString *, id> *)commandFields
-              expectedResult:(nullable NSDictionary<NSNumber *, NSDictionary<NSString *, id> *> *)expectedResult
+            requiredResponse:(nullable NSDictionary<NSNumber *, NSDictionary<NSString *, id> *> *)requiredResponse
 {
     if (self = [super init]) {
         self.path = path;
         self.commandFields = commandFields;
-        self.expectedResult = expectedResult;
+        self.requiredResponse = requiredResponse;
     }
 
     return self;
@@ -34,19 +34,19 @@
 
 - (id)copyWithZone:(NSZone *)zone
 {
-    return [[MTRCommandWithExpectedResult alloc] initWithPath:self.path commandFields:self.commandFields expectedResult:self.expectedResult];
+    return [[MTRCommandWithRequiredResponse alloc] initWithPath:self.path commandFields:self.commandFields requiredResponse:self.requiredResponse];
 }
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p, path: %@, fields: %@, expectedResult: %@", NSStringFromClass(self.class), self, self.path, self.commandFields, self.expectedResult];
+    return [NSString stringWithFormat:@"<%@: %p, path: %@, fields: %@, requiredResponse: %@", NSStringFromClass(self.class), self, self.path, self.commandFields, self.requiredResponse];
 }
 
-#pragma mark - MTRCommandWithExpectedResult NSSecureCoding implementation
+#pragma mark - MTRCommandWithRequiredResponse NSSecureCoding implementation
 
 static NSString * const sPathKey = @"pathKey";
 static NSString * const sFieldsKey = @"fieldsKey";
-static NSString * const sExpectedResultKey = @"expectedResultKey";
+static NSString * const sExpectedResultKey = @"requiredResponseKey";
 
 + (BOOL)supportsSecureCoding
 {
@@ -62,38 +62,38 @@ static NSString * const sExpectedResultKey = @"expectedResultKey";
 
     _path = [decoder decodeObjectOfClass:MTRCommandPath.class forKey:sPathKey];
     if (!_path || ![_path isKindOfClass:MTRCommandPath.class]) {
-        MTR_LOG_ERROR("MTRCommandWithExpectedResult decoded %@ for endpoint, not MTRCommandPath.", _path);
+        MTR_LOG_ERROR("MTRCommandWithRequiredResponse decoded %@ for endpoint, not MTRCommandPath.", _path);
         return nil;
     }
 
     _commandFields = [decoder decodeObjectOfClass:NSDictionary.class forKey:sFieldsKey];
     if (_commandFields) {
         if (![_commandFields isKindOfClass:NSDictionary.class]) {
-            MTR_LOG_ERROR("MTRCommandWithExpectedResult decoded %@ for commandFields, not NSDictionary.", _commandFields);
+            MTR_LOG_ERROR("MTRCommandWithRequiredResponse decoded %@ for commandFields, not NSDictionary.", _commandFields);
             return nil;
         }
 
         if (!MTRDataValueDictionaryIsWellFormed(_commandFields) || ![MTRStructureValueType isEqual:_commandFields[MTRTypeKey]]) {
-            MTR_LOG_ERROR("MTRCommandWithExpectedResult decoded %@ for commandFields, not a structure-typed data-value dictionary.", _commandFields);
+            MTR_LOG_ERROR("MTRCommandWithRequiredResponse decoded %@ for commandFields, not a structure-typed data-value dictionary.", _commandFields);
             return nil;
         }
     }
 
-    _expectedResult = [decoder decodeObjectOfClass:NSDictionary.class forKey:sExpectedResultKey];
-    if (_expectedResult) {
-        if (![_expectedResult isKindOfClass:NSDictionary.class]) {
-            MTR_LOG_ERROR("MTRCommandWithExpectedResult decoded %@ for expectedResult, not NSDictionary.", _expectedResult);
+    _requiredResponse = [decoder decodeObjectOfClass:NSDictionary.class forKey:sExpectedResultKey];
+    if (_requiredResponse) {
+        if (![_requiredResponse isKindOfClass:NSDictionary.class]) {
+            MTR_LOG_ERROR("MTRCommandWithRequiredResponse decoded %@ for requiredResponse, not NSDictionary.", _requiredResponse);
             return nil;
         }
 
-        for (id key in _expectedResult) {
+        for (id key in _requiredResponse) {
             if (![key isKindOfClass:NSNumber.class]) {
-                MTR_LOG_ERROR("MTRCommandWithExpectedResult decoded key %@ in expectedResult", key);
+                MTR_LOG_ERROR("MTRCommandWithRequiredResponse decoded key %@ in requiredResponse", key);
                 return nil;
             }
 
-            if (![_expectedResult[key] isKindOfClass:NSDictionary.class] || !MTRDataValueDictionaryIsWellFormed(_expectedResult[key])) {
-                MTR_LOG_ERROR("MTRCommandWithExpectedResult decoded value %@ for key %@ in expectedResult", _expectedResult[key], key);
+            if (![_requiredResponse[key] isKindOfClass:NSDictionary.class] || !MTRDataValueDictionaryIsWellFormed(_requiredResponse[key])) {
+                MTR_LOG_ERROR("MTRCommandWithRequiredResponse decoded value %@ for key %@ in requiredResponse", _requiredResponse[key], key);
                 return nil;
             }
         }
@@ -111,8 +111,8 @@ static NSString * const sExpectedResultKey = @"expectedResultKey";
     if (self.commandFields) {
         [coder encodeObject:self.commandFields forKey:sFieldsKey];
     }
-    if (self.expectedResult) {
-        [coder encodeObject:self.expectedResult forKey:sExpectedResultKey];
+    if (self.requiredResponse) {
+        [coder encodeObject:self.requiredResponse forKey:sExpectedResultKey];
     }
 }
 

@@ -523,7 +523,7 @@ MTR_DIRECT_MEMBERS
                             completion:responseHandler];
 }
 
-- (void)invokeCommands:(NSArray<NSArray<MTRCommandWithExpectedResult *> *> *)commands
+- (void)invokeCommands:(NSArray<NSArray<MTRCommandWithRequiredResponse *> *> *)commands
                  queue:(dispatch_queue_t)queue
             completion:(MTRDeviceResponseHandler)completion
 {

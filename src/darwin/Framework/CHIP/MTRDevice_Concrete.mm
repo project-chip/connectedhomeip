@@ -3306,7 +3306,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                               commandFields];
 }
 
-- (BOOL)_invokeResponse:(MTRDeviceResponseValueDictionary)response matchesExpectedResult:(NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> *)expectedResult
+- (BOOL)_invokeResponse:(MTRDeviceResponseValueDictionary)response matchesRequiredResponse:(NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> *)requiredResponse
 {
     if (response[MTRDataKey] == nil) {
         MTR_LOG_ERROR("%@ invokeCommands expects a data response for %@ but got no data", self, response[MTRCommandPathKey]);
@@ -3321,7 +3321,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     NSArray<NSDictionary<NSString *, id> *> * fields = data[MTRValueKey];
 
-    for (NSNumber * fieldID in expectedResult) {
+    for (NSNumber * fieldID in requiredResponse) {
         // Check that this field is present in the response.
         MTRDeviceDataValueDictionary _Nullable fieldValue = nil;
         for (NSDictionary<NSString *, id> * field in fields) {
@@ -3336,7 +3336,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             return NO;
         }
 
-        auto * expected = expectedResult[fieldID];
+        auto * expected = requiredResponse[fieldID];
         if (![expected isEqual:fieldValue]) {
             MTR_LOG_ERROR("%@ invokeCommands response for %@ field %@ got %@ but expected %@", self, response[MTRCommandPathKey], fieldID, fieldValue, expected);
             return NO;
@@ -3346,7 +3346,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return YES;
 }
 
-- (void)invokeCommands:(NSArray<NSArray<MTRCommandWithExpectedResult *> *> *)commands
+- (void)invokeCommands:(NSArray<NSArray<MTRCommandWithRequiredResponse *> *> *)commands
                  queue:(dispatch_queue_t)queue
             completion:(MTRDeviceResponseHandler)completion
 {
@@ -3361,10 +3361,10 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // We want to invoke the command groups in order, stopping after failures as needed.  Build up a
     // linked list of groups via chaining the completions, with calls out to the original
     // completion instead of going to the next list item when we want to stop.
-    for (NSArray<MTRCommandWithExpectedResult *> * commandGroup in [commands reverseObjectEnumerator]) {
+    for (NSArray<MTRCommandWithRequiredResponse *> * commandGroup in [commands reverseObjectEnumerator]) {
         // We want to invoke all the commands in the group in order, propagating along the list of
         // current responses.  Build up that linked list of command invokes via chaining the completions.
-        for (MTRCommandWithExpectedResult * command in [commandGroup reverseObjectEnumerator]) {
+        for (MTRCommandWithRequiredResponse * command in [commandGroup reverseObjectEnumerator]) {
             auto commandInvokeBlock = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * previousResponses) {
                 [self invokeCommandWithEndpointID:command.path.endpoint
                                         clusterID:command.path.cluster
@@ -3394,7 +3394,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
                                            BOOL nextAllSucceeded = allSucceededSoFar;
                                            MTRDeviceResponseValueDictionary response = responses[0];
-                                           if (command.expectedResult != nil && ![self _invokeResponse:response matchesExpectedResult:command.expectedResult]) {
+                                           if (command.requiredResponse != nil && ![self _invokeResponse:response matchesRequiredResponse:command.requiredResponse]) {
                                                nextAllSucceeded = NO;
                                            }
 
