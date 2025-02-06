@@ -84,7 +84,7 @@ private:
     tcp_pcb * mTCP;          // LwIP Transmission control protocol (TCP) control block.
     // For TCP Listen endpoint, we will pre-allocate a connection endpoint to assign the incoming connection to it.
     // when there is a new TCP connection established.
-    TCPEndPoint *mPreAllocatedConnectEP;
+    TCPEndPoint * mPreAllocatedConnectEP;
 
     uint16_t RemainingToSend();
     BufferOffset FindStartOfUnsent();

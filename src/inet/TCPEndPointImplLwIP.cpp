@@ -90,7 +90,7 @@ CHIP_ERROR TCPEndPointImplLwIP::ListenImpl(uint16_t backlog)
     CHIP_ERROR err    = CHIP_NO_ERROR;
     if (!mPreAllocatedConnectEP)
     {
-        err =  GetEndPointManager().NewEndPoint(&mPreAllocatedConnectEP);
+        err = GetEndPointManager().NewEndPoint(&mPreAllocatedConnectEP);
     }
     if (err == CHIP_NO_ERROR)
     {
