@@ -150,10 +150,10 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
             argumentIndex:0
                   ofReply:YES];
 
-    // invokeCommands gets handed MTRCommandWithExpectedResult (which includes
+    // invokeCommands gets handed MTRCommandWithRequiredResponse (which includes
     // MTRCommandPath, which is already in allowedClasses).
     [allowedClasses addObjectsFromArray:@[
-        [MTRCommandWithExpectedResult class],
+        [MTRCommandWithRequiredResponse class],
     ]];
     [interface setClasses:allowedClasses
               forSelector:@selector(deviceController:nodeID:invokeCommands:completion:)

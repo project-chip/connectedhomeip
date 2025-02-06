@@ -459,7 +459,7 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
     }
 }
 
-- (void)invokeCommands:(NSArray<NSArray<MTRCommandWithExpectedResult *> *> *)commands
+- (void)invokeCommands:(NSArray<NSArray<MTRCommandWithRequiredResponse *> *> *)commands
                  queue:(dispatch_queue_t)queue
             completion:(MTRDeviceResponseHandler)completion
 {
