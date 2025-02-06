@@ -35,8 +35,38 @@
 #include "esp_wifi.h"
 #include "nvs.h"
 
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+#include "esp_heap_caps.h"
+#include <lib/support/CHIPMemString.h>
+#include <string.h>
+#include <system/SystemTimer.h>
+#include <tracing/macros.h>
+#include <tracing/metric_event.h>
+
+using namespace chip::DeviceLayer;
+using namespace chip::Tracing;
+
+// Heap Diagnostics (internal)
+constexpr MetricKey kMetricHeapInternalFree         = "internal_free";
+constexpr MetricKey kMetricHeapInternalMinFree      = "internal_min_free";
+constexpr MetricKey kMetricHeapInternalLargestBlock = "internal_largest_free";
+
+// Heap Diagnostics (external)
+constexpr MetricKey kMetricHeapExternalFree         = "external_free";
+constexpr MetricKey kMetricHeapExternalMinFree      = "external_min_free";
+constexpr MetricKey kMetricHeapExternalLargestBlock = "external_largest_block";
+
+// Task runtime
+constexpr MetricKey kMetricTaskName = "runtime";
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+
 using namespace ::chip::DeviceLayer::Internal;
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
+
+#ifndef CONFIG_HEAP_LOG_INTERVAL
+#define CONFIG_HEAP_LOG_INTERVAL 86400000
+#endif // CONFIG_HEAP_LOG_INTERVAL
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 CHIP_ERROR ESP32Utils::IsAPEnabled(bool & apEnabled)
 {
@@ -221,6 +251,57 @@ const char * ESP32Utils::WiFiModeToStr(wifi_mode_t wifiMode)
     }
 }
 
+const char * ESP32Utils::WiFiDisconnectReasonToStr(uint16_t reason)
+{
+    switch (reason)
+    {
+    case WIFI_REASON_ASSOC_TOOMANY:
+        return "WIFI_REASON_ASSOC_TOOMANY";
+    case WIFI_REASON_NOT_ASSOCED:
+        return "WIFI_REASON_NOT_ASSOCED";
+    case WIFI_REASON_ASSOC_NOT_AUTHED:
+        return "WIFI_REASON_ASSOC_NOT_AUTHED";
+    case WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT:
+        return "WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT";
+    case WIFI_REASON_GROUP_CIPHER_INVALID:
+        return "WIFI_REASON_GROUP_CIPHER_INVALID";
+    case WIFI_REASON_UNSUPP_RSN_IE_VERSION:
+        return "WIFI_REASON_UNSUPP_RSN_IE_VERSION";
+    case WIFI_REASON_AKMP_INVALID:
+        return "WIFI_REASON_AKMP_INVALID";
+    case WIFI_REASON_CIPHER_SUITE_REJECTED:
+        return "WIFI_REASON_CIPHER_SUITE_REJECTED";
+    case WIFI_REASON_PAIRWISE_CIPHER_INVALID:
+        return "WIFI_REASON_PAIRWISE_CIPHER_INVALID";
+    case WIFI_REASON_NOT_AUTHED:
+        return "WIFI_REASON_NOT_AUTHED";
+    case WIFI_REASON_MIC_FAILURE:
+        return "WIFI_REASON_MIC_FAILURE";
+    case WIFI_REASON_IE_IN_4WAY_DIFFERS:
+        return "WIFI_REASON_IE_IN_4WAY_DIFFERS";
+    case WIFI_REASON_INVALID_RSN_IE_CAP:
+        return "WIFI_REASON_INVALID_RSN_IE_CAP";
+    case WIFI_REASON_INVALID_PMKID:
+        return "WIFI_REASON_INVALID_PMKID";
+    case WIFI_REASON_802_1X_AUTH_FAILED:
+        return "WIFI_REASON_802_1X_AUTH_FAILED";
+    case WIFI_REASON_NO_AP_FOUND:
+        return "WIFI_REASON_NO_AP_FOUND";
+    case WIFI_REASON_BEACON_TIMEOUT:
+        return "WIFI_REASON_BEACON_TIMEOUT";
+    case WIFI_REASON_AUTH_EXPIRE:
+        return "WIFI_REASON_AUTH_EXPIRE";
+    case WIFI_REASON_AUTH_LEAVE:
+        return "WIFI_REASON_AUTH_LEAVE";
+    case WIFI_REASON_ASSOC_LEAVE:
+        return "WIFI_REASON_ASSOC_LEAVE";
+    case WIFI_REASON_ASSOC_EXPIRE:
+        return "WIFI_REASON_ASSOC_EXPIRE";
+    default:
+        return "Unknown Reason";
+    }
+}
+
 struct netif * ESP32Utils::GetStationNetif(void)
 {
     return GetNetif(kDefaultWiFiStationNetifKey);
@@ -370,6 +451,134 @@ CHIP_ERROR ESP32Utils::InitWiFiStack(void)
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+
+void LogHeapDataCallback(chip::System::Layer * systemLayer, void * appState)
+{
+    // Internal RAM (default heap)
+    uint32_t internal_free               = heap_caps_get_free_size(MALLOC_CAP_INTERNAL);
+    uint32_t internal_largest_free_block = heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL);
+    uint32_t internal_min_free           = heap_caps_get_minimum_free_size(MALLOC_CAP_INTERNAL);
+
+    MATTER_LOG_METRIC(kMetricHeapInternalFree, internal_free);
+    MATTER_LOG_METRIC(kMetricHeapInternalMinFree, internal_min_free);
+    MATTER_LOG_METRIC(kMetricHeapInternalLargestBlock, internal_largest_free_block);
+
+#ifdef CONFIG_SPIRAM
+    // External RAM (if PSRAM is enabled)
+    uint32_t external_free               = heap_caps_get_free_size(MALLOC_CAP_SPIRAM);
+    uint32_t external_largest_free_block = heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM);
+    uint32_t external_min_free           = heap_caps_get_minimum_free_size(MALLOC_CAP_SPIRAM);
+
+    MATTER_LOG_METRIC(kMetricHeapExternalFree, external_free);
+    MATTER_LOG_METRIC(kMetricHeapExternalMinFree, external_min_free);
+    MATTER_LOG_METRIC(kMetricHeapExternalLargestBlock, external_largest_free_block);
+#endif // CONFIG_SPIRAM
+
+    if (appState != nullptr)
+    {
+        static bool setTimer = static_cast<bool *>(appState);
+        CHIP_ERROR err =
+            SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(CONFIG_HEAP_LOG_INTERVAL), LogHeapDataCallback, &setTimer);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to reschedule heap log timer");
+        }
+    }
+}
+
+void FailedAllocCallback(size_t size, uint32_t caps, const char * function_name)
+{
+    MATTER_TRACE_COUNTER("Failed_memory_allocations");
+    ChipLogError(DeviceLayer, "Memory allocation failed!");
+}
+
+// Function to initialize and start periodic heap logging
+void ESP32Utils::LogHeapInfo(bool setTimer)
+{
+    if (CONFIG_HEAP_LOG_INTERVAL <= 0)
+    {
+        setTimer = false;
+        return;
+    }
+
+    static bool timerState = setTimer;
+
+    if (!setTimer)
+    {
+        SystemLayer().CancelTimer(LogHeapDataCallback, &timerState);
+    }
+
+    esp_err_t err = heap_caps_register_failed_alloc_callback(FailedAllocCallback);
+    if (err != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "Failed to register callback. Error: 0x%08x", err);
+    }
+
+    LogHeapDataCallback(&SystemLayer(), &timerState);
+    if (setTimer)
+    {
+        CHIP_ERROR error = SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(CONFIG_HEAP_LOG_INTERVAL),
+                                                    LogHeapDataCallback, &timerState);
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to schedule heap log timer. Error: %s", chip::ErrorStr(error));
+        }
+    }
+}
+
+const char * StateToString(eTaskState state)
+{
+    switch (state)
+    {
+    case eRunning:
+        return "Running";
+    case eReady:
+        return "Ready";
+    case eBlocked:
+        return "Blocked";
+    case eSuspended:
+        return "Suspended";
+    case eDeleted:
+        return "Deleted";
+    default:
+        return "Unknown";
+    }
+}
+
+CHIP_ERROR ESP32Utils::LogTaskSnapshotInfo()
+{
+#ifdef CONFIG_FREERTOS_USE_TRACE_FACILITY
+    uint32_t arraySize = uxTaskGetNumberOfTasks();
+
+    chip::Platform::ScopedMemoryBuffer<TaskStatus_t> taskStatusArray;
+    VerifyOrReturnError(taskStatusArray.Calloc(arraySize), CHIP_ERROR_NO_MEMORY);
+
+    uint32_t dummyRunTimeCounter;
+    arraySize = uxTaskGetSystemState(taskStatusArray.Get(), arraySize, &dummyRunTimeCounter);
+
+    auto GenerateMetricName = [&](const char * task_name, const char * suffix) {
+        std::string metricName = task_name;
+        metricName += "_";
+        metricName += suffix;
+        return metricName;
+    };
+
+    for (int i = 0; i < arraySize; i++)
+    {
+        TaskStatus_t task = taskStatusArray[i];
+        MATTER_TRACE_INSTANT(GenerateMetricName(task.pcTaskName, "state").c_str(), StateToString(task.eCurrentState));
+        MATTER_TRACE_INSTANT(GenerateMetricName(task.pcTaskName, "stack_start_address").c_str(),
+                             std::to_string(reinterpret_cast<uintptr_t>(task.pxStackBase)).c_str());
+#ifdef CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS
+        MATTER_LOG_METRIC(kMetricTaskName, static_cast<uint32_t>(task.ulRunTimeCounter));
+#endif // CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS
+    }
+#endif // CONFIG_FREERTOS_USE_TRACE_FACILITY
+    return CHIP_NO_ERROR;
+}
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 struct netif * ESP32Utils::GetNetif(const char * ifKey)
 {
