@@ -45,7 +45,7 @@ import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.interaction_model import Status
 from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main, has_feature)
+                                         default_matter_test_main)
 from mobly import asserts
 
 
@@ -58,10 +58,8 @@ logger = logging.getLogger(__name__)
 
 
 class TC_FAN_3_1(MatterBaseTest):
-    # def steps_TC_FAN_3_1(self):
-    #     return [TestStep("1", "Commissioning already done."),
-    #             TestStep("2", "Action", "Verification"),
-    #             ]
+    def steps_TC_FAN_3_1(self):
+        return [TestStep("1", "Commissioning already done.")]
 
     @staticmethod
     async def get_attribute_value_from_queue(queue, attribute, timeout_sec: float) -> Any:
@@ -103,13 +101,13 @@ class TC_FAN_3_1(MatterBaseTest):
         asserts.assert_equal(value_read, value,
                              f"Mismatch between written and read {attribute.__name__}")
         return value_read
-    
+
     def verify_attribute_transition(self, attribute, value_current, value_previous, status, order) -> None:
         if status == Status.Success:
             if order == OrderEnum.Ascending:
                 # Verify the current attribute value is greater than the previous attribute value
                 asserts.assert_greater(value_current, value_previous,
-                                    f"Current {attribute.__name__} must be greater than previous {attribute.__name__}")
+                                       f"Current {attribute.__name__} must be greater than previous {attribute.__name__}")
             else:
                 # Verify the current attribute value is less than the previous attribute value
                 asserts.assert_less(value_current, value_previous,
@@ -135,25 +133,28 @@ class TC_FAN_3_1(MatterBaseTest):
         attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
         fan_mode_off = cluster.Enums.FanModeEnum.kOff
         fan_mode_high = cluster.Enums.FanModeEnum.kHigh
-        percent_setting_max_value = 100 # PercentSetting max value is 100 as per the spec
-        timeout_sec = 0.1 # Timeout given for item retreival from the attribute queue
+        percent_setting_max_value = 100  # PercentSetting max value is 100 as per the spec
+        timeout_sec = 0.1  # Timeout given for item retreival from the attribute queue
 
         # Sets the 'for loop' range based on the attribute that will be written to
         # and the specified order (ascending or descending)
         # Sets which mandatory attribute is to be verified (FanMode or PercentSetting)
         speed_max = await self.read_setting(endpoint, speed_max_attr)
         speed_setting_init = 0 if order == OrderEnum.Ascending else speed_max
-        range_loop = range(1, percent_setting_max_value + 1) if order == OrderEnum.Ascending else range(percent_setting_max_value -1, -1, -1)
+        range_loop = range(1, percent_setting_max_value +
+                           1) if order == OrderEnum.Ascending else range(percent_setting_max_value -1, -1, -1)
         value_init = fan_mode_off if order == OrderEnum.Ascending else fan_mode_high
         attr_to_verify = fan_mode_attr
         if attr_to_write == fan_mode_attr:
-            range_loop = range(1, fan_mode_high.value + 1) if order == OrderEnum.Ascending else range(fan_mode_high.value -1, -1, -1)
+            range_loop = range(1, fan_mode_high.value +
+                               1) if order == OrderEnum.Ascending else range(fan_mode_high.value -1, -1, -1)
             value_init = 0 if order == OrderEnum.Ascending else percent_setting_max_value
             attr_to_verify = percent_setting_attr
 
         # Logging what's being tested
         if_speed_supported = " and SpeedSetting" if self.supports_speed else ""
-        logging.info(f"[FC] Updating {attr_to_write.__name__} {order.name}, verifying {attr_to_verify.__name__}{if_speed_supported}")
+        logging.info(
+            f"[FC] Updating {attr_to_write.__name__} {order.name}, verifying {attr_to_verify.__name__}{if_speed_supported}")
 
         # Write and read back the initialization value for the attribute to verify
         # Verify that the write status is either SUCCESS or INVALID_IN_STATE
@@ -200,7 +201,8 @@ class TC_FAN_3_1(MatterBaseTest):
             if self.supports_speed:
                 speed_setting_current = await self.get_attribute_value_from_queue(queue, speed_setting_attr, timeout_sec)
                 if speed_setting_current is not None:
-                    self.verify_attribute_transition(speed_setting_attr, speed_setting_current, speed_setting_previous, write_status, order)
+                    self.verify_attribute_transition(speed_setting_attr, speed_setting_current,
+                                                     speed_setting_previous, write_status, order)
                     speed_setting_previous = speed_setting_current
 
         await attribute_subscription.cancel()
@@ -217,7 +219,9 @@ class TC_FAN_3_1(MatterBaseTest):
         feature_map_attr = Clusters.FanControl.Attributes.FeatureMap
         feature_map = await self.read_setting(endpoint=ep, attribute=feature_map_attr)
         self.supports_speed = self._supports_speed(feature_map)
-        
+
+        self.step("1")
+
         # TH writes to the DUT the PercentSetting attribute iteratively within
         # a range of 1 to 100 one at a time in ascending order
         # Verifies that FanMode and SpeedSetting values (if supported) are being
