@@ -159,8 +159,8 @@
 		512431282BA0C8BF000BC136 /* SetMRPParametersCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5124311C2BA0C09A000BC136 /* SetMRPParametersCommand.mm */; };
 		512431292BA0C8BF000BC136 /* ResetMRPParametersCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5124311A2BA0C09A000BC136 /* ResetMRPParametersCommand.mm */; };
 		5129BCFD26A9EE3300122DDF /* MTRError.h in Headers */ = {isa = PBXBuildFile; fileRef = 5129BCFC26A9EE3300122DDF /* MTRError.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		512E8E7A2D52F7B6009407E3 /* MTRCommandWithExpectedResult.mm in Sources */ = {isa = PBXBuildFile; fileRef = 512E8E792D52F7B6009407E3 /* MTRCommandWithExpectedResult.mm */; };
-		512E8E7B2D52F7B6009407E3 /* MTRCommandWithExpectedResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 512E8E782D52F7B6009407E3 /* MTRCommandWithExpectedResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		512E8E7A2D52F7B6009407E3 /* MTRCommandWithRequiredResponse.mm in Sources */ = {isa = PBXBuildFile; fileRef = 512E8E792D52F7B6009407E3 /* MTRCommandWithRequiredResponse.mm */; };
+		512E8E7B2D52F7B6009407E3 /* MTRCommandWithRequiredResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 512E8E782D52F7B6009407E3 /* MTRCommandWithRequiredResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5131BF662BE2E1B000D5D6BC /* MTRTestCase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5131BF642BE2E1B000D5D6BC /* MTRTestCase.mm */; };
 		51339B1F2A0DA64D00C798C1 /* MTRCertificateValidityTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 51339B1E2A0DA64D00C798C1 /* MTRCertificateValidityTests.m */; };
 		5136661328067D550025EDAE /* MTRDeviceController_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 5136660F28067D540025EDAE /* MTRDeviceController_Internal.h */; };
@@ -672,8 +672,8 @@
 		5124311B2BA0C09A000BC136 /* SetMRPParametersCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SetMRPParametersCommand.h; sourceTree = "<group>"; };
 		5124311C2BA0C09A000BC136 /* SetMRPParametersCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SetMRPParametersCommand.mm; sourceTree = "<group>"; };
 		5129BCFC26A9EE3300122DDF /* MTRError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRError.h; sourceTree = "<group>"; };
-		512E8E782D52F7B6009407E3 /* MTRCommandWithExpectedResult.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRCommandWithExpectedResult.h; sourceTree = "<group>"; };
-		512E8E792D52F7B6009407E3 /* MTRCommandWithExpectedResult.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRCommandWithExpectedResult.mm; sourceTree = "<group>"; };
+		512E8E782D52F7B6009407E3 /* MTRCommandWithRequiredResponse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRCommandWithRequiredResponse.h; sourceTree = "<group>"; };
+		512E8E792D52F7B6009407E3 /* MTRCommandWithRequiredResponse.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRCommandWithRequiredResponse.mm; sourceTree = "<group>"; };
 		5131BF642BE2E1B000D5D6BC /* MTRTestCase.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRTestCase.mm; sourceTree = "<group>"; };
 		5131BF652BE2E1B000D5D6BC /* MTRTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestCase.h; sourceTree = "<group>"; };
 		51339B1E2A0DA64D00C798C1 /* MTRCertificateValidityTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRCertificateValidityTests.m; sourceTree = "<group>"; };
@@ -1514,8 +1514,8 @@
 				5178E67F2AE098510069DF72 /* MTRCommandTimedCheck.h */,
 				51FE723E2ACDEF3E00437032 /* MTRCommandPayloadExtensions_Internal.h */,
 				5178E6802AE098520069DF72 /* MTRCommissionableBrowserResult_Internal.h */,
-				512E8E782D52F7B6009407E3 /* MTRCommandWithExpectedResult.h */,
-				512E8E792D52F7B6009407E3 /* MTRCommandWithExpectedResult.mm */,
+				512E8E782D52F7B6009407E3 /* MTRCommandWithRequiredResponse.h */,
+				512E8E792D52F7B6009407E3 /* MTRCommandWithRequiredResponse.mm */,
 				3D010DCD2D408FA300CFFA02 /* MTRCommissioneeInfo.h */,
 				3D010DD12D4091C800CFFA02 /* MTRCommissioneeInfo_Internal.h */,
 				3D010DCE2D408FA300CFFA02 /* MTRCommissioneeInfo.mm */,
@@ -1949,7 +1949,7 @@
 				AF1CB86E2874B03B00865A96 /* MTROTAProviderDelegate.h in Headers */,
 				51D0B1402B61B3A4006E3511 /* MTRServerCluster.h in Headers */,
 				754F3DF427FBB94B00E60580 /* MTREventTLVValueDecoder_Internal.h in Headers */,
-				512E8E7B2D52F7B6009407E3 /* MTRCommandWithExpectedResult.h in Headers */,
+				512E8E7B2D52F7B6009407E3 /* MTRCommandWithRequiredResponse.h in Headers */,
 				3CF134AF289D90FF0017A19E /* MTROperationalCertificateIssuer.h in Headers */,
 				5178E6822AE098520069DF72 /* MTRCommissionableBrowserResult_Internal.h in Headers */,
 				516415FD2B6ACA8300D5CE11 /* MTRServerAccessControl.h in Headers */,
@@ -2388,7 +2388,7 @@
 				514C79F02B62ADDA00DD6D7B /* descriptor.cpp in Sources */,
 				5109E9B42CB8B5DF0006884B /* MTRDeviceType.mm in Sources */,
 				3D843757294AD25A0070D20A /* MTRCertificateInfo.mm in Sources */,
-				512E8E7A2D52F7B6009407E3 /* MTRCommandWithExpectedResult.mm in Sources */,
+				512E8E7A2D52F7B6009407E3 /* MTRCommandWithRequiredResponse.mm in Sources */,
 				3D9F2FCE2D112295003CA2BB /* MTRAttributeTLVValueDecoder_Internal.mm in Sources */,
 				5A7947E427C0129600434CF2 /* MTRDeviceController+XPC.mm in Sources */,
 				7592BD0B2CC6BCC300EB74A0 /* EmberAttributeDataBuffer.cpp in Sources */,
