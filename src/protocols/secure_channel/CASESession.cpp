@@ -2098,11 +2098,6 @@ CHIP_ERROR CASESession::HandleSigma3b(HandleSigma3Data & data, bool & cancel)
                                                         unused, initiatorFabricId, data.initiatorNodeId, initiatorPublicKey));
     VerifyOrReturnError(data.fabricId == initiatorFabricId, CHIP_ERROR_INVALID_CASE_PARAMETER);
 
-    // TODO - Validate message signature prior to validating the received operational credentials.
-    //        The op cert check requires traversal of cert chain, that is a more expensive operation.
-    //        If message signature check fails, the cert chain check will be unnecessary, but with the
-    //        current flow of code, a malicious node can trigger a DoS style attack on the device.
-    //        The same change should be made in Sigma2 processing.
     // Step 7 - Validate Signature
     ReturnErrorOnFailure(initiatorPublicKey.ECDSA_validate_msg_signature(data.msgR3SignedSpan.data(), data.msgR3SignedSpan.size(),
                                                                          data.tbsData3Signature));
