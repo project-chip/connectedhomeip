@@ -20672,14 +20672,14 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer webRTCSessionID, Integer videoStreamID, Integer audioStreamID) {
+    public void onSuccess(Integer webRTCSessionID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo webRTCSessionIDResponseValue = new CommandResponseInfo("webRTCSessionID", "Integer");
       responseValues.put(webRTCSessionIDResponseValue, webRTCSessionID);
-      CommandResponseInfo videoStreamIDResponseValue = new CommandResponseInfo("videoStreamID", "Integer");
+      CommandResponseInfo videoStreamIDResponseValue = new CommandResponseInfo("videoStreamID", "Optional<Integer>");
       responseValues.put(videoStreamIDResponseValue, videoStreamID);
-      CommandResponseInfo audioStreamIDResponseValue = new CommandResponseInfo("audioStreamID", "Integer");
+      CommandResponseInfo audioStreamIDResponseValue = new CommandResponseInfo("audioStreamID", "Optional<Integer>");
       responseValues.put(audioStreamIDResponseValue, audioStreamID);
       callback.onSuccess(responseValues);
     }
@@ -30739,27 +30739,27 @@ public class ClusterInfoMapping {
     );
     webRTCTransportProviderClusterInteractionInfoMap.put("provideAnswer", webRTCTransportProviderprovideAnswerInteractionInfo);
 
-    Map<String, CommandParameterInfo> webRTCTransportProviderprovideICECandidateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> webRTCTransportProviderprovideICECandidatesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo webRTCTransportProviderprovideICECandidatewebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
-    webRTCTransportProviderprovideICECandidateCommandParams.put("webRTCSessionID",webRTCTransportProviderprovideICECandidatewebRTCSessionIDCommandParameterInfo);
+    CommandParameterInfo webRTCTransportProviderprovideICECandidateswebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportProviderprovideICECandidatesCommandParams.put("webRTCSessionID",webRTCTransportProviderprovideICECandidateswebRTCSessionIDCommandParameterInfo);
 
-    CommandParameterInfo webRTCTransportProviderprovideICECandidateICECandidateCommandParameterInfo = new CommandParameterInfo("ICECandidate", String.class, String.class);
-    webRTCTransportProviderprovideICECandidateCommandParams.put("ICECandidate",webRTCTransportProviderprovideICECandidateICECandidateCommandParameterInfo);
-    InteractionInfo webRTCTransportProviderprovideICECandidateInteractionInfo = new InteractionInfo(
+    CommandParameterInfo webRTCTransportProviderprovideICECandidatesICECandidatesCommandParameterInfo = new CommandParameterInfo("ICECandidates", ArrayList.class, ArrayList.class);
+    webRTCTransportProviderprovideICECandidatesCommandParams.put("ICECandidates",webRTCTransportProviderprovideICECandidatesICECandidatesCommandParameterInfo);
+    InteractionInfo webRTCTransportProviderprovideICECandidatesInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.WebRTCTransportProviderCluster) cluster)
-        .provideICECandidate((DefaultClusterCallback) callback
+        .provideICECandidates((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("webRTCSessionID")
-        , (String)
-        commandArguments.get("ICECandidate")
+        , (ArrayList<String>)
+        commandArguments.get("ICECandidates")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        webRTCTransportProviderprovideICECandidateCommandParams
+        webRTCTransportProviderprovideICECandidatesCommandParams
     );
-    webRTCTransportProviderClusterInteractionInfoMap.put("provideICECandidate", webRTCTransportProviderprovideICECandidateInteractionInfo);
+    webRTCTransportProviderClusterInteractionInfoMap.put("provideICECandidates", webRTCTransportProviderprovideICECandidatesInteractionInfo);
 
     Map<String, CommandParameterInfo> webRTCTransportProviderendSessionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
@@ -30839,27 +30839,27 @@ public class ClusterInfoMapping {
     );
     webRTCTransportRequestorClusterInteractionInfoMap.put("answer", webRTCTransportRequestoranswerInteractionInfo);
 
-    Map<String, CommandParameterInfo> webRTCTransportRequestorICECandidateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> webRTCTransportRequestorICECandidatesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo webRTCTransportRequestorICECandidatewebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
-    webRTCTransportRequestorICECandidateCommandParams.put("webRTCSessionID",webRTCTransportRequestorICECandidatewebRTCSessionIDCommandParameterInfo);
+    CommandParameterInfo webRTCTransportRequestorICECandidateswebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportRequestorICECandidatesCommandParams.put("webRTCSessionID",webRTCTransportRequestorICECandidateswebRTCSessionIDCommandParameterInfo);
 
-    CommandParameterInfo webRTCTransportRequestorICECandidateICECandidateCommandParameterInfo = new CommandParameterInfo("ICECandidate", String.class, String.class);
-    webRTCTransportRequestorICECandidateCommandParams.put("ICECandidate",webRTCTransportRequestorICECandidateICECandidateCommandParameterInfo);
-    InteractionInfo webRTCTransportRequestorICECandidateInteractionInfo = new InteractionInfo(
+    CommandParameterInfo webRTCTransportRequestorICECandidatesICECandidatesCommandParameterInfo = new CommandParameterInfo("ICECandidates", ArrayList.class, ArrayList.class);
+    webRTCTransportRequestorICECandidatesCommandParams.put("ICECandidates",webRTCTransportRequestorICECandidatesICECandidatesCommandParameterInfo);
+    InteractionInfo webRTCTransportRequestorICECandidatesInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.WebRTCTransportRequestorCluster) cluster)
-        .ICECandidate((DefaultClusterCallback) callback
+        .ICECandidates((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("webRTCSessionID")
-        , (String)
-        commandArguments.get("ICECandidate")
+        , (ArrayList<String>)
+        commandArguments.get("ICECandidates")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        webRTCTransportRequestorICECandidateCommandParams
+        webRTCTransportRequestorICECandidatesCommandParams
     );
-    webRTCTransportRequestorClusterInteractionInfoMap.put("ICECandidate", webRTCTransportRequestorICECandidateInteractionInfo);
+    webRTCTransportRequestorClusterInteractionInfoMap.put("ICECandidates", webRTCTransportRequestorICECandidatesInteractionInfo);
 
     Map<String, CommandParameterInfo> webRTCTransportRequestorendCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 

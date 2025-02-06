@@ -14632,11 +14632,11 @@ MTR_PROVISIONALLY_AVAILABLE
  */
 - (void)provideAnswerWithParams:(MTRWebRTCTransportProviderClusterProvideAnswerParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
- * Command ProvideICECandidate
+ * Command ProvideICECandidates
  *
- * This command allows for https://www.rfc-editor.org/rfc/rfc8839#section-4.2.1.2 nominated after the initial Offer / Answer exchange to be added to a session during the gathering phase.
+ * This command allows for string based https://rfc-editor.org/rfc/rfc8839#section-5.1 generated after the initial Offer / Answer exchange, via a JSEP https://datatracker.ietf.org/doc/html/rfc9429#section-4.1.20 event, a DOM https://www.w3.org/TR/webrtc/#dom-rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase.
  */
-- (void)provideICECandidateWithParams:(MTRWebRTCTransportProviderClusterProvideICECandidateParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)provideICECandidatesWithParams:(MTRWebRTCTransportProviderClusterProvideICECandidatesParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command EndSession
  *
@@ -14708,21 +14708,21 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command Offer
  *
- * This command provides the stream requestor with WebRTC session details. It is sent following the receipt of a SolicitOffer command or a re-Offer initiated by the Provider.
+ * This command provides the stream requestor with WebRTC session details.
  */
 - (void)offerWithParams:(MTRWebRTCTransportRequestorClusterOfferParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command Answer
  *
- * This command provides the stream requestor with the WebRTC session details (i.e. Session ID and SDP answer). It is the next command in the Offer/Answer flow to the ProvideOffer command.
+ * This command provides the stream requestor with the WebRTC session details (i.e. Session ID and SDP answer), It is the next command in the Offer/Answer flow to the ProvideOffer command.
  */
 - (void)answerWithParams:(MTRWebRTCTransportRequestorClusterAnswerParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
- * Command ICECandidate
+ * Command ICECandidates
  *
- * This command provides an ICE candidate to the stream requestor in a WebRTC session.
+ * This command allows for string based https://rfc-editor.org/rfc/rfc8839#section-5.1 generated after the initial Offer / Answer exchange, via a JSEP https://datatracker.ietf.org/doc/html/rfc9429#section-4.1.20 event, a DOM https://www.w3.org/TR/webrtc/#dom-rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase.
  */
-- (void)ICECandidateWithParams:(MTRWebRTCTransportRequestorClusterICECandidateParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)ICECandidatesWithParams:(MTRWebRTCTransportRequestorClusterICECandidatesParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command End
  *
@@ -14918,13 +14918,13 @@ MTR_PROVISIONALLY_AVAILABLE
                                            reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeInstalledChimeSoundsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeActiveChimeIDWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeActiveChimeIDWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeActiveChimeIDWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeActiveChimeIDWithParams:(MTRSubscribeParams *)params
+- (void)readAttributeSelectedChimeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeSelectedChimeWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeSelectedChimeWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeSelectedChimeWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeActiveChimeIDWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeSelectedChimeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeEnabledWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeEnabledWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
@@ -15134,13 +15134,13 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command ProvisionRootCertificate
  *
- * This command SHALL provision the provided certificate for the passed in CAID.
+ * This command SHALL provision a newly provided certificate, or rotate an existing one, based on the contents of the CAID field.
  */
 - (void)provisionRootCertificateWithParams:(MTRTLSCertificateManagementClusterProvisionRootCertificateParams *)params completion:(void (^)(MTRTLSCertificateManagementClusterProvisionRootCertificateResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command FindRootCertificate
  *
- * This command SHALL return the TLSCertStruct for the passed in CAID.
+ * This command SHALL return the specified TLS root certificate, or all TLS provisioned root certificates, based on the contents of the CAID field.
  */
 - (void)findRootCertificateWithParams:(MTRTLSCertificateManagementClusterFindRootCertificateParams *)params completion:(void (^)(MTRTLSCertificateManagementClusterFindRootCertificateResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -15164,13 +15164,13 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command ProvisionClientCertificate
  *
- * This command SHALL be generated to request the Node provisions the provided Client Certificate Details.
+ * This command SHALL be generated to request the Node provisions newly provided Client Certificate Details, or rotate an existing client certificate.
  */
 - (void)provisionClientCertificateWithParams:(MTRTLSCertificateManagementClusterProvisionClientCertificateParams *)params completion:(void (^)(MTRTLSCertificateManagementClusterProvisionClientCertificateResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command FindClientCertificate
  *
- * This command SHALL return the TLSClientCertificateDetailStruct for the passed in CCDID.
+ * This command SHALL return the TLSClientCertificateDetailStruct for the passed in CCDID, or all TLS client certificates, based on the contents of the CCDID field.
  */
 - (void)findClientCertificateWithParams:(MTRTLSCertificateManagementClusterFindClientCertificateParams *)params completion:(void (^)(MTRTLSCertificateManagementClusterFindClientCertificateResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -15182,7 +15182,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command RemoveClientCertificate
  *
- * This command SHALL be generated to request the Node removes the certificate provisioned to the provided Client Certificate Details ID.
+ * This command SHALL be used to request the Node removes all stored information for the provided CCDID.
  */
 - (void)removeClientCertificateWithParams:(MTRTLSCertificateManagementClusterRemoveClientCertificateParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
@@ -16540,10 +16540,10 @@ typedef NS_ENUM(uint8_t, MTRDataTypeTestGlobalEnum) {
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeThreeLevelAutoEnum) {
-    MTRDataTypeThreeLevelAutoEnumLow MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRDataTypeThreeLevelAutoEnumMedium MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRDataTypeThreeLevelAutoEnumHigh MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRDataTypeThreeLevelAutoEnumAutomatic MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeThreeLevelAutoEnumAuto MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeThreeLevelAutoEnumLow MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeThreeLevelAutoEnumMedium MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeThreeLevelAutoEnumHigh MTR_PROVISIONALLY_AVAILABLE = 0x03,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRIdentifyEffectIdentifier) {
@@ -20451,8 +20451,8 @@ typedef NS_ENUM(uint8_t, MTRWebRTCTransportProviderWebRTCEndReason) {
     MTRWebRTCTransportProviderWebRTCEndReasonUnknownReason MTR_PROVISIONALLY_AVAILABLE = 0x0B,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint8_t, MTRWebRTCTransportProviderWebRTCMetadataOptions) {
-    MTRWebRTCTransportProviderWebRTCMetadataOptionsDataTLV MTR_PROVISIONALLY_AVAILABLE = 0x1,
+typedef NS_OPTIONS(uint8_t, MTRWebRTCTransportProviderWebRTCMetadataOptionsBitmap) {
+    MTRWebRTCTransportProviderWebRTCMetadataOptionsBitmapDataTLV MTR_PROVISIONALLY_AVAILABLE = 0x1,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRWebRTCTransportRequestorStreamUsage) {
@@ -20477,8 +20477,8 @@ typedef NS_ENUM(uint8_t, MTRWebRTCTransportRequestorWebRTCEndReason) {
     MTRWebRTCTransportRequestorWebRTCEndReasonUnknownReason MTR_PROVISIONALLY_AVAILABLE = 0x0B,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint8_t, MTRWebRTCTransportRequestorWebRTCMetadataOptions) {
-    MTRWebRTCTransportRequestorWebRTCMetadataOptionsDataTLV MTR_PROVISIONALLY_AVAILABLE = 0x1,
+typedef NS_OPTIONS(uint8_t, MTRWebRTCTransportRequestorWebRTCMetadataOptionsBitmap) {
+    MTRWebRTCTransportRequestorWebRTCMetadataOptionsBitmapDataTLV MTR_PROVISIONALLY_AVAILABLE = 0x1,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportContainerFormat) {

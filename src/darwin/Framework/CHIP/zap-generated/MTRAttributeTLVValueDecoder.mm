@@ -17902,8 +17902,8 @@ static id _Nullable DecodeAttributeValueForChimeCluster(AttributeId aAttributeId
         }
         return value;
     }
-    case Attributes::ActiveChimeID::Id: {
-        using TypeInfo = Attributes::ActiveChimeID::TypeInfo;
+    case Attributes::SelectedChime::Id: {
+        using TypeInfo = Attributes::SelectedChime::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {

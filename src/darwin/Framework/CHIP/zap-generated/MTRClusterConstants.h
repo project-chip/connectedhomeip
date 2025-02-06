@@ -4721,7 +4721,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 
     // Cluster Chime attributes
     MTRAttributeIDTypeClusterChimeAttributeInstalledChimeSoundsID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterChimeAttributeActiveChimeIDID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterChimeAttributeSelectedChimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterChimeAttributeEnabledID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterChimeAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterChimeAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
@@ -6965,13 +6965,13 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideOfferID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideOfferResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
     MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideAnswerID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
-    MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideICECandidateID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+    MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideICECandidatesID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
     MTRCommandIDTypeClusterWebRTCTransportProviderCommandEndSessionID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
 
     // Cluster WebRTCTransportRequestor commands
     MTRCommandIDTypeClusterWebRTCTransportRequestorCommandOfferID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRCommandIDTypeClusterWebRTCTransportRequestorCommandAnswerID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRCommandIDTypeClusterWebRTCTransportRequestorCommandICECandidateID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterWebRTCTransportRequestorCommandICECandidatesID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRCommandIDTypeClusterWebRTCTransportRequestorCommandEndID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
 
     // Cluster PushAVStreamTransport commands

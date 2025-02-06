@@ -11679,9 +11679,9 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @property (nonatomic, copy) NSNumber * _Nonnull webRTCSessionID MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull videoStreamID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable videoStreamID MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull audioStreamID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable audioStreamID MTR_PROVISIONALLY_AVAILABLE;
 
 /**
  * Initialize an MTRWebRTCTransportProviderClusterProvideOfferResponseParams with a response-value dictionary
@@ -11730,11 +11730,11 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRWebRTCTransportProviderClusterProvideICECandidateParams : NSObject <NSCopying>
+@interface MTRWebRTCTransportProviderClusterProvideICECandidatesParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull webRTCSessionID MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nonnull iceCandidate MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull iceCandidates MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -11862,11 +11862,11 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRWebRTCTransportRequestorClusterICECandidateParams : NSObject <NSCopying>
+@interface MTRWebRTCTransportRequestorClusterICECandidatesParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull webRTCSessionID MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nonnull iceCandidate MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull iceCandidates MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -12564,7 +12564,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRTLSCertificateManagementClusterFindClientCertificateParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull ccdid MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable ccdid MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

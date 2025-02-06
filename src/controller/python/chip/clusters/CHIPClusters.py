@@ -12963,10 +12963,10 @@ class ChipClusters:
             },
             0x00000006: {
                 "commandId": 0x00000006,
-                "commandName": "ProvideICECandidate",
+                "commandName": "ProvideICECandidates",
                 "args": {
                     "webRTCSessionID": "int",
-                    "ICECandidate": "str",
+                    "ICECandidates": "str",
                 },
             },
             0x00000007: {
@@ -13041,10 +13041,10 @@ class ChipClusters:
             },
             0x00000003: {
                 "commandId": 0x00000003,
-                "commandName": "ICECandidate",
+                "commandName": "ICECandidates",
                 "args": {
                     "webRTCSessionID": "int",
-                    "ICECandidate": "str",
+                    "ICECandidates": "str",
                 },
             },
             0x00000004: {
@@ -13216,7 +13216,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "ActiveChimeID",
+                "attributeName": "SelectedChime",
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
