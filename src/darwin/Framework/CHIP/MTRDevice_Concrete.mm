@@ -331,6 +331,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 @property (nonatomic) NSDate * estimatedStartTimeFromGeneralDiagnosticsUpTime;
 
+@property (nonatomic) NSDate * lastDeviceBecameActiveCallbackTime;
+@property (nonatomic) BOOL throttlingDeviceBecameActiveCallbacks;
+
 /**
  * If currentReadClient is non-null, that means that we successfully
  * called SendAutoResubscribeRequest on the ReadClient and have not yet gotten
@@ -470,6 +473,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         _persistedClusters = [NSMutableSet set];
         _highestObservedEventNumber = nil;
         _matterCPPObjectsHolder = [[MTRDeviceMatterCPPObjectsHolder alloc] init];
+        _throttlingDeviceBecameActiveCallbacks = NO;
 
         // If there is a data store, make sure we have an observer to monitor system clock changes, so
         // NSDate-based write coalescing could be reset and not get into a bad state.
@@ -864,6 +868,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // subscription intervals are in seconds
 #define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN (10 * 60) // 10 minutes (for now)
 #define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX (60 * 60) // 60 minutes
+#define MTR_DEVICE_MIN_SECONDS_BETWEEN_DEVICE_BECAME_ACTIVE_CALLBACKS (1 * 60) // 1 minute (for now)
 
 - (BOOL)_subscriptionsAllowed
 {
@@ -1634,12 +1639,29 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     [self _changeState:MTRDeviceStateReachable];
 
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
-        if ([delegate respondsToSelector:@selector(deviceBecameActive:)]) {
-            [delegate deviceBecameActive:self];
+    // Given the framework requests a minimum subscription keep alive time of devices, this callback is not expected to happen more often than that
+    BOOL shouldCallDelegate = NO;
+    if (self.lastDeviceBecameActiveCallbackTime) {
+        NSTimeInterval intervalSinceLastCallback = -[self.lastDeviceBecameActiveCallbackTime timeIntervalSinceNow];
+        if (intervalSinceLastCallback > MTR_DEVICE_MIN_SECONDS_BETWEEN_DEVICE_BECAME_ACTIVE_CALLBACKS) {
+            shouldCallDelegate = YES;
         }
-    }];
-    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
+    } else {
+        shouldCallDelegate = YES;
+    }
+
+    if (shouldCallDelegate) {
+        [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+            if ([delegate respondsToSelector:@selector(deviceBecameActive:)]) {
+                [delegate deviceBecameActive:self];
+            }
+        }];
+        self.lastDeviceBecameActiveCallbackTime = [NSDate now];
+        self.throttlingDeviceBecameActiveCallbacks = NO;
+    } else if (!self.throttlingDeviceBecameActiveCallbacks) {
+        MTR_LOG("%@ throttling deviceBecameActive callbacks because report came in too soon after %@", self, self.lastDeviceBecameActiveCallbackTime);
+        self.throttlingDeviceBecameActiveCallbacks = YES;
+    }
 
     // in case this is called during exponential back off of subscription
     // reestablishment, this starts the attempt right away
