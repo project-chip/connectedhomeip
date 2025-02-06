@@ -43,12 +43,16 @@ public class ReportCallbackJni {
     this.callbackHandle =
         newCallback(subscriptionEstablishedCallback, resubscriptionAttemptCallback);
 
-    this.cleanable = Cleaner.create().register(this, () -> {
-      if (callbackHandle != 0) {
-        deleteCallback(callbackHandle);
-        callbackHandle = 0;
-      }
-    });
+    this.cleanable =
+        Cleaner.create()
+            .register(
+                this,
+                () -> {
+                  if (callbackHandle != 0) {
+                    deleteCallback(callbackHandle);
+                    callbackHandle = 0;
+                  }
+                });
   }
 
   long getCallbackHandle() {

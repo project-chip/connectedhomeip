@@ -71,12 +71,16 @@ public class ChipDeviceController {
     }
     deviceControllerPtr = newDeviceController(params);
 
-    this.cleanable = Cleaner.create().register(this, () -> {
-      if (deviceControllerPtr != 0) {
-        deleteDeviceController(deviceControllerPtr);
-        deviceControllerPtr = 0;
-      }
-    });
+    this.cleanable =
+        Cleaner.create()
+            .register(
+                this,
+                () -> {
+                  if (deviceControllerPtr != 0) {
+                    deleteDeviceController(deviceControllerPtr);
+                    deviceControllerPtr = 0;
+                  }
+                });
   }
 
   public void setCompletionListener(CompletionListener listener) {

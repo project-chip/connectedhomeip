@@ -30,12 +30,16 @@ public class GetConnectedDeviceCallbackJni {
     this.wrappedCallback = wrappedCallback;
     this.callbackHandle = newCallback(wrappedCallback);
 
-    this.cleanable = Cleaner.create().register(this, () -> {
-      if (callbackHandle != 0) {
-        deleteCallback(callbackHandle);
-        callbackHandle = 0;
-      }
-    });
+    this.cleanable =
+        Cleaner.create()
+            .register(
+                this,
+                () -> {
+                  if (callbackHandle != 0) {
+                    deleteCallback(callbackHandle);
+                    callbackHandle = 0;
+                  }
+                });
   }
 
   long getCallbackHandle() {

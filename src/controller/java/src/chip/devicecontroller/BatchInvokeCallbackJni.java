@@ -34,12 +34,16 @@ public final class BatchInvokeCallbackJni {
     this.wrappedBatchInvokeCallback = wrappedBatchInvokeCallback;
     this.callbackHandle = newCallback();
 
-    this.cleanable = Cleaner.create().register(this, () -> {
-      if (chipClusterPtr != 0) {
-        deleteCluster(chipClusterPtr);
-        chipClusterPtr = 0;
-      }
-    });
+    this.cleanable =
+        Cleaner.create()
+            .register(
+                this,
+                () -> {
+                  if (chipClusterPtr != 0) {
+                    deleteCluster(chipClusterPtr);
+                    chipClusterPtr = 0;
+                  }
+                });
   }
 
   long getCallbackHandle() {

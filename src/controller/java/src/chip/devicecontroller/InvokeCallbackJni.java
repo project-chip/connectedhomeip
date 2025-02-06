@@ -17,8 +17,8 @@
  */
 package chip.devicecontroller;
 
-import java.lang.ref.Cleaner;
 import chip.devicecontroller.model.InvokeElement;
+import java.lang.ref.Cleaner;
 
 /** JNI wrapper callback class for {@link InvokeCallback}. */
 public final class InvokeCallbackJni {
@@ -31,12 +31,16 @@ public final class InvokeCallbackJni {
     this.wrappedInvokeCallback = wrappedInvokeCallback;
     this.callbackHandle = newCallback();
 
-    this.cleanable = Cleaner.create().register(this, () -> {
-      if (callbackHandle != 0) {
-        deleteCallback(callbackHandle);
-        callbackHandle = 0;
-      }
-    });
+    this.cleanable =
+        Cleaner.create()
+            .register(
+                this,
+                () -> {
+                  if (callbackHandle != 0) {
+                    deleteCallback(callbackHandle);
+                    callbackHandle = 0;
+                  }
+                });
   }
 
   long getCallbackHandle() {

@@ -100,12 +100,16 @@ public class ChipClusters {
       this.endpointId = endpointId;
       this.clusterId = clusterId;
 
-      this.cleanable = Cleaner.create().register(this, () -> {
-         if (chipClusterPtr != 0) {
-           deleteCluster(chipClusterPtr);
-           chipClusterPtr = 0;
-         }
-      });
+      this.cleanable =
+        Cleaner.create()
+          .register(
+            this,
+            () -> {
+              if (chipClusterPtr != 0) {
+                deleteCluster(chipClusterPtr);
+                chipClusterPtr = 0;
+              }
+            });
     }
 
     /**
