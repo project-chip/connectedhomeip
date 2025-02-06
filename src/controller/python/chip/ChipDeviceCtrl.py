@@ -2261,6 +2261,35 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return await asyncio.futures.wrap_future(ctx.future)
 
     def get_rcac(self):
+        ''' 
+        Passes captured RCAC data back to Python test modules for validation
+        - Setting buffer size to max size mentioned in spec:
+        - Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/policies/matter_certificate_policy.adoc#615-key-sizes
+        '''
+        rcac_size = 400
+        rcac_buffer = (ctypes.c_uint8 * rcac_size)()  # Allocate buffer
+
+        actual_rcac_size = ctypes.c_size_t()
+
+        # Now calling the C++ function with the buffer size set as an additional parameter
+        self._dmLib.pychip_GetCommissioningRCACData(
+            ctypes.cast(rcac_buffer, ctypes.POINTER(ctypes.c_uint8)),
+            ctypes.byref(actual_rcac_size),
+            ctypes.c_size_t(rcac_size)  # Pass the buffer size
+        )
+
+        # Check if data is available
+        if actual_rcac_size.value > 0:
+            # Convert the data to a Python bytes object
+            rcac_data = bytearray(rcac_buffer[:actual_rcac_size.value])
+            rcac_bytes = bytes(rcac_data)
+        else:
+            LOGGER.exception("RCAC bytes was none")
+            return 
+        return rcac_bytes
+
+    '''
+    def get_rcac(self):
         # Passes captured RCAC data back to Python test modules for validation
         try:
             # Setting buffer size to max size mentioned in spec:
@@ -2290,7 +2319,8 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return None
 
         return rcac_bytes
-
+    '''
+    
     async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:
         ''' Commission with the given nodeid from the setupPayload.
             setupPayload may be a QR or manual code.

@@ -769,11 +769,27 @@ void pychip_GetCommissioningRCACData(uint8_t * rcacDataPtr, size_t * rcacSize, s
         return;
     }
 
-    // Ensure we do not exceed bufferSize
-    *rcacSize = std::min(rcacData.size(), bufferSize);
+    /// Check if the provided buffer is too small
+    if (bufferSize < rcacData.size())
+    {
+        ChipLogError(Controller, "Provided buffer size (%zu) is too small. Required: %zu. Returning zero-sized buffer.",
+                     bufferSize, rcacData.size());
+        *rcacSize = 0;
+        return;
+    }
+
+// Check if the provided buffer is too small
+    if (bufferSize < rcacData.size())
+    {
+        ChipLogError(Controller, "Provided buffer size (%zu) is too small. Required: %zu. Returning zero-sized buffer.",
+                     bufferSize, rcacData.size());
+        *rcacSize = 0;
+        return;
+    }
 
     // Copy the data from C++ to Python's allocated memory
-    std::memcpy(rcacDataPtr, rcacData.data(), *rcacSize);
+    std::memcpy(rcacDataPtr, rcacData.data(), rcacData.size());
+    *rcacSize = rcacData.size();
 }
 }
 } // extern "C"
