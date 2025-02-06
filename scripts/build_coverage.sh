@@ -207,13 +207,6 @@ fi
 # Coverage Generation
 # ------------------------------------------------------------------------------
 mkdir -p "$COVERAGE_ROOT"
-<<<<<<< HEAD
-lcov --initial --capture --ignore-errors inconsistent --directory "$OUTPUT_ROOT/obj/src" --exclude="$PWD"/zzz_generated/* --exclude="$PWD"/third_party/* --exclude=/usr/include/* --output-file "$COVERAGE_ROOT/lcov_base.info"
-lcov --capture --ignore-errors inconsistent --directory "$OUTPUT_ROOT/obj/src" --exclude="$PWD"/zzz_generated/* --exclude="$PWD"/third_party/* --exclude=/usr/include/* --output-file "$COVERAGE_ROOT/lcov_test.info"
-lcov --ignore-errors inconsistent --add-tracefile "$COVERAGE_ROOT/lcov_base.info" --add-tracefile "$COVERAGE_ROOT/lcov_test.info" --output-file "$COVERAGE_ROOT/lcov_final.info"
-genhtml "$COVERAGE_ROOT/lcov_final.info" --output-directory "$COVERAGE_ROOT/html" --title "SHA:$(git rev-parse HEAD)" --header-title "Matter SDK Coverage Report"
-=======
->>>>>>> faaedcbbb4 (Make the build_coverage script more flexible)
 
 lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" \
     --exclude="$PWD"/zzz_generated/* \

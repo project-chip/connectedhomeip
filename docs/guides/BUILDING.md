@@ -616,8 +616,8 @@ Coverage from cluster implementations - all: Coverage from the entire Matter SDK
 --python Also run Python-based tests, in addition to unit tests.
 
 -o, --output_root=DIR If specified, skip the build phase and only run coverage
-on the provided build output directory. This directory must have been
-built with use_coverage=true and have had tests run already.
+on the provided build output directory. This directory must have been built with
+use_coverage=true and have had tests run already.
 
 --target=<testname> When running unit tests, specifies a particular test target
 to run (e.g., TestEmberAttributeBuffer.run).
