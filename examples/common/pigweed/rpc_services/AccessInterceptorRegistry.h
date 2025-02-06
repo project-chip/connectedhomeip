@@ -56,9 +56,6 @@ public:
         mAccessors.erase(attrOverride);
     }
 
-    /**
-     *  Get all registered accessors.
-     */
     std::set<PigweedDebugAccessInterceptor *> GetAllAccessors() { return mAccessors; }
 
     /**
