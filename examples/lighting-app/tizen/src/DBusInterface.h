@@ -49,7 +49,6 @@ private:
 
     static gboolean OnOnOffChanged(LightAppOnOff *, GDBusMethodInvocation *, DBusInterface *);
     static gboolean OnCurrentLevelChanged(LightAppLevelControl *, GDBusMethodInvocation *, DBusInterface *);
-    static gboolean OnColorTemperatureChanged(LightAppColorControl *, GDBusMethodInvocation *, DBusInterface *);
 
     void InitOnOff();
     void InitColor();

@@ -136,7 +136,6 @@ CHIP_ERROR DBusInterface::InitOnGLibMatterContext(DBusInterface * self)
 
     g_signal_connect(self->mIfaceOnOff, "notify::on-off", G_CALLBACK(OnOnOffChanged), self);
     g_signal_connect(self->mIfaceLevelControl, "notify::current-level", G_CALLBACK(OnCurrentLevelChanged), self);
-    g_signal_connect(self->mIfaceColorControl, "notify::color-temperature-mireds", G_CALLBACK(OnColorTemperatureChanged), self);
 
     g_bus_own_name_on_connection(bus, "org.tizen.matter.example.lighting", G_BUS_NAME_OWNER_FLAGS_NONE,
                                  reinterpret_cast<GBusAcquiredCallback>(OnBusAcquired),
@@ -186,8 +185,6 @@ gboolean DBusInterface::OnCurrentLevelChanged(LightAppLevelControl * levelContro
     return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
 
-gboolean DBusInterface::OnColorTemperatureChanged(LightAppColorControl * colorControl, GDBusMethodInvocation * invocation,
-                                                  DBusInterface * self)
 {
     // Do not handle on-change event if it was triggered by internal set
     VerifyOrReturnValue(!self->mInternalSet, G_DBUS_METHOD_INVOCATION_HANDLED);
