@@ -324,6 +324,8 @@ def main() -> int:
                       action="store_true", dest="do_erase")
     parser.add_option("-i", "--terminal", help="opens terminal to interact with with device",
                       action="store_true", dest="do_interact")
+    parser.add_option("-I", "--enable_icd", help="enable ICD (Intermittently Connected Device)",
+                      action="store_true", default=False)
     parser.add_option("-m", "--menuconfig", help="runs menuconfig on platforms that support it",
                       action="store_true", dest="do_menuconfig")
     parser.add_option("-z", "--zap", help="runs zap to generate data model & interaction model artifacts",
@@ -870,6 +872,13 @@ def main() -> int:
                 linux_args.append("chip_inet_config_enable_ipv4=true")
             else:
                 linux_args.append("chip_inet_config_enable_ipv4=false")
+
+            if options.enable_icd:
+                linux_args.append("chip_enable_icd_server = true")
+                linux_args.append("chip_subscription_timeout_resumption = true")
+                linux_args.append("chip_icd_report_on_active_mode = true")
+                linux_args.append("chip_enable_icd_lit = true")
+                linux_args.append("chip_enable_icd_dsls = true")
 
             if sw_ver_string:
                 linux_args.append(
