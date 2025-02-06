@@ -464,8 +464,6 @@
 		D4772A46285AE98400383630 /* MTRClusterConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = D4772A45285AE98300383630 /* MTRClusterConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E04AC67D2BEEA17F00BA409B /* ember-io-storage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E04AC67B2BEEA17F00BA409B /* ember-io-storage.cpp */; };
 		E04AC67E2BEEA17F00BA409B /* ember-io-storage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E04AC67B2BEEA17F00BA409B /* ember-io-storage.cpp */; };
-		E04AC67F2BEEA17F00BA409B /* ember-global-attribute-access-interface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E04AC67C2BEEA17F00BA409B /* ember-global-attribute-access-interface.cpp */; };
-		E04AC6802BEEA17F00BA409B /* ember-global-attribute-access-interface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E04AC67C2BEEA17F00BA409B /* ember-global-attribute-access-interface.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -978,7 +976,6 @@
 		D444F9A82C6E99CA007761E5 /* MTRXPCClientProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRXPCClientProtocol.h; sourceTree = "<group>"; };
 		D4772A45285AE98300383630 /* MTRClusterConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRClusterConstants.h; sourceTree = "<group>"; };
 		E04AC67B2BEEA17F00BA409B /* ember-io-storage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ember-io-storage.cpp"; path = "util/ember-io-storage.cpp"; sourceTree = "<group>"; };
-		E04AC67C2BEEA17F00BA409B /* ember-global-attribute-access-interface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ember-global-attribute-access-interface.cpp"; path = "util/ember-global-attribute-access-interface.cpp"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1239,7 +1236,6 @@
 				5143041F2914CED9004DC7FE /* generic-callback-stubs.cpp */,
 				514C79F22B62ED5500DD6D7B /* attribute-storage.cpp */,
 				514C79EF2B62ADDA00DD6D7B /* descriptor.cpp */,
-				E04AC67C2BEEA17F00BA409B /* ember-global-attribute-access-interface.cpp */,
 				E04AC67B2BEEA17F00BA409B /* ember-io-storage.cpp */,
 				516415FE2B6B132200D5CE11 /* DataModelHandler.cpp */,
 				514C79F52B62F0B900DD6D7B /* util.cpp */,
@@ -2307,7 +2303,6 @@
 				037C3DB62991BD5000B7EEE2 /* ModelCommandBridge.mm in Sources */,
 				516411322B6BF75700E67C05 /* MTRIMDispatch.mm in Sources */,
 				037C3DB42991BD5000B7EEE2 /* DeviceControllerDelegateBridge.mm in Sources */,
-				E04AC6802BEEA17F00BA409B /* ember-global-attribute-access-interface.cpp in Sources */,
 				039547012992D461006D42A8 /* generic-callback-stubs.cpp in Sources */,
 				514C79F12B62ADDA00DD6D7B /* descriptor.cpp in Sources */,
 			);
@@ -2408,7 +2403,6 @@
 				5178E67E2AE098210069DF72 /* MTRCommandTimedCheck.mm in Sources */,
 				7596A84928762783004DAE0E /* MTRAsyncCallbackWorkQueue.mm in Sources */,
 				B2E0D7B9245B0B5C003C5B48 /* MTRSetupPayload.mm in Sources */,
-				E04AC67F2BEEA17F00BA409B /* ember-global-attribute-access-interface.cpp in Sources */,
 				B2E0D7B6245B0B5C003C5B48 /* MTRManualSetupPayloadParser.mm in Sources */,
 				7596A85528788557004DAE0E /* MTRClusters.mm in Sources */,
 				88EBF8CF27FABDD500686BC1 /* MTRDeviceAttestationDelegateBridge.mm in Sources */,
