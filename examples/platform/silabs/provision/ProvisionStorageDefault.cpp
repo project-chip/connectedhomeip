@@ -672,12 +672,7 @@ CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
 }
 #endif // OTA_ENCRYPTION_ENABLE
 
-/**
- * @brief Reads the test event trigger key from NVM. If the key isn't present, returns default value if defined.
- *
- * @param[out] keySpan output buffer. Must be at least large enough for 16 bytes (ken length)
- * @return CHIP_ERROR
- */
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 {
     constexpr size_t kEnableKeyLength = 16; // Expected byte size of the EnableKey
@@ -689,7 +684,7 @@ CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
     err = SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_Test_Event_Trigger_Key, keySpan.data(), kEnableKeyLength,
                                            keyLength);
 #ifndef NDEBUG
-#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
 
@@ -702,12 +697,13 @@ CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
         }
         err = CHIP_NO_ERROR;
     }
-#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY
 #endif // NDEBUG
 
     keySpan.reduce_size(kEnableKeyLength);
     return err;
 }
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 
 } // namespace Provision
 
