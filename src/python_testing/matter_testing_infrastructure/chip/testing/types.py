@@ -1,7 +1,6 @@
-from chip.tlv import float32, uint
-
-
 import typing
+
+from chip.tlv import float32, uint
 
 
 def type_matches(received_value, desired_type):
