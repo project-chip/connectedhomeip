@@ -43,7 +43,7 @@ public:
      *
      * Returns:
      *   - `std::nullopt` if the `path` was not handled by this Interceptor.
-     *     Interceptor MUST NOT have attepted to decode aDecoder.
+     *     Interceptor MUST NOT have attepted to decode `decoder`.
      *   - A `::pw::Status` value that is considered the FINAL result of the
      *     write (i.e. write handled) either with success or failure.
      */
