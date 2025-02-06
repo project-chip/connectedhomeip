@@ -17,6 +17,7 @@
  */
 package chip.devicecontroller;
 
+import java.lang.ref.Cleaner;
 import chip.devicecontroller.model.InvokeElement;
 
 /** JNI wrapper callback class for {@link InvokeCallback}. */
@@ -24,9 +25,18 @@ public final class InvokeCallbackJni {
   private final InvokeCallback wrappedInvokeCallback;
   private long callbackHandle;
 
+  private final Cleaner.Cleanable cleanable;
+
   public InvokeCallbackJni(InvokeCallback wrappedInvokeCallback) {
     this.wrappedInvokeCallback = wrappedInvokeCallback;
     this.callbackHandle = newCallback();
+
+    this.cleanable = Cleaner.create().register(this, () -> {
+      if (callbackHandle != 0) {
+        deleteCallback(callbackHandle);
+        callbackHandle = 0;
+      }
+    });
   }
 
   long getCallbackHandle() {
@@ -54,16 +64,5 @@ public final class InvokeCallbackJni {
 
   private void onDone() {
     wrappedInvokeCallback.onDone();
-  }
-
-  // TODO(#8578): Replace finalizer with PhantomReference.
-  @SuppressWarnings("deprecation")
-  protected void finalize() throws Throwable {
-    super.finalize();
-
-    if (callbackHandle != 0) {
-      deleteCallback(callbackHandle);
-      callbackHandle = 0;
-    }
   }
 }

@@ -28,6 +28,7 @@ import chip.devicecontroller.model.NodeState;
 import chip.devicecontroller.model.Status;
 
 import javax.annotation.Nullable;
+import java.lang.ref.Cleaner;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -92,10 +93,19 @@ public class ChipClusters {
 
     private Optional<Long> timeoutMillis = Optional.empty();
 
+    private final Cleaner.Cleanable cleanable;
+
     public BaseChipCluster(long devicePtr, int endpointId, long clusterId) {
       this.devicePtr = devicePtr;
       this.endpointId = endpointId;
       this.clusterId = clusterId;
+
+      this.cleanable = Cleaner.create().register(this, () -> {
+         if (chipClusterPtr != 0) {
+           deleteCluster(chipClusterPtr);
+           chipClusterPtr = 0;
+         }
+      });
     }
 
     /**
@@ -164,15 +174,6 @@ public class ChipClusters {
 
     @Deprecated
     public void deleteCluster(long chipClusterPtr) {}
-    @SuppressWarnings("deprecation")
-    protected void finalize() throws Throwable {
-      super.finalize();
-
-      if (chipClusterPtr != 0) {
-        deleteCluster(chipClusterPtr);
-        chipClusterPtr = 0;
-      }
-    }
   }
 
   abstract static class ReportCallbackImpl implements ReportCallback, SubscriptionEstablishedCallback, ResubscriptionAttemptCallback {

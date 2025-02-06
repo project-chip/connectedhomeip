@@ -19,17 +19,27 @@ package chip.devicecontroller;
 
 import chip.devicecontroller.model.InvokeResponseData;
 import chip.devicecontroller.model.NoInvokeResponseData;
+import java.lang.ref.Cleaner;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
 /** JNI wrapper callback class for {@link InvokeCallback}. */
-public final class ExtendableInvokeCallbackJni {
-  private final ExtendableInvokeCallback wrappedExtendableInvokeCallback;
+public final class BatchInvokeCallbackJni {
+  private final BatchInvokeCallbackJni wrappedBatchInvokeCallback;
   private long callbackHandle;
 
-  public ExtendableInvokeCallbackJni(ExtendableInvokeCallback wrappedExtendableInvokeCallback) {
-    this.wrappedExtendableInvokeCallback = wrappedExtendableInvokeCallback;
+  private final Cleaner.Cleanable cleanable;
+
+  public BatchInvokeCallbackJni(BatchInvokeCallback wrappedBatchInvokeCallback) {
+    this.wrappedBatchInvokeCallback = wrappedBatchInvokeCallback;
     this.callbackHandle = newCallback();
+
+    this.cleanable = Cleaner.create().register(this, () -> {
+      if (chipClusterPtr != 0) {
+        deleteCluster(chipClusterPtr);
+        chipClusterPtr = 0;
+      }
+    });
   }
 
   long getCallbackHandle() {
@@ -41,7 +51,7 @@ public final class ExtendableInvokeCallbackJni {
   private native void deleteCallback(long callbackHandle);
 
   private void onError(Exception e) {
-    wrappedExtendableInvokeCallback.onError(e);
+    wrappedBatchInvokeCallback.onError(e);
   }
 
   private void onResponse(
@@ -74,21 +84,10 @@ public final class ExtendableInvokeCallbackJni {
   }
 
   private void onNoResponse(int commandRef) {
-    wrappedExtendableInvokeCallback.onNoResponse(NoInvokeResponseData.newInstance(commandRef));
+    wrappedBatchInvokeCallback.onNoResponse(NoInvokeResponseData.newInstance(commandRef));
   }
 
   private void onDone() {
-    wrappedExtendableInvokeCallback.onDone();
-  }
-
-  // TODO(#8578): Replace finalizer with PhantomReference.
-  @SuppressWarnings("deprecation")
-  protected void finalize() throws Throwable {
-    super.finalize();
-
-    if (callbackHandle != 0) {
-      deleteCallback(callbackHandle);
-      callbackHandle = 0;
-    }
+    wrappedBatchInvokeCallback.onDone();
   }
 }

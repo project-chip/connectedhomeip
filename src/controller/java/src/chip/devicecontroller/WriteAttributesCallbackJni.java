@@ -19,6 +19,7 @@ package chip.devicecontroller;
 
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.Status;
+import java.lang.ref.Cleaner;
 import javax.annotation.Nullable;
 
 /** JNI wrapper callback class for {@link WriteAttributesCallback}. */
@@ -26,9 +27,18 @@ public final class WriteAttributesCallbackJni {
   private final WriteAttributesCallback wrappedWriteAttributesCallback;
   private long callbackHandle;
 
+  private final Cleaner.Cleanable cleanable;
+
   public WriteAttributesCallbackJni(WriteAttributesCallback wrappedWriteAttributesCallback) {
     this.wrappedWriteAttributesCallback = wrappedWriteAttributesCallback;
     this.callbackHandle = newCallback();
+
+    this.cleanable = Cleaner.create().register(this, () -> {
+      if (callbackHandle != 0) {
+        deleteCallback(callbackHandle);
+        callbackHandle = 0;
+      }
+    });
   }
 
   long getCallbackHandle() {
@@ -60,16 +70,5 @@ public final class WriteAttributesCallbackJni {
 
   private void onDone() {
     wrappedWriteAttributesCallback.onDone();
-  }
-
-  // TODO(#8578): Replace finalizer with PhantomReference.
-  @SuppressWarnings("deprecation")
-  protected void finalize() throws Throwable {
-    super.finalize();
-
-    if (callbackHandle != 0) {
-      deleteCallback(callbackHandle);
-      callbackHandle = 0;
-    }
   }
 }
