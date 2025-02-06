@@ -739,6 +739,20 @@ static constexpr EventId Id = 0x00000000;
 } // namespace Events
 } // namespace CommissionerControl
 
+namespace TlsClientManagement {
+namespace Events {
+
+namespace EndpointProvisioned {
+static constexpr EventId Id = 0x00000000;
+} // namespace EndpointProvisioned
+
+namespace EndpointRemoved {
+static constexpr EventId Id = 0x00000001;
+} // namespace EndpointRemoved
+
+} // namespace Events
+} // namespace TlsClientManagement
+
 namespace UnitTesting {
 namespace Events {
 
