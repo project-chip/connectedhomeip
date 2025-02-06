@@ -20,6 +20,7 @@ import importlib.resources as pkg_resources
 import logging
 import typing
 import xml.etree.ElementTree as ElementTree
+import zipfile
 from copy import deepcopy
 from dataclasses import dataclass
 from enum import Enum, auto
@@ -533,6 +534,7 @@ def check_clusters_for_unknown_commands(clusters: dict[uint, XmlCluster], proble
 class PrebuiltDataModelDirectory(Enum):
     k1_3 = auto()
     k1_4 = auto()
+    k1_4_1 = auto()
     kMaster = auto()
 
     @property
@@ -541,6 +543,8 @@ class PrebuiltDataModelDirectory(Enum):
             return "1.3"
         if self == PrebuiltDataModelDirectory.k1_4:
             return "1.4"
+        if self == PrebuiltDataModelDirectory.k1_4_1:
+            return "1.4.1"
         if self == PrebuiltDataModelDirectory.kMaster:
             return "master"
         raise KeyError("Invalid enum: %r" % self)
@@ -571,11 +575,14 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
         return data_model_directory
 
     # If it's a prebuilt directory, build the path based on the version and data model level
-    return pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
-        'data_model').joinpath(data_model_directory.dirname).joinpath(data_model_level.dirname)
+    zip_path = pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
+        'data_model').joinpath(data_model_directory.dirname).joinpath('allfiles.zip')
+    path = zipfile.Path(zip_path)
+
+    return path.joinpath(data_model_level.dirname)
 
 
-def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable] = PrebuiltDataModelDirectory.k1_4) -> typing.Tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
+def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable] = PrebuiltDataModelDirectory.k1_4_1) -> typing.Tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
     """
     Build XML clusters from the specified data model directory.
     This function supports both pre-built locations and full paths.
@@ -781,7 +788,7 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDe
         name = d.attrib['name']
         location = DeviceTypePathLocation(device_type_id=0)
 
-        str_id = d.attrib['id']
+        str_id = d.attrib.get('id', "")
         if not str_id:
             if name == "Base Device Type":
                 # Base is special device type, we're going to call it -1 so we can combine and remove it later.
@@ -844,7 +851,7 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDe
     return device_types, problems
 
 
-def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
+def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable] = PrebuiltDataModelDirectory.k1_4_1) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     top = get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
     device_types: dict[int, XmlDeviceType] = {}
     problems: list[ProblemNotice] = []

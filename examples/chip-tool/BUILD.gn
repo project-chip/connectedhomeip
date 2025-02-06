@@ -47,6 +47,10 @@ config("config") {
     defines += [ "CONFIG_USE_LOCAL_STORAGE" ]
   }
 
+  if (config_enable_https_requests) {
+    defines += [ "CONFIG_ENABLE_HTTPS_REQUESTS" ]
+  }
+
   cflags = [ "-Wconversion" ]
 }
 

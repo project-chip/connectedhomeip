@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/reporting/reporting.h>
@@ -99,10 +100,23 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         VerifyOrDie((*status == Status::UnsupportedEndpoint) || //
                     (*status == Status::UnsupportedCluster) ||  //
                     (*status == Status::UnsupportedAttribute));
+
+        // Check if this is an attribute that ember does not know about but is valid after all and
+        // adjust the return code. All these global attributes are `read only` hence the return
+        // of unsupported write.
+        //
+        // If the cluster or endpoint does not exist, though, keep that return code.
+        if ((*status == Protocols::InteractionModel::Status::UnsupportedAttribute) &&
+            IsSupportedGlobalAttributeNotInMetadata(request.path.mAttributeId))
+        {
+            return Status::UnsupportedWrite;
+        }
+
         return *status;
     }
 
     const EmberAfAttributeMetadata ** attributeMetadata = std::get_if<const EmberAfAttributeMetadata *>(&metadata);
+    VerifyOrDie(*attributeMetadata != nullptr);
 
     // Extra check: internal requests can bypass the read only check, however global attributes
     // have no underlying storage, so write still cannot be done
