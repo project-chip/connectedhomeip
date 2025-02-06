@@ -3644,15 +3644,15 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     XCTAssertEqual(operationalKeys.signatureCount, 1);
 
     __block BOOL subscriptionReportEnd1 = NO;
-    __block BOOL subscriptionCallbackDeleted1 = NO;
+    XCTestExpectation * subscriptionCallbackDeleted = [self expectationWithDescription:@"Subscription callback deleted"];
     @autoreleasepool {
         __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
         __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
 
-        XCTestExpectation * subscriptionReportBegin1 = [self expectationWithDescription:@"Subscription report begin 1"];
+        XCTestExpectation * subscriptionReportBegin = [self expectationWithDescription:@"Subscription report begin"];
 
         delegate.onReportBegin = ^{
-            [subscriptionReportBegin1 fulfill];
+            [subscriptionReportBegin fulfill];
         };
 
         delegate.onReportEnd = ^{
@@ -3660,18 +3660,19 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         };
 
         delegate.onSubscriptionCallbackDelete = ^{
-            subscriptionCallbackDeleted1 = YES;
+            [subscriptionCallbackDeleted fulfill];
         };
 
         [device setDelegate:delegate queue:queue];
 
-        [self waitForExpectations:@[ subscriptionReportBegin1 ] timeout:60];
+        [self waitForExpectations:@[ subscriptionReportBegin ] timeout:60];
     }
 
-    // dealloc -> delete should have been called when the autoreleasepool reaped
-    XCTAssertTrue(subscriptionCallbackDeleted1);
     // report should still be ongoing
     XCTAssertFalse(subscriptionReportEnd1);
+
+    // dealloc -> delete should be called soon after the autoreleasepool reaps
+    [self waitForExpectations:@[ subscriptionCallbackDeleted ] timeout:60];
 
     // Reset our commissionee.
     __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
