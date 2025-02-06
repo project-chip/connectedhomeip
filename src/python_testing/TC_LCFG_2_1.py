@@ -57,7 +57,7 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
         return langcodes.tag_is_valid(tag)
 
     def list_has_maximum_length_of_35_bytes(self, list):
-        return all(self.has_maximum_lenght_of_35_bytes(l) for l in list)
+        return all(self.has_maximum_lenght_of_35_bytes(elem) for elem in list)
 
     def has_maximum_lenght_of_35_bytes(self, str):
         return len(str.encode('utf-8')) <= 35
