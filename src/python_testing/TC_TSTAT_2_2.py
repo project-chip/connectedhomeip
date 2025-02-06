@@ -26,15 +26,10 @@
 # test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-import copy
 import logging
-import random
 
 import chip.clusters as Clusters
-from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
-from chip.clusters import Globals
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
+from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
