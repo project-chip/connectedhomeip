@@ -31,6 +31,7 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/Pool.h>
 #include <messaging/ExchangeContext.h>
+#include <messaging/ReliableMessageAnalyticsDelegate.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
@@ -186,6 +187,13 @@ public:
     void RegisterSessionUpdateDelegate(SessionUpdateDelegate * sessionUpdateDelegate);
 
     /**
+     *  Registers a delegate interested in analytic information
+     *
+     *  @param[in] analyticsDelegate - Pointer to delegate for reporting analytic
+     */
+    void RegisterAnalyticsDelegate(ReliableMessageAnalyticsDelegate * analyticsDelegate);
+
+    /**
      * Map a send error code to the error code we should actually use for
      * success checks.  This maps some error codes to CHIP_NO_ERROR as
      * appropriate.
@@ -249,6 +257,7 @@ private:
     ObjectPool<RetransTableEntry, CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE> mRetransTable;
 
     SessionUpdateDelegate * mSessionUpdateDelegate = nullptr;
+    ReliableMessageAnalyticsDelegate * mAnalyticsDelegate = nullptr;
 
     static System::Clock::Timeout sAdditionalMRPBackoffTime;
 };
