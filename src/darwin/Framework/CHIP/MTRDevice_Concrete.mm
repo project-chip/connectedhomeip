@@ -136,7 +136,7 @@ private:
 // Class to hold C++ objects that can only be manipulated on the Matter queue
 @interface MTRDeviceMatterCPPObjectsHolder : NSObject
 @property (nonatomic, readonly) ReadClient * readClient;
-@property (nonatomic, readonly) SubscriptionCallback * subscriptionCallback; // valid when and only when currentReadClient is valid
+@property (nonatomic, readonly) SubscriptionCallback * subscriptionCallback; // valid when and only when readClient is valid
 - (void)setReadClient:(ReadClient * _Nullable)readClient subscriptionCallback:(SubscriptionCallback * _Nullable)subscriptionCallback;
 - (void)clearReadClientAndDeleteSubscriptionCallback;
 @end
