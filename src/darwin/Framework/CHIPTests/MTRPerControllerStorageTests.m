@@ -1521,6 +1521,8 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     dispatch_sync(_storageQueue, ^{
         [storageDelegate controller:controller storeValues:testBulkValues securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
     });
+    // Since we messed with the node index, tell the data store to re-sync it's cache.
+    [controller.controllerDataStore unitTestRereadNodeIndex];
     // Verify that the store resulted in the correct values
     NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:@(3001)];
     XCTAssertEqualObjects(dataStoreClusterData, bulkTestClusterDataDictionary);
@@ -1772,6 +1774,10 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     XCTAssertNotNil([dataStore findResumptionInfoByNodeID:deviceID]);
     XCTAssertNotNil([dataStore getStoredDeviceDataForNodeID:deviceID]);
     XCTAssertNotNil([dataStore getStoredClusterDataForNodeID:deviceID]);
+    __auto_type * nodesWithStoredData = [controller nodesWithStoredData];
+    XCTAssertTrue([nodesWithStoredData containsObject:deviceID]);
+    XCTAssertEqualObjects(nodesWithStoredData, [dataStore nodesWithStoredData]);
+    XCTAssertEqualObjects(nodesWithStoredData, deviceAttributeCounts.allKeys);
 
     [controller forgetDeviceWithNodeID:deviceID];
     deviceAttributeCounts = [controller unitTestGetDeviceAttributeCounts];
@@ -1779,6 +1785,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     XCTAssertNil([dataStore findResumptionInfoByNodeID:deviceID]);
     XCTAssertNil([dataStore getStoredDeviceDataForNodeID:deviceID]);
     XCTAssertNil([dataStore getStoredClusterDataForNodeID:deviceID]);
+    nodesWithStoredData = [controller nodesWithStoredData];
+    XCTAssertFalse([nodesWithStoredData containsObject:deviceID]);
+    XCTAssertEqualObjects(nodesWithStoredData, [dataStore nodesWithStoredData]);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -2576,7 +2585,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
                                 @{
                                     MTRAttributePathKey : globalAttributePath(clusterId1, MTRAttributeIDTypeGlobalAttributeAttributeListID),
                                     MTRDataKey : arrayOfUnsignedIntegersValue(@[
-                                        attributeId1, @(0xFFF8), @(0xFFF9), @(0xFFFB), attributeId2, @(0xFFFC), @(0xFFFD)
+                                        attributeId1, attributeId2, @(0xFFFC), @(0xFFFD), @(0xFFF8), @(0xFFF9), @(0xFFFB)
                                     ]),
                                 },
 
@@ -2603,7 +2612,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
                                 @{
                                     MTRAttributePathKey : globalAttributePath(clusterId2, MTRAttributeIDTypeGlobalAttributeAttributeListID),
                                     MTRDataKey : arrayOfUnsignedIntegersValue(@[
-                                        @0xFFF8, @(0xFFF9), @(0xFFFB), attributeId2, @(0xFFFC), @(0xFFFD)
+                                        attributeId2, @(0xFFFC), @(0xFFFD), @0xFFF8, @(0xFFF9), @(0xFFFB)
                                     ]),
                                 },
 
@@ -2646,7 +2655,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
                                 @{
                                     MTRAttributePathKey : globalAttributePath(@(MTRClusterIDTypeDescriptorID), MTRAttributeIDTypeGlobalAttributeAttributeListID),
                                     MTRDataKey : arrayOfUnsignedIntegersValue(@[
-                                        @(0), @(1), @(2), @(3), @(0xFFF8), @(0xFFF9), @(0xFFFB), @(0xFFFC), @(0xFFFD)
+                                        @(0), @(1), @(2), @(3), @(0xFFFC), @(0xFFFD), @(0xFFF8), @(0xFFF9), @(0xFFFB)
                                     ]),
                                 },
 

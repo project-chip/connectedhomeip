@@ -249,11 +249,13 @@ class TestSpecParsingDeviceType(MatterBaseTest):
     def test_spec_files(self):
         one_three, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_3)
         one_four, one_four_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4)
+        one_four_one, one_four_one_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4_1)
         tot, tot_problems = build_xml_device_types(PrebuiltDataModelDirectory.kMaster)
         # 1.3 has a couple of problems related to proxy clusters and a random file from the DM editor.
         # Some of these should be fixed with the move to alchemy. For now, let's just make sure 1.4
         # and the current pull don't introduce NEW problems.
         asserts.assert_equal(len(one_four_problems), 0, "Problems found when parsing 1.4 spec")
+        asserts.assert_equal(len(one_four_one_problems), 0, "Problems found when parsing 1.4.1 spec")
         # TOT has a bunch of problems related to IDs being allocated for closures and TBR. These should all
         # mention ID-TBD as the id, so let's pull those out for now and make sure there are no UNKNOWN problems.
         filtered_tot_problems = [p for p in tot_problems if 'ID-TBD' not in p.problem]
@@ -265,6 +267,8 @@ class TestSpecParsingDeviceType(MatterBaseTest):
                                0, "Master dir does not contain any device types not in 1.4")
         asserts.assert_greater(len(set(one_four.keys()) - set(one_three.keys())),
                                0, "1.4 dir does not contain any clusters not in 1.3")
+        asserts.assert_equal(len(one_four.keys()), len(one_four_one.keys()),
+                             "Number of device types in 1.4 and 1.4.1 does not match")
         asserts.assert_equal(set(one_three.keys()) - set(one_four.keys()),
                              set(), "There are some 1.3 device types that are unexpectedly not included in the 1.4 spec")
         asserts.assert_equal(set(one_four.keys())-set(tot.keys()),

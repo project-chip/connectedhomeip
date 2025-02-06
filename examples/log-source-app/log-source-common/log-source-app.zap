@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 103,
+  "featureLevel": 106,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -41,14 +41,16 @@
         "code": 4293984259,
         "profileId": 259,
         "label": "MA-all-clusters-app",
-        "name": "MA-all-clusters-app"
+        "name": "MA-all-clusters-app",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 4293984259,
           "profileId": 259,
           "label": "MA-all-clusters-app",
-          "name": "MA-all-clusters-app"
+          "name": "MA-all-clusters-app",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [

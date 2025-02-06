@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2022-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -3304,6 +3304,127 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                               clusterID.unsignedLongLongValue, MTRClusterNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue)),
                                               commandID.unsignedLongLongValue, MTRRequestCommandNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue), static_cast<MTRCommandIDType>(commandID.unsignedLongLongValue)),
                                               commandFields];
+}
+
+- (BOOL)_invokeResponse:(MTRDeviceResponseValueDictionary)response matchesRequiredResponse:(NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> *)requiredResponse
+{
+    if (response[MTRDataKey] == nil) {
+        MTR_LOG_ERROR("%@ invokeCommands expects a data response for %@ but got no data", self, response[MTRCommandPathKey]);
+        return NO;
+    }
+
+    MTRDeviceDataValueDictionary data = response[MTRDataKey];
+    if (![MTRStructureValueType isEqual:data[MTRTypeKey]]) {
+        MTR_LOG_ERROR("%@ invokeCommands data value %@ for command response for %@ is not a structure", self, data, response[MTRCommandPathKey]);
+        return NO;
+    }
+
+    NSArray<NSDictionary<NSString *, id> *> * fields = data[MTRValueKey];
+
+    for (NSNumber * fieldID in requiredResponse) {
+        // Check that this field is present in the response.
+        MTRDeviceDataValueDictionary _Nullable fieldValue = nil;
+        for (NSDictionary<NSString *, id> * field in fields) {
+            if ([fieldID isEqual:field[MTRContextTagKey]]) {
+                fieldValue = field[MTRDataKey];
+                break;
+            }
+        }
+
+        if (fieldValue == nil) {
+            MTR_LOG_ERROR("%@ invokeCommands response for %@ does not have a field with ID %@", self, response[MTRCommandPathKey], fieldID);
+            return NO;
+        }
+
+        auto * expected = requiredResponse[fieldID];
+        if (![expected isEqual:fieldValue]) {
+            MTR_LOG_ERROR("%@ invokeCommands response for %@ field %@ got %@ but expected %@", self, response[MTRCommandPathKey], fieldID, fieldValue, expected);
+            return NO;
+        }
+    }
+
+    return YES;
+}
+
+- (void)invokeCommands:(NSArray<NSArray<MTRCommandWithRequiredResponse *> *> *)commands
+                 queue:(dispatch_queue_t)queue
+            completion:(MTRDeviceResponseHandler)completion
+{
+    // We will generally do our work on self.queue, and just dispatch to the provided queue when
+    // calling the provided completion.
+    auto nextCompletion = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * responses) {
+        dispatch_async(queue, ^{
+            completion(responses, nil);
+        });
+    };
+
+    // We want to invoke the command groups in order, stopping after failures as needed.  Build up a
+    // linked list of groups via chaining the completions, with calls out to the original
+    // completion instead of going to the next list item when we want to stop.
+    for (NSArray<MTRCommandWithRequiredResponse *> * commandGroup in [commands reverseObjectEnumerator]) {
+        // We want to invoke all the commands in the group in order, propagating along the list of
+        // current responses.  Build up that linked list of command invokes via chaining the completions.
+        for (MTRCommandWithRequiredResponse * command in [commandGroup reverseObjectEnumerator]) {
+            auto commandInvokeBlock = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * previousResponses) {
+                [self invokeCommandWithEndpointID:command.path.endpoint
+                                        clusterID:command.path.cluster
+                                        commandID:command.path.command
+                                    commandFields:command.commandFields
+                                   expectedValues:nil
+                            expectedValueInterval:nil
+                                            queue:self.queue
+                                       completion:^(NSArray<NSDictionary<NSString *, id> *> * responses, NSError * error) {
+                                           if (error != nil) {
+                                               nextCompletion(NO, [previousResponses arrayByAddingObject:@ {
+                                                   MTRCommandPathKey : command.path,
+                                                   MTRErrorKey : error,
+                                               }]);
+                                               return;
+                                           }
+
+                                           if (responses.count != 1) {
+                                               // Very much unexpected for invoking a single command.
+                                               MTR_LOG_ERROR("%@ invokeCommands unexpectedly got multiple responses for %@", self, command.path);
+                                               nextCompletion(NO, [previousResponses arrayByAddingObject:@ {
+                                                   MTRCommandPathKey : command.path,
+                                                   MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL],
+                                               }]);
+                                               return;
+                                           }
+
+                                           BOOL nextAllSucceeded = allSucceededSoFar;
+                                           MTRDeviceResponseValueDictionary response = responses[0];
+                                           if (command.requiredResponse != nil && ![self _invokeResponse:response matchesRequiredResponse:command.requiredResponse]) {
+                                               nextAllSucceeded = NO;
+                                           }
+
+                                           nextCompletion(nextAllSucceeded, [previousResponses arrayByAddingObject:response]);
+                                       }];
+            };
+
+            nextCompletion = commandInvokeBlock;
+        }
+
+        auto commandGroupInvokeBlock = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * previousResponses) {
+            if (allSucceededSoFar == NO) {
+                // Don't start a new command group if something failed in the
+                // previous one.  Note that we might be running on self.queue here, so make sure we
+                // dispatch to the correct queue.
+                MTR_LOG_ERROR("%@ failed a preceding command, not invoking command group %@ or later ones", self, commandGroup);
+                dispatch_async(queue, ^{
+                    completion(previousResponses, nil);
+                });
+                return;
+            }
+
+            nextCompletion(allSucceededSoFar, previousResponses);
+        };
+
+        nextCompletion = commandGroupInvokeBlock;
+    }
+
+    // Kick things off with a "everything succeeded so far and we have no responses yet".
+    nextCompletion(YES, @[]);
 }
 
 - (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
