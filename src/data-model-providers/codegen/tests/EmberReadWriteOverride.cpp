@@ -122,7 +122,7 @@ Status emAfWriteAttributeExternal(const chip::app::ConcreteAttributePath & path,
     memcpy(gEmberIoBuffer, input.dataPtr, len);
     gEmberIoBufferFill = len;
 
-    if (input.changeListener != nullptr)
+    if (input.changeListener != nullptr && input.markDirty != chip::app::MarkAttributeDirty::kNo)
     {
         input.changeListener->MarkDirty(chip::app::AttributePathParams(path.mEndpointId, path.mClusterId, path.mAttributeId));
     }
