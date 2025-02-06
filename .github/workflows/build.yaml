@@ -81,14 +81,6 @@ jobs:
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Run Tests
               run: scripts/tests/gn_tests.sh
-            # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
-            # TODO https://github.com/project-chip/connectedhomeip/issues/1512
-            # - name: Run Code Coverage
-            #   if: ${{ contains('main', env.BUILD_TYPE) }}
-            #   run: scripts/tools/codecoverage.sh
-            # - name: Upload Code Coverage
-            #   if: ${{ contains('main', env.BUILD_TYPE) }}
-            #   run: bash <(curl -s https://codecov.io/bash)
             - name: Set up Build Without Detail Logging
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false"
             - name: Run Build Without Detail Logging

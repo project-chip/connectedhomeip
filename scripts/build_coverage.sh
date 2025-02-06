@@ -172,8 +172,13 @@ if [ "$skip_gn" == false ]; then
     # 3) Run Python tests if requested
     #
     if [ "$ENABLE_PYTHON" == true ]; then
+        echo "Building python and applications ..."
+        scripts/run_in_build_env.sh \
+            "./scripts/tests/local.py build"
+
         echo "Running Python tests ..."
-        # TODO: run python tests.
+        scripts/run_in_build_env.sh \
+            "./scripts/tests/local.py python-tests"
     fi
 
     # ----------------------------------------------------------------------------
