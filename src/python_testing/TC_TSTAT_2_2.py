@@ -767,6 +767,22 @@ class TC_TSTAT_2_2(MatterBaseTest):
                 val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedHeatingSetpoint)
                 asserts.assert_equal(val, OccupiedHeatingSetpointValue + 30 * 10)
 
+        if self.pics_guard(hasCoolingFeature):
+            # Restores OccupiedCoolingSetpoint to original value
+            await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedCoolingSetpoint(OccupiedCoolingSetpointValue), endpoint_id=endpoint)
+
+        if self.pics_guard(hasHeatingFeature):
+            # Restores OccupiedHeatingSetpoint to original value
+            await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedHeatingSetpoint(OccupiedHeatingSetpointValue), endpoint_id=endpoint)
+
+        if self.pics_guard(hasOccupancyFeature and hasCoolingFeature):
+            # Restores UnoccupiedCoolingSetpoint to original value
+            await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedCoolingSetpoint(UnoccupiedCoolingSetpointValue), endpoint_id=endpoint)
+
+        if self.pics_guard(hasOccupancyFeature and hasHeatingFeature):
+            # Restores UnoccupiedHeatingSetpoint to original value
+            await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedHeatingSetpoint(UnoccupiedHeatingSetpointValue), endpoint_id=endpoint)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
