@@ -455,6 +455,10 @@
 		CF3B63D12CA31E71003C1C87 /* MTROTAImageTransferHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF3B63CD2CA31E71003C1C87 /* MTROTAImageTransferHandler.mm */; };
 		CF3B63D22CA31E71003C1C87 /* MTROTAUnsolicitedBDXMessageHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF3B63CE2CA31E71003C1C87 /* MTROTAUnsolicitedBDXMessageHandler.mm */; };
 		D4288E872C8A273F002FEC53 /* MTRDevice_XPC_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = D4288E862C8A273F002FEC53 /* MTRDevice_XPC_Internal.h */; };
+		B4D67A922D527F4A00C49965 /* DCLClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A8E2D527F4A00C49965 /* DCLClient.cpp */; };
+		B4D67A932D527F4A00C49965 /* DisplayTermsAndConditions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A8F2D527F4A00C49965 /* DisplayTermsAndConditions.cpp */; };
+		B4D67A952D527F4A00C49965 /* JsonSchemaMacros.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A912D527F4A00C49965 /* JsonSchemaMacros.cpp */; };
+		B4D67A9B2D538E9700C49965 /* HTTPSRequest.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A992D538E9700C49965 /* HTTPSRequest.mm */; };
 		D444F9A72C6E8F9D007761E5 /* MTRXPCServerProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = D444F9A62C6E8F9D007761E5 /* MTRXPCServerProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D444F9AA2C6E9A08007761E5 /* MTRXPCClientProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = D444F9A82C6E99CA007761E5 /* MTRXPCClientProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D4772A46285AE98400383630 /* MTRClusterConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = D4772A45285AE98300383630 /* MTRClusterConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -963,6 +967,10 @@
 		CF3B63CD2CA31E71003C1C87 /* MTROTAImageTransferHandler.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTROTAImageTransferHandler.mm; sourceTree = "<group>"; };
 		CF3B63CE2CA31E71003C1C87 /* MTROTAUnsolicitedBDXMessageHandler.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTROTAUnsolicitedBDXMessageHandler.mm; sourceTree = "<group>"; };
 		D4288E862C8A273F002FEC53 /* MTRDevice_XPC_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDevice_XPC_Internal.h; sourceTree = "<group>"; };
+		B4D67A8E2D527F4A00C49965 /* DCLClient.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = DCLClient.cpp; path = commands/dcl/DCLClient.cpp; sourceTree = "<group>"; };
+		B4D67A8F2D527F4A00C49965 /* DisplayTermsAndConditions.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = DisplayTermsAndConditions.cpp; path = commands/dcl/DisplayTermsAndConditions.cpp; sourceTree = "<group>"; };
+		B4D67A912D527F4A00C49965 /* JsonSchemaMacros.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JsonSchemaMacros.cpp; path = commands/dcl/JsonSchemaMacros.cpp; sourceTree = "<group>"; };
+		B4D67A992D538E9700C49965 /* HTTPSRequest.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = HTTPSRequest.mm; sourceTree = "<group>"; };
 		D437613E285BDC0D0051FEA2 /* MTRErrorTestUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRErrorTestUtils.h; sourceTree = "<group>"; };
 		D437613F285BDC0D0051FEA2 /* MTRTestKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestKeys.h; sourceTree = "<group>"; };
 		D4376140285BDC0D0051FEA2 /* MTRTestStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestStorage.h; sourceTree = "<group>"; };
@@ -1031,6 +1039,7 @@
 		037C3D7B2991BD4F00B7EEE2 /* commands */ = {
 			isa = PBXGroup;
 			children = (
+				B4D67A9A2D538E9700C49965 /* dcl */,
 				B43B39E92CB859A5006AA284 /* memory */,
 				5124311D2BA0C09A000BC136 /* configuration */,
 				B4FCD56C2B603A6300832859 /* bdx */,
@@ -1157,6 +1166,9 @@
 		039546872991C400006D42A8 /* chip-tool */ = {
 			isa = PBXGroup;
 			children = (
+				B4D67A8E2D527F4A00C49965 /* DCLClient.cpp */,
+				B4D67A8F2D527F4A00C49965 /* DisplayTermsAndConditions.cpp */,
+				B4D67A912D527F4A00C49965 /* JsonSchemaMacros.cpp */,
 				0382FA2F2992F40C00247BBB /* ComplexArgumentParser.cpp */,
 				0382FA2B2992F06C00247BBB /* Commands.cpp */,
 				0382FA292992F05E00247BBB /* Command.cpp */,
@@ -1760,6 +1772,14 @@
 			path = "../common/websocket-server";
 			sourceTree = "<group>";
 		};
+		B4D67A9A2D538E9700C49965 /* dcl */ = {
+			isa = PBXGroup;
+			children = (
+				B4D67A992D538E9700C49965 /* HTTPSRequest.mm */,
+			);
+			path = dcl;
+			sourceTree = "<group>";
+		};
 		B4E262182AA0CFFE00DBA5BC /* delay */ = {
 			isa = PBXGroup;
 			children = (
@@ -2198,9 +2218,13 @@
 				B45373D22A9FEB0C00807602 /* buflist.c in Sources */,
 				7592BCFB2CBEE98C00EB74A0 /* CodegenDataModelProvider_Read.cpp in Sources */,
 				7592BCFC2CBEE98C00EB74A0 /* Instance.cpp in Sources */,
+				B4D67A9B2D538E9700C49965 /* HTTPSRequest.mm in Sources */,
 				7592BCFD2CBEE98C00EB74A0 /* EmberMetadata.cpp in Sources */,
 				7592BCFE2CBEE98C00EB74A0 /* CodegenDataModelProvider.cpp in Sources */,
 				7592BCFF2CBEE98C00EB74A0 /* CodegenDataModelProvider_Write.cpp in Sources */,
+				B4D67A922D527F4A00C49965 /* DCLClient.cpp in Sources */,
+				B4D67A932D527F4A00C49965 /* DisplayTermsAndConditions.cpp in Sources */,
+				B4D67A952D527F4A00C49965 /* JsonSchemaMacros.cpp in Sources */,
 				B45373C12A9FEA9100807602 /* close.c in Sources */,
 				B45373D42A9FEB0C00807602 /* context.c in Sources */,
 				B45373E52A9FEBA400807602 /* date.c in Sources */,
