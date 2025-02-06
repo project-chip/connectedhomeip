@@ -59,8 +59,8 @@ public:
      *    treated as a successful write. Caller will treat this as a successful
      *    write and report to client. Fallback path will not be taken.
      */
-    virtual std::optional<::pw::Status> Write(const chip::app::ConcreteDataAttributePath & aPath,
-                                              chip::app::AttributeValueDecoder & aDecoder)
+    virtual std::optional<::pw::Status> Write(const chip::app::ConcreteDataAttributePath & path,
+                                              chip::app::AttributeValueDecoder & decoder)
     {
         return std::nullopt;
     }
