@@ -772,8 +772,8 @@ void pychip_GetCommissioningRCACData(uint8_t * rcacDataPtr, size_t * rcacSize, s
     /// Check if the provided buffer is too small
     if (bufferSize < rcacData.size())
     {
-        ChipLogError(Controller, "Provided buffer size (%zu) is too small. Required: %zu. Returning zero-sized buffer.",
-                     bufferSize, rcacData.size());
+        ChipLogError(Controller, "Provided buffer size (%zu) is too small. Required: %zu. Returning zero-sized buffer.", bufferSize,
+                     rcacData.size());
         *rcacSize = 0;
         return;
     }
@@ -781,8 +781,8 @@ void pychip_GetCommissioningRCACData(uint8_t * rcacDataPtr, size_t * rcacSize, s
     // Check if the provided buffer is too small
     if (bufferSize < rcacData.size())
     {
-        ChipLogError(Controller, "Provided buffer size (%zu) is too small. Required: %zu. Returning zero-sized buffer.",
-                     bufferSize, rcacData.size());
+        ChipLogError(Controller, "Provided buffer size (%zu) is too small. Required: %zu. Returning zero-sized buffer.", bufferSize,
+                     rcacData.size());
         *rcacSize = 0;
         return;
     }
