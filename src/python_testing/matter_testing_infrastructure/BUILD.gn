@@ -33,6 +33,7 @@ pw_python_package("chip-testing-module") {
   inputs = [ "env_test.yaml" ]
 
   sources = [
+    "chip.testing/matchers.py",
     "chip/testing/__init__.py",
     "chip/testing/apps.py",
     "chip/testing/basic_composition.py",
@@ -49,7 +50,6 @@ pw_python_package("chip-testing-module") {
     "chip/testing/taglist_and_topology_test.py",
     "chip/testing/tasks.py",
     "chip/testing/timeoperations.py",
-    "chip/testing/types.py",
   ]
   tests = [
     "chip/testing/test_metadata.py",
