@@ -763,7 +763,6 @@ void WriteHandler::MoveToState(const State aTargetState)
 DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::SubjectDescriptor & aSubject,
                                                               const ConcreteAttributePath & aPath)
 {
-
     // TODO: ordering is to check writability/existence BEFORE ACL and this seems wrong, however
     //       existing unit tests (TC_AcessChecker.py) validate that we get UnsupportedWrite instead of UnsupportedAccess
     //
@@ -773,9 +772,6 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     //
     //       Open issue that needs fixing: https://github.com/project-chip/connectedhomeip/issues/33735
 
-    // First check things that are not even in metadata. These are readonly.
-    VerifyOrReturnValue(!IsSupportedGlobalAttributeNotInMetadata(aPath.mAttributeId), Status::UnsupportedWrite);
-
     std::optional<DataModel::AttributeEntry> attributeEntry;
     DataModel::AttributeFinder finder(mDataModelProvider);
 
@@ -784,7 +780,11 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     // if path is not valid, return a spec-compliant return code.
     if (!attributeEntry.has_value())
     {
-        return DataModel::ValidateClusterPath(mDataModelProvider, aPath, Status::UnsupportedAttribute);
+        // Global lists are not in metadata and not writable. Return the correct error code according to the spec
+        Status attributeErrorStatus =
+            IsSupportedGlobalAttributeNotInMetadata(aPath.mAttributeId) ? Status::UnsupportedWrite : Status::UnsupportedAttribute;
+
+        return DataModel::ValidateClusterPath(mDataModelProvider, aPath, attributeErrorStatus);
     }
 
     // Allow writes on writable attributes only
