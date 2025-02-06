@@ -50,7 +50,7 @@ from chip.testing.timeoperations import get_wait_seconds_from_set_time as get_wa
 from chip.testing.timeoperations import utc_datetime_from_matter_epoch_us as utc_datetime_from_matter_epoch_us
 from chip.testing.timeoperations import utc_datetime_from_posix_time_ms as utc_datetime_from_posix_time_ms
 from chip.testing.timeoperations import utc_time_in_matter_epoch as utc_time_in_matter_epoch
-from chip.testing.matchers import type_matches as type_matches
+from chip.testing.matchers import is_type as type_matches
 from chip.tlv import uint
 
 # isort: off
