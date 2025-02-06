@@ -27,7 +27,8 @@ from chip.testing.pics import parse_pics, parse_pics_xml
 from chip.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
                                                     get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
-from chip.testing.utilities import compare_time, get_wait_seconds_from_set_time, type_matches, utc_time_in_matter_epoch
+from chip.testing.timeoperations import compare_time, get_wait_seconds_from_set_time, utc_time_in_matter_epoch
+from chip.testing.types import type_matches
 from chip.tlv import uint
 from mobly import asserts, signals
 

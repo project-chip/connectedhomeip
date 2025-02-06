@@ -1,41 +1,7 @@
-import typing
-from binascii import hexlify, unhexlify
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-import chip.clusters as Clusters
-from chip.tlv import float32, uint
 from mobly import asserts
-
-
-def type_matches(received_value, desired_type):
-    """ Checks if a received value matches an expected type.
-
-    Handles unpacking Nullable and Optional types and
-    compares list value types for non-empty lists.
-
-    Args:
-        received_value: The value to type check
-        desired_type: The expected type specification (can be a basic type, Union,
-            Optional, or List type)
-
-    Returns:
-        bool: True if the received_value matches the desired_type specification
-    """
-    if typing.get_origin(desired_type) == typing.Union:
-        return any(type_matches(received_value, t) for t in typing.get_args(desired_type))
-    elif typing.get_origin(desired_type) == list:
-        if isinstance(received_value, list):
-            # Assume an empty list is of the correct type
-            return True if received_value == [] else any(type_matches(received_value[0], t) for t in typing.get_args(desired_type))
-        else:
-            return False
-    elif desired_type == uint:
-        return isinstance(received_value, int) and received_value >= 0
-    elif desired_type == float32:
-        return isinstance(received_value, float)
-    else:
-        return isinstance(received_value, desired_type)
 
 # TODO(#31177): Need to add unit tests for all time conversion methods.
 
@@ -145,69 +111,3 @@ def get_wait_seconds_from_set_time(set_time_matter_us: int, wait_seconds: int):
     """
     seconds_passed = (utc_time_in_matter_epoch() - set_time_matter_us) // 1000000
     return wait_seconds - seconds_passed
-
-
-def bytes_from_hex(hex: str) -> bytes:
-    """ Converts hex string to bytes, handling various formats (colons, spaces, newlines).
-
-    Examples:
-        "01:ab:cd" -> b'\x01\xab\xcd'
-        "01 ab cd" -> b'\x01\xab\xcd'
-    """
-    return unhexlify("".join(hex.replace(":", "").replace(" ", "").split()))
-
-
-def hex_from_bytes(b: bytes) -> str:
-    """ Converts a bytes object to a hexadecimal string.
-
-    This function performs the inverse operation of bytes_from_hex(). It converts
-    a bytes object into a continuous hexadecimal string without any separators.
-
-    Args:
-        b: bytes, the bytes object to convert to hexadecimal
-
-    Returns:
-        str: A string containing the hexadecimal representation of the bytes,
-            using lowercase letters a-f for hex digits
-
-    Example: b'\x01\xab\xcd' -> '01abcd'
-    """
-    return hexlify(b).decode("utf-8")
-
-
-def id_str(id):
-    """ Formats a numeric ID as both decimal and hex.
-
-    Creates a string representation of an ID showing both its decimal value
-    and its hex representation in parentheses.
-
-    Args:
-        id: int, the numeric identifier to format
-
-    Returns:
-        str: A formatted string like "123 (0x7b)"
-    """
-    return f'{id} (0x{id:02x})'
-
-
-def cluster_id_str(id):
-    """ Formats a Matter cluster ID with its name and numeric representation.
-
-    Uses id_str() for numeric formatting and looks up cluster name from registry.
-    Falls back to "Unknown cluster" if ID not recognized.
-
-    Args:
-        id: int, the Matter cluster identifier
-
-    Returns:
-        str: A formatted string containing the ID and cluster name, like
-            "6 (0x06) OnOff", or "Unknown cluster" if ID not recognized
-    """
-    if id in Clusters.ClusterObjects.ALL_CLUSTERS.keys():
-        s = Clusters.ClusterObjects.ALL_CLUSTERS[id].__name__
-    else:
-        s = "Unknown cluster"
-    try:
-        return f'{id_str(id)} {s}'
-    except TypeError:
-        return 'HERE IS THE PROBLEM'

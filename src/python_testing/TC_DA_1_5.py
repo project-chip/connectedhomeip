@@ -41,7 +41,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from chip.testing.utilities import hex_from_bytes, type_matches
+from chip.testing.conversions import hex_from_bytes
+from chip.testing.types import type_matches
 from chip.tlv import TLVReader
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes

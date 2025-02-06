@@ -38,6 +38,7 @@ pw_python_package("chip-testing-module") {
     "chip/testing/basic_composition.py",
     "chip/testing/choice_conformance.py",
     "chip/testing/conformance.py",
+    "chip/testing/conversions.py",
     "chip/testing/global_attribute_ids.py",
     "chip/testing/matter_asserts.py",
     "chip/testing/matter_testing.py",
@@ -47,7 +48,8 @@ pw_python_package("chip-testing-module") {
     "chip/testing/spec_parsing.py",
     "chip/testing/taglist_and_topology_test.py",
     "chip/testing/tasks.py",
-    "chip/testing/utilities.py",
+    "chip/testing/timeoperations.py",
+    "chip/testing/types.py",
   ]
   tests = [
     "chip/testing/test_metadata.py",
