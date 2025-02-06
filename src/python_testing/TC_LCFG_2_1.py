@@ -35,10 +35,11 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import langcodes
+
 import chip.clusters as Clusters
+import langcodes
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, async_test_body
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
