@@ -119,7 +119,7 @@ tests:
       response:
           saveAs: UnoccupiedCoolingSetpointValue
 
-- label:
+    - label:
           "Saving value for comparision in step 58 read NumberOfPresets
           attribute"
       PICS: TSTAT.S.F08
