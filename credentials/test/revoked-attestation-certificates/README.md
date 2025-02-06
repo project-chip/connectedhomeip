@@ -44,14 +44,14 @@ entity.
 
 Please take an example PKI ![Indirect CRL Signing](indirect/indirect-crl.png).
 
--   PAA: `indirect/Chip-Test-PAA-FFF1-Cert.[pem|der]`
+-   PAA: `Chip-Test-PAA-FFF1-Cert.[pem|der]`
 -   PAIs:
     -   `indirect/Chip-Test-PAI-FFF1-01-Cert.[pem|der]`
         -   DAC:
             `indirect/Chip-Test-DAC-FFF1-8001-Signed-By-Test-PAI-01-Cert.[pem|der]`
     -   `indirect/Chip-Test-PAI-FFF1-02-Cert.[pem|der]`
         -   DAC:
-            `indirect/Chip-Test-DAC-FFF1-8002-Signed-By-Test-PAI-02-Cert.[pem|der]`
+            `indirect/Chip-Test-DAC-FFF1-8001-Signed-By-Test-PAI-02-Cert.[pem|der]`
     -   `indirect/Chip-Test-PAI-FFF1-03-Cert.[pem|der]`
 -   PAA Delegate: `indirect/Chip-Test-PAA-Delegate-FFF1-Cert.[pem|der]`
 -   PAA Delegated CRL: `indirect/Chip-Test-PAA-FFF1-Delegated-CRL.[pem|der]`
