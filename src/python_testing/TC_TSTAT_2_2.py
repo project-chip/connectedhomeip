@@ -35,7 +35,7 @@ from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
 from chip.clusters import Globals
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -55,7 +55,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
     def steps_TC_TSTAT_2_2(self) -> list[TestStep]:
         steps = [
-            TestStep("1", "Commission DUT to TH"),
+            TestStep("1", "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Test Harness Client reads  attribute OccupiedCoolingSetpoint from the DUT"),
             TestStep("2b", "Test Harness Client then attempts  Writes OccupiedCoolingSetpoint to value below the MinCoolSetpointLimit"),
             TestStep("2c", "Test Harness Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint attribute"),
@@ -242,7 +242,6 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
             if self.pics_guard(hasAutoModeFeature):
                 # Test Harness Writes If TSTAT.S.F05(AUTO) LowerLimit = Max(MinCoolSetpointLimit, (OccupiedHeatingSetpoint + MinSetpointDeadBand)) to OccupiedCoolingSetpoint attribute when Auto is enabled
-                # LowerLimit = Max(MinCoolSetpointLimit,(OccupiedHeatingSetpoint + MinSetpointDeadBand))
                 await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedCoolingSetpoint(max(MinCoolSetpointLimitValue, (OccupiedHeatingSetpointValue + (MinSetpointDeadBandValue)))), endpoint_id=endpoint)
 
             else:
@@ -284,8 +283,9 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
             if self.pics_guard(hasAutoModeFeature):
                 # Test Harness Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint attribute
-                status = await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedHeatingSetpoint(min(MaxHeatSetpointLimitValue, (OccupiedCoolingSetpointValue - MinSetpointDeadBandValue))), endpoint_id=endpoint, expect_success=False)
-                asserts.assert_equal(status, Status.ConstraintError)
+                upper_limit = min(MaxHeatSetpointLimitValue, (OccupiedCoolingSetpointValue - MinSetpointDeadBandValue))
+                await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedHeatingSetpoint(upper_limit), endpoint_id=endpoint)
+
             else:
                 # Test Harness Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint attribute If TSTAT.S.F05 is true
                 await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedHeatingSetpoint(MaxHeatSetpointLimitValue), endpoint_id=endpoint)
@@ -321,17 +321,14 @@ class TC_TSTAT_2_2(MatterBaseTest):
         if self.pics_guard(hasOccupancyFeature and hasCoolingFeature):
             if self.pics_guard(hasAutoModeFeature):
                 # Test Harness Writes If TSTAT.S.F05(AUTO) LowerLimit = Max(MinCoolSetpointLimit, (UnoccupiedCoolingSetpoint + MinSetpointDeadBand)) to UnoccupiedCoolingSetpoint attribute
-                # LowerLimit = Max(MinCoolSetpointLimit,(UnoccupiedCoolingSetpoint + MinSetpointDeadBand))
-                await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedCoolingSetpoint(max(MinCoolSetpointLimitValue, (UnoccupiedCoolingSetpointValue + (MinSetpointDeadBandValue)))), endpoint_id=endpoint)
+                LowerLimit = max(MinCoolSetpointLimitValue, (UnoccupiedCoolingSetpointValue + MinSetpointDeadBandValue))
+                await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedCoolingSetpoint(LowerLimit), endpoint_id=endpoint)
 
-                # Test Harness Writes the limit of MinCoolSetpointLimit to UnoccupiedCoolingSetpoint attribute
-                status = await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedCoolingSetpoint(MaxCoolSetpointLimitValue), endpoint_id=endpoint, expect_success=False)
-                asserts.assert_equal(status, Status.ConstraintError)
             else:
                 # Test Harness Writes the limit of MinCoolSetpointLimit to UnoccupiedCoolingSetpoint attribute
                 await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedCoolingSetpoint(MinCoolSetpointLimitValue), endpoint_id=endpoint)
-                # Test Harness Writes the limit of MaxCoolSetpointLimit to UnoccupiedCoolingSetpoint attribute
-                await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedCoolingSetpoint(MaxCoolSetpointLimitValue), endpoint_id=endpoint)
+            # Test Harness Writes the limit of MaxCoolSetpointLimit to UnoccupiedCoolingSetpoint attribute
+            await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedCoolingSetpoint(MaxCoolSetpointLimitValue), endpoint_id=endpoint)
 
         self.step("5a")
 
@@ -364,8 +361,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
         if self.pics_guard(hasOccupancyFeature and hasHeatingFeature):
             if self.pics_guard(hasAutoModeFeature):
                 # Test Harness Writes the limit of MaxHeatSetpointLimit to UnoccupiedHeatingSetpoint attribute
-                status = await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedHeatingSetpoint(MaxHeatSetpointLimitValue), endpoint_id=endpoint, expect_success=False)
-                asserts.assert_equal(status, Status.ConstraintError)
+                await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedHeatingSetpoint(max(MaxHeatSetpointLimitValue, (UnoccupiedCoolingSetpointValue + MinSetpointDeadBandValue))), endpoint_id=endpoint)
+
             else:
                 # Test Harness Writes the limit of MaxHeatSetpointLimit to UnoccupiedHeatingSetpoint attribute
                 await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedHeatingSetpoint(MaxHeatSetpointLimitValue), endpoint_id=endpoint)
@@ -412,7 +409,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
             if self.pics_guard(hasAutoModeFeature):
                 # Test Harness Writes If TSTAT.S.F05(AUTO) UpperLimit = Min(MaxHeatSetpointLimit, (MinCoolSetpointLimit - MinSetpointDeadBand)) to MinHeatSetpointLimit attribute when Auto is enabled
                 # UpperLimit = Min(MaxHeatSetpointLimit,(MinCoolSetpointLimit - MinSetpointDeadBand)) not possible in YAML
-                await self.write_single_attribute(attribute_value=cluster.Attributes.MinHeatSetpointLimit(min(MaxHeatSetpointLimitValue, (MinCoolSetpointLimitValue - (MinSetpointDeadBandValue)))), endpoint_id=endpoint)
+                await self.write_single_attribute(attribute_value=cluster.Attributes.MinHeatSetpointLimit(min(MaxHeatSetpointLimitValue, (MinCoolSetpointLimitValue - MinSetpointDeadBandValue))), endpoint_id=endpoint)
             else:
                 # Test Harness Writes the limit of MaxHeatSetpointLimit to MinHeatSetpointLimit attribute
                 await self.write_single_attribute(attribute_value=cluster.Attributes.MinHeatSetpointLimit(MaxHeatSetpointLimitValue), endpoint_id=endpoint)
@@ -427,6 +424,13 @@ class TC_TSTAT_2_2(MatterBaseTest):
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxHeatSetpointLimit)
             asserts.assert_greater_equal(val, MinHeatSetpointLimitValue)
             asserts.assert_less_equal(val, AbsMaxHeatSetpointLimitValue)
+
+            # Test Harness Writes a value back that is different but valid for MaxHeatSetpointLimit attribute
+            await self.write_single_attribute(attribute_value=cluster.Attributes.MaxHeatSetpointLimit(MinHeatSetpointLimitValue + 1), endpoint_id=endpoint)
+
+            # Test Harness Reads it back again to confirm the successful write of MaxHeatSetpointLimit attribute
+            val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxHeatSetpointLimit)
+            asserts.assert_equal(val, MinHeatSetpointLimitValue + 1)
 
         self.step("7b")
 
@@ -508,7 +512,6 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
             if self.pics_guard(hasAutoModeFeature):
                 # Test Harness Writes If TSTAT.S.F05(AUTO) LowerLimit = Max(AbsMinCoolSetpointLimit, (MinHeatSetpointLimit + MinSetpointDeadBand)) to MinCoolSetpointLimit attribute
-                # LowerLimit = Max(AbsMinCoolSetpointLimit,(MinHeatSetpointLimit + MinSetpointDeadBand))
                 await self.write_single_attribute(attribute_value=cluster.Attributes.MinCoolSetpointLimit(max(AbsMinCoolSetpointLimitValue, MinHeatSetpointLimitValue + MinSetpointDeadBandValue)), endpoint_id=endpoint)
             else:
                 # Test Harness Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit attribute
@@ -534,7 +537,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
         if self.pics_guard(hasCoolingFeature and hasMaxCoolSetpointLimitAttribute):
             # Test Harness Writes MaxCoolSetpointLimit to value below the AbsMinCoolSetpointLimit
-            status = await self.write_single_attribute(attribute_value=cluster.Attributes.MaxCoolSetpointLimit(AbsMinCoolSetpointLimitValue - 1), endpoint_id=endpoint, expect_success=False)
+            status = await self.write_single_attribute(attribute_value=cluster.Attributes.MaxCoolSetpointLimit(MinCoolSetpointLimitValue - 1), endpoint_id=endpoint, expect_success=False)
             asserts.assert_equal(status, Status.ConstraintError)
 
             # Test Harness Writes MaxCoolSetpointLimit to value above the AbsMaxCoolSetpointLimit
@@ -552,12 +555,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
                 await self.write_single_attribute(attribute_value=cluster.Attributes.MaxCoolSetpointLimit(MinCoolSetpointLimitValue), endpoint_id=endpoint, expect_success=False)
 
                 # Test Harness Writes If TSTAT.S.F05(AUTO) LowerLimit = Max(MinCoolSetpointLimit, (MaxHeatSetpointLimit + MinSetpointDeadBand)) to MaxCoolSetpointLimit attribute
-                # LowerLimit = Max(MinCoolSetpointLimit,(MaxHeatSetpointLimit + MinSetpointDeadBand))
                 await self.write_single_attribute(attribute_value=cluster.Attributes.MaxCoolSetpointLimit(max(MinCoolSetpointLimitValue, min(AbsMaxCoolSetpointLimitValue, (MaxHeatSetpointLimitValue + MinSetpointDeadBandValue)))), endpoint_id=endpoint)
             else:
-                # Test Harness Writes the limit of MinCoolSetpointLimit to MaxCoolSetpointLimit attribute
-                await self.write_single_attribute(attribute_value=cluster.Attributes.MaxCoolSetpointLimit(MinCoolSetpointLimitValue), endpoint_id=endpoint)
-
                 # Test Harness Writes the limit of MinCoolSetpointLimit to MaxCoolSetpointLimit attribute
                 await self.write_single_attribute(attribute_value=cluster.Attributes.MaxCoolSetpointLimit(MinCoolSetpointLimitValue), endpoint_id=endpoint)
 
