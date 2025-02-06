@@ -3610,4 +3610,85 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     XCTAssertFalse([controller isRunning]);
 }
 
+- (void)testMTRDeviceDealloc
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_queue_create("test.queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSNumber * nodeID = @(333);
+    NSNumber * fabricID = @(444);
+
+    NSError * error;
+
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // Now commission the device, to test that that works.
+    NSNumber * deviceID = @(22);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    // We should have established CASE using our operational key.
+    XCTAssertEqual(operationalKeys.signatureCount, 1);
+
+    __block BOOL subscriptionReportEnd1 = NO;
+    XCTestExpectation * subscriptionCallbackDeleted = [self expectationWithDescription:@"Subscription callback deleted"];
+    @autoreleasepool {
+        __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+        __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+        XCTestExpectation * subscriptionReportBegin = [self expectationWithDescription:@"Subscription report begin"];
+
+        delegate.onReportBegin = ^{
+            [subscriptionReportBegin fulfill];
+        };
+
+        delegate.onReportEnd = ^{
+            subscriptionReportEnd1 = YES;
+        };
+
+        delegate.onSubscriptionCallbackDelete = ^{
+            [subscriptionCallbackDeleted fulfill];
+        };
+
+        [device setDelegate:delegate queue:queue];
+
+        [self waitForExpectations:@[ subscriptionReportBegin ] timeout:60];
+    }
+
+    // report should still be ongoing
+    XCTAssertFalse(subscriptionReportEnd1);
+
+    // dealloc -> delete should be called soon after the autoreleasepool reaps
+    [self waitForExpectations:@[ subscriptionCallbackDeleted ] timeout:60];
+
+    // Reset our commissionee.
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
 @end

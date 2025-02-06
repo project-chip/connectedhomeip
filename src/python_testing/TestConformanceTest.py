@@ -22,7 +22,7 @@ from chip.testing.basic_composition import arls_populated
 from chip.testing.conformance import ConformanceDecision
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from chip.testing.spec_parsing import build_xml_clusters, build_xml_device_types
+from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types
 from mobly import asserts
 from TC_DeviceConformance import DeviceConformanceTests
 
@@ -118,8 +118,10 @@ def is_mandatory(conformance):
 
 class TestConformanceSupport(MatterBaseTest, DeviceConformanceTests):
     def setup_class(self):
-        self.xml_clusters, self.problems = build_xml_clusters()
-        self.xml_device_types, problems = build_xml_device_types()
+        # Latest fully qualified version
+        # TODO: It might be good to find a way to run this against each directory.
+        self.xml_clusters, self.problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
+        self.xml_device_types, problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4)
         self.problems.extend(problems)
 
     @async_test_body
