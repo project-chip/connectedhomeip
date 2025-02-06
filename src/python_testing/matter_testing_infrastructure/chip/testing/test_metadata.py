@@ -37,12 +37,22 @@ class TestMetadataReader(unittest.TestCase):
     '''
 
     env_file_content = '''
-    ALL_CLUSTERS_APP: out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app
-    CHIP_LOCK_APP: out/linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-lock-app
-    ENERGY_MANAGEMENT_APP: out/linux-x64-energy-management-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-energy-management-app
-    TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}
-    TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}
-    TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}
+    app-args:
+      discriminator: "1234"
+      trace-to: "json:${TRACE_APP}.json"
+    
+    script-args:
+      commissioning-method: "on-network"
+      trace-to-json: "json:${TRACE_TEST_JSON}.json"
+      trace-to-perfetto: "perfetto:${TRACE_TEST_PERFETTO}.perfetto"
+    
+    environment:
+      ALL_CLUSTERS_APP: out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app
+      CHIP_LOCK_APP: out/linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-lock-app
+      ENERGY_MANAGEMENT_APP: out/linux-x64-energy-management-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-energy-management-app
+      TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}
+      TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}
+      TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}
     '''
 
     expected_metadata = Metadata(

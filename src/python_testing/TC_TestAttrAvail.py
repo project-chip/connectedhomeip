@@ -22,7 +22,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
@@ -34,10 +34,9 @@
 #     quiet: true
 #   run2:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --passcode 20202021 --KVS kvs1
+#     app-args: --passcode 20202021 --KVS kvs1
 #     script-args: >
 #       --storage-path admin_storage.json
-#       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 1
 #       --commissioning-method on-network
@@ -45,11 +44,10 @@
 #     quiet: true
 #   run3:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1
+#     app-args: --KVS kvs1
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --endpoint 1
-#       --discriminator 1234
 #       --passcode 20202021
 #     factory-reset: false
 #     quiet: true
