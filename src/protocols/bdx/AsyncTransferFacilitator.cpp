@@ -178,9 +178,6 @@ CHIP_ERROR AsyncResponder::Init(System::Layer * layer, Messaging::ExchangeContex
 
 void AsyncResponder::NotifyEventHandled(const TransferSession::OutputEventType eventType, CHIP_ERROR status)
 {
-    ChipLogDetail(BDX, "NotifyEventHandled : Event %s Error %" CHIP_ERROR_FORMAT,
-                  TransferSession::OutputEvent::TypeToString(eventType), status.Format());
-
     // If this is the end of the transfer (whether a clean end, or some sort of error condition), ensure
     // that we destroy ourselves after unwinding the processing loop in the ProcessOutputEvents API.
     // We can ignore the status for these output events because none of them are supposed to result in
@@ -194,6 +191,8 @@ void AsyncResponder::NotifyEventHandled(const TransferSession::OutputEventType e
         eventType == TransferSession::OutputEventType::kTransferTimeout ||
         eventType == TransferSession::OutputEventType::kStatusReceived)
     {
+        ChipLogProgress(BDX, "NotifyEventHandled : Event %s Error %" CHIP_ERROR_FORMAT,
+                        TransferSession::OutputEvent::TypeToString(eventType), status.Format());
         mDestroySelfAfterProcessingEvents = true;
     }
     else if (status != CHIP_NO_ERROR)
