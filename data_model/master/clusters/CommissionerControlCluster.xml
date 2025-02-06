@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0751" name="Commissioner Control Cluster" revision="1">
   <revisionHistory>
@@ -91,7 +93,9 @@ Davis, CA 95616, USA
       </field>
       <field id="3" name="Label" type="string">
         <optionalConform/>
-        <constraint type="maxLength" value="64"/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="CommissionNode" direction="commandToServer" response="ReverseOpenCommissioningWindow">
@@ -102,29 +106,48 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="ResponseTimeoutSeconds" type="uint16" default="30">
         <mandatoryConform/>
-        <constraint type="between" from="30" to="120"/>
+        <constraint>
+          <between>
+            <from value="30"/>
+            <to value="120"/>
+          </between>
+        </constraint>
       </field>
     </command>
     <command id="0x02" name="ReverseOpenCommissioningWindow" direction="responseFromServer">
       <mandatoryConform/>
       <field id="0" name="CommissioningTimeout" type="uint16">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="PAKEPasscodeVerifier" type="octstr">
         <mandatoryConform/>
       </field>
       <field id="2" name="Discriminator" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="4095"/>
+        <constraint>
+          <max value="4095"/>
+        </constraint>
       </field>
       <field id="3" name="Iterations" type="uint32">
         <mandatoryConform/>
-        <constraint type="between" from="1000" to="100000"/>
+        <constraint>
+          <between>
+            <from value="1000"/>
+            <to value="100000"/>
+          </between>
+        </constraint>
       </field>
       <field id="4" name="Salt" type="octstr">
         <mandatoryConform/>
-        <constraint type="lengthBetween" from="16" to="32"/>
+        <constraint>
+          <lengthBetween>
+            <from value="16"/>
+            <to value="32"/>
+          </lengthBetween>
+        </constraint>
       </field>
     </command>
   </commands>
@@ -140,7 +163,9 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="StatusCode" type="status">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </event>
   </events>
