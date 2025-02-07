@@ -64,6 +64,11 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(deleteNodeID
                                                : (NSNumber *) nodeID, deleteNodeID
                                                : (NSNumber *) nodeID)
 
+MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
+    NSArray<NSNumber *> *,
+    @[], // Default return value
+    getNodesWithStoredDataWithReply)
+
 - (void)_updateRegistrationInfo
 {
     NSMutableDictionary * registrationInfo = [NSMutableDictionary dictionary];
@@ -132,13 +137,28 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(deleteNodeID
     NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
     [allowedClasses addObjectsFromArray:@[
         [MTRCommandPath class],
-        [MTRAttributePath class],
     ]];
 
     [interface setClasses:allowedClasses
               forSelector:@selector(deviceController:nodeID:invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:serverSideProcessingTimeout:completion:)
             argumentIndex:0
                   ofReply:YES];
+
+    // invokeCommands has the same reply types as invokeCommandWithEndpointID.
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:nodeID:invokeCommands:completion:)
+            argumentIndex:0
+                  ofReply:YES];
+
+    // invokeCommands gets handed MTRCommandWithRequiredResponse (which includes
+    // MTRCommandPath, which is already in allowedClasses).
+    [allowedClasses addObjectsFromArray:@[
+        [MTRCommandWithRequiredResponse class],
+    ]];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:nodeID:invokeCommands:completion:)
+            argumentIndex:2
+                  ofReply:NO];
 
     // readAttributePaths: gets handed an array of MTRAttributeRequestPath.
     allowedClasses = [MTRDeviceController_XPC _allowedClasses];

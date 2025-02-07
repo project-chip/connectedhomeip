@@ -31,6 +31,8 @@ import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
 from chip.clusters.Attribute import ValueDecodeFailure
+from chip.testing.conformance import ConformanceException
+from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
 from mobly import asserts
 
 
@@ -210,3 +212,23 @@ class BasicCompositionTests:
             asserts.fail(msg=self.problems[-1].problem)
         else:
             asserts.fail(msg)
+
+    def _get_dm(self) -> PrebuiltDataModelDirectory:
+        try:
+            spec_version = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
+        except KeyError:
+            asserts.fail(
+                "Specification Version not found on device - ensure device bas a basic information cluster on EP0 supporting Specification Version")
+        try:
+            return dm_from_spec_version(spec_version)
+        except ConformanceException as e:
+            asserts.fail(f"Unable to identify specification version: {e}")
+
+    def build_spec_xmls(self):
+        dm = self._get_dm()
+        logging.info("----------------------------------------------------------------------------------")
+        logging.info(f"-- Running tests against Specification version {dm.dirname}")
+        logging.info("----------------------------------------------------------------------------------")
+        self.xml_clusters, self.problems = build_xml_clusters(dm)
+        self.xml_device_types, problems = build_xml_device_types(dm)
+        self.problems.extend(problems)
