@@ -27,14 +27,14 @@ RUN set -x \
     && : # last line
 
 # Download and install android command line tool (for installing `sdkmanager`)
-# We need create latest folder inide cmdline-tools, since latest android commandline tool looks for this latest folder
+# We need create 10.0 folder inide cmdline-tools, since latest android commandline tool looks for this latest folder
 # when running sdkmanager --licenses
 RUN set -x \
     && wget -O /tmp/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-9862592_latest.zip \
     && cd /opt/android/sdk \
     && mkdir -p temp \
     && unzip /tmp/cmdline-tools.zip -d temp \
-    && mkdir -p cmdline-tools/latest \
+    && mkdir -p cmdline-tools/10.0 \
     && cp -rf temp/cmdline-tools/* cmdline-tools/10.0 \
     && rm -rf temp \
     && test -d /opt/android/sdk/cmdline-tools \
