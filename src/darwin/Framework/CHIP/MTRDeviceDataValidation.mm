@@ -178,14 +178,14 @@ BOOL MTRInvokeResponseIsWellFormed(NSArray<MTRDeviceResponseValueDictionary> * r
     return YES;
 }
 
-BOOL MTRInvokeResponsesAreWellFormed(NSArray<MTRDeviceResponseValueDictionary> * response)
+BOOL MTRInvokeResponsesAreWellFormed(NSArray<MTRDeviceResponseValueDictionary> * responses)
 {
-    if (!MTR_SAFE_CAST(response, NSArray)) {
-        MTR_LOG_ERROR("Invoke response is not an array: %@", response);
+    if (!MTR_SAFE_CAST(responses, NSArray)) {
+        MTR_LOG_ERROR("Invoke responses are not an array: %@", responses);
         return NO;
     }
 
-    for (MTRDeviceResponseValueDictionary responseValue in response) {
+    for (MTRDeviceResponseValueDictionary responseValue in responses) {
         // Each entry must be a dictionary that has MTRCommandPathKey.
 
         if (!MTR_SAFE_CAST(responseValue, NSDictionary) || !MTR_SAFE_CAST(responseValue[MTRCommandPathKey], MTRCommandPath)) {
