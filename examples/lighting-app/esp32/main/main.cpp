@@ -39,11 +39,6 @@
 #include <platform/ESP32/ESP32Utils.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
-#if CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS
-#include <tracing/esp32_trace/insights_sys_stats.h>
-#define START_TIMEOUT_MS 60000
-#endif
-
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
@@ -64,21 +59,36 @@
 #include <platform/ESP32/ESP32SecureCertDACProvider.h>
 #endif
 
+
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+#include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
+#include <tracing/esp32_diagnostic_trace/DiagnosticStorageManager.h>
+#include <DiagnosticDataDelegate.h>
+
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
 #include <esp_insights.h>
-#include <tracing/esp32_trace/esp32_tracing.h>
 #include <tracing/registry.h>
-#endif
+#define START_TIMEOUT_MS 60000
+#endif // CONFIG_ENABLE_ESP_INSIGHTS_TRACE
+
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
+
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+using namespace ::chip::Tracing::Diagnostics;
+static uint8_t endUserBuffer[CONFIG_END_USER_BUFFER_SIZE]; // Global static buffer used to store diagnostics
+CircularDiagnosticBuffer diagnosticStorage(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE);
+
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
 extern const char insights_auth_key_start[] asm("_binary_insights_auth_key_txt_start");
 extern const char insights_auth_key_end[] asm("_binary_insights_auth_key_txt_end");
-#endif
+#endif // CONFIG_ENABLE_ESP_INSIGHTS_TRACE
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 static const char TAG[] = "light-app";
 
@@ -133,10 +143,12 @@ static void InitServer(intptr_t context)
     DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 
+
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
     esp_insights_config_t config = {
         .log_type = ESP_DIAG_LOG_TYPE_ERROR | ESP_DIAG_LOG_TYPE_WARNING | ESP_DIAG_LOG_TYPE_EVENT,
-        .auth_key = insights_auth_key_start,
+        .auth_key = insights_auth_key_start
     };
 
     esp_err_t ret = esp_insights_init(&config);
@@ -145,14 +157,16 @@ static void InitServer(intptr_t context)
     {
         ESP_LOGE(TAG, "Failed to initialize ESP Insights, err:0x%x", ret);
     }
+    static ESP32Diagnostics diagnosticBackend(&diagnosticStorage);
+    Tracing::Register(diagnosticBackend);
 
-    static Tracing::Insights::ESP32Backend backend;
-    Tracing::Register(backend);
-
-#if CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS
-    chip::System::Stats::InsightsSystemMetrics::GetInstance().RegisterAndEnable(chip::System::Clock::Timeout(START_TIMEOUT_MS));
-#endif
-#endif
+    // Use the base class interface instead of the implementation class directly
+    chip::Diagnostics::DiagnosticDataDelegate & diagnosticDelegate = 
+        chip::Diagnostics::DiagnosticDataDelegate::GetInstance(&diagnosticStorage);
+    
+    diagnosticDelegate.StartPeriodicDiagnostics(chip::System::Clock::Timeout(START_TIMEOUT_MS));
+#endif // CONFIG_ENABLE_ESP_INSIGHTS_TRACE
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 }
 
 extern "C" void app_main()
