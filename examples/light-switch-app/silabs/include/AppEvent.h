@@ -30,6 +30,13 @@ struct AppEvent
         kEventType_Timer,
         kEventType_Light,
         kEventType_Install,
+        kEventType_ResetWarning,
+        kEventType_ResetCanceled,
+        // Button events
+        kEventType_UpPressed,
+        kEventType_UpReleased,
+        kEventType_DownPressed,
+        kEventType_DownReleased,
     };
 
     uint16_t Type;
@@ -46,9 +53,8 @@ struct AppEvent
         } TimerEvent;
         struct
         {
-            uint8_t Action;
-            int32_t Actor;
-        } LightEvent;
+            void * Context;
+        } LightSwitchEvent;
     };
 
     EventHandler Handler;

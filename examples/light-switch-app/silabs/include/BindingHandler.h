@@ -19,10 +19,28 @@
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "app-common/zap-generated/ids/Commands.h"
 #include "lib/core/CHIPError.h"
+#include <platform/CHIPDeviceLayer.h>
+#include <app/clusters/bindings/bindings.h>
+#include <variant>
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters::LevelControl;
 
 CHIP_ERROR InitBindingHandler();
 void SwitchWorkerFunction(intptr_t context);
 void BindingWorkerFunction(intptr_t context);
+
+
+struct CommandBase
+{
+    chip::BitMask<OptionsBitmap> optionsMask;
+    chip::BitMask<OptionsBitmap> optionsOverride;
+
+    // Constructor to initialize the BitMask
+    CommandBase()
+        : optionsMask(0), optionsOverride(0) {}
+};
 
 struct BindingCommandData
 {
@@ -30,4 +48,27 @@ struct BindingCommandData
     chip::CommandId commandId;
     chip::ClusterId clusterId;
     bool isGroup = false;
+
+    struct MoveToLevel : public CommandBase
+    {
+        uint8_t level;
+        DataModel::Nullable<uint16_t> transitionTime;
+    };
+    struct Move : public CommandBase
+    {
+        MoveModeEnum moveMode;
+        DataModel::Nullable<uint8_t> rate;
+    };
+    struct Step : public CommandBase
+    {
+        StepModeEnum stepMode;
+        uint8_t stepSize;
+        DataModel::Nullable<uint16_t> transitionTime;
+    };
+    struct Stop : public CommandBase
+    {
+        // Inherits optionsMask and optionsOverride from CommandBase
+    };
+    // Use std::variant to hold different command types
+    std::variant<MoveToLevel, Move, Step, Stop> commandData;
 };
