@@ -291,7 +291,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             TestStep(33, 'TH1 waits for PIXIT.CGEN.FailsafeExpiryLengthSeconds.'),
             TestStep(34, 'TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster.'),
             # TestStep(35, '''TH2 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds
-            #           and the Breadcrumb value as 1.'''),
+            #            and the Breadcrumb value as 1.'''),
             TestStep(36, 'TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds field set to 0.'),
             TestStep(37, 'TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds field set to maxFailsafe.'),
             TestStep(38, 'TH1 saves the current wall time clock in seconds as Tstart,'),
@@ -382,9 +382,14 @@ class TC_CGEN_2_2(MatterBaseTest):
 
             # Get the start time to measure the elapsed time
             start_time = time.time()
+            target_time = start_time + (maxFailsafe + .5)
 
             # Wait for the full duration of the maxFailsafe time with an additional 0.5-second buffer
-            await asyncio.sleep(maxFailsafe + 0.5)
+            while time.time() < target_time:
+                try:
+                    await asyncio.sleep(0.1)
+                except asyncio.CancelledError:
+                    continue
 
             # Calculate and log the elapsed time since the start of the wait
             elapsed_time = time.time() - start_time
@@ -686,10 +691,9 @@ class TC_CGEN_2_2(MatterBaseTest):
         # Wait the half of the maximum failsafe time using a while loop
         while time.time() < target_time:
             try:
-                await asyncio.sleep(0.1)  # Esperar un tiempo pequeño en cada iteración
+                await asyncio.sleep(0.1)
             except asyncio.CancelledError:
-                # Si se lanza el TimeoutError, simplemente lo ignoramos
-                continue  # Ignoramos el error y seguimos esperando hasta que se cumpla el tiempo objetivo
+                continue
 
         elapsed_time = time.time() - start_time
         logger.info(f'Step #33: {run_type} - Elapsed time: {elapsed_time} seconds after waiting for half of the maxFailsafe.')
@@ -720,12 +724,10 @@ class TC_CGEN_2_2(MatterBaseTest):
         target_time = start_time + maxFailsafe + 1
         while time.time() < target_time:
             try:
-                await asyncio.sleep(0.1)  # Esperar un tiempo pequeño en cada iteración
+                await asyncio.sleep(0.1)
             except asyncio.CancelledError:
-                # Si se lanza el TimeoutError, simplemente lo ignoramos
-                continue  # Ignoramos el error y seguimos esperando hasta que se cumpla el tiempo objetivo
+                continue
 
-        # await asyncio.sleep(maxFailsafe + 1)
         elapsed_time = time.time() - start_time
         logger.info(f'Step #33: {run_type} - Failsafe timer (max_fail_safe) expired after {elapsed_time} seconds.')
 
@@ -747,10 +749,8 @@ class TC_CGEN_2_2(MatterBaseTest):
         # self.step(35)
         # cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe, breadcrumb=1)
         # resp = await self.send_single_cmd(
-        #     dev_ctrl=self.default_controller,
-        #     node_id=self.dut_node_id,
-        #     # dev_ctrl=TH2,
-        #     # node_id=newNodeId+1,
+        #     dev_ctrl=TH2,
+        #     node_id=newNodeId+1,
         #     cmd=cmd)
         # # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'BusyWithOtherAdmin'(4)
         # logger.info(f'Step #35 - TH2 ArmFailSafeResponse with ErrorCode as BusyWithOtherAdmin ({resp.errorCode})')
@@ -826,7 +826,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             target_time = start_time + (maxFailsafe / 2)
             # Make TH1 wait until the current time is greater than or equal to the target time
             while time.time() < target_time:
-                time.sleep(0.1)  # Wait for 100ms to avoid excessive CPU usage
+                await asyncio.sleep(0.1)
 
             # Check if the elapsed time since start_time has reached or exceeded half of the maxFailsafe time (maxFailsafe / 2).
             # If the current time surpasses the start time by at least half of the maxFailsafe time, the TH1 process is allowed to proceed.
@@ -879,7 +879,7 @@ class TC_CGEN_2_2(MatterBaseTest):
 
             # Make TH1 wait until the current time is greater than or equal to the target time
             while time.time() < target_time:
-                time.sleep(0.1)  # Wait for 100ms to avoid excessive CPU usage
+                await asyncio.sleep(0.1)
 
             # Checks if the elapsed time from start_time has met or exceeded maxFailsafe
             # If the current time has passed the start time by at least maxFailsafe, the TH1 process can proceed
