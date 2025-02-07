@@ -522,8 +522,8 @@ def python_tests(
             run_path = as_runner(f"out/{target.target}/{target.binary}")
             f.write(f"{target.key}: {run_path}\n")
         f.write("TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}\n")
-        f.write("TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}")
-        f.write("TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}")
+        f.write("TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}\n")
+        f.write("TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}\n")
 
     if not test_filter.startswith("*"):
         test_filter = "*" + test_filter
