@@ -258,7 +258,7 @@ def gen_test_certs(chip_cert: str,
                     ]
 
         if paa_cert:
-            cmd += [ "--authorized-paa-cert", paa_cert ]
+            cmd += ["--authorized-paa-cert", paa_cert]
 
         log.info("Generate CD: {}".format(shlex.join(cmd)))
         subprocess.run(cmd)
@@ -507,7 +507,7 @@ def main():
 
     log.basicConfig(format='[%(levelname)s] %(message)s', level=log.INFO)
 
-    print (args.dac_pid)
+    print(args.dac_pid)
     check_arg(args)
 
     passcode = gen_test_passcode(args.passcode)

@@ -447,7 +447,6 @@ class Flasher(firmware_utils.Flasher):
                 new_name = os.path.join(self.work_dir, "ota_images", fw_name + ota_img_name[len("FW_OTA"):])
                 os.system("mv {} {}".format(img, new_name))
 
-
         def construct_prog_confg():
 
             iot_cfg = {
@@ -507,7 +506,6 @@ class Flasher(firmware_utils.Flasher):
                 toml.dump(iot_cfg, f)
 
             return conf_toml
-
 
         def exe_prog_cmd(flashtool_exe, mfd_addr, flashtool_path):
 
