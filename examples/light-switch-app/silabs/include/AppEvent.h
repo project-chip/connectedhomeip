@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 struct AppEvent;
 typedef void (*EventHandler)(AppEvent *);
 
