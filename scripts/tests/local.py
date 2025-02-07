@@ -417,6 +417,7 @@ def python_tests(
         "TestConformanceTest.py",  # Unit test of the conformance test (TC_DeviceConformance) - does not run against an app.
         "TestIdChecks.py",
         "TestSpecParsingDeviceType.py",
+        "TestSpecParsingSelection.py",
         "TestMatterTestingSupport.py",
         "TestSpecParsingSupport.py",
         "TestTimeSyncTrustedTimeSource.py",

@@ -77,6 +77,7 @@ def main(search_directory, env_file):
         "TestConformanceTest.py",  # Unit test of the conformance test (TC_DeviceConformance) - does not run against an app
         "TestIdChecks.py",  # Unit test - does not run against an app
         "TestSpecParsingDeviceType.py",  # Unit test - does not run against an app
+        "TestSpecParsingSelection.py",  # Unit test - does not run against an app
         "TestConformanceTest.py",  # Unit test - does not run against an app
         "TestMatterTestingSupport.py",  # Unit test - does not run against an app
         "TestSpecParsingSupport.py",  # Unit test - does not run against an app
