@@ -26,7 +26,6 @@ import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
 import chip.devicecontroller.model.DataVersionFilter;
 import chip.devicecontroller.model.InvokeElement;
-import java.lang.ref.Cleaner;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -44,8 +43,6 @@ public class ChipDeviceController {
   private CompletionListener completionListener;
   private ScanNetworksListener scanNetworksListener;
   private NOCChainIssuer nocChainIssuer;
-
-  private final Cleaner.Cleanable cleanable;
 
   /**
    * To load class and jni, we need to new AndroidChipPlatform after jni load but before new
@@ -70,17 +67,6 @@ public class ChipDeviceController {
       throw new NullPointerException("params cannot be null");
     }
     deviceControllerPtr = newDeviceController(params);
-
-    this.cleanable =
-        Cleaner.create()
-            .register(
-                this,
-                () -> {
-                  if (deviceControllerPtr != 0) {
-                    deleteDeviceController(deviceControllerPtr);
-                    deviceControllerPtr = 0;
-                  }
-                });
   }
 
   public void setCompletionListener(CompletionListener listener) {
@@ -1785,6 +1771,16 @@ public class ChipDeviceController {
 
   static {
     System.loadLibrary("CHIPController");
+  }
+
+  @SuppressWarnings("deprecation")
+  protected void finalize() throws Throwable {
+    super.finalize();
+
+    if (deviceControllerPtr != 0) {
+      deleteDeviceController(deviceControllerPtr);
+      deviceControllerPtr = 0;
+    }
   }
 
   /** Interface to implement custom operational credentials issuer (NOC chain generation). */
