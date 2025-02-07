@@ -235,7 +235,8 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
     }
     else
     {
-        ChipLogError(NotSpecified, "sFactoryDataProvider.Init() failed");
+        ChipLogError(NotSpecified, "factory data provider is failed to initialize, use example DAC provider.");
+        SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     }
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

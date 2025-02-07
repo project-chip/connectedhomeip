@@ -178,8 +178,7 @@ extern "C" void vAssertCalled(void)
 
     portABORT();
 
-    while (true)
-        ;
+    while (true) ;
 }
 
 extern "C" void user_vAssertCalled(void) __attribute__((weak, alias("vAssertCalled")));

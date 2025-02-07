@@ -56,8 +56,9 @@ extern "C" void vAssertCalled(void)
         printf("vAssertCalled, ra = %p in task %s\r\n", (void *) ra, pcTaskGetName(NULL));
     }
 
-    while (true)
-        ;
+    abort();
+
+    while (true) ;
 }
 
 extern "C" void bflb_assert(void) __attribute__((weak, alias("vAssertCalled")));
