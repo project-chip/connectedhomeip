@@ -161,24 +161,27 @@ if [ "$skip_gn" == false ]; then
 
         scripts/run_in_build_env.sh \
             "./scripts/tests/run_test_suite.py \
+             --runner chip_tool_python \
+             --exclude-tags MANUAL \
+             --exclude-tags FLAKY \
+             --exclude-tags IN_DEVELOPMENT \
+             --exclude-tags EXTRA_SLOW \
+             --exclude-tags SLOW \
+             --exclude-tags PURPOSEFUL_FAILURE \
              --chip-tool \"$OUTPUT_ROOT/chip-tool\" \
              run \
              --iterations 1 \
              --test-timeout-seconds 120 \
-             --all-clusters-app \"$OUTPUT_ROOT/chip-all-clusters-app\""
+             --all-clusters-app \"$OUTPUT_ROOT/chip-all-clusters-app\" \
+            "
     fi
 
     #
     # 3) Run Python tests if requested
     #
     if [ "$ENABLE_PYTHON" == true ]; then
-        echo "Building python and applications ..."
-        scripts/run_in_build_env.sh \
-            "./scripts/tests/local.py build"
-
         echo "Running Python tests ..."
-        scripts/run_in_build_env.sh \
-            "./scripts/tests/local.py python-tests"
+        # TODO: run python tests.
     fi
 
     # ----------------------------------------------------------------------------

@@ -500,4 +500,4 @@ jobs:
                 platform: linux
 
             - name: Run Build Coverage
-              run: ./scripts/build_coverage.sh
+              run: ./scripts/build_coverage.sh --yaml
