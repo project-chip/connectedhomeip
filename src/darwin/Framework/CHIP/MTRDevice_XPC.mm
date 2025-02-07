@@ -488,7 +488,7 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
                              return;
                          }
 
-                         if (responses != nil && !MTRInvokeResponseIsWellFormed(responses)) {
+                         if (responses != nil && !MTRInvokeResponsesAreWellFormed(responses)) {
                              MTR_LOG_ERROR("%@ got invoke responses for %@ that has invalid data: %@", self, commands, responses);
                              completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
                              return;
