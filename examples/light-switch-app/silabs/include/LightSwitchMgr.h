@@ -19,14 +19,14 @@
 
 #pragma once
 
+#include "AppEvent.h"
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/clusters/bindings/bindings.h>
 #include <app/util/basic-types.h>
+#include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
-#include <app/clusters/bindings/bindings.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include "AppEvent.h"
-#include <cmsis_os2.h>
 #include <string>
 
 using namespace chip;
@@ -49,10 +49,7 @@ public:
     };
 
     static constexpr Clusters::LevelControl::Commands::Step::Type stepCommand = {
-        .stepSize = 1,
-        .transitionTime = 0,
-        .optionsMask = 0,
-        .optionsOverride = 0
+        .stepSize = 1, .transitionTime = 0, .optionsMask = 0, .optionsOverride = 0
     };
 
     struct Timer
@@ -106,19 +103,19 @@ private:
     static LightSwitchMgr sSwitch;
 
     Timer * mLongPressTimer      = nullptr;
-    bool mFunctionButtonPressed  = false;    // True when button0 is pressed, used to trigger factory reset
-    bool mActionButtonPressed    = false;    // True when button1 is pressed, used to initiate toggle or level-up/down
-    bool mActionButtonSuppressed = false;    // True when both button0 and button1 are pressed, used to switch step direction
+    bool mFunctionButtonPressed  = false; // True when button0 is pressed, used to trigger factory reset
+    bool mActionButtonPressed    = false; // True when button1 is pressed, used to initiate toggle or level-up/down
+    bool mActionButtonSuppressed = false; // True when both button0 and button1 are pressed, used to switch step direction
     bool mResetWarning           = false;
 
     // Default Step direction for Level control
-    StepModeEnum stepDirection   = StepModeEnum::kUp;
+    StepModeEnum stepDirection = StepModeEnum::kUp;
 
     static void OnLongPressTimeout(Timer & timer);
     LightSwitchMgr() = default;
 
-     /**
-     * @brief This function will be called when PB0 is 
+    /**
+     * @brief This function will be called when PB0 is
      *        long-pressed to trigger the factory-reset
      */
     void HandleLongPress();
@@ -127,8 +124,8 @@ private:
 
     chip::EndpointId mLightSwitchEndpoint   = chip::kInvalidEndpointId;
     chip::EndpointId mGenericSwitchEndpoint = chip::kInvalidEndpointId;
-   
-     /**
+
+    /**
      * @brief Button event processing function
      *        Function triggers a switch action sent to the CHIP task
      *
