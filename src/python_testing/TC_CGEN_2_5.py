@@ -51,7 +51,7 @@ class TC_CGEN_2_5(MatterBaseTest):
 
     def pics_TC_CGEN_2_5(self) -> list[str]:
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        return ["CGEN.S", "CGEN.S.F00(TC)"]
+        return ["CGEN.S", "CGEN.S.F00"]
 
     def steps_TC_CGEN_2_5(self) -> list[TestStep]:
         return [
@@ -79,8 +79,8 @@ class TC_CGEN_2_5(MatterBaseTest):
         tc_user_response_to_simulate = self.matter_test_config.global_test_params['PIXIT.CGEN.RequiredTCAcknowledgements']
 
         self.step(0)
-        if not self.pics_guard(self.check_pics("CGEN.S.F00(TC)")):
-            self.skip_all_remaining_steps(1)
+        if not self.check_pics("CGEN.S.F00"):
+            asserts.skip('Root endpoint does not support the [commissioning] feature under test')
             return
 
         # Step 1: Begin commissioning with PASE and failsafe

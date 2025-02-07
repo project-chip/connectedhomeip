@@ -744,7 +744,7 @@ CGEN.S.C04.Rsp=1
 CGEN.S.C05.Tx=1
 
 #Feature
-CGEN.S.F00(TC)=1
+CGEN.S.F00=1
 
 #PIXIT
 PIXIT.CGEN.FailsafeExpiryLengthSeconds=0

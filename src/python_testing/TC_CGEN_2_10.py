@@ -48,7 +48,7 @@ class TC_CGEN_2_10(MatterBaseTest):
 
     def pics_TC_CGEN_2_10(self) -> list[str]:
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        return ["CGEN.S", "CGEN.S.F00(TC)"]
+        return ["CGEN.S", "CGEN.S.F00"]
 
     def steps_TC_CGEN_2_10(self) -> list[TestStep]:
         return [
@@ -68,8 +68,8 @@ class TC_CGEN_2_10(MatterBaseTest):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
 
         self.step(0)
-        if not self.pics_guard(self.check_pics("CGEN.S.F00(TC)")):
-            self.skip_all_remaining_steps(1)
+        if not self.check_pics("CGEN.S.F00"):
+            asserts.skip('Root endpoint does not support the [commissioning] feature under test')
             return
 
         # Step 1: Begin commissioning with PASE and failsafe

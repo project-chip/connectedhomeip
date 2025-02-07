@@ -3638,7 +3638,7 @@ PICS:
     - label:
           "Does the device implement the General Commissioning cluster's terms
           and conditions feature?"
-      id: CGEN.S.F00(TC)
+      id: CGEN.S.F00
 
     - label: "The device's failsafe expiration limit."
       id: PIXIT.CGEN.FailsafeExpiryLengthSeconds
