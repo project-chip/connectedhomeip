@@ -274,21 +274,21 @@ a lot of data that needs to be copied, this should be set high. */
 */
 
 #if defined(CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM) && CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM
-#define PBUF_POOL_SIZE                    0
-#define MEM_LIBC_MALLOC                   0
-#define MEM_USE_POOLS                     0
-#define MEMP_USE_CUSTOM_POOLS             0
+#define PBUF_POOL_SIZE 0
+#define MEM_LIBC_MALLOC 0
+#define MEM_USE_POOLS 0
+#define MEMP_USE_CUSTOM_POOLS 0
 
 #include <lwip/arch.h>
 #include <lwip/mem.h>
-#define LWIP_PBUF_CUSTOM_DATA           mem_size_t pool;
+#define LWIP_PBUF_CUSTOM_DATA mem_size_t pool;
 
 #if defined(__cplusplus)
 extern "C" const mem_size_t * memp_sizes;
-extern "C" struct pbuf *pbuf_rightsize(struct pbuf *p, s16_t offset);
+extern "C" struct pbuf * pbuf_rightsize(struct pbuf * p, s16_t offset);
 #else
 extern const mem_size_t * memp_sizes;
-extern struct pbuf *pbuf_rightsize(struct pbuf *p, s16_t offset);
+extern struct pbuf * pbuf_rightsize(struct pbuf * p, s16_t offset);
 #endif
 #else
 

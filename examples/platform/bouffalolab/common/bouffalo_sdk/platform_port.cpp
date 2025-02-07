@@ -58,7 +58,8 @@ extern "C" void vAssertCalled(void)
 
     abort();
 
-    while (true) ;
+    while (true)
+        ;
 }
 
 extern "C" void bflb_assert(void) __attribute__((weak, alias("vAssertCalled")));
