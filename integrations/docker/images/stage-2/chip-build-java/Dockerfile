@@ -6,7 +6,7 @@ LABEL org.opencontainers.image.source https://github.com/project-chip/connectedh
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
-    openjdk-17-jdk \
+    openjdk-11-jdk \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
@@ -20,4 +20,4 @@ RUN set -x \
     && : # last line
 
 ENV PATH $PATH:/usr/lib/kotlinc/bin
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
