@@ -40,7 +40,7 @@ from global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttribu
                                   is_valid_device_type_id)
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                     MatterBaseTest, ProblemNotice, ProblemSeverity, async_test_body, default_matter_test_main)
-from spec_parsing_support import CommandType, build_xml_clusters, build_xml_device_types
+from spec_parsing_support import CommandType
 
 
 class DeviceConformanceTests(BasicCompositionTests):
