@@ -103,6 +103,8 @@ To build and run the Python CHIP controller:
     chip-repl
     ```
 
+NOTE: To get more verbose logs, pass the debug flag: `chip-repl --debug`
+
 <hr>
 
 ## Using Python CHIP Controller REPL for Matter accessory testing
@@ -133,8 +135,8 @@ An uncommissioned accessory device advertises over Bluetooth LE or via mDNS if
 already on the network. Run the following command to scan all advertised Matter
 devices:
 
-```
-devCtrl.DiscoverCommissionableNodes()
+```python
+await devCtrl.DiscoverCommissionableNodes()
 ```
 
 ### Step 4: Set network pairing credentials
@@ -173,7 +175,7 @@ network interface, such as Thread or Wi-Fi.
 2. Set the previously obtained Active Operational Dataset as a byte array using
    the following command:
 
-    ```
+    ```python
     thread_dataset = bytes.fromhex("0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8")
     devCtrl.SetThreadOperationalDataset(thread_dataset)
     ```
@@ -183,7 +185,7 @@ network interface, such as Thread or Wi-Fi.
 Assuming your Wi-Fi SSID is _TESTSSID_, and your Wi-Fi password is _P455W4RD_,
 set the credentials to the controller by executing the following command:
 
-```
+```python
 devCtrl.SetWiFiCredentials(<ssid>, <password>)
 ```
 
@@ -213,8 +215,8 @@ with the following assumptions for the Matter accessory device:
 -   The setup pin code of the device is _20202021_
 -   The temporary Node ID is _1234_
 
-```
-devCtrl.ConnectBLE(3840, 20202021, 1234)
+```python
+await devCtrl.ConnectBLE(3840, 20202021, 1234)
 ```
 
 You can skip the last parameter, the Node ID, in the command. If you skip it,
@@ -230,8 +232,8 @@ CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
 
 Use the following command to commission the device with the QR code:
 
-```
-devCtrl.CommissionWithCode("MT:-24J0AFN00KA0648G00", 1234)
+```python
+await devCtrl.CommissionWithCode("MT:-24J0AFN00KA0648G00", 1234)
 ```
 
 After connecting the device over Bluetooth LE, the controller will go through
@@ -262,14 +264,14 @@ the following stages:
 For the light bulb example, execute the following command to toggle the LED
 state:
 
-```
+```python
 await devCtrl.SendCommand(1234, 1, Clusters.OnOff.Commands.Toggle())
 ```
 
 To change the brightness of the LED, use the following command, with the level
 value somewhere between 0 and 255.
 
-```
+```python
 commandToSend = LevelControl.Commands.MoveToLevel(level=50, transitionTime=Null, optionsMask=0, optionsOverride=0)
 await devCtrl.SendCommand(1234, 1, commandToSend)
 ```
@@ -281,7 +283,7 @@ maintains collection of attributes that a controller can obtain from a device,
 such as the vendor name, the product name, or software version. Use
 `ReadAttribute()` command to read those values from the device:
 
-```
+```python
 attributes = [
     (0, Clusters.BasicInformation.Attributes.VendorName),
     (0, Clusters.BasicInformation.Attributes.ProductName),
@@ -309,7 +311,7 @@ the full list of available commands.
 Provides the controller with Thread network credentials that will be used in the
 device commissioning procedure to configure the device with a Thread interface.
 
-```
+```python
 thread_dataset = bytes.fromhex("0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8")
 devCtrl.SetThreadOperationalDataset(thread_dataset)
 ```
@@ -319,7 +321,7 @@ devCtrl.SetThreadOperationalDataset(thread_dataset)
 Provides the controller with Wi-Fi network credentials that will be used in the
 device commissioning procedure to configure the device with a Wi-Fi interface.
 
-```
+```python
 devCtrl.SetWiFiCredentials('TESTSSID', 'P455W4RD')
 ```
 
@@ -328,8 +330,8 @@ devCtrl.SetWiFiCredentials('TESTSSID', 'P455W4RD')
 Commission with the given nodeid from the setupPayload. setupPayload may be a QR
 or the manual setup code.
 
-```
-devCtrl.CommissionWithCode("MT:-24J0AFN00KA0648G00", 1234)
+```python
+await devCtrl.CommissionWithCode("MT:-24J0AFN00KA0648G00", 1234)
 ```
 
 ### `SendCommand(<nodeid>: int, <endpoint>: int, Clusters.<cluster>.Commands.<command>(<arguments>))`

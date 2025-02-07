@@ -386,6 +386,18 @@ using namespace chip::Tracing::DarwinFramework;
     return [self _deviceForNodeID:nodeID createIfNeeded:YES];
 }
 
+- (void)forgetDeviceWithNodeID:(NSNumber *)nodeID
+{
+    MTRDevice * deviceToRemove;
+    {
+        std::lock_guard lock(*self.deviceMapLock);
+        deviceToRemove = [_nodeIDToDeviceMap objectForKey:nodeID];
+    }
+    if (deviceToRemove != nil) {
+        [self removeDevice:deviceToRemove];
+    }
+}
+
 - (void)removeDevice:(MTRDevice *)device
 {
     std::lock_guard lock(*self.deviceMapLock);
@@ -495,6 +507,12 @@ using namespace chip::Tracing::DarwinFramework;
     chip::app::DnssdServer::Instance().SetInterfaceId(interfaceId);
 }
 #endif // DEBUG
+
+- (NSArray<NSNumber *> *)nodesWithStoredData
+{
+    MTR_ABSTRACT_METHOD();
+    return @[];
+}
 
 #pragma mark - MTRDeviceControllerDelegate management
 

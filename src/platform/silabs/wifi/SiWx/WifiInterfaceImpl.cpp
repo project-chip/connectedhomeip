@@ -86,7 +86,6 @@ extern "C" {
 #endif
 
 WfxRsi_t wfx_rsi;
-extern osSemaphoreId_t sl_rs_ble_init_sem;
 
 namespace {
 
@@ -310,7 +309,6 @@ sl_status_t sl_wifi_siwx917_init(void)
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 
     wfx_rsi.dev_state.Set(WifiState::kStationInit);
-    osSemaphoreRelease(sl_rs_ble_init_sem);
     return status;
 }
 
@@ -319,14 +317,17 @@ sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_res
     sl_status_t status = SL_STATUS_OK;
     if (SL_WIFI_CHECK_IF_EVENT_FAILED(event))
     {
-        ChipLogError(DeviceLayer, "Scan Netwrok Failed: 0x%lx", *reinterpret_cast<sl_status_t *>(status));
+        if (scan_result != nullptr)
+        {
+            status = *reinterpret_cast<sl_status_t *>(scan_result);
+            ChipLogError(DeviceLayer, "ScanCallback: failed: 0x%lx", status);
+        }
+
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         security = SL_WIFI_WPA3;
 #else
         security = SL_WIFI_WPA_WPA2_MIXED;
 #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
-
-        status = SL_STATUS_FAIL;
     }
     else
     {
@@ -376,16 +377,22 @@ sl_status_t SetWifiConfigurations()
     // Setting the listen interval to 0 which will set it to DTIM interval
     sl_wifi_listen_interval_t sleep_interval = { .listen_interval = 0 };
     status                                   = sl_wifi_set_listen_interval(SL_WIFI_CLIENT_INTERFACE, sleep_interval);
-    VerifyOrReturnError(status == SL_STATUS_OK, status);
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_wifi_set_listen_interval failed: 0x%lx", status));
 
     sl_wifi_advanced_client_configuration_t client_config = { .max_retry_attempts = 5 };
     status = sl_wifi_set_advanced_client_configuration(SL_WIFI_CLIENT_INTERFACE, &client_config);
-    VerifyOrReturnError(status == SL_STATUS_OK, status);
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_wifi_set_advanced_client_configuration failed: 0x%lx", status));
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-    status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID, SL_NET_WIFI_PSK, &wfx_rsi.sec.passkey[0],
-                                   wfx_rsi.sec.passkey_length);
-    VerifyOrReturnError(status == SL_STATUS_OK, status);
+    if (wfx_rsi.sec.passkey_length != 0)
+    {
+        status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID, SL_NET_WIFI_PSK, &wfx_rsi.sec.passkey[0],
+                                       wfx_rsi.sec.passkey_length);
+        VerifyOrReturnError(status == SL_STATUS_OK, status,
+                            ChipLogError(DeviceLayer, "sl_net_set_credential failed: 0x%lx", status));
+    }
 
     sl_net_wifi_client_profile_t profile = {
         .config = {
@@ -401,7 +408,7 @@ sl_status_t SetWifiConfigurations()
             .bssid = {{0}},
             .bss_type = SL_WIFI_BSS_TYPE_INFRASTRUCTURE,
             .security = security,
-            .encryption = SL_WIFI_NO_ENCRYPTION,
+            .encryption = SL_WIFI_DEFAULT_ENCRYPTION,
             .client_options = SL_WIFI_JOIN_WITH_SCAN,
             .credential_id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID,
         },
@@ -416,11 +423,40 @@ sl_status_t SetWifiConfigurations()
     memcpy((char *) &profile.config.ssid.value, wfx_rsi.sec.ssid, wfx_rsi.sec.ssid_length);
 
     status = sl_net_set_profile((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
-    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_set_profile Failed"));
+    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_set_profile failed: 0x%lx", status));
 
     return status;
 }
 
+/**
+ * @brief Callback function for the SL_WIFI_JOIN_EVENTS group
+ *
+ * This callback handler will be invoked when any event within join event group occurs, providing the event details and any
+ * associated data The callback doesn't get called when we join a network using the sl net APIs
+ *
+ * @note In case of failure, the 'result' parameter will be of type sl_status_t, and the 'resultLenght' parameter should be ignored
+ *
+ * @param[in] event sl_wifi_event_t that triggered the callback
+ * @param[in] result Pointer to the response data received
+ * @param[in] result_length Length of the data received in bytes
+ * @param[in] arg Optional user provided argument
+ *
+ * @return sl_status_t Returns the status of the operation
+ */
+sl_status_t JoinCallback(sl_wifi_event_t event, char * result, uint32_t resultLenght, void * arg)
+{
+    sl_status_t status = SL_STATUS_OK;
+    wfx_rsi.dev_state.Clear(WifiState::kStationConnecting);
+    if (SL_WIFI_CHECK_IF_EVENT_FAILED(event))
+    {
+        status = *reinterpret_cast<sl_status_t *>(result);
+        ChipLogError(DeviceLayer, "JoinCallback: failed: 0x%lx", status);
+        wfx_rsi.dev_state.Clear(WifiState::kStationConnected);
+        wfx_retry_connection(++wfx_rsi.join_retries);
+    }
+
+    return status;
+}
 sl_status_t JoinWifiNetwork(void)
 {
     VerifyOrReturnError(!wfx_rsi.dev_state.HasAny(WifiState::kStationConnecting, WifiState::kStationConnected),
@@ -433,6 +469,9 @@ sl_status_t JoinWifiNetwork(void)
     status = SetWifiConfigurations();
     VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "Failure to set the Wifi Configurations!"));
 
+    status = sl_wifi_set_join_callback(JoinCallback, nullptr);
+    VerifyOrReturnError(status == SL_STATUS_OK, status);
+
     status = sl_net_up((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
 
     if (status == SL_STATUS_OK || status == SL_STATUS_IN_PROGRESS)
@@ -444,15 +483,11 @@ sl_status_t JoinWifiNetwork(void)
 
     // failure only happens when the firmware returns an error
     ChipLogError(DeviceLayer, "sl_wifi_connect failed: 0x%lx", static_cast<uint32_t>(status));
-    VerifyOrReturnError((wfx_rsi.join_retries <= MAX_JOIN_RETRIES_COUNT), status);
 
     wfx_rsi.dev_state.Clear(WifiState::kStationConnecting).Clear(WifiState::kStationConnected);
 
     ChipLogProgress(DeviceLayer, "Connection retry attempt %d", wfx_rsi.join_retries);
     wfx_retry_connection(++wfx_rsi.join_retries);
-
-    WifiPlatformEvent event = WifiPlatformEvent::kStationStartJoin;
-    PostWifiPlatformEvent(event);
 
     return status;
 }
@@ -524,29 +559,30 @@ CHIP_ERROR ResetCounters()
     return CHIP_NO_ERROR;
 }
 
-sl_status_t InitSiWxWifi(void)
+CHIP_ERROR InitWiFiStack(void)
 {
     sl_status_t status = SL_STATUS_OK;
 
     status = sl_net_init((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
-    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
 
     // Create Sempaphore for scan completion
     sScanCompleteSemaphore = osSemaphoreNew(1, 0, nullptr);
-    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
+    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, CHIP_ERROR_NO_MEMORY);
 
     // Create Semaphore for scan in-progress protection
     sScanInProgressSemaphore = osSemaphoreNew(1, 1, nullptr);
-    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
+    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, CHIP_ERROR_NO_MEMORY);
 
     // Create the message queue
     sWifiEventQueue = osMessageQueueNew(kWfxQueueSize, sizeof(WifiPlatformEvent), nullptr);
-    VerifyOrReturnError(sWifiEventQueue != nullptr, SL_STATUS_ALLOCATION_FAILED);
+    VerifyOrReturnError(sWifiEventQueue != nullptr, CHIP_ERROR_NO_MEMORY);
 
     status = CreateDHCPTimer();
-    VerifyOrReturnError(status == SL_STATUS_OK, status);
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(DeviceLayer, "CreateDHCPTimer failed: %lx", status));
 
-    return status;
+    return CHIP_NO_ERROR;
 }
 
 void HandleDHCPPolling(void)

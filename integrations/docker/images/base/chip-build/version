@@ -1,1 +1,1 @@
-100 : [linux] Added libpcsclite-dev package for NFC Commissioning on Linux platforms.
+109 : [Tizen] Fix race when storing cert credentials
