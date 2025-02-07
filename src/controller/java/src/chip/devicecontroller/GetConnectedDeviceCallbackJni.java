@@ -17,29 +17,14 @@
  */
 package chip.devicecontroller;
 
-import java.lang.ref.Cleaner;
-
 /** JNI wrapper callback class for getting a connected device. */
 public class GetConnectedDeviceCallbackJni {
   private final GetConnectedDeviceCallback wrappedCallback;
   private long callbackHandle;
 
-  private final Cleaner.Cleanable cleanable;
-
   public GetConnectedDeviceCallbackJni(GetConnectedDeviceCallback wrappedCallback) {
     this.wrappedCallback = wrappedCallback;
     this.callbackHandle = newCallback(wrappedCallback);
-
-    this.cleanable =
-        Cleaner.create()
-            .register(
-                this,
-                () -> {
-                  if (callbackHandle != 0) {
-                    deleteCallback(callbackHandle);
-                    callbackHandle = 0;
-                  }
-                });
   }
 
   long getCallbackHandle() {
@@ -49,6 +34,17 @@ public class GetConnectedDeviceCallbackJni {
   private native long newCallback(GetConnectedDeviceCallback wrappedCallback);
 
   private native void deleteCallback(long callbackHandle);
+
+  // TODO(#8578): Replace finalizer with PhantomReference.
+  @SuppressWarnings("deprecation")
+  protected void finalize() throws Throwable {
+    super.finalize();
+
+    if (callbackHandle != 0) {
+      deleteCallback(callbackHandle);
+      callbackHandle = 0;
+    }
+  }
 
   /** Callbacks for getting a device connected with PASE or CASE, depending on the context. */
   public interface GetConnectedDeviceCallback {
