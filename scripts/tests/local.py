@@ -54,19 +54,31 @@ def _get_native_machine_target():
     return f"{current_system_info.system.lower()}-{arch}"
 
 
+_CONFIG_PATH = "out/local_py.ini"
+
+
+def get_coverage_default(coverage: Optional[bool]) -> bool:
+    if coverage is not None:
+        return coverage
+    config = configparser.ConfigParser()
+    try:
+        config.read(_CONFIG_PATH)
+        return config["OPTIONS"].getboolean("coverage")
+    except Exception:
+        return False
+
+
 def _get_variants(coverage: Optional[bool]):
     """
     compute the build variant suffixes for the given options
     """
     variants = ["no-ble", "clang", "boringssl"]
 
-    config_path = 'out/local_py.ini'
-
     config = configparser.ConfigParser()
-    config['OPTIONS'] = {}
+    config["OPTIONS"] = {}
     try:
-        config.read(config_path)
-        logging.info("Defaults read from '%s'", config_path)
+        config.read(_CONFIG_PATH)
+        logging.info("Defaults read from '%s'", _CONFIG_PATH)
     except Exception:
         config["OPTIONS"]["coverage"] = "true"
 
@@ -74,7 +86,9 @@ def _get_variants(coverage: Optional[bool]):
         # Coverage is NOT passed in as an explicit flag, so try to
         # resume it from whatever last `build` flag was used
         coverage = config["OPTIONS"].getboolean("coverage")
-        logging.info("Coverage setting not provided via command line. Will use: %s", coverage)
+        logging.info(
+            "Coverage setting not provided via command line. Will use: %s", coverage
+        )
 
     if coverage:
         variants.append("coverage")
@@ -84,7 +98,7 @@ def _get_variants(coverage: Optional[bool]):
 
     if not os.path.exists("./out"):
         os.mkdir("./out")
-    with open(config_path, "w") as f:
+    with open(_CONFIG_PATH, "w") as f:
         config.write(f)
 
     return "-".join(variants)
@@ -452,12 +466,54 @@ def _add_target_to_cmd(cmd, flag, path, runner):
     cmd.append(_maybe_with_runner(flag[2:].replace("-", "_"), path, runner))
 
 
+@dataclass
+class GlobFilter:
+    pattern: str
+
+    def matches(self, txt: str) -> bool:
+        return fnmatch.fnmatch(txt, self.pattern)
+
+
+@dataclass
+class FilterList:
+    filters: list[GlobFilter]
+
+    def any_matches(self, txt: str) -> bool:
+        return any([f.matches(txt) for f in self.filters])
+
+
+def _parse_filters(entry: str) -> FilterList:
+    if not entry:
+        entry = "*.*"
+
+    if "," in entry:
+        entry_list = entry.split(",")
+    else:
+        entry_list = [entry]
+
+    filters = []
+    for f in entry_list:
+        if not f.startswith("*"):
+            f = "*" + f
+        if not f.endswith("*"):
+            f = f + "*"
+        filters.append(GlobFilter(pattern=f))
+
+    return FilterList(filters=filters)
+
+
 @cli.command()
 @click.option(
     "--test-filter",
     default="*",
     show_default=True,
-    help="Run only tests that match the given glob filter.",
+    help="Run only tests that match the given glob filter(s). Comma separated list of filters",
+)
+@click.option(
+    "--skip",
+    default="",
+    show_default=True,
+    help="Skip the tests matching the given glob. Comma separated list of filters. Empty for no skipping.",
 )
 @click.option(
     "--from-filter",
@@ -504,6 +560,7 @@ def _add_target_to_cmd(cmd, flag, path, runner):
 )
 def python_tests(
     test_filter,
+    skip,
     from_filter,
     from_skip_filter,
     dry_run,
@@ -533,10 +590,13 @@ def python_tests(
         f.write("TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}\n")
         f.write("TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}\n")
 
-    if not test_filter.startswith("*"):
-        test_filter = "*" + test_filter
-    if not test_filter.endswith("*"):
-        test_filter = test_filter + "*"
+    if not test_filter:
+        test_filter = "*"
+    test_filter = _parse_filters(test_filter)
+
+    if skip:
+        print("SKIP IS %r" % skip)
+        skip = _parse_filters(skip)
 
     if from_filter:
         if not from_filter.startswith("*"):
@@ -575,11 +635,14 @@ def python_tests(
     test_scripts.append("src/controller/python/test/test_scripts/mobile-device-test.py")
     test_scripts.sort()  # order consistent
 
+    # make sure we are fully aware if running with or without coverage
+    coverage = get_coverage_default(coverage)
+
     execution_times = []
     failed_tests = []
     try:
         to_run = []
-        for script in fnmatch.filter(test_scripts, test_filter or "*.*"):
+        for script in [t for t in test_scripts if test_filter.any_matches(t)]:
             if from_filter:
                 if not fnmatch.fnmatch(script, from_filter):
                     logging.info("From-filter SKIP %s", script)
@@ -591,6 +654,11 @@ def python_tests(
                     from_skip_filter = None
                 logging.info("From-skip-filter SKIP %s", script)
                 continue
+            if skip:
+                if skip.any_matches(script):
+                    logging.info("EXPLICIT SKIP %s", script)
+                    continue
+
             to_run.append(script)
 
         with alive_progress.alive_bar(len(to_run), title="Running tests") as bar:
