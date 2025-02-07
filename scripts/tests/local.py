@@ -27,7 +27,7 @@ import sys
 import textwrap
 import time
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 import alive_progress
 import click
@@ -35,8 +35,6 @@ import colorama
 import coloredlogs
 import tabulate
 import yaml
-
-# We compile for the local architecture. Figure out what platform we need
 
 
 def _get_native_machine_target():
@@ -53,6 +51,152 @@ def _get_native_machine_target():
         arch = "arm64"
 
     return f"{current_system_info.system.lower()}-{arch}"
+
+
+def _get_variants(coverage: Optional[bool]):
+    """
+    compute the build variant suffixes for the given options
+    """
+    variants = ["no-ble", "clang", "boringssl"]
+
+    if coverage is None:
+        # FIXME: figure out previous runs...
+        pass
+
+    if coverage:
+        variants.append("coverage")
+    return "-".join(variants)
+
+
+@dataclass
+class ApplicationTarget:
+    key: str  # key for test_env running in python
+    target: str  # target name for build_examples (and directory in out)
+    binary: str  # elf binary to run after it is built
+
+
+def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
+    target_prefix = _get_native_machine_target()
+    suffix = _get_variants(coverage)
+
+    targets = []
+
+    targets.append(
+        ApplicationTarget(
+            key="CHIP_TOOL",
+            target=f"{target_prefix}-chip-tool-{suffix}",
+            binary="chip-tool",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="ALL_CLUSTERS_APP",
+            target=f"{target_prefix}-all-clusters-{suffix}",
+            binary="chip-all-clusters-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="CHIP_LOCK_APP",
+            target=f"{target_prefix}-lock-{suffix}",
+            binary="chip-lock-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="ENERGY_MANAGEMENT_APP",
+            target=f"{target_prefix}-energy-management-{suffix}",
+            binary="chip-energy-management-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="LIT_ICD_APP",
+            target=f"{target_prefix}-lit-icd-{suffix}",
+            binary="lit-icd-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="CHIP_MICROWAVE_OVEN_APP",
+            target=f"{target_prefix}-microwave-oven-{suffix}",
+            binary="chip-microwave-oven-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="CHIP_RVC_APP",
+            target=f"{target_prefix}-rvc-{suffix}",
+            binary="chip-rvc-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="NETWORK_MANAGEMENT_APP",
+            target=f"{target_prefix}-network-manager-ipv6only-{suffix}",
+            binary="matter-network-manager-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="FABRIC_ADMIN_APP",
+            target=f"{target_prefix}-fabric-admin-no-wifi-rpc-ipv6only-{suffix}",
+            binary="fabric-admin",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="FABRIC_BRIDGE_APP",
+            target=f"{target_prefix}-fabric-bridge-no-wifi-rpc-ipv6only-{suffix}",
+            binary="fabric-bridge-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="FABRIC_SYNC_APP",
+            target=f"{target_prefix}-fabric-sync-no-wifi-ipv6only-{suffix}",
+            binary="fabric-sync",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="LIGHTING_APP_NO_UNIQUE_ID",
+            target=f"{target_prefix}-light-data-model-no-unique-id-ipv6only-no-wifi-{suffix}",
+            binary="chip-lighting-app",
+        )
+    )
+
+    # These are needed for chip tool tests
+    targets.append(
+        ApplicationTarget(
+            key="OTA_PROVIDER_APP",
+            target=f"{target_prefix}-ota-provider-{suffix}",
+            binary="chip-ota-provider-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="OTA_REQUESTOR_APP",
+            target=f"{target_prefix}-ota-requestor-{suffix}",
+            binary="chip-ota-requestor-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="TV_APP",
+            target=f"{target_prefix}-tv-app-{suffix}",
+            binary="chip-tv-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="BRIDGE_APP",
+            target=f"{target_prefix}-bridge-{suffix}",
+            binary="chip-bridge-app",
+        )
+    )
+
+    return targets
 
 
 class BinaryRunner(enum.Enum):
@@ -154,7 +298,7 @@ def _do_build_python():
     )
 
 
-def _do_build_apps():
+def _do_build_apps(coverage: Optional[bool]):
     """
     Builds example python apps suitable for running all python_tests.
 
@@ -162,25 +306,7 @@ def _do_build_apps():
     """
     logging.info("Building example apps...")
 
-    target_prefix = _get_native_machine_target()
-    targets = [
-        f"{target_prefix}-chip-tool-no-ble-clang-boringssl",
-        f"{target_prefix}-all-clusters-no-ble-clang-boringssl",
-        f"{target_prefix}-bridge-no-ble-clang-boringssl",
-        f"{target_prefix}-energy-management-no-ble-clang-boringssl",
-        f"{target_prefix}-fabric-admin-no-ble-no-wifi-rpc-ipv6only-clang-boringssl",
-        f"{target_prefix}-fabric-bridge-no-ble-no-wifi-rpc-ipv6only-clang-boringssl",
-        f"{target_prefix}-fabric-sync-no-ble-no-wifi-ipv6only-clang-boringssl",
-        f"{target_prefix}-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang",
-        f"{target_prefix}-lit-icd-no-ble-clang-boringssl",
-        f"{target_prefix}-lock-no-ble-clang-boringssl",
-        f"{target_prefix}-microwave-oven-no-ble-clang-boringssl",
-        f"{target_prefix}-network-manager-ipv6only-no-ble-clang-boringssl",
-        f"{target_prefix}-ota-provider-no-ble-clang-boringssl",
-        f"{target_prefix}-ota-requestor-no-ble-clang-boringssl",
-        f"{target_prefix}-rvc-no-ble-clang-boringssl",
-        f"{target_prefix}-tv-app-no-ble-clang-boringssl",
-    ]
+    targets = [t.target for t in _get_targets(coverage)]
 
     cmd = ["./scripts/build/build_examples.py"]
     for target in targets:
@@ -191,16 +317,17 @@ def _do_build_apps():
     subprocess.run(_with_activate(cmd), check=True)
 
 
-def _do_build_basic_apps():
+def _do_build_basic_apps(coverage: Optional[bool]):
     """
     Builds a minimal subset of test applications, specifically
     all-clusters and chip-tool only, for basic tests.
     """
     logging.info("Building example apps...")
-    target_prefix = _get_native_machine_target()
+
+    all_targets = dict([(t.key, t) for t in _get_targets(coverage)])
     targets = [
-        f"{target_prefix}-chip-tool-no-ble-clang-boringssl",
-        f"{target_prefix}-all-clusters-no-ble-clang-boringssl",
+        all_targets["CHIP_TOOL"].target,
+        all_targets["ALL_CLUSTERS_APP"].target,
     ]
 
     cmd = ["./scripts/build/build_examples.py"]
@@ -213,9 +340,10 @@ def _do_build_basic_apps():
 
 
 @cli.command()
-def build_basic_apps():
+@click.option("--coverage/--no-coverage", default=None)
+def build_basic_apps(coverage):
     """Builds chip-tool and all-clusters app."""
-    _do_build_basic_apps()
+    _do_build_basic_apps(coverage)
 
 
 @cli.command()
@@ -231,7 +359,8 @@ def build_python():
 
 
 @cli.command()
-def build_apps():
+@click.option("--coverage/--no-coverage", default=None)
+def build_apps(coverage):
     """
     Builds MANY apps used by python-tests.
 
@@ -239,18 +368,19 @@ def build_apps():
     To re-build the python environment use `build-python`.
     To re-build both python and apps, use `build`
     """
-    _do_build_apps()
+    _do_build_apps(coverage)
 
 
 @cli.command()
-def build():
+@click.option("--coverage/--no-coverage", default=None)
+def build(coverage):
     """
     Builds both python and apps (same as build-python + build-apps)
 
     Generally used together with `python-tests`.
     """
     _do_build_python()
-    _do_build_apps()
+    _do_build_apps(coverage)
 
 
 def _maybe_with_runner(script_name: str, path: str, runner: BinaryRunner):
@@ -337,6 +467,7 @@ def _add_target_to_cmd(cmd, flag, path, runner):
     help="Save failure logs into the specified directory instead of logging (as logging can be noisy/slow)",
     type=click.Path(exists=True, file_okay=False, dir_okay=True),
 )
+@click.option("--coverage/--no-coverage", default=None)
 @click.option(
     "--runner",
     default="none",
@@ -351,6 +482,7 @@ def python_tests(
     no_show_timings,
     runner,
     keep_going,
+    coverage,
     fail_log_dir,
 ):
     """
@@ -365,34 +497,13 @@ def python_tests(
         return _maybe_with_runner(os.path.basename(path), path, runner)
 
     # create an env file
-    target_prefix = _get_native_machine_target()
     with open("out/test_env.yaml", "wt") as f:
-        f.write(
-            textwrap.dedent(
-                f"""\
-            ALL_CLUSTERS_APP: {as_runner(f'out/{target_prefix}-all-clusters-no-ble-clang-boringssl/chip-all-clusters-app')}
-            CHIP_LOCK_APP: {as_runner(f'out/{target_prefix}-lock-no-ble-clang-boringssl/chip-lock-app')}
-            ENERGY_MANAGEMENT_APP: {
-                as_runner(f'out/{target_prefix}-energy-management-no-ble-clang-boringssl/chip-energy-management-app')}
-            LIT_ICD_APP: {as_runner(f'out/{target_prefix}-lit-icd-no-ble-clang-boringssl/lit-icd-app')}
-            CHIP_MICROWAVE_OVEN_APP: {
-                as_runner(f'out/{target_prefix}-microwave-oven-no-ble-clang-boringssl/chip-microwave-oven-app')}
-            CHIP_RVC_APP: {as_runner(f'out/{target_prefix}-rvc-no-ble-clang-boringssl/chip-rvc-app')}
-            NETWORK_MANAGEMENT_APP: {
-                as_runner(f'out/{target_prefix}-network-manager-ipv6only-no-ble-clang-boringssl/matter-network-manager-app')}
-            FABRIC_ADMIN_APP: {
-                as_runner(f'out/{target_prefix}-fabric-admin-no-ble-no-wifi-rpc-ipv6only-clang-boringssl/fabric-admin')}
-            FABRIC_BRIDGE_APP: {
-                as_runner(f'out/{target_prefix}-fabric-bridge-no-ble-no-wifi-rpc-ipv6only-clang-boringssl/fabric-bridge-app')}
-            FABRIC_SYNC_APP: {
-                as_runner(f'out/{target_prefix}-fabric-sync-no-ble-no-wifi-ipv6only-clang-boringssl/fabric-sync')}
-            LIGHTING_APP_NO_UNIQUE_ID: {as_runner(f'out/{target_prefix}-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang/chip-lighting-app')}
-            TRACE_APP: out/trace_data/app-{{SCRIPT_BASE_NAME}}
-            TRACE_TEST_JSON: out/trace_data/test-{{SCRIPT_BASE_NAME}}
-            TRACE_TEST_PERFETTO: out/trace_data/test-{{SCRIPT_BASE_NAME}}
-            """
-            )
-        )
+        for target in _get_targets(coverage):
+            run_path = as_runner(f"out/{target.target}/{target.binary}")
+            f.write(f"{target.key}: {run_path}\n")
+        f.write("TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}\n")
+        f.write("TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}")
+        f.write("TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}")
 
     if not test_filter.startswith("*"):
         test_filter = "*" + test_filter
@@ -474,13 +585,6 @@ def python_tests(
                         base_name,
                         slow_test_duration[base_name],
                     )
-                elif base_name == "TC_EEVSE_2_3.py":
-                    # TODO: this should be fixed ...
-                    #       for now just note that a `TZ=UTC` makes this pass
-                    logging.warning(
-                        "Test %s is TIMEZONE dependent. Passes with UTC but fails on EST. If this fails set 'TZ=UTC' for running the test.",
-                        base_name,
-                    )
 
                 tstart = time.time()
                 result = subprocess.run(cmd, capture_output=True)
@@ -546,15 +650,16 @@ def python_tests(
             sys.exit(1)
 
 
-def _do_build_fabric_sync_apps():
+def _do_build_fabric_sync_apps(coverage: Optional[bool]):
     """
     Build applications used for fabric sync tests
     """
     target_prefix = _get_native_machine_target()
+    suffix = _get_variants(coverage)
     targets = [
-        f"{target_prefix}-fabric-admin-no-ble-no-wifi-rpc-ipv6only-clang-boringssl",
-        f"{target_prefix}-fabric-bridge-no-ble-no-wifi-rpc-ipv6only-clang-boringssl",
-        f"{target_prefix}-all-clusters-boringssl-no-ble",
+        f"{target_prefix}-fabric-admin-no-wifi-rpc-ipv6only-{suffix}",
+        f"{target_prefix}-fabric-bridge-no-wifi-rpc-ipv6only-{suffix}",
+        f"{target_prefix}-all-clusters-{suffix}",
     ]
 
     build_cmd = ["./scripts/build/build_examples.py"]
@@ -567,21 +672,23 @@ def _do_build_fabric_sync_apps():
 
 
 @cli.command()
-def build_fabric_sync_apps():
+@click.option("--coverage/--no-coverage", default=None)
+def build_fabric_sync_apps(coverage):
     """
     Build fabric synchronizatio applications.
     """
-    _do_build_fabric_sync_apps()
+    _do_build_fabric_sync_apps(coverage)
 
 
 @cli.command()
-def build_fabric_sync():
+@click.option("--coverage/--no-coverage", default=None)
+def build_fabric_sync(coverage):
     """
     Builds both python environment and fabric sync applications
     """
     # fabric sync interfaces with python for convenience, so do that
     _do_build_python()
-    _do_build_fabric_sync_apps()
+    _do_build_fabric_sync_apps(coverage)
 
 
 @cli.command()
@@ -668,13 +775,16 @@ def casting_test(test, log_directory, tv_app, tv_casting_app, runner):
 @click.option("--target-glob", default=None)
 @click.option("--include-tags", default=None)
 @click.option("--expected-failures", default=None)
+@click.option("--coverage/--no-coverage", default=None)
 @click.option(
     "--runner",
     default="none",
     type=click.Choice(list(__RUNNERS__.keys()), case_sensitive=False),
     help="Determines the verbosity of script output",
 )
-def chip_tool_tests(target, target_glob, include_tags, expected_failures, runner):
+def chip_tool_tests(
+    target, target_glob, include_tags, expected_failures, coverage, runner
+):
     """
     Run integration tests using chip-tool.
 
@@ -694,13 +804,9 @@ def chip_tool_tests(target, target_glob, include_tags, expected_failures, runner
         "chip_tool_python",
     ]
 
-    target_prefix = _get_native_machine_target()
-    cmd.extend(
-        [
-            "--chip-tool",
-            f"./out/{target_prefix}-chip-tool-no-ble-clang-boringssl/chip-tool",
-        ]
-    )
+    paths = dict([(t.key, f"./out/{t.target}/{t.binary}") for t in _get_targets(coverage)])
+
+    cmd.extend(["--chip-tool", paths["CHIP_TOOL"]])
 
     if target is not None:
         cmd.extend(["--target", target])
@@ -718,60 +824,20 @@ def chip_tool_tests(target, target_glob, include_tags, expected_failures, runner
     if expected_failures is not None:
         cmd.extend(["--expected-failures", expected_failures, "--keep-going"])
 
-    _add_target_to_cmd(
-        cmd,
-        "--all-clusters-app",
-        f"./out/{target_prefix}-all-clusters-no-ble-clang-boringssl/chip-all-clusters-app",
-        runner,
-    )
-    _add_target_to_cmd(
-        cmd,
-        "--lock-app",
-        f"./out/{target_prefix}-lock-no-ble-clang-boringssl/chip-lock-app",
-        runner,
-    )
-    _add_target_to_cmd(
-        cmd,
-        "--ota-provider-app",
-        f"./out/{target_prefix}-ota-provider-no-ble-clang-boringssl/chip-ota-provider-app",
-        runner,
-    )
-    _add_target_to_cmd(
-        cmd,
-        "--ota-requestor-app",
-        f"./out/{target_prefix}-ota-requestor-no-ble-clang-boringssl/chip-ota-requestor-app",
-        runner,
-    )
-    _add_target_to_cmd(
-        cmd,
-        "--tv-app",
-        f"./out/{target_prefix}-tv-app-no-ble-clang-boringssl/chip-tv-app",
-        runner,
-    )
-    _add_target_to_cmd(
-        cmd,
-        "--bridge-app",
-        f"./out/{target_prefix}-bridge-no-ble-clang-boringssl/chip-bridge-app",
-        runner,
-    )
-    _add_target_to_cmd(
-        cmd,
-        "--lit-icd-app",
-        f"./out/{target_prefix}-lit-icd-no-ble-clang-boringssl/lit-icd-app",
-        runner,
-    )
-    _add_target_to_cmd(
-        cmd,
-        "--microwave-oven-app",
-        f"./out/{target_prefix}-microwave-oven-no-ble-clang-boringssl/chip-microwave-oven-app",
-        runner,
-    )
-    _add_target_to_cmd(
-        cmd,
-        "--rvc-app",
-        f"./out/{target_prefix}-rvc-no-ble-clang-boringssl/chip-rvc-app",
-        runner,
-    )
+    target_flags = [
+        ("--all-clusters-app", "ALL_CLUSTERS_APP"),
+        ("--lock-app", "CHIP_LOCK_APP"),
+        ("--ota-provider-app", "OTA_PROVIDER_APP"),
+        ("--ota-requestor-app", "OTA_REQUESTOR_APP"),
+        ("--tv-app", "TV_APP"),
+        ("--bridge-app", "BRIDGE_APP"),
+        ("--lit-icd-app", "LIT_ICD_APP"),
+        ("--microwave-oven-app", "CHIP_MICROWAVE_OVEN_APP"),
+        ("--rvc-app", "CHIP_RVC_APP"),
+    ]
+
+    for flag, path_key in target_flags:
+        _add_target_to_cmd(cmd, flag, paths[path_key], runner)
 
     subprocess.run(_with_activate(cmd), check=True)
 
