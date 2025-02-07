@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import configparser
 import enum
 import fnmatch
 import glob
@@ -26,7 +27,6 @@ import subprocess
 import sys
 import textwrap
 import time
-import configparser
 from dataclasses import dataclass
 from typing import List, Optional
 
