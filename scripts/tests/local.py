@@ -322,7 +322,7 @@ def _with_activate(build_cmd: List[str], output_path=None) -> List[str]:
     Given a bash command list, will generate a new command suitable for subprocess
     with an execution of `scripts/activate.sh` prepended to it
     """
-    cmd = shlex.join(build_cmd);
+    cmd = shlex.join(build_cmd)
     if output_path:
         cmd = cmd + f" >{output_path}"
 
