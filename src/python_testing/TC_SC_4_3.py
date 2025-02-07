@@ -19,19 +19,12 @@
 # for details about the block below.
 
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#     app: ${LIT_ICD_APP}
-#     factory-reset: true
-#     quiet: true
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${LIT_ICD_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
 import ipaddress
