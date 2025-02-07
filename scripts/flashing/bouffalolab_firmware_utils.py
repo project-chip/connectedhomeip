@@ -23,7 +23,6 @@ import re
 import shutil
 import subprocess
 import sys
-import toml
 
 import coloredlogs
 import firmware_utils

@@ -258,7 +258,7 @@ user should know it has limit to work with real ecosystem.
         export TEST_CD_PRODUCT_ID=7001  # Product ID hex string
         ```
 
-    -   Run script to generate DAC/CD and MFD.
+    -   Run script to generate DAC/CD and `MFD`.
 
         ```shell
         ./scripts/tools/bouffalolab/generate_factory_data.py --output out/test-cert --paa_cert out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.pem --paa_key out/test-cert/Chip-PAA-Key-${TEST_CERT_VENDOR_ID}.pem --pai_cert out/test-cert/Chip-PAI-Cert-${TEST_CERT_VENDOR_ID}.pem --pai_key out/test-cert/Chip-PAI-Key-${TEST_CERT_VENDOR_ID}.pem --dac_pid 0x${TEST_CERT_PRODUCT_ID} --vendor_id 0x${TEST_CD_VENDOR_ID} --product_id 0x${TEST_CD_PRODUCT_ID}
@@ -337,12 +337,6 @@ key.
 > If `MFD` file has cipher text data, please append
 > `--key <hex string of 16 bytes>` option to program to this key to efuse.
 
--   Limits on BL IOT SDK
-
-    If developer would like to program `MFD` with all plain text data, option
-    `--key <hex string of 16 bytes>` needs pass to script, otherwise, flash tool
-    will raise an error. And SoC BL602, BL702 and BL702L use BL IOT SDK for
-    Matter Application.
 
 Please free contact to `Bouffalo Lab` for DAC provider service and higher
 security solution, such as SoC inside certificate requesting.
