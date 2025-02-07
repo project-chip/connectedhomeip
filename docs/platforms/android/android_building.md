@@ -55,7 +55,8 @@ downloaded.
     3. Select NDK (Side by Side) -> 23.2.8568313
     4. Apply
 3. Install Command Line Tools:
-    1. Tools -> SDK Manager -> SDK Tools Tab -> Android SDK Command Line Tools 10.0
+    1. Tools -> SDK Manager -> SDK Tools Tab -> Android SDK Command Line Tools
+       10.0
     2. Apply
 4. Install SDK 30:
     1. Tools -> SDK Manager -> SDK Platforms Tab -> Android 11.0 (R) SDK Level
@@ -99,8 +100,8 @@ architecture:
 
 All Android projects utilize Gradle version 7.3.3 and JDK version 11.0.
 
-For developer using java 11 in MacOS, the JAVA
-can be configured as follows via `sdkman`:
+For developer using java 11 in MacOS, the JAVA can be configured as follows via
+`sdkman`:
 
 ```
 sdk install java 11.0.26-tem

@@ -46,6 +46,7 @@ system. You can install it through the following command as root:
 ```shell
 sudo apt install default-jdk
 ```
+
 Note: Current matter controller java app example needs java 8+.
 
 You also need to install kotlin compiler on your Ubuntu system:
