@@ -540,6 +540,8 @@ config("coverage") {
     cflags = [
       # CLANG builds use the clang-specific coverage, so that versions of lcov/gcov
       # do not have to match and `llvm-cov export -format=lcov` can be used
+      #
+      # Documentation: https://clang.llvm.org/docs/SourceBasedCodeCoverage.html
       "-fprofile-instr-generate",
       "-fcoverage-mapping",
     ]

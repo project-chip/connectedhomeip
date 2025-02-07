@@ -320,7 +320,7 @@ def _do_build_python():
     )
 
 
-def _do_build_apps(coverage: Optional[bool]):
+def _do_build_apps(coverage: Optional[bool], ccache: bool):
     """
     Builds example python apps suitable for running all python_tests.
 
@@ -334,6 +334,10 @@ def _do_build_apps(coverage: Optional[bool]):
     for target in targets:
         cmd.append("--target")
         cmd.append(target)
+
+    if ccache:
+        cmd.append("--pw-command-launcher=ccache")
+
     cmd.append("build")
 
     subprocess.run(_with_activate(cmd), check=True)
@@ -382,7 +386,8 @@ def build_python():
 
 @cli.command()
 @click.option("--coverage/--no-coverage", default=None)
-def build_apps(coverage):
+@click.option("--ccache/--no-ccache", default=False)
+def build_apps(coverage, ccache):
     """
     Builds MANY apps used by python-tests.
 
@@ -390,19 +395,20 @@ def build_apps(coverage):
     To re-build the python environment use `build-python`.
     To re-build both python and apps, use `build`
     """
-    _do_build_apps(coverage)
+    _do_build_apps(coverage, ccache)
 
 
 @cli.command()
 @click.option("--coverage/--no-coverage", default=None)
-def build(coverage):
+@click.option("--ccache/--no-ccache", default=False)
+def build(coverage, ccache):
     """
     Builds both python and apps (same as build-python + build-apps)
 
     Generally used together with `python-tests`.
     """
     _do_build_python()
-    _do_build_apps(coverage)
+    _do_build_apps(coverage, ccache)
 
 
 def _maybe_with_runner(script_name: str, path: str, runner: BinaryRunner):
