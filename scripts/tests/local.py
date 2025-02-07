@@ -317,15 +317,19 @@ def cli(log_level):
     )
 
 
-def _with_activate(build_cmd: List[str]) -> List[str]:
+def _with_activate(build_cmd: List[str], output_path=None) -> List[str]:
     """
     Given a bash command list, will generate a new command suitable for subprocess
     with an execution of `scripts/activate.sh` prepended to it
     """
+    cmd = shlex.join(build_cmd);
+    if output_path:
+        cmd = cmd + f" >{output_path}"
+
     return [
         "bash",
         "-c",
-        ";".join(["set -e", "source scripts/activate.sh", shlex.join(build_cmd)]),
+        ";".join(["set -e", "source scripts/activate.sh", cmd])
     ]
 
 
@@ -543,18 +547,27 @@ def gen_coverage():
             logging.warning("No profile file '%s'. Skipping.", path)
             continue
 
+        data_path = os.path.join("./out", f"{t.target}.profdata")
+        cmd = [
+            "llvm-profdata",
+            "merge",
+            "-sparse",
+            path,
+            "-o",
+            data_path
+        ]
+        p = subprocess.run(_with_activate(cmd), check=True, capture_output=True)
+
         cmd = [
             "llvm-cov",
             "export",
             "-format=lcov",
             "--instr-profile",
-            path,
+            data_path,
             os.path.join("./out", t.target, t.binary),
         ]
-        p = subprocess.run(_with_activate(cmd), check=True, capture_output=True)
         info_path = os.path.join("./out", f"{t.target}.info")
-        with open(info_path, "wb") as f:
-            f.write(p.stdout)
+        p = subprocess.run(_with_activate(cmd, output_path=info_path), check=True)
         trace_files.append(info_path)
         logging.info("Generated %s", info_path)
 
@@ -571,6 +584,12 @@ def gen_coverage():
 
     cmd.append("--output-file")
     cmd.append("out/merged.info")
+    cmd.append("--ignore-errors")
+    cmd.append("inconsistent")
+    cmd.append("--ignore-errors")
+    cmd.append("range")
+    cmd.append("--ignore-errors")
+    cmd.append("corrupt")
 
     if os.path.exists("out/merged.info"):
         os.unlink("out/merged.info")
