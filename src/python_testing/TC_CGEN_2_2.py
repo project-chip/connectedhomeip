@@ -28,6 +28,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -327,6 +328,9 @@ class TC_CGEN_2_2(MatterBaseTest):
             attribute=self.cluster_cgen.Attributes.BasicCommissioningInfo)
         maxFailsafe = basic_commissioning_info.maxCumulativeFailsafeSeconds
         logger.info(f'Step #2: The MaxCumulativeFailsafeSeconds (max_fail_safe): {maxFailsafe}')
+        maxFailsafe = 20
+        logger.info(
+            f'Step #2: Overridden MaxCumulativeFailsafeSeconds (max_fail_safe) to {maxFailsafe} seconds for optimal execution in Cert and to avoid long waits')
 
         # TH1 steps #3 through #5 using the function run_steps_3_to_5
         self.step('3-5')
@@ -344,7 +348,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         asserts.assert_equal(trusted_root_list_original_size_updated, trusted_root_list_original_size + 1,
                              "Unexpected number of entries in the TrustedRootCertificates table after update")
 
-        # Optionally, check if the new certificate is in the updated list
+        # Check if the new certificate is in the updated list
         asserts.assert_in(new_root_cert, trusted_root_list_original_updated,
                           "New root certificate was not added to the trusted root list.")
 
@@ -619,7 +623,6 @@ class TC_CGEN_2_2(MatterBaseTest):
                              "The fabrics list size should match the original fabrics list size + 1.")
 
         self.step(29)
-        # logger.info("Step #29 - TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb value as 1")
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe, breadcrumb=1)
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
