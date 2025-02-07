@@ -39,7 +39,7 @@ import asyncio
 import logging
 import random
 import time
-from datetime import datetime, timezone
+from datetime import datetime
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
