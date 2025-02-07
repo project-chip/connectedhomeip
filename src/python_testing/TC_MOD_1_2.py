@@ -98,5 +98,6 @@ class TC_MOD_1_2(MatterBaseTest):
         if not isinstance(standard_namespace, (uint, int)):
             raise ValueError("Standard Namespace value: must be of type uint or an int")
 
+
 if __name__ == "__main__":
     default_matter_test_main()
