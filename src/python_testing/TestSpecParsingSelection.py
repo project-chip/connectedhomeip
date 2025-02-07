@@ -15,10 +15,10 @@
 #    limitations under the License.
 #
 import chip.clusters as Clusters
-from chip.testing.conformance import ConformanceDecision, ConformanceException
-from chip.testing.global_attribute_ids import is_standard_attribute_id
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, dm_from_spec_version
+from conformance_support import ConformanceDecision, ConformanceException
+from global_attribute_ids import attribute_id_type, AttributeIdType
+from matter_testing_support import MatterBaseTest, default_matter_test_main
+from spec_parsing_support import PrebuiltDataModelDirectory, build_xml_clusters, dm_from_spec_version
 from chip.tlv import uint
 from mobly import asserts, signals
 from TC_DeviceConformance import DeviceConformanceTests
@@ -88,7 +88,7 @@ class TestSpecParsingSelection(MatterBaseTest, DeviceConformanceTests):
             attr = cluster.Attributes
 
             resp = {}
-            non_global_attrs = [a for a in attributes if is_standard_attribute_id(a)]
+            non_global_attrs = [a for a in attributes if attribute_id_type(a) == AttributeIdType.kStandardNonGlobal]
             for attribute_id in non_global_attrs:
                 # We don't use the values in these tests, set them all to 0. The types are wrong, but it shouldn't matter
                 resp[Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster.id][attribute_id]] = 0
