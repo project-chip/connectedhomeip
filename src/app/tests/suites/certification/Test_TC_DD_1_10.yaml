@@ -90,4 +90,3 @@ tests:
       3. If the DUT can read the NFC tag, it should retrieve the information needed for onboarding.
       4. Verify that the DUT can successfully read and decode the NFC tag’s onboarding payload such as the setup code, device details and use the retrieved information to onboard the TH device onto the Matter network.
     disabled: true
-
