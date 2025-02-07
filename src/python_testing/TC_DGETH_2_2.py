@@ -35,11 +35,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 #
-import logging
 import chip.clusters as Clusters
-
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, run_if_endpoint_matches, has_feature, has_cluster
-
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 
 
@@ -85,7 +82,6 @@ class TC_DGETH_2_2(MatterBaseTest):
     @run_if_endpoint_matches(has_cluster(Clusters.Objects.EthernetNetworkDiagnostics))
     async def test_TC_DGETH_2_2(self):
         endpoint = self.get_endpoint()
-        cluster = Clusters.Objects.EthernetNetworkDiagnostics
         attributes = Clusters.EthernetNetworkDiagnostics.Attributes
 
         # Step 1: Commission DUT (already done)
@@ -109,10 +105,6 @@ class TC_DGETH_2_2(MatterBaseTest):
             self.step(step)
             if self.pics_guard(attr.attribute_id in attribute_list):
                 initial_values[attr] = await self.read_dgeth_attribute_expect_success(endpoint, attr)
-        # Print initial values for debugging
-        self.step(8)
-        for attr, value in initial_values.items():
-            logging.info(f"Initial {attr.__name__}: {value}")
 
         # Step 8: Send ResetCounts command
         self.step(8)
