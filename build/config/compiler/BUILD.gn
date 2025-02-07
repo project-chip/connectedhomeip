@@ -536,7 +536,16 @@ config("fuzzing_default") {
 }
 
 config("coverage") {
-  cflags = [ "--coverage" ]
+  if (is_clang) {
+    cflags = [
+      # CLANG builds use the clang-specific coverage, so that versions of lcov/gcov
+      # do not have to match and `llvm-cov export -format=lcov` can be used
+      "-fprofile-instr-generate",
+      "-fcoverage-mapping",
+    ]
+  } else {
+    cflags = [ "--coverage" ]
+  }
   ldflags = cflags
 }
 

@@ -82,6 +82,8 @@ def _get_variants(coverage: Optional[bool]):
     else:
         config["OPTIONS"]["coverage"] = "false"
 
+    if not os.path.exists("./out"):
+        os.mkdir("./out")
     with open(config_path, "w") as f:
         config.write(f)
 
@@ -517,7 +519,7 @@ def python_tests(
         return _maybe_with_runner(os.path.basename(path), path, runner)
 
     # create an env file
-    with open("out/test_env.yaml", "wt") as f:
+    with open("./out/test_env.yaml", "wt") as f:
         for target in _get_targets(coverage):
             run_path = as_runner(f"out/{target.target}/{target.binary}")
             f.write(f"{target.key}: {run_path}\n")
