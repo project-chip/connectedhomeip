@@ -42,7 +42,7 @@ COPY --from=telink /opt/telink/zephyr-sdk-0.16.1 /opt/telink/zephyr-sdk-0.16.1
 
 COPY --from=tizen /opt/tizen-sdk /opt/tizen-sdk
 
-COPY --from=crosscompile /opt/ubuntu-22.04.1-aarch64-sysroot /opt/ubuntu-22.04.1-aarch64-sysroot
+COPY --from=crosscompile /opt/ubuntu-24.04-aarch64-sysroot /opt/ubuntu-24.04-aarch64-sysroot
 
 COPY --from=ameba /opt/ameba /opt/ameba
 
@@ -91,7 +91,7 @@ RUN set -x \
 #   - telnet
 #   - srecord
 # For java builds:
-#   - openjdk-8-jdk
+#   - openjdk-17-jdk
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
@@ -119,12 +119,12 @@ ENV WIFI_SDK_ROOT=/opt/silabs/wifi_sdk
 ENV IDF_PATH=/opt/espressif/esp-idf/
 ENV IDF_TOOLS_PATH=/opt/espressif/tools
 ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/6.1-langdale
-ENV JAVA_PATH=/usr/lib/jvm/java-8-openjdk-amd64
+ENV JAVA_PATH=/usr/lib/jvm/java-17-openjdk-amd64
 ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools
 ENV OPENOCD_PATH=/opt/openocd/
 ENV QEMU_ESP32=/opt/espressif/qemu/qemu-system-xtensa
 ENV QEMU_ESP32_DIR=/opt/espressif/qemu
-ENV SYSROOT_AARCH64=/opt/ubuntu-22.04.1-aarch64-sysroot
+ENV SYSROOT_AARCH64=/opt/ubuntu-24.04-aarch64-sysroot
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.16.1
 ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.18.1
