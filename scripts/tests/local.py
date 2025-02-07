@@ -244,6 +244,7 @@ class BinaryRunner(enum.Enum):
     NONE = enum.auto()
     RR = enum.auto()
     VALGRIND = enum.auto()
+    COVERAGE = enum.auto()
 
     def execute_str(self, path: str):
         if self == BinaryRunner.NONE:
@@ -252,6 +253,10 @@ class BinaryRunner(enum.Enum):
             return f"rr record {path}"
         elif self == BinaryRunner.VALGRIND:
             return f"valgrind {path}"
+        elif self == BinaryRunner.COVERAGE:
+            # Expected path is like "out/<target>/<binary>"
+            rawname = path[: path.rindex("/")] + ".profraw"
+            return f'LLVM_PROFILE_FILE="{rawname}" {path}'
 
 
 __RUNNERS__ = {
@@ -434,14 +439,33 @@ def _maybe_with_runner(script_name: str, path: str, runner: BinaryRunner):
         return path
 
     # create a separate runner script based on the app
-    script_name = f"out/{script_name}.sh"
+    if not os.path.exists("out/runners"):
+        os.mkdir("out/runners")
+
+    script_name = f"out/runners/{script_name}.sh"
     with open(script_name, "wt") as f:
         f.write(
             textwrap.dedent(
                 f"""\
                 #!/usr/bin/env bash
 
-                {runner.execute_str(path)}
+                _term() {{
+                    kill -TERM "$child"
+                }}
+                trap _term SIGTERM
+
+                _int() {{
+                    kill -INT "$child"
+                }}
+                trap _int SIGINT
+
+                {runner.execute_str(path)} $* &
+                child=$!
+                wait "$child"
+
+                # TODO: this is awkward, we claim success because otherwise
+                #       we exist with the child exit error code (SIGTERM and such)
+                exit 0
                 """
             )
         )
@@ -500,6 +524,74 @@ def _parse_filters(entry: str) -> FilterList:
         filters.append(GlobFilter(pattern=f))
 
     return FilterList(filters=filters)
+
+
+@cli.command()
+def gen_coverage():
+    """
+    Generate coverage from tests run with "--coverage"
+    """
+    # This assumes default.profraw exists, so it tries to
+    # generate coverage out of it
+    #
+    # Each target gets its own profile
+    trace_files = []
+    for t in _get_targets(coverage=True):
+        path = os.path.join("./out", f"{t.target}.profraw")
+
+        if not os.path.exists(path):
+            logging.warning("No profile file '%s'. Skipping.", path)
+            continue
+
+        cmd = [
+            "llvm-cov",
+            "export",
+            "-format=lcov",
+            "--instr-profile",
+            path,
+            os.path.join("./out", t.target, t.binary),
+        ]
+        p = subprocess.run(_with_activate(cmd), check=True, capture_output=True)
+        info_path = os.path.join("./out", f"{t.target}.info")
+        with open(info_path, "wb") as f:
+            f.write(p.stdout)
+        trace_files.append(info_path)
+        logging.info("Generated %s", info_path)
+
+    if not trace_files:
+        logging.error(
+            "Could not find any trace files. Did you run tests with coverage enabled?"
+        )
+        return
+
+    cmd = ["lcov"]
+    for t in trace_files:
+        cmd.append("--add-tracefile")
+        cmd.append(t)
+
+    cmd.append("--output-file")
+    cmd.append("out/merged.info")
+
+    if os.path.exists("out/merged.info"):
+        os.unlink("out/merged.info")
+
+    subprocess.run(cmd, check=True)
+
+    logging.info("Generating HTML...")
+    subprocess.run(
+        [
+            "genhtml",
+            "--ignore-errors",
+            "inconsistent",
+            "--ignore-errors",
+            "range",
+            "--output-directory",
+            "out/coverage",
+            "out/merged.info",
+        ],
+        check=True,
+    )
+    logging.info("Coverage HTML should be available in out/coverage/index.html")
 
 
 @cli.command()
@@ -578,6 +670,17 @@ def python_tests(
     """
     runner = __RUNNERS__[runner]
 
+    # make sure we are fully aware if running with or without coverage
+    coverage = get_coverage_default(coverage)
+    if coverage:
+        if runner != BinaryRunner.NONE:
+            logging.error("Runner for coverage is implict")
+            sys.exit(1)
+
+        # wrap around so we get a good LLVM_PROFILE_FILE
+        runner = BinaryRunner.COVERAGE
+        pass
+
     def as_runner(path):
         return _maybe_with_runner(os.path.basename(path), path, runner)
 
@@ -634,9 +737,6 @@ def python_tests(
         test_scripts.append(file)
     test_scripts.append("src/controller/python/test/test_scripts/mobile-device-test.py")
     test_scripts.sort()  # order consistent
-
-    # make sure we are fully aware if running with or without coverage
-    coverage = get_coverage_default(coverage)
 
     execution_times = []
     failed_tests = []
