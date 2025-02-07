@@ -337,6 +337,5 @@ key.
 > If `MFD` file has cipher text data, please append
 > `--key <hex string of 16 bytes>` option to program to this key to efuse.
 
-
 Please free contact to `Bouffalo Lab` for DAC provider service and higher
 security solution, such as SoC inside certificate requesting.

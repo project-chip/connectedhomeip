@@ -507,7 +507,6 @@ def main():
 
     log.basicConfig(format='[%(levelname)s] %(message)s', level=log.INFO)
 
-    print(args.dac_pid)
     check_arg(args)
 
     passcode = gen_test_passcode(args.passcode)
