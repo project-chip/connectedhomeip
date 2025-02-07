@@ -130,7 +130,8 @@ class TC_CGEN_2_5(MatterBaseTest):
             attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.FeatureMap)],
         )
         feature_map = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.FeatureMap]
-        asserts.assert_equal(feature_map & Clusters.GeneralCommissioning.Bitmaps.Feature.kTermsAndConditions, Clusters.GeneralCommissioning.Bitmaps.Feature.kTermsAndConditions, "TC feature flag is not set.")
+        asserts.assert_equal(feature_map & Clusters.GeneralCommissioning.Bitmaps.Feature.kTermsAndConditions,
+                             Clusters.GeneralCommissioning.Bitmaps.Feature.kTermsAndConditions, "TC feature flag is not set.")
 
         # Step 5: Send SetTCAcknowledgements
         self.step(5)
