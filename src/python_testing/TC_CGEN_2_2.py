@@ -42,11 +42,10 @@ import time
 from datetime import datetime, timezone
 
 import chip.clusters as Clusters
-import chip.discovery as Discovery
 from chip import ChipDeviceCtrl
-from chip.exceptions import ChipStackError
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
 
 # Create logger
 logger = logging.getLogger(__name__)
@@ -211,7 +210,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             logger.info(
                 f'Step #12 - Repeated Step #9: After waiting for failsafe timeout the Breadcrumb attribute: {breadcrumb_info}')
 
-    def get_current_utc_time_str(self):
+    def get_current_utc_time_str(self, c_time=None):
         '''
         Get the current time in UTC and return it as a formatted string.
 
@@ -222,11 +221,15 @@ class TC_CGEN_2_2(MatterBaseTest):
         Returns:
             str: The current time formatted as 'dd-mm hh:mm:ss.sss'.
         '''
-        current_time = time.time()  # Get the current timestamp
+
+        # If c_time is not provided, use the current time
+        if c_time is None:
+            c_time = time.time()
+
         formatted_time = (
-            datetime.fromtimestamp(current_time, tz=timezone.utc)
+            datetime.fromtimestamp(c_time)
             .strftime('%d-%m %H:%M:%S.')
-            + str(int((current_time % 1) * 1000)).zfill(3)
+            + str(int((c_time % 1) * 1000)).zfill(3)
         )
         return formatted_time
 
@@ -236,8 +239,7 @@ class TC_CGEN_2_2(MatterBaseTest):
     def pics_TC_CGEN_2_2(self):
         """Return the PICS definitions associated with this test."""
         pics = [
-            "CGEN.S",
-            "OPCREDS.S",
+            "CGEN.S"
         ]
         return pics
 
@@ -357,7 +359,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         logger.info(f'Step #6: The updated size of the num_trusted_roots_original list: {trusted_root_list_original_size_updated}')
 
         self.step(7)
-        if self.check_pics('PICS_SDK_CI_ONLY'):
+        if self.is_pics_sdk_ci_only:
             # Step 7 - In CI environments, the 'expire_failsafe_timer' function is used to immediately force the failsafe timer to expire,
             # avoiding the original wait time defined in PIXIT.CGEN.FailsafeExpiryLengthSeconds
             # and speeding up test execution by setting the expiration time to 1 second.
@@ -658,14 +660,13 @@ class TC_CGEN_2_2(MatterBaseTest):
         # Verify that DebugText is empty or has a maximum length of 512 characters
         debug_text = resp.debugText
         assert debug_text == '' or len(debug_text) <= 512, "debugText must be empty or have a maximum length of 512 characters"
-        logger.info(f'Step #32: {run_type} - ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        logger.info(f'Step #32: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
 
         self.step(33)
-        if self.check_pics('PICS_SDK_CI_ONLY'):
+        if self.is_pics_sdk_ci_only:
             # Step 33 - In CI environments avoiding the original wait time defined in PIXIT.CGEN.FailsafeExpiryLengthSeconds
             # and speeding up test execution by setting the expiration time to 2 seconds.
 
-            # Running identifier
             run_type = "CI Test"
             logger.info(
                 f'Step 33: {run_type} - Bypassing failsafe expiration to avoid unnecessary delays in CI environment.')
@@ -680,7 +681,6 @@ class TC_CGEN_2_2(MatterBaseTest):
             # Wait PIXIT.CGEN.FailsafeExpiryLengthSeconds time with an additional 0.5-second buffer, not allowing the fully exire (max_fail_safe).
             await asyncio.sleep(failsafe_timeout_less_than_max + .5)
         else:
-            # Running identifier
             run_type = "Cert Test"
 
             # Set the failsafe expiration timeout to PIXIT.CGEN.FailsafeExpiryLengthSecondsseconds, must be less than maxFailsafe (max_fail_safe).
@@ -739,18 +739,18 @@ class TC_CGEN_2_2(MatterBaseTest):
         logger.info(f'Step #37: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
 
         self.step(38)
-        if self.check_pics('PICS_SDK_CI_ONLY'):
+        if self.is_pics_sdk_ci_only:
             # In CI environment, bypass the wait for the failsafe expiration to avoid unnecessary delays.
             run_type = "CI Test"
             logger.info(
                 f'Step 38: {run_type} - Bypassing due to failsafe expiration workaround to avoid unnecessary delays in CI environment.')
         else:
             run_type = "Cert Test"
-            start_time = time.time()
+            t_start = time.time()
 
             # Get the current time and format it for logging
-            start_time_formatted = self.get_current_utc_time_str()
-            logger.info(f'Step #38: {run_type} - TH1 saves the Current time: {start_time_formatted}')
+            start_time_formatted = self.get_current_utc_time_str(t_start)
+            logger.info(f'Step #38: {run_type} - TH1 saves the Current time as t_start: {start_time_formatted}')
 
         self.step(39)
         # Reused TrustedRootCertificate created in step #5 - Send command to add new trusted root certificate
@@ -773,7 +773,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         self.step(41)
         # Limit maxFailsafe to 20 seconds to prevent excessively long waits in tests (due maxFailsafe = 900 seconds).
         maxFailsafe = failsafe_expiration_seconds
-        if self.check_pics('PICS_SDK_CI_ONLY'):
+        if self.is_pics_sdk_ci_only:
             # In CI environment, bypass the wait for the failsafe expiration to avoid unnecessary delays.
             run_type = "CI Test"
             logger.info(
@@ -781,16 +781,17 @@ class TC_CGEN_2_2(MatterBaseTest):
         else:
             run_type = "Cert Test"
 
-            # Make TH1 wait until the target_time is greater than or equal to half of the maxFailsafe time.
+            # Make TH1 wait until the target_time is greater than or equal to half of the maxFailsafe time with an additional 0.5-second buffer.
             target_time = maxFailsafe/2
             await asyncio.sleep(target_time + .5)
 
             # Verify that at least half of the maxFailsafe time has passed, allowing TH1 to proceed.
-            current_time = self.get_current_utc_time_str()
+            current_time_formatted = self.get_current_utc_time_str()
             logger.info(
-                f'Step #41: {run_type} - TH1 can proceed. '
-                f'Started expiration time: {start_time_formatted}, Current time: {current_time}, '
-                f'Half of the maxFailsafe duration ({target_time} seconds) has passed. '
+                f'Step #41: {run_type} - - MaxFailsafe is {maxFailsafe}. '
+                f'TH1 can proceed. Started expiration time (t_start): {start_time_formatted}, '
+                f'Current time: {current_time_formatted}, '
+                f'The target time ({target_time} seconds) has passed. '
                 f'Confirmation that ArmFailSafe has not expired yet.'
             )
 
@@ -806,7 +807,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         logger.info(f'Step #42: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
 
         self.step(43)
-        if self.check_pics('PICS_SDK_CI_ONLY'):
+        if self.is_pics_sdk_ci_only:
             # Step 43 - In CI environments, the 'expire_failsafe_timer' function is used to immediately force the failsafe timer to expire,
             # avoiding the original wait time defined in PIXIT.CGEN.FailsafeExpiryLengthSeconds,
             # and speeding up test execution by setting the expiration time to 1 second.
@@ -830,22 +831,21 @@ class TC_CGEN_2_2(MatterBaseTest):
         else:
             run_type = "Cert Test"
 
-            # Calculate the target time (Tstart + maxFailsafe)
-            target_time = start_time + maxFailsafe
-            logger.info(f'Step #43: target_time: {target_time}')
+            # Calculate the target time (Tstart + maxFailsafe) with an additional 0.5-second buffer
+            target_time = (t_start + maxFailsafe) + .5
 
-            # Make TH1 wait until the target_time is greater than or equal to maxFailsafe time.
-            while time.time() < target_time:
-                await asyncio.sleep(0.1)
+            # Wait until the target_time is reached using asyncio.sleep to avoid busy-waiting
+            await asyncio.sleep(target_time - time.time())
 
             # Checks if the elapsed time from start_time has met or exceeded maxFailsafe
             # TH1 process can proceed
-            current_time = self.get_current_utc_time_str()
+            current_time_formatted = self.get_current_utc_time_str()
             logger.info(
-                f'Step #43: {run_type} - TH1 can proceed. '
-                f'Started expiration time: {start_time_formatted}, Current time: {current_time}, '
-                f'MaxFailsafe duration ({target_time} seconds) has passed. '
-                f'Confirmation that ArmFailSafe has expired.'
+                f'Step #43: {run_type} - - MaxFailsafe is {maxFailsafe}. '
+                f'TH1 can proceed. , '
+                f'Current time: {current_time_formatted}, '
+                f'The target time ({maxFailsafe} seconds) has passed since expiration time started (t_start): {start_time_formatted}. '
+                f'Confirmation that ArmFailSafe has not expired yet.'
             )
 
         self.step(44)
