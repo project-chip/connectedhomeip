@@ -66,7 +66,7 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/GLibTypeDeleter.h>
-#include <platform/Linux/dbus/bluez/DbusBluez.h>
+#include <platform/Linux/dbus/bluez/DBusBluez.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/BLEManager.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
@@ -554,8 +554,7 @@ CHIP_ERROR BluezEndpoint::Init(BluezAdapter1 * apAdapter, bool aIsCentral)
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(DeviceLayer, "Failed to subscribe for notifications: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BluezEndpoint * self) { return self->SetupEndpointBindings(); }, this);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BluezEndpoint * self) { return self->SetupEndpointBindings(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization: %" CHIP_ERROR_FORMAT, err.Format()));
 

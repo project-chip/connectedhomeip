@@ -27,7 +27,7 @@
 #include <platform/Linux/bluez/AdapterIterator.h>
 #include <platform/Linux/bluez/BluezObjectManager.h>
 #include <platform/Linux/bluez/ChipDeviceScanner.h>
-#include <platform/Linux/dbus/bluez/DbusBluez.h>
+#include <platform/Linux/dbus/bluez/DBusBluez.h>
 #include <platform/PlatformManager.h>
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
@@ -100,8 +100,7 @@ public:
 
     ScannerDelegateImpl(PyObject * context, DeviceScannedCallback scanCallback, ScanCompleteCallback completeCallback,
                         ScanErrorCallback errorCallback) :
-        mContext(context),
-        mScanCallback(scanCallback), mCompleteCallback(completeCallback), mErrorCallback(errorCallback)
+        mContext(context), mScanCallback(scanCallback), mCompleteCallback(completeCallback), mErrorCallback(errorCallback)
     {}
 
     CHIP_ERROR ScannerInit(BluezAdapter1 * adapter)

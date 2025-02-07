@@ -23,7 +23,7 @@
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/GLibTypeDeleter.h>
-#include <platform/Linux/dbus/openthread/introspect.h>
+#include <platform/Linux/dbus/openthread/DBusOpenthread.h>
 #include <platform/NetworkCommissioning.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
