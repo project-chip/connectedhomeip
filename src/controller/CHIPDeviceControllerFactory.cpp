@@ -132,6 +132,13 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ChipLogError(Controller, "Warning: Device Controller Factory should be with a CHIP Device Layer...");
 #endif // CONFIG_DEVICE_LAYER
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    auto tcpListenParams = Transport::TcpListenParameters(stateParams.tcpEndPointManager)
+                               .SetAddressType(IPAddressType::kIPv6)
+                               .SetListenPort(params.listenPort)
+                               .SetServerListenEnabled(false); // Initialize as a TCP Client
+#endif
+
     if (params.dataModelProvider == nullptr)
     {
         ChipLogError(AppServer, "Device Controller Factory requires a `dataModelProvider` value.");
@@ -167,15 +174,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(stateParams.transportMgr->Init(Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv6)
                                                             .SetListenPort(params.listenPort)
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-                                                            ,
-                                                        Transport::TcpListenParameters(stateParams.tcpEndPointManager)
-                                                            .SetAddressType(IPAddressType::kIPv6)
-                                                            .SetListenPort(params.listenPort)
-                                                            .SetServerListenEnabled(false) // Initialize as a TCP Client
-#endif
 #if INET_CONFIG_ENABLE_IPV4
-                                                        ,
+                                                            ,
                                                         Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv4)
                                                             .SetListenPort(params.listenPort)
@@ -184,8 +184,12 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
                                                             ,
                                                         Transport::BleListenParameters(stateParams.bleLayer)
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                                             ,
+                                                        tcpListenParams
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                                                        ,
                                                         Transport::WiFiPAFListenParameters()
 #endif
                                                             ));
@@ -285,6 +289,11 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         // Consequently, reach in set the fabric table pointer to point to the right version.
         //
         app::DnssdServer::Instance().SetFabricTable(stateParams.fabricTable);
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        // Disable the TCP Server based on the TCPListenParameters setting.
+        app::DnssdServer::Instance().SetTCPServerEnabled(tcpListenParams.IsServerListenEnabled());
+#endif
     }
 
     stateParams.sessionSetupPool = Platform::New<DeviceControllerSystemStateParams::SessionSetupPool>();

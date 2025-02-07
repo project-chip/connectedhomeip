@@ -47,7 +47,7 @@ public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
-    uint32_t GetSavedOperationalHoursSinceBoot() { return mSavedOperationalHoursSinceBoot; }
+    CHIP_ERROR UpdateOperationalHours(uint32_t * totalOperationalHours);
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
@@ -55,7 +55,6 @@ private:
     CHIP_ERROR _InitChipStack(void);
 
     static void OperationalHoursSavingTimerEventHandler(k_timer * timer);
-    static void UpdateOperationalHours(intptr_t arg);
 
     // ===== Members for internal use by the following friends.
 

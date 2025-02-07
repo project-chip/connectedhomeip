@@ -18,12 +18,13 @@
 
 #include <controller/AutoCommissioner.h>
 
-#include <cstring>
-
 #include <app/InteractionModelTimeout.h>
 #include <controller/CHIPDeviceController.h>
 #include <credentials/CHIPCert.h>
 #include <lib/support/SafeInt.h>
+
+#include <cstring>
+#include <type_traits>
 
 namespace chip {
 namespace Controller {
@@ -223,6 +224,32 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         mParams.SetICDCheckInNodeId(params.GetICDCheckInNodeId().Value());
         mParams.SetICDMonitoredSubject(params.GetICDMonitoredSubject().Value());
         mParams.SetICDClientType(params.GetICDClientType().Value());
+    }
+
+    auto extraReadPaths = params.GetExtraReadPaths();
+    if (extraReadPaths.size() > 0)
+    {
+        using ReadPath = std::remove_pointer_t<decltype(extraReadPaths.data())>;
+        static_assert(std::is_trivially_copyable_v<ReadPath>, "can't use memmove / memcpy, not trivially copyable");
+
+        if (mExtraReadPaths.AllocatedSize() == extraReadPaths.size())
+        {
+            memmove(mExtraReadPaths.Get(), extraReadPaths.data(), extraReadPaths.size() * sizeof(ReadPath));
+        }
+        else
+        {
+            // We can't reallocate mExtraReadPaths yet as this would free the old buffer,
+            // and the caller might be passing a sub-span of the old paths.
+            decltype(mExtraReadPaths) oldReadPaths(std::move(mExtraReadPaths));
+            VerifyOrReturnError(mExtraReadPaths.Alloc(extraReadPaths.size()), CHIP_ERROR_NO_MEMORY);
+            memcpy(mExtraReadPaths.Get(), extraReadPaths.data(), extraReadPaths.size() * sizeof(ReadPath));
+        }
+
+        mParams.SetExtraReadPaths(mExtraReadPaths.Span());
+    }
+    else
+    {
+        mExtraReadPaths.Free();
     }
 
     return CHIP_NO_ERROR;

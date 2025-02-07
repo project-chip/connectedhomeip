@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:97
+            image: ghcr.io/project-chip/chip-build:98
 
         steps:
             - name: Checkout
@@ -114,7 +114,6 @@ jobs:
                      --known-failure app/util/config.h \
                      --known-failure app/util/DataModelHandler.cpp \
                      --known-failure app/util/DataModelHandler.h \
-                     --known-failure app/util/ember-global-attribute-access-interface.h \
                      --known-failure app/util/ember-io-storage.h \
                      --known-failure app/util/endpoint-config-api.h \
                      --known-failure app/util/generic-callbacks.h \
@@ -133,7 +132,6 @@ jobs:
                   # for them. Keeping them as a list as they still need review ...
                   #   --known-failure app/util/attribute-table.cpp \
                   #   --known-failure app/util/ember-io-storage.cpp \
-                  #   --known-failure app/util/ember-global-attribute-access-interface.cpp \
                   #   --known-failure app/util/attribute-storage.cpp \
             - name: Check for matter lint errors
               if: always()
