@@ -113,43 +113,45 @@ Please reference to `--help` for more detail.
 
 ## Generate with default configuration
 
-- Default setting uses the following parameters
+-   Default setting uses the following parameters
 
-  - PAI certification: [test PAI certification](../../../credentials/test/attestation/Chip-Test-PAI-FFF1-8000-Key.pem) 
+    -   PAI certification:
+        [test PAI certification](../../../credentials/test/attestation/Chip-Test-PAI-FFF1-8000-Key.pem)
 
-  - Vendor ID for DAC: 0xFFF1; Vendor ID for CD: 0x130d
+    -   Vendor ID for DAC: 0xFFF1; Vendor ID for CD: 0x130d
 
-  - Product ID for DAC: 0x8000, Product ID for CD: 0x1001
+    -   Product ID for DAC: 0x8000, Product ID for CD: 0x1001
 
+*   Run following command to generate all plain text factory data
 
-- Run following command to generate all plain text factory data
-
-  Please create output folder first. Here takes `out/test-cert` as example.
-
-  ```shell
-  ./scripts/tools/bouffalolab/generate_factory_data.py --output out/test-cert
-  ```
-
-  - Check DAC certificate. Here takes `out_130d_1001_106_dac_cert.pem` as generated test certificate.
+    Please create output folder first. Here takes `out/test-cert` as example.
 
     ```shell
-    openssl x509 -noout -text -in out/test-cert/out_130d_1001_106_dac_cert.pem
+    ./scripts/tools/bouffalolab/generate_factory_data.py --output out/test-cert
     ```
 
-  - Check Certification Declare. Here takes `out_130d_1001_cd.der` as generated test certificate.
+    -   Check DAC certificate. Here takes `out_130d_1001_106_dac_cert.pem` as
+        generated test certificate.
+
+        ```shell
+        openssl x509 -noout -text -in out/test-cert/out_130d_1001_106_dac_cert.pem
+        ```
+
+    -   Check Certification Declare. Here takes `out_130d_1001_cd.der` as
+        generated test certificate.
+
+        ```shell
+        ./out/linux-x64-chip-cert/chip-cert print-cd out/test-cert/out_130d_1001_cd.der
+        ```
+
+*   Run following command to generate factory data which encrypt private of
+    device attestation data
 
     ```shell
-    ./out/linux-x64-chip-cert/chip-cert print-cd out/test-cert/out_130d_1001_cd.der
+    ./scripts/tools/bouffalolab/generate_factory_data.py --output out/test-cert --key <hex string of 16 bytes>
     ```
 
-- Run following command to generate factory data which encrypt private of
-  device attestation data
-
-  ```shell
-  ./scripts/tools/bouffalolab/generate_factory_data.py --output out/test-cert --key <hex string of 16 bytes>
-  ```
-
-  > An example of hex string of 16 bytes: 12345678123456781234567812345678. 
+    > An example of hex string of 16 bytes: 12345678123456781234567812345678.
 
 After command executes successfully, the output folder will has files as below:
 
@@ -174,113 +176,119 @@ After command executes successfully, the output folder will has files as below:
 Self-defined PAA/PAI certificates may use in development and test scenario. But,
 user should know it has limit to work with real ecosystem.
 
-- Export environment variables in terminal for certificates generation
+-   Export environment variables in terminal for certificates generation
 
-  ```
-  export TEST_CERT_VENDOR_ID=130D   # Vendor ID hex string
-  export TEST_CERT_PRODUCT_ID=1001  # Product ID hex string
-  export TEST_CERT_CN=BFLB          # Common Name
-  ```
-
-- Generate PAA certificate and key to `out/cert` folder.
-
-  ```shell
-  ./out/linux-x64-chip-cert/chip-cert gen-att-cert --type a --subject-cn "${TEST_CERT_CN} PAA 01" --valid-from "2020-10-15 14:23:43" --lifetime 7305 --out-key out/test-cert/Chip-PAA-Key-${TEST_CERT_VENDOR_ID}.pem --out out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.pem --subject-vid ${TEST_CERT_VENDOR_ID}
-  ```
-
-  - Check PAA certificate
-
-    ```shell
-    openssl x509 -noout -text -in out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.pem
+    ```
+    export TEST_CERT_VENDOR_ID=130D   # Vendor ID hex string
+    export TEST_CERT_PRODUCT_ID=1001  # Product ID hex string
+    export TEST_CERT_CN=BFLB          # Common Name
     ```
 
-- Convert PAA PEM format file to PAA DER format file
-
-  ```shell
-  ./out/linux-x64-chip-cert/chip-cert convert-cert -d out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.pem out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.der
-  ```
-
-  > Please save this PAA DER format file which will be used by `chip-tool`
-  > during commissioning.
-
-- Generate PAI certificate and key:
-
-  ```shell
-  ./out/linux-x64-chip-cert/chip-cert gen-att-cert --type i --subject-cn "${TEST_CERT_CN} PAI 01" --subject-vid ${TEST_CERT_VENDOR_ID} --valid-from "2020-10-15 14:23:43" --lifetime 7305 --ca-key out/test-cert/Chip-PAA-Key-${TEST_CERT_VENDOR_ID}.pem --ca-cert out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.pem --out-key out/test-cert/Chip-PAI-Key-${TEST_CERT_VENDOR_ID}.pem --out out/test-cert/Chip-PAI-Cert-${TEST_CERT_VENDOR_ID}.pem
-  ```
-
-  -   Check PAI certificate
-
-      ```shell
-      openssl x509 -noout -text -in out/test-cert/Chip-PAI-Cert-${TEST_CERT_VENDOR_ID}.pem
-      ```
-
-- Generate `MFD` in plain text data with same VID/PID in DAC and CD
-
-  - Use same environment variables  `TEST_CERT_VENDOR_ID` and `TEST_CERT_PRODUCT_ID` for CD.
-
-      ```shell
-      ./scripts/tools/bouffalolab/generate_factory_data.py --output out/test-cert --paa_cert out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.pem --paa_key out/test-cert/Chip-PAA-Key-${TEST_CERT_VENDOR_ID}.pem --pai_cert out/test-cert/Chip-PAI-Cert-${TEST_CERT_VENDOR_ID}.pem --pai_key out/test-cert/Chip-PAI-Key-${TEST_CERT_VENDOR_ID}.pem --dac_pid 0x${TEST_CERT_PRODUCT_ID} --vendor_id 0x${TEST_CERT_VENDOR_ID} --product_id 0x${TEST_CERT_PRODUCT_ID}
-      ```
-
-      > Appending `--key <hex string of 16 bytes>` option to enable encrypt
-      > private key of attestation device data.
-
-  - Check DAC certificate. Here takes `out_130d_1001_1349_dac_cert.pem` as generated test certification.
+-   Generate PAA certificate and key to `out/cert` folder.
 
     ```shell
-    openssl x509 -noout -text -in out/test-cert/out_130d_1001_1349_dac_cert.pem
+    ./out/linux-x64-chip-cert/chip-cert gen-att-cert --type a --subject-cn "${TEST_CERT_CN} PAA 01" --valid-from "2020-10-15 14:23:43" --lifetime 7305 --out-key out/test-cert/Chip-PAA-Key-${TEST_CERT_VENDOR_ID}.pem --out out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.pem --subject-vid ${TEST_CERT_VENDOR_ID}
     ```
 
-  - Check PAA/PAI/DAC certificate chain.
+    -   Check PAA certificate
+
+        ```shell
+        openssl x509 -noout -text -in out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.pem
+        ```
+
+-   Convert PAA PEM format file to PAA DER format file
 
     ```shell
-    ./out/linux-x64-chip-cert/chip-cert validate-att-cert --dac out/test-cert/out_130d_1001_1349_dac_cert.pem --pai out/test-cert/Chip-PAI-Cert-${TEST_CERT_VENDOR_ID}.pem --paa out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.pem
-    ```
-    
-  - Check Certification Declare. Here takes `out_130d_1001_cd.der` as generated test certification.
-
-    ```shell
-    ./out/linux-x64-chip-cert/chip-cert print-cd out/test-cert/out_130d_1001_cd.der
+    ./out/linux-x64-chip-cert/chip-cert convert-cert -d out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.pem out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.der
     ```
 
-- Generate `MFD` in plain text data with different VID/PID in DAC and CD
+    > Please save this PAA DER format file which will be used by `chip-tool`
+    > during commissioning.
 
-  - Export vendor ID and product ID for CD
-  
-    ```shell
-    export TEST_CD_VENDOR_ID=730D   # Vendor ID hex string
-    export TEST_CD_PRODUCT_ID=7001  # Product ID hex string
-    ```
-  
-  - Run script to generate DAC/CD and MFD.
+-   Generate PAI certificate and key:
 
-      ```shell
-      ./scripts/tools/bouffalolab/generate_factory_data.py --output out/test-cert --paa_cert out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.pem --paa_key out/test-cert/Chip-PAA-Key-${TEST_CERT_VENDOR_ID}.pem --pai_cert out/test-cert/Chip-PAI-Cert-${TEST_CERT_VENDOR_ID}.pem --pai_key out/test-cert/Chip-PAI-Key-${TEST_CERT_VENDOR_ID}.pem --dac_pid 0x${TEST_CERT_PRODUCT_ID} --vendor_id 0x${TEST_CD_VENDOR_ID} --product_id 0x${TEST_CD_PRODUCT_ID}
-      ```
+    ```shell
+    ./out/linux-x64-chip-cert/chip-cert gen-att-cert --type i --subject-cn "${TEST_CERT_CN} PAI 01" --subject-vid ${TEST_CERT_VENDOR_ID} --valid-from "2020-10-15 14:23:43" --lifetime 7305 --ca-key out/test-cert/Chip-PAA-Key-${TEST_CERT_VENDOR_ID}.pem --ca-cert out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.pem --out-key out/test-cert/Chip-PAI-Key-${TEST_CERT_VENDOR_ID}.pem --out out/test-cert/Chip-PAI-Cert-${TEST_CERT_VENDOR_ID}.pem
+    ```
 
-      > Appending `--key <hex string of 16 bytes>` option to enable encrypt
-      > private key of attestation device data.
-      >
-      > Please use --`vendor_name`  and `--product_name` to change vendor name and product name.
-  
-  - Check DAC certificate. Here takes `out_130d_1001_1349_dac_cert.pem` as generated test certification.
-  
-    ```shell
-    openssl x509 -noout -text -in out/test-cert/out_130d_1001_1349_dac_cert.pem
-    ```
-  
-  - Check PAA/PAI/DAC certificate chain.
-  
-    ```shell
-    ./out/linux-x64-chip-cert/chip-cert validate-att-cert --dac out/test-cert/out_130d_1001_1349_dac_cert.pem --pai out/test-cert/Chip-PAI-Cert-${TEST_CERT_VENDOR_ID}.pem --paa out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.pem
-    ```
-    
-  - Check Certification Declare. Here takes `out_730D_7001_cd.der` as generated test certification.
-  
-    ```shell
-    ./out/linux-x64-chip-cert/chip-cert print-cd out/test-cert/out_130d_1001_cd.der
-    ```
+    -   Check PAI certificate
+
+        ```shell
+        openssl x509 -noout -text -in out/test-cert/Chip-PAI-Cert-${TEST_CERT_VENDOR_ID}.pem
+        ```
+
+-   Generate `MFD` in plain text data with same VID/PID in DAC and CD
+
+    -   Use same environment variables `TEST_CERT_VENDOR_ID` and
+        `TEST_CERT_PRODUCT_ID` for CD.
+
+        ```shell
+        ./scripts/tools/bouffalolab/generate_factory_data.py --output out/test-cert --paa_cert out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.pem --paa_key out/test-cert/Chip-PAA-Key-${TEST_CERT_VENDOR_ID}.pem --pai_cert out/test-cert/Chip-PAI-Cert-${TEST_CERT_VENDOR_ID}.pem --pai_key out/test-cert/Chip-PAI-Key-${TEST_CERT_VENDOR_ID}.pem --dac_pid 0x${TEST_CERT_PRODUCT_ID} --vendor_id 0x${TEST_CERT_VENDOR_ID} --product_id 0x${TEST_CERT_PRODUCT_ID}
+        ```
+
+        > Appending `--key <hex string of 16 bytes>` option to enable encrypt
+        > private key of attestation device data.
+
+    -   Check DAC certificate. Here takes `out_130d_1001_1349_dac_cert.pem` as
+        generated test certification.
+
+        ```shell
+        openssl x509 -noout -text -in out/test-cert/out_130d_1001_1349_dac_cert.pem
+        ```
+
+    -   Check PAA/PAI/DAC certificate chain.
+
+        ```shell
+        ./out/linux-x64-chip-cert/chip-cert validate-att-cert --dac out/test-cert/out_130d_1001_1349_dac_cert.pem --pai out/test-cert/Chip-PAI-Cert-${TEST_CERT_VENDOR_ID}.pem --paa out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.pem
+        ```
+
+    -   Check Certification Declare. Here takes `out_130d_1001_cd.der` as
+        generated test certification.
+
+        ```shell
+        ./out/linux-x64-chip-cert/chip-cert print-cd out/test-cert/out_130d_1001_cd.der
+        ```
+
+-   Generate `MFD` in plain text data with different VID/PID in DAC and CD
+
+    -   Export vendor ID and product ID for CD
+
+        ```shell
+        export TEST_CD_VENDOR_ID=730D   # Vendor ID hex string
+        export TEST_CD_PRODUCT_ID=7001  # Product ID hex string
+        ```
+
+    -   Run script to generate DAC/CD and MFD.
+
+        ```shell
+        ./scripts/tools/bouffalolab/generate_factory_data.py --output out/test-cert --paa_cert out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.pem --paa_key out/test-cert/Chip-PAA-Key-${TEST_CERT_VENDOR_ID}.pem --pai_cert out/test-cert/Chip-PAI-Cert-${TEST_CERT_VENDOR_ID}.pem --pai_key out/test-cert/Chip-PAI-Key-${TEST_CERT_VENDOR_ID}.pem --dac_pid 0x${TEST_CERT_PRODUCT_ID} --vendor_id 0x${TEST_CD_VENDOR_ID} --product_id 0x${TEST_CD_PRODUCT_ID}
+        ```
+
+        > Appending `--key <hex string of 16 bytes>` option to enable encrypt
+        > private key of attestation device data.
+        >
+        > Please use --`vendor_name` and `--product_name` to change vendor name
+        > and product name.
+
+    -   Check DAC certificate. Here takes `out_130d_1001_1349_dac_cert.pem` as
+        generated test certification.
+
+        ```shell
+        openssl x509 -noout -text -in out/test-cert/out_130d_1001_1349_dac_cert.pem
+        ```
+
+    -   Check PAA/PAI/DAC certificate chain.
+
+        ```shell
+        ./out/linux-x64-chip-cert/chip-cert validate-att-cert --dac out/test-cert/out_130d_1001_1349_dac_cert.pem --pai out/test-cert/Chip-PAI-Cert-${TEST_CERT_VENDOR_ID}.pem --paa out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.pem
+        ```
+
+    -   Check Certification Declare. Here takes `out_730D_7001_cd.der` as
+        generated test certification.
+
+        ```shell
+        ./out/linux-x64-chip-cert/chip-cert print-cd out/test-cert/out_130d_1001_cd.der
+        ```
 
 ## Generate with self-defined DAC certificate and key
 
