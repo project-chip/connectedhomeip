@@ -2,9 +2,6 @@ ARG VERSION=1
 FROM ghcr.io/project-chip/chip-build-java:${VERSION}
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
-# JDK 8 access
-# JDK 8 is required because Android `sdkmanager`
-# doesn't work with JDK 11.
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
@@ -72,3 +69,4 @@ RUN set -x \
 
 ENV ANDROID_HOME=/opt/android/sdk
 ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r23c
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
