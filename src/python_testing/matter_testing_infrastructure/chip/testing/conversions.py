@@ -30,8 +30,14 @@ def bytes_from_hex(hex: str) -> bytes:
     """ Converts hex string to bytes, handling various formats (colons, spaces, newlines).
 
     Examples:
-        "01:ab:cd" -> b'\x01\xab\xcd'
-        "01 ab cd" -> b'\x01\xab\xcd'
+        >>> bytes_from_hex("01:ab:cd")
+        b'\\x01\\xab\\xcd'
+        >>> bytes_from_hex("01 ab cd")
+        b'\\x01\\xab\\xcd'
+        >>> bytes_from_hex("01abcd")
+        b'\\x01\\xab\\xcd'
+        >>> bytes_from_hex("01\\nab\\ncd")
+        b'\\x01\\xab\\xcd'
     """
     return unhexlify("".join(hex.replace(":", "").replace(" ", "").split()))
 
@@ -49,7 +55,11 @@ def hex_from_bytes(b: bytes) -> str:
         str: A string containing the hexadecimal representation of the bytes,
             using lowercase letters a-f for hex digits
 
-    Example: b'\x01\xab\xcd' -> '01abcd'
+    Examples:
+        >>> hex_from_bytes(b'\\x01\\xab\\xcd')
+        '01abcd'
+        >>> hex_from_bytes(bytes([1, 171, 205]))  # Same bytes, different notation
+        '01abcd'
     """
     return hexlify(b).decode("utf-8")
 
@@ -65,6 +75,14 @@ def format_decimal_and_hex(number):
 
     Returns:
         str: A formatted string like "123 (0x7b)"
+
+    Examples:
+        >>> format_decimal_and_hex(123)
+        '123 (0x7b)'
+        >>> format_decimal_and_hex(0)
+        '0 (0x00)'
+        >>> format_decimal_and_hex(255)
+        '255 (0xff)'
     """
     return f'{number} (0x{number:02x})'
 
@@ -72,15 +90,22 @@ def format_decimal_and_hex(number):
 def cluster_id_with_name(id):
     """ Formats a Matter cluster ID with its name and numeric representation.
 
-    Uses id_str() for numeric formatting and looks up cluster name from registry.
+    Uses format_decimal_and_hex() for numeric formatting and looks up cluster name from registry.
     Falls back to "Unknown cluster" if ID not recognized.
 
     Args:
         id: int, the Matter cluster identifier
 
     Returns:
-        str: A formatted string containing the ID and cluster name, like
-            "6 (0x06) OnOff", or "Unknown cluster" if ID not recognized
+        str: A formatted string containing the ID and cluster name
+
+    Examples:
+        >>> cluster_id_with_name(6)  # OnOff cluster
+        '6 (0x06) OnOff'
+        >>> cluster_id_with_name(999999)  # Unknown cluster
+        '999999 (0xf423f) Unknown cluster'
+        >>> cluster_id_with_name("invalid")  # Invalid input
+        'HERE IS THE PROBLEM'
     """
     if id in Clusters.ClusterObjects.ALL_CLUSTERS.keys():
         s = Clusters.ClusterObjects.ALL_CLUSTERS[id].__name__
@@ -88,5 +113,10 @@ def cluster_id_with_name(id):
         s = "Unknown cluster"
     try:
         return f'{format_decimal_and_hex(id)} {s}'
-    except TypeError:
+    except (TypeError, ValueError):
         return 'HERE IS THE PROBLEM'
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

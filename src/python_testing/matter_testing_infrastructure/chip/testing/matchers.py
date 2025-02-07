@@ -39,6 +39,15 @@ def is_type(received_value, desired_type):
 
     Returns:
         bool: True if the received_value matches the desired_type specification
+
+    Examples:
+        >>> is_type(42, int)
+        True
+        >>> from typing import Optional
+        >>> is_type(None, Optional[str])
+        True
+        >>> is_type([1,2,3], list[int])
+        True
     """
     if typing.get_origin(desired_type) == typing.Union:
         return any(is_type(received_value, t) for t in typing.get_args(desired_type))
@@ -54,3 +63,8 @@ def is_type(received_value, desired_type):
         return isinstance(received_value, float)
     else:
         return isinstance(received_value, desired_type)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

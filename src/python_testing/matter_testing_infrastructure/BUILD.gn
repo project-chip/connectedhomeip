@@ -52,9 +52,12 @@ pw_python_package("chip-testing-module") {
     "chip/testing/timeoperations.py",
   ]
   tests = [
+    "chip/testing/conversions.py",
+    "chip/testing/matchers.py",
     "chip/testing/test_metadata.py",
     "chip/testing/test_tasks.py",
     "chip/testing/test_matter_asserts.py",
+    "chip/testing/timeoperations.py",
   ]
 }
 

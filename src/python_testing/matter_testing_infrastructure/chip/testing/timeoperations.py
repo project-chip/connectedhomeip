@@ -20,6 +20,10 @@
 This module provides functionality for handling time-related operations in Matter
 testing, particularly focusing on conversions between different time formats and
 epochs.
+
+Examples:
+    To run the doctests, execute the module as a script:
+    $ python3 timeoperations.py
 """
 
 from datetime import datetime, timedelta, timezone
@@ -34,7 +38,7 @@ def utc_time_in_matter_epoch(desired_datetime: Optional[datetime] = None):
     """ Converts a datetime to microseconds since Matter epoch.
 
     The Matter epoch is defined as January 1, 2000, 00:00:00 UTC. This function
-    calculates the number of microseconds between the input datetime and the
+    calculates the number of microseconds beчtween the input datetime and the
     Matter epoch. If no datetime is provided, the current UTC time is used.
 
     Args:
@@ -43,6 +47,13 @@ def utc_time_in_matter_epoch(desired_datetime: Optional[datetime] = None):
 
     Returns:
         int: Microseconds since Matter epoch
+
+    Examples:
+        >>> from datetime import datetime, timezone
+        >>> utc_time_in_matter_epoch(datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=timezone.utc))
+        0
+        >>> utc_time_in_matter_epoch(datetime(2000, 1, 1, 0, 0, 0, 1, tzinfo=timezone.utc))
+        1
     """
     if desired_datetime is None:
         utc_native = datetime.now(tz=timezone.utc)
@@ -66,6 +77,12 @@ def utc_datetime_from_matter_epoch_us(matter_epoch_us: int) -> datetime:
 
     Returns:
         datetime: UTC datetime
+
+    Examples:
+        >>> utc_datetime_from_matter_epoch_us(0)
+        datetime.datetime(2000, 1, 1, 0, 0, tzinfo=datetime.timezone.utc)
+        >>> utc_datetime_from_matter_epoch_us(123456789)
+        datetime.datetime(2000, 1, 1, 0, 2, 3, 456789, tzinfo=datetime.timezone.utc)
     """
     delta_from_epoch = timedelta(microseconds=matter_epoch_us)
     matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)
@@ -84,6 +101,12 @@ def utc_datetime_from_posix_time_ms(posix_time_ms: int) -> datetime:
 
     Returns:
         datetime: UTC datetime   
+
+    Examples:
+        >>> utc_datetime_from_posix_time_ms(0)
+        datetime.datetime(1970, 1, 1, 0, 0, tzinfo=datetime.timezone.utc)
+        >>> utc_datetime_from_posix_time_ms(1609459200000) # 2021-01-01 00:00:00 UTC
+        datetime.datetime(2021, 1, 1, 0, 0, tzinfo=datetime.timezone.utc)
     """
     millis = posix_time_ms % 1000
     seconds = posix_time_ms // 1000
@@ -102,6 +125,15 @@ def compare_time(received: int, offset: timedelta = timedelta(), utc: Optional[i
     Raises:
         AssertionError: If the received time differs from the expected time by
             more than the specified tolerance
+
+    Examples:
+        >>> compare_time(5000000, utc=0, tolerance=timedelta(seconds=5)) # Passes (exactly 5s)
+        >>> from mobly import signals
+        >>> try:
+        ...     compare_time(6000000, utc=0, tolerance=timedelta(seconds=5))
+        ... except signals.TestFailure as e:
+        ...     print("AssertionError: Received time is out of tolerance")
+        AssertionError: Received time is out of tolerance
     """
     if utc is None:
         utc = utc_time_in_matter_epoch()
@@ -128,10 +160,17 @@ def get_wait_seconds_from_set_time(set_time_matter_us: int, wait_seconds: int):
         int: Remaining seconds (negative if period expired)
 
     Examples:
-        >>> start_time = utc_time_in_matter_epoch()
-        >>> # After 2 seconds...
-        >>> get_wait_seconds_from_set_time(start_time, 5)
-        3  # Returns remaining 3 seconds from original 5 second wait
+        >>> import unittest.mock
+        >>> start_time = utc_time_in_matter_epoch(datetime(2000, 1, 1, 0, 0, 0, tzinfo=timezone.utc)) # 0
+        >>> with unittest.mock.patch(__name__ + '.utc_time_in_matter_epoch') as mock_time:
+        ...     mock_time.return_value = 2000000  # Simulate current time 2 seconds after start
+        ...     get_wait_seconds_from_set_time(start_time, 5)  # 5 - (2000000 / 1e6) = 5 - 2 = 3
+        3
     """
     seconds_passed = (utc_time_in_matter_epoch() - set_time_matter_us) // 1000000
     return wait_seconds - seconds_passed
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
