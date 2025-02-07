@@ -93,7 +93,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
     @ async_test_body
     async def test_TC_TSTAT_2_2(self):
-        endpoint = self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else 1
+        endpoint = self.get_endpoint()
 
         # Default values for various optional attributes
         AbsMaxCoolSetpointLimitValue = 3200
