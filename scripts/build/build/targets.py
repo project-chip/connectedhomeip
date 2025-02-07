@@ -257,6 +257,7 @@ def BuildEfr32Target():
         TargetPart('brd4338a', board=Efr32Board.BRD4338A, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd2605a', board=Efr32Board.BRD2605A, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd4343a', board=Efr32Board.BRD4343A, enable_wifi=True, enable_917_soc=True),
+        TargetPart('brd4342a', board=Efr32Board.BRD4342A, enable_wifi=True, enable_917_soc=True),
     ])
 
     # apps
@@ -777,10 +778,9 @@ def BuildTelinkTarget():
         TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D),
         TargetPart('tlsr9528a', board=TelinkBoard.TLSR9528A),
         TargetPart('tlsr9528a_retention', board=TelinkBoard.TLSR9528A_RETENTION),
-        TargetPart('tlsr9258a', board=TelinkBoard.TLSR9258A),
-        TargetPart('tlsr9258a_retention', board=TelinkBoard.TLSR9258A_RETENTION),
         TargetPart('tl3218x', board=TelinkBoard.TL3218X),
         TargetPart('tl7218x', board=TelinkBoard.TL7218X),
+        TargetPart('tl7218x_retention', board=TelinkBoard.TL7218X_RETENTION),
     ])
 
     target.AppendFixedTargets([

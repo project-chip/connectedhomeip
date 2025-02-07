@@ -33,7 +33,7 @@
 #
 
 import chip.clusters as Clusters
-from chip.clusters.Types import Nullable, NullValue
+from chip.clusters.Types import NullValue
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -60,10 +60,9 @@ class TC_DGWIFI_2_3(MatterBaseTest):
         value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.WiFiNetworkDiagnostics, attribute=attribute)
         if value is None:
             return
-        asserts.assert_true(isinstance(value, Nullable), f"{field_name} must be of type 'Nullable' when not None.")
         if value == NullValue:
             return
-        asserts.assert_true(validation_func(value.Value), f"{field_name} has an invalid value: {value.Value}")
+        asserts.assert_true(validation_func(value), f"{field_name} has an invalid value: {value}")
 
     def desc_TC_DGWIFI_2_3(self) -> str:
         """Returns a description of this test."""

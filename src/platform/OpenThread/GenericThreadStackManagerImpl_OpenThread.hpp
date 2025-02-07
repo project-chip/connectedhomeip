@@ -87,6 +87,13 @@ void initNetworkCommissioningThreadDriver()
 #endif
 }
 
+void resetGenericThreadDriver()
+{
+#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
+    sGenericThreadDriver.ClearNetwork();
+#endif
+}
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 CHIP_ERROR ReadDomainNameComponent(const char *& in, char * out, size_t outSize)
 {
@@ -1257,6 +1264,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo()
     otThreadSetEnabled(mOTInst, false);
     otIp6SetEnabled(mOTInst, false);
     otInstanceErasePersistentInfo(mOTInst);
+    resetGenericThreadDriver();
     Impl()->UnlockThreadStack();
 }
 

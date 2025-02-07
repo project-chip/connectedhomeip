@@ -44,6 +44,7 @@
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
+#include <credentials/attestation_verifier/TestDACRevocationDelegateImpl.h>
 
 using namespace chip;
 
@@ -59,6 +60,15 @@ const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStor
     static chip::Credentials::FileAttestationTrustStore attestationTrustStore{ paaTrustStorePath };
 
     return &attestationTrustStore;
+}
+
+Credentials::DeviceAttestationRevocationDelegate * GetTestAttestationRevocationDelegate(const char * dacRevocationSetPath)
+{
+    VerifyOrReturnValue(dacRevocationSetPath != nullptr, nullptr);
+
+    static Credentials::TestDACRevocationDelegateImpl testDacRevocationDelegate;
+    testDacRevocationDelegate.SetDeviceAttestationRevocationSetPath(dacRevocationSetPath);
+    return &testDacRevocationDelegate;
 }
 
 chip::Python::PlaceholderOperationalCredentialsIssuer sPlaceholderOperationalCredentialsIssuer;
@@ -700,4 +710,15 @@ PyChipError pychip_GetCompletionError()
     return ToPyChipError(sTestCommissioner.GetCompletionError());
 }
 
+PyChipError pychip_DeviceController_SetDACRevocationSetPath(const char * dacRevocationSetPath)
+{
+    Credentials::DeviceAttestationRevocationDelegate * dacRevocationDelegate =
+        GetTestAttestationRevocationDelegate(dacRevocationSetPath);
+    VerifyOrReturnError(dacRevocationDelegate != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    Credentials::DeviceAttestationVerifier * dacVerifier = Credentials::GetDeviceAttestationVerifier();
+    VerifyOrReturnError(dacVerifier != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
+
+    return ToPyChipError(dacVerifier->SetRevocationDelegate(dacRevocationDelegate));
+}
 } // extern "C"

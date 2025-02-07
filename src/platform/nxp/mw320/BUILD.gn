@@ -73,7 +73,10 @@ static_library("mw320") {
   # Use ethernet/wifi interface for network commissioning. Default: WiFi
   defines += [ "USE_ETHERNET_COMMISSION=0" ]
 
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/platform/logging:headers",
+  ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
@@ -83,6 +86,7 @@ static_library("mw320") {
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
+    deps += [ "${chip_root}/src/app:app_config" ]
 
     if (chip_mdns == "platform") {
       sources += [ "../../OpenThread/MdnsImpl.cpp" ]

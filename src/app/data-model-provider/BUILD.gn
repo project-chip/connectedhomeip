@@ -14,6 +14,16 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
+source_set("metadata") {
+  sources = [ "MetadataTypes.h" ]
+
+  public_deps = [
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
 source_set("data-model-provider") {
   sources = [
     "ActionContext.h",
@@ -21,20 +31,25 @@ source_set("data-model-provider") {
     "ActionReturnStatus.h",
     "Context.h",
     "EventsGenerator.h",
-    "MetadataTypes.cpp",
-    "MetadataTypes.h",
+    "MetadataList.cpp",
+    "MetadataList.h",
+    "MetadataLookup.cpp",
+    "MetadataLookup.h",
     "OperationTypes.h",
     "Provider.h",
     "ProviderChangeListener.h",
+    "ProviderMetadataTree.cpp",
+    "ProviderMetadataTree.h",
   ]
 
   public_deps = [
-    "${chip_root}/src/access:types",
+    ":metadata",
     "${chip_root}/src/app:attribute-access",
     "${chip_root}/src/app:command-handler-interface",
     "${chip_root}/src/app:events",
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app/MessageDef",
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:error",

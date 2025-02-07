@@ -36,6 +36,11 @@ RefreshKeySender::RefreshKeySender(CheckInDelegate * checkInDelegate, const ICDC
     mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {}
 
+const ICDClientInfo & RefreshKeySender::GetICDClientInfo()
+{
+    return mICDClientInfo;
+}
+
 CHIP_ERROR RefreshKeySender::RegisterClientWithNewKey(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     auto onSuccess = [&](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {

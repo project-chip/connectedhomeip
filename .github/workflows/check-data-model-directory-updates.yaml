@@ -37,3 +37,27 @@ jobs:
       - name: Check for changes to 1.4 data_model directory without a SHA update
         run: |
           python3 scripts/dm_xml_ci_change_enforcement.py data_model/1.4
+      - name: Check for changes to 1.4.1 data_model directory without a SHA update
+        run: |
+          python3 scripts/dm_xml_ci_change_enforcement.py data_model/1.4.1
+
+  check-data_model-build-file:
+    name: Check that all data_model files are listed in the data_model_xmls.gni build file
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/project-chip/chip-build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup pip modules we use
+        run: |
+            python3 -m venv out/venv
+            out/venv/bin/pip3 install \
+                jinja2
+      - name: Generate build file (data_model_xmls.gni)
+        run: out/venv/bin/python3 src/python_testing/matter_testing_infrastructure/generate_data_model_xmls_gni.py
+      - name: Ensure git works in current working directory
+        run: git config --global --add safe.directory `pwd`
+      - name: Check for uncommited changes
+        run: |
+          git diff --exit-code HEAD -- src/python_testing/matter_testing_infrastructure/data_model_xmls.gni

@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 104,
+  "featureLevel": 106,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -4493,10 +4493,10 @@
               "side": "server",
               "type": "OperatingModeEnum",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -4525,10 +4525,10 @@
               "side": "server",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "15",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

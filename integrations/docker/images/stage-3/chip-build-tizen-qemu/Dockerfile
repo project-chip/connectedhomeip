@@ -39,7 +39,7 @@ RUN set -x \
     && wget --progress=dot:giga -r -nd --no-parent -e robots=off -A 'rpi4-linux-kernel-*.src.rpm' \
     http://download.tizen.org/snapshots/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/source/ \
     # Prepare kernel source (Linux kernel + Tizen patchset)
-    && unrpm rpi4-linux-kernel-*.src.rpm \
+    && 7z x -so rpi4-linux-kernel-*.src.rpm | cpio -idmv \
     && rm rpi4-linux-kernel-*.src.rpm \
     && tar -xJf linux-kernel-*.tar.xz \
     && rm linux-kernel-*.tar.xz \

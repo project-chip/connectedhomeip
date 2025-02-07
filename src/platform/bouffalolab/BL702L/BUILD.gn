@@ -70,6 +70,7 @@ static_library("BL702L") {
   }
 
   deps = [
+    "${chip_root}/src/app:app_config",
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/platform/logging:headers",
   ]
@@ -79,7 +80,10 @@ static_library("BL702L") {
 
     import("//build_overrides/bouffalolab_iot_sdk.gni")
     import("${bouffalolab_iot_sdk_build_root}/bl702l/bl_iot_sdk.gni")
-    deps += [ "${bouffalolab_iot_sdk_build_root}/bl702l:bl_iot_sdk" ]
+    deps += [
+      "${bouffalolab_iot_sdk_build_root}/bl702l:bl_iot_sdk",
+      "${chip_root}/src/app:app_config",
+    ]
 
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",

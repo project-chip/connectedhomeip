@@ -19,6 +19,7 @@ import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/silabs/efr32_sdk.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
+import("${matter_support_root}/provision/args.gni")
 
 assert(chip_device_platform == "efr32")
 
@@ -114,7 +115,7 @@ static_library("efr32") {
     "${chip_root}/src/platform:platform_base",
     "${chip_root}/src/platform/logging:headers",
   ]
-  deps = [ "${silabs_platform_dir}/provision:provision-headers" ]
+  deps = [ "${sl_provision_root}:headers" ]
   public_configs = []
 
   # Add platform crypto implementation
@@ -136,7 +137,11 @@ static_library("efr32") {
   if (chip_enable_openthread) {
     public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
 
-    deps += [ "${chip_root}/third_party/openthread:openthread_cli" ]
+    deps += [
+      "${chip_root}/src/app:app_config",
+      "${chip_root}/src/app:app_config",
+      "${chip_root}/third_party/openthread:openthread_cli",
+    ]
 
     sources += [
       "${silabs_platform_dir}/ThreadStackManagerImpl.h",

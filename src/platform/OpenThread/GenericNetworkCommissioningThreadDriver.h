@@ -87,6 +87,8 @@ public:
         connectNetworkTimeout     = connectTimeoutSec;
     }
 
+    void ClearNetwork() { mStagingNetwork.Clear(); }
+
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new ThreadNetworkIterator(this); }
     CHIP_ERROR Init(Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback) override;

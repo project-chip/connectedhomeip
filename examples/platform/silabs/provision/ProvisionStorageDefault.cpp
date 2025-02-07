@@ -14,9 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "AttestationKey.h"
-#include "ProvisionStorage.h"
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <headers/AttestationKey.h>
+#include <headers/ProvisionStorage.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>

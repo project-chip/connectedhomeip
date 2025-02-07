@@ -1,1 +1,1 @@
-98 : [nrfconnect] Update nRF Connect SDK version.
+109 : [Tizen] Fix race when storing cert credentials

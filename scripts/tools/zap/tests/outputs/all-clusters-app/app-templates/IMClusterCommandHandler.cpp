@@ -37,67 +37,10 @@ namespace app {
 
 namespace Clusters {
 
-namespace AdministratorCommissioning {
-
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
-{
-    CHIP_ERROR TLVError = CHIP_NO_ERROR;
-    bool wasHandled     = false;
-    {
-        switch (aCommandPath.mCommandId)
-        {
-        case Commands::OpenCommissioningWindow::Id: {
-            Commands::OpenCommissioningWindow::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(apCommandObj, aCommandPath,
-                                                                                                     commandData);
-            }
-            break;
-        }
-        case Commands::OpenBasicCommissioningWindow::Id: {
-            Commands::OpenBasicCommissioningWindow::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(
-                    apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::RevokeCommissioning::Id: {
-            Commands::RevokeCommissioning::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled =
-                    emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
-                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
-        }
-        }
-    }
-
-    if (CHIP_NO_ERROR != TLVError || !wasHandled)
-    {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
-        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
-    }
-}
-
-} // namespace AdministratorCommissioning
-
 namespace BooleanStateConfiguration {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -125,26 +68,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace BooleanStateConfiguration
 
 namespace ColorControl {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -325,26 +272,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace ColorControl
 
 namespace DiagnosticLogs {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -362,26 +313,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace DiagnosticLogs
 
 namespace DishwasherAlarm {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -408,26 +363,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace DishwasherAlarm
 
 namespace EthernetNetworkDiagnostics {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -445,26 +404,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace EthernetNetworkDiagnostics
 
 namespace FanControl {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -482,26 +445,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace FanControl
 
 namespace FaultInjection {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -528,81 +495,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace FaultInjection
 
-namespace GeneralDiagnostics {
-
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
-{
-    CHIP_ERROR TLVError = CHIP_NO_ERROR;
-    bool wasHandled     = false;
-    {
-        switch (aCommandPath.mCommandId)
-        {
-        case Commands::TestEventTrigger::Id: {
-            Commands::TestEventTrigger::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::TimeSnapshot::Id: {
-            Commands::TimeSnapshot::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::PayloadTestRequest::Id: {
-            Commands::PayloadTestRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfGeneralDiagnosticsClusterPayloadTestRequestCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
-                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
-        }
-        }
-    }
-
-    if (CHIP_NO_ERROR != TLVError || !wasHandled)
-    {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
-        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
-    }
-}
-
-} // namespace GeneralDiagnostics
-
 namespace GroupKeyManagement {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -647,26 +563,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace GroupKeyManagement
 
 namespace Groups {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -729,26 +649,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace Groups
 
 namespace Identify {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -775,26 +699,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace Identify
 
 namespace LevelControl {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -875,26 +803,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace LevelControl
 
 namespace LowPower {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -912,26 +844,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace LowPower
 
 namespace ModeSelect {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -949,26 +885,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace ModeSelect
 
 namespace OtaSoftwareUpdateRequestor {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -987,26 +927,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace OtaSoftwareUpdateRequestor
 
 namespace OnOff {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1069,26 +1013,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace OnOff
 
 namespace OperationalCredentials {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1172,26 +1120,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace OperationalCredentials
 
 namespace SmokeCoAlarm {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1209,26 +1161,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace SmokeCoAlarm
 
 namespace TemperatureControl {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1246,26 +1202,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace TemperatureControl
 
 namespace Thermostat {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1310,26 +1270,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace Thermostat
 
 namespace ThreadNetworkDiagnostics {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1347,26 +1311,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace ThreadNetworkDiagnostics
 
 namespace TimeSynchronization {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1420,26 +1388,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace TimeSynchronization
 
 namespace UnitTesting {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1644,26 +1616,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace UnitTesting
 
 namespace ValveConfigurationAndControl {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1690,63 +1666,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace ValveConfigurationAndControl
 
-namespace WiFiNetworkDiagnostics {
-
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
-{
-    CHIP_ERROR TLVError = CHIP_NO_ERROR;
-    bool wasHandled     = false;
-    {
-        switch (aCommandPath.mCommandId)
-        {
-        case Commands::ResetCounts::Id: {
-            Commands::ResetCounts::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
-                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
-        }
-        }
-    }
-
-    if (CHIP_NO_ERROR != TLVError || !wasHandled)
-    {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
-        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
-    }
-}
-
-} // namespace WiFiNetworkDiagnostics
-
 namespace WindowCovering {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                                          TLV::TLVReader & aDataTlv)
 {
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
@@ -1818,19 +1761,22 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                          ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
         }
     }
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
+
+    // We use success as a marker that no special handling is required
+    // This is to avoid having a std::optional which uses slightly more code.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace WindowCovering
@@ -1839,93 +1785,91 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {
+    Protocols::InteractionModel::Status errorStatus = Protocols::InteractionModel::Status::Success;
+
     switch (aCommandPath.mClusterId)
     {
-    case Clusters::AdministratorCommissioning::Id:
-        Clusters::AdministratorCommissioning::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
-        break;
     case Clusters::BooleanStateConfiguration::Id:
-        Clusters::BooleanStateConfiguration::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::BooleanStateConfiguration::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::ColorControl::Id:
-        Clusters::ColorControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::ColorControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::DiagnosticLogs::Id:
-        Clusters::DiagnosticLogs::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::DiagnosticLogs::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::DishwasherAlarm::Id:
-        Clusters::DishwasherAlarm::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::DishwasherAlarm::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::EthernetNetworkDiagnostics::Id:
-        Clusters::EthernetNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::EthernetNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::FanControl::Id:
-        Clusters::FanControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::FanControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::FaultInjection::Id:
-        Clusters::FaultInjection::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
-        break;
-    case Clusters::GeneralDiagnostics::Id:
-        Clusters::GeneralDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::FaultInjection::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::GroupKeyManagement::Id:
-        Clusters::GroupKeyManagement::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::GroupKeyManagement::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::Groups::Id:
-        Clusters::Groups::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::Groups::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::Identify::Id:
-        Clusters::Identify::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::Identify::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::LevelControl::Id:
-        Clusters::LevelControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::LevelControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::LowPower::Id:
-        Clusters::LowPower::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::LowPower::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::ModeSelect::Id:
-        Clusters::ModeSelect::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::ModeSelect::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::OtaSoftwareUpdateRequestor::Id:
-        Clusters::OtaSoftwareUpdateRequestor::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::OtaSoftwareUpdateRequestor::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::OnOff::Id:
-        Clusters::OnOff::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::OnOff::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::OperationalCredentials::Id:
-        Clusters::OperationalCredentials::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::OperationalCredentials::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::SmokeCoAlarm::Id:
-        Clusters::SmokeCoAlarm::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::SmokeCoAlarm::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::TemperatureControl::Id:
-        Clusters::TemperatureControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::TemperatureControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::Thermostat::Id:
-        Clusters::Thermostat::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::Thermostat::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::ThreadNetworkDiagnostics::Id:
-        Clusters::ThreadNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::ThreadNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::TimeSynchronization::Id:
-        Clusters::TimeSynchronization::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::TimeSynchronization::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::UnitTesting::Id:
-        Clusters::UnitTesting::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::UnitTesting::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::ValveConfigurationAndControl::Id:
-        Clusters::ValveConfigurationAndControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
-        break;
-    case Clusters::WiFiNetworkDiagnostics::Id:
-        Clusters::WiFiNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::ValveConfigurationAndControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::WindowCovering::Id:
-        Clusters::WindowCovering::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        errorStatus = Clusters::WindowCovering::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     default:
         ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCluster);
+        errorStatus = Protocols::InteractionModel::Status::UnsupportedCluster;
         break;
+    }
+
+    if (errorStatus != Protocols::InteractionModel::Status::Success)
+    {
+        apCommandObj->AddStatus(aCommandPath, errorStatus);
     }
 }
 

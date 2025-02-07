@@ -306,7 +306,7 @@ void emberAfPm1ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 void emberAfPm10ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
     gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
-        EndpointId(endpoint), Pm10ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+        EndpointId(endpoint), Pm10ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kUgm3);
     gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
     gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(50.0f));
     gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(1.0f));

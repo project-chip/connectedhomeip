@@ -209,7 +209,6 @@ template("chip_data_model") {
         "${_app_root}/util/DataModelHandler.cpp",
         "${_app_root}/util/attribute-storage.cpp",
         "${_app_root}/util/attribute-table.cpp",
-        "${_app_root}/util/ember-global-attribute-access-interface.cpp",
         "${_app_root}/util/ember-io-storage.cpp",
         "${_app_root}/util/util.cpp",
       ]

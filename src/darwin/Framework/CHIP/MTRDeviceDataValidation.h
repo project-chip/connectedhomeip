@@ -39,4 +39,9 @@ MTR_EXTERN MTR_TESTABLE BOOL MTREventReportIsWellFormed(NSArray<MTRDeviceRespons
 // objects in the right places.
 MTR_EXTERN MTR_TESTABLE BOOL MTRInvokeResponseIsWellFormed(NSArray<MTRDeviceResponseValueDictionary> * response);
 
+// Returns whether the provided invoke reponses actually has the right sorts of
+// objects in the right places.  This differes from
+// MTRInvokeResponseIsWellFormed in not enforcing that there is only one response.
+MTR_EXTERN MTR_TESTABLE BOOL MTRInvokeResponsesAreWellFormed(NSArray<MTRDeviceResponseValueDictionary> * response);
+
 NS_ASSUME_NONNULL_END

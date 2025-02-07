@@ -121,7 +121,7 @@ if [ "$#" == "0" ]; then
             (default: /third_party/silabs/slc_gen/<board>/)
         sl_pre_gen_path
             Allow users to define a path to pre-generated board files
-            (default: /third_party/silabs/matter_support/matter/<family>/<board>/)
+            (default: third_party/silabs/matter_support/board-support/<family>/<board>/)
         sl_matter_version
             Use provided software version at build time
         sl_matter_version_str
@@ -205,7 +205,7 @@ else
 
                 NCP_DIR_SUFFIX="/"$2
                 USE_WIFI=true
-                optArgs+="chip_device_platform =\"efr32\" chip_crypto_keystore=\"psa\""
+                optArgs+="chip_device_platform =\"efr32\" chip_crypto_keystore=\"psa\" "
                 shift
                 shift
                 ;;
@@ -308,7 +308,7 @@ else
     fi
 
     # 917 exception. TODO find a more generic way
-    if [ "$SILABS_BOARD" == "BRD4338A" ] || [ "$SILABS_BOARD" == "BRD2605A" ] || [ "$SILABS_BOARD" == "BRD4343A" ]; then
+    if [ "$SILABS_BOARD" == "BRD4338A" ] || [ "$SILABS_BOARD" == "BRD2605A" ] || [ "$SILABS_BOARD" == "BRD4343A" ] || [ "$SILABS_BOARD" == "BRD4342A" ]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
     fi
@@ -379,7 +379,7 @@ else
         fi
 
         # search bootloader directory for the respective bootloaders for the input board
-        bootloaderFiles=("$(find "$MATTER_ROOT/third_party/silabs/matter_support/matter/efr32/bootloader_binaries/" -maxdepth 1 -name "*$SILABS_BOARD*" | tr '\n' ' ')")
+        bootloaderFiles=("$(find "$MATTER_ROOT/third_party/silabs/matter_support/board-support/efr32/bootloader_binaries/" -maxdepth 1 -name "*$SILABS_BOARD*" | tr '\n' ' ')")
 
         if [ "${#bootloaderFiles[@]}" -gt 1 ]; then
             for i in "${!bootloaderFiles[@]}"; do

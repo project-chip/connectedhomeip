@@ -120,15 +120,6 @@ typedef struct
     wfx_sec_t security;
 } wfx_wifi_provision_t;
 
-typedef enum
-{
-    WIFI_MODE_NULL = 0,
-    WIFI_MODE_STA,
-    WIFI_MODE_AP,
-    WIFI_MODE_APSTA,
-    WIFI_MODE_MAX,
-} wifi_mode_t;
-
 typedef struct wfx_wifi_scan_result
 {
     uint8_t ssid[WFX_MAX_SSID_LENGTH]; // excludes null-character
@@ -187,6 +178,16 @@ extern WfxRsi_t wfx_rsi;
 /* Updated functions */
 
 /**
+ * @brief Function initalizes the WiFi module before starting WiFi task.
+ *
+ * @return CHIP_ERROR CHIP_NO_ERROR, if the initialization succeeded
+ *                    CHIP_ERROR_INTERNAL, if sequence failed due to internal API error
+ *                    CHIP_ERROR_NO_MEMORY, if sequence failed due to unavaliablility of memory
+ */
+
+CHIP_ERROR InitWiFiStack(void);
+
+/**
  * @brief Function notifies the PlatformManager that an IPv6 event occured on the WiFi interface.
  *
  * @param gotIPv6Addr true, got an IPv6 address
@@ -217,6 +218,36 @@ void NotifyDisconnection(WifiDisconnectionReasons reason);
  * @param[in] ap pointer to the structure that contains the MAC address of the AP
  */
 void NotifyConnection(const MacAddress & ap);
+
+/**
+ * @brief Returns the IPv6 notification state
+ *
+ * @note This function is necessary because the class inheritance structure has not been done as of yet.
+ *       Once the inheritance is done, sub-classes will have access to the member directly wihtout needing to use an extra guetter.
+ *
+ * @return true, IPv6 change has been notified
+           false, otherwise
+ */
+bool HasNotifiedIPv6Change();
+
+/**
+ * @brief Returns the IPv4 notification state
+ *
+ * @note This function is necessary because the class inheritance structure has not been done as of yet.
+ *       Once the inheritance is done, sub-classes will have access to the member directly wihtout needing to use an extra guetter.
+ *
+ * @return true, IPv4 change has been notified
+           false, otherwise
+ */
+bool HasNotifiedIPv4Change();
+
+/**
+ * @brief Function resets the IP notification states
+ *
+ * * @note This function is necessary because the class inheritance structure has not been done as of yet.
+ *       Once the inheritance is done, sub-classes will have access to the member directly wihtout needing to use an extra guetter.
+ */
+void ResetIPNotificationStates();
 
 /**
  * @brief Returns the provide interfaces MAC address
@@ -277,26 +308,70 @@ bool IsStationConnected();
  * @return true, if the Wi-Fi Station mode is enabled
  *         false, otherwise
  */
-bool IsStationModeEnabled(void);
+bool IsStationModeEnabled();
+
+/**
+ * @brief Returns the state of the Wi-Fi station initialization
+ *
+ * @return true, if the initialization was successful
+ *         false, otherwise
+ */
+bool IsStationReady();
+
+/**
+ * @brief Triggers the device to disconnect from the connected Wi-Fi network
+ *
+ * @note The disconnection is not immediate. It can take a certain amount of time for the device to be in a disconnected state once
+ *       the function is called. When the function returns, the device might not have yet disconnected from the Wi-Fi network.
+ *
+ * @return CHIP_ERROR CHIP_NO_ERROR, disconnection request was succesfully triggered
+ *         otherwise, CHIP_ERROR_INTERNAL
+ */
+CHIP_ERROR TriggerDisconnection();
+
+/**
+ * @brief Gets the connected access point information.
+ *        See @wfx_wifi_scan_result_t for the information that is returned by the function.
+ *
+ * @param[out] info AP information
+ *
+ * @return CHIP_ERROR CHIP_NO_ERROR, device has succesfully pulled all the AP information
+ *                    CHIP_ERROR_INTERNAL, otherwise. If the function returns an error, the data in ap cannot be used.
+ */
+CHIP_ERROR GetAccessPointInfo(wfx_wifi_scan_result_t & info);
+
+/**
+ * @brief Gets the connected access point extended information.
+ *        See @wfx_wifi_scan_ext_t for the information that is returned by the information
+ *
+ * @param[out] info AP extended information
+ *
+ * @return CHIP_ERROR CHIP_NO_ERROR, device has succesfully pulled all the AP information
+ *                    CHIP_ERROR_INTERNAL, otherwise. If the function returns an error, the data in ap cannot be used.
+ */
+CHIP_ERROR GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & info);
+
+/**
+ * @brief Function resets the BeaconLostCount, BeaconRxCount, PacketMulticastRxCount, PacketMulticastTxCount, PacketUnicastRxCount,
+ *        PacketUnicastTxCount back to 0
+ *
+ * @return CHIP_ERROR CHIP_NO_ERROR, the counters were succesfully reset to 0.
+ *                    CHIP_ERROR_INTERNAL, if there was an error when resetting the counter values
+ */
+CHIP_ERROR ResetCounters();
 
 /* Function to update */
 
 void wfx_set_wifi_provision(wfx_wifi_provision_t * wifiConfig);
 bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig);
-int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap);
-int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
-int32_t wfx_reset_counts();
 void wfx_clear_wifi_provision(void);
 sl_status_t wfx_connect_to_ap(void);
-void wfx_setup_ip6_link_local(sl_wfx_interface_t);
-sl_status_t sl_matter_wifi_disconnect(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
 bool wfx_have_ipv4_addr(sl_wfx_interface_t);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
 bool wfx_have_ipv6_addr(sl_wfx_interface_t);
-wifi_mode_t wfx_get_wifi_mode(void);
 void wfx_cancel_scan(void);
 
 /*
@@ -324,8 +399,6 @@ int32_t wfx_rsi_send_data(void * p, uint16_t len);
 #endif //!(EXP_BOARD)
 #endif // RS911X_WIFI
 
-bool wfx_hw_ready(void);
-
 #ifdef RS911X_WIFI // for RS9116, 917 NCP and 917 SoC
 /* RSI Power Save */
 #if SL_ICD_ENABLED
@@ -337,27 +410,12 @@ sl_status_t wfx_power_save();
 #endif /* SL_ICD_ENABLED */
 #endif /* RS911X_WIFI */
 
-void sl_matter_wifi_task(void * arg);
-
-int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap);
-int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
-int32_t wfx_rsi_reset_count();
-int32_t sl_wifi_platform_disconnect();
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if (SLI_SI91X_MCU_INTERFACE)
-#if SL_ICD_ENABLED
-// TODO : This should be moved outside of the Wifi interface functions
-void sl_button_on_change(uint8_t btn, uint8_t btnAction);
-#endif /* SL_ICD_ENABLED */
-#endif /* SLI_SI91X_MCU_INTERFACE */
-
 #ifdef WF200_WIFI
 void sl_wfx_host_gpio_init(void);
-void wfx_bus_start(void);
 #endif /* WF200_WIFI */
 
 #ifdef __cplusplus

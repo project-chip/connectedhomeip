@@ -5959,35 +5959,11 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::DecodableType & commandData);
 /**
- * @brief General Diagnostics Cluster TestEventTrigger Command callback (from client)
- */
-bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GeneralDiagnostics::Commands::TestEventTrigger::DecodableType & commandData);
-/**
- * @brief General Diagnostics Cluster TimeSnapshot Command callback (from client)
- */
-bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GeneralDiagnostics::Commands::TimeSnapshot::DecodableType & commandData);
-/**
- * @brief General Diagnostics Cluster PayloadTestRequest Command callback (from client)
- */
-bool emberAfGeneralDiagnosticsClusterPayloadTestRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType & commandData);
-/**
  * @brief Thread Network Diagnostics Cluster ResetCounts Command callback (from client)
  */
 bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::DecodableType & commandData);
-/**
- * @brief Wi-Fi Network Diagnostics Cluster ResetCounts Command callback (from client)
- */
-bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::DecodableType & commandData);
 /**
  * @brief Ethernet Network Diagnostics Cluster ResetCounts Command callback (from client)
  */
@@ -6030,24 +6006,6 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
 bool emberAfBridgedDeviceBasicInformationClusterKeepActiveCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::BridgedDeviceBasicInformation::Commands::KeepActive::DecodableType & commandData);
-/**
- * @brief Administrator Commissioning Cluster OpenCommissioningWindow Command callback (from client)
- */
-bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::DecodableType & commandData);
-/**
- * @brief Administrator Commissioning Cluster OpenBasicCommissioningWindow Command callback (from client)
- */
-bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::DecodableType & commandData);
-/**
- * @brief Administrator Commissioning Cluster RevokeCommissioning Command callback (from client)
- */
-bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType & commandData);
 /**
  * @brief Operational Credentials Cluster AttestationRequest Command callback (from client)
  */

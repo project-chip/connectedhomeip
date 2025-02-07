@@ -86,7 +86,6 @@ extern "C" {
 #endif
 
 WfxRsi_t wfx_rsi;
-extern osSemaphoreId_t sl_rs_ble_init_sem;
 
 namespace {
 
@@ -95,17 +94,11 @@ namespace {
 bool btn0_pressed = false;
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
 
-bool hasNotifiedWifiConnectivity = false;
-bool hasNotifiedIPV6             = false;
-#if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-bool hasNotifiedIPV4 = false;
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-
 wfx_wifi_scan_ext_t temp_reset;
 
 osSemaphoreId_t sScanCompleteSemaphore;
 osSemaphoreId_t sScanInProgressSemaphore;
-osTimerId_t sDHCPTimer;
+
 osMessageQueueId_t sWifiEventQueue = nullptr;
 
 sl_net_wifi_lwip_context_t wifi_client_context;
@@ -261,27 +254,6 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t 
     return SL_STATUS_OK;
 }
 
-void DHCPTimerEventHandler(void * arg)
-{
-    WifiPlatformEvent event = WifiPlatformEvent::kStationDhcpPoll;
-    sl_matter_wifi_post_event(event);
-}
-
-void CancelDHCPTimer(void)
-{
-    VerifyOrReturn(osTimerIsRunning(sDHCPTimer), ChipLogDetail(DeviceLayer, "CancelDHCPTimer: timer not running"));
-    VerifyOrReturn(osTimerStop(sDHCPTimer) == osOK, ChipLogError(DeviceLayer, "CancelDHCPTimer: failed to stop timer"));
-}
-
-void StartDHCPTimer(uint32_t timeout)
-{
-    // Cancel timer if already started
-    CancelDHCPTimer();
-
-    VerifyOrReturn(osTimerStart(sDHCPTimer, pdMS_TO_TICKS(timeout)) == osOK,
-                   ChipLogError(DeviceLayer, "StartDHCPTimer: failed to start timer"));
-}
-
 sl_status_t sl_wifi_siwx917_init(void)
 {
     sl_status_t status = SL_STATUS_OK;
@@ -308,12 +280,6 @@ sl_status_t sl_wifi_siwx917_init(void)
     RSI_NPSSGPIO_InputBufferEn(RTE_UULP_GPIO_1_PIN, 1);
 #endif // ENABLE_CHIP_SHELL
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-
-#else
-    // NCP Configurations
-    status = sl_matter_wifi_platform_init();
-    VerifyOrReturnError(status == SL_STATUS_OK, status,
-                        ChipLogError(DeviceLayer, "sl_matter_wifi_platform_init failed: 0x%lx", static_cast<uint32_t>(status)));
 #endif // SLI_SI91X_MCU_INTERFACE
 
     sl_wifi_firmware_version_t version = { 0 };
@@ -343,25 +309,25 @@ sl_status_t sl_wifi_siwx917_init(void)
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 
     wfx_rsi.dev_state.Set(WifiState::kStationInit);
-    osSemaphoreRelease(sl_rs_ble_init_sem);
     return status;
 }
 
-// TODO: this changes will be reverted back after the Silabs WiFi SDK team fix the scan API
-#ifndef EXP_BOARD
 sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_result, uint32_t result_length, void * arg)
 {
     sl_status_t status = SL_STATUS_OK;
     if (SL_WIFI_CHECK_IF_EVENT_FAILED(event))
     {
-        ChipLogError(DeviceLayer, "Scan Netwrok Failed: 0x%lx", *reinterpret_cast<sl_status_t *>(status));
+        if (scan_result != nullptr)
+        {
+            status = *reinterpret_cast<sl_status_t *>(scan_result);
+            ChipLogError(DeviceLayer, "ScanCallback: failed: 0x%lx", status);
+        }
+
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         security = SL_WIFI_WPA3;
 #else
         security = SL_WIFI_WPA_WPA2_MIXED;
 #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
-
-        status = SL_STATUS_FAIL;
     }
     else
     {
@@ -373,17 +339,13 @@ sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_res
     osSemaphoreRelease(sScanCompleteSemaphore);
     return status;
 }
-#endif
 
 sl_status_t InitiateScan()
 {
     sl_status_t status = SL_STATUS_OK;
 
-// TODO: this changes will be reverted back after the Silabs WiFi SDK team fix the scan API
-#ifndef EXP_BOARD
     sl_wifi_ssid_t ssid = { 0 };
 
-    // TODO: this changes will be reverted back after the Silabs WiFi SDK team fix the scan API
     sl_wifi_scan_configuration_t wifi_scan_configuration = default_wifi_scan_configuration;
 
     ssid.length = wfx_rsi.sec.ssid_length;
@@ -403,7 +365,6 @@ sl_status_t InitiateScan()
     }
 
     osSemaphoreRelease(sScanInProgressSemaphore);
-#endif
 
     return status;
 }
@@ -416,16 +377,22 @@ sl_status_t SetWifiConfigurations()
     // Setting the listen interval to 0 which will set it to DTIM interval
     sl_wifi_listen_interval_t sleep_interval = { .listen_interval = 0 };
     status                                   = sl_wifi_set_listen_interval(SL_WIFI_CLIENT_INTERFACE, sleep_interval);
-    VerifyOrReturnError(status == SL_STATUS_OK, status);
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_wifi_set_listen_interval failed: 0x%lx", status));
 
     sl_wifi_advanced_client_configuration_t client_config = { .max_retry_attempts = 5 };
     status = sl_wifi_set_advanced_client_configuration(SL_WIFI_CLIENT_INTERFACE, &client_config);
-    VerifyOrReturnError(status == SL_STATUS_OK, status);
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_wifi_set_advanced_client_configuration failed: 0x%lx", status));
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-    status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID, SL_NET_WIFI_PSK, &wfx_rsi.sec.passkey[0],
-                                   wfx_rsi.sec.passkey_length);
-    VerifyOrReturnError(status == SL_STATUS_OK, status);
+    if (wfx_rsi.sec.passkey_length != 0)
+    {
+        status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID, SL_NET_WIFI_PSK, &wfx_rsi.sec.passkey[0],
+                                       wfx_rsi.sec.passkey_length);
+        VerifyOrReturnError(status == SL_STATUS_OK, status,
+                            ChipLogError(DeviceLayer, "sl_net_set_credential failed: 0x%lx", status));
+    }
 
     sl_net_wifi_client_profile_t profile = {
         .config = {
@@ -441,7 +408,7 @@ sl_status_t SetWifiConfigurations()
             .bssid = {{0}},
             .bss_type = SL_WIFI_BSS_TYPE_INFRASTRUCTURE,
             .security = security,
-            .encryption = SL_WIFI_NO_ENCRYPTION,
+            .encryption = SL_WIFI_DEFAULT_ENCRYPTION,
             .client_options = SL_WIFI_JOIN_WITH_SCAN,
             .credential_id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID,
         },
@@ -456,11 +423,40 @@ sl_status_t SetWifiConfigurations()
     memcpy((char *) &profile.config.ssid.value, wfx_rsi.sec.ssid, wfx_rsi.sec.ssid_length);
 
     status = sl_net_set_profile((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
-    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_set_profile Failed"));
+    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_set_profile failed: 0x%lx", status));
 
     return status;
 }
 
+/**
+ * @brief Callback function for the SL_WIFI_JOIN_EVENTS group
+ *
+ * This callback handler will be invoked when any event within join event group occurs, providing the event details and any
+ * associated data The callback doesn't get called when we join a network using the sl net APIs
+ *
+ * @note In case of failure, the 'result' parameter will be of type sl_status_t, and the 'resultLenght' parameter should be ignored
+ *
+ * @param[in] event sl_wifi_event_t that triggered the callback
+ * @param[in] result Pointer to the response data received
+ * @param[in] result_length Length of the data received in bytes
+ * @param[in] arg Optional user provided argument
+ *
+ * @return sl_status_t Returns the status of the operation
+ */
+sl_status_t JoinCallback(sl_wifi_event_t event, char * result, uint32_t resultLenght, void * arg)
+{
+    sl_status_t status = SL_STATUS_OK;
+    wfx_rsi.dev_state.Clear(WifiState::kStationConnecting);
+    if (SL_WIFI_CHECK_IF_EVENT_FAILED(event))
+    {
+        status = *reinterpret_cast<sl_status_t *>(result);
+        ChipLogError(DeviceLayer, "JoinCallback: failed: 0x%lx", status);
+        wfx_rsi.dev_state.Clear(WifiState::kStationConnected);
+        wfx_retry_connection(++wfx_rsi.join_retries);
+    }
+
+    return status;
+}
 sl_status_t JoinWifiNetwork(void)
 {
     VerifyOrReturnError(!wfx_rsi.dev_state.HasAny(WifiState::kStationConnecting, WifiState::kStationConnected),
@@ -473,134 +469,85 @@ sl_status_t JoinWifiNetwork(void)
     status = SetWifiConfigurations();
     VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "Failure to set the Wifi Configurations!"));
 
+    status = sl_wifi_set_join_callback(JoinCallback, nullptr);
+    VerifyOrReturnError(status == SL_STATUS_OK, status);
+
     status = sl_net_up((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
 
     if (status == SL_STATUS_OK || status == SL_STATUS_IN_PROGRESS)
     {
         WifiPlatformEvent event = WifiPlatformEvent::kStationConnect;
-        sl_matter_wifi_post_event(event);
+        PostWifiPlatformEvent(event);
         return status;
     }
 
     // failure only happens when the firmware returns an error
     ChipLogError(DeviceLayer, "sl_wifi_connect failed: 0x%lx", static_cast<uint32_t>(status));
-    VerifyOrReturnError((wfx_rsi.join_retries <= MAX_JOIN_RETRIES_COUNT), status);
 
     wfx_rsi.dev_state.Clear(WifiState::kStationConnecting).Clear(WifiState::kStationConnected);
 
     ChipLogProgress(DeviceLayer, "Connection retry attempt %d", wfx_rsi.join_retries);
     wfx_retry_connection(++wfx_rsi.join_retries);
 
-    WifiPlatformEvent event = WifiPlatformEvent::kStationStartJoin;
-    sl_matter_wifi_post_event(event);
-
     return status;
 }
 
 } // namespace
 
-/**
- * @brief Wifi initialization called from app main
- *
- * @return sl_status_t Returns underlying Wi-Fi initialization error
- */
-sl_status_t sl_matter_wifi_platform_init(void)
+sl_status_t TriggerPlatformWifiDisconnection()
 {
-    sl_status_t status = SL_STATUS_OK;
-
-    status = sl_net_init((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
-    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
-
-    // Create Sempaphore for scan completion
-    sScanCompleteSemaphore = osSemaphoreNew(1, 0, nullptr);
-    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
-
-    // Create Semaphore for scan in-progress protection
-    sScanInProgressSemaphore = osSemaphoreNew(1, 1, nullptr);
-    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, SL_STATUS_ALLOCATION_FAILED);
-
-    // Create the message queue
-    sWifiEventQueue = osMessageQueueNew(kWfxQueueSize, sizeof(WifiPlatformEvent), nullptr);
-    VerifyOrReturnError(sWifiEventQueue != nullptr, SL_STATUS_ALLOCATION_FAILED);
-
-    // Create timer for DHCP polling
-    // TODO: Use LWIP timer instead of creating a new one here
-    sDHCPTimer = osTimerNew(DHCPTimerEventHandler, osTimerPeriodic, nullptr, nullptr);
-    VerifyOrReturnError(sDHCPTimer != nullptr, SL_STATUS_ALLOCATION_FAILED);
-
-    return status;
+    return sl_net_down((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE);
 }
 
-/******************************************************************
- * @fn   int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t *ap)
- * @brief
- *       Getting the AP details
- * @param[in] ap: access point
- * @return
- *        status
- *********************************************************************/
-int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
+CHIP_ERROR GetAccessPointInfo(wfx_wifi_scan_result_t & info)
 {
     // TODO: Convert this to a int8
-    int32_t rssi = 0;
-    ap->security = wfx_rsi.sec.security;
-    ap->chan     = wfx_rsi.ap_chan;
+    int32_t rssi  = 0;
+    info.security = wfx_rsi.sec.security;
+    info.chan     = wfx_rsi.ap_chan;
 
-    chip::MutableByteSpan output(ap->ssid, WFX_MAX_SSID_LENGTH);
+    chip::MutableByteSpan output(info.ssid, WFX_MAX_SSID_LENGTH);
     // Cast is a workaround until the wfx_rsi structure is refactored
     chip::ByteSpan ssid(reinterpret_cast<uint8_t *>(wfx_rsi.sec.ssid), wfx_rsi.sec.ssid_length);
     chip::CopySpanToMutableSpan(ssid, output);
-    ap->ssid_length = output.size();
+    info.ssid_length = output.size();
 
     chip::ByteSpan apMacSpan(wfx_rsi.ap_mac.data(), wfx_rsi.ap_mac.size());
-    chip::MutableByteSpan bssidSpan(ap->bssid, kWifiMacAddressLength);
+    chip::MutableByteSpan bssidSpan(info.bssid, kWifiMacAddressLength);
     chip::CopySpanToMutableSpan(apMacSpan, bssidSpan);
 
     // TODO: add error processing
     sl_wifi_get_signal_strength(SL_WIFI_CLIENT_INTERFACE, &(rssi));
-    ap->rssi = rssi;
+    info.rssi = rssi;
 
-    return SL_STATUS_OK;
+    return CHIP_NO_ERROR;
 }
 
-/******************************************************************
- * @fn   int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t *extra_info)
- * @brief
- *       Getting the AP extra details
- * @param[in] extra info: access point extra information
- * @return
- *        status
- *********************************************************************/
-int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
+CHIP_ERROR GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & info)
 {
-    sl_status_t status        = SL_STATUS_OK;
     sl_wifi_statistics_t test = { 0 };
-    status                    = sl_wifi_get_statistics(SL_WIFI_CLIENT_INTERFACE, &test);
-    VERIFY_STATUS_AND_RETURN(status);
-    extra_info->beacon_lost_count = test.beacon_lost_count - temp_reset.beacon_lost_count;
-    extra_info->beacon_rx_count   = test.beacon_rx_count - temp_reset.beacon_rx_count;
-    extra_info->mcast_rx_count    = test.mcast_rx_count - temp_reset.mcast_rx_count;
-    extra_info->mcast_tx_count    = test.mcast_tx_count - temp_reset.mcast_tx_count;
-    extra_info->ucast_rx_count    = test.ucast_rx_count - temp_reset.ucast_rx_count;
-    extra_info->ucast_tx_count    = test.ucast_tx_count - temp_reset.ucast_tx_count;
-    extra_info->overrun_count     = test.overrun_count - temp_reset.overrun_count;
-    return status;
+
+    sl_status_t status = sl_wifi_get_statistics(SL_WIFI_CLIENT_INTERFACE, &test);
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
+
+    info.beacon_lost_count = test.beacon_lost_count - temp_reset.beacon_lost_count;
+    info.beacon_rx_count   = test.beacon_rx_count - temp_reset.beacon_rx_count;
+    info.mcast_rx_count    = test.mcast_rx_count - temp_reset.mcast_rx_count;
+    info.mcast_tx_count    = test.mcast_tx_count - temp_reset.mcast_tx_count;
+    info.ucast_rx_count    = test.ucast_rx_count - temp_reset.ucast_rx_count;
+    info.ucast_tx_count    = test.ucast_tx_count - temp_reset.ucast_tx_count;
+    info.overrun_count     = test.overrun_count - temp_reset.overrun_count;
+
+    return CHIP_NO_ERROR;
 }
 
-/******************************************************************
- * @fn   int32_t wfx_rsi_reset_count(void)
- * @brief
- *       Getting the driver reset count
- * @param[in] None
- * @return
- *        status
- *********************************************************************/
-int32_t wfx_rsi_reset_count(void)
+CHIP_ERROR ResetCounters()
 {
     sl_wifi_statistics_t test = { 0 };
-    sl_status_t status        = SL_STATUS_OK;
-    status                    = sl_wifi_get_statistics(SL_WIFI_CLIENT_INTERFACE, &test);
-    VERIFY_STATUS_AND_RETURN(status);
+
+    sl_status_t status = sl_wifi_get_statistics(SL_WIFI_CLIENT_INTERFACE, &test);
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
+
     temp_reset.beacon_lost_count = test.beacon_lost_count;
     temp_reset.beacon_rx_count   = test.beacon_rx_count;
     temp_reset.mcast_rx_count    = test.mcast_rx_count;
@@ -608,30 +555,34 @@ int32_t wfx_rsi_reset_count(void)
     temp_reset.ucast_rx_count    = test.ucast_rx_count;
     temp_reset.ucast_tx_count    = test.ucast_tx_count;
     temp_reset.overrun_count     = test.overrun_count;
-    return status;
+
+    return CHIP_NO_ERROR;
 }
 
-/******************************************************************
- * @fn   sl_wifi_platform_disconnect(void)
- * @brief
- *       Getting the driver disconnect status
- * @param[in] None
- * @return
- *        status
- *********************************************************************/
-int32_t sl_wifi_platform_disconnect(void)
+CHIP_ERROR InitWiFiStack(void)
 {
-    return sl_net_down((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE);
-}
+    sl_status_t status = SL_STATUS_OK;
 
-/// NotifyConnectivity
-/// @brief Notify the application about the connectivity status if it has not been notified yet.
-///        Helper function for HandleDHCPPolling.
-void NotifyConnectivity(void)
-{
-    VerifyOrReturn(!hasNotifiedWifiConnectivity);
-    NotifyConnection(wfx_rsi.ap_mac);
-    hasNotifiedWifiConnectivity = true;
+    status = sl_net_init((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
+
+    // Create Sempaphore for scan completion
+    sScanCompleteSemaphore = osSemaphoreNew(1, 0, nullptr);
+    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    // Create Semaphore for scan in-progress protection
+    sScanInProgressSemaphore = osSemaphoreNew(1, 1, nullptr);
+    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    // Create the message queue
+    sWifiEventQueue = osMessageQueueNew(kWfxQueueSize, sizeof(WifiPlatformEvent), nullptr);
+    VerifyOrReturnError(sWifiEventQueue != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    status = CreateDHCPTimer();
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(DeviceLayer, "CreateDHCPTimer failed: %lx", status));
+
+    return CHIP_NO_ERROR;
 }
 
 void HandleDHCPPolling(void)
@@ -644,60 +595,44 @@ void HandleDHCPPolling(void)
 
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
     uint8_t dhcp_state = dhcpclient_poll(sta_netif);
-    if (dhcp_state == DHCP_ADDRESS_ASSIGNED && !hasNotifiedIPV4)
+    if (dhcp_state == DHCP_ADDRESS_ASSIGNED && !HasNotifiedIPv4Change())
     {
         wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
-        hasNotifiedIPV4 = true;
-        event           = WifiPlatformEvent::kStationDhcpDone;
-        sl_matter_wifi_post_event(event);
+        NotifyIPv4Change(true);
+        event = WifiPlatformEvent::kStationDhcpDone;
+        PostWifiPlatformEvent(event);
         NotifyConnectivity();
     }
     else if (dhcp_state == DHCP_OFF)
     {
         NotifyIPv4Change(false);
-        hasNotifiedIPV4 = false;
     }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
     /* Checks if the assigned IPv6 address is preferred by evaluating
      * the first block of IPv6 address ( block 0)
      */
-    if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !hasNotifiedIPV6)
+    if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !HasNotifiedIPv6Change())
     {
         char addrStr[chip::Inet::IPAddress::kMaxStringLength] = { 0 };
         VerifyOrReturn(ip6addr_ntoa_r(netif_ip6_addr(sta_netif, 0), addrStr, sizeof(addrStr)) != nullptr);
         ChipLogProgress(DeviceLayer, "SLAAC OK: linklocal addr: %s", addrStr);
         NotifyIPv6Change(true);
-        hasNotifiedIPV6 = true;
-        event           = WifiPlatformEvent::kStationDhcpDone;
-        sl_matter_wifi_post_event(event);
+        event = WifiPlatformEvent::kStationDhcpDone;
+        PostWifiPlatformEvent(event);
         NotifyConnectivity();
     }
 }
-void sl_matter_wifi_post_event(WifiPlatformEvent event)
+
+void PostWifiPlatformEvent(WifiPlatformEvent event)
 {
     sl_status_t status = osMessageQueuePut(sWifiEventQueue, &event, 0, 0);
 
     if (status != osOK)
     {
-        ChipLogError(DeviceLayer, "sl_matter_wifi_post_event: failed to post event with status: %ld", status);
+        ChipLogError(DeviceLayer, "PostWifiPlatformEvent: failed to post event with status: %ld", status);
         // TODO: Handle error, requeue event depending on queue size or notify relevant task,
         // Chipdie, etc.
     }
-}
-/// ResetDHCPNotificationFlags
-/// @brief Reset the flags that are used to notify the application about DHCP connectivity
-///        and emits a WifiPlatformEvent::kStationDoDhcp event to trigger DHCP polling checks. Helper function for ProcessEvent.
-void ResetDHCPNotificationFlags(void)
-{
-
-#if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-    hasNotifiedIPV4 = false;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
-    hasNotifiedIPV6             = false;
-    hasNotifiedWifiConnectivity = false;
-
-    WifiPlatformEvent event = WifiPlatformEvent::kStationDoDhcp;
-    sl_matter_wifi_post_event(event);
 }
 
 void ProcessEvent(WifiPlatformEvent event)
@@ -820,7 +755,7 @@ void ProcessEvent(WifiPlatformEvent event)
 }
 
 /*********************************************************************************
- * @fn  void sl_matter_wifi_task(void *arg)
+ * @fn  void MatterWifiTask(void *arg)
  * @brief
  * The main WLAN task - started by StartWifiTask() that interfaces with RSI.
  * The rest of RSI stuff come in call-backs.
@@ -830,20 +765,19 @@ void ProcessEvent(WifiPlatformEvent event)
  *       None
  **********************************************************************************/
 /* ARGSUSED */
-void sl_matter_wifi_task(void * arg)
+void MatterWifiTask(void * arg)
 {
     (void) arg;
     WifiPlatformEvent event;
     sl_status_t status = SL_STATUS_OK;
 
     status = sl_wifi_siwx917_init();
-    VerifyOrReturn(
-        status == SL_STATUS_OK,
-        ChipLogError(DeviceLayer, "sl_matter_wifi_task: sl_wifi_siwx917_init failed: 0x%lx", static_cast<uint32_t>(status)));
+    VerifyOrReturn(status == SL_STATUS_OK,
+                   ChipLogError(DeviceLayer, "MatterWifiTask: sl_wifi_siwx917_init failed: 0x%lx", static_cast<uint32_t>(status)));
 
     sl_matter_wifi_task_started();
 
-    ChipLogDetail(DeviceLayer, "sl_matter_wifi_task: starting event loop");
+    ChipLogDetail(DeviceLayer, "MatterWifiTask: starting event loop");
     for (;;)
     {
         if (osMessageQueueGet(sWifiEventQueue, &event, nullptr, osWaitForever) == osOK)
@@ -852,7 +786,7 @@ void sl_matter_wifi_task(void * arg)
         }
         else
         {
-            ChipLogError(DeviceLayer, "sl_matter_wifi_task: get event failed: 0x%lx", static_cast<uint32_t>(status));
+            ChipLogError(DeviceLayer, "MatterWifiTask: get event failed: 0x%lx", static_cast<uint32_t>(status));
         }
     }
 }

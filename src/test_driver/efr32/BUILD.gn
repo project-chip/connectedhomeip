@@ -20,6 +20,8 @@ import("//build_overrides/pigweed.gni")
 import("${build_root}/config/defaults.gni")
 import("${silabs_sdk_build_root}/efr32_sdk.gni")
 
+import("${matter_support_root}/provision/args.gni")
+
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
 
@@ -94,8 +96,8 @@ source_set("efr32_test_main") {
     "${chip_root}/examples/common/pigweed:system_rpc_server",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support:pw_tests_wrapper",
-    "${chip_root}/src/platform/silabs/provision:provision-headers",
     "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs",
+    "${sl_provision_root}:headers",
   ]
 
   # OpenThread Settings
@@ -110,7 +112,7 @@ source_set("efr32_test_main") {
   deps += pw_build_LINK_DEPS
 
   libs = [
-    "${sdk_support_root}/matter/provision/lib/libProvision_${silabs_family}.a",
+    "${matter_support_root}/provision/libs/libProvision_${silabs_family}.a",
   ]
 
   include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]

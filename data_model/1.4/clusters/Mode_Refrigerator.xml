@@ -73,6 +73,20 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
+    <enum name="ModeTag">
+      <item value="0x00" name="Auto"/>
+      <item value="0x01" name="Quick"/>
+      <item value="0x02" name="Quiet"/>
+      <item value="0x03" name="LowNoise"/>
+      <item value="0x04" name="LowEnergy"/>
+      <item value="0x05" name="Vacation"/>
+      <item value="0x06" name="Min"/>
+      <item value="0x07" name="Max"/>
+      <item value="0x08" name="Night"/>
+      <item value="0x09" name="Day"/>
+      <item value="0x4000" name="RapidCool"/>
+      <item value="0x4001" name="RapidFreeze"/>
+    </enum>
     <struct name="ModeOptionStruct">
       <field id="0" name="Label">
         <mandatoryConform/>

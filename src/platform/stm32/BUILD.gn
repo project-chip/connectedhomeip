@@ -95,7 +95,10 @@ static_library("stm32") {
     import("${stm32_sdk_build_root}/stm32_sdk.gni")
     public_deps += [ "${stm32_sdk_build_root}:stm32_sdk" ]
 
-    deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+    deps += [
+      "${chip_root}/src/app:app_config",
+      "${chip_root}/src/lib/dnssd:platform_header",
+    ]
   }
 
   # Set the compiler flags

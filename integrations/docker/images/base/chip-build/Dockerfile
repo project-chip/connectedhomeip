@@ -69,6 +69,7 @@ RUN set -x \
     libnl-route-3-dev \
     libnspr4-dev \
     libpango1.0-dev \
+    libpcsclite-dev \
     libpixman-1-dev \
     libreadline-dev \
     libsdl2-dev \

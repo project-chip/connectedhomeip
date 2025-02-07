@@ -44,22 +44,16 @@
   {{target}} = AsByteSpan({{source}});
 {{else if (isCharString type)}}
   {{target}} = AsCharSpan({{source}});
+{{else if_is_struct type}}
+  {{#zcl_struct_items_by_struct_and_cluster_name type cluster}}
+   {{#if (isSupported (asUpperCamelCase ../cluster preserveAcronyms=true) struct=(asUpperCamelCase ../type preserveAcronyms=true) structField=(asStructPropertyName label))}}
+   {{>encode_value target=(concat ../target "." (asLowerCamelCase label)) source=(concat ../source "." (asStructPropertyName label)) cluster=../cluster errorCode=../errorCode depth=(incrementDepth ../depth)}}
+   {{/if}}
+  {{/zcl_struct_items_by_struct_and_cluster_name}}
+{{else if_is_strongly_typed_chip_enum type}}
+  {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
+{{else if_is_strongly_typed_bitmap type}}
+  {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
 {{else}}
-  {{#if_is_struct type}}
-    {{#zcl_struct_items_by_struct_and_cluster_name type cluster}}
-     {{#if (isSupported (asUpperCamelCase ../cluster preserveAcronyms=true) struct=(asUpperCamelCase ../type preserveAcronyms=true) structField=(asStructPropertyName label))}}
-     {{>encode_value target=(concat ../target "." (asLowerCamelCase label)) source=(concat ../source "." (asStructPropertyName label)) cluster=../cluster errorCode=../errorCode depth=(incrementDepth ../depth)}}
-     {{/if}}
-    {{/zcl_struct_items_by_struct_and_cluster_name}}
-  {{else}}
-    {{#if_is_strongly_typed_chip_enum type}}
-      {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
-    {{else}}
-      {{#if_is_strongly_typed_bitmap type}}
-        {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
-      {{else}}
-        {{target}} = {{source}}.{{asObjectiveCNumberType source type true}}Value;
-      {{/if_is_strongly_typed_bitmap}}
-    {{/if_is_strongly_typed_chip_enum}}
-  {{/if_is_struct}}
+  {{target}} = {{source}}.{{asObjectiveCNumberType source type true}}Value;
 {{/if}}
