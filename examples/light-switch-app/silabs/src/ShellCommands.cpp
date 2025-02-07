@@ -38,9 +38,11 @@ using Shell::streamer_printf;
 
 Engine sShellSwitchSubCommands;
 Engine sShellSwitchOnOffSubCommands;
+Engine sShellSwitchLevelControlSubCommands;
 
 Engine sShellSwitchGroupsSubCommands;
 Engine sShellSwitchGroupsOnOffSubCommands;
+Engine sShellSwitchGroupsLevelControlSubCommands;
 
 Engine sShellSwitchBindingSubCommands;
 
@@ -238,6 +240,620 @@ CHIP_ERROR GroupToggleSwitchCommandHandler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
+/********************************************************
+ * LevelControl switch shell functions
+ *********************************************************/
+
+CHIP_ERROR LevelControlHelpHandler(int argc, char ** argv)
+{
+    sShellSwitchLevelControlSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LevelControlSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        return LevelControlHelpHandler(argc, argv);
+    }
+
+    return sShellSwitchLevelControlSubCommands.ExecCommand(argc, argv);
+}
+
+CHIP_ERROR MoveToLevelSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc != 4)
+    {
+        return LevelControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::LevelControl::Commands::MoveToLevel::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->commandData = BindingCommandData::MoveToLevel{};
+    char * endPtr;
+    if (auto *moveToLevel = std::get_if<BindingCommandData::MoveToLevel>(&data->commandData))
+    {
+        moveToLevel->level = static_cast<uint8_t>(strtol(argv[0], &endPtr, 10));
+        moveToLevel->transitionTime = DataModel::Nullable<uint16_t>(strtol(argv[1], &endPtr, 10));
+        moveToLevel->optionsMask = chip::BitMask<OptionsBitmap>(strtol(argv[2], &endPtr, 10));
+        moveToLevel->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[3], &endPtr, 10));
+    }
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MoveSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc != 4)
+    {
+        return LevelControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::LevelControl::Commands::Move::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->commandData = BindingCommandData::Move{};
+    char * endPtr;
+    if (auto *move = std::get_if<BindingCommandData::Move>(&data->commandData))
+    {
+        move->moveMode = static_cast<Clusters::LevelControl::MoveModeEnum>(strtol(argv[0], &endPtr, 10));
+        move->rate = static_cast<DataModel::Nullable<uint8_t>>(strtol(argv[1], &endPtr, 10));
+        move->optionsMask = chip::BitMask<OptionsBitmap>(strtol(argv[2], &endPtr, 10));
+        move->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[3], &endPtr, 10));
+    }
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR StepSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc != 5)
+    {
+        return LevelControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::LevelControl::Commands::Step::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    char * endPtr;
+    data->commandData = BindingCommandData::Step{};
+    if (auto *step = std::get_if<BindingCommandData::Step>(&data->commandData))
+    {
+        step->stepMode = static_cast<Clusters::LevelControl::StepModeEnum>(strtol(argv[0], &endPtr, 10));
+        step->stepSize = static_cast<uint8_t>(strtol(argv[1], &endPtr, 10));
+        step->transitionTime = DataModel::Nullable<uint16_t>(strtol(argv[2], &endPtr, 10));
+        step->optionsMask = chip::BitMask<OptionsBitmap>(strtol(argv[3], &endPtr, 10));
+        step->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[4], &endPtr, 10));
+    }
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR StopSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc != 2)
+    {
+        return LevelControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::LevelControl::Commands::Stop::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    char * endPtr;
+    data->commandData = BindingCommandData::Stop{};
+    if (auto *stop = std::get_if<BindingCommandData::Stop>(&data->commandData))
+    {
+        stop->optionsMask = chip::BitMask<OptionsBitmap>(strtol(argv[0], &endPtr, 10));
+        stop->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[1], &endPtr, 10));
+    }
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MoveToLevelWithOnOffSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc != 4)
+    {
+        return LevelControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->commandData = BindingCommandData::MoveToLevel{};
+    char * endPtr;
+    if (auto *moveToLevel = std::get_if<BindingCommandData::MoveToLevel>(&data->commandData))
+    {
+        moveToLevel->level = static_cast<uint8_t>(strtol(argv[0], &endPtr, 10));
+        moveToLevel->transitionTime = DataModel::Nullable<uint16_t>(strtol(argv[1], &endPtr, 10));
+        moveToLevel->optionsMask = chip::BitMask<OptionsBitmap>(strtol(argv[2], &endPtr, 10));
+        moveToLevel->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[3], &endPtr, 10));
+    }
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MoveWithOnOffSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc != 4)
+    {
+        return LevelControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::LevelControl::Commands::MoveWithOnOff::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->commandData = BindingCommandData::Move{};
+    char * endPtr;
+    if (auto *move = std::get_if<BindingCommandData::Move>(&data->commandData))
+    {
+        move->moveMode = static_cast<Clusters::LevelControl::MoveModeEnum>(strtol(argv[0], &endPtr, 10));
+        move->rate = static_cast<DataModel::Nullable<uint8_t>>(strtol(argv[1], &endPtr, 10));
+        move->optionsMask = chip::BitMask<OptionsBitmap>(strtol(argv[2], &endPtr, 10));
+        move->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[3], &endPtr, 10));
+    }
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR StepWithOnOffSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc != 5)
+    {
+        return LevelControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::LevelControl::Commands::StepWithOnOff::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    char * endPtr;
+    data->commandData = BindingCommandData::Step{};
+    if (auto *step = std::get_if<BindingCommandData::Step>(&data->commandData))
+    {
+        step->stepMode = static_cast<Clusters::LevelControl::StepModeEnum>(strtol(argv[0], &endPtr, 10));
+        step->stepSize = static_cast<uint8_t>(strtol(argv[1], &endPtr, 10));
+        step->transitionTime = DataModel::Nullable<uint16_t>(strtol(argv[2], &endPtr, 10));
+        step->optionsMask = chip::BitMask<OptionsBitmap>(strtol(argv[3], &endPtr, 10));
+        step->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[4], &endPtr, 10));
+    }
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR StopWithOnOffSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc != 2)
+    {
+        return LevelControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::LevelControl::Commands::StopWithOnOff::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    char * endPtr;
+    data->commandData = BindingCommandData::Stop{};
+    if (auto *stop = std::get_if<BindingCommandData::Stop>(&data->commandData))
+    {
+        stop->optionsMask = chip::BitMask<OptionsBitmap>(strtol(argv[0], &endPtr, 10));
+        stop->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[1], &endPtr, 10));
+    }
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+#if 0
+/********************************************************
+ * LevelControl Read switch shell functions
+ *********************************************************/
+
+CHIP_ERROR LevelControlReadHelpHandler(int argc, char ** argv)
+{
+    sShellSwitchLevelControlReadSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LevelControlRead(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        return LevelControlReadHelpHandler(argc, argv);
+    }
+
+    return sShellSwitchLevelControlReadSubCommands.ExecCommand(argc, argv);
+}
+
+CHIP_ERROR LevelControlReadAttributeList(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::LevelControl::Attributes::AttributeList::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->isReadAttribute     = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LevelControlReadCurrentLevel(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::LevelControl::Attributes::CurrentLevel::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->isReadAttribute     = true;
+    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LevelControlReadRemainingTime(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::LevelControl::Attributes::RemainingTime::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->isReadAttribute     = true;
+    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LevelControlReadMinLevel(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::LevelControl::Attributes::MinLevel::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->isReadAttribute     = true;
+    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LevelControlReadMaxLevel(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::LevelControl::Attributes::MaxLevel::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->isReadAttribute     = true;
+    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LevelControlReadCurrentFrequency(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::LevelControl::Attributes::CurrentFrequency::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->isReadAttribute     = true;
+    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LevelControlReadMinFrequency(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::LevelControl::Attributes::MinFrequency::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->isReadAttribute     = true;
+    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LevelControlReadMaxFrequency(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::LevelControl::Attributes::MaxFrequency::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->isReadAttribute     = true;
+    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LevelControlReadOptions(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::LevelControl::Attributes::Options::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->isReadAttribute     = true;
+    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LevelControlReadOnOffTransitionTime(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::LevelControl::Attributes::OnOffTransitionTime::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->isReadAttribute     = true;
+    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LevelControlReadOnLevel(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::LevelControl::Attributes::OnLevel::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->isReadAttribute     = true;
+    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LevelControlReadOnTransitionTime(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::LevelControl::Attributes::OnTransitionTime::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->isReadAttribute     = true;
+    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LevelControlReadOffTransitionTime(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::LevelControl::Attributes::OffTransitionTime::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->isReadAttribute     = true;
+    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LevelControlReadDefaultMoveRate(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::LevelControl::Attributes::DefaultMoveRate::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->isReadAttribute     = true;
+    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LevelControlReadStartUpCurrentLevel(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::LevelControl::Attributes::StartUpCurrentLevel::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->isReadAttribute     = true;
+    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+#endif // commenting the read functions
+
+/********************************************************
+ * Groups LevelControl switch shell functions
+ *********************************************************/
+
+CHIP_ERROR GroupsLevelControlHelpHandler(int argc, char ** argv)
+{
+    sShellSwitchGroupsLevelControlSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsLevelControlSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        return GroupsLevelControlHelpHandler(argc, argv);
+    }
+
+    return sShellSwitchGroupsLevelControlSubCommands.ExecCommand(argc, argv);
+}
+
+CHIP_ERROR GroupsMoveToLevelSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc != 4)
+    {
+        return GroupsLevelControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::LevelControl::Commands::MoveToLevel::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->commandData = BindingCommandData::MoveToLevel{};
+    char * endPtr;
+    if (auto *moveToLevel = std::get_if<BindingCommandData::MoveToLevel>(&data->commandData))
+    {
+        moveToLevel->level = static_cast<uint8_t>(strtol(argv[0], &endPtr, 10));
+        moveToLevel->transitionTime = DataModel::Nullable<uint16_t>(strtol(argv[1], &endPtr, 10));
+        moveToLevel->optionsMask = chip::BitMask<OptionsBitmap>(strtol(argv[2], &endPtr, 10));
+        moveToLevel->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[3], &endPtr, 10));
+    }
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsMoveSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc != 4)
+    {
+        return GroupsLevelControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::LevelControl::Commands::Move::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->commandData = BindingCommandData::Move{};
+    char * endPtr;
+    if (auto *move = std::get_if<BindingCommandData::Move>(&data->commandData))
+    {
+        move->moveMode = static_cast<Clusters::LevelControl::MoveModeEnum>(strtol(argv[0], &endPtr, 10));
+        move->rate = static_cast<DataModel::Nullable<uint8_t>>(strtol(argv[1], &endPtr, 10));
+        move->optionsMask = chip::BitMask<OptionsBitmap>(strtol(argv[2], &endPtr, 10));
+        move->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[3], &endPtr, 10));
+    }
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsStepSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc != 5)
+    {
+        return GroupsLevelControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::LevelControl::Commands::Step::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    char * endPtr;
+    data->commandData = BindingCommandData::Step{};
+    if (auto *step = std::get_if<BindingCommandData::Step>(&data->commandData))
+    {
+        step->stepMode = static_cast<Clusters::LevelControl::StepModeEnum>(strtol(argv[0], &endPtr, 10));
+        step->stepSize = static_cast<uint8_t>(strtol(argv[1], &endPtr, 10));
+        step->transitionTime = DataModel::Nullable<uint16_t>(strtol(argv[2], &endPtr, 10));
+        step->optionsMask = chip::BitMask<OptionsBitmap>(strtol(argv[3], &endPtr, 10));
+        step->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[4], &endPtr, 10));
+    }
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsStopSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc != 2)
+    {
+        return GroupsLevelControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::LevelControl::Commands::Stop::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    char * endPtr;
+    data->commandData = BindingCommandData::Stop{};
+    if (auto *stop = std::get_if<BindingCommandData::Stop>(&data->commandData))
+    {
+        stop->optionsMask = chip::BitMask<OptionsBitmap>(strtol(argv[0], &endPtr, 10));
+        stop->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[1], &endPtr, 10));
+    }
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsMoveToLevelWithOnOffSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc != 4)
+    {
+        return GroupsLevelControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->commandData = BindingCommandData::MoveToLevel{};
+    char * endPtr;
+    if (auto *moveToLevel = std::get_if<BindingCommandData::MoveToLevel>(&data->commandData))
+    {
+        moveToLevel->level = static_cast<uint8_t>(strtol(argv[0], &endPtr, 10));
+        moveToLevel->transitionTime = DataModel::Nullable<uint16_t>(strtol(argv[1], &endPtr, 10));
+        moveToLevel->optionsMask = chip::BitMask<OptionsBitmap>(strtol(argv[2], &endPtr, 10));
+        moveToLevel->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[3], &endPtr, 10));
+    }
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsMoveWithOnOffSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc != 4)
+    {
+        return GroupsLevelControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::LevelControl::Commands::MoveWithOnOff::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->commandData = BindingCommandData::Move{};
+    char * endPtr;
+    if (auto *move = std::get_if<BindingCommandData::Move>(&data->commandData))
+    {
+        move->moveMode = static_cast<Clusters::LevelControl::MoveModeEnum>(strtol(argv[0], &endPtr, 10));
+        move->rate = static_cast<DataModel::Nullable<uint8_t>>(strtol(argv[1], &endPtr, 10));
+        move->optionsMask = chip::BitMask<OptionsBitmap>(strtol(argv[2], &endPtr, 10));
+        move->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[3], &endPtr, 10));
+    }
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsStepWithOnOffSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc != 5)
+    {
+        return GroupsLevelControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::LevelControl::Commands::StepWithOnOff::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    char * endPtr;
+    data->commandData = BindingCommandData::Step{};
+    if (auto *step = std::get_if<BindingCommandData::Step>(&data->commandData))
+    {
+        step->stepMode = static_cast<Clusters::LevelControl::StepModeEnum>(strtol(argv[0], &endPtr, 10));
+        step->stepSize = static_cast<uint8_t>(strtol(argv[1], &endPtr, 10));
+        step->transitionTime = DataModel::Nullable<uint16_t>(strtol(argv[2], &endPtr, 10));
+        step->optionsMask = chip::BitMask<OptionsBitmap>(strtol(argv[3], &endPtr, 10));
+        step->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[4], &endPtr, 10));
+    }
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsStopWithOnOffSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc != 2)
+    {
+        return GroupsLevelControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::LevelControl::Commands::StopWithOnOff::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    char * endPtr;
+    data->commandData = BindingCommandData::Stop{};
+    if (auto *stop = std::get_if<BindingCommandData::Stop>(&data->commandData))
+    {
+        stop->optionsMask = chip::BitMask<OptionsBitmap>(strtol(argv[0], &endPtr, 10));
+        stop->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[1], &endPtr, 10));
+    }
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
 /**
  * @brief configures switch matter shell
  */
@@ -246,6 +862,7 @@ void RegisterSwitchCommands()
     static const shell_command_t sSwitchSubCommands[] = {
         { &SwitchHelpHandler, "help", "Usage: switch <subcommand>" },
         { &OnOffSwitchCommandHandler, "onoff", " Usage: switch onoff <subcommand>" },
+        { &LevelControlSwitchCommandHandler, "levelcontrol", " Usage: switch levelcontrol <subcommand>" },
         { &GroupsSwitchCommandHandler, "groups", "Usage: switch groups <subcommand>" },
         { &BindingSwitchCommandHandler, "binding", "Usage: switch binding <subcommand>" }
     };
@@ -255,6 +872,26 @@ void RegisterSwitchCommands()
         { &OnSwitchCommandHandler, "on", "Sends on command to bound lighting app" },
         { &OffSwitchCommandHandler, "off", "Sends off command to bound lighting app" },
         { &ToggleSwitchCommandHandler, "toggle", "Sends toggle command to bound lighting app" }
+    };
+
+    static const shell_command_t sSwitchLevelControlSubCommands[] = {
+        { &LevelControlHelpHandler, "help", "Usage: switch levelcontrol <subcommand>" },
+        { &MoveToLevelSwitchCommandHandler, "move-to-level",
+          "Usage: switch levelcontrol move-to-level <level> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveSwitchCommandHandler, "move",
+          "Usage: switch levelcontrol move <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &StepSwitchCommandHandler, "step",
+          "Usage: switch levelcontrol step <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &StopSwitchCommandHandler, "stop", "step Usage: switch levelcontrol stop <optionsmask> <optionsoverride>" },
+        { &MoveToLevelWithOnOffSwitchCommandHandler, "move-to-level-with-on-off",
+          "Usage: switch levelcontrol move-with-to-level-with-on-off <level> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveWithOnOffSwitchCommandHandler, "move-with-on-off",
+          "Usage: switch levelcontrol move-with-on-off <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &StepWithOnOffSwitchCommandHandler, "step-with-on-off",
+          "Usage: switch levelcontrol step-with-on-off <stepmode> <stepsize> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &StopWithOnOffSwitchCommandHandler, "stop-with-on-off",
+          "Usage: switch levelcontrol stop-with-on-off <optionsmask> <optionsoverride>" },
     };
 
     static const shell_command_t sSwitchGroupsSubCommands[] = { { &GroupsHelpHandler, "help", "Usage: switch groups <subcommand>" },
@@ -268,6 +905,26 @@ void RegisterSwitchCommands()
         { &GroupToggleSwitchCommandHandler, "toggle", "Sends toggle command to group" }
     };
 
+    static const shell_command_t sSwitchGroupsLevelControlSubCommands[] = {
+        { &GroupsLevelControlHelpHandler, "help", "Usage: switch groups levelcontrol <subcommand>" },
+        { &GroupsMoveToLevelSwitchCommandHandler, "move-to-level",
+          "Usage: switch groups levelcontrol move-to-level <level> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &GroupsMoveSwitchCommandHandler, "move",
+          "Usage: switch groups levelcontrol move <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &GroupsStepSwitchCommandHandler, "step",
+          "Usage: switch groups levelcontrol step <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &GroupsStopSwitchCommandHandler, "stop", "step Usage: switch groups levelcontrol stop <optionsmask> <optionsoverride>" },
+        { &GroupsMoveToLevelWithOnOffSwitchCommandHandler, "move-to-level-with-on-off",
+          "Usage: switch groups levelcontrol move-with-to-level-with-on-off <level> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &GroupsMoveWithOnOffSwitchCommandHandler, "move-with-on-off",
+          "Usage: switch groups levelcontrol move-with-on-off <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &GroupsStepWithOnOffSwitchCommandHandler, "step-with-on-off",
+          "Usage: switch groups levelcontrol step-with-on-off <stepmode> <stepsize> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsStopWithOnOffSwitchCommandHandler, "stop-with-on-off",
+          "Usage: switch groups levelcontrol stop-with-on-off <optionsmask> <optionsoverride>" },
+    };
+
     static const shell_command_t sSwitchBindingSubCommands[] = {
         { &BindingHelpHandler, "help", "Usage: switch binding <subcommand>" },
         { &BindingGroupBindCommandHandler, "group", "Usage: switch binding group <fabric index> <group id>" },
@@ -278,7 +935,9 @@ void RegisterSwitchCommands()
                                                     "Light-switch commands. Usage: switch <subcommand>" };
 
     sShellSwitchGroupsOnOffSubCommands.RegisterCommands(sSwitchGroupsOnOffSubCommands, ArraySize(sSwitchGroupsOnOffSubCommands));
+    sShellSwitchGroupsLevelControlSubCommands.RegisterCommands(sSwitchGroupsLevelControlSubCommands, ArraySize(sSwitchGroupsLevelControlSubCommands));
     sShellSwitchOnOffSubCommands.RegisterCommands(sSwitchOnOffSubCommands, ArraySize(sSwitchOnOffSubCommands));
+    sShellSwitchLevelControlSubCommands.RegisterCommands(sSwitchLevelControlSubCommands, ArraySize(sSwitchLevelControlSubCommands));
     sShellSwitchGroupsSubCommands.RegisterCommands(sSwitchGroupsSubCommands, ArraySize(sSwitchGroupsSubCommands));
     sShellSwitchBindingSubCommands.RegisterCommands(sSwitchBindingSubCommands, ArraySize(sSwitchBindingSubCommands));
     sShellSwitchSubCommands.RegisterCommands(sSwitchSubCommands, ArraySize(sSwitchSubCommands));
