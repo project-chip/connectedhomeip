@@ -26,6 +26,7 @@ import subprocess
 import sys
 import textwrap
 import time
+import configparser
 from dataclasses import dataclass
 from typing import List, Optional
 
@@ -59,12 +60,31 @@ def _get_variants(coverage: Optional[bool]):
     """
     variants = ["no-ble", "clang", "boringssl"]
 
+    config_path = 'out/local_py.ini'
+
+    config = configparser.ConfigParser()
+    config['OPTIONS'] = {}
+    try:
+        config.read(config_path)
+        logging.info("Defaults read from '%s'", config_path)
+    except Exception:
+        config["OPTIONS"]["coverage"] = "true"
+
     if coverage is None:
-        # FIXME: figure out previous runs...
-        pass
+        # Coverage is NOT passed in as an explicit flag, so try to
+        # resume it from whatever last `build` flag was used
+        coverage = config["OPTIONS"].getboolean("coverage")
+        logging.info("Coverage setting not provided via command line. Will use: %s", coverage)
 
     if coverage:
         variants.append("coverage")
+        config["OPTIONS"]["coverage"] = "true"
+    else:
+        config["OPTIONS"]["coverage"] = "false"
+
+    with open(config_path, "w") as f:
+        config.write(f)
+
     return "-".join(variants)
 
 
@@ -804,7 +824,9 @@ def chip_tool_tests(
         "chip_tool_python",
     ]
 
-    paths = dict([(t.key, f"./out/{t.target}/{t.binary}") for t in _get_targets(coverage)])
+    paths = dict(
+        [(t.key, f"./out/{t.target}/{t.binary}") for t in _get_targets(coverage)]
+    )
 
     cmd.extend(["--chip-tool", paths["CHIP_TOOL"]])
 
