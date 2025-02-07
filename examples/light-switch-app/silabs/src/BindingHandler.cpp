@@ -101,8 +101,7 @@ void ProcessLevelControlUnicastBindingCommand(BindingCommandData * data, const E
 
     switch (data->commandId)
     {
-    case Clusters::LevelControl::Commands::MoveToLevel::Id:
-    {
+    case Clusters::LevelControl::Commands::MoveToLevel::Id: {
         Clusters::LevelControl::Commands::MoveToLevel::Type moveToLevelCommand;
         if (auto moveToLevel = std::get_if<BindingCommandData::MoveToLevel>(&data->commandData))
         {
@@ -110,14 +109,13 @@ void ProcessLevelControlUnicastBindingCommand(BindingCommandData * data, const E
             moveToLevelCommand.transitionTime  = moveToLevel->transitionTime;
             moveToLevelCommand.optionsMask     = moveToLevel->optionsMask;
             moveToLevelCommand.optionsOverride = moveToLevel->optionsOverride;
-            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveToLevelCommand, onSuccess, onFailure);
+            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
+                                             binding.remote, moveToLevelCommand, onSuccess, onFailure);
         }
         break;
     }
 
-    case Clusters::LevelControl::Commands::Move::Id:
-    {
+    case Clusters::LevelControl::Commands::Move::Id: {
         Clusters::LevelControl::Commands::Move::Type moveCommand;
         if (auto move = std::get_if<BindingCommandData::Move>(&data->commandData))
         {
@@ -125,14 +123,13 @@ void ProcessLevelControlUnicastBindingCommand(BindingCommandData * data, const E
             moveCommand.rate            = move->rate;
             moveCommand.optionsMask     = move->optionsMask;
             moveCommand.optionsOverride = move->optionsOverride;
-            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveCommand, onSuccess, onFailure);
+            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
+                                             binding.remote, moveCommand, onSuccess, onFailure);
         }
         break;
     }
 
-    case Clusters::LevelControl::Commands::Step::Id:
-    {
+    case Clusters::LevelControl::Commands::Step::Id: {
         Clusters::LevelControl::Commands::Step::Type stepCommand;
         if (auto step = std::get_if<BindingCommandData::Step>(&data->commandData))
         {
@@ -141,27 +138,25 @@ void ProcessLevelControlUnicastBindingCommand(BindingCommandData * data, const E
             stepCommand.transitionTime  = step->transitionTime;
             stepCommand.optionsMask     = step->optionsMask;
             stepCommand.optionsOverride = step->optionsOverride;
-            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         stepCommand, onSuccess, onFailure);
+            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
+                                             binding.remote, stepCommand, onSuccess, onFailure);
         }
         break;
     }
 
-    case Clusters::LevelControl::Commands::Stop::Id:
-    {
+    case Clusters::LevelControl::Commands::Stop::Id: {
         Clusters::LevelControl::Commands::Stop::Type stopCommand;
         if (auto stop = std::get_if<BindingCommandData::Stop>(&data->commandData))
         {
             stopCommand.optionsMask     = stop->optionsMask;
             stopCommand.optionsOverride = stop->optionsOverride;
-            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         stopCommand, onSuccess, onFailure);
+            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
+                                             binding.remote, stopCommand, onSuccess, onFailure);
         }
         break;
     }
 
-    case Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id:
-    {
+    case Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id: {
         Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type moveToLevelWithOnOffCommand;
         if (auto moveToLevel = std::get_if<BindingCommandData::MoveToLevel>(&data->commandData))
         {
@@ -169,14 +164,13 @@ void ProcessLevelControlUnicastBindingCommand(BindingCommandData * data, const E
             moveToLevelWithOnOffCommand.transitionTime  = moveToLevel->transitionTime;
             moveToLevelWithOnOffCommand.optionsMask     = moveToLevel->optionsMask;
             moveToLevelWithOnOffCommand.optionsOverride = moveToLevel->optionsOverride;
-            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveToLevelWithOnOffCommand, onSuccess, onFailure);
+            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
+                                             binding.remote, moveToLevelWithOnOffCommand, onSuccess, onFailure);
         }
         break;
     }
 
-    case Clusters::LevelControl::Commands::MoveWithOnOff::Id:
-    {
+    case Clusters::LevelControl::Commands::MoveWithOnOff::Id: {
         Clusters::LevelControl::Commands::MoveWithOnOff::Type moveWithOnOffCommand;
         if (auto move = std::get_if<BindingCommandData::Move>(&data->commandData))
         {
@@ -184,14 +178,13 @@ void ProcessLevelControlUnicastBindingCommand(BindingCommandData * data, const E
             moveWithOnOffCommand.rate            = move->rate;
             moveWithOnOffCommand.optionsMask     = move->optionsMask;
             moveWithOnOffCommand.optionsOverride = move->optionsOverride;
-            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveWithOnOffCommand, onSuccess, onFailure);
+            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
+                                             binding.remote, moveWithOnOffCommand, onSuccess, onFailure);
         }
         break;
     }
 
-    case Clusters::LevelControl::Commands::StepWithOnOff::Id:
-    {
+    case Clusters::LevelControl::Commands::StepWithOnOff::Id: {
         Clusters::LevelControl::Commands::StepWithOnOff::Type stepWithOnOffCommand;
         if (auto step = std::get_if<BindingCommandData::Step>(&data->commandData))
         {
@@ -200,21 +193,20 @@ void ProcessLevelControlUnicastBindingCommand(BindingCommandData * data, const E
             stepWithOnOffCommand.transitionTime  = step->transitionTime;
             stepWithOnOffCommand.optionsMask     = step->optionsMask;
             stepWithOnOffCommand.optionsOverride = step->optionsOverride;
-            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         stepWithOnOffCommand, onSuccess, onFailure);
+            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
+                                             binding.remote, stepWithOnOffCommand, onSuccess, onFailure);
         }
         break;
     }
 
-    case Clusters::LevelControl::Commands::StopWithOnOff::Id:
-    {
+    case Clusters::LevelControl::Commands::StopWithOnOff::Id: {
         Clusters::LevelControl::Commands::StopWithOnOff::Type stopWithOnOffCommand;
         if (auto stop = std::get_if<BindingCommandData::Stop>(&data->commandData))
         {
             stopWithOnOffCommand.optionsMask     = stop->optionsMask;
             stopWithOnOffCommand.optionsOverride = stop->optionsOverride;
-            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         stopWithOnOffCommand, onSuccess, onFailure);
+            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
+                                             binding.remote, stopWithOnOffCommand, onSuccess, onFailure);
         }
         break;
     }
@@ -229,8 +221,7 @@ void ProcessLevelControlGroupBindingCommand(BindingCommandData * data, const Emb
 
     switch (data->commandId)
     {
-    case Clusters::LevelControl::Commands::MoveToLevel::Id:
-    {
+    case Clusters::LevelControl::Commands::MoveToLevel::Id: {
         Clusters::LevelControl::Commands::MoveToLevel::Type moveToLevelCommand;
         if (auto moveToLevel = std::get_if<BindingCommandData::MoveToLevel>(&data->commandData))
         {
@@ -243,8 +234,7 @@ void ProcessLevelControlGroupBindingCommand(BindingCommandData * data, const Emb
         break;
     }
 
-    case Clusters::LevelControl::Commands::Move::Id:
-    {
+    case Clusters::LevelControl::Commands::Move::Id: {
         Clusters::LevelControl::Commands::Move::Type moveCommand;
         if (auto move = std::get_if<BindingCommandData::Move>(&data->commandData))
         {
@@ -257,8 +247,7 @@ void ProcessLevelControlGroupBindingCommand(BindingCommandData * data, const Emb
         break;
     }
 
-    case Clusters::LevelControl::Commands::Step::Id:
-    {
+    case Clusters::LevelControl::Commands::Step::Id: {
         Clusters::LevelControl::Commands::Step::Type stepCommand;
         if (auto step = std::get_if<BindingCommandData::Step>(&data->commandData))
         {
@@ -272,8 +261,7 @@ void ProcessLevelControlGroupBindingCommand(BindingCommandData * data, const Emb
         break;
     }
 
-    case Clusters::LevelControl::Commands::Stop::Id:
-    {
+    case Clusters::LevelControl::Commands::Stop::Id: {
         Clusters::LevelControl::Commands::Stop::Type stopCommand;
         if (auto stop = std::get_if<BindingCommandData::Stop>(&data->commandData))
         {
@@ -284,8 +272,7 @@ void ProcessLevelControlGroupBindingCommand(BindingCommandData * data, const Emb
         break;
     }
 
-    case Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id:
-    {
+    case Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id: {
         Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type moveToLevelWithOnOffCommand;
         if (auto moveToLevel = std::get_if<BindingCommandData::MoveToLevel>(&data->commandData))
         {
@@ -298,8 +285,7 @@ void ProcessLevelControlGroupBindingCommand(BindingCommandData * data, const Emb
         break;
     }
 
-    case Clusters::LevelControl::Commands::MoveWithOnOff::Id:
-    {
+    case Clusters::LevelControl::Commands::MoveWithOnOff::Id: {
         Clusters::LevelControl::Commands::MoveWithOnOff::Type moveWithOnOffCommand;
         if (auto move = std::get_if<BindingCommandData::Move>(&data->commandData))
         {
@@ -312,8 +298,7 @@ void ProcessLevelControlGroupBindingCommand(BindingCommandData * data, const Emb
         break;
     }
 
-    case Clusters::LevelControl::Commands::StepWithOnOff::Id:
-    {
+    case Clusters::LevelControl::Commands::StepWithOnOff::Id: {
         Clusters::LevelControl::Commands::StepWithOnOff::Type stepWithOnOffCommand;
         if (auto step = std::get_if<BindingCommandData::Step>(&data->commandData))
         {
@@ -327,8 +312,7 @@ void ProcessLevelControlGroupBindingCommand(BindingCommandData * data, const Emb
         break;
     }
 
-    case Clusters::LevelControl::Commands::StopWithOnOff::Id:
-    {
+    case Clusters::LevelControl::Commands::StopWithOnOff::Id: {
         Clusters::LevelControl::Commands::StopWithOnOff::Type stopWithOnOffCommand;
         if (auto stop = std::get_if<BindingCommandData::Stop>(&data->commandData))
         {

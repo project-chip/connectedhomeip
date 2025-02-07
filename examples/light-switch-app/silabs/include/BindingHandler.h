@@ -19,8 +19,8 @@
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "app-common/zap-generated/ids/Commands.h"
 #include "lib/core/CHIPError.h"
-#include <platform/CHIPDeviceLayer.h>
 #include <app/clusters/bindings/bindings.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <variant>
 
 using namespace chip;
@@ -31,15 +31,13 @@ CHIP_ERROR InitBindingHandler();
 void SwitchWorkerFunction(intptr_t context);
 void BindingWorkerFunction(intptr_t context);
 
-
 struct CommandBase
 {
     chip::BitMask<OptionsBitmap> optionsMask;
     chip::BitMask<OptionsBitmap> optionsOverride;
 
     // Constructor to initialize the BitMask
-    CommandBase()
-        : optionsMask(0), optionsOverride(0) {}
+    CommandBase() : optionsMask(0), optionsOverride(0) {}
 };
 
 struct BindingCommandData
