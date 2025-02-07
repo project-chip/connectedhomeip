@@ -480,16 +480,16 @@ jobs:
     build_linux_gcc_coverage:
         name: Build on Linux (coverage)
 
-        runs-on: ubuntu-latest
+        env:
+            TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
+
         if: github.actor != 'restyled-io[bot]'
+        runs-on: ubuntu-latest
 
         container:
             image: ghcr.io/project-chip/chip-build:104
-            volumes:
-                - "/:/runner-root-volume"
-                - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
-                net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+                net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
         steps:
             - name: Checkout
@@ -498,6 +498,8 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
+                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}                
 
             - name: Run Build Coverage
               run: ./scripts/build_coverage.sh --yaml
+

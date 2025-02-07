@@ -169,6 +169,7 @@ if [ "$skip_gn" == false ]; then
              --exclude-tags SLOW \
              --exclude-tags PURPOSEFUL_FAILURE \
              --chip-tool \"$OUTPUT_ROOT/chip-tool\" \
+             --target TestUserLabelCluster \
              run \
              --iterations 1 \
              --test-timeout-seconds 120 \
