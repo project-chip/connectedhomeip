@@ -772,7 +772,7 @@ void pychip_GetCommissioningRCACData(uint8_t * rcacDataPtr, size_t * rcacSize, s
     // Check if the provided buffer is too small
     if (bufferSize < rcacData.size())
     {
-        ChipLogError(Controller, "Provided buffer size (%lu) is too small. Needs to be size %lu. Returning zero-sized buffer.",
+        ChipLogError(Controller, "Allocated buffer size (%lu) is too small. RCAC data was size (%lu). Returning zero-sized buffer.",
                      static_cast<unsigned long>(bufferSize), static_cast<unsigned long>(rcacData.size()));
         *rcacSize = 0;
         return;
