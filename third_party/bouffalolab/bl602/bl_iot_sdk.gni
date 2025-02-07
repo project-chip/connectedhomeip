@@ -65,8 +65,7 @@ template("bl_iot_sdk") {
       rebase_path("${invoker.freertos_config}", root_build_dir),
     ]
 
-    if (defined(invoker.enable_lwip_pbuf_ram) &&
-        invoker.enable_lwip_pbuf_ram) {
+    if (defined(invoker.enable_lwip_pbuf_ram) && invoker.enable_lwip_pbuf_ram) {
       defines += [ "CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM=1" ]
     }
   }
@@ -912,8 +911,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/lwip_dhcpd",
     ]
 
-    if (defined(invoker.enable_lwip_pbuf_ram) &&
-        invoker.enable_lwip_pbuf_ram) {
+    if (defined(invoker.enable_lwip_pbuf_ram) && invoker.enable_lwip_pbuf_ram) {
       include_dirs += [ "${bouffalolab_iot_sdk_build_root}/patches/lwip" ]
     }
 
@@ -951,11 +949,9 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/lwip/src/core/udp.c",
     ]
 
-    if (defined(invoker.enable_lwip_pbuf_ram) &&
-        invoker.enable_lwip_pbuf_ram) {
+    if (defined(invoker.enable_lwip_pbuf_ram) && invoker.enable_lwip_pbuf_ram) {
       sources += [ "${bouffalolab_iot_sdk_build_root}/patches/lwip/mem.c" ]
-    }
-    else {
+    } else {
       sources += [ "${bl_iot_sdk_root}/components/network/lwip/src/core/mem.c" ]
     }
 

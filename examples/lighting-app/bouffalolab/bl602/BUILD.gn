@@ -232,7 +232,6 @@ bouffalolab_executable("lighting_app") {
   inputs = [ ldscript ]
 
   if (chip_print_memory_usage) {
-
     if (enable_lwip_pbuf_ram) {
       ldflags += [ "-Wl,--defsym=__RAM_PBUF_POOL=0" ]
     }

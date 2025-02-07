@@ -126,7 +126,7 @@ bouffalolab_executable("lighting_app") {
   if (enable_lwip_pbuf_ram) {
     defines += [ "CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM=1" ]
   }
-  
+
   defines += [ "BL616DK" ]
 
   sources = [

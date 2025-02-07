@@ -74,8 +74,7 @@ template("bouffalo_sdk") {
       defines += invoker.defines
     }
 
-    if (defined(invoker.enable_lwip_pbuf_ram) &&
-        invoker.enable_lwip_pbuf_ram) {
+    if (defined(invoker.enable_lwip_pbuf_ram) && invoker.enable_lwip_pbuf_ram) {
       defines += [ "CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM=1" ]
     }
   }
@@ -418,6 +417,7 @@ template("bouffalo_sdk") {
     include_dirs = [ "${bouffalo_sdk_root}/components/libc" ]
 
     sources = [
+      "${bouffalo_sdk_root}/components/libc/assert.c",
       "${bouffalo_sdk_root}/components/libc/newlib/port_init_fini.c",
       "${bouffalo_sdk_root}/components/libc/newlib/port_memory.c",
       "${bouffalo_sdk_root}/components/libc/newlib/syscalls_nosys.c",
@@ -463,7 +463,6 @@ template("bouffalo_sdk") {
       "${bouffalo_sdk_root}/components/libc/nuttx/libc/string/lib_strtok.c",
       "${bouffalo_sdk_root}/components/libc/nuttx/libc/string/lib_strtokr.c",
       "${bouffalo_sdk_root}/components/libc/nuttx/libc/string/lib_vikmemcpy.c",
-      "${bouffalo_sdk_root}/components/libc/assert.c",
       "${bouffalo_sdk_root}/components/libc/printf.c",
       "${bouffalo_sdk_root}/components/libc/snprintf.c",
       "${bouffalo_sdk_root}/components/libc/sprintf.c",
@@ -902,8 +901,7 @@ template("bouffalo_sdk") {
     include_dirs +=
         [ "${bouffalo_sdk_root}/components/net/lwip/lwip/src/apps/dhcpd" ]
 
-    if (defined(invoker.enable_lwip_pbuf_ram) &&
-        invoker.enable_lwip_pbuf_ram) {
+    if (defined(invoker.enable_lwip_pbuf_ram) && invoker.enable_lwip_pbuf_ram) {
       include_dirs += [ "${bouffalolab_iot_sdk_build_root}/patches/lwip" ]
     }
 
@@ -964,14 +962,10 @@ template("bouffalo_sdk") {
     ]
 
     if (defined(invoker.enable_lwip_pbuf_ram) && invoker.enable_lwip_pbuf_ram) {
-      sources += [ 
-        "${bouffalolab_iot_sdk_build_root}/patches/lwip/mem.c", 
-      ]
-    }
-    else {
-      sources += [ 
-        "${bouffalo_sdk_root}/components/net/lwip/lwip/src/core/mem.c",
-      ]
+      sources += [ "${bouffalolab_iot_sdk_build_root}/patches/lwip/mem.c" ]
+    } else {
+      sources +=
+          [ "${bouffalo_sdk_root}/components/net/lwip/lwip/src/core/mem.c" ]
     }
 
     sources += [
