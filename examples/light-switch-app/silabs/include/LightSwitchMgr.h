@@ -84,6 +84,8 @@ public:
     void TriggerLightSwitchAction(LightSwitchAction action, bool isGroupCommand = false);
     void TriggerLevelControlAction(StepModeEnum stepMode, bool isGroupCommand = false);
 
+    StepModeEnum getStepMode();
+
     AppEvent CreateNewEvent(AppEvent::AppEventTypes type);
 
     static LightSwitchMgr & GetInstance() { return sSwitch; }
@@ -103,9 +105,14 @@ public:
 private:
     static LightSwitchMgr sSwitch;
 
-    Timer * mLongPressTimer = nullptr;
-    bool mDownPressed       = false;
-    bool mResetWarning      = false;
+    Timer * mLongPressTimer      = nullptr;
+    bool mFunctionButtonPressed  = false;    // True when button0 is pressed, used to trigger factory reset
+    bool mActionButtonPressed    = false;    // True when button1 is pressed, used to initiate toggle or level-up/down
+    bool mActionButtonSuppressed = false;    // True when both button0 and button1 are pressed, used to switch step direction
+    bool mResetWarning           = false;
+
+    // Default Step direction for Level control
+    StepModeEnum stepDirection   = StepModeEnum::kUp;
 
     static void OnLongPressTimeout(Timer & timer);
     LightSwitchMgr() = default;
