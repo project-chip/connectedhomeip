@@ -22,8 +22,8 @@ from datetime import datetime, timedelta, timezone
 
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
-from chip.testing.matchers import type_matches
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, parse_matter_test_args
+from chip.testing.matter_testing import (MatterBaseTest, async_test_body, default_matter_test_main, parse_matter_test_args,
+                                         type_matches)
 from chip.testing.pics import parse_pics, parse_pics_xml
 from chip.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,

@@ -42,8 +42,7 @@ from datetime import timedelta
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
-from chip.testing.matchers import type_matches
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from chip.testing.timeoperations import compare_time, utc_time_in_matter_epoch
 from chip.tlv import uint
 from mobly import asserts
