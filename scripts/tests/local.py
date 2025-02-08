@@ -607,8 +607,7 @@ def gen_coverage():
 
         # re-write it.
         with open(info_path, 'wt') as f:
-             f.write("\n".join(lines))
-
+            f.write("\n".join(lines))
 
     if not trace_files:
         logging.error(
