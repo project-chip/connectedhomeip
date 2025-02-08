@@ -1642,15 +1642,25 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
 {
 
     auto & streamPriorities = commandData.streamPriorities;
+    //auto & streamPriorities = commandData.streamPriorities;
 
-    // Call the delegate
-    Status status = mDelegate.SetStreamPriorities(streamPriorities);
-
-    if (status != Status::Success)
+    auto iter = streamPriorities.begin();
+    StreamUsageEnum rankedStreamPriorities[kNumOfStreamUsageTypes];
+    int i = 0;
+    while(iter.Next())
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        auto & streamUsage = iter.GetValue();
+        rankedStreamPriorities[i++] = streamUsage;
+    }
+    CHIP_ERROR err = SetRankedVideoStreamPriorities(rankedStreamPriorities);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Failure);
         return;
     }
+
+    mDelegate.OnRankedStreamPrioritiesChanged();
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
 }

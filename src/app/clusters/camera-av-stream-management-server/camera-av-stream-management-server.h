@@ -223,15 +223,10 @@ public:
     virtual Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID) = 0;
 
     /**
-     *   @brief Handle Command Delegate for SetStreamPriorities.
+     *   @brief Command Delegate for notifying change in StreamPriorities.
      *
-     *   @param streamPriorities    Indicates the list of stream priorities to set, in decreasing order of priorities.
-     *
-     *   @return Success if the setting of stream priorities is successful; otherwise, the command SHALL be rejected with an
-     * appropriate error.
      */
-    virtual Protocols::InteractionModel::Status
-    SetStreamPriorities(const DataModel::DecodableList<StreamUsageEnum> streamPriorities) = 0;
+    virtual void OnRankedStreamPrioritiesChanged() = 0;
 
     /**
      *   @brief Handle Command Delegate for CaptureSnapshot.
