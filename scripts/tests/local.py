@@ -540,7 +540,7 @@ def gen_coverage():
     #
     # Each target gets its own profile
 
-    #for -ignore-filename-regex
+    # for -ignore-filename-regex
     ignore_paths = [
         "third_party/boringssl/.*",
         "third_party/perfetto/.*",
