@@ -582,14 +582,15 @@ def gen_coverage():
         cmd.append("--add-tracefile")
         cmd.append(t)
 
+    errors_to_ignore = [
+        "inconsistent", "range", "corrupt", "category"
+    ]
+
     cmd.append("--output-file")
     cmd.append("out/merged.info")
-    cmd.append("--ignore-errors")
-    cmd.append("inconsistent")
-    cmd.append("--ignore-errors")
-    cmd.append("range")
-    cmd.append("--ignore-errors")
-    cmd.append("corrupt")
+    for e in errors_to_ignore:
+        cmd.append("--ignore-errors")
+        cmd.append(e)
 
     if os.path.exists("out/merged.info"):
         os.unlink("out/merged.info")
@@ -597,19 +598,16 @@ def gen_coverage():
     subprocess.run(cmd, check=True)
 
     logging.info("Generating HTML...")
-    subprocess.run(
-        [
-            "genhtml",
-            "--ignore-errors",
-            "inconsistent",
-            "--ignore-errors",
-            "range",
-            "--output-directory",
-            "out/coverage",
-            "out/merged.info",
-        ],
-        check=True,
-    )
+    cmd = [ "genhtml" ]
+    for e in errors_to_ignore:
+        cmd.append("--ignore-errors")
+        cmd.append(e)
+
+    cmd.append("--output-directory")
+    cmd.append("out/coverage")
+    cmd.append("out/merged.info")
+
+    subprocess.run(cmd, check=True)
     logging.info("Coverage HTML should be available in out/coverage/index.html")
 
 
