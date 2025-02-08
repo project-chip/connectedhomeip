@@ -598,10 +598,11 @@ def gen_coverage():
         lines = []
         with open(info_path, 'rt') as f:
             for line in f.readlines():
+                line = line.rstrip()
                 if line.startswith("SF:"):
                     # This is a source file line: "SF:..."
                     path = line[3:]
-                    lines.append(f"SF:{os.path.realpath(path)}")
+                    line = f"SF:{os.path.realpath(path)}\n"
                 lines.append(line)
 
         # re-write it.
