@@ -173,12 +173,14 @@ class TC_CGEN_2_5(MatterBaseTest):
         response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion)])
         accepted_version = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion]
         asserts.assert_equal(accepted_version, tc_version_to_simulate, "TCAcceptedVersion does not match expected value.")
+        matter_asserts.assert_valid_uint16(accepted_version, "TCAcceptedVersion is not a uint16 type.")
 
         # Step 10: Verify TCAcknowledgements
         self.step(10)
         response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgements)])
         acknowledgements = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgements]
         asserts.assert_equal(acknowledgements, tc_user_response_to_simulate, "TCAcknowledgements does not match expected value.")
+        matter_asserts.assert_valid_uint16(accepted_version, "TCAcknowledgements is not a map16 type.")
 
         # Step 11: Verify TCMinRequiredVersion
         self.step(11)
