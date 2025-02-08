@@ -598,7 +598,7 @@ def gen_coverage():
     subprocess.run(cmd, check=True)
 
     logging.info("Generating HTML...")
-    cmd = [ "genhtml" ]
+    cmd = ["genhtml"]
     for e in errors_to_ignore:
         cmd.append("--ignore-errors")
         cmd.append(e)
