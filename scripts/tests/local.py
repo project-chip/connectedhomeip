@@ -856,7 +856,7 @@ def python_tests(
                         with open(out_name, "wb") as f:
                             f.write(result.stdout)
                         with open(err_name, "wb") as f:
-                            f.write(result.stdout)
+                            f.write(result.stderr)
 
                     else:
                         logging.info("STDOUT:\n%s", result.stdout.decode("utf8"))
