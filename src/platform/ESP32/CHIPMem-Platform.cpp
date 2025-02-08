@@ -29,9 +29,8 @@
 #include <atomic>
 #include <cstdio>
 #include <cstring>
-#include <stdlib.h>
 #include <esp_heap_caps.h>
-
+#include <stdlib.h>
 
 namespace chip {
 namespace Platform {
@@ -117,9 +116,9 @@ void * MemoryRealloc(void * p, size_t size)
 #ifdef CONFIG_CHIP_MEM_ALLOC_MODE_INTERNAL
     p = heap_caps_realloc(p, size, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
 #elif defined(CONFIG_CHIP_MEM_ALLOC_MODE_EXTERNAL)
-    p = heap_caps_realloc(p, size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+    p   = heap_caps_realloc(p, size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
 #else
-    p = realloc(p, size);
+    p   = realloc(p, size);
 #endif
     return p;
 }
