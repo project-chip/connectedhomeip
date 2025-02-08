@@ -439,8 +439,8 @@ class MdnsDiscovery:
         """
         # Get service info
         service_info = AsyncServiceInfo(service_type, service_name)
-        is_service_discovered = await service_info.async_request(zeroconf, 3000)
         service_info.async_clear_cache()
+        is_service_discovered = await service_info.async_request(zeroconf, 3000)
 
         if is_service_discovered:
             if self._verbose_logging:

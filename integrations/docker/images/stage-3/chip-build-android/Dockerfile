@@ -16,23 +16,28 @@ RUN set -x \
 
 # Download and install android SDK
 RUN set -x \
-    && wget -O /tmp/android-26.zip https://dl.google.com/android/repository/platform-26_r02.zip \
+    && wget -O /tmp/android-30.zip https://dl.google.com/android/repository/platform-30_r03.zip \
     && mkdir -p /opt/android/sdk/platforms \
     && cd /opt/android/sdk/platforms \
-    && unzip /tmp/android-26.zip \
-    && mv android-8.0.0 android-26 \
-    && rm -f /tmp/android-26.zip \
+    && unzip /tmp/android-30.zip \
+    && mv android-11 android-30 \
+    && rm -f /tmp/android-30.zip \
     && chmod -R a+rX /opt/android/sdk \
-    && test -d /opt/android/sdk/platforms/android-26 \
+    && test -d /opt/android/sdk/platforms/android-30 \
     && : # last line
 
 # Download and install android command line tool (for installing `sdkmanager`)
+# We need create 10.0 folder inide cmdline-tools, since latest android commandline tool looks for this latest folder
+# when running sdkmanager --licenses
 RUN set -x \
-    && wget -O /tmp/android-tools.zip https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip \
+    && wget -O /tmp/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-9862592_latest.zip \
     && cd /opt/android/sdk \
-    && unzip /tmp/android-tools.zip \
-    && rm -f /tmp/android-tools.zip \
-    && test -d /opt/android/sdk/tools \
+    && mkdir -p temp \
+    && unzip /tmp/cmdline-tools.zip -d temp \
+    && mkdir -p cmdline-tools/10.0 \
+    && cp -rf temp/cmdline-tools/* cmdline-tools/10.0 \
+    && rm -rf temp \
+    && test -d /opt/android/sdk/cmdline-tools \
     && : # last line
 
 # Download and install android NDK

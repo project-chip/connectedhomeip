@@ -1015,6 +1015,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND
+ *
+ * @brief If true, VerifyOrDie() built with @c CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+ *        generates a short message that includes only the source code location,
+ *        without the condition that fails.
+ */
+#ifndef CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND
+#define CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND 0
+#endif
+
+/**
  * @def CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES
  *
  * @brief Number of devices a controller can be simultaneously connected to

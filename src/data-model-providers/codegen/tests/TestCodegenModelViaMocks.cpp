@@ -218,6 +218,44 @@ public:
     bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return true; }
 };
 
+class MockCommandHandler : public CommandHandler
+{
+public:
+    CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath,
+                                 const Protocols::InteractionModel::ClusterStatusCode & aStatus,
+                                 const char * context = nullptr) override
+    {
+        // MOCK: do not do anything here
+        return CHIP_NO_ERROR;
+    }
+
+    void AddStatus(const ConcreteCommandPath & aRequestCommandPath, const Protocols::InteractionModel::ClusterStatusCode & aStatus,
+                   const char * context = nullptr) override
+    {
+        // MOCK: do not do anything here
+    }
+
+    FabricIndex GetAccessingFabricIndex() const override { return 1; }
+
+    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                               const DataModel::EncodableToTLV & aEncodable) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                     const DataModel::EncodableToTLV & aEncodable) override
+    {}
+
+    bool IsTimedInvoke() const override { return false; }
+
+    void FlushAcksRightAwayOnSlowCommand() override {}
+
+    Access::SubjectDescriptor GetSubjectDescriptor() const override { return kAdminSubjectDescriptor; }
+
+    Messaging::ExchangeContext * GetExchangeContext() const override { return nullptr; }
+};
+
 /// Overrides Enumerate*Commands in the CommandHandlerInterface to allow
 /// testing of behaviors when command enumeration is done in the interace.
 class CustomListCommandHandler : public CommandHandlerInterface
@@ -229,7 +267,20 @@ public:
     }
     ~CustomListCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
 
-    void InvokeCommand(HandlerContext & handlerContext) override { handlerContext.SetCommandNotHandled(); }
+    void InvokeCommand(HandlerContext & handlerContext) override
+    {
+        if (mHandleCommand)
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::Success);
+            handlerContext.SetCommandHandled();
+        }
+        else
+        {
+            handlerContext.SetCommandNotHandled();
+        }
+    }
+
+    void SetHandleCommands(bool handle) { mHandleCommand = handle; }
 
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
     {
@@ -268,6 +319,7 @@ public:
 private:
     bool mOverrideAccepted  = false;
     bool mOverrideGenerated = false;
+    bool mHandleCommand     = false;
 
     std::vector<CommandId> mAccepted;
     std::vector<CommandId> mGenerated;
@@ -1156,6 +1208,37 @@ TEST_F(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
     ASSERT_TRUE(cmds.data_equal(Span<const CommandId>(expectedCommands3)));
 }
 
+TEST_F(TestCodegenModelViaMocks, AcceptedGeneratedCommandsOnInvalidEndpoints)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    // register a CHI on ALL endpoints
+    CustomListCommandHandler handler(chip::NullOptional, MockClusterId(1));
+    handler.SetHandleCommands(true);
+
+    DataModel::ListBuilder<CommandId> generatedBuilder;
+    DataModel::ListBuilder<DataModel::AcceptedCommandEntry> acceptedBuilder;
+
+    // valid endpoint will result in valid data (even though list is empty)
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), generatedBuilder), CHIP_NO_ERROR);
+    ASSERT_TRUE(generatedBuilder.IsEmpty());
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), acceptedBuilder), CHIP_NO_ERROR);
+    ASSERT_TRUE(acceptedBuilder.IsEmpty());
+
+    // Invalid endpoint fails - we will get no commands there (even though CHI is registered)
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1)), generatedBuilder),
+              CHIP_ERROR_NOT_FOUND);
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1)), acceptedBuilder),
+              CHIP_ERROR_NOT_FOUND);
+
+    // same for invalid cluster ID
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(0x1123)), generatedBuilder),
+              CHIP_ERROR_NOT_FOUND);
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(0x1123)), acceptedBuilder),
+              CHIP_ERROR_NOT_FOUND);
+}
+
 TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
 {
 
@@ -1819,62 +1902,6 @@ TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceListIncrementalRead)
         ASSERT_EQ(actual.g, 0.25);
         ASSERT_EQ(actual.h, 0.5);
         ASSERT_TRUE(actual.e.data_equal("thisislongertofillupfaster"_span));
-    }
-}
-
-TEST_F(TestCodegenModelViaMocks, ReadGlobalAttributeAttributeList)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    ReadOperation testRequest(kMockEndpoint2, MockClusterId(3), AttributeList::Id);
-    testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-    // Data read via the encoder
-    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
-    ASSERT_EQ(model.ReadAttribute(testRequest.GetRequest(), *encoder), CHIP_NO_ERROR);
-    ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
-
-    // Validate after read
-    std::vector<DecodedAttributeData> attribute_data;
-    ASSERT_EQ(testRequest.GetEncodedIBs().Decode(attribute_data), CHIP_NO_ERROR);
-    ASSERT_EQ(attribute_data.size(), 1u);
-
-    DecodedAttributeData & encodedData = attribute_data[0];
-    ASSERT_EQ(encodedData.attributePath, testRequest.GetRequest().path);
-
-    ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_Array);
-
-    std::vector<AttributeId> items;
-    ASSERT_EQ(DecodeList(encodedData.dataReader, items), CHIP_NO_ERROR);
-
-    // Mock data contains ClusterRevision and FeatureMap.
-    // After this, Global attributes are auto-added
-    std::vector<AttributeId> expected;
-
-    // Encoding in global-attribute-access-interface has a logic of:
-    //   - Append global attributes in front of the first specified
-    //     large number global attribute.
-    // Since ClusterRevision and FeatureMap are
-    // global attributes, the order here is reversed for them
-    for (AttributeId id : GlobalAttributesNotInMetadata)
-    {
-        expected.push_back(id);
-    }
-    expected.push_back(ClusterRevision::Id);
-    expected.push_back(FeatureMap::Id);
-    expected.push_back(MockAttributeId(1));
-    expected.push_back(MockAttributeId(2));
-    expected.push_back(MockAttributeId(3));
-
-    ASSERT_EQ(items.size(), expected.size());
-
-    // Since we have no std::vector formatter, comparing element by element is somewhat
-    // more readable in case of failure.
-    for (unsigned i = 0; i < items.size(); i++)
-    {
-        EXPECT_EQ(items[i], expected[i]);
     }
 }
 

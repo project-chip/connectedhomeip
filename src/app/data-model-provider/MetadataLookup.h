@@ -21,6 +21,7 @@
 #include <app/ConcreteClusterPath.h>
 #include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/ProviderMetadataTree.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 
@@ -78,6 +79,14 @@ private:
     ProviderMetadataTree * mProvider;
     ReadOnlyBuffer<EndpointEntry> mEndpoints;
 };
+
+/// Validates that the cluster identified by `path` exists within the given provider.
+/// If the endpoint does not exist, will return Status::UnsupportedEndpoint.
+/// If the endpoint exists but does not have the cluster identified by the path, will return Status::UnsupportedCluster.
+///
+/// Otherwise, will return successStatus.
+Protocols::InteractionModel::Status ValidateClusterPath(ProviderMetadataTree * provider, const ConcreteClusterPath & path,
+                                                        Protocols::InteractionModel::Status successStatus);
 
 } // namespace DataModel
 } // namespace app

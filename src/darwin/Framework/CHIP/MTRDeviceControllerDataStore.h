@@ -61,6 +61,7 @@ typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNu
 - (nullable MTRCASESessionResumptionInfo *)findResumptionInfoByNodeID:(NSNumber *)nodeID;
 - (nullable MTRCASESessionResumptionInfo *)findResumptionInfoByResumptionID:(NSData *)resumptionID;
 - (void)storeResumptionInfo:(MTRCASESessionResumptionInfo *)resumptionInfo;
+- (void)clearResumptionInfoForNodeID:(NSNumber *)nodeID;
 - (void)clearAllResumptionInfo;
 
 /**
@@ -92,6 +93,7 @@ typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNu
  */
 - (nullable NSDictionary<NSString *, id> *)getStoredDeviceDataForNodeID:(NSNumber *)nodeID;
 - (void)storeDeviceData:(NSDictionary<NSString *, id> *)data forNodeID:(NSNumber *)nodeID;
+- (void)clearDeviceDataForNodeID:(NSNumber *)nodeID;
 
 /**
  * Mechanism for an API client to perform a block after previous async operations (writes) on the storage queue have executed.
@@ -102,6 +104,12 @@ typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNu
  * If no block is passed in, then the method returns after having synchronously flushed the queue.
  */
 - (void)synchronouslyPerformBlock:(void (^_Nullable)(void))block;
+
+/**
+ * Returns the list of node IDs for which this data store has stored data of
+ * some sort.
+ */
+- (NSArray<NSNumber *> *)nodesWithStoredData;
 
 @end
 

@@ -36,6 +36,7 @@
 #include <app/util/endpoint-config-api.h>
 #include <app/util/persistence/AttributePersistenceProvider.h>
 #include <app/util/persistence/DefaultAttributePersistenceProvider.h>
+#include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
@@ -116,18 +117,6 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
     // entry.flags.Set(DataModel::AttributeQualityFlags::kFabricSensitive)
     // entry.flags.Set(DataModel::AttributeQualityFlags::kChangesOmitted)
     return entry;
-}
-
-// TODO: DeviceTypeEntry content is IDENTICAL to EmberAfDeviceType, so centralizing
-//       to a common type is probably better. Need to figure out dependencies since
-//       this would make ember return datamodel-provider types.
-//       See: https://github.com/project-chip/connectedhomeip/issues/35889
-DataModel::DeviceTypeEntry DeviceTypeEntryFromEmber(const EmberAfDeviceType & other)
-{
-    return DataModel::DeviceTypeEntry{
-        .deviceTypeId       = other.deviceId,
-        .deviceTypeRevision = other.deviceVersion,
-    };
 }
 
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
@@ -336,6 +325,12 @@ const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const Concret
 CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path,
                                                       DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
+    // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
+    // the cluster actually exists on this endpoint before asking the CommandHandlerInterface what commands
+    // it claims to support.
+    const EmberAfCluster * serverCluster = FindServerCluster(path);
+    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
+
     CommandHandlerInterface * interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
     if (interface != nullptr)
@@ -389,8 +384,6 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
         VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
 
-    const EmberAfCluster * serverCluster = FindServerCluster(path);
-    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
     VerifyOrReturnError(serverCluster->acceptedCommandList != nullptr, CHIP_NO_ERROR);
 
     const chip::CommandId * endOfList = serverCluster->acceptedCommandList;
@@ -416,6 +409,12 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
 CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path,
                                                        DataModel::ListBuilder<CommandId> & builder)
 {
+    // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
+    // the cluster actually exists on this endpoint before asking the CommandHandlerInterface what commands
+    // it claims to support.
+    const EmberAfCluster * serverCluster = FindServerCluster(path);
+    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
+
     CommandHandlerInterface * interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
     if (interface != nullptr)
@@ -466,8 +465,6 @@ CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath
         VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
 
-    const EmberAfCluster * serverCluster = FindServerCluster(path);
-    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
     VerifyOrReturnError(serverCluster->generatedCommandList != nullptr, CHIP_NO_ERROR);
 
     const chip::CommandId * endOfList = serverCluster->generatedCommandList;
@@ -494,16 +491,9 @@ CHIP_ERROR CodegenDataModelProvider::DeviceTypes(EndpointId endpointId,
         return {};
     }
 
-    CHIP_ERROR err                            = CHIP_NO_ERROR;
-    Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(deviceTypes.size()));
-
-    for (auto & entry : deviceTypes)
-    {
-        ReturnErrorOnFailure(builder.Append(DeviceTypeEntryFromEmber(entry)));
-    }
-
+    builder.ReferenceExisting(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
     return CHIP_NO_ERROR;
 }
 
