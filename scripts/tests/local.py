@@ -567,7 +567,7 @@ def gen_coverage():
             os.path.join("./out", t.target, t.binary),
         ]
         info_path = os.path.join("./out", f"{t.target}.info")
-        p = subprocess.run(_with_activate(cmd, output_path=info_path), check=True)
+        subprocess.run(_with_activate(cmd, output_path=info_path), check=True)
         trace_files.append(info_path)
         logging.info("Generated %s", info_path)
 
