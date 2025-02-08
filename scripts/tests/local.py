@@ -772,7 +772,7 @@ def python_tests(
     if not os.path.exists("out/trace_data"):
         os.mkdir("out/trace_data")
 
-    if not os.path.exists(fail_log_dir):
+    if fail_log_dir and not os.path.exists(fail_log_dir):
         os.mkdir(fail_log_dir)
 
     metadata = yaml.full_load(open("src/python_testing/test_metadata.yaml"))
