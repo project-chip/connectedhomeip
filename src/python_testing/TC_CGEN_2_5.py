@@ -38,7 +38,7 @@
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.clusters.Attribute import ValueDecodeFailure
+from chip.clusters.Types import Nullable
 from chip.commissioning import ROOT_ENDPOINT_ID
 from chip.testing import matter_asserts
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -117,10 +117,8 @@ class TC_CGEN_2_5(MatterBaseTest):
         )
         tc_update_deadline = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCUpdateDeadline]
 
-        # Validate the value is of type Optional[uint32], e.g. either None or within the 32-bit range.
-        if isinstance(tc_update_deadline, ValueDecodeFailure):
-            asserts.assert_is_none(tc_update_deadline.TLVValue)
-        else:
+        # Validate the value is of type Optional[uint32], e.g. either Nullable or within the 32-bit range.
+        if not isinstance(tc_update_deadline, Nullable):
             matter_asserts.assert_valid_uint32(tc_update_deadline, "TCUpdateDeadline exceeds uint32 range")
 
         # Step 4: Verify TC feature flag in FeatureMap
