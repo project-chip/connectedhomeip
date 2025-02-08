@@ -539,6 +539,16 @@ def gen_coverage():
     # generate coverage out of it
     #
     # Each target gets its own profile
+
+    #for -ignore-filename-regex
+    ignore_paths = [
+        "third_party/boringssl/.*",
+        "third_party/perfetto/.*",
+        "third_party/jsoncpp/.*",
+        "third_party/nl.*",
+        "/usr/include/.*",
+    ]
+
     trace_files = []
     for t in _get_targets(coverage=True):
         path = os.path.join("./out", f"{t.target}.profraw")
@@ -566,6 +576,10 @@ def gen_coverage():
             data_path,
             os.path.join("./out", t.target, t.binary),
         ]
+        for p in ignore_paths:
+            cmd.append("-ignore-filename-regex")
+            cmd.append(p)
+
         info_path = os.path.join("./out", f"{t.target}.info")
         subprocess.run(_with_activate(cmd, output_path=info_path), check=True)
         trace_files.append(info_path)
