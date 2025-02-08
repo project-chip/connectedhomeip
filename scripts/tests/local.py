@@ -255,8 +255,8 @@ class BinaryRunner(enum.Enum):
             return f"valgrind {path}"
         elif self == BinaryRunner.COVERAGE:
             # Expected path is like "out/<target>/<binary>"
-            rawname = path[: path.rindex("/")] + ".profraw"
-            return f'LLVM_PROFILE_FILE="{rawname}" {path}'
+            rawname = os.path.basename(path[: path.rindex("/")] + ".profraw")
+            return f'LLVM_PROFILE_FILE="out/profiling/{rawname}" {path}'
 
 
 __RUNNERS__ = {
@@ -552,13 +552,13 @@ def gen_coverage():
 
     trace_files = []
     for t in _get_targets(coverage=True):
-        path = os.path.join("./out", f"{t.target}.profraw")
+        path = os.path.join("./out", "profiling", f"{t.target}.profraw")
 
         if not os.path.exists(path):
             logging.warning("No profile file '%s'. Skipping.", path)
             continue
 
-        data_path = os.path.join("./out", f"{t.target}.profdata")
+        data_path = os.path.join("./out", "profiling", f"{t.target}.profdata")
         cmd = [
             "llvm-profdata",
             "merge",
@@ -581,10 +581,33 @@ def gen_coverage():
             cmd.append("-ignore-filename-regex")
             cmd.append(p)
 
-        info_path = os.path.join("./out", f"{t.target}.info")
+        info_path = os.path.join("./out", "profiling", f"{t.target}.info")
         subprocess.run(_with_activate(cmd, output_path=info_path), check=True)
         trace_files.append(info_path)
         logging.info("Generated %s", info_path)
+
+        # !!!!! HACK ALERT !!!!!
+        #
+        # The paths for our examples are generally including CHIP as
+        # examples/<name>/third_party/connectedhomeip/....
+        # So we will replace every occurence of these to remove the extra indirection into third_party
+        #
+        # Generally we will replace every path (Shown as SF:...) with the corresponding item
+        #
+        # We assume that the info lines fit in RAM
+        lines = []
+        with open(info_path, 'rt') as f:
+            for line in f.readlines():
+                if line.startswith("SF:"):
+                    # This is a source file line: "SF:..."
+                    path = line[3:]
+                    lines.append(f"SF:{os.path.realpath(path)}")
+                lines.append(line)
+
+        # re-write it.
+        with open(info_path, 'wt') as f:
+             f.write("\n".join(lines))
+
 
     if not trace_files:
         logging.error(
@@ -602,13 +625,13 @@ def gen_coverage():
     ]
 
     cmd.append("--output-file")
-    cmd.append("out/merged.info")
+    cmd.append("out/profiling/merged.info")
     for e in errors_to_ignore:
         cmd.append("--ignore-errors")
         cmd.append(e)
 
-    if os.path.exists("out/merged.info"):
-        os.unlink("out/merged.info")
+    if os.path.exists("out/profiling/merged.info"):
+        os.unlink("out/profiling/merged.info")
 
     subprocess.run(cmd, check=True)
 
@@ -620,7 +643,7 @@ def gen_coverage():
 
     cmd.append("--output-directory")
     cmd.append("out/coverage")
-    cmd.append("out/merged.info")
+    cmd.append("out/profiling/merged.info")
 
     subprocess.run(cmd, check=True)
     logging.info("Coverage HTML should be available in out/coverage/index.html")
@@ -673,7 +696,7 @@ def gen_coverage():
     "--fail-log-dir",
     default=None,
     help="Save failure logs into the specified directory instead of logging (as logging can be noisy/slow)",
-    type=click.Path(exists=True, file_okay=False, dir_okay=True),
+    type=click.Path(file_okay=False, dir_okay=True),
 )
 @click.option("--coverage/--no-coverage", default=None)
 @click.option(
@@ -748,6 +771,9 @@ def python_tests(
     # This MUST be available or perfetto dies. This is VERY annoying to debug
     if not os.path.exists("out/trace_data"):
         os.mkdir("out/trace_data")
+
+    if not os.path.exists(fail_log_dir):
+        os.mkdir(fail_log_dir)
 
     metadata = yaml.full_load(open("src/python_testing/test_metadata.yaml"))
     excluded_patterns = set([item["name"] for item in metadata["not_automated"]])
