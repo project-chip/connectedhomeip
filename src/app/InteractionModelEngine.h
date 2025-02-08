@@ -245,12 +245,12 @@ public:
     void OnActiveModeNotification(ScopedNodeId aPeer);
 
     /**
-     *  Used to notify when a peer becomes LIT ICD or vice versa.
+     *  Used to notify when a peer operating mode becomes LIT ICD or vice versa.
      *
      *  ReadClient will call this function when it finds any updates of the OperatingMode attribute from ICD management
      * cluster. The application doesn't need to call this function, usually.
      */
-    void OnPeerTypeChange(ScopedNodeId aPeer, ReadClient::PeerType aType);
+    void OnPeerOperatingModeChange(ScopedNodeId aPeer, ReadClient::PeerOperatingMode aMode);
 
     /**
      * Add a read client to the internally tracked list of weak references. This list is used to

@@ -208,13 +208,11 @@ void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
                 aError = mpCallback.OnResubscriptionNeeded(this, aError);
                 if (aError == CHIP_NO_ERROR)
                 {
-                    return;
-                }
-                if (aError == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT)
-                {
-                    VerifyOrDie(originalReason == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
-                    ChipLogProgress(DataManagement, "ICD device is inactive mark subscription as InactiveICDSubscription");
-                    MoveToState(ClientState::InactiveICDSubscription);
+                    if (originalReason == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT)
+                    {
+                        ChipLogProgress(DataManagement, "ICD device is unreachable, mark subscription as InactiveICDSubscription, retrying is scheduled");
+                        MoveToState(ClientState::InactiveICDSubscription);
+                    }
                     return;
                 }
             }
@@ -484,26 +482,25 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
 
 void ReadClient::OnActiveModeNotification()
 {
-    // This function just tries to complete the deferred resubscription logic in `OnLivenessTimeoutCallback`.
     VerifyOrDie(mpImEngine->InActiveReadClientList(this));
-    // If we are not in InactiveICDSubscription state, that means the liveness timeout has not been reached. Simply do nothing.
+    // If we are in InactiveICDSubscription state, it means the LIT ICD device was unreachable, and ClearActiveSubscriptionState 
+    // should have been cleared in previous close call, now it transitions to the reachable status, client needs to cancel
+    // scheduled resubscription and trigger a new one immediately. Case session should have been defunct when going 
+    // into InactiveICDSubscription state during previous close call, 
     VerifyOrReturn(IsInactiveICDSubscription());
-
-    // When we reach here, the subscription definitely exceeded the liveness timeout. Just continue the unfinished resubscription
-    // logic in `OnLivenessTimeoutCallback`.
-    TriggerResubscriptionForLivenessTimeout(CHIP_ERROR_TIMEOUT);
+    CloseSession();
+    CancelResubscribeTimer();
+    MoveToState(ClientState::Idle);
+    OnResubscribeTimerCallback(nullptr, this);
 }
 
-void ReadClient::OnPeerTypeChange(PeerType aType)
+void ReadClient::OnPeerOperatingModeChange(PeerOperatingMode aMode)
 {
     VerifyOrDie(mpImEngine->InActiveReadClientList(this));
+    ChipLogProgress(DataManagement, "Peer operation mode is now %s LIT ICD.", mPeerOperatingMode == PeerOperatingMode::kLITICD ? "a" : "not a");
 
-    mIsPeerLIT = (aType == PeerType::kLITICD);
-
-    ChipLogProgress(DataManagement, "Peer is now %s LIT ICD.", mIsPeerLIT ? "a" : "not a");
-
-    // If the peer is no longer LIT, try to wake up the subscription and do resubscribe when necessary.
-    if (!mIsPeerLIT)
+    // If the peer operating mode is no longer LIT, try to wake up the subscription and do resubscribe when necessary.
+    if (mPeerOperatingMode == PeerOperatingMode::kNormal)
     {
         OnActiveModeNotification();
     }
@@ -720,10 +717,18 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
     ChipLogError(DataManagement, "Time out! failed to receive report data from Exchange: " ChipLogFormatExchange,
                  ChipLogValueExchange(apExchangeContext));
 
-    Close(CHIP_ERROR_TIMEOUT);
+    if (IsPeerLIT())
+    {
+        Close(CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
+    }
+    else
+    {
+        Close(CHIP_ERROR_TIMEOUT);
+    }
+    
 }
 
-CHIP_ERROR ReadClient::ReadICDOperatingModeFromAttributeDataIB(TLV::TLVReader && aReader, PeerType & aType)
+CHIP_ERROR ReadClient::ReadICDOperatingModeFromAttributeDataIB(TLV::TLVReader && aReader, PeerOperatingMode & aMode)
 {
     Clusters::IcdManagement::Attributes::OperatingMode::TypeInfo::DecodableType operatingMode;
 
@@ -733,10 +738,12 @@ CHIP_ERROR ReadClient::ReadICDOperatingModeFromAttributeDataIB(TLV::TLVReader &&
     switch (operatingMode)
     {
     case Clusters::IcdManagement::OperatingModeEnum::kSit:
-        aType = PeerType::kNormal;
+        aMode = PeerOperatingMode::kNormal;
         break;
     case Clusters::IcdManagement::OperatingModeEnum::kLit:
-        aType = PeerType::kLITICD;
+        aMode = PeerOperatingMode::kLITICD;
+        // If operating mode is LIT, this device should be LIT ICD.
+        mIsPeerLIT = true;
         break;
     default:
         err = CHIP_ERROR_INVALID_ARGUMENT;
@@ -843,14 +850,14 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
             if (attributePath.MatchesConcreteAttributePath(ConcreteAttributePath(
                     kRootEndpointId, Clusters::IcdManagement::Id, Clusters::IcdManagement::Attributes::OperatingMode::Id)))
             {
-                PeerType peerType;
+                PeerOperatingMode peerMode;
                 TLV::TLVReader operatingModeTlvReader;
                 operatingModeTlvReader.Init(dataReader);
-                if (CHIP_NO_ERROR == ReadICDOperatingModeFromAttributeDataIB(std::move(operatingModeTlvReader), peerType))
+                if (CHIP_NO_ERROR == ReadICDOperatingModeFromAttributeDataIB(std::move(operatingModeTlvReader), peerMode))
                 {
-                    // It is safe to call `OnPeerTypeChange` since we are in the middle of parsing the attribute data, And
+                    // It is safe to call `OnPeerOperatingModeChange` since we are in the middle of parsing the attribute data, And
                     // the subscription should be active so `OnActiveModeNotification` is a no-op in this case.
-                    InteractionModelEngine::GetInstance()->OnPeerTypeChange(mPeer, peerType);
+                    InteractionModelEngine::GetInstance()->OnPeerOperatingModeChange(mPeer, peerMode);
                 }
                 else
                 {
@@ -1029,15 +1036,16 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
                  "Subscription Liveness timeout with SubscriptionID = 0x%08" PRIx32 ", Peer = %02x:" ChipLogFormatX64,
                  _this->mSubscriptionId, _this->GetFabricIndex(), ChipLogValueX64(_this->GetPeerNodeId()));
 
-    if (_this->mIsPeerLIT)
+    if (_this->IsPeerLIT())
     {
         subscriptionTerminationCause = CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT;
     }
 
-    _this->TriggerResubscriptionForLivenessTimeout(subscriptionTerminationCause);
+    _this->CloseSession();
+    _this->Close(subscriptionTerminationCause);
 }
 
-void ReadClient::TriggerResubscriptionForLivenessTimeout(CHIP_ERROR aReason)
+void ReadClient::CloseSession()
 {
     // We didn't get a message from the server on time; it's possible that it no
     // longer has a useful CASE session to us.  Mark defunct all sessions that
@@ -1060,8 +1068,6 @@ void ReadClient::TriggerResubscriptionForLivenessTimeout(CHIP_ERROR aReason)
             session->MarkAsDefunct();
         });
     }
-
-    Close(aReason);
 }
 
 CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aPayload)
@@ -1265,12 +1271,6 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
 
 CHIP_ERROR ReadClient::DefaultResubscribePolicy(CHIP_ERROR aTerminationCause)
 {
-    if (aTerminationCause == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT)
-    {
-        ChipLogProgress(DataManagement, "ICD device is inactive, skipping scheduling resubscribe within DefaultResubscribePolicy");
-        return CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT;
-    }
-
     VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
 
     auto timeTillNextResubscription = ComputeTimeTillNextSubscription();
@@ -1305,9 +1305,9 @@ void ReadClient::HandleDeviceConnectionFailure(void * context, const Operational
 {
     ReadClient * const _this = static_cast<ReadClient *>(context);
     VerifyOrDie(_this != nullptr);
-
+    CHIP_ERROR err = failureInfo.error;
     ChipLogError(DataManagement, "Failed to establish CASE for re-subscription with error '%" CHIP_ERROR_FORMAT "'",
-                 failureInfo.error.Format());
+                 err.Format());
 
 #if CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
 #if CHIP_DETAIL_LOGGING
@@ -1322,7 +1322,11 @@ void ReadClient::HandleDeviceConnectionFailure(void * context, const Operational
     _this->mMinimalResubscribeDelay = System::Clock::kZero;
 #endif // CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
 
-    _this->Close(failureInfo.error);
+    if (_this->IsPeerLIT() && err == CHIP_ERROR_TIMEOUT)
+    {
+       err = CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT;
+    }
+    _this->Close(err);
 }
 
 void ReadClient::OnResubscribeTimerCallback(System::Layer * /* If this starts being used, fix callers that pass nullptr */,
@@ -1334,7 +1338,6 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * /* If this starts be
     _this->mIsResubscriptionScheduled = false;
 
     CHIP_ERROR err;
-
     ChipLogProgress(DataManagement, "OnResubscribeTimerCallback: ForceCASE = %d", _this->mForceCaseOnNextResub);
     _this->mNumRetries++;
 
