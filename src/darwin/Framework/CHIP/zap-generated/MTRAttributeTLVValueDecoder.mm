@@ -2282,6 +2282,17 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
         value = [NSNumber numberWithBool:cppValue];
         return value;
     }
+    case Attributes::TCUpdateDeadline::Id: {
+        using TypeInfo = Attributes::TCUpdateDeadline::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
+        return value;
+    }
     default: {
         break;
     }

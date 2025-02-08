@@ -55,6 +55,7 @@ def create_read(include_reachable: bool = False, include_max_paths: bool = False
                 bi.ProductLabel: 'myProduct',
                 bi.SerialNumber: 'ABCD1234',
                 bi.LocalConfigDisabled: False,
+                bi.SpecificationVersion: 0x01040000,
                 bi.UniqueID: 'Hashy-McHashface'}
     if include_reachable:
         attrs_bi[bi.Reachable] = True

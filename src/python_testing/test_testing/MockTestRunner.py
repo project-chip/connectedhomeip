@@ -73,4 +73,6 @@ class MockTestRunner():
         self.default_controller.Read = AsyncMock(return_value=read_cache)
         # This doesn't need to do anything since we are overriding the read anyway
         self.default_controller.FindOrEstablishPASESession = AsyncMock(return_value=None)
+        self.default_controller.GetConnectedDevice = AsyncMock(return_value=None)
+
         return run_tests_no_exit(self.test_class, self.config, hooks, self.default_controller, self.stack)

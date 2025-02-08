@@ -7987,6 +7987,7 @@ public class ChipClusters {
     private static final long TC_MIN_REQUIRED_VERSION_ATTRIBUTE_ID = 6L;
     private static final long TC_ACKNOWLEDGEMENTS_ATTRIBUTE_ID = 7L;
     private static final long TC_ACKNOWLEDGEMENTS_REQUIRED_ATTRIBUTE_ID = 8L;
+    private static final long TC_UPDATE_DEADLINE_ATTRIBUTE_ID = 9L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -8434,6 +8435,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, TC_ACKNOWLEDGEMENTS_REQUIRED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readTCUpdateDeadlineAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TC_UPDATE_DEADLINE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TC_UPDATE_DEADLINE_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeTCUpdateDeadlineAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TC_UPDATE_DEADLINE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TC_UPDATE_DEADLINE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

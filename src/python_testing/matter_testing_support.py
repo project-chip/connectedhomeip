@@ -791,7 +791,12 @@ class DeviceTypePathLocation:
         return msg
 
 
-ProblemLocation = typing.Union[ClusterPathLocation, DeviceTypePathLocation]
+class UnknownProblemLocation:
+    def __str__(self):
+        return '\n      Unknown Locations - see message for more details'
+
+
+ProblemLocation = typing.Union[ClusterPathLocation, DeviceTypePathLocation, UnknownProblemLocation]
 
 # ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
 # appeared in 3.11. To make it JSON serializable easily, multiple inheritance

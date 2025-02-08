@@ -527,6 +527,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestConformanceTest.py'
                   scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestChoiceConformanceSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestMatterTestingSupport.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestSpecParsingSelection.py'
                   scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestSpecParsingSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/test_testing/test_TC_ICDM_2_1.py'
                   scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/test_testing/test_IDM_10_4.py'
