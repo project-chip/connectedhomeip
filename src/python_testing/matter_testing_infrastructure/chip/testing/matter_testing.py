@@ -1079,6 +1079,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         dut_ip = os.getenv('LINUX_DUT_IP')
 
         if dut_ip is None:
+            if not os.path.exists(app_pipe_name):
+                # Named pipes are unique, so we MUST have consistent PID/paths
+                # set up for them to work.
+                logging.error("Named pipe %r does NOT exist" % app_pipe_name)
+                raise FileNotFoundError("CANNOT FIND %r" % app_pipe_name)
             with open(app_pipe_name, "w") as app_pipe:
                 app_pipe.write(command + "\n")
             # TODO(#31239): remove the need for sleep
