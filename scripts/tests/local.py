@@ -547,6 +547,7 @@ def gen_coverage():
         "third_party/jsoncpp/.*",
         "third_party/nl.*",
         "/usr/include/.*",
+        "/usr/lib/.*",
     ]
 
     trace_files = []
