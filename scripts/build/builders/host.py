@@ -270,8 +270,8 @@ class HostApp(Enum):
             yield 'chip-energy-management-app'
             yield 'chip-energy-management-app.map'
         elif self == HostApp.TERMS_AND_CONDITIONS:
-            yield 'terms-and-conditions-app'
-            yield 'terms-and-conditions-app.map'
+            yield 'chip-terms-and-conditions-app'
+            yield 'chip-terms-and-conditions-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
