@@ -17,14 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class EnergyPreferenceClusterBalanceStruct(val step: UInt, val label: Optional<String>) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class EnergyPreferenceClusterBalanceStruct (
+    val step: UInt,
+    val label: Optional<String>) {
+  override fun toString(): String  = buildString {
     append("EnergyPreferenceClusterBalanceStruct {\n")
     append("\tstep : $step\n")
     append("\tlabel : $label\n")
@@ -36,9 +41,9 @@ class EnergyPreferenceClusterBalanceStruct(val step: UInt, val label: Optional<S
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_STEP), step)
       if (label.isPresent) {
-        val optlabel = label.get()
-        put(ContextSpecificTag(TAG_LABEL), optlabel)
-      }
+      val optlabel = label.get()
+      put(ContextSpecificTag(TAG_LABEL), optlabel)
+    }
       endStructure()
     }
   }
@@ -47,16 +52,15 @@ class EnergyPreferenceClusterBalanceStruct(val step: UInt, val label: Optional<S
     private const val TAG_STEP = 0
     private const val TAG_LABEL = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyPreferenceClusterBalanceStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : EnergyPreferenceClusterBalanceStruct {
       tlvReader.enterStructure(tlvTag)
       val step = tlvReader.getUInt(ContextSpecificTag(TAG_STEP))
-      val label =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
-        } else {
-          Optional.empty()
-        }
-
+      val label = if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return EnergyPreferenceClusterBalanceStruct(step, label)

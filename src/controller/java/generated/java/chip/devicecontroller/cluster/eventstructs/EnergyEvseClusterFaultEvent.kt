@@ -17,18 +17,21 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class EnergyEvseClusterFaultEvent(
-  val sessionID: ULong?,
-  val state: UInt,
-  val faultStatePreviousState: UInt,
-  val faultStateCurrentState: UInt
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class EnergyEvseClusterFaultEvent (
+    val sessionID: ULong?,
+    val state: UInt,
+    val faultStatePreviousState: UInt,
+    val faultStateCurrentState: UInt) {
+  override fun toString(): String  = buildString {
     append("EnergyEvseClusterFaultEvent {\n")
     append("\tsessionID : $sessionID\n")
     append("\tstate : $state\n")
@@ -41,10 +44,10 @@ class EnergyEvseClusterFaultEvent(
     tlvWriter.apply {
       startStructure(tlvTag)
       if (sessionID != null) {
-        put(ContextSpecificTag(TAG_SESSION_ID), sessionID)
-      } else {
-        putNull(ContextSpecificTag(TAG_SESSION_ID))
-      }
+      put(ContextSpecificTag(TAG_SESSION_ID), sessionID)
+    } else {
+      putNull(ContextSpecificTag(TAG_SESSION_ID))
+    }
       put(ContextSpecificTag(TAG_STATE), state)
       put(ContextSpecificTag(TAG_FAULT_STATE_PREVIOUS_STATE), faultStatePreviousState)
       put(ContextSpecificTag(TAG_FAULT_STATE_CURRENT_STATE), faultStateCurrentState)
@@ -58,29 +61,21 @@ class EnergyEvseClusterFaultEvent(
     private const val TAG_FAULT_STATE_PREVIOUS_STATE = 2
     private const val TAG_FAULT_STATE_CURRENT_STATE = 4
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterFaultEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : EnergyEvseClusterFaultEvent {
       tlvReader.enterStructure(tlvTag)
-      val sessionID =
-        if (!tlvReader.isNull()) {
-          tlvReader.getULong(ContextSpecificTag(TAG_SESSION_ID))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_SESSION_ID))
-          null
-        }
+      val sessionID = if (!tlvReader.isNull()) {
+      tlvReader.getULong(ContextSpecificTag(TAG_SESSION_ID))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_SESSION_ID))
+      null
+    }
       val state = tlvReader.getUInt(ContextSpecificTag(TAG_STATE))
-      val faultStatePreviousState =
-        tlvReader.getUInt(ContextSpecificTag(TAG_FAULT_STATE_PREVIOUS_STATE))
-      val faultStateCurrentState =
-        tlvReader.getUInt(ContextSpecificTag(TAG_FAULT_STATE_CURRENT_STATE))
-
+      val faultStatePreviousState = tlvReader.getUInt(ContextSpecificTag(TAG_FAULT_STATE_PREVIOUS_STATE))
+      val faultStateCurrentState = tlvReader.getUInt(ContextSpecificTag(TAG_FAULT_STATE_CURRENT_STATE))
+      
       tlvReader.exitContainer()
 
-      return EnergyEvseClusterFaultEvent(
-        sessionID,
-        state,
-        faultStatePreviousState,
-        faultStateCurrentState
-      )
+      return EnergyEvseClusterFaultEvent(sessionID, state, faultStatePreviousState, faultStateCurrentState)
     }
   }
 }

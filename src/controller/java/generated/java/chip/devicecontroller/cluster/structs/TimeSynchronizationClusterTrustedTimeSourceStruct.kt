@@ -17,17 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class TimeSynchronizationClusterTrustedTimeSourceStruct(
-  val fabricIndex: UInt,
-  val nodeID: ULong,
-  val endpoint: UInt
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class TimeSynchronizationClusterTrustedTimeSourceStruct (
+    val fabricIndex: UInt,
+    val nodeID: ULong,
+    val endpoint: UInt) {
+  override fun toString(): String  = buildString {
     append("TimeSynchronizationClusterTrustedTimeSourceStruct {\n")
     append("\tfabricIndex : $fabricIndex\n")
     append("\tnodeID : $nodeID\n")
@@ -50,15 +53,12 @@ class TimeSynchronizationClusterTrustedTimeSourceStruct(
     private const val TAG_NODE_ID = 1
     private const val TAG_ENDPOINT = 2
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): TimeSynchronizationClusterTrustedTimeSourceStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : TimeSynchronizationClusterTrustedTimeSourceStruct {
       tlvReader.enterStructure(tlvTag)
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
       val endpoint = tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT))
-
+      
       tlvReader.exitContainer()
 
       return TimeSynchronizationClusterTrustedTimeSourceStruct(fabricIndex, nodeID, endpoint)

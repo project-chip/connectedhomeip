@@ -17,18 +17,20 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class OperationalStateClusterOperationCompletionEvent(
-  val completionErrorCode: UInt,
-  val totalOperationalTime: Optional<ULong>?,
-  val pausedTime: Optional<ULong>?
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class OperationalStateClusterOperationCompletionEvent (
+    val completionErrorCode: UInt,
+    val totalOperationalTime: Optional<ULong>?,
+    val pausedTime: Optional<ULong>?) {
+  override fun toString(): String  = buildString {
     append("OperationalStateClusterOperationCompletionEvent {\n")
     append("\tcompletionErrorCode : $completionErrorCode\n")
     append("\ttotalOperationalTime : $totalOperationalTime\n")
@@ -41,21 +43,21 @@ class OperationalStateClusterOperationCompletionEvent(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_COMPLETION_ERROR_CODE), completionErrorCode)
       if (totalOperationalTime != null) {
-        if (totalOperationalTime.isPresent) {
-          val opttotalOperationalTime = totalOperationalTime.get()
-          put(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME), opttotalOperationalTime)
-        }
-      } else {
-        putNull(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))
-      }
+      if (totalOperationalTime.isPresent) {
+      val opttotalOperationalTime = totalOperationalTime.get()
+      put(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME), opttotalOperationalTime)
+    }
+    } else {
+      putNull(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))
+    }
       if (pausedTime != null) {
-        if (pausedTime.isPresent) {
-          val optpausedTime = pausedTime.get()
-          put(ContextSpecificTag(TAG_PAUSED_TIME), optpausedTime)
-        }
-      } else {
-        putNull(ContextSpecificTag(TAG_PAUSED_TIME))
-      }
+      if (pausedTime.isPresent) {
+      val optpausedTime = pausedTime.get()
+      put(ContextSpecificTag(TAG_PAUSED_TIME), optpausedTime)
+    }
+    } else {
+      putNull(ContextSpecificTag(TAG_PAUSED_TIME))
+    }
       endStructure()
     }
   }
@@ -65,42 +67,33 @@ class OperationalStateClusterOperationCompletionEvent(
     private const val TAG_TOTAL_OPERATIONAL_TIME = 1
     private const val TAG_PAUSED_TIME = 2
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): OperationalStateClusterOperationCompletionEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : OperationalStateClusterOperationCompletionEvent {
       tlvReader.enterStructure(tlvTag)
       val completionErrorCode = tlvReader.getUInt(ContextSpecificTag(TAG_COMPLETION_ERROR_CODE))
-      val totalOperationalTime =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))) {
-            Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME)))
-          } else {
-            Optional.empty()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))
-          null
-        }
-      val pausedTime =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_PAUSED_TIME))) {
-            Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_PAUSED_TIME)))
-          } else {
-            Optional.empty()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_PAUSED_TIME))
-          null
-        }
-
+      val totalOperationalTime = if (!tlvReader.isNull()) {
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME)))
+    } else {
+      Optional.empty()
+    }
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))
+      null
+    }
+      val pausedTime = if (!tlvReader.isNull()) {
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_PAUSED_TIME))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_PAUSED_TIME)))
+    } else {
+      Optional.empty()
+    }
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_PAUSED_TIME))
+      null
+    }
+      
       tlvReader.exitContainer()
 
-      return OperationalStateClusterOperationCompletionEvent(
-        completionErrorCode,
-        totalOperationalTime,
-        pausedTime
-      )
+      return OperationalStateClusterOperationCompletionEvent(completionErrorCode, totalOperationalTime, pausedTime)
     }
   }
 }

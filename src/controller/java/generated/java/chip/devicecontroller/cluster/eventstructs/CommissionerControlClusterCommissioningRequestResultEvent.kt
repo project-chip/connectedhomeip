@@ -17,18 +17,21 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class CommissionerControlClusterCommissioningRequestResultEvent(
-  val requestID: ULong,
-  val clientNodeID: ULong,
-  val statusCode: UInt,
-  val fabricIndex: UInt
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class CommissionerControlClusterCommissioningRequestResultEvent (
+    val requestID: ULong,
+    val clientNodeID: ULong,
+    val statusCode: UInt,
+    val fabricIndex: UInt) {
+  override fun toString(): String  = buildString {
     append("CommissionerControlClusterCommissioningRequestResultEvent {\n")
     append("\trequestID : $requestID\n")
     append("\tclientNodeID : $clientNodeID\n")
@@ -54,24 +57,16 @@ class CommissionerControlClusterCommissioningRequestResultEvent(
     private const val TAG_STATUS_CODE = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): CommissionerControlClusterCommissioningRequestResultEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CommissionerControlClusterCommissioningRequestResultEvent {
       tlvReader.enterStructure(tlvTag)
       val requestID = tlvReader.getULong(ContextSpecificTag(TAG_REQUEST_ID))
       val clientNodeID = tlvReader.getULong(ContextSpecificTag(TAG_CLIENT_NODE_ID))
       val statusCode = tlvReader.getUInt(ContextSpecificTag(TAG_STATUS_CODE))
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
-      return CommissionerControlClusterCommissioningRequestResultEvent(
-        requestID,
-        clientNodeID,
-        statusCode,
-        fabricIndex
-      )
+      return CommissionerControlClusterCommissioningRequestResultEvent(requestID, clientNodeID, statusCode, fabricIndex)
     }
   }
 }

@@ -17,17 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ZoneManagementClusterZoneInformationStruct(
-  val zoneID: UInt,
-  val zoneType: UInt,
-  val zoneSource: UInt
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ZoneManagementClusterZoneInformationStruct (
+    val zoneID: UInt,
+    val zoneType: UInt,
+    val zoneSource: UInt) {
+  override fun toString(): String  = buildString {
     append("ZoneManagementClusterZoneInformationStruct {\n")
     append("\tzoneID : $zoneID\n")
     append("\tzoneType : $zoneType\n")
@@ -50,12 +53,12 @@ class ZoneManagementClusterZoneInformationStruct(
     private const val TAG_ZONE_TYPE = 1
     private const val TAG_ZONE_SOURCE = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ZoneManagementClusterZoneInformationStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ZoneManagementClusterZoneInformationStruct {
       tlvReader.enterStructure(tlvTag)
       val zoneID = tlvReader.getUInt(ContextSpecificTag(TAG_ZONE_ID))
       val zoneType = tlvReader.getUInt(ContextSpecificTag(TAG_ZONE_TYPE))
       val zoneSource = tlvReader.getUInt(ContextSpecificTag(TAG_ZONE_SOURCE))
-
+      
       tlvReader.exitContainer()
 
       return ZoneManagementClusterZoneInformationStruct(zoneID, zoneType, zoneSource)

@@ -17,21 +17,23 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class WaterHeaterManagementClusterWaterHeaterBoostInfoStruct(
-  val duration: ULong,
-  val oneShot: Optional<Boolean>,
-  val emergencyBoost: Optional<Boolean>,
-  val temporarySetpoint: Optional<Int>,
-  val targetPercentage: Optional<UInt>,
-  val targetReheat: Optional<UInt>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class WaterHeaterManagementClusterWaterHeaterBoostInfoStruct (
+    val duration: ULong,
+    val oneShot: Optional<Boolean>,
+    val emergencyBoost: Optional<Boolean>,
+    val temporarySetpoint: Optional<Int>,
+    val targetPercentage: Optional<UInt>,
+    val targetReheat: Optional<UInt>) {
+  override fun toString(): String  = buildString {
     append("WaterHeaterManagementClusterWaterHeaterBoostInfoStruct {\n")
     append("\tduration : $duration\n")
     append("\toneShot : $oneShot\n")
@@ -47,25 +49,25 @@ class WaterHeaterManagementClusterWaterHeaterBoostInfoStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_DURATION), duration)
       if (oneShot.isPresent) {
-        val optoneShot = oneShot.get()
-        put(ContextSpecificTag(TAG_ONE_SHOT), optoneShot)
-      }
+      val optoneShot = oneShot.get()
+      put(ContextSpecificTag(TAG_ONE_SHOT), optoneShot)
+    }
       if (emergencyBoost.isPresent) {
-        val optemergencyBoost = emergencyBoost.get()
-        put(ContextSpecificTag(TAG_EMERGENCY_BOOST), optemergencyBoost)
-      }
+      val optemergencyBoost = emergencyBoost.get()
+      put(ContextSpecificTag(TAG_EMERGENCY_BOOST), optemergencyBoost)
+    }
       if (temporarySetpoint.isPresent) {
-        val opttemporarySetpoint = temporarySetpoint.get()
-        put(ContextSpecificTag(TAG_TEMPORARY_SETPOINT), opttemporarySetpoint)
-      }
+      val opttemporarySetpoint = temporarySetpoint.get()
+      put(ContextSpecificTag(TAG_TEMPORARY_SETPOINT), opttemporarySetpoint)
+    }
       if (targetPercentage.isPresent) {
-        val opttargetPercentage = targetPercentage.get()
-        put(ContextSpecificTag(TAG_TARGET_PERCENTAGE), opttargetPercentage)
-      }
+      val opttargetPercentage = targetPercentage.get()
+      put(ContextSpecificTag(TAG_TARGET_PERCENTAGE), opttargetPercentage)
+    }
       if (targetReheat.isPresent) {
-        val opttargetReheat = targetReheat.get()
-        put(ContextSpecificTag(TAG_TARGET_REHEAT), opttargetReheat)
-      }
+      val opttargetReheat = targetReheat.get()
+      put(ContextSpecificTag(TAG_TARGET_REHEAT), opttargetReheat)
+    }
       endStructure()
     }
   }
@@ -78,53 +80,38 @@ class WaterHeaterManagementClusterWaterHeaterBoostInfoStruct(
     private const val TAG_TARGET_PERCENTAGE = 4
     private const val TAG_TARGET_REHEAT = 5
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): WaterHeaterManagementClusterWaterHeaterBoostInfoStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : WaterHeaterManagementClusterWaterHeaterBoostInfoStruct {
       tlvReader.enterStructure(tlvTag)
       val duration = tlvReader.getULong(ContextSpecificTag(TAG_DURATION))
-      val oneShot =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ONE_SHOT))) {
-          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_ONE_SHOT)))
-        } else {
-          Optional.empty()
-        }
-      val emergencyBoost =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_EMERGENCY_BOOST))) {
-          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_EMERGENCY_BOOST)))
-        } else {
-          Optional.empty()
-        }
-      val temporarySetpoint =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TEMPORARY_SETPOINT))) {
-          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_TEMPORARY_SETPOINT)))
-        } else {
-          Optional.empty()
-        }
-      val targetPercentage =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TARGET_PERCENTAGE))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_TARGET_PERCENTAGE)))
-        } else {
-          Optional.empty()
-        }
-      val targetReheat =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TARGET_REHEAT))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_TARGET_REHEAT)))
-        } else {
-          Optional.empty()
-        }
-
+      val oneShot = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ONE_SHOT))) {
+      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_ONE_SHOT)))
+    } else {
+      Optional.empty()
+    }
+      val emergencyBoost = if (tlvReader.isNextTag(ContextSpecificTag(TAG_EMERGENCY_BOOST))) {
+      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_EMERGENCY_BOOST)))
+    } else {
+      Optional.empty()
+    }
+      val temporarySetpoint = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TEMPORARY_SETPOINT))) {
+      Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_TEMPORARY_SETPOINT)))
+    } else {
+      Optional.empty()
+    }
+      val targetPercentage = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TARGET_PERCENTAGE))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_TARGET_PERCENTAGE)))
+    } else {
+      Optional.empty()
+    }
+      val targetReheat = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TARGET_REHEAT))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_TARGET_REHEAT)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return WaterHeaterManagementClusterWaterHeaterBoostInfoStruct(
-        duration,
-        oneShot,
-        emergencyBoost,
-        temporarySetpoint,
-        targetPercentage,
-        targetReheat
-      )
+      return WaterHeaterManagementClusterWaterHeaterBoostInfoStruct(duration, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat)
     }
   }
 }

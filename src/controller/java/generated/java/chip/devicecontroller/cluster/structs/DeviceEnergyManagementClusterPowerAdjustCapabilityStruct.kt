@@ -20,14 +20,16 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DeviceEnergyManagementClusterPowerAdjustCapabilityStruct(
-  val powerAdjustCapability: List<DeviceEnergyManagementClusterPowerAdjustStruct>?,
-  val cause: UInt
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class DeviceEnergyManagementClusterPowerAdjustCapabilityStruct (
+    val powerAdjustCapability: List<DeviceEnergyManagementClusterPowerAdjustStruct>?,
+    val cause: UInt) {
+  override fun toString(): String  = buildString {
     append("DeviceEnergyManagementClusterPowerAdjustCapabilityStruct {\n")
     append("\tpowerAdjustCapability : $powerAdjustCapability\n")
     append("\tcause : $cause\n")
@@ -38,14 +40,14 @@ class DeviceEnergyManagementClusterPowerAdjustCapabilityStruct(
     tlvWriter.apply {
       startStructure(tlvTag)
       if (powerAdjustCapability != null) {
-        startArray(ContextSpecificTag(TAG_POWER_ADJUST_CAPABILITY))
-        for (item in powerAdjustCapability.iterator()) {
-          item.toTlv(AnonymousTag, this)
-        }
-        endArray()
-      } else {
-        putNull(ContextSpecificTag(TAG_POWER_ADJUST_CAPABILITY))
+      startArray(ContextSpecificTag(TAG_POWER_ADJUST_CAPABILITY))
+      for (item in powerAdjustCapability.iterator()) {
+        item.toTlv(AnonymousTag, this)
       }
+      endArray()
+    } else {
+      putNull(ContextSpecificTag(TAG_POWER_ADJUST_CAPABILITY))
+    }
       put(ContextSpecificTag(TAG_CAUSE), cause)
       endStructure()
     }
@@ -55,26 +57,22 @@ class DeviceEnergyManagementClusterPowerAdjustCapabilityStruct(
     private const val TAG_POWER_ADJUST_CAPABILITY = 0
     private const val TAG_CAUSE = 1
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): DeviceEnergyManagementClusterPowerAdjustCapabilityStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : DeviceEnergyManagementClusterPowerAdjustCapabilityStruct {
       tlvReader.enterStructure(tlvTag)
-      val powerAdjustCapability =
-        if (!tlvReader.isNull()) {
-          buildList<DeviceEnergyManagementClusterPowerAdjustStruct> {
-            tlvReader.enterArray(ContextSpecificTag(TAG_POWER_ADJUST_CAPABILITY))
-            while (!tlvReader.isEndOfContainer()) {
-              add(DeviceEnergyManagementClusterPowerAdjustStruct.fromTlv(AnonymousTag, tlvReader))
-            }
-            tlvReader.exitContainer()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_POWER_ADJUST_CAPABILITY))
-          null
-        }
+      val powerAdjustCapability = if (!tlvReader.isNull()) {
+      buildList<DeviceEnergyManagementClusterPowerAdjustStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_POWER_ADJUST_CAPABILITY))
+      while(!tlvReader.isEndOfContainer()) {
+        add(DeviceEnergyManagementClusterPowerAdjustStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_POWER_ADJUST_CAPABILITY))
+      null
+    }
       val cause = tlvReader.getUInt(ContextSpecificTag(TAG_CAUSE))
-
+      
       tlvReader.exitContainer()
 
       return DeviceEnergyManagementClusterPowerAdjustCapabilityStruct(powerAdjustCapability, cause)

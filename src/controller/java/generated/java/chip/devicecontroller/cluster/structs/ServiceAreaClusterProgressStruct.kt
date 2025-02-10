@@ -17,19 +17,21 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ServiceAreaClusterProgressStruct(
-  val areaID: ULong,
-  val status: UInt,
-  val totalOperationalTime: Optional<ULong>?,
-  val estimatedTime: Optional<ULong>?
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ServiceAreaClusterProgressStruct (
+    val areaID: ULong,
+    val status: UInt,
+    val totalOperationalTime: Optional<ULong>?,
+    val estimatedTime: Optional<ULong>?) {
+  override fun toString(): String  = buildString {
     append("ServiceAreaClusterProgressStruct {\n")
     append("\tareaID : $areaID\n")
     append("\tstatus : $status\n")
@@ -44,21 +46,21 @@ class ServiceAreaClusterProgressStruct(
       put(ContextSpecificTag(TAG_AREA_ID), areaID)
       put(ContextSpecificTag(TAG_STATUS), status)
       if (totalOperationalTime != null) {
-        if (totalOperationalTime.isPresent) {
-          val opttotalOperationalTime = totalOperationalTime.get()
-          put(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME), opttotalOperationalTime)
-        }
-      } else {
-        putNull(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))
-      }
+      if (totalOperationalTime.isPresent) {
+      val opttotalOperationalTime = totalOperationalTime.get()
+      put(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME), opttotalOperationalTime)
+    }
+    } else {
+      putNull(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))
+    }
       if (estimatedTime != null) {
-        if (estimatedTime.isPresent) {
-          val optestimatedTime = estimatedTime.get()
-          put(ContextSpecificTag(TAG_ESTIMATED_TIME), optestimatedTime)
-        }
-      } else {
-        putNull(ContextSpecificTag(TAG_ESTIMATED_TIME))
-      }
+      if (estimatedTime.isPresent) {
+      val optestimatedTime = estimatedTime.get()
+      put(ContextSpecificTag(TAG_ESTIMATED_TIME), optestimatedTime)
+    }
+    } else {
+      putNull(ContextSpecificTag(TAG_ESTIMATED_TIME))
+    }
       endStructure()
     }
   }
@@ -69,33 +71,31 @@ class ServiceAreaClusterProgressStruct(
     private const val TAG_TOTAL_OPERATIONAL_TIME = 2
     private const val TAG_ESTIMATED_TIME = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterProgressStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ServiceAreaClusterProgressStruct {
       tlvReader.enterStructure(tlvTag)
       val areaID = tlvReader.getULong(ContextSpecificTag(TAG_AREA_ID))
       val status = tlvReader.getUInt(ContextSpecificTag(TAG_STATUS))
-      val totalOperationalTime =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))) {
-            Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME)))
-          } else {
-            Optional.empty()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))
-          null
-        }
-      val estimatedTime =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_ESTIMATED_TIME))) {
-            Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_ESTIMATED_TIME)))
-          } else {
-            Optional.empty()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_ESTIMATED_TIME))
-          null
-        }
-
+      val totalOperationalTime = if (!tlvReader.isNull()) {
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME)))
+    } else {
+      Optional.empty()
+    }
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))
+      null
+    }
+      val estimatedTime = if (!tlvReader.isNull()) {
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_ESTIMATED_TIME))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_ESTIMATED_TIME)))
+    } else {
+      Optional.empty()
+    }
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_ESTIMATED_TIME))
+      null
+    }
+      
       tlvReader.exitContainer()
 
       return ServiceAreaClusterProgressStruct(areaID, status, totalOperationalTime, estimatedTime)

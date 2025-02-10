@@ -17,16 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ServiceAreaClusterAreaInfoStruct(
-  val locationInfo: ServiceAreaClusterLocationDescriptorStruct?,
-  val landmarkInfo: ServiceAreaClusterLandmarkInfoStruct?
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ServiceAreaClusterAreaInfoStruct (
+    val locationInfo: ServiceAreaClusterLocationDescriptorStruct?,
+    val landmarkInfo: ServiceAreaClusterLandmarkInfoStruct?) {
+  override fun toString(): String  = buildString {
     append("ServiceAreaClusterAreaInfoStruct {\n")
     append("\tlocationInfo : $locationInfo\n")
     append("\tlandmarkInfo : $landmarkInfo\n")
@@ -37,15 +40,15 @@ class ServiceAreaClusterAreaInfoStruct(
     tlvWriter.apply {
       startStructure(tlvTag)
       if (locationInfo != null) {
-        locationInfo.toTlv(ContextSpecificTag(TAG_LOCATION_INFO), this)
-      } else {
-        putNull(ContextSpecificTag(TAG_LOCATION_INFO))
-      }
+      locationInfo.toTlv(ContextSpecificTag(TAG_LOCATION_INFO), this)
+    } else {
+      putNull(ContextSpecificTag(TAG_LOCATION_INFO))
+    }
       if (landmarkInfo != null) {
-        landmarkInfo.toTlv(ContextSpecificTag(TAG_LANDMARK_INFO), this)
-      } else {
-        putNull(ContextSpecificTag(TAG_LANDMARK_INFO))
-      }
+      landmarkInfo.toTlv(ContextSpecificTag(TAG_LANDMARK_INFO), this)
+    } else {
+      putNull(ContextSpecificTag(TAG_LANDMARK_INFO))
+    }
       endStructure()
     }
   }
@@ -54,29 +57,21 @@ class ServiceAreaClusterAreaInfoStruct(
     private const val TAG_LOCATION_INFO = 0
     private const val TAG_LANDMARK_INFO = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterAreaInfoStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ServiceAreaClusterAreaInfoStruct {
       tlvReader.enterStructure(tlvTag)
-      val locationInfo =
-        if (!tlvReader.isNull()) {
-          ServiceAreaClusterLocationDescriptorStruct.fromTlv(
-            ContextSpecificTag(TAG_LOCATION_INFO),
-            tlvReader
-          )
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_LOCATION_INFO))
-          null
-        }
-      val landmarkInfo =
-        if (!tlvReader.isNull()) {
-          ServiceAreaClusterLandmarkInfoStruct.fromTlv(
-            ContextSpecificTag(TAG_LANDMARK_INFO),
-            tlvReader
-          )
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_LANDMARK_INFO))
-          null
-        }
-
+      val locationInfo = if (!tlvReader.isNull()) {
+      ServiceAreaClusterLocationDescriptorStruct.fromTlv(ContextSpecificTag(TAG_LOCATION_INFO), tlvReader)
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_LOCATION_INFO))
+      null
+    }
+      val landmarkInfo = if (!tlvReader.isNull()) {
+      ServiceAreaClusterLandmarkInfoStruct.fromTlv(ContextSpecificTag(TAG_LANDMARK_INFO), tlvReader)
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_LANDMARK_INFO))
+      null
+    }
+      
       tlvReader.exitContainer()
 
       return ServiceAreaClusterAreaInfoStruct(locationInfo, landmarkInfo)

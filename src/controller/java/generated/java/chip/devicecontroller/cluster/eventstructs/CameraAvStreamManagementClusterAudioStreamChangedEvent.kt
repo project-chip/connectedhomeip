@@ -17,22 +17,24 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class CameraAvStreamManagementClusterAudioStreamChangedEvent(
-  val audioStreamID: UInt,
-  val streamUsage: Optional<UInt>,
-  val audioCodec: Optional<UInt>,
-  val channelCount: Optional<UInt>,
-  val sampleRate: Optional<ULong>,
-  val bitRate: Optional<ULong>,
-  val bitDepth: Optional<UInt>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class CameraAvStreamManagementClusterAudioStreamChangedEvent (
+    val audioStreamID: UInt,
+    val streamUsage: Optional<UInt>,
+    val audioCodec: Optional<UInt>,
+    val channelCount: Optional<UInt>,
+    val sampleRate: Optional<ULong>,
+    val bitRate: Optional<ULong>,
+    val bitDepth: Optional<UInt>) {
+  override fun toString(): String  = buildString {
     append("CameraAvStreamManagementClusterAudioStreamChangedEvent {\n")
     append("\taudioStreamID : $audioStreamID\n")
     append("\tstreamUsage : $streamUsage\n")
@@ -49,29 +51,29 @@ class CameraAvStreamManagementClusterAudioStreamChangedEvent(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_AUDIO_STREAM_ID), audioStreamID)
       if (streamUsage.isPresent) {
-        val optstreamUsage = streamUsage.get()
-        put(ContextSpecificTag(TAG_STREAM_USAGE), optstreamUsage)
-      }
+      val optstreamUsage = streamUsage.get()
+      put(ContextSpecificTag(TAG_STREAM_USAGE), optstreamUsage)
+    }
       if (audioCodec.isPresent) {
-        val optaudioCodec = audioCodec.get()
-        put(ContextSpecificTag(TAG_AUDIO_CODEC), optaudioCodec)
-      }
+      val optaudioCodec = audioCodec.get()
+      put(ContextSpecificTag(TAG_AUDIO_CODEC), optaudioCodec)
+    }
       if (channelCount.isPresent) {
-        val optchannelCount = channelCount.get()
-        put(ContextSpecificTag(TAG_CHANNEL_COUNT), optchannelCount)
-      }
+      val optchannelCount = channelCount.get()
+      put(ContextSpecificTag(TAG_CHANNEL_COUNT), optchannelCount)
+    }
       if (sampleRate.isPresent) {
-        val optsampleRate = sampleRate.get()
-        put(ContextSpecificTag(TAG_SAMPLE_RATE), optsampleRate)
-      }
+      val optsampleRate = sampleRate.get()
+      put(ContextSpecificTag(TAG_SAMPLE_RATE), optsampleRate)
+    }
       if (bitRate.isPresent) {
-        val optbitRate = bitRate.get()
-        put(ContextSpecificTag(TAG_BIT_RATE), optbitRate)
-      }
+      val optbitRate = bitRate.get()
+      put(ContextSpecificTag(TAG_BIT_RATE), optbitRate)
+    }
       if (bitDepth.isPresent) {
-        val optbitDepth = bitDepth.get()
-        put(ContextSpecificTag(TAG_BIT_DEPTH), optbitDepth)
-      }
+      val optbitDepth = bitDepth.get()
+      put(ContextSpecificTag(TAG_BIT_DEPTH), optbitDepth)
+    }
       endStructure()
     }
   }
@@ -85,60 +87,43 @@ class CameraAvStreamManagementClusterAudioStreamChangedEvent(
     private const val TAG_BIT_RATE = 5
     private const val TAG_BIT_DEPTH = 6
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): CameraAvStreamManagementClusterAudioStreamChangedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CameraAvStreamManagementClusterAudioStreamChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val audioStreamID = tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
-      val streamUsage =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_STREAM_USAGE))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_USAGE)))
-        } else {
-          Optional.empty()
-        }
-      val audioCodec =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_CODEC))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_CODEC)))
-        } else {
-          Optional.empty()
-        }
-      val channelCount =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CHANNEL_COUNT))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_CHANNEL_COUNT)))
-        } else {
-          Optional.empty()
-        }
-      val sampleRate =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SAMPLE_RATE))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_SAMPLE_RATE)))
-        } else {
-          Optional.empty()
-        }
-      val bitRate =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_BIT_RATE))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_BIT_RATE)))
-        } else {
-          Optional.empty()
-        }
-      val bitDepth =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_BIT_DEPTH))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_BIT_DEPTH)))
-        } else {
-          Optional.empty()
-        }
-
+      val streamUsage = if (tlvReader.isNextTag(ContextSpecificTag(TAG_STREAM_USAGE))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_USAGE)))
+    } else {
+      Optional.empty()
+    }
+      val audioCodec = if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_CODEC))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_CODEC)))
+    } else {
+      Optional.empty()
+    }
+      val channelCount = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CHANNEL_COUNT))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_CHANNEL_COUNT)))
+    } else {
+      Optional.empty()
+    }
+      val sampleRate = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SAMPLE_RATE))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_SAMPLE_RATE)))
+    } else {
+      Optional.empty()
+    }
+      val bitRate = if (tlvReader.isNextTag(ContextSpecificTag(TAG_BIT_RATE))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_BIT_RATE)))
+    } else {
+      Optional.empty()
+    }
+      val bitDepth = if (tlvReader.isNextTag(ContextSpecificTag(TAG_BIT_DEPTH))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_BIT_DEPTH)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return CameraAvStreamManagementClusterAudioStreamChangedEvent(
-        audioStreamID,
-        streamUsage,
-        audioCodec,
-        channelCount,
-        sampleRate,
-        bitRate,
-        bitDepth
-      )
+      return CameraAvStreamManagementClusterAudioStreamChangedEvent(audioStreamID, streamUsage, audioCodec, channelCount, sampleRate, bitRate, bitDepth)
     }
   }
 }

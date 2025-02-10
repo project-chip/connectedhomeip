@@ -17,18 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class UnitTestingClusterTestGlobalStruct(
-  val name: String,
-  val myBitmap: ULong?,
-  val myEnum: Optional<UInt>?
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class UnitTestingClusterTestGlobalStruct (
+    val name: String,
+    val myBitmap: ULong?,
+    val myEnum: Optional<UInt>?) {
+  override fun toString(): String  = buildString {
     append("UnitTestingClusterTestGlobalStruct {\n")
     append("\tname : $name\n")
     append("\tmyBitmap : $myBitmap\n")
@@ -41,18 +43,18 @@ class UnitTestingClusterTestGlobalStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_NAME), name)
       if (myBitmap != null) {
-        put(ContextSpecificTag(TAG_MY_BITMAP), myBitmap)
-      } else {
-        putNull(ContextSpecificTag(TAG_MY_BITMAP))
-      }
+      put(ContextSpecificTag(TAG_MY_BITMAP), myBitmap)
+    } else {
+      putNull(ContextSpecificTag(TAG_MY_BITMAP))
+    }
       if (myEnum != null) {
-        if (myEnum.isPresent) {
-          val optmyEnum = myEnum.get()
-          put(ContextSpecificTag(TAG_MY_ENUM), optmyEnum)
-        }
-      } else {
-        putNull(ContextSpecificTag(TAG_MY_ENUM))
-      }
+      if (myEnum.isPresent) {
+      val optmyEnum = myEnum.get()
+      put(ContextSpecificTag(TAG_MY_ENUM), optmyEnum)
+    }
+    } else {
+      putNull(ContextSpecificTag(TAG_MY_ENUM))
+    }
       endStructure()
     }
   }
@@ -62,28 +64,26 @@ class UnitTestingClusterTestGlobalStruct(
     private const val TAG_MY_BITMAP = 1
     private const val TAG_MY_ENUM = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterTestGlobalStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : UnitTestingClusterTestGlobalStruct {
       tlvReader.enterStructure(tlvTag)
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-      val myBitmap =
-        if (!tlvReader.isNull()) {
-          tlvReader.getULong(ContextSpecificTag(TAG_MY_BITMAP))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_MY_BITMAP))
-          null
-        }
-      val myEnum =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_MY_ENUM))) {
-            Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MY_ENUM)))
-          } else {
-            Optional.empty()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_MY_ENUM))
-          null
-        }
-
+      val myBitmap = if (!tlvReader.isNull()) {
+      tlvReader.getULong(ContextSpecificTag(TAG_MY_BITMAP))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_MY_BITMAP))
+      null
+    }
+      val myEnum = if (!tlvReader.isNull()) {
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_MY_ENUM))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MY_ENUM)))
+    } else {
+      Optional.empty()
+    }
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_MY_ENUM))
+      null
+    }
+      
       tlvReader.exitContainer()
 
       return UnitTestingClusterTestGlobalStruct(name, myBitmap, myEnum)

@@ -17,26 +17,29 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ThreadNetworkDiagnosticsClusterOperationalDatasetComponents(
-  val activeTimestampPresent: Boolean,
-  val pendingTimestampPresent: Boolean,
-  val masterKeyPresent: Boolean,
-  val networkNamePresent: Boolean,
-  val extendedPanIdPresent: Boolean,
-  val meshLocalPrefixPresent: Boolean,
-  val delayPresent: Boolean,
-  val panIdPresent: Boolean,
-  val channelPresent: Boolean,
-  val pskcPresent: Boolean,
-  val securityPolicyPresent: Boolean,
-  val channelMaskPresent: Boolean
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ThreadNetworkDiagnosticsClusterOperationalDatasetComponents (
+    val activeTimestampPresent: Boolean,
+    val pendingTimestampPresent: Boolean,
+    val masterKeyPresent: Boolean,
+    val networkNamePresent: Boolean,
+    val extendedPanIdPresent: Boolean,
+    val meshLocalPrefixPresent: Boolean,
+    val delayPresent: Boolean,
+    val panIdPresent: Boolean,
+    val channelPresent: Boolean,
+    val pskcPresent: Boolean,
+    val securityPolicyPresent: Boolean,
+    val channelMaskPresent: Boolean) {
+  override fun toString(): String  = buildString {
     append("ThreadNetworkDiagnosticsClusterOperationalDatasetComponents {\n")
     append("\tactiveTimestampPresent : $activeTimestampPresent\n")
     append("\tpendingTimestampPresent : $pendingTimestampPresent\n")
@@ -86,45 +89,24 @@ class ThreadNetworkDiagnosticsClusterOperationalDatasetComponents(
     private const val TAG_SECURITY_POLICY_PRESENT = 10
     private const val TAG_CHANNEL_MASK_PRESENT = 11
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): ThreadNetworkDiagnosticsClusterOperationalDatasetComponents {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ThreadNetworkDiagnosticsClusterOperationalDatasetComponents {
       tlvReader.enterStructure(tlvTag)
-      val activeTimestampPresent =
-        tlvReader.getBoolean(ContextSpecificTag(TAG_ACTIVE_TIMESTAMP_PRESENT))
-      val pendingTimestampPresent =
-        tlvReader.getBoolean(ContextSpecificTag(TAG_PENDING_TIMESTAMP_PRESENT))
+      val activeTimestampPresent = tlvReader.getBoolean(ContextSpecificTag(TAG_ACTIVE_TIMESTAMP_PRESENT))
+      val pendingTimestampPresent = tlvReader.getBoolean(ContextSpecificTag(TAG_PENDING_TIMESTAMP_PRESENT))
       val masterKeyPresent = tlvReader.getBoolean(ContextSpecificTag(TAG_MASTER_KEY_PRESENT))
       val networkNamePresent = tlvReader.getBoolean(ContextSpecificTag(TAG_NETWORK_NAME_PRESENT))
-      val extendedPanIdPresent =
-        tlvReader.getBoolean(ContextSpecificTag(TAG_EXTENDED_PAN_ID_PRESENT))
-      val meshLocalPrefixPresent =
-        tlvReader.getBoolean(ContextSpecificTag(TAG_MESH_LOCAL_PREFIX_PRESENT))
+      val extendedPanIdPresent = tlvReader.getBoolean(ContextSpecificTag(TAG_EXTENDED_PAN_ID_PRESENT))
+      val meshLocalPrefixPresent = tlvReader.getBoolean(ContextSpecificTag(TAG_MESH_LOCAL_PREFIX_PRESENT))
       val delayPresent = tlvReader.getBoolean(ContextSpecificTag(TAG_DELAY_PRESENT))
       val panIdPresent = tlvReader.getBoolean(ContextSpecificTag(TAG_PAN_ID_PRESENT))
       val channelPresent = tlvReader.getBoolean(ContextSpecificTag(TAG_CHANNEL_PRESENT))
       val pskcPresent = tlvReader.getBoolean(ContextSpecificTag(TAG_PSKC_PRESENT))
-      val securityPolicyPresent =
-        tlvReader.getBoolean(ContextSpecificTag(TAG_SECURITY_POLICY_PRESENT))
+      val securityPolicyPresent = tlvReader.getBoolean(ContextSpecificTag(TAG_SECURITY_POLICY_PRESENT))
       val channelMaskPresent = tlvReader.getBoolean(ContextSpecificTag(TAG_CHANNEL_MASK_PRESENT))
-
+      
       tlvReader.exitContainer()
 
-      return ThreadNetworkDiagnosticsClusterOperationalDatasetComponents(
-        activeTimestampPresent,
-        pendingTimestampPresent,
-        masterKeyPresent,
-        networkNamePresent,
-        extendedPanIdPresent,
-        meshLocalPrefixPresent,
-        delayPresent,
-        panIdPresent,
-        channelPresent,
-        pskcPresent,
-        securityPolicyPresent,
-        channelMaskPresent
-      )
+      return ThreadNetworkDiagnosticsClusterOperationalDatasetComponents(activeTimestampPresent, pendingTimestampPresent, masterKeyPresent, networkNamePresent, extendedPanIdPresent, meshLocalPrefixPresent, delayPresent, panIdPresent, channelPresent, pskcPresent, securityPolicyPresent, channelMaskPresent)
     }
   }
 }

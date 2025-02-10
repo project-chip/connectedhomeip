@@ -17,16 +17,19 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class SwitchClusterMultiPressOngoingEvent(
-  val newPosition: UInt,
-  val currentNumberOfPressesCounted: UInt
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class SwitchClusterMultiPressOngoingEvent (
+    val newPosition: UInt,
+    val currentNumberOfPressesCounted: UInt) {
+  override fun toString(): String  = buildString {
     append("SwitchClusterMultiPressOngoingEvent {\n")
     append("\tnewPosition : $newPosition\n")
     append("\tcurrentNumberOfPressesCounted : $currentNumberOfPressesCounted\n")
@@ -46,12 +49,11 @@ class SwitchClusterMultiPressOngoingEvent(
     private const val TAG_NEW_POSITION = 0
     private const val TAG_CURRENT_NUMBER_OF_PRESSES_COUNTED = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SwitchClusterMultiPressOngoingEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : SwitchClusterMultiPressOngoingEvent {
       tlvReader.enterStructure(tlvTag)
       val newPosition = tlvReader.getUInt(ContextSpecificTag(TAG_NEW_POSITION))
-      val currentNumberOfPressesCounted =
-        tlvReader.getUInt(ContextSpecificTag(TAG_CURRENT_NUMBER_OF_PRESSES_COUNTED))
-
+      val currentNumberOfPressesCounted = tlvReader.getUInt(ContextSpecificTag(TAG_CURRENT_NUMBER_OF_PRESSES_COUNTED))
+      
       tlvReader.exitContainer()
 
       return SwitchClusterMultiPressOngoingEvent(newPosition, currentNumberOfPressesCounted)

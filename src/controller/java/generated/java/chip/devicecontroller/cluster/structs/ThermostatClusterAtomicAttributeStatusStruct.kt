@@ -17,13 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ThermostatClusterAtomicAttributeStatusStruct(val attributeID: ULong, val statusCode: UInt) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ThermostatClusterAtomicAttributeStatusStruct (
+    val attributeID: ULong,
+    val statusCode: UInt) {
+  override fun toString(): String  = buildString {
     append("ThermostatClusterAtomicAttributeStatusStruct {\n")
     append("\tattributeID : $attributeID\n")
     append("\tstatusCode : $statusCode\n")
@@ -43,11 +49,11 @@ class ThermostatClusterAtomicAttributeStatusStruct(val attributeID: ULong, val s
     private const val TAG_ATTRIBUTE_ID = 0
     private const val TAG_STATUS_CODE = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterAtomicAttributeStatusStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ThermostatClusterAtomicAttributeStatusStruct {
       tlvReader.enterStructure(tlvTag)
       val attributeID = tlvReader.getULong(ContextSpecificTag(TAG_ATTRIBUTE_ID))
       val statusCode = tlvReader.getUInt(ContextSpecificTag(TAG_STATUS_CODE))
-
+      
       tlvReader.exitContainer()
 
       return ThermostatClusterAtomicAttributeStatusStruct(attributeID, statusCode)

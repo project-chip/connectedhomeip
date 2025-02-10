@@ -17,17 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class PushAvStreamTransportClusterTransportZoneOptionsStruct(
-  val zone: UInt?,
-  val sensitivity: Optional<UInt>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class PushAvStreamTransportClusterTransportZoneOptionsStruct (
+    val zone: UInt?,
+    val sensitivity: Optional<UInt>) {
+  override fun toString(): String  = buildString {
     append("PushAvStreamTransportClusterTransportZoneOptionsStruct {\n")
     append("\tzone : $zone\n")
     append("\tsensitivity : $sensitivity\n")
@@ -38,14 +40,14 @@ class PushAvStreamTransportClusterTransportZoneOptionsStruct(
     tlvWriter.apply {
       startStructure(tlvTag)
       if (zone != null) {
-        put(ContextSpecificTag(TAG_ZONE), zone)
-      } else {
-        putNull(ContextSpecificTag(TAG_ZONE))
-      }
+      put(ContextSpecificTag(TAG_ZONE), zone)
+    } else {
+      putNull(ContextSpecificTag(TAG_ZONE))
+    }
       if (sensitivity.isPresent) {
-        val optsensitivity = sensitivity.get()
-        put(ContextSpecificTag(TAG_SENSITIVITY), optsensitivity)
-      }
+      val optsensitivity = sensitivity.get()
+      put(ContextSpecificTag(TAG_SENSITIVITY), optsensitivity)
+    }
       endStructure()
     }
   }
@@ -54,25 +56,20 @@ class PushAvStreamTransportClusterTransportZoneOptionsStruct(
     private const val TAG_ZONE = 1
     private const val TAG_SENSITIVITY = 2
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): PushAvStreamTransportClusterTransportZoneOptionsStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : PushAvStreamTransportClusterTransportZoneOptionsStruct {
       tlvReader.enterStructure(tlvTag)
-      val zone =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_ZONE))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_ZONE))
-          null
-        }
-      val sensitivity =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SENSITIVITY))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_SENSITIVITY)))
-        } else {
-          Optional.empty()
-        }
-
+      val zone = if (!tlvReader.isNull()) {
+      tlvReader.getUInt(ContextSpecificTag(TAG_ZONE))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_ZONE))
+      null
+    }
+      val sensitivity = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SENSITIVITY))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_SENSITIVITY)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return PushAvStreamTransportClusterTransportZoneOptionsStruct(zone, sensitivity)

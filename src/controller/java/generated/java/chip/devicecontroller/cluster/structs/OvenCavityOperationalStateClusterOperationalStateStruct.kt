@@ -17,17 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class OvenCavityOperationalStateClusterOperationalStateStruct(
-  val operationalStateID: UInt,
-  val operationalStateLabel: Optional<String>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class OvenCavityOperationalStateClusterOperationalStateStruct (
+    val operationalStateID: UInt,
+    val operationalStateLabel: Optional<String>) {
+  override fun toString(): String  = buildString {
     append("OvenCavityOperationalStateClusterOperationalStateStruct {\n")
     append("\toperationalStateID : $operationalStateID\n")
     append("\toperationalStateLabel : $operationalStateLabel\n")
@@ -39,9 +41,9 @@ class OvenCavityOperationalStateClusterOperationalStateStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_OPERATIONAL_STATE_ID), operationalStateID)
       if (operationalStateLabel.isPresent) {
-        val optoperationalStateLabel = operationalStateLabel.get()
-        put(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL), optoperationalStateLabel)
-      }
+      val optoperationalStateLabel = operationalStateLabel.get()
+      put(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL), optoperationalStateLabel)
+    }
       endStructure()
     }
   }
@@ -50,25 +52,18 @@ class OvenCavityOperationalStateClusterOperationalStateStruct(
     private const val TAG_OPERATIONAL_STATE_ID = 0
     private const val TAG_OPERATIONAL_STATE_LABEL = 1
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): OvenCavityOperationalStateClusterOperationalStateStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : OvenCavityOperationalStateClusterOperationalStateStruct {
       tlvReader.enterStructure(tlvTag)
       val operationalStateID = tlvReader.getUInt(ContextSpecificTag(TAG_OPERATIONAL_STATE_ID))
-      val operationalStateLabel =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL)))
-        } else {
-          Optional.empty()
-        }
-
+      val operationalStateLabel = if (tlvReader.isNextTag(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return OvenCavityOperationalStateClusterOperationalStateStruct(
-        operationalStateID,
-        operationalStateLabel
-      )
+      return OvenCavityOperationalStateClusterOperationalStateStruct(operationalStateID, operationalStateLabel)
     }
   }
 }

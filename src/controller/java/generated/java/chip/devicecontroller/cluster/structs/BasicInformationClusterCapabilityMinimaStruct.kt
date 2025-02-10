@@ -17,16 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class BasicInformationClusterCapabilityMinimaStruct(
-  val caseSessionsPerFabric: UInt,
-  val subscriptionsPerFabric: UInt
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class BasicInformationClusterCapabilityMinimaStruct (
+    val caseSessionsPerFabric: UInt,
+    val subscriptionsPerFabric: UInt) {
+  override fun toString(): String  = buildString {
     append("BasicInformationClusterCapabilityMinimaStruct {\n")
     append("\tcaseSessionsPerFabric : $caseSessionsPerFabric\n")
     append("\tsubscriptionsPerFabric : $subscriptionsPerFabric\n")
@@ -46,19 +49,14 @@ class BasicInformationClusterCapabilityMinimaStruct(
     private const val TAG_CASE_SESSIONS_PER_FABRIC = 0
     private const val TAG_SUBSCRIPTIONS_PER_FABRIC = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): BasicInformationClusterCapabilityMinimaStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : BasicInformationClusterCapabilityMinimaStruct {
       tlvReader.enterStructure(tlvTag)
-      val caseSessionsPerFabric =
-        tlvReader.getUInt(ContextSpecificTag(TAG_CASE_SESSIONS_PER_FABRIC))
-      val subscriptionsPerFabric =
-        tlvReader.getUInt(ContextSpecificTag(TAG_SUBSCRIPTIONS_PER_FABRIC))
-
+      val caseSessionsPerFabric = tlvReader.getUInt(ContextSpecificTag(TAG_CASE_SESSIONS_PER_FABRIC))
+      val subscriptionsPerFabric = tlvReader.getUInt(ContextSpecificTag(TAG_SUBSCRIPTIONS_PER_FABRIC))
+      
       tlvReader.exitContainer()
 
-      return BasicInformationClusterCapabilityMinimaStruct(
-        caseSessionsPerFabric,
-        subscriptionsPerFabric
-      )
+      return BasicInformationClusterCapabilityMinimaStruct(caseSessionsPerFabric, subscriptionsPerFabric)
     }
   }
 }

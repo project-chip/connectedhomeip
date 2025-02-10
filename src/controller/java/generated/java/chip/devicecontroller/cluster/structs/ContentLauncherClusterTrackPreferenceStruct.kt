@@ -17,19 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ContentLauncherClusterTrackPreferenceStruct(
-  val languageCode: String,
-  val characteristics: Optional<List<UInt>>,
-  val audioOutputIndex: UInt
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ContentLauncherClusterTrackPreferenceStruct (
+    val languageCode: String,
+    val characteristics: Optional<List<UInt>>,
+    val audioOutputIndex: UInt) {
+  override fun toString(): String  = buildString {
     append("ContentLauncherClusterTrackPreferenceStruct {\n")
     append("\tlanguageCode : $languageCode\n")
     append("\tcharacteristics : $characteristics\n")
@@ -42,13 +43,13 @@ class ContentLauncherClusterTrackPreferenceStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_LANGUAGE_CODE), languageCode)
       if (characteristics.isPresent) {
-        val optcharacteristics = characteristics.get()
-        startArray(ContextSpecificTag(TAG_CHARACTERISTICS))
-        for (item in optcharacteristics.iterator()) {
-          put(AnonymousTag, item)
-        }
-        endArray()
+      val optcharacteristics = characteristics.get()
+      startArray(ContextSpecificTag(TAG_CHARACTERISTICS))
+      for (item in optcharacteristics.iterator()) {
+        put(AnonymousTag, item)
       }
+      endArray()
+    }
       put(ContextSpecificTag(TAG_AUDIO_OUTPUT_INDEX), audioOutputIndex)
       endStructure()
     }
@@ -59,32 +60,25 @@ class ContentLauncherClusterTrackPreferenceStruct(
     private const val TAG_CHARACTERISTICS = 1
     private const val TAG_AUDIO_OUTPUT_INDEX = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentLauncherClusterTrackPreferenceStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ContentLauncherClusterTrackPreferenceStruct {
       tlvReader.enterStructure(tlvTag)
       val languageCode = tlvReader.getString(ContextSpecificTag(TAG_LANGUAGE_CODE))
-      val characteristics =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CHARACTERISTICS))) {
-          Optional.of(
-            buildList<UInt> {
-              tlvReader.enterArray(ContextSpecificTag(TAG_CHARACTERISTICS))
-              while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUInt(AnonymousTag))
-              }
-              tlvReader.exitContainer()
-            }
-          )
-        } else {
-          Optional.empty()
-        }
+      val characteristics = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CHARACTERISTICS))) {
+      Optional.of(buildList<UInt> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_CHARACTERISTICS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getUInt(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    })
+    } else {
+      Optional.empty()
+    }
       val audioOutputIndex = tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_OUTPUT_INDEX))
-
+      
       tlvReader.exitContainer()
 
-      return ContentLauncherClusterTrackPreferenceStruct(
-        languageCode,
-        characteristics,
-        audioOutputIndex
-      )
+      return ContentLauncherClusterTrackPreferenceStruct(languageCode, characteristics, audioOutputIndex)
     }
   }
 }

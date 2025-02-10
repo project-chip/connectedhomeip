@@ -17,13 +17,18 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class SwitchClusterShortReleaseEvent(val previousPosition: UInt) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class SwitchClusterShortReleaseEvent (
+    val previousPosition: UInt) {
+  override fun toString(): String  = buildString {
     append("SwitchClusterShortReleaseEvent {\n")
     append("\tpreviousPosition : $previousPosition\n")
     append("}\n")
@@ -40,10 +45,10 @@ class SwitchClusterShortReleaseEvent(val previousPosition: UInt) {
   companion object {
     private const val TAG_PREVIOUS_POSITION = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SwitchClusterShortReleaseEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : SwitchClusterShortReleaseEvent {
       tlvReader.enterStructure(tlvTag)
       val previousPosition = tlvReader.getUInt(ContextSpecificTag(TAG_PREVIOUS_POSITION))
-
+      
       tlvReader.exitContainer()
 
       return SwitchClusterShortReleaseEvent(previousPosition)

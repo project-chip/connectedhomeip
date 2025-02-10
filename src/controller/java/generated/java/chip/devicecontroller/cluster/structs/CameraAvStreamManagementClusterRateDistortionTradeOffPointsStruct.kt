@@ -17,17 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct(
-  val codec: UInt,
-  val resolution: CameraAvStreamManagementClusterVideoResolutionStruct,
-  val minBitRate: ULong
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct (
+    val codec: UInt,
+    val resolution: CameraAvStreamManagementClusterVideoResolutionStruct,
+    val minBitRate: ULong) {
+  override fun toString(): String  = buildString {
     append("CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct {\n")
     append("\tcodec : $codec\n")
     append("\tresolution : $resolution\n")
@@ -50,26 +53,15 @@ class CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct(
     private const val TAG_RESOLUTION = 1
     private const val TAG_MIN_BIT_RATE = 2
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct {
       tlvReader.enterStructure(tlvTag)
       val codec = tlvReader.getUInt(ContextSpecificTag(TAG_CODEC))
-      val resolution =
-        CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(
-          ContextSpecificTag(TAG_RESOLUTION),
-          tlvReader
-        )
+      val resolution = CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(ContextSpecificTag(TAG_RESOLUTION), tlvReader)
       val minBitRate = tlvReader.getULong(ContextSpecificTag(TAG_MIN_BIT_RATE))
-
+      
       tlvReader.exitContainer()
 
-      return CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct(
-        codec,
-        resolution,
-        minBitRate
-      )
+      return CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct(codec, resolution, minBitRate)
     }
   }
 }

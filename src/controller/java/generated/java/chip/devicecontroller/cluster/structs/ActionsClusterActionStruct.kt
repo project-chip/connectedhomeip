@@ -17,20 +17,23 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ActionsClusterActionStruct(
-  val actionID: UInt,
-  val name: String,
-  val type: UInt,
-  val endpointListID: UInt,
-  val supportedCommands: UInt,
-  val state: UInt
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ActionsClusterActionStruct (
+    val actionID: UInt,
+    val name: String,
+    val type: UInt,
+    val endpointListID: UInt,
+    val supportedCommands: UInt,
+    val state: UInt) {
+  override fun toString(): String  = buildString {
     append("ActionsClusterActionStruct {\n")
     append("\tactionID : $actionID\n")
     append("\tname : $name\n")
@@ -62,7 +65,7 @@ class ActionsClusterActionStruct(
     private const val TAG_SUPPORTED_COMMANDS = 4
     private const val TAG_STATE = 5
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ActionsClusterActionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ActionsClusterActionStruct {
       tlvReader.enterStructure(tlvTag)
       val actionID = tlvReader.getUInt(ContextSpecificTag(TAG_ACTION_ID))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
@@ -70,17 +73,10 @@ class ActionsClusterActionStruct(
       val endpointListID = tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT_LIST_ID))
       val supportedCommands = tlvReader.getUInt(ContextSpecificTag(TAG_SUPPORTED_COMMANDS))
       val state = tlvReader.getUInt(ContextSpecificTag(TAG_STATE))
-
+      
       tlvReader.exitContainer()
 
-      return ActionsClusterActionStruct(
-        actionID,
-        name,
-        type,
-        endpointListID,
-        supportedCommands,
-        state
-      )
+      return ActionsClusterActionStruct(actionID, name, type, endpointListID, supportedCommands, state)
     }
   }
 }

@@ -17,22 +17,24 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DemandResponseLoadControlClusterLoadControlEventTransitionStruct(
-  val duration: UInt,
-  val control: UInt,
-  val temperatureControl: Optional<DemandResponseLoadControlClusterTemperatureControlStruct>,
-  val averageLoadControl: Optional<DemandResponseLoadControlClusterAverageLoadControlStruct>,
-  val dutyCycleControl: Optional<DemandResponseLoadControlClusterDutyCycleControlStruct>,
-  val powerSavingsControl: Optional<DemandResponseLoadControlClusterPowerSavingsControlStruct>,
-  val heatingSourceControl: Optional<DemandResponseLoadControlClusterHeatingSourceControlStruct>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class DemandResponseLoadControlClusterLoadControlEventTransitionStruct (
+    val duration: UInt,
+    val control: UInt,
+    val temperatureControl: Optional<DemandResponseLoadControlClusterTemperatureControlStruct>,
+    val averageLoadControl: Optional<DemandResponseLoadControlClusterAverageLoadControlStruct>,
+    val dutyCycleControl: Optional<DemandResponseLoadControlClusterDutyCycleControlStruct>,
+    val powerSavingsControl: Optional<DemandResponseLoadControlClusterPowerSavingsControlStruct>,
+    val heatingSourceControl: Optional<DemandResponseLoadControlClusterHeatingSourceControlStruct>) {
+  override fun toString(): String  = buildString {
     append("DemandResponseLoadControlClusterLoadControlEventTransitionStruct {\n")
     append("\tduration : $duration\n")
     append("\tcontrol : $control\n")
@@ -50,25 +52,25 @@ class DemandResponseLoadControlClusterLoadControlEventTransitionStruct(
       put(ContextSpecificTag(TAG_DURATION), duration)
       put(ContextSpecificTag(TAG_CONTROL), control)
       if (temperatureControl.isPresent) {
-        val opttemperatureControl = temperatureControl.get()
-        opttemperatureControl.toTlv(ContextSpecificTag(TAG_TEMPERATURE_CONTROL), this)
-      }
+      val opttemperatureControl = temperatureControl.get()
+      opttemperatureControl.toTlv(ContextSpecificTag(TAG_TEMPERATURE_CONTROL), this)
+    }
       if (averageLoadControl.isPresent) {
-        val optaverageLoadControl = averageLoadControl.get()
-        optaverageLoadControl.toTlv(ContextSpecificTag(TAG_AVERAGE_LOAD_CONTROL), this)
-      }
+      val optaverageLoadControl = averageLoadControl.get()
+      optaverageLoadControl.toTlv(ContextSpecificTag(TAG_AVERAGE_LOAD_CONTROL), this)
+    }
       if (dutyCycleControl.isPresent) {
-        val optdutyCycleControl = dutyCycleControl.get()
-        optdutyCycleControl.toTlv(ContextSpecificTag(TAG_DUTY_CYCLE_CONTROL), this)
-      }
+      val optdutyCycleControl = dutyCycleControl.get()
+      optdutyCycleControl.toTlv(ContextSpecificTag(TAG_DUTY_CYCLE_CONTROL), this)
+    }
       if (powerSavingsControl.isPresent) {
-        val optpowerSavingsControl = powerSavingsControl.get()
-        optpowerSavingsControl.toTlv(ContextSpecificTag(TAG_POWER_SAVINGS_CONTROL), this)
-      }
+      val optpowerSavingsControl = powerSavingsControl.get()
+      optpowerSavingsControl.toTlv(ContextSpecificTag(TAG_POWER_SAVINGS_CONTROL), this)
+    }
       if (heatingSourceControl.isPresent) {
-        val optheatingSourceControl = heatingSourceControl.get()
-        optheatingSourceControl.toTlv(ContextSpecificTag(TAG_HEATING_SOURCE_CONTROL), this)
-      }
+      val optheatingSourceControl = heatingSourceControl.get()
+      optheatingSourceControl.toTlv(ContextSpecificTag(TAG_HEATING_SOURCE_CONTROL), this)
+    }
       endStructure()
     }
   }
@@ -82,80 +84,39 @@ class DemandResponseLoadControlClusterLoadControlEventTransitionStruct(
     private const val TAG_POWER_SAVINGS_CONTROL = 5
     private const val TAG_HEATING_SOURCE_CONTROL = 6
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): DemandResponseLoadControlClusterLoadControlEventTransitionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : DemandResponseLoadControlClusterLoadControlEventTransitionStruct {
       tlvReader.enterStructure(tlvTag)
       val duration = tlvReader.getUInt(ContextSpecificTag(TAG_DURATION))
       val control = tlvReader.getUInt(ContextSpecificTag(TAG_CONTROL))
-      val temperatureControl =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TEMPERATURE_CONTROL))) {
-          Optional.of(
-            DemandResponseLoadControlClusterTemperatureControlStruct.fromTlv(
-              ContextSpecificTag(TAG_TEMPERATURE_CONTROL),
-              tlvReader
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-      val averageLoadControl =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_AVERAGE_LOAD_CONTROL))) {
-          Optional.of(
-            DemandResponseLoadControlClusterAverageLoadControlStruct.fromTlv(
-              ContextSpecificTag(TAG_AVERAGE_LOAD_CONTROL),
-              tlvReader
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-      val dutyCycleControl =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DUTY_CYCLE_CONTROL))) {
-          Optional.of(
-            DemandResponseLoadControlClusterDutyCycleControlStruct.fromTlv(
-              ContextSpecificTag(TAG_DUTY_CYCLE_CONTROL),
-              tlvReader
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-      val powerSavingsControl =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_POWER_SAVINGS_CONTROL))) {
-          Optional.of(
-            DemandResponseLoadControlClusterPowerSavingsControlStruct.fromTlv(
-              ContextSpecificTag(TAG_POWER_SAVINGS_CONTROL),
-              tlvReader
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-      val heatingSourceControl =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_HEATING_SOURCE_CONTROL))) {
-          Optional.of(
-            DemandResponseLoadControlClusterHeatingSourceControlStruct.fromTlv(
-              ContextSpecificTag(TAG_HEATING_SOURCE_CONTROL),
-              tlvReader
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-
+      val temperatureControl = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TEMPERATURE_CONTROL))) {
+      Optional.of(DemandResponseLoadControlClusterTemperatureControlStruct.fromTlv(ContextSpecificTag(TAG_TEMPERATURE_CONTROL), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      val averageLoadControl = if (tlvReader.isNextTag(ContextSpecificTag(TAG_AVERAGE_LOAD_CONTROL))) {
+      Optional.of(DemandResponseLoadControlClusterAverageLoadControlStruct.fromTlv(ContextSpecificTag(TAG_AVERAGE_LOAD_CONTROL), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      val dutyCycleControl = if (tlvReader.isNextTag(ContextSpecificTag(TAG_DUTY_CYCLE_CONTROL))) {
+      Optional.of(DemandResponseLoadControlClusterDutyCycleControlStruct.fromTlv(ContextSpecificTag(TAG_DUTY_CYCLE_CONTROL), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      val powerSavingsControl = if (tlvReader.isNextTag(ContextSpecificTag(TAG_POWER_SAVINGS_CONTROL))) {
+      Optional.of(DemandResponseLoadControlClusterPowerSavingsControlStruct.fromTlv(ContextSpecificTag(TAG_POWER_SAVINGS_CONTROL), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      val heatingSourceControl = if (tlvReader.isNextTag(ContextSpecificTag(TAG_HEATING_SOURCE_CONTROL))) {
+      Optional.of(DemandResponseLoadControlClusterHeatingSourceControlStruct.fromTlv(ContextSpecificTag(TAG_HEATING_SOURCE_CONTROL), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return DemandResponseLoadControlClusterLoadControlEventTransitionStruct(
-        duration,
-        control,
-        temperatureControl,
-        averageLoadControl,
-        dutyCycleControl,
-        powerSavingsControl,
-        heatingSourceControl
-      )
+      return DemandResponseLoadControlClusterLoadControlEventTransitionStruct(duration, control, temperatureControl, averageLoadControl, dutyCycleControl, powerSavingsControl, heatingSourceControl)
     }
   }
 }

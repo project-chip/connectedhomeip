@@ -17,13 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class TlsCertificateManagementClusterTLSCertStruct(val caid: UInt, val certificate: ByteArray) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class TlsCertificateManagementClusterTLSCertStruct (
+    val caid: UInt,
+    val certificate: ByteArray) {
+  override fun toString(): String  = buildString {
     append("TlsCertificateManagementClusterTLSCertStruct {\n")
     append("\tcaid : $caid\n")
     append("\tcertificate : $certificate\n")
@@ -43,11 +49,11 @@ class TlsCertificateManagementClusterTLSCertStruct(val caid: UInt, val certifica
     private const val TAG_CAID = 0
     private const val TAG_CERTIFICATE = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): TlsCertificateManagementClusterTLSCertStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : TlsCertificateManagementClusterTLSCertStruct {
       tlvReader.enterStructure(tlvTag)
       val caid = tlvReader.getUInt(ContextSpecificTag(TAG_CAID))
       val certificate = tlvReader.getByteArray(ContextSpecificTag(TAG_CERTIFICATE))
-
+      
       tlvReader.exitContainer()
 
       return TlsCertificateManagementClusterTLSCertStruct(caid, certificate)

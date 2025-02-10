@@ -17,17 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class MessagesClusterMessageResponseOptionStruct(
-  val messageResponseID: Optional<ULong>,
-  val label: Optional<String>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class MessagesClusterMessageResponseOptionStruct (
+    val messageResponseID: Optional<ULong>,
+    val label: Optional<String>) {
+  override fun toString(): String  = buildString {
     append("MessagesClusterMessageResponseOptionStruct {\n")
     append("\tmessageResponseID : $messageResponseID\n")
     append("\tlabel : $label\n")
@@ -38,13 +40,13 @@ class MessagesClusterMessageResponseOptionStruct(
     tlvWriter.apply {
       startStructure(tlvTag)
       if (messageResponseID.isPresent) {
-        val optmessageResponseID = messageResponseID.get()
-        put(ContextSpecificTag(TAG_MESSAGE_RESPONSE_ID), optmessageResponseID)
-      }
+      val optmessageResponseID = messageResponseID.get()
+      put(ContextSpecificTag(TAG_MESSAGE_RESPONSE_ID), optmessageResponseID)
+    }
       if (label.isPresent) {
-        val optlabel = label.get()
-        put(ContextSpecificTag(TAG_LABEL), optlabel)
-      }
+      val optlabel = label.get()
+      put(ContextSpecificTag(TAG_LABEL), optlabel)
+    }
       endStructure()
     }
   }
@@ -53,21 +55,19 @@ class MessagesClusterMessageResponseOptionStruct(
     private const val TAG_MESSAGE_RESPONSE_ID = 0
     private const val TAG_LABEL = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MessagesClusterMessageResponseOptionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : MessagesClusterMessageResponseOptionStruct {
       tlvReader.enterStructure(tlvTag)
-      val messageResponseID =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MESSAGE_RESPONSE_ID))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_MESSAGE_RESPONSE_ID)))
-        } else {
-          Optional.empty()
-        }
-      val label =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
-        } else {
-          Optional.empty()
-        }
-
+      val messageResponseID = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MESSAGE_RESPONSE_ID))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_MESSAGE_RESPONSE_ID)))
+    } else {
+      Optional.empty()
+    }
+      val label = if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return MessagesClusterMessageResponseOptionStruct(messageResponseID, label)

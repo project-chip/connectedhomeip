@@ -17,24 +17,25 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DemandResponseLoadControlClusterLoadControlEventStruct(
-  val eventID: ByteArray,
-  val programID: ByteArray?,
-  val control: UInt,
-  val deviceClass: ULong,
-  val enrollmentGroup: Optional<UInt>,
-  val criticality: UInt,
-  val startTime: ULong?,
-  val transitions: List<DemandResponseLoadControlClusterLoadControlEventTransitionStruct>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class DemandResponseLoadControlClusterLoadControlEventStruct (
+    val eventID: ByteArray,
+    val programID: ByteArray?,
+    val control: UInt,
+    val deviceClass: ULong,
+    val enrollmentGroup: Optional<UInt>,
+    val criticality: UInt,
+    val startTime: ULong?,
+    val transitions: List<DemandResponseLoadControlClusterLoadControlEventTransitionStruct>) {
+  override fun toString(): String  = buildString {
     append("DemandResponseLoadControlClusterLoadControlEventStruct {\n")
     append("\teventID : $eventID\n")
     append("\tprogramID : $programID\n")
@@ -52,22 +53,22 @@ class DemandResponseLoadControlClusterLoadControlEventStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_EVENT_ID), eventID)
       if (programID != null) {
-        put(ContextSpecificTag(TAG_PROGRAM_ID), programID)
-      } else {
-        putNull(ContextSpecificTag(TAG_PROGRAM_ID))
-      }
+      put(ContextSpecificTag(TAG_PROGRAM_ID), programID)
+    } else {
+      putNull(ContextSpecificTag(TAG_PROGRAM_ID))
+    }
       put(ContextSpecificTag(TAG_CONTROL), control)
       put(ContextSpecificTag(TAG_DEVICE_CLASS), deviceClass)
       if (enrollmentGroup.isPresent) {
-        val optenrollmentGroup = enrollmentGroup.get()
-        put(ContextSpecificTag(TAG_ENROLLMENT_GROUP), optenrollmentGroup)
-      }
+      val optenrollmentGroup = enrollmentGroup.get()
+      put(ContextSpecificTag(TAG_ENROLLMENT_GROUP), optenrollmentGroup)
+    }
       put(ContextSpecificTag(TAG_CRITICALITY), criticality)
       if (startTime != null) {
-        put(ContextSpecificTag(TAG_START_TIME), startTime)
-      } else {
-        putNull(ContextSpecificTag(TAG_START_TIME))
-      }
+      put(ContextSpecificTag(TAG_START_TIME), startTime)
+    } else {
+      putNull(ContextSpecificTag(TAG_START_TIME))
+    }
       startArray(ContextSpecificTag(TAG_TRANSITIONS))
       for (item in transitions.iterator()) {
         item.toTlv(AnonymousTag, this)
@@ -87,61 +88,40 @@ class DemandResponseLoadControlClusterLoadControlEventStruct(
     private const val TAG_START_TIME = 6
     private const val TAG_TRANSITIONS = 7
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): DemandResponseLoadControlClusterLoadControlEventStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : DemandResponseLoadControlClusterLoadControlEventStruct {
       tlvReader.enterStructure(tlvTag)
       val eventID = tlvReader.getByteArray(ContextSpecificTag(TAG_EVENT_ID))
-      val programID =
-        if (!tlvReader.isNull()) {
-          tlvReader.getByteArray(ContextSpecificTag(TAG_PROGRAM_ID))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_PROGRAM_ID))
-          null
-        }
+      val programID = if (!tlvReader.isNull()) {
+      tlvReader.getByteArray(ContextSpecificTag(TAG_PROGRAM_ID))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_PROGRAM_ID))
+      null
+    }
       val control = tlvReader.getUInt(ContextSpecificTag(TAG_CONTROL))
       val deviceClass = tlvReader.getULong(ContextSpecificTag(TAG_DEVICE_CLASS))
-      val enrollmentGroup =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENROLLMENT_GROUP))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ENROLLMENT_GROUP)))
-        } else {
-          Optional.empty()
-        }
+      val enrollmentGroup = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENROLLMENT_GROUP))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ENROLLMENT_GROUP)))
+    } else {
+      Optional.empty()
+    }
       val criticality = tlvReader.getUInt(ContextSpecificTag(TAG_CRITICALITY))
-      val startTime =
-        if (!tlvReader.isNull()) {
-          tlvReader.getULong(ContextSpecificTag(TAG_START_TIME))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_START_TIME))
-          null
-        }
-      val transitions =
-        buildList<DemandResponseLoadControlClusterLoadControlEventTransitionStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_TRANSITIONS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(
-              DemandResponseLoadControlClusterLoadControlEventTransitionStruct.fromTlv(
-                AnonymousTag,
-                tlvReader
-              )
-            )
-          }
-          tlvReader.exitContainer()
-        }
-
+      val startTime = if (!tlvReader.isNull()) {
+      tlvReader.getULong(ContextSpecificTag(TAG_START_TIME))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_START_TIME))
+      null
+    }
+      val transitions = buildList<DemandResponseLoadControlClusterLoadControlEventTransitionStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_TRANSITIONS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(DemandResponseLoadControlClusterLoadControlEventTransitionStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
-      return DemandResponseLoadControlClusterLoadControlEventStruct(
-        eventID,
-        programID,
-        control,
-        deviceClass,
-        enrollmentGroup,
-        criticality,
-        startTime,
-        transitions
-      )
+      return DemandResponseLoadControlClusterLoadControlEventStruct(eventID, programID, control, deviceClass, enrollmentGroup, criticality, startTime, transitions)
     }
   }
 }

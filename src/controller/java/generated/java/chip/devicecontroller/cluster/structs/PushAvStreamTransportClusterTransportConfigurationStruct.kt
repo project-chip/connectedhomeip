@@ -17,17 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class PushAvStreamTransportClusterTransportConfigurationStruct(
-  val connectionID: UInt,
-  val transportStatus: UInt,
-  val transportOptions: PushAvStreamTransportClusterTransportOptionsStruct
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class PushAvStreamTransportClusterTransportConfigurationStruct (
+    val connectionID: UInt,
+    val transportStatus: UInt,
+    val transportOptions: PushAvStreamTransportClusterTransportOptionsStruct) {
+  override fun toString(): String  = buildString {
     append("PushAvStreamTransportClusterTransportConfigurationStruct {\n")
     append("\tconnectionID : $connectionID\n")
     append("\ttransportStatus : $transportStatus\n")
@@ -50,26 +53,15 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
     private const val TAG_TRANSPORT_STATUS = 1
     private const val TAG_TRANSPORT_OPTIONS = 2
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): PushAvStreamTransportClusterTransportConfigurationStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : PushAvStreamTransportClusterTransportConfigurationStruct {
       tlvReader.enterStructure(tlvTag)
       val connectionID = tlvReader.getUInt(ContextSpecificTag(TAG_CONNECTION_ID))
       val transportStatus = tlvReader.getUInt(ContextSpecificTag(TAG_TRANSPORT_STATUS))
-      val transportOptions =
-        PushAvStreamTransportClusterTransportOptionsStruct.fromTlv(
-          ContextSpecificTag(TAG_TRANSPORT_OPTIONS),
-          tlvReader
-        )
-
+      val transportOptions = PushAvStreamTransportClusterTransportOptionsStruct.fromTlv(ContextSpecificTag(TAG_TRANSPORT_OPTIONS), tlvReader)
+      
       tlvReader.exitContainer()
 
-      return PushAvStreamTransportClusterTransportConfigurationStruct(
-        connectionID,
-        transportStatus,
-        transportOptions
-      )
+      return PushAvStreamTransportClusterTransportConfigurationStruct(connectionID, transportStatus, transportOptions)
     }
   }
 }

@@ -20,15 +20,17 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
-  val ccdid: UInt,
-  val clientCertificate: ByteArray,
-  val intermediateCertificates: List<ByteArray>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class TlsCertificateManagementClusterTLSClientCertificateDetailStruct (
+    val ccdid: UInt,
+    val clientCertificate: ByteArray,
+    val intermediateCertificates: List<ByteArray>) {
+  override fun toString(): String  = buildString {
     append("TlsCertificateManagementClusterTLSClientCertificateDetailStruct {\n")
     append("\tccdid : $ccdid\n")
     append("\tclientCertificate : $clientCertificate\n")
@@ -55,29 +57,21 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
     private const val TAG_CLIENT_CERTIFICATE = 1
     private const val TAG_INTERMEDIATE_CERTIFICATES = 2
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): TlsCertificateManagementClusterTLSClientCertificateDetailStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : TlsCertificateManagementClusterTLSClientCertificateDetailStruct {
       tlvReader.enterStructure(tlvTag)
       val ccdid = tlvReader.getUInt(ContextSpecificTag(TAG_CCDID))
       val clientCertificate = tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_CERTIFICATE))
-      val intermediateCertificates =
-        buildList<ByteArray> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getByteArray(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val intermediateCertificates = buildList<ByteArray> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getByteArray(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
-      return TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
-        ccdid,
-        clientCertificate,
-        intermediateCertificates
-      )
+      return TlsCertificateManagementClusterTLSClientCertificateDetailStruct(ccdid, clientCertificate, intermediateCertificates)
     }
   }
 }
