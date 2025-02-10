@@ -77,7 +77,8 @@ limitations under the License.
       <description>TCAcknowledgementsRequired</description>
       <access op="read" privilege="administer"/>
     </attribute>
-    <attribute side="server" code="0x09" name="TCUpdateDeadline" define="TC_UPDATE_DEADLINE" type="int32u" writable="false" optional="true" isNullable="true" apiMaturity="provisional">
+    <attribute side="server" code="0x09" define="TC_UPDATE_DEADLINE" type="int32u" writable="false" optional="true" apiMaturity="provisional">
+      <description>TCUpdateDeadline</description>
       <access op="read" privilege="administer"/>
     </attribute>
     <command source="client" code="0x00" name="ArmFailSafe" response="ArmFailSafeResponse" optional="false" cli="chip fabric_commissioning armfailsafe">

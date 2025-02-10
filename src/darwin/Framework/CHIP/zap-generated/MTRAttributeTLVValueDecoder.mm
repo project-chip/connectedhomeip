@@ -2289,12 +2289,8 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
-        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
         return value;
     }
     default: {
