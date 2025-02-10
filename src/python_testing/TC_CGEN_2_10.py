@@ -15,24 +15,14 @@
 #    limitations under the License.
 #
 
+
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#       app: ${TERMS_AND_CONDITIONS_APP}
-#       app-args: >
-#           --tc-min-required-version 1
-#           --tc-required-acknowledgements 1
-#           --custom-flow 2
-#           --capabilities 6
-#       script-args:
-#           --PICS src/app/tests/suites/certification/ci-pics-values
-#           --in-test-commissioning-method on-network
-#           --tc-version-to-simulate 1
-#           --tc-user-response-to-simulate 1
-#           --qr-code MT:-24J0AFN00KA0648G00
-#           --trace-to json:log
-#       factoryreset: True
-#       quiet: True
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${TERMS_AND_CONDITIONS_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --tc-min-required-version 1 --tc-required-acknowledgements 1 --custom-flow 2 --capabilities 6
+# test-runner-run/run1/script-args: --PICS src/app/tests/suites/certification/ci-pics-values --in-test-commissioning-method on-network --tc-version-to-simulate 1 --tc-user-response-to-simulate 1 --qr-code MT:-24J0AFN00KA0648G00 --trace-to json:log
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
