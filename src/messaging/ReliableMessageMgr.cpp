@@ -101,6 +101,27 @@ void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
 #endif
 }
 
+void ReliableMessageMgr::TransmitEventAnalyticNotification(const RetransTableEntry & entry, const SessionHandle & sessionHandle,
+                                                           const ReliableMessageAnalyticsDelegate::EventType & eventType)
+{
+    if (!mAnalyticsDelegate)
+    {
+        return;
+    }
+    uint32_t messageCounter = entry.retainedBuf.GetMessageCounter();
+    auto fabricIndex        = sessionHandle->GetFabricIndex();
+    auto destination        = kUndefinedNodeId;
+    if (sessionHandle->IsSecureSession())
+    {
+        destination = sessionHandle->AsSecureSession()->GetPeerNodeId();
+    }
+    ReliableMessageAnalyticsDelegate::TransmitEvent event = {
+        .nodeId = destination, .fabricIndex = fabricIndex, .eventType = eventType, .messageCounter = messageCounter
+    };
+
+    mAnalyticsDelegate->OnTransmitEvent(event);
+}
+
 void ReliableMessageMgr::ExecuteActions()
 {
     System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
@@ -155,25 +176,7 @@ void ReliableMessageMgr::ExecuteActions()
                          Transport::GetSessionTypeString(session), fabricIndex, ChipLogValueX64(destination),
                          CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
 
-            if (mAnalyticsDelegate)
-            {
-#if !(CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING)
-                uint32_t messageCounter = entry->retainedBuf.GetMessageCounter();
-                auto fabricIndex        = sessionHandle->GetFabricIndex();
-                auto destination        = kUndefinedNodeId;
-                if (sessionHandle->IsSecureSession())
-                {
-                    destination = sessionHandle->AsSecureSession()->GetPeerNodeId();
-                }
-#endif // !(CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING)
-                ReliableMessageAnalyticsDelegate::TransmitEvent event = { .nodeId      = destination,
-                                                                          .fabricIndex = fabricIndex,
-                                                                          .eventType =
-                                                                              ReliableMessageAnalyticsDelegate::EventType::kFailed,
-                                                                          .messageCounter = messageCounter };
-
-                mAnalyticsDelegate->OnTransmitEvent(event);
-            }
+            TransmitEventAnalyticNotification(*entry, session, ReliableMessageAnalyticsDelegate::EventType::kFailed);
 
             // If the exchange is expecting a response, it will handle sending
             // this notification once it detects that it has not gotten a
@@ -315,24 +318,8 @@ bool ReliableMessageMgr::CheckAndRemRetransTable(ReliableMessageContext * rc, ui
     mRetransTable.ForEachActiveObject([&](auto * entry) {
         if (entry->ec->GetReliableMessageContext() == rc && entry->retainedBuf.GetMessageCounter() == ackMessageCounter)
         {
-            if (mAnalyticsDelegate)
-            {
-                auto session     = entry->ec->GetSessionHandle();
-                auto fabricIndex = session->GetFabricIndex();
-                auto destination = kUndefinedNodeId;
-                if (session->IsSecureSession())
-                {
-                    destination = session->AsSecureSession()->GetPeerNodeId();
-                }
-                ReliableMessageAnalyticsDelegate::TransmitEvent event = {
-                    .nodeId         = destination,
-                    .fabricIndex    = fabricIndex,
-                    .eventType      = ReliableMessageAnalyticsDelegate::EventType::kAcknowledged,
-                    .messageCounter = ackMessageCounter
-                };
-
-                mAnalyticsDelegate->OnTransmitEvent(event);
-            }
+            auto session = entry->ec->GetSessionHandle();
+            TransmitEventAnalyticNotification(*entry, session, ReliableMessageAnalyticsDelegate::EventType::kAcknowledged);
 
             // Clear the entry from the retransmision table.
             ClearRetransTable(*entry);
@@ -568,27 +555,11 @@ void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
     // For initial send the packet has already been submitted to transport layer successfully.
     // On re-transmits we do not know if transport layer is unable to retransmit for some
     // reason, so saying we have sent re-transmit here is a little presumptuous.
-    if (mAnalyticsDelegate)
-    {
-#if !CHIP_PROGRESS_LOGGING
-        uint32_t messageCounter = entry.retainedBuf.GetMessageCounter();
-        auto fabricIndex        = sessionHandle->GetFabricIndex();
-        auto destination        = kUndefinedNodeId;
-        if (sessionHandle->IsSecureSession())
-        {
-            destination = sessionHandle->AsSecureSession()->GetPeerNodeId();
-        }
-#endif // !CHIP_PROGRESS_LOGGING
-        ReliableMessageAnalyticsDelegate::TransmitEvent event = {
-            .nodeId         = destination,
-            .fabricIndex    = fabricIndex,
-            .eventType      = entry.sendCount == 0 ? ReliableMessageAnalyticsDelegate::EventType::kInitialSend
-                                                   : ReliableMessageAnalyticsDelegate::EventType::kRetransmission,
-            .messageCounter = messageCounter
-        };
 
-        mAnalyticsDelegate->OnTransmitEvent(event);
-    }
+    ReliableMessageAnalyticsDelegate::EventType eventType = entry.sendCount == 0
+        ? ReliableMessageAnalyticsDelegate::EventType::kInitialSend
+        : ReliableMessageAnalyticsDelegate::EventType::kRetransmission;
+    TransmitEventAnalyticNotification(entry, sessionHandle, eventType);
 }
 
 #if CHIP_CONFIG_TEST

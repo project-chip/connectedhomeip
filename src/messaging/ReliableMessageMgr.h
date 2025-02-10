@@ -253,6 +253,9 @@ private:
 
     void TicklessDebugDumpRetransTable(const char * log);
 
+    void TransmitEventAnalyticNotification(const RetransTableEntry & entry, const SessionHandle & sessionHandle,
+                                           const ReliableMessageAnalyticsDelegate::EventType & eventType);
+
     // ReliableMessageProtocol Global tables for timer context
     ObjectPool<RetransTableEntry, CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE> mRetransTable;
 
