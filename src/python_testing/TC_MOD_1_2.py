@@ -21,7 +21,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ALL_CLUSTERS_APP
+#     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:TRACE_APP.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -101,6 +101,7 @@ class MOD_1_2(MatterBaseTest):
         self.cluster = Clusters.ModeSelect
         self.endpoint = self.get_endpoint(1)
         self._16bitshex = 0xFFFF
+        self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
         # commision device
         # in the test plan step 1 is defined as a precondition.
@@ -148,11 +149,19 @@ class MOD_1_2(MatterBaseTest):
         asserts.assert_true(isinstance(startup_mode, int), "Startupmode is not int")
         asserts.assert_in(startup_mode, supported_modes_values, f"Startupmode {current_mode} is not in {supported_modes_values}")
 
-        # string and readable
+        # Verify the string for ci is larger that 1 char.
+        # If is non ci ask the user if can read and understand the string.
         self.step(6)
         description = await self.read_single_attribute_check_success(endpoint=1, cluster=self.cluster, attribute=self.cluster.Attributes.Description)
         self._log_attribute("Description", description)
-        asserts.assert_true(isinstance(description, str), "Description attribute is not instance of str")
+        if self.is_ci:
+            asserts.assert_true(isinstance(description, str), "Description attribute is not str")
+            asserts.assert_true(len(description) >= 1, "Description is lower that 1 char.")
+        else:
+            user_response = self.wait_for_user_input(prompt_msg=f"Is the value \"{description}\" for attribute Description a readable and understandable string? Enter 'y' or 'n'",
+                                                     prompt_msg_placeholder="y",
+                                                     default_value="y")
+            asserts.assert_true(user_response.lower() == 'y', f"The description is not understandable to the user.")
 
         # Verify the StandardNamespace can be 16bits integer or null
         self.step(7)
