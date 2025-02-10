@@ -1055,18 +1055,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         # The named pipe name must be set in the derived classes
         self.app_pipe = None
 
-    async def commission_devices(self) -> bool:
-        conf = self.matter_test_config
-
-        for commission_idx, node_id in enumerate(conf.dut_node_ids):
-            logging.info(
-                f"Starting commissioning for root index {conf.root_of_trust_index}, fabric ID 0x{conf.fabric_id:016X}, node ID 0x{node_id:016X}")
-            logging.info(f"Commissioning method: {conf.commissioning_method}")
-
-            await CommissionDeviceTest.commission_device(self, commission_idx)
-
-        return True
-
     def get_test_steps(self, test: str) -> list[TestStep]:
         ''' Retrieves the test step list for the given test
 
