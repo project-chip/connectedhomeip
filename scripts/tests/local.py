@@ -535,6 +535,11 @@ def gen_coverage(flat):
         "third_party/boringssl/.*",
         "third_party/perfetto/.*",
         "third_party/jsoncpp/.*",
+        "third_party/editline/.*",
+        "third_party/initpp/.*",
+        "third_party/libwebsockets/.*",
+        "third_party/pigweed/.*",
+        "third_party/nanopb/.*",
         "third_party/nl.*",
         "/usr/include/.*",
         "/usr/lib/.*",
@@ -1021,13 +1026,20 @@ def casting_test(test, log_directory, tv_app, tv_casting_app, runner):
 @click.option("--expected-failures", default=None)
 @click.option("--coverage/--no-coverage", default=None)
 @click.option(
+    "--keep-going",
+    default=False,
+    is_flag=True,
+    show_default=True,
+    help="Keep going on errors. Will report all failed tests at the end.",
+)
+@click.option(
     "--runner",
     default="none",
     type=click.Choice(list(__RUNNERS__.keys()), case_sensitive=False),
     help="Determines the verbosity of script output",
 )
 def chip_tool_tests(
-    target, target_glob, include_tags, expected_failures, coverage, runner
+    target, target_glob, include_tags, expected_failures, coverage, keep_going, runner
 ):
     """
     Run integration tests using chip-tool.
@@ -1091,7 +1103,11 @@ def chip_tool_tests(
     cmd.extend(["--test-timeout-seconds", "300"])
 
     if expected_failures is not None:
-        cmd.extend(["--expected-failures", expected_failures, "--keep-going"])
+        cmd.extend(["--expected-failures", expected_failures])
+        keep_going = True # if we expect failures, we have to keep going
+
+    if keep_going:
+        cmd.append("--keep-going")
 
     target_flags = [
         ("--all-clusters-app", "ALL_CLUSTERS_APP"),
