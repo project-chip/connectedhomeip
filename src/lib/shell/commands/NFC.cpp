@@ -20,9 +20,9 @@
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
 #endif
-#include <app/server/OnboardingCodesUtil.h>
 #include <lib/shell/Engine.h>
 #include <lib/support/CodeUtils.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 using chip::DeviceLayer::ConnectivityMgr;
 
