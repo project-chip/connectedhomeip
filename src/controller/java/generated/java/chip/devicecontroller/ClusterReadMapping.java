@@ -2430,10 +2430,10 @@ public class ClusterReadMapping {
         InteractionInfo readGeneralCommissioningTCUpdateDeadlineAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.GeneralCommissioningCluster) cluster).readTCUpdateDeadlineAttribute(
-              (ChipClusters.GeneralCommissioningCluster.TCUpdateDeadlineAttributeCallback) callback
+              (ChipClusters.LongAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedGeneralCommissioningClusterTCUpdateDeadlineAttributeCallback(),
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
           readGeneralCommissioningTCUpdateDeadlineCommandParams
         );
         result.put("readTCUpdateDeadlineAttribute", readGeneralCommissioningTCUpdateDeadlineAttributeInteractionInfo);

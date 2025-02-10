@@ -10260,7 +10260,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("TCAcknowledgementsRequired", 1, value);
         }
         case GeneralCommissioning::Attributes::TCUpdateDeadline::Id: {
-            chip::app::DataModel::Nullable<uint32_t> value;
+            uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TCUpdateDeadline", 1, value);
         }
