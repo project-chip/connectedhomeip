@@ -1,15 +1,14 @@
 |                                         |   Pass Rate |
 |:----------------------------------------|------------:|
 | codeql                                  |           0 |
-| darwin                                  |          67 |
-| build-example-nrf-connect-sdk           |         100 |
+| build-example-nrf-connect-sdk           |          50 |
+| darwin                                  |         100 |
 | build-example-ti-cc32xx                 |         100 |
 | tv-casting-example-darwin               |         100 |
 | lint-code-base                          |         100 |
 | tests                                   |         100 |
 | build-example-stm32                     |         100 |
 | darwin-tests                            |         100 |
-| issue-labeler                           |         100 |
 | build-example-bouffalolab               |         100 |
 | test-tv-casting-example                 |         100 |
 | build-example-telink                    |         100 |
@@ -43,3 +42,4 @@
 | builds                                  |         100 |
 | build-example-ti-cc13xx-26xx            |         100 |
 | build-example-linux-arm                 |         100 |
+| docker-chip-images                      |         100 |
