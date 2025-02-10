@@ -1062,7 +1062,11 @@ def chip_tool_tests(
         [(t.key, f"./out/{t.target}/{t.binary}") for t in _get_targets(coverage)]
     )
 
-    cmd.extend(["--chip-tool", paths["CHIP_TOOL"]])
+    if runner == BinaryRunner.COVERAGE:
+        # when running with coveage, chip-tool also is covered
+        cmd.extend(["--chip-tool", _maybe_with_runner("chip-tool", paths["CHIP_TOOL"], runner)])
+    else:
+        cmd.extend(["--chip-tool", paths["CHIP_TOOL"]])
 
     if target is not None:
         cmd.extend(["--target", target])
