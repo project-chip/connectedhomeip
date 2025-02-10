@@ -250,13 +250,13 @@ class BinaryRunner(enum.Enum):
         if self == BinaryRunner.NONE:
             return path
         elif self == BinaryRunner.RR:
-            return f"rr record {path}"
+            return f"exec rr record {path}"
         elif self == BinaryRunner.VALGRIND:
-            return f"valgrind {path}"
+            return f"exec valgrind {path}"
         elif self == BinaryRunner.COVERAGE:
             # Expected path is like "out/<target>/<binary>"
             rawname = os.path.basename(path[: path.rindex("/")] + ".profraw")
-            return f'LLVM_PROFILE_FILE="out/profiling/{rawname}" {path}'
+            return f'export LLVM_PROFILE_FILE="out/profiling/{rawname}"; exec {path}'
 
 
 __RUNNERS__ = {
@@ -452,24 +452,7 @@ def _maybe_with_runner(script_name: str, path: str, runner: BinaryRunner):
             textwrap.dedent(
                 f"""\
                 #!/usr/bin/env bash
-
-                _term() {{
-                    kill -TERM "$child"
-                }}
-                trap _term SIGTERM
-
-                _int() {{
-                    kill -INT "$child"
-                }}
-                trap _int SIGINT
-
-                {runner.execute_str(path)} $* &
-                child=$!
-                wait "$child"
-
-                # TODO: this is awkward, we claim success because otherwise
-                #       we exist with the child exit error code (SIGTERM and such)
-                exit 0
+                {runner.execute_str(path)} $*
                 """
             )
         )
