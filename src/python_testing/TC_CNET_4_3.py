@@ -92,6 +92,7 @@ class TC_CNET_4_3(MatterBaseTest):
         networks = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks)
+        asserts.assert_true(networks, "NetworkInfoStruct list should not be empty")
         matter_asserts.assert_list_element_type(networks, Clusters.NetworkCommissioning.Structs.NetworkInfoStruct,
                                                 "All elements in list are of type NetworkInfoStruct")
         matter_asserts.assert_all(networks, lambda x: isinstance(x.networkID, bytes) and 1 <= len(x.networkID) <= 32,
