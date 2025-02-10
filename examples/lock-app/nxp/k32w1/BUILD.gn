@@ -250,6 +250,7 @@ mcxw71_k32w1_executable("lock_app") {
   deps += [
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/platform/logging:default",
+    "${chip_root}/src/setup_payload:onboarding-codes-utils",
   ]
 
   deps += [ "${chip_root}/examples/lock-app/nxp/zap:zap" ]

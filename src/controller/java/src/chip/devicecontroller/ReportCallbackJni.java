@@ -20,7 +20,6 @@ package chip.devicecontroller;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
 import chip.devicecontroller.model.NodeState;
-import java.lang.ref.Cleaner;
 import javax.annotation.Nullable;
 
 /** JNI wrapper callback class for {@link ReportCallback}. */
@@ -31,8 +30,6 @@ public class ReportCallbackJni {
   private long callbackHandle;
   @Nullable private NodeState nodeState;
 
-  private final Cleaner.Cleanable cleanable;
-
   public ReportCallbackJni(
       @Nullable SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ReportCallback reportCallback,
@@ -42,17 +39,6 @@ public class ReportCallbackJni {
     this.wrappedResubscriptionAttemptCallback = resubscriptionAttemptCallback;
     this.callbackHandle =
         newCallback(subscriptionEstablishedCallback, resubscriptionAttemptCallback);
-
-    this.cleanable =
-        Cleaner.create()
-            .register(
-                this,
-                () -> {
-                  if (callbackHandle != 0) {
-                    deleteCallback(callbackHandle);
-                    callbackHandle = 0;
-                  }
-                });
   }
 
   long getCallbackHandle() {
@@ -101,5 +87,16 @@ public class ReportCallbackJni {
 
   private void onDone() {
     wrappedReportCallback.onDone();
+  }
+
+  // TODO(#8578): Replace finalizer with PhantomReference.
+  @SuppressWarnings("deprecation")
+  protected void finalize() throws Throwable {
+    super.finalize();
+
+    if (callbackHandle != 0) {
+      deleteCallback(callbackHandle);
+      callbackHandle = 0;
+    }
   }
 }
