@@ -79,42 +79,42 @@ class TestMatterAsserts(unittest.TestCase):
     def test_assert_valid_int64(self):
         """Test assert_valid_int64 with valid and invalid values."""
         # Valid cases
-        matter_asserts.assert_valid_int64(-2 ** 63, "test_min")
-        matter_asserts.assert_valid_int64(2 ** 63 - 1, "test_max")
+        matter_asserts.assert_valid_int64(-2**63, "test_min")
+        matter_asserts.assert_valid_int64(2**63 - 1, "test_max")
 
         # Invalid cases
         with self.assertRaises(signals.TestFailure):
-            matter_asserts.assert_valid_int64(-2 ** 63 - 1, "test_too_small")
+            matter_asserts.assert_valid_int64(-2**63 - 1, "test_too_small")
         with self.assertRaises(signals.TestFailure):
-            matter_asserts.assert_valid_int64(2 ** 63, "test_too_large")
+            matter_asserts.assert_valid_int64(2**63, "test_too_large")
         with self.assertRaises(signals.TestFailure):
             matter_asserts.assert_valid_int64("42", "test_string")
 
     def test_assert_valid_int32(self):
         """Test assert_valid_int32 with valid and invalid values."""
         # Valid cases
-        matter_asserts.assert_valid_int32(-2 ** 31, "test_min")
-        matter_asserts.assert_valid_int32(2 ** 31 - 1, "test_max")
+        matter_asserts.assert_valid_int32(-2**31, "test_min")
+        matter_asserts.assert_valid_int32(2**31 - 1, "test_max")
 
         # Invalid cases
         with self.assertRaises(signals.TestFailure):
-            matter_asserts.assert_valid_int32(-2 ** 31 - 1, "test_too_small")
+            matter_asserts.assert_valid_int32(-2**31 - 1, "test_too_small")
         with self.assertRaises(signals.TestFailure):
-            matter_asserts.assert_valid_int32(2 ** 31, "test_too_large")
+            matter_asserts.assert_valid_int32(2**31, "test_too_large")
         with self.assertRaises(signals.TestFailure):
             matter_asserts.assert_valid_int32("42", "test_string")
 
     def test_assert_valid_int16(self):
         """Test assert_valid_int16 with valid and invalid values."""
         # Valid cases
-        matter_asserts.assert_valid_int16(-2 ** 15, "test_min")
-        matter_asserts.assert_valid_int16(2 ** 15 - 1, "test_max")
+        matter_asserts.assert_valid_int16(-2**15, "test_min")
+        matter_asserts.assert_valid_int16(2**15 - 1, "test_max")
 
         # Invalid cases
         with self.assertRaises(signals.TestFailure):
-            matter_asserts.assert_valid_int16(-2 ** 15 - 1, "test_too_small")
+            matter_asserts.assert_valid_int16(-2**15 - 1, "test_too_small")
         with self.assertRaises(signals.TestFailure):
-            matter_asserts.assert_valid_int16(2 ** 15, "test_too_large")
+            matter_asserts.assert_valid_int16(2**15, "test_too_large")
         with self.assertRaises(signals.TestFailure):
             matter_asserts.assert_valid_int16("42", "test_string")
 
@@ -164,18 +164,30 @@ class TestMatterAsserts(unittest.TestCase):
         with self.assertRaises(signals.TestFailure):
             matter_asserts.assert_list([1, 2, 3], "test_max_length", max_length=2)
 
-    def test_assert_list_element_type(self):
-        """Test assert_list_element_type with valid and invalid values."""
+    def test_assert_all(self):
+        """Test assert_all with valid and invalid values."""
         # Valid cases
-        matter_asserts.assert_list_element_type([], str, "test_empty")
-        matter_asserts.assert_list_element_type(["a", "b"], str, "test_strings")
-        matter_asserts.assert_list_element_type([1, 2, 3], int, "test_ints")
+        matter_asserts.assert_all([], lambda x: isinstance(x, str), "empty list")
+        matter_asserts.assert_all([1, 2, 3], lambda x: isinstance(x, int), "list of ints")
 
         # Invalid cases
         with self.assertRaises(signals.TestFailure):
-            matter_asserts.assert_list_element_type("not_a_list", str, "test_not_list")
+            matter_asserts.assert_all([1, 2, 'a'], lambda x: isinstance(x, int), "mixed types")
         with self.assertRaises(signals.TestFailure):
-            matter_asserts.assert_list_element_type([1, "2", 3], int, "test_mixed")
+            matter_asserts.assert_all("not a list", lambda x: True, "not a list")
+
+    def test_assert_list_element_type(self):
+        """Test assert_list_element_type with valid and invalid values."""
+        # Valid cases
+        matter_asserts.assert_list_element_type([], "test_empty", str)
+        matter_asserts.assert_list_element_type(["a", "b"], "test_strings", str)
+        matter_asserts.assert_list_element_type([1, 2, 3], "test_ints", int)
+
+        # Invalid cases
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_list_element_type("not_a_list", "test_not_list", str)
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_list_element_type([1, "2", 3], "test_mixed", int)
 
     # String assertion tests
     def test_assert_is_string(self):
