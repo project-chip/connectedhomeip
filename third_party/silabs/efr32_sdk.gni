@@ -344,7 +344,7 @@ template("efr32_sdk") {
 
       libs += [
         "${matter_support_root}/sdk-copies/protocol/bluetooth/bgstack/ll/build/gcc/xg26/release/liblinklayer.a",
-        "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg26_gcc_release.a",
+        "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_module_efr32xg26_gcc_release.a",
       ]
       if (silabs_mcu == "MGM260PB22VNA") {
         libs += [ "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm260pb22vna_gcc.a" ]
@@ -409,7 +409,7 @@ template("efr32_sdk") {
       _include_dirs += [ "${chip_root}/src/platform/silabs/wifi" ]
     }
 
-    if (silabs_family != "mgm24") {
+    if (silabs_family != "mgm24" && silabs_family != "mgm26") {
       _include_dirs += [
         "${efr32_sdk_root}/platform/radio/rail_lib/hal",
         "${efr32_sdk_root}/platform/radio/rail_lib/hal/efr32",
