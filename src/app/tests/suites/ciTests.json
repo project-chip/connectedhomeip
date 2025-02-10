@@ -47,7 +47,7 @@
     ],
     "Descriptor": [],
     "DeviceEnergyManagementMode": ["Test_TC_DEMM_2_1"],
-    "EthernetNetworkDiagnostics": ["Test_TC_DGETH_2_1", "Test_TC_DGETH_2_2"],
+    "EthernetNetworkDiagnostics": ["Test_TC_DGETH_2_1"],
     "DiagnosticsLogs": [],
     "EnergyEVSE": ["Test_TC_EEVSE_2_1"],
     "EnergyEVSEMode": [
