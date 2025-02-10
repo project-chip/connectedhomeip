@@ -278,9 +278,9 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::EventLoopTaskMain(void * ar
 {
     ChipLogDetail(DeviceLayer, "CHIP event task running");
     static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg)->Impl()->RunEventLoop();
-    // TODO: At this point, should we not
-    // vTaskDelete(static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg)->mEventLoopTask)?
-    // Or somehow get our caller to do it once this thread is joined?
+    vTaskDelete(NULL);
+    vQueueDelete(static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg)->mChipEventQueue);
+    static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg)->mChipEventQueue = NULL;
 }
 
 template <class ImplClass>
@@ -377,6 +377,9 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::BackgroundEventLoopTaskMain
 {
     ChipLogDetail(DeviceLayer, "CHIP background task running");
     static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg)->Impl()->RunBackgroundEventLoop();
+    vTaskDelete(NULL);
+    vQueueDelete(static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg)->mBackgroundEventQueue);
+    static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg)->mBackgroundEventQueue = NULL;
 }
 #endif
 
