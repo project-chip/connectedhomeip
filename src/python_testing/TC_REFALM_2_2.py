@@ -1,3 +1,5 @@
+#
+# Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,6 +31,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --int-arg PIXIT.REFALM.AlarmThreshold:5
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
@@ -172,7 +175,9 @@ class TC_REFALM_2_2(MatterBaseTest):
         )
 
     def _wait_thresshold(self):
-        sleep(self.wait_thresshold_v/1000)
+        """Wait the defined time at the PIXIT.REFALM.AlarmThreshold to trigger it."""
+        logger.info(f"Sleeping for {self.refalm_threshold_seconds} seconds defined at PIXIT.REFALM.AlarmThreshold")
+        sleep(self.refalm_threshold_seconds)
 
     def _send_named_pipe_command(self, command_dict: dict[str, Any]):
         app_pid = self.matter_test_config.app_pid
@@ -201,13 +206,16 @@ class TC_REFALM_2_2(MatterBaseTest):
     @async_test_body
     async def test_TC_REFALM_2_2(self):
         """Run the test steps."""
-        self.wait_thresshold_v = 5000
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         self.endpoint = self.get_endpoint(default=1)
         cluster = Clusters.RefrigeratorAlarm
-
         logger.info(f"Default endpoint {self.endpoint}")
+        # Commision the device.
+        # Read required variables.
         self.step(1)
+        asserts.assert_true('PIXIT.REFALM.AlarmThreshold' in self.matter_test_config.global_test_params, "PIXIT.REFALM.AlarmThreshold must be included on the command line in "
+                            "the --int-arg flag as PIXIT.REFALM.AlarmThreshold:<AlarmThreshold> in seconds.")
+        self.refalm_threshold_seconds = self.matter_test_config.global_test_params['PIXIT.REFALM.AlarmThreshold']
 
         # check is closed
         self.step(2)
