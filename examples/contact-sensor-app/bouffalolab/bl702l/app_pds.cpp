@@ -64,7 +64,8 @@ extern "C" void vApplicationSleep(TickType_t xExpectedIdleTime)
         // ChipLogProgress(NotSpecified, "wakeup source: rtc. %lu vs %lu ms @ %lu\r\n", xExpectedIdleTime,
         //                 (uint32_t) (bl_rtc_get_timestamp_ms() - sleep_before), (uint32_t) bl_rtc_get_timestamp_ms());
 
-        // ChipLogProgress(NotSpecified, "application_sleep; %lu, %lu, %lu\r\n", (uint32_t) sleep_calling_time, (uint32_t) sleep_time,
+        // ChipLogProgress(NotSpecified, "application_sleep; %lu, %lu, %lu\r\n", (uint32_t) sleep_calling_time, (uint32_t)
+        // sleep_time,
         //                 (uint32_t) wakeup_time);
     }
     else if (app_pds_wakeup_source == PDS_WAKEUP_BY_GPIO)
