@@ -11,14 +11,14 @@ RUN set -x \
 # Setup toolchain
 WORKDIR /opt/telink
 RUN set -x \
-    && curl --location https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/zephyr-sdk-0.16.1_linux-x86_64_minimal.tar.xz --output zephyr-sdk-0.16.1_linux-x86_64_minimal.tar.xz \
-    && tar xvf zephyr-sdk-0.16.1_linux-x86_64_minimal.tar.xz \
-    && rm -rf zephyr-sdk-0.16.1_linux-x86_64_minimal.tar.xz \
-    && zephyr-sdk-0.16.1/setup.sh -t riscv64-zephyr-elf \
+    && curl --location https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.0/zephyr-sdk-0.17.0_linux-x86_64_minimal.tar.xz --output zephyr-sdk-0.17.0_linux-x86_64_minimal.tar.xz \
+    && tar xvf zephyr-sdk-0.17.0_linux-x86_64_minimal.tar.xz \
+    && rm -rf zephyr-sdk-0.17.0_linux-x86_64_minimal.tar.xz \
+    && zephyr-sdk-0.17.0/setup.sh -t riscv64-zephyr-elf \
     && : # last line
 
 # Setup Zephyr
-ARG ZEPHYR_REVISION=c05c461b1119782cc839cf436fa04ec5e1fb2c8c
+ARG ZEPHYR_REVISION=ce4027fc0768b8509758af2e43f74e3fd2c7d58d
 WORKDIR /opt/telink/zephyrproject
 RUN set -x \
     && python3 -m pip install --break-system-packages -U --no-cache-dir west \
@@ -34,7 +34,7 @@ RUN set -x \
 
 FROM ghcr.io/project-chip/chip-build:${VERSION}
 
-COPY --from=build /opt/telink/zephyr-sdk-0.16.1/ /opt/telink/zephyr-sdk-0.16.1/
+COPY --from=build /opt/telink/zephyr-sdk-0.17.0/ /opt/telink/zephyr-sdk-0.17.0/
 COPY --from=build /opt/telink/zephyrproject/ /opt/telink/zephyrproject/
 
 RUN set -x \
@@ -45,4 +45,4 @@ RUN set -x \
     && : # last line
 
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
-ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.16.1
+ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.17.0

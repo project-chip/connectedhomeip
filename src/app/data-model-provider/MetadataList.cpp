@@ -25,106 +25,158 @@ namespace app {
 namespace DataModel {
 namespace detail {
 
-GenericMetadataList::~GenericMetadataList()
+GenericAppendOnlyBuffer::~GenericAppendOnlyBuffer()
 {
-    Invalidate();
+    if (mBufferIsAllocated && (mBuffer != nullptr))
+    {
+        Platform::MemoryFree(mBuffer);
+    }
 }
 
-GenericMetadataList & GenericMetadataList::operator=(GenericMetadataList && other)
+GenericAppendOnlyBuffer::GenericAppendOnlyBuffer(GenericAppendOnlyBuffer && other) : mElementSize(other.mElementSize)
 {
-    if (this != &other)
+    // take over the data
+    mBuffer            = other.mBuffer;
+    mElementCount      = other.mElementCount;
+    mCapacity          = other.mCapacity;
+    mBufferIsAllocated = other.mBufferIsAllocated;
+
+    // clear other
+    other.mBuffer            = nullptr;
+    other.mElementCount      = 0;
+    other.mCapacity          = 0;
+    other.mBufferIsAllocated = false;
+}
+
+GenericAppendOnlyBuffer & GenericAppendOnlyBuffer::operator=(GenericAppendOnlyBuffer && other)
+{
+    VerifyOrDie(mElementSize == other.mElementSize);
+
+    if (mBufferIsAllocated && (mBuffer != nullptr))
     {
-        // Generic metadata lists should not be used directly except for same-sized data
-        VerifyOrDie(this->mElementSize == other.mElementSize);
-
-        if (mAllocated && (mBuffer != nullptr))
-        {
-            chip::Platform::MemoryFree(mBuffer);
-        }
-
-        this->mAllocated    = other.mAllocated;
-        this->mBuffer       = other.mBuffer;
-        this->mElementCount = other.mElementCount;
-        this->mCapacity     = other.mCapacity;
-        this->mIsImmutable  = other.mIsImmutable;
-
-        other.mAllocated    = false;
-        other.mBuffer       = nullptr;
-        other.mElementCount = 0;
-        other.mCapacity     = 0;
-        other.mIsImmutable  = true;
+        Platform::Impl::PlatformMemoryManagement::MemoryFree(mBuffer);
     }
+
+    // take over the data
+    mBuffer            = other.mBuffer;
+    mElementCount      = other.mElementCount;
+    mCapacity          = other.mCapacity;
+    mBufferIsAllocated = other.mBufferIsAllocated;
+
+    // clear other
+    other.mBuffer            = nullptr;
+    other.mElementCount      = 0;
+    other.mCapacity          = 0;
+    other.mBufferIsAllocated = false;
+
     return *this;
 }
 
-const void * GenericMetadataList::operator[](size_t index) const
+CHIP_ERROR GenericAppendOnlyBuffer::EnsureAppendCapacity(size_t numElements)
 {
-    VerifyOrDie(index < mElementCount);
-    return mBuffer + index * mElementSize;
-}
-
-CHIP_ERROR GenericMetadataList::Reserve(size_t numElements)
-{
-    VerifyOrReturnError(!mIsImmutable, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mElementCount == 0, CHIP_ERROR_INCORRECT_STATE);
-
-    if ((mBuffer != nullptr) && mAllocated)
+    if (mCapacity >= mElementCount + numElements)
     {
-        chip::Platform::MemoryFree(mBuffer);
+        // Sufficient capacity already exists
+        return CHIP_NO_ERROR;
     }
 
-    mBuffer = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(numElements, mElementSize));
+    if (mBuffer == nullptr)
+    {
+        mBuffer = static_cast<uint8_t *>(Platform::MemoryCalloc(numElements, mElementSize));
+        VerifyOrReturnError(mBuffer != nullptr, CHIP_ERROR_NO_MEMORY);
+        mCapacity          = numElements;
+        mBufferIsAllocated = true;
+        return CHIP_NO_ERROR;
+    }
 
-    VerifyOrReturnError(mBuffer != nullptr, CHIP_ERROR_NO_MEMORY);
+    // we already have the data in buffer. we have two choices:
+    //   - allocated buffer needs to be extended
+    //   - re-used const buffer needs to be copied over
+    if (mBufferIsAllocated)
+    {
+        auto new_buffer = static_cast<uint8_t *>(Platform::MemoryRealloc(mBuffer, (mElementCount + numElements) * mElementSize));
+        VerifyOrReturnError(new_buffer != nullptr, CHIP_ERROR_NO_MEMORY);
+        mBuffer = new_buffer;
+    }
+    else
+    {
+        // this is NOT an allocated buffer, but it should become one
+        auto new_buffer = static_cast<uint8_t *>(Platform::MemoryCalloc(mElementCount + numElements, mElementSize));
+        VerifyOrReturnError(new_buffer != nullptr, CHIP_ERROR_NO_MEMORY);
+        mBufferIsAllocated = true;
+        memcpy(new_buffer, mBuffer, mElementCount * mElementSize);
+        mBuffer = new_buffer;
+    }
+    mCapacity = mElementCount + numElements;
 
-    mAllocated = true;
-    mCapacity  = numElements;
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GenericMetadataList::AppendRaw(const void * buffer)
+CHIP_ERROR GenericAppendOnlyBuffer::AppendSingleElementRaw(const void * buffer)
 {
-    VerifyOrReturnError(!mIsImmutable, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mElementCount < mCapacity, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(mElementCount < mCapacity, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(mBuffer + mElementCount * mElementSize, buffer, mElementSize);
     mElementCount++;
     return CHIP_NO_ERROR;
 }
 
-void GenericMetadataList::Invalidate()
+CHIP_ERROR GenericAppendOnlyBuffer::AppendElementArrayRaw(const void * __restrict__ buffer, size_t numElements)
 {
-    if ((mBuffer != nullptr) && mAllocated)
-    {
-        chip::Platform::MemoryFree(mBuffer);
-        mBuffer    = nullptr;
-        mAllocated = false;
-    }
-    mCapacity     = 0;
-    mElementCount = 0;
-    mCapacity     = 0;
-    mIsImmutable  = true;
-}
+    ReturnErrorOnFailure(EnsureAppendCapacity(numElements));
 
-CHIP_ERROR GenericMetadataList::CopyExistingBuffer(const void * buffer, size_t elements)
-{
-    ReturnErrorOnFailure(Reserve(elements));
-    memcpy(mBuffer, buffer, mElementSize * elements);
-    mIsImmutable  = true;
-    mElementCount = elements;
-    mCapacity     = elements;
+    memcpy(mBuffer + mElementCount * mElementSize, buffer, numElements * mElementSize);
+    mElementCount += numElements;
+
     return CHIP_NO_ERROR;
 }
 
-void GenericMetadataList::AcquireExistingBuffer(const void * buffer, size_t elements)
+CHIP_ERROR GenericAppendOnlyBuffer::ReferenceExistingElementArrayRaw(const void * buffer, size_t numElements)
 {
-    Invalidate();
-    mAllocated    = false;
-    mElementCount = elements;
-    mCapacity     = elements;
-    mIsImmutable  = true;
-    // NOTE: const cast, however we are marked as immutable and not allocated,
-    // so will never perform any writes on mBuffer's contents or try to deallocate it.
-    mBuffer = static_cast<uint8_t *>(const_cast<void *>(buffer));
+    if (mBuffer == nullptr)
+    {
+        // we can NEVER append with 0 capacity, so const cast is safe
+        mBuffer       = const_cast<uint8_t *>(static_cast<const uint8_t *>(buffer));
+        mElementCount = numElements;
+        // The assertions below are because we know the buffer is null/not allocated yet
+        VerifyOrDie(mCapacity == 0);
+        VerifyOrDie(!mBufferIsAllocated);
+        return CHIP_NO_ERROR;
+    }
+
+    return AppendElementArrayRaw(buffer, numElements);
+}
+
+void GenericAppendOnlyBuffer::ReleaseBuffer(void *& buffer, size_t & size, bool & allocated)
+{
+    buffer    = mBuffer;
+    size      = mElementCount;
+    allocated = mBufferIsAllocated;
+
+    // we release the ownership
+    mBuffer            = nullptr;
+    mCapacity          = 0;
+    mElementCount      = 0;
+    mBufferIsAllocated = false;
+}
+
+ScopedBuffer::~ScopedBuffer()
+{
+    if (mBuffer != nullptr)
+    {
+        Platform::MemoryFree(mBuffer);
+    }
+}
+
+ScopedBuffer & ScopedBuffer::operator=(ScopedBuffer && other)
+{
+    if (mBuffer != nullptr)
+    {
+        Platform::MemoryFree(mBuffer);
+    }
+
+    mBuffer       = other.mBuffer;
+    other.mBuffer = nullptr;
+    return *this;
 }
 
 } // namespace detail

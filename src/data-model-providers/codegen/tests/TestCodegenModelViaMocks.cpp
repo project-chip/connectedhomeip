@@ -43,6 +43,7 @@
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage-null-handling.h>
@@ -217,6 +218,44 @@ public:
     bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return true; }
 };
 
+class MockCommandHandler : public CommandHandler
+{
+public:
+    CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath,
+                                 const Protocols::InteractionModel::ClusterStatusCode & aStatus,
+                                 const char * context = nullptr) override
+    {
+        // MOCK: do not do anything here
+        return CHIP_NO_ERROR;
+    }
+
+    void AddStatus(const ConcreteCommandPath & aRequestCommandPath, const Protocols::InteractionModel::ClusterStatusCode & aStatus,
+                   const char * context = nullptr) override
+    {
+        // MOCK: do not do anything here
+    }
+
+    FabricIndex GetAccessingFabricIndex() const override { return 1; }
+
+    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                               const DataModel::EncodableToTLV & aEncodable) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                     const DataModel::EncodableToTLV & aEncodable) override
+    {}
+
+    bool IsTimedInvoke() const override { return false; }
+
+    void FlushAcksRightAwayOnSlowCommand() override {}
+
+    Access::SubjectDescriptor GetSubjectDescriptor() const override { return kAdminSubjectDescriptor; }
+
+    Messaging::ExchangeContext * GetExchangeContext() const override { return nullptr; }
+};
+
 /// Overrides Enumerate*Commands in the CommandHandlerInterface to allow
 /// testing of behaviors when command enumeration is done in the interace.
 class CustomListCommandHandler : public CommandHandlerInterface
@@ -228,7 +267,20 @@ public:
     }
     ~CustomListCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
 
-    void InvokeCommand(HandlerContext & handlerContext) override { handlerContext.SetCommandNotHandled(); }
+    void InvokeCommand(HandlerContext & handlerContext) override
+    {
+        if (mHandleCommand)
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::Success);
+            handlerContext.SetCommandHandled();
+        }
+        else
+        {
+            handlerContext.SetCommandNotHandled();
+        }
+    }
+
+    void SetHandleCommands(bool handle) { mHandleCommand = handle; }
 
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
     {
@@ -267,6 +319,7 @@ public:
 private:
     bool mOverrideAccepted  = false;
     bool mOverrideGenerated = false;
+    bool mHandleCommand     = false;
 
     std::vector<CommandId> mAccepted;
     std::vector<CommandId> mGenerated;
@@ -905,9 +958,13 @@ TEST_F(TestCodegenModelViaMocks, IterateOverEndpoints)
     CodegenDataModelProviderWithContext model;
 
     // This iteration relies on the hard-coding that occurs when mock_ember is used
-    DataModel::MetadataList<DataModel::EndpointEntry> endpoints = model.Endpoints();
+    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsBuilder;
 
-    ASSERT_EQ(endpoints.Size(), 3u);
+    ASSERT_EQ(model.Endpoints(endpointsBuilder), CHIP_NO_ERROR);
+
+    auto endpoints = endpointsBuilder.TakeBuffer();
+
+    ASSERT_EQ(endpoints.size(), 3u);
 
     EXPECT_EQ(endpoints[0].id, kMockEndpoint1);
     EXPECT_EQ(endpoints[0].parentId, kInvalidEndpointId);
@@ -929,12 +986,17 @@ TEST_F(TestCodegenModelViaMocks, IterateOverServerClusters)
 
     chip::Test::ResetVersion();
 
-    EXPECT_TRUE(model.ServerClusters(kEndpointIdThatIsMissing).Empty());
-    EXPECT_TRUE(model.ServerClusters(kInvalidEndpointId).Empty());
+    DataModel::ListBuilder<DataModel::ServerClusterEntry> builder;
+
+    EXPECT_NE(model.ServerClusters(kEndpointIdThatIsMissing, builder), CHIP_NO_ERROR);
+    EXPECT_TRUE(builder.IsEmpty());
+    EXPECT_NE(model.ServerClusters(kInvalidEndpointId, builder), CHIP_NO_ERROR);
+    EXPECT_TRUE(builder.IsEmpty());
 
     // mock endpoint 1 has 2 mock clusters: 1 and 2
-    auto serverClusters = model.ServerClusters(kMockEndpoint1);
-    ASSERT_EQ(serverClusters.Size(), 2u);
+    EXPECT_EQ(model.ServerClusters(kMockEndpoint1, builder), CHIP_NO_ERROR);
+    auto serverClusters = builder.TakeBuffer();
+    ASSERT_EQ(serverClusters.size(), 2u);
 
     EXPECT_EQ(serverClusters[0].clusterId, MockClusterId(1));
     EXPECT_EQ(serverClusters[0].dataVersion, 0u);
@@ -946,14 +1008,16 @@ TEST_F(TestCodegenModelViaMocks, IterateOverServerClusters)
 
     chip::Test::BumpVersion();
 
-    serverClusters = model.ServerClusters(kMockEndpoint1);
-    ASSERT_EQ(serverClusters.Size(), 2u);
+    EXPECT_EQ(model.ServerClusters(kMockEndpoint1, builder), CHIP_NO_ERROR);
+    serverClusters = builder.TakeBuffer();
+    ASSERT_EQ(serverClusters.size(), 2u);
     EXPECT_EQ(serverClusters[0].dataVersion, 1u);
     EXPECT_EQ(serverClusters[1].dataVersion, 1u);
 
     // mock endpoint 3 has 4 mock clusters: 1 through 4
-    serverClusters = model.ServerClusters(kMockEndpoint3);
-    ASSERT_EQ(serverClusters.Size(), 4u);
+    EXPECT_EQ(model.ServerClusters(kMockEndpoint3, builder), CHIP_NO_ERROR);
+    serverClusters = builder.TakeBuffer();
+    ASSERT_EQ(serverClusters.size(), 4u);
     EXPECT_EQ(serverClusters[0].clusterId, MockClusterId(1));
     EXPECT_EQ(serverClusters[1].clusterId, MockClusterId(2));
     EXPECT_EQ(serverClusters[2].clusterId, MockClusterId(3));
@@ -965,20 +1029,26 @@ TEST_F(TestCodegenModelViaMocks, IterateOverClientClusters)
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
-    EXPECT_TRUE(model.ClientClusters(kEndpointIdThatIsMissing).Empty());
-    EXPECT_TRUE(model.ClientClusters(kInvalidEndpointId).Empty());
+    DataModel::ListBuilder<ClusterId> builder;
+
+    EXPECT_EQ(model.ClientClusters(kEndpointIdThatIsMissing, builder), CHIP_ERROR_NOT_FOUND);
+    EXPECT_TRUE(builder.IsEmpty());
+    EXPECT_EQ(model.ClientClusters(kInvalidEndpointId, builder), CHIP_ERROR_NOT_FOUND);
+    EXPECT_TRUE(builder.IsEmpty());
 
     // mock endpoint 1 has 2 mock client clusters: 3 and 4
-    auto clientClusters = model.ClientClusters(kMockEndpoint1);
+    EXPECT_EQ(model.ClientClusters(kMockEndpoint1, builder), CHIP_NO_ERROR);
+    auto clientClusters = builder.TakeBuffer();
 
     const ClusterId kExpectedClusters1[] = { MockClusterId(3), MockClusterId(4) };
-    ASSERT_TRUE(clientClusters.GetSpanValidForLifetime().data_equal(Span<const ClusterId>(kExpectedClusters1)));
+    ASSERT_TRUE(clientClusters.data_equal(Span<const ClusterId>(kExpectedClusters1)));
 
     // mock endpoint 2 has 1 mock client clusters: 3(has server side at the same time) and 4
-    clientClusters = model.ClientClusters(kMockEndpoint2);
+    EXPECT_EQ(model.ClientClusters(kMockEndpoint2, builder), CHIP_NO_ERROR);
+    clientClusters = builder.TakeBuffer();
 
     const ClusterId kExpectedClusters2[] = { MockClusterId(3), MockClusterId(4) };
-    ASSERT_TRUE(clientClusters.GetSpanValidForLifetime().data_equal(Span<const ClusterId>(kExpectedClusters2)));
+    ASSERT_TRUE(clientClusters.data_equal(Span<const ClusterId>(kExpectedClusters2)));
 }
 
 TEST_F(TestCodegenModelViaMocks, IterateOverAttributes)
@@ -987,14 +1057,23 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAttributes)
     CodegenDataModelProviderWithContext model;
 
     // invalid paths should return in "no more data"
-    ASSERT_TRUE(model.Attributes(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).Empty());
-    ASSERT_TRUE(model.Attributes(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1))).Empty());
-    ASSERT_TRUE(model.Attributes(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10))).Empty());
-    ASSERT_TRUE(model.Attributes(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).Empty());
+    ASSERT_TRUE(model.AttributesIgnoreError(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).empty());
+    ASSERT_TRUE(model.AttributesIgnoreError(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1))).empty());
+    ASSERT_TRUE(model.AttributesIgnoreError(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10))).empty());
+    ASSERT_TRUE(model.AttributesIgnoreError(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).empty());
 
     // should be able to iterate over valid paths
-    auto attributes = model.Attributes(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
-    ASSERT_EQ(attributes.Size(), 4u);
+    DataModel::ListBuilder<DataModel::AttributeEntry> builder;
+
+    // invalid paths return errors
+    ASSERT_EQ(model.Attributes(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1)), builder), CHIP_ERROR_NOT_FOUND);
+    ASSERT_EQ(model.Attributes(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1)), builder), CHIP_ERROR_NOT_FOUND);
+    ASSERT_EQ(model.Attributes(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10)), builder), CHIP_ERROR_NOT_FOUND);
+    ASSERT_EQ(model.Attributes(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId), builder), CHIP_ERROR_NOT_FOUND);
+
+    EXPECT_EQ(model.Attributes(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)), builder), CHIP_NO_ERROR);
+    auto attributes = builder.TakeBuffer();
+    ASSERT_EQ(attributes.size(), 4u);
 
     ASSERT_EQ(attributes[0].attributeId, ClusterRevision::Id);
     ASSERT_FALSE(attributes[0].flags.Has(AttributeQualityFlags::kListAttribute));
@@ -1070,15 +1149,29 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
-    // invalid paths should return in "no more data"
-    ASSERT_TRUE(model.AcceptedCommands(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).Empty());
-    ASSERT_TRUE(model.AcceptedCommands(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1))).Empty());
-    ASSERT_TRUE(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10))).Empty());
-    ASSERT_TRUE(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).Empty());
+    DataModel::ListBuilder<DataModel::AcceptedCommandEntry> builder;
 
-    MetadataList<DataModel::AcceptedCommandEntry> cmds =
-        model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
-    ASSERT_EQ(cmds.Size(), 3u);
+    // invalid paths should return in "no more data"
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1)), builder),
+              CHIP_ERROR_NOT_FOUND);
+    ASSERT_TRUE(builder.IsEmpty());
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1)), builder), CHIP_ERROR_NOT_FOUND);
+    ASSERT_TRUE(builder.IsEmpty());
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10)), builder), CHIP_ERROR_NOT_FOUND);
+    ASSERT_TRUE(builder.IsEmpty());
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId), builder), CHIP_ERROR_NOT_FOUND);
+    ASSERT_TRUE(builder.IsEmpty());
+
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)), builder), CHIP_NO_ERROR);
+    ASSERT_EQ(builder.Size(), 3u);
+
+    auto cmds = builder.TakeBuffer();
+
+    // took ownership
+    ASSERT_EQ(builder.Size(), 0u);
+    ASSERT_TRUE(builder.IsEmpty());
+
+    ASSERT_EQ(cmds.size(), 3u);
     ASSERT_EQ(cmds[0].commandId, 1u);
     ASSERT_EQ(cmds[1].commandId, 2u);
     ASSERT_EQ(cmds[2].commandId, 23u);
@@ -1089,20 +1182,61 @@ TEST_F(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
+    DataModel::ListBuilder<CommandId> builder;
+
     // invalid paths should return in "no more data"
-    ASSERT_TRUE(model.GeneratedCommands(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).Empty());
-    ASSERT_TRUE(model.GeneratedCommands(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1))).Empty());
-    ASSERT_TRUE(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10))).Empty());
-    ASSERT_TRUE(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).Empty());
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1)), builder),
+              CHIP_ERROR_NOT_FOUND);
+    ASSERT_TRUE(builder.IsEmpty());
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1)), builder), CHIP_ERROR_NOT_FOUND);
+    ASSERT_TRUE(builder.IsEmpty());
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10)), builder), CHIP_ERROR_NOT_FOUND);
+    ASSERT_TRUE(builder.IsEmpty());
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId), builder), CHIP_ERROR_NOT_FOUND);
+    ASSERT_TRUE(builder.IsEmpty());
 
     // should be able to iterate over valid paths
-    MetadataList<CommandId> cmds        = model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
-    const CommandId expectedCommands2[] = { 2, 10 };
-    ASSERT_TRUE(cmds.GetSpanValidForLifetime().data_equal(Span<const CommandId>(expectedCommands2)));
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)), builder), CHIP_NO_ERROR);
+    auto cmds = builder.TakeBuffer();
 
-    cmds                                = model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(3)));
+    const CommandId expectedCommands2[] = { 2, 10 };
+    ASSERT_TRUE(cmds.data_equal(Span<const CommandId>(expectedCommands2)));
+
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint2, MockClusterId(3)), builder), CHIP_NO_ERROR);
+    cmds                                = builder.TakeBuffer();
     const CommandId expectedCommands3[] = { 4, 6 };
-    ASSERT_TRUE(cmds.GetSpanValidForLifetime().data_equal(Span<const CommandId>(expectedCommands3)));
+    ASSERT_TRUE(cmds.data_equal(Span<const CommandId>(expectedCommands3)));
+}
+
+TEST_F(TestCodegenModelViaMocks, AcceptedGeneratedCommandsOnInvalidEndpoints)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    // register a CHI on ALL endpoints
+    CustomListCommandHandler handler(chip::NullOptional, MockClusterId(1));
+    handler.SetHandleCommands(true);
+
+    DataModel::ListBuilder<CommandId> generatedBuilder;
+    DataModel::ListBuilder<DataModel::AcceptedCommandEntry> acceptedBuilder;
+
+    // valid endpoint will result in valid data (even though list is empty)
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), generatedBuilder), CHIP_NO_ERROR);
+    ASSERT_TRUE(generatedBuilder.IsEmpty());
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), acceptedBuilder), CHIP_NO_ERROR);
+    ASSERT_TRUE(acceptedBuilder.IsEmpty());
+
+    // Invalid endpoint fails - we will get no commands there (even though CHI is registered)
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1)), generatedBuilder),
+              CHIP_ERROR_NOT_FOUND);
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1)), acceptedBuilder),
+              CHIP_ERROR_NOT_FOUND);
+
+    // same for invalid cluster ID
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(0x1123)), generatedBuilder),
+              CHIP_ERROR_NOT_FOUND);
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(0x1123)), acceptedBuilder),
+              CHIP_ERROR_NOT_FOUND);
 }
 
 TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
@@ -1115,16 +1249,23 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
     // Validate that these work
     CustomListCommandHandler handler(MakeOptional(kMockEndpoint1), MockClusterId(1));
 
+    DataModel::ListBuilder<CommandId> generatedBuilder;
+    DataModel::ListBuilder<DataModel::AcceptedCommandEntry> acceptedBuilder;
+
     // At this point, without overrides, there should be no accepted/generated commands
-    ASSERT_TRUE(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).Empty());
-    ASSERT_TRUE(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).Empty());
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), generatedBuilder), CHIP_NO_ERROR);
+    ASSERT_TRUE(generatedBuilder.IsEmpty());
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), acceptedBuilder), CHIP_NO_ERROR);
+    ASSERT_TRUE(acceptedBuilder.IsEmpty());
 
     handler.SetOverrideAccepted(true);
     handler.SetOverrideGenerated(true);
 
     // with overrides, the list is still empty ...
-    ASSERT_TRUE(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).Empty());
-    ASSERT_TRUE(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).Empty());
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), generatedBuilder), CHIP_NO_ERROR);
+    ASSERT_TRUE(generatedBuilder.IsEmpty());
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), acceptedBuilder), CHIP_NO_ERROR);
+    ASSERT_TRUE(acceptedBuilder.IsEmpty());
 
     // set some overrides
     handler.AcceptedVec().push_back(1234);
@@ -1132,16 +1273,17 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
 
     handler.GeneratedVec().push_back(33);
 
-    MetadataList<DataModel::AcceptedCommandEntry> acceptedCommands =
-        model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), acceptedBuilder), CHIP_NO_ERROR);
+    auto acceptedCommands = acceptedBuilder.TakeBuffer();
 
-    ASSERT_EQ(acceptedCommands.Size(), 2u);
+    ASSERT_EQ(acceptedCommands.size(), 2u);
     ASSERT_EQ(acceptedCommands[0].commandId, 1234u);
     ASSERT_EQ(acceptedCommands[1].commandId, 999u);
 
-    MetadataList<CommandId> generatedCommands   = model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), generatedBuilder), CHIP_NO_ERROR);
+    auto generatedCommands                      = generatedBuilder.TakeBuffer();
     const CommandId expectedGeneratedCommands[] = { 33 };
-    ASSERT_TRUE(generatedCommands.GetSpanValidForLifetime().data_equal(Span<const CommandId>(expectedGeneratedCommands)));
+    ASSERT_TRUE(generatedCommands.data_equal(Span<const CommandId>(expectedGeneratedCommands)));
 }
 
 TEST_F(TestCodegenModelViaMocks, ReadForInvalidGlobalAttributePath)
@@ -1763,62 +1905,6 @@ TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceListIncrementalRead)
     }
 }
 
-TEST_F(TestCodegenModelViaMocks, ReadGlobalAttributeAttributeList)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    ReadOperation testRequest(kMockEndpoint2, MockClusterId(3), AttributeList::Id);
-    testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-    // Data read via the encoder
-    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
-    ASSERT_EQ(model.ReadAttribute(testRequest.GetRequest(), *encoder), CHIP_NO_ERROR);
-    ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
-
-    // Validate after read
-    std::vector<DecodedAttributeData> attribute_data;
-    ASSERT_EQ(testRequest.GetEncodedIBs().Decode(attribute_data), CHIP_NO_ERROR);
-    ASSERT_EQ(attribute_data.size(), 1u);
-
-    DecodedAttributeData & encodedData = attribute_data[0];
-    ASSERT_EQ(encodedData.attributePath, testRequest.GetRequest().path);
-
-    ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_Array);
-
-    std::vector<AttributeId> items;
-    ASSERT_EQ(DecodeList(encodedData.dataReader, items), CHIP_NO_ERROR);
-
-    // Mock data contains ClusterRevision and FeatureMap.
-    // After this, Global attributes are auto-added
-    std::vector<AttributeId> expected;
-
-    // Encoding in global-attribute-access-interface has a logic of:
-    //   - Append global attributes in front of the first specified
-    //     large number global attribute.
-    // Since ClusterRevision and FeatureMap are
-    // global attributes, the order here is reversed for them
-    for (AttributeId id : GlobalAttributesNotInMetadata)
-    {
-        expected.push_back(id);
-    }
-    expected.push_back(ClusterRevision::Id);
-    expected.push_back(FeatureMap::Id);
-    expected.push_back(MockAttributeId(1));
-    expected.push_back(MockAttributeId(2));
-    expected.push_back(MockAttributeId(3));
-
-    ASSERT_EQ(items.size(), expected.size());
-
-    // Since we have no std::vector formatter, comparing element by element is somewhat
-    // more readable in case of failure.
-    for (unsigned i = 0; i < items.size(); i++)
-    {
-        EXPECT_EQ(items[i], expected[i]);
-    }
-}
-
 TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteAclDeny)
 {
     UseMockNodeConfig config(gTestNodeConfig);
@@ -2390,8 +2476,10 @@ TEST_F(TestCodegenModelViaMocks, DeviceTypeIteration)
     CodegenDataModelProviderWithContext model;
 
     // Mock endpoint 1 has 3 device types
-    auto deviceTypes = model.DeviceTypes(kMockEndpoint1);
-    ASSERT_EQ(deviceTypes.Size(), 3u);
+    DataModel::ListBuilder<DataModel::DeviceTypeEntry> builder;
+    ASSERT_EQ(model.DeviceTypes(kMockEndpoint1, builder), CHIP_NO_ERROR);
+    auto deviceTypes = builder.TakeBuffer();
+    ASSERT_EQ(deviceTypes.size(), 3u);
 
     const DeviceTypeEntry expected1[] = {
         { .deviceTypeId = kDeviceTypeId1, .deviceTypeRevision = kDeviceTypeId1Version },
@@ -2404,13 +2492,18 @@ TEST_F(TestCodegenModelViaMocks, DeviceTypeIteration)
     }
 
     // Mock endpoint 2 has 1 device types
-    deviceTypes = model.DeviceTypes(kMockEndpoint2);
-    ASSERT_EQ(deviceTypes.Size(), 1u);
+    ASSERT_TRUE(builder.IsEmpty()); // ownership taken above, we start fresh
+    ASSERT_EQ(model.DeviceTypes(kMockEndpoint2, builder), CHIP_NO_ERROR);
+    deviceTypes = builder.TakeBuffer();
+    ASSERT_EQ(deviceTypes.size(), 1u);
     const DeviceTypeEntry expected2 = { .deviceTypeId = kDeviceTypeId2, .deviceTypeRevision = kDeviceTypeId2Version };
     ASSERT_EQ(deviceTypes[0], expected2);
 
     // empty endpoint works
-    ASSERT_TRUE(model.DeviceTypes(kMockEndpoint3).Empty());
+    ASSERT_TRUE(builder.IsEmpty()); // ownership taken above, we start fresh
+    ASSERT_EQ(model.DeviceTypes(kMockEndpoint3, builder), CHIP_NO_ERROR);
+    ASSERT_TRUE(builder.IsEmpty());
+    ASSERT_TRUE(builder.TakeBuffer().empty());
 }
 
 TEST_F(TestCodegenModelViaMocks, SemanticTagIteration)
@@ -2418,11 +2511,18 @@ TEST_F(TestCodegenModelViaMocks, SemanticTagIteration)
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
-    ASSERT_TRUE(model.SemanticTags(kMockEndpoint2).Empty());
+    DataModel::ListBuilder<Provider::SemanticTag> builder;
+    ASSERT_EQ(model.SemanticTags(kMockEndpoint2, builder), CHIP_NO_ERROR);
+    ASSERT_TRUE(builder.IsEmpty());
+    auto tags = builder.TakeBuffer();
+    ASSERT_TRUE(tags.empty());
 
     // Mock endpoint 1 has 3 semantic tags
-    MetadataList<DataModel::Provider::SemanticTag> tags = model.SemanticTags(kMockEndpoint1);
-    ASSERT_EQ(tags.Size(), 3u);
+    ASSERT_EQ(model.SemanticTags(kMockEndpoint1, builder), CHIP_NO_ERROR);
+    ASSERT_EQ(builder.Size(), 3u);
+    tags = builder.TakeBuffer();
+    ASSERT_EQ(tags.size(), 3u);
+    ASSERT_TRUE(builder.IsEmpty()); // ownership taken
 
     auto tag = tags[0];
     EXPECT_EQ(tag.mfgCode, MakeNullable(VendorId::TestVendor1));

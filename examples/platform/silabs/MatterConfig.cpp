@@ -28,9 +28,9 @@
 #include <platform/silabs/wifi/WifiInterface.h>
 
 // TODO: We shouldn't need any platform specific includes in this file
-#ifdef WF200_WIFI
-#include <platform/silabs/wifi/wf200/ncp/sl_wfx_task.h>
-#endif // WF200_WIFI
+#if (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
+#include <platform/silabs/SiWx917/SiWxPlatformInterface.h>
+#endif // (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
 #endif // SL_WIFI
 
 #if PW_RPC_ENABLED
@@ -45,12 +45,6 @@
 #include "MemMonitoring.h"
 #endif
 
-// TODO: We shouldn't need any platform specific includes in this file
-#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1
-#include <platform/silabs/SiWx917/SiWxPlatformInterface.h>
-#include <platform/silabs/wifi/wiseconnect-interface/WiseconnectWifiInterface.h>
-#endif // SLI_SI91X_MCU_INTERFACE
-
 #include <crypto/CHIPCryptoPAL.h>
 // If building with the EFR32-provided crypto backend, we can use the
 // opaque keystore
@@ -59,10 +53,10 @@
 static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeystore;
 #endif
 
-#include <ProvisionManager.h>
 #include <app/InteractionModelEngine.h>
 #include <app/TimerDelegates.h>
 #include <data-model-providers/codegen/Instance.h>
+#include <headers/ProvisionManager.h>
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 #include "SilabsTestEventTriggerDelegate.h" // nogncheck
@@ -314,18 +308,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #ifdef SL_WIFI
 CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 {
-    // TODO: Platform specific init should not be required here
-#ifdef WF200_WIFI
-    // Start wfx bus communication task.
-    wfx_bus_start();
-#endif // WF200_WIFI
-
-    // TODO: Platform specific init should not be required here
-#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1
-    VerifyOrReturnError(InitSiWxWifi() == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
-#endif // SLI_SI91X_MCU_INTERFACE
-
-    return CHIP_NO_ERROR;
+    return InitWiFiStack();
 }
 #endif // SL_WIFI
 

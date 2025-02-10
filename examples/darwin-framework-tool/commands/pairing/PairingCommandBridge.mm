@@ -22,6 +22,8 @@
 #include "../common/CertificateIssuer.h"
 #include "DeviceControllerDelegateBridge.h"
 #include "PairingCommandBridge.h"
+#include <commands/dcl/DCLClient.h>
+#include <commands/dcl/DisplayTermsAndConditions.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #import "MTRError_Utils.h"
@@ -47,7 +49,7 @@ extern NSMutableArray * gDiscoveredDevices;
 
 @end
 
-void PairingCommandBridge::SetUpDeviceControllerDelegate()
+void PairingCommandBridge::SetUpDeviceControllerDelegate(NSError * __autoreleasing * error)
 {
     CHIPToolDeviceControllerDelegate * deviceControllerDelegate = [[CHIPToolDeviceControllerDelegate alloc] init];
     [deviceControllerDelegate setCommandBridge:this];
@@ -85,6 +87,8 @@ void PairingCommandBridge::SetUpDeviceControllerDelegate()
             params.countryCode = [NSString stringWithUTF8String:mCountryCode.Value()];
         }
 
+        MaybeDisplayTermsAndConditions(params, error);
+        VerifyOrReturn(*error == nil);
         [deviceControllerDelegate setParams:params];
     }
 
@@ -92,6 +96,39 @@ void PairingCommandBridge::SetUpDeviceControllerDelegate()
     [deviceControllerDelegate setCommissioner:commissioner];
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
     [commissioner setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];
+}
+
+void PairingCommandBridge::MaybeDisplayTermsAndConditions(MTRCommissioningParameters * params, NSError * __autoreleasing * error)
+{
+    VerifyOrReturn(mUseDCL.ValueOr(false));
+
+    Json::Value tc;
+    auto client = tool::dcl::DCLClient(mDCLHostName, mDCLPort);
+    CHIP_ERROR err = client.TermsAndConditions(mOnboardingPayload, tc);
+
+    if (CHIP_NO_ERROR != err) {
+        auto errorString = [NSString stringWithFormat:@"Error retrieving terms and conditions."];
+        *error = [[NSError alloc] initWithDomain:@"PairingDomain"
+                                            code:MTRErrorCodeGeneralError
+                                        userInfo:@ { NSLocalizedDescriptionKey : NSLocalizedString(errorString, nil) }];
+        return;
+    }
+
+    if (tc != Json::nullValue) {
+        uint16_t version = 0;
+        uint16_t userResponse = 0;
+        err = tool::dcl::DisplayTermsAndConditions(tc, version, userResponse, mCountryCode);
+        if (CHIP_NO_ERROR != err) {
+            auto errorString = [NSString stringWithFormat:@"Error displaying terms and conditions."];
+            *error = [[NSError alloc] initWithDomain:@"PairingDomain"
+                                                code:MTRErrorCodeGeneralError
+                                            userInfo:@ { NSLocalizedDescriptionKey : NSLocalizedString(errorString, nil) }];
+            return;
+        }
+
+        params.acceptedTermsAndConditions = @(userResponse);
+        params.acceptedTermsAndConditionsVersion = @(version);
+    }
 }
 
 CHIP_ERROR PairingCommandBridge::RunCommand()
@@ -120,7 +157,9 @@ CHIP_ERROR PairingCommandBridge::RunCommand()
 
 void PairingCommandBridge::PairWithCode(NSError * __autoreleasing * error)
 {
-    SetUpDeviceControllerDelegate();
+    SetUpDeviceControllerDelegate(error);
+    VerifyOrReturn(*error == nil);
+
     auto * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:@(mSetupPINCode) discriminator:@(mDiscriminator)];
     MTRDeviceController * commissioner = CurrentCommissioner();
     [commissioner setupCommissioningSessionWithPayload:payload newNodeID:@(mNodeId) error:error];
@@ -128,9 +167,10 @@ void PairingCommandBridge::PairWithCode(NSError * __autoreleasing * error)
 
 void PairingCommandBridge::PairWithIndex(NSError * __autoreleasing * error)
 {
-    SetUpDeviceControllerDelegate();
-    MTRDeviceController * commissioner = CurrentCommissioner();
+    SetUpDeviceControllerDelegate(error);
+    VerifyOrReturn(*error == nil);
 
+    MTRDeviceController * commissioner = CurrentCommissioner();
     if (mIndex >= [gDiscoveredDevices count]) {
         auto errorString = [NSString stringWithFormat:@"Error retrieving discovered device at index %@", @(mIndex)];
         *error = [[NSError alloc] initWithDomain:@"PairingDomain"
@@ -152,7 +192,9 @@ void PairingCommandBridge::PairWithIndex(NSError * __autoreleasing * error)
 void PairingCommandBridge::PairWithPayload(NSError * __autoreleasing * error)
 {
     NSString * onboardingPayload = [NSString stringWithUTF8String:mOnboardingPayload];
-    SetUpDeviceControllerDelegate();
+    SetUpDeviceControllerDelegate(error);
+    VerifyOrReturn(*error == nil);
+
     auto * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:onboardingPayload error:error];
     if (payload == nil) {
         return;

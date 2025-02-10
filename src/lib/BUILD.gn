@@ -30,6 +30,7 @@ source_set("without-logging") {
     "${chip_root}/src/platform",
     "${chip_root}/src/protocols",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/src/setup_payload:onboarding-codes-utils",
     "${chip_root}/src/system",
     "${chip_root}/src/transport",
   ]

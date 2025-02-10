@@ -27,8 +27,11 @@
 #include "sl_si91x_host_interface.h"
 #include "sl_si91x_ncp_utility.h"
 #include "sl_si91x_status.h"
+#include "sl_spidrv_exp_config.h"
+#include "sl_spidrv_instances.h"
 #include "sl_status.h"
 #include "sl_wifi_constants.h"
+#include "spidrv.h"
 #include <platform/silabs/wifi/SiWx/ncp/sl_board_configuration.h>
 #include <platform/silabs/wifi/ncp/spi_multiplex.h>
 #include <stdbool.h>
@@ -42,34 +45,21 @@
 #include "sl_board_control.h"
 #endif // SL_BOARD_NAME
 
-static bool dma_callback(unsigned int channel, unsigned int sequenceNo, void * userParam);
+#define LDMA_MAX_TRANSFER_LENGTH 4096
+#define LDMA_DESCRIPTOR_ARRAY_LENGTH (LDMA_MAX_TRANSFER_LENGTH / 2048)
+#define SPI_HANDLE sl_spidrv_exp_handle
+#define MAX_DATA_PACKET_SIZE 1800
+
+// use SPI handle for EXP header (configured in project settings)
+extern SPIDRV_Handle_t sl_spidrv_exp_handle;
+static uint8_t dummy_buffer[MAX_DATA_PACKET_SIZE]   = { 0 };
+static sl_si91x_host_init_configuration init_config = { 0 };
 
 uint32_t rx_ldma_channel;
 uint32_t tx_ldma_channel;
 osMutexId_t ncp_transfer_mutex = 0;
 
-static uint32_t dummy_buffer;
-static sl_si91x_host_init_configuration init_config = { 0 };
-
-// LDMA descriptor and transfer configuration structures for USART TX channel
-LDMA_Descriptor_t ldmaTXDescriptor;
-LDMA_TransferCfg_t ldmaTXConfig;
-
-// LDMA descriptor and transfer configuration structures for USART RX channel
-LDMA_Descriptor_t ldmaRXDescriptor;
-LDMA_TransferCfg_t ldmaRXConfig;
-
 static osSemaphoreId_t transfer_done_semaphore = NULL;
-
-static bool dma_callback([[maybe_unused]] unsigned int channel, [[maybe_unused]] unsigned int sequenceNo,
-                         [[maybe_unused]] void * userParam)
-{
-#if defined(SL_CATLOG_POWER_MANAGER_PRESENT)
-    sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
-#endif
-    osSemaphoreRelease(transfer_done_semaphore);
-    return false;
-}
 
 static void gpio_interrupt([[maybe_unused]] uint8_t interrupt_number)
 {
@@ -79,60 +69,73 @@ static void gpio_interrupt([[maybe_unused]] uint8_t interrupt_number)
     }
 }
 
+static void spi_dma_callback(struct SPIDRV_HandleData * handle, Ecode_t transferStatus, int itemsTransferred)
+{
+    UNUSED_PARAMETER(handle);
+    UNUSED_PARAMETER(transferStatus);
+    UNUSED_PARAMETER(itemsTransferred);
+#if defined(SL_CATLOG_POWER_MANAGER_PRESENT)
+    sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
+#endif
+    osSemaphoreRelease(transfer_done_semaphore);
+    return;
+}
+
 static void efx32_spi_init(void)
 {
-    // Default asynchronous initializer (master mode, 1 Mbps, 8-bit data)
-    USART_InitSync_TypeDef init = USART_INITSYNC_DEFAULT;
-
-    init.msbf         = true; // MSB first transmission for SPI compatibility
-    init.autoCsEnable = false;
-    init.baudrate     = USART_INITSYNC_BAUDRATE;
+    SPIDRV_SetBitrate(SPI_HANDLE, USART_INITSYNC_BAUDRATE);
 
     // Configure SPI bus pins
     GPIO_PinModeSet(SPI_MISO_PIN.port, SPI_MISO_PIN.pin, gpioModeInput, 0);
     GPIO_PinModeSet(SPI_MOSI_PIN.port, SPI_MOSI_PIN.pin, gpioModePushPull, 0);
     GPIO_PinModeSet(SPI_CLOCK_PIN.port, SPI_CLOCK_PIN.pin, gpioModePushPullAlternate, 0);
     GPIO_PinModeSet(SPI_CS_PIN.port, SPI_CS_PIN.pin, gpioModePushPull, 1);
-    // Enable clock (not needed on xG21)
-    CMU_ClockEnable(SPI_USART_CMU_CLOCK, true);
-
-    /*
-     * Route USART RX, TX, and CLK to the specified pins.  Note that CS is
-     * not controlled by USART so there is no write to the corresponding
-     * USARTROUTE register to do this.
-     */
-    GPIO->USARTROUTE[SPI_USART_ROUTE_INDEX].RXROUTE =
-        (SPI_MISO_PIN.port << _GPIO_USART_RXROUTE_PORT_SHIFT) | (SPI_MISO_PIN.pin << _GPIO_USART_RXROUTE_PIN_SHIFT);
-    GPIO->USARTROUTE[SPI_USART_ROUTE_INDEX].TXROUTE =
-        (SPI_MOSI_PIN.port << _GPIO_USART_TXROUTE_PORT_SHIFT) | (SPI_MOSI_PIN.pin << _GPIO_USART_TXROUTE_PIN_SHIFT);
-    GPIO->USARTROUTE[SPI_USART_ROUTE_INDEX].CLKROUTE =
-        (SPI_CLOCK_PIN.port << _GPIO_USART_CLKROUTE_PORT_SHIFT) | (SPI_CLOCK_PIN.pin << _GPIO_USART_CLKROUTE_PIN_SHIFT);
-    GPIO->USARTROUTE[SPI_USART_ROUTE_INDEX].CSROUTE =
-        (SPI_CS_PIN.port << _GPIO_USART_CSROUTE_PORT_SHIFT) | (SPI_CS_PIN.pin << _GPIO_USART_CSROUTE_PIN_SHIFT);
-
-    // Enable USART interface pins
-    GPIO->USARTROUTE[SPI_USART_ROUTE_INDEX].ROUTEEN = GPIO_USART_ROUTEEN_RXPEN | // MISO
-        GPIO_USART_ROUTEEN_TXPEN |                                               // MOSI
-#if !SL_SPICTRL_MUX
-        GPIO_USART_ROUTEEN_CSPEN |
-#endif
-        GPIO_USART_ROUTEEN_CLKPEN;
-
-    // Set slew rate for alternate usage pins
-    GPIO_SlewrateSet(SPI_CLOCK_PIN.port, 7, 7);
-
-    // Configure and enable USART
-    USART_InitSync(SPI_USART, &init);
-
-    SPI_USART->TIMING |= USART_TIMING_TXDELAY_ONE | USART_TIMING_CSSETUP_ONE | USART_TIMING_CSHOLD_ONE;
-
-    // SPI_USART->CTRL_SET |= USART_CTRL_SMSDELAY;
 
     // configure packet pending interrupt priority
     NVIC_SetPriority(GPIO_ODD_IRQn, PACKET_PENDING_INT_PRI);
     GPIOINT_CallbackRegister(INTERRUPT_PIN.pin, gpio_interrupt);
     GPIO_PinModeSet(INTERRUPT_PIN.port, INTERRUPT_PIN.pin, gpioModeInputPullFilter, 0);
     GPIO_ExtIntConfig(INTERRUPT_PIN.port, INTERRUPT_PIN.pin, INTERRUPT_PIN.pin, true, false, true);
+}
+
+Ecode_t si91x_SPIDRV_MTransfer(SPIDRV_Handle_t handle, const void * txBuffer, void * rxBuffer, int count,
+                               SPIDRV_Callback_t callback)
+{
+    USART_TypeDef * usart = handle->initData.port;
+    uint8_t * tx          = (txBuffer != NULL) ? (uint8_t *) txBuffer : dummy_buffer;
+    uint8_t * rx          = (rxBuffer != NULL) ? (uint8_t *) rxBuffer : dummy_buffer;
+
+    // For transfers less than 16 bytes, directly interacting with USART buffers is faster than using DMA
+    if (count < 16)
+    {
+        while (count > 0)
+        {
+            while (!(usart->STATUS & USART_STATUS_TXBL))
+            {
+            }
+            usart->TXDATA = (uint32_t) *tx;
+            while (!(usart->STATUS & USART_STATUS_TXC))
+            {
+            }
+            *rx = (uint8_t) usart->RXDATA;
+            if (txBuffer != NULL)
+            {
+                tx++;
+            }
+            if (rxBuffer != NULL)
+            {
+                rx++;
+            }
+            count--;
+        }
+        // callback(handle, ECODE_EMDRV_SPIDRV_OK, 0);
+        return ECODE_EMDRV_SPIDRV_OK;
+    }
+    else
+    {
+        SPIDRV_MTransfer(handle, tx, rx, count, callback);
+    }
+    return ECODE_EMDRV_SPIDRV_BUSY;
 }
 
 void sl_si91x_host_set_sleep_indicator(void)
@@ -160,15 +163,16 @@ sl_status_t sl_si91x_host_init(const sl_si91x_host_init_configuration * config)
         return status;
     }
 #endif // SL_SPICTRL_MUX
-    init_config.rx_irq  = config->rx_irq;
-    init_config.rx_done = config->rx_done;
+    init_config.rx_irq      = config->rx_irq;
+    init_config.rx_done     = config->rx_done;
+    init_config.boot_option = config->boot_option;
 
     // Enable clock (not needed on xG21)
     CMU_ClockEnable(cmuClock_GPIO, true);
 
 #if SL_SPICTRL_MUX
     spi_board_init();
-#endif
+#endif // SL_SPICTRL_MUX
 
     if (transfer_done_semaphore == NULL)
     {
@@ -188,10 +192,6 @@ sl_status_t sl_si91x_host_init(const sl_si91x_host_init_configuration * config)
     // Configure interrupt, sleep and wake confirmation pins
     GPIO_PinModeSet(SLEEP_CONFIRM_PIN.port, SLEEP_CONFIRM_PIN.pin, gpioModeWiredOrPullDown, 1);
     GPIO_PinModeSet(WAKE_INDICATOR_PIN.port, WAKE_INDICATOR_PIN.pin, gpioModeWiredOrPullDown, 0);
-
-    DMADRV_Init();
-    DMADRV_AllocateChannel((unsigned int *) &rx_ldma_channel, NULL);
-    DMADRV_AllocateChannel((unsigned int *) &tx_ldma_channel, NULL);
 
     return SL_STATUS_OK;
 }
@@ -223,68 +223,8 @@ sl_status_t sl_si91x_host_spi_transfer(const void * tx_buffer, void * rx_buffer,
     sl_wfx_host_spi_cs_assert();
 #endif // SL_SPICTRL_MUX
 
-    if (buffer_length < 16)
+    if (ECODE_EMDRV_SPIDRV_BUSY == si91x_SPIDRV_MTransfer(SPI_HANDLE, tx_buffer, rx_buffer, buffer_length, spi_dma_callback))
     {
-        uint8_t * tx = (tx_buffer != NULL) ? (uint8_t *) tx_buffer : (uint8_t *) &dummy_buffer;
-        uint8_t * rx = (rx_buffer != NULL) ? (uint8_t *) rx_buffer : (uint8_t *) &dummy_buffer;
-        while (buffer_length > 0)
-        {
-            while (!(SPI_USART->STATUS & USART_STATUS_TXBL))
-            {
-            }
-            SPI_USART->TXDATA = (uint32_t) *tx;
-            while (!(SPI_USART->STATUS & USART_STATUS_TXC))
-            {
-            }
-            *rx = (uint8_t) SPI_USART->RXDATA;
-            if (tx_buffer != NULL)
-            {
-                tx++;
-            }
-            if (rx_buffer != NULL)
-            {
-                rx++;
-            }
-            buffer_length--;
-        }
-    }
-    else
-    {
-        if (tx_buffer == NULL)
-        {
-            dummy_buffer = 0;
-            ldmaTXDescriptor =
-                (LDMA_Descriptor_t) LDMA_DESCRIPTOR_SINGLE_P2P_BYTE(&dummy_buffer, &(SPI_USART->TXDATA), buffer_length);
-        }
-        else
-        {
-            ldmaTXDescriptor = (LDMA_Descriptor_t) LDMA_DESCRIPTOR_SINGLE_M2P_BYTE(tx_buffer, &(SPI_USART->TXDATA), buffer_length);
-        }
-
-        if (rx_buffer == NULL)
-        {
-            ldmaRXDescriptor =
-                (LDMA_Descriptor_t) LDMA_DESCRIPTOR_SINGLE_P2P_BYTE(&(SPI_USART->RXDATA), &dummy_buffer, buffer_length);
-        }
-        else
-        {
-            ldmaRXDescriptor = (LDMA_Descriptor_t) LDMA_DESCRIPTOR_SINGLE_P2M_BYTE(&(SPI_USART->RXDATA), rx_buffer, buffer_length);
-        }
-
-        // Transfer a byte on free space in the USART buffer
-        ldmaTXConfig = (LDMA_TransferCfg_t) LDMA_TRANSFER_CFG_PERIPHERAL(SPI_USART_LDMA_TX);
-
-        // Transfer a byte on receive data valid
-        ldmaRXConfig = (LDMA_TransferCfg_t) LDMA_TRANSFER_CFG_PERIPHERAL(SPI_USART_LDMA_RX);
-
-#if defined(SL_CATLOG_POWER_MANAGER_PRESENT)
-        sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
-#endif
-
-        // Start both channels
-        DMADRV_LdmaStartTransfer(rx_ldma_channel, &ldmaRXConfig, &ldmaRXDescriptor, dma_callback, NULL);
-        DMADRV_LdmaStartTransfer(tx_ldma_channel, &ldmaTXConfig, &ldmaTXDescriptor, NULL, NULL);
-
         if (osSemaphoreAcquire(transfer_done_semaphore, 1000) != osOK)
         {
             BREAKPOINT();
@@ -300,7 +240,6 @@ sl_status_t sl_si91x_host_spi_transfer(const void * tx_buffer, void * rx_buffer,
 
 void sl_si91x_host_hold_in_reset(void)
 {
-    GPIO_PinModeSet(RESET_PIN.port, RESET_PIN.pin, gpioModePushPull, 1);
     GPIO_PinOutClear(RESET_PIN.port, RESET_PIN.pin);
 }
 
