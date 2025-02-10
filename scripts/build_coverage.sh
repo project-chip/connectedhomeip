@@ -161,11 +161,20 @@ if [ "$skip_gn" == false ]; then
 
         scripts/run_in_build_env.sh \
             "./scripts/tests/run_test_suite.py \
+             --runner chip_tool_python \
+             --exclude-tags MANUAL \
+             --exclude-tags FLAKY \
+             --exclude-tags IN_DEVELOPMENT \
+             --exclude-tags EXTRA_SLOW \
+             --exclude-tags SLOW \
+             --exclude-tags PURPOSEFUL_FAILURE \
              --chip-tool \"$OUTPUT_ROOT/chip-tool\" \
+             --target TestUserLabelCluster \
              run \
              --iterations 1 \
              --test-timeout-seconds 120 \
-             --all-clusters-app \"$OUTPUT_ROOT/chip-all-clusters-app\""
+             --all-clusters-app \"$OUTPUT_ROOT/chip-all-clusters-app\" \
+            "
     fi
 
     #
