@@ -162,7 +162,7 @@ class MOD_1_2(MatterBaseTest):
             user_response = self.wait_for_user_input(prompt_msg=f"Is the value \"{description}\" for attribute Description a readable and understandable string? Enter 'y' or 'n'",
                                                      prompt_msg_placeholder="y",
                                                      default_value="y")
-            asserts.assert_true(user_response.lower() == 'y', f"The description is not understandable to the user.")
+            asserts.assert_true(user_response.lower() == 'y', "The description is not understandable to the user.")
 
         # Verify the StandardNamespace can be 16bits integer or null
         self.step(7)
