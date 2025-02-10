@@ -22,6 +22,7 @@ import logging as log
 import os
 import random
 import secrets
+import shlex
 import subprocess
 import sys
 from datetime import datetime, timedelta
@@ -185,7 +186,7 @@ def gen_test_certs(chip_cert: str,
                        "--pai", pai_cert,
                        "--paa", paa_cert,
                        ]
-                log.info("Verify Certificate Chain: {}".format(" ".join(cmd)))
+                log.info("Verify Certificate Chain: {}".format(shlex.join(cmd)))
                 subprocess.run(cmd)
 
     def gen_dac_certificate(chip_cert, device_name, vendor_id, product_id, pai_cert, pai_key, dac_cert, dac_key, pai_issue_date, pai_expire_date):
@@ -214,7 +215,7 @@ def gen_test_certs(chip_cert: str,
                    "--valid-from", valid_from,
                    "--lifetime", str(lifetime),
                    ]
-            log.info("Generate DAC: {}".format(" ".join(cmd)))
+            log.info("Generate DAC: {}".format(shlex.join(cmd)))
             subprocess.run(cmd)
 
     def convert_pem_to_der(chip_cert, action, pem):
@@ -254,7 +255,7 @@ def gen_test_certs(chip_cert: str,
                     "--dac-origin-product-id", hex(dac_product_id),
                     ]
 
-        log.info("Generate CD: {}".format(" ".join(cmd)))
+        log.info("Generate CD: {}".format(shlex.join(cmd)))
         subprocess.run(cmd)
 
     pai_vendor_id, pai_product_id, pai_issue_date, pai_expire_date = parse_cert_file(pai_cert)

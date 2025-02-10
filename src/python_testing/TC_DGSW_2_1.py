@@ -36,19 +36,11 @@
 #
 
 import chip.clusters as Clusters
+from chip.testing import matter_asserts
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
 
 
 class TC_DGSW_2_1(MatterBaseTest):
-
-    @staticmethod
-    def is_valid_uint64_value(value):
-        return isinstance(value, int) and 0 <= value <= 0xFFFFFFFFFFFFFFFF
-
-    @staticmethod
-    def is_valid_uint32_value(value):
-        return isinstance(value, int) and 0 <= value <= 0xFFFFFFFF
 
     async def read_dgsw_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.SoftwareDiagnostics
@@ -84,40 +76,47 @@ class TC_DGSW_2_1(MatterBaseTest):
 
         # STEP 2: TH reads from the DUT the ThreadMetrics attribute
         self.step(2)
-        if self.pics_guard(Clusters.SoftwareDiagnostics.Attributes.ThreadMetrics.attribute_id in attribute_list):
+        if self.pics_guard(attributes.ThreadMetrics.attribute_id in attribute_list):
             thread_metrics_list = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.ThreadMetrics)
-            # the Id field is mandatory
-            asserts.assert_true(self.is_valid_uint64_value(thread_metrics_list[0].id), "Id field should be a uint64 type")
-            if thread_metrics_list[0].name is not None:
-                asserts.assert_true(thread_metrics_list[0].name, str, "Name field should be a string type")
-            if thread_metrics_list[0].stackFreeCurrent is not None:
-                asserts.assert_true(self.is_valid_uint32_value(
-                    thread_metrics_list[0].stackFreeCurrent), "StackFreeCurrent field should be a uint32 type")
-            if thread_metrics_list[0].stackFreeMinimum is not None:
-                asserts.assert_true(self.is_valid_uint32_value(
-                    thread_metrics_list[0].stackFreeMinimum), "StackFreeMinimum field should be a uint32 type")
-            if thread_metrics_list[0].stackSize is not None:
-                asserts.assert_true(self.is_valid_uint32_value(
-                    thread_metrics_list[0].stackSize), "StackSize field should be a uint32s type")
+
+            # Validate each element in the thread_metrics_list
+            for metric in thread_metrics_list:
+                # The Id field is mandatory
+                matter_asserts.assert_valid_uint64(metric.id, "Id")
+
+                # Validate the optional Name field
+                if metric.name is not None:
+                    matter_asserts.assert_is_string(metric.name, "Name")
+
+                # Validate the optional StackFreeCurrent field
+                if metric.stackFreeCurrent is not None:
+                    matter_asserts.assert_valid_uint32(metric.stackFreeCurrent, "StackFreeCurrent")
+
+                # Validate the optional StackFreeMinimum field
+                if metric.stackFreeMinimum is not None:
+                    matter_asserts.assert_valid_uint32(metric.stackFreeMinimum, "StackFreeMinimum")
+
+                # Validate the optional StackSize field
+                if metric.stackSize is not None:
+                    matter_asserts.assert_valid_uint32(metric.stackSize, "StackSize")
 
         # STEP 3: TH reads from the DUT the CurrentHeapFree attribute
         self.step(3)
-        if self.pics_guard(Clusters.SoftwareDiagnostics.Attributes.CurrentHeapFree.attribute_id in attribute_list):
+        if self.pics_guard(attributes.CurrentHeapFree.attribute_id in attribute_list):
             current_heap_free_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapFree)
-            asserts.assert_true(self.is_valid_uint64_value(current_heap_free_attr), "CurrentHeapFree field should be a uint64 type")
+            matter_asserts.assert_valid_uint64(current_heap_free_attr, "CurrentHeapFree")
 
         # STEP 4: TH reads from the DUT the CurrentHeapUsed attribute
         self.step(4)
-        if self.pics_guard(Clusters.SoftwareDiagnostics.Attributes.CurrentHeapUsed.attribute_id in attribute_list):
+        if self.pics_guard(attributes.CurrentHeapUsed.attribute_id in attribute_list):
             current_heap_used_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
-            asserts.assert_true(self.is_valid_uint64_value(current_heap_used_attr), "CurrentHeapUsed field should be a uint64 type")
+            matter_asserts.assert_valid_uint64(current_heap_used_attr, "CurrentHeapUsed")
 
         # STEP 5: TH reads from the DUT the CurrentHeapHighWatermark attribute
         self.step(5)
-        if self.pics_guard(Clusters.SoftwareDiagnostics.Attributes.CurrentHeapHighWatermark.attribute_id in attribute_list):
+        if self.pics_guard(attributes.CurrentHeapHighWatermark.attribute_id in attribute_list):
             current_heap_high_watermark_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
-            asserts.assert_true(self.is_valid_uint64_value(current_heap_high_watermark_attr),
-                                "CurrentHeapHighWatermark field should be a uint64 type")
+            matter_asserts.assert_valid_uint64(current_heap_high_watermark_attr, "CurrentHeapHighWatermark")
 
 
 if __name__ == "__main__":
