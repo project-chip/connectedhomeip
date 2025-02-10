@@ -282,8 +282,8 @@ class HostApp(Enum):
             yield 'water-leak-detector-app'
             yield 'water-leak-detector-app.map'
         elif self == HostApp.TERMS_AND_CONDITIONS:
-            yield 'terms-and-conditions-app'
-            yield 'terms-and-conditions-app.map'
+            yield 'chip-terms-and-conditions-app'
+            yield 'chip-terms-and-conditions-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 

@@ -232,6 +232,13 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
             binary="chip-bridge-app",
         )
     )
+    targets.append(
+        ApplicationTarget(
+            key="TERMS_AND_CONDITIONS_APP",
+            target=f"{target_prefix}-terms-and-conditions-{suffix}",
+            binary="chip-terms-and-conditions-app",
+        )
+    )
 
     return targets
 
