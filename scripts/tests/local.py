@@ -531,7 +531,14 @@ def _parse_filters(entry: str) -> FilterList:
 
 
 @cli.command()
-def gen_coverage():
+@click.option(
+    "--flat",
+    default=False,
+    is_flag=True,
+    show_default=True,
+    help="Use a flat (1-directory) layout rather than hierarchical.",
+)
+def gen_coverage(flat):
     """
     Generate coverage from tests run with "--coverage"
     """
@@ -641,6 +648,7 @@ def gen_coverage():
         cmd.append("--ignore-errors")
         cmd.append(e)
 
+    cmd.append("--flat" if flat else "--hierarchical")
     cmd.append("--output-directory")
     cmd.append("out/coverage")
     cmd.append("out/profiling/merged.info")
