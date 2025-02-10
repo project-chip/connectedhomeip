@@ -37,11 +37,11 @@
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
+import matter_asserts
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import Nullable
 from chip.commissioning import ROOT_ENDPOINT_ID
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
