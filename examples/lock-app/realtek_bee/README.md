@@ -46,34 +46,40 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-
 
 -   Step 1: checkout Realtek specific submodules only
 
-    ```
-    user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform realtek_bee --recursive
+    ```bash
+    $ scripts/checkout_submodules.py --shallow --platform realtek_bee --recursive
     ```
 
 -   Step 1: Init REALTEK SDK
 
-    ```
-    cd ./third_party/openthread/ot-realtek
-    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/openthread/ot-realtek$ git submodule update --init --recursive
+    ```bash
+    $ git submodule update --init --recursive third_party/openthread/ot-realtek
     ```
 
 -   Step 3: activate local environment
 
-    ```
-    user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/activate.sh
+    ```bash
+    $ source ./scripts/activate.sh
     ```
 
     If the script says the environment is out of date, you can update it by
     running the following command:
 
-    ```
-    user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/bootstrap.sh
+    ```bash
+    $ source ./scripts/bootstrap.sh
     ```
 
 ## Building
 
-    user@ubuntu:~/Desktop/git/connectedhomeip$cd ./third_party/openthread/ot-realtek
-    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/openthread/ot-realtek$OT_CMAKE_NINJA_TARGET="matter-cli-mtd" ./Realtek/build bee4 sdk rtl8777g lock-app
+-   To build the demo application:
+
+    ```bash
+    $ ./scripts/build/build_examples.py --target realtek-rtl8777g-lock build
+    ```
+
+    You can find the target built file called
+    **_matter-cli-ftd_bank0_MP_dev_\*.bin\_** under the
+    `out/realtek-rtl8777g-lock/bin` directory.
 
 ## More information
 
