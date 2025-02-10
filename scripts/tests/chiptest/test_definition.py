@@ -215,7 +215,9 @@ class ApplicationPaths:
         Returns all path items and also the corresponding "Application Key" which
         is the typical application name.
 
-        This is to provider scripts a consistent way to reference a path
+        This is to provide scripts a consistent way to reference a path, even if
+        the paths used for individual appplications contain different names
+        (e.g. they could be wrapper scripts).
         """
         return [
             (self.chip_tool, "chip-tool"),
