@@ -14,11 +14,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "AttestationKey.h"
-#include "ProvisionEncoder.h"
-#include "ProvisionStorage.h"
 #include <algorithm>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <headers/AttestationKey.h>
+#include <headers/ProvisionEncoder.h>
+#include <headers/ProvisionStorage.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
@@ -649,7 +649,6 @@ CHIP_ERROR Storage::GetDeviceAttestationCSR(uint16_t vid, uint16_t pid, const Ch
 
 CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, MutableByteSpan & signature)
 {
-    AttestationKey key;
     uint8_t temp[kDeviceAttestationKeySizeMax] = { 0 };
     size_t size                                = 0;
     CHIP_ERROR err                             = Flash::Get(Parameters::ID::kDacKey, temp, sizeof(temp), size);
@@ -661,8 +660,16 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
     ReturnErrorOnFailure(err);
+#if (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE)
+    uint8_t key_buffer[kDeviceAttestationKeySizeMax] = { 0 };
+    MutableByteSpan private_key(key_buffer);
+    AttestationKey::Unwrap(temp, size, private_key);
+    return AttestationKey::SignMessageWithKey((const uint8_t *) key_buffer, message, signature);
+#else
+    AttestationKey key;
     ReturnErrorOnFailure(key.Import(temp, size));
     return key.SignMessage(message, signature);
+#endif // SLI_SI91X_MCU_INTERFACE
 }
 
 //

@@ -54,6 +54,12 @@ class CameraAvStreamManagementCluster(
 
   class SnapshotStreamAllocateResponse(val snapshotStreamID: UShort)
 
+  class CaptureSnapshotResponse(
+    val data: ByteArray,
+    val imageCodec: UByte,
+    val resolution: CameraAvStreamManagementClusterVideoResolutionStruct,
+  )
+
   class VideoSensorParamsAttribute(
     val value: CameraAvStreamManagementClusterVideoSensorParamsStruct?
   )
@@ -247,7 +253,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun audioStreamAllocate(
-    streamType: UByte,
+    streamUsage: UByte,
     audioCodec: UByte,
     channelCount: UByte,
     sampleRate: UInt,
@@ -260,8 +266,8 @@ class CameraAvStreamManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_STREAM_TYPE_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_STREAM_TYPE_REQ), streamType)
+    val TAG_STREAM_USAGE_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_STREAM_USAGE_REQ), streamUsage)
 
     val TAG_AUDIO_CODEC_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_AUDIO_CODEC_REQ), audioCodec)
@@ -335,7 +341,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun videoStreamAllocate(
-    streamType: UByte,
+    streamUsage: UByte,
     videoCodec: UByte,
     minFrameRate: UShort,
     maxFrameRate: UShort,
@@ -354,8 +360,8 @@ class CameraAvStreamManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_STREAM_TYPE_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_STREAM_TYPE_REQ), streamType)
+    val TAG_STREAM_USAGE_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_STREAM_USAGE_REQ), streamUsage)
 
     val TAG_VIDEO_CODEC_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_VIDEO_CODEC_REQ), videoCodec)
@@ -429,7 +435,6 @@ class CameraAvStreamManagementCluster(
 
   suspend fun videoStreamModify(
     videoStreamID: UShort,
-    resolution: CameraAvStreamManagementClusterVideoResolutionStruct?,
     watermarkEnabled: Boolean?,
     OSDEnabled: Boolean?,
     timedInvokeTimeout: Duration? = null,
@@ -442,15 +447,12 @@ class CameraAvStreamManagementCluster(
     val TAG_VIDEO_STREAM_ID_REQ: Int = 0
     tlvWriter.put(ContextSpecificTag(TAG_VIDEO_STREAM_ID_REQ), videoStreamID)
 
-    val TAG_RESOLUTION_REQ: Int = 1
-    resolution?.let { resolution.toTlv(ContextSpecificTag(TAG_RESOLUTION_REQ), tlvWriter) }
-
-    val TAG_WATERMARK_ENABLED_REQ: Int = 2
+    val TAG_WATERMARK_ENABLED_REQ: Int = 1
     watermarkEnabled?.let {
       tlvWriter.put(ContextSpecificTag(TAG_WATERMARK_ENABLED_REQ), watermarkEnabled)
     }
 
-    val TAG_OSD_ENABLED_REQ: Int = 3
+    val TAG_OSD_ENABLED_REQ: Int = 2
     OSDEnabled?.let { tlvWriter.put(ContextSpecificTag(TAG_OSD_ENABLED_REQ), OSDEnabled) }
     tlvWriter.endStructure()
 
@@ -609,7 +611,7 @@ class CameraAvStreamManagementCluster(
     snapshotStreamID: UShort,
     requestedResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
     timedInvokeTimeout: Duration? = null,
-  ) {
+  ): CaptureSnapshotResponse {
     val commandId: UInt = 11u
 
     val tlvWriter = TlvWriter()
@@ -631,6 +633,52 @@ class CameraAvStreamManagementCluster(
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_DATA: Int = 0
+    var data_decoded: ByteArray? = null
+
+    val TAG_IMAGE_CODEC: Int = 1
+    var imageCodec_decoded: UByte? = null
+
+    val TAG_RESOLUTION: Int = 2
+    var resolution_decoded: CameraAvStreamManagementClusterVideoResolutionStruct? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_DATA)) {
+        data_decoded = tlvReader.getByteArray(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_IMAGE_CODEC)) {
+        imageCodec_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_RESOLUTION)) {
+        resolution_decoded =
+          CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(tag, tlvReader)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (data_decoded == null) {
+      throw IllegalStateException("data not found in TLV")
+    }
+
+    if (imageCodec_decoded == null) {
+      throw IllegalStateException("imageCodec not found in TLV")
+    }
+
+    if (resolution_decoded == null) {
+      throw IllegalStateException("resolution not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return CaptureSnapshotResponse(data_decoded, imageCodec_decoded, resolution_decoded)
   }
 
   suspend fun readMaxConcurrentVideoEncodersAttribute(): UByte? {

@@ -715,6 +715,20 @@ static constexpr EventId Id = 0x00000002;
 } // namespace Events
 } // namespace CameraAvStreamManagement
 
+namespace PushAvStreamTransport {
+namespace Events {
+
+namespace PushTransportBegin {
+static constexpr EventId Id = 0x00000000;
+} // namespace PushTransportBegin
+
+namespace PushTransportEnd {
+static constexpr EventId Id = 0x00000001;
+} // namespace PushTransportEnd
+
+} // namespace Events
+} // namespace PushAvStreamTransport
+
 namespace CommissionerControl {
 namespace Events {
 

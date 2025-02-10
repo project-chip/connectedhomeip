@@ -84,20 +84,20 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="DeviceTypeList" type="list" default="desc">
       <entry type="DeviceTypeStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="minCount" value="1"/>
     </attribute>
     <attribute id="0x0001" name="ServerList" type="list" default="empty">
       <entry type="cluster-id"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="ClientList" type="list" default="empty">
       <entry type="cluster-id"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="PartsList" type="list" default="empty">
@@ -106,9 +106,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0004" name="TagList" type="list" default="MS">
-      <entry type="ref_SemTag"/>
+      <entry type="SemanticTagStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="TAGLIST"/>
       </mandatoryConform>

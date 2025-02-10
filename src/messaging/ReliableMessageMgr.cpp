@@ -513,8 +513,8 @@ void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
 
     ChipLogProgress(ExchangeManager,
                     "??%d [E:" ChipLogFormatExchange " S:%u M:" ChipLogFormatMessageCounter
-                    "] (%s) Msg Retransmission to %u:" ChipLogFormatX64 " in %" PRIu32 "ms [State:%s II:%" PRIu32 " AI:%" PRIu32
-                    " AT:%u]",
+                    "] (%s) Msg Retransmission to %u:" ChipLogFormatX64 " scheduled for %" PRIu32
+                    "ms from now [State:%s II:%" PRIu32 " AI:%" PRIu32 " AT:%u]",
                     entry.sendCount + 1, ChipLogValueExchange(&entry.ec.Get()), sessionHandle->SessionIdForLogging(),
                     messageCounter, Transport::GetSessionTypeString(sessionHandle), fabricIndex, ChipLogValueX64(destination),
                     backoff.count(), peerIsActive ? "Active" : "Idle", config.mIdleRetransTimeout.count(),

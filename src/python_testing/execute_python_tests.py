@@ -1,3 +1,4 @@
+#!/usr/bin/env -S python3 -B
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.

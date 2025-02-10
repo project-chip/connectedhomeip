@@ -57,32 +57,35 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Water Content Measurement Clusters" revision="3">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Water Content Measurement Clusters" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="CCB 2241"/>
     <revision revision="3" summary="New data model format and notation"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0405" name="Relative Humidity Measurement"/>
+    <clusterId id="0x0405" name="Relative Humidity Measurement" picsCode="RH"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="RH" scope="Endpoint"/>
   <attributes>
     <attribute id="0x0000" name="MeasuredValue" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" reportable="true"/>
       <mandatoryConform/>
-      <constraint type="between" from="MinMeasuredValue" to="MaxMeasuredValue"/>
+      <constraint type="between">
+        <from attribute="MinMeasuredValue"/>
+        <to attribute="MaxMeasuredValue"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="MinMeasuredValue" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
       <constraint type="max" value="9999"/>
     </attribute>
     <attribute id="0x0002" name="MaxMeasuredValue" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
       <constraint type="between" from="MinMeasuredValue + 1" to="10000"/>
     </attribute>

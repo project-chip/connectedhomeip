@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class CameraAvStreamManagementClusterVideoStreamChangedEvent(
   val videoStreamID: UShort,
-  val streamType: Optional<UByte>,
+  val streamUsage: Optional<UByte>,
   val videoCodec: Optional<UByte>,
   val minFrameRate: Optional<UShort>,
   val maxFrameRate: Optional<UShort>,
@@ -45,7 +45,7 @@ class CameraAvStreamManagementClusterVideoStreamChangedEvent(
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterVideoStreamChangedEvent {\n")
     append("\tvideoStreamID : $videoStreamID\n")
-    append("\tstreamType : $streamType\n")
+    append("\tstreamUsage : $streamUsage\n")
     append("\tvideoCodec : $videoCodec\n")
     append("\tminFrameRate : $minFrameRate\n")
     append("\tmaxFrameRate : $maxFrameRate\n")
@@ -62,9 +62,9 @@ class CameraAvStreamManagementClusterVideoStreamChangedEvent(
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_VIDEO_STREAM_ID), videoStreamID)
-      if (streamType.isPresent) {
-        val optstreamType = streamType.get()
-        put(ContextSpecificTag(TAG_STREAM_TYPE), optstreamType)
+      if (streamUsage.isPresent) {
+        val optstreamUsage = streamUsage.get()
+        put(ContextSpecificTag(TAG_STREAM_USAGE), optstreamUsage)
       }
       if (videoCodec.isPresent) {
         val optvideoCodec = videoCodec.get()
@@ -108,7 +108,7 @@ class CameraAvStreamManagementClusterVideoStreamChangedEvent(
 
   companion object {
     private const val TAG_VIDEO_STREAM_ID = 0
-    private const val TAG_STREAM_TYPE = 1
+    private const val TAG_STREAM_USAGE = 1
     private const val TAG_VIDEO_CODEC = 2
     private const val TAG_MIN_FRAME_RATE = 3
     private const val TAG_MAX_FRAME_RATE = 4
@@ -125,9 +125,9 @@ class CameraAvStreamManagementClusterVideoStreamChangedEvent(
     ): CameraAvStreamManagementClusterVideoStreamChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val videoStreamID = tlvReader.getUShort(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
-      val streamType =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_STREAM_TYPE))) {
-          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_STREAM_TYPE)))
+      val streamUsage =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_STREAM_USAGE))) {
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_STREAM_USAGE)))
         } else {
           Optional.empty()
         }
@@ -196,7 +196,7 @@ class CameraAvStreamManagementClusterVideoStreamChangedEvent(
 
       return CameraAvStreamManagementClusterVideoStreamChangedEvent(
         videoStreamID,
-        streamType,
+        streamUsage,
         videoCodec,
         minFrameRate,
         maxFrameRate,

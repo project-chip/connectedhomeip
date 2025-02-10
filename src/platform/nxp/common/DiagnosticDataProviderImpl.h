@@ -67,20 +67,16 @@ public:
     CHIP_ERROR GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount) override;
     CHIP_ERROR GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount) override;
     CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts() override;
-#if SDK_2_16_100
     CHIP_ERROR GetWiFiOverrunCount(uint64_t & overrunCount) override;
     CHIP_ERROR GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastTxCount) override;
-#endif
 
     uint32_t mBeaconRxCount          = 0;
     uint32_t mBeaconLostCount        = 0;
     uint32_t mPacketMulticastRxCount = 0;
     uint32_t mPacketMulticastTxCount = 0;
     uint32_t mPacketUnicastTxCount   = 0;
-#if SDK_2_16_100
-    uint32_t mPacketUnicastRxCount = 0;
-    uint64_t mOverrunCount         = 0;
-#endif
+    uint32_t mPacketUnicastRxCount   = 0;
+    uint64_t mOverrunCount           = 0;
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 };
 

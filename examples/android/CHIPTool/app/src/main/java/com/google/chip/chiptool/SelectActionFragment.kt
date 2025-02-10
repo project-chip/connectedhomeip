@@ -76,6 +76,7 @@ class SelectActionFragment : Fragment() {
     binding.groupSettingBtn.setOnClickListener { handleGroupSettingClicked() }
     binding.otaProviderBtn.setOnClickListener { handleOTAProviderClicked() }
     binding.icdBtn.setOnClickListener { handleICDClicked() }
+    binding.modeSelectBtn.setOnClickListener { handleModeSelectClicked() }
 
     return binding.root
   }
@@ -253,6 +254,10 @@ class SelectActionFragment : Fragment() {
 
   private fun handleICDClicked() {
     showFragment(ICDFragment.newInstance())
+  }
+
+  private fun handleModeSelectClicked() {
+    showFragment(ModeSelectClientFragment.newInstance())
   }
 
   companion object {

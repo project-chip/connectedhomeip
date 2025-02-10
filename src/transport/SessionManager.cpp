@@ -1297,7 +1297,7 @@ Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId pe
             {
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                 // Set up a TCP transport based session as standby
-                if ((tcpSession == nullptr || tcpSession->GetLastActivityTime() < session->GetLastActivityTime()) &&
+                if ((tcpSession == nullptr || tcpSession->GetLastPeerActivityTime() < session->GetLastPeerActivityTime()) &&
                     session->GetTCPConnection() != nullptr)
                 {
                     tcpSession = session;
@@ -1305,7 +1305,7 @@ Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId pe
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
             }
 
-            if ((mrpSession == nullptr) || (mrpSession->GetLastActivityTime() < session->GetLastActivityTime()))
+            if ((mrpSession == nullptr) || (mrpSession->GetLastPeerActivityTime() < session->GetLastPeerActivityTime()))
             {
                 mrpSession = session;
             }

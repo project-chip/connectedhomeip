@@ -439,4 +439,39 @@
     XCTAssertNotEqualObjects(a.description, b.description);
 }
 
+- (uint32_t)generateRepeatedDigitPasscode:(uint8_t)digit
+{
+    // "digit" is expected to be a single digit.  Generates a number that has
+    // that digit repeated 8 times.
+    uint32_t passcode = 0;
+    for (int i = 0; i < 8; ++i) {
+        passcode = passcode * 10 + digit;
+    }
+    return passcode;
+}
+
+- (void)testValidSetupPasscode
+{
+    // First, check the repeated-digit cases.
+    for (uint8_t digit = 0; digit <= 9; ++digit) {
+        XCTAssertFalse([MTRSetupPayload isValidSetupPasscode:@([self generateRepeatedDigitPasscode:digit])]);
+    }
+
+    // Then the sequential special cases.
+    XCTAssertFalse([MTRSetupPayload isValidSetupPasscode:@(12345678)]);
+    XCTAssertFalse([MTRSetupPayload isValidSetupPasscode:@(87654321)]);
+
+    // Then the "too big" cases:
+    XCTAssertFalse([MTRSetupPayload isValidSetupPasscode:@(100000000)]);
+    XCTAssertFalse([MTRSetupPayload isValidSetupPasscode:@(1lu << 27)]);
+    XCTAssertFalse([MTRSetupPayload isValidSetupPasscode:@((1llu << 32) + 1)]);
+
+    // Now some tests for known-valid passcodes:
+    XCTAssertTrue([MTRSetupPayload isValidSetupPasscode:@(1)]);
+    XCTAssertTrue([MTRSetupPayload isValidSetupPasscode:@(78654321)]);
+
+    // And we should only generate valid ones.
+    XCTAssertTrue([MTRSetupPayload isValidSetupPasscode:[MTRSetupPayload generateRandomSetupPasscode]]);
+}
+
 @end

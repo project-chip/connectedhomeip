@@ -1118,7 +1118,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureScanResponseData(ByteSpan data)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     memcpy(scanResponseBuffer, data.data(), data.size());
-    ByteSpan scanResponseSpan(scanResponseBuffer);
+    ByteSpan scanResponseSpan(scanResponseBuffer, data.size());
     mScanResponse = chip::Optional<ByteSpan>(scanResponseSpan);
     return CHIP_NO_ERROR;
 }

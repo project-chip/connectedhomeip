@@ -1,0 +1,537 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0504" name="Channel Cluster" revision="2">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Add EG and RP features, Identifier and Type to Channel Info for Over-the-Top (OTT) channel support."/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0504" name="Channel"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="CHANNEL" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="CL" name="ChannelList" summary="Provides list of available channels.">
+      <optionalConform/>
+    </feature>
+    <feature bit="1" code="LI" name="LineupInfo" summary="Provides lineup info, which is a reference to an external source of lineup information.">
+      <optionalConform/>
+    </feature>
+    <feature bit="2" code="EG" name="ElectronicGuide" summary="Provides electronic program guide information.">
+      <optionalConform/>
+    </feature>
+    <feature bit="3" code="RP" name="RecordProgram" summary="Provides ability to record program.">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="ChannelTypeEnum">
+      <item value="0" name="Satellite" summary="The channel is sourced from a satellite provider.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Cable" summary="The channel is sourced from a cable provider.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Terrestrial" summary="The channel is sourced from a terrestrial provider.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="OTT" summary="The channel is sourced from an OTT provider.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="LineupInfoTypeEnum">
+      <item value="0" name="MSO" summary="Multi System Operator">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="StatusEnum">
+      <item value="0" name="Success" summary="Command succeeded">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="MultipleMatches" summary="More than one equal match for the ChannelInfoStruct passed in.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="NoMatches" summary="No matches for the ChannelInfoStruct passed in.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <bitmap name="RecordingFlagBitmap">
+      <bitfield name="Scheduled" bit="0" summary="The program is scheduled for recording.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="RecordSeries" bit="1" summary="The program series is scheduled for recording.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Recorded" bit="2" summary="The program is recorded and available to be played.">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <struct name="ChannelInfoStruct">
+      <field id="0" name="MajorNumber" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="MinorNumber" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Name" type="string" default="empty">
+        <optionalConform/>
+      </field>
+      <field id="3" name="CallSign" type="string" default="empty">
+        <optionalConform/>
+      </field>
+      <field id="4" name="AffiliateCallSign" type="string" default="empty">
+        <optionalConform/>
+      </field>
+      <field id="5" name="Identifier" type="string" default="empty">
+        <optionalConform/>
+      </field>
+      <field id="6" name="Type" type="ChannelTypeEnum" default="empty">
+        <optionalConform/>
+      </field>
+    </struct>
+    <struct name="ChannelPagingStruct">
+      <field id="0" name="PreviousToken" type="PageTokenStruct" default="null">
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+      <field id="1" name="NextToken" type="PageTokenStruct" default="null">
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+    </struct>
+    <struct name="LineupInfoStruct">
+      <field id="0" name="OperatorName" type="string">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="LineupName" type="string" default="empty">
+        <optionalConform/>
+      </field>
+      <field id="2" name="PostalCode" type="string" default="empty">
+        <optionalConform/>
+      </field>
+      <field id="3" name="LineupInfoType" type="LineupInfoTypeEnum">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="PageTokenStruct">
+      <field id="0" name="Limit" type="uint16" default="0">
+        <optionalConform/>
+      </field>
+      <field id="1" name="After" type="string" default="empty">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="8192"/>
+        </constraint>
+      </field>
+      <field id="2" name="Before" type="string" default="empty">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="8192"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="ProgramCastStruct">
+      <field id="0" name="Name" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
+      </field>
+      <field id="1" name="Role" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="ProgramCategoryStruct">
+      <field id="0" name="Category" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
+      </field>
+      <field id="1" name="SubCategory" type="string" default="empty">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="ProgramStruct">
+      <field id="0" name="Identifier" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="255"/>
+        </constraint>
+      </field>
+      <field id="1" name="Channel" type="ChannelInfoStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="StartTime" type="epoch-s">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="EndTime" type="epoch-s">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="Title" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="255"/>
+        </constraint>
+      </field>
+      <field id="5" name="Subtitle" type="string" default="empty">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="255"/>
+        </constraint>
+      </field>
+      <field id="6" name="Description" type="string" default="empty">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="8192"/>
+        </constraint>
+      </field>
+      <field id="7" name="AudioLanguages" type="list" default="empty">
+        <entry type="string">
+          <constraint>
+            <maxLength value="50"/>
+          </constraint>
+        </entry>
+        <optionalConform/>
+        <constraint>
+          <maxCount value="10"/>
+        </constraint>
+      </field>
+      <field id="8" name="Ratings" type="list" default="empty">
+        <entry type="string"/>
+        <optionalConform/>
+        <constraint>
+          <maxCount value="255"/>
+        </constraint>
+      </field>
+      <field id="9" name="ThumbnailUrl" type="string" default="empty">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="8192"/>
+        </constraint>
+      </field>
+      <field id="10" name="PosterArtUrl" type="string" default="empty">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="8192"/>
+        </constraint>
+      </field>
+      <field id="11" name="DvbiUrl" type="string" default="empty">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="8192"/>
+        </constraint>
+      </field>
+      <field id="12" name="ReleaseDate" type="string" default="empty">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="30"/>
+        </constraint>
+      </field>
+      <field id="13" name="ParentalGuidanceText" type="string" default="empty">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="255"/>
+        </constraint>
+      </field>
+      <field id="14" name="RecordingFlag" type="RecordingFlagBitmap">
+        <mandatoryConform>
+          <feature name="RP"/>
+        </mandatoryConform>
+      </field>
+      <field id="15" name="SeriesInfo" type="SeriesInfoStruct" default="null">
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+      <field id="16" name="CategoryList" type="list" default="empty">
+        <entry type="ProgramCategoryStruct"/>
+        <optionalConform/>
+        <constraint>
+          <maxCount value="255"/>
+        </constraint>
+      </field>
+      <field id="17" name="CastList" type="list" default="empty">
+        <entry type="ProgramCastStruct"/>
+        <optionalConform/>
+        <constraint>
+          <maxCount value="255"/>
+        </constraint>
+      </field>
+      <field id="18" name="ExternalIDList" type="list" default="empty">
+        <entry type="AdditionalInfoStruct"/>
+        <optionalConform/>
+        <constraint>
+          <maxCount value="255"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="SeriesInfoStruct">
+      <field id="0" name="Season" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
+      </field>
+      <field id="1" name="Episode" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="ChannelList" type="list" default="empty">
+      <entry type="ChannelInfoStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0001" name="Lineup" type="LineupInfoStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="LI"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="CurrentChannel" type="ChannelInfoStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <optionalConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="ChangeChannel" direction="commandToServer" response="ChangeChannelResponse">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="CL"/>
+          <feature name="LI"/>
+        </orTerm>
+      </mandatoryConform>
+      <field id="0" name="Match" type="string">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x01" name="ChangeChannelResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <orTerm>
+          <feature name="CL"/>
+          <feature name="LI"/>
+        </orTerm>
+      </mandatoryConform>
+      <field id="0" name="Status" type="StatusEnum">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="Data" type="string">
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x02" name="ChangeChannelByNumber" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="MajorNumber" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="MinorNumber" type="uint16">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x03" name="SkipChannel" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="Count" type="int16">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x04" name="GetProgramGuide" direction="commandToServer" response="ProgramGuideResponse">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="EG"/>
+      </mandatoryConform>
+      <field id="0" name="StartTime" type="epoch-s">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="EndTime" type="epoch-s">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="ChannelList" type="list" default="empty">
+        <entry type="ChannelInfoStruct"/>
+        <optionalConform/>
+        <constraint>
+          <maxCount value="255"/>
+        </constraint>
+      </field>
+      <field id="3" name="PageToken" type="PageTokenStruct" default="null">
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+      <field id="5" name="RecordingFlag" type="RecordingFlagBitmap" default="null">
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+      <field id="6" name="ExternalIDList" type="list" default="empty">
+        <entry type="AdditionalInfoStruct"/>
+        <optionalConform/>
+        <constraint>
+          <maxCount value="255"/>
+        </constraint>
+      </field>
+      <field id="7" name="Data" type="octstr" default="MS">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="8092"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x05" name="ProgramGuideResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="EG"/>
+      </mandatoryConform>
+      <field id="0" name="Paging" type="ChannelPagingStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ProgramList" type="list" default="empty">
+        <entry type="ProgramStruct"/>
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x06" name="RecordProgram" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="RP"/>
+          <feature name="EG"/>
+        </andTerm>
+      </mandatoryConform>
+      <field id="0" name="ProgramIdentifier" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="255"/>
+        </constraint>
+      </field>
+      <field id="1" name="ShouldRecordSeries" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="ExternalIDList" type="list" default="empty">
+        <entry type="AdditionalInfoStruct"/>
+        <optionalConform/>
+        <constraint>
+          <maxCount value="255"/>
+        </constraint>
+      </field>
+      <field id="3" name="Data" type="octstr" default="MS">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="8092"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x07" name="CancelRecordProgram" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="RP"/>
+          <feature name="EG"/>
+        </andTerm>
+      </mandatoryConform>
+      <field id="0" name="ProgramIdentifier" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="255"/>
+        </constraint>
+      </field>
+      <field id="1" name="ShouldRecordSeries" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="ExternalIDList" type="list" default="empty">
+        <entry type="AdditionalInfoStruct"/>
+        <optionalConform/>
+        <constraint>
+          <maxCount value="255"/>
+        </constraint>
+      </field>
+      <field id="3" name="Data" type="octstr" default="MS">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="8092"/>
+        </constraint>
+      </field>
+    </command>
+  </commands>
+</cluster>

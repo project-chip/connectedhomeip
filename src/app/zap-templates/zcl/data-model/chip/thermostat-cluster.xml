@@ -208,7 +208,6 @@ limitations under the License.
 
   <struct name="WeeklyScheduleTransitionStruct">
     <cluster code="0x0201"/>
-    <!-- See https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/6217 for HeatSetpoint and CoolSetpoint.  They might end up being nullable. -->
     <item fieldId="0" name="TransitionTime" type="int16u" max="1439"/>
     <item fieldId="1" name="HeatSetpoint" type="temperature" isNullable="true"/>
     <item fieldId="2" name="CoolSetpoint" type="temperature" isNullable="true"/>

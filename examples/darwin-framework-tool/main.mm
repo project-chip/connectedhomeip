@@ -24,6 +24,7 @@
 #include "commands/bdx/Commands.h"
 #include "commands/common/Commands.h"
 #include "commands/configuration/Commands.h"
+#include "commands/dcl/Commands.h"
 #include "commands/delay/Commands.h"
 #include "commands/discover/Commands.h"
 #include "commands/interactive/Commands.h"
@@ -44,6 +45,7 @@ int main(int argc, const char * argv[])
         Commands commands;
         registerCommandsBdx(commands);
         registerCommandsPairing(commands);
+        registerCommandsDCL(commands);
         registerCommandsDelay(commands);
         registerCommandsDiscover(commands);
         registerCommandsInteractive(commands);

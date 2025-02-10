@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/cluster-enums.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/SubscriptionsInfoProvider.h>
@@ -261,8 +262,10 @@ TEST_F(TestICDManager, TestICDModeDurationsWith0ActiveModeDurationWithoutActiveS
     ICDConfigurationData & icdConfigData = ICDConfigurationData::GetInstance();
     ICDConfigurationDataTestAccess privateIcdConfigData(&icdConfigData);
 
-    // Set FeatureMap - Configures CIP, UAT and LITS to 1
-    mICDManager.SetTestFeatureMapValue(0x07);
+    using Feature = Clusters::IcdManagement::Feature;
+    BitFlags<Feature> featureMap;
+    featureMap.Set(Feature::kLongIdleTimeSupport).Set(Feature::kUserActiveModeTrigger).Set(Feature::kCheckInProtocolSupport);
+    privateIcdConfigData.SetFeatureMap(featureMap);
 
     // Set that there are no matching subscriptions
     mSubInfoProvider.SetHasActiveSubscription(false);
@@ -341,8 +344,10 @@ TEST_F(TestICDManager, TestICDModeDurationsWith0ActiveModeDurationWithActiveSub)
     ICDConfigurationData & icdConfigData = ICDConfigurationData::GetInstance();
     ICDConfigurationDataTestAccess privateIcdConfigData(&icdConfigData);
 
-    // Set FeatureMap - Configures CIP, UAT and LITS to 1
-    mICDManager.SetTestFeatureMapValue(0x07);
+    using Feature = Clusters::IcdManagement::Feature;
+    BitFlags<Feature> featureMap;
+    featureMap.Set(Feature::kLongIdleTimeSupport).Set(Feature::kUserActiveModeTrigger).Set(Feature::kCheckInProtocolSupport);
+    privateIcdConfigData.SetFeatureMap(featureMap);
 
     // Set that there are not matching subscriptions
     mSubInfoProvider.SetHasActiveSubscription(true);
@@ -480,10 +485,12 @@ TEST_F(TestICDManager, TestICDMRegisterUnregisterEvents)
 {
     typedef ICDListener::ICDManagementEvents ICDMEvent;
     ICDNotifier notifier = ICDNotifier::GetInstance();
+    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
 
-    // Set FeatureMap
-    // Configures CIP, UAT and LITS to 1
-    mICDManager.SetTestFeatureMapValue(0x07);
+    using Feature = Clusters::IcdManagement::Feature;
+    BitFlags<Feature> featureMap;
+    featureMap.Set(Feature::kLongIdleTimeSupport).Set(Feature::kUserActiveModeTrigger).Set(Feature::kCheckInProtocolSupport);
+    privateIcdConfigData.SetFeatureMap(featureMap);
 
     // Check ICDManager starts in SIT mode if no entries are present
     EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDMode(), ICDConfigurationData::ICDMode::SIT);
@@ -704,10 +711,15 @@ TEST_F(TestICDManager, TestICDMDSLS)
 {
     typedef ICDListener::ICDManagementEvents ICDMEvent;
     ICDNotifier notifier = ICDNotifier::GetInstance();
+    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
 
-    // Set FeatureMap
-    // Configures CIP, UAT, LITS and DSLS to 1
-    mICDManager.SetTestFeatureMapValue(0x0F);
+    using Feature = Clusters::IcdManagement::Feature;
+    BitFlags<Feature> featureMap;
+    featureMap.Set(Feature::kLongIdleTimeSupport)
+        .Set(Feature::kUserActiveModeTrigger)
+        .Set(Feature::kCheckInProtocolSupport)
+        .Set(Feature::kDynamicSitLitSupport);
+    privateIcdConfigData.SetFeatureMap(featureMap);
 
     // Check ICDManager starts in SIT mode if no entries are present
     EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDMode(), ICDConfigurationData::ICDMode::SIT);
@@ -988,9 +1000,12 @@ TEST_F(TestICDManager, TestICDStateObserverOnEnterActiveMode)
 TEST_F(TestICDManager, TestICDStateObserverOnICDModeChange)
 {
     typedef ICDListener::ICDManagementEvents ICDMEvent;
+    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
 
-    // Set FeatureMap - Configures CIP, UAT and LITS to 1
-    mICDManager.SetTestFeatureMapValue(0x07);
+    using Feature = Clusters::IcdManagement::Feature;
+    BitFlags<Feature> featureMap;
+    featureMap.Set(Feature::kLongIdleTimeSupport).Set(Feature::kUserActiveModeTrigger).Set(Feature::kCheckInProtocolSupport);
+    privateIcdConfigData.SetFeatureMap(featureMap);
 
     // Since we don't have a registration, we stay in SIT mode. No changes
     EXPECT_FALSE(mICDStateObserver.mOnICDModeChangeCalled);
@@ -1034,8 +1049,12 @@ TEST_F(TestICDManager, TestICDStateObserverOnICDModeChange)
 
 TEST_F(TestICDManager, TestICDStateObserverOnICDModeChangeOnInit)
 {
-    // Set FeatureMap - Configures CIP, UAT and LITS to 1
-    mICDManager.SetTestFeatureMapValue(0x07);
+    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
+
+    using Feature = Clusters::IcdManagement::Feature;
+    BitFlags<Feature> featureMap;
+    featureMap.Set(Feature::kLongIdleTimeSupport).Set(Feature::kUserActiveModeTrigger).Set(Feature::kCheckInProtocolSupport);
+    privateIcdConfigData.SetFeatureMap(featureMap);
 
     ICDMonitoringTable table(testStorage, kTestFabricIndex1, kMaxTestClients, &(mKeystore));
 

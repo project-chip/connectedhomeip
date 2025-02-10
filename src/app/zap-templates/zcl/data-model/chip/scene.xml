@@ -169,6 +169,7 @@ limitations under the License.
       <arg name="GroupIdentifierTo" type="group_id"/>
       <arg name="SceneIdentifierTo" type="int8u"/>
       <optionalConform/>
+      <access op="invoke" role="manage"/>
     </command>
     
     <command source="server" code="0x00" name="AddSceneResponse" optional="false" disableDefaultResponse="true">

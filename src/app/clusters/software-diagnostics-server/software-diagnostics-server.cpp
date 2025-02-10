@@ -220,14 +220,6 @@ void SoftwareDiagnosticsServer::OnSoftwareFaultDetect(const SoftwareDiagnostics:
 } // namespace app
 } // namespace chip
 
-bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(app::CommandHandler * commandObj,
-                                                              const app::ConcreteCommandPath & commandPath,
-                                                              const Commands::ResetWatermarks::DecodableType & commandData)
-{
-    // Shouldn't be called at all.
-    return false;
-}
-
 void MatterSoftwareDiagnosticsPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);

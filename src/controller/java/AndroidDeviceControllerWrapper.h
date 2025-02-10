@@ -274,7 +274,7 @@ private:
     uint32_t mActiveModeDuration  = 0;
     uint16_t mActiveModeThreshold = 0;
     chip::Controller::CommissioningParameters mCommissioningParameter;
-
+    bool mIsInitialized = false;
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller,
 #ifdef JAVA_MATTER_CONTROLLER_TEST
                                    ExampleOperationalCredentialsIssuerPtr opCredsIssuer

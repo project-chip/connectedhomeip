@@ -18,6 +18,7 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
+# FIXME: https://github.com/project-chip/connectedhomeip/issues/36885
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:

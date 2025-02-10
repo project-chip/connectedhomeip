@@ -39,6 +39,7 @@ static_library("BL602") {
     "../common/DiagnosticDataProviderImpl.cpp",
     "../common/KeyValueStoreManagerImpl.cpp",
     "../common/PlatformManagerImpl.cpp",
+    "../common/SystemTimeSupport.cpp",
   ]
 
   if (chip_enable_ota_requestor) {
@@ -69,9 +70,11 @@ static_library("BL602") {
   }
 
   deps = [
+    "${chip_root}/src/app:app_config",
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
   ]
+
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 }

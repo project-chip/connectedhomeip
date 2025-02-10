@@ -85,8 +85,8 @@ declare_args() {
     chip_enable_ble = chip_config_network_layer_ble
   }
 
-  # Enable NFC support
-  chip_enable_nfc = false
+  # Enable NFC Onboarding Payload support
+  chip_enable_nfc_onboarding_payload = false
 
   # Enable OTA requestor support
   chip_enable_ota_requestor = false
@@ -174,6 +174,8 @@ if (chip_device_platform == "cc13x4_26x4") {
 } else if (chip_device_platform == "ameba") {
   _chip_device_layer = "Ameba"
 } else if (chip_device_platform == "bl602") {
+  _chip_device_layer = "bouffalolab/common"
+} else if (chip_device_platform == "bl616") {
   _chip_device_layer = "bouffalolab/common"
 } else if (chip_device_platform == "bl702") {
   _chip_device_layer = "bouffalolab/common"
@@ -265,9 +267,9 @@ assert(
         chip_device_platform == "ameba" || chip_device_platform == "cyw30739" ||
         chip_device_platform == "webos" || chip_device_platform == "mw320" ||
         chip_device_platform == "zephyr" || chip_device_platform == "beken" ||
-        chip_device_platform == "bl602" || chip_device_platform == "bl702" ||
-        chip_device_platform == "bl702l" || chip_device_platform == "mt793x" ||
-        chip_device_platform == "SiWx917" ||
+        chip_device_platform == "bl602" || chip_device_platform == "bl616" ||
+        chip_device_platform == "bl702" || chip_device_platform == "bl702l" ||
+        chip_device_platform == "mt793x" || chip_device_platform == "SiWx917" ||
         chip_device_platform == "openiotsdk" || chip_device_platform == "asr" ||
         chip_device_platform == "stm32" || chip_device_platform == "nuttx",
     "Please select a valid value for chip_device_platform")

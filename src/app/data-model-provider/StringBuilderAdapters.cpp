@@ -28,3 +28,15 @@ StatusWithSize ToString<chip::app::DataModel::ActionReturnStatus>(const chip::ap
 }
 
 } // namespace pw
+//
+#if CHIP_CONFIG_TEST_GOOGLETEST
+namespace chip {
+
+void PrintTo(const chip::app::DataModel::ActionReturnStatus & status, std::ostream * os)
+{
+    chip::app::DataModel::ActionReturnStatus::StringStorage storage;
+    *os << "ActionReturnStatus<" << status.c_str(storage) << ">";
+}
+
+} // namespace chip
+#endif // CHIP_CONFIG_TEST_GOOGLETEST

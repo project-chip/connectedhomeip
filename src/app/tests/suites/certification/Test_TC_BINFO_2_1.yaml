@@ -715,16 +715,16 @@ tests:
       response:
           value: ProductAppearancevalue
 
+    # This list should be expanded as we expand the TH to support more specification revisions
     - label:
-          "Step 62: SpecificationVersion value should in the inclusive range of
-          (0x01040000 to 0x0104FF00) and the lower 8 bits are set to zero."
+          "Step 62: SpecificationVersion value should be set to a valid Major,
+          Minor, and Dot version with the lower 8 bits set to zero."
       command: "readAttribute"
       attribute: "SpecificationVersion"
       response:
           saveAs: SpecificationVersionValue
           constraints:
-              minValue: 0x01040000
-              maxValue: 0x0104FF00
+              anyOf: [0x01040000, 0x01040100]
               hasMasksClear: [0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80]
 
     - label:

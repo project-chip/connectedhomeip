@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2023 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,34 +18,30 @@
 /**
  *    @file
  *      PSA Crypto API based implementation of CHIP crypto primitives
- *      with Silicon Labs SDK modifications
  */
-// The psa_driver_wrappers.h file that we're including here assumes that it has
-// access to private struct members. Define this here in order to avoid
-// compilation errors.
-#define MBEDTLS_ALLOW_PRIVATE_ACCESS
 
-#include <crypto/CHIPCryptoPAL.h>
 #include <crypto/CHIPCryptoPALPSA.h>
+#include <crypto/CHIPCryptoPALmbedTLS.h>
 
-#include <type_traits>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/SafePointerCast.h>
+#include <lib/support/logging/CHIPLogging.h>
 
-// Include version header to get configuration information
-#include <mbedtls/version.h>
+#include <psa/crypto.h>
 
-#if !defined(MBEDTLS_PSA_CRYPTO_C)
-#error "This implementation needs PSA Crypto"
-#endif
-
-#if !defined(MBEDTLS_USE_PSA_CRYPTO)
-#error "This implementation requires that PSA Crypto keys can be used for CSR generation"
-#endif
-
-#include "psa/crypto.h"
-
-// Includes needed for SPAKE2+ ECP operations
 #include <mbedtls/bignum.h>
 #include <mbedtls/ecp.h>
+#include <mbedtls/error.h>
+#include <mbedtls/x509_csr.h>
+
+#include <string.h>
+#include <type_traits>
 
 // Includes needed for certificate parsing
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
@@ -59,64 +55,19 @@
 #include <mbedtls/error.h>
 #endif // defined(MBEDTLS_ERROR_C)
 
-#include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/BufferWriter.h>
-#include <lib/support/BytesToHex.h>
-#include <lib/support/CHIPArgParser.hpp>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
-#include <lib/support/SafePointerCast.h>
-#include <lib/support/logging/CHIPLogging.h>
-
-#include <string.h>
-
 namespace chip {
 namespace Crypto {
 
-using chip::Platform::MemoryCalloc;
-using chip::Platform::MemoryFree;
-
-#define MAX_ERROR_STR_LEN 128
-#define NUM_BYTES_IN_SHA256_HASH 32
-
-// In mbedTLS 3.0.0 direct access to structure fields was replaced with using MBEDTLS_PRIVATE macro.
-#if (MBEDTLS_VERSION_NUMBER >= 0x03000000)
-#define CHIP_CRYPTO_PAL_PRIVATE(x) MBEDTLS_PRIVATE(x)
-#else
-#define CHIP_CRYPTO_PAL_PRIVATE(x) x
-#endif
-
-#if (MBEDTLS_VERSION_NUMBER >= 0x03000000 && MBEDTLS_VERSION_NUMBER < 0x03010000)
-#define CHIP_CRYPTO_PAL_PRIVATE_X509(x) MBEDTLS_PRIVATE(x)
-#else
-#define CHIP_CRYPTO_PAL_PRIVATE_X509(x) x
-#endif
-
 namespace {
 
-void _log_mbedTLS_error(int error_code)
+bool IsBufferNonEmpty(const uint8_t * data, size_t data_length)
 {
-    if (error_code != 0)
-    {
-#if defined(MBEDTLS_ERROR_C)
-        char error_str[MAX_ERROR_STR_LEN];
-        mbedtls_strerror(error_code, error_str, sizeof(error_str));
-        ChipLogError(Crypto, "mbedTLS error: %s", error_str);
-#else
-        // Error codes defined in 16-bit negative hex numbers. Ease lookup by printing likewise
-        ChipLogError(Crypto, "mbedTLS error: -0x%04X", -static_cast<uint16_t>(error_code));
-#endif
-    }
+    return data != nullptr && data_length > 0;
 }
 
-void _log_PSA_error(psa_status_t status)
+bool IsValidTag(const uint8_t * tag, size_t tag_length)
 {
-    if (status != 0)
-    {
-        // Error codes defined in 16-bit negative hex numbers. Ease lookup by printing likewise
-        ChipLogError(Crypto, "PSA error: %ld", status);
-    }
+    return tag != nullptr && (tag_length == 8 || tag_length == 12 || tag_length == 16);
 }
 
 /**
@@ -149,16 +100,6 @@ int TimeCompare(mbedtls_x509_time * t1, mbedtls_x509_time * t2)
     return 0;
 }
 
-bool IsBufferNonEmpty(const uint8_t * data, size_t data_length)
-{
-    return data != nullptr && data_length > 0;
-}
-
-bool IsValidTag(const uint8_t * tag, size_t tag_length)
-{
-    return tag != nullptr && (tag_length == 8 || tag_length == 12 || tag_length == 16);
-}
-
 } // namespace
 
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
@@ -185,8 +126,15 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     status = psa_aead_set_nonce(&operation, nonce, nonce_length);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
-    status = psa_aead_update_ad(&operation, aad, aad_length);
-    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+    if (aad_length != 0)
+    {
+        status = psa_aead_update_ad(&operation, aad, aad_length);
+        VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+    }
+    else
+    {
+        ChipLogDetail(Crypto, "AES_CCM_encrypt: Using aad == null path");
+    }
 
     if (plaintext_length != 0)
     {
@@ -264,170 +212,202 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
 
 CHIP_ERROR Hash_SHA256(const uint8_t * data, const size_t data_length, uint8_t * out_buffer)
 {
-    size_t output_length = 0;
+    size_t outLength = 0;
 
-    psa_crypto_init();
+    const psa_status_t status =
+        psa_hash_compute(PSA_ALG_SHA_256, data, data_length, out_buffer, PSA_HASH_LENGTH(PSA_ALG_SHA_256), &outLength);
 
-    const psa_status_t result =
-        psa_hash_compute(PSA_ALG_SHA_256, data, data_length, out_buffer, PSA_HASH_LENGTH(PSA_ALG_SHA_256), &output_length);
-
-    VerifyOrReturnError(result == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(output_length == PSA_HASH_LENGTH(PSA_ALG_SHA_256), CHIP_ERROR_INTERNAL);
-
-    return CHIP_NO_ERROR;
+    return status == PSA_SUCCESS ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
 CHIP_ERROR Hash_SHA1(const uint8_t * data, const size_t data_length, uint8_t * out_buffer)
 {
-    size_t output_length = 0;
+    size_t outLength = 0;
 
-    psa_crypto_init();
+    const psa_status_t status =
+        psa_hash_compute(PSA_ALG_SHA_1, data, data_length, out_buffer, PSA_HASH_LENGTH(PSA_ALG_SHA_1), &outLength);
 
-    const psa_status_t result =
-        psa_hash_compute(PSA_ALG_SHA_1, data, data_length, out_buffer, PSA_HASH_LENGTH(PSA_ALG_SHA_1), &output_length);
-
-    VerifyOrReturnError(result == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(output_length == PSA_HASH_LENGTH(PSA_ALG_SHA_1), CHIP_ERROR_INTERNAL);
-
-    return CHIP_NO_ERROR;
+    return status == PSA_SUCCESS ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
-static_assert(kMAX_Hash_SHA256_Context_Size >= sizeof(psa_hash_operation_t),
-              "kMAX_Hash_SHA256_Context_Size is too small for the size of underlying psa_hash_operation_t");
-
-static inline psa_hash_operation_t * to_inner_hash_sha256_context(HashSHA256OpaqueContext * context)
+static inline psa_hash_operation_t * toHashOperation(HashSHA256OpaqueContext * context)
 {
     return SafePointerCast<psa_hash_operation_t *>(context);
 }
 
-Hash_SHA256_stream::Hash_SHA256_stream(void)
+static inline psa_hash_operation_t & toHashOperation(HashSHA256OpaqueContext & context)
 {
-    psa_hash_operation_t * context             = to_inner_hash_sha256_context(&mContext);
-    const psa_hash_operation_t initial_context = PSA_HASH_OPERATION_INIT;
-    memcpy(context, &initial_context, sizeof(psa_hash_operation_t));
+    return *SafePointerCast<psa_hash_operation_t *>(&context);
 }
 
-Hash_SHA256_stream::~Hash_SHA256_stream(void)
+Hash_SHA256_stream::Hash_SHA256_stream()
 {
-    psa_hash_operation_t * context = to_inner_hash_sha256_context(&mContext);
-    psa_hash_abort(context);
+    toHashOperation(mContext) = PSA_HASH_OPERATION_INIT;
+}
+
+Hash_SHA256_stream::~Hash_SHA256_stream()
+{
     Clear();
 }
 
-CHIP_ERROR Hash_SHA256_stream::Begin(void)
+CHIP_ERROR Hash_SHA256_stream::Begin()
 {
-    psa_crypto_init();
+    toHashOperation(mContext) = PSA_HASH_OPERATION_INIT;
+    const psa_status_t status = psa_hash_setup(toHashOperation(&mContext), PSA_ALG_SHA_256);
 
-    psa_hash_operation_t * context = to_inner_hash_sha256_context(&mContext);
-    *context                       = PSA_HASH_OPERATION_INIT;
-    const psa_status_t result      = psa_hash_setup(context, PSA_ALG_SHA_256);
-
-    VerifyOrReturnError(result == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
-
-    return CHIP_NO_ERROR;
+    return status == PSA_SUCCESS ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
 CHIP_ERROR Hash_SHA256_stream::AddData(const ByteSpan data)
 {
-    psa_hash_operation_t * context = to_inner_hash_sha256_context(&mContext);
-    const psa_status_t result      = psa_hash_update(context, Uint8::to_const_uchar(data.data()), data.size());
+    const psa_status_t status = psa_hash_update(toHashOperation(&mContext), data.data(), data.size());
 
-    VerifyOrReturnError(result == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
-
-    return CHIP_NO_ERROR;
+    return status == PSA_SUCCESS ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
 CHIP_ERROR Hash_SHA256_stream::GetDigest(MutableByteSpan & out_buffer)
 {
-    CHIP_ERROR result              = CHIP_NO_ERROR;
-    psa_status_t status            = PSA_ERROR_BAD_STATE;
-    size_t output_length           = 0;
-    psa_hash_operation_t * context = to_inner_hash_sha256_context(&mContext);
+    VerifyOrReturnError(out_buffer.size() >= PSA_HASH_LENGTH(PSA_ALG_SHA_256), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    VerifyOrReturnError(out_buffer.size() >= kSHA256_Hash_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
+    CHIP_ERROR error               = CHIP_NO_ERROR;
+    psa_status_t status            = PSA_SUCCESS;
+    psa_hash_operation_t operation = PSA_HASH_OPERATION_INIT;
+    size_t outLength;
 
-    // Clone the context first since calculating the digest finishes the operation
-    psa_hash_operation_t digest_context = PSA_HASH_OPERATION_INIT;
-    status                              = psa_hash_clone(context, &digest_context);
+    status = psa_hash_clone(toHashOperation(&mContext), &operation);
+    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
-    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+    status = psa_hash_finish(&operation, out_buffer.data(), out_buffer.size(), &outLength);
+    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    out_buffer.reduce_size(outLength);
 
-    // Calculate digest on the cloned context
-    status = psa_hash_finish(&digest_context, Uint8::to_uchar(out_buffer.data()), out_buffer.size(), &output_length);
-
-    VerifyOrExit(status == PSA_SUCCESS, result = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(output_length == PSA_HASH_LENGTH(PSA_ALG_SHA_256), result = CHIP_ERROR_INTERNAL);
 exit:
-    psa_hash_abort(&digest_context);
-    return result;
+    psa_hash_abort(&operation);
+
+    return error;
 }
 
 CHIP_ERROR Hash_SHA256_stream::Finish(MutableByteSpan & out_buffer)
 {
-    psa_hash_operation_t * context = to_inner_hash_sha256_context(&mContext);
-    size_t output_length           = 0;
+    VerifyOrReturnError(out_buffer.size() >= PSA_HASH_LENGTH(PSA_ALG_SHA_256), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    VerifyOrReturnError(out_buffer.size() >= kSHA256_Hash_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
-    const psa_status_t status = psa_hash_finish(context, Uint8::to_uchar(out_buffer.data()), out_buffer.size(), &output_length);
+    size_t outLength;
 
+    const psa_status_t status = psa_hash_finish(toHashOperation(&mContext), out_buffer.data(), out_buffer.size(), &outLength);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(output_length == PSA_HASH_LENGTH(PSA_ALG_SHA_256), CHIP_ERROR_INTERNAL);
+    out_buffer.reduce_size(outLength);
 
     return CHIP_NO_ERROR;
 }
 
-void Hash_SHA256_stream::Clear(void)
+void Hash_SHA256_stream::Clear()
 {
-    psa_hash_operation_t * context = to_inner_hash_sha256_context(&mContext);
-    psa_hash_abort(context);
+    psa_hash_abort(toHashOperation(&mContext));
+}
+
+CHIP_ERROR FindFreeKeySlotInRange(psa_key_id_t & keyId, psa_key_id_t start, uint32_t range)
+{
+    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+    psa_key_id_t end                = start + range;
+
+    VerifyOrReturnError(start >= PSA_KEY_ID_USER_MIN && end - 1 <= PSA_KEY_ID_USER_MAX, CHIP_ERROR_INVALID_ARGUMENT);
+
+    for (keyId = start; keyId < end; keyId++)
+    {
+        psa_status_t status = psa_get_key_attributes(keyId, &attributes);
+        if (status == PSA_ERROR_INVALID_HANDLE)
+        {
+            return CHIP_NO_ERROR;
+        }
+        else if (status != PSA_SUCCESS)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+    }
+    return CHIP_ERROR_NOT_FOUND;
+}
+
+CHIP_ERROR PsaKdf::Init(const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info)
+{
+    psa_status_t status        = PSA_SUCCESS;
+    psa_key_attributes_t attrs = PSA_KEY_ATTRIBUTES_INIT;
+
+    psa_set_key_type(&attrs, PSA_KEY_TYPE_DERIVE);
+    psa_set_key_algorithm(&attrs, PSA_ALG_HKDF(PSA_ALG_SHA_256));
+    psa_set_key_usage_flags(&attrs, PSA_KEY_USAGE_DERIVE);
+
+    status = psa_import_key(&attrs, secret.data(), secret.size(), &mSecretKeyId);
+    LogPsaError(status);
+    psa_reset_key_attributes(&attrs);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+
+    return InitOperation(mSecretKeyId, salt, info);
+}
+
+CHIP_ERROR PsaKdf::Init(const HkdfKeyHandle & hkdfKey, const ByteSpan & salt, const ByteSpan & info)
+{
+    return InitOperation(hkdfKey.As<psa_key_id_t>(), salt, info);
+}
+
+CHIP_ERROR PsaKdf::InitOperation(psa_key_id_t hkdfKey, const ByteSpan & salt, const ByteSpan & info)
+{
+    psa_status_t status = psa_key_derivation_setup(&mOperation, PSA_ALG_HKDF(PSA_ALG_SHA_256));
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+
+    if (salt.size() > 0)
+    {
+        status = psa_key_derivation_input_bytes(&mOperation, PSA_KEY_DERIVATION_INPUT_SALT, salt.data(), salt.size());
+        VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+    }
+
+    status = psa_key_derivation_input_key(&mOperation, PSA_KEY_DERIVATION_INPUT_SECRET, hkdfKey);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+
+    status = psa_key_derivation_input_bytes(&mOperation, PSA_KEY_DERIVATION_INPUT_INFO, info.data(), info.size());
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+
+    return CHIP_NO_ERROR;
+}
+
+void LogPsaError(psa_status_t status)
+{
+    if (status != PSA_SUCCESS)
+    {
+        ChipLogError(Crypto, "PSA error: %d", static_cast<int>(status));
+    }
+}
+
+CHIP_ERROR PsaKdf::DeriveBytes(const MutableByteSpan & output)
+{
+    psa_status_t status = psa_key_derivation_output_bytes(&mOperation, output.data(), output.size());
+    LogPsaError(status);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PsaKdf::DeriveKey(const psa_key_attributes_t & attributes, psa_key_id_t & keyId)
+{
+    psa_status_t status = psa_key_derivation_output_key(&attributes, &mOperation, &keyId);
+    LogPsaError(status);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR HKDF_sha::HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
                                  const uint8_t * info, const size_t info_length, uint8_t * out_buffer, size_t out_length)
 {
-    VerifyOrReturnError(secret != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(secret_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsBufferNonEmpty(secret, secret_length), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsBufferNonEmpty(info, info_length), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsBufferNonEmpty(out_buffer, out_length), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(salt != nullptr || salt_length == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    // Salt is optional
-    if (salt_length > 0)
-    {
-        VerifyOrReturnError(salt != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    }
+    PsaKdf kdf;
 
-    VerifyOrReturnError(info_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(info != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(out_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(kdf.Init(ByteSpan(secret, secret_length), ByteSpan(salt, salt_length), ByteSpan(info, info_length)));
 
-    CHIP_ERROR error                         = CHIP_NO_ERROR;
-    psa_status_t status                      = PSA_ERROR_BAD_STATE;
-    psa_key_derivation_operation_t operation = PSA_KEY_DERIVATION_OPERATION_INIT;
-
-    psa_crypto_init();
-
-    status = psa_key_derivation_setup(&operation, PSA_ALG_HKDF(PSA_ALG_SHA_256));
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
-
-    if (salt_length > 0)
-    {
-        status =
-            psa_key_derivation_input_bytes(&operation, PSA_KEY_DERIVATION_INPUT_SALT, Uint8::to_const_uchar(salt), salt_length);
-        VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
-    }
-
-    status =
-        psa_key_derivation_input_bytes(&operation, PSA_KEY_DERIVATION_INPUT_SECRET, Uint8::to_const_uchar(secret), secret_length);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
-
-    status = psa_key_derivation_input_bytes(&operation, PSA_KEY_DERIVATION_INPUT_INFO, Uint8::to_const_uchar(info), info_length);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
-
-    status = psa_key_derivation_output_bytes(&operation, out_buffer, out_length);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
-exit:
-    psa_key_derivation_abort(&operation);
-
-    return error;
+    return kdf.DeriveBytes(MutableByteSpan(out_buffer, out_length));
 }
 
 CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
@@ -476,10 +456,10 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const Hmac128KeyHandle & key, const uint8_t * m
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t pass_length, const uint8_t * salt, size_t salt_length,
+CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * pass, size_t pass_length, const uint8_t * salt, size_t salt_length,
                                         unsigned int iteration_count, uint32_t key_length, uint8_t * key)
 {
-    VerifyOrReturnError(IsBufferNonEmpty(password, pass_length), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsBufferNonEmpty(pass, pass_length), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(salt_length >= kSpake2p_Min_PBKDF_Salt_Length && salt_length <= kSpake2p_Max_PBKDF_Salt_Length,
                         CHIP_ERROR_INVALID_ARGUMENT);
@@ -497,7 +477,7 @@ CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t pass_le
     status = psa_key_derivation_input_integer(&operation, PSA_KEY_DERIVATION_INPUT_COST, iteration_count);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
-    status = psa_key_derivation_input_bytes(&operation, PSA_KEY_DERIVATION_INPUT_PASSWORD, password, pass_length);
+    status = psa_key_derivation_input_bytes(&operation, PSA_KEY_DERIVATION_INPUT_PASSWORD, pass, pass_length);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
     status = psa_key_derivation_output_bytes(&operation, key, key_length);
@@ -509,44 +489,23 @@ exit:
     return error;
 }
 
-CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold)
+CHIP_ERROR add_entropy_source(entropy_source /* fn_source */, void * /* p_source */, size_t /* threshold */)
 {
-    // PSA Crypto has its own entropy and doesn't support an override mechanism
-    (void) fn_source;
-    (void) p_source;
-    (void) threshold;
-
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
 {
-    VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(out_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsBufferNonEmpty(out_buffer, out_length), CHIP_ERROR_INVALID_ARGUMENT);
 
-    psa_crypto_init();
-    const psa_status_t result = psa_generate_random(Uint8::to_uchar(out_buffer), out_length);
-    VerifyOrReturnError(result == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+    const psa_status_t status = psa_generate_random(out_buffer, out_length);
 
-    return CHIP_NO_ERROR;
+    return status == PSA_SUCCESS ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
-// CryptoRNG's definition is needed to use the mbedTLS-backed SPAKE2+ and certificate operations
 static int CryptoRNG(void * ctxt, uint8_t * out_buffer, size_t out_length)
 {
     return (chip::Crypto::DRBG_get_bytes(out_buffer, out_length) == CHIP_NO_ERROR) ? 0 : 1;
-}
-
-// Mapping function is used as part of the certificate operations
-mbedtls_ecp_group_id MapECPGroupId(SupportedECPKeyTypes keyType)
-{
-    switch (keyType)
-    {
-    case SupportedECPKeyTypes::ECP256R1:
-        return MBEDTLS_ECP_DP_SECP256R1;
-    default:
-        return MBEDTLS_ECP_DP_NONE;
-    }
 }
 
 /*******************************************************************************
@@ -571,22 +530,6 @@ mbedtls_ecp_group_id MapECPGroupId(SupportedECPKeyTypes keyType)
  * base class.
  *
  ******************************************************************************/
-
-typedef struct
-{
-    uint8_t privkey[32];
-    size_t bitlen;
-} psa_plaintext_ecp_keypair;
-
-static inline psa_plaintext_ecp_keypair * to_keypair(P256KeypairContext * context)
-{
-    return SafePointerCast<psa_plaintext_ecp_keypair *>(context);
-}
-
-static inline const psa_plaintext_ecp_keypair * to_const_keypair(const P256KeypairContext * context)
-{
-    return SafePointerCast<const psa_plaintext_ecp_keypair *>(context);
-}
 
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
 {
@@ -669,44 +612,22 @@ exit:
 
 CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
-    // Todo: replace with driver call once key derivation through the driver wrapper has been figured out
-    CHIP_ERROR error                          = CHIP_NO_ERROR;
-    psa_status_t status                       = PSA_ERROR_BAD_STATE;
-    mbedtls_svc_key_id_t key_id               = 0;
-    psa_key_attributes_t attr                 = PSA_KEY_ATTRIBUTES_INIT;
-    size_t output_length                      = 0;
-    const psa_plaintext_ecp_keypair * keypair = to_const_keypair(&mKeypair);
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
 
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_UNINITIALIZED);
+    CHIP_ERROR error                      = CHIP_NO_ERROR;
+    psa_status_t status                   = PSA_SUCCESS;
+    const PsaP256KeypairContext & context = ToConstPsaContext(mKeypair);
+    const size_t outputSize               = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
+    size_t outputLength;
 
-    // Step 1: import plaintext key as volatile for ECDH
-    psa_crypto_init();
-
-    psa_set_key_type(&attr, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
-    psa_set_key_bits(&attr, keypair->bitlen);
-    psa_set_key_algorithm(&attr, PSA_ALG_ECDH);
-    psa_set_key_usage_flags(&attr, PSA_KEY_USAGE_DERIVE);
-
-    status = psa_import_key(&attr, keypair->privkey, PSA_BITS_TO_BYTES(keypair->bitlen), &key_id);
-
+    status = psa_raw_key_agreement(PSA_ALG_ECDH, context.key_id, remote_public_key.ConstBytes(), remote_public_key.Length(),
+                                   out_secret.Bytes(), outputSize, &outputLength);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
-
-    // Step 2: do key derivation
-    status = psa_raw_key_agreement(PSA_ALG_ECDH, key_id, Uint8::to_const_uchar(remote_public_key), remote_public_key.Length(),
-                                   out_secret.Bytes(), (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length(),
-                                   &output_length);
-
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
-    SuccessOrExit(error = out_secret.SetLength(output_length));
+    SuccessOrExit(error = out_secret.SetLength(outputLength));
 
 exit:
-    _log_PSA_error(status);
-    // Step 3: destroy imported key
-    psa_reset_key_attributes(&attr);
-    if (key_id != 0)
-    {
-        psa_destroy_key(key_id);
-    }
+    LogPsaError(status);
+
     return error;
 }
 
@@ -788,38 +709,48 @@ exit:
 
 CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
 {
-    CHIP_ERROR error                          = CHIP_NO_ERROR;
-    const psa_plaintext_ecp_keypair * keypair = to_const_keypair(&mKeypair);
-    size_t len                                = output.Length() == 0 ? output.Capacity() : output.Length();
-    Encoding::BufferWriter bbuf(output.Bytes(), len);
+    CHIP_ERROR error                      = CHIP_NO_ERROR;
+    psa_status_t status                   = PSA_SUCCESS;
+    const PsaP256KeypairContext & context = ToConstPsaContext(mKeypair);
+    const size_t outputSize               = output.Length() == 0 ? output.Capacity() : output.Length();
+    Encoding::BufferWriter bbuf(output.Bytes(), outputSize);
+    uint8_t privateKey[kP256_PrivateKey_Length];
+    size_t privateKeyLength = 0;
 
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_UNINITIALIZED);
+    status = psa_export_key(context.key_id, privateKey, sizeof(privateKey), &privateKeyLength);
+    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(privateKeyLength == kP256_PrivateKey_Length, error = CHIP_ERROR_INTERNAL);
 
     bbuf.Put(mPublicKey, mPublicKey.Length());
-
-    VerifyOrExit(bbuf.Available() == sizeof(keypair->privkey), error = CHIP_ERROR_INTERNAL);
-
-    bbuf.Put(keypair->privkey, PSA_BITS_TO_BYTES(keypair->bitlen));
+    bbuf.Put(privateKey, privateKeyLength);
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    output.SetLength(bbuf.Needed());
+    error = output.SetLength(bbuf.Needed());
 
 exit:
+    LogPsaError(status);
+
     return error;
 }
 
 CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 {
-    CHIP_ERROR error                    = CHIP_NO_ERROR;
-    psa_plaintext_ecp_keypair * keypair = to_keypair(&mKeypair);
-    Encoding::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
+    VerifyOrReturnError(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    CHIP_ERROR error                = CHIP_NO_ERROR;
+    psa_status_t status             = PSA_SUCCESS;
+    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+    PsaP256KeypairContext & context = ToPsaContext(mKeypair);
+    Encoding::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
 
     Clear();
 
-    memcpy(keypair->privkey, input.ConstBytes() + mPublicKey.Length(), kP256_PrivateKey_Length);
-    keypair->bitlen = 256;
+    psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
+    psa_set_key_bits(&attributes, kP256_PrivateKey_Length * 8);
+    psa_set_key_algorithm(&attributes, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
+    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_EXPORT | PSA_KEY_USAGE_SIGN_MESSAGE);
+
+    status = psa_import_key(&attributes, input.ConstBytes() + mPublicKey.Length(), kP256_PrivateKey_Length, &context.key_id);
+    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
     bbuf.Put(input.ConstBytes(), mPublicKey.Length());
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
@@ -827,6 +758,8 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     mInitialized = true;
 
 exit:
+    LogPsaError(status);
+
     return error;
 }
 
@@ -834,8 +767,9 @@ void P256Keypair::Clear()
 {
     if (mInitialized)
     {
-        psa_plaintext_ecp_keypair * keypair = to_keypair(&mKeypair);
-        memset(keypair, 0, sizeof(psa_plaintext_ecp_keypair));
+        PsaP256KeypairContext & context = ToPsaContext(mKeypair);
+        psa_destroy_key(context.key_id);
+        memset(&context, 0, sizeof(context));
         mInitialized = false;
     }
 }
@@ -847,71 +781,14 @@ P256Keypair::~P256Keypair()
 
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
+    VerifyOrReturnError(IsBufferNonEmpty(out_csr, csr_length), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
+
     MutableByteSpan csr(out_csr, csr_length);
-    CHIP_ERROR err = GenerateCertificateSigningRequest(this, csr);
-    csr_length     = (CHIP_NO_ERROR == err) ? csr.size() : 0;
-    return err;
-}
+    ReturnErrorOnFailure(GenerateCertificateSigningRequest(this, csr));
+    csr_length = csr.size();
 
-CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_length, P256PublicKey & pubkey)
-{
-#if defined(MBEDTLS_X509_CSR_PARSE_C)
-    ReturnErrorOnFailure(VerifyCertificateSigningRequestFormat(csr_buf, csr_length));
-
-    // TODO: For some embedded targets, mbedTLS library doesn't have mbedtls_x509_csr_parse_der, and mbedtls_x509_csr_parse_free.
-    //       Taking a step back, embedded targets likely will not process CSR requests. Adding this action item to reevaluate
-    //       this if there's a need for this processing for embedded targets.
-    CHIP_ERROR error   = CHIP_NO_ERROR;
-    size_t pubkey_size = 0;
-
-    mbedtls_ecp_keypair * keypair = nullptr;
-
-    P256ECDSASignature signature;
-    MutableByteSpan out_raw_sig_span(signature.Bytes(), signature.Capacity());
-
-    mbedtls_x509_csr csr;
-    mbedtls_x509_csr_init(&csr);
-
-    int result = mbedtls_x509_csr_parse_der(&csr, csr_buf, csr_length);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    // Verify the signature algorithm and public key type
-    VerifyOrExit(csr.CHIP_CRYPTO_PAL_PRIVATE(sig_md) == MBEDTLS_MD_SHA256, error = CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE);
-    VerifyOrExit(csr.CHIP_CRYPTO_PAL_PRIVATE(sig_pk) == MBEDTLS_PK_ECDSA, error = CHIP_ERROR_WRONG_KEY_TYPE);
-
-    keypair = mbedtls_pk_ec(csr.CHIP_CRYPTO_PAL_PRIVATE_X509(pk));
-
-    // Copy the public key from the CSR
-    result = mbedtls_ecp_point_write_binary(&keypair->CHIP_CRYPTO_PAL_PRIVATE(grp), &keypair->CHIP_CRYPTO_PAL_PRIVATE(Q),
-                                            MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_size, Uint8::to_uchar(pubkey), pubkey.Length());
-
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INTERNAL);
-
-    // Convert DER signature to raw signature
-    error = EcdsaAsn1SignatureToRaw(kP256_FE_Length,
-                                    ByteSpan{ csr.CHIP_CRYPTO_PAL_PRIVATE(sig).CHIP_CRYPTO_PAL_PRIVATE_X509(p),
-                                              csr.CHIP_CRYPTO_PAL_PRIVATE(sig).CHIP_CRYPTO_PAL_PRIVATE_X509(len) },
-                                    out_raw_sig_span);
-
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(out_raw_sig_span.size() == (kP256_FE_Length * 2), error = CHIP_ERROR_INTERNAL);
-    signature.SetLength(out_raw_sig_span.size());
-
-    // Verify the signature using the public key
-    error = pubkey.ECDSA_validate_msg_signature(csr.CHIP_CRYPTO_PAL_PRIVATE_X509(cri).CHIP_CRYPTO_PAL_PRIVATE_X509(p),
-                                                csr.CHIP_CRYPTO_PAL_PRIVATE_X509(cri).CHIP_CRYPTO_PAL_PRIVATE_X509(len), signature);
-
-    SuccessOrExit(error);
-
-exit:
-    mbedtls_x509_csr_free(&csr);
-    _log_mbedTLS_error(result);
-    return error;
-#else
-    ChipLogError(Crypto, "MBEDTLS_X509_CSR_PARSE_C is not enabled. CSR cannot be parsed");
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
+    return CHIP_NO_ERROR;
 }
 
 typedef struct Spake2p_Context
@@ -991,7 +868,6 @@ void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
     VerifyOrReturn(state != CHIP_SPAKE2P_STATE::PREINIT);
 
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
-
     mbedtls_ecp_point_free(&context->M);
     mbedtls_ecp_point_free(&context->N);
     mbedtls_ecp_point_free(&context->X);
@@ -1006,7 +882,6 @@ void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
     mbedtls_mpi_free(&context->tempbn);
 
     mbedtls_ecp_group_free(&context->curve);
-
     state = CHIP_SPAKE2P_STATE::PREINIT;
 }
 
@@ -1339,46 +1214,41 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointCofactorMul(void * R)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1sin, size_t w1sin_len)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len)
 {
-    CHIP_ERROR error          = CHIP_NO_ERROR;
-    int result                = 0;
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
 
+    mbedtls_ecp_group curve;
     mbedtls_mpi w1_bn;
     mbedtls_ecp_point Ltemp;
 
+    mbedtls_ecp_group_init(&curve);
     mbedtls_mpi_init(&w1_bn);
     mbedtls_ecp_point_init(&Ltemp);
 
-    result = mbedtls_mpi_read_binary(&w1_bn, Uint8::to_const_uchar(w1sin), w1sin_len);
+    result = mbedtls_ecp_group_load(&curve, MBEDTLS_ECP_DP_SECP256R1);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_mpi_mod_mpi(&w1_bn, &w1_bn, &context->curve.N);
+    result = mbedtls_mpi_read_binary(&w1_bn, Uint8::to_const_uchar(w1in), w1in_len);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-#if defined(SEMAILBOX_PRESENT)
-    // Do the point multiplication using hardware acceleration via ECDH primitive
-    error = PointMul(&Ltemp, &context->curve.G, &w1_bn);
-    if (error != CHIP_NO_ERROR)
-    {
-        goto exit;
-    }
-#else  /* SEMAILBOX_PRESENT */
-    result = mbedtls_ecp_mul(&context->curve, &Ltemp, &w1_bn, &context->curve.G, CryptoRNG, nullptr);
+    result = mbedtls_mpi_mod_mpi(&w1_bn, &w1_bn, &curve.N);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-#endif /* SEMAILBOX_PRESENT */
+
+    result = mbedtls_ecp_mul(&curve, &Ltemp, &w1_bn, &curve.G, CryptoRNG, nullptr);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     memset(Lout, 0, *L_len);
 
-    result =
-        mbedtls_ecp_point_write_binary(&context->curve, &Ltemp, MBEDTLS_ECP_PF_UNCOMPRESSED, L_len, Uint8::to_uchar(Lout), *L_len);
+    result = mbedtls_ecp_point_write_binary(&curve, &Ltemp, MBEDTLS_ECP_PF_UNCOMPRESSED, L_len, Uint8::to_uchar(Lout), *L_len);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
     _log_mbedTLS_error(result);
     mbedtls_ecp_point_free(&Ltemp);
     mbedtls_mpi_free(&w1_bn);
+    mbedtls_ecp_group_free(&curve);
 
     return error;
 }
@@ -1394,6 +1264,10 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
 
     return CHIP_NO_ERROR;
 }
+
+//
+// X.509 Handling
+//
 
 constexpr uint8_t sOID_AttributeType_CommonName[]         = { 0x55, 0x04, 0x03 };
 constexpr uint8_t sOID_AttributeType_MatterVendorId[]     = { 0x2B, 0x06, 0x01, 0x04, 0x01, 0x82, 0xA2, 0x7C, 0x02, 0x01 };
@@ -2352,94 +2226,65 @@ CHIP_ERROR ReplaceCertIfResignedCertFound(const ByteSpan & referenceCertificate,
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 }
 
-void LogPsaError(psa_status_t status)
+CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_length, P256PublicKey & pubkey)
 {
-    if (status != PSA_SUCCESS)
-    {
-        ChipLogError(Crypto, "PSA error: %d", static_cast<int>(status));
-    }
-}
+#if defined(MBEDTLS_X509_CSR_PARSE_C)
+    ReturnErrorOnFailure(VerifyCertificateSigningRequestFormat(csr_buf, csr_length));
 
-CHIP_ERROR PsaKdf::Init(const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info)
-{
-    psa_status_t status        = PSA_SUCCESS;
-    psa_key_attributes_t attrs = PSA_KEY_ATTRIBUTES_INIT;
+    // TODO: For some embedded targets, mbedTLS library doesn't have mbedtls_x509_csr_parse_der, and mbedtls_x509_csr_parse_free.
+    //       Taking a step back, embedded targets likely will not process CSR requests. Adding this action item to reevaluate
+    //       this if there's a need for this processing for embedded targets.
+    CHIP_ERROR error   = CHIP_NO_ERROR;
+    size_t pubkey_size = 0;
 
-    psa_set_key_type(&attrs, PSA_KEY_TYPE_DERIVE);
-    psa_set_key_algorithm(&attrs, PSA_ALG_HKDF(PSA_ALG_SHA_256));
-    psa_set_key_usage_flags(&attrs, PSA_KEY_USAGE_DERIVE);
+    mbedtls_ecp_keypair * keypair = nullptr;
 
-    status = psa_import_key(&attrs, secret.data(), secret.size(), &mSecretKeyId);
-    LogPsaError(status);
-    psa_reset_key_attributes(&attrs);
-    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+    P256ECDSASignature signature;
+    MutableByteSpan out_raw_sig_span(signature.Bytes(), signature.Capacity());
 
-    return InitOperation(mSecretKeyId, salt, info);
-}
+    mbedtls_x509_csr csr;
+    mbedtls_x509_csr_init(&csr);
 
-CHIP_ERROR PsaKdf::Init(const HkdfKeyHandle & hkdfKey, const ByteSpan & salt, const ByteSpan & info)
-{
-    return InitOperation(hkdfKey.As<psa_key_id_t>(), salt, info);
-}
+    int result = mbedtls_x509_csr_parse_der(&csr, csr_buf, csr_length);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-CHIP_ERROR PsaKdf::InitOperation(psa_key_id_t hkdfKey, const ByteSpan & salt, const ByteSpan & info)
-{
-    psa_status_t status = psa_key_derivation_setup(&mOperation, PSA_ALG_HKDF(PSA_ALG_SHA_256));
-    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+    // Verify the signature algorithm and public key type
+    VerifyOrExit(csr.CHIP_CRYPTO_PAL_PRIVATE(sig_md) == MBEDTLS_MD_SHA256, error = CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE);
+    VerifyOrExit(csr.CHIP_CRYPTO_PAL_PRIVATE(sig_pk) == MBEDTLS_PK_ECDSA, error = CHIP_ERROR_WRONG_KEY_TYPE);
 
-    if (salt.size() > 0)
-    {
-        status = psa_key_derivation_input_bytes(&mOperation, PSA_KEY_DERIVATION_INPUT_SALT, salt.data(), salt.size());
-        VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
-    }
+    keypair = mbedtls_pk_ec(csr.CHIP_CRYPTO_PAL_PRIVATE_X509(pk));
 
-    status = psa_key_derivation_input_key(&mOperation, PSA_KEY_DERIVATION_INPUT_SECRET, hkdfKey);
-    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+    // Copy the public key from the CSR
+    result = mbedtls_ecp_point_write_binary(&keypair->CHIP_CRYPTO_PAL_PRIVATE(grp), &keypair->CHIP_CRYPTO_PAL_PRIVATE(Q),
+                                            MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_size, Uint8::to_uchar(pubkey), pubkey.Length());
 
-    status = psa_key_derivation_input_bytes(&mOperation, PSA_KEY_DERIVATION_INPUT_INFO, info.data(), info.size());
-    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INTERNAL);
 
-    return CHIP_NO_ERROR;
-}
+    // Convert DER signature to raw signature
+    error = EcdsaAsn1SignatureToRaw(kP256_FE_Length,
+                                    ByteSpan{ csr.CHIP_CRYPTO_PAL_PRIVATE(sig).CHIP_CRYPTO_PAL_PRIVATE_X509(p),
+                                              csr.CHIP_CRYPTO_PAL_PRIVATE(sig).CHIP_CRYPTO_PAL_PRIVATE_X509(len) },
+                                    out_raw_sig_span);
 
-CHIP_ERROR PsaKdf::DeriveBytes(const MutableByteSpan & output)
-{
-    psa_status_t status = psa_key_derivation_output_bytes(&mOperation, output.data(), output.size());
-    LogPsaError(status);
-    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(out_raw_sig_span.size() == (kP256_FE_Length * 2), error = CHIP_ERROR_INTERNAL);
+    signature.SetLength(out_raw_sig_span.size());
 
-    return CHIP_NO_ERROR;
-}
+    // Verify the signature using the public key
+    error = pubkey.ECDSA_validate_msg_signature(csr.CHIP_CRYPTO_PAL_PRIVATE_X509(cri).CHIP_CRYPTO_PAL_PRIVATE_X509(p),
+                                                csr.CHIP_CRYPTO_PAL_PRIVATE_X509(cri).CHIP_CRYPTO_PAL_PRIVATE_X509(len), signature);
 
-CHIP_ERROR PsaKdf::DeriveKey(const psa_key_attributes_t & attributes, psa_key_id_t & keyId)
-{
-    psa_status_t status = psa_key_derivation_output_key(&attributes, &mOperation, &keyId);
-    LogPsaError(status);
-    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+    SuccessOrExit(error);
 
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR FindFreeKeySlotInRange(psa_key_id_t & keyId, psa_key_id_t start, uint32_t range)
-{
-    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
-    psa_key_id_t end                = start + range;
-
-    VerifyOrReturnError(start >= PSA_KEY_ID_USER_MIN && end - 1 <= PSA_KEY_ID_USER_MAX, CHIP_ERROR_INVALID_ARGUMENT);
-
-    for (keyId = start; keyId < end; keyId++)
-    {
-        psa_status_t status = psa_get_key_attributes(keyId, &attributes);
-        if (status == PSA_ERROR_INVALID_HANDLE)
-        {
-            return CHIP_NO_ERROR;
-        }
-        else if (status != PSA_SUCCESS)
-        {
-            return CHIP_ERROR_INTERNAL;
-        }
-    }
-    return CHIP_ERROR_NOT_FOUND;
+exit:
+    mbedtls_x509_csr_free(&csr);
+    _log_mbedTLS_error(result);
+    return error;
+#else
+    ChipLogError(Crypto, "MBEDTLS_X509_CSR_PARSE_C is not enabled. CSR cannot be parsed");
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
 }
 
 } // namespace Crypto

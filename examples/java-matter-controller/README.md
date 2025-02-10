@@ -30,7 +30,7 @@ system or not. In order to install the Java Runtime Environment on your system,
 run the following command as root:
 
 ```
-sudo apt install default-jre Install Java default JRE
+sudo apt install default-jre
 ```
 
 After installing the JRE, let us check if we have the Java Development Kit

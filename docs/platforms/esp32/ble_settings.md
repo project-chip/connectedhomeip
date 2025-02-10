@@ -13,13 +13,14 @@ advertising packets.
 
 ```
 {
-    uint8_t scanResponse[31]; // 0x05, 0x09, a, b, c, d
-    scanResponse[0] = 0x05;
-    scanResponse[1] = 0x09;
-    scanResponse[2] = 0x61;
-    scanResponse[3] = 0x62;
-    scanResponse[4] = 0x63;
-    scanResponse[5] = 0x64;
+
+    // Max length is 31 bytes
+    // Enter data in (length, type, value) format
+    // 0x05 - length of data
+    // 0x09 - Type (Complete Local Name)
+    // 0x61, 0x62, 0x63, 0x64 - Data (a,b,c,d)
+    uint8_t scanResponse[] = { 0x05, 0x09, 0x61, 0x62, 0x63, 0x64};
+
     chip::ByteSpan data(scanResponse);
     CHIP_ERROR err = chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureScanResponseData(data);
     if (err != CHIP_NO_ERROR)
@@ -27,6 +28,8 @@ advertising packets.
         ESP_LOGE(TAG, "Failed to configure scan response, err:%" CHIP_ERROR_FORMAT, err.Format());
     }
 }
+
+
 ```
 
 Note: Scan response should be configure before `InitServer`.

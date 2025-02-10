@@ -79,3 +79,16 @@ static_library("setup_payload") {
     "${chip_root}/src/lib/support",
   ]
 }
+
+source_set("onboarding-codes-utils") {
+  sources = [
+    "OnboardingCodesUtil.cpp",
+    "OnboardingCodesUtil.h",
+  ]
+
+  deps = [ "${chip_root}/src/platform" ]
+
+  public_deps = [ "${chip_root}/src/setup_payload" ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}

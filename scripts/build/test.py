@@ -108,7 +108,6 @@ class TestBuilder(unittest.TestCase):
         # build options do not change too much
         TARGETS = [
             'esp32-devkitc-light-rpc',
-            'esp32-m5stack-all-clusters-minimal-rpc-ipv6only',
             'android-arm64-chip-tool',
             'nrf-nrf52840dk-pump',
             'efr32-brd4187c-light-rpc-no-version',

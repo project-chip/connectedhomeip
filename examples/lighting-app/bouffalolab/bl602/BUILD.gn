@@ -66,7 +66,7 @@ bl_iot_sdk("sdk") {
     "${chip_root}/src/platform/bouffalolab/common",
   ]
 
-  freertos_config = "${examples_plat_dir}/bl602/FreeRTOSConfig.h"
+  freertos_config = "${example_dir}/bl602/FreeRTOSConfig.h"
 
   defines = [
     "INCLUDE_xSemaphoreGetMutexHolder=1",
@@ -107,7 +107,6 @@ bouffalolab_executable("lighting_app") {
     defines += [ "BOOT_PIN_RESET=8" ]
   }
 
-  defines += [ "CONF_ENABLE_FRAME_PTR=${enable_debug_frame_ptr}" ]
   defines +=
       [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
 

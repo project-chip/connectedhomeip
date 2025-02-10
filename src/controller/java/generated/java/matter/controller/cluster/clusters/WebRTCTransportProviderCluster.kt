@@ -110,7 +110,7 @@ class WebRTCTransportProviderCluster(
   }
 
   suspend fun solicitOffer(
-    streamType: UByte,
+    streamUsage: UByte,
     videoStreamID: UShort?,
     audioStreamID: UShort?,
     ICEServers: List<WebRTCTransportProviderClusterICEServerStruct>?,
@@ -123,8 +123,8 @@ class WebRTCTransportProviderCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_STREAM_TYPE_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_STREAM_TYPE_REQ), streamType)
+    val TAG_STREAM_USAGE_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_STREAM_USAGE_REQ), streamUsage)
 
     val TAG_VIDEO_STREAM_ID_REQ: Int = 1
     videoStreamID?.let { tlvWriter.put(ContextSpecificTag(TAG_VIDEO_STREAM_ID_REQ), videoStreamID) }
@@ -249,7 +249,7 @@ class WebRTCTransportProviderCluster(
   suspend fun provideOffer(
     webRTCSessionID: UShort?,
     sdp: String,
-    streamType: UByte,
+    streamUsage: UByte,
     videoStreamID: UShort?,
     audioStreamID: UShort?,
     ICEServers: List<WebRTCTransportProviderClusterICEServerStruct>?,
@@ -270,8 +270,8 @@ class WebRTCTransportProviderCluster(
     val TAG_SDP_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_SDP_REQ), sdp)
 
-    val TAG_STREAM_TYPE_REQ: Int = 2
-    tlvWriter.put(ContextSpecificTag(TAG_STREAM_TYPE_REQ), streamType)
+    val TAG_STREAM_USAGE_REQ: Int = 2
+    tlvWriter.put(ContextSpecificTag(TAG_STREAM_USAGE_REQ), streamUsage)
 
     val TAG_VIDEO_STREAM_ID_REQ: Int = 3
     videoStreamID?.let { tlvWriter.put(ContextSpecificTag(TAG_VIDEO_STREAM_ID_REQ), videoStreamID) }

@@ -131,11 +131,14 @@ Generally regenerate using one of:
 |       1296 |      0x510 | ContentAppObserver                                      |
 |       1360 |      0x550 | ZoneManagement                                          |
 |       1361 |      0x551 | CameraAvStreamManagement                                |
+|       1362 |      0x552 | CameraAvSettingsUserLevelManagement                     |
 |       1363 |      0x553 | WebRTCTransportProvider                                 |
 |       1364 |      0x554 | WebRTCTransportRequestor                                |
+|       1365 |      0x555 | PushAvStreamTransport                                   |
 |       1366 |      0x556 | Chime                                                   |
 |       1872 |      0x750 | EcosystemInformation                                    |
 |       1873 |      0x751 | CommissionerControl                                     |
+|       2049 |      0x801 | TlsCertificateManagement                                |
 | 4294048773 | 0xFFF1FC05 | UnitTesting                                             |
 | 4294048774 | 0xFFF1FC06 | FaultInjection                                          |
 | 4294048800 | 0xFFF1FC20 | SampleMei                                               |

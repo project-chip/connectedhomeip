@@ -1022,8 +1022,8 @@ class BaseTestHelper:
     async def TestResubscription(self, nodeid: int):
         ''' This validates the re-subscription logic by triggering a liveness failure caused by the expiration
             of the underlying CASE session and the resultant failure to receive reports from the server. This should
-            trigger CASE session establishment and subscription restablishment. Both the attempt and successful
-            restablishment of the subscription are validated.
+            trigger CASE session establishment and subscription reestablishment. Both the attempt and successful
+            reestablishment of the subscription are validated.
         '''
         cv = asyncio.Condition()
         resubAttempted = False
@@ -1053,7 +1053,7 @@ class BaseTestHelper:
         subscription.SetResubscriptionSucceededCallback(OnResubscriptionSucceeded, True)
 
         #
-        # Over-ride the default liveness timeout (which is set quite high to accomodate for
+        # Over-ride the default liveness timeout (which is set quite high to accommodate for
         # transport delays) to something very small. This ensures that our liveness timer will
         # fire quickly and cause a re-subscription to occur naturally.
         #

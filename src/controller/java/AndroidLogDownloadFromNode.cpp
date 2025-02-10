@@ -99,7 +99,7 @@ CHIP_ERROR AndroidLogDownloadFromNode::SendRetrieveLogsRequest(Messaging::Exchan
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Make BDX URI failure : %" CHIP_ERROR_FORMAT, err.Format());
-        FinishLogDownloadFromNode(err);
+        FinishLogDownloadFromNode(static_cast<void *>(this), err);
     }
 
     mBdxReceiver =
@@ -132,18 +132,14 @@ void AndroidLogDownloadFromNode::OnDeviceConnectedFn(void * context, Messaging::
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Log Download failure : %" CHIP_ERROR_FORMAT, err.Format());
-        self->FinishLogDownloadFromNode(err);
+        FinishLogDownloadFromNode(context, err);
     }
 }
 
 void AndroidLogDownloadFromNode::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
 {
     ChipLogProgress(Controller, "OnDeviceConnectionFailureFn: %" CHIP_ERROR_FORMAT, err.Format());
-
-    auto * self = static_cast<AndroidLogDownloadFromNode *>(context);
-    VerifyOrReturn(self != nullptr, ChipLogProgress(Controller, "Device connected failure callback with null context. Ignoring"));
-
-    self->FinishLogDownloadFromNode(err);
+    FinishLogDownloadFromNode(context, err);
 }
 
 void AndroidLogDownloadFromNode::OnResponseRetrieveLogs(void * context,
@@ -156,31 +152,31 @@ void AndroidLogDownloadFromNode::OnResponseRetrieveLogs(void * context,
     using namespace chip::app::Clusters::DiagnosticLogs;
     if (data.status == StatusEnum::kSuccess)
     {
-        ChipLogProgress(Controller, "Success. Will receive log from BDX protocol.")
+        ChipLogProgress(Controller, "Success. Will receive log from BDX protocol.");
     }
     else if (data.status == StatusEnum::kExhausted)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         self->OnTransferCallback(self->mController->GetFabricIndex(), self->mRemoteNodeId, data.logContent, &err);
-        self->FinishLogDownloadFromNode(err);
+        FinishLogDownloadFromNode(context, err);
     }
     else if (data.status == StatusEnum::kNoLogs)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         self->OnTransferCallback(self->mController->GetFabricIndex(), self->mRemoteNodeId, ByteSpan(), &err);
-        self->FinishLogDownloadFromNode(err);
+        FinishLogDownloadFromNode(context, err);
     }
     else if (data.status == StatusEnum::kBusy)
     {
-        self->FinishLogDownloadFromNode(CHIP_ERROR_BUSY);
+        FinishLogDownloadFromNode(context, CHIP_ERROR_BUSY);
     }
     else if (data.status == StatusEnum::kDenied)
     {
-        self->FinishLogDownloadFromNode(CHIP_ERROR_ACCESS_DENIED);
+        FinishLogDownloadFromNode(context, CHIP_ERROR_ACCESS_DENIED);
     }
     else
     {
-        self->FinishLogDownloadFromNode(CHIP_ERROR_INVALID_DATA_LIST);
+        FinishLogDownloadFromNode(context, CHIP_ERROR_INVALID_DATA_LIST);
     }
 }
 
@@ -191,48 +187,60 @@ void AndroidLogDownloadFromNode::OnCommandFailure(void * context, CHIP_ERROR err
     auto * self = static_cast<AndroidLogDownloadFromNode *>(context);
     VerifyOrReturn(self != nullptr, ChipLogProgress(Controller, "Send command failure callback with null context. Ignoring"));
 
-    self->FinishLogDownloadFromNode(err);
+    FinishLogDownloadFromNode(context, err);
 }
 
-void AndroidLogDownloadFromNode::FinishLogDownloadFromNode(CHIP_ERROR err)
+void AndroidLogDownloadFromNode::FinishLogDownloadFromNode(void * context, CHIP_ERROR err)
 {
-    CHIP_ERROR jniErr = CHIP_NO_ERROR;
-    if (mBdxReceiver != nullptr)
+    auto * self = static_cast<AndroidLogDownloadFromNode *>(context);
+    VerifyOrReturn(self != nullptr, ChipLogProgress(Controller, "Finish Log Download with null context. Ignoring"));
+
+    if (self->mBdxReceiver != nullptr)
     {
-        if (mTimeout > 0)
+        if (self->mTimeout > 0 && err != CHIP_ERROR_TIMEOUT)
         {
-            mBdxReceiver->CancelBDXTransferTimeout();
+            self->mBdxReceiver->CancelBDXTransferTimeout();
         }
-        delete mBdxReceiver;
-        mBdxReceiver = nullptr;
+        delete self->mBdxReceiver;
+        self->mBdxReceiver = nullptr;
     }
 
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    CHIP_ERROR jniErr = CHIP_NO_ERROR;
+    JNIEnv * env      = JniReferences::GetInstance().GetEnvForCurrentThread();
     JniLocalReferenceScope scope(env);
+
+    jobject jCallback   = self->mJavaCallback.ObjectRef();
+    jint jFabricIndex   = static_cast<jint>(self->mController->GetFabricIndex());
+    jlong jremoteNodeId = static_cast<jlong>(self->mRemoteNodeId);
+
+    VerifyOrExit(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
 
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(Controller, "Log Download succeeded.");
         jmethodID onSuccessMethod;
         // Java method signature : boolean onSuccess(int fabricIndex, long nodeId)
-        jniErr = JniReferences::GetInstance().FindMethod(env, mJavaCallback.ObjectRef(), "onSuccess", "(IJ)V", &onSuccessMethod);
+        jniErr = JniReferences::GetInstance().FindMethod(env, jCallback, "onSuccess", "(IJ)V", &onSuccessMethod);
 
-        VerifyOrReturn(jniErr == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onSuccess method"));
+        VerifyOrExit(jniErr == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onSuccess method"));
 
-        env->CallVoidMethod(mJavaCallback.ObjectRef(), onSuccessMethod, static_cast<jint>(mController->GetFabricIndex()),
-                            static_cast<jlong>(mRemoteNodeId));
-        return;
+        env->CallVoidMethod(jCallback, onSuccessMethod, jFabricIndex, jremoteNodeId);
+    }
+    else
+    {
+        ChipLogError(Controller, "Log Download Failed : %" CHIP_ERROR_FORMAT, err.Format());
+
+        jmethodID onErrorMethod;
+        // Java method signature : void onError(int fabricIndex, long nodeId, long errorCode)
+        jniErr = JniReferences::GetInstance().FindMethod(env, jCallback, "onError", "(IJJ)V", &onErrorMethod);
+        VerifyOrExit(jniErr == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onError method"));
+
+        env->CallVoidMethod(jCallback, onErrorMethod, jFabricIndex, jremoteNodeId, static_cast<jlong>(err.AsInteger()));
     }
 
-    ChipLogError(Controller, "Log Download Failed : %" CHIP_ERROR_FORMAT, err.Format());
-
-    jmethodID onErrorMethod;
-    // Java method signature : void onError(int fabricIndex, long nodeId, long errorCode)
-    jniErr = JniReferences::GetInstance().FindMethod(env, mJavaCallback.ObjectRef(), "onError", "(IJJ)V", &onErrorMethod);
-    VerifyOrReturn(jniErr == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onError method"));
-
-    env->CallVoidMethod(mJavaCallback.ObjectRef(), onErrorMethod, static_cast<jint>(mController->GetFabricIndex()),
-                        static_cast<jlong>(mRemoteNodeId), static_cast<jlong>(err.AsInteger()));
+exit:
+    // Finish this function, this object will be deleted.
+    delete self;
 }
 
 void AndroidLogDownloadFromNode::OnBdxTransferCallback(void * context, FabricIndex fabricIndex, NodeId remoteNodeId,
@@ -266,7 +274,8 @@ void AndroidLogDownloadFromNode::OnTransferCallback(FabricIndex fabricIndex, Nod
 
     if (ret != JNI_TRUE)
     {
-        ChipLogError(Controller, "Transfer will be rejected.") * errInfoOnFailure = CHIP_ERROR_INTERNAL;
+        ChipLogError(Controller, "Transfer will be rejected.");
+        *errInfoOnFailure = CHIP_ERROR_INTERNAL;
     }
 }
 
@@ -277,7 +286,7 @@ void AndroidLogDownloadFromNode::OnBdxTransferSuccessCallback(void * context, Fa
     auto * self = static_cast<AndroidLogDownloadFromNode *>(context);
     VerifyOrReturn(self != nullptr, ChipLogProgress(Controller, "Send command failure callback with null context. Ignoring"));
 
-    self->FinishLogDownloadFromNode(CHIP_NO_ERROR);
+    FinishLogDownloadFromNode(context, CHIP_NO_ERROR);
 }
 
 void AndroidLogDownloadFromNode::OnBdxTransferFailureCallback(void * context, FabricIndex fabricIndex, NodeId remoteNodeId,
@@ -288,7 +297,7 @@ void AndroidLogDownloadFromNode::OnBdxTransferFailureCallback(void * context, Fa
     auto * self = static_cast<AndroidLogDownloadFromNode *>(context);
     VerifyOrReturn(self != nullptr, ChipLogProgress(Controller, "Send command failure callback with null context. Ignoring"));
 
-    self->FinishLogDownloadFromNode(status);
+    FinishLogDownloadFromNode(context, status);
 }
 } // namespace Controller
 } // namespace chip

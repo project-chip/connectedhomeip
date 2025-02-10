@@ -21,7 +21,10 @@
 #include <platform/CHIPDeviceError.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
 #include <platform/nxp/common/CHIPDeviceNXPPlatformDefaultConfig.h>
+
+extern "C" {
 #include <settings.h>
+}
 
 /* Only for flash init, to be move to sdk framework */
 #include "nvs_port.h"

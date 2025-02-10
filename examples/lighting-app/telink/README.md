@@ -15,7 +15,6 @@ The example supports building and running on the following devices:
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | [B91](https://wiki.telink-semi.cn/wiki/Hardware/B91_Generic_Starter_Kit_Hardware_Guide) [TLSR9518ADK80D](https://wiki.telink-semi.cn/wiki/chip-series/TLSR951x-Series) | `tlsr9518adk80d`, `tlsr9518adk80d-mars`, `tlsr9518adk80d-usb` | [TLSR9518ADK80D](https://github.com/telink-semi/zephyr/blob/develop/boards/riscv/tlsr9518adk80d/doc/index.rst) |
 | [B92](https://wiki.telink-semi.cn/wiki/Hardware/B92_Generic_Starter_Kit_Hardware_Guide) [TLSR9528A](https://wiki.telink-semi.cn/wiki/chip-series/TLSR952x-Series)      | `tlsr9528a`, `tlsr9528a_retention`                            | [TLSR9528A](https://github.com/telink-semi/zephyr/blob/develop/boards/riscv/tlsr9528a/doc/index.rst)           |
-| [B95](https://wiki.telink-semi.cn/wiki/Hardware/B95_Generic_Starter_Kit_Hardware_Guide) [TLSR9258A](https://wiki.telink-semi.cn/wiki/chip-series/TLSR925x-Series)      | `tlsr9258a`                                                   | [TLSR9258A](https://github.com/telink-semi/zephyr/blob/develop/boards/riscv/tlsr9258a/doc/index.rst)           |
 | [W91](https://wiki.telink-semi.cn/wiki/Hardware/W91_Generic_Starter_Kit_Hardware_Guide) [TLSR9118BDK40D](https://wiki.telink-semi.cn/wiki/chip-series/TLSR911x-Series) | `tlsr9118bdk40d`                                              | [TLSR9118BDK40D](https://github.com/telink-semi/zephyr/blob/develop/boards/riscv/tlsr9118bdk40d/doc/index.rst) |
 
 ## Build and flash
@@ -74,6 +73,33 @@ To get output from device, connect UART to following pins:
 | GND  | GND                           |
 
 Baud rate: 115200 bits/s
+
+### Using USB COM Port Instead of UART
+
+Alternatively, the USB COM port can be used instead of UART for console output.
+
+1. Build the project with the following parameter:
+
+    ```bash
+    $ west build -b <build_target> -- -DTLNK_USB_DONGLE=y
+    ```
+
+2. Connect the USB cable to your device. A new serial device should appear in
+   your system (e.g., `/dev/ttyACM0` on Linux or a COM port on Windows).
+3. Use your preferred terminal application (like `minicom`, `screen`, or
+   `PuTTY`) to connect to the newly detected serial device.
+4. In your source code, ensure the following header is included and the USB
+   device stack is initialized:
+
+    ```c
+    #ifdef CONFIG_USB_DEVICE_STACK
+    #include <zephyr/usb/usb_device.h>
+    #endif /* CONFIG_USB_DEVICE_STACK */
+
+    #ifdef CONFIG_USB_DEVICE_STACK
+        usb_enable(NULL);
+    #endif /* CONFIG_USB_DEVICE_STACK */
+    ```
 
 ### Buttons
 

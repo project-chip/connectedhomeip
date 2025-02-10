@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class CameraAvStreamManagementClusterAudioStreamChangedEvent(
   val audioStreamID: UInt,
-  val streamType: Optional<UInt>,
+  val streamUsage: Optional<UInt>,
   val audioCodec: Optional<UInt>,
   val channelCount: Optional<UInt>,
   val sampleRate: Optional<ULong>,
@@ -35,7 +35,7 @@ class CameraAvStreamManagementClusterAudioStreamChangedEvent(
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterAudioStreamChangedEvent {\n")
     append("\taudioStreamID : $audioStreamID\n")
-    append("\tstreamType : $streamType\n")
+    append("\tstreamUsage : $streamUsage\n")
     append("\taudioCodec : $audioCodec\n")
     append("\tchannelCount : $channelCount\n")
     append("\tsampleRate : $sampleRate\n")
@@ -48,9 +48,9 @@ class CameraAvStreamManagementClusterAudioStreamChangedEvent(
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_AUDIO_STREAM_ID), audioStreamID)
-      if (streamType.isPresent) {
-        val optstreamType = streamType.get()
-        put(ContextSpecificTag(TAG_STREAM_TYPE), optstreamType)
+      if (streamUsage.isPresent) {
+        val optstreamUsage = streamUsage.get()
+        put(ContextSpecificTag(TAG_STREAM_USAGE), optstreamUsage)
       }
       if (audioCodec.isPresent) {
         val optaudioCodec = audioCodec.get()
@@ -78,7 +78,7 @@ class CameraAvStreamManagementClusterAudioStreamChangedEvent(
 
   companion object {
     private const val TAG_AUDIO_STREAM_ID = 0
-    private const val TAG_STREAM_TYPE = 1
+    private const val TAG_STREAM_USAGE = 1
     private const val TAG_AUDIO_CODEC = 2
     private const val TAG_CHANNEL_COUNT = 3
     private const val TAG_SAMPLE_RATE = 4
@@ -91,9 +91,9 @@ class CameraAvStreamManagementClusterAudioStreamChangedEvent(
     ): CameraAvStreamManagementClusterAudioStreamChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val audioStreamID = tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
-      val streamType =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_STREAM_TYPE))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_TYPE)))
+      val streamUsage =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_STREAM_USAGE))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_USAGE)))
         } else {
           Optional.empty()
         }
@@ -132,7 +132,7 @@ class CameraAvStreamManagementClusterAudioStreamChangedEvent(
 
       return CameraAvStreamManagementClusterAudioStreamChangedEvent(
         audioStreamID,
-        streamType,
+        streamUsage,
         audioCodec,
         channelCount,
         sampleRate,

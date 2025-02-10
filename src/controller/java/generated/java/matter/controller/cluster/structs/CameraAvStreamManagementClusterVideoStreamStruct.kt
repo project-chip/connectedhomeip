@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class CameraAvStreamManagementClusterVideoStreamStruct(
   val videoStreamID: UShort,
-  val streamType: UByte,
+  val streamUsage: UByte,
   val videoCodec: UByte,
   val minFrameRate: UShort,
   val maxFrameRate: UShort,
@@ -42,7 +42,7 @@ class CameraAvStreamManagementClusterVideoStreamStruct(
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterVideoStreamStruct {\n")
     append("\tvideoStreamID : $videoStreamID\n")
-    append("\tstreamType : $streamType\n")
+    append("\tstreamUsage : $streamUsage\n")
     append("\tvideoCodec : $videoCodec\n")
     append("\tminFrameRate : $minFrameRate\n")
     append("\tmaxFrameRate : $maxFrameRate\n")
@@ -62,7 +62,7 @@ class CameraAvStreamManagementClusterVideoStreamStruct(
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_VIDEO_STREAM_ID), videoStreamID)
-      put(ContextSpecificTag(TAG_STREAM_TYPE), streamType)
+      put(ContextSpecificTag(TAG_STREAM_USAGE), streamUsage)
       put(ContextSpecificTag(TAG_VIDEO_CODEC), videoCodec)
       put(ContextSpecificTag(TAG_MIN_FRAME_RATE), minFrameRate)
       put(ContextSpecificTag(TAG_MAX_FRAME_RATE), maxFrameRate)
@@ -87,7 +87,7 @@ class CameraAvStreamManagementClusterVideoStreamStruct(
 
   companion object {
     private const val TAG_VIDEO_STREAM_ID = 0
-    private const val TAG_STREAM_TYPE = 1
+    private const val TAG_STREAM_USAGE = 1
     private const val TAG_VIDEO_CODEC = 2
     private const val TAG_MIN_FRAME_RATE = 3
     private const val TAG_MAX_FRAME_RATE = 4
@@ -107,7 +107,7 @@ class CameraAvStreamManagementClusterVideoStreamStruct(
     ): CameraAvStreamManagementClusterVideoStreamStruct {
       tlvReader.enterStructure(tlvTag)
       val videoStreamID = tlvReader.getUShort(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
-      val streamType = tlvReader.getUByte(ContextSpecificTag(TAG_STREAM_TYPE))
+      val streamUsage = tlvReader.getUByte(ContextSpecificTag(TAG_STREAM_USAGE))
       val videoCodec = tlvReader.getUByte(ContextSpecificTag(TAG_VIDEO_CODEC))
       val minFrameRate = tlvReader.getUShort(ContextSpecificTag(TAG_MIN_FRAME_RATE))
       val maxFrameRate = tlvReader.getUShort(ContextSpecificTag(TAG_MAX_FRAME_RATE))
@@ -143,7 +143,7 @@ class CameraAvStreamManagementClusterVideoStreamStruct(
 
       return CameraAvStreamManagementClusterVideoStreamStruct(
         videoStreamID,
-        streamType,
+        streamUsage,
         videoCodec,
         minFrameRate,
         maxFrameRate,
