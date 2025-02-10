@@ -1058,10 +1058,11 @@ def chip_tool_tests(
         "chip_tool_python",
     ]
 
+    cmd.extend(["--exclude-tags", "MANUAL"])
+    cmd.extend(["--exclude-tags", "IN_DEVELOPMENT"])
+    cmd.extend(["--exclude-tags", "FLAKY"])
     cmd.extend(["--exclude-tags", "EXTRA_SLOW"])
     cmd.extend(["--exclude-tags", "PURPOSEFUL_FAILURE"])
-    cmd.extend(["--exclude-tags", "IN_DEVELOPMENT"])
-    cmd.extend(["--exclude-tags", "MANUAL"])
 
     paths = dict(
         [(t.key, f"./out/{t.target}/{t.binary}") for t in _get_targets(coverage)]
