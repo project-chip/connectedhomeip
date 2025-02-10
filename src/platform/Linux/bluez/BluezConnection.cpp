@@ -77,7 +77,8 @@ BluezConnection::IOChannel::~IOChannel()
 
 BluezConnection::ConnectionDataBundle::ConnectionDataBundle(const BluezConnection & aConn,
                                                             const chip::System::PacketBufferHandle & aBuf) :
-    mConn(aConn), mData(g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, aBuf->Start(), aBuf->DataLength(), sizeof(uint8_t)))
+    mConn(aConn),
+    mData(g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, aBuf->Start(), aBuf->DataLength(), sizeof(uint8_t)))
 {}
 
 CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
