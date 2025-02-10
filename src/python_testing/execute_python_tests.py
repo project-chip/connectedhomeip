@@ -93,6 +93,7 @@ def main(search_directory, env_file):
         "choice_conformance_support.py",  # Test support/shared code script, not a standalone test
         "conformance_support.py",  # Test support/shared code script, not a standalone test
         "global_attribute_ids.py",  # Test support/shared code script, not a standalone test
+        "matter_asserts.py",  # Test support/shared code script, not a standalone test
         "matter_testing_support.py",  # Test support/shared code script, not a standalone test
         "pics_support.py",  # Test support/shared code script, not a standalone test
         "spec_parsing_support.py",  # Test support/shared code script, not a standalone test
