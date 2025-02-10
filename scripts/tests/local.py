@@ -742,7 +742,6 @@ def python_tests(
 
         # wrap around so we get a good LLVM_PROFILE_FILE
         runner = BinaryRunner.COVERAGE
-        pass
 
     def as_runner(path):
         return _maybe_with_runner(os.path.basename(path), path, runner)
@@ -1059,6 +1058,16 @@ def chip_tool_tests(
     #
     # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:64
     runner = __RUNNERS__[runner]
+
+    # make sure we are fully aware if running with or without coverage
+    coverage = get_coverage_default(coverage)
+    if coverage:
+        if runner != BinaryRunner.NONE:
+            logging.error("Runner for coverage is implict")
+            sys.exit(1)
+
+        # wrap around so we get a good LLVM_PROFILE_FILE
+        runner = BinaryRunner.COVERAGE
 
     cmd = [
         "./scripts/tests/run_test_suite.py",
