@@ -49,15 +49,15 @@ class TC_VALCC_3_1(MatterBaseTest):
 
     def steps_TC_VALCC_3_1(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commission DUT if required", is_commissioning=True),
             TestStep(2, "Set up a subscription to all attributes on the DUT"),
             TestStep(3, "Send a close command to the DUT and wait until the CurrentState is closed", "DUT returns SUCCESS"),
             TestStep(4, "Send Open command", "DUT returns SUCCESS"),
-            TestStep(5, "Wait until TH receives and data report for TargetState set to NULL and an attribute report for CurrentState set to Open (ordering does not matter)",
+            TestStep(5, "Wait until TH receives the following reports (ordering does not matter): TargetState set to NULL, CurrentState set to Open",
                      "Expected attribute reports are received"),
             TestStep(6, "Read CurrentState and TargetState attribute", "CurrentState is Open, TargetState is NULL"),
             TestStep(7, "Send Close command", "DUT returns SUCCESS"),
-            TestStep(8, "Wait until TH receives and data report for TargetState set to NULL and an attribute report for CurrentState set to Closed (ordering does not matter)",
+            TestStep(8, "Wait until TH receives the following reports  (ordering does not matter): TargetState set to NULL, CurrentState set to Closed",
                      "Expected attribute reports are received"),
             TestStep(9, "Read CurrentState and TargetState attribute", "CurrentState is Closed, TargetState is NULL"),
         ]

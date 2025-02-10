@@ -25,9 +25,9 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <data-model-providers/codegen/Instance.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -110,7 +110,7 @@ int main()
         ChipLogError(AppServer, "ConnectivityMgr().SetThreadDeviceType() failed");
         return 1;
     }
-#elif !defined(CONFIG_WIFI_NRF700X)
+#elif !defined(CONFIG_WIFI_NRF70)
     return CHIP_ERROR_INTERNAL;
 #endif
 

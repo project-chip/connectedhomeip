@@ -52,8 +52,8 @@ extern "C" {
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
-#include <ProvisionChannel.h>
-#include <ProvisionManager.h>
+#include <headers/ProvisionChannel.h>
+#include <headers/ProvisionManager.h>
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -94,7 +94,7 @@ namespace {
 #define BLE_CONFIG_RF_PATH_GAIN_RX (0)
 
 // Default Connection  parameters
-#define BLE_CONFIG_MIN_INTERVAL (16) // Time = Value x 1.25 ms = 30ms
+#define BLE_CONFIG_MIN_INTERVAL (16) // Time = Value x 1.25 ms = 20ms
 #define BLE_CONFIG_MAX_INTERVAL (80) // Time = Value x 1.25 ms = 100ms
 #define BLE_CONFIG_LATENCY (0)
 #define BLE_CONFIG_TIMEOUT (100)          // Time = Value x 10 ms = 1s
@@ -678,12 +678,17 @@ void BLEManagerImpl::HandleConnectParams(volatile sl_bt_msg_t * evt)
 {
     sl_bt_evt_connection_parameters_t * con_param_evt = (sl_bt_evt_connection_parameters_t *) &(evt->data);
 
-    if (con_param_evt->timeout < BLE_CONFIG_TIMEOUT)
+    uint16_t desiredTimeout = con_param_evt->timeout < BLE_CONFIG_TIMEOUT ? BLE_CONFIG_TIMEOUT : con_param_evt->timeout;
+
+    // For better stability, renegotiate the connection parameters if the received ones from the central are outside
+    // of our defined constraints
+    if (desiredTimeout != con_param_evt->timeout || con_param_evt->interval < BLE_CONFIG_MIN_INTERVAL ||
+        con_param_evt->interval > BLE_CONFIG_MAX_INTERVAL)
     {
-        ChipLogProgress(DeviceLayer, "Request to increase the connection timeout from %d to %d", con_param_evt->timeout,
-                        BLE_CONFIG_TIMEOUT);
+        ChipLogProgress(DeviceLayer, "Renegotiate BLE connection parameters to minInterval:%d, maxInterval:%d, timeout:%d",
+                        BLE_CONFIG_MIN_INTERVAL, BLE_CONFIG_MAX_INTERVAL, desiredTimeout);
         sl_bt_connection_set_parameters(con_param_evt->connection, BLE_CONFIG_MIN_INTERVAL, BLE_CONFIG_MAX_INTERVAL,
-                                        BLE_CONFIG_LATENCY, BLE_CONFIG_TIMEOUT, BLE_CONFIG_MIN_CE_LENGTH, BLE_CONFIG_MAX_CE_LENGTH);
+                                        BLE_CONFIG_LATENCY, desiredTimeout, BLE_CONFIG_MIN_CE_LENGTH, BLE_CONFIG_MAX_CE_LENGTH);
     }
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);

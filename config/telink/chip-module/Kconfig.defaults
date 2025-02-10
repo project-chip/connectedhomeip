@@ -84,6 +84,7 @@ config HEAP_MEM_POOL_SIZE
 
 config COMMON_LIBC_MALLOC_ARENA_SIZE
     default 20716 if SOC_RISCV_TELINK_TL321X || SOC_SERIES_RISCV_TELINK_B9X_RETENTION
+    default 16384 if SOC_RISCV_TELINK_TL721X
     default 12288
 
 config NET_IPV6_MLD
@@ -165,13 +166,11 @@ config BT_GATT_CACHING
 #endif
 
 config BT_RX_STACK_SIZE
-    default 1352 if BT_B9X
-    default 1010 if BT_TLX
+    default 1352 if BT_B9X || BT_TLX
     default 2048 if BT_W91
 
 config BT_HCI_TX_STACK_SIZE
-    default 640 if BT_B9X
-    default 640 if BT_TLX
+    default 640 if BT_B9X || BT_TLX
     default 2048 if BT_W91
 
 config BT_DEVICE_NAME_GATT_WRITABLE
@@ -207,7 +206,7 @@ endif # BT
 # Cut down the ram cost by matter's change,it can keep ramcode (driver).
 # No need load the ramcode every time in thread mode (retention mode).
 # If the ram is not enough , can change it back , initial setting is n.
-if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9258A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
+if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
 config SOC_SERIES_RISCV_TELINK_B9X_NON_RETENTION_RAM_CODE
     default n if PM
 
@@ -219,9 +218,21 @@ config PWM
 
 endif
 
+if BOARD_TL7218X_RETENTION || BOARD_TL3218X_RETENTION || BOARD_TL3218X
+config SOC_SERIES_RISCV_TELINK_TLX_NON_RETENTION_RAM_CODE
+    default n if PM
+
+config TELINK_TLX_MATTER_RETENTION_LAYOUT
+    default y if PM || BOARD_TL3218X
+
+config PWM
+    default n if PM
+
+endif
+
 # Board non-retention config
 if  BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1 || \
-    BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D || BOARD_TL3218X
+    BOARD_TLSR9528A || BOARD_TLSR9518ADK80D || BOARD_TL3218X || BOARD_TL7218X
 config PWM
     default y
 endif

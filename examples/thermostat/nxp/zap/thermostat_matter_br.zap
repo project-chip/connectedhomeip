@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 104,
+  "featureLevel": 106,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -19,18 +19,18 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
+      "path": "../../../../src/app/zap-templates/app-templates.json",
+      "type": "gen-templates-json",
+      "category": "matter",
+      "version": "chip-v1"
+    },
+    {
+      "pathRelativity": "relativeToZap",
       "path": "../../../../src/app/zap-templates/zcl/zcl.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
       "description": "Matter SDK ZCL data"
-    },
-    {
-      "pathRelativity": "relativeToZap",
-      "path": "../../../../src/app/zap-templates/app-templates.json",
-      "type": "gen-templates-json",
-      "category": "matter",
-      "version": "chip-v1"
     }
   ],
   "endpointTypes": [
@@ -2999,32 +2999,6 @@
       "deviceTypeCode": 769,
       "deviceTypeProfileId": 259,
       "clusters": [
-        {
-          "name": "Identify",
-          "code": 3,
-          "mfgCode": null,
-          "define": "IDENTIFY_CLUSTER",
-          "side": "client",
-          "enabled": 1,
-          "commands": [
-            {
-              "name": "Identify",
-              "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
-              "name": "TriggerEffect",
-              "code": 64,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            }
-          ]
-        },
         {
           "name": "Identify",
           "code": 3,
