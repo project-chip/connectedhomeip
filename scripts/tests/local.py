@@ -452,7 +452,7 @@ def _maybe_with_runner(script_name: str, path: str, runner: BinaryRunner):
             textwrap.dedent(
                 f"""\
                 #!/usr/bin/env bash
-                {runner.execute_str(path)} $*
+                {runner.execute_str(path)} "$@"
                 """
             )
         )
