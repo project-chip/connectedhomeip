@@ -34,11 +34,11 @@ public:
     virtual ~ReliableMessageAnalyticsDelegate() = default;
     enum class EventType
     {
+        kUndefined,
         kInitialSend,
         kRetransmission,
         kAcknowledged,
         kFailed,
-        kUndefined, /* Should be last element in enum */
     };
 
     struct TransmitEvent

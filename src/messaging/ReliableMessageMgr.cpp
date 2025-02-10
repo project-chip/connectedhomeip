@@ -157,6 +157,14 @@ void ReliableMessageMgr::ExecuteActions()
 
             if (mAnalyticsDelegate)
             {
+#if !CHIP_PROGRESS_LOGGING
+                auto fabricIndex        = sessionHandle->GetFabricIndex();
+                auto destination        = kUndefinedNodeId;
+                if (sessionHandle->IsSecureSession())
+                {
+                    destination  = sessionHandle->AsSecureSession()->GetPeerNodeId();
+                }
+#endif // !CHIP_PROGRESS_LOGGING
                 ReliableMessageAnalyticsDelegate::TransmitEvent event = { .nodeId      = destination,
                                                                           .fabricIndex = fabricIndex,
                                                                           .eventType =
@@ -546,11 +554,29 @@ void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
         peerIsActive = sessionHandle->AsUnauthenticatedSession()->IsPeerActive();
     }
 
+    ChipLogProgress(ExchangeManager,
+                    "??%d [E:" ChipLogFormatExchange " S:%u M:" ChipLogFormatMessageCounter
+                    "] (%s) Msg Retransmission to %u:" ChipLogFormatX64 " scheduled for %" PRIu32
+                    "ms from now [State:%s II:%" PRIu32 " AI:%" PRIu32 " AT:%u]",
+                    entry.sendCount + 1, ChipLogValueExchange(&entry.ec.Get()), sessionHandle->SessionIdForLogging(),
+                    messageCounter, Transport::GetSessionTypeString(sessionHandle), fabricIndex, ChipLogValueX64(destination),
+                    backoff.count(), peerIsActive ? "Active" : "Idle", config.mIdleRetransTimeout.count(),
+                    config.mActiveRetransTimeout.count(), config.mActiveThresholdTime.count());
+#endif // CHIP_PROGRESS_LOGGING
+
     // For initial send the packet has already been submitted to transport layer successfully.
     // On re-transmits we do not know if transport layer is unable to retransmit for some
     // reason, so saying we have sent re-transmit here is a little presumptuous.
     if (mAnalyticsDelegate)
     {
+#if !CHIP_PROGRESS_LOGGING
+        auto fabricIndex        = sessionHandle->GetFabricIndex();
+        auto destination        = kUndefinedNodeId;
+        if (sessionHandle->IsSecureSession())
+        {
+            destination  = sessionHandle->AsSecureSession()->GetPeerNodeId();
+        }
+#endif // !CHIP_PROGRESS_LOGGING
         ReliableMessageAnalyticsDelegate::TransmitEvent event = {
             .nodeId         = destination,
             .fabricIndex    = fabricIndex,
@@ -562,15 +588,6 @@ void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
         mAnalyticsDelegate->OnTransmitEvent(event);
     }
 
-    ChipLogProgress(ExchangeManager,
-                    "??%d [E:" ChipLogFormatExchange " S:%u M:" ChipLogFormatMessageCounter
-                    "] (%s) Msg Retransmission to %u:" ChipLogFormatX64 " scheduled for %" PRIu32
-                    "ms from now [State:%s II:%" PRIu32 " AI:%" PRIu32 " AT:%u]",
-                    entry.sendCount + 1, ChipLogValueExchange(&entry.ec.Get()), sessionHandle->SessionIdForLogging(),
-                    messageCounter, Transport::GetSessionTypeString(sessionHandle), fabricIndex, ChipLogValueX64(destination),
-                    backoff.count(), peerIsActive ? "Active" : "Idle", config.mIdleRetransTimeout.count(),
-                    config.mActiveRetransTimeout.count(), config.mActiveThresholdTime.count());
-#endif // CHIP_PROGRESS_LOGGING
 }
 
 #if CHIP_CONFIG_TEST
