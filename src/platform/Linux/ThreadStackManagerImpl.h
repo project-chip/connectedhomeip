@@ -31,7 +31,7 @@
 namespace chip {
 
 template <>
-struct GAutoPtrDeleter<OpenthreadIoOpenthreadBorderRouter>
+struct GAutoPtrDeleter<OpenthreadBorderRouter>
 {
     using deleter = GObjectDeleter;
 };
@@ -149,12 +149,12 @@ private:
         uint8_t lqi;
     };
 
-    GAutoPtr<OpenthreadIoOpenthreadBorderRouter> mProxy;
+    GAutoPtr<OpenthreadBorderRouter> mProxy;
 
     static CHIP_ERROR GLibMatterContextInitThreadStack(ThreadStackManagerImpl * self);
     static CHIP_ERROR GLibMatterContextCallAttach(ThreadStackManagerImpl * self);
     static CHIP_ERROR GLibMatterContextCallScan(ThreadStackManagerImpl * self);
-    static void OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorderRouter * proxy, GVariant * changed_properties,
+    static void OnDbusPropertiesChanged(OpenthreadBorderRouter * proxy, GVariant * changed_properties,
                                         const gchar * const * invalidated_properties, gpointer user_data);
     void ThreadDeviceRoleChangedHandler(const gchar * role);
 
