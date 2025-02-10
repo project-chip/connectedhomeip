@@ -48,15 +48,12 @@ def extract_runs_args(py_script_path: str) -> Dict[str, Dict[str, str]]:
     runs_arg_lines: Dict[str, Dict[str, str]] = {}
 
     ci_args_section_lines = []
+
     with open(py_script_path, 'r', encoding='utf8') as py_script:
-        for line_idx, line in enumerate(py_script.readlines()):
+        for line in py_script.readlines():
             line = line.strip()
+            ci_args_section_lines.append("")  # Preserve line numbers for YAML parsing
 
-            # Append empty line to the line capture, so during YAML parsing
-            # line numbers will match the original file.
-            ci_args_section_lines.append("")
-
-            # Detect the single CI args section, to skip the lines otherwise.
             if line.startswith("# === BEGIN CI TEST ARGUMENTS ==="):
                 found_ci_args_section = True
                 continue
@@ -64,16 +61,19 @@ def extract_runs_args(py_script_path: str) -> Dict[str, Dict[str, str]]:
                 break
 
             if found_ci_args_section:
-                # Update the last line in the line capture.
                 ci_args_section_lines[-1] = " " + line.lstrip("#")
 
-    if not runs_arg_lines:
+    if ci_args_section_lines:
         try:
             runs = yaml.safe_load(NamedStringIO("\n".join(ci_args_section_lines), py_script_path))
             for run, args in runs.get("test-runner-runs", {}).items():
-                runs_arg_lines[run] = {}
-                runs_arg_lines[run]['run'] = run
-                runs_arg_lines[run].update(args)
+                runs_arg_lines[run] = args
+
+            # Capture skip-default-flags (if defined)
+            skip_flags = runs.get("skip-default-flags", [])
+            for run in runs_arg_lines:
+                runs_arg_lines[run]["skip-default-flags"] = skip_flags
+
         except yaml.YAMLError as e:
             logging.error(f"Failed to parse CI arguments YAML: {e}")
 
@@ -82,77 +82,64 @@ def extract_runs_args(py_script_path: str) -> Dict[str, Dict[str, str]]:
 
 class MetadataReader:
     """
-    A class to parse run arguments from the test scripts and
-    resolve them to environment specific values.
+    Parses test script arguments and merges them with defaults from env_test.yaml.
     """
 
     def __init__(self, env_yaml_file_path: str):
-        """
-        Reads the YAML file and Constructs the environment object
+        """Loads default arguments from env_test.yaml."""
+        with open(env_yaml_file_path, 'r', encoding='utf8') as stream:
+            env_yaml = yaml.safe_load(stream) or {}
 
-        Parameters:
-
-        env_yaml_file_path:
-         Path to the environment file that contains the YAML configuration.
-        """
-        with open(env_yaml_file_path) as stream:
-            self.env: Dict[str, str] = yaml.safe_load(stream)
+        self.default_args = env_yaml.get("default-arguments", {})
 
     def __resolve_env_vals__(self, metadata_dict: Dict[str, str]) -> None:
-        """
-        Resolves the argument defined in the test script to environment values.
-        For example, if a test script defines "all_clusters" as the value for app
-        name, we will check the environment configuration to see what raw value is
-        associated with the "all_cluster" variable and set the value for "app" option
-        to this raw value.
-
-        Parameter:
-
-        metadata_dict:
-         Dictionary where each key represent a particular argument and its value represent
-         the value for that argument defined in the test script.
-        """
+        """Resolves ${VAR} placeholders using default arguments."""
         for arg, arg_val in metadata_dict.items():
-            if not isinstance(arg_val, str):
-                continue
-            # We do not expect to recurse (like ${FOO_${BAR}}) so just expand once
-            for name, value in self.env.items():
-                arg_val = arg_val.replace(f'${{{name}}}', value)
-            metadata_dict[arg] = arg_val.strip()
+            if isinstance(arg_val, str):
+                for name, value in self.default_args.items():
+                    arg_val = arg_val.replace(f'${{{name}}}', value)
+                metadata_dict[arg] = arg_val.strip()
 
     def parse_script(self, py_script_path: str) -> List[Metadata]:
         """
-        Parses a script and returns a list of metadata object where
-        each element of that list representing run arguments associated
-        with a particular run.
+        Parses a test script and merges run arguments with defaults.
+        
+        - Uses defaults from env_test.yaml.
+        - Applies script overrides.
+        - Respects skip-default-flags.
 
-        Parameter:
-
-        py_script_path:
-         path to the python test script
-
-        Return:
-
-        List[Metadata]
-         List of Metadata object where each Metadata element represents
-         the run arguments associated with a particular run defined in
-         the script file.
+        Returns:
+            List[Metadata]: List of parsed metadata objects.
         """
         runs_metadata: List[Metadata] = []
-        runs_args = extract_runs_args(py_script_path)
+        script_args = extract_runs_args(py_script_path)
 
-        for run, attr in runs_args.items():
-            self.__resolve_env_vals__(attr)
-            runs_metadata.append(Metadata(
-                py_script_path=py_script_path,
-                run=run,
-                app=attr.get("app", ""),
-                app_args=attr.get("app-args"),
-                app_ready_pattern=attr.get("app-ready-pattern"),
-                app_stdin_pipe=attr.get("app-stdin-pipe"),
-                script_args=attr.get("script-args"),
-                factory_reset=attr.get("factory-reset", False),
-                quiet=attr.get("quiet", True),
-            ))
+        for run, script_run_args in script_args.items():
+            # Extract skip-default-flags (if present)
+            skip_default_flags = script_run_args.pop("skip-default-flags", [])
+
+            # Start with defaults
+            combined_args = {k: v.copy() if isinstance(v, dict) else v for k, v in self.default_args.items()}
+
+            # Apply script args, respecting skip-default-flags
+            for key, value in script_run_args.items():
+                if key in skip_default_flags:
+                    combined_args[key] = value  # Take from script YAML block only
+                else:
+                    combined_args.setdefault(key, value)  # Keep default if not overridden
+
+            self.__resolve_env_vals__(combined_args)  # Resolve ${VAR} placeholders
+
+        runs_metadata.append(Metadata(
+            py_script_path=py_script_path,
+            run=run,
+            app=combined_args.get("app", ""),
+            app_args=combined_args.get("app-args"),
+            app_ready_pattern=combined_args.get("app-ready-pattern"),
+            app_stdin_pipe=combined_args.get("app-stdin-pipe"),
+            script_args=combined_args.get("script-args"),
+            factory_reset=combined_args.get("factory-reset", False),
+            quiet=combined_args.get("quiet", True),
+        ))
 
         return runs_metadata

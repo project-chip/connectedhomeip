@@ -13,20 +13,10 @@
 # limitations under the License.
 
 # test environment argument definitions for metadata parser
-discriminator: 1234
-KVS: kvs1
-trace-to-appjson: json:out/trace_data/app-{SCRIPT_BASE_NAME}.json
-enable-key: 000102030405060708090a0b0c0d0e0f
+default-arguments:
 
-storage-path: admin_storage.json
-commissioning-method: on-network
-passcode: 20202021
-endpoint: 1
-trace-to-testjson: json:out/trace_data/test-{SCRIPT_BASE_NAME}.json
-trace-to-testperfetto: perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto
-manual-code: 10054912339
-PICS: src/app/tests/suites/certification/ci-pics-values
+app-args:
+    discriminator: "1234"
 
-app:
-    all-clusters: out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app
-    lock: out/linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-lock-app
+script-args:
+    discriminator: "1234"
