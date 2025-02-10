@@ -1058,6 +1058,10 @@ def chip_tool_tests(
         "chip_tool_python",
     ]
 
+    cmd.extend(["--exclude-tags", "EXTRA_SLOW"])
+    cmd.extend(["--exclude-tags", "PURPOSEFUL_FAILURE"])
+    cmd.extend(["--exclude-tags", "IN_DEVELOPMENT"])
+
     paths = dict(
         [(t.key, f"./out/{t.target}/{t.binary}") for t in _get_targets(coverage)]
     )
@@ -1079,7 +1083,10 @@ def chip_tool_tests(
 
     cmd.append("run")
     cmd.extend(["--iterations", "1"])
-    cmd.extend(["--test-timeout-seconds", "60"])
+
+    # NOTE: we allow all runs here except extra slow
+    #       This means our timeout is quite large
+    cmd.extend(["--test-timeout-seconds", "300"])
 
     if expected_failures is not None:
         cmd.extend(["--expected-failures", expected_failures, "--keep-going"])
