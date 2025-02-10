@@ -103,7 +103,7 @@ if (wifi_soc != true) {  # CCP board
       include_dirs = [
         "${chip_root}/examples/platform/silabs/efr32",
         "${chip_root}/examples/platform/silabs",
-        "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}",
+        "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}",
         "${sl_ot_efr32_root}",
         "${openthread_root}/src/",
         "${openthread_root}/third_party/tcplp",
@@ -149,7 +149,7 @@ if (wifi_soc != true) {  # CCP board
         "${sl_ot_libs_path}/src/stubs/tcp/tcp_stubs.c",
 
         # Temporary file until the files in the SI SDK is fixed
-        "${sdk_support_root}/protocol/openthread/platform-abstraction/efr32/radio.c",
+        "${matter_support_root}/sdk-copies/protocol/openthread/platform-abstraction/efr32/radio.c",
       ]
 
       include_dirs = [

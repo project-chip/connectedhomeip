@@ -58,8 +58,12 @@ public:
     // event emitting, path marking and other operations
     virtual InteractionModelContext CurrentContext() const { return mContext; }
 
-    /// TEMPORARY/TRANSITIONAL requirement for transitioning from ember-specific code
-    ///   ReadAttribute is REQUIRED to respond to GlobalAttribute read requests
+    /// NOTE: this code is NOT required to handle `List` global attributes:
+    ///       AcceptedCommandsList, GeneratedCommandsList OR AttributeList
+    ///
+    ///       Users of DataModel::Provider are expected to get these lists
+    ///       from ProviderMetadataTree (in particular IM Reads of these
+    ///       attributes will the automatically filled from metadata).
     ///
     /// Return value notes:
     ///   ActionReturnStatus::IsOutOfSpaceEncodingResponse
