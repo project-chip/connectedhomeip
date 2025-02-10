@@ -19,6 +19,7 @@ import enum
 import fnmatch
 import glob
 import logging
+import multiprocessing
 import os
 import platform
 import shlex
@@ -255,7 +256,10 @@ class BinaryRunner(enum.Enum):
             return f"exec valgrind {path}"
         elif self == BinaryRunner.COVERAGE:
             # Expected path is like "out/<target>/<binary>"
-            rawname = os.path.basename(path[: path.rindex("/")] + ".profraw")
+            #
+            # We output up to 10K of separate profiles that will be merged as a
+            # final step.
+            rawname = os.path.basename(path[: path.rindex("/")] + "-run-%10000m.profraw")
             return f'export LLVM_PROFILE_FILE="out/profiling/{rawname}"; exec {path}'
 
 
@@ -513,6 +517,86 @@ def _parse_filters(entry: str) -> FilterList:
     return FilterList(filters=filters)
 
 
+@dataclass
+class RawProfile:
+    raw_profile_paths: list[str]
+    binary_path: str
+
+
+def _raw_profile_to_info(profile: RawProfile):
+    path = profile.raw_profile_paths[0]
+
+    # Merge all per-app profiles into a single large profile
+    data_path = path[:path.find("-run-")] + ".profdata"
+    cmd = [
+        "llvm-profdata",
+        "merge",
+        "-sparse",
+    ]
+    cmd.extend(["-o", data_path])
+    cmd.extend(profile.raw_profile_paths)
+
+    p = subprocess.run(_with_activate(cmd), check=True, capture_output=True)
+
+    # Export to something lcov likes
+    cmd = [
+        "llvm-cov",
+        "export",
+        "-format=lcov",
+        "--instr-profile",
+        data_path,
+        profile.binary_path
+    ]
+
+    # for -ignore-filename-regex
+    ignore_paths = [
+        "third_party/boringssl/.*",
+        "third_party/perfetto/.*",
+        "third_party/jsoncpp/.*",
+        "third_party/editline/.*",
+        "third_party/initpp/.*",
+        "third_party/libwebsockets/.*",
+        "third_party/pigweed/.*",
+        "third_party/nanopb/.*",
+        "third_party/nl.*",
+        "/usr/include/.*",
+        "/usr/lib/.*",
+    ]
+
+    for p in ignore_paths:
+        cmd.append("-ignore-filename-regex")
+        cmd.append(p)
+
+    info_path = path.replace(".profraw", ".info")
+    subprocess.run(_with_activate(cmd, output_path=info_path), check=True)
+    logging.info("Generated %s", info_path)
+
+    # !!!!! HACK ALERT !!!!!
+    #
+    # The paths for our examples are generally including CHIP as
+    # examples/<name>/third_party/connectedhomeip/....
+    # So we will replace every occurence of these to remove the extra indirection into third_party
+    #
+    # Generally we will replace every path (Shown as SF:...) with the corresponding item
+    #
+    # We assume that the info lines fit in RAM
+    lines = []
+    with open(info_path, 'rt') as f:
+        for line in f.readlines():
+            line = line.rstrip()
+            if line.startswith("SF:"):
+                # This is a source file line: "SF:..."
+                path = line[3:]
+                line = f"SF:{os.path.realpath(path)}\n"
+            lines.append(line)
+
+    # re-write it.
+    with open(info_path, 'wt') as f:
+        f.write("\n".join(lines))
+
+    return info_path
+
+
 @cli.command()
 @click.option(
     "--flat",
@@ -530,79 +614,23 @@ def gen_coverage(flat):
     #
     # Each target gets its own profile
 
-    # for -ignore-filename-regex
-    ignore_paths = [
-        "third_party/boringssl/.*",
-        "third_party/perfetto/.*",
-        "third_party/jsoncpp/.*",
-        "third_party/editline/.*",
-        "third_party/initpp/.*",
-        "third_party/libwebsockets/.*",
-        "third_party/pigweed/.*",
-        "third_party/nanopb/.*",
-        "third_party/nl.*",
-        "/usr/include/.*",
-        "/usr/lib/.*",
-    ]
-
-    trace_files = []
+    raw_profiles = []
     for t in _get_targets(coverage=True):
-        path = os.path.join("./out", "profiling", f"{t.target}.profraw")
+        glob_str = os.path.join("./out", "profiling", f"{t.target}*.profraw")
+        app_profiles = []
+        for path in glob.glob(glob_str):
+            app_profiles.append(path)
 
-        if not os.path.exists(path):
-            logging.warning("No profile file '%s'. Skipping.", path)
-            continue
+        if app_profiles:
+            raw_profiles.append(RawProfile(
+                raw_profile_paths=app_profiles,
+                binary_path=os.path.join("./out", t.target, t.binary)
+            ))
+        else:
+            logging.warning("No profiles for %s", t.target)
 
-        data_path = os.path.join("./out", "profiling", f"{t.target}.profdata")
-        cmd = [
-            "llvm-profdata",
-            "merge",
-            "-sparse",
-            path,
-            "-o",
-            data_path
-        ]
-        p = subprocess.run(_with_activate(cmd), check=True, capture_output=True)
-
-        cmd = [
-            "llvm-cov",
-            "export",
-            "-format=lcov",
-            "--instr-profile",
-            data_path,
-            os.path.join("./out", t.target, t.binary),
-        ]
-        for p in ignore_paths:
-            cmd.append("-ignore-filename-regex")
-            cmd.append(p)
-
-        info_path = os.path.join("./out", "profiling", f"{t.target}.info")
-        subprocess.run(_with_activate(cmd, output_path=info_path), check=True)
-        trace_files.append(info_path)
-        logging.info("Generated %s", info_path)
-
-        # !!!!! HACK ALERT !!!!!
-        #
-        # The paths for our examples are generally including CHIP as
-        # examples/<name>/third_party/connectedhomeip/....
-        # So we will replace every occurence of these to remove the extra indirection into third_party
-        #
-        # Generally we will replace every path (Shown as SF:...) with the corresponding item
-        #
-        # We assume that the info lines fit in RAM
-        lines = []
-        with open(info_path, 'rt') as f:
-            for line in f.readlines():
-                line = line.rstrip()
-                if line.startswith("SF:"):
-                    # This is a source file line: "SF:..."
-                    path = line[3:]
-                    line = f"SF:{os.path.realpath(path)}\n"
-                lines.append(line)
-
-        # re-write it.
-        with open(info_path, 'wt') as f:
-            f.write("\n".join(lines))
+    with multiprocessing.Pool() as p:
+        trace_files = p.map(_raw_profile_to_info, raw_profiles)
 
     if not trace_files:
         logging.error(
@@ -1104,7 +1132,7 @@ def chip_tool_tests(
 
     if expected_failures is not None:
         cmd.extend(["--expected-failures", expected_failures])
-        keep_going = True # if we expect failures, we have to keep going
+        keep_going = True  # if we expect failures, we have to keep going
 
     if keep_going:
         cmd.append("--keep-going")
