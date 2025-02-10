@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0033" name="General Diagnostics Cluster" revision="2">
   <revisionHistory>
@@ -75,7 +77,7 @@ Davis, CA 95616, USA
       <item value="1" name="PowerOnReboot" summary="The Node has booted as the result of physical interaction with the device resulting in a reboot.">
         <mandatoryConform/>
       </item>
-      <item value="2" name="BrownOutReset" summary="The Node has rebooted as the result of a brown-out of the Node's power supply.">
+      <item value="2" name="BrownOutReset" summary="The Node has rebooted as the result of a brown-out of the Node&apos;s power supply.">
         <mandatoryConform/>
       </item>
       <item value="3" name="SoftwareWatchdogReset" summary="The Node has rebooted as the result of a software watchdog timer.">
@@ -196,16 +198,18 @@ Davis, CA 95616, USA
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
-      <field id="4" name="HardwareAddress" type="Hardware Address">
+      <field id="4" name="HardwareAddress" type="hwadr">
         <mandatoryConform/>
+        <constraint type="allowed" value="6"/>
+        <constraint type="allowed" value="8"/>
       </field>
       <field id="5" name="IPv4Addresses" type="list">
-        <entry type="ref_IPv4Address"/>
+        <entry type="ipv4adr"/>
         <mandatoryConform/>
         <constraint type="maxCount" value="4"/>
       </field>
       <field id="6" name="IPv6Addresses" type="list">
-        <entry type="ref_IPv6Address"/>
+        <entry type="ipv6adr"/>
         <mandatoryConform/>
         <constraint type="maxCount" value="8"/>
       </field>
@@ -223,17 +227,17 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="RebootCount" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="UpTime" type="uint64">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="TotalOperationalHours" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" persistence="nonVolatile"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0004" name="BootReason" type="BootReasonEnum">
@@ -272,7 +276,7 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="EnableKey" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="16"/>
+        <constraint type="allowed" value="16"/>
       </field>
       <field id="1" name="EventTrigger" type="uint64">
         <mandatoryConform/>
@@ -284,10 +288,10 @@ Davis, CA 95616, USA
     </command>
     <command id="0x02" name="TimeSnapshotResponse" direction="responseFromServer">
       <mandatoryConform/>
-      <field id="0" name="SystemTimeMs" type="ref_DataTypeSystemTimeMs" default="MS">
+      <field id="0" name="SystemTimeMs" type="systime-ms" default="MS">
         <mandatoryConform/>
       </field>
-      <field id="1" name="PosixTimeMs" type="ref_DataTypePosixMs" default="null">
+      <field id="1" name="PosixTimeMs" type="posix-ms" default="null">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
@@ -299,7 +303,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="EnableKey" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="16"/>
+        <constraint type="allowed" value="16"/>
       </field>
       <field id="1" name="Value" type="uint8">
         <mandatoryConform/>

@@ -44,12 +44,12 @@
 #endif // ENABLE_CHIP_SHELL
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-#include <ProvisionManager.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>
 #include <assert.h>
+#include <headers/ProvisionManager.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #include <sl_cmsis_os2_common.h>
@@ -184,7 +184,7 @@ void BaseApplicationDelegate::OnCommissioningSessionStopped()
 
 void BaseApplicationDelegate::OnCommissioningWindowClosed()
 {
-#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
     if (!BaseApplication::GetProvisionStatus() && !isComissioningStarted)
     {
         int32_t status = wfx_power_save(RSI_SLEEP_MODE_8, DEEP_SLEEP_WITH_RAM_RETENTION);
