@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 103,
+  "featureLevel": 106,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -41,14 +41,16 @@
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
-        "name": "MA-rootdevice"
+        "name": "MA-rootdevice",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice"
+          "name": "MA-rootdevice",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -4028,14 +4030,16 @@
         "code": 21,
         "profileId": 259,
         "label": "MA-contactsensor",
-        "name": "MA-contactsensor"
+        "name": "MA-contactsensor",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 21,
           "profileId": 259,
           "label": "MA-contactsensor",
-          "name": "MA-contactsensor"
+          "name": "MA-contactsensor",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -4454,96 +4458,6 @@
               "mfgCode": null,
               "side": "server",
               "included": 1
-            }
-          ]
-        },
-        {
-          "name": "Occupancy Sensing",
-          "code": 1030,
-          "mfgCode": null,
-          "define": "OCCUPANCY_SENSING_CLUSTER",
-          "side": "server",
-          "enabled": 1,
-          "attributes": [
-            {
-              "name": "Occupancy",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "type": "OccupancyBitmap",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "OccupancySensorType",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "type": "OccupancySensorTypeEnum",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "OccupancySensorTypeBitmap",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "type": "OccupancySensorTypeBitmap",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "FeatureMap",
-              "code": 65532,
-              "mfgCode": null,
-              "side": "server",
-              "type": "bitmap32",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": null,
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "5",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
             }
           ]
         }

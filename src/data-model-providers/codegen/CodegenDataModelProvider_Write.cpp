@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/reporting/reporting.h>
@@ -102,6 +103,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     //       and tests and implementation
     //
     //       Open issue that needs fixing: https://github.com/project-chip/connectedhomeip/issues/33735
+
     auto metadata = Ember::FindAttributeMetadata(request.path);
 
     // Explicit failure in finding a suitable metadata
@@ -110,10 +112,23 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         VerifyOrDie((*status == Status::UnsupportedEndpoint) || //
                     (*status == Status::UnsupportedCluster) ||  //
                     (*status == Status::UnsupportedAttribute));
+
+        // Check if this is an attribute that ember does not know about but is valid after all and
+        // adjust the return code. All these global attributes are `read only` hence the return
+        // of unsupported write.
+        //
+        // If the cluster or endpoint does not exist, though, keep that return code.
+        if ((*status == Protocols::InteractionModel::Status::UnsupportedAttribute) &&
+            IsSupportedGlobalAttributeNotInMetadata(request.path.mAttributeId))
+        {
+            return Status::UnsupportedWrite;
+        }
+
         return *status;
     }
 
     const EmberAfAttributeMetadata ** attributeMetadata = std::get_if<const EmberAfAttributeMetadata *>(&metadata);
+    VerifyOrDie(*attributeMetadata != nullptr);
 
     // All the global attributes that we do not have metadata for are
     // read-only. Specifically only the following list-based attributes match the
@@ -124,7 +139,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     //   - GeneratedCommands
     //
     // Given the above, UnsupportedWrite should be correct (attempt to write to a read-only list)
-    bool isReadOnly = (attributeMetadata == nullptr) || (*attributeMetadata)->IsReadOnly();
+    bool isReadOnly = (*attributeMetadata)->IsReadOnly();
 
     // Internal is allowed to bypass timed writes and read-only.
     if (!request.operationFlags.Has(DataModel::OperationFlags::kInternal))
@@ -184,21 +199,18 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
                             Status::NeedsTimedInteraction);
     }
 
-    // Extra check: internal requests can bypass the read only check, however global attributes
-    // have no underlying storage, so write still cannot be done
-    VerifyOrReturnError(attributeMetadata != nullptr, Status::UnsupportedWrite);
-
     if (request.path.mDataVersion.HasValue())
     {
-        std::optional<DataModel::ClusterInfo> clusterInfo = GetServerClusterInfo(request.path);
-        if (!clusterInfo.has_value())
+        DataVersion * versionPtr = emberAfDataVersionStorage(request.path);
+
+        if (versionPtr == nullptr)
         {
             ChipLogError(DataManagement, "Unable to get cluster info for Endpoint 0x%x, Cluster " ChipLogFormatMEI,
                          request.path.mEndpointId, ChipLogValueMEI(request.path.mClusterId));
             return Status::DataVersionMismatch;
         }
 
-        if (request.path.mDataVersion.Value() != clusterInfo->dataVersion)
+        if (request.path.mDataVersion.Value() != *versionPtr)
         {
             ChipLogError(DataManagement, "Write Version mismatch for Endpoint 0x%x, Cluster " ChipLogFormatMEI,
                          request.path.mEndpointId, ChipLogValueMEI(request.path.mClusterId));

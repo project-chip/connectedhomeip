@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2022 Project CHIP Authors
+#    Copyright (c) 2022-2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -219,6 +219,100 @@ def compare_time(received: int, offset: timedelta = timedelta(), utc: Optional[i
 def get_wait_seconds_from_set_time(set_time_matter_us: int, wait_seconds: int):
     seconds_passed = (utc_time_in_matter_epoch() - set_time_matter_us) // 1000000
     return wait_seconds - seconds_passed
+
+
+@dataclass
+class SetupPayloadInfo:
+    filter_type: discovery.FilterType = discovery.FilterType.LONG_DISCRIMINATOR
+    filter_value: int = 0
+    passcode: int = 0
+
+
+@dataclass
+class CommissioningInfo:
+    commissionee_ip_address_just_for_testing: Optional[str] = None
+    commissioning_method: Optional[str] = None
+    thread_operational_dataset: Optional[str] = None
+    wifi_passphrase: Optional[str] = None
+    wifi_ssid: Optional[str] = None
+    # Accepted Terms and Conditions if used
+    tc_version_to_simulate: int = None
+    tc_user_response_to_simulate: int = None
+
+
+async def commission_device(
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, info: SetupPayloadInfo, commissioning_info: CommissioningInfo
+) -> bool:
+    if commissioning_info.tc_version_to_simulate is not None and commissioning_info.tc_user_response_to_simulate is not None:
+        logging.debug(
+            f"Setting TC Acknowledgements to version {commissioning_info.tc_version_to_simulate} with user response {commissioning_info.tc_user_response_to_simulate}."
+        )
+        dev_ctrl.SetTCAcknowledgements(commissioning_info.tc_version_to_simulate, commissioning_info.tc_user_response_to_simulate)
+
+    if commissioning_info.commissioning_method == "on-network":
+        try:
+            await dev_ctrl.CommissionOnNetwork(
+                nodeId=node_id, setupPinCode=info.passcode, filterType=info.filter_type, filter=info.filter_value
+            )
+            return True
+        except ChipStackError as e:
+            logging.error("Commissioning failed: %s" % e)
+            return False
+    elif commissioning_info.commissioning_method == "ble-wifi":
+        try:
+            await dev_ctrl.CommissionWiFi(
+                info.filter_value,
+                info.passcode,
+                node_id,
+                commissioning_info.wifi_ssid,
+                commissioning_info.wifi_passphrase,
+                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
+            )
+            return True
+        except ChipStackError as e:
+            logging.error("Commissioning failed: %s" % e)
+            return False
+    elif commissioning_info.commissioning_method == "ble-thread":
+        try:
+            await dev_ctrl.CommissionThread(
+                info.filter_value,
+                info.passcode,
+                node_id,
+                commissioning_info.thread_operational_dataset,
+                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
+            )
+            return True
+        except ChipStackError as e:
+            logging.error("Commissioning failed: %s" % e)
+            return False
+    elif commissioning_info.commissioning_method == "on-network-ip":
+        try:
+            logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
+            await dev_ctrl.CommissionIP(
+                ipaddr=commissioning_info.commissionee_ip_address_just_for_testing,
+                setupPinCode=info.passcode,
+                nodeid=node_id,
+            )
+            return True
+        except ChipStackError as e:
+            logging.error("Commissioning failed: %s" % e)
+            return False
+    else:
+        raise ValueError("Invalid commissioning method %s!" % commissioning_info.commissioning_method)
+
+
+async def commission_devices(
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+    dut_node_ids: List[int],
+    setup_payloads: List[SetupPayloadInfo],
+    commissioning_info: CommissioningInfo,
+) -> bool:
+    commissioned = []
+    for node_id, setup_payload in zip(dut_node_ids, setup_payloads):
+        logging.info(f"Commissioning method: {commissioning_info.commissioning_method}")
+        commissioned.append(await commission_device(dev_ctrl, node_id, setup_payload, commissioning_info))
+
+    return all(commissioned)
 
 
 class SimpleEventCallback:
@@ -628,8 +722,10 @@ class MatterTestConfig:
     timeout: typing.Union[int, None] = None
     endpoint: typing.Union[int, None] = 0
     app_pid: int = 0
+    fail_on_skipped_tests: bool = False
 
     commissioning_method: Optional[str] = None
+    in_test_commissioning_method: Optional[str] = None
     discriminators: List[int] = field(default_factory=list)
     setup_passcodes: List[int] = field(default_factory=list)
     commissionee_ip_address_just_for_testing: Optional[str] = None
@@ -669,6 +765,12 @@ class MatterTestConfig:
     chip_tool_credentials_path: Optional[pathlib.Path] = None
 
     trace_to: List[str] = field(default_factory=list)
+
+    # Accepted Terms and Conditions if used
+    tc_version_to_simulate: int = None
+    tc_user_response_to_simulate: int = None
+    # path to device attestation revocation set json file
+    dac_revocation_set_path: Optional[pathlib.Path] = None
 
 
 class ClusterMapper:
@@ -795,7 +897,12 @@ class DeviceTypePathLocation:
         return msg
 
 
-ProblemLocation = typing.Union[ClusterPathLocation, DeviceTypePathLocation]
+class UnknownProblemLocation:
+    def __str__(self):
+        return '\n      Unknown Locations - see message for more details'
+
+
+ProblemLocation = typing.Union[ClusterPathLocation, DeviceTypePathLocation, UnknownProblemLocation]
 
 # ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
 # appeared in 3.11. To make it JSON serializable easily, multiple inheritance
@@ -843,13 +950,6 @@ class SetupParameters:
     def manual_code(self):
         return SetupPayload().GenerateManualPairingCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
                                                         self.custom_flow, self.capabilities, self.version)
-
-
-@dataclass
-class SetupPayloadInfo:
-    filter_type: discovery.FilterType = discovery.FilterType.LONG_DISCRIMINATOR
-    filter_value: int = 0
-    passcode: int = 0
 
 
 class MatterStackState:
@@ -1124,8 +1224,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.current_step_index = 0
         self.step_start_time = datetime.now(timezone.utc)
         self.step_skipped = False
-        self.global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
-            None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
         # self.stored_global_wildcard stores value of self.global_wildcard after first async call.
         # Because setup_class can be called before commissioning, this variable is lazy-initialized
         # where the read is deferred until the first guard function call that requires global attributes.
@@ -1152,17 +1250,14 @@ class MatterBaseTest(base_test.BaseTestClass):
                 self.step(1)
 
     def teardown_class(self):
-        """Final teardown after all tests: log all problems"""
-        if len(self.problems) == 0:
-            return
-
-        logging.info("###########################################################")
-        logging.info("Problems found:")
-        logging.info("===============")
-        for problem in self.problems:
-            logging.info(str(problem))
-        logging.info("###########################################################")
-
+        """Final teardown after all tests: log all problems."""
+        if len(self.problems) > 0:
+            logging.info("###########################################################")
+            logging.info("Problems found:")
+            logging.info("===============")
+            for problem in self.problems:
+                logging.info(str(problem))
+            logging.info("###########################################################")
         super().teardown_class()
 
     def check_pics(self, pics_key: str) -> bool:
@@ -1171,6 +1266,22 @@ class MatterBaseTest(base_test.BaseTestClass):
     @property
     def is_pics_sdk_ci_only(self) -> bool:
         return self.check_pics('PICS_SDK_CI_ONLY')
+
+    async def commission_devices(self) -> bool:
+        dev_ctrl: ChipDeviceCtrl.ChipDeviceController = self.default_controller
+        dut_node_ids: List[int] = self.matter_test_config.dut_node_ids
+        setup_payloads: List[SetupPayloadInfo] = self.get_setup_payload_info()
+        commissioning_info: CommissioningInfo = CommissioningInfo(
+            commissionee_ip_address_just_for_testing=self.matter_test_config.commissionee_ip_address_just_for_testing,
+            commissioning_method=self.matter_test_config.commissioning_method,
+            thread_operational_dataset=self.matter_test_config.thread_operational_dataset,
+            wifi_passphrase=self.matter_test_config.wifi_passphrase,
+            wifi_ssid=self.matter_test_config.wifi_ssid,
+            tc_version_to_simulate=self.matter_test_config.tc_version_to_simulate,
+            tc_user_response_to_simulate=self.matter_test_config.tc_user_response_to_simulate,
+        )
+
+        return await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
 
     async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, timeout: int = 900) -> CustomCommissioningParameters:
         rnd_discriminator = random.randint(0, 4095)
@@ -1461,6 +1572,13 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.mark_current_step_skipped()
         return pics_condition
 
+    async def _populate_wildcard(self):
+        """ Populates self.stored_global_wildcard if not already filled. """
+        if self.stored_global_wildcard is None:
+            global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
+                None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
+            self.stored_global_wildcard = await global_wildcard
+
     async def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
         """Similar to pics_guard above, except checks a condition and if False marks the test step as skipped and
            returns False using attributes against attributes_list, otherwise returns True.
@@ -1474,8 +1592,7 @@ class MatterBaseTest(base_test.BaseTestClass):
               if self.attribute_guard(condition2_needs_to_be_false_to_skip_step):
                   # skip step 2 if condition not met
            """
-        if self.stored_global_wildcard is None:
-            self.stored_global_wildcard = await self.global_wildcard
+        await self._populate_wildcard()
         attr_condition = _has_attribute(wildcard=self.stored_global_wildcard, endpoint=endpoint, attribute=attribute)
         if not attr_condition:
             self.mark_current_step_skipped()
@@ -1494,8 +1611,7 @@ class MatterBaseTest(base_test.BaseTestClass):
               if self.command_guard(condition2_needs_to_be_false_to_skip_step):
                   # skip step 2 if condition not met
            """
-        if self.stored_global_wildcard is None:
-            self.stored_global_wildcard = await self.global_wildcard
+        await self._populate_wildcard()
         cmd_condition = _has_command(wildcard=self.stored_global_wildcard, endpoint=endpoint, command=command)
         if not cmd_condition:
             self.mark_current_step_skipped()
@@ -1514,8 +1630,7 @@ class MatterBaseTest(base_test.BaseTestClass):
               if self.feature_guard(condition2_needs_to_be_false_to_skip_step):
                   # skip step 2 if condition not met
            """
-        if self.stored_global_wildcard is None:
-            self.stored_global_wildcard = await self.global_wildcard
+        await self._populate_wildcard()
         feat_condition = _has_feature(wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster, feature=feature_int)
         if not feat_condition:
             self.mark_current_step_skipped()
@@ -1838,6 +1953,7 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
     config.dut_node_ids = args.dut_node_ids
 
     config.commissioning_method = args.commissioning_method
+    config.in_test_commissioning_method = args.in_test_commissioning_method
     config.commission_only = args.commission_only
 
     config.qr_code_content.extend(args.qr_code)
@@ -1932,13 +2048,18 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.paa_trust_store_path = args.paa_trust_store_path
     config.ble_interface_id = args.ble_interface_id
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
-    config.tests = [] if args.tests is None else args.tests
+    config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.app_pid = 0 if args.app_pid is None else args.app_pid
+    config.fail_on_skipped_tests = args.fail_on_skipped
 
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
+
+    config.tc_version_to_simulate = args.tc_version_to_simulate
+    config.tc_user_response_to_simulate = args.tc_user_response_to_simulate
+    config.dac_revocation_set_path = args.dac_revocation_set_path
 
     # Accumulate all command-line-passed named args
     all_global_args = []
@@ -1962,13 +2083,10 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
 
-    basic_group.add_argument('--tests',
-                             '--test_case',
-                             action="store",
-                             nargs='+',
-                             type=str,
-                             metavar='test_a test_b...',
+    basic_group.add_argument('--tests', '--test-case', action='append', nargs='+', type=str, metavar='test_NAME',
                              help='A list of tests in the test class to execute.')
+    basic_group.add_argument('--fail-on-skipped', action="store_true", default=False,
+                             help="Fail the test if any test cases are skipped")
     basic_group.add_argument('--trace-to', nargs="*", default=[],
                              help="Where to trace (e.g perfetto, perfetto:path, json:log, json:path)")
     basic_group.add_argument('--storage-path', action="store", type=pathlib.Path,
@@ -1977,6 +2095,8 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
     paa_path_default = get_default_paa_trust_store(pathlib.Path.cwd())
     basic_group.add_argument('--paa-trust-store-path', action="store", type=pathlib.Path, metavar="PATH", default=paa_path_default,
                              help="PAA trust store path (default: %s)" % str(paa_path_default))
+    basic_group.add_argument('--dac-revocation-set-path', action="store", type=pathlib.Path, metavar="PATH",
+                             help="Path to JSON file containing the device attestation revocation set.")
     basic_group.add_argument('--ble-interface-id', action="store", type=int,
                              metavar="INTERFACE_ID", help="ID of BLE adapter (from hciconfig)")
     basic_group.add_argument('-N', '--controller-node-id', type=int_decimal_or_hex,
@@ -1998,6 +2118,10 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                                   metavar='METHOD_NAME',
                                   choices=["on-network", "ble-wifi", "ble-thread", "on-network-ip"],
                                   help='Name of commissioning method to use')
+    commission_group.add_argument('--in-test-commissioning-method', type=str,
+                                  metavar='METHOD_NAME',
+                                  choices=["on-network", "ble-wifi", "ble-thread", "on-network-ip"],
+                                  help='Name of commissioning method to use, for commissioning tests')
     commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
                                   metavar='LONG_DISCRIMINATOR',
                                   dest='discriminators',
@@ -2033,6 +2157,10 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
     commission_group.add_argument('--commission-only', action="store_true", default=False,
                                   help="If true, test exits after commissioning without running subsequent tests")
 
+    commission_group.add_argument('--tc-version-to-simulate', type=int, help="Terms and conditions version")
+
+    commission_group.add_argument('--tc-user-response-to-simulate', type=int, help="Terms and conditions acknowledgements")
+
     code_group = parser.add_mutually_exclusive_group(required=False)
 
     code_group.add_argument('-q', '--qr-code', type=str,
@@ -2056,17 +2184,17 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                               help='Path to chip-tool credentials file root')
 
     args_group = parser.add_argument_group(title="Config arguments", description="Test configuration global arguments set")
-    args_group.add_argument('--int-arg', nargs='*', action='append', type=int_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--int-arg', nargs='+', action='append', type=int_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an integer as hex or decimal (e.g. -2 or 0xFFFF_1234)")
-    args_group.add_argument('--bool-arg', nargs='*', action='append', type=bool_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--bool-arg', nargs='+', action='append', type=bool_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an boolean value (e.g. true/false or 0/1)")
-    args_group.add_argument('--float-arg', nargs='*', action='append', type=float_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--float-arg', nargs='+', action='append', type=float_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for a floating point value (e.g. -2.1 or 6.022e23)")
-    args_group.add_argument('--string-arg', nargs='*', action='append', type=str_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--string-arg', nargs='+', action='append', type=str_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for a string value")
-    args_group.add_argument('--json-arg', nargs='*', action='append', type=json_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--json-arg', nargs='+', action='append', type=json_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for JSON stored as a list or dict")
-    args_group.add_argument('--hex-arg', nargs='*', action='append', type=bytes_as_hex_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--hex-arg', nargs='+', action='append', type=bytes_as_hex_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an octet string in hex (e.g. 0011cafe or 00:11:CA:FE)")
 
     if not argv:
@@ -2077,8 +2205,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
     timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
-    runner_with_timeout = asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout)
-    return asyncio.run(runner_with_timeout)
+    return self.event_loop.run_until_complete(asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout))
 
 
 def async_test_body(body):
@@ -2271,7 +2398,7 @@ def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction):
     def run_on_singleton_matching_endpoint_internal(body):
         def matching_runner(self: MatterBaseTest, *args, **kwargs):
             runner_with_timeout = asyncio.wait_for(_get_all_matching_endpoints(self, accept_function), timeout=30)
-            matching = asyncio.run(runner_with_timeout)
+            matching = self.event_loop.run_until_complete(runner_with_timeout)
             asserts.assert_less_equal(len(matching), 1, "More than one matching endpoint found for singleton test.")
             if not matching:
                 logging.info("Test is not applicable to any endpoint - skipping test")
@@ -2318,7 +2445,7 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
     def run_if_endpoint_matches_internal(body):
         def per_endpoint_runner(self: MatterBaseTest, *args, **kwargs):
             runner_with_timeout = asyncio.wait_for(should_run_test_on_endpoint(self, accept_function), timeout=60)
-            should_run_test = asyncio.run(runner_with_timeout)
+            should_run_test = self.event_loop.run_until_complete(runner_with_timeout)
             if not should_run_test:
                 logging.info("Test is not applicable to this endpoint - skipping test")
                 asserts.skip('Endpoint does not match test requirements')
@@ -2337,73 +2464,8 @@ class CommissionDeviceTest(MatterBaseTest):
         self.is_commissioning = True
 
     def test_run_commissioning(self):
-        conf = self.matter_test_config
-        for commission_idx, node_id in enumerate(conf.dut_node_ids):
-            logging.info("Starting commissioning for root index %d, fabric ID 0x%016X, node ID 0x%016X" %
-                         (conf.root_of_trust_index, conf.fabric_id, node_id))
-            logging.info("Commissioning method: %s" % conf.commissioning_method)
-
-            if not asyncio.run(self._commission_device(commission_idx)):
-                raise signals.TestAbortAll("Failed to commission node")
-
-    async def _commission_device(self, i) -> bool:
-        dev_ctrl = self.default_controller
-        conf = self.matter_test_config
-
-        info = self.get_setup_payload_info()[i]
-
-        if conf.commissioning_method == "on-network":
-            try:
-                await dev_ctrl.CommissionOnNetwork(
-                    nodeId=conf.dut_node_ids[i],
-                    setupPinCode=info.passcode,
-                    filterType=info.filter_type,
-                    filter=info.filter_value
-                )
-                return True
-            except ChipStackError as e:
-                logging.error("Commissioning failed: %s" % e)
-                return False
-        elif conf.commissioning_method == "ble-wifi":
-            try:
-                await dev_ctrl.CommissionWiFi(
-                    info.filter_value,
-                    info.passcode,
-                    conf.dut_node_ids[i],
-                    conf.wifi_ssid,
-                    conf.wifi_passphrase,
-                    isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
-                )
-                return True
-            except ChipStackError as e:
-                logging.error("Commissioning failed: %s" % e)
-                return False
-        elif conf.commissioning_method == "ble-thread":
-            try:
-                await dev_ctrl.CommissionThread(
-                    info.filter_value,
-                    info.passcode,
-                    conf.dut_node_ids[i],
-                    conf.thread_operational_dataset,
-                    isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
-                )
-                return True
-            except ChipStackError as e:
-                logging.error("Commissioning failed: %s" % e)
-                return False
-        elif conf.commissioning_method == "on-network-ip":
-            try:
-                logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
-                await dev_ctrl.CommissionIP(
-                    ipaddr=conf.commissionee_ip_address_just_for_testing,
-                    setupPinCode=info.passcode, nodeid=conf.dut_node_ids[i]
-                )
-                return True
-            except ChipStackError as e:
-                logging.error("Commissioning failed: %s" % e)
-                return False
-        else:
-            raise ValueError("Invalid commissioning method %s!" % conf.commissioning_method)
+        if not self.event_loop.run_until_complete(self.commission_devices()):
+            raise signals.TestAbortAll("Failed to commission node(s)")
 
 
 def default_matter_test_main():
@@ -2412,10 +2474,10 @@ def default_matter_test_main():
     In this case, only one test class in a test script is allowed.
     To make your test script executable, add the following to your file:
     .. code-block:: python
-      from chip.testing.matter_testing.py import default_matter_test_main
+      from chip.testing.matter_testing import default_matter_test_main
       ...
       if __name__ == '__main__':
-        default_matter_test_main.main()
+        default_matter_test_main()
     """
 
     matter_test_config = parse_matter_test_args()
@@ -2444,7 +2506,15 @@ def get_test_info(test_class: MatterBaseTest, matter_test_config: MatterTestConf
     return info
 
 
-def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> bool:
+def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTestConfig,
+                      event_loop: asyncio.AbstractEventLoop, hooks: TestRunnerHooks,
+                      default_controller=None, external_stack=None) -> bool:
+
+    # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
+    #       Mobly deep copies the user params before passing them to the test class and the event
+    #       loop is not serializable. So, we are setting the event loop as a test class member.
+    CommissionDeviceTest.event_loop = event_loop
+    test_class.event_loop = event_loop
 
     get_test_info(test_class, matter_test_config)
 
@@ -2473,7 +2543,8 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
             default_controller = stack.certificate_authorities[0].adminList[0].NewController(
                 nodeId=matter_test_config.controller_node_id,
                 paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
-                catTags=matter_test_config.controller_cat_tags
+                catTags=matter_test_config.controller_cat_tags,
+                dacRevocationSetPath=str(matter_test_config.dac_revocation_set_path),
             )
         test_config.user_params["default_controller"] = stash_globally(default_controller)
 
@@ -2510,6 +2581,8 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
             try:
                 runner.run()
                 ok = runner.results.is_all_pass and ok
+                if matter_test_config.fail_on_skipped_tests and runner.results.skipped:
+                    ok = False
             except TimeoutError:
                 ok = False
             except signals.TestAbortAll:
@@ -2522,9 +2595,13 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
         duration = (datetime.now(timezone.utc) - runner_start_time) / timedelta(microseconds=1)
         hooks.stop(duration=duration)
 
-    # Shutdown the stack when all done
     if not external_stack:
-        stack.Shutdown()
+        async def shutdown():
+            stack.Shutdown()
+        # Shutdown the stack when all done. Use the async runner to ensure that
+        # during the shutdown callbacks can use tha same async context which was used
+        # during the initialization.
+        event_loop.run_until_complete(shutdown())
 
     if ok:
         logging.info("Final result: PASS !")
@@ -2533,6 +2610,9 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
     return ok
 
 
-def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> None:
-    if not run_tests_no_exit(test_class, matter_test_config, hooks, default_controller, external_stack):
-        sys.exit(1)
+def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig,
+              hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> None:
+    with asyncio.Runner() as runner:
+        if not run_tests_no_exit(test_class, matter_test_config, runner.get_loop(),
+                                 hooks, default_controller, external_stack):
+            sys.exit(1)

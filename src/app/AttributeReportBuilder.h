@@ -58,19 +58,18 @@ public:
     /**
      * EncodeValue encodes the value field of the report, it should be called exactly once.
      */
-    template <typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true, typename... Ts>
-    CHIP_ERROR EncodeValue(AttributeReportIBs::Builder & aAttributeReportIBs, TLV::Tag tag, T && item, Ts &&... aArgs)
+    template <typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
+    CHIP_ERROR EncodeValue(AttributeReportIBs::Builder & aAttributeReportIBs, TLV::Tag tag, const T & item)
     {
-        return DataModel::Encode(*(aAttributeReportIBs.GetAttributeReport().GetAttributeData().GetWriter()), tag, item,
-                                 std::forward<Ts>(aArgs)...);
+        return DataModel::Encode(*(aAttributeReportIBs.GetAttributeReport().GetAttributeData().GetWriter()), tag, item);
     }
 
-    template <typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true, typename... Ts>
-    CHIP_ERROR EncodeValue(AttributeReportIBs::Builder & aAttributeReportIBs, TLV::Tag tag, FabricIndex accessingFabricIndex,
-                           T && item, Ts &&... aArgs)
+    template <typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
+    CHIP_ERROR EncodeValue(AttributeReportIBs::Builder & aAttributeReportIBs, TLV::Tag tag, const T & item,
+                           FabricIndex accessingFabricIndex)
     {
         return DataModel::EncodeForRead(*(aAttributeReportIBs.GetAttributeReport().GetAttributeData().GetWriter()), tag,
-                                        accessingFabricIndex, item, std::forward<Ts>(aArgs)...);
+                                        accessingFabricIndex, item);
     }
 };
 

@@ -105,7 +105,7 @@ void processMessage(const struct log_backend * const backend, union log_msg_gene
         return;
     }
 
-    int ret = k_sem_take(&sLoggerLock, K_FOREVER);
+    [[maybe_unused]] int ret = k_sem_take(&sLoggerLock, K_FOREVER);
     assert(ret == 0);
 
     log_format_func_t outputFunc = log_format_func_t_get(LOG_OUTPUT_TEXT);

@@ -28,6 +28,8 @@
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
+#include <app/CommandHandlerInterface.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/reporting/reporting.h>
 #include <app/server/CommissioningWindowManager.h>
@@ -60,18 +62,21 @@ using Transport::Session;
     {                                                                                                                              \
         if (!::chip::ChipError::IsSuccess(expr))                                                                                   \
         {                                                                                                                          \
-            commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::code, #expr);                                  \
-            return true;                                                                                                           \
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::code, #expr);                     \
+            return;                                                                                                                \
         }                                                                                                                          \
     } while (false)
 
 namespace {
 
-class GeneralCommissioningAttrAccess : public AttributeAccessInterface
+class GeneralCommissioningGlobalInstance : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
     // Register for the GeneralCommissioning cluster on all endpoints.
-    GeneralCommissioningAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralCommissioning::Id) {}
+    GeneralCommissioningGlobalInstance() :
+        AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralCommissioning::Id),
+        CommandHandlerInterface(Optional<EndpointId>::Missing(), GeneralCommissioning::Id)
+    {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
@@ -79,11 +84,20 @@ private:
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &), AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadBasicCommissioningInfo(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadSupportsConcurrentConnection(AttributeValueEncoder & aEncoder);
+
+    void InvokeCommand(HandlerContext & ctx) override;
+
+    void HandleArmFailSafe(HandlerContext & ctx, const Commands::ArmFailSafe::DecodableType & commandData);
+    void HandleCommissioningComplete(HandlerContext & ctx, const Commands::CommissioningComplete::DecodableType & commandData);
+    void HandleSetRegulatoryConfig(HandlerContext & ctx, const Commands::SetRegulatoryConfig::DecodableType & commandData);
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    void HandleSetTCAcknowledgements(HandlerContext & ctx, const Commands::SetTCAcknowledgements::DecodableType & commandData);
+#endif
 };
 
-GeneralCommissioningAttrAccess gAttrAccess;
+GeneralCommissioningGlobalInstance gGeneralCommissioningInstance;
 
-CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR GeneralCommissioningGlobalInstance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != GeneralCommissioning::Id)
     {
@@ -93,6 +107,14 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
 
     switch (aPath.mAttributeId)
     {
+    case FeatureMap::Id: {
+        BitFlags<GeneralCommissioning::Feature> features;
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        features.Set(GeneralCommissioning::Feature::kTermsAndConditions);
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        return aEncoder.Encode(features);
+    }
+
     case RegulatoryConfig::Id: {
         return ReadIfSupported(&ConfigurationManager::GetRegulatoryLocation, aEncoder);
     }
@@ -164,10 +186,10 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GeneralCommissioningAttrAccess::ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &),
-                                                           AttributeValueEncoder & aEncoder)
+CHIP_ERROR GeneralCommissioningGlobalInstance::ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &),
+                                                               AttributeValueEncoder & aEncoder)
 {
-    uint8_t data;
+    uint8_t data   = 0;
     CHIP_ERROR err = (DeviceLayer::ConfigurationMgr().*getter)(data);
     if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
@@ -177,25 +199,24 @@ CHIP_ERROR GeneralCommissioningAttrAccess::ReadIfSupported(CHIP_ERROR (Configura
     {
         return err;
     }
-
     return aEncoder.Encode(data);
 }
 
-CHIP_ERROR GeneralCommissioningAttrAccess::ReadBasicCommissioningInfo(AttributeValueEncoder & aEncoder)
+CHIP_ERROR GeneralCommissioningGlobalInstance::ReadBasicCommissioningInfo(AttributeValueEncoder & aEncoder)
 {
-    BasicCommissioningInfo::TypeInfo::Type basicCommissioningInfo;
+    BasicCommissioningInfo::TypeInfo::Type info;
 
     // TODO: The commissioner might use the critical parameters in BasicCommissioningInfo to initialize
     // the CommissioningParameters at the beginning of commissioning flow.
-    basicCommissioningInfo.failSafeExpiryLengthSeconds  = CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC;
-    basicCommissioningInfo.maxCumulativeFailsafeSeconds = CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC;
+    info.failSafeExpiryLengthSeconds  = CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC;
+    info.maxCumulativeFailsafeSeconds = CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC;
     static_assert(CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC >= CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC,
                   "Max cumulative failsafe seconds must be larger than failsafe expiry length seconds");
 
-    return aEncoder.Encode(basicCommissioningInfo);
+    return aEncoder.Encode(info);
 }
 
-CHIP_ERROR GeneralCommissioningAttrAccess::ReadSupportsConcurrentConnection(AttributeValueEncoder & aEncoder)
+CHIP_ERROR GeneralCommissioningGlobalInstance::ReadSupportsConcurrentConnection(AttributeValueEncoder & aEncoder)
 {
     SupportsConcurrentConnection::TypeInfo::Type supportsConcurrentConnection;
 
@@ -204,6 +225,37 @@ CHIP_ERROR GeneralCommissioningAttrAccess::ReadSupportsConcurrentConnection(Attr
     supportsConcurrentConnection = (CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION) != 0;
 
     return aEncoder.Encode(supportsConcurrentConnection);
+}
+
+void GeneralCommissioningGlobalInstance::InvokeCommand(HandlerContext & handlerContext)
+{
+    switch (handlerContext.mRequestPath.mCommandId)
+    {
+    case Commands::ArmFailSafe::Id:
+        CommandHandlerInterface::HandleCommand<Commands::ArmFailSafe::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleArmFailSafe(ctx, commandData); });
+        break;
+
+    case Commands::CommissioningComplete::Id:
+        CommandHandlerInterface::HandleCommand<Commands::CommissioningComplete::DecodableType>(
+            handlerContext,
+            [this](HandlerContext & ctx, const auto & commandData) { HandleCommissioningComplete(ctx, commandData); });
+        break;
+
+    case Commands::SetRegulatoryConfig::Id:
+        CommandHandlerInterface::HandleCommand<Commands::SetRegulatoryConfig::DecodableType>(
+            handlerContext,
+            [this](HandlerContext & ctx, const auto & commandData) { HandleSetRegulatoryConfig(ctx, commandData); });
+        break;
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    case Commands::SetTCAcknowledgements::Id:
+        CommandHandlerInterface::HandleCommand<Commands::SetTCAcknowledgements::DecodableType>(
+            handlerContext,
+            [this](HandlerContext & ctx, const auto & commandData) { HandleSetTCAcknowledgements(ctx, commandData); });
+        break;
+#endif
+    }
 }
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -273,10 +325,7 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
 }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
-} // anonymous namespace
-
-bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler * commandObj,
-                                                           const app::ConcreteCommandPath & commandPath,
+void GeneralCommissioningGlobalInstance::HandleArmFailSafe(HandlerContext & ctx,
                                                            const Commands::ArmFailSafe::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("ArmFailSafe", "GeneralCommissioning");
@@ -292,8 +341,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
      * If the fail-safe timer was currently armed, and current accessing fabric matches the fail-safe
      * context’s Fabric Index, then the fail-safe timer SHALL be re-armed.
      */
-
-    FabricIndex accessingFabricIndex = commandObj->GetAccessingFabricIndex();
+    FabricIndex accessingFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
 
     // We do not allow CASE connections to arm the failsafe for the first time while the commissioning window is open in order
     // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
@@ -304,10 +352,9 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
         // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
         if (!failSafeContext.IsFailSafeArmed() &&
             Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen() &&
-            commandObj->GetSubjectDescriptor().authMode == Access::AuthMode::kCase)
+            ctx.mCommandHandler.GetSubjectDescriptor().authMode == Access::AuthMode::kCase)
         {
             response.errorCode = CommissioningErrorEnum::kBusyWithOtherAdmin;
-            commandObj->AddResponse(commandPath, response);
         }
         else if (commandData.expiryLengthSeconds == 0)
         {
@@ -316,30 +363,26 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
             // Don't set the breadcrumb, since expiring the failsafe should
             // reset it anyway.
             response.errorCode = CommissioningErrorEnum::kOk;
-            commandObj->AddResponse(commandPath, response);
         }
         else
         {
             CheckSuccess(
                 failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
                 Failure);
-            Breadcrumb::Set(commandPath.mEndpointId, commandData.breadcrumb);
+            Breadcrumb::Set(ctx.mRequestPath.mEndpointId, commandData.breadcrumb);
             response.errorCode = CommissioningErrorEnum::kOk;
-            commandObj->AddResponse(commandPath, response);
         }
     }
     else
     {
         response.errorCode = CommissioningErrorEnum::kBusyWithOtherAdmin;
-        commandObj->AddResponse(commandPath, response);
     }
 
-    return true;
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
-    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-    const Commands::CommissioningComplete::DecodableType & commandData)
+void GeneralCommissioningGlobalInstance::HandleCommissioningComplete(
+    HandlerContext & ctx, const Commands::CommissioningComplete::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("CommissioningComplete", "GeneralCommissioning");
 
@@ -347,18 +390,17 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     auto & failSafe               = Server::GetInstance().GetFailSafeContext();
     auto & fabricTable            = Server::GetInstance().GetFabricTable();
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     ChipLogProgress(FailSafe, "GeneralCommissioning: Received CommissioningComplete");
 
     Commands::CommissioningCompleteResponse::Type response;
+    CHIP_ERROR err;
 
     // Fail-safe must be armed
     if (!failSafe.IsFailSafeArmed())
     {
         response.errorCode = CommissioningErrorEnum::kNoFailSafe;
-        commandObj->AddResponse(commandPath, response);
-        return true;
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
     }
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -376,8 +418,8 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
         if (requiredTermsAndConditionsMaybe.HasValue() && !acceptedTermsAndConditionsMaybe.HasValue())
         {
             response.errorCode = CommissioningErrorEnum::kTCAcknowledgementsNotReceived;
-            commandObj->AddResponse(commandPath, response);
-            return true;
+            ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+            return;
         }
 
         if (requiredTermsAndConditionsMaybe.HasValue() && acceptedTermsAndConditionsMaybe.HasValue())
@@ -388,15 +430,15 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
             if (!requiredTermsAndConditions.ValidateVersion(acceptedTermsAndConditions))
             {
                 response.errorCode = CommissioningErrorEnum::kTCMinVersionNotMet;
-                commandObj->AddResponse(commandPath, response);
-                return true;
+                ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+                return;
             }
 
             if (!requiredTermsAndConditions.ValidateValue(acceptedTermsAndConditions))
             {
                 response.errorCode = CommissioningErrorEnum::kRequiredTCNotAccepted;
-                commandObj->AddResponse(commandPath, response);
-                return true;
+                ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+                return;
             }
         }
 
@@ -418,17 +460,17 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
-    SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
+    SessionHandle handle = ctx.mCommandHandler.GetExchangeContext()->GetSessionHandle();
 
     // Ensure it's a valid CASE session
-    if ((handle->GetSessionType() != Session::SessionType::kSecure) ||
-        (handle->AsSecureSession()->GetSecureSessionType() != SecureSession::Type::kCASE) ||
-        (!failSafe.MatchesFabricIndex(commandObj->GetAccessingFabricIndex())))
+    if (handle->GetSessionType() != Session::SessionType::kSecure ||
+        handle->AsSecureSession()->GetSecureSessionType() != SecureSession::Type::kCASE ||
+        !failSafe.MatchesFabricIndex(ctx.mCommandHandler.GetAccessingFabricIndex()))
     {
         response.errorCode = CommissioningErrorEnum::kInvalidAuthentication;
         ChipLogError(FailSafe, "GeneralCommissioning: Got commissioning complete in invalid security context");
-        commandObj->AddResponse(commandPath, response);
-        return true;
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
     }
 
     // Handle NOC commands
@@ -452,80 +494,70 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     err = devCtrl->PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex());
     CheckSuccess(err, Failure);
 
-    Breadcrumb::Set(commandPath.mEndpointId, 0);
+    Breadcrumb::Set(ctx.mRequestPath.mEndpointId, 0);
     response.errorCode = CommissioningErrorEnum::kOk;
-
-    commandObj->AddResponse(commandPath, response);
-    return true;
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandHandler * commandObj,
-                                                                   const app::ConcreteCommandPath & commandPath,
+void GeneralCommissioningGlobalInstance::HandleSetRegulatoryConfig(HandlerContext & ctx,
                                                                    const Commands::SetRegulatoryConfig::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
     Commands::SetRegulatoryConfigResponse::Type response;
-
     auto & countryCode = commandData.countryCode;
-    bool isValidLength = countryCode.size() == DeviceLayer::ConfigurationManager::kMaxLocationLength;
-    if (!isValidLength)
+
+    if (countryCode.size() != ConfigurationManager::kMaxLocationLength)
     {
         ChipLogError(Zcl, "Invalid country code: '%.*s'", static_cast<int>(countryCode.size()), countryCode.data());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError);
-        return true;
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
+        return;
     }
 
     if (commandData.newRegulatoryConfig > RegulatoryLocationTypeEnum::kIndoorOutdoor)
     {
         response.errorCode = CommissioningErrorEnum::kValueOutsideRange;
-        // TODO: How does using the country code in debug text make sense, if
-        // the real issue is the newRegulatoryConfig value?
-        response.debugText = countryCode;
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
     }
-    else
+
+    uint8_t locationCapability;
+    if (ConfigurationMgr().GetLocationCapability(locationCapability) != CHIP_NO_ERROR)
     {
-        uint8_t locationCapability;
-        uint8_t location = to_underlying(commandData.newRegulatoryConfig);
-
-        CheckSuccess(ConfigurationMgr().GetLocationCapability(locationCapability), Failure);
-
-        // If the LocationCapability attribute is not Indoor/Outdoor and the NewRegulatoryConfig value received does not match
-        // either the Indoor or Outdoor fixed value in LocationCapability.
-        if ((locationCapability != to_underlying(RegulatoryLocationTypeEnum::kIndoorOutdoor)) && (location != locationCapability))
-        {
-            response.errorCode = CommissioningErrorEnum::kValueOutsideRange;
-            // TODO: How does using the country code in debug text make sense, if
-            // the real issue is the newRegulatoryConfig value?
-            response.debugText = countryCode;
-        }
-        else
-        {
-            CheckSuccess(server->SetRegulatoryConfig(location, countryCode), Failure);
-            Breadcrumb::Set(commandPath.mEndpointId, commandData.breadcrumb);
-            response.errorCode = CommissioningErrorEnum::kOk;
-        }
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Failure);
+        return;
     }
 
-    commandObj->AddResponse(commandPath, response);
+    uint8_t location = to_underlying(commandData.newRegulatoryConfig);
 
-    return true;
+    // If the LocationCapability attribute is not Indoor/Outdoor and the NewRegulatoryConfig value received does not match
+    // either the Indoor or Outdoor fixed value in LocationCapability.
+    if ((locationCapability != to_underlying(RegulatoryLocationTypeEnum::kIndoorOutdoor)) && (location != locationCapability))
+    {
+        response.errorCode = CommissioningErrorEnum::kValueOutsideRange;
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
+    }
+
+    CheckSuccess(server->SetRegulatoryConfig(location, countryCode), Failure);
+    Breadcrumb::Set(ctx.mRequestPath.mEndpointId, commandData.breadcrumb);
+    response.errorCode = CommissioningErrorEnum::kOk;
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-bool emberAfGeneralCommissioningClusterSetTCAcknowledgementsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const GeneralCommissioning::Commands::SetTCAcknowledgements::DecodableType & commandData)
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+void GeneralCommissioningGlobalInstance::HandleSetTCAcknowledgements(
+    HandlerContext & ctx, const Commands::SetTCAcknowledgements::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("SetTCAcknowledgements", "GeneralCommissioning");
 
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     auto & failSafeContext                  = Server::GetInstance().GetFailSafeContext();
     TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
 
     if (nullptr == tcProvider)
     {
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure);
-        return true;
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Failure);
+        return;
     }
 
     Optional<TermsAndConditions> requiredTermsAndConditionsMaybe;
@@ -544,15 +576,15 @@ bool emberAfGeneralCommissioningClusterSetTCAcknowledgementsCallback(
         if (!requiredTermsAndConditions.ValidateVersion(acceptedTermsAndConditions))
         {
             response.errorCode = CommissioningErrorEnum::kTCMinVersionNotMet;
-            commandObj->AddResponse(commandPath, response);
-            return true;
+            ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+            return;
         }
 
         if (!requiredTermsAndConditions.ValidateValue(acceptedTermsAndConditions))
         {
             response.errorCode = CommissioningErrorEnum::kRequiredTCNotAccepted;
-            commandObj->AddResponse(commandPath, response);
-            return true;
+            ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+            return;
         }
     }
 
@@ -576,24 +608,20 @@ bool emberAfGeneralCommissioningClusterSetTCAcknowledgementsCallback(
     }
 
     response.errorCode = CommissioningErrorEnum::kOk;
-    commandObj->AddResponse(commandPath, response);
-    return true;
-
-#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-    return true;
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
-namespace {
-void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t)
 {
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
         // Spec says to reset Breadcrumb attribute to 0.
         Breadcrumb::Set(0, 0);
 
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         if (event->FailSafeTimerExpired.updateTermsAndConditionsHasBeenInvoked)
         {
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             // Clear terms and conditions acceptance on failsafe timer expiration
             TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
             TermsAndConditionsState initialState, updatedState;
@@ -602,8 +630,8 @@ void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t
             VerifyOrReturn(CHIP_NO_ERROR == tcProvider->RevertAcceptance());
             VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, updatedState));
             NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
-#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         }
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     }
 }
 
@@ -615,6 +643,7 @@ public:
     // Gets called when a fabric is deleted
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         // If the FabricIndex matches the last remaining entry in the Fabrics list, then the device SHALL delete all Matter
         // related data on the node which was created since it was commissioned.
         if (Server::GetInstance().GetFabricTable().FabricCount() == 0)
@@ -622,7 +651,6 @@ public:
             ChipLogProgress(Zcl, "general-commissioning-server: Last Fabric index 0x%x was removed",
                             static_cast<unsigned>(fabricIndex));
 
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
             TermsAndConditionsState initialState, updatedState;
             VerifyOrReturn(nullptr != tcProvider);
@@ -630,19 +658,20 @@ public:
             VerifyOrReturn(CHIP_NO_ERROR == tcProvider->ResetAcceptance());
             VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, updatedState));
             NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
-#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         }
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     }
 };
 
 void MatterGeneralCommissioningPluginServerInitCallback()
 {
     Breadcrumb::Set(0, 0);
-    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gGeneralCommissioningInstance);
+    ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gGeneralCommissioningInstance));
     DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
 
-    static GeneralCommissioningFabricTableDelegate generalCommissioningFabricTableDelegate;
-    Server::GetInstance().GetFabricTable().AddFabricDelegate(&generalCommissioningFabricTableDelegate);
+    static GeneralCommissioningFabricTableDelegate fabricDelegate;
+    Server::GetInstance().GetFabricTable().AddFabricDelegate(&fabricDelegate);
 }
 
 namespace chip {

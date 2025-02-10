@@ -49,6 +49,11 @@
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
+// Temporarily keep backwards compatibility. To be removed
+#ifndef CONFIG_CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
+#define CONFIG_CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
+#endif
+
 /*******************************************************************************
  * Local data types
  *******************************************************************************/
@@ -771,7 +776,7 @@ CHIP_ERROR BLEManagerCommon::StopAdvertising(void)
             CancelBleAdvTimeoutTimer();
         }
 
-#if CONFIG_CHIP_NFC_COMMISSIONING
+#if CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
         /* schedule NFC emulation stop */
         ChipDeviceEvent advChange;
         advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
