@@ -20,18 +20,16 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ActionsClusterEndpointListStruct (
-    val endpointListID: UInt,
-    val name: String,
-    val type: UInt,
-    val endpoints: List<UInt>) {
-  override fun toString(): String  = buildString {
+class ActionsClusterEndpointListStruct(
+  val endpointListID: UInt,
+  val name: String,
+  val type: UInt,
+  val endpoints: List<UInt>,
+) {
+  override fun toString(): String = buildString {
     append("ActionsClusterEndpointListStruct {\n")
     append("\tendpointListID : $endpointListID\n")
     append("\tname : $name\n")
@@ -61,19 +59,20 @@ class ActionsClusterEndpointListStruct (
     private const val TAG_TYPE = 2
     private const val TAG_ENDPOINTS = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ActionsClusterEndpointListStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ActionsClusterEndpointListStruct {
       tlvReader.enterStructure(tlvTag)
       val endpointListID = tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT_LIST_ID))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val type = tlvReader.getUInt(ContextSpecificTag(TAG_TYPE))
-      val endpoints = buildList<UInt> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_ENDPOINTS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getUInt(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val endpoints =
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_ENDPOINTS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
       return ActionsClusterEndpointListStruct(endpointListID, name, type, endpoints)

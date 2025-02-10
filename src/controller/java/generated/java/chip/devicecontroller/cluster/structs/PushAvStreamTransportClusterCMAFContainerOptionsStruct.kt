@@ -17,19 +17,17 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class PushAvStreamTransportClusterCMAFContainerOptionsStruct (
-    val chunkDuration: UInt,
-    val CENCKey: Optional<ByteArray>) {
-  override fun toString(): String  = buildString {
+class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
+  val chunkDuration: UInt,
+  val CENCKey: Optional<ByteArray>,
+) {
+  override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterCMAFContainerOptionsStruct {\n")
     append("\tchunkDuration : $chunkDuration\n")
     append("\tCENCKey : $CENCKey\n")
@@ -41,9 +39,9 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CHUNK_DURATION), chunkDuration)
       if (CENCKey.isPresent) {
-      val optCENCKey = CENCKey.get()
-      put(ContextSpecificTag(TAG_CENC_KEY), optCENCKey)
-    }
+        val optCENCKey = CENCKey.get()
+        put(ContextSpecificTag(TAG_CENC_KEY), optCENCKey)
+      }
       endStructure()
     }
   }
@@ -52,15 +50,19 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct (
     private const val TAG_CHUNK_DURATION = 0
     private const val TAG_CENC_KEY = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : PushAvStreamTransportClusterCMAFContainerOptionsStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): PushAvStreamTransportClusterCMAFContainerOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val chunkDuration = tlvReader.getUInt(ContextSpecificTag(TAG_CHUNK_DURATION))
-      val CENCKey = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CENC_KEY))) {
-      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CENC_KEY)))
-    } else {
-      Optional.empty()
-    }
-      
+      val CENCKey =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CENC_KEY))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CENC_KEY)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return PushAvStreamTransportClusterCMAFContainerOptionsStruct(chunkDuration, CENCKey)

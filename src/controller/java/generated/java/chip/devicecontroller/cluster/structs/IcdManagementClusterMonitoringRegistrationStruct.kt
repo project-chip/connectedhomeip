@@ -17,21 +17,18 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class IcdManagementClusterMonitoringRegistrationStruct (
-    val checkInNodeID: ULong,
-    val monitoredSubject: ULong,
-    val clientType: UInt,
-    val fabricIndex: UInt) {
-  override fun toString(): String  = buildString {
+class IcdManagementClusterMonitoringRegistrationStruct(
+  val checkInNodeID: ULong,
+  val monitoredSubject: ULong,
+  val clientType: UInt,
+  val fabricIndex: UInt,
+) {
+  override fun toString(): String = buildString {
     append("IcdManagementClusterMonitoringRegistrationStruct {\n")
     append("\tcheckInNodeID : $checkInNodeID\n")
     append("\tmonitoredSubject : $monitoredSubject\n")
@@ -57,16 +54,24 @@ class IcdManagementClusterMonitoringRegistrationStruct (
     private const val TAG_CLIENT_TYPE = 4
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : IcdManagementClusterMonitoringRegistrationStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): IcdManagementClusterMonitoringRegistrationStruct {
       tlvReader.enterStructure(tlvTag)
       val checkInNodeID = tlvReader.getULong(ContextSpecificTag(TAG_CHECK_IN_NODE_ID))
       val monitoredSubject = tlvReader.getULong(ContextSpecificTag(TAG_MONITORED_SUBJECT))
       val clientType = tlvReader.getUInt(ContextSpecificTag(TAG_CLIENT_TYPE))
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return IcdManagementClusterMonitoringRegistrationStruct(checkInNodeID, monitoredSubject, clientType, fabricIndex)
+      return IcdManagementClusterMonitoringRegistrationStruct(
+        checkInNodeID,
+        monitoredSubject,
+        clientType,
+        fabricIndex,
+      )
     }
   }
 }

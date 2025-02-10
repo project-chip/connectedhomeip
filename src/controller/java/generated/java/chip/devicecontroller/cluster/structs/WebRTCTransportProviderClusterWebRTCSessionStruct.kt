@@ -17,24 +17,21 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class WebRTCTransportProviderClusterWebRTCSessionStruct (
-    val id: UInt,
-    val peerNodeID: ULong,
-    val peerFabricIndex: UInt,
-    val streamUsage: UInt,
-    val videoStreamID: UInt?,
-    val audioStreamID: UInt?,
-    val metadataOptions: UInt) {
-  override fun toString(): String  = buildString {
+class WebRTCTransportProviderClusterWebRTCSessionStruct(
+  val id: UInt,
+  val peerNodeID: ULong,
+  val peerFabricIndex: UInt,
+  val streamUsage: UInt,
+  val videoStreamID: UInt?,
+  val audioStreamID: UInt?,
+  val metadataOptions: UInt,
+) {
+  override fun toString(): String = buildString {
     append("WebRTCTransportProviderClusterWebRTCSessionStruct {\n")
     append("\tid : $id\n")
     append("\tpeerNodeID : $peerNodeID\n")
@@ -54,15 +51,15 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct (
       put(ContextSpecificTag(TAG_PEER_FABRIC_INDEX), peerFabricIndex)
       put(ContextSpecificTag(TAG_STREAM_USAGE), streamUsage)
       if (videoStreamID != null) {
-      put(ContextSpecificTag(TAG_VIDEO_STREAM_ID), videoStreamID)
-    } else {
-      putNull(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
-    }
+        put(ContextSpecificTag(TAG_VIDEO_STREAM_ID), videoStreamID)
+      } else {
+        putNull(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
+      }
       if (audioStreamID != null) {
-      put(ContextSpecificTag(TAG_AUDIO_STREAM_ID), audioStreamID)
-    } else {
-      putNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
-    }
+        put(ContextSpecificTag(TAG_AUDIO_STREAM_ID), audioStreamID)
+      } else {
+        putNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
+      }
       put(ContextSpecificTag(TAG_METADATA_OPTIONS), metadataOptions)
       endStructure()
     }
@@ -77,29 +74,42 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct (
     private const val TAG_AUDIO_STREAM_ID = 6
     private const val TAG_METADATA_OPTIONS = 7
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : WebRTCTransportProviderClusterWebRTCSessionStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): WebRTCTransportProviderClusterWebRTCSessionStruct {
       tlvReader.enterStructure(tlvTag)
       val id = tlvReader.getUInt(ContextSpecificTag(TAG_ID))
       val peerNodeID = tlvReader.getULong(ContextSpecificTag(TAG_PEER_NODE_ID))
       val peerFabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_PEER_FABRIC_INDEX))
       val streamUsage = tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_USAGE))
-      val videoStreamID = if (!tlvReader.isNull()) {
-      tlvReader.getUInt(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
-      null
-    }
-      val audioStreamID = if (!tlvReader.isNull()) {
-      tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
-      null
-    }
+      val videoStreamID =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
+          null
+        }
+      val audioStreamID =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
+          null
+        }
       val metadataOptions = tlvReader.getUInt(ContextSpecificTag(TAG_METADATA_OPTIONS))
-      
+
       tlvReader.exitContainer()
 
-      return WebRTCTransportProviderClusterWebRTCSessionStruct(id, peerNodeID, peerFabricIndex, streamUsage, videoStreamID, audioStreamID, metadataOptions)
+      return WebRTCTransportProviderClusterWebRTCSessionStruct(
+        id,
+        peerNodeID,
+        peerFabricIndex,
+        streamUsage,
+        videoStreamID,
+        audioStreamID,
+        metadataOptions,
+      )
     }
   }
 }

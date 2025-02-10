@@ -17,25 +17,22 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class CameraAvStreamManagementClusterSnapshotStreamStruct (
-    val snapshotStreamID: UInt,
-    val imageCodec: UInt,
-    val frameRate: UInt,
-    val bitRate: ULong,
-    val minResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
-    val maxResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
-    val quality: UInt,
-    val referenceCount: UInt) {
-  override fun toString(): String  = buildString {
+class CameraAvStreamManagementClusterSnapshotStreamStruct(
+  val snapshotStreamID: UInt,
+  val imageCodec: UInt,
+  val frameRate: UInt,
+  val bitRate: ULong,
+  val minResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
+  val maxResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
+  val quality: UInt,
+  val referenceCount: UInt,
+) {
+  override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterSnapshotStreamStruct {\n")
     append("\tsnapshotStreamID : $snapshotStreamID\n")
     append("\timageCodec : $imageCodec\n")
@@ -73,20 +70,40 @@ class CameraAvStreamManagementClusterSnapshotStreamStruct (
     private const val TAG_QUALITY = 6
     private const val TAG_REFERENCE_COUNT = 7
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CameraAvStreamManagementClusterSnapshotStreamStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): CameraAvStreamManagementClusterSnapshotStreamStruct {
       tlvReader.enterStructure(tlvTag)
       val snapshotStreamID = tlvReader.getUInt(ContextSpecificTag(TAG_SNAPSHOT_STREAM_ID))
       val imageCodec = tlvReader.getUInt(ContextSpecificTag(TAG_IMAGE_CODEC))
       val frameRate = tlvReader.getUInt(ContextSpecificTag(TAG_FRAME_RATE))
       val bitRate = tlvReader.getULong(ContextSpecificTag(TAG_BIT_RATE))
-      val minResolution = CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(ContextSpecificTag(TAG_MIN_RESOLUTION), tlvReader)
-      val maxResolution = CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(ContextSpecificTag(TAG_MAX_RESOLUTION), tlvReader)
+      val minResolution =
+        CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(
+          ContextSpecificTag(TAG_MIN_RESOLUTION),
+          tlvReader,
+        )
+      val maxResolution =
+        CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(
+          ContextSpecificTag(TAG_MAX_RESOLUTION),
+          tlvReader,
+        )
       val quality = tlvReader.getUInt(ContextSpecificTag(TAG_QUALITY))
       val referenceCount = tlvReader.getUInt(ContextSpecificTag(TAG_REFERENCE_COUNT))
-      
+
       tlvReader.exitContainer()
 
-      return CameraAvStreamManagementClusterSnapshotStreamStruct(snapshotStreamID, imageCodec, frameRate, bitRate, minResolution, maxResolution, quality, referenceCount)
+      return CameraAvStreamManagementClusterSnapshotStreamStruct(
+        snapshotStreamID,
+        imageCodec,
+        frameRate,
+        bitRate,
+        minResolution,
+        maxResolution,
+        quality,
+        referenceCount,
+      )
     }
   }
 }

@@ -17,22 +17,20 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class EnergyEvseClusterEnergyTransferStoppedEvent (
-    val sessionID: ULong,
-    val state: UInt,
-    val reason: UInt,
-    val energyTransferred: Long,
-    val energyDischarged: Optional<Long>) {
-  override fun toString(): String  = buildString {
+class EnergyEvseClusterEnergyTransferStoppedEvent(
+  val sessionID: ULong,
+  val state: UInt,
+  val reason: UInt,
+  val energyTransferred: Long,
+  val energyDischarged: Optional<Long>,
+) {
+  override fun toString(): String = buildString {
     append("EnergyEvseClusterEnergyTransferStoppedEvent {\n")
     append("\tsessionID : $sessionID\n")
     append("\tstate : $state\n")
@@ -50,9 +48,9 @@ class EnergyEvseClusterEnergyTransferStoppedEvent (
       put(ContextSpecificTag(TAG_REASON), reason)
       put(ContextSpecificTag(TAG_ENERGY_TRANSFERRED), energyTransferred)
       if (energyDischarged.isPresent) {
-      val optenergyDischarged = energyDischarged.get()
-      put(ContextSpecificTag(TAG_ENERGY_DISCHARGED), optenergyDischarged)
-    }
+        val optenergyDischarged = energyDischarged.get()
+        put(ContextSpecificTag(TAG_ENERGY_DISCHARGED), optenergyDischarged)
+      }
       endStructure()
     }
   }
@@ -64,21 +62,28 @@ class EnergyEvseClusterEnergyTransferStoppedEvent (
     private const val TAG_ENERGY_TRANSFERRED = 4
     private const val TAG_ENERGY_DISCHARGED = 5
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : EnergyEvseClusterEnergyTransferStoppedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterEnergyTransferStoppedEvent {
       tlvReader.enterStructure(tlvTag)
       val sessionID = tlvReader.getULong(ContextSpecificTag(TAG_SESSION_ID))
       val state = tlvReader.getUInt(ContextSpecificTag(TAG_STATE))
       val reason = tlvReader.getUInt(ContextSpecificTag(TAG_REASON))
       val energyTransferred = tlvReader.getLong(ContextSpecificTag(TAG_ENERGY_TRANSFERRED))
-      val energyDischarged = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENERGY_DISCHARGED))) {
-      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_ENERGY_DISCHARGED)))
-    } else {
-      Optional.empty()
-    }
-      
+      val energyDischarged =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENERGY_DISCHARGED))) {
+          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_ENERGY_DISCHARGED)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return EnergyEvseClusterEnergyTransferStoppedEvent(sessionID, state, reason, energyTransferred, energyDischarged)
+      return EnergyEvseClusterEnergyTransferStoppedEvent(
+        sessionID,
+        state,
+        reason,
+        energyTransferred,
+        energyDischarged,
+      )
     }
   }
 }

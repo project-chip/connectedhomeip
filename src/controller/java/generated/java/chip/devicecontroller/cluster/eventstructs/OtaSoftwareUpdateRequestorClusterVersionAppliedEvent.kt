@@ -17,19 +17,16 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class OtaSoftwareUpdateRequestorClusterVersionAppliedEvent (
-    val softwareVersion: ULong,
-    val productID: UInt) {
-  override fun toString(): String  = buildString {
+class OtaSoftwareUpdateRequestorClusterVersionAppliedEvent(
+  val softwareVersion: ULong,
+  val productID: UInt,
+) {
+  override fun toString(): String = buildString {
     append("OtaSoftwareUpdateRequestorClusterVersionAppliedEvent {\n")
     append("\tsoftwareVersion : $softwareVersion\n")
     append("\tproductID : $productID\n")
@@ -49,11 +46,14 @@ class OtaSoftwareUpdateRequestorClusterVersionAppliedEvent (
     private const val TAG_SOFTWARE_VERSION = 0
     private const val TAG_PRODUCT_ID = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : OtaSoftwareUpdateRequestorClusterVersionAppliedEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): OtaSoftwareUpdateRequestorClusterVersionAppliedEvent {
       tlvReader.enterStructure(tlvTag)
       val softwareVersion = tlvReader.getULong(ContextSpecificTag(TAG_SOFTWARE_VERSION))
       val productID = tlvReader.getUInt(ContextSpecificTag(TAG_PRODUCT_ID))
-      
+
       tlvReader.exitContainer()
 
       return OtaSoftwareUpdateRequestorClusterVersionAppliedEvent(softwareVersion, productID)

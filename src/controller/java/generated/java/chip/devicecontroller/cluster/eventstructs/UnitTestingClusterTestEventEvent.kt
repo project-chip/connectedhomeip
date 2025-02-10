@@ -20,20 +20,18 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class UnitTestingClusterTestEventEvent (
-    val arg1: UInt,
-    val arg2: UInt,
-    val arg3: Boolean,
-    val arg4: chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct,
-    val arg5: List<chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct>,
-    val arg6: List<UInt>) {
-  override fun toString(): String  = buildString {
+class UnitTestingClusterTestEventEvent(
+  val arg1: UInt,
+  val arg2: UInt,
+  val arg3: Boolean,
+  val arg4: chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct,
+  val arg5: List<chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct>,
+  val arg6: List<UInt>,
+) {
+  override fun toString(): String = buildString {
     append("UnitTestingClusterTestEventEvent {\n")
     append("\targ1 : $arg1\n")
     append("\targ2 : $arg2\n")
@@ -73,27 +71,38 @@ class UnitTestingClusterTestEventEvent (
     private const val TAG_ARG5 = 5
     private const val TAG_ARG6 = 6
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : UnitTestingClusterTestEventEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterTestEventEvent {
       tlvReader.enterStructure(tlvTag)
       val arg1 = tlvReader.getUInt(ContextSpecificTag(TAG_ARG1))
       val arg2 = tlvReader.getUInt(ContextSpecificTag(TAG_ARG2))
       val arg3 = tlvReader.getBoolean(ContextSpecificTag(TAG_ARG3))
-      val arg4 = chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(TAG_ARG4), tlvReader)
-      val arg5 = buildList <chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_ARG5))
-      while(!tlvReader.isEndOfContainer()) {
-        this.add(chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
-      val arg6 = buildList <UInt> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_ARG6))
-      while(!tlvReader.isEndOfContainer()) {
-        this.add(tlvReader.getUInt(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val arg4 =
+        chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct.fromTlv(
+          ContextSpecificTag(TAG_ARG4),
+          tlvReader,
+        )
+      val arg5 =
+        buildList<chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_ARG5))
+          while (!tlvReader.isEndOfContainer()) {
+            this.add(
+              chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct.fromTlv(
+                AnonymousTag,
+                tlvReader,
+              )
+            )
+          }
+          tlvReader.exitContainer()
+        }
+      val arg6 =
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_ARG6))
+          while (!tlvReader.isEndOfContainer()) {
+            this.add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
       return UnitTestingClusterTestEventEvent(arg1, arg2, arg3, arg4, arg5, arg6)

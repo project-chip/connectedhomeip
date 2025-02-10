@@ -17,22 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class CameraAvStreamManagementClusterVideoSensorParamsStruct (
-    val sensorWidth: UInt,
-    val sensorHeight: UInt,
-    val HDRCapable: Boolean,
-    val maxFPS: UInt,
-    val maxHDRFPS: UInt) {
-  override fun toString(): String  = buildString {
+class CameraAvStreamManagementClusterVideoSensorParamsStruct(
+  val sensorWidth: UInt,
+  val sensorHeight: UInt,
+  val HDRCapable: Boolean,
+  val maxFPS: UInt,
+  val maxHDRFPS: UInt,
+) {
+  override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterVideoSensorParamsStruct {\n")
     append("\tsensorWidth : $sensorWidth\n")
     append("\tsensorHeight : $sensorHeight\n")
@@ -61,17 +58,26 @@ class CameraAvStreamManagementClusterVideoSensorParamsStruct (
     private const val TAG_MAX_FPS = 3
     private const val TAG_MAX_HDRFPS = 4
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CameraAvStreamManagementClusterVideoSensorParamsStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): CameraAvStreamManagementClusterVideoSensorParamsStruct {
       tlvReader.enterStructure(tlvTag)
       val sensorWidth = tlvReader.getUInt(ContextSpecificTag(TAG_SENSOR_WIDTH))
       val sensorHeight = tlvReader.getUInt(ContextSpecificTag(TAG_SENSOR_HEIGHT))
       val HDRCapable = tlvReader.getBoolean(ContextSpecificTag(TAG_HDR_CAPABLE))
       val maxFPS = tlvReader.getUInt(ContextSpecificTag(TAG_MAX_FPS))
       val maxHDRFPS = tlvReader.getUInt(ContextSpecificTag(TAG_MAX_HDRFPS))
-      
+
       tlvReader.exitContainer()
 
-      return CameraAvStreamManagementClusterVideoSensorParamsStruct(sensorWidth, sensorHeight, HDRCapable, maxFPS, maxHDRFPS)
+      return CameraAvStreamManagementClusterVideoSensorParamsStruct(
+        sensorWidth,
+        sensorHeight,
+        HDRCapable,
+        maxFPS,
+        maxHDRFPS,
+      )
     }
   }
 }

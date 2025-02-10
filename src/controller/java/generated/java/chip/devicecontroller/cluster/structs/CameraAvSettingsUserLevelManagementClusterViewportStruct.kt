@@ -17,21 +17,18 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class CameraAvSettingsUserLevelManagementClusterViewportStruct (
-    val x1: UInt,
-    val y1: UInt,
-    val x2: UInt,
-    val y2: UInt) {
-  override fun toString(): String  = buildString {
+class CameraAvSettingsUserLevelManagementClusterViewportStruct(
+  val x1: UInt,
+  val y1: UInt,
+  val x2: UInt,
+  val y2: UInt,
+) {
+  override fun toString(): String = buildString {
     append("CameraAvSettingsUserLevelManagementClusterViewportStruct {\n")
     append("\tx1 : $x1\n")
     append("\ty1 : $y1\n")
@@ -57,13 +54,16 @@ class CameraAvSettingsUserLevelManagementClusterViewportStruct (
     private const val TAG_X2 = 2
     private const val TAG_Y2 = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CameraAvSettingsUserLevelManagementClusterViewportStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): CameraAvSettingsUserLevelManagementClusterViewportStruct {
       tlvReader.enterStructure(tlvTag)
       val x1 = tlvReader.getUInt(ContextSpecificTag(TAG_X1))
       val y1 = tlvReader.getUInt(ContextSpecificTag(TAG_Y1))
       val x2 = tlvReader.getUInt(ContextSpecificTag(TAG_X2))
       val y2 = tlvReader.getUInt(ContextSpecificTag(TAG_Y2))
-      
+
       tlvReader.exitContainer()
 
       return CameraAvSettingsUserLevelManagementClusterViewportStruct(x1, y1, x2, y2)

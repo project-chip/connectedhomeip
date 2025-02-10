@@ -20,18 +20,16 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class AccessControlClusterAccessRestrictionEntryStruct (
-    val endpoint: UInt,
-    val cluster: ULong,
-    val restrictions: List<AccessControlClusterAccessRestrictionStruct>,
-    val fabricIndex: UInt) {
-  override fun toString(): String  = buildString {
+class AccessControlClusterAccessRestrictionEntryStruct(
+  val endpoint: UInt,
+  val cluster: ULong,
+  val restrictions: List<AccessControlClusterAccessRestrictionStruct>,
+  val fabricIndex: UInt,
+) {
+  override fun toString(): String = buildString {
     append("AccessControlClusterAccessRestrictionEntryStruct {\n")
     append("\tendpoint : $endpoint\n")
     append("\tcluster : $cluster\n")
@@ -61,22 +59,31 @@ class AccessControlClusterAccessRestrictionEntryStruct (
     private const val TAG_RESTRICTIONS = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AccessControlClusterAccessRestrictionEntryStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): AccessControlClusterAccessRestrictionEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val endpoint = tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT))
       val cluster = tlvReader.getULong(ContextSpecificTag(TAG_CLUSTER))
-      val restrictions = buildList<AccessControlClusterAccessRestrictionStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_RESTRICTIONS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(AccessControlClusterAccessRestrictionStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
+      val restrictions =
+        buildList<AccessControlClusterAccessRestrictionStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_RESTRICTIONS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(AccessControlClusterAccessRestrictionStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return AccessControlClusterAccessRestrictionEntryStruct(endpoint, cluster, restrictions, fabricIndex)
+      return AccessControlClusterAccessRestrictionEntryStruct(
+        endpoint,
+        cluster,
+        restrictions,
+        fabricIndex,
+      )
     }
   }
 }

@@ -17,19 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class AccessControlClusterAccessRestrictionStruct (
-    val type: UInt,
-    val id: ULong?) {
-  override fun toString(): String  = buildString {
+class AccessControlClusterAccessRestrictionStruct(val type: UInt, val id: ULong?) {
+  override fun toString(): String = buildString {
     append("AccessControlClusterAccessRestrictionStruct {\n")
     append("\ttype : $type\n")
     append("\tid : $id\n")
@@ -41,10 +35,10 @@ class AccessControlClusterAccessRestrictionStruct (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_TYPE), type)
       if (id != null) {
-      put(ContextSpecificTag(TAG_ID), id)
-    } else {
-      putNull(ContextSpecificTag(TAG_ID))
-    }
+        put(ContextSpecificTag(TAG_ID), id)
+      } else {
+        putNull(ContextSpecificTag(TAG_ID))
+      }
       endStructure()
     }
   }
@@ -53,16 +47,17 @@ class AccessControlClusterAccessRestrictionStruct (
     private const val TAG_TYPE = 0
     private const val TAG_ID = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AccessControlClusterAccessRestrictionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AccessControlClusterAccessRestrictionStruct {
       tlvReader.enterStructure(tlvTag)
       val type = tlvReader.getUInt(ContextSpecificTag(TAG_TYPE))
-      val id = if (!tlvReader.isNull()) {
-      tlvReader.getULong(ContextSpecificTag(TAG_ID))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_ID))
-      null
-    }
-      
+      val id =
+        if (!tlvReader.isNull()) {
+          tlvReader.getULong(ContextSpecificTag(TAG_ID))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_ID))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return AccessControlClusterAccessRestrictionStruct(type, id)
