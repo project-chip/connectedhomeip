@@ -157,14 +157,15 @@ void ReliableMessageMgr::ExecuteActions()
 
             if (mAnalyticsDelegate)
             {
-#if !CHIP_PROGRESS_LOGGING
-                auto fabricIndex = sessionHandle->GetFabricIndex();
-                auto destination = kUndefinedNodeId;
+#if !(CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING)
+                uint32_t messageCounter = entry->retainedBuf.GetMessageCounter();
+                auto fabricIndex        = sessionHandle->GetFabricIndex();
+                auto destination        = kUndefinedNodeId;
                 if (sessionHandle->IsSecureSession())
                 {
                     destination = sessionHandle->AsSecureSession()->GetPeerNodeId();
                 }
-#endif // !CHIP_PROGRESS_LOGGING
+#endif // !(CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING)
                 ReliableMessageAnalyticsDelegate::TransmitEvent event = { .nodeId      = destination,
                                                                           .fabricIndex = fabricIndex,
                                                                           .eventType =
@@ -570,8 +571,9 @@ void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
     if (mAnalyticsDelegate)
     {
 #if !CHIP_PROGRESS_LOGGING
-        auto fabricIndex = sessionHandle->GetFabricIndex();
-        auto destination = kUndefinedNodeId;
+        uint32_t messageCounter = entry.retainedBuf.GetMessageCounter();
+        auto fabricIndex        = sessionHandle->GetFabricIndex();
+        auto destination        = kUndefinedNodeId;
         if (sessionHandle->IsSecureSession())
         {
             destination = sessionHandle->AsSecureSession()->GetPeerNodeId();
