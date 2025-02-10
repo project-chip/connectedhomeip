@@ -555,7 +555,6 @@ void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
     // For initial send the packet has already been submitted to transport layer successfully.
     // On re-transmits we do not know if transport layer is unable to retransmit for some
     // reason, so saying we have sent re-transmit here is a little presumptuous.
-
     ReliableMessageAnalyticsDelegate::EventType eventType = entry.sendCount == 0
         ? ReliableMessageAnalyticsDelegate::EventType::kInitialSend
         : ReliableMessageAnalyticsDelegate::EventType::kRetransmission;
