@@ -411,6 +411,7 @@ class HostBuilder(GnBuilder):
         if use_coverage:
             self.extra_gn_options.append('use_coverage=true')
 
+        self.use_clang = use_clang # for usage in other commands
         if use_clang:
             self.extra_gn_options.append('is_clang=true')
 
