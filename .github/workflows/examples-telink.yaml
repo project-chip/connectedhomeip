@@ -204,7 +204,7 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (B92) Light Switch App with OTA (LZMA), Shell, Factory Data
+            - name: Build example Telink (B92) Light Switch App with OTA (LZMA), Shell, Factory Data, 4Mb flash
               # Run test for master and all PRs
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -217,15 +217,15 @@ jobs:
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink (B92) Lock App with DFU
+            - name: Build example Telink (B92) Lock App with DFU, 4Mb flash
               # Run test for master and s07641069 PRs
               if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-lock-dfu' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-lock-dfu-4mb' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9528a lock-app-dfu \
-                    out/telink-tlsr9528a-lock-dfu/zephyr/zephyr.elf \
+                    telink tlsr9528a lock-app-dfu-4mb \
+                    out/telink-tlsr9528a-lock-dfu-4mb/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output
