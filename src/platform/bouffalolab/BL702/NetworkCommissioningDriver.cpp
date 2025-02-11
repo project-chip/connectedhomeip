@@ -266,7 +266,7 @@ void BLWiFiDriver::OnScanWiFiNetworkDone(void * opaque)
             }
 
             p->security.SetRaw(pmsg->records[i].auth_mode);
-            strncpy((char *)p->ssid, (const char *)pmsg->records[i].ssid, kMaxWiFiSSIDLength);
+            strncpy((char *) p->ssid, (const char *) pmsg->records[i].ssid, kMaxWiFiSSIDLength);
             p->ssidLen  = strlen((char *) pmsg->records[i].ssid);
             p->channel  = pmsg->records[i].channel;
             p->wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;

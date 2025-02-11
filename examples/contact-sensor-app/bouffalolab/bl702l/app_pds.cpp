@@ -59,7 +59,6 @@ extern "C" void vApplicationSleep(TickType_t xExpectedIdleTime)
     extern BaseType_t TrapNetCounter, *pTrapNetCounter;
     if (app_pds_wakeup_source == PDS_WAKEUP_BY_RTC)
     {
-
     }
     else if (app_pds_wakeup_source == PDS_WAKEUP_BY_GPIO)
     {
