@@ -14,10 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "access/Privilege.h"
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
+#include <access/Privilege.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
