@@ -178,6 +178,35 @@ void UnlockOpenThreadTask(void)
 }
 #endif
 
+class AppFabricTableDelegate : public FabricTable::Delegate
+{
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+    {
+        if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
+        {
+            ChipLogProgress(DeviceLayer, "Performing erasing of settings partition");
+            PlatformMgr().ScheduleWork([](intptr_t) {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+                ConfigurationManagerImpl::GetDefaultInstance().ClearThreadStack();
+                ThreadStackMgrImpl().FactoryResetThreadStack();
+                ThreadStackMgr().InitThreadStack();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+                ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
+                chip::DeviceLayer::ConnectivityMgr().ClearWiFiStationProvision();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+
+                CHIP_ERROR err = Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer, "Failed to open the Basic Commissioning Window");
+                }
+            });
+        }
+    }
+};
+
 CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 {
     chip::RendezvousInformationFlags rendezvousMode(chip::RendezvousInformationFlag::kOnNetwork);
@@ -264,6 +293,9 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
     ReturnLogErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
+
+    static AppFabricTableDelegate sAppFabricDelegate;
+    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAppFabricDelegate);
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
