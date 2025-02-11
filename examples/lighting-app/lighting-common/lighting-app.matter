@@ -2627,7 +2627,7 @@ endpoint 0 {
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
 
     handle command ResetCounts;
   }
@@ -2744,12 +2744,15 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_dimmablelight = 257, version 3;
+  device type ma_colortemperaturelight = 268, version 4;
 
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0000;
     ram      attribute identifyType default = 0x0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 5;
 
@@ -2759,6 +2762,9 @@ endpoint 1 {
 
   server cluster Groups {
     ram      attribute nameSupport;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
 
@@ -2780,6 +2786,9 @@ endpoint 1 {
     ram      attribute onTime default = 0x0000;
     ram      attribute offWaitTime default = 0x0000;
     persist  attribute startUpOnOff default = 0xFF;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 6;
 
@@ -2803,6 +2812,9 @@ endpoint 1 {
     ram      attribute offTransitionTime;
     ram      attribute defaultMoveRate default = 50;
     persist  attribute startUpCurrentLevel default = 255;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 6;
 
@@ -2821,6 +2833,9 @@ endpoint 1 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -2847,6 +2862,9 @@ endpoint 1 {
     ram      attribute colorTempPhysicalMaxMireds default = 0x01C6;
     ram      attribute coupleColorTempToLevelMinMireds;
     persist  attribute startUpColorTemperatureMireds default = 0x00FA;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0x1F;
     ram      attribute clusterRevision default = 7;
 
