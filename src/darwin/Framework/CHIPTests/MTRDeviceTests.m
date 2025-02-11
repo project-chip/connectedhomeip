@@ -3350,7 +3350,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
 }
 
-- (void)doEncodeDecodeRoundTrip:(id<NSSecureCoding>)encodable
+- (NSData *)_encodeEncodable:(id<NSSecureCoding>)encodable
 {
     // We know all our encodables are in fact NSObject.
     NSObject * obj = (NSObject *) encodable;
@@ -3358,6 +3358,15 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSError * encodeError;
     NSData * encodedData = [NSKeyedArchiver archivedDataWithRootObject:encodable requiringSecureCoding:YES error:&encodeError];
     XCTAssertNil(encodeError, @"Failed to encode %@", NSStringFromClass(obj.class));
+    return encodedData;
+}
+
+- (void)doEncodeDecodeRoundTrip:(id<NSSecureCoding>)encodable
+{
+    NSData * encodedData = [self _encodeEncodable:encodable];
+
+    // We know all our encodables are in fact NSObject.
+    NSObject * obj = (NSObject *) encodable;
 
     NSError * decodeError;
     id decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:obj.class] fromData:encodedData error:&decodeError];
@@ -3365,6 +3374,19 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertTrue([decodedValue isKindOfClass:obj.class], @"Expected %@ but got %@", NSStringFromClass(obj.class), NSStringFromClass([decodedValue class]));
 
     XCTAssertEqualObjects(obj, decodedValue, @"Decoding for %@ did not round-trip correctly", NSStringFromClass([obj class]));
+}
+
+- (void)_ensureDecodeFails:(id<NSSecureCoding>)encodable
+{
+    NSData * encodedData = [self _encodeEncodable:encodable];
+
+    // We know all our encodables are in fact NSObject.
+    NSObject * obj = (NSObject *) encodable;
+
+    NSError * decodeError;
+    id decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:obj.class] fromData:encodedData error:&decodeError];
+    XCTAssertNil(decodedValue);
+    XCTAssertNotNil(decodeError);
 }
 
 - (void)test032_MTRPathClassesEncoding
@@ -6021,6 +6043,121 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // 2 commands actually run, so use double the timeout.
     [self waitForExpectations:@[ updateFabricLabelExpectingWrongValueExpectation ] timeout:(2 * kTimeoutInSeconds)];
+}
+
+- (void)test046_MTRCommandWithRequiredResponseEncoding
+{
+    // Basic test with no command fields or required response.
+    __auto_type * onPath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                           clusterID:@(MTRClusterIDTypeOnOffID)
+                                                           commandID:@(MTRCommandIDTypeClusterOnOffCommandOnID)];
+    __auto_type * onCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:onPath commandFields:nil requiredResponse:nil];
+    [self doEncodeDecodeRoundTrip:onCommand];
+
+    // Test with both command fields and an interesting required response.
+    //
+    // NSSecureCoding tracks object identity, so we need to create new objects
+    // for every instance of a thing we decode/encode with a given coder to make
+    // sure all codepaths are exercised. Use a block that returns a new
+    // dictionary each time to handle this.
+    __auto_type structureWithAllTypes = ^{
+        return @{
+            MTRTypeKey : MTRStructureValueType,
+            MTRValueKey : @[
+                @{
+                    MTRContextTagKey : @(0),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRSignedIntegerValueType,
+                        MTRValueKey : @(5),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(1),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(5),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(2),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @(YES),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(3),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUTF8StringValueType,
+                        MTRValueKey : @("abc"),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(4),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTROctetStringValueType,
+                        MTRValueKey : [[NSData alloc] initWithBase64EncodedString:@"APJj" options:0],
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(5),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRFloatValueType,
+                        MTRValueKey : @(1.0),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(6),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRDoubleValueType,
+                        MTRValueKey : @(5.0),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(7),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRNullValueType,
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(8),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRArrayValueType,
+                        MTRValueKey : @[
+                            @{
+                                MTRDataKey : @ {
+                                    MTRTypeKey : MTRUnsignedIntegerValueType,
+                                    MTRValueKey : @(9),
+                                },
+                            },
+                        ],
+                    }
+                },
+            ],
+        };
+    };
+
+    // Invalid commandFields (not a dictionary)
+    onCommand.commandFields = (id) @[];
+    [self _ensureDecodeFails:onCommand];
+
+    // Invalid required response (not a dictionary)
+    onCommand.commandFields = nil;
+    onCommand.requiredResponse = (id) @[];
+    [self _ensureDecodeFails:onCommand];
+
+    // Invalid required response (key is not NSNumber)
+    onCommand.requiredResponse = @{
+        @("abc") : structureWithAllTypes(),
+    };
+    [self _ensureDecodeFails:onCommand];
+
+    onCommand.commandFields = structureWithAllTypes();
+    onCommand.requiredResponse = @{
+        @(1) : structureWithAllTypes(),
+        @(13) : structureWithAllTypes(),
+    };
+    [self doEncodeDecodeRoundTrip:onCommand];
 }
 
 @end
