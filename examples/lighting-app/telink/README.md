@@ -74,6 +74,33 @@ To get output from device, connect UART to following pins:
 
 Baud rate: 115200 bits/s
 
+### Using USB COM Port Instead of UART
+
+Alternatively, the USB COM port can be used instead of UART for console output.
+
+1. Build the project with the following parameter:
+
+    ```bash
+    $ west build -b <build_target> -- -DTLNK_USB_DONGLE=y
+    ```
+
+2. Connect the USB cable to your device. A new serial device should appear in
+   your system (e.g., `/dev/ttyACM0` on Linux or a COM port on Windows).
+3. Use your preferred terminal application (like `minicom`, `screen`, or
+   `PuTTY`) to connect to the newly detected serial device.
+4. In your source code, ensure the following header is included and the USB
+   device stack is initialized:
+
+    ```c
+    #ifdef CONFIG_USB_DEVICE_STACK
+    #include <zephyr/usb/usb_device.h>
+    #endif /* CONFIG_USB_DEVICE_STACK */
+
+    #ifdef CONFIG_USB_DEVICE_STACK
+        usb_enable(NULL);
+    #endif /* CONFIG_USB_DEVICE_STACK */
+    ```
+
 ### Buttons
 
 The following buttons are available on **tlsr9518adk80d** board:

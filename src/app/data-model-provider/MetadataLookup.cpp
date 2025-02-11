@@ -82,6 +82,27 @@ std::optional<EndpointEntry> EndpointFinder::Find(EndpointId endpointId)
     return std::nullopt;
 }
 
+Protocols::InteractionModel::Status ValidateClusterPath(ProviderMetadataTree * provider, const ConcreteClusterPath & path,
+                                                        Protocols::InteractionModel::Status successStatus)
+{
+    if (ServerClusterFinder(provider).Find(path).has_value())
+    {
+        return successStatus;
+    }
+
+    auto endpoints = provider->EndpointsIgnoreError();
+    for (auto & endpointEntry : endpoints)
+    {
+        if (endpointEntry.id == path.mEndpointId)
+        {
+            // endpoint is valid
+            return Protocols::InteractionModel::Status::UnsupportedCluster;
+        }
+    }
+
+    return Protocols::InteractionModel::Status::UnsupportedEndpoint;
+}
+
 } // namespace DataModel
 } // namespace app
 } // namespace chip
