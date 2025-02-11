@@ -296,7 +296,7 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 
     static AppFabricTableDelegate sAppFabricDelegate;
     chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAppFabricDelegate);
-        
+
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
