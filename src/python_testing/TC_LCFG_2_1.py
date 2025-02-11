@@ -39,7 +39,7 @@
 import chip.clusters as Clusters
 import langcodes
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, run_if_endpoint_matches, default_matter_test_main, has_cluster
 from mobly import asserts
 
 
@@ -75,7 +75,7 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
             TestStep(5, "TH reads ActiveLocale")
         ]
 
-    @async_test_body
+    @run_if_endpoint_matches(has_cluster(Clusters.LocalizationConfiguration))
     async def test_TC_LCFG_2_1(self):
 
         endpoint = self.get_endpoint(default=0)
