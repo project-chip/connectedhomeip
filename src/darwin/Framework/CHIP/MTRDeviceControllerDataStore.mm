@@ -27,7 +27,7 @@
 #include <lib/support/SafeInt.h>
 
 // Log error each time sync storage takes longer than this threshold
-#define SYNC_OPERATION_DURATION_LOG_THRESHOLD (2.0)
+#define SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS (2.0)
 
 // FIXME: Are these good key strings? https://github.com/project-chip/connectedhomeip/issues/28973
 static NSString * sResumptionNodeListKey = @"caseResumptionNodeList";
@@ -151,7 +151,7 @@ static bool IsValidCATNumber(id _Nullable value)
         }
     });
     NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
-    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD) {
+    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
         MTR_LOG_ERROR("MTRDeviceControllerDataStore init took %0.6lf seconds to read from storage", syncDuration);
     }
     if (resumptionNodeList != nil) {
@@ -192,7 +192,7 @@ static bool IsValidCATNumber(id _Nullable value)
         }
     });
     NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
-    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD) {
+    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
         MTR_LOG_ERROR("MTRDeviceControllerDataStore fetchAttributeDataForAllDevices took %0.6lf seconds to read from storage", syncDuration);
     }
 
@@ -256,7 +256,7 @@ static bool IsValidCATNumber(id _Nullable value)
                          sharingType:MTRStorageSharingTypeNotShared];
     });
     NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
-    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD) {
+    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
         MTR_LOG_ERROR("MTRDeviceControllerDataStore storeResumptionInfo took %0.6lf seconds to store to storage", syncDuration);
     }
 }
@@ -304,7 +304,7 @@ static bool IsValidCATNumber(id _Nullable value)
                              sharingType:MTRStorageSharingTypeNotShared];
         });
         NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
-        if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD) {
+        if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
             MTR_LOG_ERROR("MTRDeviceControllerDataStore _clearResumptionInfoForNodeID took %0.6lf seconds to remove from storage", syncDuration);
         }
     }
@@ -325,7 +325,7 @@ static bool IsValidCATNumber(id _Nullable value)
                               sharingType:MTRStorageSharingTypeNotShared];
     });
     NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
-    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD) {
+    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
         MTR_LOG_ERROR("MTRDeviceControllerDataStore storeLastLocallyUsedNOC took %0.6lf seconds to store to storage", syncDuration);
     }
     return ok ? CHIP_NO_ERROR : CHIP_ERROR_PERSISTED_STORAGE_FAILED;
@@ -347,7 +347,7 @@ static bool IsValidCATNumber(id _Nullable value)
         }
     });
     NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
-    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD) {
+    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
         MTR_LOG_ERROR("MTRDeviceControllerDataStore fetchLastLocallyUsedNOC took %0.6lf seconds to read from storage", syncDuration);
     }
 
@@ -383,7 +383,7 @@ static bool IsValidCATNumber(id _Nullable value)
         }
     });
     NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
-    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD) {
+    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
         MTR_LOG_ERROR("MTRDeviceControllerDataStore _findResumptionInfoWithKey took %0.6lf seconds to read from storage", syncDuration);
     }
 
@@ -964,7 +964,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
         }
     });
     NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
-    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD) {
+    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
         MTR_LOG_ERROR("MTRDeviceControllerDataStore getStoredClusterDataForNodeID took %0.6lf seconds to read from storage", syncDuration);
     }
 
@@ -982,7 +982,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
         clusterDataToReturn = [self _fetchClusterDataForNodeID:nodeID endpointID:endpointID clusterID:clusterID];
     });
     NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
-    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD) {
+    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
         MTR_LOG_ERROR("MTRDeviceControllerDataStore getStoredClusterDataForNodeID took %0.6lf seconds to read from storage", syncDuration);
     }
     return clusterDataToReturn;
@@ -1254,7 +1254,7 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
         deviceData = dictionary;
     });
     NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
-    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD) {
+    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
         MTR_LOG_ERROR("MTRDeviceControllerDataStore getStoredDeviceDataForNodeID took %0.6lf seconds to read from storage", syncDuration);
     }
     return deviceData;
