@@ -2134,7 +2134,6 @@ endpoint 0 {
     callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
