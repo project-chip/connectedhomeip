@@ -85,3 +85,6 @@ examples/*/esp32/dependencies.lock
 
 # jupyter temporary files
 .ipynb_checkpoints
+
+# build files for python setup payload generator/parser impl
+src/setup_payload/python/build

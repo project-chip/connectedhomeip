@@ -21,7 +21,7 @@ import sys
 
 CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('src', 'setup_payload', 'tests'))]
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'src', 'setup_payload', 'python'))
-from SetupPayload import CommissioningFlow, SetupPayload  # noqa: E402
+from matter_setup_payload import CommissioningFlow, SetupPayload  # noqa: E402
 
 
 def payload_param_dict():
