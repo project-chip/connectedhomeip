@@ -154,6 +154,24 @@ source_set("thread-border-router-management-test-srcs") {
   ]
 }
 
+source_set("valve-configuration-and-control-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/cluster-building-blocks/QuieterReporting.h",
+    "${chip_root}/src/app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster-logic.cpp",
+    "${chip_root}/src/app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster-logic.h",
+    "${chip_root}/src/app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-delegate.h",
+    "${chip_root}/src/app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-matter-context.cpp",
+    "${chip_root}/src/app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-matter-context.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+  ]
+}
+
 source_set("ecosystem-information-test-srcs") {
   sources = [
     "${chip_root}/src/app/clusters/ecosystem-information-server/ecosystem-information-server.cpp",
@@ -233,6 +251,7 @@ chip_test_suite("tests") {
     "TestTestEventTriggerDelegate.cpp",
     "TestTimeSyncDataProvider.cpp",
     "TestTimedHandler.cpp",
+    "TestValveConfigurationAndControl.cpp",
     "TestWriteInteraction.cpp",
   ]
 
@@ -246,6 +265,7 @@ chip_test_suite("tests") {
     ":ota-requestor-test-srcs",
     ":thread-network-directory-test-srcs",
     ":time-sync-data-provider-test-srcs",
+    ":valve-configuration-and-control-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/app/common:cluster-objects",

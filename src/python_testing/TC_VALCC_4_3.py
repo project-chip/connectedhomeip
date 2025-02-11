@@ -37,7 +37,7 @@ import logging
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 
 
@@ -69,7 +69,7 @@ class TC_VALCC_4_3(MatterBaseTest):
         ]
         return pics
 
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(Clusters.ValveConfigurationAndControl, Clusters.ValveConfigurationAndControl.Bitmaps.Feature.kTimeSync))
     async def test_TC_VALCC_4_3(self):
 
         endpoint = self.get_endpoint(default=1)
@@ -78,23 +78,8 @@ class TC_VALCC_4_3(MatterBaseTest):
         attributes = Clusters.ValveConfigurationAndControl.Attributes
 
         self.step("2a")
-        feature_map = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
-
-        is_ts_feature_supported = feature_map & Clusters.ValveConfigurationAndControl.Bitmaps.Feature.kTimeSync
-
         self.step("2b")
-        if not is_ts_feature_supported:
-            logging.info("TimeSync feature not supported skipping test case")
-
-            # Skipping all remainig steps
-            for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
-                self.step(step.test_plan_number)
-                logging.info("Test step skipped")
-
-            return
-
-        else:
-            logging.info("Test step skipped")
+        # steps 2a and 2b are handled by the decorator
 
         self.step("3a")
         utcTime = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
@@ -103,15 +88,9 @@ class TC_VALCC_4_3(MatterBaseTest):
         if utcTime is not NullValue:
             logging.info("UTCTime is not null, skipping test case")
 
-            # Skipping all remainig steps
-            for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
-                self.step(step.test_plan_number)
-                logging.info("Test step skipped")
-
+            # Skipping all remaining steps
+            self.skip_all_remaining_steps(4)
             return
-
-        else:
-            logging.info("Test step skipped")
 
         self.step(4)
         try:
