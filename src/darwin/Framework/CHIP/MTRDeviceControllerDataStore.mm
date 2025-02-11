@@ -27,7 +27,7 @@
 #include <lib/support/SafeInt.h>
 
 // Log error each time sync storage takes longer than this threshold
-#define SYNC_OPERATION_DURATION_LOG_THRESHOLD   (2.0)
+#define SYNC_OPERATION_DURATION_LOG_THRESHOLD (2.0)
 
 // FIXME: Are these good key strings? https://github.com/project-chip/connectedhomeip/issues/28973
 static NSString * sResumptionNodeListKey = @"caseResumptionNodeList";
@@ -137,7 +137,7 @@ static bool IsValidCATNumber(id _Nullable value)
 
     __block id resumptionNodeList;
     __block NSArray<NSNumber *> * nodesWithAttributeInfo;
-    NSDate *startTime = [NSDate now];
+    NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
         @autoreleasepool {
             // NOTE: controller, not our weak ref, since we know it's still
@@ -185,7 +185,7 @@ static bool IsValidCATNumber(id _Nullable value)
     MTRDeviceController * controller = _controller;
     VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 
-    NSDate *startTime = [NSDate now];
+    NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
         if ([self->_storageDelegate respondsToSelector:@selector(valuesForController:securityLevel:sharingType:)]) {
             dataStoreSecureLocalValues = [self->_storageDelegate valuesForController:controller securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
@@ -217,7 +217,7 @@ static bool IsValidCATNumber(id _Nullable value)
     VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 
     auto * oldInfo = [self findResumptionInfoByNodeID:resumptionInfo.nodeID];
-    NSDate *startTime = [NSDate now];
+    NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
         if (oldInfo != nil) {
             // Remove old resumption id key.  No need to do that for the
@@ -292,7 +292,7 @@ static bool IsValidCATNumber(id _Nullable value)
 {
     auto * oldInfo = [self findResumptionInfoByNodeID:nodeID];
     if (oldInfo != nil) {
-        NSDate *startTime = [NSDate now];
+        NSDate * startTime = [NSDate now];
         dispatch_sync(_storageDelegateQueue, ^{
             [_storageDelegate controller:controller
                        removeValueForKey:ResumptionByResumptionIDKey(oldInfo.resumptionID)
@@ -307,7 +307,7 @@ static bool IsValidCATNumber(id _Nullable value)
         if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD) {
             MTR_LOG_ERROR("MTRDeviceControllerDataStore _clearResumptionInfoForNodeID took %0.6lf seconds to remove from storage", syncDuration);
         }
-   }
+    }
 }
 
 - (CHIP_ERROR)storeLastLocallyUsedNOC:(MTRCertificateTLVBytes)noc
@@ -316,7 +316,7 @@ static bool IsValidCATNumber(id _Nullable value)
     VerifyOrReturnError(controller != nil, CHIP_ERROR_PERSISTED_STORAGE_FAILED); // No way to call delegate without controller.
 
     __block BOOL ok;
-    NSDate *startTime = [NSDate now];
+    NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
         ok = [_storageDelegate controller:controller
                                storeValue:noc
@@ -337,7 +337,7 @@ static bool IsValidCATNumber(id _Nullable value)
     VerifyOrReturnValue(controller != nil, nil); // No way to call delegate without controller.
 
     __block id data;
-    NSDate *startTime = [NSDate now];
+    NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
         @autoreleasepool {
             data = [_storageDelegate controller:controller
@@ -373,7 +373,7 @@ static bool IsValidCATNumber(id _Nullable value)
     }
 
     __block id resumptionInfo;
-    NSDate *startTime = [NSDate now];
+    NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
         @autoreleasepool {
             resumptionInfo = [_storageDelegate controller:controller
@@ -904,7 +904,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
     }
 
     __block NSMutableDictionary<MTRClusterPath *, MTRDeviceClusterData *> * clusterDataToReturn = nil;
-    NSDate *startTime = [NSDate now];
+    NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
         std::lock_guard lock(self->_nodeArrayLock);
 
@@ -977,7 +977,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
     // when the consumer knows that we're supposed to have data for this cluster
     // path.
     __block MTRDeviceClusterData * clusterDataToReturn = nil;
-    NSDate *startTime = [NSDate now];
+    NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
         clusterDataToReturn = [self _fetchClusterDataForNodeID:nodeID endpointID:endpointID clusterID:clusterID];
     });
@@ -1221,7 +1221,7 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
 - (nullable NSDictionary<NSString *, id> *)getStoredDeviceDataForNodeID:(NSNumber *)nodeID
 {
     __block NSDictionary<NSString *, id> * deviceData = nil;
-    NSDate *startTime = [NSDate now];
+    NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
         MTRDeviceController * controller = self->_controller;
         VerifyOrReturn(controller != nil); // No way to call delegate without controller.
