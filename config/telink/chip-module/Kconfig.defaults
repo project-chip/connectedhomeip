@@ -63,6 +63,7 @@ config POSIX_MAX_FDS
 # Application stack size
 config MAIN_STACK_SIZE
     default 3240 if PM || SOC_RISCV_TELINK_TL321X
+    default 4512 if SOC_RISCV_TELINK_W91
     default 4096
 
 config INIT_STACKS
@@ -207,12 +208,12 @@ config PWM
 
 endif
 
-if BOARD_TL7218_RETENTION || BOARD_TL3218_RETENTION || BOARD_TL3218
+if BOARD_TL7218X_RETENTION || BOARD_TL3218X_RETENTION || BOARD_TL3218X
 config SOC_SERIES_RISCV_TELINK_TLX_NON_RETENTION_RAM_CODE
     default n if PM
 
 config TELINK_TLX_MATTER_RETENTION_LAYOUT
-    default y if PM || BOARD_TL3218
+    default y if PM || BOARD_TL3218X
 
 config PWM
     default n if PM
@@ -221,7 +222,7 @@ endif
 
 # Board non-retention config
 if  BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1 || \
-    BOARD_TLSR9528A || BOARD_TLSR9518ADK80D || BOARD_TL3218 || BOARD_TL7218
+    BOARD_TLSR9528A || BOARD_TLSR9518ADK80D || BOARD_TL3218X || BOARD_TL7218X
 config PWM
     default y
 endif
@@ -234,7 +235,7 @@ config CHIP_OTA_REQUESTOR
     default y
 
 config MCUBOOT_SIGNATURE_KEY_FILE
-	default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D
+	default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
 	depends on BOOTLOADER_MCUBOOT
 
 # In current config/zephyr/Kconfig
