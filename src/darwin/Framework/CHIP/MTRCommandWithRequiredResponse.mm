@@ -66,7 +66,7 @@ static NSString * const sExpectedResultKey = @"requiredResponseKey";
         return nil;
     }
 
-    _commandFields = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [NSString class], [NSNumber class], [NSArray class], [NSData class]]] forKey:sFieldsKey];
+    _commandFields = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[ [NSDictionary class], [NSString class], [NSNumber class], [NSArray class], [NSData class] ]] forKey:sFieldsKey];
     if (_commandFields) {
         if (![_commandFields isKindOfClass:NSDictionary.class]) {
             MTR_LOG_ERROR("MTRCommandWithRequiredResponse decoded %@ for commandFields, not NSDictionary.", _commandFields);
@@ -79,7 +79,7 @@ static NSString * const sExpectedResultKey = @"requiredResponseKey";
         }
     }
 
-    _requiredResponse = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [NSString class], [NSNumber class], [NSArray class], [NSData class]]] forKey:sExpectedResultKey];
+    _requiredResponse = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[ [NSDictionary class], [NSString class], [NSNumber class], [NSArray class], [NSData class] ]] forKey:sExpectedResultKey];
     if (_requiredResponse) {
         if (![_requiredResponse isKindOfClass:NSDictionary.class]) {
             MTR_LOG_ERROR("MTRCommandWithRequiredResponse decoded %@ for requiredResponse, not NSDictionary.", _requiredResponse);
