@@ -163,7 +163,6 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
             isOTAInitialized = true;
         }
 #endif
-
     }
 
     break;
