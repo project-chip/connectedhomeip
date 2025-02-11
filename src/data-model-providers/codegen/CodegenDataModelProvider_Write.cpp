@@ -198,6 +198,28 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     return CHIP_NO_ERROR;
 }
 
+void CodegenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttributePath & aPath, BitFlags<DataModel::ListWriteOperation> opType) {
+    AttributeAccessInterface * aai =
+        AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId);
+
+    if(aai != nullptr)
+    {
+        switch(opType)
+        {
+            case DataModel::ListWriteOperation::kListWriteBegin:
+                aai->OnListWriteBegin(aPath);
+                break;
+            case DataModel::ListWriteOperation::kListWriteEnd:
+                aai->OnListWriteEnd(aPath, false);
+                break;
+            case DataModel::ListWriteOperation::kListWriteEndFinal:
+                aai->OnListWriteEnd(aPath, true);
+                break;
+        }
+    }
+
+}
+
 void CodegenDataModelProvider::Temporary_ReportAttributeChanged(const AttributePathParams & path)
 {
     ContextAttributesChangeListener change_listener(CurrentContext());
