@@ -1153,7 +1153,8 @@ TEST_F(TestCodegenModelViaMocks, GlobalAttributeInfo)
     info = finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id));
     ASSERT_TRUE(info.has_value());
 
-    info = finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AcceptedCommandList::Id));
+    info = finder.Find(
+        ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AcceptedCommandList::Id));
     ASSERT_TRUE(info.has_value());
 }
 
