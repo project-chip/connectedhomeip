@@ -153,6 +153,11 @@ public:
      * @brief Clears entire buffer
      */
     virtual CHIP_ERROR ClearBuffer() = 0;
+
+    /**
+     * @brief Clears buffer up to the specified number of entries
+     */
+    virtual CHIP_ERROR ClearBuffer(uint32_t entries) = 0;
 };
 
 } // namespace Diagnostics

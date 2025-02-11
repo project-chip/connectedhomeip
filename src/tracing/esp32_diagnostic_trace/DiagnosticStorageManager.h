@@ -92,7 +92,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR ClearBuffer(uint32_t entries)
+    CHIP_ERROR ClearBuffer(uint32_t entries) override
     {
         while (entries--)
         {
