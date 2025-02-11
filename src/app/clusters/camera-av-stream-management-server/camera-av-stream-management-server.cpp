@@ -107,24 +107,28 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
 
     if (SupportsOptAttr(OptionalAttribute::kSupportsNightVision) || SupportsOptAttr(OptionalAttribute::kSupportsNightVisionIllum))
     {
-        VerifyOrReturnError(
-            HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot), CHIP_ERROR_INVALID_ARGUMENT,
-            ChipLogError(Zcl, "CameraAVStreamMgmt: Feature configuration error. if NIghtVision is enabled, then Video|Snapshot feature required"));
+        VerifyOrReturnError(HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot), CHIP_ERROR_INVALID_ARGUMENT,
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt: Feature configuration error. if NIghtVision is enabled, then "
+                                         "Video|Snapshot feature required"));
     }
 
     if (SupportsOptAttr(OptionalAttribute::kSupportsMicrophoneAGCEnabled))
     {
         VerifyOrReturnError(
             HasFeature(Feature::kAudio), CHIP_ERROR_INVALID_ARGUMENT,
-            ChipLogError(Zcl, "CameraAVStreamMgmt: Feature configuration error. if MicrophoneAGCEnabled, then Audio feature required"));
+            ChipLogError(Zcl,
+                         "CameraAVStreamMgmt: Feature configuration error. if MicrophoneAGCEnabled, then Audio feature required"));
     }
 
-    if (SupportsOptAttr(OptionalAttribute::kSupportsImageFlipHorizontal) || SupportsOptAttr(OptionalAttribute::kSupportsImageFlipVertical) ||
+    if (SupportsOptAttr(OptionalAttribute::kSupportsImageFlipHorizontal) ||
+        SupportsOptAttr(OptionalAttribute::kSupportsImageFlipVertical) ||
         SupportsOptAttr(OptionalAttribute::kSupportsImageRotation))
     {
-        VerifyOrReturnError(
-            HasFeature(Feature::kImageControl), CHIP_ERROR_INVALID_ARGUMENT,
-            ChipLogError(Zcl, "CameraAVStreamMgmt: Feature configuration error. if ImageFlip or Rotation enabled, then ImageControl feature required"));
+        VerifyOrReturnError(HasFeature(Feature::kImageControl), CHIP_ERROR_INVALID_ARGUMENT,
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt: Feature configuration error. if ImageFlip or Rotation enabled, then "
+                                         "ImageControl feature required"));
     }
 
     LoadPersistentAttributes();
@@ -1463,7 +1467,7 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
     auto & maxFragmentLen     = commandData.maxFragmentLen;
     auto & isWaterMarkEnabled = commandData.watermarkEnabled;
     auto & isOSDEnabled       = commandData.OSDEnabled;
-    uint16_t videoStreamID  = 0;
+    uint16_t videoStreamID    = 0;
 
     // If Watermark feature is supported, then command should have the
     // isWaterMarkEnabled param. Or, if it is not supported, then command should
@@ -1478,6 +1482,22 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
     VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) && commandData.OSDEnabled.HasValue()) ||
                        (!HasFeature(Feature::kOnScreenDisplay) && !commandData.OSDEnabled.HasValue()),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+
+    VerifyOrReturn(IsStreamUsageValid(streamUsage), {
+        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid stream usage");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+    });
+
+    VerifyOrReturn(IsVideoCodecValid(videoCodec), {
+        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid video codec");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+    });
+
+    VerifyOrReturn(minFrameRate <= maxFrameRate, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+
+    VerifyOrReturn(minBitRate <= maxBitRate, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+
+    VerifyOrReturn(minFragmentLen <= maxFragmentLen, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
     // Call the delegate
     status =
@@ -1558,6 +1578,31 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
     auto & bitDepth        = commandData.bitDepth;
     uint16_t audioStreamID = 0;
 
+    VerifyOrReturn(IsStreamUsageValid(streamUsage), {
+        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid stream usage");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+    });
+
+    VerifyOrReturn(IsAudioCodecValid(audioCodec), {
+        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid audio codec");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+    });
+
+    VerifyOrReturn(sampleRate > 0 && bitRate > 0, {
+        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid sampleRate or bitRate ");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+    });
+
+    VerifyOrReturn(IsBitDepthValid(bitDepth), {
+        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid bitDepth");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+    });
+
+    VerifyOrReturn(channelCount <= kMaxChannelCount, {
+        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid channel count");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+    });
+
     // Call the delegate
     Status status =
         mDelegate.AudioStreamAllocate(streamUsage, audioCodec, channelCount, sampleRate, bitRate, bitDepth, audioStreamID);
@@ -1604,6 +1649,21 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
     auto & quality            = commandData.quality;
     uint16_t snapshotStreamID = 0;
 
+    VerifyOrReturn(IsImageCodecValid(imageCodec), {
+        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid image codec");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
+    });
+
+    VerifyOrReturn(maxFrameRate > 0 && bitRate > 0, {
+        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid maxFrameRate or bitRate");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+    });
+
+    VerifyOrReturn(quality > 0 && quality <= kMaxImageQualityMetric, {
+        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid image quality");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+    });
+
     // Call the delegate
     Status status = mDelegate.SnapshotStreamAllocate(imageCodec, maxFrameRate, bitRate, minResolution, maxResolution, quality,
                                                      snapshotStreamID);
@@ -1642,16 +1702,22 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
 {
 
     auto & streamPriorities = commandData.streamPriorities;
-    //auto & streamPriorities = commandData.streamPriorities;
+    // auto & streamPriorities = commandData.streamPriorities;
 
     auto iter = streamPriorities.begin();
     StreamUsageEnum rankedStreamPriorities[kNumOfStreamUsageTypes];
     int i = 0;
-    while(iter.Next())
+    while (iter.Next())
     {
-        auto & streamUsage = iter.GetValue();
+        auto & streamUsage          = iter.GetValue();
         rankedStreamPriorities[i++] = streamUsage;
     }
+
+    VerifyOrReturn(i == kNumOfStreamUsageTypes, {
+        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid num of stream usages");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+    });
+
     CHIP_ERROR err = SetRankedVideoStreamPriorities(rankedStreamPriorities);
 
     if (err != CHIP_NO_ERROR)
