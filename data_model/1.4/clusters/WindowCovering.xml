@@ -407,7 +407,9 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="PhysicalClosedLimitLift" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
@@ -441,9 +443,11 @@ Davis, CA 95616, USA
           <feature name="ABS"/>
         </andTerm>
       </optionalConform>
-      <constraint type="between">
-        <from attribute="InstalledOpenLimitLift"/>
-        <to attribute="InstalledClosedLimitLift"/>
+      <constraint>
+        <between>
+          <attribute name="InstalledOpenLimitLift"/>
+          <attribute name="InstalledClosedLimitLift"/>
+        </between>
       </constraint>
     </attribute>
     <attribute id="0x0004" name="CurrentPositionTilt" type="uint16" default="null">
@@ -456,9 +460,11 @@ Davis, CA 95616, USA
           <feature name="ABS"/>
         </andTerm>
       </optionalConform>
-      <constraint type="between">
-        <from attribute="InstalledOpenLimitTilt"/>
-        <to attribute="InstalledClosedLimitTilt"/>
+      <constraint>
+        <between>
+          <attribute name="InstalledOpenLimitTilt"/>
+          <attribute name="InstalledClosedLimitTilt"/>
+        </between>
       </constraint>
     </attribute>
     <attribute id="0x0005" name="NumberOfActuationsLift" type="uint16" default="0">
@@ -479,7 +485,9 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0008" name="CurrentPositionLiftPercentage" type="percent" default="null">
       <access read="true" readPrivilege="view"/>
@@ -530,7 +538,9 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x000E" name="CurrentPositionLiftPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
@@ -541,7 +551,9 @@ Davis, CA 95616, USA
           <feature name="PA_LF"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="max" value="10000"/>
+      <constraint>
+        <max value="10000"/>
+      </constraint>
     </attribute>
     <attribute id="0x000F" name="CurrentPositionTiltPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
@@ -552,7 +564,9 @@ Davis, CA 95616, USA
           <feature name="PA_TL"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="max" value="10000"/>
+      <constraint>
+        <max value="10000"/>
+      </constraint>
     </attribute>
     <attribute id="0x0010" name="InstalledOpenLimitLift" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
@@ -564,7 +578,9 @@ Davis, CA 95616, USA
           <feature name="ABS"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="max" value="65534"/>
+      <constraint>
+        <max value="65534"/>
+      </constraint>
     </attribute>
     <attribute id="0x0011" name="InstalledClosedLimitLift" type="uint16" default="65534">
       <access read="true" readPrivilege="view"/>
@@ -576,7 +592,9 @@ Davis, CA 95616, USA
           <feature name="ABS"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="max" value="65534"/>
+      <constraint>
+        <max value="65534"/>
+      </constraint>
     </attribute>
     <attribute id="0x0012" name="InstalledOpenLimitTilt" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
@@ -588,7 +606,9 @@ Davis, CA 95616, USA
           <feature name="ABS"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="max" value="65534"/>
+      <constraint>
+        <max value="65534"/>
+      </constraint>
     </attribute>
     <attribute id="0x0013" name="InstalledClosedLimitTilt" type="uint16" default="65534">
       <access read="true" readPrivilege="view"/>
@@ -600,7 +620,9 @@ Davis, CA 95616, USA
           <feature name="ABS"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="max" value="65534"/>
+      <constraint>
+        <max value="65534"/>
+      </constraint>
     </attribute>
     <attribute id="0x0014" name="VelocityLift">
       <deprecateConform/>
@@ -626,7 +648,9 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality reportable="true"/>
       <optionalConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -652,7 +676,9 @@ Davis, CA 95616, USA
       </optionalConform>
       <field id="0" name="LiftValue" type="uint16">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x05" name="GoToLiftPercentage" direction="commandToServer" response="Y">
@@ -670,7 +696,9 @@ Davis, CA 95616, USA
       </otherwiseConform>
       <field id="0" name="LiftPercent100thsValue" type="percent100ths">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x07" name="GoToTiltValue" direction="commandToServer" response="Y">
@@ -683,7 +711,9 @@ Davis, CA 95616, USA
       </optionalConform>
       <field id="0" name="TiltValue" type="uint16">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x08" name="GoToTiltPercentage" direction="commandToServer" response="Y">
@@ -701,7 +731,9 @@ Davis, CA 95616, USA
       </otherwiseConform>
       <field id="0" name="TiltPercent100thsValue" type="percent100ths">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
   </commands>

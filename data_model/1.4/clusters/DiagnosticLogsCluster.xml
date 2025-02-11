@@ -115,7 +115,9 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="TransferFileDesignator" type="string">
         <optionalConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="RetrieveLogsResponse" direction="responseFromServer">
@@ -125,7 +127,9 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="LogContent" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="1024"/>
+        <constraint>
+          <maxLength value="1024"/>
+        </constraint>
       </field>
       <field id="2" name="UTCTimeStamp" type="epoch-us">
         <optionalConform/>
