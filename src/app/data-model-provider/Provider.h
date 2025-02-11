@@ -58,8 +58,12 @@ public:
     // event emitting, path marking and other operations
     virtual InteractionModelContext CurrentContext() const { return mContext; }
 
-    /// TEMPORARY/TRANSITIONAL requirement for transitioning from ember-specific code
-    ///   ReadAttribute is REQUIRED to respond to GlobalAttribute read requests
+    /// NOTE: this code is NOT required to handle `List` global attributes:
+    ///       AcceptedCommandsList, GeneratedCommandsList OR AttributeList
+    ///
+    ///       Users of DataModel::Provider are expected to get these lists
+    ///       from ProviderMetadataTree (in particular IM Reads of these
+    ///       attributes will the automatically filled from metadata).
     ///
     /// Return value notes:
     ///   ActionReturnStatus::IsOutOfSpaceEncodingResponse
@@ -86,14 +90,17 @@ public:
     ///    - returning a value other than Success implies an error reply (error and data are mutually exclusive)
     ///
     /// Preconditions:
-    ///    - `request.path` MUST be valid: Invoke` is only guaranteed to function correctly for
-    ///      VALID paths (i.e. use `ProviderMetadataTree::AcceptedCommands` to check). This is
-    ///      because we assume ACL or flags (like timed invoke) have to happen before invoking
-    ///      this command.
+    ///    - `request.path` MUST refer to a command that actually exists.  This is because in practice
+    ///       callers must do ACL and flag checks (e.g. for timed invoke) before calling this function.
+    ///
+    ///       Callers that do not care about those checks should use `ProviderMetadataTree::AcceptedCommands`
+    ///       to check for command existence.
+    ///
     ///    - TODO: as interfaces are updated, we may want to make the above requirement more
     ///            relaxed, as it seems desirable for users of this interface to have guaranteed
-    ///            behavior (like error on invalid paths) where as today this seems unclear as some
-    ///            command intercepts do not validate if the path is valid per endpoints.
+    ///            behavior (like error on invalid paths) whereas today this seems unclear as some
+    ///            command intercepts do not validate that the command is in fact accepted on the
+    ///            endpoint provided.
     ///
     /// Return value expectations:
     ///   - if a response has been placed into `handler` then std::nullopt MUST be returned. In particular
