@@ -40,4 +40,8 @@ declare_args() {
   # If/once the chip_use_data_model_interface flag is removed or does not support
   # a `check` option, this should alwo be removed
   chip_data_model_check_die_on_failure = false
+
+  # Controls whether the device commissioning process requires the user to
+  # acknowledge terms and conditions during commissioning.
+  chip_terms_and_conditions_required = false
 }

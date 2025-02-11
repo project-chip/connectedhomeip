@@ -119,6 +119,10 @@ enum
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     kDeviceOption_WiFi_PAF,
 #endif
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    kDeviceOption_TermsAndConditions_Version,
+    kDeviceOption_TermsAndConditions_Required,
+#endif
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -190,6 +194,10 @@ OptionDef sDeviceOptionDefs[] = {
 #endif
 #if CHIP_WITH_NLFAULTINJECTION
     { "faults", kArgumentRequired, kDeviceOption_FaultInjection },
+#endif
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    { "tc-version", kArgumentRequired, kDeviceOption_TermsAndConditions_Version },
+    { "tc-required", kArgumentRequired, kDeviceOption_TermsAndConditions_Required },
 #endif
     {}
 };
@@ -335,6 +343,15 @@ const char * sDeviceOptionHelp =
     "       Max number of subscriptions the device will allow\n"
     "  --subscription-resumption-retry-interval\n"
     "       subscription timeout resumption retry interval in seconds\n"
+#endif
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    "  --tc-version\n"
+    "       Sets the minimum required version of the Terms and Conditions\n"
+    "\n"
+    "  --tc-required\n"
+    "       Sets the required acknowledgements for the Terms and Conditions as a 16-bit enumeration.\n"
+    "       Each bit represents an ordinal corresponding to a specific acknowledgment requirement.\n"
+    "\n"
 #endif
 #if CHIP_WITH_NLFAULTINJECTION
     "  --faults <fault-string,...>\n"
@@ -682,6 +699,17 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kDeviceOption_WiFi_PAF: {
         LinuxDeviceOptions::GetInstance().mWiFiPAF        = true;
         LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds = aValue;
+        break;
+    }
+#endif
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    case kDeviceOption_TermsAndConditions_Version: {
+        LinuxDeviceOptions::GetInstance().tcVersion.SetValue(static_cast<uint16_t>(atoi(aValue)));
+        break;
+    }
+
+    case kDeviceOption_TermsAndConditions_Required: {
+        LinuxDeviceOptions::GetInstance().tcRequired.SetValue(static_cast<uint16_t>(atoi(aValue)));
         break;
     }
 #endif
