@@ -97,14 +97,14 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "Step 2c: TH reads CurrentHue attribute from DUT" # Expects 220+/-15%
+    - label: "Step 2c: TH reads CurrentHue attribute from DUT" # Expects 220 +/- 3 (15% of (220 - 200))
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 187
-              maxValue: 253
+              minValue: 217
+              maxValue: 223
 
     - label: "Wait 15s"
       PICS: CC.S.F00
@@ -115,7 +115,7 @@ tests:
               - name: "ms"
                 value: 15000
 
-    # Start value 220, expected value 24+/-15% (280 mod 256)
+    # Start value 220, expected value 25 +/- 12 (280 mod 255 +/- 15% of 80)
     # Multiple range not supported in YAML: https://github.com/project-chip/connectedhomeip/issues/23197
     - label: "Step 2d: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
@@ -123,8 +123,8 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 20
-              maxValue: 28
+              minValue: 13
+              maxValue: 37
 
     - label: "Wait 5s"
       PICS: CC.S.F00
@@ -142,8 +142,8 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 20
-              maxValue: 28
+              minValue: 13
+              maxValue: 37
 
     - label:
           "Step 3a: TH sends MoveToHue command to DUT with Hue=50,
@@ -199,7 +199,7 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "Step 3c: TH reads CurrentHue attribute from DUT" # Expects 25+/-15%
+    - label: "Step 3c: TH reads CurrentHue attribute from DUT" # Expects 25 +/- 4 (15% of (50 - 25))
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -217,14 +217,14 @@ tests:
               - name: "ms"
                 value: 15000
 
-    - label: "Step 3d: TH reads CurrentHue attribute from DUT" # Expects 206+/-15%
+    - label: "Step 3d: TH reads CurrentHue attribute from DUT" # Expects 205 +/- 15 (-50 mod 255 +/- 15% of 100)
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 175
-              maxValue: 237
+              minValue: 190
+              maxValue: 220
 
     - label: "Wait 5s"
       PICS: CC.S.F00
@@ -241,8 +241,8 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 175
-              maxValue: 237
+              minValue: 190
+              maxValue: 220
 
     - label: "Step 4a: TH reads ColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0008
