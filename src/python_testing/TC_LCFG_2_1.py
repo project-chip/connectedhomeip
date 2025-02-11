@@ -39,7 +39,7 @@
 import chip.clusters as Clusters
 import langcodes
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, run_if_endpoint_matches, default_matter_test_main, has_cluster
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 
 
