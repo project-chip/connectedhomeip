@@ -28,8 +28,6 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    # Required to Update Zephyr SDK (for developers purpose)
-    TELINK_ZEPHYR_SDK_DIR: /opt/telink/zephyr-sdk-0.17.0
 
 jobs:
     chef_linux:
@@ -107,15 +105,6 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Update Zephyr SDK (for developers purpose)
-              run: |
-                  set -e
-                  cd /opt/telink
-                  rm -rf zephyr-sdk-0.16.1
-                  curl --location https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.0/zephyr-sdk-0.17.0_linux-x86_64_minimal.tar.xz --output zephyr-sdk-0.17.0_linux-x86_64_minimal.tar.xz
-                  tar xvf zephyr-sdk-0.17.0_linux-x86_64_minimal.tar.xz
-                  rm -rf zephyr-sdk-0.17.0_linux-x86_64_minimal.tar.xz
-                  zephyr-sdk-0.17.0/setup.sh -t riscv64-zephyr-elf
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:

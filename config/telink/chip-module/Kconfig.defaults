@@ -235,8 +235,8 @@ config CHIP_OTA_REQUESTOR
     default y
 
 config MCUBOOT_SIGNATURE_KEY_FILE
-	default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
-	depends on BOOTLOADER_MCUBOOT
+    default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
+    depends on BOOTLOADER_MCUBOOT
 
 # In current config/zephyr/Kconfig
 # next deprecated values are selected
@@ -341,16 +341,16 @@ config NET_CONFIG_INIT_TIMEOUT
 
 
 config CHIP_WIFI
-	bool "Enable Telink Wi-Fi support"
-	default y if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
-	select WIFI_W91
-	select WIFI
-	select NET_STATISTICS
-	select NET_IPV6_ND # enable Neighbor Discovery to handle Router Advertisements
-	select NET_IPV6_NBR_CACHE
-	select NET_STATISTICS_USER_API
-	imply MBEDTLS_ENTROPY_C
-	imply MBEDTLS_KEY_EXCHANGE_RSA_ENABLED
+    bool "Enable Telink Wi-Fi support"
+    default y if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
+    select WIFI_W91
+    select WIFI
+    select NET_STATISTICS
+    select NET_IPV6_ND # enable Neighbor Discovery to handle Router Advertisements
+    select NET_IPV6_NBR_CACHE
+    select NET_STATISTICS_USER_API
+    imply MBEDTLS_ENTROPY_C
+    imply MBEDTLS_KEY_EXCHANGE_RSA_ENABLED
 
 if CHIP_WIFI
 
@@ -405,10 +405,10 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
       within range [-JITTER; +JITTER].
 
 config NET_MGMT_EVENT_STACK_SIZE
-	default 1250
+    default 1250
 
 config IPC_SERVICE_BACKEND_ICMSG_WQ_STACK_SIZE
-	default 2304 if TELINK_W91_IPC_DISPATCHER
+    default 2304 if TELINK_W91_IPC_DISPATCHER
 
 endif # CHIP_WIFI
 
@@ -427,7 +427,7 @@ config MBEDTLS_ENTROPY_POLL_ZEPHYR
     default y
 
 config MBEDTLS_CIPHER_AES_ENABLED
-	default y
+    default y
 
 config MBEDTLS_CIPHER_CCM_ENABLED
     default y
