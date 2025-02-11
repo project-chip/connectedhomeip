@@ -34,6 +34,7 @@ class AppTask
 {
 public:
     CHIP_ERROR StartAppTask();
+    void StopAppTask();
     static void AppTaskMain(void * pvParameter);
     void PostEvent(const AppEvent * event);
     void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
@@ -47,6 +48,7 @@ private:
 
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void TimerEventHandler(TimerHandle_t xTimer);
+    static void StopEventHandler(AppEvent * aEvent);
 
     void DispatchEvent(AppEvent * event);
 
