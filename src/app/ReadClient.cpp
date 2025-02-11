@@ -231,7 +231,7 @@ void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
     }
 
     mExchange.Release();
-
+    mpCallback.ClearFatalReportError();
     mpCallback.OnDone(this);
 }
 
@@ -805,6 +805,7 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
             ReturnErrorOnFailure(errorStatus.DecodeStatusIB(statusIB));
             NoteReportingData();
             mpCallback.OnAttributeData(attributePath, nullptr, statusIB);
+            ReturnErrorOnFailure(mpCallback.GetLastFatalReportError());
         }
         else if (CHIP_END_OF_TLV == err)
         {
@@ -861,6 +862,7 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
 
             NoteReportingData();
             mpCallback.OnAttributeData(attributePath, &dataReader, statusIB);
+            ReturnErrorOnFailure(mpCallback.GetLastFatalReportError());
         }
     }
 
@@ -868,7 +870,6 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
     {
         err = CHIP_NO_ERROR;
     }
-
     return err;
 }
 
@@ -905,6 +906,7 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
 
             NoteReportingData();
             mpCallback.OnEventData(header, &dataReader, nullptr);
+            ReturnErrorOnFailure(mpCallback.GetLastFatalReportError());
         }
         else if (err == CHIP_END_OF_TLV)
         {
@@ -919,6 +921,7 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
 
             NoteReportingData();
             mpCallback.OnEventData(header, nullptr, &statusIB);
+            ReturnErrorOnFailure(mpCallback.GetLastFatalReportError());
         }
     }
 
