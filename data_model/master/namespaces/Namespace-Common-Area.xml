@@ -1,0 +1,186 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x0010" name="Common Area">
+  <tags>
+    <tag id="0x0000" name="Aisle"/>
+    <tag id="0x0001" name="Attic"/>
+    <tag id="0x0002" name="Back Door"/>
+    <tag id="0x0003" name="Back Yard"/>
+    <tag id="0x0004" name="Balcony"/>
+    <tag id="0x0005" name="Ballroom"/>
+    <tag id="0x0006" name="Bathroom">
+      <description>Also known as Restroom</description>
+    </tag>
+    <tag id="0x0007" name="Bedroom"/>
+    <tag id="0x0008" name="Border"/>
+    <tag id="0x0009" name="Boxroom">
+      <description>A small room typically used for storage</description>
+    </tag>
+    <tag id="0x000A" name="Breakfast Room"/>
+    <tag id="0x000B" name="Carport"/>
+    <tag id="0x000C" name="Cellar"/>
+    <tag id="0x000D" name="Cloakroom"/>
+    <tag id="0x000E" name="Closet">
+      <description>A small room for storing clothing, linens, and other items.</description>
+    </tag>
+    <tag id="0x000F" name="Conservatory"/>
+    <tag id="0x0010" name="Corridor"/>
+    <tag id="0x0011" name="Craft Room"/>
+    <tag id="0x0012" name="Cupboard"/>
+    <tag id="0x0013" name="Deck"/>
+    <tag id="0x0014" name="Den">
+      <description>A small, comfortable room for individual activities such as work or hobbies</description>
+    </tag>
+    <tag id="0x0015" name="Dining"/>
+    <tag id="0x0016" name="Drawing Room"/>
+    <tag id="0x0017" name="Dressing Room"/>
+    <tag id="0x0018" name="Driveway"/>
+    <tag id="0x0019" name="Elevator"/>
+    <tag id="0x001A" name="Ensuite">
+      <description>A bathroom directly accessible from a bedroom</description>
+    </tag>
+    <tag id="0x001B" name="Entrance"/>
+    <tag id="0x001C" name="Entryway"/>
+    <tag id="0x001D" name="Family Room"/>
+    <tag id="0x001E" name="Foyer"/>
+    <tag id="0x001F" name="Front Door"/>
+    <tag id="0x0020" name="Front Yard"/>
+    <tag id="0x0021" name="Game Room"/>
+    <tag id="0x0022" name="Garage"/>
+    <tag id="0x0023" name="Garage Door"/>
+    <tag id="0x0024" name="Garden"/>
+    <tag id="0x0025" name="Garden Door"/>
+    <tag id="0x0026" name="Guest Bathroom">
+      <description>Also known as Guest Restroom</description>
+    </tag>
+    <tag id="0x0027" name="Guest Bedroom"/>
+    <tag id="0x0029" name="Guest Room">
+      <description>Also known as Guest Bedroom</description>
+    </tag>
+    <tag id="0x002A" name="Gym"/>
+    <tag id="0x002B" name="Hallway"/>
+    <tag id="0x002C" name="Hearth Room">
+      <description>A cozy room containing a fireplace or other point heat source</description>
+    </tag>
+    <tag id="0x002D" name="Kids Room"/>
+    <tag id="0x002E" name="Kids Bedroom"/>
+    <tag id="0x002F" name="Kitchen"/>
+    <tag id="0x0031" name="Laundry Room"/>
+    <tag id="0x0032" name="Lawn"/>
+    <tag id="0x0033" name="Library"/>
+    <tag id="0x0034" name="Living Room"/>
+    <tag id="0x0035" name="Lounge"/>
+    <tag id="0x0036" name="Media/TV Room"/>
+    <tag id="0x0037" name="Mud Room">
+      <description>A space used to remove soiled garments prior to entering the domicile proper</description>
+    </tag>
+    <tag id="0x0038" name="Music Room"/>
+    <tag id="0x0039" name="Nursery"/>
+    <tag id="0x003A" name="Office"/>
+    <tag id="0x003B" name="Outdoor Kitchen"/>
+    <tag id="0x003C" name="Outside"/>
+    <tag id="0x003D" name="Pantry">
+      <description>AKA a larder, a place where food is stored</description>
+    </tag>
+    <tag id="0x003E" name="Parking Lot"/>
+    <tag id="0x003F" name="Parlor"/>
+    <tag id="0x0040" name="Patio"/>
+    <tag id="0x0041" name="Play Room"/>
+    <tag id="0x0042" name="Pool Room">
+      <description>A room centered around a pool/billiards table</description>
+    </tag>
+    <tag id="0x0043" name="Porch"/>
+    <tag id="0x0044" name="Primary Bathroom"/>
+    <tag id="0x0045" name="Primary Bedroom"/>
+    <tag id="0x0046" name="Ramp"/>
+    <tag id="0x0047" name="Reception Room"/>
+    <tag id="0x0048" name="Recreation Room"/>
+    <tag id="0x004A" name="Roof"/>
+    <tag id="0x004B" name="Sauna"/>
+    <tag id="0x004C" name="Scullery">
+      <description>A utility space for cleaning dishes and laundry</description>
+    </tag>
+    <tag id="0x004D" name="Sewing Room"/>
+    <tag id="0x004E" name="Shed"/>
+    <tag id="0x004F" name="Side Door"/>
+    <tag id="0x0050" name="Side Yard"/>
+    <tag id="0x0051" name="Sitting Room"/>
+    <tag id="0x0052" name="Snug">
+      <description>An informal space meant to be &apos;cozy&apos;, &apos;snug&apos;, relaxed, meant to share with family or friends</description>
+    </tag>
+    <tag id="0x0053" name="Spa"/>
+    <tag id="0x0054" name="Staircase"/>
+    <tag id="0x0055" name="Steam Room"/>
+    <tag id="0x0056" name="Storage Room"/>
+    <tag id="0x0057" name="Studio"/>
+    <tag id="0x0058" name="Study"/>
+    <tag id="0x0059" name="Sun Room"/>
+    <tag id="0x005A" name="Swimming Pool"/>
+    <tag id="0x005B" name="Terrace"/>
+    <tag id="0x005C" name="Utility Room"/>
+    <tag id="0x005D" name="Ward">
+      <description>The innermost area of a large home</description>
+    </tag>
+    <tag id="0x005E" name="Workshop"/>
+    <tag id="0x005F" name="Toilet">
+      <description>A room dedicated to a toilet; a water closet / WC</description>
+    </tag>
+  </tags>
+</namespace>
