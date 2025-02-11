@@ -258,7 +258,7 @@ exit:
 
 void WriteHandler::DeliverListWriteBegin(const ConcreteAttributePath & aPath)
 {
-    if(mDataModelProvider != nullptr)
+    if (mDataModelProvider != nullptr)
     {
         mDataModelProvider->ListAttributeWriteNotification(aPath, DataModel::ListWriteOperation::kListWriteBegin);
     }
@@ -266,10 +266,11 @@ void WriteHandler::DeliverListWriteBegin(const ConcreteAttributePath & aPath)
 
 void WriteHandler::DeliverListWriteEnd(const ConcreteAttributePath & aPath, bool writeWasSuccessful)
 {
-    if(mDataModelProvider != nullptr)
+    if (mDataModelProvider != nullptr)
     {
-        mDataModelProvider->ListAttributeWriteNotification(aPath, writeWasSuccessful ?
-        DataModel::ListWriteOperation::kListWriteEndFinal : DataModel::ListWriteOperation::kListWriteEnd);
+        mDataModelProvider->ListAttributeWriteNotification(aPath,
+                                                           writeWasSuccessful ? DataModel::ListWriteOperation::kListWriteEndFinal
+                                                                              : DataModel::ListWriteOperation::kListWriteEnd);
     }
 }
 
