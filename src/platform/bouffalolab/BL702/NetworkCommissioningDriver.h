@@ -129,8 +129,8 @@ public:
 private:
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
 
-    WiFiScanResponse    *mScanResponse = nullptr;
-    size_t              mScanResponseNum = 0;
+    WiFiScanResponse * mScanResponse = nullptr;
+    size_t mScanResponseNum          = 0;
 
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;

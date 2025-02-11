@@ -219,7 +219,7 @@ void BLWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callba
         }
 
         mScanResponseNum = 0;
-        mpScanCallback = callback;
+        mpScanCallback   = callback;
         wifiInterface_startScan();
     }
 }
@@ -234,7 +234,8 @@ void BLWiFiDriver::OnScanWiFiNetworkDone(void * opaque)
 
     ChipLogProgress(DeviceLayer, "expected ssid %s. get %d in total, %d", mScanSSID, pmsg->num, mScanSpecific);
 
-    if (mScanSpecific) {
+    if (mScanSpecific)
+    {
         for (i = 0; i < pmsg->num; i++)
         {
             if (mScanSpecific && !strcmp(mScanSSID, (char *) (pmsg->records[i].ssid)))
@@ -244,14 +245,16 @@ void BLWiFiDriver::OnScanWiFiNetworkDone(void * opaque)
             }
         }
     }
-    else {
+    else
+    {
         ap_num = pmsg->num;
     }
 
     if (ap_num)
     {
         p = mScanResponse = (WiFiScanResponse *) malloc(sizeof(WiFiScanResponse) * ap_num);
-        if (mScanResponse == nullptr) {
+        if (mScanResponse == nullptr)
+        {
             return;
         }
 
@@ -273,9 +276,10 @@ void BLWiFiDriver::OnScanWiFiNetworkDone(void * opaque)
             memcpy(p->bssid, pmsg->records[i].bssid, 6);
 
             p++;
-            ap_cnt ++;
+            ap_cnt++;
 
-            if (ap_cnt >= ap_num) {
+            if (ap_cnt >= ap_num)
+            {
                 break;
             }
         }
@@ -286,8 +290,8 @@ void BLWiFiDriver::OnScanWiFiNetworkDone(void * opaque)
 
 void BLWiFiDriver::OnScanWiFiNetworkDone(void)
 {
-    size_t ap_cnt = mScanResponseNum;
-    WiFiScanResponse *pScanResponse = mScanResponse;
+    size_t ap_cnt                    = mScanResponseNum;
+    WiFiScanResponse * pScanResponse = mScanResponse;
 
     if (mScanResponse)
     {
@@ -310,7 +314,8 @@ void BLWiFiDriver::OnScanWiFiNetworkDone(void)
         free(mScanResponse);
         mScanResponse = nullptr;
     }
-    else {
+    else
+    {
         ChipLogProgress(DeviceLayer, "No AP found");
         if (mpScanCallback != nullptr)
         {
