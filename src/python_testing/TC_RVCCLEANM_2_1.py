@@ -22,12 +22,11 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CHIP_RVC_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
-#       --discriminator 1234
 #       --passcode 20202021
 #       --int-arg PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:1
 #       --int-arg PIXIT.RVCCLEANM.MODE_CHANGE_OK:2

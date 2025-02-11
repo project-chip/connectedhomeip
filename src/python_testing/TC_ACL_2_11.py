@@ -25,14 +25,13 @@
 #     factory-reset: true
 #     quiet: true
 #     app-args: >
-#       --discriminator 1234 --KVS kvs1
+#       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
 #       --commissioning-arl-entries "[{\"endpoint\": 1,\"cluster\": 1105,\"restrictions\": [{\"type\": 0,\"id\": 0}]}]"
 #       --arl-entries "[{\"endpoint\": 1,\"cluster\": 1105,\"restrictions\": [{\"type\": 0,\"id\": 0}]}]"
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
-#       --discriminator 1234
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
