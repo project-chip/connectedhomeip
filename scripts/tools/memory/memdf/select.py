@@ -163,7 +163,7 @@ def select_configured(config: Config, df: DF, columns=SELECTION_CHOICES) -> DF:
 def groupby(config: Config, df: DF, by: Optional[str] = None):
     if not by:
         by = config['report.by']
-    df = df[[by, 'size']].groupby(by).aggregate(np.sum).reset_index()
+    df = df[[by, 'size']].groupby(by).aggregate("sum").reset_index()
     if by in SYNTHESIZE:
         df = SYNTHESIZE[by][1](df)
     return df
