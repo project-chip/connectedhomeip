@@ -2,8 +2,8 @@ import argparse
 import csv
 import os
 import subprocess
-from datetime import datetime
 from dataclasses import dataclass
+from datetime import datetime
 
 import memdf.collect
 import memdf.report
