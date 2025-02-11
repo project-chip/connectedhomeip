@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "access/Privilege.h"
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -24,6 +25,7 @@
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventPathParams.h>
+#include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
@@ -267,14 +269,33 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
     VerifyOrReturnValue(cluster->attributeCount > 0, CHIP_NO_ERROR);
     VerifyOrReturnValue(cluster->attributes != nullptr, CHIP_NO_ERROR);
 
-    // TODO: if ember would encode data in AttributeEntry form, we could reference things directly
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(cluster->attributeCount));
+    // TODO: if ember would encode data in AttributeEntry form, we could reference things directly (shorter code,
+    //       although still allocation overhead due to global attributes not in metadata)
+    //
+    // We have Attributes from ember + global attributes that are NOT in ember metadata.
+    // We have to report them all
+    constexpr size_t kGlobalAttributeNotInMetadataCount =
+        sizeof(GlobalAttributesNotInMetadata) / sizeof(GlobalAttributesNotInMetadata[0]);
+
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(cluster->attributeCount + kGlobalAttributeNotInMetadataCount));
 
     Span<const EmberAfAttributeMetadata> attributeSpan(cluster->attributes, cluster->attributeCount);
 
     for (auto & attribute : attributeSpan)
     {
         ReturnErrorOnFailure(builder.Append(AttributeEntryFrom(path, attribute)));
+    }
+
+    DataModel::AttributeEntry globalListEntry;
+
+    globalListEntry.readPrivilege = Access::Privilege::kView;
+    globalListEntry.flags.Set(DataModel::AttributeQualityFlags::kListAttribute);
+    // these entries should also be `Fixed` however no such flag is propagated (we do not track)
+
+    for (auto & attribute : GlobalAttributesNotInMetadata)
+    {
+        globalListEntry.attributeId = attribute;
+        ReturnErrorOnFailure(builder.Append(globalListEntry));
     }
 
     return CHIP_NO_ERROR;
