@@ -7687,6 +7687,7 @@ typedef NS_ENUM(uint32_t, MTRDeviceTypeIDType) {
     MTRDeviceTypeIDTypeFlowSensorID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000306,
     MTRDeviceTypeIDTypeHumiditySensorID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000307,
     MTRDeviceTypeIDTypeHeatPumpID MTR_PROVISIONALLY_AVAILABLE = 0x00000309,
+    MTRDeviceTypeIDTypeThermostatControllerID MTR_PROVISIONALLY_AVAILABLE = 0x0000030A,
     MTRDeviceTypeIDTypeEVSEID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x0000050C,
     MTRDeviceTypeIDTypeDeviceEnergyManagementID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x0000050D,
     MTRDeviceTypeIDTypeWaterHeaterID MTR_PROVISIONALLY_AVAILABLE = 0x0000050F,

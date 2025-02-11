@@ -6663,6 +6663,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Humidity Sensor";
     case 0x00000309:
         return "Heat Pump";
+    case 0x0000030A:
+        return "Thermostat Controller";
     case 0x0000050C:
         return "EVSE";
     case 0x0000050D:
