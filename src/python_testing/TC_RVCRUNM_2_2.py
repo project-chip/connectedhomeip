@@ -134,7 +134,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
                          "PIXIT.RVCRUNM.MODE_B:<mode id>")
 
         self.directmodech_bit_mask = Clusters.RvcRunMode.Bitmaps.Feature.kDirectModeChange
-        self.endpoint = self.matter_test_config.endpoint
+        self.endpoint = self.get_endpoint()
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         self.mode_a = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_A']
         self.mode_b = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_B']

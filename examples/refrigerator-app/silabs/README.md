@@ -303,8 +303,8 @@ combination with JLinkRTTClient as follows:
 
     Enpoint for temperaturecontrol is 2 and 3
 
-    Cold Cabinet Endpoint Id 2
-    Freeze Cabinet Endpoint Id 3
+    Freeze Cabinet Endpoint Id 2
+    Cold Cabinet Endpoint Id 3
 
     This enpoint support Temperature control cluster
     ```
@@ -314,8 +314,24 @@ combination with JLinkRTTClient as follows:
     ```
     chip-tool refrigeratorandtemperaturecontrolledcabinetmode
     chip-tool temperaturecontrol
-    chip-tool refrigeratoralarm
+    ```
 
+    Subscribe refrigeratoralarm events
+
+    ```
+    chip-tool interactive start
+    refrigeratoralarm subscribe-event notify 1 10 1 1
+    ```
+
+## Trigger events from Matter CLI
+
+**door-state-change**
+
+-   Trigger refrigeratoralarm door-state-change event:
+
+    ```
+    -> matterCli> refrigeratoralarm event door-state-change open
+    -> Done
     ```
 
 ### Notes

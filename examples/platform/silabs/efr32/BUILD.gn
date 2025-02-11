@@ -21,6 +21,10 @@ import("${chip_root}/src/platform/device.gni")
 import("${silabs_sdk_build_root}/efr32_sdk.gni")
 import("${silabs_sdk_build_root}/silabs_board.gni")
 
+import("${matter_support_root}/provision/args.gni")  # Seperate import since the
+                                                     # matter_support_root is
+                                                     # defined in the
+                                                     # ef32_sdk.gni
 declare_args() {
   enable_heap_monitoring = false
 
@@ -71,7 +75,7 @@ source_set("test-event-trigger") {
     "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.h",
   ]
 
-  deps = [ "${chip_root}/src/platform/silabs/provision:provision-headers" ]
+  deps = [ "${sl_provision_root}:headers" ]
   public_configs = [ ":test-event-trigger-config" ]
   public_deps = [
     "${chip_root}/src/app:test-event-trigger",
@@ -137,7 +141,10 @@ config("efr32-common-config") {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MULTI_OTA_REQUESTOR=1" ]
   }
 
-  ldflags = [ "-Wl,--no-warn-rwx-segment" ]
+  ldflags = [
+    "-Wl,--no-warn-rwx-segment",
+    "-fno-lto",
+  ]
 }
 
 source_set("efr32-common") {
@@ -174,7 +181,8 @@ source_set("efr32-common") {
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
   ]
 
-  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
+      sl_uart_log_output) {
     sources += [ "${silabs_common_plat_dir}/uart.cpp" ]
   }
 
@@ -215,6 +223,7 @@ source_set("efr32-common") {
   public_deps += [
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/app/server",
+    "${chip_root}/src/data-model-providers/codegen:instance-header",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]

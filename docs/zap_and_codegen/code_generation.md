@@ -213,9 +213,6 @@ at:
 -   `src/app/chip_data_model.cmake`
 -   `src/app/chip_data_model.gni`
 
-Additionally, `build/chip/esp32/esp32_codegen.cmake` adds processing support for
-the 2-pass cmake builds used by the Espressif `idf.py` build system.
-
 ## Pre-generation
 
 Code pre-generation can be used:

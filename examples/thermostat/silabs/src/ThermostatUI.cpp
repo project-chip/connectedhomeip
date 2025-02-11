@@ -25,10 +25,10 @@
 #include "glib.h"
 #include "lcd.h"
 
-#if SL_WIFI && !defined(SLI_SI91X_MCU_INTERFACE)
 // Only needed for wifi NCP devices
-#include "spi_multiplex.h"
-#endif // SL_WIFI
+#if SL_WIFI && !defined(SLI_SI91X_MCU_INTERFACE)
+#include <platform/silabs/wifi/ncp/spi_multiplex.h>
+#endif // SL_WIFI && !defined(SLI_SI91X_MCU_INTERFACE)
 
 // LCD line define
 constexpr uint8_t kTempLcdInitialX = 30;

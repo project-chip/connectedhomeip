@@ -86,14 +86,6 @@ mcxw71_k32w1_sdk("sdk") {
   defines += [
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
   ]
-
-  if (nxp_nvm_component == "littlefs") {
-    include_dirs += [ "${example_platform_dir}/board" ]
-    sources += [
-      "${example_platform_dir}/board/peripherals.c",
-      "${example_platform_dir}/board/peripherals.h",
-    ]
-  }
 }
 
 mcxw71_k32w1_executable("contact_sensor_app") {
@@ -226,6 +218,7 @@ mcxw71_k32w1_executable("contact_sensor_app") {
   deps += [
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/platform/logging:default",
+    "${chip_root}/src/setup_payload:onboarding-codes-utils",
   ]
 
   #lit and sit are using different zap files

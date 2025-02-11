@@ -18,6 +18,7 @@
 #include "PairingManager.h"
 #include "DeviceManager.h"
 #include "DeviceSynchronization.h"
+#include "FabricAdmin.h"
 
 #include <netdb.h>
 #include <sys/socket.h>
@@ -103,7 +104,7 @@ PairingManager::PairingManager() :
 CHIP_ERROR PairingManager::Init(Controller::DeviceCommissioner * commissioner)
 {
     VerifyOrReturnError(commissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
+    FabricAdmin::Instance().GetDefaultICDClientStorage().UpdateFabricList(commissioner->GetFabricIndex());
     mCommissioner = commissioner;
 
     return CHIP_NO_ERROR;
@@ -281,6 +282,12 @@ void PairingManager::OnPairingDeleted(CHIP_ERROR err)
 
 void PairingManager::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 {
+    if (mPairingDelegate)
+    {
+        mPairingDelegate->OnCommissioningComplete(nodeId, err);
+        SetPairingDelegate(nullptr);
+    }
+
     if (err == CHIP_NO_ERROR)
     {
         // print to console
@@ -288,17 +295,21 @@ void PairingManager::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 
         // mCommissioner has a lifetime that is the entire life of the application itself
         // so it is safe to provide to StartDeviceSynchronization.
-        DeviceSynchronizer::Instance().StartDeviceSynchronization(mCommissioner, nodeId, false);
+        DeviceSynchronizer::Instance().StartDeviceSynchronization(mCommissioner, nodeId, mDeviceIsICD);
     }
     else
     {
+        // When ICD device commissioning fails, the ICDClientInfo stored in OnICDRegistrationComplete needs to be removed.
+        if (mDeviceIsICD)
+        {
+            CHIP_ERROR deleteEntryError = FabricAdmin::Instance().GetDefaultICDClientStorage().DeleteEntry(
+                ScopedNodeId(nodeId, mCommissioner->GetFabricIndex()));
+            if (deleteEntryError != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "Failed to delete ICD entry: %s", ErrorStr(err));
+            }
+        }
         ChipLogProgress(NotSpecified, "Device commissioning Failure: %s", ErrorStr(err));
-    }
-
-    if (mPairingDelegate)
-    {
-        mPairingDelegate->OnCommissioningComplete(nodeId, err);
-        SetPairingDelegate(nullptr);
     }
 }
 
@@ -327,6 +338,49 @@ void PairingManager::OnReadCommissioningInfo(const Controller::ReadCommissioning
     }
     ChipLogProgress(AppServer, "OnReadCommissioningInfo ICD - IdleModeDuration=%u activeModeDuration=%u activeModeThreshold=%u",
                     info.icd.idleModeDuration, info.icd.activeModeDuration, info.icd.activeModeThreshold);
+}
+
+void PairingManager::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icdCounter)
+{
+    char icdSymmetricKeyHex[Crypto::kAES_CCM128_Key_Length * 2 + 1];
+
+    Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
+                         sizeof(icdSymmetricKeyHex), Encoding::HexFlags::kNullTerminate);
+
+    app::ICDClientInfo clientInfo;
+    clientInfo.peer_node         = nodeId;
+    clientInfo.monitored_subject = mICDMonitoredSubject.Value();
+    clientInfo.start_icd_counter = icdCounter;
+    auto & ICDClientStorage      = FabricAdmin::Instance().GetDefaultICDClientStorage();
+
+    CHIP_ERROR err = ICDClientStorage.SetKey(clientInfo, mICDSymmetricKey.Value());
+    if (err == CHIP_NO_ERROR)
+    {
+        err = ICDClientStorage.StoreEntry(clientInfo);
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ICDClientStorage.RemoveKey(clientInfo);
+        ChipLogError(NotSpecified, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s",
+                     ChipLogValueX64(nodeId.GetNodeId()), err.AsString());
+        return;
+    }
+
+    mDeviceIsICD = true;
+
+    ChipLogProgress(NotSpecified, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(nodeId.GetNodeId()));
+    ChipLogProgress(NotSpecified,
+                    "ICD Registration Complete for device " ChipLogFormatX64 " / Check-In NodeID: " ChipLogFormatX64
+                    " / Monitored Subject: " ChipLogFormatX64 " / Symmetric Key: %s / ICDCounter %u",
+                    ChipLogValueX64(nodeId.GetNodeId()), ChipLogValueX64(mICDCheckInNodeId.Value()),
+                    ChipLogValueX64(mICDMonitoredSubject.Value()), icdSymmetricKeyHex, icdCounter);
+}
+
+void PairingManager::OnICDStayActiveComplete(ScopedNodeId deviceId, uint32_t promisedActiveDuration)
+{
+    ChipLogProgress(NotSpecified, "ICD Stay Active Complete for device " ChipLogFormatX64 " / promisedActiveDuration: %u",
+                    ChipLogValueX64(deviceId.GetNodeId()), promisedActiveDuration);
 }
 
 void PairingManager::OnDiscoveredDevice(const Dnssd::CommissionNodeData & nodeData)
@@ -436,6 +490,39 @@ CommissioningParameters PairingManager::GetCommissioningParameters()
     params.SetSkipCommissioningComplete(false);
     params.SetDeviceAttestationDelegate(this);
 
+    if (mICDRegistration.ValueOr(false))
+    {
+        params.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+
+        if (!mICDSymmetricKey.HasValue())
+        {
+            Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey));
+            mICDSymmetricKey.SetValue(ByteSpan(mRandomGeneratedICDSymmetricKey));
+        }
+        if (!mICDCheckInNodeId.HasValue())
+        {
+            mICDCheckInNodeId.SetValue(mCommissioner->GetNodeId());
+        }
+        if (!mICDMonitoredSubject.HasValue())
+        {
+            mICDMonitoredSubject.SetValue(mICDCheckInNodeId.Value());
+        }
+        if (!mICDClientType.HasValue())
+        {
+            mICDClientType.SetValue(app::Clusters::IcdManagement::ClientTypeEnum::kPermanent);
+        }
+        // These Optionals must have values now.
+        // The commissioner will verify these values.
+        params.SetICDSymmetricKey(mICDSymmetricKey.Value());
+        if (mICDStayActiveDurationMsec.HasValue())
+        {
+            params.SetICDStayActiveDurationMsec(mICDStayActiveDurationMsec.Value());
+        }
+        params.SetICDCheckInNodeId(mICDCheckInNodeId.Value());
+        params.SetICDMonitoredSubject(mICDMonitoredSubject.Value());
+        params.SetICDClientType(mICDClientType.Value());
+    }
+
     return params;
 }
 
@@ -467,6 +554,11 @@ void PairingManager::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
             self->mPairingDelegate->OnDeviceRemoved(nodeId, err);
             self->SetPairingDelegate(nullptr);
         }
+
+        FabricIndex fabricIndex = self->CurrentCommissioner().GetFabricIndex();
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(fabricIndex, nodeId);
+        ScopedNodeId scopedNodeId(nodeId, fabricIndex);
+        DeviceManager::Instance().RemoveSyncedDevice(scopedNodeId);
     }
     else
     {
@@ -477,10 +569,13 @@ void PairingManager::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
 void PairingManager::InitPairingCommand()
 {
     mCommissioner->RegisterPairingDelegate(this);
+    mDeviceIsICD = false;
 }
 
-CHIP_ERROR PairingManager::PairDeviceWithCode(NodeId nodeId, const char * payload)
+CHIP_ERROR PairingManager::PairDeviceWithCode(NodeId nodeId, const char * payload, bool icdRegistration)
 {
+    mICDRegistration.SetValue(icdRegistration);
+
     if (payload == nullptr || strlen(payload) > kMaxManualCodeLength + 1)
     {
         ChipLogError(NotSpecified, "PairDeviceWithCode failed: Invalid pairing payload");
@@ -543,6 +638,12 @@ CHIP_ERROR PairingManager::PairDevice(chip::NodeId nodeId, uint32_t setupPINCode
 
 CHIP_ERROR PairingManager::UnpairDevice(NodeId nodeId)
 {
+    if (nodeId == kUndefinedNodeId)
+    {
+        ChipLogError(NotSpecified, "node ID is undefined; cannot unpair device.");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     return DeviceLayer::SystemLayer().ScheduleLambda([nodeId]() {
         PairingManager & self = PairingManager::Instance();
 
@@ -562,6 +663,37 @@ CHIP_ERROR PairingManager::UnpairDevice(NodeId nodeId)
             ChipLogError(NotSpecified, "Failed to unpair device, error: %s", ErrorStr(err));
         }
     });
+}
+
+void PairingManager::ResetForNextCommand()
+{
+    mCommissioningWindowDelegate = nullptr;
+    mPairingDelegate             = nullptr;
+    mNodeId                      = chip::kUndefinedNodeId;
+    mVerifier                    = chip::ByteSpan();
+    mSalt                        = chip::ByteSpan();
+    mDiscriminator               = 0;
+    mSetupPINCode                = 0;
+    mDeviceIsICD                 = false;
+
+    memset(mRandomGeneratedICDSymmetricKey, 0, sizeof(mRandomGeneratedICDSymmetricKey));
+    memset(mVerifierBuffer, 0, sizeof(mVerifierBuffer));
+    memset(mSaltBuffer, 0, sizeof(mSaltBuffer));
+    memset(mRemoteIpAddr, 0, sizeof(mRemoteIpAddr));
+    memset(mOnboardingPayload, 0, sizeof(mOnboardingPayload));
+
+    mICDRegistration.ClearValue();
+    mICDCheckInNodeId.ClearValue();
+    mICDClientType.ClearValue();
+    mICDSymmetricKey.ClearValue();
+    mICDMonitoredSubject.ClearValue();
+    mICDStayActiveDurationMsec.ClearValue();
+
+    mWindowOpener.reset();
+    mOnOpenCommissioningWindowCallback.Cancel();
+    mOnOpenCommissioningWindowVerifierCallback.Cancel();
+    mCurrentFabricRemover.reset();
+    mCurrentFabricRemoveCallback.Cancel();
 }
 
 } // namespace admin

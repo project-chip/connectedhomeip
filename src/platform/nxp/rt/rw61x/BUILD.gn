@@ -1,5 +1,5 @@
 # Copyright (c) 2021 Project CHIP Authors
-# Copyright 2023 NXP
+# Copyright 2023-2024 NXP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,18 +52,18 @@ config("nxp_platform_config") {
       "CONFIG_CHIP_ENCRYPTED_FACTORY_DATA=1",
     ]
 
-    if (nxp_enable_secure_dac_private_key_storage) {
-      assert(nxp_enable_secure_dac_private_key_storage &&
-                 !nxp_enable_secure_whole_factory_data,
-             "please select only one protection solution")
-      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderImpl.h\"" ]
-    } else if (nxp_enable_secure_whole_factory_data) {
+    if (nxp_enable_secure_whole_factory_data) {
       assert(nxp_enable_secure_whole_factory_data &&
-                 !nxp_enable_secure_dac_private_key_storage,
+                 !nxp_enable_secure_EL2GO_factory_data,
              "please select only one protection solution")
       defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderEncImpl.h\"" ]
+    } else if (nxp_enable_secure_EL2GO_factory_data) {
+      assert(!nxp_enable_secure_whole_factory_data &&
+                 nxp_enable_secure_EL2GO_factory_data,
+             "please select only one protection solution")
+      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderEl2GoImpl.h\"" ]
     } else {
-      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/FactoryDataProviderFwkImpl.h\"" ]
+      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderImpl.h\"" ]
     }
   }
 
@@ -80,7 +80,6 @@ static_library("nxp_platform") {
     "-Wno-conversion",
     "-Wno-sign-compare",
   ]
-  deps = []
   defines = []
   sources = [
     "../../../FreeRTOS/SystemTimeSupport.cpp",
@@ -101,6 +100,7 @@ static_library("nxp_platform") {
     "CHIPDevicePlatformConfig.h",
     "PlatformManagerImpl.cpp",
   ]
+  deps = [ "${chip_root}/src/app:app_config" ]
 
   if (nxp_nvm_component == "nvm_fwk" || nxp_nvm_component == "littlefs") {
     sources += [
@@ -168,7 +168,10 @@ static_library("nxp_platform") {
       "../../common/ThreadStackManagerImpl.h",
     ]
 
-    deps += [ "${chip_root}/src/app/common:ids" ]
+    deps += [
+      "${chip_root}/src/app:app_config",
+      "${chip_root}/src/app/common:ids",
+    ]
 
     if (!nxp_build_matter_standalone_lib) {
       deps += [ "${chip_root}/third_party/openthread:openthread" ]
@@ -201,20 +204,20 @@ static_library("nxp_platform") {
       "../../common/factory_data/FactoryDataProvider.cpp",
       "../../common/factory_data/FactoryDataProvider.h",
     ]
-    if (nxp_enable_secure_dac_private_key_storage) {
-      sources += [
-        "FactoryDataProviderImpl.cpp",
-        "FactoryDataProviderImpl.h",
-      ]
-    } else if (nxp_enable_secure_whole_factory_data) {
+    if (nxp_enable_secure_whole_factory_data) {
       sources += [
         "FactoryDataProviderEncImpl.cpp",
         "FactoryDataProviderEncImpl.h",
       ]
+    } else if (nxp_enable_secure_EL2GO_factory_data) {
+      sources += [
+        "FactoryDataProviderEl2GoImpl.cpp",
+        "FactoryDataProviderEl2GoImpl.h",
+      ]
     } else {
       sources += [
-        "../../common/factory_data/FactoryDataProviderFwkImpl.cpp",
-        "../../common/factory_data/FactoryDataProviderFwkImpl.h",
+        "FactoryDataProviderImpl.cpp",
+        "FactoryDataProviderImpl.h",
       ]
     }
 

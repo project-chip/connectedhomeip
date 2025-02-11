@@ -18,7 +18,7 @@
 
 #include "CHIPCommandBridge.h"
 
-#import "CHIPToolKeypair.h"
+#import "DFTKeypair.h"
 #import <Matter/Matter.h>
 
 #include <lib/core/CHIPConfig.h>
@@ -172,10 +172,17 @@ CHIP_ERROR CHIPCommandBridge::SetUpStackWithPerControllerStorage(NSArray<NSData 
 
         NSError * error;
         __auto_type * operationalKeypair = [certificateIssuer issueOperationalKeypairWithControllerStorage:controllerStorage error:&error];
+        SecKeyRef publicKey = [operationalKeypair copyPublicKey];
+
         __auto_type * operational = [certificateIssuer issueOperationalCertificateForNodeID:nodeId
                                                                                    fabricID:fabricId
-                                                                                  publicKey:operationalKeypair.publicKey
+                                                                                  publicKey:publicKey
                                                                                       error:&error];
+
+        if (publicKey != NULL) {
+            CFAutorelease(publicKey);
+        }
+
         VerifyOrReturnError(nil == error, MTRErrorToCHIPErrorCode(error), ChipLogError(chipTool, "Can not issue an operational certificate: %@", error));
 
         __auto_type * controllerStorageQueue = dispatch_queue_create("com.chip.storage", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);

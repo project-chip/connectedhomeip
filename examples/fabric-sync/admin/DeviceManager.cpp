@@ -20,6 +20,7 @@
 #include <LinuxCommissionableDataProvider.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
+#include <bridge/include/FabricBridge.h>
 #include <crypto/RandUtils.h>
 #include <lib/support/StringBuilder.h>
 
@@ -33,11 +34,11 @@ namespace admin {
 namespace {
 
 constexpr EndpointId kAggregatorEndpointId = 1;
+constexpr uint16_t kWindowTimeout          = 300;
+constexpr uint16_t kIteration              = 1000;
+constexpr uint16_t kMaxDiscriminatorLength = 4095;
 
 } // namespace
-
-// Define the static member
-DeviceManager DeviceManager::sInstance;
 
 LinuxCommissionableDataProvider sCommissionableDataProvider;
 
@@ -71,11 +72,14 @@ void DeviceManager::UpdateLastUsedNodeId(NodeId nodeId)
 void DeviceManager::SetRemoteBridgeNodeId(chip::NodeId nodeId)
 {
     mRemoteBridgeNodeId = nodeId;
+    ChipLogProgress(NotSpecified, "Set remote bridge NodeId:" ChipLogFormatX64, ChipLogValueX64(mRemoteBridgeNodeId));
+}
 
-    if (mRemoteBridgeNodeId != kUndefinedNodeId)
-    {
-        mCommissionerControl.Init(PairingManager::Instance().CurrentCommissioner(), mRemoteBridgeNodeId, kAggregatorEndpointId);
-    }
+void DeviceManager::AddSyncedDevice(const SyncedDevice & device)
+{
+    mSyncedDevices.insert(device);
+    ChipLogProgress(NotSpecified, "Added synced device: NodeId:" ChipLogFormatX64 ", EndpointId %u",
+                    ChipLogValueX64(device.GetNodeId()), device.GetEndpointId());
 }
 
 SyncedDevice * DeviceManager::FindDeviceByEndpoint(EndpointId endpointId)
@@ -100,6 +104,39 @@ SyncedDevice * DeviceManager::FindDeviceByNode(NodeId nodeId)
         }
     }
     return nullptr;
+}
+
+void DeviceManager::RemoveSyncedDevice(chip::ScopedNodeId scopedNodeId)
+{
+    NodeId nodeId = scopedNodeId.GetNodeId();
+
+    if (bridge::FabricBridge::Instance().RemoveSynchronizedDevice(scopedNodeId) != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to remove Node ID:" ChipLogFormatX64, ChipLogValueX64(nodeId));
+    }
+
+    SyncedDevice * device = FindDeviceByNode(nodeId);
+    if (device == nullptr)
+    {
+        ChipLogProgress(NotSpecified, "No device found with NodeId:" ChipLogFormatX64, ChipLogValueX64(nodeId));
+        return;
+    }
+
+    mSyncedDevices.erase(*device);
+    ChipLogProgress(NotSpecified, "Removed synced device: NodeId:" ChipLogFormatX64 ", EndpointId %u",
+                    ChipLogValueX64(device->GetNodeId()), device->GetEndpointId());
+}
+
+void DeviceManager::InitCommissionerControl()
+{
+    if (mRemoteBridgeNodeId != kUndefinedNodeId)
+    {
+        mCommissionerControl.Init(PairingManager::Instance().CurrentCommissioner(), mRemoteBridgeNodeId, kAggregatorEndpointId);
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Failed to initialize the Commissioner Control delegate");
+    }
 }
 
 void DeviceManager::OpenLocalBridgeCommissioningWindow(uint32_t iterations, uint16_t commissioningTimeoutSec,
@@ -135,79 +172,44 @@ void DeviceManager::OpenLocalBridgeCommissioningWindow(uint32_t iterations, uint
     }
 }
 
-CHIP_ERROR DeviceManager::PairRemoteFabricBridge(NodeId nodeId, uint32_t setupPINCode, const char * deviceRemoteIp,
-                                                 uint16_t deviceRemotePort)
+void DeviceManager::OpenDeviceCommissioningWindow(ScopedNodeId scopedNodeId, uint32_t iterations, uint16_t commissioningTimeoutSec,
+                                                  uint16_t discriminator, const ByteSpan & salt, const ByteSpan & verifier)
 {
-    CHIP_ERROR err = PairingManager::Instance().PairDevice(nodeId, setupPINCode, deviceRemoteIp, deviceRemotePort);
+    // PairingManager isn't currently capable of OpenCommissioningWindow on a device of a fabric that it doesn't have
+    // the controller for. Currently no implementation need this functionality, but should they need it they will hit
+    // the verify or die below and it will be the responsiblity of whoever requires that functionality to implement.
+    VerifyOrDie(PairingManager::Instance().CurrentCommissioner().GetFabricIndex() == scopedNodeId.GetFabricIndex());
+    ChipLogProgress(NotSpecified, "Opening commissioning window for Node ID: " ChipLogFormatX64,
+                    ChipLogValueX64(scopedNodeId.GetNodeId()));
 
+    // Open the commissioning window of a device within its own fabric.
+    CHIP_ERROR err = PairingManager::Instance().OpenCommissioningWindow(
+        scopedNodeId.GetNodeId(), kRootEndpointId, commissioningTimeoutSec, iterations, discriminator, salt, verifier);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified,
-                     "Failed to pair remote fabric bridge: Node ID " ChipLogFormatX64 " with error: %" CHIP_ERROR_FORMAT,
-                     ChipLogValueX64(nodeId), err.Format());
-        return err;
+        ChipLogError(NotSpecified, "Failed to open commissioning window: %s", ErrorStr(err));
     }
-
-    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceManager::PairRemoteDevice(NodeId nodeId, const char * payload)
+void DeviceManager::OpenRemoteDeviceCommissioningWindow(EndpointId remoteEndpointId)
 {
-    CHIP_ERROR err = PairingManager::Instance().PairDeviceWithCode(nodeId, payload);
+    // Open the commissioning window of a device from another fabric via its fabric bridge.
+    // This method constructs and sends a command to open the commissioning window for a device
+    // that is part of a different fabric, accessed through a fabric bridge.
 
+    // Use random discriminator to have less chance of collision.
+    uint16_t discriminator =
+        Crypto::GetRandU16() % (kMaxDiscriminatorLength + 1); // Include the upper limit kMaxDiscriminatorLength
+
+    ByteSpan emptySalt;
+    ByteSpan emptyVerifier;
+
+    CHIP_ERROR err = PairingManager::Instance().OpenCommissioningWindow(mRemoteBridgeNodeId, remoteEndpointId, kWindowTimeout,
+                                                                        kIteration, discriminator, emptySalt, emptyVerifier);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Failed to pair device: Node ID " ChipLogFormatX64 " with error: %" CHIP_ERROR_FORMAT,
-                     ChipLogValueX64(nodeId), err.Format());
-        return err;
+        ChipLogError(NotSpecified, "Failed to open commissioning window: %s", ErrorStr(err));
     }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceManager::PairRemoteDevice(NodeId nodeId, uint32_t setupPINCode, const char * deviceRemoteIp,
-                                           uint16_t deviceRemotePort)
-{
-    CHIP_ERROR err = PairingManager::Instance().PairDevice(nodeId, setupPINCode, deviceRemoteIp, deviceRemotePort);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to pair device: Node ID " ChipLogFormatX64 " with error: %" CHIP_ERROR_FORMAT,
-                     ChipLogValueX64(nodeId), err.Format());
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceManager::UnpairRemoteFabricBridge()
-{
-    if (mRemoteBridgeNodeId == kUndefinedNodeId)
-    {
-        ChipLogError(NotSpecified, "Remote bridge node ID is undefined; cannot unpair device.");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    CHIP_ERROR err = PairingManager::Instance().UnpairDevice(mRemoteBridgeNodeId);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to unpair remote bridge device " ChipLogFormatX64, ChipLogValueX64(mRemoteBridgeNodeId));
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceManager::UnpairRemoteDevice(NodeId nodeId)
-{
-    CHIP_ERROR err = PairingManager::Instance().UnpairDevice(nodeId);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to unpair remote device " ChipLogFormatX64, ChipLogValueX64(nodeId));
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
 }
 
 void DeviceManager::SubscribeRemoteFabricBridge()
@@ -219,8 +221,9 @@ void DeviceManager::SubscribeRemoteFabricBridge()
 
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Failed to subscribe to the remote bridge (NodeId: %lu). Error: %" CHIP_ERROR_FORMAT,
-                     mRemoteBridgeNodeId, error.Format());
+        ChipLogError(NotSpecified,
+                     "Failed to subscribe to the remote bridge (NodeId: " ChipLogFormatX64 "). Error: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(mRemoteBridgeNodeId), error.Format());
         return;
     }
 }
@@ -243,8 +246,9 @@ void DeviceManager::ReadSupportedDeviceCategories()
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified,
-                     "Failed to read SupportedDeviceCategories from the remote bridge (NodeId: %lu). Error: %" CHIP_ERROR_FORMAT,
-                     mRemoteBridgeNodeId, error.Format());
+                     "Failed to read SupportedDeviceCategories from the remote bridge (NodeId: " ChipLogFormatX64
+                     "). Error: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(mRemoteBridgeNodeId), error.Format());
     }
 }
 
@@ -285,8 +289,9 @@ void DeviceManager::RequestCommissioningApproval()
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified,
-                     "Failed to request commissioning-approval to the remote bridge (NodeId: %lu). Error: %" CHIP_ERROR_FORMAT,
-                     mRemoteBridgeNodeId, error.Format());
+                     "Failed to request commissioning-approval to the remote bridge (NodeId: " ChipLogFormatX64
+                     "). Error: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(mRemoteBridgeNodeId), error.Format());
         return;
     }
 
@@ -381,13 +386,14 @@ void DeviceManager::HandleAttributePartsListUpdate(TLV::TLVReader & data)
     for (const auto & endpoint : addedEndpoints)
     {
         // print to console
-        fprintf(stderr, "A new device is added on Endpoint: %u\n", endpoint);
+        fprintf(stderr, "A new endpoint %u is added on the remote bridge\n", endpoint);
     }
 
     // Process removed endpoints
     for (const auto & endpoint : removedEndpoints)
     {
-        ChipLogProgress(NotSpecified, "Endpoint removed: %u", endpoint);
+        // print to console
+        fprintf(stderr, "Endpoint %u removed from the remote bridge\n", endpoint);
 
         SyncedDevice * device = FindDeviceByEndpoint(endpoint);
 
@@ -408,8 +414,9 @@ void DeviceManager::SendCommissionNodeRequest(uint64_t requestId, uint16_t respo
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified,
-                     "Failed to send CommissionNode command to the remote bridge (NodeId: %lu). Error: %" CHIP_ERROR_FORMAT,
-                     mRemoteBridgeNodeId, error.Format());
+                     "Failed to send CommissionNode command to the remote bridge (NodeId: " ChipLogFormatX64
+                     "). Error: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(mRemoteBridgeNodeId), error.Format());
         return;
     }
 }

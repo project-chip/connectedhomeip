@@ -182,7 +182,7 @@ ninja -C "$OUTPUT_ROOT" python_wheels
 WHEEL=("$OUTPUT_ROOT"/controller/python/chip*.whl)
 
 # Add the matter_testing_infrastructure wheel
-WHEEL+=("$OUTPUT_ROOT"/python/obj/src/python_testing/matter_testing_infrastructure/chip-testing._build_wheel/chip_testing-*.whl)
+WHEEL+=("$OUTPUT_ROOT"/obj/src/python_testing/matter_testing_infrastructure/chip-testing._build_wheel/chip_testing*.whl)
 
 if [ "$install_pytest_requirements" = "yes" ]; then
     # Add the matter_yamltests_distribution wheel

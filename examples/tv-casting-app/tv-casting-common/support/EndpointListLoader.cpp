@@ -130,7 +130,8 @@ CHIP_ERROR EndpointListLoader::Load()
 
     if (!isLoadingRequired)
     {
-        ChipLogProgress(AppServer, "EndpointListLoader::Load found no new endpoints to load");
+        ChipLogProgress(AppServer,
+                        "EndpointListLoader::Load() found no new endpoints to load. Calling EndpointListLoader::Complete()");
         mPendingAttributeReads = 0;
         Complete();
     }
@@ -172,16 +173,32 @@ void EndpointListLoader::Complete()
         mNewEndpointsToLoad  = 0;
 
         // done loading endpoints, store TargetCastingPlayer
+        ChipLogProgress(AppServer, "EndpointListLoader::Complete() Calling CastingStore::AddOrUpdate()");
         CHIP_ERROR err = support::CastingStore::GetInstance()->AddOrUpdate(*CastingPlayer::GetTargetCastingPlayer());
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "CastingStore::AddOrUpdate() failed. Err: %" CHIP_ERROR_FORMAT, err.Format());
         }
 
-        // callback client OnCompleted
+        // Only trigger OnCompleted callback for target CastingPlayer when it has loaded endpoints (count >= 1)
+        // Note: After initial commissioning (kCommissioningComplete event), endpoints will be 0.
+        // CastingPlayer Endpoints are populated later, after receiving the kBindingsChangedViaCluster device event.
         VerifyOrReturn(CastingPlayer::GetTargetCastingPlayer()->mOnCompleted,
-                       ChipLogError(AppServer, "EndpointListLoader::Complete() mOnCompleted() not found"));
-        CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(CHIP_NO_ERROR, CastingPlayer::GetTargetCastingPlayer());
+                       ChipLogError(AppServer, "EndpointListLoader::Complete() OnCompleted() not found"));
+
+        std::vector<matter::casting::memory::Strong<matter::casting::core::Endpoint>> endpoints =
+            CastingPlayer::GetTargetCastingPlayer()->GetEndpoints();
+        if (!endpoints.empty())
+        {
+            ChipLogProgress(AppServer,
+                            "EndpointListLoader::Complete() Target CastingPlayer endpoints: %d, calling client's OnCompleted()",
+                            static_cast<int>(endpoints.size()));
+            CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(CHIP_NO_ERROR, CastingPlayer::GetTargetCastingPlayer());
+        }
+        else
+        {
+            ChipLogProgress(AppServer, "EndpointListLoader::Complete() Target CastingPlayer endpoints pending setup.");
+        }
     }
 }
 

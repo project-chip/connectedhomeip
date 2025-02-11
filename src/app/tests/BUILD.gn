@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -210,6 +210,8 @@ chip_test_suite("tests") {
     "TestConcreteAttributePath.cpp",
     "TestDataModelSerialization.cpp",
     "TestDefaultOTARequestorStorage.cpp",
+    "TestDefaultSafeAttributePersistenceProvider.cpp",
+    "TestDefaultTermsAndConditionsProvider.cpp",
     "TestDefaultThreadNetworkDirectoryStorage.cpp",
     "TestEcosystemInformationCluster.cpp",
     "TestEventLoggingNoUTCTime.cpp",
@@ -242,18 +244,20 @@ chip_test_suite("tests") {
     ":ecosystem-information-test-srcs",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
-    ":power-cluster-test-srcs",
     ":thread-network-directory-test-srcs",
     ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
-    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
+    "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/icd/client:manager",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server:terms_and_conditions",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/data-model-providers/codegen:instance-header",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support:test_utils",
@@ -305,10 +309,9 @@ chip_test_suite("tests") {
     test_sources += [ "TestClusterStateCache.cpp" ]
   }
 
-  # On NRF, Open IoT SDK and fake platforms we do not have a realtime clock available, so
-  # TestEventLogging.cpp would be testing the same thing as
-  # TestEventLoggingNoUTCTime, but it's not set up to deal with the timestamps
-  # being that low.
+  # On NRF, Open IoT SDK and fake platforms we do not have a realtime clock available,
+  # so TestEventLogging.cpp would be testing the same thing as TestEventLoggingNoUTCTime,
+  # but it's not set up to deal with the timestamps being that low.
   if (chip_device_platform != "nrfconnect" &&
       chip_device_platform != "openiotsdk" && chip_device_platform != "fake") {
     test_sources += [ "TestEventLogging.cpp" ]

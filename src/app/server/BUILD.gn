@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,22 @@ config("server_config") {
   }
 }
 
+source_set("terms_and_conditions") {
+  sources = [
+    "DefaultTermsAndConditionsProvider.cpp",
+    "DefaultTermsAndConditionsProvider.h",
+    "TermsAndConditionsManager.cpp",
+    "TermsAndConditionsManager.h",
+    "TermsAndConditionsProvider.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/protocols",
+  ]
+}
+
 static_library("server") {
   output_name = "libCHIPAppServer"
 
@@ -41,8 +57,6 @@ static_library("server") {
     "Dnssd.h",
     "EchoHandler.cpp",
     "EchoHandler.h",
-    "OnboardingCodesUtil.cpp",
-    "OnboardingCodesUtil.h",
     "Server.cpp",
     "Server.h",
   ]
@@ -55,19 +69,22 @@ static_library("server") {
     "${chip_root}/src/access",
     "${chip_root}/src/access:provider-impl",
     "${chip_root}/src/app",
+    "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/icd/server:observer",
-    "${chip_root}/src/app/util/persistence",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/lib/dnssd:naming",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
     "${chip_root}/src/protocols",
-    "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
+
+  if (chip_terms_and_conditions_required) {
+    public_deps += [ ":terms_and_conditions" ]
+  }
 
   # TODO: Server.cpp uses TestGroupData.h. Unsure why test code would be in such a central place
   #       This dependency is split since it should probably be removed (or naming should

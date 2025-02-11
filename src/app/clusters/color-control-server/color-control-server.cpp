@@ -1264,10 +1264,13 @@ EmberEventControl * ColorControlServer::configureHSVEventControl(EndpointId endp
  * @param saturation Target saturation
  * @param transitionTime Transition time in 10th of seconds
  * @return Status::Success When successful,
- *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a saturation transition state.
+ *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a saturation transition state,
+ *         Status::ConstraintError if the saturation or tansitionTime are above maximum.
  */
 Status ColorControlServer::moveToSaturation(EndpointId endpoint, uint8_t saturation, uint16_t transitionTime)
 {
+    VerifyOrReturnError(saturation <= MAX_SATURATION_VALUE, Status::ConstraintError);
+    VerifyOrReturnError(transitionTime <= kMaxTransitionTime, Status::ConstraintError);
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
     VerifyOrReturnError(nullptr != colorSaturationTransitionState, Status::UnsupportedEndpoint);
 
@@ -1307,6 +1310,7 @@ Status ColorControlServer::moveToSaturation(EndpointId endpoint, uint8_t saturat
  * was called by MoveHue command and rate is a uint8 value.
  * @return Status::Success When successful,
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a saturation transition state,
+ *         Status::ConstraintError if the hue, saturation or transitionTime, are above maximum.
  */
 Status ColorControlServer::moveToHueAndSaturation(EndpointId endpoint, uint16_t hue, uint8_t saturation, uint16_t transitionTime,
                                                   bool isEnhanced)
@@ -1314,6 +1318,10 @@ Status ColorControlServer::moveToHueAndSaturation(EndpointId endpoint, uint16_t 
     uint16_t currentHue = 0;
     uint16_t halfWay    = isEnhanced ? HALF_MAX_UINT16T : HALF_MAX_UINT8T;
     bool moveUp;
+
+    VerifyOrReturnError((isEnhanced || hue <= MAX_HUE_VALUE), Status::ConstraintError);
+    VerifyOrReturnError(saturation <= MAX_SATURATION_VALUE, Status::ConstraintError);
+    VerifyOrReturnError(transitionTime <= kMaxTransitionTime, Status::ConstraintError);
 
     uint16_t epIndex                                         = getEndpointIndex(endpoint);
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionStateByIndex(epIndex);
@@ -1502,10 +1510,11 @@ Status ColorControlServer::moveToHueCommand(EndpointId endpoint, uint16_t hue, D
                                             bool isEnhanced)
 {
     MATTER_TRACE_SCOPE("moveToHue", "ColorControl");
-    VerifyOrReturnValue(moveDirection != DirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
-
     // Command Parameters constraint checks:
     VerifyOrReturnValue((isEnhanced || hue <= MAX_HUE_VALUE), Status::ConstraintError);
+    VerifyOrReturnValue(transitionTime <= kMaxTransitionTime, Status::ConstraintError);
+
+    VerifyOrReturnValue(moveDirection != DirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
 
     ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionState(endpoint);
     VerifyOrReturnValue(colorHueTransitionState != nullptr, Status::UnsupportedEndpoint);
@@ -1612,7 +1621,6 @@ Status ColorControlServer::moveToHueCommand(EndpointId endpoint, uint16_t hue, D
  * was called by MoveHue command and rate is a uint8 value.
  * @return Status::Success when successful,
  *         Status::ConstraintError when the other parameters are outside their defined value range.
-
  */
 Status ColorControlServer::moveToHueAndSaturationCommand(EndpointId endpoint, uint16_t hue, uint8_t saturation,
                                                          uint16_t transitionTime, BitMask<OptionsBitmap> optionsMask,
@@ -1622,6 +1630,7 @@ Status ColorControlServer::moveToHueAndSaturationCommand(EndpointId endpoint, ui
     // Command Parameters constraint checks:
     VerifyOrReturnValue((isEnhanced || hue <= MAX_HUE_VALUE), Status::ConstraintError);
     VerifyOrReturnValue(saturation <= MAX_SATURATION_VALUE, Status::ConstraintError);
+    VerifyOrReturnValue(transitionTime <= kMaxTransitionTime, Status::ConstraintError);
 
     VerifyOrReturnValue(shouldExecuteIfOff(endpoint, optionsMask, optionsOverride), Status::Success);
 
@@ -1646,12 +1655,19 @@ Status ColorControlServer::moveToHueAndSaturationCommand(EndpointId endpoint, ui
  * @return Status::Success when successful,
  *         Status::InvalidCommand when StepSize is 0 or an unknown HueStepMode is provided
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a hue transition state.
+ *         Status::ConstraintError when the other parameters are outside their defined value range.
  */
 Status ColorControlServer::stepHueCommand(EndpointId endpoint, HueStepMode stepMode, uint16_t stepSize, uint16_t transitionTime,
                                           BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride,
                                           bool isEnhanced)
 {
     MATTER_TRACE_SCOPE("stepHue", "ColorControl");
+    // Command Parameters constraint checks:
+    // The non-enhanced variant passed a uint8 type for transitionTime and the full range (0-255) is allowed
+    if (isEnhanced)
+    {
+        VerifyOrReturnValue(transitionTime <= kMaxTransitionTime, Status::ConstraintError);
+    }
     // Confirm validity of the step mode and step size received
     VerifyOrReturnValue(stepMode != HueStepMode::kUnknownEnumValue, Status::InvalidCommand);
     VerifyOrReturnValue(stepSize != 0, Status::InvalidCommand);
@@ -1787,7 +1803,8 @@ Status ColorControlServer::moveSaturationCommand(EndpointId endpoint, const Comm
  * @param commandData Struct containing the parameters of the command.
  * @return Status::Success when successful,
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a saturation transition state (verified in
- * moveToSaturation function) Status::ConstraintError when a command parameters is outside its defined value range.
+ * moveToSaturation function)
+ *         Status::ConstraintError when a command parameter is outside its defined value range.
  */
 Status ColorControlServer::moveToSaturationCommand(EndpointId endpoint,
                                                    const Commands::MoveToSaturation::DecodableType & commandData)
@@ -1795,6 +1812,7 @@ Status ColorControlServer::moveToSaturationCommand(EndpointId endpoint,
     MATTER_TRACE_SCOPE("moveToSaturation", "ColorControl");
     // Command Parameters constraint checks:
     VerifyOrReturnValue(commandData.saturation <= MAX_SATURATION_VALUE, Status::ConstraintError);
+    VerifyOrReturnValue(commandData.transitionTime <= kMaxTransitionTime, Status::ConstraintError);
 
     VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
     Status status = moveToSaturation(endpoint, commandData.saturation, commandData.transitionTime);
@@ -1810,7 +1828,7 @@ Status ColorControlServer::moveToSaturationCommand(EndpointId endpoint,
  * @param commandData Struct containing the parameters of the command.
  * @return Status::Success when successful,
  *         Status::InvalidCommand when a step size of 0 or an unknown SaturationStepMode is provided
- *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a saturation transition state.
+ *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a saturation transition state,
  */
 Status ColorControlServer::stepSaturationCommand(EndpointId endpoint, const Commands::StepSaturation::DecodableType & commandData)
 {
@@ -1861,7 +1879,7 @@ Status ColorControlServer::stepSaturationCommand(EndpointId endpoint, const Comm
  * @param commandData Struct containing the parameters of the command.
  * @return Status::Success when successful,
  *         Status::InvalidCommand when an unknown action or direction is provided
- *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a hue transition state.
+ *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a hue transition state,
  */
 Status ColorControlServer::colorLoopCommand(EndpointId endpoint, const Commands::ColorLoopSet::DecodableType & commandData)
 {
@@ -2146,10 +2164,18 @@ EmberEventControl * ColorControlServer::configureXYEventControl(EndpointId endpo
  * @param colorX target X
  * @param colorY target Y
  * @param transitionTime transition time in 10th of seconds
- * @return Status::Success if successful,Status::UnsupportedEndpoint XY is not supported on the endpoint
+ * @return Status::Success if successful,
+ * @return Status::Success when successful,
+ *         Status::UnsupportedEndpoint XY is not supported on the endpoint,
+ *         Status::ConstraintError when a command parameter is outside its defined value range.
  */
 Status ColorControlServer::moveToColor(EndpointId endpoint, uint16_t colorX, uint16_t colorY, uint16_t transitionTime)
 {
+    // Command Parameters constraint checks:
+    VerifyOrReturnValue(colorX <= MAX_CIE_XY_VALUE, Status::ConstraintError);
+    VerifyOrReturnValue(colorY <= MAX_CIE_XY_VALUE, Status::ConstraintError);
+    VerifyOrReturnValue(transitionTime <= kMaxTransitionTime, Status::ConstraintError);
+
     uint16_t epIndex                                = getEndpointIndex(endpoint);
     Color16uTransitionState * colorXTransitionState = getXTransitionStateByIndex(epIndex);
     Color16uTransitionState * colorYTransitionState = getYTransitionStateByIndex(epIndex);
@@ -2201,9 +2227,15 @@ Status ColorControlServer::moveToColor(EndpointId endpoint, uint16_t colorX, uin
  * @return Status::Success when successful,
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a Color XY transition state (verified in
  * moveToColor function),
+ *         Status::ConstraintError when a command parameter is outside its defined value range.
  */
 Status ColorControlServer::moveToColorCommand(EndpointId endpoint, const Commands::MoveToColor::DecodableType & commandData)
 {
+    // Command Parameters constraint checks:
+    VerifyOrReturnValue(commandData.colorX <= MAX_CIE_XY_VALUE, Status::ConstraintError);
+    VerifyOrReturnValue(commandData.colorY <= MAX_CIE_XY_VALUE, Status::ConstraintError);
+    VerifyOrReturnValue(commandData.transitionTime <= kMaxTransitionTime, Status::ConstraintError);
+
     VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
 
     Status status = moveToColor(endpoint, commandData.colorX, commandData.colorY, commandData.transitionTime);
@@ -2302,10 +2334,14 @@ Status ColorControlServer::moveColorCommand(EndpointId endpoint, const Commands:
  * @param commandData Struct containing the parameters of the command
  * @return Status::Success when successful,
  *         Status::InvalidCommand when a step X and Y of 0 is provided
- *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a Color XY transition state.
+ *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a Color XY transition state,
+ *         Status::ConstraintError when a command parameter is outside its defined value range.
  */
 Status ColorControlServer::stepColorCommand(EndpointId endpoint, const Commands::StepColor::DecodableType & commandData)
 {
+    // Command Parameters constraint checks:
+    VerifyOrReturnValue(commandData.transitionTime <= kMaxTransitionTime, Status::ConstraintError);
+
     VerifyOrReturnValue(commandData.stepX != 0 || commandData.stepY != 0, Status::InvalidCommand);
 
     uint16_t epIndex                                = getEndpointIndex(endpoint);
@@ -2440,8 +2476,11 @@ ColorControlServer::Color16uTransitionState * ColorControlServer::getTempTransit
  */
 Status ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t colorTemperature, uint16_t transitionTime)
 {
-    EndpointId endpoint = aEndpoint;
+    // Command Parameters constraint checks:
+    VerifyOrReturnValue(colorTemperature <= kMaxColorTemperatureMireds, Status::ConstraintError);
+    VerifyOrReturnValue(transitionTime <= kMaxTransitionTime, Status::ConstraintError);
 
+    EndpointId endpoint                                = aEndpoint;
     Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
     VerifyOrReturnError(nullptr != colorTempTransitionState, Status::UnsupportedEndpoint);
 
@@ -2638,10 +2677,15 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
  * @return Status::Success when successful,
  *         Status::InvalidCommand when a rate of 0 for a non-stop move or an unknown HueMoveMode is provided
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a color temp transition state.
+ *         Status::ConstraintError when a command parameter is outside its defined value range.
  */
 Status ColorControlServer::moveColorTempCommand(EndpointId endpoint,
                                                 const Commands::MoveColorTemperature::DecodableType & commandData)
 {
+    // Command Parameters constraint checks:
+    VerifyOrReturnValue(commandData.colorTemperatureMinimumMireds <= kMaxColorTemperatureMireds, Status::ConstraintError);
+    VerifyOrReturnValue(commandData.colorTemperatureMaximumMireds <= kMaxColorTemperatureMireds, Status::ConstraintError);
+
     // check moveMode and rate before any operation is done on the transition states
     // rate value is ignored if the MoveMode is stop
     VerifyOrReturnValue(commandData.moveMode != HueMoveMode::kUnknownEnumValue, Status::InvalidCommand);
@@ -2734,11 +2778,16 @@ Status ColorControlServer::moveColorTempCommand(EndpointId endpoint,
  * @param commandData Struct containing the parameters of the command.
  * @return Status::Success when successful,
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a color XY transition state (verified in
- * moveToColorTemp function).
+ * moveToColorTemp function),
+ *         Status::ConstraintError when a command parameter is outside its defined value range.
  */
 Status ColorControlServer::moveToColorTempCommand(EndpointId endpoint,
                                                   const Commands::MoveToColorTemperature::DecodableType & commandData)
 {
+    // Command Parameters constraint checks:
+    VerifyOrReturnValue(commandData.colorTemperatureMireds <= kMaxColorTemperatureMireds, Status::ConstraintError);
+    VerifyOrReturnValue(commandData.transitionTime <= kMaxTransitionTime, Status::ConstraintError);
+
     VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
 
     Status status = moveToColorTemp(endpoint, commandData.colorTemperatureMireds, commandData.transitionTime);
@@ -2754,11 +2803,17 @@ Status ColorControlServer::moveToColorTempCommand(EndpointId endpoint,
  * @param commandData Struct containing the parameters of the command
  * @return Status::Success when successful,
  *         Status::InvalidCommand when stepSize is 0 or an unknown stepMode is provided
- *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a color temp transition state.
+ *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a color temp transition state,
+ *         Status::ConstraintError when a command parameter is outside its defined value range.
  */
 Status ColorControlServer::stepColorTempCommand(EndpointId endpoint,
                                                 const Commands::StepColorTemperature::DecodableType & commandData)
 {
+    // Command Parameters constraint checks:
+    VerifyOrReturnValue(commandData.transitionTime <= kMaxTransitionTime, Status::ConstraintError);
+    VerifyOrReturnValue(commandData.colorTemperatureMinimumMireds <= kMaxColorTemperatureMireds, Status::ConstraintError);
+    VerifyOrReturnValue(commandData.colorTemperatureMaximumMireds <= kMaxColorTemperatureMireds, Status::ConstraintError);
+
     // Confirm validity of the step mode and step size received
     VerifyOrReturnValue(commandData.stepMode != HueStepMode::kUnknownEnumValue, Status::InvalidCommand);
     VerifyOrReturnValue(commandData.stepSize != 0, Status::InvalidCommand);

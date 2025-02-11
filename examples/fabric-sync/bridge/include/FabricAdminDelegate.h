@@ -31,6 +31,18 @@ public:
     virtual ~FabricAdminDelegate() = default;
 
     /**
+     * Opens a commissioning window for a specified node using pre-computed PAKE passcode verifier.
+     *
+     * @param params    Params for opening the commissioning window using verifier.
+     * @return CHIP_ERROR An error code indicating the success or failure of the operation.
+     * - CHIP_NO_ERROR: The RPC command was successfully sent.
+     * - CHIP_ERROR_BUSY: Another commissioning window is currently in progress.
+     * - CHIP_ERROR_INTERNAL: An internal error occurred.
+     */
+    virtual CHIP_ERROR OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams params,
+                                               chip::FabricIndex fabricIndex) = 0;
+
+    /**
      * Reverse commission a bridge using the specified parameters.
      *
      * This function initiates the commissioning process for a bridge node, utilizing
@@ -49,6 +61,19 @@ public:
     virtual CHIP_ERROR CommissionRemoteBridge(chip::Controller::CommissioningWindowPasscodeParams params, chip::VendorId vendorId,
                                               uint16_t productId) = 0;
 
+    /**
+     * Sends a request to keep a device active for a specified duration.
+     *
+     * @param ScopedNodeId          Identifies the target node within the fabric.
+     * @param StayActiveDurationMs  The duration for which the device should stay active.
+     * @param TimeoutMs             Timeout for the operation.
+     *
+     * @return CHIP_ERROR An error code indicating the success or failure of the
+     * operation.
+     * - CHIP_NO_ERROR: Request processed successfully.
+     * - CHIP_ERROR_INTERNAL: An internal error occurred during the preparation or sending
+     * of the command.
+     */
     virtual CHIP_ERROR KeepActive(chip::ScopedNodeId scopedNodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs) = 0;
 };
 

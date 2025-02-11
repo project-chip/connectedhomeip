@@ -80,30 +80,30 @@ defined:
 
 ## Building
 
-    ### For Linux host example:
+-   For Linux host example:
 
-    ```
+    ```sh
     source scripts/activate.sh
     ./scripts/build/build_examples.py --target linux-x64-fabric-sync-no-ble build
     ```
 
-    ### For Raspberry Pi 4 example:
+-   For Raspberry Pi 4 example:
 
     Pull Docker Images
 
-    ```
-    docker pull ghcr.io/project-chip/chip-build-crosscompile:90
+    ```sh
+    docker pull ghcr.io/project-chip/chip-build-crosscompile:112
     ```
 
     Run docker
 
-    ```
-    docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:90 /bin/bash
+    ```sh
+    docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:112 /bin/bash
     ```
 
     Build
 
-    ```
+    ```sh
     cd /var/connectedhomeip
 
     git config --global --add safe.directory /var/connectedhomeip
@@ -116,7 +116,7 @@ defined:
 
     Transfer the fabric-bridge-app binary to a Raspberry Pi
 
-    ```
+    ```sh
     scp ./fabric-sync ubuntu@xxx.xxx.xxx.xxx:/home/ubuntu
     ```
 
@@ -126,9 +126,60 @@ defined:
 
     Follow [Building](#building) section of this document.
 
--   Run Linux Fabric Sync Example App
+-   Run Linux Fabric Sync Example App on two Linux machine E1 and E2
 
     ```sh
+    sudo rm -rf /tmp/chip_*
     cd ~/connectedhomeip/
-    sudo out/debug/fabric-sync
+    out/debug/fabric-sync
+    ```
+
+-   Initiate the FS Setup Process from E1 to E2
+
+    ```sh
+    > app add-bridge 1 20202021 192.168.86.246 5540
+    Done
+    > New device with Node ID: 0000000000000001 has been successfully added.
+    A new device has been added on Endpoint: 2.
+    ```
+
+-   Verify Reverse Commissioning of the Fabric-Bridge from E1 on E2
+
+    ```sh
+    > New device with Node ID: 0000000000000002 has been successfully added.
+    ```
+
+-   Pair Light Example to E2
+
+    Since Fabric-Bridge also functions as a Matter server, running it alongside
+    the Light Example app on the same machine would cause conflicts. Therefore,
+    you need to run the Matter Light Example app on a separate physical machine
+    from the one hosting Fabric-Sync.
+
+    ```sh
+    > app add-device 3 <setup-pin-code> <device-remote-ip> <device-remote-port>
+    ```
+
+    After the device is successfully added, you will observe the following
+    message on E2 with the newly assigned Node ID:
+
+    ```sh
+    > New device with Node ID: 0x3 has been successfully added.
+    ```
+
+    Additionally, you should also get notified when a new device is added to E2
+    from the E1:
+
+    ```sh
+    > A new device is added on Endpoint 3.
+    ```
+
+-   Synchronize Light Example to E1
+
+    After the Light Example is successfully paired in E2, we can start to
+    synchronize the light device to E1 using the new assigned dynamic endpointid
+    on Ecosystem 2.
+
+    ```sh
+    > app sync-device <endpointid>
     ```

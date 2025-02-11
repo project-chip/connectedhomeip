@@ -72,10 +72,6 @@ static bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttr
 
 // If server == true, returns the number of server clusters,
 // otherwise number of client clusters on the endpoint at the given index.
-static uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * endpointType, bool server);
-
-// If server == true, returns the number of server clusters,
-// otherwise number of client clusters on the endpoint at the given index.
 static uint8_t emberAfClusterCountByIndex(uint16_t endpointIndex, bool server);
 
 // Check whether there is an endpoint defined with the given endpoint id that is
@@ -1413,6 +1409,20 @@ bool IsTreeCompositionForEndpoint(EndpointId endpoint)
         return false;
     }
     return emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isTreeComposition);
+}
+
+EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
+{
+    VerifyOrReturnValue(endpointIndex < ArraySize(emAfEndpoints), EndpointComposition::kInvalid);
+    if (emAfEndpoints[endpointIndex].bitmask.Has(EmberAfEndpointOptions::isFlatComposition))
+    {
+        return EndpointComposition::kFullFamily;
+    }
+    if (emAfEndpoints[endpointIndex].bitmask.Has(EmberAfEndpointOptions::isTreeComposition))
+    {
+        return EndpointComposition::kTree;
+    }
+    return EndpointComposition::kInvalid;
 }
 
 } // namespace app

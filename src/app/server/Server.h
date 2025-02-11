@@ -24,6 +24,7 @@
 #include <access/examples/ExampleAccessControlDelegate.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
+#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/FailSafeContext.h>
 #include <app/OperationalSessionSetupPool.h>
 #include <app/SimpleSubscriptionResumptionStorage.h>
@@ -79,11 +80,6 @@
 #include <app/icd/server/ICDCheckInBackOffStrategy.h>        // nogncheck
 #endif                                                       // CHIP_CONFIG_ENABLE_ICD_CIP
 #endif                                                       // CHIP_CONFIG_ENABLE_ICD_SERVER
-
-// TODO: https://github.com/project-chip/connectedhomeip/issues/36472
-//       this strongly couples Server to Ember and this dependency should
-//       be removed
-#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 
 namespace chip {
 
@@ -192,6 +188,11 @@ struct ServerInitParams
     // If the ICD Check-In protocol use-case is supported and no strategy is provided, server will use the default strategy.
     app::ICDCheckInBackOffStrategy * icdCheckInBackOffStrategy = nullptr;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+    // MUST NOT be null during initialization: every application must define the
+    // data model it wants to use. Backwards-compatibility can use `CodegenDataModelProviderInstance`
+    // for ember/zap-generated models.
+    chip::app::DataModel::Provider * dataModelProvider = nullptr;
 };
 
 /**
@@ -411,7 +412,7 @@ public:
 
     Credentials::OperationalCertificateStore * GetOpCertStore() { return mOpCertStore; }
 
-    app::DefaultAttributePersistenceProvider & GetDefaultAttributePersister() { return mAttributePersister; }
+    app::DefaultSafeAttributePersistenceProvider & GetDefaultAttributePersister() { return mAttributePersister; }
 
     app::reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
@@ -684,7 +685,7 @@ private:
     app::SubscriptionResumptionStorage * mSubscriptionResumptionStorage;
     Credentials::GroupDataProvider * mGroupsProvider;
     Crypto::SessionKeystore * mSessionKeystore;
-    app::DefaultAttributePersistenceProvider mAttributePersister;
+    app::DefaultSafeAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;
     ServerFabricDelegate mFabricDelegate;
     app::reporting::ReportScheduler * mReportScheduler;

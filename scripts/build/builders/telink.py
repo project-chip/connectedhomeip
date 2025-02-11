@@ -119,8 +119,9 @@ class TelinkBoard(Enum):
     TLSR9518ADK80D = auto()
     TLSR9528A = auto()
     TLSR9528A_RETENTION = auto()
-    TLSR9258A = auto()
-    TLSR9258A_RETENTION = auto()
+    TL3218X = auto()
+    TL7218X = auto()
+    TL7218X_RETENTION = auto()
 
     def GnArgName(self):
         if self == TelinkBoard.TLRS9118BDK40D:
@@ -131,10 +132,12 @@ class TelinkBoard(Enum):
             return 'tlsr9528a'
         elif self == TelinkBoard.TLSR9528A_RETENTION:
             return 'tlsr9528a_retention'
-        elif self == TelinkBoard.TLSR9258A:
-            return 'tlsr9258a'
-        elif self == TelinkBoard.TLSR9258A_RETENTION:
-            return 'tlsr9258a_retention'
+        elif self == TelinkBoard.TL3218X:
+            return 'tl3218x'
+        elif self == TelinkBoard.TL7218X:
+            return 'tl7218x'
+        elif self == TelinkBoard.TL7218X_RETENTION:
+            return 'tl7218x_retention'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -155,6 +158,7 @@ class TelinkBuilder(Builder):
                  mars_board_config: bool = False,
                  usb_board_config: bool = False,
                  compress_lzma_config: bool = False,
+                 thread_analyzer_config: bool = False,
                  ):
         super(TelinkBuilder, self).__init__(root, runner)
         self.app = app
@@ -168,6 +172,7 @@ class TelinkBuilder(Builder):
         self.mars_board_config = mars_board_config
         self.usb_board_config = usb_board_config
         self.compress_lzma_config = compress_lzma_config
+        self.thread_analyzer_config = thread_analyzer_config
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -214,6 +219,9 @@ class TelinkBuilder(Builder):
 
         if self.compress_lzma_config:
             flags.append("-DCONFIG_COMPRESS_LZMA=y")
+
+        if self.thread_analyzer_config:
+            flags.append("-DCONFIG_THREAD_ANALYZER=y")
 
         if self.options.pregen_dir:
             flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")

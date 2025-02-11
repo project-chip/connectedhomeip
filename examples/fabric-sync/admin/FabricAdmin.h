@@ -18,7 +18,12 @@
 #pragma once
 
 #include "DeviceManager.h"
+#include "IcdManager.h"
+#include "StayActiveSender.h"
 
+#include <app/icd/client/CheckInHandler.h>
+#include <app/icd/client/DefaultCheckInDelegate.h>
+#include <app/icd/client/DefaultICDClientStorage.h>
 #include <bridge/include/FabricAdminDelegate.h>
 #include <map>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -37,16 +42,26 @@ struct ScopedNodeIdHasher
     }
 };
 
-class FabricAdmin final : public bridge::FabricAdminDelegate
+class FabricAdmin final : public bridge::FabricAdminDelegate, public PairingDelegate, public IcdManager::Delegate
 {
 public:
-    static FabricAdmin & Instance();
+    static FabricAdmin & Instance() { return sInstance; }
+    static chip::app::DefaultICDClientStorage & GetDefaultICDClientStorage() { return sICDClientStorage; }
+
+    CHIP_ERROR Init();
+
+    CHIP_ERROR OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams params,
+                                       chip::FabricIndex fabricIndex) override;
 
     CHIP_ERROR
     CommissionRemoteBridge(chip::Controller::CommissioningWindowPasscodeParams params, chip::VendorId vendorId,
                            uint16_t productId) override;
 
     CHIP_ERROR KeepActive(chip::ScopedNodeId scopedNodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs) override;
+
+    void OnCheckInCompleted(const chip::app::ICDClientInfo & clientInfo) override;
+
+    void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err) override;
 
     void ScheduleSendingKeepActiveOnCheckIn(chip::ScopedNodeId scopedNodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs);
 
@@ -84,10 +99,10 @@ private:
     std::unordered_map<chip::ScopedNodeId, KeepActiveDataForCheckIn, ScopedNodeIdHasher> mPendingCheckIn;
 
     static FabricAdmin sInstance;
+    static chip::app::DefaultICDClientStorage sICDClientStorage;
+    static chip::app::CheckInHandler sCheckInHandler;
 
-    bool mInitialized = false;
-
-    void Init() { mInitialized = true; }
+    chip::NodeId mNodeId = chip::kUndefinedNodeId;
 };
 
 } // namespace admin

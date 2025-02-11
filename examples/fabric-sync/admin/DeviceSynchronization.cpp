@@ -91,11 +91,27 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
         }
     }
     break;
+    case Clusters::BasicInformation::Attributes::VendorID::Id: {
+        uint32_t vendorId;
+        if (SuccessOrLog(data->Get(vendorId), "VendorID"))
+        {
+            mCurrentDeviceData.vendorId = static_cast<chip::VendorId>(vendorId);
+        }
+    }
+    break;
     case Clusters::BasicInformation::Attributes::VendorName::Id: {
         char vendorNameBuffer[kBasicInformationAttributeBufSize];
         if (SuccessOrLog(data->GetString(vendorNameBuffer, sizeof(vendorNameBuffer)), "VendorName"))
         {
             mCurrentDeviceData.vendorName = std::string(vendorNameBuffer);
+        }
+    }
+    break;
+    case Clusters::BasicInformation::Attributes::ProductID::Id: {
+        uint32_t productId;
+        if (SuccessOrLog(data->Get(productId), "ProductID"))
+        {
+            mCurrentDeviceData.productId = productId;
         }
     }
     break;
@@ -124,6 +140,14 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
         }
     }
     break;
+    case Clusters::BasicInformation::Attributes::SoftwareVersion::Id: {
+        uint32_t softwareVersion;
+        if (SuccessOrLog(data->Get(softwareVersion), "SoftwareVersion"))
+        {
+            mCurrentDeviceData.softwareVersion = softwareVersion;
+        }
+    }
+    break;
     case Clusters::BasicInformation::Attributes::SoftwareVersionString::Id: {
         char softwareVersionStringBuffer[kBasicInformationAttributeBufSize];
         if (SuccessOrLog(data->GetString(softwareVersionStringBuffer, sizeof(softwareVersionStringBuffer)),
@@ -148,7 +172,7 @@ void DeviceSynchronizer::OnDone(app::ReadClient * apReadClient)
 {
     ChipLogProgress(NotSpecified, "Synchronization complete for NodeId:" ChipLogFormatX64, ChipLogValueX64(mNodeId));
 
-    if (mState == State::ReceivedResponse && !DeviceMgr().IsCurrentBridgeDevice(mNodeId))
+    if (mState == State::ReceivedResponse && !DeviceManager::Instance().IsCurrentBridgeDevice(mNodeId))
     {
         GetUniqueId();
         if (mState == State::GettingUid)
@@ -229,15 +253,15 @@ void DeviceSynchronizer::GetUniqueId()
     // If we have a UniqueId we can return leaving state in ReceivedResponse.
     VerifyOrReturn(!mCurrentDeviceData.uniqueId.has_value(), ChipLogDetail(NotSpecified, "We already have UniqueId"));
 
-    auto * device = DeviceMgr().FindDeviceByNode(mNodeId);
+    auto * device = DeviceManager::Instance().FindDeviceByNode(mNodeId);
     // If there is no associated remote Fabric Sync Aggregator there is no other place for us to try
     // getting the UniqueId from and can return leaving the state in ReceivedResponse.
     VerifyOrReturn(device, ChipLogDetail(NotSpecified, "No remote Fabric Sync Aggregator to get UniqueId from"));
 
     // Because device is not-null we expect IsFabricSyncReady to be true. IsFabricSyncReady indicates we have a
     // connection to the remote Fabric Sync Aggregator.
-    VerifyOrDie(DeviceMgr().IsFabricSyncReady());
-    auto remoteBridgeNodeId               = DeviceMgr().GetRemoteBridgeNodeId();
+    VerifyOrDie(DeviceManager::Instance().IsFabricSyncReady());
+    auto remoteBridgeNodeId               = DeviceManager::Instance().GetRemoteBridgeNodeId();
     EndpointId remoteEndpointIdOfInterest = device->GetEndpointId();
 
     ChipLogDetail(NotSpecified, "Attempting to get UniqueId from remote Fabric Sync Aggregator");
@@ -262,7 +286,7 @@ void DeviceSynchronizer::GetUniqueId()
     }
     else
     {
-        ChipLogDetail(NotSpecified, "Failed to get UniqueId from remote Fabric Sync Aggregator")
+        ChipLogDetail(NotSpecified, "Failed to get UniqueId from remote Fabric Sync Aggregator");
     }
 }
 
@@ -274,7 +298,7 @@ void DeviceSynchronizer::SynchronizationCompleteAddDevice()
     bridge::FabricBridge::Instance().AddSynchronizedDevice(mCurrentDeviceData);
 
     // TODO(#35077) Figure out how we should reflect CADMIN values of ICD.
-    if (!mCurrentDeviceData.isIcd)
+    if (!mCurrentDeviceData.isIcd.value_or(false))
     {
         VerifyOrDie(mController);
         ScopedNodeId scopedNodeId(mNodeId, mController->GetFabricIndex());

@@ -273,6 +273,10 @@ void emberAfInitializeAttributes(chip::EndpointId endpoint);
 // otherwise number of client clusters on this endpoint
 uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server);
 
+// If server == true, returns the number of server clusters,
+// otherwise number of client clusters on the endpoint at the given index.
+uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * endpointType, bool server);
+
 // Returns the cluster of Nth server or client cluster,
 // depending on server toggle.
 const EmberAfCluster * emberAfGetNthCluster(chip::EndpointId endpoint, uint8_t n, bool server);
@@ -377,6 +381,18 @@ bool IsFlatCompositionForEndpoint(EndpointId endpoint);
  * @brief Returns true is an Endpoint has tree composition
  */
 bool IsTreeCompositionForEndpoint(EndpointId endpoint);
+
+enum class EndpointComposition : uint8_t
+{
+    kFullFamily,
+    kTree,
+    kInvalid,
+};
+
+/**
+ * @brief Returns the composition for a given endpoint index
+ */
+EndpointComposition GetCompositionForEndpointIndex(uint16_t index);
 
 } // namespace app
 } // namespace chip

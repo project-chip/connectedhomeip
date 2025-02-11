@@ -45,7 +45,7 @@ CHIP_ERROR BridgedAdministratorCommissioning::Read(const ConcreteReadAttributePa
 {
     VerifyOrDie(aPath.mClusterId == Clusters::AdministratorCommissioning::Id);
     EndpointId endpointId  = aPath.mEndpointId;
-    BridgedDevice * device = BridgeDeviceMgr().GetDevice(endpointId);
+    BridgedDevice * device = BridgedDeviceManager::Instance().GetDevice(endpointId);
 
     if (!device)
     {

@@ -48,6 +48,7 @@ import dacite  # type: ignore
 from . import FabricAdmin
 from . import clusters as Clusters
 from . import discovery
+from .bdx import Bdx
 from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
 from .clusters import Command as ClusterCommand
@@ -1343,6 +1344,36 @@ class ChipDeviceControllerBase():
         # An empty list is the expected return for sending group write attribute.
         return []
 
+    def TestOnlyPrepareToReceiveBdxData(self) -> asyncio.Future:
+        '''
+        Sets up the system to expect a node to initiate a BDX transfer. The transfer will send data here.
+
+        Returns:
+            - a future that will yield a BdxTransfer with the init message from the transfer.
+        '''
+        self.CheckIsActive()
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        Bdx.PrepareToReceiveBdxData(future).raise_on_error()
+        return future
+
+    def TestOnlyPrepareToSendBdxData(self, data: bytes) -> asyncio.Future:
+        '''
+        Sets up the system to expect a node to initiate a BDX transfer. The transfer will send data to the node.
+
+        Returns:
+            - a future that will yield a BdxTransfer with the init message from the transfer.
+        '''
+        self.CheckIsActive()
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        Bdx.PrepareToSendBdxData(future, data).raise_on_error()
+        return future
+
     def _parseAttributePathTuple(self, pathTuple: typing.Union[
         None,  # Empty tuple, all wildcard
         typing.Tuple[int],  # Endpoint
@@ -1550,8 +1581,7 @@ class ChipDeviceControllerBase():
 
         if result := transaction.GetSubscriptionHandler():
             return result
-        else:
-            return transaction.GetReadResponse()
+        return transaction.GetReadResponse()
 
     async def ReadAttribute(
         self,
@@ -1974,6 +2004,15 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_CreateManualCode.restype = PyChipError
             self._dmLib.pychip_CreateManualCode.argtypes = [c_uint16, c_uint32, c_char_p, c_size_t, POINTER(c_size_t)]
 
+            self._dmLib.pychip_DeviceController_SetSkipCommissioningComplete.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetSkipCommissioningComplete.argtypes = [c_bool]
+
+            self._dmLib.pychip_DeviceController_SetTermsAcknowledgements.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetTermsAcknowledgements.argtypes = [c_uint16, c_uint16]
+
+            self._dmLib.pychip_DeviceController_SetDACRevocationSetPath.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetDACRevocationSetPath.argtypes = [c_char_p]
+
 
 class ChipDeviceController(ChipDeviceControllerBase):
     ''' The ChipDeviceCommissioner binding, named as ChipDeviceController
@@ -2100,6 +2139,20 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetDSTOffset(offset, validStarting, validUntil)
+        ).raise_on_error()
+
+    def SetTCAcknowledgements(self, tcAcceptedVersion: int, tcUserResponse: int):
+        ''' Set the TC acknowledgements to set during commissioning'''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetTermsAcknowledgements(tcAcceptedVersion, tcUserResponse)
+        ).raise_on_error()
+
+    def SetSkipCommissioningComplete(self, skipCommissioningComplete: bool):
+        ''' Set whether to skip the commissioning complete callback'''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetSkipCommissioningComplete(skipCommissioningComplete)
         ).raise_on_error()
 
     def SetDefaultNTP(self, defaultNTP: str):
@@ -2257,6 +2310,18 @@ class ChipDeviceController(ChipDeviceControllerBase):
             )
 
             return await asyncio.futures.wrap_future(ctx.future)
+
+    def SetDACRevocationSetPath(self, dacRevocationSetPath: typing.Optional[str]):
+        ''' Set the path to the device attestation revocation set JSON file.
+
+        Args:
+            dacRevocationSetPath: Path to the JSON file containing the device attestation revocation set
+        '''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetDACRevocationSetPath(
+                c_char_p(str.encode(dacRevocationSetPath) if dacRevocationSetPath else None))
+        ).raise_on_error()
 
 
 class BareChipDeviceController(ChipDeviceControllerBase):

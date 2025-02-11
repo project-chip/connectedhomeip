@@ -1,0 +1,740 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0102" name="Window Covering Cluster" revision="5">
+  <revisionHistory>
+    <revision revision="1" summary="Mandatory global ClusterRevision attribute added; CCB 1994 1995 1996 1997 2086 2094 2095 2096 2097"/>
+    <revision revision="2" summary="CCB 2328"/>
+    <revision revision="3" summary="CCB 2477 2555 2845 3028"/>
+    <revision revision="4" summary="All Hubs changes with FeatureMap &amp; OperationalStatus attribute"/>
+    <revision revision="5" summary="New data model format and notation. Created plus clarified PositionAware and AbsolutePosition features. General cleanup of functionality."/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0102" name="Window Covering"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="WNCV" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="LF" name="Lift" summary="Lift control and behavior for lifting/sliding window coverings">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="1" code="TL" name="Tilt" summary="Tilt control and behavior for tilting window coverings">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="2" code="PA_LF" name="PositionAwareLift" summary="Position aware lift control is supported.">
+      <optionalConform>
+        <feature name="LF"/>
+      </optionalConform>
+    </feature>
+    <feature bit="3" code="ABS" name="AbsolutePosition" summary="Absolute positioning is supported.">
+      <optionalConform/>
+    </feature>
+    <feature bit="4" code="PA_TL" name="PositionAwareTilt" summary="Position aware tilt control is supported.">
+      <optionalConform>
+        <feature name="TL"/>
+      </optionalConform>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="EndProductTypeEnum">
+      <item value="0" name="RollerShade" summary="Simple Roller Shade">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="1" name="RomanShade" summary="Roman Shade">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="2" name="BalloonShade" summary="Balloon Shade">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="3" name="WovenWood" summary="Woven Wood">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="4" name="PleatedShade" summary="Pleated Shade">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="5" name="CellularShade" summary="Cellular Shade">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="6" name="LayeredShade" summary="Layered Shade">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="7" name="LayeredShade2D" summary="Layered Shade 2D">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="8" name="SheerShade" summary="Sheer Shade">
+        <mandatoryConform>
+          <andTerm>
+            <feature name="LF"/>
+            <feature name="TL"/>
+          </andTerm>
+        </mandatoryConform>
+      </item>
+      <item value="9" name="TiltOnlyInteriorBlind" summary="Tilt Only Interior Blind">
+        <mandatoryConform>
+          <feature name="TL"/>
+        </mandatoryConform>
+      </item>
+      <item value="10" name="InteriorBlind" summary="Interior Blind">
+        <mandatoryConform>
+          <andTerm>
+            <feature name="LF"/>
+            <feature name="TL"/>
+          </andTerm>
+        </mandatoryConform>
+      </item>
+      <item value="11" name="VerticalBlindStripCurtain" summary="Vertical Blind, Strip Curtain">
+        <mandatoryConform>
+          <andTerm>
+            <feature name="LF"/>
+            <feature name="TL"/>
+          </andTerm>
+        </mandatoryConform>
+      </item>
+      <item value="12" name="InteriorVenetianBlind" summary="Interior Venetian Blind">
+        <mandatoryConform>
+          <andTerm>
+            <feature name="LF"/>
+            <feature name="TL"/>
+          </andTerm>
+        </mandatoryConform>
+      </item>
+      <item value="13" name="ExteriorVenetianBlind" summary="Exterior Venetian Blind">
+        <mandatoryConform>
+          <andTerm>
+            <feature name="LF"/>
+            <feature name="TL"/>
+          </andTerm>
+        </mandatoryConform>
+      </item>
+      <item value="14" name="LateralLeftCurtain" summary="Lateral Left Curtain">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="15" name="LateralRightCurtain" summary="Lateral Right Curtain">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="16" name="CentralCurtain" summary="Central Curtain">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="17" name="RollerShutter" summary="Roller Shutter">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="18" name="ExteriorVerticalScreen" summary="Exterior Vertical Screen">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="19" name="AwningTerracePatio" summary="Awning Terrace (Patio)">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="20" name="AwningVerticalScreen" summary="Awning Vertical Screen">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="21" name="TiltOnlyPergola" summary="Tilt Only Pergola">
+        <mandatoryConform>
+          <orTerm>
+            <feature name="LF"/>
+            <feature name="TL"/>
+          </orTerm>
+        </mandatoryConform>
+      </item>
+      <item value="22" name="SwingingShutter" summary="Swinging Shutter">
+        <mandatoryConform>
+          <orTerm>
+            <feature name="LF"/>
+            <feature name="TL"/>
+          </orTerm>
+        </mandatoryConform>
+      </item>
+      <item value="23" name="SlidingShutter" summary="Sliding Shutter">
+        <mandatoryConform>
+          <orTerm>
+            <feature name="LF"/>
+            <feature name="TL"/>
+          </orTerm>
+        </mandatoryConform>
+      </item>
+      <item value="255" name="Unknown" summary="Unknown">
+        <optionalConform/>
+      </item>
+    </enum>
+    <enum name="TypeEnum">
+      <item value="0" name="RollerShade" summary="RollerShade">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="1" name="RollerShade2Motor" summary="RollerShade - 2 Motor">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="2" name="RollerShadeExterior" summary="RollerShade - Exterior">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="3" name="RollerShadeExterior2Motor" summary="RollerShade - Exterior - 2 Motor">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="4" name="Drapery" summary="Drapery (curtain)">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="5" name="Awning" summary="Awning">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="6" name="Shutter" summary="Shutter">
+        <mandatoryConform>
+          <orTerm>
+            <feature name="LF"/>
+            <feature name="TL"/>
+          </orTerm>
+        </mandatoryConform>
+      </item>
+      <item value="7" name="TiltBlindTiltOnly" summary="Tilt Blind - Tilt Only">
+        <mandatoryConform>
+          <feature name="TL"/>
+        </mandatoryConform>
+      </item>
+      <item value="8" name="TiltBlindLiftAndTilt" summary="Tilt Blind - Lift &amp; Tilt">
+        <mandatoryConform>
+          <andTerm>
+            <feature name="LF"/>
+            <feature name="TL"/>
+          </andTerm>
+        </mandatoryConform>
+      </item>
+      <item value="9" name="ProjectorScreen" summary="Projector Screen">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </item>
+      <item value="255" name="Unknown" summary="Unknown">
+        <optionalConform/>
+      </item>
+    </enum>
+    <bitmap name="ConfigStatusBitmap">
+      <bitfield name="Operational" bit="0" summary="Device is operational.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="OnlineReserved" bit="1" summary="">
+        <deprecateConform/>
+      </bitfield>
+      <bitfield name="LiftMovementReversed" bit="2" summary="The lift movement is reversed.">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="LiftPositionAware" bit="3" summary="Supports the PositionAwareLift feature (PA_LF).">
+        <mandatoryConform>
+          <feature name="PA_LF"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="TiltPositionAware" bit="4" summary="Supports the PositionAwareTilt feature (PA_TL).">
+        <mandatoryConform>
+          <feature name="PA_TL"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="LiftEncoderControlled" bit="5" summary="Uses an encoder for lift.">
+        <mandatoryConform>
+          <feature name="PA_LF"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="TiltEncoderControlled" bit="6" summary="Uses an encoder for tilt.">
+        <mandatoryConform>
+          <feature name="PA_TL"/>
+        </mandatoryConform>
+      </bitfield>
+    </bitmap>
+    <bitmap name="ModeBitmap">
+      <bitfield name="MotorDirectionReversed" bit="0" summary="Reverse the lift direction.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="CalibrationMode" bit="1" summary="Perform a calibration.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="MaintenanceMode" bit="2" summary="Freeze all motions for maintenance.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="LedFeedback" bit="3" summary="Control the LEDs feedback.">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="OperationalStatusBitmap">
+      <bitfield name="Global" from="0x00" to="0x01" summary="Global operational state.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Lift" from="0x02" to="0x03" summary="Lift operational state.">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="Tilt" from="0x04" to="0x05" summary="Tilt operational state.">
+        <mandatoryConform>
+          <feature name="TL"/>
+        </mandatoryConform>
+      </bitfield>
+    </bitmap>
+    <bitmap name="SafetyStatusBitmap">
+      <bitfield name="RemoteLockout" bit="0" summary="Movement commands are ignored (locked out). e.g. not granted authorization, outside some time/date range.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="TamperDetection" bit="1" summary="Tampering detected on sensors or any other safety equipment. Ex: a device has been forcedly moved without its actuator(s).">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="FailedCommunication" bit="2" summary="Communication failure to sensors or other safety equipment.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="PositionFailure" bit="3" summary="Device has failed to reach the desired position. e.g. with position aware device, time expired before TargetPosition is reached.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ThermalProtection" bit="4" summary="Motor(s) and/or electric circuit thermal protection activated.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ObstacleDetected" bit="5" summary="An obstacle is preventing actuator movement.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Power" bit="6" summary="Device has power related issue or limitation e.g. device is running w/ the help of a backup battery or power might not be fully available at the moment.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="StopInput" bit="7" summary="Local safety sensor (not a direct obstacle) is preventing movements (e.g. Safety EU Standard EN60335).">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="MotorJammed" bit="8" summary="Mechanical problem related to the motor(s) detected.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="HardwareFailure" bit="9" summary="PCB, fuse and other electrics problems.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ManualOperation" bit="10" summary="Actuator is manually operated and is preventing actuator movement (e.g. actuator is disengaged/decoupled).">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Protection" bit="11" summary="Protection is activated.">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="Type" type="TypeEnum" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="PhysicalClosedLimitLift" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0002" name="PhysicalClosedLimitTilt" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0003" name="CurrentPositionLift" type="uint16" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <optionalConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </optionalConform>
+      <constraint>
+        <between>
+          <attribute name="InstalledOpenLimitLift"/>
+          <attribute name="InstalledClosedLimitLift"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="CurrentPositionTilt" type="uint16" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <optionalConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </optionalConform>
+      <constraint>
+        <between>
+          <attribute name="InstalledOpenLimitTilt"/>
+          <attribute name="InstalledClosedLimitTilt"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0005" name="NumberOfActuationsLift" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform>
+        <feature name="LF"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0006" name="NumberOfActuationsTilt" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform>
+        <feature name="TL"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0007" name="ConfigStatus" type="ConfigStatusBitmap" default="desc">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0008" name="CurrentPositionLiftPercentage" type="percent" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="nonVolatile" reportable="true"/>
+      <optionalConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+        </andTerm>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0009" name="CurrentPositionTiltPercentage" type="percent" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="nonVolatile" reportable="true"/>
+      <optionalConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+        </andTerm>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x000A" name="OperationalStatus" type="OperationalStatusBitmap" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality reportable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x000B" name="TargetPositionLiftPercent100ths" type="percent100ths" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" reportable="true"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x000C" name="TargetPositionTiltPercent100ths" type="percent100ths" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" reportable="true"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x000D" name="EndProductType" type="EndProductTypeEnum" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000E" name="CurrentPositionLiftPercent100ths" type="percent100ths" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="nonVolatile" reportable="true"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <max value="10000"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000F" name="CurrentPositionTiltPercent100ths" type="percent100ths" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="nonVolatile" reportable="true"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <max value="10000"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0010" name="InstalledOpenLimitLift" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <max value="65534"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0011" name="InstalledClosedLimitLift" type="uint16" default="65534">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <max value="65534"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0012" name="InstalledOpenLimitTilt" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <max value="65534"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0013" name="InstalledClosedLimitTilt" type="uint16" default="65534">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <max value="65534"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0014" name="VelocityLift">
+      <deprecateConform/>
+    </attribute>
+    <attribute id="0x0015" name="AccelerationTimeLift">
+      <deprecateConform/>
+    </attribute>
+    <attribute id="0x0016" name="DecelerationTimeLift">
+      <deprecateConform/>
+    </attribute>
+    <attribute id="0x0017" name="Mode" type="ModeBitmap" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0018" name="IntermediateSetpointsLift">
+      <deprecateConform/>
+    </attribute>
+    <attribute id="0x0019" name="IntermediateSetpointsTilt">
+      <deprecateConform/>
+    </attribute>
+    <attribute id="0x001A" name="SafetyStatus" type="SafetyStatusBitmap" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality reportable="true"/>
+      <optionalConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="UpOrOpen" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x01" name="DownOrClose" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x02" name="StopMotion" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x04" name="GoToLiftValue" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <optionalConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </optionalConform>
+      <field id="0" name="LiftValue" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x05" name="GoToLiftPercentage" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <feature name="LF"/>
+            <feature name="PA_LF"/>
+          </andTerm>
+        </mandatoryConform>
+        <optionalConform>
+          <feature name="LF"/>
+        </optionalConform>
+      </otherwiseConform>
+      <field id="0" name="LiftPercent100thsValue" type="percent100ths">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x07" name="GoToTiltValue" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <optionalConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </optionalConform>
+      <field id="0" name="TiltValue" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x08" name="GoToTiltPercentage" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <feature name="TL"/>
+            <feature name="PA_TL"/>
+          </andTerm>
+        </mandatoryConform>
+        <optionalConform>
+          <feature name="TL"/>
+        </optionalConform>
+      </otherwiseConform>
+      <field id="0" name="TiltPercent100thsValue" type="percent100ths">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+  </commands>
+</cluster>

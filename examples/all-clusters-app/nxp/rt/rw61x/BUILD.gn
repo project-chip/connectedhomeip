@@ -1,5 +1,5 @@
 # Copyright (c) 2021 Project CHIP Authors
-# Copyright 2023 NXP
+# Copyright 2023-2024 NXP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,15 +54,6 @@ app_common_folder = "all-clusters-app/all-clusters-common"
 # Particular sources/defines/includes could be added/changed depending on the target application.
 rt_sdk("sdk") {
   defines = []
-
-  # To be moved, temporary mbedtls config fix to build app with factory data
-  if (nxp_enable_secure_dac_private_key_storage ||
-      nxp_enable_secure_whole_factory_data) {
-    defines += [
-      "MBEDTLS_NIST_KW_C",
-      "MBEDTLS_PSA_CRYPTO_CLIENT",
-    ]
-  }
 
   cflags = []
   public_deps = []
@@ -141,8 +132,8 @@ rt_executable("all_cluster_app") {
     "../../common/main/main.cpp",
   ]
 
-  if (nxp_enable_secure_dac_private_key_storage ||
-      nxp_enable_secure_whole_factory_data) {
+  if (nxp_enable_secure_whole_factory_data ||
+      nxp_enable_secure_EL2GO_factory_data) {
     sources += [ "${chip_root}/examples/platform/nxp/${nxp_platform}/factory_data/source/AppFactoryDataExample.cpp" ]
     if (nxp_enable_secure_whole_factory_data) {
       defines += [ "ENABLE_SECURE_WHOLE_FACTORY_DATA" ]
@@ -176,6 +167,7 @@ rt_executable("all_cluster_app") {
   deps = [
     "${chip_root}/examples/${app_common_folder}",
     "${chip_root}/src/platform/logging:default",
+    "${chip_root}/src/setup_payload:onboarding-codes-utils",
   ]
 
   sources += [
@@ -217,6 +209,10 @@ rt_executable("all_cluster_app") {
 
     include_dirs += [ "${common_example_dir}/wifi_connect/include" ]
     sources += [ "${common_example_dir}/wifi_connect/source/WifiConnect.cpp" ]
+  }
+
+  if (chip_enable_ble) {
+    defines += [ "APP_BT_DEVICE_NAME=\"NXP-AllClustersApp\"" ]
   }
 
   # In case a dedicated assert function needs to be supported the flag sdk_fsl_assert_support should be set to false

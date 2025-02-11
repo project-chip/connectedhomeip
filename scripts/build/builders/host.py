@@ -86,6 +86,7 @@ class HostApp(Enum):
     NETWORK_MANAGER = auto()
     ENERGY_MANAGEMENT = auto()
     WATER_LEAK_DETECTOR = auto()
+    TERMS_AND_CONDITIONS = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -159,7 +160,9 @@ class HostApp(Enum):
         elif self == HostApp.ENERGY_MANAGEMENT:
             return 'energy-management-app/linux'
         elif self == HostApp.WATER_LEAK_DETECTOR:
-            return 'water-leak-detector/linux'
+            return 'water-leak-detector-app/linux'
+        elif self == HostApp.TERMS_AND_CONDITIONS:
+            return 'terms-and-conditions-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -278,6 +281,9 @@ class HostApp(Enum):
         elif self == HostApp.WATER_LEAK_DETECTOR:
             yield 'water-leak-detector-app'
             yield 'water-leak-detector-app.map'
+        elif self == HostApp.TERMS_AND_CONDITIONS:
+            yield 'chip-terms-and-conditions-app'
+            yield 'chip-terms-and-conditions-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -336,6 +342,7 @@ class HostBuilder(GnBuilder):
                  chip_casting_simplified: Optional[bool] = None,
                  disable_shell=False,
                  use_googletest=False,
+                 terms_and_conditions_required: Optional[bool] = None,
                  ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -404,6 +411,7 @@ class HostBuilder(GnBuilder):
         if use_coverage:
             self.extra_gn_options.append('use_coverage=true')
 
+        self.use_clang = use_clang  # for usage in other commands
         if use_clang:
             self.extra_gn_options.append('is_clang=true')
 
@@ -458,6 +466,12 @@ class HostBuilder(GnBuilder):
 
         if chip_casting_simplified is not None:
             self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
+
+        if terms_and_conditions_required is not None:
+            if terms_and_conditions_required:
+                self.extra_gn_options.append('chip_terms_and_conditions_required=true')
+            else:
+                self.extra_gn_options.append('chip_terms_and_conditions_required=false')
 
         if self.board == HostBoard.ARM64:
             if not use_clang:
@@ -573,7 +587,7 @@ class HostBuilder(GnBuilder):
             self._Execute(['mkdir', '-p', self.coverage_dir], title="Create coverage output location")
 
     def PreBuildCommand(self):
-        if self.app == HostApp.TESTS and self.use_coverage:
+        if self.app == HostApp.TESTS and self.use_coverage and not self.use_clang:
             cmd = ['ninja', '-C', self.output_dir]
 
             if self.ninja_jobs is not None:
@@ -591,7 +605,8 @@ class HostBuilder(GnBuilder):
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
 
     def PostBuildCommand(self):
-        if self.app == HostApp.TESTS and self.use_coverage:
+        # TODO: CLANG coverage is not yet implemented, requires different tooling
+        if self.app == HostApp.TESTS and self.use_coverage and not self.use_clang:
             self._Execute(['lcov', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
                            '--exclude', os.path.join(self.chip_dir, '**/tests/*'),
                            '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),

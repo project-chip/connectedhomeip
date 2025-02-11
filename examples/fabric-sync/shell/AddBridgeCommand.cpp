@@ -48,13 +48,14 @@ void AddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
 
     if (err == CHIP_NO_ERROR)
     {
-        admin::DeviceMgr().SetRemoteBridgeNodeId(mBridgeNodeId);
+        admin::DeviceManager::Instance().SetRemoteBridgeNodeId(mBridgeNodeId);
 
         ChipLogProgress(NotSpecified, "Successfully paired bridge device: NodeId: " ChipLogFormatX64,
                         ChipLogValueX64(mBridgeNodeId));
 
-        admin::DeviceMgr().UpdateLastUsedNodeId(mBridgeNodeId);
-        admin::DeviceMgr().SubscribeRemoteFabricBridge();
+        admin::DeviceManager::Instance().UpdateLastUsedNodeId(mBridgeNodeId);
+        admin::DeviceManager::Instance().SubscribeRemoteFabricBridge();
+        admin::DeviceManager::Instance().InitCommissionerControl();
 
         // After successful commissioning of the Commissionee, initiate Reverse Commissioning
         // via the Commissioner Control Cluster. However, we must first verify that the
@@ -62,7 +63,7 @@ void AddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
         //
         // Note: The Fabric-Admin MUST NOT send the RequestCommissioningApproval command
         // if the remote Fabric-Bridge lacks Fabric Synchronization support.
-        DeviceLayer::SystemLayer().ScheduleLambda([]() { admin::DeviceMgr().ReadSupportedDeviceCategories(); });
+        DeviceLayer::SystemLayer().ScheduleLambda([]() { admin::DeviceManager::Instance().ReadSupportedDeviceCategories(); });
     }
     else
     {
@@ -70,12 +71,13 @@ void AddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
                      ChipLogValueX64(deviceId), err.Format());
     }
 
+    admin::PairingManager::Instance().ResetForNextCommand();
     CommandRegistry::Instance().ResetActiveCommand();
 }
 
 CHIP_ERROR AddBridgeCommand::RunCommand()
 {
-    if (admin::DeviceMgr().IsFabricSyncReady())
+    if (admin::DeviceManager::Instance().IsFabricSyncReady())
     {
         // print to console
         fprintf(stderr, "Remote Fabric Bridge has already been configured.\n");
@@ -84,10 +86,11 @@ CHIP_ERROR AddBridgeCommand::RunCommand()
 
     admin::PairingManager::Instance().SetPairingDelegate(this);
 
-    ChipLogProgress(NotSpecified, "Running AddBridgeCommand with Node ID: %lu, PIN Code: %u, Address: %s, Port: %u", mBridgeNodeId,
-                    mSetupPINCode, mRemoteAddr, mRemotePort);
+    ChipLogProgress(NotSpecified,
+                    "Running AddBridgeCommand with Node ID: " ChipLogFormatX64 ", PIN Code: %u, Address: %s, Port: %u",
+                    ChipLogValueX64(mBridgeNodeId), mSetupPINCode, mRemoteAddr, mRemotePort);
 
-    return admin::DeviceMgr().PairRemoteFabricBridge(mBridgeNodeId, mSetupPINCode, mRemoteAddr, mRemotePort);
+    return admin::PairingManager::Instance().PairDevice(mBridgeNodeId, mSetupPINCode, mRemoteAddr, mRemotePort);
 }
 
 } // namespace commands
