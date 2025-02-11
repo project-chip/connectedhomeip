@@ -134,10 +134,6 @@ void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t even
         case IP_EVENT_GOT_IP6:
             memcpy(&event.Platform.ESPSystemEvent.Data.IpGotIp6, eventData, sizeof(event.Platform.ESPSystemEvent.Data.IpGotIp6));
             break;
-        case IP_EVENT_AP_STAIPASSIGNED:
-            memcpy(&event.Platform.ESPSystemEvent.Data.IpApStaIpAssigned, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.IpApStaIpAssigned));
-            break;
         default:
             break;
         }
@@ -171,18 +167,6 @@ void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t even
         case WIFI_EVENT_STA_WPS_ER_FAILED:
             memcpy(&event.Platform.ESPSystemEvent.Data.WiFiStaWpsErFailed, eventData,
                    sizeof(event.Platform.ESPSystemEvent.Data.WiFiStaWpsErFailed));
-            break;
-        case WIFI_EVENT_AP_STACONNECTED:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiApStaConnected, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiApStaConnected));
-            break;
-        case WIFI_EVENT_AP_STADISCONNECTED:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiApStaDisconnected, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiApStaDisconnected));
-            break;
-        case WIFI_EVENT_AP_PROBEREQRECVED:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiApProbeReqRecved, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiApProbeReqRecved));
             break;
         default:
             break;
