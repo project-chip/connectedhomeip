@@ -20,7 +20,6 @@ from typing import Mapping, Optional
 import memdf.name
 import memdf.util.config
 import memdf.util.pretty
-import numpy as np  # type: ignore
 from memdf import DF, Config, ConfigDescription
 
 
