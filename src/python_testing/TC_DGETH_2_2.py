@@ -37,8 +37,11 @@
 # === END CI TEST ARGUMENTS ===
 #
 import chip.clusters as Clusters
+import logging
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
+
+logger = logging.getLogger(__name__)
 
 
 class TC_DGETH_2_2(MatterBaseTest):
@@ -106,10 +109,12 @@ class TC_DGETH_2_2(MatterBaseTest):
             self.step(step)
             if self.pics_guard(attr.attribute_id in attribute_list):
                 initial_values[attr] = await self.read_dgeth_attribute_expect_success(endpoint, attr)
+                logger.info(f"Initial {attr.__name__} value: {initial_values[attr]}")
 
         # Step 8: Send ResetCounts command
         self.step(8)
         await self.send_reset_counts_command()
+        logger.info("Reset counts command sent")
 
         # Steps 9-13: Verify post-reset values
         verification_map = {
@@ -125,6 +130,7 @@ class TC_DGETH_2_2(MatterBaseTest):
             if self.pics_guard(attr.attribute_id in attribute_list):
                 post_value = await self.read_dgeth_attribute_expect_success(endpoint, attr)
                 initial_value = initial_values.get(attr)
+                logger.info(f"Post-reset {attr.__name__} value: {post_value} (initial: {initial_value})")
 
                 asserts.assert_true(
                     comparator(post_value, initial_value),
