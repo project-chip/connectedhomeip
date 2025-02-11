@@ -16,20 +16,12 @@
 
 import os
 from enum import Enum
-
-# Define a branch enum for different versions or branches
-
-
-class Branch(Enum):
-    MASTER = "master"
-    V1_3 = "v1_3"
-    V1_4 = "v1_4"
-    IN_PROGRESS = "in_progress"
+from chip.testing.spec_parsing import PrebuiltDataModelDirectory
 
 
 def get_chip_root():
     """
-    Returns the CHIP root directory, trying the environment variable first 
+    Returns the CHIP root directory, trying the environment variable first
     and falling back if necessary.
     """
     chip_root = os.getenv('PW_PROJECT_ROOT')
@@ -44,14 +36,14 @@ def get_chip_root():
             ) from e
 
 
-def get_data_model_path(branch: Branch):
+def get_data_model_path(dir: PrebuiltDataModelDirectory):
     """
     Returns the path to the data model directory for a given branch.
     """
     chip_root = get_chip_root()
-    data_model_path = os.path.join(chip_root, 'data_model', branch.value)
+    data_model_path = os.path.join(chip_root, 'data_model', dir.dirname)
     if not os.path.exists(data_model_path):
-        raise FileNotFoundError(f"Data model path for branch {branch} does not exist: {data_model_path}")
+        raise FileNotFoundError(f"Data model path for branch {dir.dirname} does not exist: {data_model_path}")
     return data_model_path
 
 
@@ -66,15 +58,20 @@ def get_spec_xml_output_path():
     return output_dir
 
 
-def get_documentation_file_path():
+def get_cluster_documentation_file_path():
     """
     Returns the path to the documentation file.
     """
     chip_root = get_chip_root()
-    documentation_file = os.path.join(chip_root, 'docs', 'ids_and_codes', 'spec_clusters.md')
-    if not os.path.exists(documentation_file):
-        raise FileNotFoundError(f"Documentation file does not exist: {documentation_file}")
-    return documentation_file
+    return os.path.join(chip_root, 'docs', 'ids_and_codes', 'spec_clusters.md')
+
+
+def get_device_types_documentation_file_path():
+    """
+    Returns the path to the documentation file.
+    """
+    chip_root = get_chip_root()
+    return os.path.join(chip_root, 'docs', 'ids_and_codes', 'spec_device_types.md')
 
 
 def get_python_testing_path():
@@ -99,11 +96,3 @@ def get_in_progress_defines():
         'hvac', 'matter-fabric-synchronization', 'metering', 'secondary-net',
         'service-area-cluster', 'solar-power', 'tcp', 'water-heater', 'wifiSetup'
     ]
-
-
-def get_available_branches():
-    """
-    Return a list of available branches for the data model.
-    This can be expanded or dynamically fetched if necessary.
-    """
-    return [Branch.MASTER, Branch.V1_3, Branch.V1_4]
