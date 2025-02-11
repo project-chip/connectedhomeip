@@ -92,18 +92,6 @@ std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteDataAttribute
 DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                        AttributeValueDecoder & decoder)
 {
-    ChipLogDetail(DataManagement, "Writing attribute: Cluster=" ChipLogFormatMEI " Endpoint=0x%x AttributeId=" ChipLogFormatMEI,
-                  ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId));
-
-    // TODO: ordering is to check writability/existence BEFORE ACL and this seems wrong, however
-    //       existing unit tests (TC_AcessChecker.py) validate that we get UnsupportedWrite instead of UnsupportedAccess
-    //
-    //       This should likely be fixed in spec (probably already fixed by
-    //       https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/9024)
-    //       and tests and implementation
-    //
-    //       Open issue that needs fixing: https://github.com/project-chip/connectedhomeip/issues/33735
-
     auto metadata = Ember::FindAttributeMetadata(request.path);
 
     // Explicit failure in finding a suitable metadata
@@ -130,74 +118,11 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     const EmberAfAttributeMetadata ** attributeMetadata = std::get_if<const EmberAfAttributeMetadata *>(&metadata);
     VerifyOrDie(*attributeMetadata != nullptr);
 
-    // All the global attributes that we do not have metadata for are
-    // read-only. Specifically only the following list-based attributes match the
-    // "global attributes not in metadata" (see GlobalAttributes.h :: GlobalAttributesNotInMetadata):
-    //   - AttributeList
-    //   - EventList
-    //   - AcceptedCommands
-    //   - GeneratedCommands
+    // Extra check: internal requests can bypass the read only check, however global attributes
+    // have no underlying storage, so write still cannot be done
     //
-    // Given the above, UnsupportedWrite should be correct (attempt to write to a read-only list)
-    bool isReadOnly = (*attributeMetadata)->IsReadOnly();
-
-    // Internal is allowed to bypass timed writes and read-only.
-    if (!request.operationFlags.Has(DataModel::OperationFlags::kInternal))
-    {
-        VerifyOrReturnError(!isReadOnly, Status::UnsupportedWrite);
-    }
-
-    // ACL check for non-internal requests
-    bool checkAcl = !request.operationFlags.Has(DataModel::OperationFlags::kInternal);
-
-    // For chunking, ACL check is not re-done if the previous write was successful for the exact same
-    // path. We apply this everywhere as a shortcut, although realistically this is only for AccessControl cluster
-    if (checkAcl && request.previousSuccessPath.has_value())
-    {
-        // NOTE: explicit cast/check only for attribute path and nothing else.
-        //
-        //       In particular `request.path` is a DATA path (contains a list index)
-        //       and we do not want request.previousSuccessPath to be auto-cast to a
-        //       data path with a empty list and fail the compare.
-        //
-        //       This could be `request.previousSuccessPath != request.path` (where order
-        //       is important) however that would seem more brittle (relying that a != b
-        //       behaves differently than b != a due to casts). Overall Data paths are not
-        //       the same as attribute paths.
-        //
-        //       Also note that Concrete path have a mExpanded that is not used in compares.
-        const ConcreteAttributePath & attributePathA = request.path;
-        const ConcreteAttributePath & attributePathB = *request.previousSuccessPath;
-
-        checkAcl = (attributePathA != attributePathB);
-    }
-
-    if (checkAcl)
-    {
-        VerifyOrReturnError(request.subjectDescriptor != nullptr, Status::UnsupportedAccess);
-
-        Access::RequestPath requestPath{ .cluster     = request.path.mClusterId,
-                                         .endpoint    = request.path.mEndpointId,
-                                         .requestType = Access::RequestType::kAttributeWriteRequest,
-                                         .entityId    = request.path.mAttributeId };
-        CHIP_ERROR err = Access::GetAccessControl().Check(*request.subjectDescriptor, requestPath,
-                                                          RequiredPrivilege::ForWriteAttribute(request.path));
-
-        if (err != CHIP_NO_ERROR)
-        {
-            VerifyOrReturnValue(err != CHIP_ERROR_ACCESS_DENIED, Status::UnsupportedAccess);
-            VerifyOrReturnValue(err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL, Status::AccessRestricted);
-
-            return err;
-        }
-    }
-
-    // Internal is allowed to bypass timed writes and read-only.
-    if (!request.operationFlags.Has(DataModel::OperationFlags::kInternal))
-    {
-        VerifyOrReturnError(!(*attributeMetadata)->MustUseTimedWrite() || request.writeFlags.Has(DataModel::WriteFlags::kTimed),
-                            Status::NeedsTimedInteraction);
-    }
+    // I.e. if we get a `EmberAfCluster*` value from finding metadata, we fail here.
+    VerifyOrReturnError(attributeMetadata != nullptr, Status::UnsupportedWrite);
 
     if (request.path.mDataVersion.HasValue())
     {

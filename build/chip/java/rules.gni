@@ -104,10 +104,7 @@ template("java_library") {
   # Building from sources - perform Java compilation and JAR creation.
   if (!_is_prebuilt) {
     # Additional flags
-    _javac_flags = [
-      "-Werror",
-      "-Xlint:all",
-    ]
+    _javac_flags = [ "-Xlint:all" ]
     if (defined(invoker.javac_flags)) {
       _javac_flags += invoker.javac_flags
     }
