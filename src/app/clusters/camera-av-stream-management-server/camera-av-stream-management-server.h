@@ -47,6 +47,8 @@ using SnapshotParamsStruct         = Structs::SnapshotParamsStruct::Type;
 constexpr uint8_t kMaxSpeakerLevel          = 254;
 constexpr uint8_t kMaxMicrophoneLevel       = 254;
 constexpr uint16_t kMaxImageRotationDegrees = 359;
+constexpr uint8_t kMaxChannelCount          = 8;
+constexpr uint8_t kMaxImageQualityMetric    = 100;
 
 constexpr size_t kViewportStructMaxSerializedSize =
     TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t));
@@ -115,9 +117,8 @@ public:
     VideoStreamAllocate(StreamUsageEnum streamUsage, VideoCodecEnum videoCodec, const uint16_t minFrameRate,
                         const uint16_t maxFrameRate, const VideoResolutionStruct & minResolution,
                         const VideoResolutionStruct & maxResolution, const uint32_t minBitRate, const uint32_t maxBitRate,
-                        const uint16_t minFragmentLen, const uint16_t maxFragmentLen,
-                        const chip::Optional<bool> waterMarkEnabled, const chip::Optional<bool> osdEnabled,
-                        uint16_t & outStreamID) = 0;
+                        const uint16_t minFragmentLen, const uint16_t maxFragmentLen, const chip::Optional<bool> waterMarkEnabled,
+                        const chip::Optional<bool> osdEnabled, uint16_t & outStreamID) = 0;
 
     /**
      *   @brief Handle Command Delegate for Video stream modification.
@@ -133,7 +134,8 @@ public:
      *   @return Success if the stream modification is successful; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
-    virtual Protocols::InteractionModel::Status VideoStreamModify(const uint16_t streamID, const chip::Optional<bool> waterMarkEnabled,
+    virtual Protocols::InteractionModel::Status VideoStreamModify(const uint16_t streamID,
+                                                                  const chip::Optional<bool> waterMarkEnabled,
                                                                   const chip::Optional<bool> osdEnabled) = 0;
 
     /**
@@ -592,6 +594,59 @@ private:
         }
         return CHIP_NO_ERROR;
     }
+
+    bool IsAudioCodecValid(AudioCodecEnum audioCodec)
+    {
+        switch (audioCodec)
+        {
+        case AudioCodecEnum::kOpus:
+        case AudioCodecEnum::kAacLc:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    bool IsVideoCodecValid(VideoCodecEnum videoCodec)
+    {
+        switch (videoCodec)
+        {
+        case VideoCodecEnum::kH264:
+        case VideoCodecEnum::kHevc:
+        case VideoCodecEnum::kVvc:
+        case VideoCodecEnum::kAv1:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    bool IsImageCodecValid(ImageCodecEnum imageCodec)
+    {
+        switch (imageCodec)
+        {
+        case ImageCodecEnum::kJpeg:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    bool IsStreamUsageValid(StreamUsageEnum streamUsage)
+    {
+        switch (streamUsage)
+        {
+        case StreamUsageEnum::kInternal:
+        case StreamUsageEnum::kRecording:
+        case StreamUsageEnum::kAnalysis:
+        case StreamUsageEnum::kLiveView:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    bool IsBitDepthValid(uint8_t bitDepth) { return (bitDepth == 8 || bitDepth == 16 || bitDepth == 24 || bitDepth == 32); }
 
     /**
      * IM-level implementation of read
