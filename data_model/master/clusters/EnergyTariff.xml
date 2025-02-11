@@ -1,0 +1,568 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0700" name="Energy Tariff Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial Matter revision"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0700" name="Energy Tariff"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="SETRF" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="PRICE" name="Pricing" summary="Supports information about commodity pricing">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="1" code="FCRED" name="FriendlyCredit" summary="Supports information about when friendly credit periods begin and end">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="2" code="AUXLD" name="AuxiliaryLoad" summary="Supports information about when auxiliary loads should be enabled or disabled">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="3" code="PEAKP" name="PeakPeriod" summary="Supports information about peak periods">
+      <optionalConform/>
+    </feature>
+    <feature bit="4" code="PWRTHLD" name="PowerThreshold" summary="Supports information about power threshold">
+      <optionalConform/>
+    </feature>
+    <feature bit="5" code="RNDM" name="Randomization" summary="Supports information about randomization of calendar transitions">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="BlockModeEnum">
+      <item value="0" name="NoBlock" summary="Tariff has no usage blocks">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Combined" summary="Usage is metered in combined blocks">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Individual" summary="Usage is metered separately by tariff component">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="DayTypeEnum">
+      <item value="0" name="Standard" summary="Standard">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Holiday" summary="Holiday">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Dynamic" summary="Dynamic Pricing">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="PeakPeriodSeverityEnum">
+      <item value="0" name="Unused" summary="Unused">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Low" summary="Low">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Medium" summary="Medium">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="High" summary="High">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="TransitionRandomizationTypeEnum">
+      <item value="0" name="None" summary="No randomization applied">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Fixed" summary="An unchanging offset">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Random" summary="A random value">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="RandomPositive" summary="A random positive value">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="RandomNegative" summary="A random negative value">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <bitmap name="AuxiliaryLoadBitmap">
+      <bitfield name="AuxiliarySwitch1" bit="0" summary="Auxiliary Switch 1">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="AuxiliarySwitch2" bit="1" summary="Auxiliary Switch 2">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="AuxiliarySwitch3" bit="2" summary="Auxiliary Switch 3">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="AuxiliarySwitch4" bit="3" summary="Auxiliary Switch 4">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="AuxiliarySwitch5" bit="4" summary="Auxiliary Switch 5">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="AuxiliarySwitch6" bit="5" summary="Auxiliary Switch 6">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="AuxiliarySwitch7" bit="6" summary="Auxiliary Switch 7">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="AuxiliarySwitch8" bit="7" summary="Auxiliary Switch 8">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="DayPatternDayOfWeekBitmap">
+      <bitfield name="Sunday" bit="0" summary="Sunday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Monday" bit="1" summary="Monday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Tuesday" bit="2" summary="Tuesday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Wednesday" bit="3" summary="Wednesday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Thursday" bit="4" summary="Thursday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Friday" bit="5" summary="Friday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Saturday" bit="6" summary="Saturday">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <struct name="CalendarPeriodStruct">
+      <field id="0" name="StartDate" type="epoch-s">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <min>
+            <attribute name="StartDate"/>
+          </min>
+        </constraint>
+      </field>
+      <field id="1" name="DayPatternIDs" type="list">
+        <entry type="uint32"/>
+        <mandatoryConform/>
+        <constraint>
+          <countBetween>
+            <from value="1"/>
+            <to value="7"/>
+          </countBetween>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="CalendarTransitionStruct">
+      <field id="0" name="CalendarTransitionID" type="uint32">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="StartTime" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="1499"/>
+        </constraint>
+      </field>
+      <field id="2" name="Duration" type="uint16">
+        <optionalConform/>
+        <constraint>
+          <max value="1500 - StartTime"/>
+        </constraint>
+      </field>
+      <field id="3" name="RandomizationOffset" type="int16">
+        <optionalConform>
+          <feature name="RNDM"/>
+        </optionalConform>
+      </field>
+      <field id="4" name="RandomizationType" type="TransitionRandomizationTypeEnum" default="None">
+        <optionalConform>
+          <feature name="RNDM"/>
+        </optionalConform>
+      </field>
+    </struct>
+    <struct name="DayPatternStruct">
+      <field id="0" name="DayPatternID" type="uint32">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="DaysOfWeek" type="DayPatternDayOfWeekBitmap">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="TransitionIDs" type="list">
+        <entry type="uint32"/>
+        <mandatoryConform/>
+        <constraint>
+          <countBetween>
+            <from value="1"/>
+            <to value="96"/>
+          </countBetween>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="DayStruct">
+      <field id="0" name="Date" type="epoch-s">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="DayType" type="DayTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="TransitionIDs" type="list">
+        <entry type="uint32"/>
+        <mandatoryConform/>
+        <constraint>
+          <countBetween>
+            <from value="1"/>
+            <to value="96"/>
+          </countBetween>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="PeakPeriodStruct">
+      <field id="0" name="Severity" type="PeakPeriodSeverityEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="PeakPeriod" type="uint16" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="TariffComponentStruct">
+      <field id="0" name="TariffComponentId" type="uint32">
+        <mandatoryConform>
+          <notTerm>
+            <field name="Predicted"/>
+          </notTerm>
+        </mandatoryConform>
+      </field>
+      <field id="1" name="Price" type="TariffPriceStruct">
+        <quality nullable="true"/>
+        <optionalConform choice="a" more="true" min="1">
+          <feature name="PRICE"/>
+        </optionalConform>
+      </field>
+      <field id="2" name="FriendlyCredit" type="bool">
+        <optionalConform choice="a" more="true" min="1">
+          <feature name="FCRED"/>
+        </optionalConform>
+      </field>
+      <field id="3" name="AuxiliaryLoad" type="AuxiliaryLoadBitmap">
+        <optionalConform choice="a" more="true" min="1">
+          <feature name="AUXLD"/>
+        </optionalConform>
+      </field>
+      <field id="4" name="PeakPeriod" type="PeakPeriodStruct" default="0">
+        <optionalConform choice="a" more="true" min="1">
+          <feature name="PEAKP"/>
+        </optionalConform>
+      </field>
+      <field id="5" name="PowerThreshold" type="PowerThresholdStruct" default="0">
+        <optionalConform choice="a" more="true" min="1">
+          <feature name="PWRTHLD"/>
+        </optionalConform>
+      </field>
+      <field id="6" name="Threshold" type="uint32">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="7" name="Label" type="string">
+        <quality nullable="true"/>
+        <optionalConform/>
+        <constraint>
+          <maxLength value="128"/>
+        </constraint>
+      </field>
+      <field id="8" name="Predicted" type="bool">
+        <optionalConform/>
+      </field>
+    </struct>
+    <struct name="TariffInformationStruct">
+      <field id="0" name="TariffLabel" type="string">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="128"/>
+        </constraint>
+      </field>
+      <field id="1" name="ProviderName" type="string">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="128"/>
+        </constraint>
+      </field>
+      <field id="2" name="Currency" type="CurrencyStruct">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="PRICE"/>
+        </mandatoryConform>
+      </field>
+      <field id="3" name="BlockMode" type="BlockModeEnum">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="TariffPeriodStruct">
+      <field id="0" name="Label" type="string">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="128"/>
+        </constraint>
+      </field>
+      <field id="1" name="CalendarTransitionIDs" type="list">
+        <entry type="uint32"/>
+        <mandatoryConform/>
+        <constraint>
+          <minCount value="1"/>
+        </constraint>
+      </field>
+      <field id="2" name="TariffComponentIDs" type="list">
+        <entry type="uint32"/>
+        <mandatoryConform/>
+        <constraint>
+          <minCount value="1"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="TariffPriceStruct">
+      <field id="0" name="PriceType" type="TariffPriceTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Price" type="money">
+        <optionalConform choice="c" more="true" min="1"/>
+      </field>
+      <field id="2" name="PriceLevel" type="int16">
+        <optionalConform choice="c" more="true" min="1"/>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="TariffInfo" type="TariffInformationStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="MeteringUnit" type="MeteringUnitEnum" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="StartDate" type="epoch-s" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="Transitions" type="list" default="empty">
+      <entry type="CalendarTransitionStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0004" name="DayPatterns" type="list" default="empty">
+      <entry type="DayPatternStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0005" name="CalendarPeriods" type="list" default="empty">
+      <entry type="CalendarPeriodStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <countBetween>
+          <from value="1"/>
+          <to value="4"/>
+        </countBetween>
+      </constraint>
+    </attribute>
+    <attribute id="0x0006" name="IndividualDays" type="list" default="empty">
+      <entry type="DayStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <maxCount value="50"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0007" name="CurrentDay" type="DayStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0008" name="NextDay" type="DayStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0009" name="CurrentTransition" type="CalendarTransitionStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x000A" name="CurrentTransitionDate" type="epoch-s" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x000B" name="NextTransition" type="CalendarTransitionStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x000C" name="NextTransitionDate" type="epoch-s" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x000D" name="TariffComponents" type="list" default="empty">
+      <entry type="TariffComponentStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <minCount value="1"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000E" name="TariffPeriods" type="list" default="empty">
+      <entry type="TariffPeriodStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <minCount value="1"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000F" name="CurrentTariffComponents" type="list" default="empty">
+      <entry type="TariffComponentStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0010" name="NextTariffComponents" type="list" default="empty">
+      <entry type="TariffComponentStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0011" name="DefaultRandomizationOffset" type="int16" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="RNDM"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0012" name="DefaultRandomizationType" type="TransitionRandomizationTypeEnum" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="RNDM"/>
+      </mandatoryConform>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="GetTariffComponent" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="TariffComponentID" type="uint32">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x00" name="GetTariffComponentResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="Label" type="string">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="128"/>
+        </constraint>
+      </field>
+      <field id="1" name="CalendarTransitionIDs" type="list">
+        <entry type="uint32"/>
+        <mandatoryConform/>
+        <constraint>
+          <minCount value="1"/>
+        </constraint>
+      </field>
+      <field id="2" name="TariffComponent" type="TariffComponentStruct">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x01" name="GetCalendarTransition" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="CalendarTransitionID" type="uint32">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x01" name="GetCalendarTransitionResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="Transition" type="CalendarTransitionStruct">
+        <mandatoryConform/>
+      </field>
+    </command>
+  </commands>
+</cluster>
