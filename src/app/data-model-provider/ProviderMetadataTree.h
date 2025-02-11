@@ -61,7 +61,7 @@ public:
     virtual CHIP_ERROR ServerClusters(EndpointId endpointId, ListBuilder<ServerClusterEntry> & builder) = 0;
 
     /// Attribute lists contain all attributes. This MUST include all global
-    /// attributes (See SPEC 7.13 Global Elements / Global Attributes Table). 
+    /// attributes (See SPEC 7.13 Global Elements / Global Attributes Table).
     /// In particular this MUST contain:
     ///    - AcceptedCommandList::Id
     ///    - AttributeList::Id
