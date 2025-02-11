@@ -15,6 +15,8 @@
 #  limitations under the License.
 #
 
+import logging
+
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
@@ -37,7 +39,6 @@
 # === END CI TEST ARGUMENTS ===
 #
 import chip.clusters as Clusters
-import logging
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 
