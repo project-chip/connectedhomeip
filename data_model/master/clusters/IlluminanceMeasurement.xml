@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -75,39 +75,52 @@ Davis, CA 95616, USA
       <item value="1" name="CMOS" summary="Indicates CMOS sensor type">
         <mandatoryConform/>
       </item>
-      <item from="64" to="254" name="MS" summary="Reserved for manufacturer specific light sensor types">
-        <optionalConform/>
-      </item>
     </enum>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="MeasuredValue" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" reportable="true"/>
       <mandatoryConform/>
-      <constraint type="allowed" value="0"/>
-      <constraint type="between" from="MinMeasuredValue" to="MaxMeasuredValue"/>
+      <constraint>
+        <allowed value="0"/>
+      </constraint>
+      <constraint>
+        <between>
+          <attribute name="MinMeasuredValue"/>
+          <attribute name="MaxMeasuredValue"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="MinMeasuredValue" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="between" from="1" to="65533"/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="65533"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="MaxMeasuredValue" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="min" value="MinMeasuredValue + 1"/>
+      <constraint>
+        <min value="MinMeasuredValue + 1"/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="Tolerance" type="uint16">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
-      <constraint type="max" value="2048"/>
+      <constraint>
+        <max value="2048"/>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="LightSensorType" type="LightSensorTypeEnum" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
   </attributes>

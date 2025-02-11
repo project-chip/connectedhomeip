@@ -467,7 +467,7 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
 
     @try {
         [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-            MTR_LOG_ERROR("Error: %@", error);
+            MTR_LOG_ERROR("%@ Error in %@: %@", self, NSStringFromSelector(_cmd), error);
             dispatch_async(queue, ^{
                 completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
             });
@@ -488,7 +488,7 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
                              return;
                          }
 
-                         if (responses != nil && !MTRInvokeResponseIsWellFormed(responses)) {
+                         if (responses != nil && !MTRInvokeResponsesAreWellFormed(responses)) {
                              MTR_LOG_ERROR("%@ got invoke responses for %@ that has invalid data: %@", self, commands, responses);
                              completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
                              return;
@@ -505,7 +505,7 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
                      });
                  }];
     } @catch (NSException * exception) {
-        MTR_LOG_ERROR("Exception sending XPC message: %@", exception);
+        MTR_LOG_ERROR("%@ Exception sending XPC message for %@: %@", self, NSStringFromSelector(_cmd), exception);
         dispatch_async(queue, ^{
             completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
         });
@@ -521,7 +521,7 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
 
     @try {
         [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-            MTR_LOG_ERROR("Error: %@", error);
+            MTR_LOG_ERROR("%@ Error in %@: %@", self, NSStringFromSelector(_cmd), error);
             dispatch_async(queue, ^{
                 completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
             });
@@ -538,7 +538,7 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
                        });
                    }];
     } @catch (NSException * exception) {
-        MTR_LOG_ERROR("Exception sending XPC messsage: %@", exception);
+        MTR_LOG_ERROR("%@ Exception sending XPC messsage for %@: %@", self, NSStringFromSelector(_cmd), exception);
         dispatch_async(queue, ^{
             completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
         });

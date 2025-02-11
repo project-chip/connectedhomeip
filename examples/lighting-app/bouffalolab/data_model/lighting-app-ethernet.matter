@@ -1013,7 +1013,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
   provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
   provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
-  provisional readonly attribute access(read: administer) optional int32u TCUpdateDeadline = 9;
+  provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2127,6 +2127,18 @@ endpoint 0 {
 
   binding cluster OtaSoftwareUpdateProvider;
 
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
   server cluster AccessControl {
     emits event AccessControlEntryChanged;
     emits event AccessControlExtensionChanged;
@@ -2209,7 +2221,7 @@ endpoint 0 {
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
-    ram      attribute featureMap default = 1;
+    ram      attribute featureMap default = 4;
     ram      attribute clusterRevision default = 1;
 
     handle command ScanNetworks;

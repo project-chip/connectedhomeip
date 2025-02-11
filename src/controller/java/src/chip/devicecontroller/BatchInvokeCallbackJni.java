@@ -19,31 +19,17 @@ package chip.devicecontroller;
 
 import chip.devicecontroller.model.InvokeResponseData;
 import chip.devicecontroller.model.NoInvokeResponseData;
-import java.lang.ref.Cleaner;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
 /** JNI wrapper callback class for {@link InvokeCallback}. */
-public final class BatchInvokeCallbackJni {
-  private final BatchInvokeCallbackJni wrappedBatchInvokeCallback;
+public final class ExtendableInvokeCallbackJni {
+  private final ExtendableInvokeCallback wrappedExtendableInvokeCallback;
   private long callbackHandle;
 
-  private final Cleaner.Cleanable cleanable;
-
-  public BatchInvokeCallbackJni(BatchInvokeCallback wrappedBatchInvokeCallback) {
-    this.wrappedBatchInvokeCallback = wrappedBatchInvokeCallback;
+  public ExtendableInvokeCallbackJni(ExtendableInvokeCallback wrappedExtendableInvokeCallback) {
+    this.wrappedExtendableInvokeCallback = wrappedExtendableInvokeCallback;
     this.callbackHandle = newCallback();
-
-    this.cleanable =
-        Cleaner.create()
-            .register(
-                this,
-                () -> {
-                  if (chipClusterPtr != 0) {
-                    deleteCluster(chipClusterPtr);
-                    chipClusterPtr = 0;
-                  }
-                });
   }
 
   long getCallbackHandle() {
@@ -55,7 +41,7 @@ public final class BatchInvokeCallbackJni {
   private native void deleteCallback(long callbackHandle);
 
   private void onError(Exception e) {
-    wrappedBatchInvokeCallback.onError(e);
+    wrappedExtendableInvokeCallback.onError(e);
   }
 
   private void onResponse(
@@ -88,10 +74,21 @@ public final class BatchInvokeCallbackJni {
   }
 
   private void onNoResponse(int commandRef) {
-    wrappedBatchInvokeCallback.onNoResponse(NoInvokeResponseData.newInstance(commandRef));
+    wrappedExtendableInvokeCallback.onNoResponse(NoInvokeResponseData.newInstance(commandRef));
   }
 
   private void onDone() {
-    wrappedBatchInvokeCallback.onDone();
+    wrappedExtendableInvokeCallback.onDone();
+  }
+
+  // TODO(#8578): Replace finalizer with PhantomReference.
+  @SuppressWarnings("deprecation")
+  protected void finalize() throws Throwable {
+    super.finalize();
+
+    if (callbackHandle != 0) {
+      deleteCallback(callbackHandle);
+      callbackHandle = 0;
+    }
   }
 }
