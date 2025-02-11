@@ -194,22 +194,6 @@
               "reportableChange": 0
             },
             {
-              "name": "Extension",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "type": "array",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": null,
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
               "name": "SubjectsPerAccessControlEntry",
               "code": 2,
               "mfgCode": null,
