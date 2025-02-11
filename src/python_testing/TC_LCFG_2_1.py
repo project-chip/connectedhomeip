@@ -50,12 +50,6 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
     def has_repeated_values(self, list):
         return len(list) != len(set(list))
 
-    def has_less_than_32_elements(self, list):
-        return len(list) <= 32
-
-    def is_language_tag(self, tag: str) -> bool:
-        return langcodes.tag_is_valid(tag)
-
     def list_has_maximum_length_of_35_bytes(self, list):
         return all(self.has_maximum_lenght_of_35_bytes(elem) for elem in list)
 
@@ -99,8 +93,7 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
                              "SupportedLocales attribute has no repeated values")
 
         # Verify maximun number of elements in the SupportedLocales list is 32
-        asserts.assert_true(self.has_less_than_32_elements(initial_values_supported_locales),
-                            "SupportedLocales attribute has less than 32 elements")
+        asserts.assert_true(len(initial_values_supported_locales) <= 32, "SupportedLocales attribute has less than 32 elements")
 
         # Verify values of SupportedLocales attribute has a maximum lenght of 35 bytes
         asserts.assert_true(self.list_has_maximum_length_of_35_bytes(initial_values_supported_locales),
@@ -119,7 +112,7 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
         asserts.assert_true(bool(initial_active_locale), "ActiveLocale attribute is not empty")
 
         # Verify that the ActiveLocale attribute is Language Tag as defined by BCP47
-        asserts.assert_true(self.is_language_tag(initial_active_locale),
+        asserts.assert_true(langcodes.tag_is_valid(initial_active_locale),
                             "ActiveLocale attribute is Language Tag as defined by BCP47")
 
         # Verify that the value of ActiveLocale attribute has maximum lenght of 35 bytes
