@@ -153,7 +153,7 @@ void ESP32Diagnostics::TraceEnd(const char * label, const char * group) {}
 
 void ESP32Diagnostics::TraceInstant(const char * label, const char * value)
 {
-    VerifyOrReturn(IsPresent(value, gSkipList));
+    VerifyOrReturn(!IsPresent(value, gSkipList));
     ReturnOnFailure(StoreDiagnostics(label, value));
 }
 
