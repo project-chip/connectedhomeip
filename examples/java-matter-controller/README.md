@@ -7,11 +7,11 @@ cluster requests to a Matter device
 
 <hr>
 
-- [Matter Controller Java App Example](#matter-controller-java-app-example)
-  - [Requirements for building](#requirements-for-building)
-    - [Linux](#linux)
-  - [Preparing for build](#preparing-for-build)
-  - [Building \& Running the app](#building--running-the-app)
+-   [Matter Controller Java App Example](#matter-controller-java-app-example)
+    -   [Requirements for building](#requirements-for-building)
+        -   [Linux](#linux)
+    -   [Preparing for build](#preparing-for-build)
+    -   [Building \& Running the app](#building--running-the-app)
 
 <hr>
 

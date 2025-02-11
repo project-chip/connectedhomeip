@@ -5,11 +5,11 @@ control Matter accessory devices.
 
 <hr>
 
-- [Matter Controller Kotlin App Example](#matter-controller-kotlin-app-example)
-  - [Requirements for building](#requirements-for-building)
-    - [Linux](#linux)
-  - [Preparing for build](#preparing-for-build)
-  - [Building \& Running the app](#building--running-the-app)
+-   [Matter Controller Kotlin App Example](#matter-controller-kotlin-app-example)
+    -   [Requirements for building](#requirements-for-building)
+        -   [Linux](#linux)
+    -   [Preparing for build](#preparing-for-build)
+    -   [Building \& Running the app](#building--running-the-app)
 
 <hr>
 
