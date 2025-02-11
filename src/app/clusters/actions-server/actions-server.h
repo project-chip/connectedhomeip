@@ -35,17 +35,6 @@ static constexpr size_t kEndpointListMaxSize = 256u;
 
 class Delegate;
 
-class MatterContext
-{
-public:
-    virtual ~MatterContext() = default;
-    // MarkDirty
-    virtual void MarkDirty(EndpointId aEndpointId, AttributeId aAttributeId)
-    {
-        MatterReportingAttributeChangeCallback(aEndpointId, Id, aAttributeId);
-    }
-};
-
 struct ActionStructStorage : public Structs::ActionStruct::Type
 {
     ActionStructStorage(){};
@@ -174,7 +163,6 @@ public:
 
 private:
     static ActionsServer sInstance;
-    MatterContext mMatterContext;
     static constexpr size_t kMaxEndpointListLength = 256u;
     static constexpr size_t kMaxActionListLength   = 256u;
 
@@ -184,6 +172,10 @@ private:
                                          const AttributeValueEncoder::ListEncodeHelper & aEncoder);
     bool HaveActionWithId(EndpointId aEndpointId, uint16_t aActionId);
 
+    void MarkDirty(EndpointId aEndpointId, AttributeId aAttributeId)
+    {
+        MatterReportingAttributeChangeCallback(aEndpointId, Id, aAttributeId);
+    }
     // Cannot use CommandHandlerInterface::HandleCommand directly because we need to do the HaveActionWithId() check before
     // sending a command.
     template <typename RequestT, typename FuncT>
