@@ -118,6 +118,8 @@ public:
     void ResetResubscriptionBackoff() { mResubscriptionNumRetries = 0; }
 
 private:
+    void OnSubscriptionEstablished(chip::SubscriptionId aSubscriptionId) override;
+
     void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override;
 
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
@@ -4770,6 +4772,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 #pragma mark - SubscriptionCallback
 namespace {
+void SubscriptionCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
+{
+    // The next time we need to do a resubscribe, we should start a new backoff
+    // sequence.
+    ResetResubscriptionBackoff();
+    MTRBaseSubscriptionCallback::OnSubscriptionEstablished(aSubscriptionId);
+}
+
 void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus)
 {
     if (mEventReports == nil) {
