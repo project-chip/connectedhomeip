@@ -289,7 +289,7 @@ void BLWiFiDriver::OnScanWiFiNetworkDone(void)
     size_t ap_cnt = mScanResponseNum;
     WiFiScanResponse *pScanResponse = mScanResponse;
 
-    if (mScanResponse) 
+    if (mScanResponse)
     {
         if (CHIP_NO_ERROR == DeviceLayer::SystemLayer().ScheduleLambda([ap_cnt, pScanResponse]() {
                 BLScanResponseIterator iter(ap_cnt, pScanResponse);
