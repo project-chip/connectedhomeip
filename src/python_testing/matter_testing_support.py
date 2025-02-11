@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2022 Project CHIP Authors
+#    Copyright (c) 2022-2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -218,6 +218,100 @@ def compare_time(received: int, offset: timedelta = timedelta(), utc: int = None
 def get_wait_seconds_from_set_time(set_time_matter_us: int, wait_seconds: int):
     seconds_passed = (utc_time_in_matter_epoch() - set_time_matter_us) // 1000000
     return wait_seconds - seconds_passed
+
+
+@dataclass
+class SetupPayloadInfo:
+    filter_type: discovery.FilterType = discovery.FilterType.LONG_DISCRIMINATOR
+    filter_value: int = 0
+    passcode: int = 0
+
+
+@dataclass
+class CommissioningInfo:
+    commissionee_ip_address_just_for_testing: Optional[str] = None
+    commissioning_method: Optional[str] = None
+    thread_operational_dataset: Optional[str] = None
+    wifi_passphrase: Optional[str] = None
+    wifi_ssid: Optional[str] = None
+    # Accepted Terms and Conditions if used
+    tc_version_to_simulate: int = None
+    tc_user_response_to_simulate: int = None
+
+
+async def commission_device(
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, info: SetupPayloadInfo, commissioning_info: CommissioningInfo
+) -> bool:
+    if commissioning_info.tc_version_to_simulate is not None and commissioning_info.tc_user_response_to_simulate is not None:
+        logging.debug(
+            f"Setting TC Acknowledgements to version {commissioning_info.tc_version_to_simulate} with user response {commissioning_info.tc_user_response_to_simulate}."
+        )
+        dev_ctrl.SetTCAcknowledgements(commissioning_info.tc_version_to_simulate, commissioning_info.tc_user_response_to_simulate)
+
+    if commissioning_info.commissioning_method == "on-network":
+        try:
+            await dev_ctrl.CommissionOnNetwork(
+                nodeId=node_id, setupPinCode=info.passcode, filterType=info.filter_type, filter=info.filter_value
+            )
+            return True
+        except ChipStackError as e:
+            logging.error("Commissioning failed: %s" % e)
+            return False
+    elif commissioning_info.commissioning_method == "ble-wifi":
+        try:
+            await dev_ctrl.CommissionWiFi(
+                info.filter_value,
+                info.passcode,
+                node_id,
+                commissioning_info.wifi_ssid,
+                commissioning_info.wifi_passphrase,
+                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
+            )
+            return True
+        except ChipStackError as e:
+            logging.error("Commissioning failed: %s" % e)
+            return False
+    elif commissioning_info.commissioning_method == "ble-thread":
+        try:
+            await dev_ctrl.CommissionThread(
+                info.filter_value,
+                info.passcode,
+                node_id,
+                commissioning_info.thread_operational_dataset,
+                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
+            )
+            return True
+        except ChipStackError as e:
+            logging.error("Commissioning failed: %s" % e)
+            return False
+    elif commissioning_info.commissioning_method == "on-network-ip":
+        try:
+            logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
+            await dev_ctrl.CommissionIP(
+                ipaddr=commissioning_info.commissionee_ip_address_just_for_testing,
+                setupPinCode=info.passcode,
+                nodeid=node_id,
+            )
+            return True
+        except ChipStackError as e:
+            logging.error("Commissioning failed: %s" % e)
+            return False
+    else:
+        raise ValueError("Invalid commissioning method %s!" % commissioning_info.commissioning_method)
+
+
+async def commission_devices(
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+    dut_node_ids: List[int],
+    setup_payloads: List[SetupPayloadInfo],
+    commissioning_info: CommissioningInfo,
+) -> bool:
+    commissioned = []
+    for node_id, setup_payload in zip(dut_node_ids, setup_payloads):
+        logging.info(f"Commissioning method: {commissioning_info.commissioning_method}")
+        commissioned.append(await commission_device(dev_ctrl, node_id, setup_payload, commissioning_info))
+
+    return all(commissioned)
 
 
 class SimpleEventCallback:
@@ -629,6 +723,7 @@ class MatterTestConfig:
     app_pid: int = 0
 
     commissioning_method: Optional[str] = None
+    in_test_commissioning_method: Optional[str] = None
     discriminators: List[int] = field(default_factory=list)
     setup_passcodes: List[int] = field(default_factory=list)
     commissionee_ip_address_just_for_testing: Optional[str] = None
@@ -665,6 +760,10 @@ class MatterTestConfig:
     chip_tool_credentials_path: Optional[pathlib.Path] = None
 
     trace_to: List[str] = field(default_factory=list)
+
+    # Accepted Terms and Conditions if used
+    tc_version_to_simulate: int = None
+    tc_user_response_to_simulate: int = None
 
 
 class ClusterMapper:
@@ -826,10 +925,24 @@ class ProblemNotice:
 
 
 @dataclass
-class SetupPayloadInfo:
-    filter_type: discovery.FilterType = discovery.FilterType.LONG_DISCRIMINATOR
-    filter_value: int = 0
-    passcode: int = 0
+class SetupParameters:
+    passcode: int
+    vendor_id: int = 0xFFF1
+    product_id: int = 0x8001
+    discriminator: int = 3840
+    custom_flow: int = 0
+    capabilities: int = 0b0100
+    version: int = 0
+
+    @property
+    def qr_code(self):
+        return SetupPayload().GenerateQrCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
+                                             self.custom_flow, self.capabilities, self.version)
+
+    @property
+    def manual_code(self):
+        return SetupPayload().GenerateManualPairingCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
+                                                        self.custom_flow, self.capabilities, self.version)
 
 
 class MatterStackState:
@@ -1138,6 +1251,22 @@ class MatterBaseTest(base_test.BaseTestClass):
     @property
     def is_pics_sdk_ci_only(self) -> bool:
         return self.check_pics('PICS_SDK_CI_ONLY')
+
+    async def commission_devices(self) -> bool:
+        dev_ctrl: ChipDeviceCtrl.ChipDeviceController = self.default_controller
+        dut_node_ids: List[int] = self.matter_test_config.dut_node_ids
+        setup_payloads: List[SetupPayloadInfo] = self.get_setup_payload_info()
+        commissioning_info: CommissioningInfo = CommissioningInfo(
+            commissionee_ip_address_just_for_testing=self.matter_test_config.commissionee_ip_address_just_for_testing,
+            commissioning_method=self.matter_test_config.commissioning_method,
+            thread_operational_dataset=self.matter_test_config.thread_operational_dataset,
+            wifi_passphrase=self.matter_test_config.wifi_passphrase,
+            wifi_ssid=self.matter_test_config.wifi_ssid,
+            tc_version_to_simulate=self.matter_test_config.tc_version_to_simulate,
+            tc_user_response_to_simulate=self.matter_test_config.tc_user_response_to_simulate,
+        )
+
+        return await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
 
     async def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int) -> CustomCommissioningParameters:
         rnd_discriminator = random.randint(0, 4095)
@@ -1735,6 +1864,7 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
     config.dut_node_ids = args.dut_node_ids
 
     config.commissioning_method = args.commissioning_method
+    config.in_test_commissioning_method = args.in_test_commissioning_method
     config.commission_only = args.commission_only
 
     config.qr_code_content.extend(args.qr_code)
@@ -1837,6 +1967,9 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
 
+    config.tc_version_to_simulate = args.tc_version_to_simulate
+    config.tc_user_response_to_simulate = args.tc_user_response_to_simulate
+
     # Accumulate all command-line-passed named args
     all_global_args = []
     argsets = [item for item in (args.int_arg, args.float_arg, args.string_arg, args.json_arg,
@@ -1895,6 +2028,10 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                                   metavar='METHOD_NAME',
                                   choices=["on-network", "ble-wifi", "ble-thread", "on-network-ip"],
                                   help='Name of commissioning method to use')
+    commission_group.add_argument('--in-test-commissioning-method', type=str,
+                                  metavar='METHOD_NAME',
+                                  choices=["on-network", "ble-wifi", "ble-thread", "on-network-ip"],
+                                  help='Name of commissioning method to use, for commissioning tests')
     commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
                                   metavar='LONG_DISCRIMINATOR',
                                   dest='discriminators',
@@ -1929,6 +2066,10 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
 
     commission_group.add_argument('--commission-only', action="store_true", default=False,
                                   help="If true, test exits after commissioning without running subsequent tests")
+
+    commission_group.add_argument('--tc-version-to-simulate', type=int, help="Terms and conditions version")
+
+    commission_group.add_argument('--tc-user-response-to-simulate', type=int, help="Terms and conditions acknowledgements")
 
     code_group = parser.add_mutually_exclusive_group(required=False)
 
@@ -2201,73 +2342,8 @@ class CommissionDeviceTest(MatterBaseTest):
         self.is_commissioning = True
 
     def test_run_commissioning(self):
-        conf = self.matter_test_config
-        for commission_idx, node_id in enumerate(conf.dut_node_ids):
-            logging.info("Starting commissioning for root index %d, fabric ID 0x%016X, node ID 0x%016X" %
-                         (conf.root_of_trust_index, conf.fabric_id, node_id))
-            logging.info("Commissioning method: %s" % conf.commissioning_method)
-
-            if not asyncio.run(self._commission_device(commission_idx)):
-                raise signals.TestAbortAll("Failed to commission node")
-
-    async def _commission_device(self, i) -> bool:
-        dev_ctrl = self.default_controller
-        conf = self.matter_test_config
-
-        info = self.get_setup_payload_info()[i]
-
-        if conf.commissioning_method == "on-network":
-            try:
-                await dev_ctrl.CommissionOnNetwork(
-                    nodeId=conf.dut_node_ids[i],
-                    setupPinCode=info.passcode,
-                    filterType=info.filter_type,
-                    filter=info.filter_value
-                )
-                return True
-            except ChipStackError as e:
-                logging.error("Commissioning failed: %s" % e)
-                return False
-        elif conf.commissioning_method == "ble-wifi":
-            try:
-                await dev_ctrl.CommissionWiFi(
-                    info.filter_value,
-                    info.passcode,
-                    conf.dut_node_ids[i],
-                    conf.wifi_ssid,
-                    conf.wifi_passphrase,
-                    isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
-                )
-                return True
-            except ChipStackError as e:
-                logging.error("Commissioning failed: %s" % e)
-                return False
-        elif conf.commissioning_method == "ble-thread":
-            try:
-                await dev_ctrl.CommissionThread(
-                    info.filter_value,
-                    info.passcode,
-                    conf.dut_node_ids[i],
-                    conf.thread_operational_dataset,
-                    isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
-                )
-                return True
-            except ChipStackError as e:
-                logging.error("Commissioning failed: %s" % e)
-                return False
-        elif conf.commissioning_method == "on-network-ip":
-            try:
-                logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
-                await dev_ctrl.CommissionIP(
-                    ipaddr=conf.commissionee_ip_address_just_for_testing,
-                    setupPinCode=info.passcode, nodeid=conf.dut_node_ids[i]
-                )
-                return True
-            except ChipStackError as e:
-                logging.error("Commissioning failed: %s" % e)
-                return False
-        else:
-            raise ValueError("Invalid commissioning method %s!" % conf.commissioning_method)
+        if not asyncio.run(self.commission_devices()):
+            raise signals.TestAbortAll("Failed to commission node")
 
 
 def default_matter_test_main():
