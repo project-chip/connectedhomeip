@@ -75,7 +75,7 @@ jobs:
               # TODO: this direct path loading is not maintainable. Our build system should define and
               #       support test classes.
               run: |
-                 $JAVA_PATH/bin/java \
+                 $JAVA_HOME/bin/java \
                    -cp 'third_party/java_deps/artifacts/*:out/linux-x64-tests/lib/src/controller/java/*' \
                    org.junit.runner.JUnitCore       \
                    matter.tlv.TlvWriterTest           \

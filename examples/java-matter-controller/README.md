@@ -7,10 +7,11 @@ cluster requests to a Matter device
 
 <hr>
 
--   [Matter Controller Java App Example](#matter-controller-java-app-example)
-    -   [Requirements for building](#requirements-for-building)
-    -   [Preparing for build](#preparing-for-build)
-    -   [Building & Running the app](#building--running-the-app)
+- [Matter Controller Java App Example](#matter-controller-java-app-example)
+  - [Requirements for building](#requirements-for-building)
+    - [Linux](#linux)
+  - [Preparing for build](#preparing-for-build)
+  - [Building \& Running the app](#building--running-the-app)
 
 <hr>
 
@@ -95,7 +96,7 @@ export PATH="/usr/lib/kotlinc/bin:$PATH"
 ### Linux
 
 ```shell
-export JAVA_PATH=[JDK path]
+export JAVA_HOME=[JDK path]
 ```
 
 <hr>
