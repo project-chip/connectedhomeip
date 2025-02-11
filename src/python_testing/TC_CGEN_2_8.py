@@ -49,7 +49,10 @@ class TC_CGEN_2_8(MatterBaseTest):
             TestStep(5, "DUT is factory reset."),
             TestStep(6, "Perform the necessary actions to put the DUT into a commissionable state."),
             TestStep(7, "TH begins commissioning the DUT and performs the steps 'Device discovery and establish commissioning channel' through 'Security setup using CASE', skipping 'Configure information- TC Acknowledgements'"),
-            TestStep(8, "TH sends CommissioningComplete to DUT."),
+            TestStep(8, "TH reads from the DUT the attribute TCAcceptedVersion."),
+            TestStep(9, "TH reads from the DUT the attribute TCAcknowledgements."),
+            TestStep(10, "TH reads from the DUT the attribute TCAcknowledgementsRequired."),
+            TestStep(11, "TH sends CommissioningComplete to DUT."),
         ]
 
     @async_test_body
@@ -135,8 +138,26 @@ class TC_CGEN_2_8(MatterBaseTest):
         self.matter_test_config.tc_user_response_to_simulate = None
         await self.commission_devices()
 
-        # Step 8: Verify CommissioningComplete fails
+        # Step 8: Verify that TCAcceptedVersion equals 0
         self.step(8)
+        response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion)])
+        accepted_version = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion]
+        asserts.assert_equal(accepted_version, 0, "TCAcceptedVersion does not match expected value.")
+
+        # Step 9: Verify that TCAcknowledgements equals 0
+        self.step(9)
+        response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgements)])
+        acknowledgements = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgements]
+        asserts.assert_equal(acknowledgements, 0, "TCAcknowledgements does not match expected value.")
+
+        # Step 10: Verify that TCAcknowledgementsRequired equals True
+        self.step(10)
+        response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired)])
+        tc_acknowledgements_required = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired]
+        asserts.assert_equal(tc_acknowledgements_required, True, "TCAcknowledgementsRequired should be True.")
+
+        # Step 11: Verify CommissioningComplete fails
+        self.step(11)
         response = await commissioner.SendCommand(
             nodeid=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
