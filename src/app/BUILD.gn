@@ -107,17 +107,22 @@ source_set("paths") {
     "${chip_root}/src/app/util:types",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support",
   ]
 }
 
 source_set("global-attributes") {
-  sources = [ "GlobalAttributes.h" ]
+  sources = [
+    "GlobalAttributes.cpp",
+    "GlobalAttributes.h",
+  ]
 
   # This also depends on zap-generated code which is currently impossible to split out
   # as a dependency
   public_deps = [
     ":app_config",
     "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/lib/support",
   ]
 }
@@ -219,6 +224,7 @@ static_library("interaction-model") {
     ":event-reporter",
     ":paths",
     ":subscription-info-provider",
+    "${chip_root}/src/access",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
@@ -262,7 +268,6 @@ static_library("interaction-model") {
     # We likely should formalize and change this with a proper DataModel::Provider that
     # is consistent instead
     sources += [
-      "${chip_root}/src/app/util/ember-global-attribute-access-interface.cpp",
       "${chip_root}/src/app/util/ember-io-storage.cpp",
       "dynamic_server/DynamicDispatcher.cpp",
     ]
@@ -350,6 +355,7 @@ source_set("status-response") {
     ":constants",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/interaction_model",
   ]
 }
 
@@ -387,6 +393,7 @@ source_set("command-handler-impl") {
     ":status-response",
     "${chip_root}/src/access:types",
     "${chip_root}/src/app/MessageDef",
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/util:callbacks",

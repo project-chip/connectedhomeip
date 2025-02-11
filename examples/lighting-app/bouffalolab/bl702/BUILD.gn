@@ -56,7 +56,6 @@ declare_args() {
   baudrate = 2000000
 
   enable_cdc_module = false
-  config_cache_size = 16384
   enable_psram = true
 }
 
@@ -71,7 +70,7 @@ bl_iot_sdk("sdk") {
     "${chip_root}/src/platform/bouffalolab/common",
   ]
 
-  freertos_config = "${examples_plat_dir}/bl702/FreeRTOSConfig.h"
+  freertos_config = "${example_dir}/bl702/FreeRTOSConfig.h"
 
   defines = [
     "INCLUDE_xSemaphoreGetMutexHolder=1",
@@ -310,7 +309,6 @@ bouffalolab_executable("lighting_app") {
   if (chip_print_memory_usage) {
     ldflags += [
       "-Wl,--print-memory-usage",
-      "-Wl,--defsym=__CACHE_SIZE=${config_cache_size}",
       "-fstack-usage",
     ]
   }

@@ -270,6 +270,12 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
+ * Forget any information we have about the device with the given node ID.  That
+ * includes clearing any information we have stored about it.
+ */
+- (void)forgetDeviceWithNodeID:(NSNumber *)nodeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+/**
  * Compute a PASE verifier for the desired setup passcode.
  *
  * @param[in] setupPasscode   The desired passcode to use.
@@ -302,6 +308,13 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * there does not need to be a resume call to match every suspend call.
  */
 - (void)resume MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
+
+/**
+ * Returns the list of node IDs for which this controller has stored
+ * information.  Returns empty list if the controller does not have any
+ * information stored.
+ */
+- (NSArray<NSNumber *> *)nodesWithStoredData MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 /**
  * Shut down the controller. Calls to shutdown after the first one are NO-OPs.
