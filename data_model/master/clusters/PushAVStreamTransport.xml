@@ -1,0 +1,472 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0555" name="Push AV Stream Transport Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial Release"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0555" name="Push AV Stream Transport"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="PAVST" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="PERZONESENS" name="PerZoneSensitivity" summary="Supports a sensitivity value per Zone">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <number name="PushTransportConnectionID" type="uint16"/>
+    <enum name="ContainerFormatEnum">
+      <item value="0" name="CMAF" summary="CMAF container format">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="IngestMethodsEnum">
+      <item value="0" name="CMAFIngest" summary="CMAF ingestion format">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="StatusCodeEnum">
+      <item value="0x02" name="AllocationNotPermitted" summary="The specified transport cannot be allocated.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="InvalidTLSEndpoint" summary="The specified TLSEndpointID cannot be found.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x04" name="InvalidStream" summary="The specified VideoStreamID or AudioStreamID cannot be found.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x05" name="InvalidURL" summary="The Specified URL is invalid.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x06" name="InvalidZone" summary="A Specified ZoneID was invalid.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x07" name="UnsupportedContainerFormat" summary="The Specified Container Format is not supported using the selected Ingestion Method.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x08" name="UnsupportedIngestMethod" summary="The Specified Ingestion Method is not supported.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x09" name="InvalidTriggerType" summary="The trigger type is invalid for this command.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x10" name="InvalidTransportStatus" summary="The Stream Transport Status is invalid for this command.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="StreamMultiplexingEnum">
+      <item value="0" name="Interleaved" summary="AV Streams are interleaved">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="TransportStatusEnum">
+      <item value="0" name="Active" summary="Push Transport can transport AV Streams">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Inactive" summary="Push Transport cannot transport AV Streams">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="TransportTriggerTypeEnum">
+      <item value="0" name="Command" summary="Triggered only via a command invocation">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Motion" summary="Triggered via motion detection or command">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Continuous" summary="Triggered always when transport status is Active">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="TriggerActivationReasonEnum">
+      <item value="0" name="UserInitiated" summary="Trigger has been activated by user action">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Automation" summary="Trigger has been activated by automation">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Emergency" summary="Trigger has been activated for emergency reasons">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <bitmap name="SupportedContainerFormatsBitmap">
+      <bitfield name="CMAF" bit="0" summary="CMAF container format">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="SupportedIngestMethodsBitmap">
+      <bitfield name="CMAFIngest" bit="0" summary="CMAF ingestion format">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <struct name="CMAFContainerOptionsStruct">
+      <field id="0" name="ChunkDuration" type="uint16" default="4">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="CENCKey" type="octstr">
+        <optionalConform/>
+      </field>
+    </struct>
+    <struct name="ContainerOptionsStruct">
+      <field id="0" name="ContainerType" type="ContainerFormatEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="CMAFContainerOptions" type="CMAFContainerOptionsStruct">
+        <mandatoryConform>
+          <equalTerm>
+            <field name="ContainerType"/>
+            <literal value="0"/>
+          </equalTerm>
+        </mandatoryConform>
+      </field>
+    </struct>
+    <struct name="MetadataOptionsStruct">
+      <field id="0" name="Multiplexing" type="StreamMultiplexingEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="IncludeMotionZones" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="EnableMetadataPrivacySensitive" type="bool">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="TransportConfigurationStruct">
+      <field id="0" name="ConnectionID" type="PushTransportConnectionID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="TransportStatus" type="TransportStatusEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="TransportOptions" type="TransportOptionsStruct">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="TransportMotionTriggerTimeControlStruct">
+      <field id="0" name="InitialDuration" type="uint16" default="10">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="1" name="AugmentationDuration" type="uint16" default="5">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="MaxDuration" type="elapsed-s" default="30">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="3" name="BlindDuration" type="uint16" default="30">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="TransportOptionsStruct">
+      <field id="0" name="StreamUsage" type="StreamUsageEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="VideoStreamID" type="VideoStreamID">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+      <field id="2" name="AudioStreamID" type="AudioStreamID">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+      <field id="3" name="EndpointID" type="TLSEndpointID">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="URL" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="2000"/>
+        </constraint>
+      </field>
+      <field id="5" name="TriggerOptions" type="TransportTriggerOptionsStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="6" name="IngestMethod" type="IngestMethodsEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="7" name="ContainerFormat" type="ContainerFormatEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="8" name="ContainerOptions" type="ContainerOptionsStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="9" name="MetadataOptions" type="MetadataOptionsStruct">
+        <optionalConform/>
+      </field>
+      <field id="10" name="ExpiryTime" type="epoch-s">
+        <optionalConform/>
+      </field>
+    </struct>
+    <struct name="TransportTriggerOptionsStruct">
+      <field id="0" name="TriggerType" type="TransportTriggerTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="MotionZones" type="list" default="empty">
+        <entry type="TransportZoneOptionsStruct"/>
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <equalTerm>
+            <field name="TriggerType"/>
+            <literal value="1"/>
+          </equalTerm>
+        </mandatoryConform>
+      </field>
+      <field id="2" name="MotionSensitivity" type="uint8" default="5">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <andTerm>
+            <equalTerm>
+              <field name="TriggerType"/>
+              <literal value="1"/>
+            </equalTerm>
+            <notTerm>
+              <feature name="PERZONESENS"/>
+            </notTerm>
+          </andTerm>
+        </mandatoryConform>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="10"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="3" name="MotionTimeControl" type="TransportMotionTriggerTimeControlStruct">
+        <mandatoryConform>
+          <equalTerm>
+            <field name="TriggerType"/>
+            <literal value="1"/>
+          </equalTerm>
+        </mandatoryConform>
+      </field>
+      <field id="4" name="MaxPreRollLen" type="uint16">
+        <mandatoryConform>
+          <orTerm>
+            <equalTerm>
+              <field name="TriggerType"/>
+              <literal value="0"/>
+            </equalTerm>
+            <equalTerm>
+              <field name="TriggerType"/>
+              <literal value="1"/>
+            </equalTerm>
+          </orTerm>
+        </mandatoryConform>
+      </field>
+    </struct>
+    <struct name="TransportZoneOptionsStruct">
+      <field id="1" name="Zone" type="ZoneID">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Sensitivity" type="uint8" default="5">
+        <mandatoryConform>
+          <feature name="PERZONESENS"/>
+        </mandatoryConform>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="10"/>
+          </between>
+        </constraint>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="SupportedContainerFormats" type="SupportedContainerFormatsBitmap">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="SupportedIngestMethods" type="SupportedIngestMethodsBitmap">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="CurrentConnections" type="list" default="empty">
+      <entry type="PushTransportConnectionID"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="AllocatePushTransport" direction="commandToServer" response="AllocatePushTransportResponse">
+      <quality largeMessage="true"/>
+      <access invokePrivilege="manage"/>
+      <mandatoryConform/>
+      <field id="0" name="TransportOptions" type="TransportOptionsStruct">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x01" name="AllocatePushTransportResponse" direction="responseFromServer">
+      <quality largeMessage="true"/>
+      <mandatoryConform/>
+      <field id="0" name="ConnectionID" type="PushTransportConnectionID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="TransportOptions" type="TransportOptionsStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="TransportStatus" type="TransportStatusEnum">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x02" name="DeallocatePushTransport" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform/>
+      <field id="0" name="ConnectionID" type="PushTransportConnectionID">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x03" name="ModifyPushTransport" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform/>
+      <field id="0" name="ConnectionID" type="PushTransportConnectionID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="TransportOptions" type="TransportOptionsStruct">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x04" name="SetTransportStatus" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform/>
+      <field id="0" name="ConnectionID" type="PushTransportConnectionID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="TransportStatus" type="TransportStatusEnum">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x05" name="ManuallyTriggerTransport" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="ConnectionID" type="PushTransportConnectionID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ActivationReason" type="TriggerActivationReasonEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="TimeControl" type="TransportMotionTriggerTimeControlStruct">
+        <optionalConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x06" name="FindTransport" direction="commandToServer" response="FindTransportResponse">
+      <quality largeMessage="true"/>
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="ConnectionID" type="PushTransportConnectionID" default="null">
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x07" name="FindTransportResponse" direction="responseFromServer">
+      <quality largeMessage="true"/>
+      <mandatoryConform/>
+      <field id="0" name="StreamConfigurations" type="list">
+        <entry type="TransportConfigurationStruct"/>
+        <mandatoryConform/>
+      </field>
+    </command>
+  </commands>
+  <events>
+    <event id="0x00" name="PushTransportBegin" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="ConnectionID" type="PushTransportConnectionID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="TriggerType" type="TransportTriggerTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="ActivationReason" type="TriggerActivationReasonEnum">
+        <mandatoryConform>
+          <equalTerm>
+            <field name="TriggerType"/>
+            <literal value="0"/>
+          </equalTerm>
+        </mandatoryConform>
+      </field>
+    </event>
+    <event id="0x01" name="PushTransportEnd" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="ConnectionID" type="PushTransportConnectionID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="TriggerType" type="TransportTriggerTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="ActivationReason" type="TriggerActivationReasonEnum">
+        <mandatoryConform>
+          <equalTerm>
+            <field name="TriggerType"/>
+            <literal value="0"/>
+          </equalTerm>
+        </mandatoryConform>
+      </field>
+    </event>
+  </events>
+</cluster>
