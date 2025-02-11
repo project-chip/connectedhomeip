@@ -37,6 +37,7 @@ static constexpr size_t kActionsDelegateTableSize =
     MATTER_DM_ACTIONS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kActionsDelegateTableSize <= kEmberInvalidEndpointIndex, "Actions Delegate table size error");
 
+// TODO: We should not use global array, instead we can use one cluster instance per endpoint.
 Delegate * gDelegateTable[kActionsDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId aEndpoint)
@@ -425,7 +426,7 @@ CHIP_ERROR ActionsServer::ModifyActionList(EndpointId aEndpoint, const ActionStr
             existingAction.Set(aAction.actionID, aAction.name, aAction.type, aAction.endpointListID, aAction.supportedCommands,
                                aAction.state);
 
-            mMatterContext.MarkDirty(aEndpoint, Attributes::ActionList::Id);
+            MarkDirty(aEndpoint, Attributes::ActionList::Id);
             return CHIP_NO_ERROR;
         }
     }
@@ -455,7 +456,7 @@ CHIP_ERROR ActionsServer::ModifyEndpointList(EndpointId aEndpoint, const Endpoin
         if (existingEpList.endpointListID == aEpList.endpointListID)
         {
             existingEpList.Set(aEpList.endpointListID, aEpList.name, aEpList.type, aEpList.endpoints);
-            mMatterContext.MarkDirty(aEndpoint, Attributes::EndpointLists::Id);
+            MarkDirty(aEndpoint, Attributes::EndpointLists::Id);
             return CHIP_NO_ERROR;
         }
     }
