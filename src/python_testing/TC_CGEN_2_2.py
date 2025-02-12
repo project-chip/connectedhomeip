@@ -42,7 +42,9 @@ import time
 from datetime import datetime
 
 import chip.clusters as Clusters
+from chip.exceptions import ChipStackError
 from chip import ChipDeviceCtrl
+from chip.interaction_model import InteractionModelError
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -532,8 +534,12 @@ class TC_CGEN_2_2(MatterBaseTest):
                 dev_ctrl=TH2,
                 node_id=newNodeId,
                 cmd=cmd)
-        except Exception as e:
+        except ChipStackError as e:
+            asserts.assert_in('Timeout',
+                              str(e), f'Expected Timeout error, but got {str(e)}')
             logger.info(f"Step #22 - TH2 Expected error occurred during ArmFailSafe command: {str(e)}. Proceeding to next step.")
+        else:
+            asserts.assert_true(False, 'Expected Timeout, but no exception occurred.')
 
         self.step(23)
         nocs_updated = await self.read_single_attribute_check_success(
@@ -596,9 +602,12 @@ class TC_CGEN_2_2(MatterBaseTest):
             cmd = self.cluster_opcreds.Commands.AddTrustedRootCertificate(th2_new_root_cert)
             resp = await self.send_single_cmd(dev_ctrl=TH2, node_id=newNodeId+1, cmd=cmd)
 
-        except Exception as e:
-            logger.info(
-                f"Step #27 - Expected error occurred during TrustedRootCertificate command: {str(e)}. Proceeding to next step.")
+        except InteractionModelError as e:
+            asserts.assert_in('FailsafeRequired (0xca)',
+                              str(e), f'Expected FailsafeRequired error, but got {str(e)}')
+            logger.info(f'Step #27 - Expected error occurred: {str(e)}. Proceeding to next step.')
+        else:
+            asserts.assert_true(False, 'Expected InteractionModelError with FailsafeRequired, but no exception occurred.')
 
         self.step(28)
         fabrics_updated = await self.read_single_attribute_check_success(
