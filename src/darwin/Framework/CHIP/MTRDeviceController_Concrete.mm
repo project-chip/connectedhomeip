@@ -1431,8 +1431,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (BOOL)usesThreadForDevice:(chip::NodeId)nodeID
 {
-    if (nodeID == chip::kUndefinedNodeId)
-    {
+    if (nodeID == chip::kUndefinedNodeId) {
         return NO;
     }
 

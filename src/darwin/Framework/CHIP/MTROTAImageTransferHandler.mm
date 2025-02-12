@@ -292,26 +292,20 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
     // If the time elapsed is greater than kBdxThrottleIntervalInMsecs, call the completion handler to respond with a Block right away.
     // If time elapsed is less than kBdxThrottleIntervalInMsecs, dispatch the completion handler to respond with a Block after kBdxThrottleIntervalInMsecs has elapsed.
 
-    if (mIsPeerNodeAThreadDevice)
-    {
+    if (mIsPeerNodeAThreadDevice) {
         completionHandler = ^(NSData * _Nullable data, BOOL isEOF) {
             uint64_t timeElapsed = chip::System::SystemClock().GetMonotonicMilliseconds64().count() - startBlockQueryHandlingTimestamp;
-            if (timeElapsed >= kBdxThrottleIntervalInMsecs.count())
-            {
+            if (timeElapsed >= kBdxThrottleIntervalInMsecs.count()) {
                 completionHandler = respondWithBlock;
-            }
-            else
-            {
+            } else {
                 double timeRemainingInSecs = (kBdxThrottleIntervalInMsecs.count() - timeElapsed) / kMilliSecondsInSecond;
-                dispatch_time_t time =  dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeRemainingInSecs * NSEC_PER_SEC));
+                dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, (int64_t) (timeRemainingInSecs * NSEC_PER_SEC));
                 dispatch_after(time, dispatch_get_main_queue(), ^{
                     respondWithBlock(data, isEOF);
                 });
             }
         };
-    }
-    else
-    {
+    } else {
         completionHandler = respondWithBlock;
     }
 
