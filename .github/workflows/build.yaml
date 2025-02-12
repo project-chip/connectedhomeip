@@ -43,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:98
+            image: ghcr.io/project-chip/chip-build:112
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -81,14 +81,6 @@ jobs:
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Run Tests
               run: scripts/tests/gn_tests.sh
-            # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
-            # TODO https://github.com/project-chip/connectedhomeip/issues/1512
-            # - name: Run Code Coverage
-            #   if: ${{ contains('main', env.BUILD_TYPE) }}
-            #   run: scripts/tools/codecoverage.sh
-            # - name: Upload Code Coverage
-            #   if: ${{ contains('main', env.BUILD_TYPE) }}
-            #   run: bash <(curl -s https://codecov.io/bash)
             - name: Set up Build Without Detail Logging
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false"
             - name: Run Build Without Detail Logging
@@ -139,7 +131,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:98
+            image: ghcr.io/project-chip/chip-build:112
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -308,7 +300,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:98
+            image: ghcr.io/project-chip/chip-build:112
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -373,7 +365,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:98
+            image: ghcr.io/project-chip/chip-build:112
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -488,16 +480,16 @@ jobs:
     build_linux_gcc_coverage:
         name: Build on Linux (coverage)
 
-        runs-on: ubuntu-latest
+        env:
+            TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
+
         if: github.actor != 'restyled-io[bot]'
+        runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:98
-            volumes:
-                - "/:/runner-root-volume"
-                - "/tmp/log_output:/tmp/test_logs"
+            image: ghcr.io/project-chip/chip-build:112
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
-                net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+                net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
         steps:
             - name: Checkout
@@ -506,6 +498,7 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
+                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}                
 
             - name: Run Build Coverage
-              run: ./scripts/build_coverage.sh
+              run: ./scripts/build_coverage.sh --yaml

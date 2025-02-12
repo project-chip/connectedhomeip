@@ -57,71 +57,75 @@ tests:
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [
-                  0,
-                  1,
-                  2,
-                  3,
-                  4,
-                  5,
-                  6,
-                  7,
-                  8,
-                  9,
-                  10,
-                  11,
-                  12,
-                  13,
-                  14,
-                  15,
-                  16,
-                  18,
-                  19,
-                  20,
-                  21,
-                  22,
-                  0xFFF8, # GeneratedCommandList
-                  0xFFF9, # AcceptedCommandList
-                  0xFFFA, # EventList
-                  0xFFFB, # AttributeList
-                  0xFFFC, # FeatureMap
-                  0xFFFD, # ClusterRevision
-              ]
+          constraints:
+              python: |
+                  return set(value) == {
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16,
+                        18,
+                        19,
+                        20,
+                        21,
+                        22,
+                        0xFFF8, # GeneratedCommandList
+                        0xFFF9, # AcceptedCommandList
+                        0xFFFA, # EventList
+                        0xFFFB, # AttributeList
+                        0xFFFC, # FeatureMap
+                        0xFFFD, # ClusterRevision
+                    }
 
     - label: "Read AttributeList value"
       PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [
-                  0,
-                  1,
-                  2,
-                  3,
-                  4,
-                  5,
-                  6,
-                  7,
-                  8,
-                  9,
-                  10,
-                  11,
-                  12,
-                  13,
-                  14,
-                  15,
-                  16,
-                  18,
-                  19,
-                  20,
-                  21,
-                  22,
-                  0xFFF8, # GeneratedCommandList
-                  0xFFF9, # AcceptedCommandList
-                  0xFFFB, # AttributeList
-                  0xFFFC, # FeatureMap
-                  0xFFFD, # ClusterRevision
-              ]
+          constraints:
+              python: |
+                  return set(value) == {
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16,
+                        18,
+                        19,
+                        20,
+                        21,
+                        22,
+                        0xFFF8, # GeneratedCommandList
+                        0xFFF9, # AcceptedCommandList
+                        0xFFFB, # AttributeList
+                        0xFFFC, # FeatureMap
+                        0xFFFD, # ClusterRevision
+                    }
 
     - label: "Read NodeLabel"
       command: "readAttribute"
@@ -207,7 +211,7 @@ tests:
       attribute: "SpecificationVersion"
       response:
           # For now all-clusters-app has a version 1.4.
-          value: 0x01040000
+          value: 0x01040100
 
     - label: "Read the Max Paths Per Invoke value"
       command: "readAttribute"

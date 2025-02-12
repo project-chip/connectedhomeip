@@ -950,6 +950,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
          commissioningParams:(MTRCommissioningParameters *)commissioningParams
                        error:(NSError * __autoreleasing *)error
 {
+    MTR_LOG("%@ trying to commission node with ID 0x%016llX parameters %@", self, nodeID.unsignedLongLongValue, commissioningParams);
+
     if (self.suspended) {
         MTR_LOG_ERROR("%@ suspended: can't commission device ID 0x%016llX with parameters %@", self, nodeID.unsignedLongLongValue, commissioningParams);
         // TODO: Can we do a better error here?
@@ -972,6 +974,25 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         }
         if (commissioningParams.threadOperationalDataset) {
             params.SetThreadOperationalDataset(AsByteSpan(commissioningParams.threadOperationalDataset));
+        }
+        if (commissioningParams.acceptedTermsAndConditions && commissioningParams.acceptedTermsAndConditionsVersion) {
+            if (!chip::CanCastTo<uint16_t>([commissioningParams.acceptedTermsAndConditions unsignedIntValue])) {
+                MTR_LOG_ERROR("%@ Error: acceptedTermsAndConditions value should be between 0 and 65535", self);
+                *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+                return NO;
+            }
+
+            if (!chip::CanCastTo<uint16_t>([commissioningParams.acceptedTermsAndConditionsVersion unsignedIntValue])) {
+                MTR_LOG_ERROR("%@ Error: acceptedTermsAndConditionsVersion value should be between 0 and 65535", self);
+                *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+                return NO;
+            }
+
+            chip::Controller::TermsAndConditionsAcknowledgement termsAndConditionsAcknowledgement = {
+                .acceptedTermsAndConditions = static_cast<uint16_t>([commissioningParams.acceptedTermsAndConditions unsignedIntValue]),
+                .acceptedTermsAndConditionsVersion = static_cast<uint16_t>([commissioningParams.acceptedTermsAndConditionsVersion unsignedIntValue])
+            };
+            params.SetTermsAndConditionsAcknowledgement(termsAndConditionsAcknowledgement);
         }
         params.SetSkipCommissioningComplete(commissioningParams.skipCommissioningComplete);
         if (commissioningParams.wifiSSID) {
@@ -1718,6 +1739,16 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
 
     return nil;
+}
+
+- (NSArray<NSNumber *> *)nodesWithStoredData
+{
+    if (!self.controllerDataStore) {
+        // We have nothing stored, if we have no way to store.
+        return @[];
+    }
+
+    return [self.controllerDataStore nodesWithStoredData];
 }
 
 @end

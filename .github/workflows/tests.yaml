@@ -50,7 +50,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:98
+            image: ghcr.io/project-chip/chip-build:112
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -461,7 +461,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:98
+            image: ghcr.io/project-chip/chip-build:112
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -502,6 +502,7 @@ jobs:
                       --target linux-x64-fabric-bridge-rpc-ipv6only-no-ble-no-wifi-clang \
                       --target linux-x64-fabric-sync-ipv6only-no-ble-no-wifi-clang \
                       --target linux-x64-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang \
+                      --target linux-x64-terms-and-conditions \
                       --target linux-x64-python-bindings \
                       build \
                       --copy-artifacts-to objdir-clone \
@@ -520,6 +521,7 @@ jobs:
                   echo "FABRIC_BRIDGE_APP: out/linux-x64-fabric-bridge-rpc-ipv6only-no-ble-no-wifi-clang/fabric-bridge-app" >> /tmp/test_env.yaml
                   echo "FABRIC_SYNC_APP: out/linux-x64-fabric-sync-ipv6only-no-ble-no-wifi-clang/fabric-sync" >> /tmp/test_env.yaml
                   echo "LIGHTING_APP_NO_UNIQUE_ID: out/linux-x64-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang/chip-lighting-app" >> /tmp/test_env.yaml
+                  echo "TERMS_AND_CONDITIONS_APP: out/linux-x64-terms-and-conditions/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
@@ -537,6 +539,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestIdChecks.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestMatterTestingSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingDeviceType.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingSelection.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingSupport.py'
 
             - name: Run Tests
@@ -545,6 +548,22 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/controller/python/test/test_scripts/mobile-device-test.py'
                   scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing'
                   scripts/run_in_python_env.sh out/venv 'scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py --all-clusters out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app'
+
+            - name: Execute Jupyter Notebooks
+              run: |
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --jupyter-lab --install_virtual_env out/venv'
+                  ./scripts/run_in_build_env.sh \
+                   "./scripts/build/build_examples.py \
+                      --target linux-x64-all-clusters-ipv6only-no-ble-no-wifi-clang-test \
+                      build \
+                      --copy-artifacts-to objdir-clone \
+                   "
+                  scripts/run_in_python_env.sh out/venv \
+                  "jupyter execute docs/development_controllers/chip-repl/Matter_REPL_Intro.ipynb \
+                  docs/development_controllers/chip-repl/Matter_Basic_Interactions.ipynb \
+                  docs/development_controllers/chip-repl/Matter_Access_Control.ipynb \
+                  docs/development_controllers/chip-repl/Matter_Multi_Fabric_Commissioning.ipynb \
+                  "
 
             - name: Uploading core files
               uses: actions/upload-artifact@v4

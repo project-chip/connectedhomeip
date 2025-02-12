@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0091" name="Electrical Energy Measurement Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0091" name="Electrical Energy Measurement Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added support for apparent and reactive energy measurement"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0091" name="Electrical Energy Measurement"/>
@@ -67,16 +68,22 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="EEM" scope="Endpoint"/>
   <features>
     <feature bit="0" code="IMPE" name="ImportedEnergy" summary="Measurement of energy imported by the server">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="1" code="EXPE" name="ExportedEnergy" summary="Measurement of energy provided by the server">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="2" code="CUME" name="CumulativeEnergy" summary="Measurements are cumulative">
-      <optionalConform choice="b" more="true"/>
+      <optionalConform choice="b" more="true" min="1"/>
     </feature>
     <feature bit="3" code="PERE" name="PeriodicEnergy" summary="Measurements are periodic">
-      <optionalConform choice="b" more="true"/>
+      <optionalConform choice="b" more="true" min="1"/>
+    </feature>
+    <feature bit="4" code="APPE" name="ApparentEnergy" summary="Measurements report apparent energy">
+      <optionalConform/>
+    </feature>
+    <feature bit="5" code="REAE" name="ReactiveEnergy" summary="Measurements report reactive energy">
+      <optionalConform/>
     </feature>
   </features>
   <dataTypes>
@@ -109,27 +116,58 @@ Davis, CA 95616, USA
     <struct name="EnergyMeasurementStruct">
       <field id="0" name="Energy" type="energy-mWh">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="2"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="4611686018427387904"/>
+          </between>
+        </constraint>
       </field>
       <field id="1" name="StartTimestamp" type="epoch-s"/>
       <field id="2" name="EndTimestamp" type="epoch-s">
-        <constraint type="min" value="StartTimestamp + 1"/>
+        <constraint>
+          <min value="StartTimestamp + 1"/>
+        </constraint>
       </field>
       <field id="3" name="StartSystime" type="systime-ms"/>
       <field id="4" name="EndSystime" type="systime-ms">
-        <constraint type="min" value="StartSystime + 1"/>
+        <constraint>
+          <min value="StartSystime + 1"/>
+        </constraint>
+      </field>
+      <field id="5" name="ApparentEnergy" type="energy-mVAh">
+        <mandatoryConform>
+          <feature name="APPE"/>
+        </mandatoryConform>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="4611686018427387904"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="6" name="ReactiveEnergy" type="energy-mVARh">
+        <mandatoryConform>
+          <feature name="REAE"/>
+        </mandatoryConform>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="4611686018427387904"/>
+          </between>
+        </constraint>
       </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="Accuracy" type="ref_MeasurementAccuracyStruct">
+    <attribute id="0x0000" name="Accuracy" type="MeasurementAccuracyStruct">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="CumulativeEnergyImported" type="EnergyMeasurementStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform>
         <andTerm>
           <feature name="IMPE"/>
@@ -139,7 +177,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="CumulativeEnergyExported" type="EnergyMeasurementStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform>
         <andTerm>
           <feature name="EXPE"/>
@@ -149,7 +187,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="PeriodicEnergyImported" type="EnergyMeasurementStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform>
         <andTerm>
           <feature name="IMPE"/>
@@ -159,7 +197,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="PeriodicEnergyExported" type="EnergyMeasurementStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform>
         <andTerm>
           <feature name="EXPE"/>
@@ -169,7 +207,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0005" name="CumulativeEnergyReset" type="CumulativeEnergyResetStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform>
         <feature name="CUME"/>
       </optionalConform>

@@ -92,13 +92,13 @@ defined:
     Pull Docker Images
 
     ```sh
-    docker pull ghcr.io/project-chip/chip-build-crosscompile:97
+    docker pull ghcr.io/project-chip/chip-build-crosscompile:112
     ```
 
     Run docker
 
     ```sh
-    docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:97 /bin/bash
+    docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:112 /bin/bash
     ```
 
     Build
