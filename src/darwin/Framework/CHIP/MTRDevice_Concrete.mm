@@ -1701,7 +1701,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     assertChipStackLockedByCurrentThread();
 
     std::lock_guard lock(_lock);
-    self.lastSubscriptionActiveTime = [NSDate now];
 
     _receivingReport = YES;
     if (_state != MTRDeviceStateReachable) {
@@ -2888,6 +2887,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                ^(void) {
                                    mtr_strongify(self);
                                    VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription report begin called back with nil MTRDevice"));
+                                   {
+                                       std::lock_guard lock(self->_lock);
+                                       self.lastSubscriptionActiveTime = [NSDate now];
+                                   }
 
                                    MTR_LOG("%@ got report begin", self);
                                    [self _handleReportBegin];
@@ -4745,18 +4748,20 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return HaveSubscriptionEstablishedRightNow(_internalDeviceState);
 }
 
-// TODO: make this configurable - for now use 500ms or 0.5 seconds
-#define MTRDEVICE_ACTIVE_COMMUNICATION_THRESHOLD_SECONDS (0.5)
+// TODO: make this configurable - for now use 1.5 second
+#define MTRDEVICE_ACTIVE_COMMUNICATION_THRESHOLD_SECONDS (1.5)
 
 - (void)_deviceMayBeReachable
 {
     // Ignore this call if actively receiving communication from this device
     {
         std::lock_guard lock(self->_lock);
-        NSTimeInterval intervalSinceDeviceLastActive = -[self.lastSubscriptionActiveTime timeIntervalSinceNow];
-        if (intervalSinceDeviceLastActive < MTRDEVICE_ACTIVE_COMMUNICATION_THRESHOLD_SECONDS) {
-            MTR_LOG("%@ _deviceMayBeReachable called and ignored, because last received communication from device %.6lf seconds ago", self, intervalSinceDeviceLastActive);
-            return;
+        if (self.lastSubscriptionActiveTime) {
+            NSTimeInterval intervalSinceDeviceLastActive = -[self.lastSubscriptionActiveTime timeIntervalSinceNow];
+            if (intervalSinceDeviceLastActive < MTRDEVICE_ACTIVE_COMMUNICATION_THRESHOLD_SECONDS) {
+                MTR_LOG("%@ _deviceMayBeReachable called and ignored, because last received communication from device %.6lf seconds ago", self, intervalSinceDeviceLastActive);
+                return;
+            }
         }
     }
 
