@@ -17,8 +17,8 @@ default-arguments:
     all-clusters: out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app
     lock: out/linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-lock-app
 
-app-args:
-    discriminator: "1234"
+    app-args:
+        discriminator: "1234"
 
-script-args:
-    discriminator: "1234"
+    script-args:
+        discriminator: "1234"
