@@ -49,7 +49,7 @@ import tempfile
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
-from matter_testing_infrastructure.chip.testing.tasks import Subprocess
+from chip.testing.tasks import Subprocess
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 from TC_MCORE_FS_1_1 import AppServer
