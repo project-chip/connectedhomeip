@@ -76,7 +76,6 @@ bl_iot_sdk("sdk") {
     "OTA_AUTO_REBOOT_DELAY=${ota_auto_reboot_delay_seconds}",
     "CHIP_UART_BAUDRATE=${baudrate}",
     "SYS_AOS_LOOP_ENABLE",
-    "CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE=48",
   ]
 
   defines += [ "PW_RPC_ENABLED=${chip_enable_pw_rpc}" ]

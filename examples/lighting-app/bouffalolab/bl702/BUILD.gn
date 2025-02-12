@@ -96,9 +96,6 @@ bl_iot_sdk("sdk") {
   }
 
   defines += [ "CHIP_DEVICE_CONFIG_ENABLE_ETHERNET=${chip_enable_ethernet}" ]
-  if (chip_enable_ethernet) {
-    defines += [ "CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE=48" ]
-  }
 
   if (enable_psram) {
     defines += [ "CFG_USE_PSRAM=1" ]

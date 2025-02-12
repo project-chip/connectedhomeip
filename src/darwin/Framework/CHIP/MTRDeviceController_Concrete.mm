@@ -950,6 +950,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
          commissioningParams:(MTRCommissioningParameters *)commissioningParams
                        error:(NSError * __autoreleasing *)error
 {
+    MTR_LOG("%@ trying to commission node with ID 0x%016llX parameters %@", self, nodeID.unsignedLongLongValue, commissioningParams);
+
     if (self.suspended) {
         MTR_LOG_ERROR("%@ suspended: can't commission device ID 0x%016llX with parameters %@", self, nodeID.unsignedLongLongValue, commissioningParams);
         // TODO: Can we do a better error here?

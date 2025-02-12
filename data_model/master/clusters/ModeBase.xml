@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,12 +54,13 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Mode Base Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Mode Base Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
-    <revision revision="2" summary="ChangeToModeResponse command: StatusText must be provided for InvalidInMode status.
-             Require at least one standard mode tag. Define reserved ranges for base/derived clusters"/>
+    <revision revision="2" summary="ChangeToModeResponse command: StatusText must be provided for InvalidInMode status. Require at least one standard mode tag. Define reserved ranges for base/derived clusters"/>
   </revisionHistory>
   <clusterIds>
     <clusterId name="Mode Base"/>
@@ -73,22 +74,31 @@ Davis, CA 95616, USA
   <dataTypes>
     <struct name="ModeOptionStruct">
       <field id="0" name="Label" type="string" default="MS">
+        <quality persistence="fixed"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="64"/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
       </field>
       <field id="1" name="Mode" type="uint8" default="MS">
+        <quality persistence="fixed"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="ModeTags" type="list" default="MS">
         <entry type="ModeTagStruct"/>
+        <quality persistence="fixed"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="8"/>
+        <constraint>
+          <maxCount value="8"/>
+        </constraint>
       </field>
     </struct>
     <struct name="ModeTagStruct">
       <field id="0" name="MfgCode" type="vendor-id">
         <optionalConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="Value" type="enum16">
         <mandatoryConform/>
@@ -99,29 +109,40 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="SupportedModes" type="list" default="MS">
       <entry type="ModeOptionStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="countBetween" from="2" to="255"/>
+      <constraint>
+        <countBetween>
+          <from value="2"/>
+          <to value="255"/>
+        </countBetween>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="CurrentMode" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="StartUpMode" type="uint8" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <optionalConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="OnMode" type="uint8" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="DEPONOFF"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -130,28 +151,32 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="NewMode" type="uint8">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="ChangeToModeResponse" direction="responseFromServer">
       <mandatoryConform/>
       <field id="0" name="Status" type="enum8">
-        <enum>
-          <item from="0x00" to="0x3F" name="CommonCodes" summary="Common standard values defined in the generic Mode Base cluster specification.">
-            <mandatoryConform/>
-          </item>
-          <item from="0x40" to="0x7F" name="DerivedClusterCodes" summary="Derived cluster specific standard values defined in the derived Mode Base cluster specification.">
-            <mandatoryConform/>
-          </item>
-          <item from="0x80" to="0xBF" name="MfgCodes" summary="Manufacturer specific values. For the derived Mode Base cluster instances, these are manufacturer specific under the derived cluster.">
-            <mandatoryConform/>
-          </item>
-        </enum>
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="StatusText" type="string">
-        <constraint type="maxLength" value="64"/>
+        <otherwiseConform>
+          <optionalConform>
+            <equalTerm>
+              <field name="Status"/>
+              <status name="SUCCESS"/>
+            </equalTerm>
+          </optionalConform>
+          <mandatoryConform/>
+        </otherwiseConform>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
       </field>
     </command>
   </commands>
