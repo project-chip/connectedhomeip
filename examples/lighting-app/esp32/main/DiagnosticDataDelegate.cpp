@@ -3,15 +3,13 @@
 #include <esp_log.h>
 #include <lib/core/TLVReader.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <system/SystemClock.h>
 #include <tracing/esp32_diagnostic_trace/Diagnostics.h>
 #include <unordered_map>
-#include <system/SystemClock.h>
-#include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
 namespace Diagnostics {
-
-
 
 enum class ValueType : uint8_t
 {
@@ -35,8 +33,9 @@ public:
         return *mInstance;
     }
 
-    DiagnosticDataDelegateImpl(Tracing::Diagnostics::DiagnosticStorageInterface * storageInstance)
-        : mStorageInstance(storageInstance){}
+    DiagnosticDataDelegateImpl(Tracing::Diagnostics::DiagnosticStorageInterface * storageInstance) :
+        mStorageInstance(storageInstance)
+    {}
 
     CHIP_ERROR StartPeriodicDiagnostics(chip::System::Clock::Timeout aTimeout) override
     {
@@ -58,7 +57,7 @@ public:
     CHIP_ERROR SetSamplingInterval(chip::System::Clock::Timeout aTimeout) override
     {
         mTimeout = aTimeout;
-        
+
         if (mTimeout == System::Clock::kZero)
         {
             return StopPeriodicDiagnostics();
@@ -69,6 +68,7 @@ public:
         return DeviceLayer::SystemLayer().StartTimer(mTimeout, DiagnosticSamplingHandler, this);
     }
 
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     CHIP_ERROR EnableDiagnostics() override
     {
         VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -81,13 +81,21 @@ public:
         ParseAndSendDiagnostics(span.data(), span.size());
         return err;
     }
+#else
+    CHIP_ERROR EnableDiagnostics() override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+
 private:
     Tracing::Diagnostics::DiagnosticStorageInterface * mStorageInstance = nullptr;
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     uint8_t mRetrievalBuffer[CONFIG_RETRIEVAL_BUFFER_SIZE];
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     uint32_t mReadDiagnosticEntries = 0;
     System::Clock::Timeout mTimeout = System::Clock::kZero;
     std::unordered_map<const char *, ValueType> mRegisteredMetrics;
-
 
     CHIP_ERROR ClearSentDiagnosticsData() override
     {
@@ -105,7 +113,7 @@ private:
 
     CHIP_ERROR ParseAndSendDiagnostics(const uint8_t * inBuffer, uint32_t inBufferSize)
     {
-        CHIP_ERROR err      = CHIP_NO_ERROR;
+        CHIP_ERROR err = CHIP_NO_ERROR;
         printf("Parsing and sending diagnostics\n");
 
         // Create TLV reader for input buffer
@@ -190,10 +198,10 @@ private:
     void LogTraceData(const char * label, const char * group)
     {
         printf("Writing trace data to ESP_DIAG\n");
-        const char * tag = "MTR_TRC";
+        const char * tag    = "MTR_TRC";
         const char * format = "EV (%" PRIu32 ") %s: %s";
-        esp_err_t err = ESP_OK;
-        err = esp_diag_log_event(tag, format, esp_log_timestamp(), label, group);
+        esp_err_t err       = ESP_OK;
+        err                 = esp_diag_log_event(tag, format, esp_log_timestamp(), label, group);
         if (err == ESP_OK)
         {
             printf("Send data to insights successfully\n");
@@ -288,20 +296,19 @@ private:
     static void DiagnosticSamplingHandler(System::Layer * systemLayer, void * context)
     {
         auto * instance = static_cast<DiagnosticDataDelegateImpl *>(context);
-        
+
         // Retrieve and send diagnostics
         instance->EnableDiagnostics();
-        
+
         // Clear processed diagnostics
         instance->ClearSentDiagnosticsData();
-        
+
         // Schedule next sampling
         DeviceLayer::SystemLayer().StartTimer(instance->mTimeout, DiagnosticSamplingHandler, instance);
     }
 };
 
-DiagnosticDataDelegate & DiagnosticDataDelegate::GetInstance(
-    Tracing::Diagnostics::DiagnosticStorageInterface * storageInstance)
+DiagnosticDataDelegate & DiagnosticDataDelegate::GetInstance(Tracing::Diagnostics::DiagnosticStorageInterface * storageInstance)
 {
     return DiagnosticDataDelegateImpl::GetInstance(storageInstance);
 }
