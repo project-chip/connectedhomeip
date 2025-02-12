@@ -33,10 +33,10 @@ constexpr double kMilliSecondsInSecond = 1000.0;
 // Timeout for the BDX transfer session. The OTA Spec mandates this should be >= 5 minutes.
 constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60);
 
-// For thread devices, we need to throttle sending Blocks in response to BlockQuery messages
-// to avoid spamming the network with too many BDX messages. We are going to match the polling
-// interval of 50 ms as the time to wait before sending a Block in response to a BlockQuery.
-constexpr System::Clock::Timeout kBdxThrottleIntervalInMsecs = System::Clock::Milliseconds32(50);
+// For thread devices, we may want to throttle sending Blocks in response to BlockQuery messages
+// to avoid spamming the network with too many BDX messages.  For now, match the old 50ms
+// polling interval we used to have.
+constexpr auto kBdxThrottleInterval = System::Clock::Milliseconds32(50);
 
 constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
 
@@ -245,7 +245,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
     // For thread devices, we need to throttle sending the response to BlockQuery, if the query is processed, before kBdxThrottleIntervalInMsecs
     // has elapsed to prevent the BDX messages spamming up the network. Get the timestamp at which we start processing the BlockQuery message.
 
-    __block uint64_t startBlockQueryHandlingTimestamp = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
+    auto startBlockQueryHandlingTimestamp = System::SystemClock().GetMonotonicTimestamp()
 
     auto blockSize = @(mTransfer.GetTransferBlockSize());
     auto blockIndex = @(mTransfer.GetNextBlockNum());
@@ -294,12 +294,12 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
 
     if (mIsPeerNodeAThreadDevice) {
         completionHandler = ^(NSData * _Nullable data, BOOL isEOF) {
-            uint64_t timeElapsed = chip::System::SystemClock().GetMonotonicMilliseconds64().count() - startBlockQueryHandlingTimestamp;
-            if (timeElapsed >= kBdxThrottleIntervalInMsecs.count()) {
+            auto timeElapsed = System::SystemClock().GetMonotonicTimestamp - startBlockQueryHandlingTimestamp;
+            if (timeElapsed >= kBdxThrottleIntervalInMsecs) {
                 completionHandler = respondWithBlock;
             } else {
-                double timeRemainingInSecs = (kBdxThrottleIntervalInMsecs.count() - timeElapsed) / kMilliSecondsInSecond;
-                dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, (int64_t) (timeRemainingInSecs * NSEC_PER_SEC));
+                auto timeRemaining = std::chrono::duration_cast<std::chrono::nanoseconds>(kBdxThrottleIntervalInMsecs - timeElapsed);
+                dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, timeRemaining.count());
                 dispatch_after(time, dispatch_get_main_queue(), ^{
                     respondWithBlock(data, isEOF);
                 });

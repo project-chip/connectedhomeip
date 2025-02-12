@@ -75,7 +75,7 @@ private:
 
     bool mNeedToCallTransferSessionEnd = false;
 
-    bool mIsPeerNodeAThreadDevice = NO;
+    bool mIsPeerNodeAKnownThreadDevice = NO;
 };
 
 NS_ASSUME_NONNULL_END
