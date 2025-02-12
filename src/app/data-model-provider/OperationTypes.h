@@ -76,8 +76,8 @@ enum class ReadFlags : uint32_t
 enum class ListWriteOperation : uint8_t
 {
     kListWriteBegin = 0,
-    kListWriteEnd,
-    kListWriteEndFinal
+    kListWriteSuccess,
+    kListWriteFailure
 };
 
 struct ReadAttributeRequest : OperationRequest

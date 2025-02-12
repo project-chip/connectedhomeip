@@ -80,11 +80,12 @@ public:
     virtual ActionReturnStatus WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder) = 0;
 
     ///   Indicates the start/end of a series of list operations. This function will be called either before the first
-    ///   Write operation or after the last one of a series of consequence attribute data of the same attribute.
+    ///   Write operation or after the last one of a series of consecutive attribute data of the same attribute.
     ///
     ///   1) This function will be called if the client tries to set a nullable list attribute to null.
-    ///   2) This function will only be called once for a series of consequent attribute data (regardless the kind of list
-    ///   operation) of the same attribute.
+    ///   2) This function will only be called for a series of consecutive attribute data (regardless the kind of list
+    ///   operation) of the same attribute at the beggining or end of the Write operations.
+    ///   3) The opType argument indicates the type of notification (Start, Failure, Success).
     virtual void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, BitFlags<ListWriteOperation> opType) = 0;
 
     /// `handler` is used to send back the reply.

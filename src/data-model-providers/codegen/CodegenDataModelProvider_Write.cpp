@@ -210,10 +210,10 @@ void CodegenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttr
         case DataModel::ListWriteOperation::kListWriteBegin:
             aai->OnListWriteBegin(aPath);
             break;
-        case DataModel::ListWriteOperation::kListWriteEnd:
+        case DataModel::ListWriteOperation::kListWriteFailure:
             aai->OnListWriteEnd(aPath, false);
             break;
-        case DataModel::ListWriteOperation::kListWriteEndFinal:
+        case DataModel::ListWriteOperation::kListWriteSuccess:
             aai->OnListWriteEnd(aPath, true);
             break;
         }
