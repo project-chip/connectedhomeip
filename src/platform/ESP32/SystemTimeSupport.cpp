@@ -94,9 +94,9 @@ CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
         const time_t timep = tv.tv_sec;
         struct tm calendar;
         localtime_r(&timep, &calendar);
-        ChipLogProgress(DeviceLayer, "Real time clock set to %lld (%04d/%02d/%02d %02d:%02d:%02d UTC)",
-                        static_cast<long long>(tv.tv_sec), calendar.tm_year + 1900, calendar.tm_mon + 1, calendar.tm_mday,
-                        calendar.tm_hour, calendar.tm_min, calendar.tm_sec);
+        char time_str[64];
+        strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S UTC", &calendar);
+        ChipLogProgress(DeviceLayer, "Real time clock set to %lld (%s)", static_cast<long long>(tv.tv_sec), time_str);
     }
 #endif // CHIP_PROGRESS_LOGGING
     return CHIP_NO_ERROR;
