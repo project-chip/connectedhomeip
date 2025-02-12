@@ -120,6 +120,7 @@ tests:
           The current SDK implementation stores log files transferred via the BDX protocol in the /tmp folder.
           if {PICS_MCORE_DLOG_S_UTCTIMESTAMP} then verify that UTCTimeStamp is included in the RetrieveLogsResponse command
           if {PICS_MCORE_DLOG_S_TIMESINCEBOOT} then verify that TimeSinceBoot is included in the RetrieveLogsResponse command
+      disabled: true
 
     - label:
           "Step 4: if (SendInitMsgfromDUT = false) TH does not send BDX
@@ -466,7 +467,6 @@ tests:
           [1707967219.637242][10723:10726] CHIP:TOO:     status: 2
           [1707967219.637248][10723:10726] CHIP:TOO:     logContent:
           [1707967219.637253][10723:10726] CHIP:TOO:    }
-
       disabled: true
 
     - label:
