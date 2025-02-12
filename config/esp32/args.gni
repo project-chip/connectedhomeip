@@ -29,7 +29,6 @@ lwip_platform = "external"
 chip_inet_config_enable_tcp_endpoint = false
 chip_inet_config_enable_udp_endpoint = true
 
-#Use platform memory management
 chip_config_memory_management = "platform"
 
 custom_toolchain = "//third_party/connectedhomeip/config/esp32/toolchain:esp32"

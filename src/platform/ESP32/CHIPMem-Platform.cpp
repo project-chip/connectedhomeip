@@ -26,106 +26,66 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <atomic>
-#include <cstdio>
-#include <cstring>
 #include <esp_heap_caps.h>
 #include <stdlib.h>
 
 namespace chip {
 namespace Platform {
 
-#define VERIFY_INITIALIZED() VerifyInitialized(__func__)
-
-static std::atomic_int memoryInitialized{ 0 };
-
-static void VerifyInitialized(const char * func)
-{
-    if (!memoryInitialized)
-    {
-        ChipLogError(DeviceLayer, "ABORT: chip::Platform::%s() called before chip::Platform::MemoryInit()", func);
-        abort();
-    }
-}
-
 CHIP_ERROR MemoryAllocatorInit(void * buf, size_t bufSize)
 {
-    if (memoryInitialized++ > 0)
-    {
-        ChipLogError(DeviceLayer, "ABORT: chip::Platform::MemoryInit() called twice.");
-        abort();
-    }
-
     return CHIP_NO_ERROR;
 }
 
-void MemoryAllocatorShutdown()
-{
-    if (--memoryInitialized < 0)
-    {
-        ChipLogError(DeviceLayer, "ABORT: chip::Platform::MemoryShutdown() called twice.");
-        abort();
-    }
-}
+void MemoryAllocatorShutdown() {}
 
 void * MemoryAlloc(size_t size)
 {
-    void * ptr;
-    VERIFY_INITIALIZED();
 #ifdef CONFIG_CHIP_MEM_ALLOC_MODE_INTERNAL
-    ptr = heap_caps_malloc(size, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+    return heap_caps_malloc(size, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
 #elif defined(CONFIG_CHIP_MEM_ALLOC_MODE_EXTERNAL)
-    ptr = heap_caps_malloc(size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+    return heap_caps_malloc(size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
 #else
-    ptr = malloc(size);
+    return malloc(size);
 #endif
-    return ptr;
 }
 
 void * MemoryAlloc(size_t size, bool isLongTermAlloc)
 {
-    void * ptr;
-    VERIFY_INITIALIZED();
 #ifdef CONFIG_CHIP_MEM_ALLOC_MODE_INTERNAL
-    ptr = heap_caps_malloc(size, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+    return heap_caps_malloc(size, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
 #elif defined(CONFIG_CHIP_MEM_ALLOC_MODE_EXTERNAL)
-    ptr = heap_caps_malloc(size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+    return heap_caps_malloc(size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
 #else
-    ptr = malloc(size);
+    return malloc(size);
 #endif
-    return ptr;
 }
 
 void * MemoryCalloc(size_t num, size_t size)
 {
-    void * ptr;
-    VERIFY_INITIALIZED();
 #ifdef CONFIG_CHIP_MEM_ALLOC_MODE_INTERNAL
-    ptr = heap_caps_calloc(num, size, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+    return heap_caps_calloc(num, size, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
 #elif defined(CONFIG_CHIP_MEM_ALLOC_MODE_EXTERNAL)
-    ptr = heap_caps_calloc(num, size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+    return heap_caps_calloc(num, size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
 #else
-    ptr = calloc(num, size);
+    return calloc(num, size);
 #endif
-    return ptr;
 }
 
 void * MemoryRealloc(void * p, size_t size)
 {
-    VERIFY_INITIALIZED();
 #ifdef CONFIG_CHIP_MEM_ALLOC_MODE_INTERNAL
     p = heap_caps_realloc(p, size, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
 #elif defined(CONFIG_CHIP_MEM_ALLOC_MODE_EXTERNAL)
-    p   = heap_caps_realloc(p, size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+    p = heap_caps_realloc(p, size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
 #else
-    p   = realloc(p, size);
+    p = realloc(p, size);
 #endif
     return p;
 }
 
 void MemoryFree(void * p)
 {
-    VERIFY_INITIALIZED();
 #ifdef CONFIG_MATTER_MEM_ALLOC_MODE_DEFAULT
     free(p);
 #else
