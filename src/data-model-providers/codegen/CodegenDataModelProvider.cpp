@@ -274,8 +274,7 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
     //
     // We have Attributes from ember + global attributes that are NOT in ember metadata.
     // We have to report them all
-    constexpr size_t kGlobalAttributeNotInMetadataCount =
-        ArraySize(GlobalAttributesNotInMetadata);
+    constexpr size_t kGlobalAttributeNotInMetadataCount = ArraySize(GlobalAttributesNotInMetadata);
 
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(cluster->attributeCount + kGlobalAttributeNotInMetadataCount));
 
