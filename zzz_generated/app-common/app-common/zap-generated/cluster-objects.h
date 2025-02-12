@@ -6533,6 +6533,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TCAcknowledgementsRequired
+namespace TCUpdateDeadline {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TCUpdateDeadline::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TCUpdateDeadline
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -6589,6 +6601,7 @@ struct TypeInfo
         Attributes::TCMinRequiredVersion::TypeInfo::DecodableType TCMinRequiredVersion                 = static_cast<uint16_t>(0);
         Attributes::TCAcknowledgements::TypeInfo::DecodableType TCAcknowledgements                     = static_cast<uint16_t>(0);
         Attributes::TCAcknowledgementsRequired::TypeInfo::DecodableType TCAcknowledgementsRequired     = static_cast<bool>(0);
+        Attributes::TCUpdateDeadline::TypeInfo::DecodableType TCUpdateDeadline;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

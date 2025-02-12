@@ -354,6 +354,7 @@ def python_tests(
             CHIP_RVC_APP: {as_runner(f'out/{target_prefix}-rvc-no-ble-clang-boringssl/chip-rvc-app')}
             NETWORK_MANAGEMENT_APP: {
                 as_runner(f'out/{target_prefix}-network-manager-ipv6only-no-ble-clang-boringssl/matter-network-manager-app')}
+            TERMS_AND_CONDITIONS_APP: {as_runner(f'out/{target_prefix}-terms-and-conditions/chip-terms-and-conditions-app')}
             TRACE_APP: out/trace_data/app-{{SCRIPT_BASE_NAME}}
             TRACE_TEST_JSON: out/trace_data/test-{{SCRIPT_BASE_NAME}}
             TRACE_TEST_PERFETTO: out/trace_data/test-{{SCRIPT_BASE_NAME}}
@@ -417,6 +418,7 @@ def python_tests(
         "TestConformanceTest.py",  # Unit test of the conformance test (TC_DeviceConformance) - does not run against an app.
         "TestIdChecks.py",
         "TestSpecParsingDeviceType.py",
+        "TestSpecParsingSelection.py",
         "TestMatterTestingSupport.py",
         "TestSpecParsingSupport.py",
         "TestTimeSyncTrustedTimeSource.py",

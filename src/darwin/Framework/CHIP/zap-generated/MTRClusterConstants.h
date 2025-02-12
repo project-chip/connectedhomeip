@@ -1107,6 +1107,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterGeneralCommissioningAttributeTCMinRequiredVersionID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
     MTRAttributeIDTypeClusterGeneralCommissioningAttributeTCAcknowledgementsID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
     MTRAttributeIDTypeClusterGeneralCommissioningAttributeTCAcknowledgementsRequiredID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterGeneralCommissioningAttributeTCUpdateDeadlineID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
     MTRAttributeIDTypeClusterGeneralCommissioningAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterGeneralCommissioningAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterGeneralCommissioningAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,

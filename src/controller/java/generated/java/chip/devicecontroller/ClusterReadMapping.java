@@ -2426,6 +2426,17 @@ public class ClusterReadMapping {
           readGeneralCommissioningTCAcknowledgementsRequiredCommandParams
         );
         result.put("readTCAcknowledgementsRequiredAttribute", readGeneralCommissioningTCAcknowledgementsRequiredAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGeneralCommissioningTCUpdateDeadlineCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGeneralCommissioningTCUpdateDeadlineAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GeneralCommissioningCluster) cluster).readTCUpdateDeadlineAttribute(
+              (ChipClusters.GeneralCommissioningCluster.TCUpdateDeadlineAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedGeneralCommissioningClusterTCUpdateDeadlineAttributeCallback(),
+          readGeneralCommissioningTCUpdateDeadlineCommandParams
+        );
+        result.put("readTCUpdateDeadlineAttribute", readGeneralCommissioningTCUpdateDeadlineAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readGeneralCommissioningGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readGeneralCommissioningGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

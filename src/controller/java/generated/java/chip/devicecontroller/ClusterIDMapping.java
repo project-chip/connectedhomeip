@@ -2872,6 +2872,7 @@ public class ClusterIDMapping {
             TCMinRequiredVersion(6L),
             TCAcknowledgements(7L),
             TCAcknowledgementsRequired(8L),
+            TCUpdateDeadline(9L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

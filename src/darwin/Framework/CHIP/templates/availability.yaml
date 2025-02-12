@@ -9767,6 +9767,7 @@
               - TCMinRequiredVersion
               - TCAcknowledgements
               - TCAcknowledgementsRequired
+              - TCUpdateDeadline
           OccupancySensing:
               # Targeting 1.4
               - HoldTime

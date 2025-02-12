@@ -76,6 +76,7 @@ buildconfig_header("app_buildconfig") {
     "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER=${chip_build_controller_dynamic_server}",
     "CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP=${chip_enable_busy_handling_for_operational_session_setup}",
     "CHIP_CONFIG_DATA_MODEL_CHECK_DIE_ON_FAILURE=${chip_data_model_check_die_on_failure}",
+    "CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED=${chip_terms_and_conditions_required}",
   ]
 
   if (chip_use_data_model_interface == "disabled") {

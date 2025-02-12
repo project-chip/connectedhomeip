@@ -196,6 +196,44 @@ public:
     bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return true; }
 };
 
+class MockCommandHandler : public CommandHandler
+{
+public:
+    CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath,
+                                 const Protocols::InteractionModel::ClusterStatusCode & aStatus,
+                                 const char * context = nullptr) override
+    {
+        // MOCK: do not do anything here
+        return CHIP_NO_ERROR;
+    }
+
+    void AddStatus(const ConcreteCommandPath & aRequestCommandPath, const Protocols::InteractionModel::ClusterStatusCode & aStatus,
+                   const char * context = nullptr) override
+    {
+        // MOCK: do not do anything here
+    }
+
+    FabricIndex GetAccessingFabricIndex() const override { return 1; }
+
+    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                               const DataModel::EncodableToTLV & aEncodable) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                     const DataModel::EncodableToTLV & aEncodable) override
+    {}
+
+    bool IsTimedInvoke() const override { return false; }
+
+    void FlushAcksRightAwayOnSlowCommand() override {}
+
+    Access::SubjectDescriptor GetSubjectDescriptor() const override { return kAdminSubjectDescriptor; }
+
+    Messaging::ExchangeContext * GetExchangeContext() const override { return nullptr; }
+};
+
 /// Overrides Enumerate*Commands in the CommandHandlerInterface to allow
 /// testing of behaviors when command enumeration is done in the interace.
 class CustomListCommandHandler : public CommandHandlerInterface
@@ -207,7 +245,20 @@ public:
     }
     ~CustomListCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
 
-    void InvokeCommand(HandlerContext & handlerContext) override { handlerContext.SetCommandNotHandled(); }
+    void InvokeCommand(HandlerContext & handlerContext) override
+    {
+        if (mHandleCommand)
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::Success);
+            handlerContext.SetCommandHandled();
+        }
+        else
+        {
+            handlerContext.SetCommandNotHandled();
+        }
+    }
+
+    void SetHandleCommands(bool handle) { mHandleCommand = handle; }
 
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
     {
@@ -246,6 +297,7 @@ public:
 private:
     bool mOverrideAccepted  = false;
     bool mOverrideGenerated = false;
+    bool mHandleCommand     = false;
 
     std::vector<CommandId> mAccepted;
     std::vector<CommandId> mGenerated;
@@ -1265,6 +1317,104 @@ TEST(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
         path = model.NextGeneratedCommand(ConcreteCommandPath(kMockEndpoint2, MockClusterId(3), 6));
         EXPECT_FALSE(path.HasValidIds());
     }
+}
+
+TEST(TestCodegenModelViaMocks, AcceptedCommandValidity)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    // register a CHI on ALL endpoints
+    CustomListCommandHandler handler(chip::NullOptional, MockClusterId(1));
+    handler.SetHandleCommands(true);
+
+    handler.SetOverrideAccepted(true);
+    handler.AcceptedVec().push_back(1234);
+
+    // Command succeeds on a valid endpoint
+    EXPECT_TRUE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234)).has_value());
+
+    // but not if the command is invalid
+    EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 0x1122)).has_value());
+
+    // Fails on an invalid endpoint (even if the handler is on wildcard endpoint)
+    EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kEndpointIdThatIsMissing, MockClusterId(1), 1234)).has_value());
+    EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kEndpointIdThatIsMissing, MockClusterId(1), 0x1122)).has_value());
+}
+
+TEST(TestCodegenModelViaMocks, CommandHandlerInterfaceValidity)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    // register a CHI on ALL endpoints
+    CustomListCommandHandler handler(chip::NullOptional, MockClusterId(1));
+    handler.SetHandleCommands(true);
+
+    MockCommandHandler commandHandler;
+
+    // Command succeeds on a valid endpoint
+    {
+        const ConcreteCommandPath kCommandPath(kMockEndpoint1, MockClusterId(1), kMockCommandId1);
+        const InvokeRequest kInvokeRequest{ .path = kCommandPath };
+        chip::TLV::TLVReader tlvReader;
+
+        // std::nullopt is returned when the command is handled
+        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ &commandHandler), std::nullopt);
+    }
+
+    // Command fails on an invalid endpoint
+    {
+        const ConcreteCommandPath kCommandPath(kEndpointIdThatIsMissing, MockClusterId(1), kMockCommandId1);
+        const InvokeRequest kInvokeRequest{ .path = kCommandPath };
+        chip::TLV::TLVReader tlvReader;
+
+        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ &commandHandler),
+                  Protocols::InteractionModel::Status::UnsupportedEndpoint);
+    }
+
+    // Command fails on an invalid cluster
+    {
+        const ConcreteCommandPath kCommandPath(kMockEndpoint1, MockClusterId(0x1123), kMockCommandId1);
+        const InvokeRequest kInvokeRequest{ .path = kCommandPath };
+        chip::TLV::TLVReader tlvReader;
+
+        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ &commandHandler),
+                  Protocols::InteractionModel::Status::UnsupportedCluster);
+    }
+}
+
+TEST(TestCodegenModelViaMocks, AcceptedGeneratedCommandsOnInvalidEndpoints)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    // register a CHI on ALL endpoints
+    CustomListCommandHandler handler(chip::NullOptional, MockClusterId(1));
+
+    // check a valid endpoint (no override)
+    EXPECT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).IsValid());
+    EXPECT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).HasValidIds());
+
+    handler.SetOverrideAccepted(true);
+    handler.SetOverrideGenerated(true);
+
+    // Make the lists non-empty som something is returned.
+    handler.AcceptedVec().push_back(1234);
+    handler.AcceptedVec().push_back(2345);
+    handler.GeneratedVec().push_back(33);
+    handler.GeneratedVec().push_back(44);
+
+    EXPECT_TRUE(model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).IsValid());
+    EXPECT_TRUE(model.NextAcceptedCommand(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234)).IsValid());
+    EXPECT_TRUE(model.FirstGeneratedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).HasValidIds());
+    EXPECT_TRUE(model.NextGeneratedCommand(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 33)).HasValidIds());
+
+    // invalid endpoint
+    EXPECT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).IsValid());
+    EXPECT_FALSE(model.NextAcceptedCommand(ConcreteCommandPath(kEndpointIdThatIsMissing, MockClusterId(1), 1234)).IsValid());
+    EXPECT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).HasValidIds());
+    EXPECT_FALSE(model.NextGeneratedCommand(ConcreteCommandPath(kEndpointIdThatIsMissing, MockClusterId(1), 33)).HasValidIds());
 }
 
 TEST(TestCodegenModelViaMocks, CommandHandlerInterfaceAcceptedCommands)

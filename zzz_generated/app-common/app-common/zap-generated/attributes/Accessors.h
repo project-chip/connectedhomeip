@@ -834,6 +834,17 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
 } // namespace TCAcknowledgementsRequired
 
+namespace TCUpdateDeadline {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
+                                        MarkAttributeDirty markDirty);
+} // namespace TCUpdateDeadline
+
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);

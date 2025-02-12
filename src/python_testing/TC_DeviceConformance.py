@@ -40,15 +40,13 @@ from global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttribu
                                   is_valid_device_type_id)
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                     MatterBaseTest, ProblemNotice, ProblemSeverity, async_test_body, default_matter_test_main)
-from spec_parsing_support import CommandType, build_xml_clusters, build_xml_device_types
+from spec_parsing_support import CommandType
 
 
 class DeviceConformanceTests(BasicCompositionTests):
     async def setup_class_helper(self):
         await super().setup_class_helper()
-        self.xml_clusters, self.problems = build_xml_clusters()
-        self.xml_device_types, problems = build_xml_device_types()
-        self.problems.extend(problems)
+        self.build_spec_xmls()
 
     def _get_device_type_id(self, device_type_name: str) -> int:
         id = [id for id, dt in self.xml_device_types.items() if dt.name.lower() == device_type_name.lower()]
@@ -60,9 +58,9 @@ class DeviceConformanceTests(BasicCompositionTests):
         # Currently this is just NIM. We may later be able to pull this from the device type scrape using the ManagedAclAllowed condition,
         # but these are not currently exposed directly by the device.
         allowed_ids = [self._get_device_type_id('network infrastructure manager')]
-        for endpoint in self.endpoints_tlv.values():
+        for endpoint in self.endpoints.values():
             desc = Clusters.Descriptor
-            device_types = [dt.deviceType for dt in endpoint[desc.id][desc.Attributes.DeviceTypeList.attribute_id]]
+            device_types = [dt.deviceType for dt in endpoint[desc][desc.Attributes.DeviceTypeList]]
             if set(allowed_ids).intersection(set(device_types)):
                 # TODO: it's unclear if this needs to be present on every endpoint. Right now, this assumes one is sufficient.
                 return True
