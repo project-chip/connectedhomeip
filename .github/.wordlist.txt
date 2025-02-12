@@ -1630,6 +1630,7 @@ xFFFF
 xfffff
 xFFFFFFEFFFFFFFFF
 XMLPICSValidator
+XMLs
 xtensa
 xvzf
 xwayland
