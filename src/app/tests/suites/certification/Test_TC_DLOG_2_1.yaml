@@ -319,7 +319,7 @@ tests:
           If SendInitMsgfromDUT = false  proceed with the following validation:
 
           1. Verification:
-          On TH(chip-tool), verify that the DUT responds by sending RetrieveLogsResponse Command with Exhausted(1) status code to TH and LogContent field of RetrieveLogsResponse contains at most 1024 bytes
+          On TH(chip-tool), verify   that the DUT responds by sending RetrieveLogsResponse Command with Exhausted(1) status code to TH and LogContent field of RetrieveLogsResponse contains at most 1024 bytes
 
           [1725363236.448] [56032:56034] [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_0032 Command=0x0000_0001
           [1725363236.449] [56032:56034] [TOO] Endpoint: 0 Cluster: 0x0000_0032 Command 0x0000_0001
