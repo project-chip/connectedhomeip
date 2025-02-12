@@ -36,7 +36,7 @@ chip_enable_openthread = true
 
 chip_inet_config_enable_ipv4 = false
 chip_inet_config_enable_tcp_endpoint = false
-chip_enable_nfc = false
+chip_enable_nfc_onboarding_payload = false
 chip_build_libshell = false
 chip_enable_ota_requestor = false
 
