@@ -672,9 +672,9 @@ CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
 }
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
-#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 {
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
     constexpr size_t kEnableKeyLength = 16; // Expected byte size of the EnableKey
     CHIP_ERROR err                    = CHIP_NO_ERROR;
     size_t keyLength                  = 0;
@@ -702,8 +702,10 @@ CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 
     keySpan.reduce_size(kEnableKeyLength);
     return err;
-}
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+}
 
 } // namespace Provision
 
