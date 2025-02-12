@@ -77,6 +77,10 @@ if [ "$#" == "0" ]; then
             BRD4317A
             BRD4318A
             BRD4319A
+            BRD4350A
+            BRD4351A
+            BRD2709A
+
 
 
     <Build options> - optional noteworthy build options for EFR32
@@ -363,7 +367,7 @@ else
     if [ "$USE_BOOTLOADER" == true ]; then
 
         binName=""
-        InternalBootloaderBoards=("BRD4337A" "BRD2704A" "BRD2703A" "BRD4319A")
+        InternalBootloaderBoards=("BRD4337A" "BRD2704A" "BRD2703A" "BRD4319A","BRD4350A","BRD4351A","BRD2709A")
         bootloaderPath=""
         commanderPath=""
         # find the matter root folder

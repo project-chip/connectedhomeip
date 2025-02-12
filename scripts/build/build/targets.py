@@ -257,6 +257,9 @@ def BuildEfr32Target():
         TargetPart('brd2605a', board=Efr32Board.BRD2605A, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd4343a', board=Efr32Board.BRD4343A, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd4342a', board=Efr32Board.BRD4342A, enable_wifi=True, enable_917_soc=True),
+        TargetPart('brd4350a', board=Efr32Board.BRD4350A),
+        TargetPart('brd4351a', board=Efr32Board.BRD4351A),
+        TargetPart('brd2709a', board=Efr32Board.BRD2709A),
     ])
 
     # apps
