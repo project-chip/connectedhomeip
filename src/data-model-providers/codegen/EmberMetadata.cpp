@@ -26,41 +26,26 @@ namespace Ember {
 
 using Protocols::InteractionModel::Status;
 
-std::variant<const EmberAfCluster *,           // global attribute, data from a cluster
-             const EmberAfAttributeMetadata *, // a specific attribute stored by ember
+std::variant<const EmberAfAttributeMetadata *, // a specific attribute stored by ember
              Status                            // one of Status::Unsupported*
              >
 FindAttributeMetadata(const ConcreteAttributePath & aPath)
 {
-    if (IsGlobalAttribute(aPath.mAttributeId))
-    {
-        // Global list attribute check first: during path expansion a lot of attributes
-        // will actually be global attributes (so not too much of a performance hit)
-        for (auto & attr : GlobalAttributesNotInMetadata)
-        {
-            if (attr == aPath.mAttributeId)
-            {
-                const EmberAfCluster * cluster = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);
-                if (cluster == nullptr)
-                {
-                    return (emberAfFindEndpointType(aPath.mEndpointId) == nullptr) ? Status::UnsupportedEndpoint
-                                                                                   : Status::UnsupportedCluster;
-                }
-
-                return cluster;
-            }
-        }
-    }
     const EmberAfAttributeMetadata * metadata =
         emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 
     if (metadata == nullptr)
     {
-        Status status = ValidateClusterPath(aPath);
-
-        if (status != Status::Success)
+        const EmberAfEndpointType * type = emberAfFindEndpointType(aPath.mEndpointId);
+        if (type == nullptr)
         {
-            return status;
+            return Status::UnsupportedEndpoint;
+        }
+
+        const EmberAfCluster * cluster = emberAfFindClusterInType(type, aPath.mClusterId, CLUSTER_MASK_SERVER);
+        if (cluster == nullptr)
+        {
+            return Status::UnsupportedCluster;
         }
 
         // Since we know the attribute is unsupported and the endpoint/cluster are
@@ -69,24 +54,6 @@ FindAttributeMetadata(const ConcreteAttributePath & aPath)
     }
 
     return metadata;
-}
-
-Status ValidateClusterPath(const ConcreteClusterPath & path)
-{
-
-    const EmberAfEndpointType * type = emberAfFindEndpointType(path.mEndpointId);
-    if (type == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-
-    const EmberAfCluster * cluster = emberAfFindClusterInType(type, path.mClusterId, CLUSTER_MASK_SERVER);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedCluster;
-    }
-
-    return Status::Success;
 }
 
 } // namespace Ember

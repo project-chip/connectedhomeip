@@ -42,11 +42,11 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #ifdef USE_CHIP_DATA_MODEL
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <data-model-providers/codegen/Instance.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #endif // USE_CHIP_DATA_MODEL
 
 #ifdef CHIP_OPEN_IOT_SDK_OTA_ENABLE
