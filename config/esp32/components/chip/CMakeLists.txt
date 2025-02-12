@@ -294,6 +294,11 @@ if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
   chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_trace:esp32_trace_tracing\"")
 endif()
 
+if (CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
+    chip_gn_arg_bool("matter_enable_tracing_support"  "true")
+    chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_diagnostic_trace:esp32_diagnostic_tracing\"")
+endif()
+
 if (CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS)
      chip_gn_arg_append("matter_enable_esp_insights_system_stats"            "true")
 endif()
@@ -304,6 +309,10 @@ endif()
 
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
+endif()
+
+if (CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
+    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_diagnostic_trace/include")
 endif()
 
 if (CONFIG_CHIP_DEVICE_ENABLE_DYNAMIC_SERVER)
@@ -370,6 +379,11 @@ endif()
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
   list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32TracingBackend.a")
 endif()
+
+if (CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
+  list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32DiagnosticsBackend.a")
+endif()
+
 
 # When using the pregenerated files, there is a edge case where an error appears for
 # undeclared argument chip_code_pre_generated_directory. To get around with it we are
