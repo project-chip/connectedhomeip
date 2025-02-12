@@ -264,6 +264,8 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
     static SilabsTestEventTriggerDelegate sTestEventTriggerDelegate;
+    sTestEventTriggerDelegate.Init(&provision.GetStorage());
+
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 

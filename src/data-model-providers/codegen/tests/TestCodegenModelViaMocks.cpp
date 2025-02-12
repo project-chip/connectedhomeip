@@ -1073,7 +1073,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAttributes)
 
     EXPECT_EQ(model.Attributes(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)), builder), CHIP_NO_ERROR);
     auto attributes = builder.TakeBuffer();
-    ASSERT_EQ(attributes.size(), 4u);
+    ASSERT_EQ(attributes.size(), 7u);
 
     ASSERT_EQ(attributes[0].attributeId, ClusterRevision::Id);
     ASSERT_FALSE(attributes[0].flags.Has(AttributeQualityFlags::kListAttribute));
@@ -1086,6 +1086,16 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAttributes)
 
     ASSERT_EQ(attributes[3].attributeId, MockAttributeId(2));
     ASSERT_TRUE(attributes[3].flags.Has(AttributeQualityFlags::kListAttribute));
+
+    // Ends with global list attributes
+    ASSERT_EQ(attributes[4].attributeId, GeneratedCommandList::Id);
+    ASSERT_TRUE(attributes[4].flags.Has(AttributeQualityFlags::kListAttribute));
+
+    ASSERT_EQ(attributes[5].attributeId, AcceptedCommandList::Id);
+    ASSERT_TRUE(attributes[5].flags.Has(AttributeQualityFlags::kListAttribute));
+
+    ASSERT_EQ(attributes[6].attributeId, AttributeList::Id);
+    ASSERT_TRUE(attributes[6].flags.Has(AttributeQualityFlags::kListAttribute));
 }
 
 TEST_F(TestCodegenModelViaMocks, FindAttribute)
@@ -1127,7 +1137,7 @@ TEST_F(TestCodegenModelViaMocks, FindAttribute)
     EXPECT_FALSE(info->writePrivilege.has_value());                       // NOLINT(bugprone-unchecked-optional-access)
 }
 
-// global attributes are EXPLICITLY not supported
+// global attributes are EXPLICITLY supported
 TEST_F(TestCodegenModelViaMocks, GlobalAttributeInfo)
 {
     UseMockNodeConfig config(gTestNodeConfig);
@@ -1138,10 +1148,14 @@ TEST_F(TestCodegenModelViaMocks, GlobalAttributeInfo)
     std::optional<AttributeEntry> info = finder.Find(
         ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id));
 
-    ASSERT_FALSE(info.has_value());
+    ASSERT_TRUE(info.has_value());
 
     info = finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id));
-    ASSERT_FALSE(info.has_value());
+    ASSERT_TRUE(info.has_value());
+
+    info = finder.Find(
+        ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AcceptedCommandList::Id));
+    ASSERT_TRUE(info.has_value());
 }
 
 TEST_F(TestCodegenModelViaMocks, IterateOverAcceptedCommands)

@@ -18,9 +18,8 @@
 
 #pragma once
 
-#include <stdint.h>
-
 #include <app/TestEventTriggerDelegate.h>
+#include <headers/ProvisionedDataProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
@@ -33,11 +32,24 @@ public:
     explicit SilabsTestEventTriggerDelegate() = default;
 
     /**
+     * @brief Configures the Silabs Test Event trigger
+     *
+     * @param provider pointer to the silabs provisionned data provider
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR, if the init was succesful
+     *                    CHIP_ERROR_INVALID_ARGUMENT, if the manager input is equal to nullptr
+     */
+    CHIP_ERROR Init(DeviceLayer::Silabs::Provision::ProvisionedDataProvider * provider);
+
+    /**
      * @brief Checks to see if `enableKey` provided matches value chosen by the manufacturer.
      * @param enableKey Buffer of the key to verify.
      * @return True or False.
      */
     bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override;
+
+private:
+    DeviceLayer::Silabs::Provision::ProvisionedDataProvider * mProvider = nullptr;
 };
 
 } // namespace chip

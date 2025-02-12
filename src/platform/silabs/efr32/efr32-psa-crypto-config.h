@@ -34,9 +34,9 @@
 #endif // SL_USE_COAP_CONFIG
 
 // Multi-chip OTA encryption processing
-#if OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
 #define PSA_WANT_ALG_CTR
-#endif // OTA_ENCRYPTION_ENABLE
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
 // Include Generated fies
 #include "psa_crypto_config.h"

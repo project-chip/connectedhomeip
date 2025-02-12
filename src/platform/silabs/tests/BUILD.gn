@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,14 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
-import("${chip_root}/config/standalone/args.gni")
-import("${chip_root}/src/platform/bouffalolab/BL616/args.gni")
+import("${chip_root}/build/chip/chip_test_group.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/src/platform/silabs/tests/args.gni")
 
-bouffalo_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+chip_test_group("silabs_platform_tests") {
+  tests = []
 
-chip_detail_logging = false
-
-# use -Os instead of -Og
-is_debug = false
+  if (sl_build_unit_tests) {
+    tests += [ "${chip_root}/examples/platform/silabs/tests:examples_tests" ]
+  }
+}
