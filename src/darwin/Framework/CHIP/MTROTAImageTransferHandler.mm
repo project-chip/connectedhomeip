@@ -28,8 +28,15 @@ using namespace chip::app;
 
 constexpr uint32_t kMaxBdxBlockSize = 1024;
 
+constexpr double kMilliSecondsInSecond = 1000.0;
+
 // Timeout for the BDX transfer session. The OTA Spec mandates this should be >= 5 minutes.
 constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60);
+
+// For thread devices, we need to throttle sending Blocks in response to BlockQuery messages
+// to avoid spamming the network with too many BDX messages. We are going to match the polling
+// interval of 50 ms as the time to wait before sending a Block in response to a BlockQuery.
+constexpr System::Clock::Timeout kBdxThrottleIntervalInMsecs = System::Clock::Milliseconds32(50);
 
 constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
 
@@ -77,6 +84,8 @@ CHIP_ERROR MTROTAImageTransferHandler::Init(Messaging::ExchangeContext * exchang
     // We should have already checked that this controller supports OTA.
     VerifyOrReturnError(mDelegate != nil, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mDelegateNotificationQueue != nil, CHIP_ERROR_INCORRECT_STATE);
+
+    mIsPeerNodeAThreadDevice = [controller usesThreadForDevice:mPeer.GetNodeId()];
 
     BitFlags<bdx::TransferControlFlags> flags(bdx::TransferControlFlags::kReceiverDrive);
 
@@ -233,6 +242,11 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
 {
     assertChipStackLockedByCurrentThread();
 
+    // For thread devices, we need to throttle sending the response to BlockQuery, if the query is processed, before kBdxThrottleIntervalInMsecs
+    // has elapsed to prevent the BDX messages spamming up the network. Get the timestamp at which we start processing the BlockQuery message.
+
+    __block uint64_t startBlockQueryHandlingTimestamp = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
+
     auto blockSize = @(mTransfer.GetTransferBlockSize());
     auto blockIndex = @(mTransfer.GetNextBlockNum());
 
@@ -241,7 +255,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
 
     MTROTAImageTransferHandlerWrapper * __weak weakWrapper = mOTAImageTransferHandlerWrapper;
 
-    auto completionHandler = ^(NSData * _Nullable data, BOOL isEOF) {
+    auto respondWithBlock = ^(NSData * _Nullable data, BOOL isEOF) {
         [controller
             asyncDispatchToMatterQueue:^() {
                 assertChipStackLockedByCurrentThread();
@@ -271,6 +285,35 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
                               // should already have been destroyed anyway.
                           }];
     };
+
+    __block void (^completionHandler)(NSData * _Nullable data, BOOL isEOF) = nil;
+
+    // If the peer node is a Thread device, check how much time has elapsed since we started processing the BlockQuery.
+    // If the time elapsed is greater than kBdxThrottleIntervalInMsecs, call the completion handler to respond with a Block right away.
+    // If time elapsed is less than kBdxThrottleIntervalInMsecs, dispatch the completion handler to respond with a Block after kBdxThrottleIntervalInMsecs has elapsed.
+
+    if (mIsPeerNodeAThreadDevice)
+    {
+        completionHandler = ^(NSData * _Nullable data, BOOL isEOF) {
+            uint64_t timeElapsed = chip::System::SystemClock().GetMonotonicMilliseconds64().count() - startBlockQueryHandlingTimestamp;
+            if (timeElapsed >= kBdxThrottleIntervalInMsecs.count())
+            {
+                completionHandler = respondWithBlock;
+            }
+            else
+            {
+                double timeRemainingInSecs = (kBdxThrottleIntervalInMsecs.count() - timeElapsed) / kMilliSecondsInSecond;
+                dispatch_time_t time =  dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeRemainingInSecs * NSEC_PER_SEC));
+                dispatch_after(time, dispatch_get_main_queue(), ^{
+                    respondWithBlock(data, isEOF);
+                });
+            }
+        };
+    }
+    else
+    {
+        completionHandler = respondWithBlock;
+    }
 
     // TODO Handle MaxLength
 
