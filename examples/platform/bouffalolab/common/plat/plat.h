@@ -23,6 +23,10 @@
 
 #define EXT_DISCOVERY_TIMEOUT_SECS 20
 
+#ifndef CONFIG_APP_FABRIC_TABLE_DELEGATE
+#define CONFIG_APP_FABRIC_TABLE_DELEGATE 0
+#endif
+
 typedef void (*app_pds_gpio_irq_handler_t)(void * arg);
 
 #ifdef __cplusplus
