@@ -2808,7 +2808,7 @@ limitations under the License.
     <deviceType>
         <name>MA-thermostatcontroller</name>
         <domain>CHIP</domain>
-        <typeName>Matter Thermostat Controller</typeName>
+        <typeName>Thermostat Controller</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x030A</deviceId>
         <class>Simple</class>
