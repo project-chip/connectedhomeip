@@ -41,16 +41,7 @@ from functools import partial
 from itertools import chain
 from typing import Any, Iterable, List, Optional, Tuple
 
-from chip.testing.conversions import bytes_from_hex as bytes_from_hex
-from chip.testing.conversions import cluster_id_with_name as cluster_id_str
-from chip.testing.conversions import format_decimal_and_hex as id_str
-from chip.testing.conversions import hex_from_bytes as hex_from_bytes
-from chip.testing.matchers import is_type as type_matches
-from chip.testing.timeoperations import compare_time as compare_time
-from chip.testing.timeoperations import get_wait_seconds_from_set_time as get_wait_seconds_from_set_time
-from chip.testing.timeoperations import utc_datetime_from_matter_epoch_us as utc_datetime_from_matter_epoch_us
-from chip.testing.timeoperations import utc_datetime_from_posix_time_ms as utc_datetime_from_posix_time_ms
-from chip.testing.timeoperations import utc_time_in_matter_epoch as utc_time_in_matter_epoch
+from chip.testing import conversions, matchers, timeoperations
 from chip.tlv import uint
 
 # isort: off
@@ -2528,13 +2519,14 @@ def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig,
             sys.exit(1)
 
 
-type_matches = type_matches
-utc_time_in_matter_epoch = utc_time_in_matter_epoch
-utc_datetime_from_matter_epoch_us = utc_datetime_from_matter_epoch_us
-utc_datetime_from_posix_time_ms = utc_datetime_from_posix_time_ms
-compare_time = compare_time
-get_wait_seconds_from_set_time = get_wait_seconds_from_set_time
-bytes_from_hex = bytes_from_hex
-hex_from_bytes = hex_from_bytes
-id_str = id_str
-cluster_id_str = cluster_id_str
+# TODO(#37537): Remove these temporary aliases after transition period
+type_matches = matchers.is_type
+utc_time_in_matter_epoch = timeoperations.utc_time_in_matter_epoch
+utc_datetime_from_matter_epoch_us = timeoperations.utc_datetime_from_matter_epoch_us
+utc_datetime_from_posix_time_ms = timeoperations.utc_datetime_from_posix_time_ms
+compare_time = timeoperations.compare_time
+get_wait_seconds_from_set_time = timeoperations.get_wait_seconds_from_set_time
+bytes_from_hex = conversions.bytes_from_hex
+hex_from_bytes = conversions.hex_from_bytes
+id_str = conversions.format_decimal_and_hex
+cluster_id_str = conversions.cluster_id_str
