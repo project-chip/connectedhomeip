@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2023 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,8 +38,10 @@
 
 import chip.clusters as Clusters
 import langcodes
+import random
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from chip.testing.matter_asserts import assert_non_empty_string
 from mobly import asserts
 
 
@@ -50,11 +52,8 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
     def has_repeated_values(self, list):
         return len(list) != len(set(list))
 
-    def list_has_maximum_length_of_35_bytes(self, list):
-        return all(self.has_maximum_lenght_of_35_bytes(elem) for elem in list)
-
-    def has_maximum_lenght_of_35_bytes(self, str):
-        return len(str.encode('utf-8')) <= 35
+    def values_have_maximum_length(self, list, max_lenght):
+        return all((len(elem.encode('utf-8')) <= max_lenght) for elem in list)
 
     def supported_locales_has_active_locale(self, list, str):
         return str in list
@@ -74,7 +73,8 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
 
         endpoint = self.get_endpoint(default=0)
         value_not_present_in_supported_locales = "fw-GB"
-        es_ES = "es-ES"
+        max_lenght_string = 35
+        max_length_list = 32
 
         # Step 0: Commissioning DUT (already done)
         self.step(0)
@@ -82,22 +82,23 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
         # Step 1: TH reads SupportedLocales attribute from DUT
         self.step(1)
 
-        initial_values_supported_locales = await self.read_single_attribute_check_success(
+        initial_supported_locales = await self.read_single_attribute_check_success(
             cluster=Clusters.LocalizationConfiguration,
             attribute=Clusters.LocalizationConfiguration.Attributes.SupportedLocales,
             endpoint=endpoint
         )
 
         # Verify values in SupportedLocales attribute are not repeated
-        asserts.assert_false(self.has_repeated_values(initial_values_supported_locales),
-                             "SupportedLocales attribute has no repeated values")
+        asserts.assert_false(self.has_repeated_values(initial_supported_locales),
+                             "SupportedLocales attribute should not have repeated values")
 
         # Verify maximun number of elements in the SupportedLocales list is 32
-        asserts.assert_true(len(initial_values_supported_locales) <= 32, "SupportedLocales attribute has less than 32 elements")
+        asserts.assert_less_equal(len(initial_supported_locales), max_length_list,
+                                  "SupportedLocales attribute should have less than " + str(max_length_list) + " elements")
 
-        # Verify values of SupportedLocales attribute has a maximum lenght of 35 bytes
-        asserts.assert_true(self.list_has_maximum_length_of_35_bytes(initial_values_supported_locales),
-                            "SupportedLocales attribute has a maximum lenght of 35 bytes")
+        # Verify values of SupportedLocales attribute have a maximum lenght of 35 bytes
+        asserts.assert_true(self.values_have_maximum_length(initial_supported_locales, max_lenght_string),
+                            "Values of SupportedLocales attribute should have a maximum lenght of " + str(max_lenght_string) + " bytes")
 
         # Step 2: TH reads ActiveLocale attribute from the DUT
         self.step(2)
@@ -109,19 +110,18 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
         )
 
         # Verify that the ActiveLocale attribute is not empty
-        asserts.assert_true(bool(initial_active_locale), "ActiveLocale attribute is not empty")
+        assert_non_empty_string(initial_active_locale, "ActiveLocale attribute should not be empty")
 
         # Verify that the ActiveLocale attribute is Language Tag as defined by BCP47
-        asserts.assert_true(langcodes.tag_is_valid(initial_active_locale),
-                            "ActiveLocale attribute is Language Tag as defined by BCP47")
+        assert langcodes.tag_is_valid(initial_active_locale), "ActiveLocale attribute should be Language Tag as defined by BCP47"
 
         # Verify that the value of ActiveLocale attribute has maximum lenght of 35 bytes
-        asserts.assert_true(self.has_maximum_lenght_of_35_bytes(initial_active_locale),
-                            "ActiveLocale attribute has less than 35 bytes")
+        asserts.assert_less_equal(len(initial_active_locale), max_lenght_string,
+                                  "ActiveLocale attribute should have less than " + str(max_lenght_string) + " bytes")
 
         # Verify that the ActiveLocale attribute value is present in the SupportedLocales attribute list
-        asserts.assert_true(self.supported_locales_has_active_locale(initial_values_supported_locales,
-                            initial_active_locale), "ActiveLocale attribute value is present in the SupportedLocales attribute list")
+        asserts.assert_true(self.supported_locales_has_active_locale(initial_supported_locales,
+                            initial_active_locale), "ActiveLocale attribute value should be present in the SupportedLocales attribute list")
 
         # Step 3: TH writes new string not present in SupportedLocales attribute to ActiveLocale attribute
         self.step(3)
@@ -134,7 +134,11 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
         # Step 4: TH writes new string present in SupportedLocales attribute to ActiveALocale attribute
         self.step(4)
 
-        value_present_in_supported_locales = initial_values_supported_locales[initial_values_supported_locales.index(es_ES)]
+        filtered_supported_locales = [elem for elem in initial_supported_locales if elem != initial_active_locale]
+        if filtered_supported_locales:
+            value_present_in_supported_locales = random.choice(filtered_supported_locales)
+        else:
+            asserts.fail("SupportedLocales attribute has only one element and is the same value as ActiveLocale")
 
         result = await self.write_single_attribute(attribute_value=Clusters.LocalizationConfiguration.Attributes.ActiveLocale(value_present_in_supported_locales), endpoint_id=endpoint, expect_success=True)
 
