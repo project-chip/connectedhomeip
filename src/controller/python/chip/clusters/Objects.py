@@ -415,10 +415,10 @@ class Globals:
             kUnknownEnumValue = 3
 
         class ThreeLevelAutoEnum(MatterIntEnum):
-            kLow = 0x00
-            kMedium = 0x01
-            kHigh = 0x02
-            kAutomatic = 0x03
+            kAuto = 0x00
+            kLow = 0x01
+            kMedium = 0x02
+            kHigh = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
@@ -46738,7 +46738,7 @@ class WebRTCTransportProvider(Cluster):
             kUnknownEnumValue = 12
 
     class Bitmaps:
-        class WebRTCMetadataOptions(IntFlag):
+        class WebRTCMetadataOptionsBitmap(IntFlag):
             kDataTLV = 0x1
 
     class Structs:
@@ -46873,13 +46873,13 @@ class WebRTCTransportProvider(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=1, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=2, Type=typing.Union[None, Nullable, uint]),
                     ])
 
             webRTCSessionID: uint = 0
-            videoStreamID: uint = 0
-            audioStreamID: uint = 0
+            videoStreamID: typing.Union[None, Nullable, uint] = None
+            audioStreamID: typing.Union[None, Nullable, uint] = None
 
         @dataclass
         class ProvideAnswer(ClusterCommand):
@@ -46900,7 +46900,7 @@ class WebRTCTransportProvider(Cluster):
             sdp: str = ""
 
         @dataclass
-        class ProvideICECandidate(ClusterCommand):
+        class ProvideICECandidates(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000553
             command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
@@ -46911,11 +46911,11 @@ class WebRTCTransportProvider(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="ICECandidate", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(Label="ICECandidates", Tag=1, Type=typing.List[str]),
                     ])
 
             webRTCSessionID: uint = 0
-            ICECandidate: str = ""
+            ICECandidates: typing.List[str] = field(default_factory=lambda: [])
 
         @dataclass
         class EndSession(ClusterCommand):
@@ -47088,7 +47088,7 @@ class WebRTCTransportRequestor(Cluster):
             kUnknownEnumValue = 12
 
     class Bitmaps:
-        class WebRTCMetadataOptions(IntFlag):
+        class WebRTCMetadataOptionsBitmap(IntFlag):
             kDataTLV = 0x1
 
     class Structs:
@@ -47174,7 +47174,7 @@ class WebRTCTransportRequestor(Cluster):
             sdp: str = ""
 
         @dataclass
-        class ICECandidate(ClusterCommand):
+        class ICECandidates(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000554
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
@@ -47185,11 +47185,11 @@ class WebRTCTransportRequestor(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="ICECandidate", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(Label="ICECandidates", Tag=1, Type=typing.List[str]),
                     ])
 
             webRTCSessionID: uint = 0
-            ICECandidate: str = ""
+            ICECandidates: typing.List[str] = field(default_factory=lambda: [])
 
         @dataclass
         class End(ClusterCommand):
@@ -47889,7 +47889,7 @@ class Chime(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="installedChimeSounds", Tag=0x00000000, Type=typing.List[Chime.Structs.ChimeSoundStruct]),
-                ClusterObjectFieldDescriptor(Label="activeChimeID", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="selectedChime", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="enabled", Tag=0x00000002, Type=bool),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -47899,7 +47899,7 @@ class Chime(Cluster):
             ])
 
     installedChimeSounds: typing.List[Chime.Structs.ChimeSoundStruct] = field(default_factory=lambda: [])
-    activeChimeID: uint = 0
+    selectedChime: uint = 0
     enabled: bool = False
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -47953,7 +47953,7 @@ class Chime(Cluster):
             value: typing.List[Chime.Structs.ChimeSoundStruct] = field(default_factory=lambda: [])
 
         @dataclass
-        class ActiveChimeID(ClusterAttributeDescriptor):
+        class SelectedChime(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000556
@@ -48730,10 +48730,10 @@ class TlsCertificateManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="ccdid", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="ccdid", Tag=0, Type=typing.Union[Nullable, uint]),
                     ])
 
-            ccdid: uint = 0
+            ccdid: typing.Union[Nullable, uint] = NullValue
 
         @dataclass
         class FindClientCertificateResponse(ClusterCommand):

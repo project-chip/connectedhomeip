@@ -6971,11 +6971,11 @@ bool emberAfWebRTCTransportProviderClusterProvideAnswerCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::DecodableType & commandData);
 /**
- * @brief WebRTC Transport Provider Cluster ProvideICECandidate Command callback (from client)
+ * @brief WebRTC Transport Provider Cluster ProvideICECandidates Command callback (from client)
  */
-bool emberAfWebRTCTransportProviderClusterProvideICECandidateCallback(
+bool emberAfWebRTCTransportProviderClusterProvideICECandidatesCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::DecodableType & commandData);
+    const chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::DecodableType & commandData);
 /**
  * @brief WebRTC Transport Provider Cluster EndSession Command callback (from client)
  */
@@ -6995,11 +6995,11 @@ bool emberAfWebRTCTransportRequestorClusterAnswerCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WebRTCTransportRequestor::Commands::Answer::DecodableType & commandData);
 /**
- * @brief WebRTC Transport Requestor Cluster ICECandidate Command callback (from client)
+ * @brief WebRTC Transport Requestor Cluster ICECandidates Command callback (from client)
  */
-bool emberAfWebRTCTransportRequestorClusterICECandidateCallback(
+bool emberAfWebRTCTransportRequestorClusterICECandidatesCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::DecodableType & commandData);
+    const chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidates::DecodableType & commandData);
 /**
  * @brief WebRTC Transport Requestor Cluster End Command callback (from client)
  */
