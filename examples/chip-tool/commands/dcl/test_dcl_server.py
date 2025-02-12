@@ -214,12 +214,14 @@ def run_https_server(cert_file="cert.pem", key_file="key.pem"):
     httpd = http.server.HTTPServer(
         (DEFAULT_HOSTNAME, DEFAULT_PORT), RESTRequestHandler)
 
-    httpd.socket = ssl.wrap_socket(
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    context.load_cert_chain(certfile="server.crt", keyfile="server.key")
+    httpd.socket = context.wrap_socket(
         httpd.socket,
         server_side=True,
-        certfile=cert_file,
-        keyfile=key_file,
-        ssl_version=ssl.PROTOCOL_TLS,
+        # certfile=cert_file,
+        # keyfile=key_file,
+        # ssl_version=ssl.PROTOCOL_TLS,
     )
 
     print(f"Serving on https://{DEFAULT_HOSTNAME}:{DEFAULT_PORT}")
