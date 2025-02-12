@@ -95,7 +95,7 @@ CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
         struct tm calendar;
         localtime_r(&timep, &calendar);
         ChipLogProgress(DeviceLayer, "Real time clock set to %lld (%04d/%02d/%02d %02d:%02d:%02d UTC)",
-                        static_cast<long long>(tv.tv_sec), calendar.tm_year, calendar.tm_mon, calendar.tm_mday, calendar.tm_hour,
+                        static_cast<long long>(tv.tv_sec), calendar.tm_year + 1900, calendar.tm_mon + 1, calendar.tm_mday, calendar.tm_hour,
                         calendar.tm_min, calendar.tm_sec);
     }
 #endif // CHIP_PROGRESS_LOGGING
