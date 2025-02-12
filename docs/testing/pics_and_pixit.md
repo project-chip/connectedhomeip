@@ -92,10 +92,11 @@ the full set of PICS XML files into the
 present for the endpoint being described. Documentation on how to use the PICS
 tool can be found in the PICS tool readme in the tool menu.
 
-Many of the full-node MCORE elements really only apply to the root node. For
-example, the entire device is commissionable, but commissioning tests only need
-to be run against EP0, so MCORE PICS should be set on the EP0 PICS set. TODO:
-Rene - does this apply generally or are there some gotchas here?
+Some of of the full-node MCORE elements really only apply to the root node,
+while others apply across all endpoints. For example, the entire device is
+commissionable, but commissioning tests only need to be run against EP0, so
+MCORE PICS should be set on the EP0 PICS set. Things like MCORE.IDM apply to
+every endpoint.
 
 ### Helper scripts
 
@@ -124,6 +125,11 @@ tool:
 -   PICS describing whether optionally-writable attributes are writable
 -   any other non-element PICS
 
+It is important to note that this script is NOT the official tool for PICS
+generation, just a helper to assist with this manual process. It is very
+important to go back and check that the values are as expected and to fill in
+the other PICS.
+
 ### Verifying PICS using the IDM-10.4 certification test
 
 While not all PICS are verifiable on the device, we do have tests that verify
@@ -137,6 +143,10 @@ checker test is TC-IDM-10.4, implemented in
 [TC_pics_checker.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_pics_checker.py).
 These tests run a single set of PICS XML files against an endpoint. The
 `--endpoint` and `--PICS` flags are therefore required.
+
+Note that you can run tests locally against the PICS XMLs for an endpoint by
+supplying the name of the directory containing the set of PICS XML files for
+that endpoint.
 
 ## Setting PIXITs for Matter devices
 
