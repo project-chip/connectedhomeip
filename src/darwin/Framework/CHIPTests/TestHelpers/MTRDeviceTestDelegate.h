@@ -37,6 +37,7 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
 @property (nonatomic, nullable) dispatch_block_t onSubscriptionPoolWorkComplete;
 @property (nonatomic, nullable) dispatch_block_t onClusterDataPersisted;
 @property (nonatomic, nullable) dispatch_block_t onSubscriptionCallbackDelete;
+@property (nonatomic, nullable) dispatch_block_t onSubscriptionReset;
 @end
 
 @interface MTRDeviceTestDelegateWithSubscriptionSetupOverride : MTRDeviceTestDelegate

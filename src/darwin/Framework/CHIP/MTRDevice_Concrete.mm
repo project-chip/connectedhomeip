@@ -336,6 +336,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @property (nonatomic) NSDate * lastDeviceBecameActiveCallbackTime;
 @property (nonatomic) BOOL throttlingDeviceBecameActiveCallbacks;
 
+// Keep track of the last time we received subscription related communication from the device
+@property (nonatomic, nullable) NSDate * lastSubscriptionActiveTime;
+
 /**
  * If currentReadClient is non-null, that means that we successfully
  * called SendAutoResubscribeRequest on the ReadClient and have not yet gotten
@@ -360,6 +363,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)unitTestClusterDataPersisted:(MTRDevice *)device;
 - (BOOL)unitTestSuppressTimeBasedReachabilityChanges:(MTRDevice *)device;
 - (void)unitTestSubscriptionCallbackDeleteForDevice:(MTRDevice *)device;
+- (void)unitTestSubscriptionResetForDevice:(MTRDevice *)device;
 @end
 #endif
 
@@ -2669,6 +2673,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self.matterCPPObjectsHolder clearReadClientAndDeleteSubscriptionCallback];
 
     [self _doHandleSubscriptionError:nil];
+
+#ifdef DEBUG
+    [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+        if ([testDelegate respondsToSelector:@selector(unitTestSubscriptionResetForDevice:)]) {
+            [testDelegate unitTestSubscriptionResetForDevice:self];
+        }
+    }];
+#endif
 }
 
 #ifdef DEBUG
@@ -2774,6 +2786,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                ^(NSArray * value) {
                                    mtr_strongify(self);
                                    VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription attribute report called back with nil MTRDevice"));
+                                   {
+                                       std::lock_guard lock(self->_lock);
+                                       self.lastSubscriptionActiveTime = [NSDate now];
+                                   }
 
                                    MTR_LOG("%@ got attribute report (%p) %@", self, value, value);
                                    dispatch_async(self.queue, ^{
@@ -2790,6 +2806,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                ^(NSArray * value) {
                                    mtr_strongify(self);
                                    VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription event report called back with nil MTRDevice"));
+                                   {
+                                       std::lock_guard lock(self->_lock);
+                                       self.lastSubscriptionActiveTime = [NSDate now];
+                                   }
 
                                    MTR_LOG("%@ got event report %@", self, value);
                                    dispatch_async(self.queue, ^{
@@ -2822,6 +2842,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
                                    MTR_LOG("%@ got subscription established", self);
                                    std::lock_guard lock(self->_lock);
+                                   self.lastSubscriptionActiveTime = [NSDate now];
 
                                    // First synchronously change state
                                    if (HadSubscriptionEstablishedOnce(self->_internalDeviceState)) {
@@ -2866,6 +2887,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                ^(void) {
                                    mtr_strongify(self);
                                    VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription report begin called back with nil MTRDevice"));
+                                   {
+                                       std::lock_guard lock(self->_lock);
+                                       self.lastSubscriptionActiveTime = [NSDate now];
+                                   }
 
                                    MTR_LOG("%@ got report begin", self);
                                    [self _handleReportBegin];
@@ -4723,8 +4748,23 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return HaveSubscriptionEstablishedRightNow(_internalDeviceState);
 }
 
+// TODO: make this configurable - for now use 1.5 second
+#define MTRDEVICE_ACTIVE_COMMUNICATION_THRESHOLD_SECONDS (1.5)
+
 - (void)_deviceMayBeReachable
 {
+    // Ignore this call if actively receiving communication from this device
+    {
+        std::lock_guard lock(self->_lock);
+        if (self.lastSubscriptionActiveTime) {
+            NSTimeInterval intervalSinceDeviceLastActive = -[self.lastSubscriptionActiveTime timeIntervalSinceNow];
+            if (intervalSinceDeviceLastActive < MTRDEVICE_ACTIVE_COMMUNICATION_THRESHOLD_SECONDS) {
+                MTR_LOG("%@ _deviceMayBeReachable called and ignored, because last received communication from device %.6lf seconds ago", self, intervalSinceDeviceLastActive);
+                return;
+            }
+        }
+    }
+
     MTR_LOG("%@ _deviceMayBeReachable called, resetting subscription", self);
     // TODO: This should only be allowed for thread devices
     mtr_weakify(self);
