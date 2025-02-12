@@ -52,9 +52,6 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
     def has_repeated_values(self, list):
         return len(list) != len(set(list))
 
-    def values_have_maximum_length(self, list, max_lenght):
-        return all((len(elem.encode('utf-8')) <= max_lenght) for elem in list)
-
     def supported_locales_has_active_locale(self, list, str):
         return str in list
 
@@ -94,11 +91,12 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
 
         # Verify maximun number of elements in the SupportedLocales list is 32
         asserts.assert_less_equal(len(initial_supported_locales), max_length_list,
-                                  "SupportedLocales attribute should have less than " + str(max_length_list) + " elements")
+                                  "SupportedLocales attribute should have less than '{max_length_list}' elements")
 
         # Verify values of SupportedLocales attribute have a maximum lenght of 35 bytes
-        asserts.assert_true(self.values_have_maximum_length(initial_supported_locales, max_lenght_string),
-                            "Values of SupportedLocales attribute should have a maximum lenght of " + str(max_lenght_string) + " bytes")
+        for elem in initial_supported_locales:
+            asserts.assert_less_equal(len(elem.encode('utf-8')), max_lenght_string,
+                                      "Value '{elem}' in SupportedLocales attribute should have a maximum lenght of '{max_lenght_string}' bytes")
 
         # Step 2: TH reads ActiveLocale attribute from the DUT
         self.step(2)
@@ -117,7 +115,7 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
 
         # Verify that the value of ActiveLocale attribute has maximum lenght of 35 bytes
         asserts.assert_less_equal(len(initial_active_locale), max_lenght_string,
-                                  "ActiveLocale attribute should have less than " + str(max_lenght_string) + " bytes")
+                                  "ActiveLocale attribute should have less than '{max_lenght_string}' bytes")
 
         # Verify that the ActiveLocale attribute value is present in the SupportedLocales attribute list
         asserts.assert_true(self.supported_locales_has_active_locale(initial_supported_locales,
