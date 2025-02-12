@@ -140,7 +140,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:112"
+    - name: "ghcr.io/project-chip/chip-build-vscode:113"
       id: Android
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
