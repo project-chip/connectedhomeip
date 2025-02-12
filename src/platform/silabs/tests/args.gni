@@ -16,5 +16,5 @@ import("//build/chip/tests.gni")
 
 declare_args() {
   # Build argument to enable Silabs specific unit tests
-  sl_build_unit_tests = chip_build_tests
+  sl_build_unit_tests = chip_build_all_platform_tests
 }
