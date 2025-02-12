@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2023 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,9 +38,9 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.clusters.Types import Nullable
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+from chip.clusters.Types import NullValue
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
 class MOD_1_2(MatterBaseTest):
     """Proposal test for Mode Select Cluster attributes as a server."""
 
-    def TC_MOD_1_2(self) -> str:
+    def desc_MOD_1_2(self) -> str:
         return "80.2.1. [TC-MOD-1.2] Cluster attributes with DUT as Server"
 
     def pics_MOD_1_2(self):
@@ -91,26 +91,25 @@ class MOD_1_2(MatterBaseTest):
             logger.info(
                 "SupportedMode.semanticTags contains values, verifying attributes for manufacturedcode and value are not longer than 16bits int")
             for semantictag in supported_mode.semanticTags:
-                asserts.assert_true(semantictag >= 0 and semantictag.mfgCode <= self._16bitshex,
+                asserts.assert_true(semantictag.mfgCode >= 0 and semantictag.mfgCode <= self._16bitshex,
                                     "Element semantictag.Mfgcode is greater than 16 bits")
-                asserts.assert_true(semantictag >= 0 and semantictag.value <= self._16bitshex,
+                asserts.assert_true(semantictag.value >= 0 and semantictag.value <= self._16bitshex,
                                     "Element semantictag.Value is greater than 16 bits")
 
     def _log_attribute(self, name, value):
-        logger.info(f"{name} attribute {value} with type {type(value)}")
+        logger.info(f"{name} attribute with value: {value} with type: {type(value)}")
 
     @async_test_body
     async def test_MOD_1_2(self):
         self.cluster = Clusters.ModeSelect
         self.endpoint = self.get_endpoint(1)
         self._16bitshex = 0xFFFF
-        self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
-        # commision device
-        # in the test plan step 1 is defined as a precondition.
+        # Commision device
+        # In the test plan step 1 is defined as a precondition.
         self.step(1)
 
-        # veirfy the Supported modes
+        # Veirfy the Supported modes
         # Verify contains attributes label and mode
         # Verify if semantic tags has elements in list , and if there are values assert the values
         self.step(2)
@@ -122,9 +121,9 @@ class MOD_1_2(MatterBaseTest):
         for supported_mode in supported_modes:
             logger.info(
                 f"Label {supported_mode} with type {type(supported_mode)} and {supported_mode.label} and {supported_mode.mode} and {supported_mode.semanticTags}")
-            # verify the struct values
+            # Verify the struct values
             self._verify_supported_mode(supported_mode=supported_mode)
-            # after verifying the struct is correct append the mode value.
+            # After verifying the struct is correct append the mode value.
             supported_modes_values.append(supported_mode.mode)
         logger.info(f"Supported modes values {supported_modes_values}")
 
@@ -137,30 +136,31 @@ class MOD_1_2(MatterBaseTest):
 
         self.step(4)
         on_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster, attribute=self.cluster.Attributes.OnMode)
-        # On mode can be null
+        # On mode can be Nullvalue
         self._log_attribute("OnMode", on_mode)
-        asserts.assert_true((isinstance(on_mode, int) or isinstance(on_mode, Nullable)),
-                            "Onmode is not int or is not clusters.Types.Nullable")
-        # verify that OnMode is in the list of Supported Modes, but if null, cant be verified.
-        if not isinstance(on_mode, Nullable):
-            asserts.assert_in(on_mode, supported_modes_values, f"Onmode {current_mode} is not in {supported_modes_values}")
+        asserts.assert_true((isinstance(on_mode, int) or on_mode is NullValue),
+                            "Onmode is not int or is not Nullvalue")
+        # Verify that OnMode is in the list of Supported Modes, but if null, cant be verified.
+        if on_mode is not NullValue:
+            asserts.assert_in(on_mode, supported_modes_values, f"Onmode {on_mode} is not in {supported_modes_values}")
 
-        # Validate startup mode
+        # Validate startup mode ( attribute Startup is optional)
         self.step(5)
-        startup_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster, attribute=self.cluster.Attributes.StartUpMode)
-        self._log_attribute("StartupMode", startup_mode)
-        asserts.assert_true(isinstance(startup_mode, int), "Startupmode is not int")
-        asserts.assert_in(startup_mode, supported_modes_values, f"Startupmode {current_mode} is not in {supported_modes_values}")
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=self.cluster.Attributes.StartUpMode):
+            startup_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster, attribute=self.cluster.Attributes.StartUpMode)
+            self._log_attribute("StartupMode", startup_mode)
+            asserts.assert_true(isinstance(startup_mode, int), "Startupmode is not int")
+            asserts.assert_in(startup_mode, supported_modes_values,
+                              f"Startupmode {startup_mode} is not in {supported_modes_values}")
 
-        # Verify the string for ci is larger that 1 char.
+        # Verify the string  is str and larger that 1 char.
         # If is non ci ask the user if can read and understand the string.
         self.step(6)
         description = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster, attribute=self.cluster.Attributes.Description)
         self._log_attribute("Description", description)
-        if self.is_ci:
-            asserts.assert_true(isinstance(description, str), "Description attribute is not str")
-            asserts.assert_true(len(description) >= 1, "Description is lower that 1 char.")
-        else:
+        asserts.assert_true(isinstance(description, str), "Description attribute is not str")
+        asserts.assert_true(len(description) >= 1, "Description is lower that 1 char.")
+        if not self.is_pics_sdk_ci_only:
             user_response = self.wait_for_user_input(prompt_msg=f"Is the value \"{description}\" for attribute Description a readable and understandable string? Enter 'y' or 'n'",
                                                      prompt_msg_placeholder="y",
                                                      default_value="y")
@@ -170,8 +170,8 @@ class MOD_1_2(MatterBaseTest):
         self.step(7)
         standard_namepace = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster, attribute=self.cluster.Attributes.StandardNamespace)
         self._log_attribute("StandardNamespace", standard_namepace)
-        asserts.assert_true((isinstance(standard_namepace, Nullable) or (isinstance(standard_namepace, int) and (standard_namepace >= 0 and standard_namepace <= self._16bitshex))),
-                            "Standard namespace is not 16bit enum or not Nullable")
+        asserts.assert_true((standard_namepace is NullValue or (isinstance(standard_namepace, int) and (standard_namepace >= 0 and standard_namepace <= self._16bitshex))),
+                            "Standard namespace is not 16bit enum or not Nullvalue")
 
 
 if __name__ == "__main__":
