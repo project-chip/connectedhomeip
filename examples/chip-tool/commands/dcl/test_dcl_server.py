@@ -211,21 +211,25 @@ class RESTRequestHandler(http.server.BaseHTTPRequestHandler):
 
 
 def run_https_server(cert_file="cert.pem", key_file="key.pem"):
-    httpd = http.server.HTTPServer(
-        (DEFAULT_HOSTNAME, DEFAULT_PORT), RESTRequestHandler)
+    # Creates a basic HTTP server instance that listens on DEFAULT_HOSTNAME and DEFAULT_PORT
+    # RESTRequestHandler handles incoming HTTP requests
+    httpd = http.server.HTTPServer((DEFAULT_HOSTNAME, DEFAULT_PORT), RESTRequestHandler)
 
+    # Creates an SSL context using TLS protocol for secure communications
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    context.load_cert_chain(certfile="server.crt", keyfile="server.key")
-    httpd.socket = context.wrap_socket(
-        httpd.socket,
-        server_side=True,
-        # certfile=cert_file,
-        # keyfile=key_file,
-        # ssl_version=ssl.PROTOCOL_TLS,
-    )
 
-    print(f"Serving on https://{DEFAULT_HOSTNAME}:{DEFAULT_PORT}")
-    httpd.serve_forever()
+    # Loads the SSL certificate and private key for the server
+    # cert_file: contains the server's public certificate
+    # key_file: contains the server's private key
+    context.load_cert_chain(certfile=cert_file, keyfile=key_file)
+
+    # Uses a context manager (with statement) to wrap the HTTP server's socket with SSL
+    # server_side=True indicates this is a server socket
+    # The wrapped socket is automatically closed when exiting the with block
+    with context.wrap_socket(httpd.socket, server_side=True) as httpd.socket:
+        print(f"Serving on https://{DEFAULT_HOSTNAME}:{DEFAULT_PORT}")
+        # Starts the server and runs indefinitely, handling incoming HTTPS requests
+        httpd.serve_forever()
 
 
 # Generate self-signed certificates if needed
