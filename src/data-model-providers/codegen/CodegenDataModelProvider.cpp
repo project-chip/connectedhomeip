@@ -285,7 +285,6 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
         ReturnErrorOnFailure(builder.Append(AttributeEntryFrom(path, attribute)));
     }
 
-
     // This "GlobalListEntry" is specific for metadata that ember does not include
     // in its attribute list metadata.
     //
