@@ -1201,6 +1201,9 @@ class MatterBaseTest(base_test.BaseTestClass):
     def dut_node_id(self) -> int:
         return self.matter_test_config.dut_node_ids[0]
 
+    def get_endpoint(self, default: Optional[int] = 0) -> int:
+        return self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else default
+
     def setup_class(self):
         super().setup_class()
 

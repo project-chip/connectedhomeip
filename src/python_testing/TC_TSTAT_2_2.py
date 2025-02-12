@@ -18,27 +18,19 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --endpoint 1
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
 # === END CI TEST ARGUMENTS ===
 
 import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
