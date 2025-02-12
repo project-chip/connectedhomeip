@@ -315,7 +315,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/fabric-bridge-app fab
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/fabric-admin fabric-admin
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lighting-data-model-no-unique-id-app chip-lighting-data-model-no-unique-id-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/matter-network-manager-app matter-network-manager-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-terms-and-conditions-app apps/chip-terms-and-conditions-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-terms-and-conditions-app chip-terms-and-conditions-app
 
 # Stage 3.1: Setup the Matter Python environment
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_lib python_lib
