@@ -28,8 +28,6 @@
 #include <platform/CHIPDeviceBuildConfig.h>
 #endif
 
-#include <lib/core/CHIPConfig.h>
-
 /* Include a project-specific configuration file, if defined.
  *
  * An application or module that incorporates the chip Device Layer can define a project
@@ -40,6 +38,8 @@
 #ifdef CHIP_DEVICE_PROJECT_CONFIG_INCLUDE
 #include CHIP_DEVICE_PROJECT_CONFIG_INCLUDE
 #endif
+
+#include <lib/core/CHIPConfig.h>
 
 /* Include a platform-specific configuration file, if defined.
  *
