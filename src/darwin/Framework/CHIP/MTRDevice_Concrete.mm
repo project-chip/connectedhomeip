@@ -337,7 +337,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @property (nonatomic) BOOL throttlingDeviceBecameActiveCallbacks;
 
 // Keep track of the last time we received subscription related communication from the device
-@property (nonatomic) NSDate * lastSubscriptionActiveTime;
+@property (nonatomic, nullable) NSDate * lastSubscriptionActiveTime;
 
 /**
  * If currentReadClient is non-null, that means that we successfully
