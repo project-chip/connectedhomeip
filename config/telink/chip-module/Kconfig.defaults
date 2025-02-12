@@ -63,7 +63,7 @@ config POSIX_MAX_FDS
 # Application stack size
 config MAIN_STACK_SIZE
     default 3240 if PM || SOC_RISCV_TELINK_TL321X
-    default 4512 if SOC_RISCV_TELINK_W91
+    default 4608 if SOC_RISCV_TELINK_W91
     default 4096
 
 config INIT_STACKS
