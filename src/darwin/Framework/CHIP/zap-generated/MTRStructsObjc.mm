@@ -6705,6 +6705,75 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRClosureControlClusterOverallStateStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _positioning = nil;
+
+        _latching = nil;
+
+        _speed = nil;
+
+        _extraInfo = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRClosureControlClusterOverallStateStruct alloc] init];
+
+    other.positioning = self.positioning;
+    other.latching = self.latching;
+    other.speed = self.speed;
+    other.extraInfo = self.extraInfo;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: positioning:%@; latching:%@; speed:%@; extraInfo:%@; >", NSStringFromClass([self class]), _positioning, _latching, _speed, _extraInfo];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRClosureControlClusterOverallTargetStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _tagPosition = nil;
+
+        _tagLatch = nil;
+
+        _speed = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRClosureControlClusterOverallTargetStruct alloc] init];
+
+    other.tagPosition = self.tagPosition;
+    other.tagLatch = self.tagLatch;
+    other.speed = self.speed;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: tagPosition:%@; tagLatch:%@; speed:%@; >", NSStringFromClass([self class]), _tagPosition, _tagLatch, _speed];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRServiceAreaClusterLandmarkInfoStruct
 - (instancetype)init
 {
