@@ -41,7 +41,9 @@ from functools import partial
 from itertools import chain
 from typing import Any, Iterable, List, Optional, Tuple
 
-from chip.testing import conversions, matchers, timeoperations
+import chip.testing.conversions as conversions
+import chip.testing.matchers as matchers
+import chip.testing.timeoperations as timeoperations
 from chip.tlv import uint
 
 # isort: off
@@ -2529,4 +2531,4 @@ get_wait_seconds_from_set_time = timeoperations.get_wait_seconds_from_set_time
 bytes_from_hex = conversions.bytes_from_hex
 hex_from_bytes = conversions.hex_from_bytes
 id_str = conversions.format_decimal_and_hex
-cluster_id_str = conversions.cluster_id_str
+cluster_id_str = conversions.cluster_id_with_name
