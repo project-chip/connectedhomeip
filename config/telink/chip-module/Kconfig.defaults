@@ -69,15 +69,15 @@ config INIT_STACKS
     default y
 
 config IDLE_STACK_SIZE
-    default 512 if PM || SOC_RISCV_TELINK_TL321X
+    default 512 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
 
 
 config ISR_STACK_SIZE
     default 576 if PM
-    default 528 if SOC_RISCV_TELINK_TL321X
+    default 528 if SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
-    default 616 if PM
+    default 616 if PM || SOC_RISCV_TELINK_W91
 
 config HEAP_MEM_POOL_SIZE
     default 256
@@ -97,19 +97,19 @@ config NET_IF_MCAST_IPV6_ADDR_COUNT
 
 # Network buffers
 config NET_PKT_RX_COUNT
-    default 4 if PM || SOC_RISCV_TELINK_TL321X
+    default 4 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
     default 8
 
 config NET_PKT_TX_COUNT
-    default 4 if PM || SOC_RISCV_TELINK_TL321X
+    default 4 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
     default 8
 
 config NET_BUF_RX_COUNT
-    default 12 if PM || SOC_RISCV_TELINK_TL321X
+    default 12 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
     default 32
 
 config NET_BUF_TX_COUNT
-    default 12 if PM || SOC_RISCV_TELINK_TL321X
+    default 12 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
     default 32
 
 config GPIO
@@ -160,11 +160,11 @@ config BT_GATT_CACHING
 
 config BT_RX_STACK_SIZE
     default 1352 if BT_B9X || BT_TLX
-    default 2048 if BT_W91
+    default 896 if BT_W91
 
 config BT_HCI_TX_STACK_SIZE
     default 640 if BT_B9X || BT_TLX
-    default 2048 if BT_W91
+    default 896 if BT_W91
 
 config BT_DEVICE_NAME_GATT_WRITABLE
     default n
@@ -406,6 +406,12 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 
 config NET_MGMT_EVENT_STACK_SIZE
     default 1128
+
+config TELINK_W91_WIFI_EVENT_THREAD_STACK_SIZE
+	default 1136
+
+config IPC_SERVICE_ICMSG_WORK_QUEUE_STACK_SIZE
+	default 544
 
 endif # CHIP_WIFI
 
