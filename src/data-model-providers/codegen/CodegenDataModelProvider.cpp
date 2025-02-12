@@ -285,11 +285,18 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
         ReturnErrorOnFailure(builder.Append(AttributeEntryFrom(path, attribute)));
     }
 
+
+    // This "GlobalListEntry" is specific for metadata that ember does not include
+    // in its attribute list metadata.
+    //
+    // By spec these Attribute/AcceptedCommands/GeneratedCommants lists are:
+    //   - lists of elements
+    //   - read-only, with read privilege view
+    //   - fixed value (no such flag exists, so this is not a quality flag we set/track)
     DataModel::AttributeEntry globalListEntry;
 
     globalListEntry.readPrivilege = Access::Privilege::kView;
     globalListEntry.flags.Set(DataModel::AttributeQualityFlags::kListAttribute);
-    // these entries should also be `Fixed` however no such flag is propagated (we do not track)
 
     for (auto & attribute : GlobalAttributesNotInMetadata)
     {
