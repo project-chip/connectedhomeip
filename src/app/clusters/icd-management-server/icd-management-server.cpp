@@ -25,7 +25,9 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/icd/server/ICDNotifier.h>
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+#include <app/icd/server/ICDNotifier.h> // nogncheck
+#endif
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 

@@ -98,7 +98,7 @@
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/server/ICDManager.h>
+#include <app/icd/server/ICDManager.h> // nogncheck
 #endif
 #include <app/TestEventTriggerDelegate.h>
 
