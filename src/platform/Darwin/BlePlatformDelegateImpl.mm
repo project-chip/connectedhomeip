@@ -27,7 +27,7 @@
 
 #include <ble/Ble.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/Darwin/BlePlatformDelegate.h>
+#include <platform/Darwin/BlePlatformDelegateImpl.h>
 
 #import "MTRUUIDHelper.h"
 

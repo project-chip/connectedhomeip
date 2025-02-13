@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <ble/Ble.h>
 #include <lib/core/Global.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/Darwin/BleScannerDelegate.h>
@@ -45,7 +46,7 @@ class BLEManagerImpl final : public BLEManager, private BleLayer
     friend BLEManager;
 
 public:
-    CHIP_ERROR ConfigureBle(uint32_t aNodeId, bool aIsCentral) { return CHIP_NO_ERROR; }
+    CHIP_ERROR ConfigureBle(uint32_t bleDeviceId, bool aIsCentral) { return CHIP_NO_ERROR; }
     CHIP_ERROR StartScan(BleScannerDelegate * delegate, BleScanMode mode = BleScanMode::kDefault);
     CHIP_ERROR StopScan();
 
