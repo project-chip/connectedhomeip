@@ -210,7 +210,9 @@ void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
                 {
                     if (originalReason == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT)
                     {
-                        ChipLogProgress(DataManagement, "ICD device is unreachable, mark subscription as InactiveICDSubscription, retrying is scheduled");
+                        ChipLogProgress(
+                            DataManagement,
+                            "ICD device is unreachable, mark subscription as InactiveICDSubscription, retrying is scheduled");
                         MoveToState(ClientState::InactiveICDSubscription);
                     }
                     return;
@@ -497,7 +499,8 @@ void ReadClient::OnActiveModeNotification()
 void ReadClient::OnPeerOperatingModeChange(PeerOperatingMode aMode)
 {
     VerifyOrDie(mpImEngine->InActiveReadClientList(this));
-    ChipLogProgress(DataManagement, "Peer operation mode is now %s LIT ICD.", mPeerOperatingMode == PeerOperatingMode::kLITICD ? "a" : "not a");
+    ChipLogProgress(DataManagement, "Peer operation mode is now %s LIT ICD.",
+                    mPeerOperatingMode == PeerOperatingMode::kLITICD ? "a" : "not a");
 
     // If the peer operating mode is no longer LIT, try to wake up the subscription and do resubscribe when necessary.
     if (mPeerOperatingMode == PeerOperatingMode::kNormal)
@@ -725,7 +728,6 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
     {
         Close(CHIP_ERROR_TIMEOUT);
     }
-
 }
 
 CHIP_ERROR ReadClient::ReadICDOperatingModeFromAttributeDataIB(TLV::TLVReader && aReader, PeerOperatingMode & aMode)
@@ -1306,8 +1308,7 @@ void ReadClient::HandleDeviceConnectionFailure(void * context, const Operational
     ReadClient * const _this = static_cast<ReadClient *>(context);
     VerifyOrDie(_this != nullptr);
     CHIP_ERROR err = failureInfo.error;
-    ChipLogError(DataManagement, "Failed to establish CASE for re-subscription with error '%" CHIP_ERROR_FORMAT "'",
-                 err.Format());
+    ChipLogError(DataManagement, "Failed to establish CASE for re-subscription with error '%" CHIP_ERROR_FORMAT "'", err.Format());
 
 #if CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
 #if CHIP_DETAIL_LOGGING
@@ -1324,7 +1325,7 @@ void ReadClient::HandleDeviceConnectionFailure(void * context, const Operational
 
     if (_this->IsPeerLIT() && err == CHIP_ERROR_TIMEOUT)
     {
-       err = CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT;
+        err = CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT;
     }
     _this->Close(err);
 }

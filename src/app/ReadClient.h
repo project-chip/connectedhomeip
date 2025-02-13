@@ -497,7 +497,6 @@ public:
      */
     Optional<System::Clock::Timeout> GetSubscriptionTimeout();
 
-
     bool IsPeerLIT() { return mIsPeerLIT; }
     PeerOperatingMode GetLITOperatingMode() { return mPeerOperatingMode; }
 
@@ -665,7 +664,7 @@ private:
 
     bool mIsPeerLIT = false;
 
-    PeerOperatingMode mPeerOperatingMode = PeerOperatingMode::kNormal ;
+    PeerOperatingMode mPeerOperatingMode = PeerOperatingMode::kNormal;
 
     // End Of Container (0x18) uses one byte.
     static constexpr uint16_t kReservedSizeForEndOfContainer = 1;
