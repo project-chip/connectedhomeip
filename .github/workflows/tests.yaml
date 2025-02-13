@@ -93,6 +93,8 @@ jobs:
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
                       src/app/zap-templates/zcl/data-model/chip/chime-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/closure-control-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/closure-dimension-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-bitmaps.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-enums.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-structs.xml \
