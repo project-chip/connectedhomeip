@@ -186,12 +186,14 @@ public:
      */
     void RegisterSessionUpdateDelegate(SessionUpdateDelegate * sessionUpdateDelegate);
 
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
     /**
      *  Registers a delegate interested in analytic information
      *
      *  @param[in] analyticsDelegate - Pointer to delegate for reporting analytic
      */
     void RegisterAnalyticsDelegate(ReliableMessageAnalyticsDelegate * analyticsDelegate);
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
 
     /**
      * Map a send error code to the error code we should actually use for
@@ -253,8 +255,10 @@ private:
 
     void TicklessDebugDumpRetransTable(const char * log);
 
-    void TransmitEventAnalyticNotification(const RetransTableEntry & entry, const SessionHandle & sessionHandle,
-                                           const ReliableMessageAnalyticsDelegate::EventType & eventType);
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+    void NotifyMessageSendAnalytics(const RetransTableEntry & entry, const SessionHandle & sessionHandle,
+                                    const ReliableMessageAnalyticsDelegate::EventType & eventType);
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
 
     // ReliableMessageProtocol Global tables for timer context
     ObjectPool<RetransTableEntry, CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE> mRetransTable;

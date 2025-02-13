@@ -2052,6 +2052,7 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
 TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEventualSuccess)
 {
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
@@ -2366,6 +2367,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitUnau
     EXPECT_EQ(secondTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kAcknowledged);
     EXPECT_EQ(messageCounter, secondTransmitEvent.messageCounter);
 }
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
 
 /**
  * TODO: A test that we should have but can't write with the existing
