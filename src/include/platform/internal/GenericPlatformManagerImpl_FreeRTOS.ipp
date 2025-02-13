@@ -46,18 +46,7 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
 
     vTaskSetTimeOutState(&mNextTimerBaseTime);
     mNextTimerDurationTicks = 0;
-    // TODO: This nulling out of mEventLoopTask should happen when we shut down
-    // the task, not here!
-    mEventLoopTask = NULL;
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
-    mBackgroundEventLoopTask = NULL;
-#endif
-    mChipTimerActive = false;
-
-    // We support calling Shutdown followed by InitChipStack, because some tests
-    // do that.  To keep things simple for existing consumers, we keep not
-    // destroying our lock and queue in shutdown, but rather check whether they
-    // already exist here before trying to create them.
+    mChipTimerActive        = false;
 
     if (mChipStackLock == NULL)
     {
@@ -277,10 +266,11 @@ template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::EventLoopTaskMain(void * arg)
 {
     ChipLogDetail(DeviceLayer, "CHIP event task running");
-    static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg)->Impl()->RunEventLoop();
-    // TODO: At this point, should we not
-    // vTaskDelete(static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg)->mEventLoopTask)?
-    // Or somehow get our caller to do it once this thread is joined?
+    GenericPlatformManagerImpl_FreeRTOS<ImplClass> * platformManager =
+        static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg);
+    platformManager->Impl()->RunEventLoop();
+    vTaskDelete(NULL);
+    platformManager->mEventLoopTask = NULL;
 }
 
 template <class ImplClass>
@@ -376,7 +366,11 @@ template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::BackgroundEventLoopTaskMain(void * arg)
 {
     ChipLogDetail(DeviceLayer, "CHIP background task running");
-    static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg)->Impl()->RunBackgroundEventLoop();
+    GenericPlatformManagerImpl_FreeRTOS<ImplClass> * platformManager =
+        static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg);
+    platformManager->Impl()->RunBackgroundEventLoop();
+    vTaskDelete(NULL);
+    platformManager->mBackgroundEventLoopTask = NULL;
 }
 #endif
 
@@ -416,6 +410,20 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::PostEventFromISR(const Chip
 template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_Shutdown(void)
 {
+    if (mChipEventQueue)
+    {
+        vQueueDelete(mChipEventQueue);
+        mChipEventQueue = NULL;
+    }
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
+    if (mBackgroundEventQueue)
+    {
+        vQueueDelete(mBackgroundEventQueue);
+        mBackgroundEventQueue = NULL;
+    }
+#endif
+    vSemaphoreDelete(mChipStackLock);
+    mChipStackLock = NULL;
     GenericPlatformManagerImpl<ImplClass>::_Shutdown();
 }
 
