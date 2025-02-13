@@ -483,10 +483,10 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
 void ReadClient::OnActiveModeNotification()
 {
     VerifyOrDie(mpImEngine->InActiveReadClientList(this));
-    // If we are in InactiveICDSubscription state, it means the LIT ICD device was unreachable, and ClearActiveSubscriptionState 
+    // If we are in InactiveICDSubscription state, it means the LIT ICD device was unreachable, and ClearActiveSubscriptionState
     // should have been cleared in previous close call, now it transitions to the reachable status, client needs to cancel
-    // scheduled resubscription and trigger a new one immediately. Case session should have been defunct when going 
-    // into InactiveICDSubscription state during previous close call, 
+    // scheduled resubscription and trigger a new one immediately. Case session should have been defunct when going
+    // into InactiveICDSubscription state during previous close call,
     VerifyOrReturn(IsInactiveICDSubscription());
     CloseSession();
     CancelResubscribeTimer();
@@ -725,7 +725,7 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
     {
         Close(CHIP_ERROR_TIMEOUT);
     }
-    
+
 }
 
 CHIP_ERROR ReadClient::ReadICDOperatingModeFromAttributeDataIB(TLV::TLVReader && aReader, PeerOperatingMode & aMode)

@@ -345,7 +345,7 @@ public:
      *  Re-activate an inactive subscription.
      *
      *  When subscribing to LIT-ICD and timeout reached, the read client will move to the InactiveICDSubscription state
-     *  and resubscription should have been scheduled by previous close call, resubscription can be triggered immediately via 
+     *  and resubscription should have been scheduled by previous close call, resubscription can be triggered immediately via
      *  OnActiveModeNotification() when receiving check-in message.
      *
      *  If the subscription is not in the `InactiveICDSubscription` state, this function will do nothing. So it is always safe to
