@@ -15,9 +15,9 @@
 # limitations under the License.
 import logging
 
-import jinja2
 import click
 import coloredlogs
+import jinja2
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants

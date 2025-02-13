@@ -86,7 +86,7 @@ def main(log_level, no_log_timestamps, binary, raw_profile):
         "third_party/nl.*",
         "/usr/include/.*",
         "/usr/lib/.*",
-        ".*/tests/.*" # do not report test coverage to not inflate numbers
+        ".*/tests/.*"  # do not report test coverage to not inflate numbers
     ]
 
     logging.info("Generating lcov file ...")
