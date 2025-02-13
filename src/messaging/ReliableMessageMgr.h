@@ -264,7 +264,9 @@ private:
     ObjectPool<RetransTableEntry, CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE> mRetransTable;
 
     SessionUpdateDelegate * mSessionUpdateDelegate        = nullptr;
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
     ReliableMessageAnalyticsDelegate * mAnalyticsDelegate = nullptr;
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
 
     static System::Clock::Timeout sAdditionalMRPBackoffTime;
 };
