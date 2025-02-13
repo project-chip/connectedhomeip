@@ -52,5 +52,7 @@
     "Smoke CO Alarm": 118,
     "Water Valve": 66,
     "Water Leak Detector": 67,
-    "HeatPump": 777
+    "HeatPump": 777,
+    "Water Freeze Detector": 65,
+    "Rain Sensor": 68
 }
