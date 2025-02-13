@@ -63,9 +63,6 @@ Davis, CA 95616, USA
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>
-    <cluster id="ID-TBD" name="Thread Border Router Diagnostics" side="server">
-      <optionalConform/>
-    </cluster>
     <cluster id="0x0035" name="Thread Network Diagnostics" side="server">
       <mandatoryConform/>
     </cluster>

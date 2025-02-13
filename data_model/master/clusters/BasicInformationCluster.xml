@@ -63,7 +63,7 @@ Davis, CA 95616, USA
     <revision revision="2" summary="Added ProductAppearance attribute"/>
     <revision revision="3" summary="Added SpecificationVersion and MaxPathsPerInvoke attributes"/>
     <revision revision="4" summary="Updated conformance for UniqueID to mandatory"/>
-    <revision revision="5" summary="Added DeviceLocation and ConfigurationVersion attribute"/>
+    <revision revision="5" summary="Added ConfigurationVersion attribute"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0028" name="Basic Information"/>
@@ -350,11 +350,6 @@ Davis, CA 95616, USA
       <constraint>
         <min value="1"/>
       </constraint>
-    </attribute>
-    <attribute id="0x0017" name="DeviceLocation" type="LocationDescriptorStruct" default="MS">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
-      <quality nullable="true" persistence="nonVolatile"/>
-      <optionalConform/>
     </attribute>
     <attribute id="0x0018" name="ConfigurationVersion" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>

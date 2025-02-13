@@ -676,6 +676,11 @@ void emberAfTlsCertificateManagementClusterInitCallback(chip::EndpointId endpoin
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfMeterIdentificationClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfUnitTestingClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -5633,6 +5638,44 @@ chip::Protocols::InteractionModel::Status MatterTlsCertificateManagementClusterS
  * @param endpoint  Endpoint that is being served
  */
 void emberAfTlsCertificateManagementClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
+// Meter Identification Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfMeterIdentificationClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterMeterIdentificationClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfMeterIdentificationClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterMeterIdentificationClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterMeterIdentificationClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfMeterIdentificationClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // Unit Testing Cluster

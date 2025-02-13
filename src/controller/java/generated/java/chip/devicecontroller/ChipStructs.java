@@ -16286,6 +16286,82 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
     return output.toString();
   }
 }
+public static class MeterIdentificationClusterPowerThresholdStruct {
+  public Optional<Long> powerThreshold;
+  public Optional<Long> apparentPowerThreshold;
+  public @Nullable Integer powerThresholdSource;
+  private static final long POWER_THRESHOLD_ID = 0L;
+  private static final long APPARENT_POWER_THRESHOLD_ID = 1L;
+  private static final long POWER_THRESHOLD_SOURCE_ID = 2L;
+
+  public MeterIdentificationClusterPowerThresholdStruct(
+    Optional<Long> powerThreshold,
+    Optional<Long> apparentPowerThreshold,
+    @Nullable Integer powerThresholdSource
+  ) {
+    this.powerThreshold = powerThreshold;
+    this.apparentPowerThreshold = apparentPowerThreshold;
+    this.powerThresholdSource = powerThresholdSource;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(POWER_THRESHOLD_ID, powerThreshold.<BaseTLVType>map((nonOptionalpowerThreshold) -> new IntType(nonOptionalpowerThreshold)).orElse(new EmptyType())));
+    values.add(new StructElement(APPARENT_POWER_THRESHOLD_ID, apparentPowerThreshold.<BaseTLVType>map((nonOptionalapparentPowerThreshold) -> new IntType(nonOptionalapparentPowerThreshold)).orElse(new EmptyType())));
+    values.add(new StructElement(POWER_THRESHOLD_SOURCE_ID, powerThresholdSource != null ? new UIntType(powerThresholdSource) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static MeterIdentificationClusterPowerThresholdStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Long> powerThreshold = Optional.empty();
+    Optional<Long> apparentPowerThreshold = Optional.empty();
+    @Nullable Integer powerThresholdSource = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == POWER_THRESHOLD_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          powerThreshold = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == APPARENT_POWER_THRESHOLD_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          apparentPowerThreshold = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == POWER_THRESHOLD_SOURCE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          powerThresholdSource = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new MeterIdentificationClusterPowerThresholdStruct(
+      powerThreshold,
+      apparentPowerThreshold,
+      powerThresholdSource
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MeterIdentificationClusterPowerThresholdStruct {\n");
+    output.append("\tpowerThreshold: ");
+    output.append(powerThreshold);
+    output.append("\n");
+    output.append("\tapparentPowerThreshold: ");
+    output.append(apparentPowerThreshold);
+    output.append("\n");
+    output.append("\tpowerThresholdSource: ");
+    output.append(powerThresholdSource);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class UnitTestingClusterSimpleStruct {
   public Integer a;
   public Boolean b;

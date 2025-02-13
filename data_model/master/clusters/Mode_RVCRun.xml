@@ -71,9 +71,6 @@ Davis, CA 95616, USA
     <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
       <disallowConform/>
     </feature>
-    <feature bit="20" code="DIRECTMODECH" name="DirectModeChange" summary="Cluster supports changing run modes from non-Idle states">
-      <optionalConform/>
-    </feature>
   </features>
   <dataTypes>
     <enum name="ModeTag">

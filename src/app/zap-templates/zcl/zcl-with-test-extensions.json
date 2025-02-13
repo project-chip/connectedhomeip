@@ -47,6 +47,7 @@
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
         "drlc-cluster.xml",
+        "meter-identification-cluster.xml",
         "microwave-oven-mode-cluster.xml",
         "microwave-oven-control-cluster.xml",
         "door-lock-cluster.xml",
@@ -678,6 +679,7 @@
             "FeatureMap",
             "ClusterRevision"
         ],
+        "Meter Identification": ["PowerThreshold"],
         "Water Heater Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Wi-Fi Network Management": ["SSID", "PassphraseSurrogate"],
         "Thread Network Directory": [

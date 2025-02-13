@@ -223,19 +223,6 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </otherwiseConform>
     </attribute>
-    <attribute id="0x000A" name="NFCConstrainedDataModel" type="bool" default="false">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <otherwiseConform>
-        <mandatoryConform/>
-        <mandatoryConform>
-          <feature name="NFC"/>
-        </mandatoryConform>
-      </otherwiseConform>
-      <constraint>
-        <desc/>
-      </constraint>
-    </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="ArmFailSafe" direction="commandToServer" response="ArmFailSafeResponse">

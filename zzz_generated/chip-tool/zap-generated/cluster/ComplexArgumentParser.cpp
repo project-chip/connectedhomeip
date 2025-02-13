@@ -7285,6 +7285,49 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.intermediateCertificates);
 }
 
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::MeterIdentification::Structs::PowerThresholdStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PowerThresholdStruct.powerThresholdSource",
+                                                                  "powerThresholdSource", value.isMember("powerThresholdSource")));
+
+    char labelWithMember[kMaxLabelLength];
+    if (value.isMember("powerThreshold"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "powerThreshold");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.powerThreshold, value["powerThreshold"]));
+    }
+    valueCopy.removeMember("powerThreshold");
+
+    if (value.isMember("apparentPowerThreshold"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "apparentPowerThreshold");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.apparentPowerThreshold, value["apparentPowerThreshold"]));
+    }
+    valueCopy.removeMember("apparentPowerThreshold");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "powerThresholdSource");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.powerThresholdSource, value["powerThresholdSource"]));
+    valueCopy.removeMember("powerThresholdSource");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::MeterIdentification::Structs::PowerThresholdStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.powerThreshold);
+    ComplexArgumentParser::Finalize(request.apparentPowerThreshold);
+    ComplexArgumentParser::Finalize(request.powerThresholdSource);
+}
+
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::UnitTesting::Structs::SimpleStruct::Type & request,
                                         Json::Value & value)
 {

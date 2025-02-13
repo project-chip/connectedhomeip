@@ -13663,6 +13663,74 @@ class ChipClusters:
             },
         },
     }
+    _METER_IDENTIFICATION_CLUSTER_INFO = {
+        "clusterName": "MeterIdentification",
+        "clusterId": 0x00000B06,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "MeterType",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "PointOfDelivery",
+                "attributeId": 0x00000001,
+                "type": "str",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "MeterSerialNumber",
+                "attributeId": 0x00000002,
+                "type": "str",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "ProtocolVersion",
+                "attributeId": 0x00000003,
+                "type": "str",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "PowerThreshold",
+                "attributeId": 0x00000004,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _UNIT_TESTING_CLUSTER_INFO = {
         "clusterName": "UnitTesting",
         "clusterId": 0xFFF1FC05,
@@ -14780,6 +14848,7 @@ class ChipClusters:
         0x00000750: _ECOSYSTEM_INFORMATION_CLUSTER_INFO,
         0x00000751: _COMMISSIONER_CONTROL_CLUSTER_INFO,
         0x00000801: _TLS_CERTIFICATE_MANAGEMENT_CLUSTER_INFO,
+        0x00000B06: _METER_IDENTIFICATION_CLUSTER_INFO,
         0xFFF1FC05: _UNIT_TESTING_CLUSTER_INFO,
         0xFFF1FC06: _FAULT_INJECTION_CLUSTER_INFO,
         0xFFF1FC20: _SAMPLE_MEI_CLUSTER_INFO,
@@ -14914,6 +14983,7 @@ class ChipClusters:
         "EcosystemInformation": _ECOSYSTEM_INFORMATION_CLUSTER_INFO,
         "CommissionerControl": _COMMISSIONER_CONTROL_CLUSTER_INFO,
         "TlsCertificateManagement": _TLS_CERTIFICATE_MANAGEMENT_CLUSTER_INFO,
+        "MeterIdentification": _METER_IDENTIFICATION_CLUSTER_INFO,
         "UnitTesting": _UNIT_TESTING_CLUSTER_INFO,
         "FaultInjection": _FAULT_INJECTION_CLUSTER_INFO,
         "SampleMei": _SAMPLE_MEI_CLUSTER_INFO,
