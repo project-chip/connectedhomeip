@@ -107,6 +107,7 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/MediaPlaybackClusterTrackStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/MessagesClusterMessageResponseOptionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/MessagesClusterMessageStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/MeterIdentificationClusterPowerThresholdStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/MicrowaveOvenModeClusterModeOptionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/MicrowaveOvenModeClusterModeTagStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ModeSelectClusterModeOptionStruct.kt",

@@ -35,6 +35,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/dishwasher-alarm-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/dishwasher-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/measurement-and-sensing.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/meter-identification-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/microwave-oven-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/microwave-oven-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml";

@@ -5922,6 +5922,41 @@ enum class SupportedDeviceCategoryBitmap : uint32_t
 
 namespace TlsCertificateManagement {} // namespace TlsCertificateManagement
 
+namespace MeterIdentification {
+
+// Enum for MeterTypeEnum
+enum class MeterTypeEnum : uint8_t
+{
+    kUtility = 0x00,
+    kPrivate = 0x01,
+    kGeneric = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for PowerThresholdSourceEnum
+enum class PowerThresholdSourceEnum : uint8_t
+{
+    kContract  = 0x00,
+    kRegulator = 0x01,
+    kEquipment = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kPowerThreshold = 0x1,
+};
+} // namespace MeterIdentification
+
 namespace UnitTesting {
 
 // Enum for SimpleEnum

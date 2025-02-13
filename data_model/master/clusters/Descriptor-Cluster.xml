@@ -57,11 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x001D" name="Descriptor Cluster" revision="3">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x001D" name="Descriptor Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Semantic tag list; TagList feature"/>
-    <revision revision="3" summary="Add EndpointUniqueID attribute"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x001D" name="Descriptor"/>
@@ -122,14 +121,6 @@ Davis, CA 95616, USA
           <from value="1"/>
           <to value="6"/>
         </countBetween>
-      </constraint>
-    </attribute>
-    <attribute id="0x0005" name="EndpointUniqueID" type="string">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <optionalConform/>
-      <constraint>
-        <maxLength value="32"/>
       </constraint>
     </attribute>
   </attributes>

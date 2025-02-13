@@ -840,6 +840,11 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MeterIdentification::Structs::PowerThresholdStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::MeterIdentification::Structs::PowerThresholdStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::UnitTesting::Structs::SimpleStruct::Type & request,
                         Json::Value & value);
 

@@ -46259,6 +46259,155 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace TlsCertificateManagement
+namespace MeterIdentification {
+namespace Structs {
+namespace PowerThresholdStruct {
+enum class Fields : uint8_t
+{
+    kPowerThreshold         = 0,
+    kApparentPowerThreshold = 1,
+    kPowerThresholdSource   = 2,
+};
+
+struct Type
+{
+public:
+    Optional<int64_t> powerThreshold;
+    Optional<int64_t> apparentPowerThreshold;
+    DataModel::Nullable<PowerThresholdSourceEnum> powerThresholdSource;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace PowerThresholdStruct
+} // namespace Structs
+
+namespace Attributes {
+
+namespace MeterType {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::MeterTypeEnum>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::MeterTypeEnum>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::MeterTypeEnum> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeterType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeterType
+namespace PointOfDelivery {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::CharSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PointOfDelivery::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 64; }
+};
+} // namespace PointOfDelivery
+namespace MeterSerialNumber {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::CharSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeterSerialNumber::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 64; }
+};
+} // namespace MeterSerialNumber
+namespace ProtocolVersion {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::CharSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProtocolVersion::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 64; }
+};
+} // namespace ProtocolVersion
+namespace PowerThreshold {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::Structs::PowerThresholdStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::Structs::PowerThresholdStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::Clusters::MeterIdentification::Structs::PowerThresholdStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PowerThreshold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PowerThreshold
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+};
+} // namespace AcceptedCommandList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeterType::TypeInfo::DecodableType meterType;
+        Attributes::PointOfDelivery::TypeInfo::DecodableType pointOfDelivery;
+        Attributes::MeterSerialNumber::TypeInfo::DecodableType meterSerialNumber;
+        Attributes::ProtocolVersion::TypeInfo::DecodableType protocolVersion;
+        Attributes::PowerThreshold::TypeInfo::DecodableType powerThreshold;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace MeterIdentification
 namespace UnitTesting {
 namespace Structs {
 namespace SimpleStruct {

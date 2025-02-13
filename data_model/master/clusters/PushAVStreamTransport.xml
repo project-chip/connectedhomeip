@@ -315,7 +315,7 @@ Davis, CA 95616, USA
       </field>
     </struct>
     <struct name="TransportZoneOptionsStruct">
-      <field id="1" name="Zone" type="ZoneID">
+      <field id="1" name="Zone" type="ZoneIDType">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>

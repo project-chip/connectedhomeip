@@ -82,6 +82,29 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
+    <enum name="PowerThresholdSourceEnum">
+      <item value="0x00" name="Contract" summary="The value comes from a signed contract">
+        <mandatoryConform/>
+      </item>
+      <item value="0x01" name="Regulator" summary="The value comes from a legal regulator">
+        <mandatoryConform/>
+      </item>
+      <item value="0x02" name="Equipment" summary="The value comes from a certified limits of the meter">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <struct name="PowerThresholdStruct">
+      <field id="0" name="PowerThreshold" type="int64">
+        <optionalConform choice="b"/>
+      </field>
+      <field id="1" name="ApparentPowerThreshold" type="int64">
+        <optionalConform choice="b"/>
+      </field>
+      <field id="2" name="PowerThresholdSource" type="PowerThresholdSourceEnum">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </struct>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="MeterType" type="MeterTypeEnum">
