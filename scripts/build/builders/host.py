@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+import shlex
 from enum import Enum, auto
 from platform import uname
 from typing import Optional
@@ -547,6 +548,13 @@ class HostBuilder(GnBuilder):
         if self.board == HostBoard.ARM64:
             self.build_env['PKG_CONFIG_PATH'] = os.path.join(
                 self.SysRootPath('SYSROOT_AARCH64'), 'lib/aarch64-linux-gnu/pkgconfig')
+        if self.app == HostApp.TESTS and self.use_coverage and self.use_clang:
+            # Every test is expected to have a distinct build ID, so `%m` will be
+            # distinct.
+            #
+            # Output is relative to "oputput_dir" since that is where GN executs
+            self.build_env['LLVM_PROFILE_FILE'] = os.path.join("coverage", "profiles", "run_%b.profraw")
+
         return self.build_env
 
     def SysRootPath(self, name):
@@ -620,6 +628,31 @@ class HostBuilder(GnBuilder):
                            ], title="Final coverage info")
             self._Execute(['genhtml', os.path.join(self.coverage_dir, 'lcov_final.info'), '--output-directory',
                            os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
+
+        # coverage for clang works by having perfdata for every test run, which are in "*.profraw" files
+        if self.app == HostApp.TESTS and self.use_coverage and self.use_clang:
+            # Clang coverage config generates "coverage/{name}.lcov" for each test indivdually
+            # merge thes and generate a coverage report
+
+            self._Execute([
+                "bash",
+                "-c",
+                f'find {shlex.quote(self.coverage_dir)} -name "*.lcov"'
+                + ' | xargs -n 1 echo --add-tracefile'
+                + f' | xargs lcov --rc max_message_count=5 --ignore-errors inconsistent --output-file {shlex.quote(os.path.join(self.coverage_dir, "merged.info"))}'
+            ],
+                title="Merging coverage data into a single coverage file")
+
+            self._Execute([
+                "genhtml",
+                "--ignore-errors",
+                "inconsistent",
+                "--flat",  # hierarchical may also be useful...
+                "--output",
+                os.path.join(self.output_dir, "html"),
+                os.path.join(self.coverage_dir, "merged.info"),
+            ],
+                title="Generating HTML coverage report")
 
         if self.app == HostApp.JAVA_MATTER_CONTROLLER:
             self.createJavaExecutable("java-matter-controller")
