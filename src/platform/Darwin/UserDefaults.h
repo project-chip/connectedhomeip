@@ -24,5 +24,7 @@ namespace Platform {
 
 std::optional<uint16_t> GetUserDefaultDnssdSRPTimeoutInMSecs();
 
+std::optional<uint16_t> GetUserDefaultBDXThrottleIntervalForThreadInMSecs();
+
 } // namespace Platform
 } // namespace chip
