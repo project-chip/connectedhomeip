@@ -17,6 +17,10 @@
 
 #import "MTRCommissioningParameters.h"
 
+#import <CommonCrypto/CommonDigest.h>
+
+#include <lib/support/BytesToHex.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRCommissioningParameters : NSObject
@@ -47,10 +51,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    // SSID is not required to be UTF-8, but almost always is.
     NSString * ssidString;
     if (self.wifiSSID) {
-        ssidString = [[NSString alloc] initWithData:self.wifiSSID encoding:NSUTF8StringEncoding];
+        // We want to log the SSID, but hash it, so that the actual SSID cannot be
+        // recovered from the log.
+        uint8_t hashedValue[CC_SHA256_DIGEST_LENGTH];
+        CC_SHA256(self.wifiSSID.bytes, static_cast<CC_LONG>(self.wifiSSID.length), hashedValue);
+
+        char hexValue[sizeof(hashedValue) * 2];
+        chip::Encoding::BytesToHex(hashedValue, sizeof(hashedValue), hexValue, sizeof(hexValue), chip::Encoding::HexFlags::kUppercase);
+        ssidString = [[NSString alloc] initWithBytes:hexValue
+                                              length:sizeof(hexValue)
+                                            encoding:NSUTF8StringEncoding];
     } else {
         ssidString = nil;
     }
