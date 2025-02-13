@@ -411,6 +411,7 @@ class HostBuilder(GnBuilder):
         if use_coverage:
             self.extra_gn_options.append('use_coverage=true')
 
+        self.use_clang = use_clang  # for usage in other commands
         if use_clang:
             self.extra_gn_options.append('is_clang=true')
 
@@ -555,7 +556,7 @@ class HostBuilder(GnBuilder):
 
     def generate(self):
         super(HostBuilder, self).generate()
-        if 'JAVA_PATH' in os.environ:
+        if 'JAVA_HOME' in os.environ:
             self._Execute(
                 ["third_party/java_deps/set_up_java_deps.sh"],
                 title="Setting up Java deps",
@@ -586,7 +587,7 @@ class HostBuilder(GnBuilder):
             self._Execute(['mkdir', '-p', self.coverage_dir], title="Create coverage output location")
 
     def PreBuildCommand(self):
-        if self.app == HostApp.TESTS and self.use_coverage:
+        if self.app == HostApp.TESTS and self.use_coverage and not self.use_clang:
             cmd = ['ninja', '-C', self.output_dir]
 
             if self.ninja_jobs is not None:
@@ -604,7 +605,8 @@ class HostBuilder(GnBuilder):
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
 
     def PostBuildCommand(self):
-        if self.app == HostApp.TESTS and self.use_coverage:
+        # TODO: CLANG coverage is not yet implemented, requires different tooling
+        if self.app == HostApp.TESTS and self.use_coverage and not self.use_clang:
             self._Execute(['lcov', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
                            '--exclude', os.path.join(self.chip_dir, '**/tests/*'),
                            '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),

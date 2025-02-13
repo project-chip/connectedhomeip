@@ -163,8 +163,13 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
 
     if (chip_build_tests) {
-      deps += [ "//src:tests" ]
-      deps += [ "//examples:example_tests" ]
+      deps += [
+        "//examples:example_tests",
+        "//src:tests",
+
+        # Platform test group locations.
+        "//src/platform/silabs/tests:silabs_platform_tests",
+      ]
 
       if (current_os == "android" && current_toolchain == default_toolchain) {
         deps += [ "${chip_root}/build/chip/java/tests:java_build_test" ]
@@ -251,6 +256,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "//scripts/py_matter_yamltests:matter_yamltests.tests",
         "//src:tests_run",
         "//src/python_testing/matter_testing_infrastructure:chip-testing.tests",
+
+        # Platform test group locations.
+        "//src/platform/silabs/tests:silabs_platform_tests_run",
       ]
 
       if (current_os == "linux" || current_os == "mac") {

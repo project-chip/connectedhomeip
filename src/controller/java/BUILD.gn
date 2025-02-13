@@ -679,7 +679,7 @@ android_library("java") {
   ]
 
   # TODO: add classpath support (we likely need to add something like
-  #  ..../platforms/android-26/android.jar to access BLE items)
+  #  ..../platforms/android-30/android.jar to access BLE items)
 }
 
 if (chip_link_tests) {
@@ -711,7 +711,7 @@ if (chip_link_tests) {
     javac_flags = [ "-Xlint:deprecation" ]
 
     # TODO: add classpath support (we likely need to add something like
-    #  ..../platforms/android-26/android.jar to access BLE items)
+    #  ..../platforms/android-30/android.jar to access BLE items)
   }
 
   android_library("tests") {
@@ -746,12 +746,12 @@ if (chip_link_tests) {
     javac_flags = [ "-Xlint:deprecation" ]
 
     # TODO: add classpath support (we likely need to add something like
-    #  ..../platforms/android-26/android.jar to access BLE items)
+    #  ..../platforms/android-30/android.jar to access BLE items)
   }
 }
 
 if (!matter_enable_java_compilation) {
   java_prebuilt("android") {
-    jar_path = "${android_sdk_root}/platforms/android-26/android.jar"
+    jar_path = "${android_sdk_root}/platforms/android-30/android.jar"
   }
 }

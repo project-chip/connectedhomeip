@@ -1073,7 +1073,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAttributes)
 
     EXPECT_EQ(model.Attributes(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)), builder), CHIP_NO_ERROR);
     auto attributes = builder.TakeBuffer();
-    ASSERT_EQ(attributes.size(), 4u);
+    ASSERT_EQ(attributes.size(), 7u);
 
     ASSERT_EQ(attributes[0].attributeId, ClusterRevision::Id);
     ASSERT_FALSE(attributes[0].flags.Has(AttributeQualityFlags::kListAttribute));
@@ -1086,6 +1086,16 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAttributes)
 
     ASSERT_EQ(attributes[3].attributeId, MockAttributeId(2));
     ASSERT_TRUE(attributes[3].flags.Has(AttributeQualityFlags::kListAttribute));
+
+    // Ends with global list attributes
+    ASSERT_EQ(attributes[4].attributeId, GeneratedCommandList::Id);
+    ASSERT_TRUE(attributes[4].flags.Has(AttributeQualityFlags::kListAttribute));
+
+    ASSERT_EQ(attributes[5].attributeId, AcceptedCommandList::Id);
+    ASSERT_TRUE(attributes[5].flags.Has(AttributeQualityFlags::kListAttribute));
+
+    ASSERT_EQ(attributes[6].attributeId, AttributeList::Id);
+    ASSERT_TRUE(attributes[6].flags.Has(AttributeQualityFlags::kListAttribute));
 }
 
 TEST_F(TestCodegenModelViaMocks, FindAttribute)
@@ -1127,7 +1137,7 @@ TEST_F(TestCodegenModelViaMocks, FindAttribute)
     EXPECT_FALSE(info->writePrivilege.has_value());                       // NOLINT(bugprone-unchecked-optional-access)
 }
 
-// global attributes are EXPLICITLY not supported
+// global attributes are EXPLICITLY supported
 TEST_F(TestCodegenModelViaMocks, GlobalAttributeInfo)
 {
     UseMockNodeConfig config(gTestNodeConfig);
@@ -1138,10 +1148,14 @@ TEST_F(TestCodegenModelViaMocks, GlobalAttributeInfo)
     std::optional<AttributeEntry> info = finder.Find(
         ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id));
 
-    ASSERT_FALSE(info.has_value());
+    ASSERT_TRUE(info.has_value());
 
     info = finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id));
-    ASSERT_FALSE(info.has_value());
+    ASSERT_TRUE(info.has_value());
+
+    info = finder.Find(
+        ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AcceptedCommandList::Id));
+    ASSERT_TRUE(info.has_value());
 }
 
 TEST_F(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
@@ -1905,29 +1919,6 @@ TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceListIncrementalRead)
     }
 }
 
-TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteAclDeny)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    /* Using this path is also failing existence checks, so this cannot be enabled
-     * until we fix ordering of ACL to be done before existence checks
-
-      WriteOperation test(kMockEndpoint1, MockClusterId(1), MockAttributeId(10));
-      AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
-
-      ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::UnsupportedAccess);
-      ASSERT_TRUE(model.ChangeListener().DirtyList().empty());
-    */
-
-    WriteOperation test(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_INT32U_ATTRIBUTE_TYPE));
-    AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
-
-    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::UnsupportedAccess);
-    ASSERT_TRUE(model.ChangeListener().DirtyList().empty());
-}
-
 TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteBasicTypes)
 {
     TestEmberScalarTypeWrite<uint8_t, ZCL_INT8U_ATTRIBUTE_TYPE>(0x12);
@@ -2206,42 +2197,6 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteLongBytes)
     EXPECT_EQ(writtenData[2], 11u);
     EXPECT_EQ(writtenData[3], 12u);
     EXPECT_EQ(writtenData[4], 13u);
-}
-
-TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteTimedWrite)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    WriteOperation test(kMockEndpoint3, MockClusterId(4), kAttributeIdTimedWrite);
-    test.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-    AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
-
-    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::NeedsTimedInteraction);
-
-    // writing as timed should be fine
-    test.SetWriteFlags(WriteFlags::kTimed);
-    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_NO_ERROR);
-}
-
-TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteReadOnlyAttribute)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    WriteOperation test(kMockEndpoint3, MockClusterId(4), kAttributeIdReadOnly);
-    test.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-    AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
-
-    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::UnsupportedWrite);
-
-    // Internal writes bypass the read only requirement
-    test.SetOperationFlags(OperationFlags::kInternal);
-    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_NO_ERROR);
 }
 
 TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteDataVersion)

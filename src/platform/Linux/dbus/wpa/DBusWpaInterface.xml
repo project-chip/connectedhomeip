@@ -1,33 +1,57 @@
-<?xml version="1.0" ?>
-<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "https://raw.githubusercontent.com/freedesktop/dbus/master/doc/introspect.dtd">
+<!--
+Copyright (c) 2020 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+This file is constructed based on the wpa_supplicant D-Bus API exposed by the
+wpa_supplicant daemon. The list of methods and properties is available at:
+https://w1.fi/wpa_supplicant/devel/dbus.html
+
+Please note that this file is not a complete representation of the
+wpa_supplicant D-Bus API, but only includes the methods that are relevant for
+the wpa_supplicant integration with the Matter SDK.
+-->
+
+<!DOCTYPE node PUBLIC
+  "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+  "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+
 <node>
     <interface name="fi.w1.wpa_supplicant1.Interface">
+
         <method name="Scan">
             <arg name="args" type="a{sv}" direction="in" />
         </method>
-        <method name="SignalPoll">
-            <arg name="args" type="a{sv}" direction="out" />
-        </method>
+
         <method name="Disconnect" />
+
         <method name="AddNetwork">
             <arg name="args" type="a{sv}" direction="in" />
             <arg name="path" type="o" direction="out" />
         </method>
-        <method name="Reassociate" />
-        <method name="Reattach" />
-        <method name="Reconnect" />
+
         <method name="RemoveNetwork">
             <arg name="path" type="o" direction="in" />
         </method>
+
         <method name="RemoveAllNetworks" />
+
         <method name="SelectNetwork">
             <arg name="path" type="o" direction="in" />
         </method>
-        <method name="NetworkReply">
-            <arg name="path" type="o" direction="in" />
-            <arg name="field" type="s" direction="in" />
-            <arg name="value" type="s" direction="in" />
-        </method>
+
         <method name="AddBlob">
             <arg name="name" type="s" direction="in" />
             <arg name="data" type="ay" direction="in">
@@ -35,266 +59,47 @@
                 <annotation name="org.gtk.GDBus.C.ForceGVariant" value="true"/>
             </arg>
         </method>
-        <method name="GetBlob">
-            <arg name="name" type="s" direction="in" />
-            <arg name="data" type="ay" direction="out" />
-        </method>
+
         <method name="RemoveBlob">
             <arg name="name" type="s" direction="in" />
         </method>
-        <method name="SetPKCS11EngineAndModulePath">
-            <arg name="pkcs11_engine_path" type="s" direction="in" />
-            <arg name="pkcs11_module_path" type="s" direction="in" />
-        </method>
-        <method name="FlushBSS">
-            <arg name="age" type="u" direction="in" />
-        </method>
-        <method name="SubscribeProbeReq" />
-        <method name="UnsubscribeProbeReq" />
-        <method name="EAPLogoff" />
-        <method name="EAPLogon" />
+
         <method name="AutoScan">
             <arg name="arg" type="s" direction="in" />
         </method>
+
         <method name="NANPublish">
             <arg name="nan_args" type="s" direction="in" />
             <arg name="publish_id" type="i" direction="out" />
         </method>
+
         <method name="NANCancelPublish">
             <arg name="nan_args" type="s" direction="in" />
         </method>
+
         <method name="NANSubscribe">
             <arg name="nan_args" type="s" direction="in" />
             <arg name="subscribe_id" type="i" direction="out" />
         </method>
+
         <method name="NANCancelSubscribe">
             <arg name="nan_args" type="s" direction="in" />
         </method>
+
         <method name="NANTransmit">
             <arg name="nan_args" type="s" direction="in" />
         </method>
-        <method name="TDLSDiscover">
-            <arg name="peer_address" type="s" direction="in" />
-        </method>
-        <method name="TDLSSetup">
-            <arg name="peer_address" type="s" direction="in" />
-        </method>
-        <method name="TDLSStatus">
-            <arg name="peer_address" type="s" direction="in" />
-            <arg name="status" type="s" direction="out" />
-        </method>
-        <method name="TDLSTeardown">
-            <arg name="peer_address" type="s" direction="in" />
-        </method>
-        <method name="TDLSChannelSwitch">
-            <arg name="args" type="a{sv}" direction="in" />
-        </method>
-        <method name="TDLSCancelChannelSwitch">
-            <arg name="peer_address" type="s" direction="in" />
-        </method>
-        <method name="VendorElemAdd">
-            <arg name="frame_id" type="i" direction="in" />
-            <arg name="ielems" type="ay" direction="in" />
-        </method>
-        <method name="VendorElemGet">
-            <arg name="frame_id" type="i" direction="in" />
-            <arg name="ielems" type="ay" direction="out" />
-        </method>
-        <method name="VendorElemRem">
-            <arg name="frame_id" type="i" direction="in" />
-            <arg name="ielems" type="ay" direction="in" />
-        </method>
+
         <method name="SaveConfig" />
-        <method name="AbortScan" />
-        <signal name="ScanDone">
-            <arg name="success" type="b" />
-        </signal>
-        <signal name="NanDiscoveryresult">
-            <arg name="result" type="b" />
-            <arg name="discov_info" type="a{sv}" />
-        </signal>
-        <signal name="NanReceive">
-            <arg name="nanrx" type="a{sv}" />
-        </signal>
-        <signal name="NanPublishterminated">
-            <arg name="publish_id" type="i" />
-            <arg name="reason" type="i" />
-        </signal>
-        <signal name="NanSubscribeterminated">
-            <arg name="term_subscribe_id" type="i" />
-            <arg name="reason" type="i" />
-        </signal>
-        <signal name="BSSAdded">
-            <arg name="path" type="o" />
-            <arg name="properties" type="a{sv}" />
-        </signal>
-        <signal name="BSSRemoved">
-            <arg name="path" type="o" />
-        </signal>
-        <signal name="BlobAdded">
-            <arg name="name" type="s" />
-        </signal>
-        <signal name="BlobRemoved">
-            <arg name="name" type="s" />
-        </signal>
-        <signal name="NetworkAdded">
-            <arg name="path" type="o" />
-            <arg name="properties" type="a{sv}" />
-        </signal>
-        <signal name="NetworkRemoved">
-            <arg name="path" type="o" />
-        </signal>
-        <signal name="NetworkSelected">
-            <arg name="path" type="o" />
-        </signal>
-        <signal name="PropertiesChanged">
-            <arg name="properties" type="a{sv}" />
-        </signal>
-        <signal name="ProbeRequest">
-            <arg name="args" type="a{sv}" />
-        </signal>
-        <signal name="Certification">
-            <arg name="certification" type="a{sv}" />
-        </signal>
-        <signal name="EAP">
-            <arg name="status" type="s" />
-            <arg name="parameter" type="s" />
-        </signal>
-        <signal name="StaAuthorized">
-            <arg name="name" type="s" />
-        </signal>
-        <signal name="StaDeauthorized">
-            <arg name="name" type="s" />
-        </signal>
-        <signal name="StationAdded">
-            <arg name="path" type="o" />
-            <arg name="properties" type="a{sv}" />
-        </signal>
-        <signal name="StationRemoved">
-            <arg name="path" type="o" />
-        </signal>
-        <signal name="NetworkRequest">
-            <arg name="path" type="o" />
-            <arg name="field" type="s" />
-            <arg name="text" type="s" />
-        </signal>
-        <property name="Capabilities" type="a{sv}" access="read" />
+
         <property name="State" type="s" access="read" />
-        <property name="Scanning" type="b" access="read" />
-        <property name="ApScan" type="u" access="readwrite" />
-        <property name="BSSExpireAge" type="u" access="readwrite" />
-        <property name="BSSExpireCount" type="u" access="readwrite" />
-        <property name="Country" type="s" access="readwrite" />
-        <property name="Ifname" type="s" access="read" />
-        <property name="Driver" type="s" access="read" />
-        <property name="BridgeIfname" type="s" access="read" />
-        <property name="ConfigFile" type="s" access="read" />
         <property name="CurrentBSS" type="o" access="read" />
         <property name="CurrentNetwork" type="o" access="read" />
         <property name="CurrentAuthMode" type="s" access="read" />
-        <property name="Blobs" type="a{say}" access="read" />
         <property name="BSSs" type="ao" access="read" />
-        <property name="Networks" type="ao" access="read" />
-        <property name="FastReauth" type="b" access="readwrite" />
-        <property name="ScanInterval" type="i" access="readwrite" />
-        <property name="PKCS11EnginePath" type="s" access="read" />
-        <property name="PKCS11ModulePath" type="s" access="read" />
         <property name="DisconnectReason" type="i" access="read" />
         <property name="AuthStatusCode" type="i" access="read" />
         <property name="AssocStatusCode" type="i" access="read" />
-        <property name="RoamTime" type="u" access="read" />
-        <property name="RoamComplete" type="b" access="read" />
-        <property name="SessionLength" type="u" access="read" />
-        <property name="BSSTMStatus" type="u" access="read" />
-        <property name="Stations" type="ao" access="read" />
-        <property name="MACAddressRandomizationMask" type="a{say}" access="readwrite" />
-        <property name="CtrlInterface" type="s" access="readwrite" />
-        <property name="CtrlInterfaceGroup" type="s" access="readwrite" />
-        <property name="EapolVersion" type="s" access="readwrite" />
-        <property name="Bgscan" type="s" access="readwrite" />
-        <property name="DisableScanOffload" type="s" access="readwrite" />
-        <property name="OpenscEnginePath" type="s" access="readwrite" />
-        <property name="OpensslCiphers" type="s" access="readwrite" />
-        <property name="PcscReader" type="s" access="readwrite" />
-        <property name="PcscPin" type="s" access="readwrite" />
-        <property name="ExternalSim" type="s" access="readwrite" />
-        <property name="DriverParam" type="s" access="readwrite" />
-        <property name="Dot11RSNAConfigPMKLifetime" type="s" access="readwrite" />
-        <property name="Dot11RSNAConfigPMKReauthThreshold" type="s" access="readwrite" />
-        <property name="Dot11RSNAConfigSATimeout" type="s" access="readwrite" />
-        <property name="UpdateConfig" type="s" access="readwrite" />
-        <property name="Uuid" type="s" access="readwrite" />
-        <property name="AutoUuid" type="s" access="readwrite" />
-        <property name="DeviceName" type="s" access="readwrite" />
-        <property name="Manufacturer" type="s" access="readwrite" />
-        <property name="ModelName" type="s" access="readwrite" />
-        <property name="ModelNumber" type="s" access="readwrite" />
-        <property name="SerialNumber" type="s" access="readwrite" />
-        <property name="DeviceType" type="s" access="readwrite" />
-        <property name="OsVersion" type="s" access="readwrite" />
-        <property name="ConfigMethods" type="s" access="readwrite" />
-        <property name="SecDeviceType" type="s" access="readwrite" />
-        <property name="IpAddrGo" type="s" access="readwrite" />
-        <property name="IpAddrMask" type="s" access="readwrite" />
-        <property name="IpAddrStart" type="s" access="readwrite" />
-        <property name="IpAddrEnd" type="s" access="readwrite" />
-        <property name="BssMaxCount" type="s" access="readwrite" />
-        <property name="FilterSsids" type="s" access="readwrite" />
-        <property name="FilterRssi" type="s" access="readwrite" />
-        <property name="MaxNumSta" type="s" access="readwrite" />
-        <property name="ApIsolate" type="s" access="readwrite" />
-        <property name="DisassocLowAck" type="s" access="readwrite" />
-        <property name="Hs20" type="s" access="readwrite" />
-        <property name="Interworking" type="s" access="readwrite" />
-        <property name="Hessid" type="s" access="readwrite" />
-        <property name="AccessNetworkType" type="s" access="readwrite" />
-        <property name="GoInterworking" type="s" access="readwrite" />
-        <property name="GoAccessNetworkType" type="s" access="readwrite" />
-        <property name="GoInternet" type="s" access="readwrite" />
-        <property name="GoVenueGroup" type="s" access="readwrite" />
-        <property name="GoVenueType" type="s" access="readwrite" />
-        <property name="PbcInM1" type="s" access="readwrite" />
-        <property name="Autoscan" type="s" access="readwrite" />
-        <property name="ExtPasswordBackend" type="s" access="readwrite" />
-        <property name="AutoInterworking" type="s" access="readwrite" />
-        <property name="Okc" type="s" access="readwrite" />
-        <property name="Pmf" type="s" access="readwrite" />
-        <property name="SaeGroups" type="s" access="readwrite" />
-        <property name="SaePwe" type="s" access="readwrite" />
-        <property name="SaePmkidInAssoc" type="s" access="readwrite" />
-        <property name="DtimPeriod" type="s" access="readwrite" />
-        <property name="BeaconInt" type="s" access="readwrite" />
-        <property name="ApVendorElements" type="s" access="readwrite" />
-        <property name="IgnoreOldScanRes" type="s" access="readwrite" />
-        <property name="FreqList" type="s" access="readwrite" />
-        <property name="ScanCurFreq" type="s" access="readwrite" />
-        <property name="SchedScanInterval" type="s" access="readwrite" />
-        <property name="SchedScanStartDelay" type="s" access="readwrite" />
-        <property name="TdlsExternalControl" type="s" access="readwrite" />
-        <property name="OsuDir" type="s" access="readwrite" />
-        <property name="WowlanTriggers" type="s" access="readwrite" />
-        <property name="MacAddr" type="s" access="readwrite" />
-        <property name="RandAddrLifetime" type="s" access="readwrite" />
-        <property name="PreassocMacAddr" type="s" access="readwrite" />
-        <property name="KeyMgmtOffload" type="s" access="readwrite" />
-        <property name="PassiveScan" type="s" access="readwrite" />
-        <property name="ReassocSameBssOptim" type="s" access="readwrite" />
-        <property name="FstGroupId" type="s" access="readwrite" />
-        <property name="FstPriority" type="s" access="readwrite" />
-        <property name="FstLlt" type="s" access="readwrite" />
-        <property name="CertInCb" type="s" access="readwrite" />
-        <property name="WpaRscRelaxation" type="s" access="readwrite" />
-        <property name="SchedScanPlans" type="s" access="readwrite" />
-        <property name="GasAddress3" type="s" access="readwrite" />
-        <property name="FtmResponder" type="s" access="readwrite" />
-        <property name="FtmInitiator" type="s" access="readwrite" />
-        <property name="GasRandAddrLifetime" type="s" access="readwrite" />
-        <property name="GasRandMacAddr" type="s" access="readwrite" />
-        <property name="DppConfigProcessing" type="s" access="readwrite" />
-        <property name="DppName" type="s" access="readwrite" />
-        <property name="DppMudUrl" type="s" access="readwrite" />
-        <property name="ColocIntfReporting" type="s" access="readwrite" />
+
     </interface>
-    <node name="BSSs" />
-    <node name="Networks" />
 </node>

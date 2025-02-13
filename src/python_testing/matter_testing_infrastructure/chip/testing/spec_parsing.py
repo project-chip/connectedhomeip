@@ -64,6 +64,9 @@ class XmlFeature:
     name: str
     conformance: ConformanceCallable
 
+    def __str__(self):
+        return f'{self.code}: {self.name} conformance {str(self.conformance)}'
+
 
 @dataclass
 class XmlAttribute:
@@ -90,6 +93,9 @@ class XmlCommand:
     id: int
     name: str
     conformance: ConformanceCallable
+
+    def __str__(self):
+        return f'{self.name} id:0x{self.id:02X} {self.id} conformance: {str(self.conformance)}'
 
 
 @dataclass
@@ -826,7 +832,13 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDe
         clusters = d.iter('cluster')
         for c in clusters:
             try:
-                cid = uint(int(c.attrib['id'], 0))
+                try:
+                    cid = uint(int(c.attrib['id'], 0))
+                except ValueError:
+                    location = DeviceTypePathLocation(device_type_id=id)
+                    problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                    severity=ProblemSeverity.WARNING, problem=f"Unknown cluster id {c.attrib['id']}"))
+                    continue
                 conformance_xml, tmp_problem = get_conformance(c, cid)
                 if tmp_problem:
                     problems.append(tmp_problem)
