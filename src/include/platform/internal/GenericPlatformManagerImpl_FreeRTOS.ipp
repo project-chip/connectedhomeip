@@ -422,6 +422,8 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_Shutdown(void)
         mBackgroundEventQueue = NULL;
     }
 #endif
+    vSemaphoreDelete(mChipStackLock);
+    mChipStackLock = NULL;
     GenericPlatformManagerImpl<ImplClass>::_Shutdown();
 }
 
