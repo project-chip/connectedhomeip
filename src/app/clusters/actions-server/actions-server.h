@@ -99,8 +99,8 @@ struct EndpointListStorage : public Structs::EndpointListStruct::Type
         {
             mEpList[index] = aEndpointList[index];
         }
-        endpoints                   = DataModel::List<const EndpointId>(Span(mEpList, epListSize));
-        MutableCharSpan mEpListName = Span(mBuffer, sizeof(mBuffer));
+        endpoints = DataModel::List<const EndpointId>(Span(mEpList, epListSize));
+        MutableCharSpan mEpListName(mBuffer);
         CopyCharSpanToMutableCharSpanWithTruncation(aEpListName, mEpListName);
         name = mEpListName;
     }
@@ -172,6 +172,7 @@ private:
                                          const AttributeValueEncoder::ListEncodeHelper & aEncoder);
     bool HaveActionWithId(EndpointId aEndpointId, uint16_t aActionId);
 
+    // TODO: We should move to non-global dirty marker.
     void MarkDirty(EndpointId aEndpointId, AttributeId aAttributeId)
     {
         MatterReportingAttributeChangeCallback(aEndpointId, Id, aAttributeId);
