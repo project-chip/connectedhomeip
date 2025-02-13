@@ -170,28 +170,6 @@ template("chip_test_suite") {
           output_dir = _test_output_dir
         }
         tests += [ _test_name ]
-
-        # CLANG tests will generate "coverage/<name>.profraw"
-        # what we want is to be able to run lcov on it, so what we do is:
-        #    - index the file via `llvm-profdata merge -sparse ...` to get a .profdata
-        #    - export via `llvm-cov export -format=lcov ...` to get a lcov file
-        if (use_coverage && is_clang) {
-          pw_python_action("${_test_name}.lcov") {
-              _lcov_dir = "${root_build_dir}/coverage"
-
-              script = "${chip_root}/scripts/build/clang_generate_lcov.py"
-              outputs = [ "${_lcov_dir}/${_test_name}.lcov" ]
-              args = [
-                "--binary",
-                rebase_path("${root_build_dir}/tests/${_test_name}"),
-                "--raw-profile",
-                # we rely that running the test generates this ...
-                rebase_path("${_lcov_dir}/${_test_name}.profraw"),
-              ]
-              deps = [ ":${_test_name}.run"]
-          }
-        }
-
       }
     }
 
@@ -211,9 +189,6 @@ template("chip_test_suite") {
         # Add the .run targets created by pw_test.
         foreach(_test, tests) {
           deps += [ ":${_test}.run" ]
-          if (use_coverage && is_clang) {
-             deps += [ ":${_test}.lcov" ]
-          }
         }
       }
     }

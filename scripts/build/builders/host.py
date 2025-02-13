@@ -631,17 +631,31 @@ class HostBuilder(GnBuilder):
 
         # coverage for clang works by having perfdata for every test run, which are in "*.profraw" files
         if self.app == HostApp.TESTS and self.use_coverage and self.use_clang:
-            # Clang coverage config generates "coverage/{name}.lcov" for each test indivdually
-            # merge thes and generate a coverage report
+            # Clang coverage config generates "coverage/{name}.profraw" for each test indivdually
+            # Here we are merging ALL raw profiles into a single indexed file
+
+            _indexed_instrumentation = shlex.quote(os.path.join(self.coverage_dir, "merged.profdata"))
 
             self._Execute([
                 "bash",
                 "-c",
-                f'find {shlex.quote(self.coverage_dir)} -name "*.lcov"'
-                + ' | xargs -n 1 echo --add-tracefile'
-                + f' | xargs lcov --rc max_message_count=5 --ignore-errors inconsistent --output-file {shlex.quote(os.path.join(self.coverage_dir, "merged.info"))}'
+                f'find {shlex.quote(self.coverage_dir)} -name "*.profraw"'
+                + f' | xargs llvm-profdata merge -sparse -o {_indexed_instrumentation}'
             ],
-                title="Merging coverage data into a single coverage file")
+                title="Generating merged coverage data")
+
+            _lcov_data = os.path.join(self.coverage_dir, "merged.lcov")
+
+            self._Execute([
+                "bash",
+                "-c",
+                f'find {shlex.quote(self.coverage_dir)} -name "*.profraw"'
+                + ' | xargs -n1 basename | sed "s/\\.profraw//" '
+                + f' | xargs -I @ echo {shlex.quote(os.path.join(self.output_dir, "tests", "@"))}'
+                + f' | xargs llvm-cov export -format=lcov --instr-profile {_indexed_instrumentation} '
+                + f' | cat >{shlex.quote(_lcov_data)}'
+            ],
+                title="Generating lcov data")
 
             self._Execute([
                 "genhtml",
@@ -652,7 +666,7 @@ class HostBuilder(GnBuilder):
                 # "--hierarchical" <- this may be interesting
                 "--output",
                 os.path.join(self.output_dir, "html"),
-                os.path.join(self.coverage_dir, "merged.info"),
+                os.path.join(self.coverage_dir, "merged.lcov"),
             ],
                 title="Generating HTML coverage report")
 
