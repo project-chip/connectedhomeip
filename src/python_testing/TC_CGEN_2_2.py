@@ -210,29 +210,6 @@ class TC_CGEN_2_2(MatterBaseTest):
             logger.info(
                 f'Step #12 - Repeated Step #9: After waiting for failsafe timeout the Breadcrumb attribute: {breadcrumb_info}')
 
-    def get_current_utc_time_str(self, c_time=None):
-        '''
-        Get the current time in UTC and return it as a formatted string.
-
-        The format of the returned string will be 'dd-mm hh:mm:ss.sss', 
-        where 'dd' is the day, 'mm' is the month, 'hh' is the hour, 
-        'mm' is the minute, 'ss' is the second, and 'sss' are the milliseconds.
-
-        Returns:
-            str: The current time formatted as 'dd-mm hh:mm:ss.sss'.
-        '''
-
-        # If c_time is not provided, use the current time
-        if c_time is None:
-            c_time = time.time()
-
-        formatted_time = (
-            datetime.fromtimestamp(c_time)
-            .strftime('%d-%m %H:%M:%S.')
-            + str(int((c_time % 1) * 1000)).zfill(3)
-        )
-        return formatted_time
-
     def desc_TC_CGEN_2_2(self) -> str:
         return '[TC-CGEN-2.2] ArmFailSafe command verification [DUT - Server]'
 
@@ -756,8 +733,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             t_start = time.time()
 
             # Get the current time and format it for logging
-            start_time_formatted = self.get_current_utc_time_str(t_start)
-            logger.info(f'Step #38: {run_type} - TH1 saves the Current time as t_start: {start_time_formatted}')
+            logger.info(f'Step #38: {run_type} - TH1 saves the Current time as t_start')
 
         self.step(39)
         # Reused TrustedRootCertificate created in step #5 - Send command to add new trusted root certificate
@@ -792,12 +768,13 @@ class TC_CGEN_2_2(MatterBaseTest):
             target_time = maxFailsafe/2
             await asyncio.sleep(target_time + .5)
 
+            c_time = time.time()
+            elapsed_time = (c_time - t_start) * 1000
+
             # Verify that at least half of the maxFailsafe time has passed, allowing TH1 to proceed.
-            current_time_formatted = self.get_current_utc_time_str()
             logger.info(
                 f'Step #41: {run_type} - - MaxFailsafe is {maxFailsafe}. '
-                f'TH1 can proceed. Started expiration time (t_start): {start_time_formatted}, '
-                f'Current time: {current_time_formatted}, '
+                f'TH1 can proceed. Elapsed time: {elapsed_time:.2f} ms.'
                 f'The target time ({target_time} seconds) has passed. '
                 f'Confirmation that ArmFailSafe has not expired yet.'
             )
@@ -844,14 +821,15 @@ class TC_CGEN_2_2(MatterBaseTest):
             # Wait until the target_time is reached using asyncio.sleep to avoid busy-waiting
             await asyncio.sleep(target_time - time.time())
 
+            c_time = time.time()
+            elapsed_time = (c_time - t_start) * 1000
+
             # Checks if the elapsed time from start_time has met or exceeded maxFailsafe
             # TH1 process can proceed
-            current_time_formatted = self.get_current_utc_time_str()
             logger.info(
                 f'Step #43: {run_type} - - MaxFailsafe is {maxFailsafe}. '
-                f'TH1 can proceed. , '
-                f'Current time: {current_time_formatted}, '
-                f'The target time ({maxFailsafe} seconds) has passed since expiration time started (t_start): {start_time_formatted}. '
+                f'TH1 can proceed. Elapsed time: {elapsed_time:.2f} ms. '
+                f'The target time ({maxFailsafe} seconds) has passed '
                 f'Confirmation that ArmFailSafe has not expired yet.'
             )
 
