@@ -56,7 +56,7 @@ class TC_CGEN_2_2(MatterBaseTest):
     cluster_opcreds = Clusters.OperationalCredentials
     cluster_cgen = Clusters.GeneralCommissioning
 
-    async def expire_failsafe_timer(self, dev_ctrl, node_id, expiration_time_seconds):
+    async def set_failsafe_timer(self, dev_ctrl, node_id, expiration_time_seconds):
         '''
         Triggering the failsafe expiry to clean up resources like fabric tables, NOCs (Node Operational Credentials),
         and trusted root certificates. This is necessary to avoid accumulation of invalid data, which could be caused
@@ -360,7 +360,7 @@ class TC_CGEN_2_2(MatterBaseTest):
 
         self.step(7)
         if self.is_pics_sdk_ci_only:
-            # Step 7 - In CI environments, the 'expire_failsafe_timer' function is used to immediately force the failsafe timer to expire,
+            # Step 7 - In CI environments, the 'set_failsafe_timer' function is used to immediately force the failsafe timer to expire,
             # avoiding the original wait time defined in PIXIT.CGEN.FailsafeExpiryLengthSeconds
             # and speeding up test execution by setting the expiration time to 1 second.
 
@@ -373,7 +373,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             expiration_time_seconds = 1
 
             # Force the failsafe timer to expire immediately for TH1, avoiding unnecessary delays in CI environments
-            resp = await self.expire_failsafe_timer(
+            resp = await self.set_failsafe_timer(
                 dev_ctrl=self.default_controller,
                 node_id=self.dut_node_id,
                 expiration_time_seconds=expiration_time_seconds)
@@ -815,7 +815,7 @@ class TC_CGEN_2_2(MatterBaseTest):
 
         self.step(43)
         if self.is_pics_sdk_ci_only:
-            # Step 43 - In CI environments, the 'expire_failsafe_timer' function is used to immediately force the failsafe timer to expire,
+            # Step 43 - In CI environments, the 'set_failsafe_timer' function is used to immediately force the failsafe timer to expire,
             # avoiding the original wait time defined in PIXIT.CGEN.FailsafeExpiryLengthSeconds,
             # and speeding up test execution by setting the expiration time to 1 second.
 
@@ -827,7 +827,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             expiration_time_seconds = 1
 
             # Force the failsafe timer to expire immediately for TH1, avoiding unnecessary delays in CI environments
-            resp = await self.expire_failsafe_timer(
+            resp = await self.set_failsafe_timer(
                 dev_ctrl=self.default_controller,
                 node_id=self.dut_node_id,
                 expiration_time_seconds=expiration_time_seconds)
