@@ -647,7 +647,9 @@ class HostBuilder(GnBuilder):
                 "genhtml",
                 "--ignore-errors",
                 "inconsistent",
-                "--flat",  # hierarchical may also be useful...
+                "--ignore-errors",
+                "range",
+                # "--hierarchical" <- this may be interesting
                 "--output",
                 os.path.join(self.output_dir, "html"),
                 os.path.join(self.coverage_dir, "merged.info"),
