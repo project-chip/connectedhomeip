@@ -76,6 +76,8 @@ private:
     bool mNeedToCallTransferSessionEnd = false;
 
     bool mIsPeerNodeAKnownThreadDevice = NO;
+
+    chip::System::Clock::Milliseconds32 mBDXThrottleIntervalForThreadDevicesInMSecs;
 };
 
 NS_ASSUME_NONNULL_END

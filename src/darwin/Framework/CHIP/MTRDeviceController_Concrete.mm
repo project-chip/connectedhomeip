@@ -1429,9 +1429,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return NO;
 }
 
-- (BOOL)usesThreadForDevice:(chip::NodeId)nodeID
+- (BOOL)definitelyUsesThreadForDevice:(chip::NodeId)nodeID
 {
-    if (nodeID == chip::kUndefinedNodeId) {
+    if (!chip::IsOperationalNodeId(nodeID)) {
         return NO;
     }
 
@@ -1464,7 +1464,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
     // In the case that this device is known to use thread, queue this with subscription attempts as well, to
     // help with throttling Thread traffic.
-    if ([self usesThreadForDevice:nodeID]) {
+    if ([self definitelyUsesThreadForDevice:nodeID]) {
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull workItemCompletion) {
             MTRInternalDeviceConnectionCallback completionWrapper = ^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
