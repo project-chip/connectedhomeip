@@ -39,7 +39,7 @@ tests:
       arguments:
           value: 0
 
-    - label: "Step 1b: H sends On command to DUT"
+    - label: "Step 1b: TH sends On command to DUT"
       PICS: OO.S.C01.Rsp
       cluster: "On/Off"
       command: "On"
@@ -98,14 +98,15 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # In 10s, the value will have changed by (120-60)*10/30 = 20. A 15% tolerance is 3, so value must be in range 80+/-3 => [77, 83]
     - label: "Step 2c: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 68
-              maxValue: 92
+              minValue: 77
+              maxValue: 83
 
     - label: "Wait 10s"
       PICS: CC.S.F00
@@ -116,14 +117,15 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # In 20s, the value will have changed by (120-60)*20/30 = 40. A 15% tolerance is 6, so value must be in range 100+/-6 => [94, 106]
     - label: "Step 2d: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 85
-              maxValue: 115
+              minValue: 94
+              maxValue: 106
 
     - label: "Wait 10s"
       PICS: CC.S.F00
@@ -134,14 +136,15 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # In 30s, the value will have changed by (120-60)*30/30 = 60. A 15% tolerance is 9, so value must be in range 120+/-9 => [111, 129]
     - label: "Step 2e: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 102
-              maxValue: 138
+              minValue: 111
+              maxValue: 129
 
     - label: "Wait 5s"
       PICS: CC.S.F00
@@ -158,8 +161,8 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 102
-              maxValue: 138
+              minValue: 111
+              maxValue: 129
 
     - label:
           "Step 3a: TH sends MoveToHue command to DUT with Hue=60,
@@ -206,61 +209,45 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 10s"
+    - label: "Wait 5s"
       PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 10000
+                value: 5000
 
-    #https://github.com/CHIP-Specifications/chip-test-scripts/issues/416#issuecomment-1228072461
+    # In 30s, the value will have changed by 180 (total change)
+    # In 5s, the value will have changed by 180*5/30 = 30. A 15% tolerance is 4.5, so ~5, and value must be in range 30+/-5 => [25, 35]
     - label: "Step 3c: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
-      verification: |
-          ./chip-tool colorcontrol read current-hue 1 1
-          Verify response contains a CurrentHue value  in  TH(chip-tool)  Logs:
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 25
+              maxValue: 35
 
-          [1649661849.854961][8307:8312] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087274517
-          [1649661849.855019][8307:8312] CHIP:TOO:   current hue: 0 (value can vary)
-          [1649661849.855097][8307:8312] CHIP:EM: Sending Standalone Ack for MessageCounter:13414799 on exchange 39735i
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Wait 10s"
+    - label: "Wait 15s"
       PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 10000
+                value: 15000
 
-    #https://github.com/CHIP-Specifications/chip-test-scripts/issues/493#issuecomment-1422075950
+    # In 20s, the value will have changed by 180*20/30 = 120. A 15% tolerance is 18, so value must be in range
+    # 60-120 = 255-60 = 195+/-18 => [177, 213]
     - label: "Step 3d: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
-      verification: |
-          ./chip-tool colorcontrol read current-hue 1 1
-
-          After another 10 seconds , Verify that CurrentHue value as 195 On  TH(chip-tool)  Logs:
-          [1649661821.298198][8292:8297] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087274517
-          [1649661821.298271][8292:8297] CHIP:TOO:   current hue: 195 (value can vary)
-          [1649661821.298374][8292:8297] CHIP:EM: Sending Standalone Ack for MessageCounter:13643708 on exchange 28536i
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 177
+              maxValue: 213
 
     - label: "Wait 10s"
       PICS: CC.S.F00
@@ -271,24 +258,16 @@ tests:
               - name: "ms"
                 value: 10000
 
-    #https://github.com/CHIP-Specifications/chip-test-scripts/issues/493#issuecomment-1422075950
+    # In 30s, the value will have changed by 180*30/30 = 180. A 15% tolerance is 27, so value must be in range
+    # 60-180 = 255-120 = 135+/-27 => [108, 162]
     - label: "Step 3e: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
-      verification: |
-          ./chip-tool colorcontrol read current-hue 1 1
-          After another 10 seconds , Verify that CurrentHue value as 135 On  TH(chip-tool)  Logs:
-
-          [1649661821.298198][8292:8297] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087274517
-          [1649661821.298271][8292:8297] CHIP:TOO:   current hue: 135
-          [1649661821.298374][8292:8297] CHIP:EM: Sending Standalone Ack for MessageCounter:13643708 on exchange 28536i"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 108
+              maxValue: 162
 
     - label: "Wait 5s"
       PICS: CC.S.F00
@@ -305,8 +284,8 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 115
-              maxValue: 155
+              minValue: 108
+              maxValue: 162
 
     - label:
           "Step 4a: TH sends MoveToHue command to DUT with Hue=60,
@@ -362,14 +341,15 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # In 10s, the value will have changed by (120-60)*10/30 = 20. A 15% tolerance is 3, so value must be in range 80+/-3 => [77, 83]
     - label: "Step 4c: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 68
-              maxValue: 92
+              minValue: 77
+              maxValue: 83
 
     - label: "Wait 10s"
       PICS: CC.S.F00
@@ -380,14 +360,15 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # In 20s, the value will have changed by (120-60)*20/30 = 40. A 15% tolerance is 6, so value must be in range 100+/-6 => [94, 106]
     - label: "Step 4d: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 85
-              maxValue: 115
+              minValue: 94
+              maxValue: 106
 
     - label: "Wait 10s"
       PICS: CC.S.F00
@@ -398,14 +379,15 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # In 30s, the value will have changed by (120-60)*30/30 = 60. A 15% tolerance is 9, so value must be in range 120+/-9 => [111, 129]
     - label: "Step 4e: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 102
-              maxValue: 138
+              minValue: 111
+              maxValue: 129
 
     - label: "Wait 5s"
       PICS: CC.S.F00
@@ -422,8 +404,8 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 102
-              maxValue: 138
+              minValue: 111
+              maxValue: 129
 
     - label:
           "Step 5a: TH sends MoveToHue command to DUT with Hue=120,
@@ -479,14 +461,15 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # In 10s, the value will have changed by (120-60)*10/30 = 20. A 15% tolerance is 3, so value must be in range 100+/-3 => [97, 103]
     - label: "Step 5c: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 85
-              maxValue: 115
+              minValue: 97
+              maxValue: 103
 
     - label: "Wait 10s"
       PICS: CC.S.F00
@@ -497,14 +480,15 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # In 20s, the value will have changed by (120-60)*20/30 = 40. A 15% tolerance is 6, so value must be in range 80+/-6 => [74, 86]
     - label: "Step 5d: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 68
-              maxValue: 92
+              minValue: 74
+              maxValue: 86
 
     - label: "Wait 10s"
       PICS: CC.S.F00
@@ -515,6 +499,7 @@ tests:
               - name: "ms"
                 value: 10000
 
+    # In 30s, the value will have changed by (120-60)*30/30 = 60. A 15% tolerance is 9, so value must be in range 60+/-9 => [51, 69]
     - label: "Step 5e: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
