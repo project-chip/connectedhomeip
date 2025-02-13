@@ -1666,6 +1666,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)operationalInstanceAdded:(NSNumber *)nodeID
 {
+    MTR_LOG("%@ at fabric index %u notified about new operational node 0x%016llx (%llu)", self, self.fabricIndex,
+        nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue);
+
     // If we don't have an existing MTRDevice for this node ID, that's fine;
     // nothing to do.
     MTRDevice * device = [self _deviceForNodeID:nodeID createIfNeeded:NO];
