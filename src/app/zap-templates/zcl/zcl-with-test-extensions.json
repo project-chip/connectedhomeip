@@ -32,6 +32,7 @@
         "chime-cluster.xml",
         "chip-ota.xml",
         "channel-cluster.xml",
+        "closure-control-cluster.xml",
         "clusters-extensions.xml",
         "color-control-cluster.xml",
         "commissioner-control-cluster.xml",
