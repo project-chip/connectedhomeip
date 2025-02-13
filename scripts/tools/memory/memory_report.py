@@ -1,7 +1,6 @@
 import argparse
 import csv
 import os
-import pandas
 import subprocess
 from dataclasses import dataclass
 from datetime import datetime
@@ -10,6 +9,7 @@ import memdf.collect
 import memdf.report
 import memdf.select
 import memdf.util
+import pandas
 from memdf import Config, DFs, SectionDF
 
 # Constants for output directories
