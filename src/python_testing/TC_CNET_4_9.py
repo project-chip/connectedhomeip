@@ -36,7 +36,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, run_if_endpoint_matches, default_matter_test_main, has_feature, type_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, run_if_endpoint_matches, default_matter_test_main, has_feature, type_matches, async_test_body
 from mobly import asserts
 
 
@@ -45,7 +45,7 @@ class TC_CNET_4_9(MatterBaseTest):
         return [
             TestStep("Precondition", "TH is commissioned", is_commissioning=True),
             TestStep(1, 'TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900'),
-            TestStep(2, 'TH reads Networks attribute from the DUT and saves the number of entries as NumNetworks'),
+            # TestStep(2, 'TH reads Networks attribute from the DUT and saves the number of entries as NumNetworks'),
             # TestStep(3, 'TH finds the index of the Networks list entry with NetworkID field value PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and saves it as Userwifi_netidx'),
             # TestStep(4, 'TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1'),
             # TestStep(5, 'TH reads Networks attribute from the DUT'),
@@ -69,9 +69,10 @@ class TC_CNET_4_9(MatterBaseTest):
     def pics_TC_CNET_4_9(self):
         return ['CNET.S']
 
-    @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
+    # @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
+    @async_test_body
     async def test_TC_CNET_4_9(self):
-        cnet = Clusters.NetworkCommissioning
+        cnet = Clusters.GeneralCommissioning
         attr = cnet.Attributes
 
         # Commissioning is already done
@@ -81,13 +82,13 @@ class TC_CNET_4_9(MatterBaseTest):
         self.step(1)
 
         cmd = cnet.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
-        result = await self.send_single_command(cmd=cmd)
+        result = await self.send_single_cmd(cmd=cmd)
         asserts.assert_true(type_matches(result, cnet.Commands.ArmFailSafeResponse), "Unexpected value returned from ArmFailSafe")
         asserts.assert_equal(result.errorCode, 0)
         asserts.assert_equal(result.debugText, "")
 
         # TH reads Networks attribute from the DUT and saves the number of entries as NumNetworks
-        self.step(2)
+        # self.step(2)
 
         # networks_attribute = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.FeatureMap)
 
