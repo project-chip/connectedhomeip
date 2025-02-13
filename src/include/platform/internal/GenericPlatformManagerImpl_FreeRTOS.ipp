@@ -270,9 +270,7 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::EventLoopTaskMain(void * ar
         static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg);
     platformManager->Impl()->RunEventLoop();
     vTaskDelete(NULL);
-    vQueueDelete(platformManager->mChipEventQueue);
-    platformManager->mChipEventQueue = NULL;
-    platformManager->mEventLoopTask  = NULL;
+    platformManager->mEventLoopTask = NULL;
 }
 
 template <class ImplClass>
@@ -372,8 +370,6 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::BackgroundEventLoopTaskMain
         static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg);
     platformManager->Impl()->RunBackgroundEventLoop();
     vTaskDelete(NULL);
-    vQueueDelete(platformManager->mBackgroundEventQueue);
-    platformManager->mBackgroundEventQueue    = NULL;
     platformManager->mBackgroundEventLoopTask = NULL;
 }
 #endif
@@ -414,6 +410,18 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::PostEventFromISR(const Chip
 template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_Shutdown(void)
 {
+    if (mChipEventQueue)
+    {
+        vQueueDelete(mChipEventQueue);
+        mChipEventQueue = NULL;
+    }
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
+    if (mBackgroundEventQueue)
+    {
+        vQueueDelete(mBackgroundEventQueue);
+        mBackgroundEventQueue = NULL;
+    }
+#endif
     GenericPlatformManagerImpl<ImplClass>::_Shutdown();
 }
 
