@@ -4786,9 +4786,28 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             [self _resetSubscription];
         }
 
+        auto peerScopeId = commissioner->GetPeerScopedId(self->_nodeID.unsignedLongLongValue);
         auto caseSessionMgr = commissioner->CASESessionMgr();
         VerifyOrDie(caseSessionMgr != nullptr);
-        caseSessionMgr->ReleaseSession(commissioner->GetPeerScopedId(self->_nodeID.unsignedLongLongValue));
+        caseSessionMgr->ReleaseSession(peerScopeId);
+
+// TODO: make this configurable - for now use 1.5 second
+#define MTRDEVICE_ACTIVE_SESSION_THRESHOLD_MILLISECONDS (15000)
+        auto sessionMgr = commissioner->SessionMgr();
+        VerifyOrDie(sessionMgr != nullptr);
+        sessionMgr->ForEachMatchingSession(peerScopeId, [](auto * session) {
+            auto secureSession = session->AsSecureSession();
+            if (!secureSession) {
+                return;
+            }
+
+            auto threshold = System::Clock::Timeout(MTRDEVICE_ACTIVE_SESSION_THRESHOLD_MILLISECONDS);
+            if ((System::SystemClock().GetMonotonicTimestamp() - session->GetLastPeerActivityTime()) < threshold) {
+                return;
+            }
+
+            session->MarkAsDefunct();
+        });
 
         std::lock_guard lock(self->_lock);
         // Use _ensureSubscriptionForExistingDelegates so that the subscriptions
