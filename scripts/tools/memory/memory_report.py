@@ -1,6 +1,7 @@
 import argparse
 import csv
 import os
+import pandas
 import subprocess
 from dataclasses import dataclass
 from datetime import datetime
@@ -214,24 +215,12 @@ def generate_html_report(csv_file_path: str, html_page_title: str, html_table_ti
         <hr>
         """
 
-        with open(csv_file_path, 'r') as csv_file:
-            reader = csv.reader(csv_file)
-            headers = next(reader)
-            data = list(reader)
+        table = pandas.read_csv(csv_file_path)
+        table['Details'] = "<details><summary>Show/Hide</summary>" + \
+            table['Details'].str.replace('\n', '<br>') + "</details>"
 
-        html_table = f"<h2>{html_table_title}</h2><table>"
-        html_table += "<tr>" + "".join(f"<th>{header}</th>" for header in headers) + "</tr>"
-        for row in data:
-            html_table += "<tr>"
-            for cell in row:
-                if len(cell) > 100:
-                    html_table += "<td><details><summary>Show/Hide</summary>" + cell.replace('\n', '<br>') + "</details></td>"
-                elif cell in ("PASS", "FAIL"):
-                    html_table += f"<td value='{cell}'>{cell}</td>"
-                else:
-                    html_table += "<td>" + cell.replace('\n', '<br>') + "</td>"
-            html_table += "</tr>"
-        html_table += "</table>"
+        html_table = f"<h2>{html_table_title}</h2>"
+        html_table += table.to_html(escape=False)
         html_report += html_table
         html_report += """
         </body>
