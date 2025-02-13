@@ -71,7 +71,7 @@ extern "C" {
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/server/ICDConfigurationData.h>
+#include <app/icd/server/ICDConfigurationData.h> // nogncheck
 #include <platform/silabs/wifi/icd/WifiSleepManager.h>
 
 #if SLI_SI91X_MCU_INTERFACE // SoC Only
@@ -860,7 +860,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     /*
      * Acquire the new IP address
      */
-    wfx_rsi.ip4_addr[0] = (ip) &0xFF;
+    wfx_rsi.ip4_addr[0] = (ip) & 0xFF;
     wfx_rsi.ip4_addr[1] = (ip >> 8) & 0xFF;
     wfx_rsi.ip4_addr[2] = (ip >> 16) & 0xFF;
     wfx_rsi.ip4_addr[3] = (ip >> 24) & 0xFF;
