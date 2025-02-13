@@ -816,7 +816,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
   provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
   provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
-  provisional readonly attribute access(read: administer) optional int32u TCUpdateDeadline = 9;
+  provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1857,70 +1857,6 @@ cluster BooleanState = 69 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status. */
-cluster OccupancySensing = 1030 {
-  revision 5;
-
-  enum OccupancySensorTypeEnum : enum8 {
-    kPIR = 0;
-    kUltrasonic = 1;
-    kPIRAndUltrasonic = 2;
-    kPhysicalContact = 3;
-  }
-
-  bitmap Feature : bitmap32 {
-    kOther = 0x1;
-    kPassiveInfrared = 0x2;
-    kUltrasonic = 0x4;
-    kPhysicalContact = 0x8;
-    kActiveInfrared = 0x10;
-    kRadar = 0x20;
-    kRFSensing = 0x40;
-    kVision = 0x80;
-  }
-
-  bitmap OccupancyBitmap : bitmap8 {
-    kOccupied = 0x1;
-  }
-
-  bitmap OccupancySensorTypeBitmap : bitmap8 {
-    kPIR = 0x1;
-    kUltrasonic = 0x2;
-    kPhysicalContact = 0x4;
-  }
-
-  struct HoldTimeLimitsStruct {
-    int16u holdTimeMin = 0;
-    int16u holdTimeMax = 1;
-    int16u holdTimeDefault = 2;
-  }
-
-  info event OccupancyChanged = 0 {
-    OccupancyBitmap occupancy = 0;
-  }
-
-  readonly attribute OccupancyBitmap occupancy = 0;
-  readonly attribute OccupancySensorTypeEnum occupancySensorType = 1;
-  readonly attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
-  attribute access(write: manage) optional int16u holdTime = 3;
-  readonly attribute optional HoldTimeLimitsStruct holdTimeLimits = 4;
-  attribute access(write: manage) optional int16u PIROccupiedToUnoccupiedDelay = 16;
-  attribute access(write: manage) optional int16u PIRUnoccupiedToOccupiedDelay = 17;
-  attribute access(write: manage) optional int8u PIRUnoccupiedToOccupiedThreshold = 18;
-  attribute access(write: manage) optional int16u ultrasonicOccupiedToUnoccupiedDelay = 32;
-  attribute access(write: manage) optional int16u ultrasonicUnoccupiedToOccupiedDelay = 33;
-  attribute access(write: manage) optional int8u ultrasonicUnoccupiedToOccupiedThreshold = 34;
-  attribute access(write: manage) optional int16u physicalContactOccupiedToUnoccupiedDelay = 48;
-  attribute access(write: manage) optional int16u physicalContactUnoccupiedToOccupiedDelay = 49;
-  attribute access(write: manage) optional int8u physicalContactUnoccupiedToOccupiedThreshold = 50;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 endpoint 0 {
   device type ma_rootdevice = 22, version 2;
 
@@ -2295,14 +2231,6 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster OccupancySensing {
-    ram      attribute occupancy;
-    ram      attribute occupancySensorType;
-    ram      attribute occupancySensorTypeBitmap;
-    callback attribute featureMap;
-    ram      attribute clusterRevision default = 5;
   }
 }
 
