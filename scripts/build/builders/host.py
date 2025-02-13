@@ -640,7 +640,7 @@ class HostBuilder(GnBuilder):
                 "bash",
                 "-c",
                 f'find {shlex.quote(self.coverage_dir)} -name "*.profraw"'
-                + f' | xargs llvm-profdata merge -sparse -o {_indexed_instrumentation}'
+                + f' | xargs -n 10240 llvm-profdata merge -sparse -o {_indexed_instrumentation}'
             ],
                 title="Generating merged coverage data")
 
@@ -651,8 +651,12 @@ class HostBuilder(GnBuilder):
                 "-c",
                 f'find {shlex.quote(self.coverage_dir)} -name "*.profraw"'
                 + ' | xargs -n1 basename | sed "s/\\.profraw//" '
-                + f' | xargs -I @ echo {shlex.quote(os.path.join(self.output_dir, "tests", "@"))}'
-                + f' | xargs llvm-cov export -format=lcov --instr-profile {_indexed_instrumentation} '
+                + f' | xargs -I @ echo -object {shlex.quote(os.path.join(self.output_dir, "tests", "@"))}'
+                + f' | xargs -n 10240 llvm-cov export -format=lcov --instr-profile {_indexed_instrumentation} '
+                + ' --ignore-filename-regex "/third_party/"'
+                + ' --ignore-filename-regex "/tests/"'
+                + ' --ignore-filename-regex "/usr/include/"'
+                + ' --ignore-filename-regex "/usr/lib/"'
                 + f' | cat >{shlex.quote(_lcov_data)}'
             ],
                 title="Generating lcov data")
