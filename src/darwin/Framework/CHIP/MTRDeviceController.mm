@@ -151,6 +151,11 @@ using namespace chip::Tracing::DarwinFramework;
     return nil;
 }
 
+- (void)dealloc
+{
+    MTR_LOG("%@ dealloc: %p", NSStringFromClass([self class]), self);
+}
+
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@: %p, uuid: %@, suspended: %@>", NSStringFromClass(self.class), self, self.uniqueIdentifier, MTR_YES_NO(self.suspended)];
