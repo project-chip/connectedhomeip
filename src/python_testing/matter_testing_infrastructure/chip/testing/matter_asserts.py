@@ -175,19 +175,24 @@ def assert_all(value: List[T], condition: Callable[[T], bool], description: str)
         asserts.assert_true(condition(item), f"Element at index {i} does not satisfy the condition: {description}")
 
 
-def assert_list_element_type(value: List[Any], description: str, expected_type: Type[T]) -> None:
+def assert_list_element_type(value: List[Any], expected_type: Type[T], description: str, allow_empty: bool = False) -> None:
     """
     Asserts that all elements in the list are of the expected type.
 
     Args:
         value: The list to validate
-        description: User-defined description for error messages
         expected_type: The type that all elements should match
+        description: User-defined description for error messages
+        allow_empty: If False, raises AssertionError for empty lists (default: False)
 
     Raises:
-        AssertionError: If value is not a list or contains elements of wrong type
+        AssertionError: If value is not a list, contains elements of wrong type,
+                       or is empty when allow_empty=False
+        TypeError: If expected_type is not a valid type
     """
     assert_list(value, description)
+    if not allow_empty and not value:
+        asserts.fail(f"{description} must not be empty")
     for i, item in enumerate(value):
         asserts.assert_true(isinstance(item, expected_type),
                             f"{description}[{i}] must be of type {expected_type.__name__}")

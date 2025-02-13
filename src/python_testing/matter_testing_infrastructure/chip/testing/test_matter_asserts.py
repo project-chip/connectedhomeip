@@ -179,15 +179,17 @@ class TestMatterAsserts(unittest.TestCase):
     def test_assert_list_element_type(self):
         """Test assert_list_element_type with valid and invalid values."""
         # Valid cases
-        matter_asserts.assert_list_element_type([], "test_empty", str)
-        matter_asserts.assert_list_element_type(["a", "b"], "test_strings", str)
-        matter_asserts.assert_list_element_type([1, 2, 3], "test_ints", int)
+        matter_asserts.assert_list_element_type(["a", "b"], str, "test_strings")
+        matter_asserts.assert_list_element_type([1, 2, 3], int, "test_ints")
+        matter_asserts.assert_list_element_type([], str, "test_empty", allow_empty=True)
 
         # Invalid cases
         with self.assertRaises(signals.TestFailure):
-            matter_asserts.assert_list_element_type("not_a_list", "test_not_list", str)
+            matter_asserts.assert_list_element_type("not_a_list", str, "test_not_list")
         with self.assertRaises(signals.TestFailure):
-            matter_asserts.assert_list_element_type([1, "2", 3], "test_mixed", int)
+            matter_asserts.assert_list_element_type([1, "2", 3], int, "test_mixed")
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_list_element_type([], str, "test_empty")  # empty list should fail by default
 
     # String assertion tests
     def test_assert_is_string(self):

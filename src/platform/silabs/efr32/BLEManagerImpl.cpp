@@ -52,8 +52,8 @@ extern "C" {
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
-#include <ProvisionChannel.h>
-#include <ProvisionManager.h>
+#include <headers/ProvisionChannel.h>
+#include <headers/ProvisionManager.h>
 
 using namespace ::chip;
 using namespace ::chip::Ble;

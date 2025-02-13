@@ -39,7 +39,9 @@ pw_python_package("chip-testing-module") {
     "chip/testing/basic_composition.py",
     "chip/testing/choice_conformance.py",
     "chip/testing/conformance.py",
+    "chip/testing/conversions.py",
     "chip/testing/global_attribute_ids.py",
+    "chip/testing/matchers.py",
     "chip/testing/matter_asserts.py",
     "chip/testing/matter_testing.py",
     "chip/testing/metadata.py",
@@ -48,6 +50,7 @@ pw_python_package("chip-testing-module") {
     "chip/testing/spec_parsing.py",
     "chip/testing/taglist_and_topology_test.py",
     "chip/testing/tasks.py",
+    "chip/testing/timeoperations.py",
   ]
   tests = [
     "chip/testing/test_metadata.py",
@@ -74,6 +77,15 @@ pw_zip("data_model_zip_1_4") {
   output = "${root_out_dir}/data_model/zip_1_4.zip"
 }
 
+pw_zip("data_model_zip_1_4_1") {
+  inputs = []
+  foreach(file, data_model_XMLS_1_4_1) {
+    zip_path = rebase_path(file, "${chip_root}/data_model/1.4.1/", "/")
+    inputs += [ "${file} > /${zip_path}" ]
+  }
+  output = "${root_out_dir}/data_model/zip_1_4_1.zip"
+}
+
 pw_zip("data_model_zip_master") {
   inputs = []
   foreach(file, data_model_XMLS_master) {
@@ -88,7 +100,7 @@ pw_python_distribution("chip-testing") {
 
   generate_setup_cfg = {
     name = "chip-testing"
-    version = "1.4.0"
+    version = "1.4.1"
     include_default_pyproject_file = true
     include_extra_files_in_package_data = true
   }
@@ -96,12 +108,14 @@ pw_python_distribution("chip-testing") {
   public_deps = [
     ":data_model_zip_1_3",
     ":data_model_zip_1_4",
+    ":data_model_zip_1_4_1",
     ":data_model_zip_master",
   ]
 
   extra_files = [
     "${root_out_dir}/data_model/zip_1_3.zip > chip/testing/data_model/1.3/allfiles.zip",
     "${root_out_dir}/data_model/zip_1_4.zip > chip/testing/data_model/1.4/allfiles.zip",
+    "${root_out_dir}/data_model/zip_1_4_1.zip > chip/testing/data_model/1.4.1/allfiles.zip",
     "${root_out_dir}/data_model/zip_master.zip > chip/testing/data_model/master/allfiles.zip",
   ]
 }

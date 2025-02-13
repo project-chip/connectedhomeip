@@ -51,9 +51,6 @@ declare_args() {
   # Disable AWS SDK OTA by default
   aws_sdk_ota = false
 
-  # Self-provision enabled
-  use_provision_channel = false
-
   # Temperature Sensor support
   sl_enable_si70xx_sensor = false
 

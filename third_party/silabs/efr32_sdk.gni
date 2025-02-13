@@ -24,7 +24,7 @@ import("silabs_board.gni")
 declare_args() {
   # Location of the efr32 SDK.
   efr32_sdk_root = "${chip_root}/third_party/silabs/simplicity_sdk"
-  sdk_support_root = "${chip_root}/third_party/silabs/matter_support"
+  matter_support_root = "${chip_root}/third_party/silabs/matter_support"
   wiseconnect_sdk_root =
       "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
   wifi_sdk_root = "${chip_root}/third_party/silabs/wifi_sdk"
@@ -117,8 +117,7 @@ declare_args() {
       "${efr32_sdk_root}/protocol/openthread/platform-abstraction"
 
   # board related pre-generated files path (default)
-  sl_pre_gen_path =
-      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/"
+  sl_pre_gen_path = "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}/"
 
   # board related generated files path (used if slc_generate or slc_reuse_files is set)
   slc_gen_path = "${chip_root}/third_party/silabs/slc_gen/${silabs_board}/"
@@ -246,7 +245,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/openthread/include",
       "${efr32_sdk_root}/util/third_party/openthread/src/core",
       "${efr32_sdk_root}/util/third_party/openthread/examples/platforms/",
-      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/config",
+      "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}/config",
 
       # Headers needed for Init no function will be called if OT is not used
       "${sl_ot_efr32_root}",
@@ -263,22 +262,22 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure",
       ]
 
-      libs += [ "${sdk_support_root}/protocol/openthread/libs/libsl_openthread_cm33_gcc.a" ]
+      libs += [ "${matter_support_root}/sdk-copies/protocol/openthread/libs/libsl_openthread_cm33_gcc.a" ]
 
       if (!chip_enable_ble_rs911x) {
         libs += [
-          "${sdk_support_root}/protocol/bluetooth/bgcommon/lib/build/gcc/cortex-m33/bgcommon/release/libbgcommon.a",
-          "${sdk_support_root}/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a",
-          "${sdk_support_root}/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi_gatt_server.a",
-          "${sdk_support_root}/protocol/bluetooth/build/gcc/cortex-m33/bgapi_protocol/api3/release/libbgapi_core.a",
-          "${sdk_support_root}/protocol/bluetooth/build/gcc/cortex-m33/ble_host/accept_list/release/libble_host_accept_list_stub.a",
-          "${sdk_support_root}/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libble_host.a",
-          "${sdk_support_root}/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libbondingdb_stub.a",
-          "${sdk_support_root}/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi.a",
-          "${sdk_support_root}/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi_stub_gatt_client.a",
-          "${sdk_support_root}/protocol/bluetooth/build/gcc/cortex-m33/ble_host/hal/release/libble_host_hal_series2.a",
-          "${sdk_support_root}/protocol/bluetooth/build/gcc/cortex-m33/ble_host/hci/release/libble_host_hci.a",
-          "${sdk_support_root}/protocol/bluetooth/build/gcc/cortex-m33/ble_host/system/release/libble_system.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/bgcommon/lib/build/gcc/cortex-m33/bgcommon/release/libbgcommon.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi_gatt_server.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/bgapi_protocol/api3/release/libbgapi_core.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/accept_list/release/libble_host_accept_list_stub.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libble_host.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libbondingdb_stub.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi_stub_gatt_client.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/hal/release/libble_host_hal_series2.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/hci/release/libble_host_hci.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/system/release/libble_system.a",
         ]
       }
     }
@@ -292,10 +291,10 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/emdrv/spidrv/config",
       ]
 
-      libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg24_gcc_release.a" ]
+      libs += [ "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg24_gcc_release.a" ]
 
       if (!chip_enable_ble_rs911x) {
-        libs += [ "${sdk_support_root}/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a" ]
+        libs += [ "${matter_support_root}/sdk-copies/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a" ]
       }
 
       defines += [ "EFR32MG24" ]
@@ -307,18 +306,18 @@ template("efr32_sdk") {
       ]
 
       libs += [
-        "${sdk_support_root}/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a",
-        "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a",
+        "${matter_support_root}/sdk-copies/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a",
+        "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a",
       ]
 
       if (silabs_mcu == "MGM240PB32VNA") {
-        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240pb32vna_gcc.a" ]
+        libs += [ "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240pb32vna_gcc.a" ]
       } else if (silabs_mcu == "MGM240PB22VNA") {
-        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240pb22vna_gcc.a" ]
+        libs += [ "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240pb22vna_gcc.a" ]
       } else if (silabs_mcu == "MGM240L022RNF") {
-        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240l022rnf_gcc.a" ]
+        libs += [ "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240l022rnf_gcc.a" ]
       } else if (silabs_mcu == "MGM240SD22VNA") {
-        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240sd22vna_gcc.a" ]
+        libs += [ "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240sd22vna_gcc.a" ]
         defines += [ "SLI_RADIOAES_REQUIRES_MASKING=1" ]
       }
 
@@ -331,8 +330,8 @@ template("efr32_sdk") {
       ]
 
       libs += [
-        "${sdk_support_root}/protocol/bluetooth/bgstack/ll/build/gcc/xg26/release/liblinklayer.a",
-        "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg26_gcc_release.a",
+        "${matter_support_root}/sdk-copies/protocol/bluetooth/bgstack/ll/build/gcc/xg26/release/liblinklayer.a",
+        "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg26_gcc_release.a",
       ]
 
       defines += [ "EFR32MG26" ]
@@ -548,7 +547,7 @@ template("efr32_sdk") {
     }
 
     if (chip_enable_multi_ota_encryption && chip_enable_multi_ota_requestor) {
-      defines += [ "OTA_ENCRYPTION_ENABLE=1" ]
+      defines += [ "SL_MATTER_ENABLE_OTA_ENCRYPTION=1" ]
     }
 
     if (chip_enable_ota_custom_tlv_testing && chip_enable_multi_ota_requestor) {
@@ -1110,7 +1109,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/common/src/sl_status.c",
         "${efr32_sdk_root}/platform/driver/i2cspm/src/sl_i2cspm.c",
         "${efr32_sdk_root}/platform/emlib/src/em_i2c.c",
-        "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_i2cspm_init.c",
+        "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}/autogen/sl_i2cspm_init.c",
       ]
     }
 
