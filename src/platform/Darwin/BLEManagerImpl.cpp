@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,9 +26,9 @@
 #include <ble/Ble.h>
 #include <lib/core/Global.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/Darwin/BleApplicationDelegate.h>
-#include <platform/Darwin/BleConnectionDelegate.h>
-#include <platform/Darwin/BlePlatformDelegate.h>
+#include <platform/Darwin/BleApplicationDelegateImpl.h>
+#include <platform/Darwin/BleConnectionDelegateImpl.h>
+#include <platform/Darwin/BlePlatformDelegateImpl.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 

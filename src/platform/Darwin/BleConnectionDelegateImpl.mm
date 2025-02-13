@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2015-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +28,7 @@
 #include <ble/Ble.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/Darwin/BleConnectionDelegate.h>
+#include <platform/Darwin/BleConnectionDelegateImpl.h>
 #include <platform/Darwin/BleScannerDelegate.h>
 #include <platform/LockTracker.h>
 #include <setup_payload/SetupPayload.h>

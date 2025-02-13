@@ -657,14 +657,14 @@
 		3DECCB6F2934AC1C00585AEC /* MTRLogging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRLogging.h; sourceTree = "<group>"; };
 		3DECCB712934AFE200585AEC /* MTRLogging.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRLogging.mm; sourceTree = "<group>"; };
 		3DECCB732934C21B00585AEC /* MTRDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDefines.h; sourceTree = "<group>"; };
-		3DF521682D5E90BE008F8E52 /* BleApplicationDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BleApplicationDelegate.h; sourceTree = "<group>"; };
+		3DF521682D5E90BE008F8E52 /* BleApplicationDelegateImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BleApplicationDelegateImpl.h; sourceTree = "<group>"; };
 		3DF521692D5E90BE008F8E52 /* BleApplicationDelegateImpl.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BleApplicationDelegateImpl.mm; sourceTree = "<group>"; };
-		3DF5216A2D5E90BE008F8E52 /* BleConnectionDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BleConnectionDelegate.h; sourceTree = "<group>"; };
+		3DF5216A2D5E90BE008F8E52 /* BleConnectionDelegateImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BleConnectionDelegateImpl.h; sourceTree = "<group>"; };
 		3DF5216B2D5E90BE008F8E52 /* BleConnectionDelegateImpl.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BleConnectionDelegateImpl.mm; sourceTree = "<group>"; };
 		3DF5216C2D5E90BE008F8E52 /* BLEManagerImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLEManagerImpl.h; sourceTree = "<group>"; };
 		3DF5216D2D5E90BE008F8E52 /* BLEManagerImpl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BLEManagerImpl.cpp; sourceTree = "<group>"; };
 		3DF5216E2D5E90BE008F8E52 /* BlePlatformConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BlePlatformConfig.h; sourceTree = "<group>"; };
-		3DF5216F2D5E90BE008F8E52 /* BlePlatformDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BlePlatformDelegate.h; sourceTree = "<group>"; };
+		3DF5216F2D5E90BE008F8E52 /* BlePlatformDelegateImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BlePlatformDelegateImpl.h; sourceTree = "<group>"; };
 		3DF521702D5E90BE008F8E52 /* BlePlatformDelegateImpl.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BlePlatformDelegateImpl.mm; sourceTree = "<group>"; };
 		3DF521712D5E90BE008F8E52 /* BleScannerDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BleScannerDelegate.h; sourceTree = "<group>"; };
 		3DF521722D5E90BE008F8E52 /* BUILD.gn */ = {isa = PBXFileReference; lastKnownFileType = text; path = BUILD.gn; sourceTree = "<group>"; };
@@ -1400,14 +1400,14 @@
 			isa = PBXGroup;
 			children = (
 				3DF521722D5E90BE008F8E52 /* BUILD.gn */,
-				3DF521682D5E90BE008F8E52 /* BleApplicationDelegate.h */,
+				3DF521682D5E90BE008F8E52 /* BleApplicationDelegateImpl.h */,
 				3DF521692D5E90BE008F8E52 /* BleApplicationDelegateImpl.mm */,
-				3DF5216A2D5E90BE008F8E52 /* BleConnectionDelegate.h */,
+				3DF5216A2D5E90BE008F8E52 /* BleConnectionDelegateImpl.h */,
 				3DF5216B2D5E90BE008F8E52 /* BleConnectionDelegateImpl.mm */,
 				3DF5216C2D5E90BE008F8E52 /* BLEManagerImpl.h */,
 				3DF5216D2D5E90BE008F8E52 /* BLEManagerImpl.cpp */,
 				3DF5216E2D5E90BE008F8E52 /* BlePlatformConfig.h */,
-				3DF5216F2D5E90BE008F8E52 /* BlePlatformDelegate.h */,
+				3DF5216F2D5E90BE008F8E52 /* BlePlatformDelegateImpl.h */,
 				3DF521702D5E90BE008F8E52 /* BlePlatformDelegateImpl.mm */,
 				3DF521712D5E90BE008F8E52 /* BleScannerDelegate.h */,
 				3DF521732D5E90BE008F8E52 /* CHIPDevicePlatformConfig.h */,
