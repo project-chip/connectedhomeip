@@ -89,7 +89,6 @@ def main(log_level, no_log_timestamps, output, raw_profile_filename):
                 logging.info("File %s is already as expected. Will not re-write", output)
                 sys.exit(0)
 
-
     logging.info("Writing output to %s (profile name: %s)", output, raw_profile_filename)
     with open(output, "wt") as f:
         f.write(expected_output)
