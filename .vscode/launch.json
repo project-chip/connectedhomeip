@@ -5,6 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python Debugger: test_dcl_server",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/workspace/connectedhomeip/examples/chip-tool/commands/dcl/test_dcl_server.py",
+            "args": [],
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Attach to running process",
             "type": "lldb",
             "request": "attach",
