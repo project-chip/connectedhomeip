@@ -55,6 +55,7 @@
 #include <app/server/Server.h>
 #include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
+#include <bridged-actions-stub.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -87,6 +88,7 @@ Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupporte
 Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 Clusters::ValveConfigurationAndControl::ValveControlDelegate sValveDelegate;
 Clusters::TimeSynchronization::ExtendedTimeSyncDelegate sTimeSyncDelegate;
+Clusters::Actions::ActionsDelegateImpl sActionsDelegateImpl;
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
 constexpr const uint8_t kNamespaceCommon   = 7;
@@ -339,6 +341,12 @@ void emberAfThermostatClusterInitCallback(EndpointId endpoint)
     auto & delegate = ThermostatDelegate::GetInstance();
 
     SetDefaultDelegate(endpoint, &delegate);
+}
+
+void emberAfActionsClusterInitCallback(EndpointId endpoint)
+{
+    VerifyOrReturn(endpoint == 1);
+    Clusters::Actions::ActionsServer::Instance().SetDefaultDelegate(endpoint, &sActionsDelegateImpl);
 }
 
 Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
