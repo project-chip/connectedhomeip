@@ -33,6 +33,8 @@
 #include <platform/silabs/wifi/WifiInterface.h>
 #include <platform/silabs/wifi/lwip-support/dhcp_client.h>
 #include <platform/silabs/wifi/lwip-support/ethernetif.h>
+#include <platform/silabs/wifi/lwip-support/lwip_netif.h>
+#include <platform/silabs/wifi/wf200/ncp/efr_spi.h>
 #include <platform/silabs/wifi/wf200/ncp/sl_wfx_board.h>
 #include <platform/silabs/wifi/wf200/ncp/sl_wfx_host.h>
 #include <platform/silabs/wifi/wf200/ncp/sl_wfx_task.h>
@@ -283,6 +285,21 @@ error_handler:
 
     return result;
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
+/**
+ * @brief Updates the IPv4 address in the Wi-Fi interface and notifies the application layer about the new IP address.
+ *
+ * @param[in] ip New IPv4 address
+ */
+void GotIPv4Address(uint32_t ip)
+{
+    ChipLogDetail(DeviceLayer, "DHCP IP=%d.%d.%d.%d", (ip & 0xFF), (ip >> 8 & 0xFF), (ip >> 16 & 0xFF), (ip >> 24 & 0xFF));
+    sta_ip = ip;
+
+    NotifyIPv4Change(true);
+}
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
 } // namespace
 
@@ -794,7 +811,7 @@ static void wfx_events_task(void * p_arg)
     EventBits_t flags;
     (void) p_arg;
 
-    sta_netif      = wfx_get_netif(SL_WFX_STA_INTERFACE);
+    sta_netif      = chip::DeviceLayer::Silabs::Lwip::GetNetworkInterface(SL_WFX_STA_INTERFACE);
     last_dhcp_poll = xTaskGetTickCount();
     while (true)
     {
@@ -820,8 +837,7 @@ static void wfx_events_task(void * p_arg)
 
                 if ((dhcp_state == DHCP_ADDRESS_ASSIGNED) && !HasNotifiedIPv4Change())
                 {
-                    wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
-                    NotifyIPv4Change(true);
+                    GotIPv4Address((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
                     if (!hasNotifiedWifiConnectivity)
                     {
                         ChipLogProgress(DeviceLayer, "will notify WiFi connectivity");
@@ -857,7 +873,7 @@ static void wfx_events_task(void * p_arg)
             ChipLogProgress(DeviceLayer, "connected to AP");
             wifi_extra.Set(WifiState::kStationConnected);
             retryJoin = 0;
-            wfx_lwip_set_sta_link_up();
+            chip::DeviceLayer::Silabs::Lwip::SetLwipStationLinkUp();
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
             if (!(wifi_extra.Has(WifiState::kAPReady)))
             {
@@ -878,7 +894,7 @@ static void wfx_events_task(void * p_arg)
             NotifyIPv6Change(false);
             hasNotifiedWifiConnectivity = false;
             wifi_extra.Clear(WifiState::kStationConnected);
-            wfx_lwip_set_sta_link_down();
+            chip::DeviceLayer::Silabs::Lwip::SetLwipStationLinkDown();
         }
 
         if (flags & SL_WFX_SCAN_START)
@@ -1012,7 +1028,7 @@ static sl_status_t wfx_wifi_hw_start(void)
 
     /* Initialize the LwIP stack */
     ChipLogDetail(DeviceLayer, "WF200:Start LWIP");
-    sl_matter_lwip_start();
+    chip::DeviceLayer::Silabs::Lwip::InitializeLwip();
     sl_matter_wifi_task_started();
 
     ChipLogDetail(DeviceLayer, "WF200:ready.");
@@ -1135,31 +1151,6 @@ bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
     VerifyOrReturnError(which_if == SL_WFX_STA_INTERFACE, false);
     return IsStationConnected();
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-/*****************************************************************************
- * @brief
- *    function called when dhcp got ipv4
- * @param[in]  ip : internet protocol
- ******************************************************************************/
-void wfx_dhcp_got_ipv4(uint32_t ip)
-{
-    /*
-     * Acquire the new IP address
-     */
-    uint8_t ip4_addr[4];
-
-    ip4_addr[0] = (ip) &0xFF;
-    ip4_addr[1] = (ip >> 8) & 0xFF;
-    ip4_addr[2] = (ip >> 16) & 0xFF;
-    ip4_addr[3] = (ip >> 24) & 0xFF;
-
-    ChipLogDetail(DeviceLayer, "DHCP IP=%d.%d.%d.%d", ip4_addr[0], ip4_addr[1], ip4_addr[2], ip4_addr[3]);
-    sta_ip = ip;
-
-    NotifyIPv4Change(true);
-}
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
 /****************************************************************************
  * @brief
