@@ -506,8 +506,7 @@ void HandleDHCPPolling(void)
     uint8_t dhcp_state = dhcpclient_poll(sta_netif);
     if (dhcp_state == DHCP_ADDRESS_ASSIGNED && !HasNotifiedIPv4Change())
     {
-        wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
-        NotifyIPv4Change(true);
+        GotIPv4Address((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
         NotifyConnectivity();
     }
     else if (dhcp_state == DHCP_OFF)
@@ -692,29 +691,3 @@ void MatterWifiTask(void * arg)
         }
     }
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-/********************************************************************************************
- * @fn   void wfx_dhcp_got_ipv4(uint32_t ip)
- * @brief
- *        Acquire the new ip address
- * @param[in] ip: internet protocol
- * @return
- *        None
- **********************************************************************************************/
-void wfx_dhcp_got_ipv4(uint32_t ip)
-{
-    /*
-     * Acquire the new IP address
-     */
-    wfx_rsi.ip4_addr[0] = (ip) & 0xFF;
-    wfx_rsi.ip4_addr[1] = (ip >> 8) & 0xFF;
-    wfx_rsi.ip4_addr[2] = (ip >> 16) & 0xFF;
-    wfx_rsi.ip4_addr[3] = (ip >> 24) & 0xFF;
-    ChipLogProgress(DeviceLayer, "DHCP OK: IP=%d.%d.%d.%d", wfx_rsi.ip4_addr[0], wfx_rsi.ip4_addr[1], wfx_rsi.ip4_addr[2],
-                    wfx_rsi.ip4_addr[3]);
-    /* Notify the Connectivity Manager - via the app */
-    wfx_rsi.dev_state.Set(WifiState::kStationDhcpDone, WifiState::kStationReady);
-    NotifyIPv4Change(true);
-}
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */

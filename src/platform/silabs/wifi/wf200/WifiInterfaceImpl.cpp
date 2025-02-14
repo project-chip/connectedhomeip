@@ -306,6 +306,22 @@ inline int16_t ConvertRcpiToRssi(uint32_t rcpi)
     VerifyOrReturnValue(rssi >= std::numeric_limits<int16_t>::min(), std::numeric_limits<int16_t>::min());
     return rssi;
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
+/**
+ * @brief Updates the IPv4 address in the Wi-Fi interface and notifies the application layer about the new IP address.
+ *
+ * @param[in] ip New IPv4 address
+ */
+void GotIPv4Address(uint32_t ip)
+{
+    ChipLogDetail(DeviceLayer, "DHCP IP=%d.%d.%d.%d", (ip & 0xFF), (ip >> 8 & 0xFF), (ip >> 16 & 0xFF), (ip >> 24 & 0xFF));
+    sta_ip = ip;
+
+    NotifyIPv4Change(true);
+}
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
+
 } // namespace
 
 CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, MutableByteSpan & address)
@@ -856,8 +872,7 @@ static void wfx_events_task(void * p_arg)
 
                 if ((dhcp_state == DHCP_ADDRESS_ASSIGNED) && !HasNotifiedIPv4Change())
                 {
-                    wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
-                    NotifyIPv4Change(true);
+                    GotIPv4Address((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
                     if (!hasNotifiedWifiConnectivity)
                     {
                         ChipLogProgress(DeviceLayer, "will notify WiFi connectivity");
@@ -1171,31 +1186,6 @@ bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
     VerifyOrReturnError(which_if == SL_WFX_STA_INTERFACE, false);
     return IsStationConnected();
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-/*****************************************************************************
- * @brief
- *    function called when dhcp got ipv4
- * @param[in]  ip : internet protocol
- ******************************************************************************/
-void wfx_dhcp_got_ipv4(uint32_t ip)
-{
-    /*
-     * Acquire the new IP address
-     */
-    uint8_t ip4_addr[4];
-
-    ip4_addr[0] = (ip) &0xFF;
-    ip4_addr[1] = (ip >> 8) & 0xFF;
-    ip4_addr[2] = (ip >> 16) & 0xFF;
-    ip4_addr[3] = (ip >> 24) & 0xFF;
-
-    ChipLogDetail(DeviceLayer, "DHCP IP=%d.%d.%d.%d", ip4_addr[0], ip4_addr[1], ip4_addr[2], ip4_addr[3]);
-    sta_ip = ip;
-
-    NotifyIPv4Change(true);
-}
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
 /****************************************************************************
  * @brief

@@ -166,9 +166,6 @@ typedef struct wfx_rsi_s
     uint8_t ip4_addr[4]; /* Not sure if this is enough */
 } WfxRsi_t;
 
-// TODO: We shouldn't need to have access to a global variable in the interface here
-extern WfxRsi_t wfx_rsi;
-
 /* Updated functions */
 
 /**
@@ -393,7 +390,4 @@ void wfx_cancel_scan(void);
  */
 void sl_matter_wifi_task_started(void);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-void wfx_dhcp_got_ipv4(uint32_t);
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 void wfx_retry_connection(uint16_t retryAttempt);
