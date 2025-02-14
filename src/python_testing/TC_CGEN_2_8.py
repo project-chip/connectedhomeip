@@ -131,6 +131,9 @@ class TC_CGEN_2_8(MatterBaseTest):
             "First CommissioningComplete failed",
         )
 
+        # Close the commissioner session with the device to clean up resources
+        commissioner.CloseSession(nodeid=self.dut_node_id)
+
         # Step 5: Factory reset is handled by test operator
         self.step(5)
         if not self.check_pics('PICS_USER_PROMPT'):
