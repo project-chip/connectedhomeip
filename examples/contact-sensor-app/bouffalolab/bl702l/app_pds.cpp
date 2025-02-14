@@ -59,17 +59,9 @@ extern "C" void vApplicationSleep(TickType_t xExpectedIdleTime)
     extern BaseType_t TrapNetCounter, *pTrapNetCounter;
     if (app_pds_wakeup_source == PDS_WAKEUP_BY_RTC)
     {
-        extern void * pxCurrentTCB;
-
-        ChipLogProgress(NotSpecified, "wakeup source: rtc. %lu vs %lu ms @ %lu\r\n", xExpectedIdleTime,
-                        (uint32_t) (bl_rtc_get_timestamp_ms() - sleep_before), (uint32_t) bl_rtc_get_timestamp_ms());
-
-        ChipLogProgress(NotSpecified, "application_sleep; %lu, %lu, %lu\r\n", (uint32_t) sleep_calling_time, (uint32_t) sleep_time,
-                        (uint32_t) wakeup_time);
     }
     else if (app_pds_wakeup_source == PDS_WAKEUP_BY_GPIO)
     {
-
         if (((1 << CHIP_RESET_PIN) & app_pds_wakeup_pin) && app_pds_irq_handler)
         {
             app_pds_irq_handler(&gpio_key);
@@ -79,10 +71,6 @@ extern "C" void vApplicationSleep(TickType_t xExpectedIdleTime)
         {
             app_pds_irq_handler(&gpio_contact);
         }
-
-        ChipLogProgress(NotSpecified, "wakeup source: gpio -> 0x%08lX. %lu vs %lu ms @ %lu\r\n", app_pds_wakeup_pin,
-                        xExpectedIdleTime, (uint32_t) (bl_rtc_get_timestamp_ms() - sleep_before),
-                        (uint32_t) bl_rtc_get_timestamp_ms());
     }
 
     app_pds_wakeup_source = -1;

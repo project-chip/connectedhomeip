@@ -73,6 +73,7 @@ private:
     bool isComissioningStarted = false;
     void OnCommissioningSessionStarted() override;
     void OnCommissioningSessionStopped() override;
+    void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override;
     void OnCommissioningWindowClosed() override;
 
     // FabricTable::Delegate
