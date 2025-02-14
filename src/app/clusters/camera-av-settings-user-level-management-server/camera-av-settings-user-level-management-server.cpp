@@ -16,12 +16,11 @@
  *
  */
 
-#include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
-#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
@@ -42,25 +41,21 @@ namespace app {
 namespace Clusters {
 namespace CameraAvSettingsUserLevelManagement {
 
-CameraAVSettingsUserLevelMgmtServer::CameraAVSettingsUserLevelMgmtServer(EndpointId endpointId, Delegate & delegate) :
-    AttributeAccessInterface(MakeOptional(endpointId), CameraAvSettingsUserLevelManagementme::Id), CommandHandlerInterface(MakeOptional(endpointId), CameraAvSettingsUserLevelManagement::Id),
-    mDelegate(delegate)
+CameraAvSettingsUserLevelMgmtServer::CameraAvSettingsUserLevelMgmtServer(EndpointId endpointId, Delegate * delegate, BitMask<Feature> aFeature) :
+    AttributeAccessInterface(MakeOptional(endpointId), CameraAvSettingsUserLevelManagement::Id), CommandHandlerInterface(MakeOptional(endpointId), CameraAvSettingsUserLevelManagement::Id),
+    mDelegate(delegate),mEndpointId(endpointId), mFeature(aFeature)
 {
-    mDelegate.SetServer(this);
+    mDelegate->SetServer(this);
 }
 
-CameraAVSettingsUserLevelMgmtServer::~CameraAVSettingsUserLevelMgmtServer()
+CameraAvSettingsUserLevelMgmtServer::~CameraAvSettingsUserLevelMgmtServer()
 {
-    // Explicitly set the CameraAVSettingsUserLevelMgmtServer pointer in the Delegate to
-    // null.
-    mDelegate.SetServer(nullptr);
-
     // Unregister command handler and attribute access interfaces
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
-CHIP_ERROR CameraAVSettingsUserLevelMgmtServer::Init()
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
 {
     LoadPersistentAttributes();
 
@@ -69,19 +64,19 @@ CHIP_ERROR CameraAVSettingsUserLevelMgmtServer::Init()
     return CHIP_NO_ERROR;
 }
 
-bool CameraAVSettingsUserLevelMgmtServer::HasFeature(Feature feature) const
+bool CameraAvSettingsUserLevelMgmtServer::HasFeature(Feature feature) const
 {
     return mFeature.Has(feature);
 }
 
-bool CameraAVSettingsUserLevelMgmtServer::SupportsOptAttr(OptionalAttributes aOptionalAttrs) const
+bool CameraAvSettingsUserLevelMgmtServer::SupportsOptAttr(OptionalAttributes aOptionalAttrs) const
 {
     return mOptionalAttrs.Has(aOptionalAttrs);
 }
 
 
 // AttributeAccessInterface
-CHIP_ERROR CameraAVSettingsUserLevelMgmtServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == CameraAvSettingsUserLevelManagement::Id);
     ChipLogError(Zcl, "Camera AV Settings User Level Management: Reading");
@@ -96,51 +91,49 @@ CHIP_ERROR CameraAVSettingsUserLevelMgmtServer::Read(const ConcreteReadAttribute
             HasFeature(Feature::kMechanicalPan), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt: can not get MPTZPosition, feature is not supported"));
 
-        ReturnErrorOnFailure(aEncoder.Encode(mMaxConcurrentVideoEncoders));
+        ReturnErrorOnFailure(aEncoder.Encode(0));
         break;
     case MaxPresets::Id:
         VerifyOrReturnError(HasFeature(Feature::kMechanicalPresets), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt: can not get MaxPresets, feature is not supported"));
 
-        ReturnErrorOnFailure(aEncoder.Encode(mMaxEncodedPixelRate));
+        ReturnErrorOnFailure(aEncoder.Encode(mMaxPresets));
         break;
     case MPTZPresets::Id:
         VerifyOrReturnError(HasFeature(Feature::kMechanicalPresets), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt: can not get MPTZPresets, feature is not supported"));
 
-        ReturnErrorOnFailure(aEncoder.Encode(mVideoSensorParams));
+        ReturnErrorOnFailure(aEncoder.Encode(0));
         break;
     case DPTZRelativeMove::Id:
         VerifyOrReturnError(HasFeature(Feature::kDigitalPTZ), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt: can not get DPTZRelativeMove, feature is not supported"));
-        ReturnErrorOnFailure(aEncoder.Encode(mNightVisionCapable));
+        ReturnErrorOnFailure(aEncoder.Encode(0));
         break;
     case ZoomMax::Id:
         VerifyOrReturnError(HasFeature(Feature::kMechanicalZoom), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt: can not get ZoomMax, feature is not supported"));
-        ReturnErrorOnFailure(aEncoder.Encode(mMinViewPort));
+        ReturnErrorOnFailure(aEncoder.Encode(mZoomMax));
         break;
     case TiltMin::Id:
         VerifyOrReturnError(HasFeature(Feature::kMechanicalTilt), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt: can not get TiltMin, feature is not supported"));
-        ReturnErrorOnFailure(aEncoder.Encode(mMaxContentBufferSize));
+        ReturnErrorOnFailure(aEncoder.Encode(mTiltMin));
         break;
     case TiltMax::Id:
         VerifyOrReturnError(HasFeature(Feature::kMechanicalTilt), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt: can not get TiltMax, feature is not supported"));
-        ReturnErrorOnFailure(aEncoder.Encode(mMicrophoneCapabilities));
+        ReturnErrorOnFailure(aEncoder.Encode(mTiltMax));
         break;
     case PanMin::Id:
-        VerifyOrReturnError(HasFeature(Feature::kMechanicalPan) && HasFeature(Feature::kSpeaker),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+        VerifyOrReturnError(HasFeature(Feature::kMechanicalPan), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt: can not get PanMin, feature is not supported"));
-        ReturnErrorOnFailure(aEncoder.Encode(mSpeakerCapabilities));
+        ReturnErrorOnFailure(aEncoder.Encode(mPanMin));
         break;
     case PanMax::Id:
-        VerifyOrReturnError(HasFeature(Feature::kMechanicalPan) && HasFeature(Feature::kSpeaker),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+        VerifyOrReturnError(HasFeature(Feature::kMechanicalPan), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt: can not get PanMax, feature is not supported"));
-        ReturnErrorOnFailure(aEncoder.Encode(mTwoWayTalkSupport));
+        ReturnErrorOnFailure(aEncoder.Encode(mPanMax));
         break;
     }
 
@@ -148,14 +141,14 @@ CHIP_ERROR CameraAVSettingsUserLevelMgmtServer::Read(const ConcreteReadAttribute
 }
 
 
-void CameraAVSettingsUserLevelMgmtServer::LoadPersistentAttributes()
+void CameraAvSettingsUserLevelMgmtServer::LoadPersistentAttributes()
 {
      // Signal delegate that all persistent configuration attributes have been loaded.
-    mDelegate.PersistentAttributesLoadedCallback();
+    mDelegate->PersistentAttributesLoadedCallback();
 }
 
 // CommandHandlerInterface
-void CameraAVSettingsUserLevelMgmtServer::InvokeCommand(HandlerContext & handlerContext)
+void CameraAvSettingsUserLevelMgmtServer::InvokeCommand(HandlerContext & handlerContext)
 {
     ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt: InvokeCommand");
     switch (handlerContext.mRequestPath.mCommandId)
@@ -267,46 +260,33 @@ void CameraAVSettingsUserLevelMgmtServer::InvokeCommand(HandlerContext & handler
     }
 }
 
-void CameraAVSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext & ctx,
+void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext & ctx,
                                                          const Commands::MPTZSetPosition::DecodableType & commandData)
 {
     Status status = Status::Success;
 
-    auto & pan      = commandData.pan;
-    auto & tilt     = commandData.tilt;
-    auto & zoom     = commandData.zoom;
-
     // Call the delegate
-    status =
-        mDelegate.MPTZSetPosition();
+    status = mDelegate->MPTZSetPosition();
 
-    if (status == Status::Success)
-    {
-        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, status);
-        return;
-    }
-
-exit:
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-void CameraAVSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext & ctx,
+void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext & ctx,
                                                        const Commands::MPTZRelativeMove::DecodableType & commandData)
 {
     Status status           = Status::Success;
 
     // Call the delegate
-    status = mDelegate.MPTZRelativeMove();
+    status = mDelegate->MPTZRelativeMove();
 
-exit:
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-void CameraAVSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext & ctx,
+void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext & ctx,
                                                            const Commands::MPTZMoveToPreset::DecodableType & commandData)
 {
     // Call the delegate
-    Status status = mDelegate.MPTZMoveToPreset();
+    Status status = mDelegate->MPTZMoveToPreset();
 
     if (status != Status::Success)
     {
@@ -317,11 +297,11 @@ void CameraAVSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
 }
 
-void CameraAVStreamMgmtServer::HandleMPTZSavePreset(HandlerContext & ctx,
+void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & ctx,
                                                          const Commands::MPTZSavePreset::DecodableType & commandData)
 {
     // Call the delegate
-    Status status = mDelegate.MPTZSavePreset();
+    Status status = mDelegate->MPTZSavePreset();
 
     if (status != Status::Success)
     {
@@ -329,15 +309,14 @@ void CameraAVStreamMgmtServer::HandleMPTZSavePreset(HandlerContext & ctx,
         return;
     }
 
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
 }
 
-void CameraAVStreamMgmtServer::HandleMPTZRemovePreset(HandlerContext & ctx,
+void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRemovePreset(HandlerContext & ctx,
                                                            const Commands::MPTZRemovePreset::DecodableType & commandData)
 {
     // Call the delegate
-    Status status = mDelegate.MPTZRemovePreset();
+    Status status = mDelegate->MPTZRemovePreset();
 
     if (status != Status::Success)
     {
@@ -348,11 +327,11 @@ void CameraAVStreamMgmtServer::HandleMPTZRemovePreset(HandlerContext & ctx,
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
 }
 
-void CameraAVStreamMgmtServer::HandleDPTZSetViewport(HandlerContext & ctx,
+void CameraAvSettingsUserLevelMgmtServer::HandleDPTZSetViewport(HandlerContext & ctx,
                                                             const Commands::DPTZSetViewport::DecodableType & commandData)
 {
     // Call the delegate
-    Status status = mDelegate.DPTZSetViewport();
+    Status status = mDelegate->DPTZSetViewport();
 
     if (status != Status::Success)
     {
@@ -360,15 +339,14 @@ void CameraAVStreamMgmtServer::HandleDPTZSetViewport(HandlerContext & ctx,
         return;
     }
 
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
 }
 
-void CameraAVStreamMgmtServer::HandleDPTZRelativeMove(HandlerContext & ctx,
+void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext & ctx,
                                                               const Commands::DPTZRelativeMove::DecodableType & commandData)
 {
     // Call the delegate
-    Status status = mDelegate.DPTZRelativeMove();
+    Status status = mDelegate->DPTZRelativeMove();
 
     if (status != Status::Success)
     {

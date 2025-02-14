@@ -21,7 +21,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
-
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -30,43 +29,11 @@ namespace app {
 namespace Clusters {
 namespace CameraAvSettingsUserLevelManagement {
 
+using chip::Protocols::InteractionModel::Status;
+using MPTZStructType        = Structs::MPTZStruct::Type;
+using MPTZPresetStructType  = Structs::MPTZPresetStruct::Type;
 
-/** @brief
- *  Defines interfaces for implementing application-specific logic for various aspects of the CameraAvUserSettingsManagement Cluster.
- *  Specifically, it defines interfaces for the interaction with manual and digital pan, tilt, and zoom functions.
- */
-class Delegate
-{
-public:
-    Delegate() = default;
-    virtual ~Delegate() = default;
-
-    /**
-     *  @brief Callback into the delegate once persistent attributes managed by
-     *  the Cluster have been loaded from Storage.
-     */
-    virtual Protocols::InteractionModel::Status PersistentAttributesLoadedCallback() = 0;
-
-    /**
-     * delegate command handlers
-     */
-    virtual Protocols::InteractionModel::Status MPTZSetPosition() = 0;
-    virtual Protocols::InteractionModel::Status MPTZRelativeMove() = 0;
-    virtual Protocols::InteractionModel::Status MPTZMoveToPreset() = 0;
-    virtual Protocols::InteractionModel::Status MPTZSavePreset() = 0;
-    virtual Protocols::InteractionModel::Status MPTZRemovePreset() = 0;
-    virtual Protocols::InteractionModel::Status DPTZSetViewport() = 0;
-    virtual Protocols::InteractionModel::Status DPTZRelativeMove() = 0;
-
-protected:
-    friend class CameraAvSettingsUserLevelMgmtServer;
-
-    CameraAvSettingsUserLevelMgmtServer * mServer = nullptr;
-
-    // sets the Server pointer
-    void SetServer(CameraAvSettingsUserLevelMgmtServer * aServer) { mServer = aServer; }
-    CameraAvSettingsUserLevelMgmtServer * GetServer() const { return mServer; }
-};
+class Delegate; 
 
 enum class OptionalAttributes : uint32_t
 {
@@ -81,18 +48,18 @@ enum class OptionalAttributes : uint32_t
     kPanMax            = 0x0100,
 };
 
-class CameraAvSettingsUserLevelMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface
+class CameraAvSettingsUserLevelMgmtServer : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
     /**
-     * Creates a chime server instance. The Init() function needs to be called for this instance to be registered and
+     * Creates a server instance. The Init() function needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aDelegate A reference to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CameraAvSettingsUserLevelMgmtServer(EndpointId endpointId, Delegate & delegate);
-    ~CameraAvSettingsUserLevelMgmtServer();
+    CameraAvSettingsUserLevelMgmtServer(EndpointId endpointId, Delegate * delegate, BitMask<Feature> aFeature);
+    ~CameraAvSettingsUserLevelMgmtServer() override;
 
     CHIP_ERROR Init();
     void Shutdown();
@@ -103,15 +70,15 @@ public:
 
     // None of the Attributes are Settable
     // Attribute Getters
-    const MPTZStruct & GetMptzPosition() const { return mMaxMptzPosition; }
+    const MPTZStructType & GetMptzPosition() const { return mMptzPosition; }
 
     uint8_t GetMaxPresets() const { return mMaxPresets; }
 
-    const std::vector<MPTZPresetStruct> & GetMptzPresets() const { return mMptzPresets; }
+    const std::vector<MPTZPresetStructType> & GetMptzPresets() const { return mMptzPresets; }
 
-    const std::vector<videoStreamId> GetDptzRelativeMove() const { return mDptzRelativeMove; }
+    const std::vector<uint16_t> GetDptzRelativeMove() const { return mDptzRelativeMove; }
 
-    uint8_t GetZoomMax() const { return mMZoomMax; }
+    uint8_t GetZoomMax() const { return mZoomMax; }
 
     int16_t GetTiltMin() const { return mTiltMin; }
 
@@ -124,21 +91,26 @@ public:
     EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
 
 private:
-    CameraAVUserSettingsMgmtDelegate & mDelegate;
+    Delegate * mDelegate;
     EndpointId mEndpointId;
     BitMask<Feature> mFeature;
     BitMask<OptionalAttributes> mOptionalAttrs;
 
+    const Optional<int16_t> defaultPan  = Optional(static_cast<int16_t>(0));
+    const Optional<int16_t> defaultTilt = Optional(static_cast<int16_t>(0));
+    const Optional<uint8_t> defaultZoom = Optional(static_cast<uint8_t>(1));
+
     // Attributes local storage
-    const MPTZStruct mMaxMptzPosition;
-    const uint8_t mMaxPresets;
-    const std::vector<MPTZPresetStruct> mMptzPresets;
-    const std::vector<videoStreamId> mDptzRelativeMove;
-    const uint8_t mMZoomMax;
-    const int16_t mTiltMin;
-    const int16_t mTiltMax;
-    const int16_t mPanMin;
-    const int16_t mPanMax;
+    MPTZStructType mMptzPosition;
+
+    const uint8_t mMaxPresets                          = 1;
+    std::vector<MPTZPresetStructType> mMptzPresets;
+    const std::vector<uint16_t> mDptzRelativeMove;
+    const uint8_t mZoomMax                             = 100;
+    const int16_t mTiltMin                             = -90;     
+    const int16_t mTiltMax                             = 90;
+    const int16_t mPanMin                              = -180;
+    const int16_t mPanMax                              = 180;
 
     // Attribute handler interface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -158,6 +130,46 @@ private:
      */
     void LoadPersistentAttributes();
 };
+
+/** @brief
+ *  Defines interfaces for implementing application-specific logic for various aspects of the CameraAvUserSettingsManagement Cluster.
+ *  Specifically, it defines interfaces for the interaction with manual and digital pan, tilt, and zoom functions.
+ */
+class Delegate
+{
+public:
+    Delegate() = default;
+    virtual ~Delegate() = default;
+
+    /**
+     *  @brief Callback into the delegate once persistent attributes managed by
+     *  the Cluster have been loaded from Storage.
+     */
+    virtual Protocols::InteractionModel::Status PersistentAttributesLoadedCallback() { return Status::Success; };
+
+    /**
+     * delegate command handlers
+     */
+    virtual Protocols::InteractionModel::Status MPTZSetPosition() = 0;
+    virtual Protocols::InteractionModel::Status MPTZRelativeMove() = 0;
+    virtual Protocols::InteractionModel::Status MPTZMoveToPreset() = 0;
+    virtual Protocols::InteractionModel::Status MPTZSavePreset() = 0;
+    virtual Protocols::InteractionModel::Status MPTZRemovePreset() = 0;
+    virtual Protocols::InteractionModel::Status DPTZSetViewport() = 0;
+    virtual Protocols::InteractionModel::Status DPTZRelativeMove() = 0;
+
+private:
+    friend class CameraAvSettingsUserLevelMgmtServer;
+
+    CameraAvSettingsUserLevelMgmtServer * mServer = nullptr;
+
+    // sets the Server pointer
+    void SetServer(CameraAvSettingsUserLevelMgmtServer * aServer) { mServer = aServer; }
+
+protected: 
+    CameraAvSettingsUserLevelMgmtServer * GetServer() const { return mServer; }
+};
+
 
 } // namespace CameraAvSettingsUserLevelManagement
 } // namespace Clusters

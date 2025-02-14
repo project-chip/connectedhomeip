@@ -9838,7 +9838,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
 }
 
 /** This cluster provides an interface into controls associated with the operation of a device that provides pan, tilt, and zoom functions, either mechanically, or against a digital image. */
-provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
+cluster CameraAvSettingsUserLevelManagement = 1362 {
   revision 1;
 
   bitmap Feature : bitmap32 {

@@ -31,41 +31,18 @@ Git: 1.4-444-g6d595e737
 
   <struct name="MPTZStruct" apiMaturity="provisional">
     <cluster code="0x0552"/>
-    <item fieldId="0" name="Pan" type="int16s" optional="true" default="0" min="-180" max="180"/>
-    <item fieldId="1" name="Tilt" type="int16s" optional="true" default="0" min="-180" max="180"/>
+    <item fieldId="0" name="Pan" type="int16s" optional="true" default="0"/>
+    <item fieldId="1" name="Tilt" type="int16s" optional="true" default="0"/>
     <item fieldId="2" name="Zoom" type="int8u" optional="true" default="1" min="1"/>
   </struct>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <domain>Cameras</domain>
     <name>Camera AV Settings User Level Management</name>
     <code>0x0552</code>
     <define>CAMERA_AV_SETTINGS_USER_LEVEL_MANAGEMENT_CLUSTER</define>
     <description>This cluster provides an interface into controls associated with the operation of a device that provides pan, tilt, and zoom functions, either mechanically, or against a digital image.</description>
     <client init="false" tick="false">true</client>
-    <features>
-      <feature bit="0" code="DPTZ" name="DigitalPTZ" summary="Digital PTZ support">
-        <optionalConform/>
-      </feature>
-      <feature bit="1" code="MPAN" name="MechanicalPan" summary="Mechanical Pan support">
-        <optionalConform choice="a" more="true" min="1"/>
-      </feature>
-      <feature bit="2" code="MTILT" name="MechanicalTilt" summary="Mechanical Tilt support">
-        <optionalConform choice="a" more="true" min="1"/>
-      </feature>
-      <feature bit="3" code="MZOOM" name="MechanicalZoom" summary="Mechanical Zoom support">
-        <optionalConform choice="a" more="true" min="1"/>
-      </feature>
-      <feature bit="4" code="MPRESETS" name="MechanicalPresets" summary="Mechanical saved presets support">
-        <optionalConform>
-          <orTerm>
-            <feature name="MPAN"/>
-            <feature name="MTILT"/>
-            <feature name="MZOOM"/>
-          </orTerm>
-        </optionalConform>
-      </feature>
-    </features>
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="1"/>
     <attribute code="0x0000" side="server" define="MPTZ" type="MPTZStruct" optional="true">
@@ -199,5 +176,28 @@ Git: 1.4-444-g6d595e737
       </optionalConform>
     </command>
 
+    <features>
+      <feature bit="0" code="DPTZ" name="DigitalPTZ" summary="Digital PTZ support">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="MPAN" name="MechanicalPan" summary="Mechanical Pan support">
+        <optionalConform choice="a" more="true" min="1"/>
+      </feature>
+      <feature bit="2" code="MTILT" name="MechanicalTilt" summary="Mechanical Tilt support">
+        <optionalConform choice="a" more="true" min="1"/>
+      </feature>
+      <feature bit="3" code="MZOOM" name="MechanicalZoom" summary="Mechanical Zoom support">
+        <optionalConform choice="a" more="true" min="1"/>
+      </feature>
+      <feature bit="4" code="MPRESETS" name="MechanicalPresets" summary="Mechanical saved presets support">
+        <optionalConform>
+          <orTerm>
+            <feature name="MPAN"/>
+            <feature name="MTILT"/>
+            <feature name="MZOOM"/>
+          </orTerm>
+        </optionalConform>
+      </feature>
+    </features>
   </cluster>
 </configurator>

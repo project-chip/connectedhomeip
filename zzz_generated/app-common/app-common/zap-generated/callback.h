@@ -6929,48 +6929,6 @@ bool emberAfCameraAvStreamManagementClusterCaptureSnapshotCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshot::DecodableType & commandData);
 /**
- * @brief Camera AV Settings User Level Management Cluster MPTZSetPosition Command callback (from client)
- */
-bool emberAfCameraAvSettingsUserLevelManagementClusterMPTZSetPositionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::DecodableType & commandData);
-/**
- * @brief Camera AV Settings User Level Management Cluster MPTZRelativeMove Command callback (from client)
- */
-bool emberAfCameraAvSettingsUserLevelManagementClusterMPTZRelativeMoveCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::DecodableType & commandData);
-/**
- * @brief Camera AV Settings User Level Management Cluster MPTZMoveToPreset Command callback (from client)
- */
-bool emberAfCameraAvSettingsUserLevelManagementClusterMPTZMoveToPresetCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::DecodableType & commandData);
-/**
- * @brief Camera AV Settings User Level Management Cluster MPTZSavePreset Command callback (from client)
- */
-bool emberAfCameraAvSettingsUserLevelManagementClusterMPTZSavePresetCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::DecodableType & commandData);
-/**
- * @brief Camera AV Settings User Level Management Cluster MPTZRemovePreset Command callback (from client)
- */
-bool emberAfCameraAvSettingsUserLevelManagementClusterMPTZRemovePresetCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::DecodableType & commandData);
-/**
- * @brief Camera AV Settings User Level Management Cluster DPTZSetViewport Command callback (from client)
- */
-bool emberAfCameraAvSettingsUserLevelManagementClusterDPTZSetViewportCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::DecodableType & commandData);
-/**
- * @brief Camera AV Settings User Level Management Cluster DPTZRelativeMove Command callback (from client)
- */
-bool emberAfCameraAvSettingsUserLevelManagementClusterDPTZRelativeMoveCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::DecodableType & commandData);
-/**
  * @brief WebRTC Transport Provider Cluster SolicitOffer Command callback (from client)
  */
 bool emberAfWebRTCTransportProviderClusterSolicitOfferCallback(
