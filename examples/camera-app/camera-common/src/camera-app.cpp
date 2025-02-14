@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
@@ -14,35 +15,35 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include "camera-app.h"
-#include "camera-device.h"
-#include <AppMain.h>
-#include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace Camera;
+using namespace chip::app::Clusters::Chime;
 
-CameraDevice cameraDevice;
+template <typename T>
+using List   = chip::app::DataModel::List<T>;
+using Status = Protocols::InteractionModel::Status;
 
-void ApplicationInit()
+void CameraApp::InitCameraDeviceClusters()
 {
-    ChipLogProgress(Zcl, "Matter Camera Linux App: ApplicationInit()");
-    CameraAppInit(&cameraDevice);
+
+    // Initialize Cluster Servers
+    mChimeServer.Init();
 }
 
-void ApplicationShutdown()
+static constexpr EndpointId kCameraEndpointId = 1;
+
+Platform::UniquePtr<CameraApp> gCameraApp;
+
+void CameraAppInit(Camera::CameraDevice * cameraDevice)
 {
-    CameraAppShutdown();
+    gCameraApp = Platform::MakeUnique<CameraApp>(kCameraEndpointId, cameraDevice);
+    gCameraApp.get()->InitCameraDeviceClusters();
 }
 
-int main(int argc, char * argv[])
+void CameraAppShutdown()
 {
-    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
-
-    ChipLinuxAppMainLoop();
-
-    return 0;
+    gCameraApp = nullptr;
 }

@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
@@ -15,34 +16,20 @@
  *    limitations under the License.
  */
 
-#include "camera-app.h"
 #include "camera-device.h"
 #include <AppMain.h>
-#include <platform/CHIPDeviceConfig.h>
+#include <iostream>
 
-using namespace chip;
-using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::Chime;
 using namespace Camera;
 
-CameraDevice cameraDevice;
-
-void ApplicationInit()
+CameraDevice::CameraDevice()
 {
-    ChipLogProgress(Zcl, "Matter Camera Linux App: ApplicationInit()");
-    CameraAppInit(&cameraDevice);
+    // set up the different modules/components
 }
 
-void ApplicationShutdown()
+ChimeDelegate & CameraDevice::GetChimeDelegate()
 {
-    CameraAppShutdown();
-}
-
-int main(int argc, char * argv[])
-{
-    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
-
-    ChipLinuxAppMainLoop();
-
-    return 0;
+    return mChimeManager;
 }

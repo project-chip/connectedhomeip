@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
@@ -15,34 +16,23 @@
  *    limitations under the License.
  */
 
-#include "camera-app.h"
-#include "camera-device.h"
-#include <AppMain.h>
-#include <platform/CHIPDeviceConfig.h>
+#pragma once
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace Camera;
+// include the CHIPProjectConfig from config/standalone
+#include <CHIPProjectConfig.h>
 
-CameraDevice cameraDevice;
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 0
 
-void ApplicationInit()
-{
-    ChipLogProgress(Zcl, "Matter Camera Linux App: ApplicationInit()");
-    CameraAppInit(&cameraDevice);
-}
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT 1
 
-void ApplicationShutdown()
-{
-    CameraAppShutdown();
-}
+#define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
 
-int main(int argc, char * argv[])
-{
-    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE 1
 
-    ChipLinuxAppMainLoop();
+#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 0x0142 // Camera Device Type
 
-    return 0;
-}
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_NAME 1
+
+#define CHIP_DEVICE_ENABLE_PORT_PARAMS 1
+
+#define CHIP_DEVICE_CONFIG_DEVICE_NAME "Camera"

@@ -22,6 +22,6 @@ chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
 chip_project_config_include = "<CHIPProjectAppConfig.h>"
 chip_system_project_config_include = "<SystemProjectConfig.h>"
 chip_project_config_include_dirs =
-    [ "${chip_root}/examples/refrigerator-app/linux/include" ]
+    [ "${chip_root}/examples/camera-app/linux/include" ]
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 matter_enable_tracing_support = true

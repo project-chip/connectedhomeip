@@ -15,6 +15,11 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/app/common_flags.gni")
+
+assert(chip_build_tools)
+
 config("includes") {
   include_dirs = [
     ".",
@@ -22,21 +27,24 @@ config("includes") {
   ]
 }
 
-executable("matter-camera-app") {
+executable("camera-app") {
   sources = [
     "${chip_root}/examples/camera-app/camera-common/src/camera-app.cpp",
+    "${chip_root}/examples/camera-app/linux/src/camera-device.cpp",
+    "${chip_root}/examples/camera-app/linux/src/clusters/chime/chime-manager.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
 
   deps = [
-    "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/examples/camera-app/camera-common",
+    "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/lib",
   ]
 
   include_dirs = [
     "include",
+    "include/clusters/chime",
     "${chip_root}/examples/camera-app/camera-common/include",
   ]
 
@@ -46,7 +54,7 @@ executable("matter-camera-app") {
 }
 
 group("linux") {
-  deps = [ ":matter-camera-app" ]
+  deps = [ ":camera-app" ]
 }
 
 group("default") {
