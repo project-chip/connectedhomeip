@@ -1034,10 +1034,17 @@ class MatterBaseTest(base_test.BaseTestClass):
     def get_default_app_pipe_name(self) -> str:
         return self.app_pipe
 
-    def write_to_app_pipe(self, command_dict: dict, app_pipe_name: Optional[str] = None):
+    def write_to_app_pipe(self, command_dict: dict, app_pipe_name: Optional[str] = None, app_pid: Optional[int] = None):
         """
-        Sends an out-of-band command to a Matter app.
+        Send an out-of-band command to a Matter app.
+        Args:
+            command_dict (dict): dictionary with the command and data
+            app_pipe_name (Optional[str], optional): Name of the cluster pipe file (i.e. /tmp/chip_all_clusters_fifo_ or /tmp/chip_rvc_fifo_). Defaults to None.
+            app_pid (Optional[uint], optional): pid of the process for app_pipe_name. Defaults to None.
 
+        Extra:
+        Using parameter app_pipe_name replaces self.app_app_pipe_name.
+        Using parameter app-pid replaces self.app_pid.
         Use the following environment variables:
 
          - LINUX_DUT_IP
@@ -1045,22 +1052,24 @@ class MatterBaseTest(base_test.BaseTestClass):
               such as during CI, and the commands are sent to it using a local named pipe
             * if provided, the commands for writing to the named pipe are forwarded to the DUT
         - LINUX_DUT_USER
-
             * if LINUX_DUT_IP is provided, use this for the DUT user name
             * If a remote password is needed, set up ssh keys to ensure that this script can log in to the DUT without a password:
                  + Step 1: If you do not have a key, create one using ssh-keygen
                  + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
                  + Step 3: From now on ssh user@ip will no longer ask for your password
+
         """
 
         if app_pipe_name is None:
             app_pipe_name = self.get_default_app_pipe_name()
+        if app_pid is None:
+            app_pid = self.matter_test_config.app_pid
 
         if not isinstance(app_pipe_name, str):
-            raise TypeError("the named pipe must be provided as a string value")
+            raise TypeError("The named pipe must be provided as a string value")
 
         if not isinstance(command_dict, dict):
-            raise TypeError("the command must be passed as a dictionary value")
+            raise TypeError("The command must be passed as a dictionary value")
 
         import json
         command = json.dumps(command_dict)
@@ -1069,12 +1078,19 @@ class MatterBaseTest(base_test.BaseTestClass):
         dut_ip = os.getenv('LINUX_DUT_IP')
 
         if dut_ip is None:
+            if not isinstance(app_pid, int):
+                raise TypeError("The app_pid flag is not instance of int")
+            # Verify we have a valid app-id
+            if app_pid == 0:
+                asserts.fail("app_pid is 0 , is the flag --app-pid set?. app-id flag must be set in order to write to pipe.")
+            app_pipe_name = app_pipe_name + str(app_pid)
             if not os.path.exists(app_pipe_name):
                 # Named pipes are unique, so we MUST have consistent PID/paths
-                # set up for them to work.
+                # Set up for them to work.
                 logging.error("Named pipe %r does NOT exist" % app_pipe_name)
                 raise FileNotFoundError("CANNOT FIND %r" % app_pipe_name)
             with open(app_pipe_name, "w") as app_pipe:
+                logger.info(f"Sending out-of-band command: {command} to file: {app_pipe_name}")
                 app_pipe.write(command + "\n")
             # TODO(#31239): remove the need for sleep
             sleep(0.001)
