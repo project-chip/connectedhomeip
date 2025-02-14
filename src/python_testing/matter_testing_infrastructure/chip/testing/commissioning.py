@@ -31,7 +31,6 @@ from chip.exceptions import ChipStackError
 # isort: on
 
 
-
 @dataclass
 class SetupPayloadInfo:
     filter_type: discovery.FilterType = discovery.FilterType.LONG_DISCRIMINATOR
