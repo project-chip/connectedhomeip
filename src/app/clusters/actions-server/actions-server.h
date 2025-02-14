@@ -61,9 +61,9 @@ struct ActionStructStorage : public Structs::ActionStruct::Type
         endpointListID    = aEpListID;
         supportedCommands = aCommands;
         state             = aActionState;
-        MutableCharSpan mActionName(mBuffer);
-        CopyCharSpanToMutableCharSpanWithTruncation(aActionName, mActionName);
-        name = mActionName;
+        MutableCharSpan actionName(mBuffer);
+        CopyCharSpanToMutableCharSpanWithTruncation(aActionName, actionName);
+        name = actionName;
     }
 
 private:
@@ -100,9 +100,9 @@ struct EndpointListStorage : public Structs::EndpointListStruct::Type
             mEpList[index] = aEndpointList[index];
         }
         endpoints = DataModel::List<const EndpointId>(Span(mEpList, epListSize));
-        MutableCharSpan mEpListName(mBuffer);
-        CopyCharSpanToMutableCharSpanWithTruncation(aEpListName, mEpListName);
-        name = mEpListName;
+        MutableCharSpan epListName(mBuffer);
+        CopyCharSpanToMutableCharSpanWithTruncation(aEpListName, epListName);
+        name = epListName;
     }
 
 private:
@@ -122,13 +122,13 @@ public:
 
     /**
      * @brief
-     *   Called when the state of action is changed.
+     *   Called when the state of an action is changed.
      */
     void OnStateChanged(EndpointId aEndpoint, uint16_t aActionId, uint32_t aInvokeId, ActionStateEnum aActionState);
 
     /**
      * @brief
-     *   Called when the action is failed..
+     *   Called when an action fails.
      */
     void OnActionFailed(EndpointId aEndpoint, uint16_t aActionId, uint32_t aInvokeId, ActionStateEnum aActionState,
                         ActionErrorEnum aActionError);
@@ -178,7 +178,7 @@ private:
         MatterReportingAttributeChangeCallback(aEndpointId, Id, aAttributeId);
     }
     // Cannot use CommandHandlerInterface::HandleCommand directly because we need to do the HaveActionWithId() check before
-    // sending a command.
+    // handling a command.
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
 
@@ -211,13 +211,14 @@ public:
      * @param index The index of the action to be returned. It is assumed that actions are indexable from 0 and with no gaps.
      * @param action A reference to the ActionStructStorage which should be initialized via copy/assignments or calling Set().
      * @return Returns a CHIP_NO_ERROR if there was no error and the action was returned successfully.
-     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is past the end of the list of actionList.
+     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is past the end of the list of actions.
      */
     virtual CHIP_ERROR ReadActionAtIndex(uint16_t index, ActionStructStorage & action) = 0;
 
     /**
      * Get the EndpointList at the Nth index from list of endpointList.
-     * @param index The index of the endpointList to be returned. It is assumed that actions are indexable from 0 and with no gaps.
+     * @param index The index of the endpointList to be returned. It is assumed that endpoint lists are indexable from 0 and with no
+     * gaps.
      * @param action A reference to the EndpointListStorage which should be initialized via copy/assignments or calling Set().
      * @return Returns a CHIP_NO_ERROR if there was no error and the epList was returned successfully.
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is past the end of the list of endpointLists.
@@ -233,132 +234,100 @@ public:
 
     /**
      * On receipt of each and every command,
-     * if the InvokeID data field is provided by the client when invoking a command, the server SHALL generate a StateChanged event
-     * when the action changes to a new state or an ActionFailed event when execution of the action fails.
-     *
-     * If the command refers to an action which currently is not in a state where the command applies, a response SHALL be
-     * generated with the Status::InvalidCommand.
+     * the server shall generate a either StateChanged or ActionFailed event.
+     * If the command is not supproted by the action, Status::InvalidCommand shall be reported.
      */
 
     /**
-     * When an InstantAction command is received, an action (state change) on the involved endpoints shall trigger,
-     * in a "fire and forget" manner. Afterwards, the action’s state SHALL be Inactive.
-     *
+     * @brief Delegate should implement a handler to InstantAction.
      * @param actionId The actionId of an action.
-     * It should report Status::Success if successful and may report other Status codes if it fails
+     * It should report Status::Success if successful and may report other Status codes if it fails.
      */
     virtual Protocols::InteractionModel::Status HandleInstantAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When an InstantActionWithTransition command is received, an action (state change) on the involved endpoints shall trigger,
-     * with a specified time to transition from the current state to the new state. During the transition, the action’s state SHALL
-     * be Active. Afterwards, the action’s state SHALL be Inactive.
-     *
+     * @brief Delegate should implement a handler to InstantActionWithTransition.
      * @param actionId The actionId of an action.
      * @param transitionTime The time for transition from the current state to the new state.
-     * It should report Status::Success if successful and may report other Status codes if it fails
+     * It should report Status::Success if successful and may report other Status codes if it fails.
      */
     virtual Protocols::InteractionModel::Status HandleInstantActionWithTransition(uint16_t actionId, uint16_t transitionTime,
                                                                                   Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When a StartAction command is received, the commencement of an action on the involved endpoints shall trigger. Afterwards,
-     * the action’s state SHALL be Inactive.
-     *
+     * @brief Delegate should implement a handler to StartAction.
      * @param actionId The actionId of an action.
-     * It should report Status::Success if successful and may report other Status codes if it fails
+     * It should report Status::Success if successful and may report other Status codes if it fails.
      */
     virtual Protocols::InteractionModel::Status HandleStartAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When a StartActionWithDuration command is received, the commencement of an action on the involved endpoints shall trigger,
-     * and SHALL change the action’s state to Active. After the specified Duration, the action will stop, and the action’s state
-     * SHALL change to Inactive.
-     *
+     * @brief Delegate should implement a handler to StartActionWithDuration.
      * @param actionId The actionId of an action.
      * @param duration The time for which an action shall be in start state.
-     * It should report Status::Success if successful and may report other Status codes if it fails
+     * It should report Status::Success if successful and may report other Status codes if it fails.
      */
     virtual Protocols::InteractionModel::Status HandleStartActionWithDuration(uint16_t actionId, uint32_t duration,
                                                                               Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When a StopAction command is received, the ongoing action on the involved endpoints shall stop. Afterwards, the action’s
-     * state SHALL be Inactive.
-     *
+     * @brief Delegate should implement a handler to StopAction.
      * @param actionId The actionId of an action.
-     * It should report Status::Success if successful and may report other Status codes if it fails
+     * It should report Status::Success if successful and may report other Status codes if it fails.
      */
     virtual Protocols::InteractionModel::Status HandleStopAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When a PauseAction command is received, the ongoing action on the involved endpoints shall pause and SHALL change the
-     * action’s state to Paused.
-     *
+     * @brief Delegate should implement a handler to PauseAction.
      * @param actionId The actionId of an action.
-     * It should report Status::Success if successful and may report other Status codes if it fails
+     * It should report Status::Success if successful and may report other Status codes if it fails.
      */
     virtual Protocols::InteractionModel::Status HandlePauseAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When a PauseActionWithDuration command is received, pauses an ongoing action, and SHALL change the action’s state to Paused.
-     * After the specified Duration, the ongoing action will be automatically resumed. which SHALL change the action’s state to
-     * Active.
-     *
+     * @brief Delegate should implement a handler to PauseActionWithDuration.
      * @param actionId The actionId of an action.
      * @param duration The time for which an action shall be in pause state.
-     * It should report Status::Success if successful and may report other Status codes if it fails
+     * It should report Status::Success if successful and may report other Status codes if it fails.
      */
     virtual Protocols::InteractionModel::Status HandlePauseActionWithDuration(uint16_t actionId, uint32_t duration,
                                                                               Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When a ResumeAction command is received, the previously paused action shall resume and SHALL change the action’s state to
-     * Active.
-     *
+     * @brief Delegate should implement a handler to ResumeAction.
      * @param actionId The actionId of an action.
-     * It should report Status::Success if successful and may report other Status codes if it fails
+     * It should report Status::Success if successful and may report other Status codes if it fails.
      */
     virtual Protocols::InteractionModel::Status HandleResumeAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When an EnableAction command is received, it enables a certain action or automation. Afterwards, the action’s state SHALL be
-     * Active.
-     *
+     * @brief Delegate should implement a handler to EnableAction.
      * @param actionId The actionId of an action.
-     * It should report Status::Success if successful and may report other Status codes if it fails
+     * It should report Status::Success if successful and may report other Status codes if it fails.
      */
     virtual Protocols::InteractionModel::Status HandleEnableAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When an EnableActionWithDuration command is received, it enables a certain action or automation, and SHALL change the
-     * action’s state to be Active. After the specified Duration, the action or automation will stop, and the action’s state SHALL
-     * change to Disabled.
-     *
+     * @brief Delegate should implement a handler to EnableActionWithDuration.
      * @param actionId The actionId of an action.
      * @param duration The time for which an action shall be in active state.
-     * It should report Status::Success if successful and may report other Status codes if it fails
+     * It should report Status::Success if successful and may report other Status codes if it fails.
      */
     virtual Protocols::InteractionModel::Status HandleEnableActionWithDuration(uint16_t actionId, uint32_t duration,
                                                                                Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When a DisableAction command is received, it disables a certain action or automation, and SHALL change the action’s state to
-     * Inactive.
-     *
+     * @brief Delegate should implement a handler to DisableAction.
      * @param actionId The actionId of an action.
-     * It should report Status::Success if successful and may report other Status codes if it fails
+     * It should report Status::Success if successful and may report other Status codes if it fails.
      */
     virtual Protocols::InteractionModel::Status HandleDisableAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When a DisableActionWithDuration command is received, it disables a certain action or automation, and SHALL change the
-     * action’s state to Disabled. After the specified Duration, the action or automation will re-start, and the action’s state
-     * SHALL change to either Inactive or Active, depending on the actions.
-     *
+     * @brief Delegate should implement a handler to DisableActionWithDuration.
      * @param actionId The actionId of an action.
      * @param duration The time for which an action shall be in disable state.
-     * It should report Status::Success if successful and may report other Status codes if it fails
+     * It should report Status::Success if successful and may report other Status codes if it fails.
      */
     virtual Protocols::InteractionModel::Status HandleDisableActionWithDuration(uint16_t actionId, uint32_t duration,
                                                                                 Optional<uint32_t> invokeId) = 0;

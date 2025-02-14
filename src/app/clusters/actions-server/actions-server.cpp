@@ -45,11 +45,11 @@ Delegate * GetDelegate(EndpointId aEndpoint)
     return (aEndpoint >= kActionsDelegateTableSize ? nullptr : gDelegateTable[aEndpoint]);
 }
 
-CHIP_ERROR IsValid(Delegate * delegate)
+CHIP_ERROR ValidateDelegate(Delegate * aDelegate, EndpointId aEndpoint)
 {
-    if (delegate == nullptr)
+    if (aDelegate == nullptr)
     {
-        ChipLogError(Zcl, "Actions delegate is null!!!");
+        ChipLogError(Zcl, "Actions delegate is null for endpoint: %d !!!", aEndpoint);
         return CHIP_ERROR_INCORRECT_STATE;
     }
     return CHIP_NO_ERROR;
@@ -127,7 +127,7 @@ CHIP_ERROR ActionsServer::ReadActionListAttribute(const ConcreteReadAttributePat
                                                   const AttributeValueEncoder::ListEncodeHelper & aEncoder)
 {
     Delegate * delegate = GetDelegate(aPath.mEndpointId);
-    VerifyOrReturnError(IsValid(delegate) == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(ValidateDelegate(delegate, aPath.mEndpointId));
 
     for (uint16_t i = 0; i < kMaxActionListLength; i++)
     {
@@ -148,7 +148,7 @@ CHIP_ERROR ActionsServer::ReadEndpointListAttribute(const ConcreteReadAttributeP
                                                     const AttributeValueEncoder::ListEncodeHelper & aEncoder)
 {
     Delegate * delegate = GetDelegate(aPath.mEndpointId);
-    VerifyOrReturnError(IsValid(delegate) == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(ValidateDelegate(delegate, aPath.mEndpointId));
 
     for (uint16_t i = 0; i < kMaxEndpointListLength; i++)
     {
@@ -168,7 +168,7 @@ CHIP_ERROR ActionsServer::ReadEndpointListAttribute(const ConcreteReadAttributeP
 bool ActionsServer::HaveActionWithId(EndpointId aEndpointId, uint16_t aActionId)
 {
     Delegate * delegate = GetDelegate(aEndpointId);
-    VerifyOrReturnValue(IsValid(delegate) == CHIP_NO_ERROR, false);
+    VerifyOrReturnValue(ValidateDelegate(delegate, aEndpointId) == CHIP_NO_ERROR, false);
     return delegate->HaveActionWithId(aActionId);
 }
 
@@ -193,7 +193,7 @@ void ActionsServer::HandleCommand(HandlerContext & handlerContext, FuncT func)
             return;
         }
 
-        if (HaveActionWithId(handlerContext.mRequestPath.mEndpointId, requestPayload.actionID))
+        if (!HaveActionWithId(handlerContext.mRequestPath.mEndpointId, requestPayload.actionID))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::NotFound);
             return;
@@ -404,7 +404,7 @@ void ActionsServer::InvokeCommand(HandlerContext & handlerContext)
 CHIP_ERROR ActionsServer::ModifyActionList(EndpointId aEndpoint, const ActionStructStorage & aAction)
 {
     Delegate * delegate = GetDelegate(aEndpoint);
-    VerifyOrReturnError(IsValid(delegate) == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(ValidateDelegate(delegate, aEndpoint));
 
     // Read through the list to find and update the existing action that matches the passed-in action's ID.
     for (uint16_t i = 0; i < kMaxActionListLength; i++)
@@ -432,7 +432,7 @@ CHIP_ERROR ActionsServer::ModifyActionList(EndpointId aEndpoint, const ActionStr
 CHIP_ERROR ActionsServer::ModifyEndpointList(EndpointId aEndpoint, const EndpointListStorage & aEpList)
 {
     Delegate * delegate = GetDelegate(aEndpoint);
-    VerifyOrReturnError(IsValid(delegate) == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(ValidateDelegate(delegate, aEndpoint));
 
     // Read through the list to find and update the existing action that matches the passed-in endpoint-list's ID
     for (uint16_t i = 0; i < kMaxEndpointListLength; i++)

@@ -344,6 +344,7 @@ void emberAfThermostatClusterInitCallback(EndpointId endpoint)
 
 void emberAfActionsClusterInitCallback(EndpointId endpoint)
 {
+    VerifyOrReturn(endpoint == 1);
     Clusters::Actions::ActionsServer::Instance().SetDefaultDelegate(endpoint, &sActionsDelegateImpl);
 }
 
