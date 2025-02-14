@@ -54,7 +54,7 @@
         }
       ],
       "deviceVersions": [
-        1
+        3
       ],
       "deviceIdentifiers": [
         22
@@ -180,22 +180,6 @@
             {
               "name": "ACL",
               "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "type": "array",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": null,
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "Extension",
-              "code": 1,
               "mfgCode": null,
               "side": "server",
               "type": "array",
@@ -693,7 +677,7 @@
               "storageOption": "RAM",
               "singleton": 1,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "4",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -888,7 +872,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x0001",
+              "defaultValue": "0x0002",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -1005,38 +989,6 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "ScanMaxTimeSeconds",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "ConnectMaxTimeSeconds",
-              "code": 3,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -1432,14 +1384,6 @@
             {
               "name": "OpenCommissioningWindow",
               "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "OpenBasicCommissioningWindow",
-              "code": 1,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
@@ -2101,7 +2045,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "5",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -2134,14 +2078,6 @@
               "isEnabled": 1
             },
             {
-              "name": "ViewGroup",
-              "code": 1,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
               "name": "ViewGroupResponse",
               "code": 1,
               "mfgCode": null,
@@ -2150,8 +2086,8 @@
               "isEnabled": 1
             },
             {
-              "name": "GetGroupMembership",
-              "code": 2,
+              "name": "ViewGroup",
+              "code": 1,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
@@ -2166,8 +2102,8 @@
               "isEnabled": 1
             },
             {
-              "name": "RemoveGroup",
-              "code": 3,
+              "name": "GetGroupMembership",
+              "code": 2,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
@@ -2179,6 +2115,14 @@
               "mfgCode": null,
               "source": "server",
               "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "RemoveGroup",
+              "code": 3,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
               "isEnabled": 1
             },
             {
@@ -2225,7 +2169,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": null,
+              "defaultValue": "",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -2241,7 +2185,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": null,
+              "defaultValue": "",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -2257,7 +2201,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": null,
+              "defaultValue": "",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -2289,7 +2233,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "4",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -2332,7 +2276,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -2348,7 +2292,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -2364,7 +2308,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -2572,6 +2516,22 @@
               "reportableChange": 0
             },
             {
+              "name": "BatReplacementNeeded",
+              "code": 15,
+              "mfgCode": null,
+              "side": "server",
+              "type": "boolean",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "BatReplaceability",
               "code": 16,
               "mfgCode": null,
@@ -2741,7 +2701,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "3",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
