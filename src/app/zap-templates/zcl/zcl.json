@@ -195,11 +195,7 @@
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["ActiveChimeID", "Enabled"],
-        "Closure Control": [
-            "OverallState",
-            "OverallTarget",
-            "FeatureMap"
-        ],
+        "Closure Control": ["OverallState", "OverallTarget", "FeatureMap"],
         "Descriptor": ["ClusterRevision", "FeatureMap"],
         "Device Energy Management": [
             "ESAType",
