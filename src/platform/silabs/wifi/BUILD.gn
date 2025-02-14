@@ -152,7 +152,7 @@ source_set("wifi-platform") {
     ]
   }
 
-  # TODO: Once the WifiInterface refactor is done and becomes a class, we will be inject an interface instead of having them in same source_set
+  # TODO: Once the WifiInterface refactor is done and becomes a class, we will inject an interface instead of having them in same source_set
   if (chip_enable_icd_server) {
     public_deps += [ "${chip_root}/src/app/icd/server:configuration-data" ]
 

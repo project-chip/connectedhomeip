@@ -26,7 +26,7 @@ namespace Silabs {
 
 /**
  * @brief WifiSleepManager is a singleton class that manages the sleep modes for Wi-Fi devices.
- *        The class contains the buisness logic associated with optimizing the sleep states based on the Matter SDK internal states
+ *        The class contains the business logic associated with optimizing the sleep states based on the Matter SDK internal states
  */
 class WifiSleepManager
 {

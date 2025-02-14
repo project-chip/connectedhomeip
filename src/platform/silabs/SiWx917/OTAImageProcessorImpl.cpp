@@ -161,7 +161,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     imageProcessor->mHeaderParser.Init();
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    // Setting the device is in high performace - no-sleepy mode during OTA tranfer
+    // Setting the device in high performance - no-sleep mode during OTA tranfer
     DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformance();
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER*/
 

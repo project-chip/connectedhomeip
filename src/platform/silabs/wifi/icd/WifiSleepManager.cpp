@@ -22,7 +22,7 @@
 
 namespace {
 
-// TODO: Once the platform sleep platform calls are unified, we can removed this ifdef
+// TODO: Once the platform sleep calls are unified, we can removed this ifdef
 #if SLI_SI917 // 917 SoC & NCP
 
 /**
@@ -143,8 +143,8 @@ CHIP_ERROR WifiSleepManager::VerifyAndTransitionToLowPowerMode(PowerEvent event)
 
     if (mIsCommissioningInProgress)
     {
-        // During commissioning, don't let the device to go to sleep
-        // This is needed to interrupt the sleep and retry to join the network
+        // During commissioning, don't let the device go to sleep
+        // This is needed to interrupt the sleep and retry joining the network
         return CHIP_NO_ERROR;
     }
 

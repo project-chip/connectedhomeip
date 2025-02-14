@@ -821,7 +821,7 @@ CHIP_ERROR ConfigurePowerSave(rsi_power_save_profile_mode_t sl_si91x_ble_state, 
     sl_wifi_performance_profile_t wifi_profile = { .profile = sl_si91x_wifi_state,
                                                    // TODO: Performance profile fails if not alligned with DTIM
                                                    .dtim_aligned_type = SL_SI91X_ALIGN_WITH_DTIM_BEACON,
-                                                   // TODO: Different types need to be fixe in the Wi-Fi SDK
+                                                   // TODO: Different types need to be fixed in the Wi-Fi SDK
                                                    .listen_interval = static_cast<uint16_t>(listenInterval) };
 
     sl_status_t status = sl_wifi_set_performance_profile(&wifi_profile);
