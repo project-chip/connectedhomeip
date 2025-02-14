@@ -135,16 +135,18 @@ class MOD_1_2(MatterBaseTest):
         asserts.assert_in(current_mode, supported_modes_values, f"Current mode {current_mode} is not in {supported_modes_values}")
 
         self.step(4)
-        on_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster, attribute=self.cluster.Attributes.OnMode)
-        # On mode can be Nullvalue
-        self._log_attribute("OnMode", on_mode)
-        asserts.assert_true((isinstance(on_mode, int) or on_mode is NullValue),
-                            "Onmode is not int or is not Nullvalue")
-        # Verify that OnMode is in the list of Supported Modes, but if null, cant be verified.
-        if on_mode is not NullValue:
-            asserts.assert_in(on_mode, supported_modes_values, f"Onmode {on_mode} is not in {supported_modes_values}")
+        # DEPONOFF in the Mandatory/Optional Column
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=self.cluster.Attributes.OnMode):
+            on_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster, attribute=self.cluster.Attributes.OnMode)
+            # On mode can be Nullvalue
+            self._log_attribute("OnMode", on_mode)
+            asserts.assert_true((isinstance(on_mode, int) or on_mode is NullValue),
+                                "Onmode is not int or is not Nullvalue")
+            # Verify that OnMode is in the list of Supported Modes, but if null, cant be verified.
+            if on_mode is not NullValue:
+                asserts.assert_in(on_mode, supported_modes_values, f"Onmode {on_mode} is not in {supported_modes_values}")
 
-        # Validate startup mode ( attribute Startup is optional)
+        # Validate startup mode (attribute Startup is optional)
         self.step(5)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=self.cluster.Attributes.StartUpMode):
             startup_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster, attribute=self.cluster.Attributes.StartUpMode)
