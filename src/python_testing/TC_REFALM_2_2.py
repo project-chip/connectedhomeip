@@ -135,7 +135,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         """Return the status of the executed command. By default the status is 0x0 unless a different 
         status on InteractionModel is returned. For this test we consider the status 0x0 as not succesfull."""
         cmd_status = Status.Success
-        if self.is_ci:
+        if self.is_pics_sdk_ci_only:
             try:
                 await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=self.endpoint, payload=cmd)
             except InteractionModelError as uc:
@@ -150,16 +150,16 @@ class TC_REFALM_2_2(MatterBaseTest):
         return cmd_status
 
     def _ask_for_closed_door(self):
-        if self.is_ci:
+        if self.is_pics_sdk_ci_only:
             self._send_close_door_commnad()
             sleep(1)
         else:
-            user_response = self.wait_for_user_input(prompt_msg="Ensure that the door on the DUT is closed.",
+            user_response = self.wait_for_user_input(prompt_msg="Ensure that the door on the DUT is closed. Enter 'y' or 'n' after completition",
                                                      default_value="y")
             asserts.assert_equal(user_response.lower(), "y")
 
     def _ask_for_open_door(self):
-        if self.is_ci:
+        if self.is_pics_sdk_ci_only:
             self._send_open_door_command()
         else:
             user_response = self.wait_for_user_input(prompt_msg="Manually open the door on the DUT. Enter 'y' or 'n' after completition",
@@ -206,7 +206,6 @@ class TC_REFALM_2_2(MatterBaseTest):
     @async_test_body
     async def test_TC_REFALM_2_2(self):
         """Run the test steps."""
-        self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         self.endpoint = self.get_endpoint(default=1)
         cluster = Clusters.RefrigeratorAlarm
         logger.info(f"Default endpoint {self.endpoint}")

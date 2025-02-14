@@ -293,13 +293,13 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
  *   echo '{"Name":"SetRefrigeratorDoorStatus", "EndpointId": 1, "DoorOpen": 1}' > /tmp/chip_all_clusters_fifo_1146610
  *
  * JSON Arguments:
- *   - "Name": Must be "SetRefDoorStatus"
+ *   - "Name": Must be "SetRefrigeratorDoorStatus"
  *   - "EndpointId": ID of endpoint
- *   - "DoorOpen": Status of the door, open or closed.
+ *   - "DoorOpen": Status of the Door, open or closed.
  *
  * @param jsonValue - JSON payload from named pipe
  */
-void SetRefrigetatorDoorStatusHandler(Json::Value & jsonValue)
+void SetRefrigeratorDoorStatusHandler(Json::Value & jsonValue)
 {
     bool hasEndpointId = HasNumericField(jsonValue, "EndpointId");
     bool hasDoorStatus = HasNumericField(jsonValue, "DoorOpen");
@@ -307,13 +307,13 @@ void SetRefrigetatorDoorStatusHandler(Json::Value & jsonValue)
     if (!hasEndpointId || !hasDoorStatus)
     {
         std::string inputJson = jsonValue.toStyledString();
-        ChipLogError(NotSpecified, "Missing or invalid value for one of EndpointId, Status in %s", inputJson.c_str());
+        ChipLogError(NotSpecified, "Missing or invalid value for one of EndpointId, DoorOpen in %s", inputJson.c_str());
         return;
     }
     // values to update the door status
     EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
     bool doorStatus       = static_cast<bool>(jsonValue["DoorOpen"].asBool());
-    ChipLogDetail(NotSpecified, "SetRefrigetatorDoorStatusHandler State -> %d.", doorStatus);
+    ChipLogDetail(NotSpecified, "SetRefrigeratorDoorStatusHandler State -> %d.", doorStatus);
     if (!doorStatus)
     {
         RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId, doorStatus);
@@ -554,7 +554,7 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "SetRefrigeratorDoorStatus")
     {
-        SetRefrigetatorDoorStatusHandler(self->mJsonValue);
+        SetRefrigeratorDoorStatusHandler(self->mJsonValue);
     }
     else
     {
