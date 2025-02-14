@@ -87,7 +87,7 @@ CHIP_ERROR WifiSleepManager::RequestHighPerformance()
 
     mHighPerformanceRequestCounter++;
 
-    // We don't do the mHighPerformanceRequestCounter check here; the check is in VerifyAndTransitionToLowPowerMode function
+    // We don't do the mHighPerformanceRequestCounter check here; the check is in the VerifyAndTransitionToLowPowerMode function
     ReturnErrorOnFailure(VerifyAndTransitionToLowPowerMode(PowerEvent::kGenericEvent));
 
     return CHIP_NO_ERROR;
@@ -100,7 +100,7 @@ CHIP_ERROR WifiSleepManager::RemoveHighPerformanceRequest()
 
     mHighPerformanceRequestCounter--;
 
-    // We don't do the mHighPerformanceRequestCounter check here; the check is in VerifyAndTransitionToLowPowerMode function
+    // We don't do the mHighPerformanceRequestCounter check here; the check is in the VerifyAndTransitionToLowPowerMode function
     ReturnErrorOnFailure(VerifyAndTransitionToLowPowerMode(PowerEvent::kGenericEvent));
 
     return CHIP_NO_ERROR;
