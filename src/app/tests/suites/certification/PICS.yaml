@@ -3632,6 +3632,23 @@ PICS:
           CommissioningCompleteResponse command?"
       id: CGEN.S.C05.Tx
 
+    #
+    # server / features
+    #
+    - label:
+          "Does the device implement the General Commissioning cluster's terms
+          and conditions feature?"
+      id: CGEN.S.F00
+
+    - label: "The device's failsafe expiration limit."
+      id: PIXIT.CGEN.FailsafeExpiryLengthSeconds
+
+    - label: "The device's required terms and conditions acknowledgements."
+      id: PIXIT.CGEN.RequiredTCAcknowledgements
+
+    - label: "The device's required minimum terms and conditions revision."
+      id: PIXIT.CGEN.TCRevision
+
     # General Diagnostics Cluster Test Plan
     - label:
           "Does the device implement the General Diagnostics cluster as a
@@ -6489,17 +6506,32 @@ PICS:
     - label: "Does the device implement the PresetTypes attribute?"
       id: TSTAT.S.A0048
 
+    - label: "Does the device implement the ScheduleTypes attribute?"
+      id: TSTAT.S.A0049
+
     - label: "Does the device implement the NumberOfPresets attribute?"
       id: TSTAT.S.A004a
+
+    - label: "Does the device implement the NumberOfSchedules attribute?"
+      id: TSTAT.S.A004b
+
+    - label:
+          "Does the device implement the NumberOfScheduleTransitions attribute?"
+      id: TSTAT.S.A004c
+
+    - label:
+          "Does the device implement the NumberOfScheduleTransitionPerDay
+          attribute?"
+      id: TSTAT.S.A004d
 
     - label: "Does the device implement the ActivePresetHandle attribute?"
       id: TSTAT.S.A004e
 
+    - label: "Does the device implement the ActiveScheduleHandle attribute?"
+      id: TSTAT.S.A004f
+
     - label: "Does the device implement the Presets attribute?"
       id: TSTAT.S.A0050
-
-    - label: "Does the device implement the Schedules attribute?"
-      id: TSTAT.S.A0051
 
     - label: "Does the device implement the Schedules attribute?"
       id: TSTAT.S.A0051

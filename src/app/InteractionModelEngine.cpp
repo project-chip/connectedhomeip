@@ -1801,28 +1801,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
         }
     }
 
-    {
-        DataModel::ServerClusterFinder finder(provider);
-        if (finder.Find(aCommandPath).has_value())
-        {
-            // cluster exists, so command is invalid
-            return Protocols::InteractionModel::Status::UnsupportedCommand;
-        }
-    }
-
-    // At this point either cluster or endpoint does not exist. If we find the endpoint, then the cluster
-    // is invalid
-    {
-        DataModel::EndpointFinder finder(provider);
-        if (finder.Find(aCommandPath.mEndpointId))
-        {
-            // endpoint exists, so cluster is invalid
-            return Protocols::InteractionModel::Status::UnsupportedCluster;
-        }
-    }
-
-    // endpoint not found
-    return Protocols::InteractionModel::Status::UnsupportedEndpoint;
+    // invalid command, return the right failure status
+    return DataModel::ValidateClusterPath(provider, aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
 }
 
 DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Provider * model)
