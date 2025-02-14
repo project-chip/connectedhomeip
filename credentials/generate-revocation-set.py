@@ -389,14 +389,14 @@ class DCLDClientInterface:
 
     def get_crl_file(self,
         revocation_point: dict,
-        unused_crl_signer_certificate: x509.Certificate) -> x509.CertificateRevocationList:
+        crl_signer_certificate: x509.Certificate) -> x509.CertificateRevocationList:
             """Obtain the CRL."""
             try:
                 r = requests.get(revocation_point["dataURL"], timeout=5)
                 logging.debug(f"Fetched CRL: {r.content}")
                 return x509.load_der_x509_crl(r.content)
-            except Exception as e:
-                logging.error('Failed to fetch a valid CRL', e)
+            except Exception:
+                logging.warning(f"Failed to fetch a valid CRL for': {crl_signer_certificate.subject.rfc4514_string()}")
 
 
     def get_formatted_hex_skid(self, skid_hex: str) -> str:
@@ -730,7 +730,7 @@ def from_dcl(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: 
 
         # Parse the crl signer delegator
         crl_signer_delegator_cert = None
-        if "crlSignerDelegator" in revocation_point:
+        if "crlSignerDelegator" in revocation_point and revocation_point["crlSignerDelegator"] != "":
             crl_signer_delegator_cert_pem = revocation_point["crlSignerDelegator"]
             logging.debug(f"CRLSignerDelegator: {crl_signer_delegator_cert_pem}")
             try:
