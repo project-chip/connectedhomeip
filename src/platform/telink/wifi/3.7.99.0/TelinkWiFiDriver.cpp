@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "TelinkWiFiDriver.h"
+#include "../TelinkWiFiDriver.h"
 
 #include <stdint.h>
 

@@ -13,6 +13,19 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+# Generate Zephyr version files for backward compatibility
+file(STRINGS "$ENV{ZEPHYR_BASE}/VERSION" ZEPHYR_VERSION_STRING REGEX "[0-9]+")
+string(REGEX REPLACE "[^0-9;]" "" ZEPHYR_VERSION_STRING "${ZEPHYR_VERSION_STRING}")
+string(REPLACE ";" "." ZEPHYR_VERSION_STRING "${ZEPHYR_VERSION_STRING}")
+file(WRITE "${CMAKE_BINARY_DIR}/modules/chip-module/zephyr_version.gni" "ZEPHYR_VERSION_STRING = \"${ZEPHYR_VERSION_STRING}\"\n")
+if(${ZEPHYR_VERSION_STRING} MATCHES "^3\\.3")
+  set(ZEPHYR_VERSION_OVERLAY_FILE "${CMAKE_BINARY_DIR}/zephyr_version.conf")
+  file(WRITE ${ZEPHYR_VERSION_OVERLAY_FILE} "CONFIG_ZEPHYR_VERSION_3_3=y\n")
+
+  # Add required MbedTLS defines for Zephyr 3.3
+  add_definitions(-DMBEDTLS_HKDF_C -DMBEDTLS_X509_CREATE_C -DMBEDTLS_X509_CSR_WRITE_C)
+endif()
+
 string(REPLACE "_retention" "" BASE_BOARD ${BOARD})
 string(REGEX REPLACE "_v[0-9]+" "" BASE_BOARD ${BASE_BOARD})
 
@@ -117,7 +130,7 @@ else()
 endif()
 
 if(NOT CONF_FILE)
-  set(CONF_FILE ${USB_CONF_OVERLAY_FILE} ${MARS_CONF_OVERLAY_FILE} prj.conf)
+  set(CONF_FILE ${USB_CONF_OVERLAY_FILE} ${MARS_CONF_OVERLAY_FILE} ${ZEPHYR_VERSION_OVERLAY_FILE} prj.conf)
 endif()
 
 # Load NCS/Zephyr build system

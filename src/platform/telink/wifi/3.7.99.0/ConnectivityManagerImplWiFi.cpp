@@ -21,7 +21,7 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/ConnectivityManager.h>
 
-#include "ConnectivityManagerImplWiFi.h"
+#include "../ConnectivityManagerImplWiFi.h"
 #include "WiFiManager.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI

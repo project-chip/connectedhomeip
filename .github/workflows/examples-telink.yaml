@@ -46,7 +46,6 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:

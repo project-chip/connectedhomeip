@@ -24,6 +24,10 @@ config CHIP_PROJECT_CONFIG
     string "Project configuration file for Matter"
     default "include/CHIPProjectConfig.h"
 
+config ZEPHYR_VERSION_3_3
+    bool "Using Zephyr version 3.3"
+    default n
+
 config LOG
     default y
 
@@ -63,7 +67,7 @@ config POSIX_MAX_FDS
 # Application stack size
 config MAIN_STACK_SIZE
     default 3240 if PM || SOC_RISCV_TELINK_TL321X
-    default 4608 if SOC_RISCV_TELINK_W91
+    default 4608 if SOC_RISCV_TELINK_W91 && !ZEPHYR_VERSION_3_3
     default 4096
 
 config INIT_STACKS
@@ -81,11 +85,12 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
     default 616 if PM
 
 config HEAP_MEM_POOL_SIZE
+    default 256 if ZEPHYR_VERSION_3_3
     default 1280
 
 config COMMON_LIBC_MALLOC_ARENA_SIZE
-    default 20716 if SOC_SERIES_RISCV_TELINK_B9X_RETENTION
-    default 16384 if SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_TL721X
+    default 20716 if SOC_SERIES_RISCV_TELINK_B9X_RETENTION || (SOC_RISCV_TELINK_TL321X && ZEPHYR_VERSION_3_3)
+    default 16384 if SOC_RISCV_TELINK_TL721X || (SOC_RISCV_TELINK_TL321X && !ZEPHYR_VERSION_3_3)
     default 12288
 
 config NET_IPV6_MLD
@@ -173,6 +178,7 @@ config BT_DEVICE_NAME_GATT_WRITABLE
 if SOC_RISCV_TELINK_B9X || SOC_RISCV_TELINK_TLX
 
 config TL_BLE_CTRL_THREAD_STACK_SIZE
+    default 648 if ZEPHYR_VERSION_3_3
     default 680
 
 config TL_BLE_CTRL_MASTER_MAX_NUM
@@ -188,7 +194,6 @@ config TL_BLE_CTRL_RF_POWER
 
 choice TL_BLE_CTRL_MAC_TYPE
     default TL_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
-
 endchoice
 
 endif # SOC_RISCV_TELINK_B9X || SOC_RISCV_TELINK_TLX
@@ -405,10 +410,14 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
       within range [-JITTER; +JITTER].
 
 config NET_MGMT_EVENT_STACK_SIZE
+    default 1128 if ZEPHYR_VERSION_3_3
     default 1250
 
+if !ZEPHYR_VERSION_3_3
 config IPC_SERVICE_BACKEND_ICMSG_WQ_STACK_SIZE
+    int "Size of RX work queue stack"
     default 2304 if TELINK_W91_IPC_DISPATCHER
+endif
 
 endif # CHIP_WIFI
 
@@ -421,9 +430,6 @@ config CHIP_ENABLE_PAIRING_AUTOSTART
 
 # Configure MBEDTLS lib
 config MBEDTLS
-    default y
-
-config MBEDTLS_ENTROPY_POLL_ZEPHYR
     default y
 
 config MBEDTLS_CIPHER_AES_ENABLED
@@ -447,17 +453,28 @@ config MBEDTLS_ECDH_C
 config MBEDTLS_ECDSA_C
     default y
 
-config MBEDTLS_HKDF_C
-    default y
-
 config MBEDTLS_PKCS5_C
-    default y
-
-config MBEDTLS_X509_CSR_WRITE_C
     default y
 
 config MBEDTLS_KEY_EXCHANGE_ECDH_ECDSA_ENABLED
     default y
+
+if !ZEPHYR_VERSION_3_3
+config MBEDTLS_ENTROPY_POLL_ZEPHYR
+    bool "Provide entropy data to Mbed TLS through entropy driver or random generator"
+    default y
+
+config MBEDTLS_HKDF_C
+    bool "HMAC-based Extract-and-Expand Key Derivation Function"
+    default y
+
+config MBEDTLS_X509_CSR_WRITE_C
+    bool "X.509 Certificate Signing Requests writing"
+    default y
+endif # !ZEPHYR_VERSION_3_3
+
+config GETOPT_LONG
+    default y if ZEPHYR_VERSION_3_3
 
 # Disable not used shell modules
 

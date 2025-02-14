@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include <platform/ConfigurationManager.h>
+
 #include "InetUtils.h"
 
 #include <zephyr/net/net_if.h>
@@ -38,10 +40,18 @@ net_if * GetInterface(Inet::InterfaceId ifaceId)
     return ifaceId.IsPresent() ? net_if_get_by_index(ifaceId.GetPlatformInterface()) : net_if_get_default();
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 net_if * GetWiFiInterface()
 {
+// TODO: Remove dependency after Telink Zephyr 3.3 support is removed
+// net_if_get_first_wifi() is not available in Zephyr 3.3
+#if defined(CONFIG_SOC_RISCV_TELINK_W91) && defined(CONFIG_ZEPHYR_VERSION_3_3)
+    return GetInterface();
+#else
     return net_if_get_first_wifi();
+#endif
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 } // namespace InetUtils
 } // namespace DeviceLayer
