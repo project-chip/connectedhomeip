@@ -40,7 +40,7 @@ constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60);
 // To override the throttle interval,
 // use ` defaults write <domain> BDXThrottleIntervalForThreadDevicesInMSecs <throttleIntervalinMsecs>`
 // See UserDefaults.mm for details.
-constexpr auto kBdxThrottleDefaultIntervalInMsecs = System::Clock::Milliseconds32(50);
+constexpr auto kBdxThrottleDefaultInterval = System::Clock::Milliseconds32(50);
 
 constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
 
@@ -64,7 +64,7 @@ constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
 }
 @end
 
-MTROTAImageTransferHandler::MTROTAImageTransferHandler(chip::System::Layer * layer)
+MTROTAImageTransferHandler::MTROTAImageTransferHandler(System::Layer * layer)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -91,8 +91,7 @@ CHIP_ERROR MTROTAImageTransferHandler::Init(Messaging::ExchangeContext * exchang
 
     mIsPeerNodeAKnownThreadDevice = [controller definitelyUsesThreadForDevice:mPeer.GetNodeId()];
 
-    uint16_t throttleInterval = chip::Platform::GetUserDefaultBDXThrottleIntervalForThreadInMSecs().value_or(kBdxThrottleDefaultIntervalInMsecs.count());
-    mBDXThrottleIntervalForThreadDevicesInMSecs = System::Clock::Milliseconds32(throttleInterval);
+    mBDXThrottleIntervalForThreadDevices = Platform::GetUserDefaultBDXThrottleIntervalForThread().value_or(kBdxThrottleDefaultInterval);
 
     BitFlags<bdx::TransferControlFlags> flags(bdx::TransferControlFlags::kReceiverDrive);
 
@@ -249,9 +248,8 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
 {
     assertChipStackLockedByCurrentThread();
 
-    // For thread devices, we need to throttle sending the response to BlockQuery, if the query is processed, before kBdxThrottleDefaultIntervalInMsecs
-    // has elapsed to prevent the BDX messages spamming up the network. Get the timestamp at which we start processing the BlockQuery message.
-
+    // For thread devices, we need to throttle sending the response to
+    // BlockQuery, so need to track when we started handling BlockQuery.
     auto startBlockQueryHandlingTimestamp = System::SystemClock().GetMonotonicTimestamp();
 
     auto blockSize = @(mTransfer.GetTransferBlockSize());
@@ -306,19 +304,20 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
 
     void (^completionHandler)(NSData * _Nullable data, BOOL isEOF) = nil;
 
-    // If the peer node is a Thread device, check how much time has elapsed since we started processing the BlockQuery.
-    // If the time elapsed is greater than kBdxThrottleDefaultIntervalInMsecs, call the completion handler to respond with a Block right away.
-    // If time elapsed is less than kBdxThrottleDefaultIntervalInMsecs, dispatch the completion handler to respond with a Block after kBdxThrottleDefaultIntervalInMsecs has elapsed.
-
+    // If the peer node is a Thread device, check how much time has elapsed since we started processing the BlockQuery,
+    // round it up to the nearest multiple of kBdxThrottleDefaultInterval, and respond with the block at that point.
     if (mIsPeerNodeAKnownThreadDevice) {
         completionHandler = ^(NSData * _Nullable data, BOOL isEOF) {
             auto timeElapsed = System::SystemClock().GetMonotonicTimestamp() - startBlockQueryHandlingTimestamp;
+            // Integer division rounds down, so dividing by mBDXThrottleIntervalForThreadDevices and then multiplying
+            // by it again rounds down to the nearest multiple of mBDXThrottleIntervalForThreadDevices.
+            auto remainder = timeElapsed - (timeElapsed / mBDXThrottleIntervalForThreadDevices) * mBDXThrottleIntervalForThreadDevices;
 
-            if (timeElapsed >= mBDXThrottleIntervalForThreadDevicesInMSecs) {
+            if (remainder == System::Clock::Milliseconds32(0)) {
                 respondWithBlock(data, isEOF);
             } else {
-                auto timeRemaining = std::chrono::duration_cast<std::chrono::nanoseconds>(mBDXThrottleIntervalForThreadDevicesInMSecs - timeElapsed);
-                dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, (int64_t) (timeRemaining.count()));
+                auto nsRemaining = std::chrono::duration_cast<std::chrono::nanoseconds>(remainder);
+                dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, nsRemaining.count());
                 dispatch_after(time, delegateQueue, ^{
                     respondWithBlock(data, isEOF);
                 });

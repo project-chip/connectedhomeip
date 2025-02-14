@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
 # Copyright (c) 2020 Project CHIP Authors
 #
@@ -21,8 +20,10 @@
 # relevant for the Matter GATT service and advertisement management. Also,
 # some properties and methods not used by Matter are omitted in order to
 # decrease the size of Matter SDK library.
-#
 -->
+<!DOCTYPE node PUBLIC
+  "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+  "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 
 <node>
 
@@ -158,9 +159,9 @@
     <property name="Discoverable" type="b" access="read"/>
     <!--
     Do not expose discoverable timeout property, so BlueZ will set it
-    internally to zero, effectively disabling the timeout. Becase of BlueZ
+    internally to zero, effectively disabling the timeout. Because of BlueZ
     bug, which is not fixed until BlueZ 5.73, exposing discoverable timeout
-    as zero will timout the advertisement immediately.
+    as zero will timeout the advertisement immediately.
 
     <property name="DiscoverableTimeout" type="q" access="read"/>
     -->

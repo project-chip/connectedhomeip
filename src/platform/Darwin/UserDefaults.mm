@@ -40,7 +40,7 @@ namespace Platform {
         return std::nullopt;
     }
 
-    std::optional<uint16_t> GetUserDefaultBDXThrottleIntervalForThreadInMSecs()
+    std::optional<System::Clock::Milliseconds16> GetUserDefaultBDXThrottleIntervalForThread()
     {
         NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
         NSInteger bdxThrottleIntervalInMsecs = [defaults integerForKey:kBDXThrottleIntervalInMsecsUserDefaultKey];
@@ -48,7 +48,7 @@ namespace Platform {
         if (bdxThrottleIntervalInMsecs > 0 && CanCastTo<uint16_t>(bdxThrottleIntervalInMsecs)) {
             uint16_t intervalInMsecs = static_cast<uint16_t>(bdxThrottleIntervalInMsecs);
             ChipLogProgress(BDX, "Got a user default value for BDX Throttle Interval for Thread devices - %d msecs", intervalInMsecs);
-            return std::make_optional(intervalInMsecs);
+            return std::make_optional(System::Clock::Milliseconds16(intervalInMsecs));
         }
 
         // For now return NullOptional if value returned in bdxThrottleIntervalInMsecs is 0, since that either means the key was not found or value was zero.
