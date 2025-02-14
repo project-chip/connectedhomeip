@@ -271,7 +271,8 @@ static const auto * optionalInternalStateKeys = @[ kMTRDeviceInternalPropertyKey
             continue;
         }
         if (!MTR_SAFE_CAST(value, NSNumber) && !MTR_SAFE_CAST(value, NSDate)) {
-            MTR_LOG_ERROR("%@ device:internalStateUpdated: handed state with invalid value for \"%@\": %@", self, key, value);
+            MTR_LOG_ERROR("%@ device:internalStateUpdated: handed state with invalid value of type %@ for \"%@\": %@", self,
+                NSStringFromClass([value class]), key, value);
             return NO;
         }
     }
