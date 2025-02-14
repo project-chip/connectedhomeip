@@ -37,8 +37,8 @@ from click_option_group import AllOptionGroup, RequiredMutuallyExclusiveOptionGr
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
-from cryptography.x509.oid import NameOID
 from cryptography.x509.extensions import ExtensionNotFound
+from cryptography.x509.oid import NameOID
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
