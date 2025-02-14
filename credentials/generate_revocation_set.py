@@ -270,12 +270,14 @@ def get_certificate_authority_details(crl_signer_certificate: x509.Certificate,
         logging.debug("Using CRL Signer certificate for details")
 
     certificate_authority_name = cert_for_details.subject
-    certificate_akid = get_skid(cert_for_details)
+    try:
+        certificate_akid = get_skid(cert_for_details)
+        logging.debug(f"Certificate Authority Name: {certificate_authority_name}")
+        logging.debug(f"Certificate AKID: {certificate_akid}")
 
-    logging.debug(f"Certificate Authority Name: {certificate_authority_name}")
-    logging.debug(f"Certificate AKID: {certificate_akid}")
-
-    return certificate_authority_name, certificate_akid
+        return certificate_authority_name, certificate_akid
+    except ExtensionNotFound:
+        logging.warning("Certificate SKID not found in authoarity certificate.")
 
 def get_b64_name(name: x509.name.Name) -> str:
     '''
@@ -360,7 +362,7 @@ class DCLDClientInterface:
         try:
             akid = get_akid(initial_cert)
         except ExtensionNotFound:
-            logging.error('Certificate AKID not found.')
+            logging.warning('Certificate AKID not found.')
             return
         paa_certificate = None
         while not paa_certificate:
@@ -379,7 +381,7 @@ class DCLDClientInterface:
             try:
                 akid = get_akid(issuer_certificate)
             except ExtensionNotFound:
-                logging.error('Issuer Certificate AKID not found.')
+                logging.warning('Issuer Certificate AKID not found.')
             logging.debug(f"akid: {akid}")
         if paa_certificate is None:
             logging.warning("PAA Certificate not found, continue...")
@@ -578,9 +580,13 @@ class LocalFilesDCLDClient(DCLDClientInterface):
 
 
     def get_lookup_key(self, certificate: x509.Certificate) -> str:
-        base64_name = get_b64_name(certificate.subject)    
-        skid_hex_formatted = self.get_formatted_hex_skid(get_skid(certificate))
-        return base64_name + skid_hex_formatted
+        base64_name = get_b64_name(certificate.subject) 
+        try:
+            skid = get_skid(certificate)
+            skid_hex_formatted = self.get_formatted_hex_skid(skid)
+            return base64_name + skid_hex_formatted
+        except ExtensionNotFound:
+            logging.warning("CertificateSKID not found, continue...")
 
 
     def get_crls(self, unread_crls: []) -> list[x509.CertificateRevocationList]:
