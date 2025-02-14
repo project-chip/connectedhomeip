@@ -751,10 +751,9 @@ def from_dcl(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: 
             continue
 
         # 6. Obtain the CRL
-        logging.debug(f"Getting CRL file for revocation point: {revocation_point}")
-        logging.debug(f"Getting CRL file for revocation point: {crl_signer_certificate}")
         crl_file = dcld_client.get_crl_file(revocation_point, crl_signer_certificate)
         if crl_file is None:
+            logging.warning(f"CRL file not found for revocation point")
             continue
 
         # 7. Perform CRL File Validation
