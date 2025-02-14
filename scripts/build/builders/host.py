@@ -653,12 +653,17 @@ class HostBuilder(GnBuilder):
                 + ' | xargs -n1 basename | sed "s/\\.profraw//" '
                 + f' | xargs -I @ echo -object {shlex.quote(os.path.join(self.output_dir, "tests", "@"))}'
                 + f' | xargs -n 10240 llvm-cov export -format=lcov --instr-profile {_indexed_instrumentation} '
+                # only care about SDK code. third_party is not considered sdk
                 + ' --ignore-filename-regex "/third_party/"'
-                + ' --ignore-filename-regex "/zzz_generated/"'      # about 75K lines with almost 0% coverage ...
-                + ' --ignore-filename-regex "/out/.*/Linux/dbus/"'  # generated interface files. about 8K lines with little coverage
+                # about 75K lines with almost 0% coverage
+                + ' --ignore-filename-regex "/zzz_generated/"'
+                # generated interface files. about 8K lines with little coverage
+                + ' --ignore-filename-regex "/out/.*/Linux/dbus/"'
                 # 100% coverage for 1K lines, but not relevant (test code)
                 + ' --ignore-filename-regex "/out/.*/clang_static_coverage_config/"'
+                # Tests are likely 100% or close to, want to see only "functionality tested"
                 + ' --ignore-filename-regex "/tests/"'
+                # Ignore system includes
                 + ' --ignore-filename-regex "/usr/include/"'
                 + ' --ignore-filename-regex "/usr/lib/"'
                 + f' | cat >{shlex.quote(_lcov_data)}'
