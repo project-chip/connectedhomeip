@@ -214,7 +214,7 @@ jobs:
               with:
                 # Exclude all files under "third_party/"
                 files-ignore: |
-                  third_party/**              
+                  third_party/**
             - name: Clang-tidy validation
               # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
               #       See https://github.com/llvm/llvm-project/issues/97426
