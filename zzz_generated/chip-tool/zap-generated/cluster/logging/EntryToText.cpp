@@ -6641,6 +6641,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Color Temperature Light";
     case 0x0000010D:
         return "Extended Color Light";
+    case 0x00000142:
+        return "Camera";
     case 0x00000202:
         return "Window Covering";
     case 0x00000203:
