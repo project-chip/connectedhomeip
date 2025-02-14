@@ -252,7 +252,7 @@ class TC_FAN_3_1(MatterBaseTest):
     @async_test_body
     async def test_TC_FAN_3_1(self):
         # Setup
-        ep = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint(default=1)
         cluster = Clusters.FanControl
 
         # *** STEP 1 ***
@@ -262,38 +262,38 @@ class TC_FAN_3_1(MatterBaseTest):
         # *** STEP 2 ***
         # TH checks for the existence of the SpeedSetting feature
         self.step(2)
-        feature_map = await self.read_setting(ep, cluster.Attributes.FeatureMap)
+        feature_map = await self.read_setting(endpoint, cluster.Attributes.FeatureMap)
         self.supports_speed = bool(feature_map & cluster.Bitmaps.Feature.kMultiSpeed)
 
         # *** STEP 3 ***
         # TH subscribes to the DUT's FanControl cluster
         self.step(3)
         self.attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
-        await self.attribute_subscription.start(self.default_controller, self.dut_node_id, ep)
+        await self.attribute_subscription.start(self.default_controller, self.dut_node_id, endpoint)
 
         # TH writes to the DUT the PercentSetting attribute iteratively within
         # a range of 1 to 100 one at a time in ascending order
         # Verifies that FanMode and SpeedSetting values (if supported) are being
-        # updated accordingly (greater or less than the previous values)
-        await self.verify_fan_control_attribute_values(ep, cluster.Attributes.PercentSetting, OrderEnum.Ascending)
+        # updated accordingly (current values greater than previous values)
+        await self.verify_fan_control_attribute_values(endpoint, cluster.Attributes.PercentSetting, OrderEnum.Ascending)
 
         # TH writes to the DUT the PercentSetting attribute iteratively within
-        # a range of 1 to 100 one at a time in descending order
+        # a range of 100 to 0 one at a time in descending order
         # Verifies that FanMode and SpeedSetting values (if supported) are being
-        # updated accordingly (greater or less than the previous values)
-        await self.verify_fan_control_attribute_values(ep, cluster.Attributes.PercentSetting, OrderEnum.Descending)
+        # updated accordingly (current values less than previous values)
+        await self.verify_fan_control_attribute_values(endpoint, cluster.Attributes.PercentSetting, OrderEnum.Descending)
 
         # TH writes to the DUT the FanMode attribute iteratively within a range of
         # the number of available fan modes one at a time in ascending order
         # Verifies that PercentSetting and SpeedSetting values (if supported) are being
-        # updated accordingly (greater or less than the previous values)
-        await self.verify_fan_control_attribute_values(ep, cluster.Attributes.FanMode, OrderEnum.Ascending)
+        # updated accordingly (current values greater than previous values)
+        await self.verify_fan_control_attribute_values(endpoint, cluster.Attributes.FanMode, OrderEnum.Ascending)
 
         # TH writes to the DUT the FanMode attribute iteratively within a range of
         # the number of available fan modes one at a time in descending order
         # Verifies that PercentSetting and SpeedSetting values (if supported) are being
-        # updated accordingly (greater or less than the previous values)
-        await self.verify_fan_control_attribute_values(ep, cluster.Attributes.FanMode, OrderEnum.Descending)
+        # updated accordingly (current values less than previous values)
+        await self.verify_fan_control_attribute_values(endpoint, cluster.Attributes.FanMode, OrderEnum.Descending)
 
 
 if __name__ == "__main__":
