@@ -392,7 +392,6 @@ class DCLDClientInterface:
         unused_crl_signer_certificate: x509.Certificate) -> x509.CertificateRevocationList:
             """Obtain the CRL."""
             try:
-                url = revocation_point["dataURL"]
                 r = requests.get(revocation_point["dataURL"], timeout=5)
                 logging.debug(f"Fetched CRL: {r.content}")
                 return x509.load_der_x509_crl(r.content)
@@ -404,7 +403,7 @@ class DCLDClientInterface:
         return ':'.join([skid_hex[i:i+2] for i in range(0, len(skid_hex), 2)])
 
 
-class DCLDClient(DCLDClientInterface):
+class NodeDCLDClient(DCLDClientInterface):
     '''
     A client for interacting with DCLD using command line interface (CLI).
     '''
@@ -564,7 +563,7 @@ class RESTDCLDClient(DCLDClientInterface):
         return self.get_only_approved_certificate(response, skid_hex)
 
 
-class LocalDCLDClient(DCLDClientInterface):
+class LocalFilesDCLDClient(DCLDClientInterface):
     '''
     A client for interacting with local DLCD response data.
     '''
@@ -680,7 +679,6 @@ class LocalDCLDClient(DCLDClientInterface):
 def cli():
     pass
 
-
 @cli.command('from-dcl')
 @click.help_option('-h', '--help')
 @optgroup.group('Input data sources', cls=RequiredMutuallyExclusiveOptionGroup)
@@ -708,11 +706,11 @@ def from_dcl(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: 
     )
 
     if use_local_data:
-        dcld_client = LocalDCLDClient(crls, certificates, revocation_points_response)
+        dcld_client = LocalFilesDCLDClient(crls, certificates, revocation_points_response)
     elif use_main_net_http or use_test_net_http:
         dcld_client = RESTDCLDClient(True if use_main_net_http else False)
     else:
-        dcld_client = DCLDClient(use_main_net_dcld or use_test_net_dcld, True if use_main_net_dcld else False)
+        dcld_client = NodeDCLDClient(use_main_net_dcld or use_test_net_dcld, True if use_main_net_dcld else False)
 
     revocation_point_list = dcld_client.get_revocation_points()
     revocation_set = []
@@ -809,7 +807,7 @@ def from_dcl(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: 
                                                     certificate_authority_name, certificate_akid_hex, crl_signer_delegator_cert)
         logging.debug(f"Entry to append: {entry}")
         revocation_set.append(entry)
-    logging.debug(f"Revocation Set: {revocation_set}")
+
     with open(output, 'w+') as outfile:
         json.dump(revocation_set, outfile, indent=4)
 
