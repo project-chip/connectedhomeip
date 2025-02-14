@@ -93,6 +93,11 @@ Git: 0.7-summer-2025-5-g06c4d5596-dirty
 
   <enum name="TriggerPositionEnum" type="enum8">
     <cluster code="0x0104"/>
+    <item name="AtFullyClosed" value="0x00"/>
+    <item name="AtFullyOpened" value="0x01"/>
+    <item name="InBetween" value="0x02"/>
+    <item name="AtVentilation" value="0x03"/>
+    <item name="AtPedestrian" value="0x04"/>
   </enum>
 
   <struct name="OverallStateStruct" apiMaturity="provisional">
@@ -139,7 +144,7 @@ Git: 0.7-summer-2025-5-g06c4d5596-dirty
         <feature name="FB"/>
       </mandatoryConform>
     </attribute>
-    <attribute code="0x0007" side="server" define="TRIGGER_POSITION" type="TriggerPositionEnum" optional="true">
+    <attribute code="0x0007" side="server" define="TRIGGER_POSITION" type="TriggerPositionEnum" optional="true" min="0x00" max="0x04">
       <description>TriggerPosition</description>
       <mandatoryConform>
         <feature name="FB"/>
@@ -185,7 +190,7 @@ Git: 0.7-summer-2025-5-g06c4d5596-dirty
       <description>Upon receipt, this SHALL configure the Fallback feature behavior using the data as follows: </description>
       <arg id="0" name="RestingProcedure" type="RestingProcedureEnum" optional="true" min="0x00" max="0x02"/>
       <arg id="1" name="TriggerCondition" type="TriggerConditionEnum" optional="true" min="0x00" max="0x02"/>
-      <arg id="2" name="TriggerPosition" type="TriggerPositionEnum" optional="true"/>
+      <arg id="2" name="TriggerPosition" type="TriggerPositionEnum" optional="true" min="0x00" max="0x04"/>
       <arg id="3" name="WaitingDelay" type="elapsed_s" optional="true" max="86400"/>
       <mandatoryConform>
         <feature name="FB"/>

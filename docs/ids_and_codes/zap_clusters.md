@@ -89,6 +89,7 @@ Generally regenerate using one of:
 |        159 |       0x9F | DeviceEnergyManagementMode                              |
 |        257 |      0x101 | DoorLock                                                |
 |        258 |      0x102 | WindowCovering                                          |
+|        260 |      0x104 | ClosureControl                                          |
 |        336 |      0x150 | ServiceArea                                             |
 |        512 |      0x200 | PumpConfigurationAndControl                             |
 |        513 |      0x201 | Thermostat                                              |
