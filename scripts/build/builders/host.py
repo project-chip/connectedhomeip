@@ -656,7 +656,7 @@ class HostBuilder(GnBuilder):
                 + ' --ignore-filename-regex "/third_party/"'
                 + ' --ignore-filename-regex "/zzz_generated/"'      # about 75K lines with almost 0% coverage ...
                 + ' --ignore-filename-regex "/out/.*/Linux/dbus/"'  # generated interface files. about 8K lines with little coverage
-                + ' --ignore-filename-regex "/out/clang_static_coverage_config/"'  # 100% coverage for 1K lines, but not relevant (test code)
+                + ' --ignore-filename-regex "/out/.*/clang_static_coverage_config/"'  # 100% coverage for 1K lines, but not relevant (test code)
                 + ' --ignore-filename-regex "/tests/"'
                 + ' --ignore-filename-regex "/usr/include/"'
                 + ' --ignore-filename-regex "/usr/lib/"'
