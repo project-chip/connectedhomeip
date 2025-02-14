@@ -654,6 +654,7 @@ class HostBuilder(GnBuilder):
                 + f' | xargs -I @ echo -object {shlex.quote(os.path.join(self.output_dir, "tests", "@"))}'
                 + f' | xargs -n 10240 llvm-cov export -format=lcov --instr-profile {_indexed_instrumentation} '
                 + ' --ignore-filename-regex "/third_party/"'
+                    + ' --ignore-filename-regex "/zzz_generated/"'  # NOTE: about 75K lines with almost 0% coverage ...
                 + ' --ignore-filename-regex "/tests/"'
                 + ' --ignore-filename-regex "/usr/include/"'
                 + ' --ignore-filename-regex "/usr/lib/"'
