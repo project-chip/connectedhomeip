@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-# pylint: disable=C,R,F,I,W,E
-
 #
 # Copyright (c) 2023-2024 Project CHIP Authors
 #
@@ -100,19 +98,10 @@ def parse_vid_pid_from_distinguished_name(distinguished_name):
 
 
 def get_akid(cert: x509.Certificate) -> str:
-    try:
-        return cert.extensions.get_extension_for_oid(x509.OID_AUTHORITY_KEY_IDENTIFIER).value.key_identifier.hex().upper()
-    except Exception:
-        logging.warning("AKID not found in certificate")
-        return None
-
+    return cert.extensions.get_extension_for_oid(x509.OID_AUTHORITY_KEY_IDENTIFIER).value.key_identifier.hex().upper()
 
 def get_skid(cert: x509.Certificate) -> str:
-    try:
-        return cert.extensions.get_extension_for_oid(x509.OID_SUBJECT_KEY_IDENTIFIER).value.key_identifier.hex().upper()
-    except Exception:
-        logging.warning("SKID not found in certificate")
-        return None
+    return cert.extensions.get_extension_for_oid(x509.OID_SUBJECT_KEY_IDENTIFIER).value.key_identifier.hex().upper()
 
 def verify_cert(cert: x509.Certificate, root: x509.Certificate) -> bool:
     '''
@@ -416,7 +405,6 @@ class NodeDCLDClient(DCLDClientInterface):
     '''
     A client for interacting with DCLD using command line interface (CLI).
     '''
-    # DO NOT SUBMIT: VERIFY this class is working as expected. 
     def __init__(self, dcld_exe: str, production: bool):
         '''
         Initialize the client
@@ -771,8 +759,16 @@ def from_dcl(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: 
 
         # 7. Perform CRL File Validation
         # a.
-        crl_signer_skid = get_skid(crl_signer_certificate)
-        crl_akid = get_akid(crl_file)
+        try:
+            crl_signer_skid = get_skid(crl_signer_certificate)
+        except ExtensionNotFound:
+            logging.warning("CRL Signer SKID not found, continue...")
+            continue
+        try:
+            crl_akid = get_akid(crl_file)
+        except ExtensionNotFound:
+            logging.warning("CRL AKID is not found, continue...")
+            continue
         if crl_akid != crl_signer_skid:
             logging.warning("CRL AKID is not CRL Signer SKID, continue...")
             continue
