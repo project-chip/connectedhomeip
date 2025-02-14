@@ -170,6 +170,9 @@ SECTIONS
     _bt_l2cap_fixed_chan_list_start = .;
     KEEP(*(SORT_BY_NAME("._bt_l2cap_fixed_chan.static.*")))
     _bt_l2cap_fixed_chan_list_end = .;
+
+    . = ALIGN(8);
+    KEEP(*libCHIP.a:*(.bss.*PlatformManagerImp*))
   } >tcm_ocram AT >flash
 
   .boot2 (NOLOAD) :

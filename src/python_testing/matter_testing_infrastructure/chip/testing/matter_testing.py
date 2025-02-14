@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2022 Project CHIP Authors
+#    Copyright (c) 2022-2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +32,7 @@ import threading
 import time
 import typing
 import uuid
-from binascii import hexlify, unhexlify
+from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
@@ -41,7 +41,10 @@ from functools import partial
 from itertools import chain
 from typing import Any, Iterable, List, Optional, Tuple
 
-from chip.tlv import float32, uint
+import chip.testing.conversions as conversions
+import chip.testing.matchers as matchers
+import chip.testing.timeoperations as timeoperations
+from chip.tlv import uint
 
 # isort: off
 
@@ -149,76 +152,98 @@ def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
         return pathlib.Path.cwd()
 
 
-def type_matches(received_value, desired_type):
-    """ Checks if the value received matches the expected type.
+@dataclass
+class SetupPayloadInfo:
+    filter_type: discovery.FilterType = discovery.FilterType.LONG_DISCRIMINATOR
+    filter_value: int = 0
+    passcode: int = 0
 
-        Handles unpacking Nullable and Optional types and
-        compares list value types for non-empty lists.
-    """
-    if typing.get_origin(desired_type) == typing.Union:
-        return any(type_matches(received_value, t) for t in typing.get_args(desired_type))
-    elif typing.get_origin(desired_type) == list:
-        if isinstance(received_value, list):
-            # Assume an empty list is of the correct type
-            return True if received_value == [] else any(type_matches(received_value[0], t) for t in typing.get_args(desired_type))
-        else:
+
+@dataclass
+class CommissioningInfo:
+    commissionee_ip_address_just_for_testing: Optional[str] = None
+    commissioning_method: Optional[str] = None
+    thread_operational_dataset: Optional[str] = None
+    wifi_passphrase: Optional[str] = None
+    wifi_ssid: Optional[str] = None
+    # Accepted Terms and Conditions if used
+    tc_version_to_simulate: int = None
+    tc_user_response_to_simulate: int = None
+
+
+async def commission_device(
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, info: SetupPayloadInfo, commissioning_info: CommissioningInfo
+) -> bool:
+    if commissioning_info.tc_version_to_simulate is not None and commissioning_info.tc_user_response_to_simulate is not None:
+        logging.debug(
+            f"Setting TC Acknowledgements to version {commissioning_info.tc_version_to_simulate} with user response {commissioning_info.tc_user_response_to_simulate}."
+        )
+        dev_ctrl.SetTCAcknowledgements(commissioning_info.tc_version_to_simulate, commissioning_info.tc_user_response_to_simulate)
+
+    if commissioning_info.commissioning_method == "on-network":
+        try:
+            await dev_ctrl.CommissionOnNetwork(
+                nodeId=node_id, setupPinCode=info.passcode, filterType=info.filter_type, filter=info.filter_value
+            )
+            return True
+        except ChipStackError as e:
+            logging.error("Commissioning failed: %s" % e)
             return False
-    elif desired_type == uint:
-        return isinstance(received_value, int) and received_value >= 0
-    elif desired_type == float32:
-        return isinstance(received_value, float)
+    elif commissioning_info.commissioning_method == "ble-wifi":
+        try:
+            await dev_ctrl.CommissionWiFi(
+                info.filter_value,
+                info.passcode,
+                node_id,
+                commissioning_info.wifi_ssid,
+                commissioning_info.wifi_passphrase,
+                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
+            )
+            return True
+        except ChipStackError as e:
+            logging.error("Commissioning failed: %s" % e)
+            return False
+    elif commissioning_info.commissioning_method == "ble-thread":
+        try:
+            await dev_ctrl.CommissionThread(
+                info.filter_value,
+                info.passcode,
+                node_id,
+                commissioning_info.thread_operational_dataset,
+                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
+            )
+            return True
+        except ChipStackError as e:
+            logging.error("Commissioning failed: %s" % e)
+            return False
+    elif commissioning_info.commissioning_method == "on-network-ip":
+        try:
+            logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
+            await dev_ctrl.CommissionIP(
+                ipaddr=commissioning_info.commissionee_ip_address_just_for_testing,
+                setupPinCode=info.passcode,
+                nodeid=node_id,
+            )
+            return True
+        except ChipStackError as e:
+            logging.error("Commissioning failed: %s" % e)
+            return False
     else:
-        return isinstance(received_value, desired_type)
-
-# TODO(#31177): Need to add unit tests for all time conversion methods.
+        raise ValueError("Invalid commissioning method %s!" % commissioning_info.commissioning_method)
 
 
-def utc_time_in_matter_epoch(desired_datetime: Optional[datetime] = None):
-    """ Returns the time in matter epoch in us.
+async def commission_devices(
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+    dut_node_ids: List[int],
+    setup_payloads: List[SetupPayloadInfo],
+    commissioning_info: CommissioningInfo,
+) -> bool:
+    commissioned = []
+    for node_id, setup_payload in zip(dut_node_ids, setup_payloads):
+        logging.info(f"Commissioning method: {commissioning_info.commissioning_method}")
+        commissioned.append(await commission_device(dev_ctrl, node_id, setup_payload, commissioning_info))
 
-        If desired_datetime is None, it will return the current time.
-    """
-    if desired_datetime is None:
-        utc_native = datetime.now(tz=timezone.utc)
-    else:
-        utc_native = desired_datetime
-    # Matter epoch is 0 hours, 0 minutes, 0 seconds on Jan 1, 2000 UTC
-    utc_th_delta = utc_native - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)
-    utc_th_us = int(utc_th_delta.total_seconds() * 1000000)
-    return utc_th_us
-
-
-matter_epoch_us_from_utc_datetime = utc_time_in_matter_epoch
-
-
-def utc_datetime_from_matter_epoch_us(matter_epoch_us: int) -> datetime:
-    """Returns the given Matter epoch time as a usable Python datetime in UTC."""
-    delta_from_epoch = timedelta(microseconds=matter_epoch_us)
-    matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)
-
-    return matter_epoch + delta_from_epoch
-
-
-def utc_datetime_from_posix_time_ms(posix_time_ms: int) -> datetime:
-    millis = posix_time_ms % 1000
-    seconds = posix_time_ms // 1000
-    return datetime.fromtimestamp(seconds, timezone.utc) + timedelta(milliseconds=millis)
-
-
-def compare_time(received: int, offset: timedelta = timedelta(), utc: Optional[int] = None, tolerance: timedelta = timedelta(seconds=5)) -> None:
-    if utc is None:
-        utc = utc_time_in_matter_epoch()
-
-    # total seconds includes fractional for microseconds
-    expected = utc + offset.total_seconds() * 1000000
-    delta_us = abs(expected - received)
-    delta = timedelta(microseconds=delta_us)
-    asserts.assert_less_equal(delta, tolerance, "Received time is out of tolerance")
-
-
-def get_wait_seconds_from_set_time(set_time_matter_us: int, wait_seconds: int):
-    seconds_passed = (utc_time_in_matter_epoch() - set_time_matter_us) // 1000000
-    return wait_seconds - seconds_passed
+    return all(commissioned)
 
 
 class SimpleEventCallback:
@@ -710,21 +735,6 @@ class ClusterMapper:
                 return f"Attribute {attribute_name} ({attribute_id}, 0x{attribute_id:04X})"
 
 
-def id_str(id):
-    return f'{id} (0x{id:02x})'
-
-
-def cluster_id_str(id):
-    if id in Clusters.ClusterObjects.ALL_CLUSTERS.keys():
-        s = Clusters.ClusterObjects.ALL_CLUSTERS[id].__name__
-    else:
-        s = "Unknown cluster"
-    try:
-        return f'{id_str(id)} {s}'
-    except TypeError:
-        return 'HERE IS THE PROBLEM'
-
-
 @dataclass
 class CustomCommissioningParameters:
     commissioningParameters: CommissioningParameters
@@ -803,7 +813,12 @@ class DeviceTypePathLocation:
         return msg
 
 
-ProblemLocation = typing.Union[ClusterPathLocation, DeviceTypePathLocation]
+class UnknownProblemLocation:
+    def __str__(self):
+        return '\n      Unknown Locations - see message for more details'
+
+
+ProblemLocation = typing.Union[ClusterPathLocation, DeviceTypePathLocation, UnknownProblemLocation]
 
 # ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
 # appeared in 3.11. To make it JSON serializable easily, multiple inheritance
@@ -851,13 +866,6 @@ class SetupParameters:
     def manual_code(self):
         return SetupPayload().GenerateManualPairingCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
                                                         self.custom_flow, self.capabilities, self.version)
-
-
-@dataclass
-class SetupPayloadInfo:
-    filter_type: discovery.FilterType = discovery.FilterType.LONG_DISCRIMINATOR
-    filter_value: int = 0
-    passcode: int = 0
 
 
 class MatterStackState:
@@ -930,19 +938,6 @@ class MatterStackState:
     @property
     def stack(self) -> ChipStack:
         return builtins.chipStack
-
-
-def bytes_from_hex(hex: str) -> bytes:
-    """Converts any `hex` string representation including `01:ab:cd` to bytes
-
-    Handles any whitespace including newlines, which are all stripped.
-    """
-    return unhexlify("".join(hex.replace(":", "").replace(" ", "").split()))
-
-
-def hex_from_bytes(b: bytes) -> str:
-    """Converts a bytes object `b` into a hex string (reverse of bytes_from_hex)"""
-    return hexlify(b).decode("utf-8")
 
 
 @dataclass
@@ -1074,6 +1069,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         dut_ip = os.getenv('LINUX_DUT_IP')
 
         if dut_ip is None:
+            if not os.path.exists(app_pipe_name):
+                # Named pipes are unique, so we MUST have consistent PID/paths
+                # set up for them to work.
+                logging.error("Named pipe %r does NOT exist" % app_pipe_name)
+                raise FileNotFoundError("CANNOT FIND %r" % app_pipe_name)
             with open(app_pipe_name, "w") as app_pipe:
                 app_pipe.write(command + "\n")
             # TODO(#31239): remove the need for sleep
@@ -1174,6 +1174,22 @@ class MatterBaseTest(base_test.BaseTestClass):
     @property
     def is_pics_sdk_ci_only(self) -> bool:
         return self.check_pics('PICS_SDK_CI_ONLY')
+
+    async def commission_devices(self) -> bool:
+        dev_ctrl: ChipDeviceCtrl.ChipDeviceController = self.default_controller
+        dut_node_ids: List[int] = self.matter_test_config.dut_node_ids
+        setup_payloads: List[SetupPayloadInfo] = self.get_setup_payload_info()
+        commissioning_info: CommissioningInfo = CommissioningInfo(
+            commissionee_ip_address_just_for_testing=self.matter_test_config.commissionee_ip_address_just_for_testing,
+            commissioning_method=self.matter_test_config.commissioning_method,
+            thread_operational_dataset=self.matter_test_config.thread_operational_dataset,
+            wifi_passphrase=self.matter_test_config.wifi_passphrase,
+            wifi_ssid=self.matter_test_config.wifi_ssid,
+            tc_version_to_simulate=self.matter_test_config.tc_version_to_simulate,
+            tc_user_response_to_simulate=self.matter_test_config.tc_user_response_to_simulate,
+        )
+
+        return await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
 
     async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, timeout: int = 900) -> CustomCommissioningParameters:
         rnd_discriminator = random.randint(0, 4095)
@@ -2359,82 +2375,6 @@ class CommissionDeviceTest(MatterBaseTest):
         if not self.event_loop.run_until_complete(self.commission_devices()):
             raise signals.TestAbortAll("Failed to commission node(s)")
 
-    async def commission_devices(self) -> bool:
-        conf = self.matter_test_config
-
-        commissioned = []
-        setup_payloads = self.get_setup_payload_info()
-        for node_id, setup_payload in zip(conf.dut_node_ids, setup_payloads):
-            logging.info(f"Starting commissioning for root index {conf.root_of_trust_index}, "
-                         f"fabric ID 0x{conf.fabric_id:016X}, node ID 0x{node_id:016X}")
-            logging.info(f"Commissioning method: {conf.commissioning_method}")
-            commissioned.append(await self.commission_device(node_id, setup_payload))
-
-        return all(commissioned)
-
-    async def commission_device(self, node_id: int, info: SetupPayloadInfo) -> bool:
-        dev_ctrl = self.default_controller
-        conf = self.matter_test_config
-
-        if conf.tc_version_to_simulate is not None and conf.tc_user_response_to_simulate is not None:
-            logging.debug(
-                f"Setting TC Acknowledgements to version {conf.tc_version_to_simulate} with user response {conf.tc_user_response_to_simulate}.")
-            dev_ctrl.SetTCAcknowledgements(conf.tc_version_to_simulate, conf.tc_user_response_to_simulate)
-
-        if conf.commissioning_method == "on-network":
-            try:
-                await dev_ctrl.CommissionOnNetwork(
-                    nodeId=node_id,
-                    setupPinCode=info.passcode,
-                    filterType=info.filter_type,
-                    filter=info.filter_value
-                )
-                return True
-            except ChipStackError as e:
-                logging.error("Commissioning failed: %s" % e)
-                return False
-        elif conf.commissioning_method == "ble-wifi":
-            try:
-                await dev_ctrl.CommissionWiFi(
-                    info.filter_value,
-                    info.passcode,
-                    node_id,
-                    conf.wifi_ssid,
-                    conf.wifi_passphrase,
-                    isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
-                )
-                return True
-            except ChipStackError as e:
-                logging.error("Commissioning failed: %s" % e)
-                return False
-        elif conf.commissioning_method == "ble-thread":
-            try:
-                await dev_ctrl.CommissionThread(
-                    info.filter_value,
-                    info.passcode,
-                    node_id,
-                    conf.thread_operational_dataset,
-                    isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
-                )
-                return True
-            except ChipStackError as e:
-                logging.error("Commissioning failed: %s" % e)
-                return False
-        elif conf.commissioning_method == "on-network-ip":
-            try:
-                logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
-                await dev_ctrl.CommissionIP(
-                    ipaddr=conf.commissionee_ip_address_just_for_testing,
-                    setupPinCode=info.passcode,
-                    nodeid=node_id,
-                )
-                return True
-            except ChipStackError as e:
-                logging.error("Commissioning failed: %s" % e)
-                return False
-        else:
-            raise ValueError("Invalid commissioning method %s!" % conf.commissioning_method)
-
 
 def default_matter_test_main():
     """Execute the test class in a test module.
@@ -2584,3 +2524,16 @@ def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig,
         if not run_tests_no_exit(test_class, matter_test_config, runner.get_loop(),
                                  hooks, default_controller, external_stack):
             sys.exit(1)
+
+
+# TODO(#37537): Remove these temporary aliases after transition period
+type_matches = matchers.is_type
+utc_time_in_matter_epoch = timeoperations.utc_time_in_matter_epoch
+utc_datetime_from_matter_epoch_us = timeoperations.utc_datetime_from_matter_epoch_us
+utc_datetime_from_posix_time_ms = timeoperations.utc_datetime_from_posix_time_ms
+compare_time = timeoperations.compare_time
+get_wait_seconds_from_set_time = timeoperations.get_wait_seconds_from_set_time
+bytes_from_hex = conversions.bytes_from_hex
+hex_from_bytes = conversions.hex_from_bytes
+id_str = conversions.format_decimal_and_hex
+cluster_id_str = conversions.cluster_id_with_name

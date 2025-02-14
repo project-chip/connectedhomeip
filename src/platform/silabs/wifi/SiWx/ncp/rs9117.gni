@@ -43,7 +43,7 @@ rs9117_src_sapi = [
   "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ncp_interface/sl_si91x_ncp_driver.c",
 
   # Wi-Fi Config - Using the file sdk support until the wiseconnect file is fixed
-  "${sdk_support_root}/components/service/network_manager/src/sl_net_for_lwip.c",
+  "${matter_support_root}/sdk-copies/components/service/network_manager/src/sl_net_for_lwip.c",
 
   # wifi component
   "${wifi_sdk_root}/components/protocol/wifi/src/sl_wifi_basic_credentials.c",

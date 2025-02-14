@@ -75,6 +75,7 @@ class MockTestRunner():
         self.default_controller.Read = AsyncMock(return_value=read_cache)
         # This doesn't need to do anything since we are overriding the read anyway
         self.default_controller.FindOrEstablishPASESession = AsyncMock(return_value=None)
+        self.default_controller.GetConnectedDevice = AsyncMock(return_value=None)
         with asyncio.Runner() as runner:
             return run_tests_no_exit(self.test_class, self.config, runner.get_loop(),
                                      hooks, self.default_controller, self.stack)
