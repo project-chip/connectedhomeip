@@ -2814,15 +2814,8 @@ limitations under the License.
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
-            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
-                <requireAttribute>SERVER_LIST</requireAttribute>
-                <requireAttribute>CLIENT_LIST</requireAttribute>
-                <requireAttribute>PARTS_LIST</requireAttribute>
-            </include>
-            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>BINDING</requireAttribute>
-            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Thermostat" client="true" server="false" clientLocked="true" serverLocked="true"></include>
             <include cluster="Identify" client="true" server="false" clientLocked="false" serverLocked="true"></include>
             <include cluster="Groups" client="true" server="false" clientLocked="false" serverLocked="true"></include>
