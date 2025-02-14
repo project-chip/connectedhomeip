@@ -33,7 +33,7 @@ using namespace chip::app::Clusters;
 void notifyIcdActive(System::Layer * layer, void *)
 {
     ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
-    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(10000), notifyIcdActive, nullptr);
+    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC*1000), notifyIcdActive, nullptr);
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
@@ -58,7 +58,7 @@ int main(int argc, char * argv[])
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(10000), notifyIcdActive, nullptr);
+    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC*1000), notifyIcdActive, nullptr);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     ChipLinuxAppMainLoop();

@@ -326,6 +326,12 @@ def main() -> int:
                       action="store_true", dest="do_interact")
     parser.add_option("-I", "--enable_icd", help="enable ICD (Intermittently Connected Device)",
                       action="store_true", default=False)
+    parser.add_option("", "--icd_idle_duration_sec", type=int,
+                      help="ICD idle mode duration (seconds). Default is 60", metavar="ICD_IDLE_SEC", default=60)
+    parser.add_option("", "--icd_active_duration_ms", type=int,
+                      help="ICD active mode duration (milliseconds). Default is 10000", metavar="ICD_ACTIVE_DURATION_MS", default=10000)
+    parser.add_option("", "--icd_active_threshold_ms", type=int,
+                      help="ICD idle mode threshold (milliseconds). Default is 5000", metavar="ICD_ACTIVE_THRESHOLD_MS", default=5000)
     parser.add_option("-m", "--menuconfig", help="runs menuconfig on platforms that support it",
                       action="store_true", dest="do_menuconfig")
     parser.add_option("-z", "--zap", help="runs zap to generate data model & interaction model artifacts",
@@ -872,6 +878,8 @@ def main() -> int:
                 linux_args.append("chip_inet_config_enable_ipv4=true")
             else:
                 linux_args.append("chip_inet_config_enable_ipv4=false")
+            
+            flush_print("{options.icd_idle_duration_sec}")
 
             if options.enable_icd:
                 linux_args.append("chip_enable_icd_server = true")
@@ -879,6 +887,9 @@ def main() -> int:
                 linux_args.append("chip_icd_report_on_active_mode = true")
                 linux_args.append("chip_enable_icd_lit = true")
                 linux_args.append("chip_enable_icd_dsls = true")
+                linux_args.append(f'chip_config_icd_idle_mode_duration_sec = {options.icd_idle_duration_sec}')
+                linux_args.append(f'chip_config_icd_active_mode_duration_ms = {options.icd_active_duration_ms}')
+                linux_args.append(f'chip_config_icd_active_mode_threshold_ms = {options.icd_active_threshold_ms}')
 
             if sw_ver_string:
                 linux_args.append(
