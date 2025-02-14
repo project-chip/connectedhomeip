@@ -118,10 +118,18 @@ def verify_cert(cert: x509.Certificate, root: x509.Certificate) -> bool:
     '''
     Verifies if the cert is signed by root.
     '''
-# /////Come back to get_akid and get_skid
-    cert_akid = get_akid(cert)
-    root_skid = get_skid(root)
-    if cert_akid is None or root_skid is None or cert_akid != root_skid:
+    try:
+        cert_akid = get_akid(cert)
+    except ExtensionNotFound:
+        logging.warning("Certificate AKID not found, continue...")
+        return False
+    try:
+        root_skid = get_skid(root)
+    except ExtensionNotFound:
+        logging.warning("Root SKID not found, continue...")
+        return False
+
+    if cert_akid != root_skid:
         return False
 
     if cert.issuer != root.subject:
