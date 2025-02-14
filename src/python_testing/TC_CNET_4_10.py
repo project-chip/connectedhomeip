@@ -179,8 +179,8 @@ class TC_CNET_4_10(MatterBaseTest):
                              "Network count not restored")
         found = False
         for network in networks:
-            if (network.networkID == thread_network_id and
-                    network.connected):
+            if (network.NetworkID == thread_network_id and
+                    network.Connected):
                 found = True
                 break
         asserts.assert_true(found, "Thread network not restored")
