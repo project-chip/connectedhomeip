@@ -20,16 +20,16 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional
 
+import chip.logging
+import chip.native
 from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
+from chip import discovery
 from chip.ChipDeviceCtrl import CommissioningParameters
+from chip.clusters import ClusterObjects as ClusterObjects
+from chip.exceptions import ChipStackError
 
 # isort: on
 
-import chip.logging
-import chip.native
-from chip import discovery
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.exceptions import ChipStackError
 
 
 @dataclass
