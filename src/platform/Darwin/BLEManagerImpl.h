@@ -26,6 +26,9 @@
 #include <ble/Ble.h>
 #include <lib/core/Global.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/Darwin/BleApplicationDelegateImpl.h>
+#include <platform/Darwin/BleConnectionDelegateImpl.h>
+#include <platform/Darwin/BlePlatformDelegateImpl.h>
 #include <platform/Darwin/BleScannerDelegate.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -39,7 +42,11 @@ using namespace chip::Ble;
 /**
  * Concrete implementation of the BLEManagerImpl singleton object for the Darwin platforms.
  */
-class BLEManagerImpl final : public BLEManager, private BleLayer
+class BLEManagerImpl final : public BLEManager,
+                             private BleLayer,
+                             private BleApplicationDelegateImpl,
+                             private BleConnectionDelegateImpl,
+                             private BlePlatformDelegateImpl
 {
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -71,10 +78,6 @@ private:
     friend BLEManagerImpl & BLEMgrImpl(void);
 
     static Global<BLEManagerImpl> sInstance;
-
-    BleConnectionDelegate * mConnectionDelegate   = nullptr;
-    BlePlatformDelegate * mPlatformDelegate       = nullptr;
-    BleApplicationDelegate * mApplicationDelegate = nullptr;
 };
 
 /**
