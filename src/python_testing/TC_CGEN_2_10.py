@@ -52,8 +52,7 @@ class TC_CGEN_2_10(MatterBaseTest):
 
     def steps_TC_CGEN_2_10(self) -> list[TestStep]:
         return [
-            TestStep(0, description="", expectation="", is_commissioning=False),
-            TestStep(1, "TH reads from the DUT the attribute TCAcceptedVersion. Store the value as acceptedVersion."),
+            TestStep(1, "TH reads from the DUT the attribute TCAcceptedVersion. Store the value as acceptedVersion.", is_commissioning=False),
             TestStep(2, "TH reads from the DUT the attribute TCAcknowledgements. Store the value as userAcknowledgements."),
             TestStep(3, "TH Sends the SetTCAcknowledgements command to the DUT with the fields set as follows:\n* TCVersion: 0\n* TCUserResponse: 65535"),
             TestStep(4, "TH reads from the DUT the attribute TCAcceptedVersion."),
@@ -67,7 +66,6 @@ class TC_CGEN_2_10(MatterBaseTest):
     async def test_TC_CGEN_2_10(self):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
 
-        self.step(0)
         if not self.check_pics("CGEN.S.F00"):
             asserts.skip('Root endpoint does not support the [commissioning] feature under test')
             return

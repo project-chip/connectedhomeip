@@ -738,9 +738,6 @@ CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 }
 
 } // namespace Provision
-
-void MigrateDacProvider(void) {}
-
 } // namespace Silabs
 } // namespace DeviceLayer
 } // namespace chip
