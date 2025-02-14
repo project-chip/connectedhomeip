@@ -190,6 +190,20 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     });
 }
 
+- (bool)isPendingPasscodeFromUser
+{
+    ChipLogProgress(AppServer, "MCCastingPlayer.isPendingPasscodeFromUser() called");
+    VerifyOrReturnValue([[MCCastingApp getSharedInstance] isRunning], false, ChipLogError(AppServer, "MCCastingPlayer.isPendingPasscodeFromUser() MCCastingApp NOT running"));
+
+    dispatch_queue_t workQueue = [[MCCastingApp getSharedInstance] getWorkQueue];
+    
+    __block bool isPending = false;
+    dispatch_sync(workQueue, ^{
+        isPending = _cppCastingPlayer->IsPendingPasscodeFromUser();
+    });
+    return isPending;
+}
+
 - (instancetype _Nonnull)initWithCppCastingPlayer:(matter::casting::memory::Strong<matter::casting::core::CastingPlayer>)cppCastingPlayer
 {
     if (self = [super init]) {
