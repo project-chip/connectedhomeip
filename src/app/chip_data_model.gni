@@ -451,6 +451,11 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/ArlEncoder.cpp",
           "${_app_root}/clusters/${cluster}/ArlEncoder.h",
         ]
+      } else if (cluster == "closure-control-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+        ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }
