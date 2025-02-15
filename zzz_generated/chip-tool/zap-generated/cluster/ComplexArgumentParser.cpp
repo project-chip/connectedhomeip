@@ -4196,6 +4196,96 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::DoorLock::Structs::Cre
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::ClosureControl::Structs::OverallStateStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    char labelWithMember[kMaxLabelLength];
+    if (value.isMember("positioning"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "positioning");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.positioning, value["positioning"]));
+    }
+    valueCopy.removeMember("positioning");
+
+    if (value.isMember("latching"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "latching");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.latching, value["latching"]));
+    }
+    valueCopy.removeMember("latching");
+
+    if (value.isMember("speed"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "speed");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.speed, value["speed"]));
+    }
+    valueCopy.removeMember("speed");
+
+    if (value.isMember("extraInfo"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "extraInfo");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.extraInfo, value["extraInfo"]));
+    }
+    valueCopy.removeMember("extraInfo");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ClosureControl::Structs::OverallStateStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.positioning);
+    ComplexArgumentParser::Finalize(request.latching);
+    ComplexArgumentParser::Finalize(request.speed);
+    ComplexArgumentParser::Finalize(request.extraInfo);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    char labelWithMember[kMaxLabelLength];
+    if (value.isMember("tagPosition"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "tagPosition");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.tagPosition, value["tagPosition"]));
+    }
+    valueCopy.removeMember("tagPosition");
+
+    if (value.isMember("tagLatch"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "tagLatch");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.tagLatch, value["tagLatch"]));
+    }
+    valueCopy.removeMember("tagLatch");
+
+    if (value.isMember("speed"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "speed");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.speed, value["speed"]));
+    }
+    valueCopy.removeMember("speed");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.tagPosition);
+    ComplexArgumentParser::Finalize(request.tagLatch);
+    ComplexArgumentParser::Finalize(request.speed);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::ServiceArea::Structs::LandmarkInfoStruct::Type & request,
                                         Json::Value & value)
 {

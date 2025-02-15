@@ -179,6 +179,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "DoorLock";
     case chip::app::Clusters::WindowCovering::Id:
         return "WindowCovering";
+    case chip::app::Clusters::ClosureControl::Id:
+        return "ClosureControl";
     case chip::app::Clusters::ServiceArea::Id:
         return "ServiceArea";
     case chip::app::Clusters::PumpConfigurationAndControl::Id:
@@ -2716,6 +2718,43 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::WindowCovering::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::WindowCovering::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ClosureControl::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ClosureControl::Attributes::CountdownTime::Id:
+            return "CountdownTime";
+        case chip::app::Clusters::ClosureControl::Attributes::MainState::Id:
+            return "MainState";
+        case chip::app::Clusters::ClosureControl::Attributes::CurrentErrorList::Id:
+            return "CurrentErrorList";
+        case chip::app::Clusters::ClosureControl::Attributes::OverallState::Id:
+            return "OverallState";
+        case chip::app::Clusters::ClosureControl::Attributes::OverallTarget::Id:
+            return "OverallTarget";
+        case chip::app::Clusters::ClosureControl::Attributes::RestingProcedure::Id:
+            return "RestingProcedure";
+        case chip::app::Clusters::ClosureControl::Attributes::TriggerCondition::Id:
+            return "TriggerCondition";
+        case chip::app::Clusters::ClosureControl::Attributes::TriggerPosition::Id:
+            return "TriggerPosition";
+        case chip::app::Clusters::ClosureControl::Attributes::WaitingDelay::Id:
+            return "WaitingDelay";
+        case chip::app::Clusters::ClosureControl::Attributes::KickoffTimer::Id:
+            return "KickoffTimer";
+        case chip::app::Clusters::ClosureControl::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ClosureControl::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ClosureControl::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ClosureControl::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ClosureControl::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -5424,6 +5463,23 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "GoToTiltValue";
         case chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Id:
             return "GoToTiltPercentage";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ClosureControl::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ClosureControl::Commands::Stop::Id:
+            return "Stop";
+        case chip::app::Clusters::ClosureControl::Commands::MoveTo::Id:
+            return "MoveTo";
+        case chip::app::Clusters::ClosureControl::Commands::Calibrate::Id:
+            return "Calibrate";
+        case chip::app::Clusters::ClosureControl::Commands::ConfigureFallback::Id:
+            return "ConfigureFallback";
+        case chip::app::Clusters::ClosureControl::Commands::CancelFallback::Id:
+            return "CancelFallback";
         default:
             return "Unknown";
         }

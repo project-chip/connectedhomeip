@@ -3452,6 +3452,60 @@ static BOOL AttributeIsSpecifiedInWindowCoveringCluster(AttributeId aAttributeId
     }
     }
 }
+static BOOL AttributeIsSpecifiedInClosureControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ClosureControl;
+    switch (aAttributeId) {
+    case Attributes::CountdownTime::Id: {
+        return YES;
+    }
+    case Attributes::MainState::Id: {
+        return YES;
+    }
+    case Attributes::CurrentErrorList::Id: {
+        return YES;
+    }
+    case Attributes::OverallState::Id: {
+        return YES;
+    }
+    case Attributes::OverallTarget::Id: {
+        return YES;
+    }
+    case Attributes::RestingProcedure::Id: {
+        return YES;
+    }
+    case Attributes::TriggerCondition::Id: {
+        return YES;
+    }
+    case Attributes::TriggerPosition::Id: {
+        return YES;
+    }
+    case Attributes::WaitingDelay::Id: {
+        return YES;
+    }
+    case Attributes::KickoffTimer::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInServiceAreaCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ServiceArea;
@@ -6521,6 +6575,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::WindowCovering::Id: {
         return AttributeIsSpecifiedInWindowCoveringCluster(aAttributeId);
+    }
+    case Clusters::ClosureControl::Id: {
+        return AttributeIsSpecifiedInClosureControlCluster(aAttributeId);
     }
     case Clusters::ServiceArea::Id: {
         return AttributeIsSpecifiedInServiceAreaCluster(aAttributeId);

@@ -10669,6 +10669,190 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ClosureControl;
+    switch (aAttributeId) {
+    case Attributes::CountdownTime::Id: {
+        using TypeInfo = Attributes::CountdownTime::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::MainState::Id: {
+        using TypeInfo = Attributes::MainState::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
+    case Attributes::CurrentErrorList::Id: {
+        using TypeInfo = Attributes::CurrentErrorList::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::OverallState::Id: {
+        using TypeInfo = Attributes::OverallState::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRClosureControlClusterOverallStateStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTRClosureControlClusterOverallStateStruct new];
+            if (cppValue.Value().positioning.HasValue()) {
+                value.positioning = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().positioning.Value())];
+            } else {
+                value.positioning = nil;
+            }
+            if (cppValue.Value().latching.HasValue()) {
+                value.latching = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().latching.Value())];
+            } else {
+                value.latching = nil;
+            }
+            if (cppValue.Value().speed.HasValue()) {
+                value.speed = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().speed.Value())];
+            } else {
+                value.speed = nil;
+            }
+            if (cppValue.Value().extraInfo.HasValue()) {
+                value.extraInfo = [NSNumber numberWithUnsignedInt:cppValue.Value().extraInfo.Value()];
+            } else {
+                value.extraInfo = nil;
+            }
+        }
+        return value;
+    }
+    case Attributes::OverallTarget::Id: {
+        using TypeInfo = Attributes::OverallTarget::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRClosureControlClusterOverallTargetStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTRClosureControlClusterOverallTargetStruct new];
+            if (cppValue.Value().tagPosition.HasValue()) {
+                value.tagPosition = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().tagPosition.Value())];
+            } else {
+                value.tagPosition = nil;
+            }
+            if (cppValue.Value().tagLatch.HasValue()) {
+                value.tagLatch = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().tagLatch.Value())];
+            } else {
+                value.tagLatch = nil;
+            }
+            if (cppValue.Value().speed.HasValue()) {
+                value.speed = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().speed.Value())];
+            } else {
+                value.speed = nil;
+            }
+        }
+        return value;
+    }
+    case Attributes::RestingProcedure::Id: {
+        using TypeInfo = Attributes::RestingProcedure::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
+    case Attributes::TriggerCondition::Id: {
+        using TypeInfo = Attributes::TriggerCondition::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
+    case Attributes::TriggerPosition::Id: {
+        using TypeInfo = Attributes::TriggerPosition::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
+    case Attributes::WaitingDelay::Id: {
+        using TypeInfo = Attributes::WaitingDelay::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
+        return value;
+    }
+    case Attributes::KickoffTimer::Id: {
+        using TypeInfo = Attributes::KickoffTimer::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ServiceArea;
@@ -19980,6 +20164,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::WindowCovering::Id: {
         return DecodeAttributeValueForWindowCoveringCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::ClosureControl::Id: {
+        return DecodeAttributeValueForClosureControlCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::ServiceArea::Id: {
         return DecodeAttributeValueForServiceAreaCluster(aPath.mAttributeId, aReader, aError);

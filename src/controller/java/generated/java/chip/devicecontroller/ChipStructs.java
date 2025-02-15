@@ -9292,6 +9292,173 @@ public static class DoorLockClusterCredentialStruct {
     return output.toString();
   }
 }
+public static class ClosureControlClusterOverallStateStruct {
+  public Optional<Integer> positioning;
+  public Optional<Integer> latching;
+  public Optional<Integer> speed;
+  public Optional<Long> extraInfo;
+  private static final long POSITIONING_ID = 0L;
+  private static final long LATCHING_ID = 1L;
+  private static final long SPEED_ID = 2L;
+  private static final long EXTRA_INFO_ID = 3L;
+
+  public ClosureControlClusterOverallStateStruct(
+    Optional<Integer> positioning,
+    Optional<Integer> latching,
+    Optional<Integer> speed,
+    Optional<Long> extraInfo
+  ) {
+    this.positioning = positioning;
+    this.latching = latching;
+    this.speed = speed;
+    this.extraInfo = extraInfo;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(POSITIONING_ID, positioning.<BaseTLVType>map((nonOptionalpositioning) -> new UIntType(nonOptionalpositioning)).orElse(new EmptyType())));
+    values.add(new StructElement(LATCHING_ID, latching.<BaseTLVType>map((nonOptionallatching) -> new UIntType(nonOptionallatching)).orElse(new EmptyType())));
+    values.add(new StructElement(SPEED_ID, speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType())));
+    values.add(new StructElement(EXTRA_INFO_ID, extraInfo.<BaseTLVType>map((nonOptionalextraInfo) -> new UIntType(nonOptionalextraInfo)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ClosureControlClusterOverallStateStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Integer> positioning = Optional.empty();
+    Optional<Integer> latching = Optional.empty();
+    Optional<Integer> speed = Optional.empty();
+    Optional<Long> extraInfo = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == POSITIONING_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          positioning = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == LATCHING_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          latching = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == SPEED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          speed = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == EXTRA_INFO_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          extraInfo = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new ClosureControlClusterOverallStateStruct(
+      positioning,
+      latching,
+      speed,
+      extraInfo
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ClosureControlClusterOverallStateStruct {\n");
+    output.append("\tpositioning: ");
+    output.append(positioning);
+    output.append("\n");
+    output.append("\tlatching: ");
+    output.append(latching);
+    output.append("\n");
+    output.append("\tspeed: ");
+    output.append(speed);
+    output.append("\n");
+    output.append("\textraInfo: ");
+    output.append(extraInfo);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ClosureControlClusterOverallTargetStruct {
+  public Optional<Integer> tagPosition;
+  public Optional<Integer> tagLatch;
+  public Optional<Integer> speed;
+  private static final long TAG_POSITION_ID = 0L;
+  private static final long TAG_LATCH_ID = 1L;
+  private static final long SPEED_ID = 2L;
+
+  public ClosureControlClusterOverallTargetStruct(
+    Optional<Integer> tagPosition,
+    Optional<Integer> tagLatch,
+    Optional<Integer> speed
+  ) {
+    this.tagPosition = tagPosition;
+    this.tagLatch = tagLatch;
+    this.speed = speed;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(TAG_POSITION_ID, tagPosition.<BaseTLVType>map((nonOptionaltagPosition) -> new UIntType(nonOptionaltagPosition)).orElse(new EmptyType())));
+    values.add(new StructElement(TAG_LATCH_ID, tagLatch.<BaseTLVType>map((nonOptionaltagLatch) -> new UIntType(nonOptionaltagLatch)).orElse(new EmptyType())));
+    values.add(new StructElement(SPEED_ID, speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ClosureControlClusterOverallTargetStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Integer> tagPosition = Optional.empty();
+    Optional<Integer> tagLatch = Optional.empty();
+    Optional<Integer> speed = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == TAG_POSITION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          tagPosition = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == TAG_LATCH_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          tagLatch = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == SPEED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          speed = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new ClosureControlClusterOverallTargetStruct(
+      tagPosition,
+      tagLatch,
+      speed
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ClosureControlClusterOverallTargetStruct {\n");
+    output.append("\ttagPosition: ");
+    output.append(tagPosition);
+    output.append("\n");
+    output.append("\ttagLatch: ");
+    output.append(tagLatch);
+    output.append("\n");
+    output.append("\tspeed: ");
+    output.append(speed);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ServiceAreaClusterLandmarkInfoStruct {
   public Integer landmarkTag;
   public @Nullable Integer relativePositionTag;
