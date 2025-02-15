@@ -101,6 +101,29 @@ void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
 #endif
 }
 
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+void ReliableMessageMgr::NotifyMessageSendAnalytics(const RetransTableEntry & entry, const SessionHandle & sessionHandle,
+                                                    const ReliableMessageAnalyticsDelegate::EventType & eventType)
+{
+    if (!mAnalyticsDelegate)
+    {
+        return;
+    }
+    uint32_t messageCounter = entry.retainedBuf.GetMessageCounter();
+    auto fabricIndex        = sessionHandle->GetFabricIndex();
+    auto destination        = kUndefinedNodeId;
+    if (sessionHandle->IsSecureSession())
+    {
+        destination = sessionHandle->AsSecureSession()->GetPeerNodeId();
+    }
+    ReliableMessageAnalyticsDelegate::TransmitEvent event = {
+        .nodeId = destination, .fabricIndex = fabricIndex, .eventType = eventType, .messageCounter = messageCounter
+    };
+
+    mAnalyticsDelegate->OnTransmitEvent(event);
+}
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+
 void ReliableMessageMgr::ExecuteActions()
 {
     System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
@@ -154,6 +177,10 @@ void ReliableMessageMgr::ExecuteActions()
                          sendCount + 1, ChipLogValueExchange(&entry->ec.Get()), session->SessionIdForLogging(), messageCounter,
                          Transport::GetSessionTypeString(session), fabricIndex, ChipLogValueX64(destination),
                          CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
+
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+            NotifyMessageSendAnalytics(*entry, session, ReliableMessageAnalyticsDelegate::EventType::kFailed);
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
 
             // If the exchange is expecting a response, it will handle sending
             // this notification once it detects that it has not gotten a
@@ -295,6 +322,11 @@ bool ReliableMessageMgr::CheckAndRemRetransTable(ReliableMessageContext * rc, ui
     mRetransTable.ForEachActiveObject([&](auto * entry) {
         if (entry->ec->GetReliableMessageContext() == rc && entry->retainedBuf.GetMessageCounter() == ackMessageCounter)
         {
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+            auto session = entry->ec->GetSessionHandle();
+            NotifyMessageSendAnalytics(*entry, session, ReliableMessageAnalyticsDelegate::EventType::kAcknowledged);
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+
             // Clear the entry from the retransmision table.
             ClearRetransTable(*entry);
 
@@ -440,6 +472,13 @@ void ReliableMessageMgr::RegisterSessionUpdateDelegate(SessionUpdateDelegate * s
     mSessionUpdateDelegate = sessionUpdateDelegate;
 }
 
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+void ReliableMessageMgr::RegisterAnalyticsDelegate(ReliableMessageAnalyticsDelegate * analyticsDelegate)
+{
+    mAnalyticsDelegate = analyticsDelegate;
+}
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+
 CHIP_ERROR ReliableMessageMgr::MapSendError(CHIP_ERROR error, uint16_t exchangeId, bool isInitiator)
 {
     if (
@@ -520,6 +559,16 @@ void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
                     backoff.count(), peerIsActive ? "Active" : "Idle", config.mIdleRetransTimeout.count(),
                     config.mActiveRetransTimeout.count(), config.mActiveThresholdTime.count());
 #endif // CHIP_PROGRESS_LOGGING
+
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+    // For initial send the packet has already been submitted to transport layer successfully.
+    // On re-transmits we do not know if transport layer is unable to retransmit for some
+    // reason, so saying we have sent re-transmit here is a little presumptuous.
+    ReliableMessageAnalyticsDelegate::EventType eventType = entry.sendCount == 0
+        ? ReliableMessageAnalyticsDelegate::EventType::kInitialSend
+        : ReliableMessageAnalyticsDelegate::EventType::kRetransmission;
+    NotifyMessageSendAnalytics(entry, sessionHandle, eventType);
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
 }
 
 #if CHIP_CONFIG_TEST

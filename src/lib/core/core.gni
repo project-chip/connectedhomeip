@@ -126,6 +126,8 @@ declare_args() {
   chip_enable_sending_batch_commands =
       current_os == "linux" || current_os == "mac" || current_os == "ios" ||
       current_os == "android"
+
+  chip_enable_mrp_analytics = current_os == "linux" || current_os == "android"
 }
 
 if (chip_target_style == "") {
