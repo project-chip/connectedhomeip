@@ -314,7 +314,7 @@ static const auto * optionalInternalStateKeys = @{
 - (void)_updateInternalState:(NSMutableDictionary *)newState
 {
     VerifyOrReturn([self _ensureValidValuesForKeys:requiredInternalStateKeys inInternalState:newState valueRequired:YES]);
-    VerifyOrReturn([self _ensureValidValuesForKeys:requiredInternalStateKeys inInternalState:newState valueRequired:NO]);
+    VerifyOrReturn([self _ensureValidValuesForKeys:optionalInternalStateKeys inInternalState:newState valueRequired:NO]);
 
     NSNumber * oldStateNumber = MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDeviceState], NSNumber);
     NSNumber * newStateNumber = MTR_SAFE_CAST(newState[kMTRDeviceInternalPropertyDeviceState], NSNumber);
