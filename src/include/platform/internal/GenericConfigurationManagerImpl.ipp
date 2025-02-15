@@ -369,7 +369,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryWiFiMACAddres
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryMACAddress(MutableByteSpan buf)
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryMACAddress(MutableByteSpan & buf)
 {
     if (buf.size() != ConfigurationManager::kPrimaryMACAddressLength)
         return CHIP_ERROR_INVALID_ARGUMENT;
