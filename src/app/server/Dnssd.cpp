@@ -170,7 +170,7 @@ void DnssdServer::AddICDKeyToAdvertisement(AdvertisingParams & advParams)
 }
 #endif
 
-void DnssdServer::GetPrimaryOrFallbackMACAddress(chip::MutableByteSpan mac)
+void DnssdServer::GetPrimaryOrFallbackMACAddress(MutableByteSpan & mac)
 {
     if (ConfigurationMgr().GetPrimaryMACAddress(mac) != CHIP_NO_ERROR)
     {
