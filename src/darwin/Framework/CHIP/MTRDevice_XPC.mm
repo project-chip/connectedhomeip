@@ -253,15 +253,23 @@
     }];
 }
 
-static const auto * requiredInternalStateKeys = @[ kMTRDeviceInternalPropertyDeviceState, kMTRDeviceInternalPropertyLastSubscriptionAttemptWait ];
-static const auto * optionalInternalStateKeys = @[ kMTRDeviceInternalPropertyKeyVendorID, kMTRDeviceInternalPropertyKeyProductID, kMTRDeviceInternalPropertyNetworkFeatures, kMTRDeviceInternalPropertyMostRecentReportTime, kMTRDeviceInternalPropertyLastSubscriptionFailureTime ];
+static const auto * requiredInternalStateKeys = @{
+    kMTRDeviceInternalPropertyDeviceState : NSNumber.class,
+    kMTRDeviceInternalPropertyLastSubscriptionAttemptWait : NSNumber.class,
+};
 
-- (BOOL)_internalState:(NSDictionary *)dictionary hasValidValuesForKeys:(const NSArray<NSString *> *)keys valueRequired:(BOOL)required
+static const auto * optionalInternalStateKeys = @{
+    kMTRDeviceInternalPropertyKeyVendorID : NSNumber.class,
+    kMTRDeviceInternalPropertyKeyProductID : NSNumber.class,
+    kMTRDeviceInternalPropertyNetworkFeatures : NSNumber.class,
+    kMTRDeviceInternalPropertyMostRecentReportTime : NSDate.class,
+    kMTRDeviceInternalPropertyLastSubscriptionFailureTime : NSDate.class,
+};
+
+- (BOOL)_ensureValidValuesForKeys:(const NSDictionary<NSString *, Class> *)keys inInternalState:(NSMutableDictionary *)internalState valueRequired:(BOOL)required
 {
-    // At one point, all keys were NSNumber valued; now there are also NSDates.
-    // TODO:  Create a mapping between keys and their expected types and use that in the type check below.
     for (NSString * key in keys) {
-        id value = dictionary[key];
+        id value = internalState[key];
         if (!value) {
             if (required) {
                 MTR_LOG_ERROR("%@ device:internalStateUpdated: handed state with no value for \"%@\": %@", self, key, value);
@@ -270,10 +278,17 @@ static const auto * optionalInternalStateKeys = @[ kMTRDeviceInternalPropertyKey
 
             continue;
         }
-        if (!MTR_SAFE_CAST(value, NSNumber) && !MTR_SAFE_CAST(value, NSDate)) {
+        if (![value isKindOfClass:keys[key]]) {
             MTR_LOG_ERROR("%@ device:internalStateUpdated: handed state with invalid value of type %@ for \"%@\": %@", self,
                 NSStringFromClass([value class]), key, value);
-            return NO;
+            if (required) {
+                return NO;
+            }
+
+            // If an optional value is invalid, just drop it and press on with
+            // the other parts of the state, so we don't break those pieces
+            // just because something optional has gone awry.
+            [internalState removeObjectForKey:key];
         }
     }
 
@@ -293,13 +308,21 @@ static const auto * optionalInternalStateKeys = @[ kMTRDeviceInternalPropertyKey
         return;
     }
 
+    [self _updateInternalState:[dictionary mutableCopy]];
+}
+
+- (void)_updateInternalState:(NSMutableDictionary *)newState
+{
+    VerifyOrReturn([self _ensureValidValuesForKeys:requiredInternalStateKeys inInternalState:newState valueRequired:YES]);
+    VerifyOrReturn([self _ensureValidValuesForKeys:optionalInternalStateKeys inInternalState:newState valueRequired:NO]);
+
     NSNumber * oldStateNumber = MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDeviceState], NSNumber);
-    NSNumber * newStateNumber = MTR_SAFE_CAST(dictionary[kMTRDeviceInternalPropertyDeviceState], NSNumber);
+    NSNumber * newStateNumber = MTR_SAFE_CAST(newState[kMTRDeviceInternalPropertyDeviceState], NSNumber);
 
-    VerifyOrReturn([self _internalState:dictionary hasValidValuesForKeys:requiredInternalStateKeys valueRequired:YES]);
-    VerifyOrReturn([self _internalState:dictionary hasValidValuesForKeys:optionalInternalStateKeys valueRequired:NO]);
+    NSNumber * oldPrimedState = MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDeviceCachePrimed], NSNumber);
+    NSNumber * newPrimedState = MTR_SAFE_CAST(newState[kMTRDeviceInternalPropertyDeviceCachePrimed], NSNumber);
 
-    [self _setInternalState:dictionary];
+    [self _setInternalState:newState];
 
     if (!MTREqualObjects(oldStateNumber, newStateNumber)) {
         MTRDeviceState state = self.state;
@@ -307,9 +330,6 @@ static const auto * optionalInternalStateKeys = @[ kMTRDeviceInternalPropertyKey
             [delegate device:self stateChanged:state];
         }];
     }
-
-    NSNumber * oldPrimedState = MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDeviceCachePrimed], NSNumber);
-    NSNumber * newPrimedState = MTR_SAFE_CAST(dictionary[kMTRDeviceInternalPropertyDeviceCachePrimed], NSNumber);
 
     if (!MTREqualObjects(oldPrimedState, newPrimedState)) {
         [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
