@@ -165,12 +165,6 @@ public:
          * ReadClient::DefaultResubscribePolicy is broken down into its constituent methods that are publicly available for
          * applications to call and sequence.
          *
-         * If the peer is LIT ICD, and the timeout is reached, `aTerminationCause` will be
-         * `CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT`. In this case, returning `CHIP_NO_ERROR` will still trigger a resubscribe
-         * attempt, while returning `CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT` will put the subscription in the
-         * `InactiveICDSubscription` state.  In the latter case, OnResubscriptionNeeded will be called again when
-         * `OnActiveModeNotification` is called.
-         *
          * If the method is over-ridden, it's the application's responsibility to take the appropriate steps needed to eventually
          * call-back into the ReadClient object to schedule a re-subscription (by invoking ReadClient::ScheduleResubscription).
          *
@@ -292,7 +286,7 @@ public:
         Subscribe,
     };
 
-    enum class PeerType : uint8_t
+    enum class PeerOperatingMode : uint8_t
     {
         kNormal,
         kLITICD,
@@ -350,12 +344,12 @@ public:
     /**
      *  Re-activate an inactive subscription.
      *
-     *  When subscribing to LIT-ICD and liveness timeout reached and OnResubscriptionNeeded returns
-     * CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT, the read client will move to the InactiveICDSubscription state and
-     * resubscription can be triggered via OnActiveModeNotification().
+     *  When subscribing to LIT-ICD and timeout reached, the read client will move to the InactiveICDSubscription state
+     *  and resubscription should have been scheduled by previous close call, resubscription can be triggered immediately via
+     *  OnActiveModeNotification() when receiving check-in message.
      *
      *  If the subscription is not in the `InactiveICDSubscription` state, this function will do nothing. So it is always safe to
-     * call this function when a check-in message is received.
+     *  call this function when a check-in message is received.
      */
     void OnActiveModeNotification();
 
@@ -503,6 +497,9 @@ public:
      */
     Optional<System::Clock::Timeout> GetSubscriptionTimeout();
 
+    bool IsPeerLIT() { return mIsPeerLIT; }
+    PeerOperatingMode GetLITOperatingMode() { return mPeerOperatingMode; }
+
 private:
     friend class TestReadInteraction;
     friend class InteractionModelEngine;
@@ -534,13 +531,13 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
     /**
-     *  Updates the type (LIT ICD or not) of the peer.
+     *  Updates the operating mode (LIT ICD or not) of the peer.
      *
      *  When the subscription is active, this function will just set the flag. When the subscription is an InactiveICDSubscription,
      * setting the peer type to SIT or normal devices will also trigger a resubscription attempt.
      *
      */
-    void OnPeerTypeChange(PeerType aType);
+    void OnPeerOperatingModeChange(PeerOperatingMode aMode);
 
     /**
      *  Check if current read client is being used
@@ -562,7 +559,7 @@ private:
     CHIP_ERROR BuildDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                           const Span<AttributePathParams> & aAttributePaths,
                                           const Span<DataVersionFilter> & aDataVersionFilters, bool & aEncodedDataVersionList);
-    CHIP_ERROR ReadICDOperatingModeFromAttributeDataIB(TLV::TLVReader && aReader, PeerType & aType);
+    CHIP_ERROR ReadICDOperatingModeFromAttributeDataIB(TLV::TLVReader && aReader, PeerOperatingMode & aMode);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 
@@ -572,7 +569,7 @@ private:
     CHIP_ERROR ComputeLivenessCheckTimerTimeout(System::Clock::Timeout * aTimeout);
     void CancelLivenessCheckTimer();
     void CancelResubscribeTimer();
-    void TriggerResubscriptionForLivenessTimeout(CHIP_ERROR aReason);
+    void CloseSession();
     void MoveToState(const ClientState aTargetState);
     CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ConcreteDataAttributePath & aClusterInfo);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload, ReportType aReportType);
@@ -666,6 +663,8 @@ private:
     System::Clock::Timeout mLivenessTimeoutOverride = System::Clock::kZero;
 
     bool mIsPeerLIT = false;
+
+    PeerOperatingMode mPeerOperatingMode = PeerOperatingMode::kNormal;
 
     // End Of Container (0x18) uses one byte.
     static constexpr uint16_t kReservedSizeForEndOfContainer = 1;
