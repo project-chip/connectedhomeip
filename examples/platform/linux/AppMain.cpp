@@ -91,6 +91,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_METER_IDENTIFICATION_TRIGGER
+#include <app/clusters/meter-identification-server/MeterIdentificationTestEventTriggerHandler.h>
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
 #endif
@@ -633,6 +636,10 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
     static EnergyReportingTestEventTriggerHandler sEnergyReportingTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sEnergyReportingTestEventTriggerHandler);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_METER_IDENTIFICATION_TRIGGER
+    static MeterIdentificationTestEventTriggerHandler sMeterIdentificationTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sMeterIdentificationTestEventTriggerHandler);
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER
     static WaterHeaterManagementTestEventTriggerHandler sWaterHeaterManagementTestEventTriggerHandler;

@@ -115,6 +115,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::MediaPlayback::Id:
         emberAfMediaPlaybackClusterInitCallback(endpoint);
         break;
+    case app::Clusters::MeterIdentification::Id:
+        emberAfMeterIdentificationClusterInitCallback(endpoint);
+        break;
     case app::Clusters::ModeSelect::Id:
         emberAfModeSelectClusterInitCallback(endpoint);
         break;

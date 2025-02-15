@@ -31,6 +31,7 @@ declare_args() {
   chip_enable_boolean_state_configuration_trigger = false
   chip_enable_energy_evse_trigger = false
   chip_enable_energy_reporting_trigger = false
+  chip_enable_meter_identification_trigger = false
   chip_enable_water_heater_management_trigger = false
   chip_enable_device_energy_management_trigger = false
 }
@@ -69,6 +70,10 @@ source_set("energy-reporting-test-event-trigger") {
   sources = [ "${chip_root}/src/app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h" ]
 }
 
+source_set("meter-identification-test-event-trigger") {
+  sources = [ "${chip_root}/src/app/clusters/meter-identification-server/MeterIdentificationTestEventTriggerHandler.h" ]
+}
+
 source_set("water-heater-management-test-event-trigger") {
   sources = [ "${chip_root}/src/app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h" ]
 }
@@ -104,6 +109,7 @@ source_set("app-main") {
     ":energy-reporting-test-event-trigger",
     ":smco-test-event-trigger",
     ":software-diagnostics-test-event-trigger",
+    ":meter-identification-test-event-trigger",
     ":water-heater-management-test-event-trigger",
     ":wifi-diagnostics-test-event-trigger",
     "${chip_root}/src/data-model-providers/codegen:instance-header",
@@ -156,6 +162,7 @@ source_set("app-main") {
     "CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER=${chip_enable_boolean_state_configuration_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER=${chip_enable_energy_evse_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER=${chip_enable_energy_reporting_trigger}",
+    "CHIP_DEVICE_CONFIG_ENABLE_METER_IDENTIFICATION_TRIGGER=${chip_enable_meter_identification_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER=${chip_enable_water_heater_management_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_WIFI_DIAGNOSTIC_TRIGGER=${chip_enable_wifi_diagnostics_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER=${chip_enable_device_energy_management_trigger}",
