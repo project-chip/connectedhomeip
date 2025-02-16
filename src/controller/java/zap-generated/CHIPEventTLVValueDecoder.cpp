@@ -9366,6 +9366,90 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::TlsClientManagement::Id: {
+        using namespace app::Clusters::TlsClientManagement;
+        switch (aPath.mEventId)
+        {
+        case Events::EndpointProvisioned::Id: {
+            Events::EndpointProvisioned::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_endpointID;
+            std::string value_endpointIDClassName     = "java/lang/Integer";
+            std::string value_endpointIDCtorSignature = "(I)V";
+            jint jnivalue_endpointID                  = static_cast<jint>(cppValue.endpointID);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_endpointIDClassName.c_str(), value_endpointIDCtorSignature.c_str(), jnivalue_endpointID, value_endpointID);
+
+            jclass endpointProvisionedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$TlsClientManagementClusterEndpointProvisionedEvent",
+                endpointProvisionedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$TlsClientManagementClusterEndpointProvisionedEvent");
+                return nullptr;
+            }
+
+            jmethodID endpointProvisionedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, endpointProvisionedStructClass, "<init>",
+                                                                "(Ljava/lang/Integer;)V", &endpointProvisionedStructCtor);
+            if (err != CHIP_NO_ERROR || endpointProvisionedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$TlsClientManagementClusterEndpointProvisionedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(endpointProvisionedStructClass, endpointProvisionedStructCtor, value_endpointID);
+
+            return value;
+        }
+        case Events::EndpointRemoved::Id: {
+            Events::EndpointRemoved::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_endpointID;
+            std::string value_endpointIDClassName     = "java/lang/Integer";
+            std::string value_endpointIDCtorSignature = "(I)V";
+            jint jnivalue_endpointID                  = static_cast<jint>(cppValue.endpointID);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_endpointIDClassName.c_str(), value_endpointIDCtorSignature.c_str(), jnivalue_endpointID, value_endpointID);
+
+            jclass endpointRemovedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$TlsClientManagementClusterEndpointRemovedEvent",
+                endpointRemovedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$TlsClientManagementClusterEndpointRemovedEvent");
+                return nullptr;
+            }
+
+            jmethodID endpointRemovedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, endpointRemovedStructClass, "<init>", "(Ljava/lang/Integer;)V",
+                                                                &endpointRemovedStructCtor);
+            if (err != CHIP_NO_ERROR || endpointRemovedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$TlsClientManagementClusterEndpointRemovedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(endpointRemovedStructClass, endpointRemovedStructCtor, value_endpointID);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::UnitTesting::Id: {
         using namespace app::Clusters::UnitTesting;
         switch (aPath.mEventId)
