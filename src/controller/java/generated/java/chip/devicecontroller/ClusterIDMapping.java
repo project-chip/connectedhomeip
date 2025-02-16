@@ -17673,7 +17673,7 @@ public class ClusterIDMapping {
             SolicitOffer(1L),
             ProvideOffer(3L),
             ProvideAnswer(5L),
-            ProvideICECandidate(6L),
+            ProvideICECandidates(6L),
             EndSession(7L),;
             private final long id;
             Command(long id) {
@@ -17743,17 +17743,17 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ProvideICECandidateCommandField {WebRTCSessionID(0),ICECandidate(1),;
+                }public enum ProvideICECandidatesCommandField {WebRTCSessionID(0),ICECandidates(1),;
                     private final int id;
-                    ProvideICECandidateCommandField(int id) {
+                    ProvideICECandidatesCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static ProvideICECandidateCommandField value(int id) throws NoSuchFieldError {
-                        for (ProvideICECandidateCommandField field : ProvideICECandidateCommandField.values()) {
+                    public static ProvideICECandidatesCommandField value(int id) throws NoSuchFieldError {
+                        for (ProvideICECandidatesCommandField field : ProvideICECandidatesCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -17863,7 +17863,7 @@ public class ClusterIDMapping {
         public enum Command {
             Offer(1L),
             Answer(2L),
-            ICECandidate(3L),
+            ICECandidates(3L),
             End(4L),;
             private final long id;
             Command(long id) {
@@ -17916,17 +17916,17 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ICECandidateCommandField {WebRTCSessionID(0),ICECandidate(1),;
+                }public enum ICECandidatesCommandField {WebRTCSessionID(0),ICECandidates(1),;
                     private final int id;
-                    ICECandidateCommandField(int id) {
+                    ICECandidatesCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static ICECandidateCommandField value(int id) throws NoSuchFieldError {
-                        for (ICECandidateCommandField field : ICECandidateCommandField.values()) {
+                    public static ICECandidatesCommandField value(int id) throws NoSuchFieldError {
+                        for (ICECandidatesCommandField field : ICECandidatesCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -18201,7 +18201,7 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             InstalledChimeSounds(0L),
-            ActiveChimeID(1L),
+            SelectedChime(1L),
             Enabled(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
