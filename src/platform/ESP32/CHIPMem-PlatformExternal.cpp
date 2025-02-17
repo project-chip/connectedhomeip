@@ -16,13 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements heap memory allocation APIs for CHIP. These functions are platform
- *      specific and might be C Standard Library heap functions re-direction in most of cases.
- *
- */
-
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
