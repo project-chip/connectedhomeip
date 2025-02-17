@@ -968,6 +968,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.is_commissioning = False
         # The named pipe name must be set in the derived classes
         self.app_pipe = None
+        # The app_pipe_pid pid must be set in the derived class
+        self.app_pipe_pid = None
 
     def get_test_steps(self, test: str) -> list[TestStep]:
         ''' Retrieves the test step list for the given test
@@ -1034,6 +1036,9 @@ class MatterBaseTest(base_test.BaseTestClass):
     def get_default_app_pipe_name(self) -> str:
         return self.app_pipe
 
+    def get_default_app_pipe_pid(self) -> int:
+        return self.app_pipe_pid
+
     def write_to_app_pipe(self, command_dict: dict, app_pipe_name: Optional[str] = None, app_pid: Optional[int] = None):
         """
         Send an out-of-band command to a Matter app.
@@ -1063,7 +1068,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if app_pipe_name is None:
             app_pipe_name = self.get_default_app_pipe_name()
         if app_pid is None:
-            app_pid = self.matter_test_config.app_pid
+            app_pid = self.get_default_app_pipe_pid()
 
         if not isinstance(app_pipe_name, str):
             raise TypeError("The named pipe must be provided as a string value")
