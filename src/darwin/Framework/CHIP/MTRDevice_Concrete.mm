@@ -1031,8 +1031,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // in fact be reachable yet; we won't know until we have managed to
     // establish a CASE session.  And at that point, our subscription will
     // trigger the state change as needed.
+    BOOL shouldReattemptSubscription = NO;
     if (self.reattemptingSubscription) {
-        [self _reattemptSubscriptionNowIfNeededWithReason:reason];
+        shouldReattemptSubscription = YES;
     } else {
         readClientToResubscribe = self.matterCPPObjectsHolder.readClient;
         subscriptionCallback = self.matterCPPObjectsHolder.subscriptionCallback;
@@ -1048,9 +1049,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             subscriptionCallback->ResetResubscriptionBackoff();
         }
         readClientToResubscribe->TriggerResubscribeIfScheduled(reason.UTF8String);
-    } else if (_internalDeviceState == MTRInternalDeviceStateSubscribing && nodeLikelyReachable) {
+    } else if (((_internalDeviceState == MTRInternalDeviceStateSubscribing) || shouldReattemptSubscription) && nodeLikelyReachable) {
         // If we have reason to suspect that the node is now reachable and we haven't established a
         // CASE session yet, let's consider it to be stalled and invalidate the pairing session.
+
+        // Reset back off for framework resubscription
+        os_unfair_lock_lock(&self->_lock);
+        [self _setLastSubscriptionAttemptWait:0];
+        os_unfair_lock_unlock(&self->_lock);
+
         mtr_weakify(self);
         [self._concreteController asyncGetCommissionerOnMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
             mtr_strongify(self);
@@ -1060,6 +1067,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             VerifyOrDie(caseSessionMgr != nullptr);
             caseSessionMgr->ReleaseSession(commissioner->GetPeerScopedId(self->_nodeID.unsignedLongLongValue));
         } errorHandler:nil /* not much we can do */];
+    }
+
+    // Reattempt subscription after the above ReleaseSession call to avoid churn
+    if (shouldReattemptSubscription) {
+        [self _reattemptSubscriptionNowIfNeededWithReason:reason];
     }
 }
 
