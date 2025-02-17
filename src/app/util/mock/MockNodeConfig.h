@@ -45,7 +45,7 @@ constexpr EmberAfAttributeMetadata DefaultAttributeMetadata(chip::AttributeId id
         .attributeId   = id,
         .size          = 4,
         .attributeType = ZCL_INT32U_ATTRIBUTE_TYPE,
-        .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+        .mask          = MATTER_ATTRIBUTE_BITMAP_WRITABLE | MATTER_ATTRIBUTE_BITMAP_NULLABLE,
     };
 }
 
@@ -56,7 +56,7 @@ struct MockAttributeConfig
     MockAttributeConfig(AttributeId aId) : id(aId), attributeMetaData(internal::DefaultAttributeMetadata(aId)) {}
     MockAttributeConfig(AttributeId aId, EmberAfAttributeMetadata metadata) : id(aId), attributeMetaData(metadata) {}
     MockAttributeConfig(AttributeId aId, EmberAfAttributeType type,
-                        EmberAfAttributeMask mask = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE) :
+                        EmberAfAttributeMask mask = MATTER_ATTRIBUTE_BITMAP_WRITABLE | MATTER_ATTRIBUTE_BITMAP_NULLABLE) :
         id(aId),
         attributeMetaData(internal::DefaultAttributeMetadata(aId))
     {
