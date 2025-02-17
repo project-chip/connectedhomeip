@@ -153,7 +153,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (void)dealloc
 {
-    MTR_LOG("%@ dealloc: %p", NSStringFromClass([self class]), self);
+    MTR_LOG("%@ dealloc", self);
 }
 
 - (NSString *)description
