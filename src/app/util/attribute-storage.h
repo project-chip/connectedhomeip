@@ -59,12 +59,12 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
     } /* cluster revision */                                                                                                       \
     }
 
-// The attrMask must contain the relevant MATTER_ATTRIBUTE_BITMAP_* bits from
+// The attrMask must contain the relevant MATTER_ATTRIBUTE_FLAG_* bits from
 // attribute-metadata.h.  Specifically:
 //
-// * Writable attributes must have MATTER_ATTRIBUTE_BITMAP_WRITABLE
-// * Nullable attributes (have X in the quality column in the spec) must have MATTER_ATTRIBUTE_BITMAP_NULLABLE
-// * Attributes that have T in the Access column in the spec must have MATTER_ATTRIBUTE_BITMAP_MUST_USE_TIMED_WRITE
+// * Writable attributes must have MATTER_ATTRIBUTE_FLAG_WRITABLE
+// * Nullable attributes (have X in the quality column in the spec) must have MATTER_ATTRIBUTE_FLAG_NULLABLE
+// * Attributes that have T in the Access column in the spec must have MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE
 #define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \
     {                                                                                                                              \
         ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType), attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)               \
@@ -222,8 +222,8 @@ uint8_t emberAfGetClusterCountForEndpoint(chip::EndpointId endpoint);
 // Check if a cluster is implemented or not. If yes, the cluster is returned.
 //
 // mask = 0 -> find either client or server
-// mask = MATTER_CLUSTER_BITMAP_CLIENT -> find client
-// mask = MATTER_CLUSTER_BITMAP_SERVER -> find server
+// mask = MATTER_CLUSTER_FLAG_CLIENT -> find client
+// mask = MATTER_CLUSTER_FLAG_SERVER -> find server
 //
 // If a pointer to an index is provided, it will be updated to point to the relative index of the cluster
 // within the set of clusters that match the mask criteria.

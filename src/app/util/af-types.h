@@ -58,17 +58,17 @@ typedef void (*EmberAfGenericClusterFunction)(void);
 #define MATTER_DM_NULL_MANUFACTURER_CODE 0x0000
 
 // The following define names are relevant to the ZAP_CLUSTER_MASK macro.
-#define MATTER_CLUSTER_BITMAP_INIT_FUNCTION 0x01
-#define MATTER_CLUSTER_BITMAP_ATTRIBUTE_CHANGED_FUNCTION 0x02
+#define MATTER_CLUSTER_FLAG_INIT_FUNCTION 0x01
+#define MATTER_CLUSTER_FLAG_ATTRIBUTE_CHANGED_FUNCTION 0x02
 // Bit 2 (0x04)  and Bit3 (0x08) are free.
-#define MATTER_CLUSTER_BITMAP_SHUTDOWN_FUNCTION 0x10
-#define MATTER_CLUSTER_BITMAP_PRE_ATTRIBUTE_CHANGED_FUNCTION 0x20
-#define MATTER_CLUSTER_BITMAP_SERVER 0x40
-#define MATTER_CLUSTER_BITMAP_CLIENT 0x80
+#define MATTER_CLUSTER_FLAG_SHUTDOWN_FUNCTION 0x10
+#define MATTER_CLUSTER_FLAG_PRE_ATTRIBUTE_CHANGED_FUNCTION 0x20
+#define MATTER_CLUSTER_FLAG_SERVER 0x40
+#define MATTER_CLUSTER_FLAG_CLIENT 0x80
 
 /**
  * @brief Type for the cluster mask
- *  Value of the mask represents a single, or aggregated, MATTER_CLUSTER_BITMAP_X
+ *  Value of the mask represents a single, or aggregated, MATTER_CLUSTER_FLAG_X
  */
 typedef uint8_t EmberAfClusterMask;
 
@@ -129,9 +129,9 @@ struct EmberAfCluster
      */
     uint16_t eventCount;
 
-    bool IsServer() const { return (mask & MATTER_CLUSTER_BITMAP_SERVER) != 0; }
+    bool IsServer() const { return (mask & MATTER_CLUSTER_FLAG_SERVER) != 0; }
 
-    bool IsClient() const { return (mask & MATTER_CLUSTER_BITMAP_CLIENT) != 0; }
+    bool IsClient() const { return (mask & MATTER_CLUSTER_FLAG_CLIENT) != 0; }
 };
 
 using EmberAfDeviceType = chip::app::DataModel::DeviceTypeEntry;

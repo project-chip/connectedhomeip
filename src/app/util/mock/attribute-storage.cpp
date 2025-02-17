@@ -208,7 +208,7 @@ uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
 
 uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * type, bool server)
 {
-    const EmberAfClusterMask cluster_mask = server ? MATTER_CLUSTER_BITMAP_SERVER : MATTER_CLUSTER_BITMAP_CLIENT;
+    const EmberAfClusterMask cluster_mask = server ? MATTER_CLUSTER_FLAG_SERVER : MATTER_CLUSTER_FLAG_CLIENT;
 
     return static_cast<uint8_t>(std::count_if(type->cluster, type->cluster + type->clusterCount,
                                               [=](const EmberAfCluster & cluster) { return (cluster.mask & cluster_mask) != 0; }));
@@ -313,7 +313,7 @@ chip::Optional<chip::AttributeId> emberAfGetServerAttributeIdByIndex(chip::Endpo
 
 uint8_t emberAfClusterIndex(chip::EndpointId endpointId, chip::ClusterId clusterId, EmberAfClusterMask mask)
 {
-    VerifyOrReturnValue(mask == 0 || (mask & MATTER_CLUSTER_BITMAP_SERVER) != 0, UINT8_MAX); // only server clusters supported
+    VerifyOrReturnValue(mask == 0 || (mask & MATTER_CLUSTER_FLAG_SERVER) != 0, UINT8_MAX); // only server clusters supported
     ptrdiff_t index;
     auto cluster = GetMockNodeConfig().clusterByIds(endpointId, clusterId, &index);
     VerifyOrReturnValue(cluster != nullptr, UINT8_MAX);

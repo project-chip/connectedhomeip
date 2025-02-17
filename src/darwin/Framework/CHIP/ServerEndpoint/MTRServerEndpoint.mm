@@ -256,7 +256,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
         metadata.clusterSize = 0; // All our attributes are external.
 
-        metadata.mask = MATTER_CLUSTER_BITMAP_SERVER;
+        metadata.mask = MATTER_CLUSTER_FLAG_SERVER;
 
         metadata.functions = nullptr; // None of our clusters, including Descriptor, uses these.
 
@@ -277,7 +277,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
         metadata.clusterSize = 0; // All our attributes are external.
 
-        metadata.mask = MATTER_CLUSTER_BITMAP_SERVER;
+        metadata.mask = MATTER_CLUSTER_FLAG_SERVER;
 
         metadata.functions = nullptr; // Descriptor does not use these.
 

@@ -312,7 +312,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
             // Size in bytes does not matter, since we plan to
             // handle this entirely via AttributeAccessInterface.
             0,
-            // MATTER_ATTRIBUTE_BITMAP_NULLABLE is not relevant because we
+            // MATTER_ATTRIBUTE_FLAG_NULLABLE is not relevant because we
             // are handling this all via AttributeAccessInterface.
             0)));
     }

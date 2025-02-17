@@ -196,7 +196,7 @@ uint8_t emberAfClusterCount(EndpointId endpoint, bool server)
 
 uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * type, bool server)
 {
-    const EmberAfClusterMask cluster_mask = server ? MATTER_CLUSTER_BITMAP_SERVER : MATTER_CLUSTER_BITMAP_CLIENT;
+    const EmberAfClusterMask cluster_mask = server ? MATTER_CLUSTER_FLAG_SERVER : MATTER_CLUSTER_FLAG_CLIENT;
 
     return static_cast<uint8_t>(std::count_if(type->cluster, type->cluster + type->clusterCount,
                                               [=](const EmberAfCluster & cluster) { return (cluster.mask & cluster_mask) != 0; }));
@@ -209,7 +209,7 @@ Optional<AttributeId> emberAfGetServerAttributeIdByIndex(EndpointId endpoint, Cl
 
 uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
 {
-    if (endpoint == kSupportedEndpoint && clusterId == OtaSoftwareUpdateProvider::Id && (mask & MATTER_CLUSTER_BITMAP_SERVER))
+    if (endpoint == kSupportedEndpoint && clusterId == OtaSoftwareUpdateProvider::Id && (mask & MATTER_CLUSTER_FLAG_SERVER))
     {
         return 0;
     }
@@ -233,7 +233,7 @@ const EmberAfCluster otaProviderCluster{
     .attributes           = nullptr,
     .attributeCount       = 0,
     .clusterSize          = 0,
-    .mask                 = MATTER_CLUSTER_BITMAP_SERVER,
+    .mask                 = MATTER_CLUSTER_FLAG_SERVER,
     .functions            = nullptr,
     .acceptedCommandList  = acceptedCommands,
     .generatedCommandList = generatedCommands,

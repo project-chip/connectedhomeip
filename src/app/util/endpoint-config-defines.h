@@ -29,5 +29,5 @@
     {                                                                                                                              \
         (uint32_t) x                                                                                                               \
     }
-#define ZAP_ATTRIBUTE_MASK(mask) MATTER_ATTRIBUTE_BITMAP_##mask
-#define ZAP_CLUSTER_MASK(bit) MATTER_CLUSTER_BITMAP_##bit
+#define ZAP_ATTRIBUTE_MASK(mask) MATTER_ATTRIBUTE_FLAG_##mask
+#define ZAP_CLUSTER_MASK(bit) MATTER_CLUSTER_FLAG_##bit

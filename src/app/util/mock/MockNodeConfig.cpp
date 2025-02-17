@@ -129,11 +129,11 @@ MockClusterConfig::MockClusterConfig(ClusterId aId, std::initializer_list<MockAt
 
     if (side.Has(MockClusterSide::kServer))
     {
-        mEmberCluster.mask |= MATTER_CLUSTER_BITMAP_SERVER;
+        mEmberCluster.mask |= MATTER_CLUSTER_FLAG_SERVER;
     }
     if (side.Has(MockClusterSide::kClient))
     {
-        mEmberCluster.mask |= MATTER_CLUSTER_BITMAP_CLIENT;
+        mEmberCluster.mask |= MATTER_CLUSTER_FLAG_CLIENT;
     }
     mEmberCluster.clusterId      = id;
     mEmberCluster.attributeCount = static_cast<uint16_t>(attributes.size());

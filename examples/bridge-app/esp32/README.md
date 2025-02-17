@@ -54,7 +54,7 @@ defined:
     definition.
 
 -   All attributes defined with these macros will be configured as
-    `MATTER_ATTRIBUTE_BITMAP_EXTERNAL_STORAGE` in the ZCL database and therefore
+    `MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE` in the ZCL database and therefore
     will rely on the application to maintain storage for the attribute.
     Consequently, reads or writes to these attributes must be handled within the
     application by the `emberAfExternalAttributeWriteCallback` and
