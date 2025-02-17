@@ -82,7 +82,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
         if ( [device _delegateExists] ) {
             NSMutableDictionary * nodeDictionary = [NSMutableDictionary dictionary];
             MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDKey, nodeID, nodeDictionary)
-            
+
             [nodeIDs addObject:nodeDictionary];
         }
     }
