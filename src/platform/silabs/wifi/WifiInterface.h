@@ -360,7 +360,27 @@ CHIP_ERROR GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & info);
  */
 CHIP_ERROR ResetCounters();
 
+/**
+ * @brief Configures the broadcast filter.
+ *
+ * @param[in] enableBroadcastFilter Boolean to enable or disable the broadcast filter.
+ *
+ * @return CHIP_ERROR CHIP_NO_ERROR, the counters were succesfully reset to 0.
+ *                    CHIP_ERROR_INTERNAL, if there was an error when configuring the broadcast filter
+ */
+CHIP_ERROR ConfigureBroadcastFilter(bool enableBroadcastFilter);
+
 /* Function to update */
+
+// TODO: Harmonize the Power Save function inputs for all platforms
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
+CHIP_ERROR ConfigurePowerSave(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state,
+                              uint32_t listenInterval);
+#else
+CHIP_ERROR ConfigurePowerSave();
+#endif /* (SLI_SI91X_MCU_INTERFACE | EXP_BOARD) */
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 void wfx_set_wifi_provision(wfx_wifi_provision_t * wifiConfig);
 bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig);
@@ -398,17 +418,6 @@ void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off);
 int32_t wfx_rsi_send_data(void * p, uint16_t len);
 #endif //!(EXP_BOARD)
 #endif // RS911X_WIFI
-
-#ifdef RS911X_WIFI // for RS9116, 917 NCP and 917 SoC
-/* RSI Power Save */
-#if SL_ICD_ENABLED
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state);
-#else
-sl_status_t wfx_power_save();
-#endif /* (SLI_SI91X_MCU_INTERFACE | EXP_BOARD) */
-#endif /* SL_ICD_ENABLED */
-#endif /* RS911X_WIFI */
 
 #ifdef __cplusplus
 extern "C" {
