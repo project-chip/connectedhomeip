@@ -825,7 +825,7 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
             conEP = static_cast<TCPEndPointImplLwIP *>(listenEP->mPreAllocatedConnectEP);
             if (conEP == nullptr)
             {
-                // The listen endpoint received a new incoming connection before it had a chance to pre-allocates a new connection
+                // The listen endpoint received a new incoming connection before it had a chance to pre-allocate a new connection
                 // endpoint.
                 err = CHIP_ERROR_BUSY;
             }
