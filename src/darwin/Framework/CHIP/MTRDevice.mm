@@ -201,7 +201,7 @@ MTR_DIRECT_MEMBERS
     MTR_LOG("%@ added delegate info %@", self, newDelegateInfo);
 
     // Call hook to allow subclasses to act on delegate addition.
-    [self _delegateAdded: delegate];
+    [self _delegateAdded:delegate];
 }
 
 - (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate
@@ -235,7 +235,7 @@ MTR_DIRECT_MEMBERS
     }
 
     // Call hook to allow subclasses to act on delegate addition.
-    [self _delegateRemoved: delegate];
+    [self _delegateRemoved:delegate];
 }
 
 - (void)_delegateRemoved:(id<MTRDeviceDelegate>)delegate
