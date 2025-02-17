@@ -7676,6 +7676,7 @@ typedef NS_ENUM(uint32_t, MTRDeviceTypeIDType) {
     MTRDeviceTypeIDTypeDimmablePlugInUnitID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x0000010B,
     MTRDeviceTypeIDTypeColorTemperatureLightID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x0000010C,
     MTRDeviceTypeIDTypeExtendedColorLightID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x0000010D,
+    MTRDeviceTypeIDTypeMountedOnOffControlID MTR_PROVISIONALLY_AVAILABLE = 0x0000010F,
     MTRDeviceTypeIDTypeCameraID MTR_PROVISIONALLY_AVAILABLE = 0x00000142,
     MTRDeviceTypeIDTypeWindowCoveringID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000202,
     MTRDeviceTypeIDTypeWindowCoveringControllerID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000203,
