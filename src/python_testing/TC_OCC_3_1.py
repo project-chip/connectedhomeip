@@ -91,25 +91,11 @@ class TC_OCC_3_1(MatterBaseTest):
         ]
         return pics
 
-    # Sends and out-of-band command to the all-clusters-app
-    def write_to_app_pipe(self, command):
-        # CI app pipe id creation
-        self.app_pipe = "/tmp/chip_all_clusters_fifo_"
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when using named pipe")
-            self.app_pipe = self.app_pipe + str(app_pid)
-
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests are flaky)
-        time.sleep(0.001)
-
     @async_test_body
     async def test_TC_OCC_3_1(self):
         hold_time = 10 if not self.is_ci else 1.0  # 10 seconds for occupancy state hold time
-
+        self.app_pipe = "/tmp/chip_all_clusters_fifo_"
+        self.app_pipe_pid = self.matter_test_config.app_pid
         self.step(1)  # Commissioning already done
 
         self.step(2)

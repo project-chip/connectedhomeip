@@ -83,26 +83,13 @@ class TC_OCC_3_2(MatterBaseTest):
         ]
         return pics
 
-    # Sends and out-of-band command to the all-clusters-app
-    def write_to_app_pipe(self, command):
-        # CI app pipe id creation
-        self.app_pipe = "/tmp/chip_all_clusters_fifo_"
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when using named pipe")
-            self.app_pipe = self.app_pipe + str(app_pid)
-
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests are flaky)
-        time.sleep(0.001)
-
     @async_test_body
     async def test_TC_OCC_3_2(self):
         endpoint_id = self.get_endpoint()
         node_id = self.dut_node_id
         dev_ctrl = self.default_controller
+        self.app_pipe = "/tmp/chip_all_clusters_fifo_"
+        self.app_pipe_pid = self.matter_test_config.app_pid
 
         post_prompt_settle_delay_seconds = 10.0
         cluster = Clusters.Objects.OccupancySensing
@@ -136,7 +123,7 @@ class TC_OCC_3_2(MatterBaseTest):
         self.step("3a")
         # CI call to trigger off
         if self.is_ci:
-            self.write_to_app_pipe('{"Name":"SetOccupancy", "EndpointId": 1, "Occupancy": 0}')
+            self.write_to_app_pipe({"Name": "SetOccupancy", "EndpointId": 1, "Occupancy": 0})
         else:
             self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after DUT goes back to unoccupied state.")
 
@@ -150,7 +137,7 @@ class TC_OCC_3_2(MatterBaseTest):
 
         # CI call to trigger on
         if self.is_ci:
-            self.write_to_app_pipe('{"Name":"SetOccupancy", "EndpointId": 1, "Occupancy": 1}')
+            self.write_to_app_pipe({"Name": "SetOccupancy", "EndpointId": 1, "Occupancy": 1})
         else:
             self.wait_for_user_input(
                 prompt_msg="Type any letter and press ENTER after the sensor occupancy is triggered and its occupancy state changed.")
