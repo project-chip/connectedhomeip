@@ -90,6 +90,10 @@ CHIP_ERROR TCPEndPointImplLwIP::ListenImpl(uint16_t backlog)
     CHIP_ERROR err    = CHIP_NO_ERROR;
     if (!mPreAllocatedConnectEP)
     {
+        // Pre allocate a TCP EndPoint for TCP connection, it will be released under either of the two conditions:
+        // - The Listen EndPoint receives a connection and the connection will use this endpoint. The endpoint will be release when
+        // the connection is released.
+        // - The Listen Endpoint is closed.
         err = GetEndPointManager().NewEndPoint(&mPreAllocatedConnectEP);
     }
     if (err == CHIP_NO_ERROR)
@@ -446,6 +450,11 @@ void TCPEndPointImplLwIP::DoCloseImpl(CHIP_ERROR err, State oldState)
         }
     }
 
+    if (mPreAllocatedConnectEP)
+    {
+        // If the Listen EndPoint has a pre-allocated connect EndPoint, release it for the Retain() in the constructor
+        mPreAllocatedConnectEP->Free();
+    }
     if (mState == State::kClosed)
     {
         mUnackedLength = 0;
@@ -816,7 +825,8 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
             conEP = static_cast<TCPEndPointImplLwIP *>(listenEP->mPreAllocatedConnectEP);
             if (conEP == nullptr)
             {
-                // The listen endpoint receives a new incomming connection before it pre-allocates a new connection endpoint.
+                // The listen endpoint received a new incoming connection before it had a chance to pre-allocates a new connection
+                // endpoint.
                 err = CHIP_ERROR_BUSY;
             }
         }
@@ -849,8 +859,18 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
             // Post a callback to the HandleConnectionReceived() function, passing it the new end point.
             listenEP->Retain();
             conEP->Retain();
+            // Hand over the implied ref from constructing mPreAllocatedConnectEP to
+            // ongoing connection.
+            listenEP->mPreAllocatedConnectEP = nullptr;
+
             err = lSystemLayer.ScheduleLambda([listenEP, conEP] {
                 listenEP->HandleIncomingConnection(conEP);
+                // Pre-allocate another endpoint for next connection if current connection is established
+                CHIP_ERROR error = listenEP->GetEndPointManager().NewEndPoint(&listenEP->mPreAllocatedConnectEP);
+                if (error != CHIP_NO_ERROR)
+                {
+                    listenEP->HandleError(error);
+                }
                 conEP->Release();
                 listenEP->Release();
             });
@@ -860,24 +880,6 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
                 listenEP->Release();
                 err = CHIP_ERROR_CONNECTION_ABORTED;
                 conEP->Release(); // for the Retain() above
-            }
-            else
-            {
-                // Pre-allocate another endpoint for next connection
-                listenEP->mPreAllocatedConnectEP = nullptr;
-                listenEP->Retain();
-                err = lSystemLayer.ScheduleLambda([listenEP]() {
-                    CHIP_ERROR error = listenEP->GetEndPointManager().NewEndPoint(&listenEP->mPreAllocatedConnectEP);
-                    if (error != CHIP_NO_ERROR)
-                    {
-                        listenEP->HandleError(error);
-                    }
-                    listenEP->Release();
-                });
-                if (err != CHIP_NO_ERROR)
-                {
-                    listenEP->Release();
-                }
             }
         }
 
