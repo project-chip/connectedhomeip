@@ -549,6 +549,15 @@ config("coverage") {
     cflags = [ "--coverage" ]
   }
   ldflags = cflags
+
+  if (is_clang) {
+    # Looking to add buildid which _could_ be used for coverage
+    # file format using `%b` (see
+    # https://clang.llvm.org/docs/SourceBasedCodeCoverage.html#running-the-instrumented-program)
+    # however at the time of writing this, linux clang used during bootstrap
+    # does not seem to support this.
+    ldflags += [ "-Wl,--build-id" ]
+  }
 }
 
 config("coverage_default") {
