@@ -266,7 +266,7 @@ class TC_FAN_3_1(MatterBaseTest):
         speed_setting_current = speed_setting_read
         speed_setting_previous = speed_setting_read
         for value_to_write in iteration_range:
-            # Clear the queue before each update to avoid attribute report duplicates
+            # Clear the attribute report queue before each update to avoid duplicates
             self.attribute_subscription.get_last_report()
 
             # Write to attribute
@@ -277,16 +277,14 @@ class TC_FAN_3_1(MatterBaseTest):
             # Verify that the current attribute value is greater than the previous
             # one if order was set to Ascending, or less if order was set to Descending
             if write_status == Status.Success:
-                # Get current attribute value
+                # Get current attribute value and verify progression
                 queue = self.attribute_subscription.attribute_queue.queue
                 attr_value_current = await self.get_attribute_value_from_queue(queue, attr_to_verify, timeout_sec)
-
-                # Verify attribute value progression
                 if attr_value_current is not None:
                     self.verify_attribute_progression(attr_to_verify, attr_value_current, attr_value_previous, order)
                     attr_value_previous = attr_value_current
 
-                # Verify the same for the SpeedSetting attribute value (if supported)
+                # Get current SpeedSetting attribute value and verify progression (if supported)
                 if self.supports_speed:
                     speed_setting_current = await self.get_attribute_value_from_queue(queue, speed_setting_attr, timeout_sec)
                     if speed_setting_current is not None:
@@ -296,14 +294,12 @@ class TC_FAN_3_1(MatterBaseTest):
             # If the write status is INVALID_IN_STATE, it means no write operation occurred
             # Verify that the current attribute value is equal to the previous one
             elif write_status == Status.InvalidInState:
-                # Get current attribute value
+                # Get current attribute value and verify it's equal to the previous value
                 attr_value_current = await self.read_setting(endpoint, attr_to_verify)
-
-                # Verify attribute value
                 asserts.assert_equal(attr_value_current, attr_value_previous,
                                      f"[FC] Current {attr_to_verify.__name__} attribute value must be equal to the previous one")
 
-                # Verify the same for the SpeedSetting attribute value (if supported)
+                # Get current SpeedSetting attribute value and verify it's equal to the previous value (if supported)
                 if self.supports_speed:
                     speed_setting_current = await self.read_setting(endpoint, speed_setting_attr)
                     asserts.assert_equal(speed_setting_current, speed_setting_previous,
