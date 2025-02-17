@@ -138,11 +138,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         self.mode_a = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_A']
         self.mode_b = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_B']
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
-            self.app_pipe = self.app_pipe + str(app_pid)
+        self.app_pipe_pid = self.matter_test_config.app_pid
 
         asserts.assert_true(self.check_pics("RVCRUNM.S"), "RVCRUNM.S must be supported")
         # I think that the following PICS should be listed in the preconditions section in the test plan as if either
