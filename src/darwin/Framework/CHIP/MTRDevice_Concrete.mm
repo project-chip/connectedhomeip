@@ -1069,7 +1069,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         } errorHandler:nil /* not much we can do */];
     }
 
-    // Reattempt subscription after the above ReleaseSession call to avoid churn
+    // The subscription reattempt here eventually asyncs onto the matter queue for session,
+    // and should be called after the above ReleaseSession call, to avoid churn.
     if (shouldReattemptSubscription) {
         [self _reattemptSubscriptionNowIfNeededWithReason:reason];
     }
