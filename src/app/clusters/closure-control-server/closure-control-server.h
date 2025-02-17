@@ -28,6 +28,7 @@
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <app/cluster-building-blocks/QuieterReporting.h>
 
 namespace chip {
 namespace app {
@@ -60,7 +61,6 @@ public:
     // ------------------------------------------------------------------
     // Get attribute methods
     virtual DataModel::Nullable<uint32_t> GetCountdownTime()                           = 0;
-    virtual MainStateEnum GetMainState()                                               = 0;
     virtual DataModel::Nullable<Structs::OverallStateStruct::Type> GetOverallState()   = 0;
     virtual DataModel::Nullable<Structs::OverallTargetStruct::Type> GetOverallTarget() = 0;
     virtual RestingProcedureEnum GetRestingProcedure()                                 = 0;
@@ -91,9 +91,9 @@ enum class OptionalAttributes : uint32_t
 class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs) :
+    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs, ClusterId aClusterId) :
         AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
-        mDelegate(aDelegate), mFeature(aFeature), mOptionalAttrs(aOptionalAttrs)
+        mDelegate(aDelegate), mClusterId(aClusterId), mFeature(aFeature), mOptionalAttrs(aOptionalAttrs)
     {
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
@@ -105,11 +105,55 @@ public:
 
     bool HasFeature(Feature aFeature) const;
     bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
+    
+    // Attribute setters
+    /**
+     * Set Main State.
+     * @param aMainState The Main state that should now be the current one.
+     * @return CHIP_NO_ERROR if set was successful.
+     */
+    CHIP_ERROR SetMainState(const MainStateEnum & aMainState);
+    
+    // Attribute getters
+    /**
+     * Get Main State.
+     * @return The Main State.
+     */
+    MainStateEnum GetMainState() const;
+    
+    /**
+     * @brief Whenever application delegate wants to possibly report a new updated time,
+     *        call this method. The `GetCountdownTime()` method will be called on the delegate.
+     */
+    void UpdateCountdownTimeFromDelegate() { UpdateCountdownTime(/* fromDelegate = */ true); }
+    
+    /**
+     * This function returns true if the phase value given exists in the PhaseList attribute, otherwise it returns false.
+     */
+    bool IsSupportedState(MainStateEnum aMainState);
+
+protected:
+    /**
+     * Causes reporting/udpating of CountdownTime attribute from driver if sufficient changes have
+     * occurred (based on Q quality definition for operational state). Calls the Delegate::GetCountdownTime() method.
+     *
+     * @param fromDelegate true if the change notice was triggered by the delegate, false if internal to cluster logic.
+     */
+    void UpdateCountdownTime(bool fromDelegate);
+
+    /**
+     * @brief Whenever the cluster logic thinks time should be updated, call this.
+     */
+    void UpdateCountdownTimeFromClusterLogic() { UpdateCountdownTime(/* fromDelegate=*/false); }
 
 private:
     Delegate & mDelegate;
+    const ClusterId mClusterId;
+    
     BitMask<Feature> mFeature;
     BitMask<OptionalAttributes> mOptionalAttrs;
+    MainStateEnum mMainState;
+    app::QuieterReportingAttribute<uint32_t> mCountdownTime{ DataModel::NullNullable };
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
