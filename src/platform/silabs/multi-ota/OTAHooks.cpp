@@ -22,16 +22,28 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
 #include <platform/silabs/multi-ota/OTAFactoryDataProcessor.h>
+#ifndef SLI_SI91X_MCU_INTERFACE
 #include <platform/silabs/multi-ota/OTAFirmwareProcessor.h>
+#endif
 
+#if SL_WIFI
+#include <platform/silabs/multi-ota/SiWx917/OTAWiFiFirmwareProcessor.h>
+#endif
 #if OTA_TEST_CUSTOM_TLVS
 #include <platform/silabs/multi-ota/OTACustomProcessor.h>
 #endif
 
 CHIP_ERROR chip::OTAMultiImageProcessorImpl::ProcessDescriptor(void * descriptor)
 {
+#ifndef SLI_SI91X_MCU_INTERFACE
     [[maybe_unused]] auto desc = static_cast<chip::OTAFirmwareProcessor::Descriptor *>(descriptor);
     ChipLogDetail(SoftwareUpdate, "Descriptor: %ld, %s, %s", desc->version, desc->versionString, desc->buildDate);
+#endif
+
+#if SL_WIFI
+    [[maybe_unused]] auto descWiFi = static_cast<chip::OTAWiFiFirmwareProcessor::Descriptor *>(descriptor);
+    ChipLogDetail(SoftwareUpdate, "Descriptor: %ld, %s, %s", descWiFi->version, descWiFi->versionString, descWiFi->buildDate);
+#endif
 
     return CHIP_NO_ERROR;
 }
