@@ -34,6 +34,7 @@ declare_args() {
   chip_use_esp32_ecdsa_peripheral = false
   chip_enable_ethernet = false
   chip_enable_route_hook = false
+  chip_memory_alloc_mode = "default"
 }
 
 defines = [
@@ -83,7 +84,13 @@ static_library("ESP32") {
   ]
 
   if (chip_config_memory_management == "platform") {
-    sources += [ "CHIPMem-Platform.cpp" ]
+    if (chip_memory_alloc_mode == "internal") {
+      sources += [ "CHIPMem-PlatformInternal.cpp" ]
+    } else if (chip_memory_alloc_mode == "external") {
+      sources += [ "CHIPMem-PlatformExternal.cpp" ]
+    } else {
+      sources += [ "CHIPMem-PlatformDefault.cpp" ]
+    }
   }
 
   if (chip_enable_ota_requestor) {

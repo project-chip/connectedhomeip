@@ -41,56 +41,27 @@ void MemoryAllocatorShutdown() {}
 
 void * MemoryAlloc(size_t size)
 {
-#ifdef CONFIG_CHIP_MEM_ALLOC_MODE_INTERNAL
     return heap_caps_malloc(size, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
-#elif defined(CONFIG_CHIP_MEM_ALLOC_MODE_EXTERNAL)
-    return heap_caps_malloc(size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-    return malloc(size);
-#endif
 }
 
 void * MemoryAlloc(size_t size, bool isLongTermAlloc)
 {
-#ifdef CONFIG_CHIP_MEM_ALLOC_MODE_INTERNAL
     return heap_caps_malloc(size, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
-#elif defined(CONFIG_CHIP_MEM_ALLOC_MODE_EXTERNAL)
-    return heap_caps_malloc(size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-    return malloc(size);
-#endif
 }
 
 void * MemoryCalloc(size_t num, size_t size)
 {
-#ifdef CONFIG_CHIP_MEM_ALLOC_MODE_INTERNAL
     return heap_caps_calloc(num, size, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
-#elif defined(CONFIG_CHIP_MEM_ALLOC_MODE_EXTERNAL)
-    return heap_caps_calloc(num, size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-    return calloc(num, size);
-#endif
 }
 
 void * MemoryRealloc(void * p, size_t size)
 {
-#ifdef CONFIG_CHIP_MEM_ALLOC_MODE_INTERNAL
-    p = heap_caps_realloc(p, size, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
-#elif defined(CONFIG_CHIP_MEM_ALLOC_MODE_EXTERNAL)
-    p = heap_caps_realloc(p, size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-    p = realloc(p, size);
-#endif
-    return p;
+    return heap_caps_realloc(p, size, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
 }
 
 void MemoryFree(void * p)
 {
-#ifdef CONFIG_MATTER_MEM_ALLOC_MODE_DEFAULT
-    free(p);
-#else
     heap_caps_free(p);
-#endif
 }
 
 bool MemoryInternalCheckPointer(const void * p, size_t min_size)
