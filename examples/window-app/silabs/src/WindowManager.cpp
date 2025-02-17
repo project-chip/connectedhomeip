@@ -27,12 +27,12 @@
 #include <WindowManager.h>
 
 #include <app/clusters/window-covering-server/window-covering-server.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #ifdef SL_WIFI
 #include <app/clusters/network-commissioning/network-commissioning.h>

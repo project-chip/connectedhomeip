@@ -136,7 +136,7 @@ source_set("wifi-platform") {
       "${silabs_platform_dir}/wifi/wiseconnect-interface/WiseconnectWifiInterface.h",
 
       # Wi-Fi Config - Using the file sdk support until the wiseconnect file is fixed
-      "${sdk_support_root}/components/service/network_manager/src/sl_net_for_lwip.c",
+      "${matter_support_root}/sdk-copies/components/service/network_manager/src/sl_net_for_lwip.c",
     ]
 
     public_deps += [ "${lwip_root}:lwip" ]
@@ -149,6 +149,16 @@ source_set("wifi-platform") {
       "${silabs_platform_dir}/wifi/lwip-support/ethernetif.cpp",
       "${silabs_platform_dir}/wifi/lwip-support/ethernetif.h",
       "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.cpp",
+    ]
+  }
+
+  # TODO: Once the WifiInterface refactor is done and becomes a class, we will inject an interface instead of having them in same source_set
+  if (chip_enable_icd_server) {
+    public_deps += [ "${chip_root}/src/app/icd/server:configuration-data" ]
+
+    sources += [
+      "${silabs_platform_dir}/wifi/icd/WifiSleepManager.cpp",
+      "${silabs_platform_dir}/wifi/icd/WifiSleepManager.h",
     ]
   }
 }
