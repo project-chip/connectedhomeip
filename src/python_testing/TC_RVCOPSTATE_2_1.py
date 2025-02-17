@@ -90,11 +90,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
         self.endpoint = self.get_endpoint()
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
-            self.app_pipe = self.app_pipe + str(app_pid)
+        self.app_pipe_pid = self.matter_test_config.app_pid
 
         cluster = Clusters.RvcOperationalState
         attributes = cluster.Attributes
