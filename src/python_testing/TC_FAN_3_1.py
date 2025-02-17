@@ -52,7 +52,7 @@ from mobly import asserts
 class OrderEnum(Enum):
     Ascending = 1
     Descending = 2
-    
+
 
 logger = logging.getLogger(__name__)
 
@@ -175,7 +175,7 @@ class TC_FAN_3_1(MatterBaseTest):
         if attr_to_update == percent_setting_attr:
             attr_to_verify = fan_mode_attr
             iteration_range = range(1, percent_setting_max_value +
-                                1) if order == OrderEnum.Ascending else range(percent_setting_max_value - 1, -1, -1)
+                                    1) if order == OrderEnum.Ascending else range(percent_setting_max_value - 1, -1, -1)
             value_init_verify = fan_mode_off if order == OrderEnum.Ascending else fan_mode_high
             value_init_update = 0 if order == OrderEnum.Ascending else percent_setting_max_value
         elif attr_to_update == fan_mode_attr:
