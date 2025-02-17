@@ -6478,7 +6478,7 @@ cluster WindowCovering = 258 {
   command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
 }
 
-/**  */
+/** This cluster provides an interface for controlling a Closure device. */
 cluster ClosureControl = 260 {
   revision 1;
 

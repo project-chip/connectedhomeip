@@ -120,7 +120,7 @@ Git: 0.7-summer-2025-5-g06c4d5596-dirty
     <name>Closure Control</name>
     <code>0x0104</code>
     <define>CLOSURE_CONTROL_CLUSTER</define>
-    <description/>
+    <description>This cluster provides an interface for controlling a Closure device.</description>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="1"/>
