@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+import shlex
 from enum import Enum, auto
 from platform import uname
 from typing import Optional
@@ -282,8 +283,8 @@ class HostApp(Enum):
             yield 'water-leak-detector-app'
             yield 'water-leak-detector-app.map'
         elif self == HostApp.TERMS_AND_CONDITIONS:
-            yield 'terms-and-conditions-app'
-            yield 'terms-and-conditions-app.map'
+            yield 'chip-terms-and-conditions-app'
+            yield 'chip-terms-and-conditions-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -411,6 +412,7 @@ class HostBuilder(GnBuilder):
         if use_coverage:
             self.extra_gn_options.append('use_coverage=true')
 
+        self.use_clang = use_clang  # for usage in other commands
         if use_clang:
             self.extra_gn_options.append('is_clang=true')
 
@@ -546,6 +548,13 @@ class HostBuilder(GnBuilder):
         if self.board == HostBoard.ARM64:
             self.build_env['PKG_CONFIG_PATH'] = os.path.join(
                 self.SysRootPath('SYSROOT_AARCH64'), 'lib/aarch64-linux-gnu/pkgconfig')
+        if self.app == HostApp.TESTS and self.use_coverage and self.use_clang:
+            # Every test is expected to have a distinct build ID, so `%m` will be
+            # distinct.
+            #
+            # Output is relative to "oputput_dir" since that is where GN executs
+            self.build_env['LLVM_PROFILE_FILE'] = os.path.join("coverage", "profiles", "run_%b.profraw")
+
         return self.build_env
 
     def SysRootPath(self, name):
@@ -555,7 +564,7 @@ class HostBuilder(GnBuilder):
 
     def generate(self):
         super(HostBuilder, self).generate()
-        if 'JAVA_PATH' in os.environ:
+        if 'JAVA_HOME' in os.environ:
             self._Execute(
                 ["third_party/java_deps/set_up_java_deps.sh"],
                 title="Setting up Java deps",
@@ -586,7 +595,7 @@ class HostBuilder(GnBuilder):
             self._Execute(['mkdir', '-p', self.coverage_dir], title="Create coverage output location")
 
     def PreBuildCommand(self):
-        if self.app == HostApp.TESTS and self.use_coverage:
+        if self.app == HostApp.TESTS and self.use_coverage and not self.use_clang:
             cmd = ['ninja', '-C', self.output_dir]
 
             if self.ninja_jobs is not None:
@@ -604,7 +613,8 @@ class HostBuilder(GnBuilder):
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
 
     def PostBuildCommand(self):
-        if self.app == HostApp.TESTS and self.use_coverage:
+        # TODO: CLANG coverage is not yet implemented, requires different tooling
+        if self.app == HostApp.TESTS and self.use_coverage and not self.use_clang:
             self._Execute(['lcov', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
                            '--exclude', os.path.join(self.chip_dir, '**/tests/*'),
                            '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),
@@ -618,6 +628,60 @@ class HostBuilder(GnBuilder):
                            ], title="Final coverage info")
             self._Execute(['genhtml', os.path.join(self.coverage_dir, 'lcov_final.info'), '--output-directory',
                            os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
+
+        # coverage for clang works by having perfdata for every test run, which are in "*.profraw" files
+        if self.app == HostApp.TESTS and self.use_coverage and self.use_clang:
+            # Clang coverage config generates "coverage/{name}.profraw" for each test indivdually
+            # Here we are merging ALL raw profiles into a single indexed file
+
+            _indexed_instrumentation = shlex.quote(os.path.join(self.coverage_dir, "merged.profdata"))
+
+            self._Execute([
+                "bash",
+                "-c",
+                f'find {shlex.quote(self.coverage_dir)} -name "*.profraw"'
+                + f' | xargs -n 10240 llvm-profdata merge -sparse -o {_indexed_instrumentation}'
+            ],
+                title="Generating merged coverage data")
+
+            _lcov_data = os.path.join(self.coverage_dir, "merged.lcov")
+
+            self._Execute([
+                "bash",
+                "-c",
+                f'find {shlex.quote(self.coverage_dir)} -name "*.profraw"'
+                + ' | xargs -n1 basename | sed "s/\\.profraw//" '
+                + f' | xargs -I @ echo -object {shlex.quote(os.path.join(self.output_dir, "tests", "@"))}'
+                + f' | xargs -n 10240 llvm-cov export -format=lcov --instr-profile {_indexed_instrumentation} '
+                # only care about SDK code. third_party is not considered sdk
+                + ' --ignore-filename-regex "/third_party/"'
+                # about 75K lines with almost 0% coverage
+                + ' --ignore-filename-regex "/zzz_generated/"'
+                # generated interface files. about 8K lines with little coverage
+                + ' --ignore-filename-regex "/out/.*/Linux/dbus/"'
+                # 100% coverage for 1K lines, but not relevant (test code)
+                + ' --ignore-filename-regex "/out/.*/clang_static_coverage_config/"'
+                # Tests are likely 100% or close to, want to see only "functionality tested"
+                + ' --ignore-filename-regex "/tests/"'
+                # Ignore system includes
+                + ' --ignore-filename-regex "/usr/include/"'
+                + ' --ignore-filename-regex "/usr/lib/"'
+                + f' | cat >{shlex.quote(_lcov_data)}'
+            ],
+                title="Generating lcov data")
+
+            self._Execute([
+                "genhtml",
+                "--ignore-errors",
+                "inconsistent",
+                "--ignore-errors",
+                "range",
+                # "--hierarchical" <- this may be interesting
+                "--output",
+                os.path.join(self.output_dir, "html"),
+                os.path.join(self.coverage_dir, "merged.lcov"),
+            ],
+                title="Generating HTML coverage report")
 
         if self.app == HostApp.JAVA_MATTER_CONTROLLER:
             self.createJavaExecutable("java-matter-controller")

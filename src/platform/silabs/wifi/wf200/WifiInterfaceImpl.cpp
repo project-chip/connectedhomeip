@@ -452,6 +452,20 @@ CHIP_ERROR GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & info)
     return CHIP_NO_ERROR;
 }
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+CHIP_ERROR ConfigurePowerSave()
+{
+    // TODO: Implement Power save configuration. We do a silent failure to avoid causing problems in higher layers.
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConfigureBroadcastFilter(bool enableBroadcastFilter)
+{
+    // TODO: Implement Broadcast filtering. We do a silent failure to avoid causing problems in higher layers.
+    return CHIP_NO_ERROR;
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
 /***************************************************************************
  * @brief
  * Creates WFX events processing task.

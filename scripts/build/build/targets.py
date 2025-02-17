@@ -79,8 +79,7 @@ def BuildHostFakeTarget():
         "-clang").ExceptIfRe('-libfuzzer')
     target.AppendModifier("pw-fuzztest", fuzzing_type=HostFuzzingType.PW_FUZZTEST).OnlyIfRe(
         "-clang").ExceptIfRe('-(libfuzzer|ossfuzz|asan)')
-    target.AppendModifier('coverage', use_coverage=True).OnlyIfRe(
-        '-(chip-tool|all-clusters)')
+    target.AppendModifier('coverage', use_coverage=True)
     target.AppendModifier('dmalloc', use_dmalloc=True)
     target.AppendModifier('clang', use_clang=True)
 
@@ -186,8 +185,7 @@ def BuildHostTarget():
         "-clang").ExceptIfRe('-libfuzzer')
     target.AppendModifier("pw-fuzztest", fuzzing_type=HostFuzzingType.PW_FUZZTEST).OnlyIfRe(
         "-clang").ExceptIfRe('-(libfuzzer|ossfuzz|asan)')
-    target.AppendModifier('coverage', use_coverage=True).OnlyIfRe(
-        '-(chip-tool|all-clusters|tests)')
+    target.AppendModifier('coverage', use_coverage=True)
     target.AppendModifier('dmalloc', use_dmalloc=True)
     target.AppendModifier('clang', use_clang=True)
     target.AppendModifier('test', extra_tests=True)

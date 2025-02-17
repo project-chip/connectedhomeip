@@ -18511,8 +18511,9 @@ void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCo
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "tcacknowledgements-required", 0, 1, Attributes::TCAcknowledgementsRequired::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint32_t>>(Id, "tcupdate-deadline", 0, UINT32_MAX, Attributes::TCUpdateDeadline::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "tcupdate-deadline", 0, UINT32_MAX,
+                                                                              Attributes::TCUpdateDeadline::Id,
+                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //

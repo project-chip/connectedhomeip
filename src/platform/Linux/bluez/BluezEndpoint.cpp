@@ -66,7 +66,7 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/GLibTypeDeleter.h>
-#include <platform/Linux/dbus/bluez/DbusBluez.h>
+#include <platform/Linux/dbus/bluez/DBusBluez.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/BLEManager.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>

@@ -29,7 +29,7 @@ using namespace ::chip;
 #include "AppTask.h"
 #include "ota.h"
 
-#include <app/server/OnboardingCodesUtil.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
