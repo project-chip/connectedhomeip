@@ -884,11 +884,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     return self.suspended == NO && ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
 }
 
-- (void)_delegateAdded
+- (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    [super _delegateAdded];
+    [super _delegateAdded: delegate];
 
     [self _ensureSubscriptionForExistingDelegates:@"delegate is set"];
 }

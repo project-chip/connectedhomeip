@@ -18,6 +18,7 @@
 
 #import "MTRDefines_Internal.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTRDevice_Internal.h"
 #import "MTRDevice_XPC.h"
 #import "MTRDevice_XPC_Internal.h"
 #import "MTRError_Internal.h"
@@ -77,10 +78,13 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
     NSMutableArray * nodeIDs = [NSMutableArray array];
 
     for (NSNumber * nodeID in [self.nodeIDToDeviceMap keyEnumerator]) {
-        NSMutableDictionary * nodeDictionary = [NSMutableDictionary dictionary];
-        MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDKey, nodeID, nodeDictionary)
-
-        [nodeIDs addObject:nodeDictionary];
+        MTRDevice * device = [self _deviceForNodeID: nodeID createIfNeeded: NO];
+        if ( [device _delegateExists] ) {
+            NSMutableDictionary * nodeDictionary = [NSMutableDictionary dictionary];
+            MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDKey, nodeID, nodeDictionary)
+            
+            [nodeIDs addObject:nodeDictionary];
+        }
     }
     MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDsKey, nodeIDs, registrationInfo)
     MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationControllerContextKey, controllerContext, registrationInfo)
@@ -385,8 +389,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
     MTRDevice * deviceToReturn = [[MTRDevice_XPC alloc] initWithNodeID:nodeID controller:self];
     [self.nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
     MTR_LOG("%s: returning XPC device for node id %@", __PRETTY_FUNCTION__, nodeID);
-
-    [self _updateRegistrationInfo];
 
     return deviceToReturn;
 }

@@ -201,10 +201,10 @@ MTR_DIRECT_MEMBERS
     MTR_LOG("%@ added delegate info %@", self, newDelegateInfo);
 
     // Call hook to allow subclasses to act on delegate addition.
-    [self _delegateAdded];
+    [self _delegateAdded: delegate];
 }
 
-- (void)_delegateAdded
+- (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -214,9 +214,9 @@ MTR_DIRECT_MEMBERS
 - (void)removeDelegate:(id<MTRDeviceDelegate>)delegate
 {
     MTR_LOG("%@ removeDelegate %@", self, delegate);
-
+    
     std::lock_guard lock(_lock);
-
+    
     NSMutableSet<MTRDeviceDelegateInfo *> * delegatesToRemove = [NSMutableSet set];
     [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
         id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
@@ -233,6 +233,16 @@ MTR_DIRECT_MEMBERS
         [_delegates minusSet:delegatesToRemove];
         MTR_LOG("%@ removeDelegate: removed %lu", self, static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
     }
+    
+    // Call hook to allow subclasses to act on delegate addition.
+    [self _delegateRemoved: delegate];
+}
+
+- (void)_delegateRemoved:(id<MTRDeviceDelegate>)delegate
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    // Nothing to do for now. At the moment this is a hook for subclasses.
 }
 
 - (void)invalidate
