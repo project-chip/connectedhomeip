@@ -58,6 +58,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         self.mode_fail = 0
         self.is_ci = False
         self.app_pipe = "/tmp/chip_rvc_fifo_"
+        self.app_pipe_pid = self.matter_test_config.app_pid
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.RvcCleanMode
@@ -92,11 +93,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         self.mode_ok = self.matter_test_config.global_test_params['PIXIT.RVCCLEANM.MODE_CHANGE_OK']
         self.mode_fail = self.matter_test_config.global_test_params['PIXIT.RVCCLEANM.MODE_CHANGE_FAIL']
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
-            self.app_pipe = self.app_pipe + str(app_pid)
+        self.app_pipe_pid = self.matter_test_config.app_pid
 
         asserts.assert_true(self.check_pics("RVCCLEANM.S.A0000"), "RVCCLEANM.S.A0000 must be supported")
         asserts.assert_true(self.check_pics("RVCCLEANM.S.A0001"), "RVCCLEANM.S.A0001 must be supported")
