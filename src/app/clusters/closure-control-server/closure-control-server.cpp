@@ -61,6 +61,82 @@ bool Instance::SupportsOptAttr(OptionalAttributes aOptionalAttrs) const
     return mOptionalAttrs.Has(aOptionalAttrs);
 }
 
+bool Instance::IsSupportedState(MainStateEnum aMainState)
+{
+    switch (aMainState)
+    {
+    case MainStateEnum::kCalibrating:
+        return HasFeature(Feature::kCalibration);
+    case MainStateEnum::kProtected:
+        return HasFeature(Feature::kProtection);
+    case MainStateEnum::kDisengaged:
+        return HasFeature(Feature::kManuallyOperable);
+    case MainStateEnum::kPendingFallback:
+        return HasFeature(Feature::kFallback);
+    default:
+        return true;
+    }
+    return true;
+}
+
+CHIP_ERROR Instance::SetMainState(const MainStateEnum & aMainState)
+{
+    if (!IsSupportedState(aMainState))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    
+    MainStateEnum oldMainState = mMainState;
+    mMainState                         = aMainState;
+    if (mMainState != oldMainState)
+    {
+        MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), mClusterId, Attributes::MainState::Id);
+        UpdateCountdownTimeFromClusterLogic();
+    }
+    return CHIP_NO_ERROR;
+}
+
+MainStateEnum Instance::GetMainState() const
+{
+    return mMainState;
+}
+
+void Instance::UpdateCountdownTime(bool fromDelegate)
+{
+    app::DataModel::Nullable<uint32_t> newCountdownTime = mDelegate.GetCountdownTime();
+    auto now                                            = System::SystemClock().GetMonotonicTimestamp();
+
+    bool markDirty = false;
+
+    if (fromDelegate)
+    {
+        // Updates from delegate are reduce-reported to every 10s max (choice of this implementation), in addition
+        // to default change-from-null, change-from-zero and increment policy.
+        auto predicate = [](const decltype(mCountdownTime)::SufficientChangePredicateCandidate & candidate) -> bool {
+            if (candidate.lastDirtyValue.IsNull() || candidate.newValue.IsNull())
+            {
+                return false;
+            }
+
+            uint32_t lastDirtyValue           = candidate.lastDirtyValue.Value();
+            uint32_t newValue                 = candidate.newValue.Value();
+            uint32_t kNumSecondsDeltaToReport = 10;
+            return (newValue < lastDirtyValue) && ((lastDirtyValue - newValue) > kNumSecondsDeltaToReport);
+        };
+        markDirty = (mCountdownTime.SetValue(newCountdownTime, now, predicate) == AttributeDirtyState::kMustReport);
+    }
+    else
+    {
+        auto predicate = [](const decltype(mCountdownTime)::SufficientChangePredicateCandidate &) -> bool { return true; };
+        markDirty      = (mCountdownTime.SetValue(newCountdownTime, now, predicate) == AttributeDirtyState::kMustReport);
+    }
+
+    if (markDirty)
+    {
+        MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), mClusterId, Attributes::CountdownTime::Id);
+    }
+}
+
 // AttributeAccessInterface
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -75,7 +151,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         }
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     case MainState::Id:
-        return aEncoder.Encode(mDelegate.GetMainState());
+        return aEncoder.Encode(GetMainState());
     case CurrentErrorList::Id:
         return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return this->EncodeCurrentErrorList(encoder); });
     case OverallState::Id:
