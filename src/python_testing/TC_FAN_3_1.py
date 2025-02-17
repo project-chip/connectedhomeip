@@ -182,7 +182,8 @@ class TC_FAN_3_1(MatterBaseTest):
             value_init_update = 0 if order == OrderEnum.Ascending else percent_setting_max_value
         elif attr_to_update == fan_mode_attr:
             attr_to_verify = percent_setting_attr
-            iteration_range = range(1, len(self.fan_modes)) if order == OrderEnum.Ascending else range(len(self.fan_modes) - 2, -1, -1)
+            iteration_range = range(1, len(self.fan_modes)) if order == OrderEnum.Ascending else range(
+                len(self.fan_modes) - 2, -1, -1)
             value_init_verify = 0 if order == OrderEnum.Ascending else percent_setting_max_value
             value_init_update = fan_mode_off if order == OrderEnum.Ascending else fan_mode_high
 
@@ -312,7 +313,7 @@ class TC_FAN_3_1(MatterBaseTest):
         ep = self.get_endpoint(default=1)
         cluster = Clusters.FanControl
         attributes = cluster.Attributes
-        
+
         # *** STEP 1 ***
         # Commissioning already done
         self.step(1)
