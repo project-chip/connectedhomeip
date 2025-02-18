@@ -6274,6 +6274,9 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateFabricLabelID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000009,
     MTRCommandIDTypeClusterOperationalCredentialsCommandRemoveFabricID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000000A,
     MTRCommandIDTypeClusterOperationalCredentialsCommandAddTrustedRootCertificateID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000000B,
+    MTRCommandIDTypeClusterOperationalCredentialsCommandSetVidVerificationStatementID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
+    MTRCommandIDTypeClusterOperationalCredentialsCommandSignVidVerificationRequestID MTR_PROVISIONALLY_AVAILABLE = 0x0000000D,
+    MTRCommandIDTypeClusterOperationalCredentialsCommandSignVidVerificationResponseID MTR_PROVISIONALLY_AVAILABLE = 0x0000000E,
 
     // Cluster GroupKeyManagement deprecated command id names
     MTRClusterGroupKeyManagementCommandKeySetWriteID
