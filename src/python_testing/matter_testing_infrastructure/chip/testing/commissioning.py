@@ -23,7 +23,7 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional
 
-from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
+from chip import ChipDeviceCtrl
 from chip import discovery
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.clusters import ClusterObjects as ClusterObjects
