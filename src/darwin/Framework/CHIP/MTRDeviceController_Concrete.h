@@ -224,6 +224,11 @@ NS_ASSUME_NONNULL_BEGIN
                        completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
 
 /**
+ * Returns YES if the MTRDevice corrresponding to the given node ID is known to be a thread device, NO otherwise.
+ */
+- (BOOL)definitelyUsesThreadForDevice:(chip::NodeId)nodeID;
+
+/**
  * Will return chip::kUndefinedFabricIndex if we do not have a fabric index.
  */
 @property (readonly) chip::FabricIndex fabricIndex;

@@ -22,6 +22,9 @@
 #import "MTROTAUnsolicitedBDXMessageHandler.h"
 #import "NSStringSpanConversion.h"
 
+#include <chrono>
+#include <platform/Darwin/UserDefaults.h>
+
 using namespace chip;
 using namespace chip::bdx;
 using namespace chip::app;
@@ -30,6 +33,14 @@ constexpr uint32_t kMaxBdxBlockSize = 1024;
 
 // Timeout for the BDX transfer session. The OTA Spec mandates this should be >= 5 minutes.
 constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60);
+
+// For thread devices, we may want to throttle sending Blocks in response to BlockQuery messages
+// to avoid spamming the network with too many BDX messages.  For now, default to the old 50ms
+// polling interval we used to have.
+// To override the throttle interval,
+// use ` defaults write <domain> BDXThrottleIntervalForThreadDevicesInMSecs <throttleIntervalinMsecs>`
+// See UserDefaults.mm for details.
+constexpr auto kBdxThrottleDefaultInterval = System::Clock::Milliseconds32(50);
 
 constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
 
@@ -53,7 +64,7 @@ constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
 }
 @end
 
-MTROTAImageTransferHandler::MTROTAImageTransferHandler(chip::System::Layer * layer)
+MTROTAImageTransferHandler::MTROTAImageTransferHandler(System::Layer * layer)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -77,6 +88,10 @@ CHIP_ERROR MTROTAImageTransferHandler::Init(Messaging::ExchangeContext * exchang
     // We should have already checked that this controller supports OTA.
     VerifyOrReturnError(mDelegate != nil, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mDelegateNotificationQueue != nil, CHIP_ERROR_INCORRECT_STATE);
+
+    mIsPeerNodeAKnownThreadDevice = [controller definitelyUsesThreadForDevice:mPeer.GetNodeId()];
+
+    mBDXThrottleIntervalForThreadDevices = Platform::GetUserDefaultBDXThrottleIntervalForThread().value_or(kBdxThrottleDefaultInterval);
 
     BitFlags<bdx::TransferControlFlags> flags(bdx::TransferControlFlags::kReceiverDrive);
 
@@ -233,6 +248,10 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
 {
     assertChipStackLockedByCurrentThread();
 
+    // For thread devices, we need to throttle sending the response to
+    // BlockQuery, so need to track when we started handling BlockQuery.
+    auto startBlockQueryHandlingTimestamp = System::SystemClock().GetMonotonicTimestamp();
+
     auto blockSize = @(mTransfer.GetTransferBlockSize());
     auto blockIndex = @(mTransfer.GetNextBlockNum());
 
@@ -241,7 +260,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
 
     MTROTAImageTransferHandlerWrapper * __weak weakWrapper = mOTAImageTransferHandlerWrapper;
 
-    auto completionHandler = ^(NSData * _Nullable data, BOOL isEOF) {
+    auto respondWithBlock = ^(NSData * _Nullable data, BOOL isEOF) {
         [controller
             asyncDispatchToMatterQueue:^() {
                 assertChipStackLockedByCurrentThread();
@@ -283,6 +302,31 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+    void (^completionHandler)(NSData * _Nullable data, BOOL isEOF) = nil;
+
+    // If the peer node is a Thread device, check how much time has elapsed since we started processing the BlockQuery,
+    // round it up to the nearest multiple of kBdxThrottleDefaultInterval, and respond with the block at that point.
+    if (mIsPeerNodeAKnownThreadDevice) {
+        completionHandler = ^(NSData * _Nullable data, BOOL isEOF) {
+            auto timeElapsed = System::SystemClock().GetMonotonicTimestamp() - startBlockQueryHandlingTimestamp;
+            // Integer division rounds down, so dividing by mBDXThrottleIntervalForThreadDevices and then multiplying
+            // by it again rounds down to the nearest multiple of mBDXThrottleIntervalForThreadDevices.
+            auto remainder = timeElapsed - (timeElapsed / mBDXThrottleIntervalForThreadDevices) * mBDXThrottleIntervalForThreadDevices;
+
+            if (remainder == System::Clock::Milliseconds32(0)) {
+                respondWithBlock(data, isEOF);
+            } else {
+                auto nsRemaining = std::chrono::duration_cast<std::chrono::nanoseconds>(remainder);
+                dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, nsRemaining.count());
+                dispatch_after(time, delegateQueue, ^{
+                    respondWithBlock(data, isEOF);
+                });
+            }
+        };
+    } else {
+        completionHandler = respondWithBlock;
+    }
+
     dispatch_async(delegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector(handleBDXQueryForNodeID:
                                                                       controller:blockSize:blockIndex:bytesToSkip:completion:)]) {
@@ -310,7 +354,7 @@ void MTROTAImageTransferHandler::HandleTransferSessionOutput(TransferSession::Ou
 
     TransferSession::OutputEventType eventType = event.EventType;
 
-    ChipLogError(BDX, "OutputEvent type: %s", event.ToString(eventType));
+    ChipLogDetail(BDX, "OutputEvent type: %s", event.ToString(eventType));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     switch (event.EventType) {

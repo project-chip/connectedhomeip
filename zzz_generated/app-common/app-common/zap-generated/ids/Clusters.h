@@ -256,6 +256,9 @@ static constexpr ClusterId Id = 0x00000101;
 namespace WindowCovering {
 static constexpr ClusterId Id = 0x00000102;
 } // namespace WindowCovering
+namespace ClosureControl {
+static constexpr ClusterId Id = 0x00000104;
+} // namespace ClosureControl
 namespace ServiceArea {
 static constexpr ClusterId Id = 0x00000150;
 } // namespace ServiceArea

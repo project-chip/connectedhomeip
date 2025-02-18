@@ -60,6 +60,14 @@ public:
     virtual CHIP_ERROR ClientClusters(EndpointId endpointId, ListBuilder<ClusterId> & builder)          = 0;
     virtual CHIP_ERROR ServerClusters(EndpointId endpointId, ListBuilder<ServerClusterEntry> & builder) = 0;
 
+    /// Attribute lists contain all attributes. This MUST include all global
+    /// attributes (See SPEC 7.13 Global Elements / Global Attributes Table).
+    /// In particular this MUST contain:
+    ///    - AcceptedCommandList::Id
+    ///    - AttributeList::Id
+    ///    - ClusterRevision::Id
+    ///    - FeatureMap::Id
+    ///    - GeneratedCommandList::Id
     virtual CHIP_ERROR Attributes(const ConcreteClusterPath & path, ListBuilder<AttributeEntry> & builder)             = 0;
     virtual CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ListBuilder<CommandId> & builder)           = 0;
     virtual CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path, ListBuilder<AcceptedCommandEntry> & builder) = 0;
@@ -83,7 +91,11 @@ public:
     virtual void Temporary_ReportAttributeChanged(const AttributePathParams & path) = 0;
 
     // "convenience" functions that just return the data and ignore the error
-    // This returns the builder as-is even after the error (e.g. not found would return empty data)
+    // This returns the `ListBuilder<..>::TakeBuffer` from their equivalent fuctions as-is,
+    // even after an error (e.g. not found would return empty data).
+    //
+    // Usage of these indicates no error handling (not even logging) and code should
+    // consider handling errors instead.
     ReadOnlyBuffer<EndpointEntry> EndpointsIgnoreError();
     ReadOnlyBuffer<ServerClusterEntry> ServerClustersIgnoreError(EndpointId endpointId);
     ReadOnlyBuffer<AttributeEntry> AttributesIgnoreError(const ConcreteClusterPath & path);
