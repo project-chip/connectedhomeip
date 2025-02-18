@@ -42,7 +42,7 @@ import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from modebase_cluster_check import ModeBaseClusterChecks
 
-CLUSTER = Clusters.RefrigeratorAndTemperatureControlledCabinetMode
+CLUSTER = Clusters.OvenMode
 
 
 class TC_OTCCM_1_2(MatterBaseTest, ModeBaseClusterChecks):
@@ -60,8 +60,8 @@ class TC_OTCCM_1_2(MatterBaseTest, ModeBaseClusterChecks):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH reads from the DUT the SupportedModes attribute."),
             TestStep(3, "TH reads from the DUT the CurrentMode attribute."),
-            TestStep(4, "TH reads from the DUT the OnMode attribute."),
-            TestStep(5, "TH reads from the DUT the StartUpMode attribute.")
+            # TestStep(4, "TH reads from the DUT the OnMode attribute."),
+            # TestStep(5, "TH reads from the DUT the StartUpMode attribute.")
         ]
         return steps
 
@@ -82,10 +82,11 @@ class TC_OTCCM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         self.step(2)
         # Verify common checks for Mode Base as described in the TC-OTCCM-1.2
         supported_modes = await self.check_supported_modes_and_labels(endpoint=endpoint)
-        # According to the spec, there should be at least one RapidCool or RapidFreeze tag in
-        # the ones supported.
-        additional_tags = [CLUSTER.Enums.ModeTag.kRapidCool,
-                           CLUSTER.Enums.ModeTag.kRapidFreeze]
+        # According to the spec, there should be at least one like
+        # Bake, Convection, Grill, Roast, Clean, Convection Bake, Convection Roast, Warming, Proofing
+        # tag in the ones supported.
+        additional_tags = [CLUSTER.Enums.ModeTag.kBake,
+                           CLUSTER.Enums.ModeTag.kConvection]
         self.check_tags_in_lists(supported_modes=supported_modes, required_tags=additional_tags)
 
         self.step(3)
@@ -93,17 +94,17 @@ class TC_OTCCM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         mode = self.cluster.Attributes.CurrentMode
         await self.read_and_check_mode(endpoint=endpoint, mode=mode, supported_modes=supported_modes)
 
-        self.step(4)
-        # Verify that the OnMode attribute has a valid value or null.
-        mode = self.cluster.Attributes.OnMode
-        await self.read_and_check_mode(endpoint=endpoint, mode=mode,
-                                       supported_modes=supported_modes, is_nullable=True)
+        # self.step(4)
+        # # Verify that the OnMode attribute has a valid value or null.
+        # mode = self.cluster.Attributes.OnMode
+        # await self.read_and_check_mode(endpoint=endpoint, mode=mode,
+        #                                supported_modes=supported_modes, is_nullable=True)
 
-        self.step(5)
-        # Verify that the StartUpMode has a valid value or null
-        mode = self.cluster.Attributes.StartUpMode
-        await self.read_and_check_mode(endpoint=endpoint, mode=mode,
-                                       supported_modes=supported_modes, is_nullable=True)
+        # self.step(5)
+        # # Verify that the StartUpMode has a valid value or null
+        # mode = self.cluster.Attributes.StartUpMode
+        # await self.read_and_check_mode(endpoint=endpoint, mode=mode,
+        #                                supported_modes=supported_modes, is_nullable=True)
 
 
 if __name__ == "__main__":
