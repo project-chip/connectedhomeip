@@ -17,6 +17,7 @@
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
+#include <access/Privilege.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -24,6 +25,7 @@
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventPathParams.h>
+#include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
@@ -267,14 +269,38 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
     VerifyOrReturnValue(cluster->attributeCount > 0, CHIP_NO_ERROR);
     VerifyOrReturnValue(cluster->attributes != nullptr, CHIP_NO_ERROR);
 
-    // TODO: if ember would encode data in AttributeEntry form, we could reference things directly
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(cluster->attributeCount));
+    // TODO: if ember would encode data in AttributeEntry form, we could reference things directly (shorter code,
+    //       although still allocation overhead due to global attributes not in metadata)
+    //
+    // We have Attributes from ember + global attributes that are NOT in ember metadata.
+    // We have to report them all
+    constexpr size_t kGlobalAttributeNotInMetadataCount = ArraySize(GlobalAttributesNotInMetadata);
+
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(cluster->attributeCount + kGlobalAttributeNotInMetadataCount));
 
     Span<const EmberAfAttributeMetadata> attributeSpan(cluster->attributes, cluster->attributeCount);
 
     for (auto & attribute : attributeSpan)
     {
         ReturnErrorOnFailure(builder.Append(AttributeEntryFrom(path, attribute)));
+    }
+
+    // This "GlobalListEntry" is specific for metadata that ember does not include
+    // in its attribute list metadata.
+    //
+    // By spec these Attribute/AcceptedCommands/GeneratedCommants lists are:
+    //   - lists of elements
+    //   - read-only, with read privilege view
+    //   - fixed value (no such flag exists, so this is not a quality flag we set/track)
+    DataModel::AttributeEntry globalListEntry;
+
+    globalListEntry.readPrivilege = Access::Privilege::kView;
+    globalListEntry.flags.Set(DataModel::AttributeQualityFlags::kListAttribute);
+
+    for (auto & attribute : GlobalAttributesNotInMetadata)
+    {
+        globalListEntry.attributeId = attribute;
+        ReturnErrorOnFailure(builder.Append(globalListEntry));
     }
 
     return CHIP_NO_ERROR;

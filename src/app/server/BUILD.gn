@@ -91,12 +91,8 @@ static_library("server") {
   #       be updated if this is not really "testing" even though headers are Test*.h)
   public_deps += [ "${chip_root}/src/lib/support:testing" ]
 
-  if (chip_enable_icd_server) {
-    public_deps += [ "${chip_root}/src/app/icd/server:notifier" ]
-
-    if (chip_enable_icd_checkin) {
-      public_deps +=
-          [ "${chip_root}/src/app/icd/server:default-check-in-back-off" ]
-    }
+  if (chip_enable_icd_checkin) {
+    public_deps +=
+        [ "${chip_root}/src/app/icd/server:default-check-in-back-off" ]
   }
 }

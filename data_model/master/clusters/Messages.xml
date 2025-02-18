@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -51,45 +51,6 @@ are the sole property of their respective owners.
 
 This notice and disclaimer must be included on all copies of this document.
 
-Connectivity Standards Alliance +
-508 Second Street, Suite 206 +
-Davis, CA 95616, USA
-
-:xrefstyle: short
-
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved. This
-information within this document is the property of the Connectivity Standards
-Alliance and its use and disclosure are restricted.
-
-Elements of Connectivity Standards Alliance specifications may be subject to third
-party intellectual property rights, including without limitation,
-patent, copyright or trademark rights (such a third party may or may
-not be a member of the Connectivity Standards Alliance). The Connectivity Standards Alliance is not
-responsible and shall not be held responsible in any manner for
-identifying or failing to identify any or all such third party
-intellectual property rights.
-
-This document and the information contained herein are provided on an
-"AS IS" basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
-OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE
-OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD
-PARTIES (INCLUDING WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS
-INCLUDING PATENT, COPYRIGHT OR TRADEMARK RIGHTS) OR (B) ANY IMPLIED
-WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE
-OR NON-INFRINGEMENT. IN NO EVENT WILL THE CONNECTIVITY STANDARDS ALLIANCE BE LIABLE
-FOR ANY LOSS OF PROFITS, LOSS OF BUSINESS, LOSS OF USE OF DATA,
-INTERRUPTION OF BUSINESS, OR FOR ANY OTHER DIRECT, INDIRECT, SPECIAL
-OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES OF ANY
-KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT OR THE
-INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF
-SUCH LOSS OR DAMAGE.
-
-All company, brand and product names may be trademarks that are the
-sole property of their respective owners.
-
-This legal notice must be included on all copies of this document that
-are made.
-
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
@@ -125,7 +86,6 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
-    <number name="MessageID" type=""/>
     <enum name="FutureMessagePreferenceEnum">
       <item value="0" name="Allowed" summary="Similar messages are allowed">
         <mandatoryConform/>
@@ -187,17 +147,24 @@ Davis, CA 95616, USA
     <struct name="MessageResponseOptionStruct">
       <field id="0" name="MessageResponseID" type="uint32">
         <mandatoryConform/>
-        <constraint type="min" value="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
       </field>
       <field id="1" name="Label" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
     </struct>
     <struct name="MessageStruct">
-      <field id="0" name="MessageID" type="MessageID">
+      <field id="0" name="MessageID" type="message-id">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
       <field id="1" name="Priority" type="MessagePriorityEnum" default="0">
         <access fabricSensitive="true"/>
@@ -220,7 +187,9 @@ Davis, CA 95616, USA
       <field id="5" name="MessageText" type="string">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="256"/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
       </field>
       <field id="6" name="Responses" type="list" default="empty">
         <entry type="MessageResponseOptionStruct"/>
@@ -228,7 +197,9 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="RESP"/>
         </mandatoryConform>
-        <constraint type="maxCount" value="4"/>
+        <constraint>
+          <maxCount value="4"/>
+        </constraint>
       </field>
       <access fabricScoped="true"/>
     </struct>
@@ -238,21 +209,28 @@ Davis, CA 95616, USA
       <entry type="MessageStruct"/>
       <access read="true" readPrivilege="view" fabricScoped="true"/>
       <mandatoryConform/>
-      <constraint type="maxCount" value="8"/>
+      <constraint>
+        <maxCount value="8"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="ActiveMessageIDs" type="list" default="empty">
-      <entry type="MessageID"/>
+      <entry type="message-id"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="maxCount" value="8"/>
+      <constraint>
+        <maxCount value="8"/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="PresentMessagesRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
-      <field id="0" name="MessageID" type="MessageID">
+      <field id="0" name="MessageID" type="message-id">
         <mandatoryConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
       <field id="1" name="Priority" type="MessagePriorityEnum" default="0">
         <mandatoryConform/>
@@ -270,46 +248,61 @@ Davis, CA 95616, USA
       </field>
       <field id="5" name="MessageText" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="256"/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
       </field>
       <field id="6" name="Responses" type="list" default="empty">
         <entry type="MessageResponseOptionStruct"/>
         <mandatoryConform>
           <feature name="RESP"/>
         </mandatoryConform>
-        <constraint type="maxCount" value="4"/>
+        <constraint>
+          <maxCount value="4"/>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="CancelMessagesRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="MessageIDs" type="list">
-        <entry type="MessageID"/>
+        <entry type="message-id"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="8"/>
+        <constraint>
+          <maxCount value="8"/>
+        </constraint>
       </field>
     </command>
   </commands>
   <events>
     <event id="0x00" name="MessageQueued" priority="info">
-      <access readPrivilege="view"/>
+      <access readPrivilege="view" fabricSensitive="true"/>
       <mandatoryConform/>
-      <field id="0" name="MessageID" type="MessageID">
+      <field id="0" name="MessageID" type="message-id">
         <mandatoryConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
     </event>
     <event id="0x01" name="MessagePresented" priority="info">
-      <access readPrivilege="view"/>
+      <access readPrivilege="view" fabricSensitive="true"/>
       <mandatoryConform/>
-      <field id="0" name="MessageID" type="MessageID">
+      <field id="0" name="MessageID" type="message-id">
         <mandatoryConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
     </event>
     <event id="0x02" name="MessageComplete" priority="info">
-      <access readPrivilege="view"/>
+      <access readPrivilege="view" fabricSensitive="true"/>
       <mandatoryConform/>
-      <field id="0" name="MessageID" type="MessageID">
+      <field id="0" name="MessageID" type="message-id">
         <mandatoryConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
       <field id="1" name="ResponseID" type="uint32" default="null">
         <quality nullable="true"/>
@@ -322,7 +315,9 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="RPLY"/>
         </mandatoryConform>
-        <constraint type="maxLength" value="256"/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
       </field>
       <field id="3" name="FutureMessagesPreference" type="FutureMessagePreferenceEnum" default="null">
         <quality nullable="true"/>

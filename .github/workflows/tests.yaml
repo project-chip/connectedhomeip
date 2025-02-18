@@ -50,7 +50,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:104
+            image: ghcr.io/project-chip/chip-build:112
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -93,6 +93,7 @@ jobs:
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
                       src/app/zap-templates/zcl/data-model/chip/chime-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/closure-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-bitmaps.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-enums.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-structs.xml \
@@ -461,7 +462,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:104
+            image: ghcr.io/project-chip/chip-build:112
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
