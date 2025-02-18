@@ -561,6 +561,18 @@ class RESTDCLDClient(DCLDClientInterface):
     def get_approved_certificate(self, subject_name: x509.name.Name, skid_hex: str) -> tuple[bool, x509.Certificate]:
         '''
         Get certificate from DCL
+        
+        Parameters
+        ----------
+        subject_name: x509.name.Name
+            Subject Name object
+        skid_hex: str
+            Subject Key ID in hex format
+
+        Returns
+        -------
+        tuple[bool, x509.Certificate]
+            Tuple of is_paa and the certificate from the DCL.
         '''
         logging.debug(
             f"Fetching issuer from:{self.rest_node_url}/dcl/pki/certificates/{get_b64_name(subject_name)}/{self.get_formatted_hex_skid(skid_hex)}")
