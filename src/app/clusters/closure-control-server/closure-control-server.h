@@ -103,7 +103,7 @@ public:
 
     bool HasFeature(Feature aFeature) const;
     bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
-    
+
     // Attribute setters
     /**
      * Set Main State.
@@ -111,7 +111,7 @@ public:
      * @return CHIP_NO_ERROR if set was successful.
      */
     CHIP_ERROR SetMainState(const MainStateEnum & aMainState);
-    
+
     /**
      * Set OverallState.
      * @param aMainState The OverallState that should now be the current State.
@@ -132,7 +132,7 @@ public:
      * @return The Main State.
      */
     MainStateEnum GetMainState() const;
-    
+
     /**
      * Get OverallState.
      * @return The OverallState.
@@ -150,7 +150,7 @@ public:
      *        call this method. The `GetCountdownTime()` method will be called on the delegate.
      */
     void UpdateCountdownTimeFromDelegate() { UpdateCountdownTime(/* fromDelegate = */ true); }
-    
+
     /**
      * This function returns true if the phase value given exists in the PhaseList attribute, otherwise it returns false.
      */
