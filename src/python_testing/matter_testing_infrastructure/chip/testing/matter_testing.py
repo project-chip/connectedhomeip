@@ -37,7 +37,6 @@ from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
-from functools import partial
 from itertools import chain
 from typing import Any, Iterable, List, Optional, Tuple
 
@@ -45,7 +44,6 @@ import chip.testing.conversions as conversions
 import chip.testing.decorators as decorators
 import chip.testing.matchers as matchers
 import chip.testing.timeoperations as timeoperations
-from chip.tlv import uint
 
 # isort: off
 
@@ -2293,3 +2291,6 @@ has_cluster = decorators.has_cluster
 has_attribute = decorators.has_attribute
 has_command = decorators.has_command
 has_feature = decorators.has_feature
+_has_feature = decorators._has_feature
+_has_command = decorators._has_command
+_has_attribute = decorators._has_attribute
