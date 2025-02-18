@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This file defines and interface for objects interested in MRP events for analytics
+ *      This file defines an interface for objects interested in MRP events for analytics
  */
 
 #pragma once
@@ -36,15 +36,19 @@ public:
     enum class SessionType
     {
         kEstablishedCase,
-        // Initially starting with only one session type but thinking about future when we expand to allow
-        // other session types like Establishing a CASE session.
+        // Initially, we are starting with only one session type, but we are considering the future when we expand to allow
+        // other session types, such as establishing a CASE session.
     };
 
     enum class EventType
     {
+        // Event associated with first time this specific message is sent.
         kInitialSend,
+        // Event associated with re-transmitting a message that was previously sent but not acknowledged.
         kRetransmission,
+        // Event associated with receiving an acknowledgement of a previously sent message.
         kAcknowledged,
+        // Event associated with transmission of a message that failed to be acknowledged.
         kFailed,
     };
 
