@@ -141,7 +141,7 @@ private:
         kFastAdvertisingEnabled = 0x0002,
         kAdvertising            = 0x0004,
         kRestartAdvertising     = 0x0008,
-        kEFRBLEStackInitialized = 0x0010,
+        kSiLabsBLEStackInitialize = 0x0010,
         kDeviceNameSet          = 0x0020,
         kExtAdvertisingEnabled  = 0x0040,
     };
