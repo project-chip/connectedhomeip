@@ -415,12 +415,12 @@ class NodeDCLDClient(DCLDClientInterface):
 
     def __init__(self, dcld_exe: str, production: bool):
         '''
-        Initialize the client
+        Initialize the client.
 
         dcld_exe: str
-            Path to `dcld` executable
+            Path to `dcld` executable.
         production: bool
-            Use MainNet DCL URL with dcld executable
+            Use MainNet DCL URL with dcld executable.
         '''
 
         self.dcld_exe = dcld_exe
@@ -433,12 +433,12 @@ class NodeDCLDClient(DCLDClientInterface):
         Parameters
         ----------
         cmdlist: list[str]
-            List of command line arguments to append to some predefined arguments
+            List of command line arguments to append to some predefined arguments.
 
         Returns
         -------
         list[str]
-            The complete command list including the DCLD executable and node option if in production
+            The complete command list including the DCLD executable and node option if in production.
         '''
 
         return [self.dcld_exe] + cmdlist + (['--node', PRODUCTION_NODE_URL] if self.production else [])
@@ -450,12 +450,12 @@ class NodeDCLDClient(DCLDClientInterface):
         Parameters
         ----------
         cmdlist: list[str]
-            List of command line arguments to append to some predefined arguments
+            List of command line arguments to append to some predefined arguments.
 
         Returns
         -------
         dict
-            The JSON output from the command
+            The JSON output from the command.
         '''
 
         # Set the output as JSON
@@ -467,12 +467,12 @@ class NodeDCLDClient(DCLDClientInterface):
 
     def get_revocation_points(self) -> list[dict]:
         '''
-        Get revocation points from DCL
+        Get revocation points from DCL.
 
         Returns
         -------
         list[dict]
-            List of revocation points
+            List of revocation points.
         '''
 
         response = self.get_dcld_cmd_output_json(['query', 'pki', 'all-revocation-points'])
@@ -480,17 +480,17 @@ class NodeDCLDClient(DCLDClientInterface):
 
     def get_revocations_points_by_skid(self, issuer_subject_key_id) -> list[dict]:
         '''
-        Get revocation points by subject key ID
+        Get revocation points by subject key ID.
 
         Parameters
         ----------
         issuer_subject_key_id: str
-            Subject key ID
+            Subject key ID.
 
         Returns
         -------
         list[dict]
-            List of revocation points
+            List of revocation points.
         '''
 
         response = self.get_dcld_cmd_output_json(['query', 'pki', 'revocation-points',
@@ -500,14 +500,14 @@ class NodeDCLDClient(DCLDClientInterface):
 
     def get_approved_certificate(self, subject_name: x509.name.Name, skid_hex: str) -> tuple[bool, x509.Certificate]:
         '''
-        Get certificate from DCL
+        Get certificate from DCL.
 
         Parameters
         ----------
         subject_name: x509.name.Name
-            Subject Name object
+            Subject Name object.
         skid_hex: str
-            Subject Key ID in hex format
+            Subject Key ID in hex format.
 
         Returns
         -------
@@ -529,7 +529,7 @@ class RESTDCLDClient(DCLDClientInterface):
 
     def __init__(self, production: bool):
         '''
-        Initialize the client
+        Initialize the client.
 
         production: bool
             Indicates if the client should use MainNet or TestNet REST API URL.
@@ -538,12 +538,12 @@ class RESTDCLDClient(DCLDClientInterface):
 
     def get_revocation_points(self) -> list[dict]:
         '''
-        Get revocation points from DCL
+        Get revocation points from DCL.
 
         Returns
         -------
         list[dict]
-            List of revocation points
+            List of revocation points.
         '''
 
         response = self.send_get_request(f"{self.rest_node_url}/dcl/pki/revocation-points")
@@ -552,17 +552,17 @@ class RESTDCLDClient(DCLDClientInterface):
 
     def get_revocations_points_by_skid(self, issuer_subject_key_id) -> list[dict]:
         '''
-        Get revocation points by subject key ID
+        Get revocation points by subject key ID.
 
         Parameters
         ----------
         issuer_subject_key_id: str
-            Subject key ID
+            Subject key ID.
 
         Returns
         -------
         list[dict]
-            List of revocation points
+            List of revocation points.
         '''
 
         response = self.send_get_request(f"{self.rest_node_url}/dcl/pki/revocation-points/{issuer_subject_key_id}")
@@ -571,14 +571,14 @@ class RESTDCLDClient(DCLDClientInterface):
 
     def get_approved_certificate(self, subject_name: x509.name.Name, skid_hex: str) -> tuple[bool, x509.Certificate]:
         '''
-        Get certificate from DCL
+        Get certificate from DCL.
 
         Parameters
         ----------
         subject_name: x509.name.Name
-            Subject Name object
+            Subject Name object.
         skid_hex: str
-            Subject Key ID in hex format
+            Subject Key ID in hex format.
 
         Returns
         -------
@@ -600,7 +600,7 @@ class LocalFilesDCLDClient(DCLDClientInterface):
 
     def __init__(self, crls: [], dcl_certificates: [], revocation_points_response_file: str):
         '''
-        Initialize the client
+        Initialize the client.
 
         Parameters
         ----------
@@ -697,12 +697,12 @@ class LocalFilesDCLDClient(DCLDClientInterface):
 
     def get_revocation_points(self) -> list[dict]:
         '''
-        Get revocation points from DCL
+        Get revocation points from DCL.
 
         Returns
         -------
         list[dict]
-            List of revocation points
+            List of revocation points.
         '''
         return self.revocation_points_response["PkiRevocationDistributionPoint"]
 
@@ -713,7 +713,7 @@ class LocalFilesDCLDClient(DCLDClientInterface):
         Parameters
         ----------
         issuer_subject_key_id: str
-            Subject key ID
+            Subject key ID.
 
         Returns
         -------
