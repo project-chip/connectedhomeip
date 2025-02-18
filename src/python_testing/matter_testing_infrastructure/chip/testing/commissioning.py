@@ -127,8 +127,7 @@ async def commission_device(
         logging.debug(
             f"Setting TC Acknowledgements to version {commissioning_info.tc_version_to_simulate} with user response {commissioning_info.tc_user_response_to_simulate}."
         )
-        dev_ctrl.SetTCAcknowledgements(
-            commissioning_info.tc_version_to_simulate, commissioning_info.tc_user_response_to_simulate)
+        dev_ctrl.SetTCAcknowledgements(commissioning_info.tc_version_to_simulate, commissioning_info.tc_user_response_to_simulate)
 
     if commissioning_info.commissioning_method == "on-network":
         try:
@@ -147,8 +146,7 @@ async def commission_device(
                 node_id,
                 commissioning_info.wifi_ssid,
                 commissioning_info.wifi_passphrase,
-                isShortDiscriminator=(info.filter_type ==
-                                      DiscoveryFilterType.SHORT_DISCRIMINATOR),
+                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
             )
             return True
         except ChipStackError as e:
@@ -161,8 +159,7 @@ async def commission_device(
                 info.passcode,
                 node_id,
                 commissioning_info.thread_operational_dataset,
-                isShortDiscriminator=(info.filter_type ==
-                                      DiscoveryFilterType.SHORT_DISCRIMINATOR),
+                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
             )
             return True
         except ChipStackError as e:
@@ -170,8 +167,7 @@ async def commission_device(
             return False
     elif commissioning_info.commissioning_method == "on-network-ip":
         try:
-            logging.warning(
-                "==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
+            logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
             await dev_ctrl.CommissionIP(
                 ipaddr=commissioning_info.commissionee_ip_address_just_for_testing,
                 setupPinCode=info.passcode,
@@ -182,8 +178,7 @@ async def commission_device(
             logging.error("Commissioning failed: %s" % e)
             return False
     else:
-        raise ValueError("Invalid commissioning method %s!" %
-                         commissioning_info.commissioning_method)
+        raise ValueError("Invalid commissioning method %s!" % commissioning_info.commissioning_method)
 
 
 async def commission_devices(
@@ -208,8 +203,7 @@ async def commission_devices(
     """
     commissioned = []
     for node_id, setup_payload in zip(dut_node_ids, setup_payloads):
-        logging.info(
-            f"Commissioning method: {commissioning_info.commissioning_method}")
+        logging.info(f"Commissioning method: {commissioning_info.commissioning_method}")
         commissioned.append(await commission_device(dev_ctrl, node_id, setup_payload, commissioning_info))
 
     return all(commissioned)
