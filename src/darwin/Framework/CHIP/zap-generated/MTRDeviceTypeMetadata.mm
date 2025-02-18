@@ -90,6 +90,7 @@ static /* constexpr */ const MTRDeviceTypeData knownDeviceTypes[] = {
     { 0x00000306, MTRDeviceTypeClass::Simple, @"Flow Sensor" },
     { 0x00000307, MTRDeviceTypeClass::Simple, @"Humidity Sensor" },
     { 0x00000309, MTRDeviceTypeClass::Simple, @"Heat Pump" },
+    { 0x0000030A, MTRDeviceTypeClass::Simple, @"Thermostat Controller" },
     { 0x0000050C, MTRDeviceTypeClass::Simple, @"EVSE" },
     { 0x0000050D, MTRDeviceTypeClass::Utility, @"Device Energy Management" },
     { 0x0000050F, MTRDeviceTypeClass::Simple, @"Water Heater" },
