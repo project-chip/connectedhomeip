@@ -224,9 +224,7 @@ class TC_FAN_3_1(MatterBaseTest):
 
     async def verify_fan_control_attribute_progression(self, endpoint, attr_to_update, order) -> None:
         # Setup
-        cluster = Clusters.FanControl
-        speed_setting_attr = cluster.Attributes.SpeedSetting
-        speed_max_attr = cluster.Attributes.SpeedMax
+        speed_setting_attr = Clusters.FanControl.Attributes.SpeedSetting
         timeout_sec = 0.1  # Timeout given for item retreival from the attribute queue
 
         # *** NEXT STEP ***
