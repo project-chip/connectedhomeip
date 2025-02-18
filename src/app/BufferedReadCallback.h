@@ -44,7 +44,7 @@ public:
 
 private:
     /*
-     * Generates the reconsistuted TLV array from the stored individual list elements
+     * Generates the reconstituted TLV array from the stored individual list elements
      */
     CHIP_ERROR GenerateListTLV(TLV::ScopedBufferTLVReader & reader);
 
