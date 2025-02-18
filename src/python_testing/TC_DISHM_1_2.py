@@ -42,7 +42,7 @@ import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from modebase_cluster_check import ModeBaseClusterChecks
 
-CLUSTER = Clusters.RefrigeratorAndTemperatureControlledCabinetMode
+CLUSTER = Clusters.DishwasherMode
 
 
 class TC_DISHM_1_2(MatterBaseTest, ModeBaseClusterChecks):
@@ -82,10 +82,10 @@ class TC_DISHM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         self.step(2)
         # Verify common checks for Mode Base as described in the TC-DISHM-1.2
         supported_modes = await self.check_supported_modes_and_labels(endpoint=endpoint)
-        # According to the spec, there should be at least one RapidCool or RapidFreeze tag in
+        # According to the spec, there should be at least one Normal, Heavy, OR Light tag in
         # the ones supported.
-        additional_tags = [CLUSTER.Enums.ModeTag.kRapidCool,
-                           CLUSTER.Enums.ModeTag.kRapidFreeze]
+        additional_tags = [CLUSTER.Enums.ModeTag.kNormal,
+                           CLUSTER.Enums.ModeTag.kHeavy]
         self.check_tags_in_lists(supported_modes=supported_modes, required_tags=additional_tags)
 
         self.step(3)
