@@ -49,6 +49,7 @@ public:
     CHIP_ERROR ClearTargetVersion() override;
 
 private:
+    bool CheckDuplicateProvider(ProviderLocationList & listProviders, ProviderLocationType provider);
     CHIP_ERROR Load(const char * key, MutableByteSpan & buffer);
     PersistentStorageDelegate * mPersistentStorage = nullptr;
 };

@@ -97,6 +97,35 @@ TEST(TestDefaultOTARequestorStorage, TestDefaultProvidersEmpty)
     EXPECT_FALSE(providers.Begin().Next());
 }
 
+TEST(TestDefaultOTARequestorStorage, TestDefaultProvidersDuplicated)
+{
+    TestPersistentStorageDelegate persistentStorage;
+    DefaultOTARequestorStorage otaStorage;
+    otaStorage.Init(persistentStorage);
+
+    const auto makeProvider = [](FabricIndex fabric, NodeId nodeId, EndpointId endpointId) {
+        OTARequestorStorage::ProviderLocationType provider;
+        provider.fabricIndex    = fabric;
+        provider.providerNodeID = nodeId;
+        provider.endpoint       = endpointId;
+        return provider;
+    };
+
+    ProviderLocationList providers = {};
+    EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(1), NodeId(0x11111111), EndpointId(1))));
+    EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(1), NodeId(0x11111111), EndpointId(1))));
+    EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(2), NodeId(0x22222222), EndpointId(2))));
+    EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(2), NodeId(0x22222222), EndpointId(2))));
+    EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(3), NodeId(0x33333333), EndpointId(3))));
+    EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(3), NodeId(0x33333333), EndpointId(3))));
+    EXPECT_EQ(CHIP_NO_ERROR, otaStorage.StoreDefaultProviders(providers));
+
+    providers = {};
+    EXPECT_EQ(CHIP_NO_ERROR, otaStorage.LoadDefaultProviders(providers));
+
+    EXPECT_TRUE(providers.mListSize == 3U);
+}
+
 TEST(TestDefaultOTARequestorStorage, TestCurrentProviderLocation)
 {
     TestPersistentStorageDelegate persistentStorage;
@@ -181,6 +210,40 @@ TEST(TestDefaultOTARequestorStorage, TestTargetVersion)
     EXPECT_EQ(targetVersion, 2u);
     EXPECT_EQ(CHIP_NO_ERROR, otaStorage.ClearTargetVersion());
     EXPECT_NE(CHIP_NO_ERROR, otaStorage.LoadTargetVersion(targetVersion));
+}
+
+TEST(TestDefaultOTARequestorStorage, TestDuplicateProvider)
+{
+    ProviderLocationList listProviders = {};
+    OTARequestorStorage::ProviderLocationType provider;
+    TestPersistentStorageDelegate persistentStorage;
+    DefaultOTARequestorStorage otaStorage;
+
+    otaStorage.Init(persistentStorage);
+
+    provider.providerNodeID = 1231524802U;
+    provider.fabricIndex = 1U;
+    provider.endpoint = 2U;
+
+    EXPECT_EQ(true, otaStorage.CheckDuplicateProvider(listProviders, provider));
+
+    listProviders.Add(provider);
+    EXPECT_EQ(true, otaStorage.CheckDuplicateProvider(listProviders, provider));
+
+    provider.providerNodeID = 1231524801U;
+    provider.fabricIndex = 1U;
+    provider.endpoint = 2U;
+    EXPECT_EQ(false, otaStorage.CheckDuplicateProvider(listProviders, provider));
+
+    provider.providerNodeID = 1231524802U;
+    provider.fabricIndex = 2U;
+    provider.endpoint = 2U;
+    EXPECT_EQ(false, otaStorage.CheckDuplicateProvider(listProviders, provider));
+
+    provider.providerNodeID = 1231524802U;
+    provider.fabricIndex = 1U;
+    provider.endpoint = 3U;
+    EXPECT_EQ(false, otaStorage.CheckDuplicateProvider(listProviders, provider));
 }
 
 } // namespace
