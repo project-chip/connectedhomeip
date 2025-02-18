@@ -51,12 +51,14 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRDeviceController (Test)
 + (void)forceLocalhostAdvertisingOnly;
 - (void)removeDevice:(MTRDevice *)device;
+- (void)syncRunOnWorkQueue:(void (^)(void))block error:(NSError * __autoreleasing *)error;
 @property (nonatomic, readonly, nullable) id<MTRDeviceControllerDataStoreAttributeStoreMethods> controllerDataStore;
 @end
 
 @interface MTRDevice (Test)
 - (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary;
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
+- (void)_deviceMayBeReachable;
 @end
 
 #pragma mark - Declarations for items compiled only for DEBUG configuration

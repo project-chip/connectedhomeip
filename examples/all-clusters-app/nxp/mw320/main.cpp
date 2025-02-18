@@ -19,8 +19,8 @@
 
 #include <lib/shell/Engine.h>
 
-#include <app/server/OnboardingCodesUtil.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/SetupPayload.h>
 
 #include <lib/core/CHIPCore.h>
