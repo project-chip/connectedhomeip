@@ -71,11 +71,11 @@ class CommissioningInfo:
         wifi_ssid (Optional[str]):
             The name of the Wi-Fi network to which the device should connect.
 
-        tc_version_to_simulate (int):
+        tc_version_to_simulate (Optional[int]):
             The version of the Terms and Conditions to simulate during testing.
             This is used when accepting terms and conditions in a simulated environment.
 
-        tc_user_response_to_simulate (int):
+        tc_user_response_to_simulate (Optional[int]):
             The user response to simulate for the Terms and Conditions, if applicable.
     """
     commissionee_ip_address_just_for_testing: Optional[str] = None
@@ -83,8 +83,8 @@ class CommissioningInfo:
     thread_operational_dataset: Optional[str] = None
     wifi_passphrase: Optional[str] = None
     wifi_ssid: Optional[str] = None
-    tc_version_to_simulate: int = None
-    tc_user_response_to_simulate: int = None
+    tc_version_to_simulate: Optional[int] = None
+    tc_user_response_to_simulate: Optional[int] = None
 
 
 @dataclass
