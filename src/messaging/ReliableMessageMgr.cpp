@@ -105,21 +105,27 @@ void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
 void ReliableMessageMgr::NotifyMessageSendAnalytics(const RetransTableEntry & entry, const SessionHandle & sessionHandle,
                                                     const ReliableMessageAnalyticsDelegate::EventType & eventType)
 {
-    if (!mAnalyticsDelegate)
+    // For now we only support sending analytics for establish CASE sessions.
+    if (!mAnalyticsDelegate || !sessionHandle->IsSecureSession())
     {
         return;
     }
-    uint32_t messageCounter = entry.retainedBuf.GetMessageCounter();
-    auto fabricIndex        = sessionHandle->GetFabricIndex();
-    auto destination        = kUndefinedNodeId;
-    if (sessionHandle->IsSecureSession())
-    {
-        destination = sessionHandle->AsSecureSession()->GetPeerNodeId();
-    }
-    ReliableMessageAnalyticsDelegate::TransmitEvent event = {
-        .nodeId = destination, .fabricIndex = fabricIndex, .eventType = eventType, .messageCounter = messageCounter
-    };
 
+    auto secureSession = sessionHandle->AsSecureSession();
+    if (!secureSession->IsCASESession())
+    {
+        return;
+    }
+
+    uint32_t messageCounter                               = entry.retainedBuf.GetMessageCounter();
+    auto fabricIndex                                      = sessionHandle->GetFabricIndex();
+    auto destination                                      = secureSession->GetPeerNodeId();
+    ReliableMessageAnalyticsDelegate::TransmitEvent event = { .nodeId      = destination,
+                                                              .fabricIndex = fabricIndex,
+                                                              .sessionType =
+                                                                  ReliableMessageAnalyticsDelegate::SessionType::kEstablishedCase,
+                                                              .eventType      = eventType,
+                                                              .messageCounter = messageCounter };
     mAnalyticsDelegate->OnTransmitEvent(event);
 }
 #endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
@@ -366,6 +372,10 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+        NotifyMessageSendAnalytics(*entry, entry->ec->GetSessionHandle(),
+                                   ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
 #if CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
         const ExchangeManager * exchangeMgr = entry->ec->GetExchangeMgr();
         // TODO: investigate why in ReliableMessageMgr::CheckResendApplicationMessageWithPeerExchange unit test released exchange
@@ -563,11 +573,12 @@ void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
 #if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
     // For initial send the packet has already been submitted to transport layer successfully.
     // On re-transmits we do not know if transport layer is unable to retransmit for some
-    // reason, so saying we have sent re-transmit here is a little presumptuous.
-    ReliableMessageAnalyticsDelegate::EventType eventType = entry.sendCount == 0
-        ? ReliableMessageAnalyticsDelegate::EventType::kInitialSend
-        : ReliableMessageAnalyticsDelegate::EventType::kRetransmission;
-    NotifyMessageSendAnalytics(entry, sessionHandle, eventType);
+    // reason. For this reason we only call NotifyMessageSendAnalytics if it is the inital send
+    // and send kRetransmission after we know transmission is successful elsewhere.
+    if (entry.sendCount == 0)
+    {
+        NotifyMessageSendAnalytics(entry, sessionHandle, ReliableMessageAnalyticsDelegate::EventType::kInitialSend);
+    }
 #endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
 }
 

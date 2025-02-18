@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This file defines interface for objects interested in MRP events for analytics
+ *      This file defines and interface for objects interested in MRP events for analytics
  */
 
 #pragma once
@@ -32,9 +32,16 @@ class ReliableMessageAnalyticsDelegate
 {
 public:
     virtual ~ReliableMessageAnalyticsDelegate() = default;
+
+    enum class SessionType
+    {
+        kEstablishedCase,
+        // Initially starting with only one session type but thinking about future when we expand to allow
+        // other session types like Establishing a CASE session.
+    };
+
     enum class EventType
     {
-        kUndefined,
         kInitialSend,
         kRetransmission,
         kAcknowledged,
@@ -43,9 +50,16 @@ public:
 
     struct TransmitEvent
     {
-        NodeId nodeId           = kUndefinedNodeId;
+        // When the session has a peer node ID, this will be a value other than kUndefinedNodeId.
+        NodeId nodeId = kUndefinedNodeId;
+        // When the session has a fabric index, this will be a value other than kUndefinedFabricIndex.
         FabricIndex fabricIndex = kUndefinedFabricIndex;
-        EventType eventType     = EventType::kUndefined;
+        // Session type of the transmit analytic event.
+        SessionType sessionType = SessionType::kEstablishedCase;
+        // The transmit event type.
+        EventType eventType = EventType::kInitialSend;
+        // The outgoing message counter associated with the event. If there is no outgoing message counter
+        // this value will be 0.
         uint32_t messageCounter = 0;
     };
 
