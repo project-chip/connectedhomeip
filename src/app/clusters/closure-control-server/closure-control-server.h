@@ -61,8 +61,6 @@ public:
     // ------------------------------------------------------------------
     // Get attribute methods
     virtual DataModel::Nullable<uint32_t> GetCountdownTime()                           = 0;
-    virtual DataModel::Nullable<Structs::OverallStateStruct::Type> GetOverallState()   = 0;
-    virtual DataModel::Nullable<Structs::OverallTargetStruct::Type> GetOverallTarget() = 0;
     virtual RestingProcedureEnum GetRestingProcedure()                                 = 0;
     virtual TriggerConditionEnum GetTriggerCondition()                                 = 0;
     virtual TriggerPositionEnum GetTriggerPosition()                                   = 0;
@@ -114,6 +112,20 @@ public:
      */
     CHIP_ERROR SetMainState(const MainStateEnum & aMainState);
     
+    /**
+     * Set OverallState.
+     * @param aMainState The OverallState that should now be the current State.
+     * @return CHIP_NO_ERROR if set was successful.
+     */
+    CHIP_ERROR SetOverallState(const DataModel::Nullable<Structs::OverallStateStruct::Type> & aOverallState);
+
+    /**
+     * Set OverallTarget.
+     * @param aMainState The OverallTarget that should be set.
+     * @return CHIP_NO_ERROR if set was successful.
+     */
+    CHIP_ERROR SetOverallTarget(const DataModel::Nullable<Structs::OverallTargetStruct::Type> & aOverallTarget);
+
     // Attribute getters
     /**
      * Get Main State.
@@ -121,6 +133,18 @@ public:
      */
     MainStateEnum GetMainState() const;
     
+    /**
+     * Get OverallState.
+     * @return The OverallState.
+     */
+    DataModel::Nullable<Structs::OverallStateStruct::Type> GetOverallState() const;
+
+    /**
+     * Get OverallTarget.
+     * @return The OverallTarget.
+     */
+    DataModel::Nullable<Structs::OverallTargetStruct::Type> GetOverallTarget() const;
+
     /**
      * @brief Whenever application delegate wants to possibly report a new updated time,
      *        call this method. The `GetCountdownTime()` method will be called on the delegate.
@@ -149,11 +173,13 @@ protected:
 private:
     Delegate & mDelegate;
     const ClusterId mClusterId;
-    
     BitMask<Feature> mFeature;
     BitMask<OptionalAttributes> mOptionalAttrs;
-    MainStateEnum mMainState;
+
     app::QuieterReportingAttribute<uint32_t> mCountdownTime{ DataModel::NullNullable };
+    MainStateEnum mMainState;
+    DataModel::Nullable<Structs::OverallStateStruct::Type> & mOverallState;
+    DataModel::Nullable<Structs::OverallTargetStruct::Type> & mOverallTarget;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;

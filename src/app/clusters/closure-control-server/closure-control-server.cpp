@@ -91,7 +91,28 @@ CHIP_ERROR Instance::SetMainState(const MainStateEnum & aMainState)
     if (mMainState != oldMainState)
     {
         MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), mClusterId, Attributes::MainState::Id);
-        UpdateCountdownTimeFromClusterLogic();
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Instance::SetOverallState(const DataModel::Nullable<Structs::OverallStateStruct::Type> & aOverallState)
+{
+    DataModel::Nullable<Structs::OverallStateStruct::Type> oldOverallState = mOverallState;
+    mOverallState                         = aOverallState;
+    if (mOverallState != oldOverallState)
+    {
+        MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), mClusterId, Attributes::OverallState::Id);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Instance::SetOverallTarget(const DataModel::Nullable<Structs::OverallTargetStruct::Type> & aOverallTarget)
+{
+    DataModel::Nullable<Structs::OverallTargetStruct::Type> oldOverallTarget = mOverallTarget;
+    mOverallTarget                         = aOverallTarget;
+    if (mOverallTarget != oldOverallTarget)
+    {
+        MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), mClusterId, Attributes::OverallTarget::Id);
     }
     return CHIP_NO_ERROR;
 }
@@ -99,6 +120,16 @@ CHIP_ERROR Instance::SetMainState(const MainStateEnum & aMainState)
 MainStateEnum Instance::GetMainState() const
 {
     return mMainState;
+}
+
+DataModel::Nullable<Structs::OverallStateStruct::Type> Instance::GetOverallState() const
+{
+    return mOverallState;
+}
+
+DataModel::Nullable<Structs::OverallTargetStruct::Type> Instance::GetOverallTarget() const
+{
+    return mOverallTarget;
 }
 
 void Instance::UpdateCountdownTime(bool fromDelegate)
@@ -110,20 +141,11 @@ void Instance::UpdateCountdownTime(bool fromDelegate)
 
     if (fromDelegate)
     {
-        // Updates from delegate are reduce-reported to every 10s max (choice of this implementation), in addition
+        // Updates from delegate are reduce-reported to every 1s max (choice of this implementation), in addition
         // to default change-from-null, change-from-zero and increment policy.
-        auto predicate = [](const decltype(mCountdownTime)::SufficientChangePredicateCandidate & candidate) -> bool {
-            if (candidate.lastDirtyValue.IsNull() || candidate.newValue.IsNull())
-            {
-                return false;
-            }
-
-            uint32_t lastDirtyValue           = candidate.lastDirtyValue.Value();
-            uint32_t newValue                 = candidate.newValue.Value();
-            uint32_t kNumSecondsDeltaToReport = 10;
-            return (newValue < lastDirtyValue) && ((lastDirtyValue - newValue) > kNumSecondsDeltaToReport);
-        };
-        markDirty = (mCountdownTime.SetValue(newCountdownTime, now, predicate) == AttributeDirtyState::kMustReport);
+        System::Clock::Milliseconds64 reportInterval = System::Clock::Milliseconds64(1000);
+        auto predicate                               = mCountdownTime.GetPredicateForSufficientTimeSinceLastDirty(reportInterval);
+        markDirty                                    = (mCountdownTime.SetValue(newCountdownTime, now, predicate) == AttributeDirtyState::kMustReport);
     }
     else
     {
@@ -155,9 +177,9 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case CurrentErrorList::Id:
         return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return this->EncodeCurrentErrorList(encoder); });
     case OverallState::Id:
-        return aEncoder.Encode(mDelegate.GetOverallState());
+        return aEncoder.Encode(GetOverallState());
     case OverallTarget::Id:
-        return aEncoder.Encode(mDelegate.GetOverallTarget());
+        return aEncoder.Encode(GetOverallTarget());
     case RestingProcedure::Id:
         if (HasFeature(Feature::kFallback))
         {
