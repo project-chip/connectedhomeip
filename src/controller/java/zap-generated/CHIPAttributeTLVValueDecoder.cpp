@@ -42739,8 +42739,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ActiveChimeID::Id: {
-            using TypeInfo = Attributes::ActiveChimeID::TypeInfo;
+        case Attributes::SelectedChime::Id: {
+            using TypeInfo = Attributes::SelectedChime::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

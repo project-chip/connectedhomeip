@@ -421,10 +421,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ThreeLevelAuto
     using EnumType = Globals::ThreeLevelAutoEnum;
     switch (val)
     {
+    case EnumType::kAuto:
     case EnumType::kLow:
     case EnumType::kMedium:
     case EnumType::kHigh:
-    case EnumType::kAutomatic:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

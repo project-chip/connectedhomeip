@@ -14486,7 +14486,7 @@ private:
 | * SolicitOffer                                                      |   0x01 |
 | * ProvideOffer                                                      |   0x03 |
 | * ProvideAnswer                                                     |   0x05 |
-| * ProvideICECandidate                                               |   0x06 |
+| * ProvideICECandidates                                              |   0x06 |
 | * EndSession                                                        |   0x07 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -14634,23 +14634,23 @@ private:
 };
 
 /*
- * Command ProvideICECandidate
+ * Command ProvideICECandidates
  */
-class WebRTCTransportProviderProvideICECandidate : public ClusterCommand
+class WebRTCTransportProviderProvideICECandidates : public ClusterCommand
 {
 public:
-    WebRTCTransportProviderProvideICECandidate(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("provide-icecandidate", credsIssuerConfig)
+    WebRTCTransportProviderProvideICECandidates(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("provide-icecandidates", credsIssuerConfig), mComplex_ICECandidates(&mRequest.ICECandidates)
     {
         AddArgument("WebRTCSessionID", 0, UINT16_MAX, &mRequest.webRTCSessionID);
-        AddArgument("ICECandidate", &mRequest.ICECandidate);
+        AddArgument("ICECandidates", &mComplex_ICECandidates);
         ClusterCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WebRTCTransportProvider::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -14660,7 +14660,7 @@ public:
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WebRTCTransportProvider::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -14669,7 +14669,8 @@ public:
     }
 
 private:
-    chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::Type mRequest;
+    chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::CharSpan>> mComplex_ICECandidates;
 };
 
 /*
@@ -14717,7 +14718,7 @@ private:
 | Commands:                                                           |        |
 | * Offer                                                             |   0x01 |
 | * Answer                                                            |   0x02 |
-| * ICECandidate                                                      |   0x03 |
+| * ICECandidates                                                     |   0x03 |
 | * End                                                               |   0x04 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -14814,23 +14815,23 @@ private:
 };
 
 /*
- * Command ICECandidate
+ * Command ICECandidates
  */
-class WebRTCTransportRequestorICECandidate : public ClusterCommand
+class WebRTCTransportRequestorICECandidates : public ClusterCommand
 {
 public:
-    WebRTCTransportRequestorICECandidate(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("icecandidate", credsIssuerConfig)
+    WebRTCTransportRequestorICECandidates(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("icecandidates", credsIssuerConfig), mComplex_ICECandidates(&mRequest.ICECandidates)
     {
         AddArgument("WebRTCSessionID", 0, UINT16_MAX, &mRequest.webRTCSessionID);
-        AddArgument("ICECandidate", &mRequest.ICECandidate);
+        AddArgument("ICECandidates", &mComplex_ICECandidates);
         ClusterCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WebRTCTransportRequestor::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidates::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -14840,7 +14841,7 @@ public:
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WebRTCTransportRequestor::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidates::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -14849,7 +14850,8 @@ public:
     }
 
 private:
-    chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::Type mRequest;
+    chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidates::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::CharSpan>> mComplex_ICECandidates;
 };
 
 /*
@@ -15163,7 +15165,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * InstalledChimeSounds                                              | 0x0000 |
-| * ActiveChimeID                                                     | 0x0001 |
+| * SelectedChime                                                     | 0x0001 |
 | * Enabled                                                           | 0x0002 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
@@ -28055,12 +28057,12 @@ void registerClusterWebRTCTransportProvider(Commands & commands, CredentialIssue
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                         //
-        make_unique<WebRTCTransportProviderSolicitOffer>(credsIssuerConfig),        //
-        make_unique<WebRTCTransportProviderProvideOffer>(credsIssuerConfig),        //
-        make_unique<WebRTCTransportProviderProvideAnswer>(credsIssuerConfig),       //
-        make_unique<WebRTCTransportProviderProvideICECandidate>(credsIssuerConfig), //
-        make_unique<WebRTCTransportProviderEndSession>(credsIssuerConfig),          //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                          //
+        make_unique<WebRTCTransportProviderSolicitOffer>(credsIssuerConfig),         //
+        make_unique<WebRTCTransportProviderProvideOffer>(credsIssuerConfig),         //
+        make_unique<WebRTCTransportProviderProvideAnswer>(credsIssuerConfig),        //
+        make_unique<WebRTCTransportProviderProvideICECandidates>(credsIssuerConfig), //
+        make_unique<WebRTCTransportProviderEndSession>(credsIssuerConfig),           //
         //
         // Attributes
         //
@@ -28112,11 +28114,11 @@ void registerClusterWebRTCTransportRequestor(Commands & commands, CredentialIssu
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                   //
-        make_unique<WebRTCTransportRequestorOffer>(credsIssuerConfig),        //
-        make_unique<WebRTCTransportRequestorAnswer>(credsIssuerConfig),       //
-        make_unique<WebRTCTransportRequestorICECandidate>(credsIssuerConfig), //
-        make_unique<WebRTCTransportRequestorEnd>(credsIssuerConfig),          //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                    //
+        make_unique<WebRTCTransportRequestorOffer>(credsIssuerConfig),         //
+        make_unique<WebRTCTransportRequestorAnswer>(credsIssuerConfig),        //
+        make_unique<WebRTCTransportRequestorICECandidates>(credsIssuerConfig), //
+        make_unique<WebRTCTransportRequestorEnd>(credsIssuerConfig),           //
         //
         // Attributes
         //
@@ -28249,7 +28251,7 @@ void registerClusterChime(Commands & commands, CredentialIssuerCommands * credsI
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "installed-chime-sounds", Attributes::InstalledChimeSounds::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "active-chime-id", Attributes::ActiveChimeID::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "selected-chime", Attributes::SelectedChime::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "enabled", Attributes::Enabled::Id, credsIssuerConfig),                             //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
@@ -28261,7 +28263,7 @@ void registerClusterChime(Commands & commands, CredentialIssuerCommands * credsI
             WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type>>>(
             Id, "installed-chime-sounds", Attributes::InstalledChimeSounds::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "active-chime-id", 0, UINT8_MAX, Attributes::ActiveChimeID::Id,
+        make_unique<WriteAttribute<uint8_t>>(Id, "selected-chime", 0, UINT8_MAX, Attributes::SelectedChime::Id,
                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "enabled", 0, 1, Attributes::Enabled::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
@@ -28278,7 +28280,7 @@ void registerClusterChime(Commands & commands, CredentialIssuerCommands * credsI
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "installed-chime-sounds", Attributes::InstalledChimeSounds::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "active-chime-id", Attributes::ActiveChimeID::Id, credsIssuerConfig),               //
+        make_unique<SubscribeAttribute>(Id, "selected-chime", Attributes::SelectedChime::Id, credsIssuerConfig),                //
         make_unique<SubscribeAttribute>(Id, "enabled", Attributes::Enabled::Id, credsIssuerConfig),                             //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
