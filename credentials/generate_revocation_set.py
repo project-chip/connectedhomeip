@@ -501,6 +501,18 @@ class NodeDCLDClient(DCLDClientInterface):
     def get_approved_certificate(self, subject_name: x509.name.Name, skid_hex: str) -> tuple[bool, x509.Certificate]:
         '''
         Get certificate from DCL
+        
+        Parameters
+        ----------
+        subject_name: x509.name.Name
+            Subject Name object
+        skid_hex: str
+            Subject Key ID in hex format
+
+        Returns
+        -------
+        tuple[bool, x509.Certificate]
+            Tuple of is_paa and the certificate from the DCL.
         '''
         subject_name_b64 = get_b64_name(subject_name)
         query_cmd_list = ['query', 'pki', 'x509-cert', '-u', subject_name_b64, '-k', skid_hex]
@@ -519,8 +531,8 @@ class RESTDCLDClient(DCLDClientInterface):
         '''
         Initialize the client
 
-        rest_node_url: str
-            RESTful API URL
+        production: bool
+            Indicates if the client should use MainNet or TestNet REST API URL.
         '''
         self.rest_node_url = PRODUCTION_NODE_URL_REST if production else TEST_NODE_URL_REST
 
@@ -560,7 +572,7 @@ class RESTDCLDClient(DCLDClientInterface):
     def get_approved_certificate(self, subject_name: x509.name.Name, skid_hex: str) -> tuple[bool, x509.Certificate]:
         '''
         Get certificate from DCL
-
+        
         Parameters
         ----------
         subject_name: x509.name.Name
@@ -589,7 +601,17 @@ class LocalFilesDCLDClient(DCLDClientInterface):
     def __init__(self, crls: [], dcl_certificates: [], revocation_points_response_file: str):
         '''
         Initialize the client
+        
+        Parameters
+        ----------
+        crls: list
+            List of CRL files.
+        dcl_certificates: list
+            List of certificate files.
+        revocation_points_response_file: str
+            Path to the get-revocation-points response json file.
         '''
+
         logging.debug(f"Loading certificates from {dcl_certificates}")
         logging.debug(f"Loading crls from {crls}")
         logging.debug(f"Loading revocation points response from {revocation_points_response_file}")
@@ -598,6 +620,19 @@ class LocalFilesDCLDClient(DCLDClientInterface):
         self.authoritative_certs = self.get_authoritative_certificates(dcl_certificates)
 
     def get_lookup_key(self, certificate: x509.Certificate) -> str:
+        '''
+        Get key used in this class to lookup certificates.
+         
+        Parameters
+        ----------
+        certificate: x509.Certificate
+            Certificate object.
+        
+        Returns
+        -------
+        str:
+            lookup key derived from the certificate.
+        '''
         base64_name = get_b64_name(certificate.subject)
         try:
             skid = get_skid(certificate)
@@ -607,7 +642,19 @@ class LocalFilesDCLDClient(DCLDClientInterface):
             logging.warning("CertificateSKID not found, continue...")
 
     def get_crls(self, unread_crls: []) -> list[x509.CertificateRevocationList]:
-        """Obtain the CRL."""
+        '''
+        Get CRLs from list of files.
+         
+        Parameters
+        ----------
+        unread_crls: list
+            List of CRL files.
+        
+        Returns
+        -------
+        list[x509.CertificateRevocationList]
+            List of CRLs.
+        '''
         crls = []
         for file in unread_crls:
             crl_content = file.read()
@@ -618,6 +665,16 @@ class LocalFilesDCLDClient(DCLDClientInterface):
     def get_authoritative_certificates(self, dcl_certificates: []) -> dict[str, x509.Certificate]:
         '''
         Get certificates from revocation points response file and list of provided dcl certificates.
+        
+        Parameters
+        ----------
+        dcl_certificates: list
+            List of certificate files.
+            
+        Returns
+        -------
+        dict[str, x509.CertificateRevocationList]
+            Dictionary of certificates, keyed by lookup key.
         '''
         certificates = {}
         logging.debug(f"Loading certificates from {dcl_certificates}")
@@ -627,7 +684,8 @@ class LocalFilesDCLDClient(DCLDClientInterface):
                 # with open(file, "r") as f:
                 certificate = x509.load_pem_x509_certificate(file.read())
                 certificates[self.get_lookup_key(certificate)] = certificate
-
+                
+        logging.debug("Loading certificates from revocation_points_response file.")
         for point in self.revocation_points_response["PkiRevocationDistributionPoint"]:
             if "crlSignerDelegator" in point and point["crlSignerDelegator"] != "":
                 certificate = x509.load_pem_x509_certificate(bytes(point["crlSignerDelegator"], 'utf-8'))
@@ -660,7 +718,7 @@ class LocalFilesDCLDClient(DCLDClientInterface):
         Returns
         -------
         list[dict]
-            List of revocation points
+            List of revocation points with the same issuer subject key ID.
         '''
         same_issuer_points = []
         for point in self.revocation_points_response["PkiRevocationDistributionPoint"]:
@@ -671,6 +729,19 @@ class LocalFilesDCLDClient(DCLDClientInterface):
     def get_approved_certificate(self, subject_name: x509.name.Name, skid_hex: str) -> tuple[bool, x509.Certificate]:
         '''
         Get certificate from DCL
+        
+        Parameters
+        ----------
+        subject_name: x509.name.Name
+            Subject name object.
+            
+        skid_hex: str
+            Subject Key ID in hex format.
+
+        Returns
+        -------
+        tuple[bool, x509.Certificate]
+            Tuple of is_paa and the certificate from the DCL.
         '''
         subject_name_b64 = get_b64_name(subject_name)
         skid_hex_formatted = self.get_formatted_hex_skid(skid_hex)
@@ -680,10 +751,23 @@ class LocalFilesDCLDClient(DCLDClientInterface):
         return False, None
 
     def get_crl_file(self,
-                     revocation_point: dict,
+                     unused_revocation_point: dict,
                      crl_signer_certificate: x509.Certificate) -> x509.CertificateRevocationList:
         '''
         Obtain the CRL.
+        
+        Parameters
+        ----------
+        unused_revocation_point: dict
+            Revocation point json (dictionary). Not used.
+            
+        crl_signer_certificate: x509.Certificate
+            Crl signer certificate.
+
+        Returns
+        -------
+        x509.CertificateRevocationList
+            CRL signed by the CRL signer certificate.
         '''
         for crl in self.crls:
             if crl.issuer.public_bytes() == crl_signer_certificate.subject.public_bytes():
