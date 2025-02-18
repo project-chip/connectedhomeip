@@ -3164,14 +3164,10 @@ cluster OvenCavityOperationalState = 72 {
     ErrorStateStruct commandResponseState = 0;
   }
 
-  /** Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server. */
-  command Pause(): OperationalCommandResponse = 0;
   /** Upon receipt, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
   command Stop(): OperationalCommandResponse = 1;
   /** Upon receipt, the device SHALL start its operation if it is safe to do so and the device is in an operational state from which it can be started. */
   command Start(): OperationalCommandResponse = 2;
-  /** Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press). */
-  command Resume(): OperationalCommandResponse = 3;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
@@ -3232,7 +3228,7 @@ cluster OvenMode = 73 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
   /** This command is used to change device modes.
@@ -3323,10 +3319,6 @@ cluster LaundryWasherMode = 81 {
     kWhites = 16387;
   }
 
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
-  }
-
   struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -3340,8 +3332,6 @@ cluster LaundryWasherMode = 81 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3355,7 +3345,7 @@ cluster LaundryWasherMode = 81 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
   /** This command is used to change device modes.
@@ -3382,10 +3372,6 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
     kRapidFreeze = 16385;
   }
 
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
-  }
-
   struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -3399,8 +3385,6 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3414,7 +3398,7 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
   /** This command is used to change device modes.
@@ -3659,10 +3643,6 @@ cluster DishwasherMode = 89 {
     kLight = 16386;
   }
 
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
-  }
-
   struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -3676,8 +3656,6 @@ cluster DishwasherMode = 89 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3691,7 +3669,7 @@ cluster DishwasherMode = 89 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
   /** This command is used to change device modes.
@@ -3907,10 +3885,6 @@ cluster MicrowaveOvenMode = 94 {
     kDay = 9;
     kNormal = 16384;
     kDefrost = 16385;
-  }
-
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
   }
 
   struct ModeTagStruct {
