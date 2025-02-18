@@ -7039,36 +7039,6 @@ bool emberAfCameraAvSettingsUserLevelManagementClusterDPTZRelativeMoveCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::DecodableType & commandData);
 /**
- * @brief WebRTC Transport Provider Cluster SolicitOffer Command callback (from client)
- */
-bool emberAfWebRTCTransportProviderClusterSolicitOfferCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportProvider::Commands::SolicitOffer::DecodableType & commandData);
-/**
- * @brief WebRTC Transport Provider Cluster ProvideOffer Command callback (from client)
- */
-bool emberAfWebRTCTransportProviderClusterProvideOfferCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOffer::DecodableType & commandData);
-/**
- * @brief WebRTC Transport Provider Cluster ProvideAnswer Command callback (from client)
- */
-bool emberAfWebRTCTransportProviderClusterProvideAnswerCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::DecodableType & commandData);
-/**
- * @brief WebRTC Transport Provider Cluster ProvideICECandidates Command callback (from client)
- */
-bool emberAfWebRTCTransportProviderClusterProvideICECandidatesCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::DecodableType & commandData);
-/**
- * @brief WebRTC Transport Provider Cluster EndSession Command callback (from client)
- */
-bool emberAfWebRTCTransportProviderClusterEndSessionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportProvider::Commands::EndSession::DecodableType & commandData);
-/**
  * @brief WebRTC Transport Requestor Cluster Offer Command callback (from client)
  */
 bool emberAfWebRTCTransportRequestorClusterOfferCallback(
