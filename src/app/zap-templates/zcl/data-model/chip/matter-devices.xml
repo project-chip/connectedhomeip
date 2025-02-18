@@ -844,6 +844,36 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-mounted-onoff-control</name>
+        <domain>CHIP</domain>
+        <typeName>Mounted On/Off Control</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x010F</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Level Control" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="LT" name="Lighting"></feature>
+                    <feature code="OO" name="OnOff"></feature>
+                </features>
+            </include>
+            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="LT" name="Lighting"></feature>
+                </features>
+            </include>
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false">
+                <requireCommand>CopyScene</requireCommand>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-camera</name>
         <domain>CHIP</domain>
         <typeName>Camera</typeName>
