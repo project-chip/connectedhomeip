@@ -24,11 +24,11 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/StatusIB.h>
+#include <app/cluster-building-blocks/QuieterReporting.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <app/cluster-building-blocks/QuieterReporting.h>
 
 namespace chip {
 namespace app {
@@ -60,12 +60,12 @@ public:
 
     // ------------------------------------------------------------------
     // Get attribute methods
-    virtual DataModel::Nullable<uint32_t> GetCountdownTime()                           = 0;
-    virtual RestingProcedureEnum GetRestingProcedure()                                 = 0;
-    virtual TriggerConditionEnum GetTriggerCondition()                                 = 0;
-    virtual TriggerPositionEnum GetTriggerPosition()                                   = 0;
-    virtual uint32_t GetWaitingDelay()                                                 = 0;
-    virtual uint32_t GetKickoffTimer()                                                 = 0;
+    virtual DataModel::Nullable<uint32_t> GetCountdownTime() = 0;
+    virtual RestingProcedureEnum GetRestingProcedure()       = 0;
+    virtual TriggerConditionEnum GetTriggerCondition()       = 0;
+    virtual TriggerPositionEnum GetTriggerPosition()         = 0;
+    virtual uint32_t GetWaitingDelay()                       = 0;
+    virtual uint32_t GetKickoffTimer()                       = 0;
 
     /* These functions are called by the ReadAttribute handler to iterate through lists
      * The cluster server will call Start<Type>Read to allow the delegate to create a temporary
@@ -89,9 +89,11 @@ enum class OptionalAttributes : uint32_t
 class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs, ClusterId aClusterId) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
-        mDelegate(aDelegate), mClusterId(aClusterId), mFeature(aFeature), mOptionalAttrs(aOptionalAttrs)
+    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs,
+             ClusterId aClusterId) :
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id),
+        CommandHandlerInterface(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mClusterId(aClusterId), mFeature(aFeature),
+        mOptionalAttrs(aOptionalAttrs)
     {
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
