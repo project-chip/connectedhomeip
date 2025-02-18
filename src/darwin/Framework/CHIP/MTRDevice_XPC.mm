@@ -22,6 +22,7 @@
 #import <Matter/MTRDeviceControllerParameters.h>
 
 #import "MTRDeviceController_Internal.h"
+#import "MTRDeviceController_XPC_Internal.h"
 
 #import "MTRAsyncWorkQueue.h"
 #import "MTRAttestationTrustStoreBridge.h"
@@ -144,6 +145,22 @@
 - (MTRNetworkCommissioningFeature)networkCommissioningFeatures
 {
     return [[self._internalState objectForKey:kMTRDeviceInternalPropertyNetworkFeatures] unsignedIntValue];
+}
+
+#pragma mark - Delegate added/removed callbacks
+
+- (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate
+{
+    [super _delegateAdded:delegate];
+    MTR_LOG("%@ delegate added: %@", self, delegate);
+    [(MTRDeviceController_XPC *) [self deviceController] _updateRegistrationInfo];
+}
+
+- (void)_delegateRemoved:(id<MTRDeviceDelegate>)delegate
+{
+    [super _delegateRemoved:delegate];
+    MTR_LOG("%@ delegate removed: %@", self, delegate);
+    [(MTRDeviceController_XPC *) [self deviceController] _updateRegistrationInfo];
 }
 
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
