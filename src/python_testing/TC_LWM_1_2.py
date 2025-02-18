@@ -42,7 +42,7 @@ import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from modebase_cluster_check import ModeBaseClusterChecks
 
-CLUSTER = Clusters.RefrigeratorAndTemperatureControlledCabinetMode
+CLUSTER = Clusters.LaundryWasherMode
 
 
 class TC_LWM_1_2(MatterBaseTest, ModeBaseClusterChecks):
@@ -82,16 +82,16 @@ class TC_LWM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         self.step(2)
         # Verify common checks for Mode Base as described in the TC-LWM-1.2
         supported_modes = await self.check_supported_modes_and_labels(endpoint=endpoint)
-        # According to the spec, there should be at least one RapidCool or RapidFreeze tag in
+        # According to the spec, there should be at least one Normal, Delicate, or Heavy tag in
         # the ones supported.
-        additional_tags = [CLUSTER.Enums.ModeTag.kRapidCool,
-                           CLUSTER.Enums.ModeTag.kRapidFreeze]
+        additional_tags = [CLUSTER.Enums.ModeTag.kNormal,
+                           CLUSTER.Enums.ModeTag.kDelicate]
         self.check_tags_in_lists(supported_modes=supported_modes, required_tags=additional_tags)
 
         self.step(3)
         # Verify that the CurrentMode attribute has a valid value.
         mode = self.cluster.Attributes.CurrentMode
-        await self.read_and_check_mode(endpoint=endpoint, mode=mode, supported_modes=supported_modes)
+        resp = await self.read_and_check_mode(endpoint=endpoint, mode=mode, supported_modes=supported_modes)
 
         self.step(4)
         # Verify that the OnMode attribute has a valid value or null.
