@@ -560,7 +560,7 @@ class RESTDCLDClient(DCLDClientInterface):
     def get_approved_certificate(self, subject_name: x509.name.Name, skid_hex: str) -> tuple[bool, x509.Certificate]:
         '''
         Get certificate from DCL
-        
+
         Parameters
         ----------
         subject_name: x509.name.Name
