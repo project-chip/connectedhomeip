@@ -15,6 +15,10 @@
 #    limitations under the License.
 #
 
+"""
+This module contains classes and functions designed to handle the commissioning process of Matter devices.
+"""
+
 import logging
 from dataclasses import dataclass
 from typing import List, Optional
@@ -33,6 +37,14 @@ DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
 
 @dataclass
 class SetupPayloadInfo:
+    """
+    Represents information required to set up a payload during commissioning.
+
+    Attributes:
+        filter_type (discovery.FilterType): The type of filter used for discrimination. Default is `FilterType.LONG_DISCRIMINATOR`.
+        filter_value (int): The value associated with the filter type. Default is `0`.
+        passcode (int): A unique code or password required for setup. Default is `0`.
+    """
     filter_type: discovery.FilterType = discovery.FilterType.LONG_DISCRIMINATOR
     filter_value: int = 0
     passcode: int = 0
@@ -40,18 +52,50 @@ class SetupPayloadInfo:
 
 @dataclass
 class CommissioningInfo:
+    """
+    Represents the information required for commissioning a device.
+
+    Attributes:
+        commissionee_ip_address_just_for_testing (Optional[str]):
+            The IP address of the commissionee used only for testing purposes.
+
+        commissioning_method (Optional[str]):
+            The method by which the device is being commissioned.
+
+        thread_operational_dataset (Optional[str]):
+            The Thread operational dataset if applicable during commissioning.
+
+        wifi_passphrase (Optional[str]):
+            The passphrase to connect to a Wi-Fi network, if required.
+
+        wifi_ssid (Optional[str]):
+            The name of the Wi-Fi network to which the device should connect.
+
+        tc_version_to_simulate (int):
+            The version of the Terms and Conditions to simulate during testing.
+            This is used when accepting terms and conditions in a simulated environment.
+
+        tc_user_response_to_simulate (int):
+            The user response to simulate for the Terms and Conditions, if applicable.
+    """
     commissionee_ip_address_just_for_testing: Optional[str] = None
     commissioning_method: Optional[str] = None
     thread_operational_dataset: Optional[str] = None
     wifi_passphrase: Optional[str] = None
     wifi_ssid: Optional[str] = None
-    # Accepted Terms and Conditions if used
     tc_version_to_simulate: int = None
     tc_user_response_to_simulate: int = None
 
 
 @dataclass
 class CustomCommissioningParameters:
+    """
+    A custom data class that encapsulates commissioning parameters with an additional random discriminator.
+
+    Attributes:
+        commissioningParameters (CommissioningParameters): The underlying commissioning parameters.
+        randomDiscriminator (int): A randomly generated value used to uniquely identify or distinguish instances during commissioning processes.
+    """
     commissioningParameters: CommissioningParameters
     randomDiscriminator: int
 
@@ -59,6 +103,27 @@ class CustomCommissioningParameters:
 async def commission_device(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, info: SetupPayloadInfo, commissioning_info: CommissioningInfo
 ) -> bool:
+    """
+    Starts the commissioning process of a chip device.
+
+    This function handles different commissioning methods based on the specified method.
+    It supports various commissioning techniques such as "on-network", "ble-wifi", and "ble-thread".
+
+    Parameters:
+        dev_ctrl: The chip device controller instance.
+        node_id: Unique identifier for the chip node.
+        info: Contains setup information including passcode, filter_type, and filter_value.
+        commissioning_info: Specifies the type of commissioning method to use.
+
+    Returns:
+        True if the commissioning process completes successfully. False otherwise,
+        except in case of an error which logs the exception details.
+
+    Note:
+        The "on-network-ip" method is deprecated as it's not supported in long-term
+        environments.
+    """
+
     if commissioning_info.tc_version_to_simulate is not None and commissioning_info.tc_user_response_to_simulate is not None:
         logging.debug(
             f"Setting TC Acknowledgements to version {commissioning_info.tc_version_to_simulate} with user response {commissioning_info.tc_user_response_to_simulate}."
@@ -128,6 +193,20 @@ async def commission_devices(
     setup_payloads: List[SetupPayloadInfo],
     commissioning_info: CommissioningInfo,
 ) -> bool:
+    """
+    Attempt to commission all specified device nodes with their respective setup payloads.
+
+    Args:
+        dev_ctrl: The chip device controller being used.
+        dut_node_ids: List of node IDs that need to be commissioned.
+        setup_payloads: List of SetupPayloadInfo objects containing configuration data
+            for each node to be set up and commissioned.
+        commissioning_info: Information about the commissioning process, including method,
+            parameters, etc.
+
+    Returns:
+        bool: True if all devices were successfully commissioned; False otherwise.
+    """
     commissioned = []
     for node_id, setup_payload in zip(dut_node_ids, setup_payloads):
         logging.info(
