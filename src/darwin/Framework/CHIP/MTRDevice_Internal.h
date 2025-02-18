@@ -149,7 +149,8 @@ MTR_DIRECT_MEMBERS
 - (BOOL)_delegateExists;
 
 // Must be called by subclasses or MTRDevice implementation only.
-- (void)_delegateAdded;
+- (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate;
+- (void)_delegateRemoved:(id<MTRDeviceDelegate>)delegate;
 
 #ifdef DEBUG
 // Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously

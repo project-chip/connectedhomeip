@@ -32,7 +32,6 @@ source_set("nullable-primitives") {
 # These headers/cpp only depend on core/common
 source_set("types") {
   sources = [
-    "att-storage.h",
     "attribute-metadata.cpp",
     "attribute-metadata.h",
     "basic-types.h",
