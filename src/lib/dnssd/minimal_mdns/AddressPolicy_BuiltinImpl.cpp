@@ -200,7 +200,7 @@ bool AllInterfaces::CurrentInterfaceHasAddressOfType(chip::Inet::IPAddressType t
     return false;
 }
 
-class DefaultAddressPolicy : public AddressPolicy
+class BuiltinAddressPolicy : public AddressPolicy
 {
 public:
     chip::Platform::UniquePtr<ListenIterator> GetListenEndpoints() override
@@ -215,13 +215,12 @@ public:
     }
 };
 
-DefaultAddressPolicy gDefaultAddressPolicy;
-
 } // namespace
 
-void SetDefaultAddressPolicy()
+AddressPolicy * GetDefaultAddressPolicy()
 {
-    SetAddressPolicy(&gDefaultAddressPolicy);
+    static BuiltinAddressPolicy gAddressPolicy;
+    return &gAddressPolicy;
 }
 
 } // namespace Minimal
