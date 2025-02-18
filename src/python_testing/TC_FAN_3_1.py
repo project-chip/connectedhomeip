@@ -58,7 +58,7 @@ logger = logging.getLogger(__name__)
 
 
 class TC_FAN_3_1(MatterBaseTest):
-    def desc_TC_FAN_3_3(self) -> str:
+    def desc_TC_FAN_3_1(self) -> str:
         return "[TC-FAN-3.1] Mandatory functionality with DUT as Server"    
     
     def steps_TC_FAN_3_1(self):
