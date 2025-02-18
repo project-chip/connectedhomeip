@@ -97,23 +97,15 @@ CHIP_ERROR Instance::SetMainState(const MainStateEnum & aMainState)
 
 CHIP_ERROR Instance::SetOverallState(const DataModel::Nullable<Structs::OverallStateStruct::Type> & aOverallState)
 {
-    DataModel::Nullable<Structs::OverallStateStruct::Type> oldOverallState = mOverallState;
-    mOverallState                         = aOverallState;
-    if (mOverallState != oldOverallState)
-    {
-        MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), mClusterId, Attributes::OverallState::Id);
-    }
+    mOverallState = aOverallState;
+    MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), mClusterId, Attributes::OverallState::Id);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Instance::SetOverallTarget(const DataModel::Nullable<Structs::OverallTargetStruct::Type> & aOverallTarget)
 {
-    DataModel::Nullable<Structs::OverallTargetStruct::Type> oldOverallTarget = mOverallTarget;
-    mOverallTarget                         = aOverallTarget;
-    if (mOverallTarget != oldOverallTarget)
-    {
-        MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), mClusterId, Attributes::OverallTarget::Id);
-    }
+    mOverallTarget = aOverallTarget;
+    MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), mClusterId, Attributes::OverallTarget::Id);
     return CHIP_NO_ERROR;
 }
 
