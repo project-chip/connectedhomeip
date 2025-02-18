@@ -59,8 +59,8 @@ logger = logging.getLogger(__name__)
 
 class TC_FAN_3_1(MatterBaseTest):
     def desc_TC_FAN_3_1(self) -> str:
-        return "[TC-FAN-3.1] Mandatory functionality with DUT as Server"    
-    
+        return "[TC-FAN-3.1] Mandatory functionality with DUT as Server"
+
     def steps_TC_FAN_3_1(self):
         return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
                 TestStep(2, "[FC] TH reads the FanModeSequence attribute to retreive the available fan modes.",
