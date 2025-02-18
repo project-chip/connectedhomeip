@@ -24,7 +24,6 @@ import base64
 import json
 import logging
 import os
-import re
 import subprocess
 import sys
 import unittest
@@ -561,7 +560,7 @@ class RESTDCLDClient(DCLDClientInterface):
     def get_approved_certificate(self, subject_name: x509.name.Name, skid_hex: str) -> tuple[bool, x509.Certificate]:
         '''
         Get certificate from DCL
-
+        
         Parameters
         ----------
         subject_name: x509.name.Name
@@ -775,7 +774,7 @@ def from_dcl(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: 
         # 6. Obtain the CRL
         crl_file = dcld_client.get_crl_file(revocation_point, crl_signer_certificate)
         if crl_file is None:
-            logging.warning(f"CRL file not found for revocation point")
+            logging.warning("CRL file not found for revocation point, continue...")
             continue
 
         # 7. Perform CRL File Validation
