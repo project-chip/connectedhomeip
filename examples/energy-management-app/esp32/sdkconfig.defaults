@@ -78,3 +78,6 @@ CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER=y
 
 # Ensure kPowerForecastReporting (PFR) is set in the DeviceEnergyManagement::Feature attribute. Note cannot set PFR and SFR.
 CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING=y
+
+# Enable OTA Requestor
+CONFIG_ENABLE_OTA_REQUESTOR=y
