@@ -105,23 +105,23 @@ union EmberAfDefaultOrMinMaxAttributeValue
 };
 
 // Attribute masks modify how attributes are used by the framework
-//
+// The following define names are relevant to the ZAP_ATTRIBUTE_MASK macro.
 // Attribute that has this mask is NOT read-only
-#define ATTRIBUTE_MASK_WRITABLE (0x01)
+#define MATTER_ATTRIBUTE_FLAG_WRITABLE (0x01)
 // Attribute that has this mask is saved in non-volatile memory
-#define ATTRIBUTE_MASK_NONVOLATILE (0x02)
-// Alias until ZAP gets updated to output ATTRIBUTE_MASK_NONVOLATILE
-#define ATTRIBUTE_MASK_TOKENIZE ATTRIBUTE_MASK_NONVOLATILE
+#define MATTER_ATTRIBUTE_FLAG_NONVOLATILE (0x02)
+// Alias until ZAP gets updated to output MATTER_ATTRIBUTE_FLAG_NONVOLATILE
+#define MATTER_ATTRIBUTE_FLAG_TOKENIZE MATTER_ATTRIBUTE_FLAG_NONVOLATILE
 // Attribute that has this mask has a min/max values
-#define ATTRIBUTE_MASK_MIN_MAX (0x04)
+#define MATTER_ATTRIBUTE_FLAG_MIN_MAX (0x04)
 // Attribute requires a timed interaction to write
-#define ATTRIBUTE_MASK_MUST_USE_TIMED_WRITE (0x08)
+#define MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE (0x08)
 // Attribute deferred to external storage
-#define ATTRIBUTE_MASK_EXTERNAL_STORAGE (0x10)
+#define MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE (0x10)
 // Attribute is singleton
-#define ATTRIBUTE_MASK_SINGLETON (0x20)
+#define MATTER_ATTRIBUTE_FLAG_SINGLETON (0x20)
 // Attribute is nullable
-#define ATTRIBUTE_MASK_NULLABLE (0x40)
+#define MATTER_ATTRIBUTE_FLAG_NULLABLE (0x40)
 
 /**
  * @brief Each attribute has it's metadata stored in such struct.
@@ -170,41 +170,41 @@ struct EmberAfAttributeMetadata
     /**
      * Check whether this attribute has a define min and max.
      */
-    bool HasMinMax() const { return mask & ATTRIBUTE_MASK_MIN_MAX; }
+    bool HasMinMax() const { return mask & MATTER_ATTRIBUTE_FLAG_MIN_MAX; }
 
     /**
      * Check whether this attribute is nullable.
      */
-    bool IsNullable() const { return mask & ATTRIBUTE_MASK_NULLABLE; }
+    bool IsNullable() const { return mask & MATTER_ATTRIBUTE_FLAG_NULLABLE; }
 
     /**
      * Check whether this attribute is readonly.
      */
-    bool IsReadOnly() const { return !(mask & ATTRIBUTE_MASK_WRITABLE); }
+    bool IsReadOnly() const { return !(mask & MATTER_ATTRIBUTE_FLAG_WRITABLE); }
 
     /**
      * Check whether this attribute requires a timed write.
      */
-    bool MustUseTimedWrite() const { return mask & ATTRIBUTE_MASK_MUST_USE_TIMED_WRITE; }
+    bool MustUseTimedWrite() const { return mask & MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE; }
 
     /**
      * Check whether this attibute's storage is managed outside the built-in
      * attribute store.
      */
-    bool IsExternal() const { return mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE; }
+    bool IsExternal() const { return mask & MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE; }
 
     /**
      * Check whether this is a "singleton" attribute, in the sense that it has a
      * single value across multiple instances of the cluster.  This is not
      * mutually exclusive with the attribute being external.
      */
-    bool IsSingleton() const { return mask & ATTRIBUTE_MASK_SINGLETON; }
+    bool IsSingleton() const { return mask & MATTER_ATTRIBUTE_FLAG_SINGLETON; }
 
     /**
      * Check whether this attribute is automatically stored in non-volatile
      * memory.
      */
-    bool IsAutomaticallyPersisted() const { return (mask & ATTRIBUTE_MASK_NONVOLATILE) && !IsExternal(); }
+    bool IsAutomaticallyPersisted() const { return (mask & MATTER_ATTRIBUTE_FLAG_NONVOLATILE) && !IsExternal(); }
 };
 
 /** @brief Returns true if the given attribute type is a string. */
