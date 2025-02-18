@@ -58,6 +58,9 @@ logger = logging.getLogger(__name__)
 
 
 class TC_FAN_3_1(MatterBaseTest):
+    def desc_TC_FAN_3_3(self) -> str:
+        return "[TC-FAN-3.1] Mandatory functionality with DUT as Server"    
+    
     def steps_TC_FAN_3_1(self):
         return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
                 TestStep(2, "[FC] TH reads the FanModeSequence attribute to retreive the available fan modes.",
@@ -229,10 +232,10 @@ class TC_FAN_3_1(MatterBaseTest):
 
         # *** NEXT STEP ***
         # TH configures the testing setup for the one of the following scenarios:
-        #   - Updating the PercentSetting attribute in ascending order and monitoring the FanMode (and SpeedSetting, if supported) attributes
-        #   - Updating the PercentSetting attribute in descending order and monitoring the FanMode (and SpeedSetting, if supported) attributes
-        #   - Updating the FanMode attribute in aescending order and monitoring the PercentSetting (and SpeedSetting, if supported) attributes
-        #   - Updating the FanMode attribute in descending order and monitoring the PercentSetting (and SpeedSetting, if supported) attributes
+        #   - Update the PercentSetting attribute in ascending order and monitor the FanMode (and SpeedSetting, if supported) attributes
+        #   - Update the PercentSetting attribute in descending order and monitor the FanMode (and SpeedSetting, if supported) attributes
+        #   - Update the FanMode attribute in aescending order and monitor the PercentSetting (and SpeedSetting, if supported) attributes
+        #   - Update the FanMode attribute in descending order and monitor the PercentSetting (and SpeedSetting, if supported) attributes
         self.step(self.current_step_index + 1)
 
         # Get initialization parameters
