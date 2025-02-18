@@ -178,8 +178,8 @@ private:
 
     app::QuieterReportingAttribute<uint32_t> mCountdownTime{ DataModel::NullNullable };
     MainStateEnum mMainState;
-    DataModel::Nullable<Structs::OverallStateStruct::Type> & mOverallState;
-    DataModel::Nullable<Structs::OverallTargetStruct::Type> & mOverallTarget;
+    DataModel::Nullable<Structs::OverallStateStruct::Type> mOverallState;
+    DataModel::Nullable<Structs::OverallTargetStruct::Type> mOverallTarget;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
