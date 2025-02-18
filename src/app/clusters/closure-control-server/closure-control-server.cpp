@@ -85,7 +85,7 @@ CHIP_ERROR Instance::SetMainState(const MainStateEnum & aMainState)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    
+
     MainStateEnum oldMainState = mMainState;
     mMainState                         = aMainState;
     if (mMainState != oldMainState)
