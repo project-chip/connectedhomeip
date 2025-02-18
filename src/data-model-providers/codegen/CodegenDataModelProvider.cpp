@@ -162,11 +162,18 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
                                                                               TLV::TLVReader & input_arguments,
                                                                               CommandHandler * handler)
 {
+    bool clusterRecognizedByCHI = false;
     CommandHandlerInterface * handler_interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
 
-    if (handler_interface)
+    // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
+    // the cluster actually exists on this endpoint before asking the CommandHandlerInterface whether it
+    // supports the command.
+    const bool clusterIsPresent = (FindServerCluster(request.path) != nullptr);
+
+    if (clusterIsPresent && handler_interface)
     {
+        clusterRecognizedByCHI = true;
         CommandHandlerInterface::HandlerContext context(*handler, request.path, input_arguments);
         handler_interface->InvokeCommand(context);
 
@@ -178,7 +185,7 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
     }
 
     // Ember always sets the return in the handler
-    DispatchSingleClusterCommand(request.path, input_arguments, handler);
+    DispatchSingleClusterCommand(request.path, input_arguments, handler, clusterRecognizedByCHI);
     return std::nullopt;
 }
 
