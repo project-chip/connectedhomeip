@@ -137,13 +137,13 @@ private:
     // ===== Private members reserved for use by this class only.
     enum class Flags : uint16_t
     {
-        kAdvertisingEnabled     = 0x0001,
-        kFastAdvertisingEnabled = 0x0002,
-        kAdvertising            = 0x0004,
-        kRestartAdvertising     = 0x0008,
+        kAdvertisingEnabled       = 0x0001,
+        kFastAdvertisingEnabled   = 0x0002,
+        kAdvertising              = 0x0004,
+        kRestartAdvertising       = 0x0008,
         kSiLabsBLEStackInitialize = 0x0010,
-        kDeviceNameSet          = 0x0020,
-        kExtAdvertisingEnabled  = 0x0040,
+        kDeviceNameSet            = 0x0020,
+        kExtAdvertisingEnabled    = 0x0040,
     };
 
     enum
