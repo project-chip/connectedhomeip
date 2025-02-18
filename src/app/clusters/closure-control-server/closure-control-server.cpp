@@ -87,7 +87,7 @@ CHIP_ERROR Instance::SetMainState(const MainStateEnum & aMainState)
     }
 
     MainStateEnum oldMainState = mMainState;
-    mMainState                         = aMainState;
+    mMainState                 = aMainState;
     if (mMainState != oldMainState)
     {
         MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), mClusterId, Attributes::MainState::Id);
@@ -137,7 +137,7 @@ void Instance::UpdateCountdownTime(bool fromDelegate)
         // to default change-from-null, change-from-zero and increment policy.
         System::Clock::Milliseconds64 reportInterval = System::Clock::Milliseconds64(1000);
         auto predicate                               = mCountdownTime.GetPredicateForSufficientTimeSinceLastDirty(reportInterval);
-        markDirty                                    = (mCountdownTime.SetValue(newCountdownTime, now, predicate) == AttributeDirtyState::kMustReport);
+        markDirty = (mCountdownTime.SetValue(newCountdownTime, now, predicate) == AttributeDirtyState::kMustReport);
     }
     else
     {
