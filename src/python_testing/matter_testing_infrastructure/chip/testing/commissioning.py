@@ -23,8 +23,7 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional
 
-from chip import ChipDeviceCtrl
-from chip import discovery
+from chip import ChipDeviceCtrl, discovery
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.exceptions import ChipStackError
