@@ -83,8 +83,8 @@ class TC_DEMM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         # Verify common checks for Mode Base as described in the TC-DEMM-1.2
         supported_modes = await self.check_supported_modes_and_labels(endpoint=endpoint)
         # According to the spec, there should be at least on like
-        # No Optimization, Device Optimization, Local Optimization, or Grid Optimization tag in
-        # the ones supported.
+        # No Optimization, Device Optimization, Local Optimization, or Grid Optimization
+        # tag in the ones supported.
         additional_tags = [CLUSTER.Enums.ModeTag.kNoOptimization,
                            CLUSTER.Enums.ModeTag.kDeviceOptimization]
         self.check_tags_in_lists(supported_modes=supported_modes, required_tags=additional_tags)
