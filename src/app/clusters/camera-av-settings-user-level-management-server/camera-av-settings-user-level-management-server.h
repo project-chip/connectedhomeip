@@ -33,7 +33,7 @@ using chip::Protocols::InteractionModel::Status;
 using MPTZStructType        = Structs::MPTZStruct::Type;
 using MPTZPresetStructType  = Structs::MPTZPresetStruct::Type;
 
-class Delegate; 
+class Delegate;
 
 enum class OptionalAttributes : uint32_t
 {
@@ -107,13 +107,18 @@ private:
     std::vector<MPTZPresetStructType> mMptzPresets;
     const std::vector<uint16_t> mDptzRelativeMove;
     const uint8_t mZoomMax                             = 100;
-    const int16_t mTiltMin                             = -90;     
+    const int16_t mTiltMin                             = -90;
     const int16_t mTiltMax                             = 90;
     const int16_t mPanMin                              = -180;
     const int16_t mPanMax                              = 180;
 
     // Attribute handler interface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+    // Helper Read functions for complex attribute types
+    CHIP_ERROR ReadAndEncodeMPTZPosition(const AttributeValueEncoder::ListEncodeHelper & encoder);
+    CHIP_ERROR ReadAndEncodeMPTZPresets(const AttributeValueEncoder::ListEncodeHelper & encoder);
+    CHIP_ERROR ReadAndEncodeDPTZRelativeMove(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
     // Command handler interface
     void InvokeCommand(HandlerContext & ctx) override;
@@ -166,7 +171,7 @@ private:
     // sets the Server pointer
     void SetServer(CameraAvSettingsUserLevelMgmtServer * aServer) { mServer = aServer; }
 
-protected: 
+protected:
     CameraAvSettingsUserLevelMgmtServer * GetServer() const { return mServer; }
 };
 

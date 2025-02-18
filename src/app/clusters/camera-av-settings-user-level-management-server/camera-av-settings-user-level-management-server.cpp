@@ -59,6 +59,11 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
 {
     LoadPersistentAttributes();
 
+    // Set defauly MPTZ
+    mptzPosition.pan = defaultPan;
+    mptzPosition.tilt = defaultTilt;
+    mptzPosition.zoom = defaultZoom;
+
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
@@ -74,6 +79,36 @@ bool CameraAvSettingsUserLevelMgmtServer::SupportsOptAttr(OptionalAttributes aOp
     return mOptionalAttrs.Has(aOptionalAttrs);
 }
 
+// Helper Read functions for complex attribute types
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::ReadAndEncodeMPTZPosition(const AttributeValueEncoder::ListEncodeHelper & encoder)
+{
+    for (const auto & mptzPosition : mMPTZPosition)
+    {
+        ReturnErrorOnFailure(encoder.Encode(mptzPosition));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::ReadAndEncodeMPTZPresets(const AttributeValueEncoder::ListEncodeHelper & encoder)
+{
+    for (const auto & maxPresets : mMaxPresets)
+    {
+        ReturnErrorOnFailure(encoder.Encode(maxPresets));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::ReadAndEncodeDPTZRelativeMove(const AttributeValueEncoder::ListEncodeHelper & encoder)
+{
+    for (const auto & dptzRelativeMove : mDptzRelativeMove)
+    {
+        ReturnErrorOnFailure(encoder.Encode(dptzRelativeMove));
+    }
+
+    return CHIP_NO_ERROR;
+}
 
 // AttributeAccessInterface
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -88,10 +123,11 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Read(const ConcreteReadAttribute
         break;
     case MPTZPosition::Id:
         VerifyOrReturnError(
-            HasFeature(Feature::kMechanicalPan), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            HasFeature(Feature::kMechanicalPan) || HasFeature(Feature::kMechanicalTilt) || HasFeature(Feature::kMechanicalZoom), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt: can not get MPTZPosition, feature is not supported"));
 
-        ReturnErrorOnFailure(aEncoder.Encode(0));
+        ReturnErrorOnFailure(aEncoder.Encode(
+            [this](const auto & encoder) -> CHIP_ERROR {return this->ReadAndEncodeMPTZPosition(encoder); }));
         break;
     case MaxPresets::Id:
         VerifyOrReturnError(HasFeature(Feature::kMechanicalPresets), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
@@ -103,12 +139,14 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Read(const ConcreteReadAttribute
         VerifyOrReturnError(HasFeature(Feature::kMechanicalPresets), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt: can not get MPTZPresets, feature is not supported"));
 
-        ReturnErrorOnFailure(aEncoder.Encode(0));
+        ReturnErrorOnFailure(aEncoder.EncodeList(
+            [this](const auto & encoder) -> CHIP_ERROR {return this->ReadAndEncodeMaxPresets(encoder); }));
         break;
     case DPTZRelativeMove::Id:
         VerifyOrReturnError(HasFeature(Feature::kDigitalPTZ), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt: can not get DPTZRelativeMove, feature is not supported"));
-        ReturnErrorOnFailure(aEncoder.Encode(0));
+        ReturnErrorOnFailure(aEncoder.EncodeList(
+            [this](const auto & encoder) -> CHIP_ERROR {return this->ReadAndEncodeDTPZRelativeMove(encoder); }));
         break;
     case ZoomMax::Id:
         VerifyOrReturnError(HasFeature(Feature::kMechanicalZoom), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
