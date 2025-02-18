@@ -176,7 +176,7 @@ static EmberAfAttributeMetadata mockMetadataBool = {
     .attributeId   = 0,
     .size          = 1,
     .attributeType = ZCL_BOOLEAN_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint8 = {
@@ -184,7 +184,7 @@ static EmberAfAttributeMetadata mockMetadataUint8 = {
     .attributeId   = 0,
     .size          = 1,
     .attributeType = ZCL_INT8U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_NULLABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint8Max = {
@@ -192,7 +192,7 @@ static EmberAfAttributeMetadata mockMetadataUint8Max = {
     .attributeId   = 0,
     .size          = 1,
     .attributeType = ZCL_INT8U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE | ATTRIBUTE_MASK_MIN_MAX,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_NULLABLE | MATTER_ATTRIBUTE_FLAG_MIN_MAX,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint16 = {
@@ -200,7 +200,7 @@ static EmberAfAttributeMetadata mockMetadataUint16 = {
     .attributeId   = 0,
     .size          = 2,
     .attributeType = ZCL_INT16U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint24 = {
@@ -208,7 +208,7 @@ static EmberAfAttributeMetadata mockMetadataUint24 = {
     .attributeId   = 0,
     .size          = 3,
     .attributeType = ZCL_INT24U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint32 = {
@@ -216,7 +216,7 @@ static EmberAfAttributeMetadata mockMetadataUint32 = {
     .attributeId   = 0,
     .size          = 4,
     .attributeType = ZCL_INT32U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint40 = {
@@ -224,7 +224,7 @@ static EmberAfAttributeMetadata mockMetadataUint40 = {
     .attributeId   = 0,
     .size          = 5,
     .attributeType = ZCL_INT40U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint48 = {
@@ -232,7 +232,7 @@ static EmberAfAttributeMetadata mockMetadataUint48 = {
     .attributeId   = 0,
     .size          = 6,
     .attributeType = ZCL_INT48U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint56 = {
@@ -240,7 +240,7 @@ static EmberAfAttributeMetadata mockMetadataUint56 = {
     .attributeId   = 0,
     .size          = 7,
     .attributeType = ZCL_INT56U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint64 = {
@@ -248,7 +248,7 @@ static EmberAfAttributeMetadata mockMetadataUint64 = {
     .attributeId   = 0,
     .size          = 8,
     .attributeType = ZCL_INT64U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt8 = {
@@ -256,7 +256,7 @@ static EmberAfAttributeMetadata mockMetadataInt8 = {
     .attributeId   = 0,
     .size          = 1,
     .attributeType = ZCL_INT8S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_MIN_MAX,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_MIN_MAX,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt16 = {
@@ -264,7 +264,7 @@ static EmberAfAttributeMetadata mockMetadataInt16 = {
     .attributeId   = 0,
     .size          = 2,
     .attributeType = ZCL_INT16S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_MIN_MAX,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_MIN_MAX,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt24 = {
@@ -272,7 +272,7 @@ static EmberAfAttributeMetadata mockMetadataInt24 = {
     .attributeId   = 0,
     .size          = 3,
     .attributeType = ZCL_INT24S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt32 = {
@@ -280,7 +280,7 @@ static EmberAfAttributeMetadata mockMetadataInt32 = {
     .attributeId   = 0,
     .size          = 4,
     .attributeType = ZCL_INT32S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt40 = {
@@ -288,7 +288,7 @@ static EmberAfAttributeMetadata mockMetadataInt40 = {
     .attributeId   = 0,
     .size          = 5,
     .attributeType = ZCL_INT40S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt48 = {
@@ -296,7 +296,7 @@ static EmberAfAttributeMetadata mockMetadataInt48 = {
     .attributeId   = 0,
     .size          = 6,
     .attributeType = ZCL_INT48S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt56 = {
@@ -304,7 +304,7 @@ static EmberAfAttributeMetadata mockMetadataInt56 = {
     .attributeId   = 0,
     .size          = 7,
     .attributeType = ZCL_INT56S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt64 = {
@@ -312,7 +312,7 @@ static EmberAfAttributeMetadata mockMetadataInt64 = {
     .attributeId   = 0,
     .size          = 8,
     .attributeType = ZCL_INT64S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 // clang-format off

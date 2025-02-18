@@ -49,6 +49,7 @@ amebad
 amebaiot
 AmebaZ
 amebaz2
+ANC
 announcementReason
 AnnounceOTAProvider
 AnnounceOTAProviderRequest
@@ -85,6 +86,7 @@ ASR
 AssertionError
 AST
 ASYNC
+ATL
 ATLs
 atomics
 att
@@ -114,6 +116,7 @@ avahi
 avL
 AwaitNextAction
 AXXXF
+Axxxx
 AYNJV
 babaf
 backend
@@ -507,6 +510,7 @@ entrypoint
 enum
 Enums
 env
+EP
 epochKey
 epochStartTime
 eq
@@ -538,6 +542,7 @@ ExtendedPAN
 ExtensionEntry
 extern
 extpanid
+Exx
 FabricId
 fabricIdx
 fabricIndex
@@ -585,6 +590,7 @@ fuzzer
 fuzzers
 fuzztest
 FW
+Fxx
 gbl
 gcloud
 GDB
@@ -684,6 +690,7 @@ ICMP
 IDF
 IDL
 IDLs
+IDM
 idt
 idx
 ifconfig
@@ -1235,6 +1242,7 @@ RPi's
 RPis
 RSA
 rsn
+Rsp
 RSSI
 RST
 rsync
@@ -1622,6 +1630,7 @@ xFFFF
 xfffff
 xFFFFFFEFFFFFFFFF
 XMLPICSValidator
+XMLs
 xtensa
 xvzf
 xwayland
