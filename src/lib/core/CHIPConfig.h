@@ -1868,5 +1868,19 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_TEST_GOOGLETEST
 
 /**
+ *  @def CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+ *
+ *  @brief
+ *    Enables code for collecting and sending analytic related events for MRP
+ *
+ * The purpose of this macro is to prevent compiling code related to MRP analytics
+ * for devices that are not interested interested to save on flash.
+ */
+
+#ifndef CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+#define CHIP_CONFIG_MRP_ANALYTICS_ENABLED 0
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+
+/**
  * @}
  */
