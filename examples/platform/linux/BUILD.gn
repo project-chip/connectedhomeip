@@ -78,7 +78,7 @@ source_set("device-energy-management-test-event-trigger") {
 }
 
 source_set("app-main") {
-  defines = [ "CHIP_DEVICE_ENABLE_PORT_PARAMS", "ENABLE_TRACING=${matter_enable_tracing_support}" ]
+  defines = [ "ENABLE_TRACING=${matter_enable_tracing_support}" ]
   sources = [
     "AppMain.cpp",
     "AppMain.h",
