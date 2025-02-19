@@ -33,13 +33,41 @@
 #include <app/data-model-provider/Provider.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>
+#include <pigweed/rpc_services/AccessInterceptor.h>
+#include <pigweed/rpc_services/AccessInterceptorRegistry.h>
 #include <platform/PlatformManager.h>
+#include <set>
 
 namespace chip {
 namespace rpc {
+
+std::optional<::pw::Status> TryWriteViaAccessor(const chip::app::ConcreteDataAttributePath & path,
+                                                chip::app::AttributeValueDecoder & decoder)
+{
+    std::set<PigweedDebugAccessInterceptor *> accessors = PigweedDebugAccessInterceptorRegistry::Instance().GetAllAccessors();
+
+    for (PigweedDebugAccessInterceptor * accessor : accessors)
+    {
+        std::optional<::pw::Status> result = accessor->Write(path, decoder);
+        if (result.has_value()) // Write was either a success or failure.
+        {
+            return result;
+        }
+        else if (decoder.TriedDecode())
+        {
+            ChipLogError(Support, "Interceptor tried decode but did not return status.");
+            return ::pw::Status::FailedPrecondition();
+        }
+    }
+
+    VerifyOrReturnError(!decoder.TriedDecode(), ::pw::Status::FailedPrecondition());
+
+    return std::nullopt;
+}
 
 // Implementation class for chip.rpc.Attributes.
 class Attributes : public pw_rpc::nanopb::Attributes::Service<Attributes>
@@ -207,6 +235,14 @@ public:
         }
 
         app::AttributeValueDecoder decoder(tlvReader.value(), subjectDescriptor);
+
+        std::optional<::pw::Status> interceptResult = TryWriteViaAccessor(write_request.path, decoder);
+        if (interceptResult.has_value())
+        {
+            return *interceptResult;
+        }
+        ChipLogProgress(Support, "No custom PigweedRPC Attribute Accessor registration found, using fake write access.");
+
         app::DataModel::ActionReturnStatus result = provider->WriteAttribute(write_request, decoder);
 
         if (!result.IsSuccess())
