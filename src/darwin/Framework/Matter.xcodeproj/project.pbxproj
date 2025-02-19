@@ -436,12 +436,17 @@
 		B45374002A9FEC4F00807602 /* unix-init.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373F92A9FEC4F00807602 /* unix-init.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
 		B45374012A9FEC4F00807602 /* unix-sockets.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373FA2A9FEC4F00807602 /* unix-sockets.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
 		B4C8E6B72B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4C8E6B42B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.mm */; };
+		B4D67A3B2D00DAB700C49965 /* XPCServerRegistry.h in Headers */ = {isa = PBXBuildFile; fileRef = B4D67A382D00DAB700C49965 /* XPCServerRegistry.h */; };
+		B4D67A3C2D00DAB700C49965 /* XPCServerRegistry.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A392D00DAB700C49965 /* XPCServerRegistry.mm */; };
+		B4D67A3D2D00DAB700C49965 /* DeviceControllerServer.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A362D00DAB700C49965 /* DeviceControllerServer.mm */; };
+		B4D67A3E2D00DAB700C49965 /* XPCServer.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A372D00DAB700C49965 /* XPCServer.mm */; };
 		B4D67A412D00DD3D00C49965 /* DFTKeypair.h in Headers */ = {isa = PBXBuildFile; fileRef = B4D67A3F2D00DD3D00C49965 /* DFTKeypair.h */; };
 		B4D67A422D00DD3D00C49965 /* DFTKeypair.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A402D00DD3D00C49965 /* DFTKeypair.mm */; };
 		B4D67A922D527F4A00C49965 /* DCLClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A8E2D527F4A00C49965 /* DCLClient.cpp */; };
 		B4D67A932D527F4A00C49965 /* DisplayTermsAndConditions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A8F2D527F4A00C49965 /* DisplayTermsAndConditions.cpp */; };
 		B4D67A952D527F4A00C49965 /* JsonSchemaMacros.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A912D527F4A00C49965 /* JsonSchemaMacros.cpp */; };
 		B4D67A9B2D538E9700C49965 /* HTTPSRequest.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A992D538E9700C49965 /* HTTPSRequest.mm */; };
+		B4D67A462D07021700C49965 /* XPCServerProtocols.h in Headers */ = {isa = PBXBuildFile; fileRef = B4D67A452D07021700C49965 /* XPCServerProtocols.h */; };
 		B4E262162AA0CF1C00DBA5BC /* RemoteDataModelLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4E262122AA0C7A300DBA5BC /* RemoteDataModelLogger.mm */; };
 		B4E262172AA0CF2000DBA5BC /* RemoteDataModelLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = B4E262132AA0C7A300DBA5BC /* RemoteDataModelLogger.h */; };
 		B4E2621B2AA0D02000DBA5BC /* SleepCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4E262192AA0D01D00DBA5BC /* SleepCommand.mm */; };
@@ -998,12 +1003,17 @@
 		B45373FA2A9FEC4F00807602 /* unix-sockets.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "unix-sockets.c"; path = "repo/lib/plat/unix/unix-sockets.c"; sourceTree = "<group>"; };
 		B4C8E6B32B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDiagnosticLogsDownloader.h; sourceTree = "<group>"; };
 		B4C8E6B42B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDiagnosticLogsDownloader.mm; sourceTree = "<group>"; };
+		B4D67A362D00DAB700C49965 /* DeviceControllerServer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DeviceControllerServer.mm; sourceTree = "<group>"; };
+		B4D67A372D00DAB700C49965 /* XPCServer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = XPCServer.mm; sourceTree = "<group>"; };
+		B4D67A382D00DAB700C49965 /* XPCServerRegistry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPCServerRegistry.h; sourceTree = "<group>"; };
+		B4D67A392D00DAB700C49965 /* XPCServerRegistry.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = XPCServerRegistry.mm; sourceTree = "<group>"; };
 		B4D67A3F2D00DD3D00C49965 /* DFTKeypair.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DFTKeypair.h; sourceTree = "<group>"; };
 		B4D67A402D00DD3D00C49965 /* DFTKeypair.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DFTKeypair.mm; sourceTree = "<group>"; };
 		B4D67A8E2D527F4A00C49965 /* DCLClient.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = DCLClient.cpp; path = commands/dcl/DCLClient.cpp; sourceTree = "<group>"; };
 		B4D67A8F2D527F4A00C49965 /* DisplayTermsAndConditions.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = DisplayTermsAndConditions.cpp; path = commands/dcl/DisplayTermsAndConditions.cpp; sourceTree = "<group>"; };
 		B4D67A912D527F4A00C49965 /* JsonSchemaMacros.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JsonSchemaMacros.cpp; path = commands/dcl/JsonSchemaMacros.cpp; sourceTree = "<group>"; };
 		B4D67A992D538E9700C49965 /* HTTPSRequest.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = HTTPSRequest.mm; sourceTree = "<group>"; };
+		B4D67A452D07021700C49965 /* XPCServerProtocols.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPCServerProtocols.h; sourceTree = "<group>"; };
 		B4E262122AA0C7A300DBA5BC /* RemoteDataModelLogger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RemoteDataModelLogger.mm; sourceTree = "<group>"; };
 		B4E262132AA0C7A300DBA5BC /* RemoteDataModelLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RemoteDataModelLogger.h; sourceTree = "<group>"; };
 		B4E262192AA0D01D00DBA5BC /* SleepCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SleepCommand.mm; sourceTree = "<group>"; };
@@ -1171,6 +1181,7 @@
 			children = (
 				B4D67A3F2D00DD3D00C49965 /* DFTKeypair.h */,
 				B4D67A402D00DD3D00C49965 /* DFTKeypair.mm */,
+				B4D67A3A2D00DAB700C49965 /* xpc */,
 				B409D0AC2CCFB89600A7ED5A /* DeviceDelegate.h */,
 				B409D0AD2CCFB89600A7ED5A /* DeviceDelegate.mm */,
 				B43B39EF2CB99090006AA284 /* CertificateIssuer.h */,
@@ -1889,6 +1900,18 @@
 			path = dcl;
 			sourceTree = "<group>";
 		};
+		B4D67A3A2D00DAB700C49965 /* xpc */ = {
+			isa = PBXGroup;
+			children = (
+				B4D67A452D07021700C49965 /* XPCServerProtocols.h */,
+				B4D67A362D00DAB700C49965 /* DeviceControllerServer.mm */,
+				B4D67A372D00DAB700C49965 /* XPCServer.mm */,
+				B4D67A382D00DAB700C49965 /* XPCServerRegistry.h */,
+				B4D67A392D00DAB700C49965 /* XPCServerRegistry.mm */,
+			);
+			path = xpc;
+			sourceTree = "<group>";
+		};
 		B4E262182AA0CFFE00DBA5BC /* delay */ = {
 			isa = PBXGroup;
 			children = (
@@ -1976,6 +1999,7 @@
 				B43B39EC2CB859A5006AA284 /* DumpMemoryGraphCommand.h in Headers */,
 				B43B39ED2CB859A5006AA284 /* Commands.h in Headers */,
 				B43B39EE2CB859A5006AA284 /* LeaksTool.h in Headers */,
+				B4D67A462D07021700C49965 /* XPCServerProtocols.h in Headers */,
 				7534D17E2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.h in Headers */,
 				037C3DBD2991BD5000B7EEE2 /* OTAProviderDelegate.h in Headers */,
 				B4FCD5702B603A6300832859 /* Commands.h in Headers */,
@@ -1985,6 +2009,7 @@
 				037C3DCB2991BD5100B7EEE2 /* CHIPCommandStorageDelegate.h in Headers */,
 				037C3DD32991BD5200B7EEE2 /* logging.h in Headers */,
 				037C3DB72991BD5000B7EEE2 /* ModelCommandBridge.h in Headers */,
+				B4D67A3B2D00DAB700C49965 /* XPCServerRegistry.h in Headers */,
 				037C3DC52991BD5100B7EEE2 /* StorageManagementCommand.h in Headers */,
 				037C3DCC2991BD5100B7EEE2 /* MTRError_Utils.h in Headers */,
 				7592BD002CBEE98C00EB74A0 /* Instance.h in Headers */,
@@ -2379,6 +2404,9 @@
 				75A202E62BA8DBAC00A771DD /* reporting.cpp in Sources */,
 				039145E82993179300257B3E /* GetCommissionerNodeIdCommand.mm in Sources */,
 				0395469F2991DFC5006D42A8 /* json_reader.cpp in Sources */,
+				B4D67A3C2D00DAB700C49965 /* XPCServerRegistry.mm in Sources */,
+				B4D67A3D2D00DAB700C49965 /* DeviceControllerServer.mm in Sources */,
+				B4D67A3E2D00DAB700C49965 /* XPCServer.mm in Sources */,
 				514C79F42B62ED5500DD6D7B /* attribute-storage.cpp in Sources */,
 				0395469E2991DFC5006D42A8 /* json_writer.cpp in Sources */,
 				B4D67A422D00DD3D00C49965 /* DFTKeypair.mm in Sources */,
