@@ -38,6 +38,8 @@ source_set("data-model") {
     "FabricScopedPreEncodedValue.cpp",
     "FabricScopedPreEncodedValue.h",
     "List.h",
+    "MetadataList.cpp",
+    "MetadataList.h",
     "PreEncodedValue.cpp",
     "PreEncodedValue.h",
     "WrappedStructEncoder.h",

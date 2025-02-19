@@ -104,46 +104,46 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 }
 
 // CommandHandlerInterface
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, ListBuilder<AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
+    using QF = DataModel::CommandQualityFlags;
 
     if (HasFeature(Feature::kPowerAdjustment))
     {
-        for (auto && cmd : {
-                 PowerAdjustRequest::Id,
-                 CancelPowerAdjustRequest::Id,
-             })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
+        VerifyOrExit(builder.AppendElements({
+            {PowerAdjustRequest::Id,       QF::kFabricScoped, Access::Privilege::kOperate}, //TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
+            {CancelPowerAdjustRequest::Id, QF::kFabricScoped, Access::Privilege::kOperate}  //TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
+        }));
     }
 
     if (HasFeature(Feature::kStartTimeAdjustment))
     {
-        VerifyOrExit(callback(StartTimeAdjustRequest::Id, context) == Loop::Continue, /**/);
+        VerifyOrExit(builder.AppendElement({StartTimeAdjustRequest::Id, QF::kFabricScoped})); //TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
     }
 
     if (HasFeature(Feature::kPausable))
     {
-        VerifyOrExit(callback(PauseRequest::Id, context) == Loop::Continue, /**/);
-        VerifyOrExit(callback(ResumeRequest::Id, context) == Loop::Continue, /**/);
+        VerifyOrExit(builder.AppendElements({
+            {PauseRequest::Id,  QF::kFabricScoped, Access::Privilege::kOperate},
+            {ResumeRequest::Id, BitFlags<QF>(QF::kFabricScoped), Access::Privilege::kOperate}
+        }));
     }
 
     if (HasFeature(Feature::kForecastAdjustment))
     {
-        VerifyOrExit(callback(ModifyForecastRequest::Id, context) == Loop::Continue, /**/);
+        VerifyOrExit(builder.AppendElement({ModifyForecastRequest::Id, QF::kFabricScoped})); //TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
     }
 
     if (HasFeature(Feature::kConstraintBasedAdjustment))
     {
-        VerifyOrExit(callback(RequestConstraintBasedForecast::Id, context) == Loop::Continue, /**/);
+       VerifyOrExit(builder.AppendElement({ModifyForecastRequest::Id, QF::kFabricScoped})); //TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
     }
 
     if (HasFeature(Feature::kStartTimeAdjustment) || HasFeature(Feature::kForecastAdjustment) ||
         HasFeature(Feature::kConstraintBasedAdjustment))
     {
-        VerifyOrExit(callback(CancelRequest::Id, context) == Loop::Continue, /**/);
+        VerifyOrExit(builder.AppendElement({CancelRequest::Id, QF::kFabricScoped})); //TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
     }
 
 exit:
