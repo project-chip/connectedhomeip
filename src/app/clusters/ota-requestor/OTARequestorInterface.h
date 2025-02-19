@@ -134,10 +134,7 @@ public:
     /**
      * Get the list size
      */
-    size_t GetListSize()
-    {
-        return mListSize;
-    }
+    size_t GetListSize() { return mListSize; }
 
 private:
     Optional<app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type> mList[CHIP_CONFIG_MAX_FABRICS];
