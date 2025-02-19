@@ -169,7 +169,7 @@
     [super _delegateRemoved:delegate];
     MTR_LOG("%@ delegate removed: %@", self, delegate);
 
-    // dispatch to own queue to exit lock when calling out to other code
+    // dispatch to own queue so we're not holding our lock while calling out to the controller code.
     dispatch_async(self.queue, ^{
         [(MTRDeviceController_XPC *) [self deviceController] _updateRegistrationInfo];
     });
