@@ -1996,9 +1996,9 @@ namespace Answer {
 static constexpr CommandId Id = 0x00000002;
 } // namespace Answer
 
-namespace ICECandidate {
+namespace ICECandidates {
 static constexpr CommandId Id = 0x00000003;
-} // namespace ICECandidate
+} // namespace ICECandidates
 
 namespace End {
 static constexpr CommandId Id = 0x00000004;

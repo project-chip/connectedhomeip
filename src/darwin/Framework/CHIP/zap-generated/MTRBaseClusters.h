@@ -14874,11 +14874,11 @@ MTR_PROVISIONALLY_AVAILABLE
  */
 - (void)answerWithParams:(MTRWebRTCTransportRequestorClusterAnswerParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
- * Command ICECandidate
+ * Command ICECandidates
  *
- * This command provides an ICE candidate to the stream requestor in a WebRTC session.
+ * This command provides an ICE candidates to the stream requestor in a WebRTC session.
  */
-- (void)ICECandidateWithParams:(MTRWebRTCTransportRequestorClusterICECandidateParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)ICECandidatesWithParams:(MTRWebRTCTransportRequestorClusterICECandidatesParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command End
  *

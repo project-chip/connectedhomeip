@@ -31494,12 +31494,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace Answer.
-namespace ICECandidate {
+namespace ICECandidates {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kWebRTCSessionID), webRTCSessionID);
-    encoder.Encode(to_underlying(Fields::kICECandidate), ICECandidate);
+    encoder.Encode(to_underlying(Fields::kICECandidates), ICECandidates);
     return encoder.Finalize();
 }
 
@@ -31521,9 +31521,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, webRTCSessionID);
         }
-        else if (__context_tag == to_underlying(Fields::kICECandidate))
+        else if (__context_tag == to_underlying(Fields::kICECandidates))
         {
-            err = DataModel::Decode(reader, ICECandidate);
+            err = DataModel::Decode(reader, ICECandidates);
         }
         else
         {
@@ -31532,7 +31532,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ICECandidate.
+} // namespace ICECandidates.
 namespace End {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {

@@ -63316,11 +63316,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void ICECandidate(DefaultClusterCallback callback, Integer webRTCSessionID, String ICECandidate) {
-      ICECandidate(callback, webRTCSessionID, ICECandidate, 0);
+    public void ICECandidates(DefaultClusterCallback callback, Integer webRTCSessionID, ArrayList<String> ICECandidates) {
+      ICECandidates(callback, webRTCSessionID, ICECandidates, 0);
     }
 
-    public void ICECandidate(DefaultClusterCallback callback, Integer webRTCSessionID, String ICECandidate, int timedInvokeTimeoutMs) {
+    public void ICECandidates(DefaultClusterCallback callback, Integer webRTCSessionID, ArrayList<String> ICECandidates, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -63328,9 +63328,9 @@ public class ChipClusters {
       BaseTLVType webRTCSessionIDtlvValue = new UIntType(webRTCSessionID);
       elements.add(new StructElement(webRTCSessionIDFieldID, webRTCSessionIDtlvValue));
 
-      final long ICECandidateFieldID = 1L;
-      BaseTLVType ICECandidatetlvValue = new StringType(ICECandidate);
-      elements.add(new StructElement(ICECandidateFieldID, ICECandidatetlvValue));
+      final long ICECandidatesFieldID = 1L;
+      BaseTLVType ICECandidatestlvValue = ArrayType.generateArrayType(ICECandidates, (elementICECandidates) -> new StringType(elementICECandidates));
+      elements.add(new StructElement(ICECandidatesFieldID, ICECandidatestlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {

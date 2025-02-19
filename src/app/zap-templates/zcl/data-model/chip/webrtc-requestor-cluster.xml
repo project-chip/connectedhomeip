@@ -20,8 +20,8 @@ Source: src/app_clusters/WebRTC_Requestor.adoc
 Parameters: in-progress 
 Git: 0.9-fall2024-228-g54b1ae035
 -->
-<configurator>
-  <domain name="CHIP"/>
+<configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
+  <domain name="Cameras"/>
   <cluster apiMaturity="provisional">
     <domain>Cameras</domain>
     <name>WebRTC Transport Requestor</name>
@@ -46,10 +46,10 @@ Git: 0.9-fall2024-228-g54b1ae035
       <arg id="2" name="SDP" type="char_string"/>
     </command>
 
-    <command code="0x03" source="client" name="ICECandidate" optional="false">
-      <description>This command provides an ICE candidate to the stream requestor in a WebRTC session.</description>
+    <command code="0x03" source="client" name="ICECandidates" optional="false">
+      <description>This command provides an ICE candidates to the stream requestor in a WebRTC session.</description>
       <arg id="1" name="WebRTCSessionID" type="int16u"/>
-      <arg id="2" name="ICECandidate" type="char_string"/>
+      <arg id="2" name="ICECandidates" array="true" type="char_string" minLength="1"/>
     </command>
 
     <command code="0x04" source="client" name="End" optional="false">

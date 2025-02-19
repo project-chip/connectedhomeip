@@ -18015,7 +18015,7 @@ public class ClusterIDMapping {
         public enum Command {
             Offer(1L),
             Answer(2L),
-            ICECandidate(3L),
+            ICECandidates(3L),
             End(4L),;
             private final long id;
             Command(long id) {
@@ -18068,17 +18068,17 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ICECandidateCommandField {WebRTCSessionID(0),ICECandidate(1),;
+                }public enum ICECandidatesCommandField {WebRTCSessionID(0),ICECandidates(1),;
                     private final int id;
-                    ICECandidateCommandField(int id) {
+                    ICECandidatesCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static ICECandidateCommandField value(int id) throws NoSuchFieldError {
-                        for (ICECandidateCommandField field : ICECandidateCommandField.values()) {
+                    public static ICECandidatesCommandField value(int id) throws NoSuchFieldError {
+                        for (ICECandidatesCommandField field : ICECandidatesCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
