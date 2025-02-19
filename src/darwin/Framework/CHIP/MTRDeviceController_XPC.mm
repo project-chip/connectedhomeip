@@ -72,24 +72,26 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
 
 - (void)_updateRegistrationInfo
 {
-    NSMutableDictionary * registrationInfo = [NSMutableDictionary dictionary];
+    dispatch_async(self.workQueue, ^{
+        NSMutableDictionary * registrationInfo = [NSMutableDictionary dictionary];
 
-    NSMutableDictionary * controllerContext = [NSMutableDictionary dictionary];
-    NSMutableArray * nodeIDs = [NSMutableArray array];
+        NSMutableDictionary * controllerContext = [NSMutableDictionary dictionary];
+        NSMutableArray * nodeIDs = [NSMutableArray array];
 
-    for (NSNumber * nodeID in [self.nodeIDToDeviceMap keyEnumerator]) {
-        MTRDevice * device = [self _deviceForNodeID:nodeID createIfNeeded:NO];
-        if ([device delegateExists]) {
-            NSMutableDictionary * nodeDictionary = [NSMutableDictionary dictionary];
-            MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDKey, nodeID, nodeDictionary)
+        for (NSNumber * nodeID in [self.nodeIDToDeviceMap keyEnumerator]) {
+            MTRDevice * device = [self _deviceForNodeID:nodeID createIfNeeded:NO];
+            if ([device delegateExists]) {
+                NSMutableDictionary * nodeDictionary = [NSMutableDictionary dictionary];
+                MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDKey, nodeID, nodeDictionary)
 
-            [nodeIDs addObject:nodeDictionary];
+                [nodeIDs addObject:nodeDictionary];
+            }
         }
-    }
-    MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDsKey, nodeIDs, registrationInfo)
-    MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationControllerContextKey, controllerContext, registrationInfo)
+        MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDsKey, nodeIDs, registrationInfo)
+        MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationControllerContextKey, controllerContext, registrationInfo)
 
-    [self updateControllerConfiguration:registrationInfo];
+        [self updateControllerConfiguration:registrationInfo];
+    });
 }
 
 - (void)_registerNodeID:(NSNumber *)nodeID
