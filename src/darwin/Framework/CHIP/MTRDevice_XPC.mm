@@ -151,16 +151,28 @@
 
 - (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate
 {
+    os_unfair_lock_assert_owner(&self->_lock);
+
     [super _delegateAdded:delegate];
     MTR_LOG("%@ delegate added: %@", self, delegate);
-    [(MTRDeviceController_XPC *) [self deviceController] _updateRegistrationInfo];
+
+    // dispatch to own queue to exit lock when calling out to other code
+    dispatch_async(self.queue, ^{
+        [(MTRDeviceController_XPC *) [self deviceController] _updateRegistrationInfo];
+    });
 }
 
 - (void)_delegateRemoved:(id<MTRDeviceDelegate>)delegate
 {
+    os_unfair_lock_assert_owner(&self->_lock);
+
     [super _delegateRemoved:delegate];
     MTR_LOG("%@ delegate removed: %@", self, delegate);
-    [(MTRDeviceController_XPC *) [self deviceController] _updateRegistrationInfo];
+
+    // dispatch to own queue to exit lock when calling out to other code
+    dispatch_async(self.queue, ^{
+        [(MTRDeviceController_XPC *) [self deviceController] _updateRegistrationInfo];
+    });
 }
 
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
