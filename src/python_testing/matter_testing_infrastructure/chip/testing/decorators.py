@@ -36,7 +36,7 @@ from mobly import asserts
 if TYPE_CHECKING:
     from chip.testing.matter_testing import MatterBaseTest
 
-EndpointCheckFunction = Callable[[ClusterObjects.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
+EndpointCheckFunction = Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
 
 def get_cluster_from_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> ClusterObjects.Cluster:
