@@ -5857,8 +5857,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "ProvideOffer";
         case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Id:
             return "ProvideAnswer";
-        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::Id:
-            return "ProvideICECandidate";
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Id:
+            return "ProvideICECandidates";
         case chip::app::Clusters::WebRTCTransportProvider::Commands::EndSession::Id:
             return "EndSession";
         default:

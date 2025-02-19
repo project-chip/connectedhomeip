@@ -13098,10 +13098,10 @@ class ChipClusters:
             },
             0x00000006: {
                 "commandId": 0x00000006,
-                "commandName": "ProvideICECandidate",
+                "commandName": "ProvideICECandidates",
                 "args": {
                     "webRTCSessionID": "int",
-                    "ICECandidate": "str",
+                    "ICECandidates": "str",
                 },
             },
             0x00000007: {

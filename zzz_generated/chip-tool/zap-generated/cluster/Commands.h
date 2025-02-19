@@ -14706,7 +14706,7 @@ private:
 | * SolicitOffer                                                      |   0x01 |
 | * ProvideOffer                                                      |   0x03 |
 | * ProvideAnswer                                                     |   0x05 |
-| * ProvideICECandidate                                               |   0x06 |
+| * ProvideICECandidates                                              |   0x06 |
 | * EndSession                                                        |   0x07 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -14854,23 +14854,23 @@ private:
 };
 
 /*
- * Command ProvideICECandidate
+ * Command ProvideICECandidates
  */
-class WebRTCTransportProviderProvideICECandidate : public ClusterCommand
+class WebRTCTransportProviderProvideICECandidates : public ClusterCommand
 {
 public:
-    WebRTCTransportProviderProvideICECandidate(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("provide-icecandidate", credsIssuerConfig)
+    WebRTCTransportProviderProvideICECandidates(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("provide-icecandidates", credsIssuerConfig), mComplex_ICECandidates(&mRequest.ICECandidates)
     {
         AddArgument("WebRTCSessionID", 0, UINT16_MAX, &mRequest.webRTCSessionID);
-        AddArgument("ICECandidate", &mRequest.ICECandidate);
+        AddArgument("ICECandidates", &mComplex_ICECandidates);
         ClusterCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WebRTCTransportProvider::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -14880,7 +14880,7 @@ public:
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WebRTCTransportProvider::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -14889,7 +14889,8 @@ public:
     }
 
 private:
-    chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::Type mRequest;
+    chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::CharSpan>> mComplex_ICECandidates;
 };
 
 /*
@@ -28375,12 +28376,12 @@ void registerClusterWebRTCTransportProvider(Commands & commands, CredentialIssue
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                         //
-        make_unique<WebRTCTransportProviderSolicitOffer>(credsIssuerConfig),        //
-        make_unique<WebRTCTransportProviderProvideOffer>(credsIssuerConfig),        //
-        make_unique<WebRTCTransportProviderProvideAnswer>(credsIssuerConfig),       //
-        make_unique<WebRTCTransportProviderProvideICECandidate>(credsIssuerConfig), //
-        make_unique<WebRTCTransportProviderEndSession>(credsIssuerConfig),          //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                          //
+        make_unique<WebRTCTransportProviderSolicitOffer>(credsIssuerConfig),         //
+        make_unique<WebRTCTransportProviderProvideOffer>(credsIssuerConfig),         //
+        make_unique<WebRTCTransportProviderProvideAnswer>(credsIssuerConfig),        //
+        make_unique<WebRTCTransportProviderProvideICECandidates>(credsIssuerConfig), //
+        make_unique<WebRTCTransportProviderEndSession>(credsIssuerConfig),           //
         //
         // Attributes
         //

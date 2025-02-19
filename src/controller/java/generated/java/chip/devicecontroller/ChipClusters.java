@@ -62931,9 +62931,9 @@ public class ChipClusters {
           final long webRTCSessionIDFieldID = 0L;
           Integer webRTCSessionID = null;
           final long videoStreamIDFieldID = 1L;
-          Integer videoStreamID = null;
+          @Nullable Optional<Integer> videoStreamID = null;
           final long audioStreamIDFieldID = 2L;
-          Integer audioStreamID = null;
+          @Nullable Optional<Integer> audioStreamID = null;
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == webRTCSessionIDFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -62943,12 +62943,12 @@ public class ChipClusters {
             } else if (element.contextTagNum() == videoStreamIDFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
                 UIntType castingValue = element.value(UIntType.class);
-                videoStreamID = castingValue.value(Integer.class);
+                videoStreamID = Optional.of(castingValue.value(Integer.class));
               }
             } else if (element.contextTagNum() == audioStreamIDFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
                 UIntType castingValue = element.value(UIntType.class);
-                audioStreamID = castingValue.value(Integer.class);
+                audioStreamID = Optional.of(castingValue.value(Integer.class));
               }
             }
           }
@@ -62980,11 +62980,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void provideICECandidate(DefaultClusterCallback callback, Integer webRTCSessionID, String ICECandidate) {
-      provideICECandidate(callback, webRTCSessionID, ICECandidate, 0);
+    public void provideICECandidates(DefaultClusterCallback callback, Integer webRTCSessionID, ArrayList<String> ICECandidates) {
+      provideICECandidates(callback, webRTCSessionID, ICECandidates, 0);
     }
 
-    public void provideICECandidate(DefaultClusterCallback callback, Integer webRTCSessionID, String ICECandidate, int timedInvokeTimeoutMs) {
+    public void provideICECandidates(DefaultClusterCallback callback, Integer webRTCSessionID, ArrayList<String> ICECandidates, int timedInvokeTimeoutMs) {
       final long commandId = 6L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -62992,9 +62992,9 @@ public class ChipClusters {
       BaseTLVType webRTCSessionIDtlvValue = new UIntType(webRTCSessionID);
       elements.add(new StructElement(webRTCSessionIDFieldID, webRTCSessionIDtlvValue));
 
-      final long ICECandidateFieldID = 1L;
-      BaseTLVType ICECandidatetlvValue = new StringType(ICECandidate);
-      elements.add(new StructElement(ICECandidateFieldID, ICECandidatetlvValue));
+      final long ICECandidatesFieldID = 1L;
+      BaseTLVType ICECandidatestlvValue = ArrayType.generateArrayType(ICECandidates, (elementICECandidates) -> new StringType(elementICECandidates));
+      elements.add(new StructElement(ICECandidatesFieldID, ICECandidatestlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -63033,7 +63033,7 @@ public class ChipClusters {
     }
 
     public interface ProvideOfferResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer webRTCSessionID, Integer videoStreamID, Integer audioStreamID);
+      void onSuccess(Integer webRTCSessionID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID);
     }
 
     public interface CurrentSessionsAttributeCallback extends BaseAttributeCallback {

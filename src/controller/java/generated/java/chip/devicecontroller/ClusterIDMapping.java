@@ -17825,7 +17825,7 @@ public class ClusterIDMapping {
             SolicitOffer(1L),
             ProvideOffer(3L),
             ProvideAnswer(5L),
-            ProvideICECandidate(6L),
+            ProvideICECandidates(6L),
             EndSession(7L),;
             private final long id;
             Command(long id) {
@@ -17895,17 +17895,17 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ProvideICECandidateCommandField {WebRTCSessionID(0),ICECandidate(1),;
+                }public enum ProvideICECandidatesCommandField {WebRTCSessionID(0),ICECandidates(1),;
                     private final int id;
-                    ProvideICECandidateCommandField(int id) {
+                    ProvideICECandidatesCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static ProvideICECandidateCommandField value(int id) throws NoSuchFieldError {
-                        for (ProvideICECandidateCommandField field : ProvideICECandidateCommandField.values()) {
+                    public static ProvideICECandidatesCommandField value(int id) throws NoSuchFieldError {
+                        for (ProvideICECandidatesCommandField field : ProvideICECandidatesCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
