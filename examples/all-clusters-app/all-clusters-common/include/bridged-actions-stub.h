@@ -54,7 +54,7 @@ private:
 
     CHIP_ERROR ReadActionAtIndex(uint16_t index, ActionStructStorage & action) override;
     CHIP_ERROR ReadEndpointListAtIndex(uint16_t index, EndpointListStorage & epList) override;
-    bool HaveActionWithId(uint16_t actionId) override;
+    bool HaveActionWithId(uint16_t actionId, uint16_t & actionIndex) override;
 
     Protocols::InteractionModel::Status HandleInstantAction(uint16_t actionId, Optional<uint32_t> invokeId) override;
     Protocols::InteractionModel::Status HandleInstantActionWithTransition(uint16_t actionId, uint16_t transitionTime,

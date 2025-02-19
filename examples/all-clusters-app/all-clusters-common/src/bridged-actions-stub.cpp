@@ -44,12 +44,15 @@ CHIP_ERROR ActionsDelegateImpl::ReadEndpointListAtIndex(uint16_t index, Endpoint
     return CHIP_NO_ERROR;
 }
 
-bool ActionsDelegateImpl::HaveActionWithId(uint16_t actionId)
+bool ActionsDelegateImpl::HaveActionWithId(uint16_t actionId, uint16_t & actionIndex)
 {
-    for (size_t i = 0; i < kEndpointList.size(); i++)
+    for (uint16_t i = 0; i < kEndpointList.size(); i++)
     {
         if (kActionList[i].actionID == actionId)
+        {
+            actionIndex = i;
             return true;
+        }
     }
     return false;
 }

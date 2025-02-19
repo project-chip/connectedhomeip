@@ -87,12 +87,13 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    bool HaveActionWithId(uint16_t actionId) override
+    bool HaveActionWithId(uint16_t actionId, uint16_t & aActionIndex) override
     {
         for (uint16_t i = 0; i < mNumActions; i++)
         {
             if (mActions[i].actionID == actionId)
             {
+                aActionIndex = i;
                 return true;
             }
         }
