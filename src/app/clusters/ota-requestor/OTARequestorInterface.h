@@ -131,6 +131,14 @@ public:
         return CHIP_ERROR_NOT_FOUND;
     }
 
+    /**
+     * Get the list size
+     */
+    size_t GetListSize()
+    {
+        return mListSize;
+    }
+
 private:
     Optional<app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type> mList[CHIP_CONFIG_MAX_FABRICS];
     size_t mListSize = 0;

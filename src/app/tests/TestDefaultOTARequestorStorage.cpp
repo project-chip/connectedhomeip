@@ -123,7 +123,7 @@ TEST(TestDefaultOTARequestorStorage, TestDefaultProvidersDuplicated)
     providers = {};
     EXPECT_EQ(CHIP_NO_ERROR, otaStorage.LoadDefaultProviders(providers));
 
-    EXPECT_TRUE(providers.mListSize == 3U);
+    EXPECT_TRUE(providers.GetListSize() == 3U);
 }
 
 TEST(TestDefaultOTARequestorStorage, TestCurrentProviderLocation)
