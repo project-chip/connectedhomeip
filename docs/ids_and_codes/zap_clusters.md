@@ -89,6 +89,7 @@ Generally regenerate using one of:
 |        159 |       0x9F | DeviceEnergyManagementMode                              |
 |        257 |      0x101 | DoorLock                                                |
 |        258 |      0x102 | WindowCovering                                          |
+|        260 |      0x104 | ClosureControl                                          |
 |        336 |      0x150 | ServiceArea                                             |
 |        512 |      0x200 | PumpConfigurationAndControl                             |
 |        513 |      0x201 | Thermostat                                              |
@@ -134,9 +135,11 @@ Generally regenerate using one of:
 |       1362 |      0x552 | CameraAvSettingsUserLevelManagement                     |
 |       1363 |      0x553 | WebRTCTransportProvider                                 |
 |       1364 |      0x554 | WebRTCTransportRequestor                                |
+|       1365 |      0x555 | PushAvStreamTransport                                   |
 |       1366 |      0x556 | Chime                                                   |
 |       1872 |      0x750 | EcosystemInformation                                    |
 |       1873 |      0x751 | CommissionerControl                                     |
+|       2049 |      0x801 | TlsCertificateManagement                                |
 | 4294048773 | 0xFFF1FC05 | UnitTesting                                             |
 | 4294048774 | 0xFFF1FC06 | FaultInjection                                          |
 | 4294048800 | 0xFFF1FC20 | SampleMei                                               |

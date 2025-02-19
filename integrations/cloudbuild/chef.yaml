@@ -1,5 +1,5 @@
 steps:
-    - name: "ghcr.io/project-chip/chip-build-vscode:97"
+    - name: "ghcr.io/project-chip/chip-build-vscode:112"
       entrypoint: "bash"
       args:
           - "-c"
@@ -7,7 +7,7 @@ steps:
               git config --global --add safe.directory "*"
               python scripts/checkout_submodules.py --shallow --recursive --platform esp32 nrfconnect silabs linux android 
       id: Submodules
-    - name: "ghcr.io/project-chip/chip-build-vscode:97"
+    - name: "ghcr.io/project-chip/chip-build-vscode:112"
       # NOTE: silabs boostrap is NOT done with the rest as it requests a conflicting
       #       jinja2 version (asks for 3.1.3 when constraints.txt asks for 3.0.3)
       env:
@@ -23,7 +23,7 @@ steps:
           - name: pwenv
             path: /pwenv
       timeout: 900s
-    - name: "ghcr.io/project-chip/chip-build-vscode:97"
+    - name: "ghcr.io/project-chip/chip-build-vscode:112"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -38,7 +38,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:97"
+    - name: "ghcr.io/project-chip/chip-build-vscode:112"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -57,28 +57,6 @@ steps:
       volumes:
           - name: pwenv
             path: /pwenv
-
-    - name: "gcr.io/cloud-builders/docker"
-      args:
-          [
-              "/workspace/examples/chef/create_docker.py",
-              "--commit_sha",
-              "$COMMIT_SHA",
-              "--short_sha",
-              "$SHORT_SHA",
-              "--revision_id",
-              "$REVISION_ID",
-              "--build_id",
-              "$BUILD_ID",
-              "--image_name",
-              "$_DOCKER_IMAGE_NAME",
-              "--tar_path",
-              "/workspace/artifacts",
-          ]
-      id: DockerAll
-      entrypoint: python3
-      waitFor:
-          - CompileNoip
 
 logsBucket: matter-build-automation-build-logs
 

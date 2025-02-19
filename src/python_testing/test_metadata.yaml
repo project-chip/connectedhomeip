@@ -55,6 +55,8 @@ not_automated:
       reason: Unit test - does not run against an app
     - name: TestConformanceTest.py
       reason: Unit test - does not run against an app
+    - name: TestSpecParsingSelection.py
+      reason: Unit test - does not run against an app
     - name: TestMatterTestingSupport.py
       reason: Unit test - does not run against an app
     - name: TestSpecParsingSupport.py
@@ -77,6 +79,8 @@ not_automated:
       reason: Shared code for TC_*, not a standalone test
     - name: test_plan_table_generator.py
       reason: Code/Test not being used or not shared code for any other tests
+    - name: modebase_cluster_check.py
+      reason: Shared code for Modebase derived clusters, not a standalone test.
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially

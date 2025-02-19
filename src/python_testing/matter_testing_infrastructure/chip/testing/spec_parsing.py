@@ -20,6 +20,7 @@ import importlib.resources as pkg_resources
 import logging
 import typing
 import xml.etree.ElementTree as ElementTree
+import zipfile
 from copy import deepcopy
 from dataclasses import dataclass
 from enum import Enum, auto
@@ -33,7 +34,7 @@ from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TA
                                       parse_callable_from_xml, parse_device_type_callable_from_xml)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                         EventPathLocation, FeaturePathLocation, ProblemNotice, ProblemSeverity)
+                                         EventPathLocation, FeaturePathLocation, ProblemLocation, ProblemNotice, ProblemSeverity)
 from chip.tlv import uint
 
 _PRIVILEGE_STR = {
@@ -53,18 +54,25 @@ class SpecParsingException(Exception):
     pass
 
 
+# passing in feature map, attribute list, command list
+ConformanceCallable = Callable[[uint, list[uint], list[uint]], ConformanceDecision]
+
+
 @dataclass
 class XmlFeature:
     code: str
     name: str
-    conformance: Callable[[uint], ConformanceDecision]
+    conformance: ConformanceCallable
+
+    def __str__(self):
+        return f'{self.code}: {self.name} conformance {str(self.conformance)}'
 
 
 @dataclass
 class XmlAttribute:
     name: str
     datatype: str
-    conformance: Callable[[uint], ConformanceDecision]
+    conformance: ConformanceCallable
     read_access: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
     write_access: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
     write_optional: bool
@@ -84,20 +92,23 @@ class XmlAttribute:
 class XmlCommand:
     id: int
     name: str
-    conformance: Callable[[uint], ConformanceDecision]
+    conformance: ConformanceCallable
+
+    def __str__(self):
+        return f'{self.name} id:0x{self.id:02X} {self.id} conformance: {str(self.conformance)}'
 
 
 @dataclass
 class XmlEvent:
     name: str
-    conformance: Callable[[uint], ConformanceDecision]
+    conformance: ConformanceCallable
 
 
 @dataclass
 class XmlCluster:
     name: str
     revision: int
-    derived: str
+    derived: Optional[str]
     feature_map: dict[str, uint]
     attribute_map: dict[str, uint]
     command_map: dict[str, uint]
@@ -122,7 +133,7 @@ class ClusterSide(Enum):
 class XmlDeviceTypeClusterRequirements:
     name: str
     side: ClusterSide
-    conformance: Callable[[uint, list[uint], list[uint]], ConformanceDecision]
+    conformance: ConformanceCallable
     # TODO: add element requirements
 
     def __str__(self):
@@ -177,21 +188,22 @@ CLUSTER_NAME_FIXES = {0x0036: 'WiFi Network Diagnostics', 0x042a: 'PM25 Concentr
 DEVICE_TYPE_NAME_FIXES = {0x010b: 'Dimmable Plug-In Unit', 0x010a: 'On/Off Plug-in Unit'}
 
 
-def get_location_from_element(element: ElementTree.Element, cluster_id: int):
+def get_location_from_element(element: ElementTree.Element, cluster_id: Optional[int]) -> ProblemLocation:
+    if cluster_id is None:
+        cluster_id = 0
     if element.tag == 'feature':
-        location = FeaturePathLocation(endpoint_id=0, cluster_id=cluster_id, feature_code=element.attrib['code'])
+        return FeaturePathLocation(endpoint_id=0, cluster_id=cluster_id, feature_code=element.attrib['code'])
     elif element.tag == 'command':
-        location = CommandPathLocation(endpoint_id=0, cluster_id=cluster_id, command_id=int(element.attrib['id'], 0))
+        return CommandPathLocation(endpoint_id=0, cluster_id=cluster_id, command_id=int(element.attrib['id'], 0))
     elif element.tag == 'attribute':
-        location = AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=int(element.attrib['id'], 0))
+        return AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=int(element.attrib['id'], 0))
     elif element.tag == 'event':
-        location = EventPathLocation(endpoint_id=0, cluster_id=cluster_id, event_id=int(element.attrib['id'], 0))
+        return EventPathLocation(endpoint_id=0, cluster_id=cluster_id, event_id=int(element.attrib['id'], 0))
     else:
-        location = ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id)
-    return location
+        return ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id)
 
 
-def get_conformance(element: ElementTree.Element, cluster_id: int) -> tuple[ElementTree.Element, typing.Optional[ProblemNotice]]:
+def get_conformance(element: ElementTree.Element, cluster_id: Optional[uint]) -> tuple[ElementTree.Element, typing.Optional[ProblemNotice]]:
     for sub in element:
         if sub.tag in TOP_LEVEL_CONFORMANCE_TAGS:
             return sub, None
@@ -201,8 +213,13 @@ def get_conformance(element: ElementTree.Element, cluster_id: int) -> tuple[Elem
     return ElementTree.Element(OPTIONAL_CONFORM), problem
 
 
+# Tuple of the root element, the conformance xml element within the root and the optional access element within the root
+XmlElementDescriptor = tuple[ElementTree.Element, ElementTree.Element, Optional[ElementTree.Element]]
+
+
 class ClusterParser:
-    def __init__(self, cluster, cluster_id, name):
+    # Cluster ID is optional to support base clusters that have no ID of their own.
+    def __init__(self, cluster: ElementTree.Element, cluster_id: Optional[uint], name: str):
         self._problems: list[ProblemNotice] = []
         self._cluster = cluster
         self._cluster_id = cluster_id
@@ -218,10 +235,12 @@ class ClusterParser:
         except (KeyError, StopIteration):
             self._derived = None
 
-        for id in cluster.iter('clusterIds'):
-            if list(id.iter('provisionalConform')):
-                self._is_provisional = True
+        for ids in cluster.iter('clusterIds'):
+            for id in ids.iter('clusterId'):
+                if id.attrib['name'] == name and list(id.iter('provisionalConform')):
+                    self._is_provisional = True
 
+        self._pics: Optional[str] = None
         try:
             classification = next(cluster.iter('classification'))
             self._pics = classification.attrib['picsCode']
@@ -250,7 +269,7 @@ class ClusterParser:
                 return sub
         return None
 
-    def get_all_type(self, type_container: str, type_name: str, key_name: str) -> list[tuple[ElementTree.Element, ElementTree.Element, ElementTree.Element]]:
+    def get_all_type(self, type_container: str, type_name: str, key_name: str) -> list[XmlElementDescriptor]:
         ret = []
         container_tags = self._cluster.iter(type_container)
         for container in container_tags:
@@ -266,54 +285,56 @@ class ClusterParser:
                 ret.append((element, conformance, access))
         return ret
 
-    def get_all_feature_elements(self) -> list[tuple[ElementTree.Element, ElementTree.Element]]:
+    def get_all_feature_elements(self) -> list[XmlElementDescriptor]:
         ''' Returns a list of features and their conformances'''
         return self.get_all_type('features', 'feature', 'code')
 
-    def get_all_attribute_elements(self) -> list[tuple[ElementTree.Element, ElementTree.Element]]:
+    def get_all_attribute_elements(self) -> list[XmlElementDescriptor]:
         ''' Returns a list of attributes and their conformances'''
         return self.get_all_type('attributes', 'attribute', 'id')
 
-    def get_all_command_elements(self) -> list[tuple[ElementTree.Element, ElementTree.Element]]:
+    def get_all_command_elements(self) -> list[XmlElementDescriptor]:
         ''' Returns a list of commands and their conformances '''
         return self.get_all_type('commands', 'command', 'id')
 
-    def get_all_event_elements(self) -> list[tuple[ElementTree.Element, ElementTree.Element]]:
+    def get_all_event_elements(self) -> list[XmlElementDescriptor]:
         ''' Returns a list of events and their conformances'''
         return self.get_all_type('events', 'event', 'id')
 
     def create_feature_map(self) -> dict[str, uint]:
         features = {}
         for element, _, _ in self.feature_elements:
-            features[element.attrib['code']] = 1 << int(element.attrib['bit'], 0)
+            features[element.attrib['code']] = uint(1 << int(element.attrib['bit'], 0))
         return features
 
     def create_attribute_map(self) -> dict[str, uint]:
         attributes = {}
         for element, conformance, _ in self.attribute_elements:
-            attributes[element.attrib['name']] = int(element.attrib['id'], 0)
+            attributes[element.attrib['name']] = uint(int(element.attrib['id'], 0))
         return attributes
 
     def create_command_map(self) -> dict[str, uint]:
         commands = {}
         for element, _, _ in self.command_elements:
-            commands[element.attrib['name']] = int(element.attrib['id'], 0)
+            commands[element.attrib['name']] = uint(int(element.attrib['id'], 0))
         return commands
 
-    def parse_conformance(self, conformance_xml: ElementTree.Element) -> Callable:
+    def parse_conformance(self, conformance_xml: ElementTree.Element) -> Optional[ConformanceCallable]:
         try:
             return parse_callable_from_xml(conformance_xml, self.params)
         except ConformanceException as ex:
             # Just point to the general cluster, because something is mismatched, but it's not clear what
-            location = ClusterPathLocation(endpoint_id=0, cluster_id=self._cluster_id)
+            location = ClusterPathLocation(endpoint_id=0, cluster_id=self._cluster_id if self._cluster_id is not None else 0)
             self._problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
                                                 severity=ProblemSeverity.WARNING, problem=str(ex)))
             return None
 
-    def parse_write_optional(self, element_xml: ElementTree.Element, access_xml: ElementTree.Element) -> bool:
+    def parse_write_optional(self, element_xml: ElementTree.Element, access_xml: Optional[ElementTree.Element]) -> bool:
+        if access_xml is None:
+            return False
         return access_xml.attrib['write'] == 'optional'
 
-    def parse_access(self, element_xml: ElementTree.Element, access_xml: ElementTree.Element, conformance: Callable) -> tuple[Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum], Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum], Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]]:
+    def parse_access(self, element_xml: ElementTree.Element, access_xml: Optional[ElementTree.Element], conformance: Callable) -> tuple[Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum], Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum], Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]]:
         ''' Returns a tuple of access types for read / write / invoke'''
         def str_to_access_type(privilege_str: str) -> Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum:
             if privilege_str == 'view':
@@ -361,7 +382,7 @@ class ClusterParser:
     def parse_features(self) -> dict[uint, XmlFeature]:
         features = {}
         for element, conformance_xml, _ in self.feature_elements:
-            mask = 1 << int(element.attrib['bit'], 0)
+            mask = uint(1 << int(element.attrib['bit'], 0))
             conformance = self.parse_conformance(conformance_xml)
             if conformance is None:
                 continue
@@ -370,9 +391,9 @@ class ClusterParser:
         return features
 
     def parse_attributes(self) -> dict[uint, XmlAttribute]:
-        attributes = {}
+        attributes: dict[uint, XmlAttribute] = {}
         for element, conformance_xml, access_xml in self.attribute_elements:
-            code = int(element.attrib['id'], 0)
+            code = uint(int(element.attrib['id'], 0))
             # Some deprecated attributes don't have their types included, for now, lets just fallback to UNKNOWN
             try:
                 datatype = element.attrib['type']
@@ -394,7 +415,7 @@ class ClusterParser:
         # Add in the global attributes for the base class
         for id in GlobalAttributeIds:
             # TODO: Add data type here. Right now it's unused. We should parse this from the spec.
-            attributes[id] = XmlAttribute(name=id.to_name(), datatype="", conformance=mandatory(
+            attributes[uint(id)] = XmlAttribute(name=id.to_name(), datatype="", conformance=mandatory(
             ), read_access=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView, write_access=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue, write_optional=False)
         return attributes
 
@@ -419,27 +440,28 @@ class ClusterParser:
                 continue
             code = int(element.attrib['id'], 0)
             conformance = self.parse_conformance(conformance_xml)
-            commands.append(XmlCommand(id=code, name=element.attrib['name'], conformance=conformance))
+            if conformance is not None:
+                commands.append(XmlCommand(id=code, name=element.attrib['name'], conformance=conformance))
         return commands
 
     def parse_commands(self, command_type: CommandType) -> dict[uint, XmlCommand]:
-        commands = {}
+        commands: dict[uint, XmlCommand] = {}
         for element, conformance_xml, access_xml in self.command_elements:
             if self.get_command_type(element) != command_type:
                 continue
-            code = int(element.attrib['id'], 0)
+            code = uint(int(element.attrib['id'], 0))
             conformance = self.parse_conformance(conformance_xml)
             if conformance is None:
                 continue
             if code in commands:
                 conformance = or_operation([conformance, commands[code].conformance])
-            commands[code] = XmlCommand(id=code, name=element.attrib['name'], conformance=conformance)
+            commands[uint(code)] = XmlCommand(id=code, name=element.attrib['name'], conformance=conformance)
         return commands
 
-    def parse_events(self) -> dict[uint, XmlAttribute]:
-        events = {}
+    def parse_events(self) -> dict[uint, XmlEvent]:
+        events: dict[uint, XmlEvent] = {}
         for element, conformance_xml, access_xml in self.event_elements:
-            code = int(element.attrib['id'], 0)
+            code = uint(int(element.attrib['id'], 0))
             conformance = self.parse_conformance(conformance_xml)
             if conformance is None:
                 continue
@@ -467,7 +489,7 @@ class ClusterParser:
         return self._problems
 
 
-def add_cluster_data_from_xml(xml: ElementTree.Element, clusters: dict[int, XmlCluster], pure_base_clusters: dict[str, XmlCluster], ids_by_name: dict[str, int], problems: list[ProblemNotice]) -> None:
+def add_cluster_data_from_xml(xml: ElementTree.Element, clusters: dict[uint, XmlCluster], pure_base_clusters: dict[str, XmlCluster], ids_by_name: dict[str, uint], problems: list[ProblemNotice]) -> None:
     ''' Adds cluster data to the supplied dicts as appropriate
 
         xml: XML element read from from the XML cluster file
@@ -482,10 +504,16 @@ def add_cluster_data_from_xml(xml: ElementTree.Element, clusters: dict[int, XmlC
         ids = c.iter('clusterId')
         for id in ids:
             name = id.get('name')
-            cluster_id = id.get('id')
-            if cluster_id:
-                cluster_id = int(id.get('id'), 0)
-                ids_by_name[name] = cluster_id
+            cluster_id_str = id.get('id')
+            cluster_id: Optional[uint] = None
+            if cluster_id_str:
+                cluster_id = uint(int(cluster_id_str, 0))
+
+            if name is None:
+                location = ClusterPathLocation(endpoint_id=0, cluster_id=0 if cluster_id is None else cluster_id)
+                problems.append(ProblemNotice(test_name="Spec XML parsing", location=location,
+                                severity=ProblemSeverity.WARNING, problem=f"Cluster with no name {cluster}"))
+                continue
 
             parser = ClusterParser(c, cluster_id, name)
             new = parser.create_cluster()
@@ -493,6 +521,7 @@ def add_cluster_data_from_xml(xml: ElementTree.Element, clusters: dict[int, XmlC
 
             if cluster_id:
                 clusters[cluster_id] = new
+                ids_by_name[name] = cluster_id
             else:
                 # Fully derived clusters have no id, but also shouldn't appear on a device.
                 # We do need to keep them, though, because we need to update the derived
@@ -501,7 +530,7 @@ def add_cluster_data_from_xml(xml: ElementTree.Element, clusters: dict[int, XmlC
                 pure_base_clusters[name] = new
 
 
-def check_clusters_for_unknown_commands(clusters: dict[int, XmlCluster], problems: list[ProblemNotice]):
+def check_clusters_for_unknown_commands(clusters: dict[uint, XmlCluster], problems: list[ProblemNotice]):
     for id, cluster in clusters.items():
         for cmd in cluster.unknown_commands:
             problems.append(ProblemNotice(test_name="Spec XML parsing", location=CommandPathLocation(
@@ -511,6 +540,7 @@ def check_clusters_for_unknown_commands(clusters: dict[int, XmlCluster], problem
 class PrebuiltDataModelDirectory(Enum):
     k1_3 = auto()
     k1_4 = auto()
+    k1_4_1 = auto()
     kMaster = auto()
 
     @property
@@ -519,6 +549,8 @@ class PrebuiltDataModelDirectory(Enum):
             return "1.3"
         if self == PrebuiltDataModelDirectory.k1_4:
             return "1.4"
+        if self == PrebuiltDataModelDirectory.k1_4_1:
+            return "1.4.1"
         if self == PrebuiltDataModelDirectory.kMaster:
             return "master"
         raise KeyError("Invalid enum: %r" % self)
@@ -549,11 +581,14 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
         return data_model_directory
 
     # If it's a prebuilt directory, build the path based on the version and data model level
-    return pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
-        'data_model').joinpath(data_model_directory.dirname).joinpath(data_model_level.dirname)
+    zip_path = pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
+        'data_model').joinpath(data_model_directory.dirname).joinpath('allfiles.zip')
+    path = zipfile.Path(zip_path)
+
+    return path.joinpath(data_model_level.dirname)
 
 
-def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable] = PrebuiltDataModelDirectory.k1_4) -> typing.Tuple[dict[int, dict], list]:
+def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable]) -> typing.Tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
     """
     Build XML clusters from the specified data model directory.
     This function supports both pre-built locations and full paths.
@@ -563,9 +598,9 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     with all XML files in it)
     """
 
-    clusters: dict[int, XmlCluster] = {}
+    clusters: dict[uint, XmlCluster] = {}
     pure_base_clusters: dict[str, XmlCluster] = {}
-    ids_by_name: dict[str, int] = {}
+    ids_by_name: dict[str, uint] = {}
     problems: list[ProblemNotice] = []
 
     top = get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
@@ -601,13 +636,13 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
         nonlocal problems
         problems = [p for p in problems if p.location != location]
 
-    descriptor_id = Clusters.Descriptor.id
+    descriptor_id = uint(Clusters.Descriptor.id)
     code = 'TAGLIST'
     mask = clusters[descriptor_id].feature_map[code]
     clusters[descriptor_id].features[mask].conformance = optional()
     remove_problem(FeaturePathLocation(endpoint_id=0, cluster_id=descriptor_id, feature_code=code))
 
-    action_id = Clusters.Actions.id
+    action_id = uint(Clusters.Actions.id)
     for c in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[action_id]:
         clusters[action_id].accepted_commands[c].conformance = optional()
         remove_problem(CommandPathLocation(endpoint_id=0, cluster_id=action_id, command_id=c))
@@ -619,7 +654,7 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     # to implement either arithmetic conformance handling (once spec changes land here) or specific test
     # https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/7808 for spec changes.
     # see 3.2.8. Defined Primaries Information Attribute Set, affects Primary<#>X/Y/Intensity attributes.
-    cc_id = Clusters.ColorControl.id
+    cc_id = uint(Clusters.ColorControl.id)
     cc_attr = Clusters.ColorControl.Attributes
     affected_attributes = [cc_attr.Primary1X,
                            cc_attr.Primary1Y,
@@ -645,44 +680,45 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
 
     # Workaround for temp control cluster - this is parsed incorrectly in the DM XML and is missing all its attributes
     # Remove this workaround when https://github.com/csa-data-model/projects/issues/330 is fixed
-    temp_control_id = Clusters.TemperatureControl.id
+    temp_control_id = uint(Clusters.TemperatureControl.id)
     if temp_control_id in clusters and not clusters[temp_control_id].attributes:
         view = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView
         none = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue
         clusters[temp_control_id].attributes = {
-            0x00: XmlAttribute(name='TemperatureSetpoint', datatype='temperature', conformance=feature(0x01, 'TN'), read_access=view, write_access=none, write_optional=False),
-            0x01: XmlAttribute(name='MinTemperature', datatype='temperature', conformance=feature(0x01, 'TN'), read_access=view, write_access=none, write_optional=False),
-            0x02: XmlAttribute(name='MaxTemperature', datatype='temperature', conformance=feature(0x01, 'TN'), read_access=view, write_access=none, write_optional=False),
-            0x03: XmlAttribute(name='Step', datatype='temperature', conformance=feature(0x04, 'STEP'), read_access=view, write_access=none, write_optional=False),
-            0x04: XmlAttribute(name='SelectedTemperatureLevel', datatype='uint8', conformance=feature(0x02, 'TL'), read_access=view, write_access=none, write_optional=False),
-            0x05: XmlAttribute(name='SupportedTemperatureLevels', datatype='list', conformance=feature(0x02, 'TL'), read_access=view, write_access=none, write_optional=False),
+            uint(0x00): XmlAttribute(name='TemperatureSetpoint', datatype='temperature', conformance=feature(uint(0x01), 'TN'), read_access=view, write_access=none, write_optional=False),
+            uint(0x01): XmlAttribute(name='MinTemperature', datatype='temperature', conformance=feature(uint(0x01), 'TN'), read_access=view, write_access=none, write_optional=False),
+            uint(0x02): XmlAttribute(name='MaxTemperature', datatype='temperature', conformance=feature(uint(0x01), 'TN'), read_access=view, write_access=none, write_optional=False),
+            uint(0x03): XmlAttribute(name='Step', datatype='temperature', conformance=feature(uint(0x04), 'STEP'), read_access=view, write_access=none, write_optional=False),
+            uint(0x04): XmlAttribute(name='SelectedTemperatureLevel', datatype='uint8', conformance=feature(uint(0x02), 'TL'), read_access=view, write_access=none, write_optional=False),
+            uint(0x05): XmlAttribute(name='SupportedTemperatureLevels', datatype='list', conformance=feature(uint(0x02), 'TL'), read_access=view, write_access=none, write_optional=False),
         }
 
     # TODO: Need automated parsing for atomic attributes.
-    atomic_request_cmd_id = 0xFE
-    atomic_response_cmd_id = 0xFD
+    atomic_request_cmd_id = uint(0xFE)
+    atomic_response_cmd_id = uint(0xFD)
     atomic_request_name = "Atomic Request"
     atomic_response_name = "Atomic Response"
     presets_name = "Presets"
     schedules_name = "Schedules"
-    if clusters[Clusters.Thermostat.id].revision >= 8:
-        presents_id = clusters[Clusters.Thermostat.id].attribute_map[presets_name]
-        schedules_id = clusters[Clusters.Thermostat.id].attribute_map[schedules_name]
+    thermostat_id = uint(Clusters.Thermostat.id)
+    if clusters[thermostat_id].revision >= 8:
+        presents_id = clusters[thermostat_id].attribute_map[presets_name]
+        schedules_id = clusters[thermostat_id].attribute_map[schedules_name]
         conformance = or_operation([conformance_support.attribute(presents_id, presets_name),
                                    conformance_support.attribute(schedules_id, schedules_name)])
-        clusters[Clusters.Thermostat.id].accepted_commands[atomic_request_cmd_id] = XmlCommand(
+        clusters[thermostat_id].accepted_commands[atomic_request_cmd_id] = XmlCommand(
             id=atomic_request_cmd_id, name=atomic_request_name, conformance=conformance)
-        clusters[Clusters.Thermostat.id].generated_commands[atomic_response_cmd_id] = XmlCommand(
+        clusters[thermostat_id].generated_commands[atomic_response_cmd_id] = XmlCommand(
             id=atomic_response_cmd_id, name=atomic_response_name, conformance=conformance)
-        clusters[Clusters.Thermostat.id].command_map[atomic_request_name] = atomic_request_cmd_id
-        clusters[Clusters.Thermostat.id].command_map[atomic_response_name] = atomic_response_cmd_id
+        clusters[thermostat_id].command_map[atomic_request_name] = atomic_request_cmd_id
+        clusters[thermostat_id].command_map[atomic_response_name] = atomic_response_cmd_id
 
     check_clusters_for_unknown_commands(clusters, problems)
 
     return clusters, problems
 
 
-def combine_derived_clusters_with_base(xml_clusters: dict[int, XmlCluster], pure_base_clusters: dict[str, XmlCluster], ids_by_name: dict[str, int], problems: list[ProblemNotice]) -> None:
+def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pure_base_clusters: dict[str, XmlCluster], ids_by_name: dict[str, uint], problems: list[ProblemNotice]) -> None:
     ''' Overrides base elements with the derived cluster values for derived clusters. '''
 
     def combine_attributes(base: dict[uint, XmlAttribute], derived: dict[uint, XmlAttribute], cluster_id: uint, problems: list[ProblemNotice]) -> dict[uint, XmlAttribute]:
@@ -734,10 +770,10 @@ def combine_derived_clusters_with_base(xml_clusters: dict[int, XmlCluster], pure
             events.update(c.events)
             unknown_commands = deepcopy(base.unknown_commands)
             for cmd in c.unknown_commands:
-                if cmd.id in accepted_commands.keys() and cmd.name == accepted_commands[cmd.id].name:
-                    accepted_commands[cmd.id].conformance = cmd.conformance
-                elif cmd.id in generated_commands.keys() and cmd.name == generated_commands[cmd.id].name:
-                    generated_commands[cmd.id].conformance = cmd.conformance
+                if cmd.id in accepted_commands.keys() and cmd.name == accepted_commands[uint(cmd.id)].name:
+                    accepted_commands[uint(cmd.id)].conformance = cmd.conformance
+                elif cmd.id in generated_commands.keys() and cmd.name == generated_commands[uint(cmd.id)].name:
+                    generated_commands[uint(cmd.id)].conformance = cmd.conformance
                 else:
                     unknown_commands.append(cmd)
             provisional = c.is_provisional or base.is_provisional
@@ -758,7 +794,7 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDe
         name = d.attrib['name']
         location = DeviceTypePathLocation(device_type_id=0)
 
-        str_id = d.attrib['id']
+        str_id = d.attrib.get('id', "")
         if not str_id:
             if name == "Base Device Type":
                 # Base is special device type, we're going to call it -1 so we can combine and remove it later.
@@ -784,7 +820,6 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDe
         except (KeyError, StopIteration):
             # this is fine for base device type
             if id == -1:
-                classification = 'BASE'
                 scope = 'BASE'
                 device_class = 'BASE'
             else:
@@ -797,7 +832,13 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDe
         clusters = d.iter('cluster')
         for c in clusters:
             try:
-                cid = int(c.attrib['id'], 0)
+                try:
+                    cid = uint(int(c.attrib['id'], 0))
+                except ValueError:
+                    location = DeviceTypePathLocation(device_type_id=id)
+                    problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                    severity=ProblemSeverity.WARNING, problem=f"Unknown cluster id {c.attrib['id']}"))
+                    continue
                 conformance_xml, tmp_problem = get_conformance(c, cid)
                 if tmp_problem:
                     problems.append(tmp_problem)
@@ -822,10 +863,10 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDe
     return device_types, problems
 
 
-def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
+def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable]) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     top = get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
     device_types: dict[int, XmlDeviceType] = {}
-    problems = []
+    problems: list[ProblemNotice] = []
 
     found_xmls = 0
 
@@ -852,3 +893,26 @@ def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelD
     device_types.pop(-1)
 
     return device_types, problems
+
+
+def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirectory:
+    ''' Returns the data model directory for a given specification revision.
+
+        input: specification revision attribute data from the basic information cluster
+        output: PrebuiltDataModelDirectory
+        raises: ConformanceException if the given specification_version does not conform to a known data model
+    '''
+    # Specification version attribute is 2 bytes major, 2 bytes minor, 2 bytes dot 2 bytes reserved.
+    # However, 1.3 allowed the dot to be any value
+    if specification_version < 0x01040000:
+        specification_version &= 0xFFFF00FF
+
+    version_to_dm = {0x01030000: PrebuiltDataModelDirectory.k1_3,
+                     0x01040000: PrebuiltDataModelDirectory.k1_4,
+                     0x01040100: PrebuiltDataModelDirectory.k1_4_1,
+                     0x01050000: PrebuiltDataModelDirectory.kMaster}
+
+    if specification_version not in version_to_dm.keys():
+        raise ConformanceException(f"Unknown specification_version {specification_version:08X}")
+
+    return version_to_dm[specification_version]

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -85,56 +85,84 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="CookTime" type="elapsed-s" default="30">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="between" from="1" to="MaxCookTime"/>
+      <constraint>
+        <between value="1">
+          <attribute name="MaxCookTime"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="MaxCookTime" type="elapsed-s" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="between" from="1" to="86400"/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="86400"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="PowerSetting" type="uint8" default="desc">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="PWRNUM"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="MinPower" type="uint8" default="10">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="PWRLMTS"/>
       </mandatoryConform>
-      <constraint type="between" from="1" to="99"/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="99"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="MaxPower" type="uint8" default="100">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="PWRLMTS"/>
       </mandatoryConform>
-      <constraint type="between" from="MinPower + 1" to="100"/>
+      <constraint>
+        <between>
+          <from value="MinPower + 1"/>
+          <to value="100"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="PowerStep" type="uint8" default="10">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="PWRLMTS"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0006" name="SupportedWatts" type="list" default="MS">
       <entry type="uint16"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform>
           <feature name="WATTS"/>
         </mandatoryConform>
       </otherwiseConform>
-      <constraint type="countBetween" from="1" to="10"/>
+      <constraint>
+        <countBetween>
+          <from value="1"/>
+          <to value="10"/>
+        </countBetween>
+      </constraint>
     </attribute>
     <attribute id="0x0007" name="SelectedWattIndex" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
@@ -144,11 +172,13 @@ Davis, CA 95616, USA
           <feature name="WATTS"/>
         </mandatoryConform>
       </otherwiseConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0008" name="WattRating" type="uint16" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform/>
     </attribute>
   </attributes>
@@ -157,24 +187,37 @@ Davis, CA 95616, USA
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="CookMode" type="uint8" default="desc">
-        <optionalConform choice="b" more="true"/>
-        <constraint type="desc"/>
+        <optionalConform choice="b" more="true" min="1"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="CookTime" type="elapsed-s" default="30">
-        <optionalConform choice="b" more="true"/>
-        <constraint type="between" from="1" to="MaxCookTime"/>
+        <optionalConform choice="b" more="true" min="1"/>
+        <constraint>
+          <between value="1">
+            <attribute name="MaxCookTime"/>
+          </between>
+        </constraint>
       </field>
       <field id="2" name="PowerSetting" type="uint8" default="MaxPower">
-        <optionalConform choice="b" more="true">
+        <optionalConform choice="b" more="true" min="1">
           <feature name="PWRNUM"/>
         </optionalConform>
-        <constraint type="between" from="MinPower" to="MaxPower"/>
+        <constraint>
+          <between>
+            <attribute name="MinPower"/>
+            <attribute name="MaxPower"/>
+          </between>
+        </constraint>
       </field>
       <field id="3" name="WattSettingIndex" type="uint8" default="MS">
-        <optionalConform choice="b" more="true">
+        <optionalConform choice="b" more="true" min="1">
           <feature name="WATTS"/>
         </optionalConform>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="StartAfterSetting" type="bool" default="false">
         <optionalConform/>
@@ -185,7 +228,11 @@ Davis, CA 95616, USA
       <optionalConform/>
       <field id="0" name="TimeToAdd" type="elapsed-s">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="MaxCookTime"/>
+        <constraint>
+          <between value="1">
+            <attribute name="MaxCookTime"/>
+          </between>
+        </constraint>
       </field>
     </command>
   </commands>

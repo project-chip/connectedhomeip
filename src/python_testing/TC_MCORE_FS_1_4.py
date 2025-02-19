@@ -393,7 +393,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         asserts.assert_true(dut_fsa_bridge_endpoints_new.issuperset(dut_fsa_bridge_endpoints),
                             "Expected only new endpoints to be added")
         unique_endpoints_set = dut_fsa_bridge_endpoints_new - dut_fsa_bridge_endpoints
-        asserts.assert_equal(len(unique_endpoints_set), 1, "Expected only one new endpoint on DUT_FSA")
+        asserts.assert_equal(len(unique_endpoints_set), 1, "Expected exactly one new endpoint on DUT_FSA")
         dut_fsa_bridge_th_server_endpoint = list(unique_endpoints_set)[0]
 
         # Verify that DUT_FSA copied the TH_SERVER_NO_UID UniqueID from TH_FSA.

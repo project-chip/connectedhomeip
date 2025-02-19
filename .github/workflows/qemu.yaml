@@ -41,7 +41,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && github.repository_owner == 'espressif'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32-qemu:97
+            image: ghcr.io/project-chip/chip-build-esp32-qemu:112
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -79,7 +79,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-tizen-qemu:97
+            image: ghcr.io/project-chip/chip-build-tizen-qemu:112
             options: --user root
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"

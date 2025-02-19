@@ -844,6 +844,63 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-mounted-onoff-control</name>
+        <domain>CHIP</domain>
+        <typeName>Mounted On/Off Control</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x010F</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Level Control" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="LT" name="Lighting"></feature>
+                    <feature code="OO" name="OnOff"></feature>
+                </features>
+            </include>
+            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="LT" name="Lighting"></feature>
+                </features>
+            </include>
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false">
+                <requireCommand>CopyScene</requireCommand>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-camera</name>
+        <domain>CHIP</domain>
+        <typeName>Camera</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0142</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Camera AV Settings User Level Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Camera AV Stream Management" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="ADO" name="Audio"></feature>
+                    <feature code="SNP" name="Snapshot"></feature>
+                    <feature code="VDO" name="Video"></feature>
+                </features>
+            </include>
+            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Push AV Stream Transport" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="TLS Certificate Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="TLS Client Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Time Synchronization" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="WebRTC Transport Provider" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="WebRTC Transport Requestor" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Zone Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-pump</name>
         <domain>CHIP</domain>
         <typeName>Pump</typeName>
@@ -2803,6 +2860,23 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
             </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-thermostatcontroller</name>
+        <domain>CHIP</domain>
+        <typeName>Thermostat Controller</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x030A</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Thermostat" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Identify" client="true" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Groups" client="true" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Scenes Management" client="true" server="false" clientLocked="false" serverLocked="true"></include>
         </clusters>
     </deviceType>
 </configurator>

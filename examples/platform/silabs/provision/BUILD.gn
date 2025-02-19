@@ -22,6 +22,8 @@ if (wifi_soc) {
   import("${silabs_sdk_build_root}/efr32_sdk.gni")
 }
 
+# Seperate import since the matter_support_root is defined in the ef32_sdk.gni / SiWx917_sdk.gni
+import("${matter_support_root}/provision/args.gni")
 source_set("storage") {
   sources = [ "ProvisionStorageCustom.cpp" ]
 
@@ -33,32 +35,24 @@ source_set("storage") {
 
   if (wifi_soc) {
     if (sl_si91x_crypto_flavor == "psa") {
-      libs =
-          [ "${sdk_support_root}/matter/provision/lib/libProvisionPSA_si917.a" ]
+      libs = [ "${sl_provision_root}/libs/libProvisionPSA_si917.a" ]
     } else {
-      libs = [ "${sdk_support_root}/matter/provision/lib/libProvision_si917.a" ]
+      libs = [ "${sl_provision_root}/libs/libProvision_si917.a" ]
     }
   } else {
     if (use_provision_flash_storage) {
-      libs = [ "${sdk_support_root}/matter/provision/lib/libProvisionFlash_${silabs_family}.a" ]
+      libs =
+          [ "${sl_provision_root}/libs/libProvisionFlash_${silabs_family}.a" ]
     } else {
-      libs = [ "${sdk_support_root}/matter/provision/lib/libProvision_${silabs_family}.a" ]
+      libs = [ "${sl_provision_root}/libs/libProvision_${silabs_family}.a" ]
     }
   }
 
   deps = [ "${chip_root}/src/lib" ]
 
-  public_deps =
-      [ "${chip_root}/src/platform/silabs/provision:provision-headers" ]
+  public_deps = [ "${sl_provision_root}:headers" ]
 
   if (sl_enable_test_event_trigger) {
-    # Temporary workaround since we have duplicated configurations
-    if (wifi_soc) {
-      public_configs = [ "${chip_root}/examples/platform/silabs/SiWx917:test-event-trigger-config" ]
-    } else {
-      public_configs = [
-        "${chip_root}/examples/platform/silabs/efr32:test-event-trigger-config",
-      ]
-    }
+    public_configs = [ "${chip_root}/examples/platform/silabs/test-event-trigger:test-event-trigger-config" ]
   }
 }

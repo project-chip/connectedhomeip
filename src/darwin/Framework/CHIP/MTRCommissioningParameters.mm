@@ -45,6 +45,12 @@ NS_ASSUME_NONNULL_BEGIN
     self.failSafeTimeout = failSafeExpiryTimeoutSecs;
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<MTRCommissioningParameters: %p, has ssid: %d, has thread dataset: %d>", self,
+                     self.wifiSSID != nil, self.threadOperationalDataset != nil];
+}
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -749,6 +749,15 @@ static BOOL CommandNeedsTimedInvokeInWindowCoveringCluster(AttributeId aAttribut
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInClosureControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ClosureControl;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInServiceAreaCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ServiceArea;
@@ -1169,6 +1178,15 @@ static BOOL CommandNeedsTimedInvokeInWebRTCTransportRequestorCluster(AttributeId
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInPushAVStreamTransportCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::PushAvStreamTransport;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInChimeCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Chime;
@@ -1190,6 +1208,15 @@ static BOOL CommandNeedsTimedInvokeInEcosystemInformationCluster(AttributeId aAt
 static BOOL CommandNeedsTimedInvokeInCommissionerControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::CommissionerControl;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInTLSCertificateManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::TlsCertificateManagement;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1446,6 +1473,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::WindowCovering::Id: {
         return CommandNeedsTimedInvokeInWindowCoveringCluster(commandID);
     }
+    case Clusters::ClosureControl::Id: {
+        return CommandNeedsTimedInvokeInClosureControlCluster(commandID);
+    }
     case Clusters::ServiceArea::Id: {
         return CommandNeedsTimedInvokeInServiceAreaCluster(commandID);
     }
@@ -1581,6 +1611,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::WebRTCTransportRequestor::Id: {
         return CommandNeedsTimedInvokeInWebRTCTransportRequestorCluster(commandID);
     }
+    case Clusters::PushAvStreamTransport::Id: {
+        return CommandNeedsTimedInvokeInPushAVStreamTransportCluster(commandID);
+    }
     case Clusters::Chime::Id: {
         return CommandNeedsTimedInvokeInChimeCluster(commandID);
     }
@@ -1589,6 +1622,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::CommissionerControl::Id: {
         return CommandNeedsTimedInvokeInCommissionerControlCluster(commandID);
+    }
+    case Clusters::TlsCertificateManagement::Id: {
+        return CommandNeedsTimedInvokeInTLSCertificateManagementCluster(commandID);
     }
     case Clusters::UnitTesting::Id: {
         return CommandNeedsTimedInvokeInUnitTestingCluster(commandID);

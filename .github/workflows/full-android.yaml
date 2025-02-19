@@ -33,13 +33,13 @@ jobs:
         name: Run
 
         env:
-            JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/
+            JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64/
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-android:97
+            image: ghcr.io/project-chip/chip-build-android:113
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 

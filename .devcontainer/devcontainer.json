@@ -1,20 +1,26 @@
 {
     "name": "CHIP Ubuntu Development Environment",
     "runArgs": [
-        "--cap-add=SYS_PTRACE",
-        "--security-opt",
-        "seccomp=unconfined",
         "--network=host",
-        "--privileged",
-        "-v",
-        "/dev/bus/usb:/dev/bus/usb:ro",
         "--device-cgroup-rule=a 189:* rmw",
         "--add-host=host.docker.internal:host-gateway"
     ],
+    "privileged": true,
+    "capAdd": ["SYS_PTRACE"],
+    "securityOpt": ["seccomp=unconfined"],
     "mounts": [
-        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+        {
+            "source": "/var/run/docker.sock",
+            "target": "/var/run/docker.sock",
+            "type": "bind"
+        },
+        {
+            "source": "/dev/bus/usb",
+            "target": "/dev/bus/usb",
+            "type": "bind"
+        }
     ],
-    "initializeCommand": "bash .devcontainer/build.sh --tag matter-dev-environment:local --version 74",
+    "initializeCommand": "bash .devcontainer/build.sh --tag matter-dev-environment:local --version 97",
     "image": "matter-dev-environment:local",
     "remoteUser": "vscode",
     "containerEnv": {

@@ -35,7 +35,7 @@ jobs:
 
         runs-on: ubuntu-20.04
         container:
-            image: ghcr.io/project-chip/chip-build:97
+            image: ghcr.io/project-chip/chip-build:112
         defaults:
             run:
                 shell: sh

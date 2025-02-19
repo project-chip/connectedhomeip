@@ -4289,6 +4289,72 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace WindowCovering
 
+namespace ClosureControl {
+namespace Attributes {
+
+namespace CountdownTime {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace CountdownTime
+
+namespace MainState {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MainState
+
+namespace CurrentErrorList {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace CurrentErrorList
+
+namespace OverallState {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace OverallState
+
+namespace OverallTarget {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace OverallTarget
+
+namespace RestingProcedure {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace RestingProcedure
+
+namespace TriggerCondition {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace TriggerCondition
+
+namespace TriggerPosition {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace TriggerPosition
+
+namespace WaitingDelay {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace WaitingDelay
+
+namespace KickoffTimer {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace KickoffTimer
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ClosureControl
+
 namespace ServiceArea {
 namespace Attributes {
 
@@ -7175,6 +7241,44 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace WebRTCTransportRequestor
 
+namespace PushAvStreamTransport {
+namespace Attributes {
+
+namespace SupportedContainerFormats {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace SupportedContainerFormats
+
+namespace SupportedIngestMethods {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace SupportedIngestMethods
+
+namespace CurrentConnections {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace CurrentConnections
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace PushAvStreamTransport
+
 namespace Chime {
 namespace Attributes {
 
@@ -7276,6 +7380,48 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace CommissionerControl
+
+namespace TlsCertificateManagement {
+namespace Attributes {
+
+namespace MaxRootCertificates {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MaxRootCertificates
+
+namespace CurrentRootCertificates {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentRootCertificates
+
+namespace MaxClientCertificates {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxClientCertificates
+
+namespace CurrentClientCertificates {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace CurrentClientCertificates
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace TlsCertificateManagement
 
 namespace UnitTesting {
 namespace Attributes {

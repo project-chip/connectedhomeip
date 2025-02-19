@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-imx:97
+            image: ghcr.io/project-chip/chip-build-imx:112
 
         steps:
             - name: Checkout

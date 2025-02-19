@@ -86,7 +86,6 @@ function(chip_configure_data_model APP_TARGET)
         ${CHIP_APP_BASE_DIR}/server/DefaultTermsAndConditionsProvider.cpp
         ${CHIP_APP_BASE_DIR}/server/Dnssd.cpp
         ${CHIP_APP_BASE_DIR}/server/EchoHandler.cpp
-        ${CHIP_APP_BASE_DIR}/server/OnboardingCodesUtil.cpp
         ${CHIP_APP_BASE_DIR}/server/Server.cpp
     )
 
@@ -120,19 +119,6 @@ function(chip_configure_data_model APP_TARGET)
         set(APP_GEN_FILES)
     endif()
 
-    # These are:
-    #   //src/app/icd/server:notfier
-    #   //src/app/icd/server:monitoring-table
-    #   //src/app/icd/server:configuration-data
-    #
-    # TODO: ideally we would avoid duplication and would link gn-built items. In this case
-    #       it may be slightly harder because these are source_sets rather than libraries.
-    target_sources(${APP_TARGET} ${SCOPE}
-        ${CHIP_APP_BASE_DIR}/icd/server/ICDMonitoringTable.cpp
-        ${CHIP_APP_BASE_DIR}/icd/server/ICDNotifier.cpp
-        ${CHIP_APP_BASE_DIR}/icd/server/ICDConfigurationData.cpp
-    )
-
     # This is:
     #    //src/app/common:cluster-objects
     #
@@ -162,7 +148,6 @@ function(chip_configure_data_model APP_TARGET)
         ${CHIP_APP_BASE_DIR}/util/attribute-table.cpp
         ${CHIP_APP_BASE_DIR}/util/binding-table.cpp
         ${CHIP_APP_BASE_DIR}/util/DataModelHandler.cpp
-        ${CHIP_APP_BASE_DIR}/util/ember-global-attribute-access-interface.cpp
         ${CHIP_APP_BASE_DIR}/util/ember-io-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/generic-callback-stubs.cpp
         ${CHIP_APP_BASE_DIR}/util/privilege-storage.cpp

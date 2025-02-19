@@ -23,6 +23,7 @@
         "CHANNEL_CLUSTER": [],
         "CHIME_CLUSTER": [],
         "CLIENT_MONITORING_CLUSTER": [],
+        "CLOSURE_CONTROL_CLUSTER": [],
         "COLOR_CONTROL_CLUSTER": [],
         "COMMISSIONER_CONTROL_CLUSTER": [],
         "COMMISSIONING_CLUSTER": [],
@@ -69,6 +70,7 @@
         "MESSAGES_CLUSTER": [],
         "MODE_SELECT_CLUSTER": [],
         "NETWORK_COMMISSIONING_CLUSTER": [],
+        "PUSH_AV_STREAM_TRANSPORT_CLUSTER": [],
         "SAMPLE_MEI_CLUSTER": [],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "OCCUPANCY_SENSING_CLUSTER": [],
@@ -122,6 +124,7 @@
         "TIME_FORMAT_LOCALIZATION_CLUSTER": [],
         "TIME_SYNCHRONIZATION_CLUSTER": [],
         "TIMER_CLUSTER": [],
+        "TLS_CERTIFICATE_MANAGEMENT_CLUSTER": [],
         "TRUSTED_ROOT_CERTIFICATES_CLUSTER": [],
         "UNIT_LOCALIZATION_CLUSTER": [],
         "UNIT_TESTING_CLUSTER": [],
@@ -174,6 +177,7 @@
         ],
         "CHANNEL_CLUSTER": ["channel-server"],
         "CHIME_CLUSTER": ["chime-server"],
+        "CLOSURE_CONTROL_CLUSTER": [],
         "COLOR_CONTROL_CLUSTER": ["color-control-server"],
         "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
         "COMMISSIONING_CLUSTER": [],
@@ -233,6 +237,7 @@
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
+        "PUSH_AV_STREAM_TRANSPORT_CLUSTER": [],
         "SAMPLE_MEI_CLUSTER": ["sample-mei-server"],
         "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
         "ON_OFF_CLUSTER": ["on-off-server"],
@@ -305,6 +310,7 @@
         "TIME_FORMAT_LOCALIZATION_CLUSTER": ["time-format-localization-server"],
         "TIME_SYNCHRONIZATION_CLUSTER": ["time-synchronization-server"],
         "TIMER_CLUSTER": ["timer-server"],
+        "TLS_CERTIFICATE_MANAGEMENT_CLUSTER": [],
         "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],

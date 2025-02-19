@@ -207,9 +207,9 @@
 	platforms = mw320
 [submodule "third_party/silabs/matter_support"]
 	path = third_party/silabs/matter_support
-	url = https://github.com/SiliconLabs/sdk_support.git
+	url = https://github.com/SiliconLabsSoftware/matter_support.git
 	branch = main
-	platforms = silabs,silabs_docker
+	platforms = silabs,silabs_docker,unit_tests
 [submodule "third_party/silabs/simplicity_sdk"]
 	path = third_party/silabs/simplicity_sdk
 	url = https://github.com/SiliconLabs/simplicity_sdk.git
@@ -349,3 +349,8 @@
 	path = third_party/re2/src
 	url = https://github.com/google/re2.git
 	platforms = linux,darwin
+[submodule "third_party/libdatachannel/repo"]
+	path = third_party/libdatachannel/repo
+	url = https://github.com/paullouisageneau/libdatachannel.git
+	platforms = linux
+	recursive = true

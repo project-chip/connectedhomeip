@@ -40,7 +40,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:97
+            image: ghcr.io/project-chip/chip-build:112
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -52,7 +52,7 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: linux
+                platform: linux unit_tests
                 bootstrap-log-name: bootstrap-logs-unittest-${{ matrix.type }}
             - name: Artifact suffix
               id: outsuffix
@@ -66,11 +66,11 @@ jobs:
               # TODO: If rotating_device_id is ever removed/combined, we have to cover boringssl otherwise
               run: |
                   case $BUILD_TYPE in
-                     "main") GN_ARGS='';;
-                     "clang") GN_ARGS='is_clang=true';;
-                     "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
-                     "rotating_device_id") GN_ARGS='chip_crypto="boringssl" chip_enable_rotating_device_id=true';;
-                     "icd") GN_ARGS='chip_enable_icd_server=true chip_enable_icd_lit=true';;
+                     "main") GN_ARGS='chip_build_all_platform_tests=true';;
+                     "clang") GN_ARGS='is_clang=true chip_build_all_platform_tests=true';;
+                     "mbedtls") GN_ARGS='chip_crypto="mbedtls" chip_build_all_platform_tests=true';;
+                     "rotating_device_id") GN_ARGS='chip_crypto="boringssl" chip_enable_rotating_device_id=true chip_build_all_platform_tests=true';;
+                     "icd") GN_ARGS='chip_enable_icd_server=true chip_enable_icd_lit=true chip_build_all_platform_tests=true';;
                      *) ;;
                   esac
 

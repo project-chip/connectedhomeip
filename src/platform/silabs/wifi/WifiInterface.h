@@ -84,7 +84,7 @@ enum class WifiState : uint16_t
     kStationMode        = (1 << 7), /* Enable Station Mode */
     kAPMode             = (1 << 8), /* Enable AP Mode */
     kStationReady       = (kStationConnected | kStationDhcpDone),
-    kStationStarted     = (1 << 9),  /* RSI task started */
+    kStationStarted     = (1 << 9),
     kScanStarted        = (1 << 10), /* Scan Started */
 };
 
@@ -119,15 +119,6 @@ typedef struct
     size_t passkey_length;
     wfx_sec_t security;
 } wfx_wifi_provision_t;
-
-typedef enum
-{
-    WIFI_MODE_NULL = 0,
-    WIFI_MODE_STA,
-    WIFI_MODE_AP,
-    WIFI_MODE_APSTA,
-    WIFI_MODE_MAX,
-} wifi_mode_t;
 
 typedef struct wfx_wifi_scan_result
 {
@@ -187,6 +178,16 @@ extern WfxRsi_t wfx_rsi;
 /* Updated functions */
 
 /**
+ * @brief Function initalizes the WiFi module before starting WiFi task.
+ *
+ * @return CHIP_ERROR CHIP_NO_ERROR, if the initialization succeeded
+ *                    CHIP_ERROR_INTERNAL, if sequence failed due to internal API error
+ *                    CHIP_ERROR_NO_MEMORY, if sequence failed due to unavaliablility of memory
+ */
+
+CHIP_ERROR InitWiFiStack(void);
+
+/**
  * @brief Function notifies the PlatformManager that an IPv6 event occured on the WiFi interface.
  *
  * @param gotIPv6Addr true, got an IPv6 address
@@ -219,6 +220,36 @@ void NotifyDisconnection(WifiDisconnectionReasons reason);
 void NotifyConnection(const MacAddress & ap);
 
 /**
+ * @brief Returns the IPv6 notification state
+ *
+ * @note This function is necessary because the class inheritance structure has not been done as of yet.
+ *       Once the inheritance is done, sub-classes will have access to the member directly wihtout needing to use an extra guetter.
+ *
+ * @return true, IPv6 change has been notified
+           false, otherwise
+ */
+bool HasNotifiedIPv6Change();
+
+/**
+ * @brief Returns the IPv4 notification state
+ *
+ * @note This function is necessary because the class inheritance structure has not been done as of yet.
+ *       Once the inheritance is done, sub-classes will have access to the member directly wihtout needing to use an extra guetter.
+ *
+ * @return true, IPv4 change has been notified
+           false, otherwise
+ */
+bool HasNotifiedIPv4Change();
+
+/**
+ * @brief Function resets the IP notification states
+ *
+ * * @note This function is necessary because the class inheritance structure has not been done as of yet.
+ *       Once the inheritance is done, sub-classes will have access to the member directly wihtout needing to use an extra guetter.
+ */
+void ResetIPNotificationStates();
+
+/**
  * @brief Returns the provide interfaces MAC address
  *        Valid buffer large enough for the MAC address must be provided to the function
  *
@@ -249,28 +280,118 @@ CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, chip::MutableByteSpan & a
  */
 CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback);
 
+/**
+ * @brief Creates and starts the WiFi task that processes Wifi events and operations
+ *
+ * @return CHIP_ERROR CHIP_NO_ERROR if the task was successfully started and initialized
+ *         CHIP_ERROR_NO_MEMORY if the task failed to be created
+ *         CHIP_ERROR_INTERNAL if software or hardware initialization failed
+ */
+CHIP_ERROR StartWifiTask();
+
+/**
+ * @brief Configures the Wi-Fi devices as a Wi-Fi station
+ */
+void ConfigureStationMode();
+
+/**
+ * @brief Returns the state of the Wi-Fi connection
+ *
+ * @return true, if the Wi-Fi device is connected to an AP
+ *         false, otherwise
+ */
+bool IsStationConnected();
+
+/**
+ * @brief Returns the state of the Wi-Fi Station configuration of the Wi-Fi device
+ *
+ * @return true, if the Wi-Fi Station mode is enabled
+ *         false, otherwise
+ */
+bool IsStationModeEnabled();
+
+/**
+ * @brief Returns the state of the Wi-Fi station initialization
+ *
+ * @return true, if the initialization was successful
+ *         false, otherwise
+ */
+bool IsStationReady();
+
+/**
+ * @brief Triggers the device to disconnect from the connected Wi-Fi network
+ *
+ * @note The disconnection is not immediate. It can take a certain amount of time for the device to be in a disconnected state once
+ *       the function is called. When the function returns, the device might not have yet disconnected from the Wi-Fi network.
+ *
+ * @return CHIP_ERROR CHIP_NO_ERROR, disconnection request was succesfully triggered
+ *         otherwise, CHIP_ERROR_INTERNAL
+ */
+CHIP_ERROR TriggerDisconnection();
+
+/**
+ * @brief Gets the connected access point information.
+ *        See @wfx_wifi_scan_result_t for the information that is returned by the function.
+ *
+ * @param[out] info AP information
+ *
+ * @return CHIP_ERROR CHIP_NO_ERROR, device has succesfully pulled all the AP information
+ *                    CHIP_ERROR_INTERNAL, otherwise. If the function returns an error, the data in ap cannot be used.
+ */
+CHIP_ERROR GetAccessPointInfo(wfx_wifi_scan_result_t & info);
+
+/**
+ * @brief Gets the connected access point extended information.
+ *        See @wfx_wifi_scan_ext_t for the information that is returned by the information
+ *
+ * @param[out] info AP extended information
+ *
+ * @return CHIP_ERROR CHIP_NO_ERROR, device has succesfully pulled all the AP information
+ *                    CHIP_ERROR_INTERNAL, otherwise. If the function returns an error, the data in ap cannot be used.
+ */
+CHIP_ERROR GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & info);
+
+/**
+ * @brief Function resets the BeaconLostCount, BeaconRxCount, PacketMulticastRxCount, PacketMulticastTxCount, PacketUnicastRxCount,
+ *        PacketUnicastTxCount back to 0
+ *
+ * @return CHIP_ERROR CHIP_NO_ERROR, the counters were succesfully reset to 0.
+ *                    CHIP_ERROR_INTERNAL, if there was an error when resetting the counter values
+ */
+CHIP_ERROR ResetCounters();
+
+/**
+ * @brief Configures the broadcast filter.
+ *
+ * @param[in] enableBroadcastFilter Boolean to enable or disable the broadcast filter.
+ *
+ * @return CHIP_ERROR CHIP_NO_ERROR, the counters were succesfully reset to 0.
+ *                    CHIP_ERROR_INTERNAL, if there was an error when configuring the broadcast filter
+ */
+CHIP_ERROR ConfigureBroadcastFilter(bool enableBroadcastFilter);
+
 /* Function to update */
 
-sl_status_t wfx_wifi_start(void);
-void wfx_enable_sta_mode(void);
+// TODO: Harmonize the Power Save function inputs for all platforms
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
+CHIP_ERROR ConfigurePowerSave(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state,
+                              uint32_t listenInterval);
+#else
+CHIP_ERROR ConfigurePowerSave();
+#endif /* (SLI_SI91X_MCU_INTERFACE | EXP_BOARD) */
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
 void wfx_set_wifi_provision(wfx_wifi_provision_t * wifiConfig);
 bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig);
-bool wfx_is_sta_mode_enabled(void);
-int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap);
-int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
-int32_t wfx_reset_counts();
 void wfx_clear_wifi_provision(void);
 sl_status_t wfx_connect_to_ap(void);
-void wfx_setup_ip6_link_local(sl_wfx_interface_t);
-bool wfx_is_sta_connected(void);
-sl_status_t sl_matter_wifi_disconnect(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
 bool wfx_have_ipv4_addr(sl_wfx_interface_t);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
 bool wfx_have_ipv6_addr(sl_wfx_interface_t);
-wifi_mode_t wfx_get_wifi_mode(void);
 void wfx_cancel_scan(void);
 
 /*
@@ -298,40 +419,12 @@ int32_t wfx_rsi_send_data(void * p, uint16_t len);
 #endif //!(EXP_BOARD)
 #endif // RS911X_WIFI
 
-bool wfx_hw_ready(void);
-
-#ifdef RS911X_WIFI // for RS9116, 917 NCP and 917 SoC
-/* RSI Power Save */
-#if SL_ICD_ENABLED
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state);
-#else
-sl_status_t wfx_power_save();
-#endif /* (SLI_SI91X_MCU_INTERFACE | EXP_BOARD) */
-#endif /* SL_ICD_ENABLED */
-#endif /* RS911X_WIFI */
-
-void sl_matter_wifi_task(void * arg);
-
-int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap);
-int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
-int32_t wfx_rsi_reset_count();
-int32_t sl_wifi_platform_disconnect();
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if (SLI_SI91X_MCU_INTERFACE)
-#if SL_ICD_ENABLED
-// TODO : This should be moved outside of the Wifi interface functions
-void sl_button_on_change(uint8_t btn, uint8_t btnAction);
-#endif /* SL_ICD_ENABLED */
-#endif /* SLI_SI91X_MCU_INTERFACE */
-
 #ifdef WF200_WIFI
 void sl_wfx_host_gpio_init(void);
-void wfx_bus_start(void);
 #endif /* WF200_WIFI */
 
 #ifdef __cplusplus

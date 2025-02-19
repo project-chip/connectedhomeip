@@ -33,11 +33,15 @@
 #include <access/SubjectDescriptor.h>
 #include <app/AppConfig.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/EventPathParams.h>
 #include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataList.h>
+#include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
+#include <app/data-model/List.h>
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
 #include <app/util/endpoint-config-api.h>
@@ -89,14 +93,13 @@ bool MayHaveAccessibleEventPathForEndpoint(DataModel::Provider * aProvider, Endp
                                                                aSubjectDescriptor);
     }
 
-    DataModel::ClusterEntry clusterEntry = aProvider->FirstServerCluster(aEventPath.mEndpointId);
-    while (clusterEntry.IsValid())
+    for (auto & cluster : aProvider->ServerClustersIgnoreError(aEventPath.mEndpointId))
     {
-        if (MayHaveAccessibleEventPathForEndpointAndCluster(clusterEntry.path, aEventPath, aSubjectDescriptor))
+        if (MayHaveAccessibleEventPathForEndpointAndCluster(ConcreteClusterPath(aEventPath.mEndpointId, cluster.clusterId),
+                                                            aEventPath, aSubjectDescriptor))
         {
             return true;
         }
-        clusterEntry = aProvider->NextServerCluster(clusterEntry.path);
     }
 
     return false;
@@ -112,7 +115,7 @@ bool MayHaveAccessibleEventPath(DataModel::Provider * aProvider, const EventPath
         return MayHaveAccessibleEventPathForEndpoint(aProvider, aEventPath.mEndpointId, aEventPath, subjectDescriptor);
     }
 
-    for (DataModel::EndpointEntry ep = aProvider->FirstEndpoint(); ep.IsValid(); ep = aProvider->NextEndpoint(ep.id))
+    for (const DataModel::EndpointEntry & ep : aProvider->EndpointsIgnoreError())
     {
         if (MayHaveAccessibleEventPathForEndpoint(aProvider, ep.id, aEventPath, subjectDescriptor))
         {
@@ -1563,7 +1566,8 @@ CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(SingleLinkedListNo
 
 bool InteractionModelEngine::IsExistentAttributePath(const ConcreteAttributePath & path)
 {
-    return GetDataModelProvider()->GetAttributeInfo(path).has_value();
+    DataModel::AttributeFinder finder(mDataModelProvider);
+    return finder.Find(path).has_value();
 }
 
 void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(SingleLinkedListNode<AttributePathParams> *& aAttributePaths)
@@ -1711,7 +1715,9 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request)
 {
 
-    Status status = CheckCommandExistence(request.path);
+    DataModel::AcceptedCommandEntry acceptedCommandEntry;
+
+    Status status = CheckCommandExistence(request.path, acceptedCommandEntry);
 
     if (status != Status::Success)
     {
@@ -1720,13 +1726,14 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
         return status;
     }
 
-    status = CheckCommandAccess(request);
+    status = CheckCommandAccess(request, acceptedCommandEntry);
     VerifyOrReturnValue(status == Status::Success, status);
 
-    return CheckCommandFlags(request);
+    return CheckCommandFlags(request, acceptedCommandEntry);
 }
 
-Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(const DataModel::InvokeRequest & aRequest)
+Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(const DataModel::InvokeRequest & aRequest,
+                                                                               const DataModel::AcceptedCommandEntry & entry)
 {
     if (aRequest.subjectDescriptor == nullptr)
     {
@@ -1737,11 +1744,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(c
                                      .endpoint    = aRequest.path.mEndpointId,
                                      .requestType = Access::RequestType::kCommandInvokeRequest,
                                      .entityId    = aRequest.path.mCommandId };
-    std::optional<DataModel::CommandInfo> commandInfo = mDataModelProvider->GetAcceptedCommandInfo(aRequest.path);
-    Access::Privilege minimumRequiredPrivilege =
-        commandInfo.has_value() ? commandInfo->invokePrivilege : Access::Privilege::kOperate;
 
-    CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, minimumRequiredPrivilege);
+    CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, entry.invokePrivilege);
     if (err != CHIP_NO_ERROR)
     {
         if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
@@ -1754,14 +1758,11 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(c
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(const DataModel::InvokeRequest & aRequest)
+Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(const DataModel::InvokeRequest & aRequest,
+                                                                              const DataModel::AcceptedCommandEntry & entry)
 {
-    std::optional<DataModel::CommandInfo> commandInfo = mDataModelProvider->GetAcceptedCommandInfo(aRequest.path);
-    // This is checked by previous validations, so it should not happen
-    VerifyOrDie(commandInfo.has_value());
-
-    const bool commandNeedsTimedInvoke = commandInfo->flags.Has(DataModel::CommandQualityFlags::kTimed);
-    const bool commandIsFabricScoped   = commandInfo->flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
+    const bool commandNeedsTimedInvoke = entry.flags.Has(DataModel::CommandQualityFlags::kTimed);
+    const bool commandIsFabricScoped   = entry.flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
 
     if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
     {
@@ -1784,34 +1785,24 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistence(const ConcreteCommandPath & aCommandPath)
+Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistence(const ConcreteCommandPath & aCommandPath,
+                                                                                  DataModel::AcceptedCommandEntry & entry)
 {
     auto provider = GetDataModelProvider();
-    if (provider->GetAcceptedCommandInfo(aCommandPath).has_value())
-    {
-        return Protocols::InteractionModel::Status::Success;
-    }
 
-    // We failed, figure out why ...
-    //
-    if (provider->GetServerClusterInfo(aCommandPath).has_value())
+    DataModel::ListBuilder<DataModel::AcceptedCommandEntry> acceptedCommands;
+    (void) provider->AcceptedCommands(aCommandPath, acceptedCommands);
+    for (auto & existing : acceptedCommands.TakeBuffer())
     {
-        return Protocols::InteractionModel::Status::UnsupportedCommand; // cluster exists, so command is invalid
-    }
-
-    // At this point either cluster or endpoint does not exist. If we find the endpoint, then the cluster
-    // is invalid
-    for (DataModel::EndpointEntry ep = provider->FirstEndpoint(); ep.IsValid(); ep = provider->NextEndpoint(ep.id))
-    {
-        if (ep.id == aCommandPath.mEndpointId)
+        if (existing.commandId == aCommandPath.mCommandId)
         {
-            // endpoint exists, so cluster is invalid
-            return Protocols::InteractionModel::Status::UnsupportedCluster;
+            entry = existing;
+            return Protocols::InteractionModel::Status::Success;
         }
     }
 
-    // endpoint not found
-    return Protocols::InteractionModel::Status::UnsupportedEndpoint;
+    // invalid command, return the right failure status
+    return DataModel::ValidateClusterPath(provider, aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
 }
 
 DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Provider * model)
@@ -1956,12 +1947,20 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
     });
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
     {
+        // ReadClient::Close may delete the read client so that readClient->GetNextClient() will be use-after-free.
+        // We need save readClient as nextReadClient before closing.
         if (readClient->GetFabricIndex() == fabricIndex)
         {
             ChipLogProgress(InteractionModel, "Fabric removed, deleting obsolete read client with FabricIndex: %u", fabricIndex);
+            auto * nextReadClient = readClient->GetNextClient();
             readClient->Close(CHIP_ERROR_IM_FABRIC_DELETED, false);
+            readClient = nextReadClient;
+        }
+        else
+        {
+            readClient = readClient->GetNextClient();
         }
     }
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
