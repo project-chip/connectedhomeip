@@ -157,7 +157,7 @@ CHIP_ERROR CHIPCommandBridge::SetUpStackWithPerControllerStorage(NSArray<NSData 
 
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     std::string commissionerName = mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha;
-    for (size_t i = 0; i < ArraySize(identities); ++i) {
+    for (size_t i = 0; i < MATTER_ARRAY_SIZE(identities); ++i) {
         __auto_type * fabricId = GetCommissionerFabricId(identities[i]);
         __auto_type * uuidString = [NSString stringWithFormat:@"%@%@", @(kControllerIdPrefix), fabricId];
         __auto_type * controllerId = [[NSUUID alloc] initWithUUIDString:uuidString];
@@ -228,7 +228,7 @@ CHIP_ERROR CHIPCommandBridge::SetUpStackWithSharedStorage(NSArray<NSData *> * pr
 
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     std::string commissionerName = mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha;
-    for (size_t i = 0; i < ArraySize(identities); ++i) {
+    for (size_t i = 0; i < MATTER_ARRAY_SIZE(identities); ++i) {
         __auto_type * fabricId = GetCommissionerFabricId(identities[i]);
         __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:certificateIssuer.ipk
                                                                             fabricID:fabricId
@@ -339,7 +339,7 @@ void CHIPCommandBridge::RestartCommissioners()
         auto factory = [MTRDeviceControllerFactory sharedInstance];
 
         constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
-        for (size_t i = 0; i < ArraySize(identities); ++i) {
+        for (size_t i = 0; i < MATTER_ARRAY_SIZE(identities); ++i) {
             __auto_type * certificateIssuer = [CertificateIssuer sharedInstance];
             auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithIPK:certificateIssuer.ipk fabricID:@(i + 1) nocSigner:certificateIssuer.signingKey];
 

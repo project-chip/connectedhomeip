@@ -182,8 +182,7 @@ class AttributeCaptureAssertion
 public:
     constexpr AttributeCaptureAssertion(chip::EndpointId ep, chip::ClusterId cl, chip::AttributeId at,
                                         std::optional<unsigned> listSize = std::nullopt) :
-        mEndpoint(ep),
-        mCluster(cl), mAttribute(at), mListSize(listSize)
+        mEndpoint(ep), mCluster(cl), mAttribute(at), mListSize(listSize)
     {}
 
     chip::app::ConcreteAttributePath Path() const { return chip::app::ConcreteAttributePath(mEndpoint, mCluster, mAttribute); }
@@ -505,7 +504,7 @@ public:
         AppContext::SetUp();
 
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
-        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
+        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
         chip::Test::SetMockNodeConfig(TestMockNodeConfig());
@@ -1615,8 +1614,7 @@ void TestReadInteraction::TestSetDirtyBetweenChunks()
         public:
             DirtyingMockDelegate(AttributePathParams (&aReadPaths)[2], int & aNumAttributeResponsesWhenSetDirty,
                                  int & aNumArrayItemsWhenSetDirty) :
-                mReadPaths(aReadPaths),
-                mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
+                mReadPaths(aReadPaths), mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
                 mNumArrayItemsWhenSetDirty(aNumArrayItemsWhenSetDirty)
             {}
 

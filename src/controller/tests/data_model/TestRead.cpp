@@ -948,8 +948,8 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
         readPrepareParams.mpEventPathParamsList = eventPathParams;
         // This size needs to be big enough that we can't fit our
         // DataVersionFilterIBs in the same packet.  Max size is
-        // ArraySize(eventPathParams);
-        static_assert(75 <= ArraySize(eventPathParams));
+        // MATTER_ARRAY_SIZE(eventPathParams);
+        static_assert(75 <= MATTER_ARRAY_SIZE(eventPathParams));
         readPrepareParams.mEventPathParamsListSize = 75;
 
         err = readClient.SendRequest(readPrepareParams);
@@ -1136,8 +1136,8 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
         readPrepareParams.mpEventPathParamsList        = eventPathParams;
 
         // This size needs to be big enough that we can only fit our first
-        // DataVersionFilterIB. Max size is ArraySize(eventPathParams);
-        static_assert(73 <= ArraySize(eventPathParams));
+        // DataVersionFilterIB. Max size is MATTER_ARRAY_SIZE(eventPathParams);
+        static_assert(73 <= MATTER_ARRAY_SIZE(eventPathParams));
         readPrepareParams.mEventPathParamsListSize = 73;
         err                                        = readClient.SendRequest(readPrepareParams);
         EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -1468,7 +1468,7 @@ TEST_F(TestRead, TestResubscribeAttributeTimeout)
         // Read full wildcard paths, repeat twice to ensure chunking.
         AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
         attributePathParams[0].mEndpointId             = kTestEndpointId;
         attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
         attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
@@ -1550,7 +1550,7 @@ TEST_F(TestRead, TestSubscribeAttributeTimeout)
 
         AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
         attributePathParams[0].mEndpointId             = kTestEndpointId;
         attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
         attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
@@ -2289,7 +2289,7 @@ TEST_F(TestRead, TestSubscribe_OnActiveModeNotification)
         // Read full wildcard paths, repeat twice to ensure chunking.
         AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
         attributePathParams[0].mEndpointId             = kTestEndpointId;
         attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
         attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
@@ -2379,7 +2379,7 @@ TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
         // Read full wildcard paths, repeat twice to ensure chunking.
         AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
         attributePathParams[0].mEndpointId             = kRootEndpointId;
         attributePathParams[0].mClusterId              = Clusters::IcdManagement::Id;
         attributePathParams[0].mAttributeId            = Clusters::IcdManagement::Attributes::OperatingMode::Id;
@@ -2490,7 +2490,7 @@ TEST_F(TestRead, TestSubscribe_ImmediatelyResubscriptionForLIT)
         // Read full wildcard paths, repeat twice to ensure chunking.
         AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
         attributePathParams[0].mEndpointId             = kTestEndpointId;
         attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
         attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
@@ -3078,7 +3078,7 @@ TEST_F(TestRead, TestSubscribeAttributeDeniedNotExistPath)
 
         AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
         attributePathParams[0].mEndpointId             = kRootEndpointId; // this cluster does NOT exist on the root endpoint
         attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
         attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::ListStructOctetString::Id;
@@ -4330,7 +4330,7 @@ TEST_F(TestRead, TestReadHandler_TooManyPaths)
     // Needs to be larger than our plausible path pool.
     AttributePathParams attributePathParams[sTooLargePathCount];
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-    readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+    readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
 
     {
         MockInteractionModelApp delegate;
@@ -4382,7 +4382,7 @@ TEST_F(TestRead, TestReadHandler_TwoParallelReadsSecondTooManyPaths)
         // Read full wildcard paths, repeat twice to ensure chunking.
         AttributePathParams attributePathParams1[2];
         readPrepareParams1.mpAttributePathParamsList    = attributePathParams1;
-        readPrepareParams1.mAttributePathParamsListSize = ArraySize(attributePathParams1);
+        readPrepareParams1.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams1);
 
         CHIP_ERROR err = readClient1.SendRequest(readPrepareParams1);
         EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -4391,7 +4391,7 @@ TEST_F(TestRead, TestReadHandler_TwoParallelReadsSecondTooManyPaths)
         // Read full wildcard paths, repeat twice to ensure chunking.
         AttributePathParams attributePathParams2[sTooLargePathCount];
         readPrepareParams2.mpAttributePathParamsList    = attributePathParams2;
-        readPrepareParams2.mAttributePathParamsListSize = ArraySize(attributePathParams2);
+        readPrepareParams2.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams2);
 
         err = readClient2.SendRequest(readPrepareParams2);
         EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -4601,8 +4601,8 @@ TEST_F(TestRead, TestReadHandler_KeepSubscriptionTest)
 
     readParam.mAttributePathParamsListSize = 0;
     readClient                             = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(),
-                                              InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
-                                              ReadClient::InteractionType::Subscribe);
+                                                                          InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
+                                                                          ReadClient::InteractionType::Subscribe);
     EXPECT_EQ(readClient->SendRequest(readParam), CHIP_NO_ERROR);
 
     DrainAndServiceIO();

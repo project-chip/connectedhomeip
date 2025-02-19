@@ -287,7 +287,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
     }
 
     if (needsDescriptorAttributes) {
-        attributeCount += ArraySize(sDescriptorAttributesMetadata);
+        attributeCount += MATTER_ARRAY_SIZE(sDescriptorAttributesMetadata);
     }
 
     // And add one for ClusterRevision
@@ -506,7 +506,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 {
     os_unfair_lock_assert_owner(&_lock);
     return [NSString stringWithFormat:@"<MTRServerCluster endpoint %u, id " ChipLogFormatMEI ">",
-                     _parentEndpoint, ChipLogValueMEI(_clusterID.unsignedLongLongValue)];
+        _parentEndpoint, ChipLogValueMEI(_clusterID.unsignedLongLongValue)];
 }
 
 @end
