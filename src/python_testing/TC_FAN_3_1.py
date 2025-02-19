@@ -138,7 +138,7 @@ class TC_FAN_3_1(MatterBaseTest):
     async def get_fan_modes(self, endpoint, exclude_auto: bool = False) -> list[int]:
         # Read FanModeSequence attribute value
         fan_mode_sequence_attr = Clusters.FanControl.Attributes.FanModeSequence
-        fm_en = Clusters.FanControl.Enums.FanModeEnum
+        fm_enum = Clusters.FanControl.Enums.FanModeEnum
         fan_mode_sequence = await self.read_setting(endpoint, fan_mode_sequence_attr)
 
         # There are only 6 valid FanModeSequence values (0, 1, 2, 3, 4, 5)
@@ -150,20 +150,20 @@ class TC_FAN_3_1(MatterBaseTest):
 
         fan_modes = None
         if fan_mode_sequence == 0:
-            fan_modes = [fm_en.kOff.value, fm_en.kLow.value, fm_en.kMedium.value, fm_en.kHigh.value]
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kMedium, fm_enum.kHigh]
         elif fan_mode_sequence == 1:
-            fan_modes = [fm_en.kOff.value, fm_en.kLow.value, fm_en.kHigh.value]
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kHigh]
         elif fan_mode_sequence == 2:
-            fan_modes = [fm_en.kOff.value, fm_en.kLow.value, fm_en.kMedium.value, fm_en.kHigh.value, fm_en.kAuto.value]
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kMedium, fm_enum.kHigh, fm_enum.kAuto]
         elif fan_mode_sequence == 3:
-            fan_modes = [fm_en.kOff.value, fm_en.kLow.value, fm_en.kHigh.value, fm_en.kAuto.value]
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kHigh, fm_enum.kAuto]
         elif fan_mode_sequence == 4:
-            fan_modes = [fm_en.kOff.value, fm_en.kHigh.value, fm_en.kAuto.value]
+            fan_modes = [fm_enum.kOff, fm_enum.kHigh, fm_enum.kAuto]
         elif fan_mode_sequence == 5:
-            fan_modes = [fm_en.kOff.value, fm_en.kHigh.value]
+            fan_modes = [fm_enum.kOff, fm_enum.kHigh]
 
-        if exclude_auto and fm_en.kAuto.value in fan_modes:
-            fan_modes.remove(fm_en.kAuto.value)
+        if exclude_auto and fm_enum.kAuto in fan_modes:
+            fan_modes.remove(fm_enum.kAuto)
 
         return fan_modes
 
