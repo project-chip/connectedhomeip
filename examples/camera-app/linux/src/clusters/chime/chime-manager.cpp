@@ -37,7 +37,7 @@ CHIP_ERROR ChimeManager::GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chim
     }
     chimeID = mChimeSounds[chimeIndex].chimeID;
 
-    return chip::CopyCharSpanToMutableCharSpan(mChimeSounds[chimeIndex].name, name);
+    return CopyCharSpanToMutableCharSpan(mChimeSounds[chimeIndex].name, name);
 }
 
 CHIP_ERROR ChimeManager::GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID)

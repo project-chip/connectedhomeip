@@ -27,9 +27,8 @@ config("includes") {
   ]
 }
 
-executable("camera-app") {
+executable("chip-camera-app") {
   sources = [
-    "${chip_root}/examples/camera-app/camera-common/src/camera-app.cpp",
     "${chip_root}/examples/camera-app/linux/src/camera-device.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/chime/chime-manager.cpp",
     "include/CHIPProjectAppConfig.h",
@@ -38,6 +37,7 @@ executable("camera-app") {
 
   deps = [
     "${chip_root}/examples/camera-app/camera-common",
+    "${chip_root}/examples/camera-app/camera-common:camera-lib",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/lib",
   ]
@@ -54,9 +54,9 @@ executable("camera-app") {
 }
 
 group("linux") {
-  deps = [ ":camera-app" ]
+  deps = [ ":chip-camera-app" ]
 }
 
 group("default") {
-  deps = [ ":linux" ]
+  deps = [ ":chip-camera-app" ]
 }

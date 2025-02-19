@@ -23,3 +23,18 @@ chip_data_model("camera-common") {
   zap_file = "camera-app.zap"
   is_server = true
 }
+
+source_set("camera-lib") {
+  public_configs = [ ":config" ]
+
+  sources = [
+    "include/camera-app.h",
+    "include/camera-device-interface.h",
+    "src/camera-app.cpp",
+  ]
+
+  deps = [
+    "${chip_root}/examples/camera-app/camera-common",
+    "${chip_root}/src/lib",
+  ]
+}

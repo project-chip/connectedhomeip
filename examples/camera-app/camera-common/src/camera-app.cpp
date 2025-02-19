@@ -28,7 +28,6 @@ using Status = Protocols::InteractionModel::Status;
 
 void CameraApp::InitCameraDeviceClusters()
 {
-
     // Initialize Cluster Servers
     mChimeServer.Init();
 }
@@ -37,7 +36,7 @@ static constexpr EndpointId kCameraEndpointId = 1;
 
 Platform::UniquePtr<CameraApp> gCameraApp;
 
-void CameraAppInit(Camera::CameraDevice * cameraDevice)
+void CameraAppInit(CameraDeviceInterface * cameraDevice)
 {
     gCameraApp = Platform::MakeUnique<CameraApp>(kCameraEndpointId, cameraDevice);
     gCameraApp.get()->InitCameraDeviceClusters();

@@ -20,7 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
-#include "camera-device.h"
+#include "camera-device-interface.h"
 #include <app/util/config.h>
 #include <cstring>
 #include <protocols/interaction_model/StatusCode.h>
@@ -32,7 +32,7 @@ class CameraApp
 
 public:
     // This class is responsible for initialising all the camera clusters and managing the interactions between them
-    explicit CameraApp(chip::EndpointId aClustersEndpoint, Camera::CameraDevice * cameraDevice) :
+    explicit CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface * cameraDevice) :
         mChimeServer(aClustersEndpoint, cameraDevice->GetChimeDelegate())
     {}
 
@@ -44,6 +44,6 @@ private:
     chip::app::Clusters::ChimeServer mChimeServer;
 };
 
-void CameraAppInit(Camera::CameraDevice * cameraDevice);
+void CameraAppInit(CameraDeviceInterface * cameraDevice);
 
 void CameraAppShutdown();

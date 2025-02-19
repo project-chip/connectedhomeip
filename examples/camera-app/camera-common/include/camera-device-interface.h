@@ -17,23 +17,14 @@
  */
 
 #pragma once
-#include "camera-device-interface.h"
-#include "chime-manager.h"
-#include <protocols/interaction_model/StatusCode.h>
+#include <app/clusters/chime-server/chime-server.h>
 
-namespace Camera {
-
-class CameraDevice : public CameraDeviceInterface
+// Camera Device Interface defines all the clusters that need to be implemented for a Camera Device
+class CameraDeviceInterface
 {
-
 public:
-    CameraDevice();
+    virtual ~CameraDeviceInterface(){};
 
-    virtual chip::app::Clusters::ChimeDelegate & GetChimeDelegate();
-
-private:
-    // Various cluster server delegates
-    ChimeManager mChimeManager;
+    // Getter for Chime Delegate
+    virtual chip::app::Clusters::ChimeDelegate & GetChimeDelegate() = 0;
 };
-
-} // namespace Camera
