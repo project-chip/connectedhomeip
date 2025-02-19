@@ -59,7 +59,7 @@ CHIP_ERROR DefaultOTARequestorStorage::StoreDefaultProviders(const ProviderLocat
                                                static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
-bool DefaultOTARequestorStorage::CheckDuplicateProvider(ProviderLocationList & listProviders, ProviderLocationType provider)
+bool DefaultOTARequestorStorage::ProviderAlreadyInList(ProviderLocationList & listProviders, ProviderLocationType provider)
 {
     auto iterator = listProviders.Begin();
 
@@ -96,7 +96,7 @@ CHIP_ERROR DefaultOTARequestorStorage::LoadDefaultProviders(ProviderLocationList
     {
         ProviderLocationType provider;
         ReturnErrorOnFailure(provider.Decode(reader));
-        if (CheckDuplicateProvider(providers, provider) == false)
+        if (ProviderAlreadyInList(providers, provider) == false)
         {
             providers.Add(provider);
         }
