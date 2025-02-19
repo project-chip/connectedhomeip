@@ -409,6 +409,9 @@ static constexpr ClusterId Id = 0x00000751;
 namespace TlsCertificateManagement {
 static constexpr ClusterId Id = 0x00000801;
 } // namespace TlsCertificateManagement
+namespace TlsClientManagement {
+static constexpr ClusterId Id = 0x00000802;
+} // namespace TlsClientManagement
 namespace UnitTesting {
 static constexpr ClusterId Id = 0xFFF1FC05;
 } // namespace UnitTesting

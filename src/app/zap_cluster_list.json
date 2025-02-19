@@ -125,6 +125,7 @@
         "TIME_SYNCHRONIZATION_CLUSTER": [],
         "TIMER_CLUSTER": [],
         "TLS_CERTIFICATE_MANAGEMENT_CLUSTER": [],
+        "TLS_CLIENT_MANAGEMENT_CLUSTER": [],
         "TRUSTED_ROOT_CERTIFICATES_CLUSTER": [],
         "UNIT_LOCALIZATION_CLUSTER": [],
         "UNIT_TESTING_CLUSTER": [],
@@ -311,6 +312,7 @@
         "TIME_SYNCHRONIZATION_CLUSTER": ["time-synchronization-server"],
         "TIMER_CLUSTER": ["timer-server"],
         "TLS_CERTIFICATE_MANAGEMENT_CLUSTER": [],
+        "TLS_CLIENT_MANAGEMENT_CLUSTER": [],
         "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],

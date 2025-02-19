@@ -129,6 +129,7 @@
         "time-synchronization-cluster.xml",
         "timer-cluster.xml",
         "tls-certificate-management-cluster.xml",
+        "tls-client-management-cluster.xml",
         "user-label-cluster.xml",
         "unit-localization-cluster.xml",
         "valve-configuration-and-control-cluster.xml",

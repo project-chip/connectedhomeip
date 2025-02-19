@@ -7020,6 +7020,98 @@ public static class CommissionerControlClusterCommissioningRequestResultEvent {
     return output.toString();
   }
 }
+public static class TlsClientManagementClusterEndpointProvisionedEvent {
+  public Integer endpointID;
+  private static final long ENDPOINT_ID_ID = 0L;
+
+  public TlsClientManagementClusterEndpointProvisionedEvent(
+    Integer endpointID
+  ) {
+    this.endpointID = endpointID;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ENDPOINT_ID_ID, new UIntType(endpointID)));
+
+    return new StructType(values);
+  }
+
+  public static TlsClientManagementClusterEndpointProvisionedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer endpointID = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ENDPOINT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endpointID = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new TlsClientManagementClusterEndpointProvisionedEvent(
+      endpointID
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("TlsClientManagementClusterEndpointProvisionedEvent {\n");
+    output.append("\tendpointID: ");
+    output.append(endpointID);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class TlsClientManagementClusterEndpointRemovedEvent {
+  public Integer endpointID;
+  private static final long ENDPOINT_ID_ID = 0L;
+
+  public TlsClientManagementClusterEndpointRemovedEvent(
+    Integer endpointID
+  ) {
+    this.endpointID = endpointID;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ENDPOINT_ID_ID, new UIntType(endpointID)));
+
+    return new StructType(values);
+  }
+
+  public static TlsClientManagementClusterEndpointRemovedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer endpointID = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ENDPOINT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endpointID = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new TlsClientManagementClusterEndpointRemovedEvent(
+      endpointID
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("TlsClientManagementClusterEndpointRemovedEvent {\n");
+    output.append("\tendpointID: ");
+    output.append(endpointID);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class UnitTestingClusterTestEventEvent {
   public Integer arg1;
   public Integer arg2;
