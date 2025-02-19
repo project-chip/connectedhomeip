@@ -539,6 +539,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestIdChecks.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestMatterTestingSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingDeviceType.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingNamespace.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingSelection.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingSupport.py'
 

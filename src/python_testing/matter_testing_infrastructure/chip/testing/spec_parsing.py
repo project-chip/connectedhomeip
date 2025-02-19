@@ -26,6 +26,7 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from importlib.abc import Traversable
 from typing import Callable, Optional, Union
+import os
 
 import chip.clusters as Clusters
 import chip.testing.conformance as conformance_support
@@ -33,7 +34,7 @@ from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TA
                                       ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
                                       parse_callable_from_xml, parse_device_type_callable_from_xml)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
+from chip.testing.matter_testing import (NamespacePathLocation, AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation, UnknownProblemLocation,
                                          EventPathLocation, FeaturePathLocation, ProblemLocation, ProblemNotice, ProblemSeverity)
 from chip.tlv import uint
 
@@ -139,6 +140,53 @@ class XmlDeviceTypeClusterRequirements:
     def __str__(self):
         return f'{self.name}: {str(self.conformance)}'
 
+"""
+Location, XML namespaces, and XML Tags implementation below this line
+"""
+'''
+@dataclass
+class Location:
+    """Represents a location in a source file for error reporting"""
+    def __init__(self, file: str = "", line: int = 0):
+        self.file = file
+        self.line = line
+
+    def __str__(self):
+        if self.file and self.line:
+            return f"{self.file}:{self.line}"
+        elif self.file:
+            return self.file
+        return ""
+'''
+
+@dataclass
+class XmlNamespace:
+    """Represents a namespace definition from XML"""
+    def __init__(self):
+        self.id: int = 0
+        self.name: str = ""
+        self.tags: dict[int, XmlTag] = {}
+
+    def __str__(self) -> str:
+        tags_str = '\n  '.join(f"{tag_id:04X}: {tag.name}" 
+                              for tag_id, tag in sorted(self.tags.items()))
+        return f"Namespace 0x{self.id:04X} ({self.name})\n  {tags_str}"
+
+@dataclass
+class XmlTag:
+    """Represents a tag within a namespace"""
+    def __init__(self):
+        self.id: int = 0
+        self.name: str = ""
+        self.description: Optional[str] = None
+
+    def __str__(self) -> str:
+        desc = f" - {self.description}" if self.description else ""
+        return f"{self.name}{desc}"
+
+"""
+XML namespaces and XML Tags implementation above this line
+"""
 
 @dataclass
 class XmlDeviceType:
@@ -785,6 +833,129 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
                              is_provisional=provisional)
             xml_clusters[id] = new
 
+
+"""
+Added XML namespace parsing functions below
+"""
+def parse_namespace(et: ElementTree.Element) -> tuple[XmlNamespace, list[ProblemNotice]]:
+    """Parse a single namespace XML definition"""
+    problems: list[ProblemNotice] = []
+    namespace = XmlNamespace()
+    
+    # Parse namespace attributes
+    namespace_id = et.get('id')
+    if namespace_id is not None:
+        try:
+            namespace.id = int(str(namespace_id), 16)
+        except (ValueError, TypeError):
+            problems.append(ProblemNotice(
+                test_name="Parse Namespace XML",
+                location=NamespacePathLocation(),
+                severity=ProblemSeverity.WARNING,
+                problem=f"Invalid namespace ID: {namespace_id}"
+            ))
+    else:
+        problems.append(ProblemNotice(
+            test_name="Parse Namespace XML",
+            location=NamespacePathLocation(),
+            severity=ProblemSeverity.WARNING,
+            problem="Missing namespace ID"
+        ))
+    
+    # Parse and validate namespace name
+    namespace.name = et.get('name', '').strip()
+    if not namespace.name:
+        problems.append(ProblemNotice(
+            test_name="Parse Namespace XML",
+            location=NamespacePathLocation(namespace_id=getattr(namespace, 'id', None)),
+            severity=ProblemSeverity.WARNING,
+            problem="Missing or empty namespace name"
+        ))
+    
+    # Parse tags
+    tags_elem = et.find('tags')
+    if tags_elem is not None:
+        for tag_elem in tags_elem.findall('tag'):
+            tag = XmlTag()
+            tag_id = tag_elem.get('id')
+            if tag_id is not None:
+                try:
+                    tag.id = int(str(tag_id), 16)
+                except (ValueError, TypeError):
+                    problems.append(ProblemNotice(
+                        test_name="Parse Namespace XML",
+                        location=NamespacePathLocation(namespace_id=namespace.id),
+                        severity=ProblemSeverity.WARNING,
+                        problem=f"Invalid tag ID: {tag_id}"
+                    ))
+                    continue
+                
+            tag.name = tag_elem.get('name', '').strip()
+            if not tag.name:
+                problems.append(ProblemNotice(
+                    test_name="Parse Namespace XML",
+                    location=NamespacePathLocation(namespace_id=namespace.id, tag_id=getattr(tag, 'id', None)),
+                    severity=ProblemSeverity.WARNING,
+                    problem=f"Missing name for tag {tag.id}"
+                ))
+                continue
+
+            desc_elem = tag_elem.find('description')
+            if desc_elem is not None and desc_elem.text:
+                tag.description = desc_elem.text.strip()
+
+            namespace.tags[tag.id] = tag
+
+    return namespace, problems
+
+def build_xml_namespaces(data_model_directory: str) -> tuple[dict[int, XmlNamespace], list[ProblemNotice]]:
+    """Build a dictionary of namespaces from XML files in the given directory"""
+    namespace_path = os.path.join(data_model_directory, "namespaces")
+    namespaces: dict[int, XmlNamespace] = {}
+    problems: list[ProblemNotice] = []
+
+    if not os.path.exists(namespace_path):
+        problems.append(ProblemNotice(
+            test_name="Build XML Namespaces",
+            location=UnknownProblemLocation(),
+            severity=ProblemSeverity.WARNING,
+            problem=f"Namespace directory not found: {namespace_path}"
+        ))
+        return namespaces, problems
+
+    for filename in os.listdir(namespace_path):
+        if not filename.endswith('.xml'):
+            continue
+            
+        filepath = os.path.join(namespace_path, filename)
+        try:
+            tree = ElementTree.parse(filepath)
+            namespace, parse_problems = parse_namespace(tree.getroot())
+            problems.extend(parse_problems)
+            
+            if namespace.id in namespaces:
+                problems.append(ProblemNotice(
+                    test_name="Build XML Namespaces",
+                    location=UnknownProblemLocation(),
+                    severity=ProblemSeverity.WARNING,
+                    problem=f"Duplicate namespace ID {namespace.id:04X} in {filename}"
+                ))
+            else:
+                namespaces[namespace.id] = namespace
+                
+        except Exception as e:
+            problems.append(ProblemNotice(
+                test_name="Build XML Namespaces",
+                location=UnknownProblemLocation(),
+                severity=ProblemSeverity.WARNING,
+                problem=f"Failed to parse {filename}: {str(e)}"
+            ))
+
+    return namespaces, problems
+
+"""
+Added XML namespace parsing functions above
+"""
 
 def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     problems: list[ProblemNotice] = []

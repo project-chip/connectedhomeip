@@ -896,13 +896,27 @@ class DeviceTypePathLocation:
             msg += f'\n       ClusterID: {self.cluster_id}'
         return msg
 
+@dataclass
+class NamespacePathLocation:
+    """Location in a namespace definition"""
+    def __init__(self, namespace_id: Optional[int] = None, tag_id: Optional[int] = None):
+        self.namespace_id = namespace_id
+        self.tag_id = tag_id
+
+    def __str__(self) -> str:
+        result = "Namespace"
+        if self.namespace_id is not None:
+            result += f" 0x{self.namespace_id:04X}"
+        if self.tag_id is not None:
+            result += f" Tag 0x{self.tag_id:04X}"
+        return result
 
 class UnknownProblemLocation:
     def __str__(self):
         return '\n      Unknown Locations - see message for more details'
 
-
-ProblemLocation = typing.Union[ClusterPathLocation, DeviceTypePathLocation, UnknownProblemLocation]
+ProblemLocation = typing.Union[ClusterPathLocation, DeviceTypePathLocation, 
+                       UnknownProblemLocation, NamespacePathLocation]
 
 # ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
 # appeared in 3.11. To make it JSON serializable easily, multiple inheritance
