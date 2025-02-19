@@ -98,12 +98,18 @@ unsigned emberMetadataStructureGeneration = 0;
 // we need this data block for the defaults
 #if (defined(GENERATED_DEFAULTS) && GENERATED_DEFAULTS_COUNT)
 constexpr const uint8_t generatedDefaults[] = GENERATED_DEFAULTS;
-#define ZAP_LONG_DEFAULTS_INDEX(index) { &generatedDefaults[index] }
+#define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
+    {                                                                                                                              \
+        &generatedDefaults[index]                                                                                                  \
+    }
 #endif // GENERATED_DEFAULTS
 
 #if (defined(GENERATED_MIN_MAX_DEFAULTS) && GENERATED_MIN_MAX_DEFAULT_COUNT)
 constexpr const EmberAfAttributeMinMaxValue minMaxDefaults[] = GENERATED_MIN_MAX_DEFAULTS;
-#define ZAP_MIN_MAX_DEFAULTS_INDEX(index) { &minMaxDefaults[index] }
+#define ZAP_MIN_MAX_DEFAULTS_INDEX(index)                                                                                          \
+    {                                                                                                                              \
+        &minMaxDefaults[index]                                                                                                     \
+    }
 #endif // GENERATED_MIN_MAX_DEFAULTS
 
 #ifdef GENERATED_FUNCTION_ARRAYS

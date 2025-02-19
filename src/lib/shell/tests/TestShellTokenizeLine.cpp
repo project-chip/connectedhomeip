@@ -44,48 +44,48 @@ struct test_shell_vector
 static const struct test_shell_vector test_vector_shell_tokenizer[] = {
     {
         .line = "hello how are you?",
-        .argv = (const char *[]) { "hello", "how", "are", "you?" },
+        .argv = (const char *[]){ "hello", "how", "are", "you?" },
         .argc = 4,
     },
     {
         .line = "hey yo yo",
-        .argv = (const char *[]) { "hey", "yo", "yo" },
+        .argv = (const char *[]){ "hey", "yo", "yo" },
         .argc = 3,
     },
     {
         .line = "This  has  double  spaces",
-        .argv = (const char *[]) { "This", "has", "double", "spaces" },
+        .argv = (const char *[]){ "This", "has", "double", "spaces" },
         .argc = 4,
     },
     {
         .line = " leading space",
-        .argv = (const char *[]) { "leading", "space" },
+        .argv = (const char *[]){ "leading", "space" },
         .argc = 2,
     },
     {
         .line = "trailing space ",
-        .argv = (const char *[]) { "trailing", "space", "" },
+        .argv = (const char *[]){ "trailing", "space", "" },
         .argc = 3,
     },
     {
         .line = "no_space",
-        .argv = (const char *[]) { "no_space" },
+        .argv = (const char *[]){ "no_space" },
         .argc = 1,
     },
     {
         .line = " ",
-        .argv = (const char *[]) {},
+        .argv = (const char *[]){},
         .argc = 0,
     },
     {
         .line = "",
-        .argv = (const char *[]) {},
+        .argv = (const char *[]){},
         .argc = 0,
     },
     {
         .line = "hey 1 2 3 4 5 6 7 max out",
         .argv =
-            (const char *[]) {
+            (const char *[]){
                 "hey",
                 "1",
                 "2",

@@ -53,7 +53,7 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE) && CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE
         mChipStackLock = xSemaphoreCreateMutexStatic(&mChipStackLockMutex);
 #else
-        mChipStackLock = xSemaphoreCreateMutex();
+        mChipStackLock  = xSemaphoreCreateMutex();
 #endif
 
         if (mChipStackLock == NULL)

@@ -45,7 +45,9 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 // The role argument should be used to determine whether cluster works as a server or a client.
 // It can be assigned with the ZAP_CLUSTER_MASK(SERVER) or ZAP_CLUSTER_MASK(CLUSTER) values.
 #define DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, role, incomingCommands, outgoingCommands)                                 \
-    { clusterId, clusterAttrs, MATTER_ARRAY_SIZE(clusterAttrs), 0, role, NULL, incomingCommands, outgoingCommands }
+    {                                                                                                                              \
+        clusterId, clusterAttrs, MATTER_ARRAY_SIZE(clusterAttrs), 0, role, NULL, incomingCommands, outgoingCommands                \
+    }
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_END }
 
@@ -64,7 +66,9 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 // * Nullable attributes (have X in the quality column in the spec) must have MATTER_ATTRIBUTE_FLAG_NULLABLE
 // * Attributes that have T in the Access column in the spec must have MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE
 #define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \
-    { ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType), attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) }
+    {                                                                                                                              \
+        ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType), attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)               \
+    }
 
 /**
  * @brief locate attribute metadata
