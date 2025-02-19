@@ -79,7 +79,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
 
     for (NSNumber * nodeID in [self.nodeIDToDeviceMap keyEnumerator]) {
         MTRDevice * device = [self _deviceForNodeID:nodeID createIfNeeded:NO];
-        if ([device _delegateExists]) {
+        if ([device delegateExists]) {
             NSMutableDictionary * nodeDictionary = [NSMutableDictionary dictionary];
             MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDKey, nodeID, nodeDictionary)
 
