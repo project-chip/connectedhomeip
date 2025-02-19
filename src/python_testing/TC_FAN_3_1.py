@@ -237,7 +237,6 @@ class TC_FAN_3_1(MatterBaseTest):
         self.step(self.current_step_index + 1)
 
         # Logging the scenario being tested
-        # await self.log_scenario(endpoint, attr_to_update, attr_to_verify, speed_setting_read, order)
         await self.log_scenario(attr_to_update, attr_to_verify, attr_to_update_value, attr_to_verify_value, speed_setting_value, order)
 
         # Write to attribute iteratively
