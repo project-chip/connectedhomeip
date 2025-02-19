@@ -72,7 +72,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
 
 - (void)_updateRegistrationInfo
 {
-    std::lock_guard lock(*self.deviceMapLock);
+    os_unfair_lock_lock(self.deviceMapLock);
 
     NSMutableDictionary * registrationInfo = [NSMutableDictionary dictionary];
 
@@ -80,7 +80,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
     NSMutableArray * nodeIDs = [NSMutableArray array];
 
     for (NSNumber * nodeID in [self.nodeIDToDeviceMap keyEnumerator]) {
-        MTRDevice * device = self.nodeIDToDeviceMap[nodeID];
+        MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:nodeID];
         if ([device delegateExists]) {
             NSMutableDictionary * nodeDictionary = [NSMutableDictionary dictionary];
             MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDKey, nodeID, nodeDictionary)
@@ -92,6 +92,8 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
     MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationControllerContextKey, controllerContext, registrationInfo)
 
     [self updateControllerConfiguration:registrationInfo];
+
+    os_unfair_lock_unlock(self.deviceMapLock);
 }
 
 - (void)_registerNodeID:(NSNumber *)nodeID
