@@ -2879,4 +2879,18 @@ limitations under the License.
             <include cluster="Scenes Management" client="true" server="false" clientLocked="false" serverLocked="true"></include>
         </clusters>
     </deviceType>
+    <deviceType>
+        <name>MA-chime</name>
+        <domain>CHIP</domain>
+        <typeName>Chime</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0146</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="true" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Chime" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
 </configurator>
