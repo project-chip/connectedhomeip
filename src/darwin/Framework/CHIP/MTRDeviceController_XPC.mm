@@ -23,6 +23,7 @@
 #import "MTRDevice_XPC_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRUnfairLock.h"
 #import "MTRXPCClientProtocol.h"
 #import "MTRXPCServerProtocol.h"
 
@@ -72,7 +73,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
 
 - (void)_updateRegistrationInfo
 {
-    os_unfair_lock_lock(self.deviceMapLock);
+    std::lock_guard lock(*self.deviceMapLock);
 
     NSMutableDictionary * registrationInfo = [NSMutableDictionary dictionary];
 
@@ -92,8 +93,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
     MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationControllerContextKey, controllerContext, registrationInfo)
 
     [self updateControllerConfiguration:registrationInfo];
-
-    os_unfair_lock_unlock(self.deviceMapLock);
 }
 
 - (void)_registerNodeID:(NSNumber *)nodeID
