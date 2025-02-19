@@ -96,31 +96,11 @@ class TC_FAN_3_1(MatterBaseTest):
             await asyncio.sleep(0.01)
         return None
 
-    @staticmethod
-    def get_enum_value(value) -> int:
-        """
-        Retrieves the numeric value of an Enum instance.
-
-        - If the input is an Enum instance, it returns its corresponding numeric value.
-        - If the input is already a numeric value, it returns it unchanged.
-
-        Args:
-            value (enum.Enum or int): The input value to be processed.
-
-        Returns:
-            int: The numeric value of the Enum instance or the original integer.
-        """
-        if isinstance(value, enum.Enum):
-            enum_type = type(value)
-            value = enum_type(value)
-        return value
-
     async def read_setting(self, endpoint, attribute):
         cluster = Clusters.Objects.FanControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     async def write_setting(self, endpoint, attribute, value) -> Status:
-        value = self.get_enum_value(value)
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attribute(value))])
         write_status = result[0].Status
         write_status_success = (write_status == Status.Success) or (write_status == Status.InvalidInState)
@@ -145,8 +125,7 @@ class TC_FAN_3_1(MatterBaseTest):
         # Verifying read FanModeSequence attribute value is valid
         asserts.assert_in(fan_mode_sequence, range(0, 5), f"Unsupported FanModeSequence: {fan_mode_sequence}")
 
-        fan_mode_sequence_enum_value = self.get_enum_value(fan_mode_sequence)
-        logging.info(f"[FC] Supported fan modes: {fan_mode_sequence_enum_value.name}")
+        logging.info(f"[FC] Supported fan modes: {fan_mode_sequence.name}")
 
         fan_modes = None
         if fan_mode_sequence == 0:
