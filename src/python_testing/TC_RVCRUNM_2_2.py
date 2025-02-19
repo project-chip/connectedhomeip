@@ -30,6 +30,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 1
+#       --app-pipe /tmp/chip_rvc_fifo_
 #       --int-arg PIXIT.RVCRUNM.MODE_A:1
 #       --int-arg PIXIT.RVCRUNM.MODE_B:2
 #       --trace-to json:${TRACE_TEST_JSON}.json
@@ -84,7 +85,6 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         self.supported_run_modes_dut = []
         self.idle_mode_dut = 0
         self.is_ci = False
-        self.app_pipe = "/tmp/chip_rvc_fifo_"
 
     async def read_mod_attribute_expect_success(self, cluster, attribute):
         return await self.read_single_attribute_check_success(
@@ -138,7 +138,6 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         self.mode_a = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_A']
         self.mode_b = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_B']
-        self.app_pipe_pid = self.matter_test_config.app_pid
 
         asserts.assert_true(self.check_pics("RVCRUNM.S"), "RVCRUNM.S must be supported")
         # I think that the following PICS should be listed in the preconditions section in the test plan as if either

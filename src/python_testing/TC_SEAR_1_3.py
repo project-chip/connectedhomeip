@@ -31,6 +31,7 @@
 #       --passcode 20202021
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
 #       --endpoint 1
+#       --app-pipe /tmp/chip_rvc_fifo_
 #       --json-arg PIXIT.SEAR.VALID_AREAS:'[7, 1234567]'
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -50,7 +51,6 @@ class TC_SEAR_1_3(MatterBaseTest):
         super().__init__(*args)
         self.endpoint = None
         self.is_ci = False
-        self.app_pipe = "/tmp/chip_rvc_fifo_"
 
     async def read_sear_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ServiceArea
@@ -91,7 +91,6 @@ class TC_SEAR_1_3(MatterBaseTest):
         self.endpoint = self.get_endpoint()
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        self.app_pipe_pid = self.matter_test_config.app_pid
         self.print_step(1, "Commissioning, already done")
 
         # Ensure that the device is in the correct state

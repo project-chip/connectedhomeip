@@ -32,6 +32,7 @@
 #       --endpoint 1
 #       --int-arg PIXIT.RVCRUNM.MODE_CHANGE_OK:0
 #       --int-arg PIXIT.RVCRUNM.MODE_CHANGE_FAIL:2
+#       --app-pipe /tmp/chip_rvc_fifo_
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -58,7 +59,6 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
         self.mode_ok = 0
         self.mode_fail = 0
         self.is_ci = False
-        self.app_pipe = "/tmp/chip_rvc_fifo_"
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.RvcRunMode
@@ -87,7 +87,6 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
         self.mode_ok = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_CHANGE_OK']
         self.mode_fail = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_CHANGE_FAIL']
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        self.app_pipe_pid = self.matter_test_config.app_pid
 
         asserts.assert_true(self.check_pics("RVCRUNM.S.A0000"), "RVCRUNM.S.A0000 must be supported")
         asserts.assert_true(self.check_pics("RVCRUNM.S.A0001"), "RVCRUNM.S.A0001 must be supported")

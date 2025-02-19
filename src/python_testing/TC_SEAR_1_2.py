@@ -31,6 +31,7 @@
 #       --passcode 20202021
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
 #       --endpoint 1
+#       --app-pipe /tmp/chip_rvc_fifo_
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -50,7 +51,6 @@ class TC_SEAR_1_2(MatterBaseTest):
         super().__init__(*args)
         self.endpoint = None
         self.is_ci = False
-        self.app_pipe = "/tmp/chip_rvc_fifo_"
         self.mapid_list = []
 
         # this must be kept in sync with the definitions from the Common Landmark Semantic Tag Namespace
@@ -207,7 +207,6 @@ class TC_SEAR_1_2(MatterBaseTest):
         self.endpoint = self.get_endpoint(default=1)
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        self.app_pipe_pid = self.matter_test_config.app_pid
         self.print_step(1, "Commissioning, already done")
 
         # Ensure that the device is in the correct state

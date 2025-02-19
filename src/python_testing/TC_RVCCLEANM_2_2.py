@@ -29,6 +29,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --app-pipe /tmp/chip_rvc_fifo_
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -63,7 +64,6 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
         self.old_clean_mode_dut = 0
         self.new_clean_mode_th = 0
         self.is_ci = False
-        self.app_pipe = "/tmp/chip_rvc_fifo_"
 
     async def read_mod_attribute_expect_success(self, cluster, attribute):
         return await self.read_single_attribute_check_success(
@@ -107,7 +107,6 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
         self.directmodech_bit_mask = Clusters.RvcCleanMode.Bitmaps.Feature.kDirectModeChange
         self.endpoint = self.get_endpoint()
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        self.app_pipe_pid = self.matter_test_config.app_pid
 
         asserts.assert_true(self.check_pics("RVCCLEANM.S"), "RVCCLEANM.S must be supported")
         asserts.assert_true(self.check_pics("RVCRUNM.S.A0000"), "RVCRUNM.S.A0000 must be supported")

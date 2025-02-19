@@ -29,6 +29,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --app-pipe /tmp/chip_all_clusters_fifo_
 #       --endpoint 1
 #       --bool-arg simulate_occupancy:true
 #     factory-reset: true
@@ -41,8 +42,6 @@
 #  [TC-OCC-3.2] test precedure step 3a, 3c
 
 import logging
-import time
-
 import chip.clusters as Clusters
 from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
                                          await_sequence_of_reports, default_matter_test_main)
@@ -88,8 +87,6 @@ class TC_OCC_3_2(MatterBaseTest):
         endpoint_id = self.get_endpoint()
         node_id = self.dut_node_id
         dev_ctrl = self.default_controller
-        self.app_pipe = "/tmp/chip_all_clusters_fifo_"
-        self.app_pipe_pid = self.matter_test_config.app_pid
 
         post_prompt_settle_delay_seconds = 10.0
         cluster = Clusters.Objects.OccupancySensing

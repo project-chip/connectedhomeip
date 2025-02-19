@@ -30,6 +30,7 @@
 #       --passcode 20202021
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
 #       --endpoint 1
+#       --app-pipe /tmp/chip_rvc_fifo_
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -64,7 +65,6 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
         super().__init__(*args)
         self.endpoint = None
         self.is_ci = False
-        self.app_pipe = "/tmp/chip_rvc_fifo_"
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.RvcOperationalState
@@ -106,7 +106,6 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
         self.endpoint = self.get_endpoint()
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        self.app_pipe_pid = self.matter_test_config.app_pid
 
         asserts.assert_true(self.check_pics("RVCOPSTATE.S.A0004"), "RVCOPSTATE.S.A0004 must be supported")
         asserts.assert_true(self.check_pics("RVCOPSTATE.S.C04.Tx"), "RVCOPSTATE.S.C04.Tx must be supported")
