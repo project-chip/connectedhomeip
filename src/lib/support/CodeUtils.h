@@ -696,7 +696,9 @@ inline void chipDie(void)
  *       with a variable-length array argument, so we just do the C-compatible
  *       thing in C++ as well.
  */
+#ifndef MATTER_ARRAY_SIZE
 #define MATTER_ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+#endif
 
 /**
  * @brief Ensures that if `str` is NULL, a non-null `default_str_value` is provided
