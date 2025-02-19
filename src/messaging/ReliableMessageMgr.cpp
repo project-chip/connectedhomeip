@@ -105,7 +105,7 @@ void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
 void ReliableMessageMgr::NotifyMessageSendAnalytics(const RetransTableEntry & entry, const SessionHandle & sessionHandle,
                                                     const ReliableMessageAnalyticsDelegate::EventType & eventType)
 {
-    // For now we only support sending analytics for establish CASE sessions.
+    // For now we only support sending analytics for messages being sent over an established CASE session.
     if (!mAnalyticsDelegate || !sessionHandle->IsSecureSession())
     {
         return;

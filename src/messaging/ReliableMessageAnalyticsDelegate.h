@@ -58,7 +58,7 @@ public:
         NodeId nodeId = kUndefinedNodeId;
         // When the session has a fabric index, this will be a value other than kUndefinedFabricIndex.
         FabricIndex fabricIndex = kUndefinedFabricIndex;
-        // Session type of the transmit analytic event.
+        // Session type of session the message involved is being sent on.
         SessionType sessionType = SessionType::kEstablishedCase;
         // The transmit event type.
         EventType eventType = EventType::kInitialSend;
