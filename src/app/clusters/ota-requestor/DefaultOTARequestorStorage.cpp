@@ -67,8 +67,7 @@ bool DefaultOTARequestorStorage::ProviderAlreadyInList(ProviderLocationList & li
     {
         ProviderLocationType pl = iterator.GetValue();
 
-        if ((pl.providerNodeID == provider.providerNodeID) &&
-            (pl.fabricIndex == provider.fabricIndex) &&
+        if ((pl.providerNodeID == provider.providerNodeID) && (pl.fabricIndex == provider.fabricIndex) &&
             (pl.endpoint == provider.endpoint))
         {
             return true;

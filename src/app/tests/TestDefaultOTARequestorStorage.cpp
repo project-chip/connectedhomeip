@@ -222,8 +222,8 @@ TEST(TestDefaultOTARequestorStorage, TestDuplicateProvider)
     otaStorage.Init(persistentStorage);
 
     provider.providerNodeID = 1231524802U;
-    provider.fabricIndex = 1U;
-    provider.endpoint = 2U;
+    provider.fabricIndex    = 1U;
+    provider.endpoint       = 2U;
 
     EXPECT_EQ(true, otaStorage.ProviderAlreadyInList(listProviders, provider));
 
@@ -231,18 +231,18 @@ TEST(TestDefaultOTARequestorStorage, TestDuplicateProvider)
     EXPECT_EQ(true, otaStorage.ProviderAlreadyInList(listProviders, provider));
 
     provider.providerNodeID = 1231524801U;
-    provider.fabricIndex = 1U;
-    provider.endpoint = 2U;
+    provider.fabricIndex    = 1U;
+    provider.endpoint       = 2U;
     EXPECT_EQ(false, otaStorage.ProviderAlreadyInList(listProviders, provider));
 
     provider.providerNodeID = 1231524802U;
-    provider.fabricIndex = 2U;
-    provider.endpoint = 2U;
+    provider.fabricIndex    = 2U;
+    provider.endpoint       = 2U;
     EXPECT_EQ(false, otaStorage.ProviderAlreadyInList(listProviders, provider));
 
     provider.providerNodeID = 1231524802U;
-    provider.fabricIndex = 1U;
-    provider.endpoint = 3U;
+    provider.fabricIndex    = 1U;
+    provider.endpoint       = 3U;
     EXPECT_EQ(false, otaStorage.ProviderAlreadyInList(listProviders, provider));
 }
 
