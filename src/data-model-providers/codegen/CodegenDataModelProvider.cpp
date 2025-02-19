@@ -99,10 +99,10 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
     const ConcreteAttributePath attributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
 
     entry.attributeId   = attribute.attributeId;
-    entry.readPrivilege = RequiredPrivilege::ForReadAttribute(attributePath);
+    entry.SetReadPrivilege(RequiredPrivilege::ForReadAttribute(attributePath));
     if (!attribute.IsReadOnly())
     {
-        entry.writePrivilege = RequiredPrivilege::ForWriteAttribute(attributePath);
+        entry.SetWritePrivilege(RequiredPrivilege::ForWriteAttribute(attributePath));
     }
 
     entry.flags.Set(DataModel::AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));
@@ -294,7 +294,7 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
     //   - fixed value (no such flag exists, so this is not a quality flag we set/track)
     DataModel::AttributeEntry globalListEntry;
 
-    globalListEntry.readPrivilege = Access::Privilege::kView;
+    globalListEntry.SetReadPrivilege(Access::Privilege::kView);
     globalListEntry.flags.Set(DataModel::AttributeQualityFlags::kListAttribute);
 
     for (auto & attribute : GlobalAttributesNotInMetadata)
