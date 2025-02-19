@@ -12,7 +12,7 @@ RUN set -x \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
-# Download Simplicity SDK v2024.12.1-0 (da66128
+# Download Simplicity SDK v2024.12.1-0 (da66128)
 RUN wget https://github.com/SiliconLabs/simplicity_sdk/releases/download/v2024.12.1-0/simplicity-sdk.zip -O /tmp/simplicity_sdk.zip \
     && unzip /tmp/simplicity_sdk.zip -d /tmp/simplicity_sdk \
     && rm -rf /tmp/simplicity_sdk.zip \
