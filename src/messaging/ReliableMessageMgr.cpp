@@ -319,6 +319,9 @@ System::Clock::Timeout ReliableMessageMgr::GetBackoff(System::Clock::Timeout bas
 void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 {
     CalculateNextRetransTime(*entry);
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+    NotifyMessageSendAnalytics(*entry, entry->ec->GetSessionHandle(), ReliableMessageAnalyticsDelegate::EventType::kInitialSend);
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
     StartTimer();
 }
 
@@ -569,17 +572,6 @@ void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
                     backoff.count(), peerIsActive ? "Active" : "Idle", config.mIdleRetransTimeout.count(),
                     config.mActiveRetransTimeout.count(), config.mActiveThresholdTime.count());
 #endif // CHIP_PROGRESS_LOGGING
-
-#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
-    // For initial send the packet has already been submitted to transport layer successfully.
-    // On re-transmits we do not know if transport layer is unable to retransmit for some
-    // reason. For this reason we only call NotifyMessageSendAnalytics if it is the inital send
-    // and send kRetransmission after we know transmission is successful elsewhere.
-    if (entry.sendCount == 0)
-    {
-        NotifyMessageSendAnalytics(entry, sessionHandle, ReliableMessageAnalyticsDelegate::EventType::kInitialSend);
-    }
-#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
 }
 
 #if CHIP_CONFIG_TEST
