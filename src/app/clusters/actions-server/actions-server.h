@@ -93,7 +93,7 @@ struct EndpointListStorage : public Structs::EndpointListStruct::Type
     {
         endpointListID    = aEpListId;
         type              = aEpListType;
-        size_t epListSize = std::min(aEndpointList.size(), ArraySize(mEpList));
+        size_t epListSize = std::min(aEndpointList.size(), MATTER_ARRAY_SIZE(mEpList));
 
         for (size_t index = 0; index < epListSize; index++)
         {

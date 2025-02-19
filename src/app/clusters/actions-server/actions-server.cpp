@@ -419,13 +419,11 @@ void ActionsServer::InvokeCommand(HandlerContext & handlerContext)
 void ActionsServer::ActionListModified(EndpointId aEndpoint)
 {
     MarkDirty(aEndpoint, Attributes::ActionList::Id);
-    return;
 }
 
 void ActionsServer::EndpointListModified(EndpointId aEndpoint)
 {
     MarkDirty(aEndpoint, Attributes::EndpointLists::Id);
-    return;
 }
 
 void MatterActionsPluginServerInitCallback()
