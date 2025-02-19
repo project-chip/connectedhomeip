@@ -90,7 +90,7 @@ class TC_LWM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         self.step(3)
         # Verify that the CurrentMode attribute has a valid value.
         mode = self.cluster.Attributes.CurrentMode
-        resp = await self.read_and_check_mode(endpoint=endpoint, mode=mode, supported_modes=supported_modes)
+        await self.read_and_check_mode(endpoint=endpoint, mode=mode, supported_modes=supported_modes)
 
         self.step(4)
         # Verify that the OnMode attribute has a valid value or null.
