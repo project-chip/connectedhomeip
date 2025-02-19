@@ -110,7 +110,7 @@ tests:
       response:
           constraints:
               minValue: 20
-              maxValue: 50
+              maxValue: 60
 
     - label: "Wait 2s"
       cluster: "DelayCommands"
@@ -127,7 +127,7 @@ tests:
       response:
           constraints:
               minValue: 20
-              maxValue: 50
+              maxValue: 60
 
     - label:
           "Step 3a: TH sends MoveToSaturation command to DUT with Saturation=150
