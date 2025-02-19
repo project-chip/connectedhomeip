@@ -198,19 +198,19 @@ def async_test_body(body):
     a asyncio-run synchronous method. This decorator does the wrapping.
     """
 
-    def async_runner(self: MatterBaseTest, *args, **kwargs):
+    def async_runner(self: "MatterBaseTest", *args, **kwargs):
         return _async_runner(body, self, *args, **kwargs)
     return async_runner
 
 
-async def _get_all_matching_endpoints(self, accept_function: EndpointCheckFunction) -> list[int]:
+async def _get_all_matching_endpoints(self: "MatterBaseTest", accept_function: EndpointCheckFunction) -> list[int]:
     """ Returns a list of endpoints matching the accept condition. """
     wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
     matching = [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
     return matching
 
 
-async def should_run_test_on_endpoint(self, accept_function: EndpointCheckFunction) -> bool:
+async def should_run_test_on_endpoint(self: "MatterBaseTest", accept_function: EndpointCheckFunction) -> bool:
     """ Helper function for the run_if_endpoint_matches decorator.
 
         Returns True if self.matter_test_config.endpoint matches the accept function.
@@ -231,7 +231,7 @@ def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction):
         Note that currently this test is limited to devices with a SINGLE matching endpoint.
     """
     def run_on_singleton_matching_endpoint_internal(body):
-        def matching_runner(self, *args, **kwargs):
+        def matching_runner(self: "MatterBaseTest", *args, **kwargs):
             # Import locally to avoid circular dependency
             from chip.testing.matter_testing import MatterBaseTest
             assert isinstance(self, MatterBaseTest)
@@ -282,7 +282,7 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
         PICS values internally.
     """
     def run_if_endpoint_matches_internal(body):
-        def per_endpoint_runner(self, *args, **kwargs):
+        def per_endpoint_runner(self: "MatterBaseTest", *args, **kwargs):
             # Import locally to avoid circular dependency
             from chip.testing.matter_testing import MatterBaseTest
             assert isinstance(self, MatterBaseTest)
