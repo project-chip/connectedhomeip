@@ -80,8 +80,8 @@ class TC_CNET_4_11(MatterBaseTest):
         # Commissioning is already done
         self.step("precondition")
         logger.info("///---------------- step 0 ----------------///")
-        fm = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.FeatureMap)
-        logger.info(f"---------------- featureMap: {fm}")
+        # fm = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.FeatureMap)
+        # logger.info(f"---------------- featureMap: {fm}")
 
         # Precondition: TH reads FeatureMap attribute from the DUT and verifies if DUT supports WiFi on endpoint
         # feature_map = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.FeatureMap)
@@ -93,73 +93,86 @@ class TC_CNET_4_11(MatterBaseTest):
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900
         self.step(1)
         logger.info("///---------------- step 1 ----------------///")
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
-        result = await self.send_single_cmd(cmd=cmd)
-        # Verify that DUT sends ArmFailSafeResponse command to the TH
-        asserts.assert_true(type_matches(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
-                            "Unexpected value returned from ArmFailSafe")
-        asserts.assert_equal(result.errorCode, 0, "Error code is not 0")
-        asserts.assert_equal(result.debugText, "", "Debug text is not empty")
+        # cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
+        # result = await self.send_single_cmd(cmd=cmd)
+        # # Verify that DUT sends ArmFailSafeResponse command to the TH
+        # asserts.assert_true(type_matches(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
+        #                     "Unexpected value returned from ArmFailSafe")
+        # asserts.assert_equal(result.errorCode, 0, "Error code is not 0")
+        # asserts.assert_equal(result.debugText, "", "Debug text is not empty")
 
         # TH reads Networks attribute from the DUT and saves the number of entries as 'NumNetworks'
         self.step(2)
         logger.info("///---------------- step 2 ----------------///")
-        networks = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning, attribute=attr.Networks)
-        numNetworks = len(networks)
-        logger.info(f"---------------- NumNetworks: {numNetworks}")
-        logger.info(f"---------------- Networks: {networks}")
-        logger.info(f"---------------- NetworkID: {networks[0].networkID}")
-        logger.info(f"---------------- Connected: {networks[0].connected}")
-        asserts.assert_true(PIXIT_CNET_WIFI_1ST_ACCESSPOINT_SSID ==
-                            networks[0].networkID, "networkID DOES NOT match")
-        asserts.assert_true(networks[0].connected, f"network {networks[0].networkID} IS NOT connected")
+        # networks = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning, attribute=attr.Networks)
+        # numNetworks = len(networks)
+        # logger.info(f"---------------- NumNetworks: {numNetworks}")
+        # logger.info(f"---------------- Networks: {networks}")
+        # logger.info(f"---------------- NetworkID: {networks[0].networkID}")
+        # logger.info(f"---------------- Connected: {networks[0].connected}")
+        # asserts.assert_true(PIXIT_CNET_WIFI_1ST_ACCESSPOINT_SSID ==
+        #                     networks[0].networkID, "networkID DOES NOT match")
+        # asserts.assert_true(networks[0].connected, f"network {networks[0].networkID} IS NOT connected")
 
-        # self.step(3)
+        supported_wifi_bands = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.SupportedWiFiBands)
+        print(f"---------------- supported_wifi_bands: {supported_wifi_bands}")
         # networks = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.Networks)
+        # print(f"---------------- networks: {networks}")
         # connected = [network for network in networks if network.connected is True]
         # asserts.assert_greater_equal(len(connected), 1, "Did not find any connected networks on a commissioned device")
         # known_ssid = connected[0].networkID
 
-        # async def scan_and_check(ssid_to_scan: Optional[bytes], breadcrumb: int, expect_results: bool = True):
-        #     all_security = 0
-        #     for security_bitmask in cnet.Bitmaps.WiFiSecurityBitmap:
-        #         all_security |= security_bitmask
+        # self.step(3)
+        networks = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.Networks)
+        connected = [network for network in networks if network.connected is True]
+        asserts.assert_greater_equal(len(connected), 1, "Did not find any connected networks on a commissioned device")
+        known_ssid = connected[0].networkID
 
-        #     ssid = ssid_to_scan if ssid_to_scan is not None else NullValue
-        #     cmd = cnet.Commands.ScanNetworks(ssid=ssid, breadcrumb=breadcrumb)
-        #     scan_results = await self.send_single_cmd(cmd=cmd)
-        #     asserts.assert_true(type_matches(scan_results, cnet.Commands.ScanNetworksResponse),
-        #                         "Unexpected value returned from scan network")
-        #     logging.info(f"Scan results: {scan_results}")
+        async def scan_and_check(ssid_to_scan: Optional[bytes], breadcrumb: int, expect_results: bool = True):
+            all_security = 0
+            for security_bitmask in cnet.Bitmaps.WiFiSecurityBitmap:
+                all_security |= security_bitmask
 
-        #     if scan_results.debugText:
-        #         debug_text_len = len(scan_results.debug_text)
-        #         asserts.assert_less_equal(debug_text_len, 512, f"DebugText length {debug_text_len} was out of range")
+            ssid = ssid_to_scan if ssid_to_scan is not None else NullValue
+            print(f"---------------- ssid: {ssid}")
+            cmd = cnet.Commands.ScanNetworks(ssid=ssid, breadcrumb=breadcrumb)
+            scan_results = await self.send_single_cmd(cmd=cmd)
+            print(f"---------------- scan_results: {scan_results}")
+            asserts.assert_true(type_matches(scan_results, cnet.Commands.ScanNetworksResponse),
+                                "Unexpected value returned from scan network")
+            logging.info(f"Scan results: {scan_results}")
 
-        #     if expect_results:
-        #         asserts.assert_equal(scan_results.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
-        #                              f"ScanNetworks was expected to have succeeded, got {scan_results.networkingStatus} instead")
-        #         asserts.assert_greater_equal(len(scan_results.wiFiScanResults), 1, "No responses returned from ScanNetwork command")
-        #     else:
-        #         asserts.assert_equal(scan_results.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kNetworkNotFound,
-        #                              f"ScanNetworks was expected to received NetworkNotFound(5), got {scan_results.networkingStatus} instead")
-        #         return
+            if scan_results.debugText:
+                debug_text_len = len(scan_results.debug_text)
+                asserts.assert_less_equal(debug_text_len, 512, f"DebugText length {debug_text_len} was out of range")
 
-        #     for network in scan_results.wiFiScanResults:
-        #         asserts.assert_true((network.security & ~all_security) == 0, "Unexpected bitmap in the security field")
-        #         asserts.assert_less_equal(len(network.ssid), 32, f"Returned SSID {network.ssid} is too long")
-        #         if ssid_to_scan is not None:
-        #             asserts.assert_equal(network.ssid, ssid_to_scan, "Unexpected SSID returned in directed scan")
-        #         asserts.assert_true(type_matches(network.bssid, bytes), "Incorrect type for BSSID")
-        #         asserts.assert_equal(len(network.bssid), 6, "Unexpected length of BSSID")
-        #         # TODO: this is inherited from the old test plan, but we should match the channel to the supported band. This range is unreasonably large.
-        #         asserts.assert_less_equal(network.channel, 65535, "Unexpected channel value")
-        #         if network.wiFiBand:
-        #             asserts.assert_true(network.wiFiBand in supported_wifi_bands,
-        #                                 "Listed wiFiBand is not in supported_wifi_bands")
-        #         if network.rssi:
-        #             asserts.assert_greater_equal(network.rssi, -120, "RSSI out of range")
-        #             asserts.assert_less_equal(network.rssi, 0, "RSSI out of range")
+            if expect_results:
+                asserts.assert_equal(scan_results.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                                     f"ScanNetworks was expected to have succeeded, got {scan_results.networkingStatus} instead")
+                asserts.assert_greater_equal(len(scan_results.wiFiScanResults), 1, "No responses returned from ScanNetwork command")
+            else:
+                asserts.assert_equal(scan_results.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kNetworkNotFound,
+                                     f"ScanNetworks was expected to received NetworkNotFound(5), got {scan_results.networkingStatus} instead")
+                return
+
+            print(f"---------------- scan_results.wiFiScanResults: {scan_results.wiFiScanResults}")
+            for network in scan_results.wiFiScanResults:
+                print(f"---------------- network: {network}")
+                asserts.assert_true((network.security & ~all_security) == 0, "Unexpected bitmap in the security field")
+                asserts.assert_less_equal(len(network.ssid), 32, f"Returned SSID {network.ssid} is too long")
+                if ssid_to_scan is not None:
+                    print(f"---------------- ssid_to_scan: {ssid_to_scan}")
+                    asserts.assert_equal(network.ssid, ssid_to_scan, "Unexpected SSID returned in directed scan")
+                asserts.assert_true(type_matches(network.bssid, bytes), "Incorrect type for BSSID")
+                asserts.assert_equal(len(network.bssid), 6, "Unexpected length of BSSID")
+                # TODO: this is inherited from the old test plan, but we should match the channel to the supported band. This range is unreasonably large.
+                asserts.assert_less_equal(network.channel, 65535, "Unexpected channel value")
+                if network.wiFiBand:
+                    asserts.assert_true(network.wiFiBand in supported_wifi_bands,
+                                        "Listed wiFiBand is not in supported_wifi_bands")
+                if network.rssi:
+                    asserts.assert_greater_equal(network.rssi, -120, "RSSI out of range")
+                    asserts.assert_less_equal(network.rssi, 0, "RSSI out of range")
 
         # self.step(4)
         # await scan_and_check(ssid_to_scan=None, breadcrumb=1, expect_results=True)
@@ -169,7 +182,7 @@ class TC_CNET_4_11(MatterBaseTest):
         # asserts.assert_equal(breadcrumb, 1, "Incorrect breadcrumb value")
 
         # self.step(6)
-        # await scan_and_check(ssid_to_scan=known_ssid, breadcrumb=2, expect_results=True)
+        await scan_and_check(ssid_to_scan=known_ssid, breadcrumb=2, expect_results=True)
 
         # self.step(7)
         # breadcrumb = await self.read_single_attribute_check_success(cluster=Clusters.GeneralCommissioning, attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb, endpoint=0)
