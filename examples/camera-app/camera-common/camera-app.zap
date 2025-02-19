@@ -4597,12 +4597,31 @@
     {
       "id": 2,
       "name": "MA-camera",
-      "deviceTypes": [],
-      "deviceVersions": [],
-      "deviceIdentifiers": [],
-      "deviceTypeName": "",
-      "deviceTypeCode": "",
-      "deviceTypeProfileId": "",
+      "deviceTypeRef": {
+        "code": 322,
+        "profileId": 259,
+        "label": "MA-camera",
+        "name": "MA-camera",
+        "deviceTypeOrder": 0
+      },
+      "deviceTypes": [
+        {
+          "code": 322,
+          "profileId": 259,
+          "label": "MA-camera",
+          "name": "MA-camera",
+          "deviceTypeOrder": 0
+        }
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        322
+      ],
+      "deviceTypeName": "MA-rootdevice",
+      "deviceTypeCode": 322,
+      "deviceTypeProfileId": 259,
       "clusters": [
         {
           "name": "Identify",
