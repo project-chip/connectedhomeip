@@ -638,7 +638,7 @@ class LocalFilesDclClient(DclClientInterface):
             return self.format_lookup_key(base64_name, skid)
         except ExtensionNotFound:
             logging.warning("CertificateSKID not found, continue...")
-    
+
     def format_lookup_key(self, base64_name: str, skid_hex: str) -> str:
         '''
         Get formatted key used in this class to lookup certificates.
