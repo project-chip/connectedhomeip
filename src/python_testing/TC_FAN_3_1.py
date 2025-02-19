@@ -208,22 +208,22 @@ class TC_FAN_3_1(MatterBaseTest):
             sub_text = f"({value_previous}:{value_previous.name}) to ({value_current}:{value_current.name})"
         logging.info(f"\t\t[FC] {attr_to_verify.__name__} changed from {sub_text}")
 
-    async def log_scenario(self, endpoint, attr_to_update, attr_to_verify, speed_setting_read, order):
-        cluster = Clusters.FanControl
-        fan_mode_attr = cluster.Attributes.FanMode
-        percent_setting_attr = cluster.Attributes.PercentSetting
-
+    async def log_scenario(self, attr_to_update, attr_to_verify, attr_to_update_value, attr_to_verify_value, speed_setting_value, order):
         # Logging the scenario being tested
-        sub_text = " and SpeedSetting" if self.supports_speed else ""
+        speed_setting_scenario = " and SpeedSetting" if self.supports_speed else ""
         logging.info(
-            f"[FC] Update {attr_to_update.__name__} {order.name}, verify {attr_to_verify.__name__}{sub_text}")
+            f"[FC] Update {attr_to_update.__name__} {order.name}, verify {attr_to_verify.__name__}{speed_setting_scenario}")
 
         # Logging initialization values (FanMode, PercentSetting, and SpeedSetting (if supported))
-        fan_mode_log = cluster.Enums.FanModeEnum(await self.read_setting(endpoint, fan_mode_attr))
-        percent_setting_log = await self.read_setting(endpoint, percent_setting_attr)
-        sub_text = f" SpeedSetting({speed_setting_read})" if self.supports_speed else ""
+        if attr_to_update == Clusters.FanControl.Attributes.PercentSetting:
+            percent_setting_log = attr_to_update_value
+            fan_mode_log = f"{attr_to_verify_value}:{attr_to_verify_value.name}"
+        else:
+            percent_setting_log = attr_to_verify_value
+            fan_mode_log = f"{attr_to_update_value}:{attr_to_update_value.name}"
+        speed_setting_log = f" SpeedSetting({speed_setting_value})" if self.supports_speed else ""
         logging.info(
-            f"[FC] Initialization values: FanMode({fan_mode_log}:{fan_mode_log.name}) PercentSetting({percent_setting_log}){sub_text}")
+            f"[FC] Initialization values: FanMode({fan_mode_log}) PercentSetting({percent_setting_log}){speed_setting_log}")
 
     async def verify_fan_control_attribute_progression(self, endpoint, attr_to_update, order) -> None:
         # Setup
@@ -243,28 +243,29 @@ class TC_FAN_3_1(MatterBaseTest):
             await self.get_initialization_parametes(attr_to_update, order)
 
         # Initializatization of the attribute to update (Write and read back verification)
-        await self.write_and_verify_attribute(endpoint, attr_to_update, value_init_update)
+        attr_to_update_value = await self.write_and_verify_attribute(endpoint, attr_to_update, value_init_update)
 
         # Initializatization of the attribute to verify (Write and read back verification)
-        attr_value_read = await self.write_and_verify_attribute(endpoint, attr_to_verify, value_init_verify)
+        attr_to_verify_value = await self.write_and_verify_attribute(endpoint, attr_to_verify, value_init_verify)
 
         # Initializatization of the SpeedSetting attribute, if supported (Write and read back verification)
         if self.supports_speed:
             speed_setting_init = 0 if order == OrderEnum.Ascending else self.speed_max
-            speed_setting_read = await self.write_and_verify_attribute(endpoint, speed_setting_attr, speed_setting_init)
+            speed_setting_value = await self.write_and_verify_attribute(endpoint, speed_setting_attr, speed_setting_init)
 
         # *** NEXT STEP ***
         # TH performs the testing scenario defined in the previous step
         self.step(self.current_step_index + 1)
 
         # Logging the scenario being tested
-        await self.log_scenario(endpoint, attr_to_update, attr_to_verify, speed_setting_read, order)
+        # await self.log_scenario(endpoint, attr_to_update, attr_to_verify, speed_setting_read, order)
+        await self.log_scenario(attr_to_update, attr_to_verify, attr_to_update_value, attr_to_verify_value, speed_setting_value, order)
 
         # Write to attribute iteratively
-        attr_value_current = attr_value_read
-        attr_value_previous = attr_value_read
-        speed_setting_current = speed_setting_read
-        speed_setting_previous = speed_setting_read
+        attr_value_current = attr_to_verify_value
+        attr_value_previous = attr_to_verify_value
+        speed_setting_current = speed_setting_value
+        speed_setting_previous = speed_setting_value
         for value_to_write in iteration_range:
             # Clear the attribute report queue before each update to avoid duplicates
             self.attribute_subscription.get_last_report()
