@@ -32,6 +32,7 @@
 
 using namespace chip;
 using namespace chip::app::DataModel;
+using namespace chip::app::DataModel::detail;
 
 namespace {
 
@@ -204,4 +205,65 @@ TEST_F(TestMetadataList, ListBuilderConvertersWorks)
     }
 }
 
+TEST_F(TestMetadataList, BufferMoveOperationsWork)
+{
+
+    {
+        ListBuilder<int> list;
+
+        ASSERT_EQ(list.EnsureAppendCapacity(3), CHIP_NO_ERROR);
+
+        list.Append(10);
+        list.Append(11);
+        list.Append(12);
+
+        // Get a ListBuilder base class object
+        GenericAppendOnlyBuffer originalBuffer{ static_cast<GenericAppendOnlyBuffer &&>(std::move(list)) };
+
+        ASSERT_EQ(originalBuffer.Size(), size_t{ 3 });
+        ASSERT_FALSE(originalBuffer.IsEmpty());
+
+        /// move constructor called for the second time here
+        GenericAppendOnlyBuffer newBuffer{ std::move(originalBuffer) };
+
+        ASSERT_EQ(originalBuffer.Size(), size_t{ 0 });
+        ASSERT_TRUE(originalBuffer.IsEmpty());
+
+        ASSERT_EQ(newBuffer.Size(), size_t{ 3 });
+        ASSERT_FALSE(newBuffer.IsEmpty());
+    }
+
+    {
+        ListBuilder<int> list1;
+
+        ASSERT_EQ(list1.EnsureAppendCapacity(3), CHIP_NO_ERROR);
+
+        list1.Append(10);
+        list1.Append(11);
+        list1.Append(12);
+
+        ListBuilder<int> list2;
+
+        ASSERT_EQ(list2.EnsureAppendCapacity(2), CHIP_NO_ERROR);
+
+        list2.Append(20);
+        list2.Append(21);
+
+        // Get a ListBuilder base class object
+        GenericAppendOnlyBuffer originalBuffer{ static_cast<GenericAppendOnlyBuffer &&>(std::move(list1)) };
+
+        // Get another ListBuilder base class object
+        GenericAppendOnlyBuffer anotherBuffer{ static_cast<GenericAppendOnlyBuffer &&>(std::move(list2)) };
+
+        ASSERT_EQ(originalBuffer.Size(), size_t{ 3 });
+        ASSERT_EQ(anotherBuffer.Size(), size_t{ 2 });
+
+        // move assignemnt operator called here
+        originalBuffer = std::move(anotherBuffer);
+
+        ASSERT_EQ(originalBuffer.Size(), size_t{ 2 });
+        ASSERT_EQ(anotherBuffer.Size(), size_t{ 0 });
+        ASSERT_TRUE(anotherBuffer.IsEmpty());
+    }
+}
 } // namespace
