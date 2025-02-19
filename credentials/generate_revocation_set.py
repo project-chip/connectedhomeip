@@ -52,6 +52,13 @@ __LOG_LEVELS__ = {
 class RevocationType(Enum):
     CRL = 1
 
+class CertVerificationResult(Enum):
+    SUCCESS = 1
+    SKID_NOT_FOUND = 2
+    AKID_NOT_FOUND = 3
+    SIGNATURE_VERIFICATION_FAILED = 4
+    ISSUER_MISMATCH = 5
+    AKID_MISMATCH = 6
 
 OID_VENDOR_ID = x509.ObjectIdentifier("1.3.6.1.4.1.37244.2.1")
 OID_PRODUCT_ID = x509.ObjectIdentifier("1.3.6.1.4.1.37244.2.2")
@@ -104,41 +111,42 @@ def get_skid(cert: x509.Certificate) -> str:
     return cert.extensions.get_extension_for_oid(x509.OID_SUBJECT_KEY_IDENTIFIER).value.key_identifier.hex().upper()
 
 
-def verify_cert(cert: x509.Certificate, root: x509.Certificate) -> bool:
+def verify_cert(cert: x509.Certificate, root: x509.Certificate) -> CertVerificationResult:
     '''
     Verifies if the cert is signed by root.
     '''
     try:
         cert_akid = get_akid(cert)
     except ExtensionNotFound:
-        logging.warning("Certificate AKID not found, continue...")
-        return False
+        return CertVerificationResult.AKID_NOT_FOUND
     try:
         root_skid = get_skid(root)
     except ExtensionNotFound:
-        logging.warning("Root SKID not found, continue...")
-        return False
+        return CertVerificationResult.SKID_NOT_FOUND
 
     if cert_akid != root_skid:
-        return False
+        return CertVerificationResult.AKID_MISMATCH
 
     if cert.issuer != root.subject:
-        return False
+        return CertVerificationResult.ISSUER_MISMATCH
 
     # public_key().verify() do not return anything if signature is valid,
     # will raise an exception if signature is invalid
     try:
         root.public_key().verify(cert.signature, cert.tbs_certificate_bytes, ec.ECDSA(cert.signature_hash_algorithm))
     except Exception:
-        logging.warning(
-            f"Signature verification failed for cert subject: {cert.subject.rfc4514_string()}, issuer: {cert.issuer.rfc4514_string()}")
-        return False
+        return CertVerificationResult.SIGNATURE_VERIFICATION_FAILED
 
-    return True
+    return CertVerificationResult.SUCCESS
 
 
 def is_self_signed_certificate(cert: x509.Certificate) -> bool:
-    return verify_cert(cert, cert)
+    result = verify_cert(cert, cert)
+    if result == CertVerificationResult.SUCCESS:
+        return True
+    else:
+        logging.debug(f"Certificate with subject: {cert.subject.rfc4514_string()} is not a valid self-signed certificate. Result: {result.name}")
+    return False
 
 
 # delegator is optional so can be None, but crl_signer and paa has to be present
@@ -152,9 +160,22 @@ def validate_cert_chain(crl_signer: x509.Certificate, crl_signer_delegator: x509
     '''
 
     if crl_signer_delegator:
-        return verify_cert(crl_signer, crl_signer_delegator) and verify_cert(crl_signer_delegator, paa)
+        result_signer = verify_cert(crl_signer, crl_signer_delegator)
+        if not result_signer == CertVerificationResult.SUCCESS:
+            logging.debug(f"Cannot verify certificate subject: {crl_signer.subject.rfc4514_string()} issued by certificate subject: {crl_signer_delegator.subject.rfc4514_string()}. Result: {result_signer.name}")
+            return False
+
+        result_delegator = verify_cert(crl_signer_delegator, paa)
+        if not result_delegator == CertVerificationResult.SUCCESS:
+            logging.debug(f"Cannot verify certificate subject: {crl_signer_delegator.subject.rfc4514_string()} issued by certificate subject: {paa.subject.rfc4514_string()}. Result: {result.name}")
+            return False
+        return True
     else:
-        return verify_cert(crl_signer, paa)
+        result = verify_cert(crl_signer, paa)
+        if not result == CertVerificationResult.SUCCESS:
+            logging.debug(f"Cannot verify certificate subject: {crl_signer.subject.rfc4514_string()} issued by certificate subject: {paa.subject.rfc4514_string()}. Result: {result.name}")
+            return False
+        return True
 
 
 def validate_vid_pid(revocation_point: dict, crl_signer_certificate: x509.Certificate, crl_signer_delegator_certificate: x509.Certificate) -> bool:
@@ -638,7 +659,7 @@ class LocalFilesDclClient(DclClientInterface):
             return self.format_lookup_key(base64_name, skid)
         except ExtensionNotFound:
             logging.warning("CertificateSKID not found, continue...")
-
+    
     def format_lookup_key(self, base64_name: str, skid_hex: str) -> str:
         '''
         Get formatted key used in this class to lookup certificates.
