@@ -24,6 +24,15 @@ include("${CHIP_ROOT}/src/data-model-providers/codegen/model.cmake")
 function(chip_configure_cluster APP_TARGET CLUSTER)
     file(GLOB CLUSTER_SOURCES "${CHIP_APP_BASE_DIR}/clusters/${CLUSTER}/*.cpp")
     target_sources(${APP_TARGET} PRIVATE ${CLUSTER_SOURCES})
+
+    # Add clusters dependencies
+    if (CLUSTER STREQUAL "icd-management-server")
+      # Add ICDConfigurationData when ICD management server cluster is included,
+      # but ICD support is disabled, e.g. lock-app on some platforms
+      if(NOT CONFIG_CHIP_ENABLE_ICD_SUPPORT)
+        target_sources(${APP_TARGET} PRIVATE ${CHIP_APP_BASE_DIR}/icd/server/ICDConfigurationData.cpp)
+      endif()
+    endif()
 endfunction()
 
 #
