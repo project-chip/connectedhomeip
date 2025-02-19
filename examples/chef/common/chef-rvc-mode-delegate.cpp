@@ -17,6 +17,7 @@
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
+#include <chef-rvc-mode-delegate.h>
 
 using namespace chip;
 using namespace chip::app;
