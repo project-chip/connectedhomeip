@@ -24,8 +24,8 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ThermostatClusterActiveScheduleChangeEvent(
-  val previousScheduleHandle: Optional<ByteArray>,
-  val currentScheduleHandle: ByteArray,
+  val previousScheduleHandle: Optional<ByteArray>?,
+  val currentScheduleHandle: ByteArray?,
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterActiveScheduleChangeEvent {\n")
@@ -37,11 +37,19 @@ class ThermostatClusterActiveScheduleChangeEvent(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      if (previousScheduleHandle.isPresent) {
-        val optpreviousScheduleHandle = previousScheduleHandle.get()
-        put(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE), optpreviousScheduleHandle)
+      if (previousScheduleHandle != null) {
+        if (previousScheduleHandle.isPresent) {
+          val optpreviousScheduleHandle = previousScheduleHandle.get()
+          put(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE), optpreviousScheduleHandle)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE))
       }
-      put(ContextSpecificTag(TAG_CURRENT_SCHEDULE_HANDLE), currentScheduleHandle)
+      if (currentScheduleHandle != null) {
+        put(ContextSpecificTag(TAG_CURRENT_SCHEDULE_HANDLE), currentScheduleHandle)
+      } else {
+        putNull(ContextSpecificTag(TAG_CURRENT_SCHEDULE_HANDLE))
+      }
       endStructure()
     }
   }
@@ -53,13 +61,23 @@ class ThermostatClusterActiveScheduleChangeEvent(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterActiveScheduleChangeEvent {
       tlvReader.enterStructure(tlvTag)
       val previousScheduleHandle =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE))) {
-          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE)))
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE))) {
+            Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE)))
+          } else {
+            Optional.empty()
+          }
         } else {
-          Optional.empty()
+          tlvReader.getNull(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE))
+          null
         }
       val currentScheduleHandle =
-        tlvReader.getByteArray(ContextSpecificTag(TAG_CURRENT_SCHEDULE_HANDLE))
+        if (!tlvReader.isNull()) {
+          tlvReader.getByteArray(ContextSpecificTag(TAG_CURRENT_SCHEDULE_HANDLE))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_SCHEDULE_HANDLE))
+          null
+        }
 
       tlvReader.exitContainer()
 

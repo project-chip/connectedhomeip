@@ -32623,10 +32623,10 @@ class Thermostat(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="currentLocalTemperature", Tag=0, Type=int),
+                        ClusterObjectFieldDescriptor(Label="currentLocalTemperature", Tag=0, Type=typing.Union[Nullable, int]),
                     ])
 
-            currentLocalTemperature: int = 0
+            currentLocalTemperature: typing.Union[Nullable, int] = NullValue
 
         @dataclass
         class OccupancyChange(ClusterEvent):
@@ -32664,13 +32664,13 @@ class Thermostat(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="systemMode", Tag=0, Type=Thermostat.Enums.SystemModeEnum),
-                        ClusterObjectFieldDescriptor(Label="occupancy", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="occupancy", Tag=1, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="previousSetpoint", Tag=2, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="currentSetpoint", Tag=3, Type=int),
                     ])
 
             systemMode: Thermostat.Enums.SystemModeEnum = 0
-            occupancy: uint = 0
+            occupancy: typing.Optional[uint] = None
             previousSetpoint: typing.Optional[int] = None
             currentSetpoint: int = 0
 
@@ -32730,12 +32730,12 @@ class Thermostat(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="previousScheduleHandle", Tag=0, Type=typing.Optional[bytes]),
-                        ClusterObjectFieldDescriptor(Label="currentScheduleHandle", Tag=1, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="previousScheduleHandle", Tag=0, Type=typing.Union[None, Nullable, bytes]),
+                        ClusterObjectFieldDescriptor(Label="currentScheduleHandle", Tag=1, Type=typing.Union[Nullable, bytes]),
                     ])
 
-            previousScheduleHandle: typing.Optional[bytes] = None
-            currentScheduleHandle: bytes = b""
+            previousScheduleHandle: typing.Union[None, Nullable, bytes] = None
+            currentScheduleHandle: typing.Union[Nullable, bytes] = NullValue
 
         @dataclass
         class ActivePresetChange(ClusterEvent):
@@ -32751,12 +32751,12 @@ class Thermostat(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="previousPresetHandle", Tag=0, Type=typing.Optional[bytes]),
-                        ClusterObjectFieldDescriptor(Label="currentPresetHandle", Tag=1, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="previousPresetHandle", Tag=0, Type=typing.Union[None, Nullable, bytes]),
+                        ClusterObjectFieldDescriptor(Label="currentPresetHandle", Tag=1, Type=typing.Union[Nullable, bytes]),
                     ])
 
-            previousPresetHandle: typing.Optional[bytes] = None
-            currentPresetHandle: bytes = b""
+            previousPresetHandle: typing.Union[None, Nullable, bytes] = None
+            currentPresetHandle: typing.Union[Nullable, bytes] = NullValue
 
 
 @dataclass

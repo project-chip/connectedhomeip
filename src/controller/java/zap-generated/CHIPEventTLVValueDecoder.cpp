@@ -7653,12 +7653,19 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jobject value_currentLocalTemperature;
-            std::string value_currentLocalTemperatureClassName     = "java/lang/Integer";
-            std::string value_currentLocalTemperatureCtorSignature = "(I)V";
-            jint jnivalue_currentLocalTemperature                  = static_cast<jint>(cppValue.currentLocalTemperature);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                value_currentLocalTemperatureClassName.c_str(), value_currentLocalTemperatureCtorSignature.c_str(),
-                jnivalue_currentLocalTemperature, value_currentLocalTemperature);
+            if (cppValue.currentLocalTemperature.IsNull())
+            {
+                value_currentLocalTemperature = nullptr;
+            }
+            else
+            {
+                std::string value_currentLocalTemperatureClassName     = "java/lang/Integer";
+                std::string value_currentLocalTemperatureCtorSignature = "(I)V";
+                jint jnivalue_currentLocalTemperature = static_cast<jint>(cppValue.currentLocalTemperature.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    value_currentLocalTemperatureClassName.c_str(), value_currentLocalTemperatureCtorSignature.c_str(),
+                    jnivalue_currentLocalTemperature, value_currentLocalTemperature);
+            }
 
             jclass localTemperatureChangeStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(
@@ -7756,11 +7763,21 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 value_systemModeClassName.c_str(), value_systemModeCtorSignature.c_str(), jnivalue_systemMode, value_systemMode);
 
             jobject value_occupancy;
-            std::string value_occupancyClassName     = "java/lang/Integer";
-            std::string value_occupancyCtorSignature = "(I)V";
-            jint jnivalue_occupancy                  = static_cast<jint>(cppValue.occupancy.Raw());
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                value_occupancyClassName.c_str(), value_occupancyCtorSignature.c_str(), jnivalue_occupancy, value_occupancy);
+            if (!cppValue.occupancy.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_occupancy);
+            }
+            else
+            {
+                jobject value_occupancyInsideOptional;
+                std::string value_occupancyInsideOptionalClassName     = "java/lang/Integer";
+                std::string value_occupancyInsideOptionalCtorSignature = "(I)V";
+                jint jnivalue_occupancyInsideOptional                  = static_cast<jint>(cppValue.occupancy.Value().Raw());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    value_occupancyInsideOptionalClassName.c_str(), value_occupancyInsideOptionalCtorSignature.c_str(),
+                    jnivalue_occupancyInsideOptional, value_occupancyInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_occupancyInsideOptional, value_occupancy);
+            }
 
             jobject value_previousSetpoint;
             if (!cppValue.previousSetpoint.HasValue())
@@ -7800,7 +7817,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             jmethodID setpointChangeStructCtor;
             err = chip::JniReferences::GetInstance().FindMethod(
                 env, setpointChangeStructClass, "<init>",
-                "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/lang/Integer;)V", &setpointChangeStructCtor);
+                "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/Integer;)V", &setpointChangeStructCtor);
             if (err != CHIP_NO_ERROR || setpointChangeStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$ThermostatClusterSetpointChangeEvent constructor");
@@ -7945,23 +7962,38 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             else
             {
                 jobject value_previousScheduleHandleInsideOptional;
-                jbyteArray value_previousScheduleHandleInsideOptionalByteArray =
-                    env->NewByteArray(static_cast<jsize>(cppValue.previousScheduleHandle.Value().size()));
-                env->SetByteArrayRegion(value_previousScheduleHandleInsideOptionalByteArray, 0,
-                                        static_cast<jsize>(cppValue.previousScheduleHandle.Value().size()),
-                                        reinterpret_cast<const jbyte *>(cppValue.previousScheduleHandle.Value().data()));
-                value_previousScheduleHandleInsideOptional = value_previousScheduleHandleInsideOptionalByteArray;
+                if (cppValue.previousScheduleHandle.Value().IsNull())
+                {
+                    value_previousScheduleHandleInsideOptional = nullptr;
+                }
+                else
+                {
+                    jbyteArray value_previousScheduleHandleInsideOptionalByteArray =
+                        env->NewByteArray(static_cast<jsize>(cppValue.previousScheduleHandle.Value().Value().size()));
+                    env->SetByteArrayRegion(
+                        value_previousScheduleHandleInsideOptionalByteArray, 0,
+                        static_cast<jsize>(cppValue.previousScheduleHandle.Value().Value().size()),
+                        reinterpret_cast<const jbyte *>(cppValue.previousScheduleHandle.Value().Value().data()));
+                    value_previousScheduleHandleInsideOptional = value_previousScheduleHandleInsideOptionalByteArray;
+                }
                 chip::JniReferences::GetInstance().CreateOptional(value_previousScheduleHandleInsideOptional,
                                                                   value_previousScheduleHandle);
             }
 
             jobject value_currentScheduleHandle;
-            jbyteArray value_currentScheduleHandleByteArray =
-                env->NewByteArray(static_cast<jsize>(cppValue.currentScheduleHandle.size()));
-            env->SetByteArrayRegion(value_currentScheduleHandleByteArray, 0,
-                                    static_cast<jsize>(cppValue.currentScheduleHandle.size()),
-                                    reinterpret_cast<const jbyte *>(cppValue.currentScheduleHandle.data()));
-            value_currentScheduleHandle = value_currentScheduleHandleByteArray;
+            if (cppValue.currentScheduleHandle.IsNull())
+            {
+                value_currentScheduleHandle = nullptr;
+            }
+            else
+            {
+                jbyteArray value_currentScheduleHandleByteArray =
+                    env->NewByteArray(static_cast<jsize>(cppValue.currentScheduleHandle.Value().size()));
+                env->SetByteArrayRegion(value_currentScheduleHandleByteArray, 0,
+                                        static_cast<jsize>(cppValue.currentScheduleHandle.Value().size()),
+                                        reinterpret_cast<const jbyte *>(cppValue.currentScheduleHandle.Value().data()));
+                value_currentScheduleHandle = value_currentScheduleHandleByteArray;
+            }
 
             jclass activeScheduleChangeStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(
@@ -8002,22 +8034,37 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             else
             {
                 jobject value_previousPresetHandleInsideOptional;
-                jbyteArray value_previousPresetHandleInsideOptionalByteArray =
-                    env->NewByteArray(static_cast<jsize>(cppValue.previousPresetHandle.Value().size()));
-                env->SetByteArrayRegion(value_previousPresetHandleInsideOptionalByteArray, 0,
-                                        static_cast<jsize>(cppValue.previousPresetHandle.Value().size()),
-                                        reinterpret_cast<const jbyte *>(cppValue.previousPresetHandle.Value().data()));
-                value_previousPresetHandleInsideOptional = value_previousPresetHandleInsideOptionalByteArray;
+                if (cppValue.previousPresetHandle.Value().IsNull())
+                {
+                    value_previousPresetHandleInsideOptional = nullptr;
+                }
+                else
+                {
+                    jbyteArray value_previousPresetHandleInsideOptionalByteArray =
+                        env->NewByteArray(static_cast<jsize>(cppValue.previousPresetHandle.Value().Value().size()));
+                    env->SetByteArrayRegion(value_previousPresetHandleInsideOptionalByteArray, 0,
+                                            static_cast<jsize>(cppValue.previousPresetHandle.Value().Value().size()),
+                                            reinterpret_cast<const jbyte *>(cppValue.previousPresetHandle.Value().Value().data()));
+                    value_previousPresetHandleInsideOptional = value_previousPresetHandleInsideOptionalByteArray;
+                }
                 chip::JniReferences::GetInstance().CreateOptional(value_previousPresetHandleInsideOptional,
                                                                   value_previousPresetHandle);
             }
 
             jobject value_currentPresetHandle;
-            jbyteArray value_currentPresetHandleByteArray =
-                env->NewByteArray(static_cast<jsize>(cppValue.currentPresetHandle.size()));
-            env->SetByteArrayRegion(value_currentPresetHandleByteArray, 0, static_cast<jsize>(cppValue.currentPresetHandle.size()),
-                                    reinterpret_cast<const jbyte *>(cppValue.currentPresetHandle.data()));
-            value_currentPresetHandle = value_currentPresetHandleByteArray;
+            if (cppValue.currentPresetHandle.IsNull())
+            {
+                value_currentPresetHandle = nullptr;
+            }
+            else
+            {
+                jbyteArray value_currentPresetHandleByteArray =
+                    env->NewByteArray(static_cast<jsize>(cppValue.currentPresetHandle.Value().size()));
+                env->SetByteArrayRegion(value_currentPresetHandleByteArray, 0,
+                                        static_cast<jsize>(cppValue.currentPresetHandle.Value().size()),
+                                        reinterpret_cast<const jbyte *>(cppValue.currentPresetHandle.Value().data()));
+                value_currentPresetHandle = value_currentPresetHandleByteArray;
+            }
 
             jclass activePresetChangeStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(

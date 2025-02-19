@@ -22,7 +22,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ThermostatClusterLocalTemperatureChangeEvent(val currentLocalTemperature: Int) {
+class ThermostatClusterLocalTemperatureChangeEvent(val currentLocalTemperature: Int?) {
   override fun toString(): String = buildString {
     append("ThermostatClusterLocalTemperatureChangeEvent {\n")
     append("\tcurrentLocalTemperature : $currentLocalTemperature\n")
@@ -32,7 +32,11 @@ class ThermostatClusterLocalTemperatureChangeEvent(val currentLocalTemperature: 
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_CURRENT_LOCAL_TEMPERATURE), currentLocalTemperature)
+      if (currentLocalTemperature != null) {
+        put(ContextSpecificTag(TAG_CURRENT_LOCAL_TEMPERATURE), currentLocalTemperature)
+      } else {
+        putNull(ContextSpecificTag(TAG_CURRENT_LOCAL_TEMPERATURE))
+      }
       endStructure()
     }
   }
@@ -43,7 +47,12 @@ class ThermostatClusterLocalTemperatureChangeEvent(val currentLocalTemperature: 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterLocalTemperatureChangeEvent {
       tlvReader.enterStructure(tlvTag)
       val currentLocalTemperature =
-        tlvReader.getInt(ContextSpecificTag(TAG_CURRENT_LOCAL_TEMPERATURE))
+        if (!tlvReader.isNull()) {
+          tlvReader.getInt(ContextSpecificTag(TAG_CURRENT_LOCAL_TEMPERATURE))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_LOCAL_TEMPERATURE))
+          null
+        }
 
       tlvReader.exitContainer()
 

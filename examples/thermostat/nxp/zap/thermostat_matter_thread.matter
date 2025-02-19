@@ -1646,7 +1646,7 @@ cluster UserLabel = 65 {
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
-  revision 7;
+  revision 9;
 
   enum ACCapacityFormatEnum : enum8 {
     kBTUh = 0;
@@ -1879,7 +1879,7 @@ cluster Thermostat = 513 {
   }
 
   info event LocalTemperatureChange = 1 {
-    temperature currentLocalTemperature = 0;
+    nullable temperature currentLocalTemperature = 0;
   }
 
   info event OccupancyChange = 2 {
@@ -1889,7 +1889,7 @@ cluster Thermostat = 513 {
 
   info event SetpointChange = 3 {
     SystemModeEnum systemMode = 0;
-    OccupancyBitmap occupancy = 1;
+    optional OccupancyBitmap occupancy = 1;
     optional temperature previousSetpoint = 2;
     temperature currentSetpoint = 3;
   }
@@ -1905,13 +1905,13 @@ cluster Thermostat = 513 {
   }
 
   info event ActiveScheduleChange = 6 {
-    optional octet_string previousScheduleHandle = 0;
-    octet_string currentScheduleHandle = 1;
+    optional nullable octet_string previousScheduleHandle = 0;
+    nullable octet_string currentScheduleHandle = 1;
   }
 
   info event ActivePresetChange = 7 {
-    optional octet_string previousPresetHandle = 0;
-    octet_string currentPresetHandle = 1;
+    optional nullable octet_string previousPresetHandle = 0;
+    nullable octet_string currentPresetHandle = 1;
   }
 
   readonly attribute nullable temperature localTemperature = 0;

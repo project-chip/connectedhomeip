@@ -7590,7 +7590,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _currentLocalTemperature = @(0);
+        _currentLocalTemperature = nil;
     }
     return self;
 }
@@ -7649,7 +7649,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _systemMode = @(0);
 
-        _occupancy = @(0);
+        _occupancy = nil;
 
         _previousSetpoint = nil;
 
@@ -7745,7 +7745,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _previousScheduleHandle = nil;
 
-        _currentScheduleHandle = [NSData data];
+        _currentScheduleHandle = nil;
     }
     return self;
 }
@@ -7775,7 +7775,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _previousPresetHandle = nil;
 
-        _currentPresetHandle = [NSData data];
+        _currentPresetHandle = nil;
     }
     return self;
 }

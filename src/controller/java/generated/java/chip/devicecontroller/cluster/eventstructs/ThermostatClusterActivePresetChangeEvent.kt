@@ -24,8 +24,8 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ThermostatClusterActivePresetChangeEvent(
-  val previousPresetHandle: Optional<ByteArray>,
-  val currentPresetHandle: ByteArray,
+  val previousPresetHandle: Optional<ByteArray>?,
+  val currentPresetHandle: ByteArray?,
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterActivePresetChangeEvent {\n")
@@ -37,11 +37,19 @@ class ThermostatClusterActivePresetChangeEvent(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      if (previousPresetHandle.isPresent) {
-        val optpreviousPresetHandle = previousPresetHandle.get()
-        put(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE), optpreviousPresetHandle)
+      if (previousPresetHandle != null) {
+        if (previousPresetHandle.isPresent) {
+          val optpreviousPresetHandle = previousPresetHandle.get()
+          put(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE), optpreviousPresetHandle)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE))
       }
-      put(ContextSpecificTag(TAG_CURRENT_PRESET_HANDLE), currentPresetHandle)
+      if (currentPresetHandle != null) {
+        put(ContextSpecificTag(TAG_CURRENT_PRESET_HANDLE), currentPresetHandle)
+      } else {
+        putNull(ContextSpecificTag(TAG_CURRENT_PRESET_HANDLE))
+      }
       endStructure()
     }
   }
@@ -53,13 +61,23 @@ class ThermostatClusterActivePresetChangeEvent(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterActivePresetChangeEvent {
       tlvReader.enterStructure(tlvTag)
       val previousPresetHandle =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE))) {
-          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE)))
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE))) {
+            Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE)))
+          } else {
+            Optional.empty()
+          }
         } else {
-          Optional.empty()
+          tlvReader.getNull(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE))
+          null
         }
       val currentPresetHandle =
-        tlvReader.getByteArray(ContextSpecificTag(TAG_CURRENT_PRESET_HANDLE))
+        if (!tlvReader.isNull()) {
+          tlvReader.getByteArray(ContextSpecificTag(TAG_CURRENT_PRESET_HANDLE))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_PRESET_HANDLE))
+          null
+        }
 
       tlvReader.exitContainer()
 

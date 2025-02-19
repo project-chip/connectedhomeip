@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (c) 2021 Project CHIP Authors
+Copyright (c) 2021-2025 Project CHIP Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -265,7 +265,7 @@ limitations under the License.
     <define>THERMOSTAT_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="7"/>
+    <globalAttribute side="either" code="0xFFFD" value="9"/>
     <features>
       <feature bit="0" code="HEAT" name="Heating" summary="Thermostat is capable of managing a heating device">
         <otherwiseConform>
@@ -690,40 +690,44 @@ limitations under the License.
       <arg id="2" name="Timeout" type="int16u" optional="true"/>
     </command>
 
-    <event code="0x0000" name="SystemModeChange" priority="info" side="server" apiMaturity="provisional">
+    <event code="0x0000" name="SystemModeChange" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>This event SHALL be generated when the SystemMode attribute changes.</description>
-      <field id="0" name="PreviousSystemMode" type="SystemModeEnum" optional="true"/>
-      <field id="1" name="CurrentSystemMode" type="SystemModeEnum"/>
+      <field id="0" name="PreviousSystemMode" type="SystemModeEnum" optional="true" min="0x00" max="0x09"/>
+      <field id="1" name="CurrentSystemMode" type="SystemModeEnum" min="0x00" max="0x09"/>
       <mandatoryConform>
         <feature name="TEVT"/>
       </mandatoryConform>
     </event>
 
-    <event code="0x0001" name="LocalTemperatureChange" priority="info" side="server" apiMaturity="provisional">
-      <description>This field SHALL indicate the current value of the LocalTemperature attribute.</description>
-      <field id="0" name="CurrentLocalTemperature" type="temperature"/>
+    <event code="0x0001" name="LocalTemperatureChange" priority="info" side="server" apiMaturity="provisional" optional="true">
+      <description>This event SHALL be generated when the LocalTemperature attribute changes significantly.</description>
+      <field id="0" name="CurrentLocalTemperature" type="temperature" isNullable="true"/>
       <mandatoryConform>
-        <feature name="TEVT"/>
-        <notTerm>
-          <feature name="LTNE"/>
-        </notTerm>
+        <andTerm>
+          <feature name="TEVT"/>
+          <notTerm>
+            <feature name="LTNE"/>
+          </notTerm>
+        </andTerm>
       </mandatoryConform>
     </event>
 
-    <event code="0x0002" name="OccupancyChange" priority="info" side="server" apiMaturity="provisional">
+    <event code="0x0002" name="OccupancyChange" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>This event SHALL be generated when the Occupancy attribute changes.</description>
-      <field id="0" name="PreviousOccupancy" type="OccupancyBitmap" optional="true"/>
-      <field id="1" name="CurrentOccupancy" type="OccupancyBitmap"/>
+      <field id="0" name="PreviousOccupancy" type="OccupancyBitmap" optional="true" min="0x00" max="0x01"/>
+      <field id="1" name="CurrentOccupancy" type="OccupancyBitmap" min="0x00" max="0x01"/>
       <mandatoryConform>
-        <feature name="TEVT"/>
-        <feature name="OCC"/>
+        <andTerm>
+          <feature name="TEVT"/>
+          <feature name="OCC"/>
+        </andTerm>
       </mandatoryConform>
     </event>
 
-    <event code="0x0003" name="SetpointChange" priority="info" side="server" apiMaturity="provisional">
-      <description>This event SHALL be generated when the value of any of the OccupiedHeatingSetpoint, UnoccupiedHeatingSetpoint>>, OccupiedCoolingSetpoint, or UnoccupiedCoolingSetpoint attributes is changed</description>
-      <field id="0" name="SystemMode" type="SystemModeEnum"/>
-      <field id="1" name="Occupancy" type="OccupancyBitmap"/>
+    <event code="0x0003" name="SetpointChange" priority="info" side="server" apiMaturity="provisional" optional="true">
+      <description>This event SHALL be generated when the value of any of the OccupiedHeatingSetpoint, UnoccupiedHeatingSetpoint, OccupiedCoolingSetpoint, or UnoccupiedCoolingSetpoint attributes is changed.</description>
+      <field id="0" name="SystemMode" type="SystemModeEnum" min="0x00" max="0x09"/>
+      <field id="1" name="Occupancy" type="OccupancyBitmap" optional="true" default="0x01" min="0x00" max="0x01"/>
       <field id="2" name="PreviousSetpoint" type="temperature" optional="true"/>
       <field id="3" name="CurrentSetpoint" type="temperature"/>
       <mandatoryConform>
@@ -731,42 +735,50 @@ limitations under the License.
       </mandatoryConform>
     </event>
 
-    <event code="0x0004" name="RunningStateChange" priority="info" side="server" apiMaturity="provisional">
+    <event code="0x0004" name="RunningStateChange" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>This event SHALL be generated when the ThermostatRunningState attribute changes.</description>
-      <field id="0" name="PreviousRunningState" type="RelayStateBitmap" optional="true"/>
-      <field id="1" name="CurrentRunningState" type="RelayStateBitmap"/>
+      <field id="0" name="PreviousRunningState" type="RelayStateBitmap" optional="true" min="0x0000" max="0x007F"/>
+      <field id="1" name="CurrentRunningState" type="RelayStateBitmap" min="0x0000" max="0x007F"/>
       <mandatoryConform>
         <feature name="TEVT"/>
       </mandatoryConform>
     </event>
 
-    <event code="0x0005" name="RunningModeChange" priority="info" side="server" apiMaturity="provisional">
+    <event code="0x0005" name="RunningModeChange" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>This event SHALL be generated when the ThermostatRunningMode attribute changes.</description>
-      <field id="0" name="PreviousRunningMode" type="ThermostatRunningModeEnum" optional="true"/>
-      <field id="1" name="CurrentRunningMode" type="ThermostatRunningModeEnum"/>
+      <field id="0" name="PreviousRunningMode" type="ThermostatRunningModeEnum" optional="true" min="0x00" max="0x04"/>
+      <field id="1" name="CurrentRunningMode" type="ThermostatRunningModeEnum" min="0x00" max="0x04"/>
       <mandatoryConform>
-        <feature name="TEVT"/>
+        <andTerm>
+          <feature name="TEVT"/>
+          <feature name="AUTO"/>
+        </andTerm>
       </mandatoryConform>
     </event>
 
-    <event code="0x0006" name="ActiveScheduleChange" priority="info" side="server" apiMaturity="provisional">
+    <event code="0x0006" name="ActiveScheduleChange" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>This event SHALL be generated when the ActiveScheduleHandle attribute changes.</description>
-      <field id="0" name="PreviousScheduleHandle" type="octet_string" optional="true"/>
-      <field id="1" name="CurrentScheduleHandle" type="octet_string"/>
+      <field id="0" name="PreviousScheduleHandle" type="octet_string" optional="true" isNullable="true" length="16"/>
+      <field id="1" name="CurrentScheduleHandle" type="octet_string" isNullable="true" length="16"/>
       <mandatoryConform>
-        <feature name="TEVT"/>
-        <feature name="MSCH"/>
+        <andTerm>
+          <feature name="TEVT"/>
+          <feature name="MSCH"/>
+        </andTerm>
       </mandatoryConform>
     </event>
 
-    <event code="0x0007" name="ActivePresetChange" priority="info" side="server" apiMaturity="provisional">
+    <event code="0x0007" name="ActivePresetChange" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>This event SHALL be generated when the ActivePresetHandle attribute changes.</description>
-      <field id="0" name="PreviousPresetHandle" type="octet_string" optional="true"/>
-      <field id="1" name="CurrentPresetHandle" type="octet_string"/>
+      <field id="0" name="PreviousPresetHandle" type="octet_string" optional="true" isNullable="true" length="16"/>
+      <field id="1" name="CurrentPresetHandle" type="octet_string" isNullable="true" length="16"/>
       <mandatoryConform>
-        <feature name="TEVT"/>
-        <feature name="PRES"/>
+        <andTerm>
+          <feature name="TEVT"/>
+          <feature name="PRES"/>
+        </andTerm>
       </mandatoryConform>
     </event>
+
   </cluster>
 </configurator>
