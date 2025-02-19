@@ -300,7 +300,7 @@ def fetch_crl_from_url(url: str, timeout: int) -> x509.CertificateRevocationList
         logging.error('Failed to fetch a valid CRL', e)
 
 
-class DCLDClientInterface:
+class DclClientInterface:
     '''
     An interface for interacting with DCLD.
     '''
@@ -345,7 +345,7 @@ class DCLDClientInterface:
 
     def get_approved_certificate(self, subject_name: x509.name.Name, skid_hex: str) -> tuple[bool, x509.Certificate]:
         '''
-        Get certificate from DCL
+        Get certificate from DCL.
         '''
         raise NotImplementedError
 
@@ -373,7 +373,6 @@ class DCLDClientInterface:
         paa_certificate = None
         while not paa_certificate:
             try:
-                # akid_hex = akid.hex().upper()
                 is_root, issuer_certificate = self.get_approved_certificate(issuer_name, akid)
                 if is_root:
                     paa_certificate = issuer_certificate
@@ -408,23 +407,23 @@ class DCLDClientInterface:
         return ':'.join([skid_hex[i:i+2] for i in range(0, len(skid_hex), 2)])
 
 
-class NodeDCLDClient(DCLDClientInterface):
+class NodeDclClient(DclClientInterface):
     '''
     A client for interacting with DCLD using command line interface (CLI).
     '''
 
-    def __init__(self, dcld_exe: str, production: bool):
+    def __init__(self, dcld_exe: str, use_test_net: bool):
         '''
         Initialize the client.
 
         dcld_exe: str
             Path to `dcld` executable.
-        production: bool
-            Use MainNet DCL URL with dcld executable.
+         use_test_net: bool
+            Indicates if the client should use TestNet or MainNet URL with dcld executable.
         '''
 
         self.dcld_exe = dcld_exe
-        self.production = production
+        self.use_test_net = use_test_net
 
     def build_dcld_command_line(self, cmdlist: list[str]) -> list[str]:
         '''
@@ -441,7 +440,7 @@ class NodeDCLDClient(DCLDClientInterface):
             The complete command list including the DCLD executable and node option if in production.
         '''
 
-        return [self.dcld_exe] + cmdlist + (['--node', PRODUCTION_NODE_URL] if self.production else [])
+        return [self.dcld_exe] + cmdlist + ([] if self.use_test_net else ['--node', PRODUCTION_NODE_URL])
 
     def get_dcld_cmd_output_json(self, cmdlist: list[str]) -> dict:
         '''
@@ -522,19 +521,19 @@ class NodeDCLDClient(DCLDClientInterface):
         return self.get_only_approved_certificate(response, skid_hex)
 
 
-class RESTDCLDClient(DCLDClientInterface):
+class RestDclClient(DclClientInterface):
     '''
     A client for interacting with DCLD using the REST API.
     '''
 
-    def __init__(self, production: bool):
+    def __init__(self, use_test_net: bool):
         '''
         Initialize the client.
 
-        production: bool
-            Indicates if the client should use MainNet or TestNet REST API URL.
+        use_test_net: bool
+            Indicates if the client should use TestNet or MainNet REST API URL.
         '''
-        self.rest_node_url = PRODUCTION_NODE_URL_REST if production else TEST_NODE_URL_REST
+        self.rest_node_url = TEST_NODE_URL_REST if use_test_net else PRODUCTION_NODE_URL_REST
 
     def get_revocation_points(self) -> list[dict]:
         '''
@@ -593,7 +592,7 @@ class RESTDCLDClient(DCLDClientInterface):
         return self.get_only_approved_certificate(response, skid_hex)
 
 
-class LocalFilesDCLDClient(DCLDClientInterface):
+class LocalFilesDclClient(DclClientInterface):
     '''
     A client for interacting with local DLCD response data.
     '''
@@ -636,10 +635,29 @@ class LocalFilesDCLDClient(DCLDClientInterface):
         base64_name = get_b64_name(certificate.subject)
         try:
             skid = get_skid(certificate)
-            skid_hex_formatted = self.get_formatted_hex_skid(skid)
-            return base64_name + skid_hex_formatted
+            return self.format_lookup_key(base64_name, skid)
         except ExtensionNotFound:
             logging.warning("CertificateSKID not found, continue...")
+    
+    def format_lookup_key(self, base64_name: str, skid_hex: str) -> str:
+        '''
+        Get formatted key used in this class to lookup certificates.
+
+        Parameters
+        ----------
+        base64_name: str
+            Base64 encoded subject name.
+        skid_hex: str
+            Subject Key ID in hex format.
+
+        Returns
+        -------
+        str:
+            Key used in this class to lookup certificates.
+        '''
+        delimiter = '/'
+        skid_hex_formatted = self.get_formatted_hex_skid(skid_hex)
+        return delimiter.join([base64_name, skid_hex_formatted])
 
     def get_crls(self, unread_crls: []) -> list[x509.CertificateRevocationList]:
         '''
@@ -743,9 +761,7 @@ class LocalFilesDCLDClient(DCLDClientInterface):
         tuple[bool, x509.Certificate]
             Tuple of is_paa and the certificate from the DCL.
         '''
-        subject_name_b64 = get_b64_name(subject_name)
-        skid_hex_formatted = self.get_formatted_hex_skid(skid_hex)
-        lookup_key = subject_name_b64 + skid_hex_formatted
+        lookup_key = self.format_lookup_key(get_b64_name(subject_name), skid_hex)
         if lookup_key in self.authoritative_certs:
             return is_self_signed_certificate(self.authoritative_certs[lookup_key]), self.authoritative_certs[lookup_key]
         return False, None
@@ -808,11 +824,11 @@ def from_dcl(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: 
     )
 
     if use_local_data:
-        dcld_client = LocalFilesDCLDClient(crls, certificates, revocation_points_response)
+        dcld_client = LocalFilesDclClient(crls, certificates, revocation_points_response)
     elif use_main_net_http or use_test_net_http:
-        dcld_client = RESTDCLDClient(True if use_main_net_http else False)
+        dcld_client = RestDclClient(True if use_test_net_http else False)
     else:
-        dcld_client = NodeDCLDClient(use_main_net_dcld or use_test_net_dcld, True if use_main_net_dcld else False)
+        dcld_client = NodeDclClient(use_main_net_dcld or use_test_net_dcld, True if use_test_net_dcld else False)
 
     revocation_point_list = dcld_client.get_revocation_points()
     revocation_set = []
@@ -929,7 +945,12 @@ def from_dcl(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: 
 @click.option('--output', default='revocation_set.json', type=click.File('w'), help='Output filename (default: revocation_set.json)')
 @click.option('--is-paa', default=False, is_flag=True, help='Indicates if the CRL issuer is the PAA')
 def from_crl(crl, crl_signer, delegator, paa, output, is_paa):
-    """Generate revocation set from a single CRL file. This does NOT run the full validation algorithm."""
+    '''
+    Generate revocation set from a single CRL file for a single authority (PAA or PAI) without the need
+    to create a fake get-revocation-points json response file. This does NOT run the full validation algorithm
+    from Matter Spec section 6.2.4.1. To extract the complete revocation set for a PAA and one or more PAI(s)
+    and test against the full algorithm use the `from-dcl`command with the `--use-local-data` flag instead.
+    '''
     crl = x509.load_pem_x509_crl(crl.read())
     crl_signer = x509.load_pem_x509_certificate(crl_signer.read())
     delegator = x509.load_pem_x509_certificate(delegator.read()) if delegator else None
