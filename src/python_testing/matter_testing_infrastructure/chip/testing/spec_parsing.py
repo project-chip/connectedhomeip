@@ -141,24 +141,8 @@ class XmlDeviceTypeClusterRequirements:
         return f'{self.name}: {str(self.conformance)}'
 
 """
-Location, XML namespaces, and XML Tags implementation below this line
+XML namespaces and XML Tags dataclass implementation below this line
 """
-'''
-@dataclass
-class Location:
-    """Represents a location in a source file for error reporting"""
-    def __init__(self, file: str = "", line: int = 0):
-        self.file = file
-        self.line = line
-
-    def __str__(self):
-        if self.file and self.line:
-            return f"{self.file}:{self.line}"
-        elif self.file:
-            return self.file
-        return ""
-'''
-
 @dataclass
 class XmlNamespace:
     """Represents a namespace definition from XML"""
