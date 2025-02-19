@@ -72,24 +72,28 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
 
 - (void)_updateRegistrationInfo
 {
-    NSMutableDictionary * registrationInfo = [NSMutableDictionary dictionary];
+    dispatch_async(self.workQueue, ^{
+        std::lock_guard lock(*self.deviceMapLock);
 
-    NSMutableDictionary * controllerContext = [NSMutableDictionary dictionary];
-    NSMutableArray * nodeIDs = [NSMutableArray array];
+        NSMutableDictionary * registrationInfo = [NSMutableDictionary dictionary];
 
-    for (NSNumber * nodeID in [self.nodeIDToDeviceMap keyEnumerator]) {
-        MTRDevice * device = [self _deviceForNodeID:nodeID createIfNeeded:NO];
-        if ([device delegateExists]) {
-            NSMutableDictionary * nodeDictionary = [NSMutableDictionary dictionary];
-            MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDKey, nodeID, nodeDictionary)
+        NSMutableDictionary * controllerContext = [NSMutableDictionary dictionary];
+        NSMutableArray * nodeIDs = [NSMutableArray array];
 
-            [nodeIDs addObject:nodeDictionary];
+        for (NSNumber * nodeID in [self.nodeIDToDeviceMap keyEnumerator]) {
+            MTRDevice * device = self.nodeIDToDeviceMap[nodeID];
+            if ([device delegateExists]) {
+                NSMutableDictionary * nodeDictionary = [NSMutableDictionary dictionary];
+                MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDKey, nodeID, nodeDictionary)
+
+                [nodeIDs addObject:nodeDictionary];
+            }
         }
-    }
-    MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDsKey, nodeIDs, registrationInfo)
-    MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationControllerContextKey, controllerContext, registrationInfo)
+        MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDsKey, nodeIDs, registrationInfo)
+        MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationControllerContextKey, controllerContext, registrationInfo)
 
-    [self updateControllerConfiguration:registrationInfo];
+        [self updateControllerConfiguration:registrationInfo];
+    });
 }
 
 - (void)_registerNodeID:(NSNumber *)nodeID
