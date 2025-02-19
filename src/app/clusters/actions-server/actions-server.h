@@ -138,28 +138,18 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
     /**
-     * Update an existing action in the action list for the given endpoint.
-     * If the action with the given actionID doesn't exist, returns CHIP_ERROR_NOT_FOUND.
+     * A notification from an application to the sever that an ActionList is modified..
      *
      * @param aEndpoint The endpoint ID where the action should be updated
-     * @param aAction The action structure containing the updated action details
-     * @return CHIP_ERROR_INCORRECT_STATE if delegate is null
-     *         CHIP_ERROR_NOT_FOUND if action doesn't exist
-     *         CHIP_NO_ERROR if successful
      */
-    CHIP_ERROR ModifyActionList(EndpointId aEndpoint, const ActionStructStorage & aAction);
+    void ActionListModified(EndpointId aEndpoint);
 
     /**
-     * Update an existing endpoint list for the given endpoint.
-     * If the endpoint list with the given ID doesn't exist, returns CHIP_ERROR_NOT_FOUND.
+     * A notification from an application to the sever that an EndpointList is modified..
      *
-     * @param aEndpoint The endpoint ID where the endpoint list should be updated
-     * @param aEpList The endpoint list structure containing the updated list details
-     * @return CHIP_ERROR_INCORRECT_STATE if delegate is null
-     *         CHIP_ERROR_NOT_FOUND if endpoint list doesn't exist
-     *         CHIP_NO_ERROR if successful
+     * @param aEndpoint The endpoint ID where the action should be updated
      */
-    CHIP_ERROR ModifyEndpointList(EndpointId aEndpoint, const EndpointListStorage & aEpList);
+    void EndpointListModified(EndpointId aEndpoint);
 
 private:
     static ActionsServer sInstance;
@@ -170,7 +160,7 @@ private:
                                        const AttributeValueEncoder::ListEncodeHelper & aEncoder);
     CHIP_ERROR ReadEndpointListAttribute(const ConcreteReadAttributePath & aPath,
                                          const AttributeValueEncoder::ListEncodeHelper & aEncoder);
-    bool HaveActionWithId(EndpointId aEndpointId, uint16_t aActionId);
+    bool HaveActionWithId(EndpointId aEndpointId, uint16_t aActionId, uint16_t & aActionIndex);
 
     // TODO: We should move to non-global dirty marker.
     void MarkDirty(EndpointId aEndpointId, AttributeId aAttributeId)
@@ -227,26 +217,26 @@ public:
 
     /**
      * Check whether there is an action with the given actionId in the list of actions.
-     * @param actionId The action ID to search for.
+     * @param aActionId The action ID to search for.
+     * @param aActionIndex A reference to the index at which an action with matching aActionId.
      * @return Returns a true if matching action is found otherwise false.
      */
-    virtual bool HaveActionWithId(uint16_t actionId) = 0;
+    virtual bool HaveActionWithId(uint16_t aActionId, uint16_t & aActionIndex) = 0;
 
     /**
-     * On receipt of each and every command,
-     * the server shall generate a either StateChanged or ActionFailed event.
-     * If the command is not supproted by the action, Status::InvalidCommand shall be reported.
+     * The implementations of the Handle* command callbacks below are expected to call OnStateChanged or
+     * OnActionFailed as needed to generate the events required by the spec.
      */
 
     /**
-     * @brief Delegate should implement a handler to InstantAction.
+     * @brief Callback that will be called to handle an InstantAction command.
      * @param actionId The actionId of an action.
      * It should report Status::Success if successful and may report other Status codes if it fails.
      */
     virtual Protocols::InteractionModel::Status HandleInstantAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * @brief Delegate should implement a handler to InstantActionWithTransition.
+     * @brief Callback that will be called to handle an InstantActionWithTransition command.
      * @param actionId The actionId of an action.
      * @param transitionTime The time for transition from the current state to the new state.
      * It should report Status::Success if successful and may report other Status codes if it fails.
@@ -255,14 +245,14 @@ public:
                                                                                   Optional<uint32_t> invokeId) = 0;
 
     /**
-     * @brief Delegate should implement a handler to StartAction.
+     * @brief Callback that will be called to handle a StartAction command.
      * @param actionId The actionId of an action.
      * It should report Status::Success if successful and may report other Status codes if it fails.
      */
     virtual Protocols::InteractionModel::Status HandleStartAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * @brief Delegate should implement a handler to StartActionWithDuration.
+     * @brief Callback that will be called to handle a StartActionWithDuration command.
      * @param actionId The actionId of an action.
      * @param duration The time for which an action shall be in start state.
      * It should report Status::Success if successful and may report other Status codes if it fails.
@@ -271,21 +261,21 @@ public:
                                                                               Optional<uint32_t> invokeId) = 0;
 
     /**
-     * @brief Delegate should implement a handler to StopAction.
+     * @brief Callback that will be called to handle a StopAction command.
      * @param actionId The actionId of an action.
      * It should report Status::Success if successful and may report other Status codes if it fails.
      */
     virtual Protocols::InteractionModel::Status HandleStopAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * @brief Delegate should implement a handler to PauseAction.
+     * @brief Callback that will be called to handle a PauseAction command.
      * @param actionId The actionId of an action.
      * It should report Status::Success if successful and may report other Status codes if it fails.
      */
     virtual Protocols::InteractionModel::Status HandlePauseAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * @brief Delegate should implement a handler to PauseActionWithDuration.
+     * @brief Callback that will be called to handle a PauseActionWithDuration command.
      * @param actionId The actionId of an action.
      * @param duration The time for which an action shall be in pause state.
      * It should report Status::Success if successful and may report other Status codes if it fails.
@@ -294,21 +284,21 @@ public:
                                                                               Optional<uint32_t> invokeId) = 0;
 
     /**
-     * @brief Delegate should implement a handler to ResumeAction.
+     * @brief Callback that will be called to handle a ResumeAction command.
      * @param actionId The actionId of an action.
      * It should report Status::Success if successful and may report other Status codes if it fails.
      */
     virtual Protocols::InteractionModel::Status HandleResumeAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * @brief Delegate should implement a handler to EnableAction.
+     * @brief Callback that will be called to handle an EnableAction command.
      * @param actionId The actionId of an action.
      * It should report Status::Success if successful and may report other Status codes if it fails.
      */
     virtual Protocols::InteractionModel::Status HandleEnableAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * @brief Delegate should implement a handler to EnableActionWithDuration.
+     * @brief Callback that will be called to handle an EnableActionWithDuration command.
      * @param actionId The actionId of an action.
      * @param duration The time for which an action shall be in active state.
      * It should report Status::Success if successful and may report other Status codes if it fails.
@@ -317,14 +307,14 @@ public:
                                                                                Optional<uint32_t> invokeId) = 0;
 
     /**
-     * @brief Delegate should implement a handler to DisableAction.
+     * @brief Callback that will be called to handle a DisableAction command.
      * @param actionId The actionId of an action.
      * It should report Status::Success if successful and may report other Status codes if it fails.
      */
     virtual Protocols::InteractionModel::Status HandleDisableAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * @brief Delegate should implement a handler to DisableActionWithDuration.
+     * @brief Callback that will be called to handle a DisableActionWithDuration command.
      * @param actionId The actionId of an action.
      * @param duration The time for which an action shall be in disable state.
      * It should report Status::Success if successful and may report other Status codes if it fails.

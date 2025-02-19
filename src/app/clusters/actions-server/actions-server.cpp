@@ -165,11 +165,11 @@ CHIP_ERROR ActionsServer::ReadEndpointListAttribute(const ConcreteReadAttributeP
     return CHIP_NO_ERROR;
 }
 
-bool ActionsServer::HaveActionWithId(EndpointId aEndpointId, uint16_t aActionId)
+bool ActionsServer::HaveActionWithId(EndpointId aEndpointId, uint16_t aActionId, uint16_t & aActionIndex)
 {
     Delegate * delegate = GetDelegate(aEndpointId);
     VerifyOrReturnValue(ValidateDelegate(delegate, aEndpointId) == CHIP_NO_ERROR, false);
-    return delegate->HaveActionWithId(aActionId);
+    return delegate->HaveActionWithId(aActionId, aActionIndex);
 }
 
 template <typename RequestT, typename FuncT>
@@ -193,10 +193,25 @@ void ActionsServer::HandleCommand(HandlerContext & handlerContext, FuncT func)
             return;
         }
 
-        if (!HaveActionWithId(handlerContext.mRequestPath.mEndpointId, requestPayload.actionID))
+        uint16_t actionIndex = kMaxActionListLength;
+        if (!HaveActionWithId(handlerContext.mRequestPath.mEndpointId, requestPayload.actionID, actionIndex))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::NotFound);
             return;
+        }
+        if (actionIndex != kMaxActionListLength)
+        {
+            Delegate * delegate = GetDelegate(handlerContext.mRequestPath.mEndpointId);
+            ReturnOnFailure(ValidateDelegate(delegate, handlerContext.mRequestPath.mEndpointId));
+            ActionStructStorage action;
+            delegate->ReadActionAtIndex(actionIndex, action);
+            // Check if the command bit is set in the SupportedCommands of an ations.
+            if (!(action.supportedCommands.Raw() & (1 << handlerContext.mRequestPath.mCommandId)))
+            {
+                handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
+                                                         Protocols::InteractionModel::Status::InvalidCommand);
+                return;
+            }
         }
 
         func(handlerContext, requestPayload);
@@ -401,58 +416,16 @@ void ActionsServer::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
-CHIP_ERROR ActionsServer::ModifyActionList(EndpointId aEndpoint, const ActionStructStorage & aAction)
+void ActionsServer::ActionListModified(EndpointId aEndpoint)
 {
-    Delegate * delegate = GetDelegate(aEndpoint);
-    ReturnErrorOnFailure(ValidateDelegate(delegate, aEndpoint));
-
-    // Read through the list to find and update the existing action that matches the passed-in action's ID.
-    for (uint16_t i = 0; i < kMaxActionListLength; i++)
-    {
-        ActionStructStorage existingAction;
-        CHIP_ERROR err = delegate->ReadActionAtIndex(i, existingAction);
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-        {
-            break;
-        }
-
-        if (existingAction.actionID == aAction.actionID)
-        {
-            existingAction.Set(aAction.actionID, aAction.name, aAction.type, aAction.endpointListID, aAction.supportedCommands,
-                               aAction.state);
-
-            MarkDirty(aEndpoint, Attributes::ActionList::Id);
-            return CHIP_NO_ERROR;
-        }
-    }
-
-    return CHIP_ERROR_NOT_FOUND;
+    MarkDirty(aEndpoint, Attributes::ActionList::Id);
+    return;
 }
 
-CHIP_ERROR ActionsServer::ModifyEndpointList(EndpointId aEndpoint, const EndpointListStorage & aEpList)
+void ActionsServer::EndpointListModified(EndpointId aEndpoint)
 {
-    Delegate * delegate = GetDelegate(aEndpoint);
-    ReturnErrorOnFailure(ValidateDelegate(delegate, aEndpoint));
-
-    // Read through the list to find and update the existing action that matches the passed-in endpoint-list's ID
-    for (uint16_t i = 0; i < kMaxEndpointListLength; i++)
-    {
-        EndpointListStorage existingEpList;
-        CHIP_ERROR err = delegate->ReadEndpointListAtIndex(i, existingEpList);
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-        {
-            break;
-        }
-
-        if (existingEpList.endpointListID == aEpList.endpointListID)
-        {
-            existingEpList.Set(aEpList.endpointListID, aEpList.name, aEpList.type, aEpList.endpoints);
-            MarkDirty(aEndpoint, Attributes::EndpointLists::Id);
-            return CHIP_NO_ERROR;
-        }
-    }
-
-    return CHIP_ERROR_NOT_FOUND;
+    MarkDirty(aEndpoint, Attributes::EndpointLists::Id);
+    return;
 }
 
 void MatterActionsPluginServerInitCallback()
