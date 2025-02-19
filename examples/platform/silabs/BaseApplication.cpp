@@ -182,9 +182,6 @@ void BaseApplicationDelegate::OnCommissioningSessionStarted()
 
 #if SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
     WifiSleepManager::GetInstance().HandleCommissioningSessionStarted();
-    // Setting the device to high power mode during commissioning
-    // TODO: remove this once the packet drop issue is resolved
-    WifiSleepManager::GetInstance().RequestHighPerformance();
 #endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
 }
 
@@ -194,9 +191,6 @@ void BaseApplicationDelegate::OnCommissioningSessionStopped()
 
 #if SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
     WifiSleepManager::GetInstance().HandleCommissioningSessionStopped();
-    // Removing the high power mode request on session stopped
-    // TODO: remove this once the packet drop issue is resolved
-    WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
 #endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
 }
 
@@ -206,9 +200,6 @@ void BaseApplicationDelegate::OnCommissioningSessionEstablishmentError(CHIP_ERRO
 
 #if SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
     WifiSleepManager::GetInstance().HandleCommissioningSessionStopped();
-    // Removing the high power mode request on failed commissioning
-    // TODO: remove this once the packet drop issue is resolved
-    WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
 #endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
 }
 
@@ -925,9 +916,6 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
 
     case DeviceEventType::kCommissioningComplete: {
 #if SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
-        // DUT is commissioned, removing the High Performance request
-        // TODO: remove this once the packet drop issue is resolved
-        WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
         WifiSleepManager::GetInstance().VerifyAndTransitionToLowPowerMode(WifiSleepManager::PowerEvent::kCommissioningComplete);
 #endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
     }
