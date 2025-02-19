@@ -26,6 +26,8 @@
 #include <stdbool.h> // For bool
 #include <stdint.h>  // For various uint*_t types
 
+#include <app/util/AttributesChangedListener.h>
+#include <app/util/MarkAttributeDirty.h>
 #include <app/util/basic-types.h>
 #include <app/util/types_stub.h> // For various types.
 
@@ -280,30 +282,3 @@ typedef chip::Protocols::InteractionModel::Status (*EmberAfClusterPreAttributeCh
 #define MAX_INT16U_VALUE (0xFFFF)
 
 /** @} END addtogroup */
-
-namespace chip {
-namespace app {
-
-enum class MarkAttributeDirty
-{
-    kIfChanged,
-    kNo,
-    // kYes might need to be used if the attribute value was previously changed
-    // without reporting, and now is being set in a situation where we know
-    // reporting needs to be triggered (e.g. because QuieterReportingAttribute
-    // indicated that).
-    kYes,
-};
-
-/// Notification object of a specific path being changed
-class AttributesChangedListener
-{
-public:
-    virtual ~AttributesChangedListener() = default;
-
-    /// Called when the set of attributes identified by AttributePathParams (which may contain wildcards) is to be considered dirty.
-    virtual void MarkDirty(const AttributePathParams & path) = 0;
-};
-
-} // namespace app
-} // namespace chip
