@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "closure-control-cluster-objects.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
@@ -119,14 +120,14 @@ public:
      * @param aMainState The OverallState that should now be the current State.
      * @return CHIP_NO_ERROR if set was successful.
      */
-    CHIP_ERROR SetOverallState(const DataModel::Nullable<Structs::OverallStateStruct::Type> & aOverallState);
+    CHIP_ERROR SetOverallState(const GenericOverallState & aOverallState);
 
     /**
      * Set OverallTarget.
      * @param aMainState The OverallTarget that should be set.
      * @return CHIP_NO_ERROR if set was successful.
      */
-    CHIP_ERROR SetOverallTarget(const DataModel::Nullable<Structs::OverallTargetStruct::Type> & aOverallTarget);
+    CHIP_ERROR SetOverallTarget(const GenericOverallTarget & aOverallTarget);
 
     // Attribute getters
     /**
@@ -137,15 +138,15 @@ public:
 
     /**
      * Get OverallState.
-     * @return The OverallState.
+     * @return  The GenericOverallState to fill with the current Overall State
      */
-    DataModel::Nullable<Structs::OverallStateStruct::Type> GetOverallState() const;
+    GenericOverallState GetOverallState() const;
 
     /**
      * Get OverallTarget.
-     * @return The OverallTarget.
+     * @return The GenericOverallTarget to fill with the current Overall Target
      */
-    DataModel::Nullable<Structs::OverallTargetStruct::Type> GetOverallTarget() const;
+    GenericOverallTarget GetOverallTarget() const;
 
     /**
      * @brief Whenever application delegate wants to possibly report a new updated time,
@@ -180,8 +181,8 @@ private:
 
     app::QuieterReportingAttribute<uint32_t> mCountdownTime{ DataModel::NullNullable };
     MainStateEnum mMainState;
-    DataModel::Nullable<Structs::OverallStateStruct::Type> mOverallState;
-    DataModel::Nullable<Structs::OverallTargetStruct::Type> mOverallTarget;
+    GenericOverallState mOverallState;
+    GenericOverallTarget mOverallTarget;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
