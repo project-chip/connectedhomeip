@@ -46,11 +46,11 @@ CHIP_ERROR ActionsDelegateImpl::ReadEndpointListAtIndex(uint16_t index, Endpoint
 
 bool ActionsDelegateImpl::HaveActionWithId(uint16_t actionId, uint16_t & actionIndex)
 {
-    for (uint16_t i = 0; i < kEndpointList.size(); i++)
+    for (size_t i = 0; i < kEndpointList.size(); i++)
     {
         if (kActionList[i].actionID == actionId)
         {
-            actionIndex = i;
+            actionIndex = (uint16_t) i;
             return true;
         }
     }
