@@ -66,7 +66,7 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interacti
 class TC_IDM_4_2(MatterBaseTest):
 
     def steps_TC_IDM_4_2(self):
-        return [TestStep(1, "Commissioning already done.", is_commissioning=True),
+        return [TestStep(0, "Commissioning already done.", is_commissioning=True),
                 TestStep(1, "CR1 reads the ServerList attribute from the Descriptor cluster on EP0.",
                          "If the ICD Management cluster ID (70,0x46) is present, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = IdleModeDuration and min_interval_floor_s to 0, otherwise, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = 60 mins and min_interval_floor_s to 3."),
                 TestStep(2, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value greater than subscription_max_interval_publisher_limit_sec. DUT sends a report data action to the TH. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.",
