@@ -99,7 +99,7 @@ CHIP_ERROR Instance::SetOverallState(const GenericOverallState & aOverallState)
 {
     GenericOverallState oldOverallState = mOverallState;
     mOverallState = aOverallState;
-    
+
     // If the overall target state has changed, trigger the attribute change callback
     if (!oldOverallState.IsEqual(mOverallState))
     {

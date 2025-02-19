@@ -157,7 +157,7 @@ struct GenericOverallTarget : public Structs::OverallTargetStruct::Type
 
         return true;
     }
-}; 
+};
 
 } // namespace ClosureControl
 } // namespace Clusters
