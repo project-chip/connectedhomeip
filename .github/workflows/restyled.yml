@@ -30,7 +30,7 @@ jobs:
           !cancelled() &&
           steps.restyler.outputs.success == 'true' &&
           github.event.pull_request.head.repo.full_name == github.repository
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with:
           base: ${{ steps.restyler.outputs.restyled-base }}
           branch: ${{ steps.restyler.outputs.restyled-head }}

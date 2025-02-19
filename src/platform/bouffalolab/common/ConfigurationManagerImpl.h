@@ -70,7 +70,7 @@ private:
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-    CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override;
+    CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan & buf) override;
 #endif
 
     static void DoFactoryReset(intptr_t arg);

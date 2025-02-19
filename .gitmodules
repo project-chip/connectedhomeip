@@ -349,3 +349,8 @@
 	path = third_party/re2/src
 	url = https://github.com/google/re2.git
 	platforms = linux,darwin
+[submodule "third_party/libdatachannel/repo"]
+	path = third_party/libdatachannel/repo
+	url = https://github.com/paullouisageneau/libdatachannel.git
+	platforms = linux
+	recursive = true
