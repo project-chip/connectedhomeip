@@ -51,7 +51,6 @@ from chip.tlv import uint
 from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
 import chip.FabricAdmin  # Needed before chip.CertificateAuthority
 import chip.CertificateAuthority
-from chip.ChipDeviceCtrl import CommissioningParameters
 
 # isort: on
 from time import sleep
