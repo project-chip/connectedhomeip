@@ -6428,36 +6428,6 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::DecodableType & commandData);
 /**
- * @brief Closure Control Cluster Stop Command callback (from client)
- */
-bool emberAfClosureControlClusterStopCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClosureControl::Commands::Stop::DecodableType & commandData);
-/**
- * @brief Closure Control Cluster MoveTo Command callback (from client)
- */
-bool emberAfClosureControlClusterMoveToCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClosureControl::Commands::MoveTo::DecodableType & commandData);
-/**
- * @brief Closure Control Cluster Calibrate Command callback (from client)
- */
-bool emberAfClosureControlClusterCalibrateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClosureControl::Commands::Calibrate::DecodableType & commandData);
-/**
- * @brief Closure Control Cluster ConfigureFallback Command callback (from client)
- */
-bool emberAfClosureControlClusterConfigureFallbackCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClosureControl::Commands::ConfigureFallback::DecodableType & commandData);
-/**
- * @brief Closure Control Cluster CancelFallback Command callback (from client)
- */
-bool emberAfClosureControlClusterCancelFallbackCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClosureControl::Commands::CancelFallback::DecodableType & commandData);
-/**
  * @brief Thermostat Cluster SetpointRaiseLower Command callback (from client)
  */
 bool emberAfThermostatClusterSetpointRaiseLowerCallback(
