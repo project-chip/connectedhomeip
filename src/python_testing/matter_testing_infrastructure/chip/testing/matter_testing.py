@@ -653,6 +653,7 @@ class MatterTestConfig:
     timeout: typing.Union[int, None] = None
     endpoint: typing.Union[int, None] = 0
     app_pid: int = 0
+    pipe_name: typing.Union[str, None] = None
     fail_on_skipped_tests: bool = False
 
     commissioning_method: Optional[str] = None
@@ -966,10 +967,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         # List of accumulated problems across all tests
         self.problems = []
         self.is_commissioning = False
-        # The named pipe name must be set in the derived classes
-        self.app_pipe = None
-        # The app_pipe_pid pid must be set in the derived class
-        self.app_pipe_pid = None
 
     def get_test_steps(self, test: str) -> list[TestStep]:
         ''' Retrieves the test step list for the given test
@@ -1033,12 +1030,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         except AttributeError:
             return test
 
-    def get_default_app_pipe_name(self) -> str:
-        return self.app_pipe
-
-    def get_default_app_pipe_pid(self) -> int:
-        return self.app_pipe_pid
-
     def write_to_app_pipe(self, command_dict: dict, app_pipe_name: Optional[str] = None, app_pid: Optional[int] = None):
         """
         Send an out-of-band command to a Matter app.
@@ -1048,9 +1039,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             app_pid (Optional[uint], optional): pid of the process for app_pipe_name. Defaults to None.
 
         Extra:
-        Using parameter app_pipe_name replaces self.app_app_pipe_name.
-        Using parameter app-pid replaces self.app_pid.
-        Use the following environment variables:
+        By default app_pipe_name is taken from CI argument --app_pipe. Parameter (app_pipe_name) overwrites this value.
+        By default app_pid is taken from CI argument --app-pid. Parameter (app_pid) overwrites this value.
+
+        This method use the following environment variables:
 
          - LINUX_DUT_IP
             * if not provided, the Matter app is assumed to run on the same machine as the test,
@@ -1066,9 +1058,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
 
         if app_pipe_name is None:
-            app_pipe_name = self.get_default_app_pipe_name()
+            app_pipe_name = self.matter_test_config.app_pipe
         if app_pid is None:
-            app_pid = self.get_default_app_pipe_pid()
+            app_pid = self.matter_test_config.app_pid
 
         if not isinstance(app_pipe_name, str):
             raise TypeError("The named pipe must be provided as a string value")
@@ -1082,13 +1074,15 @@ class MatterBaseTest(base_test.BaseTestClass):
         import os
         dut_ip = os.getenv('LINUX_DUT_IP')
 
+        # Checks for concatenate app_pipe and app_pid
+        if not isinstance(app_pid, int):
+            raise TypeError("The --app-pid flag is not instance of int")
+        # Verify we have a valid app-id
+        if app_pid == 0:
+            asserts.fail("app_pid is 0 , is the flag --app-pid set?. app-id flag must be set in order to write to pipe.")
+        app_pipe_name = app_pipe_name + str(app_pid)
+
         if dut_ip is None:
-            if not isinstance(app_pid, int):
-                raise TypeError("The app_pid flag is not instance of int")
-            # Verify we have a valid app-id
-            if app_pid == 0:
-                asserts.fail("app_pid is 0 , is the flag --app-pid set?. app-id flag must be set in order to write to pipe.")
-            app_pipe_name = app_pipe_name + str(app_pid)
             if not os.path.exists(app_pipe_name):
                 # Named pipes are unique, so we MUST have consistent PID/paths
                 # Set up for them to work.
@@ -1981,6 +1975,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.app_pid = 0 if args.app_pid is None else args.app_pid
+    config.app_pipe = args.app_pipe
     config.fail_on_skipped_tests = args.fail_on_skipped
 
     config.controller_node_id = args.controller_node_id
@@ -2038,6 +2033,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
     basic_group.add_argument('--app-pid', type=int, default=0, help="The PID of the app against which the test is going to run")
+    basic_group.add_argument('--app-pipe', type=str, default=None, help="The path of the app to send an out-of-band command")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 
