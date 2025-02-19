@@ -15,21 +15,19 @@
 #    limitations under the License.
 #
 
-# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
-# for details about the block below.
-#
-# FIXME: https://github.com/project-chip/connectedhomeip/issues/36885
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${CHIP_MICROWAVE_OVEN_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -37,13 +35,10 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
 
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from modebase_cluster_check import ModeBaseClusterChecks
-
-logger = logging.getLogger(__name__)
 
 CLUSTER = Clusters.EnergyEvseMode
 
@@ -63,8 +58,6 @@ class TC_EEVSEM_1_2(MatterBaseTest, ModeBaseClusterChecks):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH reads from the DUT the SupportedModes attribute."),
             TestStep(3, "TH reads from the DUT the CurrentMode attribute."),
-            # TestStep(4, "TH reads from the DUT the OnMode attribute."),
-            # TestStep(5, "TH reads from the DUT the StartUpMode attribute.")
         ]
         return steps
 
@@ -85,10 +78,9 @@ class TC_EEVSEM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         self.step(2)
         # Verify common checks for Mode Base as described in the TC-EEVSEM-1.2
         supported_modes = await self.check_supported_modes_and_labels(endpoint=endpoint)
-        logger.info(f'Step #2: supported_modes({supported_modes})')
 
-        # According to the spec, there should be at least one Manual or Time of Use tag in
-        # the ones supported.
+        # According to the spec, there should be at least one Manual or Time of Use
+        # tag in the ones supported.
         additional_tags = [CLUSTER.Enums.ModeTag.kManual,
                            CLUSTER.Enums.ModeTag.kTimeOfUse]
         self.check_tags_in_lists(supported_modes=supported_modes, required_tags=additional_tags)
@@ -97,19 +89,6 @@ class TC_EEVSEM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         # Verify that the CurrentMode attribute has a valid value.
         mode = self.cluster.Attributes.CurrentMode
         await self.read_and_check_mode(endpoint=endpoint, mode=mode, supported_modes=supported_modes)
-        logger.info(f'Step #4: cluster Attributes({vars(self.cluster.Attributes)})')
-
-        # self.step(4)
-        # # Verify that the OnMode attribute has a valid value or null.
-        # mode = self.cluster.Attributes.OnMode
-        # await self.read_and_check_mode(endpoint=endpoint, mode=mode,
-        #                                supported_modes=supported_modes, is_nullable=True)
-
-        # self.step(5)
-        # # Verify that the StartUpMode has a valid value or null
-        # mode = self.cluster.Attributes.StartUpMode
-        # await self.read_and_check_mode(endpoint=endpoint, mode=mode,
-        #                                supported_modes=supported_modes, is_nullable=True)
 
 
 if __name__ == "__main__":
