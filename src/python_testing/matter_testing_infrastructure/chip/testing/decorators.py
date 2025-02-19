@@ -181,13 +181,9 @@ def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFla
     return partial(_has_feature, cluster=cluster, feature=feature)
 
 
-def _async_runner(body, self, *args, **kwargs):
-    # Import locally to avoid circular dependency
-    from chip.testing.matter_testing import MatterBaseTest
-    assert isinstance(self, MatterBaseTest)
-
-    timeout = getattr(self.matter_test_config, 'timeout', None) or self.default_timeout
-    return self.event_loop.run_until_complete(asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout))
+def _async_runner(body, test_instance, *args, **kwargs):
+    timeout = getattr(test_instance.matter_test_config, 'timeout', None) or test_instance.default_timeout
+    return test_instance.event_loop.run_until_complete(asyncio.wait_for(body(test_instance, *args, **kwargs), timeout=timeout))
 
 
 def async_test_body(body):
@@ -203,25 +199,25 @@ def async_test_body(body):
     return async_runner
 
 
-async def _get_all_matching_endpoints(self: "MatterBaseTest", accept_function: EndpointCheckFunction) -> list[int]:
+async def _get_all_matching_endpoints(test_instance, accept_function: EndpointCheckFunction) -> list[int]:
     """ Returns a list of endpoints matching the accept condition. """
-    wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
+    wildcard = await test_instance.default_controller.Read(test_instance.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
     matching = [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
     return matching
 
 
-async def should_run_test_on_endpoint(self: "MatterBaseTest", accept_function: EndpointCheckFunction) -> bool:
+async def should_run_test_on_endpoint(test_instance, accept_function: EndpointCheckFunction) -> bool:
     """ Helper function for the run_if_endpoint_matches decorator.
 
-        Returns True if self.matter_test_config.endpoint matches the accept function.
+        Returns True if test_instance.matter_test_config.endpoint matches the accept function.
     """
-    if self.matter_test_config.endpoint is None:
+    if test_instance.matter_test_config.endpoint is None:
         msg = """
               The --endpoint flag is required for this test.
               """
         asserts.fail(msg)
-    matching = await (_get_all_matching_endpoints(self, accept_function))
-    return self.matter_test_config.endpoint in matching
+    matching = await (_get_all_matching_endpoints(test_instance, accept_function))
+    return test_instance.matter_test_config.endpoint in matching
 
 
 def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction):
@@ -282,19 +278,15 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
         PICS values internally.
     """
     def run_if_endpoint_matches_internal(body):
-        def per_endpoint_runner(self: "MatterBaseTest", *args, **kwargs):
-            # Import locally to avoid circular dependency
-            from chip.testing.matter_testing import MatterBaseTest
-            assert isinstance(self, MatterBaseTest)
-
-            runner_with_timeout = asyncio.wait_for(should_run_test_on_endpoint(self, accept_function), timeout=60)
-            should_run_test = self.event_loop.run_until_complete(runner_with_timeout)
+        def per_endpoint_runner(test_instance, *args, **kwargs):
+            runner_with_timeout = asyncio.wait_for(should_run_test_on_endpoint(test_instance, accept_function), timeout=60)
+            should_run_test = test_instance.event_loop.run_until_complete(runner_with_timeout)
             if not should_run_test:
                 logging.info("Test is not applicable to this endpoint - skipping test")
                 asserts.skip('Endpoint does not match test requirements')
                 return
-            logging.info(f'Running test on endpoint {self.matter_test_config.endpoint}')
-            timeout = getattr(self.matter_test_config, 'timeout', None) or self.default_timeout
-            self.event_loop.run_until_complete(asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout))
+            logging.info(f'Running test on endpoint {test_instance.matter_test_config.endpoint}')
+            timeout = getattr(test_instance.matter_test_config, 'timeout', None) or test_instance.default_timeout
+            test_instance.event_loop.run_until_complete(asyncio.wait_for(body(test_instance, *args, **kwargs), timeout=timeout))
         return per_endpoint_runner
     return run_if_endpoint_matches_internal
