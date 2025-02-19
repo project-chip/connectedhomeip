@@ -104,15 +104,35 @@ enum class CommandQualityFlags : uint32_t
     kLargeMessage = 0x0004, // `L` quality on commands
 };
 
+
 struct AcceptedCommandEntry
 {
     CommandId commandId;
 
-    // TODO: this can be more compact (use some flags for privilege)
-    //       to make this compact, add a compact enum and make flags/invokePrivilege getters (to still be type safe)
-    BitFlags<CommandQualityFlags> flags;
-    Access::Privilege invokePrivilege = Access::Privilege::kOperate;
+
+    Access::Privilege GetInvokePrivilege() {
+        return static_cast<Access::Privilege>(flags & PrivilegeMask);
+    }
+
+    void SetInvokePrivilege(Access::Privilege privilege){
+        flags &= ~PrivilegeMask; 
+        flags |= static_cast<uint8_t>(privilege);
+    }
+    
+    BitFlags<CommandQualityFlags> GetQualityFlags(){
+        return static_cast<CommandQualityFlags>((flags & ~PrivilegeMask) >> 5}) ;
+    }
+
+    void SetQualityFlags(BitFlags<CommandQualityFlags> qflags){
+        flags &= PrivilegeMask; 
+        flags |= static_cast<uint8_t>(qflags.Raw()) << 5;
+    }
+
+private:
+    static constexpr uint8_t PrivilegeMask = 0b0001'1111;
+    uint8_t flags;
 };
+
 
 /// Represents a device type that resides on an endpoint
 struct DeviceTypeEntry
