@@ -95,17 +95,31 @@ CHIP_ERROR Instance::SetMainState(const MainStateEnum & aMainState)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::SetOverallState(const DataModel::Nullable<Structs::OverallStateStruct::Type> & aOverallState)
+CHIP_ERROR Instance::SetOverallState(const GenericOverallState & aOverallState)
 {
+    GenericOverallState oldOverallState = mOverallState;
     mOverallState = aOverallState;
-    MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), mClusterId, Attributes::OverallState::Id);
+    
+    // If the overall target state has changed, trigger the attribute change callback
+    if (!oldOverallState.IsEqual(mOverallState))
+    {
+        MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), mClusterId, Attributes::OverallState::Id);
+    }
+
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::SetOverallTarget(const DataModel::Nullable<Structs::OverallTargetStruct::Type> & aOverallTarget)
+CHIP_ERROR Instance::SetOverallTarget(const GenericOverallTarget & aOverallTarget)
 {
+    GenericOverallTarget oldOverallTarget = mOverallTarget;
     mOverallTarget = aOverallTarget;
-    MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), mClusterId, Attributes::OverallTarget::Id);
+
+    // If the overall target state has changed, trigger the attribute change callback
+    if (!oldOverallTarget.IsEqual(mOverallTarget))
+    {
+        MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), mClusterId, Attributes::OverallTarget::Id);
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -114,12 +128,12 @@ MainStateEnum Instance::GetMainState() const
     return mMainState;
 }
 
-DataModel::Nullable<Structs::OverallStateStruct::Type> Instance::GetOverallState() const
+GenericOverallState Instance::GetOverallState() const
 {
     return mOverallState;
 }
 
-DataModel::Nullable<Structs::OverallTargetStruct::Type> Instance::GetOverallTarget() const
+GenericOverallTarget Instance::GetOverallTarget() const
 {
     return mOverallTarget;
 }
