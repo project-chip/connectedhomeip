@@ -40,6 +40,7 @@ pw_python_package("chip-testing-module") {
     "chip/testing/choice_conformance.py",
     "chip/testing/conformance.py",
     "chip/testing/conversions.py",
+    "chip/testing/decorators.py",
     "chip/testing/global_attribute_ids.py",
     "chip/testing/matchers.py",
     "chip/testing/matter_asserts.py",
