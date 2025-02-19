@@ -126,7 +126,8 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         super().teardown_class()
 
     def steps_TC_MCORE_FS_1_1(self) -> list[TestStep]:
-        steps = [TestStep(1, "Enable Fabric Synchronization on DUT_FSA using the manufacturer specified mechanism.", is_commissioning=True),
+        steps = [TestStep(0, "Commissioning already done.", is_commissioning=True),
+                 TestStep(1, "Enable Fabric Synchronization on DUT_FSA using the manufacturer specified mechanism.", is_commissioning=True),
                  TestStep(2, "Commission DUT_FSA onto TH_FSA fabric."),
                  TestStep(3, "Reverse Commission TH_FSAs onto DUT_FSA fabric."),
                  TestStep("3a", "TH_FSA sends RequestCommissioningApproval"),
@@ -169,6 +170,9 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
                 break
 
         asserts.assert_not_equal(dut_commissioning_control_endpoint, 0, "Invalid aggregator endpoint. Cannot proceed with test.")
+
+        # Commissioning
+        self.step(0)
 
         self.step(1)
         self.step(2)
