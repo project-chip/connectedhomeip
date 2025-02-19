@@ -32,10 +32,10 @@ namespace ClosureControl {
  */
 struct GenericOverallState : public Structs::OverallStateStruct::Type
 {
-    GenericOverallState(Optional<PositioningEnum> positioningValue = NullOptional,
-                        Optional<LatchingEnum> latchingValue = NullOptional,
+    GenericOverallState(Optional<PositioningEnum> positioningValue       = NullOptional,
+                        Optional<LatchingEnum> latchingValue             = NullOptional,
                         Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional,
-                        Optional<uint32_t> extraInfoValue = NullOptional)
+                        Optional<uint32_t> extraInfoValue                = NullOptional)
     {
         Set(positioningValue, latchingValue, speedValue, extraInfoValue);
     }
@@ -48,31 +48,31 @@ struct GenericOverallState : public Structs::OverallStateStruct::Type
         return *this;
     }
 
-    void Set(Optional<PositioningEnum> positioningValue = NullOptional,
-                Optional<LatchingEnum> latchingValue = NullOptional,
-                Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional,
-                Optional<uint32_t> extraInfoValue = NullOptional)
+    void Set(Optional<PositioningEnum> positioningValue = NullOptional, Optional<LatchingEnum> latchingValue = NullOptional,
+             Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional, Optional<uint32_t> extraInfoValue = NullOptional)
     {
-        if (positioningValue.HasValue()) {
+        if (positioningValue.HasValue())
+        {
             positioning = positioningValue;
         }
-        if (latchingValue.HasValue()) {
+        if (latchingValue.HasValue())
+        {
             latching = latchingValue;
         }
-        if (speedValue.HasValue()) {
+        if (speedValue.HasValue())
+        {
             speed = speedValue;
         }
-        if (extraInfoValue.HasValue()) {
+        if (extraInfoValue.HasValue())
+        {
             extraInfo = extraInfoValue;
         }
     }
 
     bool IsEqual(const Structs::OverallStateStruct::Type & rhs) const
     {
-        if (positioning.HasValue() != rhs.positioning.HasValue() ||
-            latching.HasValue() != rhs.latching.HasValue() ||
-            speed.HasValue() != rhs.speed.HasValue() ||
-            extraInfo.HasValue() != rhs.extraInfo.HasValue())
+        if (positioning.HasValue() != rhs.positioning.HasValue() || latching.HasValue() != rhs.latching.HasValue() ||
+            speed.HasValue() != rhs.speed.HasValue() || extraInfo.HasValue() != rhs.extraInfo.HasValue())
         {
             return false;
         }
@@ -103,9 +103,9 @@ struct GenericOverallState : public Structs::OverallStateStruct::Type
  */
 struct GenericOverallTarget : public Structs::OverallTargetStruct::Type
 {
-    GenericOverallTarget(Optional<TagPositionEnum> tagPositionValue = NullOptional,
-                            Optional<TagLatchEnum> tagLatchValue = NullOptional,
-                            Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
+    GenericOverallTarget(Optional<TagPositionEnum> tagPositionValue       = NullOptional,
+                         Optional<TagLatchEnum> tagLatchValue             = NullOptional,
+                         Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
         Set(tagPositionValue, tagLatchValue, speedValue);
     }
@@ -118,25 +118,26 @@ struct GenericOverallTarget : public Structs::OverallTargetStruct::Type
         return *this;
     }
 
-    void Set(Optional<TagPositionEnum> tagPositionValue = NullOptional,
-                Optional<TagLatchEnum> tagLatchValue = NullOptional,
-                Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
+    void Set(Optional<TagPositionEnum> tagPositionValue = NullOptional, Optional<TagLatchEnum> tagLatchValue = NullOptional,
+             Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
-        if (tagPositionValue.HasValue()) {
+        if (tagPositionValue.HasValue())
+        {
             tagPosition = tagPositionValue;
         }
-        if (tagLatchValue.HasValue()) {
+        if (tagLatchValue.HasValue())
+        {
             tagLatch = tagLatchValue;
         }
-        if (speedValue.HasValue()) {
+        if (speedValue.HasValue())
+        {
             speed = speedValue;
         }
     }
 
     bool IsEqual(const Structs::OverallTargetStruct::Type & rhs) const
     {
-        if (tagPosition.HasValue() != rhs.tagPosition.HasValue() ||
-            tagLatch.HasValue() != rhs.tagLatch.HasValue() ||
+        if (tagPosition.HasValue() != rhs.tagPosition.HasValue() || tagLatch.HasValue() != rhs.tagLatch.HasValue() ||
             speed.HasValue() != rhs.speed.HasValue())
         {
             return false;
