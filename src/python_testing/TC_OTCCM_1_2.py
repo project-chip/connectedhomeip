@@ -15,21 +15,19 @@
 #    limitations under the License.
 #
 
-# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
-# for details about the block below.
-#
-# FIXME: https://github.com/project-chip/connectedhomeip/issues/36885
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${CHIP_MICROWAVE_OVEN_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -60,8 +58,6 @@ class TC_OTCCM_1_2(MatterBaseTest, ModeBaseClusterChecks):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH reads from the DUT the SupportedModes attribute."),
             TestStep(3, "TH reads from the DUT the CurrentMode attribute."),
-            # TestStep(4, "TH reads from the DUT the OnMode attribute."),
-            # TestStep(5, "TH reads from the DUT the StartUpMode attribute.")
         ]
         return steps
 
@@ -93,18 +89,6 @@ class TC_OTCCM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         # Verify that the CurrentMode attribute has a valid value.
         mode = self.cluster.Attributes.CurrentMode
         await self.read_and_check_mode(endpoint=endpoint, mode=mode, supported_modes=supported_modes)
-
-        # self.step(4)
-        # # Verify that the OnMode attribute has a valid value or null.
-        # mode = self.cluster.Attributes.OnMode
-        # await self.read_and_check_mode(endpoint=endpoint, mode=mode,
-        #                                supported_modes=supported_modes, is_nullable=True)
-
-        # self.step(5)
-        # # Verify that the StartUpMode has a valid value or null
-        # mode = self.cluster.Attributes.StartUpMode
-        # await self.read_and_check_mode(endpoint=endpoint, mode=mode,
-        #                                supported_modes=supported_modes, is_nullable=True)
 
 
 if __name__ == "__main__":
