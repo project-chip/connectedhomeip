@@ -23,16 +23,15 @@ and endpoint matching.
 
 import asyncio
 import logging
-from functools import partial
-from typing import Callable, TYPE_CHECKING
 from enum import IntFlag
-from chip.clusters import ClusterObjects as ClusterObjects
+from functools import partial
+from typing import TYPE_CHECKING, Callable
+
 import chip.clusters as Clusters
-
-from mobly import asserts
-
 from chip.clusters import Attribute
+from chip.clusters import ClusterObjects as ClusterObjects
 from chip.testing.global_attribute_ids import GlobalAttributeIds
+from mobly import asserts
 
 if TYPE_CHECKING:
     from chip.testing.matter_testing import MatterBaseTest
