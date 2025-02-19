@@ -27,6 +27,7 @@ function(chip_configure_cluster APP_TARGET CLUSTER)
 
     # Add clusters dependencies
     if (CLUSTER STREQUAL "icd-management-server")
+      # TODO(#32321): Remove after issue is resolved
       # Add ICDConfigurationData when ICD management server cluster is included,
       # but ICD support is disabled, e.g. lock-app on some platforms
       if(NOT CONFIG_CHIP_ENABLE_ICD_SUPPORT)
