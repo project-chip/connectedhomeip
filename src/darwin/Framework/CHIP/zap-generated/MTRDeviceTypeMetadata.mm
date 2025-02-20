@@ -78,6 +78,7 @@ static /* constexpr */ const MTRDeviceTypeData knownDeviceTypes[] = {
     { 0x0000010C, MTRDeviceTypeClass::Simple, @"Color Temperature Light" },
     { 0x0000010D, MTRDeviceTypeClass::Simple, @"Extended Color Light" },
     { 0x0000010F, MTRDeviceTypeClass::Simple, @"Mounted On/Off Control" },
+    { 0x00000110, MTRDeviceTypeClass::Simple, @"Mounted Dimmable Load Control" },
     { 0x00000142, MTRDeviceTypeClass::Simple, @"Camera" },
     { 0x00000202, MTRDeviceTypeClass::Simple, @"Window Covering" },
     { 0x00000203, MTRDeviceTypeClass::Simple, @"Window Covering Controller" },

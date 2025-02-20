@@ -616,6 +616,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTROperationalCredentialsClusterSetVidVerificationStatementParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTROperationalCredentialsClusterSignVidVerificationRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTROperationalCredentialsClusterSignVidVerificationResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRGroupKeyManagementClusterKeySetWriteParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -2260,7 +2278,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRWebRTCTransportRequestorClusterICECandidateParams (InternalMethods)
+@interface MTRWebRTCTransportRequestorClusterICECandidatesParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
