@@ -5031,6 +5031,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "RemoveFabric";
         case chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Id:
             return "AddTrustedRootCertificate";
+        case chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::Id:
+            return "SetVidVerificationStatement";
+        case chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::Id:
+            return "SignVidVerificationRequest";
         default:
             return "Unknown";
         }
@@ -5872,8 +5876,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Offer";
         case chip::app::Clusters::WebRTCTransportRequestor::Commands::Answer::Id:
             return "Answer";
-        case chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::Id:
-            return "ICECandidate";
+        case chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidates::Id:
+            return "ICECandidates";
         case chip::app::Clusters::WebRTCTransportRequestor::Commands::End::Id:
             return "End";
         default:
@@ -6141,6 +6145,8 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "CSRResponse";
         case chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::Id:
             return "NOCResponse";
+        case chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationResponse::Id:
+            return "SignVidVerificationResponse";
         default:
             return "Unknown";
         }
@@ -6699,6 +6705,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Extended Color Light";
     case 0x0000010F:
         return "Mounted On/Off Control";
+    case 0x00000110:
+        return "Mounted Dimmable Load Control";
     case 0x00000142:
         return "Camera";
     case 0x00000202:
