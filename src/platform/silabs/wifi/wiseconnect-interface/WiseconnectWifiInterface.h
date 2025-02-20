@@ -112,3 +112,10 @@ void PostWifiPlatformEvent(WifiPlatformEvent event);
  * @param[in] arg context pointer
  */
 void MatterWifiTask(void * arg);
+
+/**
+ * @brief Updates the IPv4 address in the Wi-Fi interface and notifies the application layer about the new IP address.
+ *
+ * @param[in] ip New IPv4 address
+ */
+void GotIPv4Address(uint32_t ip);
