@@ -79,28 +79,93 @@ class RealtekBuilder(Builder):
                  root,
                  runner,
                  board: RealtekBoard = RealtekBoard.RTL8777G,
-                 app: RealtekApp = RealtekApp.LIGHT):
+                 app: RealtekApp = RealtekApp.LIGHT,
+                 enable_cli: bool = False,
+                 enable_rpc: bool = False,
+                 enable_shell: bool = False):
         super(RealtekBuilder, self).__init__(root, runner)
         self.board = board
         self.app = app
+        self.enable_cli = enable_cli
+        self.enable_rpc = enable_rpc
+        self.enable_shell = enable_shell
+
+        os.environ['OT_SRCDIR'] = os.path.join(os.getcwd(), 'third_party/openthread/ot-realtek')
+        os.environ['REALTEK_SDK_PATH'] = os.path.join(os.environ['OT_SRCDIR'], 'third_party/Realtek/rtl87x2g_sdk')
+        os.environ['BUILD_BANK'] = 'bank0'
+        os.environ['OT_CMAKE_NINJA_TARGET'] = self.app.TargetName
+
+    def CmakeBuildFlags(self):
+        flags = []
+
+        flags.append("-DCMAKE_BUILD_TYPE=Release")
+        flags.append("-DCMAKE_TOOLCHAIN_FILE=src/bee4/arm-none-eabi.cmake")
+        flags.append("-DBUILD_TYPE=sdk")
+        flags.append(f"-DBUILD_TARGET={self.board.BoardName}")
+        flags.append(f"-DBUILD_BOARD_TARGET={self.board.BoardName}")
+        flags.append(f"-DOT_CMAKE_NINJA_TARGET={self.app.TargetName}")
+
+        if self.enable_cli:
+            flags.append("-DENABLE_CLI=ON")
+        else:
+            flags.append("-DENABLE_CLI=OFF")
+
+        if self.enable_rpc:
+            flags.append("-DENABLE_PW_RPC=ON")
+        else:
+            flags.append("-DENABLE_PW_RPC=OFF")
+
+        if self.enable_shell:
+            flags.append("-DENABLE_SHELL=ON")
+        else:
+            flags.append("-DENABLE_SHELL=OFF")
+
+        build_flags = " ".join(flags)
+
+        return build_flags
 
     def generate(self):
-        logging.info('generate %s', self.output_dir)
+        os.environ['OUT_FOLDER'] = self.output_dir
+
+        cmd = 'cd {}/openthread \n'.format(os.environ['OT_SRCDIR'])
+        cmd += 'git checkout thread-reference-20230706'
+        self._Execute(['bash', '-c', cmd])
+
+        cmd = 'arm-none-eabi-gcc -D BUILD_BANK=0 -E -P -x c {ot_src_dir}/src/bee4/{board_name}/app.ld -o {ot_src_dir}/src/bee4/{board_name}/app.ld.gen'.format(
+            ot_src_dir=os.environ['OT_SRCDIR'],
+            board_name=self.board.BoardName)
+        self._Execute(['bash', '-c', cmd])
+
+        cmd = f'export MATTER_EXAMPLE_PATH={self.root}/examples/{self.app.ExampleName}/realtek_bee \n'
+
+        cmd += 'cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON {build_flags} {example_folder} -B{out_folder}'.format(
+            build_flags=self.CmakeBuildFlags(),
+            example_folder=os.environ['OT_SRCDIR'],
+            out_folder=self.output_dir)
+
+        self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
 
     def _build(self):
-        cmd = 'third_party/openthread/ot-realtek/Realtek/build.sh {out_folder} {board} {app} {target} '.format(
-            out_folder=self.output_dir.strip(),
-            board=self.board.BoardName,
-            app=self.app.ExampleName,
-            target=self.app.TargetName
-        )
+        cmd = ['ninja', '-C', self.output_dir]
 
-        # <build root> <build_system> <output_directory> <application>
-        cmd += ' '.join([self.root, 'ninja', self.output_dir,
-                        self.app.ExampleName])
+        if self.ninja_jobs is not None:
+            cmd.append('-j' + str(self.ninja_jobs))
 
-        self._Execute(['bash', '-c', cmd],
-                      title='Generating ' + self.identifier)
+        cmd.append(self.app.TargetName)
+
+        self._Execute(cmd, title='Building ' + self.identifier)
+
+        self.PostBuildCommand()
 
     def build_outputs(self):
         logging.info('build_outputs %s', self.output_dir)
+
+    def PostBuildCommand(self):
+        cmd = f'{self.root}/third_party/openthread/ot-realtek/Realtek/post_build '
+
+        # <bank> <target_name>
+        cmd += ' '.join([os.environ.get('BUILD_BANK'), self.app.TargetName])
+
+        self._Execute(['bash', '-c', cmd], title='PostBuild ' + self.identifier)
+
+        os.system(f"rm -rf {self.root}/third_party/openthread/ot-realtek/src/bee4/{self.board.BoardName}/*.gen")
