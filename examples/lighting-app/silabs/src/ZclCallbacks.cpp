@@ -21,8 +21,10 @@
  */
 
 #include "AppConfig.h"
+#include "ColorFormat.h"
 #include "LightingManager.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
@@ -40,6 +42,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 {
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
+    EndpointId endpoint     = attributePath.mEndpointId;
     ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
     if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
@@ -56,13 +59,79 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
         // WIP Apply attribute change to Light
     }
+#ifdef SL_MATTER_RGB_LED_ENABLED
     else if (clusterId == ColorControl::Id)
     {
         ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
-
         // WIP Apply attribute change to Light
+
+        /* XY color space */
+        if (attributeId == ColorControl::Attributes::CurrentX::Id || attributeId == ColorControl::Attributes::CurrentY::Id)
+        {
+            ChipLogProgress(Zcl, "Bhanu 111111");
+            XyColor_t xy;
+            if (size != sizeof(uint16_t))
+            {
+                ChipLogError(Zcl, "Wrong length for ColorControl value: %d", size);
+                return;
+            }
+            if (attributeId == ColorControl::Attributes::CurrentX::Id)
+            {
+                ChipLogProgress(Zcl, "Bhanu 222222");
+                xy.x = *reinterpret_cast<uint16_t *>(value);
+                // get Y from cluster value storage
+                Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentY::Get(endpoint, &xy.y);
+                assert(status == Protocols::InteractionModel::Status::Success);
+            }
+            if (attributeId == ColorControl::Attributes::CurrentY::Id)
+            {
+                ChipLogProgress(Zcl, "Bhanu 33333");
+                xy.y = *reinterpret_cast<uint16_t *>(value);
+                // get X from cluster value storage
+                Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentX::Get(endpoint, &xy.x);
+                assert(status == Protocols::InteractionModel::Status::Success);
+            }
+            ChipLogProgress(Zcl, "New XY color: %u|%u", xy.x, xy.y);
+            LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_XY, sizeof(xy),
+                                           (uint32_t *) &xy);
+        }
+        /* HSV color space */
+        else if (attributeId == ColorControl::Attributes::CurrentHue::Id ||
+                 attributeId == ColorControl::Attributes::CurrentSaturation::Id ||
+                 attributeId == ColorControl::Attributes::EnhancedCurrentHue::Id)
+        {
+            HsvColor_t hsv;
+            if (attributeId == ColorControl::Attributes::CurrentHue::Id)
+            {
+                hsv.h = *value;
+                // get saturation from cluster value storage
+                Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentSaturation::Get(endpoint, &hsv.s);
+                assert(status == Protocols::InteractionModel::Status::Success);
+            }
+            else if (attributeId == ColorControl::Attributes::CurrentSaturation::Id)
+            {
+                hsv.s = *value;
+                // get hue from cluster value storage
+                Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentHue::Get(endpoint, &hsv.h);
+                assert(status == Protocols::InteractionModel::Status::Success);
+            }
+            ChipLogProgress(Zcl, "New HSV color: %u|%u", hsv.h, hsv.s);
+            LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_HSV, sizeof(hsv),
+                                           (uint32_t *) &hsv);
+        }
+
+        else if (attributeId == ColorControl::Attributes::ColorTemperatureMireds::Id)
+        {
+            CtColor_t ct;
+            ct.ctMireds = *(uint16_t *) value;
+            ChipLogProgress(Zcl, "New Temperature Mireds color = %u", *(uint16_t *) value);
+            ChipLogProgress(Zcl, "New ColorTemperatureMireds: : %u", ct.ctMireds);
+            LightMgr().InitiateLightAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_CT, sizeof(ct),
+                                           (uint32_t *) &value);
+        }
     }
+#endif // SL_MATTER_RGB_LED_ENABLED
     else if (clusterId == Identify::Id)
     {
         ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",

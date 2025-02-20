@@ -82,3 +82,24 @@ void LEDWidget::Animate()
         }
     }
 }
+uint8_t LEDWidget::GetLED()
+{
+    return mLed;
+}
+bool LEDWidget::GetLEDStatus(uint8_t led)
+{
+    return mLedStatus;
+}
+#ifdef SL_MATTER_RGB_LED_ENABLED
+void RGBLEDWidget::SetColor(uint8_t red, uint8_t blue, uint8_t green)
+{
+    if (GetLEDStatus(GetLED()))
+    {
+        GetPlatform().SetLedColor(GetLED(), red, blue, green);
+    }
+}
+void RGBLEDWidget::GetColor(uint16_t r, uint16_t g, uint16_t b)
+{
+    GetPlatform().GetLedColor(GetLED(), r, g, b);
+}
+#endif // SL_MATTER_RGB_LED_ENABLED

@@ -137,7 +137,11 @@ CHIP_ERROR SilabsPlatform::SetLed(bool state, uint8_t led)
 bool SilabsPlatform::GetLedState(uint8_t led)
 {
     // TODO
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+    return sl_si91x_simple_rgb_led_get_current_state(&led_led0);
+#else
     return SilabsPlatformAbstractionBase::GetLedState(led);
+#endif //(defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 }
 
 CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
@@ -151,6 +155,21 @@ CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
     return CHIP_NO_ERROR;
 }
 #endif // ENABLE_WSTK_LEDS
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+CHIP_ERROR SilabsPlatform::SetLedColor(uint8_t led, uint8_t red, uint8_t green, uint8_t blue)
+{
+    uint32_t rgb_color;
+    rgb_color = (red) << 16 | (green) << 8 | (blue);
+    sl_si91x_simple_rgb_led_set_colour(SL_RGB_LED_INSTANCE(led), rgb_color);
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR SilabsPlatform::GetLedColor(uint8_t led, uint16_t r, uint16_t g, uint16_t b)
+{
+    sl_si91x_simple_rgb_led_get_colour(SL_RGB_LED_INSTANCE(led), &r, &g, &b);
+    return CHIP_NO_ERROR;
+}
+#endif // defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED
 
 void SilabsPlatform::StartScheduler()
 {

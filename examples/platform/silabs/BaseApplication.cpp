@@ -118,7 +118,7 @@ osThreadId_t sAppTaskHandle;
 osMessageQueueId_t sAppEventQueue;
 
 #if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)))
-LEDWidget sStatusLED;
+RGBLEDWidget sStatusLED;
 #endif // ENABLE_WSTK_LEDS
 
 #ifdef SL_WIFI
