@@ -7039,11 +7039,11 @@ bool emberAfWebRTCTransportRequestorClusterAnswerCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WebRTCTransportRequestor::Commands::Answer::DecodableType & commandData);
 /**
- * @brief WebRTC Transport Requestor Cluster ICECandidate Command callback (from client)
+ * @brief WebRTC Transport Requestor Cluster ICECandidates Command callback (from client)
  */
-bool emberAfWebRTCTransportRequestorClusterICECandidateCallback(
+bool emberAfWebRTCTransportRequestorClusterICECandidatesCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::DecodableType & commandData);
+    const chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidates::DecodableType & commandData);
 /**
  * @brief WebRTC Transport Requestor Cluster End Command callback (from client)
  */
