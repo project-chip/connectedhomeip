@@ -867,7 +867,7 @@ def parse_namespace(et: ElementTree.Element) -> tuple[XmlNamespace, list[Problem
             tag_id = tag_elem.get('id')
             if tag_id is not None:
                 try:
-                    tag.id = int(str(tag_id), 16)
+                    tag.id = int(str(tag_id), 0)
                 except (ValueError, TypeError):
                     problems.append(ProblemNotice(
                         test_name="Parse Namespace XML",
