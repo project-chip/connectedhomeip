@@ -6709,6 +6709,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Mounted Dimmable Load Control";
     case 0x00000142:
         return "Camera";
+    case 0x00000146:
+        return "Chime";
     case 0x00000202:
         return "Window Covering";
     case 0x00000203:
