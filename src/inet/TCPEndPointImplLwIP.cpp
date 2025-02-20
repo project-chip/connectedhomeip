@@ -454,6 +454,7 @@ void TCPEndPointImplLwIP::DoCloseImpl(CHIP_ERROR err, State oldState)
     {
         // If the Listen EndPoint has a pre-allocated connect EndPoint, release it for the Retain() in the constructor
         mPreAllocatedConnectEP->Free();
+        mPreAllocatedConnectEP = nullptr;
     }
     if (mState == State::kClosed)
     {
