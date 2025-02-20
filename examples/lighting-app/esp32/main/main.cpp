@@ -67,8 +67,7 @@
 
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
 #include <esp_insights.h>
-#include <tracing/registry.h>
-#define START_TIMEOUT_MS 60000
+#define START_TIMEOUT_MS 10000
 #endif // CONFIG_ENABLE_ESP_INSIGHTS_TRACE
 
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
@@ -162,7 +161,7 @@ static void InitServer(intptr_t context)
 
     // Use the base class interface instead of the implementation class directly
     chip::Diagnostics::DiagnosticDataDelegate & diagnosticDelegate = 
-        chip::Diagnostics::DiagnosticDataDelegate::GetInstance(&diagnosticStorage);
+    chip::Diagnostics::DiagnosticDataDelegate::GetInstance(&diagnosticStorage);
     
     diagnosticDelegate.StartPeriodicDiagnostics(chip::System::Clock::Timeout(START_TIMEOUT_MS));
 #endif // CONFIG_ENABLE_ESP_INSIGHTS_TRACE
