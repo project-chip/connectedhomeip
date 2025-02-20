@@ -253,6 +253,12 @@ MTR_DIRECT_MEMBERS
     [self _cancelAllAttributeValueWaiters];
 }
 
+- (BOOL)delegateExists
+{
+    std::lock_guard lock(_lock);
+    return [self _delegateExists];
+}
+
 - (BOOL)_delegateExists
 {
     os_unfair_lock_assert_owner(&self->_lock);
