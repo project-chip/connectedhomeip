@@ -252,7 +252,7 @@ void ChimeServer::InvokeCommand(HandlerContext & ctx)
     {
     case Commands::PlayChimeSound::Id:
         CommandHandlerInterface::HandleCommand<Commands::PlayChimeSound::DecodableType>(
-            ctx, [this](HandlerContext & ctx, const auto & req) { HandlePlayChimeSound(ctx, req); });
+            ctx, [this](HandlerContext & context, const auto & req) { HandlePlayChimeSound(context, req); });
         break;
     }
 }
