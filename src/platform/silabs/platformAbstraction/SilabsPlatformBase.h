@@ -51,6 +51,12 @@ public:
     virtual bool GetLedState(uint8_t led) { return 0; }
     virtual CHIP_ERROR ToggleLed(uint8_t led) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
+    // RGB LEDS
+#ifdef SL_MATTER_RGB_LED_ENABLED
+    virtual CHIP_ERROR SetLedColor(uint8_t led, uint8_t r, uint8_t g, uint8_t b) { return CHIP_ERROR_NOT_IMPLEMENTED; };
+    virtual CHIP_ERROR GetLedColor(uint8_t led, uint16_t r, uint16_t g, uint16_t b) { return CHIP_ERROR_NOT_IMPLEMENTED; };
+#endif // SL_MATTER_RGB_LED_ENABLED
+
     // Flash
     virtual CHIP_ERROR FlashInit() { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual CHIP_ERROR FlashErasePage(uint32_t addr) { return CHIP_ERROR_NOT_IMPLEMENTED; }

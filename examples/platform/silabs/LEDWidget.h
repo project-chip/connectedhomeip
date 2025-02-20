@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "ColorFormat.h"
 #include <stdint.h>
 
 class LEDWidget
@@ -31,6 +32,8 @@ public:
     void Blink(uint32_t changeRateMS);
     void Blink(uint32_t onTimeMS, uint32_t offTimeMS);
     void Animate();
+    uint8_t GetLED();
+    bool GetLEDStatus(uint8_t led);
 
 private:
     uint64_t mLastChangeTimeMS;
@@ -38,4 +41,15 @@ private:
     uint32_t mBlinkOffTimeMS;
     uint8_t mLed;
     bool mLedStatus;
+};
+class RGBLEDWidget : public LEDWidget
+{
+public:
+    void SetColor(uint8_t red, uint8_t green, uint8_t blue);
+    void GetColor(uint16_t red, uint16_t green, uint16_t blue);
+
+private:
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
 };

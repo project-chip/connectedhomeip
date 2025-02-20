@@ -57,6 +57,12 @@ public:
 
     void StartScheduler(void) override;
 
+#ifdef SL_MATTER_RGB_LED_ENABLED
+    // RGB LEDs
+    CHIP_ERROR SetLedColor(uint8_t led, uint8_t r, uint8_t g, uint8_t b) override;
+    CHIP_ERROR GetLedColor(uint8_t led, uint16_t r, uint16_t g, uint16_t b) override;
+#endif // SL_MATTER_RGB_LED_ENABLED
+
     CHIP_ERROR FlashInit() override;
     CHIP_ERROR FlashErasePage(uint32_t addr) override;
     CHIP_ERROR FlashWritePage(uint32_t addr, const uint8_t * data, size_t size) override;

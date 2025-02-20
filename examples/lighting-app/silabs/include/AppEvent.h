@@ -49,6 +49,12 @@ struct AppEvent
             uint8_t Action;
             int32_t Actor;
         } LightEvent;
+        struct
+        {
+            uint8_t Action;
+            int32_t Actor;
+            uint32_t *Value;
+        } LightControlEvent;
     };
 
     EventHandler Handler;
