@@ -47692,7 +47692,7 @@ class WebRTCTransportRequestor(Cluster):
             sdp: str = ""
 
         @dataclass
-        class ICECandidate(ClusterCommand):
+        class ICECandidates(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000554
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
@@ -47703,11 +47703,11 @@ class WebRTCTransportRequestor(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="ICECandidate", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(Label="ICECandidates", Tag=1, Type=typing.List[str]),
                     ])
 
             webRTCSessionID: uint = 0
-            ICECandidate: str = ""
+            ICECandidates: typing.List[str] = field(default_factory=lambda: [])
 
         @dataclass
         class End(ClusterCommand):
