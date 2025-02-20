@@ -21,7 +21,6 @@
  #include <platform/silabs/multi-ota/SiWx917/OTAWiFiFirmwareProcessor.h>
  
  #include <app/clusters/ota-requestor/OTARequestorInterface.h>
- #include "wfx_host_events.h"
  #include <platform/silabs/SilabsConfig.h>
  #ifdef __cplusplus
  extern "C" {
@@ -37,7 +36,7 @@
  #define RPS_HEADER 1
  #define RPS_DATA 2
  
- #define SL_STATUS_FW_UPDATE_DONE SL_STATUS_SI91X_NO_AP_FOUND
+ #define SL_STATUS_FW_UPDATE_DONE SL_STATUS_SI91X_FW_UPDATE_DONE
  uint8_t flag = RPS_HEADER;
  
  namespace chip {
@@ -47,8 +46,8 @@
  
  CHIP_ERROR OTAWiFiFirmwareProcessor::Init()
  {
-     ReturnErrorCodeIf(mCallbackProcessDescriptor == nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
-     mAccumulator.Init(sizeof(Descriptor));
+    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
+    mAccumulator.Init(sizeof(Descriptor));
  #if OTA_ENCRYPTION_ENABLE
      mUnalignmentNum = 0;
  #endif
@@ -70,31 +69,30 @@
  
  CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
  {
-     int32_t status        = SL_STATUS_OK;
+     int32_t status = SL_STATUS_OK;
      // Store the header of the OTA file
      static uint8_t writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
-     // Used to tranfer other block to processor
+     // Used to transfer other blocks to the processor
      static uint8_t writeDataBuffer[1024] __attribute__((aligned(4))) = { 0 };
  
      if (!mDescriptorProcessed)
      {
          ReturnErrorOnFailure(ProcessDescriptor(block));
  #if OTA_ENCRYPTION_ENABLE
-         /* 16 bytes to used to store undecrypted data because of unalignment */
+         // 16 bytes used to store undecrypted data due to unalignment
          mAccumulator.Init(requestedOtaMaxBlockSize + 16);
  #endif
      }
  
  #if OTA_ENCRYPTION_ENABLE
-     MutableByteSpan mBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
+     MutableByteSpan mBlock(mAccumulator.data(), mAccumulator.GetThreshold());
      memcpy(&mBlock[0], &mBlock[requestedOtaMaxBlockSize], mUnalignmentNum);
      memcpy(&mBlock[mUnalignmentNum], block.data(), block.size());
  
      if (mUnalignmentNum + block.size() < requestedOtaMaxBlockSize)
      {
-         uint32_t mAlignmentNum = (mUnalignmentNum + block.size()) / 16;
-         mAlignmentNum          = mAlignmentNum * 16;
-         mUnalignmentNum        = (mUnalignmentNum + block.size()) % 16;
+         uint32_t mAlignmentNum = (mUnalignmentNum + block.size()) / 16 * 16;
+         mUnalignmentNum = (mUnalignmentNum + block.size()) % 16;
          memcpy(&mBlock[requestedOtaMaxBlockSize], &mBlock[mAlignmentNum], mUnalignmentNum);
          mBlock.reduce_size(mAlignmentNum);
      }
@@ -109,23 +107,22 @@
  #endif
  
      if (flag == RPS_HEADER)
-     {   
-         memcpy(&writeBuffer, block.data(), kAlignmentBytes);
-         // Send RPS header which is received as first chunk
+     {
+         memcpy(writeBuffer, block.data(), kAlignmentBytes);
+         // Send RPS header received as the first chunk
          status = sl_si91x_fwup_start(writeBuffer);
          status = sl_si91x_fwup_load(writeBuffer, kAlignmentBytes);
-         flag   = RPS_DATA;
-         memcpy(&writeDataBuffer, block.data() + kAlignmentBytes, (block.size() - kAlignmentBytes));
-         status = sl_si91x_fwup_load(writeDataBuffer, (block.size() - kAlignmentBytes));
-     } 
+         flag = RPS_DATA;
+         memcpy(writeDataBuffer, block.data() + kAlignmentBytes, block.size() - kAlignmentBytes);
+         status = sl_si91x_fwup_load(writeDataBuffer, block.size() - kAlignmentBytes);
+     }
      else if (flag == RPS_DATA)
      {
-         memcpy(&writeDataBuffer, block.data(), block.size());
+         memcpy(writeDataBuffer, block.data(), block.size());
          // Send RPS content
          status = sl_si91x_fwup_load(writeDataBuffer, block.size());
          if (status != SL_STATUS_OK)
          {
-             // When TA recived all the blocks it will return SL_STATUS_FW_UPDATE_DONE status
              if (status == SL_STATUS_FW_UPDATE_DONE)
              {
                  mReset = true;
@@ -162,7 +159,7 @@
          // send system reset request to reset the MCU and upgrade the m4 image
          ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
          // Reboots the device
-         sl_si91x_soc_soft_reset();
+         sl_si91x_soc_nvic_reset();
  #endif
      }
      return CHIP_NO_ERROR;

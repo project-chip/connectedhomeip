@@ -116,7 +116,9 @@ void OTAMultiImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "HandlePrepareDownload: started");
 
+#ifndef SLI_SI91X_MCU_INTERFACE // required for 917 NCP
     CORE_CRITICAL_SECTION(bootloader_init();)
+#endif
 
     imageProcessor->mParams.downloadedBytes = 0;
 
