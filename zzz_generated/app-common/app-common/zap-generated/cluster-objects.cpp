@@ -8929,6 +8929,7 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
     encoder.Encode(to_underlying(Fields::kFabricID), fabricID);
     encoder.Encode(to_underlying(Fields::kNodeID), nodeID);
     encoder.Encode(to_underlying(Fields::kLabel), label);
+    encoder.Encode(to_underlying(Fields::kVidVerificationStatement), vidVerificationStatement);
     if (aAccessingFabricIndex.HasValue())
     {
         encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
@@ -8971,6 +8972,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, label);
         }
+        else if (__context_tag == to_underlying(Fields::kVidVerificationStatement))
+        {
+            err = DataModel::Decode(reader, vidVerificationStatement);
+        }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
             err = DataModel::Decode(reader, fabricIndex);
@@ -8998,18 +9003,12 @@ CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIn
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
 {
-    bool includeSensitive = !aAccessingFabricIndex.HasValue() || (aAccessingFabricIndex.Value() == fabricIndex);
 
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
 
-    if (includeSensitive)
-    {
-        encoder.Encode(to_underlying(Fields::kNoc), noc);
-    }
-    if (includeSensitive)
-    {
-        encoder.Encode(to_underlying(Fields::kIcac), icac);
-    }
+    encoder.Encode(to_underlying(Fields::kNoc), noc);
+    encoder.Encode(to_underlying(Fields::kIcac), icac);
+    encoder.Encode(to_underlying(Fields::kVvsc), vvsc);
     if (aAccessingFabricIndex.HasValue())
     {
         encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
@@ -9039,6 +9038,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kIcac))
         {
             err = DataModel::Decode(reader, icac);
+        }
+        else if (__context_tag == to_underlying(Fields::kVvsc))
+        {
+            err = DataModel::Decode(reader, vvsc);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
@@ -9514,6 +9517,133 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace AddTrustedRootCertificate.
+namespace SetVidVerificationStatement {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kVendorID), vendorID);
+    encoder.Encode(to_underlying(Fields::kVidVerificationStatement), vidVerificationStatement);
+    encoder.Encode(to_underlying(Fields::kVvsc), vvsc);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kVendorID))
+        {
+            err = DataModel::Decode(reader, vendorID);
+        }
+        else if (__context_tag == to_underlying(Fields::kVidVerificationStatement))
+        {
+            err = DataModel::Decode(reader, vidVerificationStatement);
+        }
+        else if (__context_tag == to_underlying(Fields::kVvsc))
+        {
+            err = DataModel::Decode(reader, vvsc);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SetVidVerificationStatement.
+namespace SignVidVerificationRequest {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    encoder.Encode(to_underlying(Fields::kClientChallenge), clientChallenge);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
+        }
+        else if (__context_tag == to_underlying(Fields::kClientChallenge))
+        {
+            err = DataModel::Decode(reader, clientChallenge);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SignVidVerificationRequest.
+namespace SignVidVerificationResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    encoder.Encode(to_underlying(Fields::kFabricBindingVersion), fabricBindingVersion);
+    encoder.Encode(to_underlying(Fields::kSignature), signature);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
+        }
+        else if (__context_tag == to_underlying(Fields::kFabricBindingVersion))
+        {
+            err = DataModel::Decode(reader, fabricBindingVersion);
+        }
+        else if (__context_tag == to_underlying(Fields::kSignature))
+        {
+            err = DataModel::Decode(reader, signature);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SignVidVerificationResponse.
 } // namespace Commands
 
 namespace Attributes {
@@ -31820,12 +31950,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace Answer.
-namespace ICECandidate {
+namespace ICECandidates {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kWebRTCSessionID), webRTCSessionID);
-    encoder.Encode(to_underlying(Fields::kICECandidate), ICECandidate);
+    encoder.Encode(to_underlying(Fields::kICECandidates), ICECandidates);
     return encoder.Finalize();
 }
 
@@ -31847,9 +31977,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, webRTCSessionID);
         }
-        else if (__context_tag == to_underlying(Fields::kICECandidate))
+        else if (__context_tag == to_underlying(Fields::kICECandidates))
         {
-            err = DataModel::Decode(reader, ICECandidate);
+            err = DataModel::Decode(reader, ICECandidates);
         }
         else
         {
@@ -31858,7 +31988,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ICECandidate.
+} // namespace ICECandidates.
 namespace End {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -37066,6 +37196,8 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Id:
             return true;
+        case Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::Id:
+            return true;
         default:
             return false;
         }
@@ -37569,6 +37701,25 @@ bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
     }
     if ((aCluster == Clusters::CameraAvStreamManagement::Id) &&
         (aCommand == Clusters::CameraAvStreamManagement::Commands::CaptureSnapshotResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::WebRTCTransportRequestor::Id) &&
+        (aCommand == Clusters::WebRTCTransportRequestor::Commands::Offer::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::WebRTCTransportRequestor::Id) &&
+        (aCommand == Clusters::WebRTCTransportRequestor::Commands::Answer::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::WebRTCTransportRequestor::Id) &&
+        (aCommand == Clusters::WebRTCTransportRequestor::Commands::ICECandidates::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::WebRTCTransportRequestor::Id) && (aCommand == Clusters::WebRTCTransportRequestor::Commands::End::Id))
     {
         return true;
     }
