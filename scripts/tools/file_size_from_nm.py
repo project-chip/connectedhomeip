@@ -350,6 +350,7 @@ def build_treemap(
     fig.update_traces(root_color="lightgray")
     fig.show()
 
+
 def symbols_from_objdump(elf_file: str) -> list[Symbol]:
 
     sources = {}
@@ -357,7 +358,7 @@ def symbols_from_objdump(elf_file: str) -> list[Symbol]:
 
     # First try to figure out `source paths`. Do the "ugly" way and search for all strings that
     # seem to match a 'source'
-    for line in subprocess.check_output(["strings", elf_file ]).decode("utf8").split('\n'):
+    for line in subprocess.check_output(["strings", elf_file]).decode("utf8").split('\n'):
         if '/' not in line:
             # want directory paths...
             continue
@@ -367,7 +368,7 @@ def symbols_from_objdump(elf_file: str) -> list[Symbol]:
 
         path = m.groupdict()['path']
 
-        # heuristics: 
+        # heuristics:
         #   - some paths start with relative paths and we remove that
         #   - remove intermediate ../
         while path.startswith('../'):
@@ -495,12 +496,13 @@ def symbols_from_objdump(elf_file: str) -> list[Symbol]:
             name=captures['name'],
             symbol_type=captures['section'],
             size=size,
-            tree_path = path,
+            tree_path=path,
         )
 
         symbols.append(s)
 
     return symbols
+
 
 def symbols_from_nm(elf_file: str) -> list[Symbol]:
     items = subprocess.check_output(
@@ -542,7 +544,7 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
             "V",
         }:
             logging.debug("Found %s of size %d", name, size)
-            symbols.append(Symbol(name=name, symbol_type=t, size=size, tree_path = tree_display_name(name)))
+            symbols.append(Symbol(name=name, symbol_type=t, size=size, tree_path=tree_display_name(name)))
         elif t in {
             # BSS - 0-initialized, not code
             "b",
