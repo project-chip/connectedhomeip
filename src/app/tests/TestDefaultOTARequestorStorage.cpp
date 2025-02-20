@@ -225,7 +225,7 @@ TEST(TestDefaultOTARequestorStorage, TestDuplicateProvider)
     provider.fabricIndex    = 1U;
     provider.endpoint       = 2U;
 
-    EXPECT_EQ(true, otaStorage.ProviderAlreadyInList(listProviders, provider));
+    EXPECT_EQ(false, otaStorage.ProviderAlreadyInList(listProviders, provider));
 
     listProviders.Add(provider);
     EXPECT_EQ(true, otaStorage.ProviderAlreadyInList(listProviders, provider));
