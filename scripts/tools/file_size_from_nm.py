@@ -118,6 +118,11 @@ def tree_display_name(name: str) -> list[str]:
     if name.startswith("vtable for "):
         name = name[11:]
 
+    # Known variables for ember:
+    for variable_name in ['::generatedAttributes', '::generatedClusters', '::generatedEmberAfEndpointTypes', '::fixedDeviceTypeList', '::generatedCommands']:
+        if variable_name in name:
+            return ["EMBER", "METADATA", name]
+
     # to abvoid treating '(anonymous namespace)::' as special because of space,
     # replace it with something that looks similar
     name = name.replace('(anonymous namespace)::', 'ANONYMOUS_NAMESPACE::')
@@ -248,7 +253,7 @@ def tree_display_name(name: str) -> list[str]:
 
     if len(result) == 1:
         if result[0].startswith("ot"):  # Show openthread methods a bit grouped
-            result = ["ot"] + result
+            return ["ot", "C"] + result
         return ["C"] + result
 
     return [r.replace('ANONYMOUS_NAMESPACE', '(anonymous namespace)') for r in result]
