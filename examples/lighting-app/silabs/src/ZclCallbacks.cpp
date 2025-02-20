@@ -69,7 +69,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         /* XY color space */
         if (attributeId == ColorControl::Attributes::CurrentX::Id || attributeId == ColorControl::Attributes::CurrentY::Id)
         {
-            ChipLogProgress(Zcl, "Bhanu 111111");
             XyColor_t xy;
             if (size != sizeof(uint16_t))
             {
@@ -78,7 +77,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             }
             if (attributeId == ColorControl::Attributes::CurrentX::Id)
             {
-                ChipLogProgress(Zcl, "Bhanu 222222");
                 xy.x = *reinterpret_cast<uint16_t *>(value);
                 // get Y from cluster value storage
                 Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentY::Get(endpoint, &xy.y);
@@ -86,7 +84,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             }
             if (attributeId == ColorControl::Attributes::CurrentY::Id)
             {
-                ChipLogProgress(Zcl, "Bhanu 33333");
                 xy.y = *reinterpret_cast<uint16_t *>(value);
                 // get X from cluster value storage
                 Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentX::Get(endpoint, &xy.x);
