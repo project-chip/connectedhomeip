@@ -455,6 +455,7 @@ def symbols_from_objdump(elf_file: str) -> list[Symbol]:
 
     offset_file_map = {}
     symbols = []
+    unknown_file_names = set()
 
     for line in items.split("\n"):
         line = line.strip()
@@ -483,10 +484,12 @@ def symbols_from_objdump(elf_file: str) -> list[Symbol]:
                     symbol_file_name = offset_file_map[offset - delta]
 
         if symbol_file_name not in sources:
-            logging.warning('Source %s is not known', symbol_file_name)
-            path = [captures['section'], 'UNKNOWN', 'symbol_file_name']
+            if symbol_file_name not in unknown_file_names:
+                logging.warning('Source %r is not known', symbol_file_name)
+                unknown_file_names.add(symbol_file_name)
+            path = [captures['section'], 'UNKNOWN', symbol_file_name, captures['name']]
         else:
-            path = [captures['section']] + sources[symbol_file_name]
+            path = [captures['section']] + sources[symbol_file_name] + [captures['name']]
 
         s = Symbol(
             name=captures['name'],
