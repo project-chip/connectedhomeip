@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,6 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-
 #include <lib/support/CommonIterator.h>
 
 namespace chip {
@@ -28,7 +27,7 @@ namespace Clusters {
 namespace ClosureControl {
 
 /**
- * A class which represents the overall state of an closure control cluster derivation instance.
+ * Structure represents the overall state of a closure control cluster derivation instance.
  */
 struct GenericOverallState : public Structs::OverallStateStruct::Type
 {
@@ -99,7 +98,7 @@ struct GenericOverallState : public Structs::OverallStateStruct::Type
 };
 
 /**
- * A class which represents the overall target state of an closure control cluster derivation instance.
+ * Structure represents the overall target state of a closure control cluster derivation instance.
  */
 struct GenericOverallTarget : public Structs::OverallTargetStruct::Type
 {
