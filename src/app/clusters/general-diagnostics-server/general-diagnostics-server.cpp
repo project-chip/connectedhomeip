@@ -113,8 +113,8 @@ TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(ByteSpan enableKey)
 }
 
 class GeneralDiagnosticsGlobalInstance : public AttributeAccessInterface,
-                                        public CommandHandlerInterface,
-                                        public DeviceLayer::ConnectivityManagerDelegate
+                                         public CommandHandlerInterface,
+                                         public DeviceLayer::ConnectivityManagerDelegate
 {
 public:
     // Register for the GeneralDiagnostics cluster on all endpoints.
@@ -235,7 +235,7 @@ void GeneralDiagnosticsGlobalInstance::InvokeCommand(HandlerContext & handlerCon
 
 template <typename T>
 CHIP_ERROR GeneralDiagnosticsGlobalInstance::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &),
-                                                            AttributeValueEncoder & aEncoder)
+                                                             AttributeValueEncoder & aEncoder)
 {
     T data;
     CHIP_ERROR err = (GetDiagnosticDataProvider().*getter)(data);
@@ -253,7 +253,7 @@ CHIP_ERROR GeneralDiagnosticsGlobalInstance::ReadIfSupported(CHIP_ERROR (Diagnos
 
 template <typename T>
 CHIP_ERROR GeneralDiagnosticsGlobalInstance::ReadListIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &),
-                                                                AttributeValueEncoder & aEncoder)
+                                                                 AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     T faultList;
@@ -304,7 +304,7 @@ CHIP_ERROR GeneralDiagnosticsGlobalInstance::ReadNetworkInterfaces(AttributeValu
 }
 
 void GeneralDiagnosticsGlobalInstance::HandleTestEventTrigger(HandlerContext & ctx,
-                                                             const Commands::TestEventTrigger::DecodableType & commandData)
+                                                              const Commands::TestEventTrigger::DecodableType & commandData)
 {
     auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
     if (triggerDelegate == nullptr)
@@ -321,7 +321,7 @@ void GeneralDiagnosticsGlobalInstance::HandleTestEventTrigger(HandlerContext & c
 }
 
 void GeneralDiagnosticsGlobalInstance::HandleTimeSnapshot(HandlerContext & ctx,
-                                                         const Commands::TimeSnapshot::DecodableType & commandData)
+                                                          const Commands::TimeSnapshot::DecodableType & commandData)
 {
     ChipLogError(Zcl, "Received TimeSnapshot command!");
 
@@ -354,7 +354,7 @@ void GeneralDiagnosticsGlobalInstance::HandleTimeSnapshot(HandlerContext & ctx,
 
 #ifdef GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD
 void GeneralDiagnosticsGlobalInstance::HandlePayloadTestRequest(HandlerContext & ctx,
-                                                               const Commands::PayloadTestRequest::DecodableType & commandData)
+                                                                const Commands::PayloadTestRequest::DecodableType & commandData)
 {
     // Max allowed is 2048.
     if (commandData.count > 2048)
