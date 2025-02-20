@@ -14790,7 +14790,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command ProvideICECandidates
  *
- * This command allows for https://rfc-editor.org/rfc/rfc8839#section-5.1 generated after the initial Offer / Answer exchange to be added to a session during the gathering phase.
+ * This command allows for string based https://rfc-editor.org/rfc/rfc8839#section-5.1 generated after the initial Offer / Answer exchange, via a JSEP https://datatracker.ietf.org/doc/html/rfc9429#section-4.1.20 event, a DOM https://www.w3.org/TR/webrtc/#dom-rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase.
  */
 - (void)provideICECandidatesWithParams:(MTRWebRTCTransportProviderClusterProvideICECandidatesParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**

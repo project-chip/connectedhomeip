@@ -37246,6 +37246,41 @@ bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
     {
         return true;
     }
+    if ((aCluster == Clusters::WebRTCTransportProvider::Id) &&
+        (aCommand == Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::WebRTCTransportProvider::Id) &&
+        (aCommand == Clusters::WebRTCTransportProvider::Commands::SolicitOfferResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::WebRTCTransportProvider::Id) &&
+        (aCommand == Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::WebRTCTransportProvider::Id) &&
+        (aCommand == Clusters::WebRTCTransportProvider::Commands::ProvideOfferResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::WebRTCTransportProvider::Id) &&
+        (aCommand == Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::WebRTCTransportProvider::Id) &&
+        (aCommand == Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::WebRTCTransportProvider::Id) &&
+        (aCommand == Clusters::WebRTCTransportProvider::Commands::EndSession::Id))
+    {
+        return true;
+    }
     if ((aCluster == Clusters::WebRTCTransportRequestor::Id) &&
         (aCommand == Clusters::WebRTCTransportRequestor::Commands::Offer::Id))
     {
