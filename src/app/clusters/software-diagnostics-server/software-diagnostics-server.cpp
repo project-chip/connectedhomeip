@@ -104,7 +104,7 @@ CHIP_ERROR SoftwareDiagnosticsAttrAccess::Read(const ConcreteReadAttributePath &
 }
 
 CHIP_ERROR SoftwareDiagnosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(uint64_t &),
-                                                         AttributeValueEncoder & aEncoder)
+                                                          AttributeValueEncoder & aEncoder)
 {
     uint64_t data;
     CHIP_ERROR err = (DeviceLayer::GetDiagnosticDataProvider().*getter)(data);

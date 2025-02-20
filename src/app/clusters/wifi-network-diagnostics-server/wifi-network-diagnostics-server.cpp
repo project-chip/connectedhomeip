@@ -75,7 +75,7 @@ private:
 
 template <typename T, typename Type>
 CHIP_ERROR WiFiDiagnosticsGlobalInstance::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &), Type & data,
-                                                         AttributeValueEncoder & aEncoder)
+                                                          AttributeValueEncoder & aEncoder)
 {
     T value;
     CHIP_ERROR err = (mDiagnosticProvider.*getter)(value);
@@ -266,7 +266,8 @@ void WiFiDiagnosticsGlobalInstance::InvokeCommand(HandlerContext & handlerContex
 }
 
 #ifdef WI_FI_NETWORK_DIAGNOSTICS_ENABLE_RESET_COUNTS_CMD
-void WiFiDiagnosticsGlobalInstance::HandleResetCounts(HandlerContext & ctx, const Commands::ResetCounts::DecodableType & commandData)
+void WiFiDiagnosticsGlobalInstance::HandleResetCounts(HandlerContext & ctx,
+                                                      const Commands::ResetCounts::DecodableType & commandData)
 {
     mDiagnosticProvider.ResetWiFiNetworkDiagnosticsCounts();
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
