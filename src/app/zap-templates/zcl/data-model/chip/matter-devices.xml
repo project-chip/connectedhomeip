@@ -2888,7 +2888,7 @@ limitations under the License.
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
-            <include cluster="Identify" client="true" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="false">
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Chime" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
