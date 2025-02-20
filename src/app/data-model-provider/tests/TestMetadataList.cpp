@@ -226,8 +226,8 @@ TEST_F(TestMetadataList, BufferMoveOperationsWork)
         /// move constructor called for the second time here
         GenericAppendOnlyBuffer newBuffer{ std::move(originalBuffer) };
 
-        ASSERT_EQ(originalBuffer.Size(), size_t{ 0 });
-        ASSERT_TRUE(originalBuffer.IsEmpty());
+        ASSERT_EQ(originalBuffer.Size(), size_t{ 0 }); // NOLINT(bugprone-use-after-move)
+        ASSERT_TRUE(originalBuffer.IsEmpty());         // NOLINT(bugprone-use-after-move)
 
         ASSERT_EQ(newBuffer.Size(), size_t{ 3 });
         ASSERT_FALSE(newBuffer.IsEmpty());
@@ -262,8 +262,8 @@ TEST_F(TestMetadataList, BufferMoveOperationsWork)
         originalBuffer = std::move(anotherBuffer);
 
         ASSERT_EQ(originalBuffer.Size(), size_t{ 2 });
-        ASSERT_EQ(anotherBuffer.Size(), size_t{ 0 });
-        ASSERT_TRUE(anotherBuffer.IsEmpty());
+        ASSERT_EQ(anotherBuffer.Size(), size_t{ 0 }); // NOLINT(bugprone-use-after-move)
+        ASSERT_TRUE(anotherBuffer.IsEmpty());         // NOLINT(bugprone-use-after-move)
     }
 }
 } // namespace
