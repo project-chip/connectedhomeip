@@ -265,6 +265,7 @@ def test_tree_display_name():
 def build_treemap(
     name: str,
     symbols: list[Symbol],
+    separator: str,
     style: ChartStyle,
     max_depth: int,
     zoom: Optional[str],
@@ -291,7 +292,7 @@ def build_treemap(
             partial = ""
             # try to filter out the tree name. If it contains the zoom item, keep it, otherwise discard
             while tree_name and partial != zoom:
-                partial += "::" + tree_name[0]
+                partial += separator + tree_name[0]
                 tree_name = tree_name[1:]
             if not tree_name:
                 continue
@@ -299,7 +300,7 @@ def build_treemap(
         if strip is not None:
             partial = ""
             for part_name in tree_name:
-                partial = "::" + part_name
+                partial = separator + part_name
                 if partial == strip:
                     break
             if partial == strip:
@@ -307,7 +308,7 @@ def build_treemap(
 
         partial = ""
         for name in tree_name[:-1]:
-            next_value = partial + "::" + name
+            next_value = partial + separator + name
             if next_value not in known_parents:
                 known_parents.add(next_value)
                 data["name"].append(next_value)
@@ -611,11 +612,13 @@ def main(
 
     if __FETCH_STYLES__[fetch_via] == FetchStyle.NM:
         symbols = symbols_from_nm(elf_file.absolute().as_posix())
+        separator = "::"
     else:
         symbols = symbols_from_objdump(elf_file.absolute().as_posix())
+        separator = "/"
 
     build_treemap(
-        elf_file.name, symbols, __CHART_STYLES__[display_type], max_depth, zoom, strip
+        elf_file.name, symbols, separator, __CHART_STYLES__[display_type], max_depth, zoom, strip
     )
 
 
