@@ -6996,7 +6996,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster WebRTCTransportRequestor commands
     MTRCommandIDTypeClusterWebRTCTransportRequestorCommandOfferID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRCommandIDTypeClusterWebRTCTransportRequestorCommandAnswerID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRCommandIDTypeClusterWebRTCTransportRequestorCommandICECandidateID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterWebRTCTransportRequestorCommandICECandidatesID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRCommandIDTypeClusterWebRTCTransportRequestorCommandEndID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
 
     // Cluster PushAVStreamTransport commands

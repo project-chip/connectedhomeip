@@ -12016,11 +12016,11 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRWebRTCTransportRequestorClusterICECandidateParams : NSObject <NSCopying>
+@interface MTRWebRTCTransportRequestorClusterICECandidatesParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull webRTCSessionID MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nonnull iceCandidate MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull iceCandidates MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
