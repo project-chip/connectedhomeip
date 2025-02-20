@@ -31,6 +31,7 @@
 #include <platform/internal/testing/ConfigUnitTest.h>
 
 #include <zephyr/settings/settings.h>
+#include <zephyr/storage/flash_map.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -47,6 +48,12 @@ namespace Internal {
 #define NAMESPACE_FACTORY CHIP_DEVICE_CONFIG_SETTINGS_KEY "-fct/"
 #define NAMESPACE_CONFIG CHIP_DEVICE_CONFIG_SETTINGS_KEY "/cfg/"
 #define NAMESPACE_COUNTERS CHIP_DEVICE_CONFIG_SETTINGS_KEY "/ctr/"
+
+#if DT_HAS_CHOSEN(zephyr_settings_partition)
+#define SETTINGS_PARTITION DT_FIXED_PARTITION_ID(DT_CHOSEN(zephyr_settings_partition))
+#else
+#define SETTINGS_PARTITION FIXED_PARTITION_ID(storage_partition)
+#endif
 
 // Keys stored in the chip factory nam
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_SerialNum                = CONFIG_KEY(NAMESPACE_FACTORY "serial-num");
@@ -77,6 +84,8 @@ const ZephyrConfig::Key ZephyrConfig::kConfigKey_UniqueId           = CONFIG_KEY
 const ZephyrConfig::Key ZephyrConfig::kCounterKey_RebootCount           = CONFIG_KEY(NAMESPACE_COUNTERS "reboot-count");
 const ZephyrConfig::Key ZephyrConfig::kCounterKey_BootReason            = CONFIG_KEY(NAMESPACE_COUNTERS "boot-reason");
 const ZephyrConfig::Key ZephyrConfig::kCounterKey_TotalOperationalHours = CONFIG_KEY(NAMESPACE_COUNTERS "total-operational-hours");
+
+static size_t sSectorSize = 0;
 
 namespace {
 
@@ -161,6 +170,23 @@ CHIP_ERROR ZephyrConfig::Init()
     if (settings_subsys_init() != 0)
         return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
 
+    flash_sector flashSector;
+    uint32_t sectorCnt = 1;
+    int err            = flash_area_get_sectors(SETTINGS_PARTITION, &sectorCnt, &flashSector);
+
+    if (err != 0)
+    {
+        return System::MapErrorZephyr(err);
+    }
+
+#if defined(CONFIG_SETTINGS_NVS)
+    sSectorSize = CONFIG_SETTINGS_NVS_SECTOR_SIZE_MULT * flashSector.fs_size;
+#elif defined(CONFIG_SETTINGS_ZMS)
+    sSectorSize = CONFIG_SETTINGS_ZMS_SECTOR_SIZE_MULT * flashSector.fs_size;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
+
     return CHIP_NO_ERROR;
 }
 
@@ -229,7 +255,9 @@ CHIP_ERROR ZephyrConfig::WriteConfigValue(Key key, uint64_t val)
 
 CHIP_ERROR ZephyrConfig::WriteConfigValueStr(Key key, const char * str)
 {
-    return WriteConfigValueStr(key, str, str ? strlen(str) : 0);
+    /* The max value size is smaller than the sector size by several ATE size, but the API to get the exact size is not available.
+     * The backend implementation validates the detailed size, so we don't need to do that here. */
+    return WriteConfigValueStr(key, str, str ? strnlen(str, sSectorSize) : 0);
 }
 
 CHIP_ERROR ZephyrConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
@@ -291,7 +319,7 @@ void ZephyrConfig::RunConfigUnitTest()
 bool ZephyrConfig::BuildCounterConfigKey(::chip::Platform::PersistedStorage::Key counterId, char key[SETTINGS_MAX_NAME_LEN])
 {
     constexpr size_t KEY_PREFIX_LEN = sizeof(NAMESPACE_COUNTERS) - 1;
-    const size_t keySuffixLen       = strlen(counterId) + 1; // including null-character
+    const size_t keySuffixLen       = strnlen(counterId, SETTINGS_MAX_NAME_LEN) + 1; // including null-character
 
     if (KEY_PREFIX_LEN + keySuffixLen > SETTINGS_MAX_NAME_LEN)
         return false;
