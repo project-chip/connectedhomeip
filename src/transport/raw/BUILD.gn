@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/inet/inet.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/device.gni")
 
 static_library("raw") {
   output_name = "libRawTransport"
@@ -49,6 +50,13 @@ static_library("raw") {
     sources += [
       "WiFiPAF.cpp",
       "WiFiPAF.h",
+    ]
+  }
+
+  if (chip_enable_nfc_commissioning) {
+    sources += [
+      "NFC.cpp",
+      "NFC.h",
     ]
   }
 
