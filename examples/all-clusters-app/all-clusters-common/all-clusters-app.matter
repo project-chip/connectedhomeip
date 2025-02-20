@@ -8167,9 +8167,22 @@ endpoint 1 {
   server cluster Actions {
     callback attribute actionList;
     callback attribute endpointLists;
-    callback attribute setupURL;
+    ram      attribute setupURL default = "https://example.com";
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 1;
+
+    handle command InstantAction;
+    handle command InstantActionWithTransition;
+    handle command StartAction;
+    handle command StartActionWithDuration;
+    handle command StopAction;
+    handle command PauseAction;
+    handle command PauseActionWithDuration;
+    handle command ResumeAction;
+    handle command EnableAction;
+    handle command EnableActionWithDuration;
+    handle command DisableAction;
+    handle command DisableActionWithDuration;
   }
 
   server cluster PowerSource {
