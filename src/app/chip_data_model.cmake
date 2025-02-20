@@ -24,6 +24,16 @@ include("${CHIP_ROOT}/src/data-model-providers/codegen/model.cmake")
 function(chip_configure_cluster APP_TARGET CLUSTER)
     file(GLOB CLUSTER_SOURCES "${CHIP_APP_BASE_DIR}/clusters/${CLUSTER}/*.cpp")
     target_sources(${APP_TARGET} PRIVATE ${CLUSTER_SOURCES})
+
+    # Add clusters dependencies
+    if (CLUSTER STREQUAL "icd-management-server")
+      # TODO(#32321): Remove after issue is resolved
+      # Add ICDConfigurationData when ICD management server cluster is included,
+      # but ICD support is disabled, e.g. lock-app on some platforms
+      if(NOT CONFIG_CHIP_ENABLE_ICD_SUPPORT)
+        target_sources(${APP_TARGET} PRIVATE ${CHIP_APP_BASE_DIR}/icd/server/ICDConfigurationData.cpp)
+      endif()
+    endif()
 endfunction()
 
 #
@@ -118,14 +128,6 @@ function(chip_configure_data_model APP_TARGET)
     else()
         set(APP_GEN_FILES)
     endif()
-
-    # This is:
-    #    //src/app/common:cluster-objects
-    #
-    # TODO: ideally we would avoid duplication and would link gn-built items
-    target_sources(${APP_TARGET} ${SCOPE}
-        ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
-    )
 
     chip_zapgen(${APP_TARGET}-zapgen
         INPUT "${ARG_ZAP_FILE}"

@@ -11124,8 +11124,8 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"Answer";
             break;
 
-        case MTRCommandIDTypeClusterWebRTCTransportRequestorCommandICECandidateID:
-            result = @"ICECandidate";
+        case MTRCommandIDTypeClusterWebRTCTransportRequestorCommandICECandidatesID:
+            result = @"ICECandidates";
             break;
 
         case MTRCommandIDTypeClusterWebRTCTransportRequestorCommandEndID:

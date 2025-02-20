@@ -2260,7 +2260,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRWebRTCTransportRequestorClusterICECandidateParams (InternalMethods)
+@interface MTRWebRTCTransportRequestorClusterICECandidatesParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

@@ -20286,10 +20286,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)ICECandidateWithParams:(MTRWebRTCTransportRequestorClusterICECandidateParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)ICECandidatesWithParams:(MTRWebRTCTransportRequestorClusterICECandidatesParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
-        params = [[MTRWebRTCTransportRequestorClusterICECandidateParams
+        params = [[MTRWebRTCTransportRequestorClusterICECandidatesParams
             alloc] init];
     }
 
@@ -20299,7 +20299,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = WebRTCTransportRequestor::Commands::ICECandidate::Type;
+    using RequestType = WebRTCTransportRequestor::Commands::ICECandidates::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
