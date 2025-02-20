@@ -55,7 +55,7 @@ private:
 
 template <typename T>
 CHIP_ERROR EthernetDiagnosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &),
-                                                         AttributeValueEncoder & aEncoder)
+                                                          AttributeValueEncoder & aEncoder)
 {
     T data;
     CHIP_ERROR err = (DeviceLayer::GetDiagnosticDataProvider().*getter)(data);
