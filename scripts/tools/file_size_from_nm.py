@@ -118,6 +118,10 @@ def tree_display_name(name: str) -> list[str]:
     if name.startswith("vtable for "):
         name = name[11:]
 
+    # to abvoid treating '(anonymous namespace)::' as special because of space,
+    # replace it with something that looks similar
+    name = name.replace('(anonymous namespace)::', 'ANONYMOUS_NAMESPACE::')
+
     # Ember methods are generally c-style that are in a particular format:
     #   - emAf* are INTERNAL ember functions
     #   - emberAf* are PUBLIC (from an ember perspective) functions
@@ -326,8 +330,8 @@ def test_tree_display_name():
     ) == ["foo", "bar<baz>", "void method(my::arg name, other::arg::type)"]
 
     assert tree_display_name(
-        "(anonymous namespace)::AccessControlAttribute::Read(someargs)"
-    ) == ["(anonymous namespace)", "AccessControlAttribute", "Read", "(anonymous namespace)::AccessControlAttribute::Read(someargs)"]
+        "(anonymous namespace)::AccessControlAttribute::Read(args)"
+    ) == ["ANONYMOUS_NAMESPACE", "AccessControlAttribute", "Read(args)"]
 
 
 def build_treemap(
