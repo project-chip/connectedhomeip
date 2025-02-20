@@ -18,7 +18,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/att-storage.h>
 #include <app/util/attribute-table.h>
 
 #include <app/util/af-types.h>

@@ -34,7 +34,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Update Docs
-        uses: test-room-7/action-update-file@v1
+        uses: test-room-7/action-update-file@v2
         with:
           file-path: docs/daily_pass_percentage.md
           commit-msg: Update daily pass percentage

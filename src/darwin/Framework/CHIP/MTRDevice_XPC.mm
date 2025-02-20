@@ -22,6 +22,7 @@
 #import <Matter/MTRDeviceControllerParameters.h>
 
 #import "MTRDeviceController_Internal.h"
+#import "MTRDeviceController_XPC_Internal.h"
 
 #import "MTRAsyncWorkQueue.h"
 #import "MTRAttestationTrustStoreBridge.h"
@@ -144,6 +145,34 @@
 - (MTRNetworkCommissioningFeature)networkCommissioningFeatures
 {
     return [[self._internalState objectForKey:kMTRDeviceInternalPropertyNetworkFeatures] unsignedIntValue];
+}
+
+#pragma mark - Delegate added/removed callbacks
+
+- (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    [super _delegateAdded:delegate];
+    MTR_LOG("%@ delegate added: %@", self, delegate);
+
+    // dispatch to own queue so we're not holding our lock while calling out to the controller code.
+    dispatch_async(self.queue, ^{
+        [(MTRDeviceController_XPC *) [self deviceController] _updateRegistrationInfo];
+    });
+}
+
+- (void)_delegateRemoved:(id<MTRDeviceDelegate>)delegate
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    [super _delegateRemoved:delegate];
+    MTR_LOG("%@ delegate removed: %@", self, delegate);
+
+    // dispatch to own queue so we're not holding our lock while calling out to the controller code.
+    dispatch_async(self.queue, ^{
+        [(MTRDeviceController_XPC *) [self deviceController] _updateRegistrationInfo];
+    });
 }
 
 #pragma mark - Client Callbacks (MTRDeviceDelegate)

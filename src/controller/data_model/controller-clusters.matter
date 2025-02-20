@@ -6478,6 +6478,147 @@ cluster WindowCovering = 258 {
   command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
 }
 
+/** This cluster provides an interface for controlling a Closure device. */
+cluster ClosureControl = 260 {
+  revision 1;
+
+  enum ClosureErrorEnum : enum8 {
+    kBlocked = 0;
+    kTemperatureLimited = 1;
+    kMaintenanceRequired = 2;
+    kInternalInterference = 3;
+  }
+
+  enum LatchingEnum : enum8 {
+    kLatchedAndSecured = 0;
+    kLatchedButNotSecured = 1;
+    kNotLatched = 2;
+  }
+
+  enum MainStateEnum : enum8 {
+    kStopped = 0;
+    kMoving = 1;
+    kWaitingForMotion = 2;
+    kError = 3;
+    kCalibrating = 4;
+    kProtected = 5;
+    kDisengaged = 6;
+    kSetupRequired = 7;
+    kPendingFallback = 8;
+  }
+
+  enum PositioningEnum : enum8 {
+    kFullyClosed = 0;
+    kFullyOpened = 1;
+    kPartiallyOpened = 2;
+    kOpenedForPedestrian = 3;
+    kOpenedForVentilation = 4;
+    kOpenedAtSignature = 5;
+  }
+
+  enum RestingProcedureEnum : enum8 {
+    kDoNothing = 0;
+    kReturnToFullyOpened = 1;
+    kReturnToFullyClosed = 2;
+  }
+
+  enum TagLatchEnum : enum8 {
+    kLatch = 0;
+    kUnlatch = 1;
+  }
+
+  enum TagPositionEnum : enum8 {
+    kCloseInFull = 0;
+    kOpenInFull = 1;
+    kPedestrian = 2;
+    kVentilation = 3;
+    kSignature = 4;
+    kSequenceNextStep = 5;
+    kPedestrianNextStep = 6;
+  }
+
+  enum TriggerConditionEnum : enum8 {
+    kAfterDelay = 0;
+    kAfterApplicativeTrigger = 1;
+    kAfterDelayOrApplicativeTrigger = 2;
+  }
+
+  enum TriggerPositionEnum : enum8 {
+    kAtFullyClosed = 0;
+    kAtFullyOpened = 1;
+    kInBetween = 2;
+    kAtVentilation = 3;
+    kAtPedestrian = 4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPositioning = 0x1;
+    kMotionLatching = 0x2;
+    kInstantaneous = 0x4;
+    kSpeed = 0x8;
+    kVentilation = 0x10;
+    kPedestrian = 0x20;
+    kCalibration = 0x40;
+    kProtection = 0x80;
+    kManuallyOperable = 0x100;
+    kFallback = 0x200;
+  }
+
+  struct OverallStateStruct {
+    optional PositioningEnum positioning = 0;
+    optional LatchingEnum latching = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+    optional bitmap32 extraInfo = 3;
+  }
+
+  struct OverallTargetStruct {
+    optional TagPositionEnum tagPosition = 0;
+    optional TagLatchEnum tagLatch = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  readonly attribute optional nullable elapsed_s countdownTime = 0;
+  readonly attribute MainStateEnum mainState = 1;
+  readonly attribute ClosureErrorEnum currentErrorList[] = 2;
+  readonly attribute nullable OverallStateStruct overallState = 3;
+  readonly attribute nullable OverallTargetStruct overallTarget = 4;
+  readonly attribute optional RestingProcedureEnum restingProcedure = 5;
+  readonly attribute optional TriggerConditionEnum triggerCondition = 6;
+  readonly attribute optional TriggerPositionEnum triggerPosition = 7;
+  readonly attribute optional elapsed_s waitingDelay = 8;
+  readonly attribute optional elapsed_s kickoffTimer = 9;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct MoveToRequest {
+    optional TagPositionEnum tag = 0;
+    optional TagLatchEnum latch = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  request struct ConfigureFallbackRequest {
+    optional RestingProcedureEnum restingProcedure = 0;
+    optional TriggerConditionEnum triggerCondition = 1;
+    optional TriggerPositionEnum triggerPosition = 2;
+    optional elapsed_s waitingDelay = 3;
+  }
+
+  /** On receipt of this command, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
+  command Stop(): DefaultSuccess = 0;
+  /** Upon receipt, this SHALL move the product in the most fitting state following the data as follows: */
+  command MoveTo(MoveToRequest): DefaultSuccess = 1;
+  /** Upon receipt, this SHALL initiate a calibration. */
+  command access(invoke: manage) Calibrate(): DefaultSuccess = 2;
+  /** Upon receipt, this SHALL configure the Fallback feature behavior using the data as follows: */
+  command ConfigureFallback(ConfigureFallbackRequest): DefaultSuccess = 3;
+  /** Upon receipt, this SHALL cancel the current PendingFallback. */
+  command CancelFallback(): DefaultSuccess = 4;
+}
+
 /** The Service Area cluster provides an interface for controlling the areas where a device should operate, and for querying the current area being serviced. */
 provisional cluster ServiceArea = 336 {
   revision 1;
@@ -10119,9 +10260,9 @@ provisional cluster WebRTCTransportRequestor = 1364 {
     char_string sdp = 1;
   }
 
-  request struct ICECandidateRequest {
+  request struct ICECandidatesRequest {
     int16u webRTCSessionID = 0;
-    char_string ICECandidate = 1;
+    char_string ICECandidates[] = 1;
   }
 
   request struct EndRequest {
@@ -10129,12 +10270,12 @@ provisional cluster WebRTCTransportRequestor = 1364 {
     WebRTCEndReasonEnum reason = 1;
   }
 
-  /** This command provides the stream requestor with WebRTC session details. It is sent following the receipt of a SolicitOffer command or a re-Offer initiated by the Provider. */
+  /** This command provides the stream requestor with WebRTC session details. */
   command Offer(OfferRequest): DefaultSuccess = 1;
-  /** This command provides the stream requestor with the WebRTC session details (i.e. Session ID and SDP answer). It is the next command in the Offer/Answer flow to the ProvideOffer command. */
+  /** This command provides the stream requestor with the WebRTC session details (i.e. Session ID and SDP answer), It is the next command in the Offer/Answer flow to the ProvideOffer command. */
   command Answer(AnswerRequest): DefaultSuccess = 2;
-  /** This command provides an ICE candidate to the stream requestor in a WebRTC session. */
-  command ICECandidate(ICECandidateRequest): DefaultSuccess = 3;
+  /** This command allows for string based https://rfc-editor.org/rfc/rfc8839#section-5.1 generated after the initial Offer / Answer exchange, via a JSEP https://datatracker.ietf.org/doc/html/rfc9429#section-4.1.20 event, a DOM https://www.w3.org/TR/webrtc/#dom-rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase. */
+  command ICECandidates(ICECandidatesRequest): DefaultSuccess = 3;
   /** This command notifies the stream requestor that the provider has ended the WebRTC session. */
   command End(EndRequest): DefaultSuccess = 4;
 }

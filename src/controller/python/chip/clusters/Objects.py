@@ -117,6 +117,7 @@ __all__ = [
     "DeviceEnergyManagementMode",
     "DoorLock",
     "WindowCovering",
+    "ClosureControl",
     "ServiceArea",
     "PumpConfigurationAndControl",
     "Thermostat",
@@ -29162,6 +29163,523 @@ class WindowCovering(Cluster):
 
 
 @dataclass
+class ClosureControl(Cluster):
+    id: typing.ClassVar[int] = 0x00000104
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="countdownTime", Tag=0x00000000, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="mainState", Tag=0x00000001, Type=ClosureControl.Enums.MainStateEnum),
+                ClusterObjectFieldDescriptor(Label="currentErrorList", Tag=0x00000002, Type=typing.List[ClosureControl.Enums.ClosureErrorEnum]),
+                ClusterObjectFieldDescriptor(Label="overallState", Tag=0x00000003, Type=typing.Union[Nullable, ClosureControl.Structs.OverallStateStruct]),
+                ClusterObjectFieldDescriptor(Label="overallTarget", Tag=0x00000004, Type=typing.Union[Nullable, ClosureControl.Structs.OverallTargetStruct]),
+                ClusterObjectFieldDescriptor(Label="restingProcedure", Tag=0x00000005, Type=typing.Optional[ClosureControl.Enums.RestingProcedureEnum]),
+                ClusterObjectFieldDescriptor(Label="triggerCondition", Tag=0x00000006, Type=typing.Optional[ClosureControl.Enums.TriggerConditionEnum]),
+                ClusterObjectFieldDescriptor(Label="triggerPosition", Tag=0x00000007, Type=typing.Optional[ClosureControl.Enums.TriggerPositionEnum]),
+                ClusterObjectFieldDescriptor(Label="waitingDelay", Tag=0x00000008, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="kickoffTimer", Tag=0x00000009, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    countdownTime: typing.Union[None, Nullable, uint] = None
+    mainState: ClosureControl.Enums.MainStateEnum = 0
+    currentErrorList: typing.List[ClosureControl.Enums.ClosureErrorEnum] = field(default_factory=lambda: [])
+    overallState: typing.Union[Nullable, ClosureControl.Structs.OverallStateStruct] = NullValue
+    overallTarget: typing.Union[Nullable, ClosureControl.Structs.OverallTargetStruct] = NullValue
+    restingProcedure: typing.Optional[ClosureControl.Enums.RestingProcedureEnum] = None
+    triggerCondition: typing.Optional[ClosureControl.Enums.TriggerConditionEnum] = None
+    triggerPosition: typing.Optional[ClosureControl.Enums.TriggerPositionEnum] = None
+    waitingDelay: typing.Optional[uint] = None
+    kickoffTimer: typing.Optional[uint] = None
+    generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
+    acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
+    attributeList: typing.List[uint] = field(default_factory=lambda: [])
+    featureMap: uint = 0
+    clusterRevision: uint = 0
+
+    class Enums:
+        class ClosureErrorEnum(MatterIntEnum):
+            kBlocked = 0x00
+            kTemperatureLimited = 0x01
+            kMaintenanceRequired = 0x02
+            kInternalInterference = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
+
+        class LatchingEnum(MatterIntEnum):
+            kLatchedAndSecured = 0x00
+            kLatchedButNotSecured = 0x01
+            kNotLatched = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
+        class MainStateEnum(MatterIntEnum):
+            kStopped = 0x00
+            kMoving = 0x01
+            kWaitingForMotion = 0x02
+            kError = 0x03
+            kCalibrating = 0x04
+            kProtected = 0x05
+            kDisengaged = 0x06
+            kSetupRequired = 0x07
+            kPendingFallback = 0x08
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 9
+
+        class PositioningEnum(MatterIntEnum):
+            kFullyClosed = 0x00
+            kFullyOpened = 0x01
+            kPartiallyOpened = 0x02
+            kOpenedForPedestrian = 0x03
+            kOpenedForVentilation = 0x04
+            kOpenedAtSignature = 0x05
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 6
+
+        class RestingProcedureEnum(MatterIntEnum):
+            kDoNothing = 0x00
+            kReturnToFullyOpened = 0x01
+            kReturnToFullyClosed = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
+        class TagLatchEnum(MatterIntEnum):
+            kLatch = 0x00
+            kUnlatch = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
+
+        class TagPositionEnum(MatterIntEnum):
+            kCloseInFull = 0x00
+            kOpenInFull = 0x01
+            kPedestrian = 0x02
+            kVentilation = 0x03
+            kSignature = 0x04
+            kSequenceNextStep = 0x05
+            kPedestrianNextStep = 0x06
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 7
+
+        class TriggerConditionEnum(MatterIntEnum):
+            kAfterDelay = 0x00
+            kAfterApplicativeTrigger = 0x01
+            kAfterDelayOrApplicativeTrigger = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
+        class TriggerPositionEnum(MatterIntEnum):
+            kAtFullyClosed = 0x00
+            kAtFullyOpened = 0x01
+            kInBetween = 0x02
+            kAtVentilation = 0x03
+            kAtPedestrian = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 5
+
+    class Bitmaps:
+        class Feature(IntFlag):
+            kPositioning = 0x1
+            kMotionLatching = 0x2
+            kInstantaneous = 0x4
+            kSpeed = 0x8
+            kVentilation = 0x10
+            kPedestrian = 0x20
+            kCalibration = 0x40
+            kProtection = 0x80
+            kManuallyOperable = 0x100
+            kFallback = 0x200
+
+    class Structs:
+        @dataclass
+        class OverallStateStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="positioning", Tag=0, Type=typing.Optional[ClosureControl.Enums.PositioningEnum]),
+                        ClusterObjectFieldDescriptor(Label="latching", Tag=1, Type=typing.Optional[ClosureControl.Enums.LatchingEnum]),
+                        ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
+                        ClusterObjectFieldDescriptor(Label="extraInfo", Tag=3, Type=typing.Optional[uint]),
+                    ])
+
+            positioning: 'typing.Optional[ClosureControl.Enums.PositioningEnum]' = None
+            latching: 'typing.Optional[ClosureControl.Enums.LatchingEnum]' = None
+            speed: 'typing.Optional[Globals.Enums.ThreeLevelAutoEnum]' = None
+            extraInfo: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class OverallTargetStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="tagPosition", Tag=0, Type=typing.Optional[ClosureControl.Enums.TagPositionEnum]),
+                        ClusterObjectFieldDescriptor(Label="tagLatch", Tag=1, Type=typing.Optional[ClosureControl.Enums.TagLatchEnum]),
+                        ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
+                    ])
+
+            tagPosition: 'typing.Optional[ClosureControl.Enums.TagPositionEnum]' = None
+            tagLatch: 'typing.Optional[ClosureControl.Enums.TagLatchEnum]' = None
+            speed: 'typing.Optional[Globals.Enums.ThreeLevelAutoEnum]' = None
+
+    class Commands:
+        @dataclass
+        class Stop(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000104
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+        @dataclass
+        class MoveTo(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000104
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="tag", Tag=0, Type=typing.Optional[ClosureControl.Enums.TagPositionEnum]),
+                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[ClosureControl.Enums.TagLatchEnum]),
+                        ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
+                    ])
+
+            tag: typing.Optional[ClosureControl.Enums.TagPositionEnum] = None
+            latch: typing.Optional[ClosureControl.Enums.TagLatchEnum] = None
+            speed: typing.Optional[Globals.Enums.ThreeLevelAutoEnum] = None
+
+        @dataclass
+        class Calibrate(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000104
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+        @dataclass
+        class ConfigureFallback(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000104
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="restingProcedure", Tag=0, Type=typing.Optional[ClosureControl.Enums.RestingProcedureEnum]),
+                        ClusterObjectFieldDescriptor(Label="triggerCondition", Tag=1, Type=typing.Optional[ClosureControl.Enums.TriggerConditionEnum]),
+                        ClusterObjectFieldDescriptor(Label="triggerPosition", Tag=2, Type=typing.Optional[ClosureControl.Enums.TriggerPositionEnum]),
+                        ClusterObjectFieldDescriptor(Label="waitingDelay", Tag=3, Type=typing.Optional[uint]),
+                    ])
+
+            restingProcedure: typing.Optional[ClosureControl.Enums.RestingProcedureEnum] = None
+            triggerCondition: typing.Optional[ClosureControl.Enums.TriggerConditionEnum] = None
+            triggerPosition: typing.Optional[ClosureControl.Enums.TriggerPositionEnum] = None
+            waitingDelay: typing.Optional[uint] = None
+
+        @dataclass
+        class CancelFallback(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000104
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+    class Attributes:
+        @dataclass
+        class CountdownTime(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: typing.Union[None, Nullable, uint] = None
+
+        @dataclass
+        class MainState(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=ClosureControl.Enums.MainStateEnum)
+
+            value: ClosureControl.Enums.MainStateEnum = 0
+
+        @dataclass
+        class CurrentErrorList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[ClosureControl.Enums.ClosureErrorEnum])
+
+            value: typing.List[ClosureControl.Enums.ClosureErrorEnum] = field(default_factory=lambda: [])
+
+        @dataclass
+        class OverallState(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ClosureControl.Structs.OverallStateStruct])
+
+            value: typing.Union[Nullable, ClosureControl.Structs.OverallStateStruct] = NullValue
+
+        @dataclass
+        class OverallTarget(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ClosureControl.Structs.OverallTargetStruct])
+
+            value: typing.Union[Nullable, ClosureControl.Structs.OverallTargetStruct] = NullValue
+
+        @dataclass
+        class RestingProcedure(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[ClosureControl.Enums.RestingProcedureEnum])
+
+            value: typing.Optional[ClosureControl.Enums.RestingProcedureEnum] = None
+
+        @dataclass
+        class TriggerCondition(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[ClosureControl.Enums.TriggerConditionEnum])
+
+            value: typing.Optional[ClosureControl.Enums.TriggerConditionEnum] = None
+
+        @dataclass
+        class TriggerPosition(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[ClosureControl.Enums.TriggerPositionEnum])
+
+            value: typing.Optional[ClosureControl.Enums.TriggerPositionEnum] = None
+
+        @dataclass
+        class WaitingDelay(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000008
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
+
+        @dataclass
+        class KickoffTimer(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000009
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+
+@dataclass
 class ServiceArea(Cluster):
     id: typing.ClassVar[int] = 0x00000150
 
@@ -47174,7 +47692,7 @@ class WebRTCTransportRequestor(Cluster):
             sdp: str = ""
 
         @dataclass
-        class ICECandidate(ClusterCommand):
+        class ICECandidates(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000554
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
@@ -47185,11 +47703,11 @@ class WebRTCTransportRequestor(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="ICECandidate", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(Label="ICECandidates", Tag=1, Type=typing.List[str]),
                     ])
 
             webRTCSessionID: uint = 0
-            ICECandidate: str = ""
+            ICECandidates: typing.List[str] = field(default_factory=lambda: [])
 
         @dataclass
         class End(ClusterCommand):

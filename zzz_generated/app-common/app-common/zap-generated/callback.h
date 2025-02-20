@@ -421,6 +421,11 @@ void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfClosureControlClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfServiceAreaClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -3658,6 +3663,45 @@ MatterWindowCoveringClusterServerPreAttributeChangedCallback(const chip::app::Co
 void emberAfWindowCoveringClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Closure Control Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfClosureControlClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterClosureControlClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfClosureControlClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterClosureControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterClosureControlClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfClosureControlClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Service Area Cluster
 //
 
@@ -6384,6 +6428,36 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::DecodableType & commandData);
 /**
+ * @brief Closure Control Cluster Stop Command callback (from client)
+ */
+bool emberAfClosureControlClusterStopCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ClosureControl::Commands::Stop::DecodableType & commandData);
+/**
+ * @brief Closure Control Cluster MoveTo Command callback (from client)
+ */
+bool emberAfClosureControlClusterMoveToCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ClosureControl::Commands::MoveTo::DecodableType & commandData);
+/**
+ * @brief Closure Control Cluster Calibrate Command callback (from client)
+ */
+bool emberAfClosureControlClusterCalibrateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ClosureControl::Commands::Calibrate::DecodableType & commandData);
+/**
+ * @brief Closure Control Cluster ConfigureFallback Command callback (from client)
+ */
+bool emberAfClosureControlClusterConfigureFallbackCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ClosureControl::Commands::ConfigureFallback::DecodableType & commandData);
+/**
+ * @brief Closure Control Cluster CancelFallback Command callback (from client)
+ */
+bool emberAfClosureControlClusterCancelFallbackCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ClosureControl::Commands::CancelFallback::DecodableType & commandData);
+/**
  * @brief Thermostat Cluster SetpointRaiseLower Command callback (from client)
  */
 bool emberAfThermostatClusterSetpointRaiseLowerCallback(
@@ -6995,11 +7069,11 @@ bool emberAfWebRTCTransportRequestorClusterAnswerCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WebRTCTransportRequestor::Commands::Answer::DecodableType & commandData);
 /**
- * @brief WebRTC Transport Requestor Cluster ICECandidate Command callback (from client)
+ * @brief WebRTC Transport Requestor Cluster ICECandidates Command callback (from client)
  */
-bool emberAfWebRTCTransportRequestorClusterICECandidateCallback(
+bool emberAfWebRTCTransportRequestorClusterICECandidatesCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::DecodableType & commandData);
+    const chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidates::DecodableType & commandData);
 /**
  * @brief WebRTC Transport Requestor Cluster End Command callback (from client)
  */
