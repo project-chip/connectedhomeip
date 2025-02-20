@@ -118,4 +118,4 @@ void MatterWifiTask(void * arg);
  *
  * @param[in] ip New IPv4 address
  */
-void GotIPv4Address(uint32_t ip)
+void GotIPv4Address(uint32_t ip);
