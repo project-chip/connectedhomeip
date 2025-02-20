@@ -69,7 +69,7 @@ namespace Inet {
 #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) const
 {
-    if (mPlatformInterface && nameBufSize >= kMaxIfNameLength)
+    if (mPlatformInterface && nameBufSize >= InterfaceId::kMaxIfNameLength)
     {
         nameBuf[0] = 'o';
         nameBuf[1] = 't';
@@ -84,7 +84,7 @@ CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) con
 }
 CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & interface)
 {
-    if (strlen(intfName) < 3)
+    if (strnlen(intfName, kMaxIfNameLength) < 3)
     {
         return INET_ERROR_UNKNOWN_INTERFACE;
     }
@@ -210,7 +210,7 @@ CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) con
 
 CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & interface)
 {
-    if (strlen(intfName) < 3)
+    if (strnlen(intfName, InterfaceId::kMaxIfNameLength) < 3)
     {
         return INET_ERROR_UNKNOWN_INTERFACE;
     }
@@ -445,7 +445,7 @@ CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) con
         {
             return CHIP_ERROR_POSIX(errno);
         }
-        size_t nameLength = strlen(intfName);
+        size_t nameLength = strnlen(intfName, IF_NAMESIZE);
         if (nameLength >= nameBufSize)
         {
             return CHIP_ERROR_BUFFER_TOO_SMALL;
@@ -579,7 +579,8 @@ InterfaceId InterfaceIterator::GetInterfaceId()
 CHIP_ERROR InterfaceIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
 {
     VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(strlen(mIntfArray[mCurIntf].if_name) < nameBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(strnlen(mIntfArray[mCurIntf].if_name, InterfaceId::kMaxIfNameLength) < nameBufSize,
+                        CHIP_ERROR_BUFFER_TOO_SMALL);
     Platform::CopyString(nameBuf, nameBufSize, mIntfArray[mCurIntf].if_name);
     return CHIP_NO_ERROR;
 }
@@ -728,7 +729,7 @@ InterfaceId InterfaceAddressIterator::GetInterfaceId()
 CHIP_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
 {
     VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(strlen(mCurAddr->ifa_name) < nameBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(strnlen(mCurAddr->ifa_name, InterfaceId::kMaxIfNameLength) < nameBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
     Platform::CopyString(nameBuf, nameBufSize, mCurAddr->ifa_name);
     return CHIP_NO_ERROR;
 }
@@ -802,7 +803,7 @@ CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) con
             return CHIP_ERROR_INCORRECT_STATE;
         }
         const char * name = net_if_get_device(currentInterface)->name;
-        size_t nameLength = strlen(name);
+        size_t nameLength = strnlen(name, InterfaceId::kMaxIfNameLength);
         if (nameLength >= nameBufSize)
         {
             return CHIP_ERROR_BUFFER_TOO_SMALL;
@@ -825,7 +826,7 @@ CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & i
 
     while ((currentInterface = net_if_get_by_index(++currentId)) != nullptr)
     {
-        if (strcmp(net_if_get_device(currentInterface)->name, intfName) == 0)
+        if (strncmp(net_if_get_device(currentInterface)->name, intfName, InterfaceId::kMaxIfNameLength) == 0)
         {
             interface = InterfaceId(currentId);
             return CHIP_NO_ERROR;
