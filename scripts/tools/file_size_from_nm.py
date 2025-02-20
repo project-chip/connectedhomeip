@@ -356,7 +356,7 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
     for line in items.split("\n"):
         if not line.strip():
             continue
-        _offset, size, t, name = line.split(" ")
+        _, size, t, name = line.split(" ")
 
         size = int(size, 10)
 
