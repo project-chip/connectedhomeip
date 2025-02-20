@@ -6274,6 +6274,9 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateFabricLabelID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000009,
     MTRCommandIDTypeClusterOperationalCredentialsCommandRemoveFabricID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000000A,
     MTRCommandIDTypeClusterOperationalCredentialsCommandAddTrustedRootCertificateID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000000B,
+    MTRCommandIDTypeClusterOperationalCredentialsCommandSetVidVerificationStatementID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
+    MTRCommandIDTypeClusterOperationalCredentialsCommandSignVidVerificationRequestID MTR_PROVISIONALLY_AVAILABLE = 0x0000000D,
+    MTRCommandIDTypeClusterOperationalCredentialsCommandSignVidVerificationResponseID MTR_PROVISIONALLY_AVAILABLE = 0x0000000E,
 
     // Cluster GroupKeyManagement deprecated command id names
     MTRClusterGroupKeyManagementCommandKeySetWriteID
@@ -7702,6 +7705,7 @@ typedef NS_ENUM(uint32_t, MTRDeviceTypeIDType) {
     MTRDeviceTypeIDTypeColorTemperatureLightID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x0000010C,
     MTRDeviceTypeIDTypeExtendedColorLightID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x0000010D,
     MTRDeviceTypeIDTypeMountedOnOffControlID MTR_PROVISIONALLY_AVAILABLE = 0x0000010F,
+    MTRDeviceTypeIDTypeMountedDimmableLoadControlID MTR_PROVISIONALLY_AVAILABLE = 0x00000110,
     MTRDeviceTypeIDTypeCameraID MTR_PROVISIONALLY_AVAILABLE = 0x00000142,
     MTRDeviceTypeIDTypeWindowCoveringID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000202,
     MTRDeviceTypeIDTypeWindowCoveringControllerID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000203,
