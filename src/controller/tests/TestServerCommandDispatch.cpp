@@ -104,8 +104,7 @@ void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterface
         });
 }
 
-CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                                                CommandHandlerInterface::CommandIdCallback callback, void * context)
+CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, ListBuilder<AcceptedCommandEntry> & builder)
 {
     if (!mOverrideAcceptedCommands)
     {
@@ -116,7 +115,7 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
     {
         return CHIP_NO_ERROR;
     }
-
+    builder.get
     // We just have one command id.
     callback(Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id, context);
     return CHIP_NO_ERROR;
