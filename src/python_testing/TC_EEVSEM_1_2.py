@@ -40,7 +40,7 @@ import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from modebase_cluster_check import ModeBaseClusterChecks
 
-CLUSTER = Clusters.EnergyEvseMode
+cluster_eevsem_mode = Clusters.EnergyEvseMode
 
 
 class TC_EEVSEM_1_2(MatterBaseTest, ModeBaseClusterChecks):
@@ -48,7 +48,7 @@ class TC_EEVSEM_1_2(MatterBaseTest, ModeBaseClusterChecks):
     def __init__(self, *args):
         MatterBaseTest.__init__(self, *args)
         ModeBaseClusterChecks.__init__(self,
-                                       modebase_derived_cluster=CLUSTER)
+                                       modebase_derived_cluster=cluster_eevsem_mode)
 
     def desc_TC_EEVSEM_1_2(self) -> str:
         return "[TC-EEVSEM-1.2] Cluster attributes with DUT as Server"
@@ -81,8 +81,8 @@ class TC_EEVSEM_1_2(MatterBaseTest, ModeBaseClusterChecks):
 
         # According to the spec, there should be at least one Manual or Time of Use
         # tag in the ones supported.
-        additional_tags = [CLUSTER.Enums.ModeTag.kManual,
-                           CLUSTER.Enums.ModeTag.kTimeOfUse]
+        additional_tags = [cluster_eevsem_mode.Enums.ModeTag.kManual,
+                           cluster_eevsem_mode.Enums.ModeTag.kTimeOfUse]
         self.check_tags_in_lists(supported_modes=supported_modes, required_tags=additional_tags)
 
         self.step(3)
