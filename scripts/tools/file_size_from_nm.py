@@ -91,12 +91,15 @@ _CLUSTER_EXPRESSIONS = [
     re.compile(r'emberAf(?P<cluster>.+)ClusterClientInitCallback\('),
     re.compile(r'emberAf(?P<cluster>.+)ClusterInitCallback\('),
     re.compile(r'emberAf(?P<cluster>.+)ClusterServerInitCallback\('),
+
+
+
     re.compile(r'emberAf(?P<cluster>.+)ClusterServerTickCallback\('),
     re.compile(r'Matter(?P<cluster>.+)ClusterServerAttributeChangedCallback\('),
     re.compile(r'Matter(?P<cluster>.+)ClusterServerPreAttributeChangedCallback\('),
     re.compile(r'Matter(?P<cluster>.+)ClusterServerShutdownCallback\('),
     # commands
-    re.compile(r'emberAf(?P<cluster>.+Cluster)(?P<command>.+)Callback\('),
+    re.compile(r'emberAf(?P<cluster>.+)Cluster(?P<command>.+)Callback\('),
 ]
 
 
@@ -157,7 +160,8 @@ def tree_display_name(name: str) -> list[str]:
         # application hook points.
         return ["EMBER", "CALLBACKS", "PLUGIN", name]
 
-    if name.startswith("emAf") or name.startswith("emberAf"):
+    # We also capture '(anonymous namespace)::emAfWriteAttribute or similar
+    if name.startswith("emAf") or name.startswith("emberAf") or ("::emAf" in name) or ('::emberAf' in name):
         # Place this as ::EMBER::API (these are internal and public functions from ember)
         return ["EMBER", "API", name]
 
@@ -250,8 +254,22 @@ def tree_display_name(name: str) -> list[str]:
 # pytest file_size_from_nm.py
 def test_tree_display_name():
     assert tree_display_name("fooBar") == ["C", "fooBar"]
-    assert tree_display_name("emberAfTest") == ["emberAf", "emberAfTest"]
-    assert tree_display_name("MatterSomeCall") == ["Matter", "MatterSomeCall"]
+    assert tree_display_name("emberAfTest") == ["EMBER", "API", "emberAfTest"]
+    assert tree_display_name("MatterSomeCall") == ["C", "MatterSomeCall"]
+
+    assert tree_display_name("emberAfFooBarClusterServerInitCallback()") ==[
+        "chip", "app", "Clusters", "FooBar", "EMBER", "emberAfFooBarClusterServerInitCallback()"
+                             ]
+    assert tree_display_name("emberAfFooBarClusterInitCallback()") ==[
+        "chip", "app", "Clusters", "FooBar", "EMBER", "emberAfFooBarClusterInitCallback()" 
+    ]
+    assert tree_display_name("MatterFooBarClusterServerShutdownCallback()") ==[
+        "chip", "app", "Clusters", "FooBar", "EMBER", "MatterFooBarClusterServerShutdownCallback()"
+    ]
+    assert tree_display_name("emberAfFooBarClusterSomeCommandCallback()") == [
+        "chip", "app", "Clusters", "FooBar", "EMBER", "SomeCommand", "emberAfFooBarClusterSomeCommandCallback()"
+    ]
+
     assert tree_display_name("chip::Some::Constructor()") == [
         "chip",
         "Some",
@@ -306,6 +324,10 @@ def test_tree_display_name():
     assert tree_display_name(
         "void foo::bar<baz>::method(my::arg name, other::arg::type)"
     ) == ["foo", "bar<baz>", "void method(my::arg name, other::arg::type)"]
+
+    assert tree_display_name(
+        "(anonymous namespace)::AccessControlAttribute::Read(someargs)"
+    ) == ["(anonymous namespace)", "AccessControlAttribute", "Read", "(anonymous namespace)::AccessControlAttribute::Read(someargs)"]
 
 
 def build_treemap(
