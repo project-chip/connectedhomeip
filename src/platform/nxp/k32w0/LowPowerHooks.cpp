@@ -48,10 +48,14 @@ extern "C" void stopM2();
 extern "C" void sched_enable();
 extern "C" uint64_t otPlatTimeGet(void);
 extern "C" void vOptimizeConsumption(void);
+extern "C" void BOARD_CheckPowerDownDcdcVoltage(void);
+extern "C" void BOARD_CheckWakeUpDcdcVoltage(void);
 
 WEAK void dm_switch_wakeupCallBack(void);
 WEAK void dm_switch_preSleepCallBack(void);
 WEAK void vOptimizeConsumption(void);
+WEAK void BOARD_CheckPowerDownDcdcVoltage(void);
+WEAK void BOARD_CheckWakeUpDcdcVoltage(void);
 static void ThreadExitSleep();
 static void BOARD_SetClockForWakeup(void);
 
@@ -106,6 +110,10 @@ uint32_t dm_switch_get15_4InitWakeUpTime(void)
 
 WEAK void dm_switch_wakeupCallBack(void)
 {
+    /* Check VBAT voltage after wakeup and set DCDC voltage
+    according for K32W041A/AM variants */
+    BOARD_CheckWakeUpDcdcVoltage();
+
     BOARD_SetClockForWakeup();
     SHA_ClkInit(SHA_INSTANCE);
     CLOCK_EnableClock(kCLOCK_Aes);
@@ -164,6 +172,16 @@ WEAK void vOptimizeConsumption(void)
     /* Intentionally left empty, user needs to redefine it at application level */
 }
 
+WEAK void BOARD_CheckPowerDownDcdcVoltage(void)
+{
+    /* Intentionally left empty, will be linked to board.c function */
+}
+
+WEAK void BOARD_CheckWakeUpDcdcVoltage(void)
+{
+    /* Intentionally left empty, will be linked to board.c function */
+}
+
 WEAK void dm_switch_preSleepCallBack(void)
 {
 #if ENABLE_LOW_POWER_LOGS
@@ -198,6 +216,10 @@ WEAK void dm_switch_preSleepCallBack(void)
     BOARD_DeInitAdc();
     /* DeInit the necessary clocks */
     BOARD_SetClockForPowerMode();
+
+    /* Check VBAT voltage before going to sleep and set DCDC voltage
+    according for K32W041A/AM variants */
+    BOARD_CheckPowerDownDcdcVoltage();
 }
 
 void dm_switch_init15_4AfterWakeUp(void)

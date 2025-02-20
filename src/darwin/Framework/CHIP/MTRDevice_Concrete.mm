@@ -2887,6 +2887,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                    [matterCPPObjectsHolder setReadClient:nullptr subscriptionCallback:nullptr];
 
                                    // OnDone
+                                   std::lock_guard lock(self->_lock);
                                    [self _doHandleSubscriptionReset:nil];
                                },
                                ^(void) {

@@ -4710,7 +4710,9 @@ public class ClusterIDMapping {
             UpdateNOC(7L),
             UpdateFabricLabel(9L),
             RemoveFabric(10L),
-            AddTrustedRootCertificate(11L),;
+            AddTrustedRootCertificate(11L),
+            SetVidVerificationStatement(12L),
+            SignVidVerificationRequest(13L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -4858,6 +4860,40 @@ public class ClusterIDMapping {
                     }
                     public static AddTrustedRootCertificateCommandField value(int id) throws NoSuchFieldError {
                         for (AddTrustedRootCertificateCommandField field : AddTrustedRootCertificateCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetVidVerificationStatementCommandField {VendorID(0),VidVerificationStatement(1),Vvsc(2),;
+                    private final int id;
+                    SetVidVerificationStatementCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetVidVerificationStatementCommandField value(int id) throws NoSuchFieldError {
+                        for (SetVidVerificationStatementCommandField field : SetVidVerificationStatementCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SignVidVerificationRequestCommandField {FabricIndex(0),ClientChallenge(1),;
+                    private final int id;
+                    SignVidVerificationRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SignVidVerificationRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (SignVidVerificationRequestCommandField field : SignVidVerificationRequestCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -18015,7 +18051,7 @@ public class ClusterIDMapping {
         public enum Command {
             Offer(1L),
             Answer(2L),
-            ICECandidate(3L),
+            ICECandidates(3L),
             End(4L),;
             private final long id;
             Command(long id) {
@@ -18068,17 +18104,17 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ICECandidateCommandField {WebRTCSessionID(0),ICECandidate(1),;
+                }public enum ICECandidatesCommandField {WebRTCSessionID(0),ICECandidates(1),;
                     private final int id;
-                    ICECandidateCommandField(int id) {
+                    ICECandidatesCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static ICECandidateCommandField value(int id) throws NoSuchFieldError {
-                        for (ICECandidateCommandField field : ICECandidateCommandField.values()) {
+                    public static ICECandidatesCommandField value(int id) throws NoSuchFieldError {
+                        for (ICECandidatesCommandField field : ICECandidatesCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
