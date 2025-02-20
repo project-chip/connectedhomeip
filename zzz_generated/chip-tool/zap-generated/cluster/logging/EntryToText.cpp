@@ -6705,6 +6705,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Extended Color Light";
     case 0x0000010F:
         return "Mounted On/Off Control";
+    case 0x00000110:
+        return "Mounted Dimmable Load Control";
     case 0x00000142:
         return "Camera";
     case 0x00000202:
