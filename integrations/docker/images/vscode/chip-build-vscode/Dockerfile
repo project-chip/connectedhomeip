@@ -91,7 +91,7 @@ RUN set -x \
 #   - telnet
 #   - srecord
 # For java builds:
-#   - openjdk-17-jdk
+#   - openjdk-11-jdk
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
@@ -119,7 +119,7 @@ ENV WIFI_SDK_ROOT=/opt/silabs/wifi_sdk
 ENV IDF_PATH=/opt/espressif/esp-idf/
 ENV IDF_TOOLS_PATH=/opt/espressif/tools
 ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/6.1-langdale
-ENV JAVA_PATH=/usr/lib/jvm/java-17-openjdk-amd64
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools
 ENV OPENOCD_PATH=/opt/openocd/
 ENV QEMU_ESP32=/opt/espressif/qemu/qemu-system-xtensa
