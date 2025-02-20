@@ -152,7 +152,8 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
             f">>> pairing onnetwork 111 {setup_params.passcode}")
 
     def steps_TC_MCORE_FS_1_2(self) -> list[TestStep]:
-        steps = [TestStep(1, "TH subscribes to PartsList attribute of the Descriptor cluster of DUT_FSA endpoint 0."),
+        steps = [TestStep(0, "Commissioning already done.", is_commissioning=True),
+                 TestStep(1, "TH subscribes to PartsList attribute of the Descriptor cluster of DUT_FSA endpoint 0."),
                  TestStep(2, "Follow manufacturer provided instructions to have DUT_FSA commission TH_SERVER"),
                  TestStep(3, "TH waits up to 30 seconds for subscription report from the PartsList attribute of the Descriptor to contain new endpoint"),
                  TestStep(4, "TH uses DUT to open commissioning window to TH_SERVER"),
@@ -172,6 +173,9 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
 
         min_report_interval_sec = self.user_params.get("min_report_interval_sec", 0)
         max_report_interval_sec = self.user_params.get("max_report_interval_sec", 30)
+
+        # Commissioning
+        self.step(0)
 
         self.step(1)
         # Subscribe to the PartsList
