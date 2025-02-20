@@ -15,24 +15,20 @@
 #    limitations under the License.
 #
 
-import xml.etree.ElementTree as ElementTree
+from importlib.abc import Traversable
 from jinja2 import Template
 import os
+import xml.etree.ElementTree as ElementTree
+import zipfile
 
 from chip.testing.matter_testing import (MatterBaseTest, default_matter_test_main, 
                                        ProblemNotice, ProblemSeverity, NamespacePathLocation)
-from chip.testing.spec_parsing import (XmlNamespace, parse_namespace,
-                                     build_xml_namespaces)
+from chip.testing.spec_parsing import (XmlNamespace, parse_namespace, PrebuiltDataModelDirectory,
+                                     build_xml_namespaces, get_data_model_directory, DataModelLevel)
 from mobly import asserts
 
 class TestSpecParsingNamespace(MatterBaseTest):
     def setup_class(self):
-        # Get the data model paths
-        self.dm_1_3 = os.path.join(os.path.dirname(__file__), "..", "..", "data_model", "1.3")
-        self.dm_1_4 = os.path.join(os.path.dirname(__file__), "..", "..", "data_model", "1.4")
-        self.dm_1_4_1 = os.path.join(os.path.dirname(__file__), "..", "..", "data_model", "1.4.1")
-        self.dm_master = os.path.join(os.path.dirname(__file__), "..", "..", "data_model", "master")
-
         # Test data setup
         self.namespace_id = 0x0001
         self.namespace_name = "Test Namespace"
@@ -110,14 +106,14 @@ class TestSpecParsingNamespace(MatterBaseTest):
 
     def test_spec_files(self):
         """Test parsing actual spec files from different versions"""
-        one_three, _ = build_xml_namespaces(self.dm_1_3)
-        one_four, one_four_problems = build_xml_namespaces(self.dm_1_4)
-        one_four_one, one_four_one_problems = build_xml_namespaces(self.dm_1_4_1)
-        tot, tot_problems = build_xml_namespaces(self.dm_master)
+        one_three, _ = build_xml_namespaces(PrebuiltDataModelDirectory.k1_3)
+        one_four, one_four_problems = build_xml_namespaces(PrebuiltDataModelDirectory.k1_4)
+        one_four_one, one_four_one_problems = build_xml_namespaces(PrebuiltDataModelDirectory.k1_4_1)
+        tot, tot_problems = build_xml_namespaces(PrebuiltDataModelDirectory.kMaster)
 
         asserts.assert_equal(len(one_four_problems), 0, "Problems found when parsing 1.4 spec")
         asserts.assert_equal(len(one_four_one_problems), 0, "Problems found when parsing 1.4.1 spec")
-        
+
         # Check version relationships
         asserts.assert_greater(len(set(tot.keys()) - set(one_three.keys())),
                             0, "Master dir does not contain any namespaces not in 1.3")
@@ -132,50 +128,49 @@ class TestSpecParsingNamespace(MatterBaseTest):
         asserts.assert_equal(set(one_four.keys()) - set(tot.keys()),
                         set(), "There are some 1.4 namespaces that are unexpectedly not included in the TOT files")
 
-    def validate_namespace_xml(self, xml_file: str) -> list[ProblemNotice]:
-        # Validating XML namespace files
-        problems = []
+    def validate_namespace_xml(self, xml_file: Traversable) -> list[ProblemNotice]:
+        """Validate namespace XML file"""
+        problems: list[ProblemNotice] = []
         try:
-            tree = ElementTree.parse(xml_file)
-            root = tree.getroot()
-            
-            # Check for namespace ID and validate format
-            namespace_id = root.get('id')
-            if not namespace_id:
-                problems.append(ProblemNotice(
-                    test_name="Validate Namespace XML",
-                    location=NamespacePathLocation(),
-                    severity=ProblemSeverity.WARNING,
-                    problem=f"Missing namespace ID in {xml_file}"
-                ))
-            else:
-                # Validate 16-bit hex format (0xNNNN)
-                try:
-                    # Remove '0x' prefix if present and try to parse
-                    id_value = int(namespace_id.replace('0x', ''), 16)
-                    if id_value < 0 or id_value > 0xFFFF:
-                        problems.append(ProblemNotice(
-                            test_name="Validate Namespace XML",
-                            location=NamespacePathLocation(),
-                            severity=ProblemSeverity.WARNING,
-                            problem=f"Namespace ID {namespace_id} is not a valid 16-bit value in {xml_file}"
-                        ))
-
-                    # Check format is exactly 0xNNNN where N is a hex digit
-                    if not namespace_id.lower().startswith('0x') or len(namespace_id) != 6:
-                        problems.append(ProblemNotice(
-                            test_name="Validate Namespace XML",
-                            location=NamespacePathLocation(),
-                            severity=ProblemSeverity.WARNING,
-                            problem=f"Namespace ID {namespace_id} does not follow required format '0xNNNN' in {xml_file}"
-                        ))
-                except ValueError:
+            with xml_file.open('r', encoding="utf8") as f:
+                root = ElementTree.parse(f).getroot()
+                
+                # Check for namespace ID and validate format
+                namespace_id = root.get('id')
+                if not namespace_id:
                     problems.append(ProblemNotice(
                         test_name="Validate Namespace XML",
                         location=NamespacePathLocation(),
                         severity=ProblemSeverity.WARNING,
-                        problem=f"Invalid hex format for namespace ID {namespace_id} in {xml_file}"
+                        problem=f"Missing namespace ID in {xml_file.name}"
                     ))
+                else:
+                    # Validate 16-bit hex format (0xNNNN)
+                    try:
+                        # Remove '0x' prefix if present and try to parse
+                        id_value = int(namespace_id.replace('0x', ''), 16)
+                        if id_value < 0 or id_value > 0xFFFF:
+                            problems.append(ProblemNotice(
+                                test_name="Validate Namespace XML",
+                                location=NamespacePathLocation(),
+                                severity=ProblemSeverity.WARNING,
+                                problem=f"Namespace ID {namespace_id} is not a valid 16-bit value in {xml_file.name}"
+                            ))
+                        # Check format is exactly 0xNNNN where N is hex digit
+                        if not namespace_id.lower().startswith('0x') or len(namespace_id) != 6:
+                            problems.append(ProblemNotice(
+                                test_name="Validate Namespace XML",
+                                location=NamespacePathLocation(),
+                                severity=ProblemSeverity.WARNING,
+                                problem=f"Namespace ID {namespace_id} does not follow required format '0xNNNN' in {xml_file.name}"
+                            ))
+                    except ValueError:
+                        problems.append(ProblemNotice(
+                            test_name="Validate Namespace XML",
+                            location=NamespacePathLocation(),
+                            severity=ProblemSeverity.WARNING,
+                            problem=f"Invalid hex format for namespace ID {namespace_id} in {xml_file.name}"
+                        ))
 
             # Check for namespace name
             namespace_name = root.get('name', '').strip()
@@ -184,7 +179,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
                     test_name="Validate Namespace XML",
                     location=NamespacePathLocation(),
                     severity=ProblemSeverity.WARNING,
-                    problem=f"Missing or empty namespace name in {xml_file}"
+                    problem=f"Missing or empty namespace name in {xml_file.name}"
                 ))
 
             # Check tags structure
@@ -198,19 +193,18 @@ class TestSpecParsingNamespace(MatterBaseTest):
                             test_name="Validate Namespace XML",
                             location=NamespacePathLocation(),
                             severity=ProblemSeverity.WARNING,
-                            problem=f"Missing tag ID in {xml_file}"
+                            problem=f"Missing tag ID in {xml_file.name}"
                         ))
                     else:
-                        # Validate 16-bit hex format for tags (0xNNNN)
                         try:
                             # Remove '0x' prefix if present and try to parse
-                            id_value = int(tag_id.replace('0x', ''), 16)
+                            id_value = int(tag_id.replace('0x', ''), 0)
                             if id_value < 0 or id_value > 0xFFFF:
                                 problems.append(ProblemNotice(
                                     test_name="Validate Namespace XML",
                                     location=NamespacePathLocation(),
                                     severity=ProblemSeverity.WARNING,
-                                    problem=f"Tag ID {tag_id} is not a valid 16-bit value in {xml_file}"
+                                    problem=f"Tag ID {tag_id} is not a valid 16-bit value in {xml_file.name}"
                                 ))
                             # Check format is exactly 0xNNNN where N is hex digit
                             if not tag_id.lower().startswith('0x') or len(tag_id) != 6:
@@ -218,14 +212,14 @@ class TestSpecParsingNamespace(MatterBaseTest):
                                     test_name="Validate Namespace XML",
                                     location=NamespacePathLocation(),
                                     severity=ProblemSeverity.WARNING,
-                                    problem=f"Tag ID {tag_id} does not follow required format '0xNNNN' in {xml_file}"
+                                    problem=f"Tag ID {tag_id} does not follow required format '0xNNNN' in {xml_file.name}"
                                 ))
                         except ValueError:
                             problems.append(ProblemNotice(
                                 test_name="Validate Namespace XML",
                                 location=NamespacePathLocation(),
                                 severity=ProblemSeverity.WARNING,
-                                problem=f"Invalid hex format for tag ID {tag_id} in {xml_file}"
+                                problem=f"Invalid hex format for tag ID {tag_id} in {xml_file.name}"
                             ))
 
                     # Check tag name
@@ -235,56 +229,76 @@ class TestSpecParsingNamespace(MatterBaseTest):
                             test_name="Validate Namespace XML",
                             location=NamespacePathLocation(),
                             severity=ProblemSeverity.WARNING,
-                            problem=f"Missing or empty tag name in {xml_file}"
+                            problem=f"Missing or empty tag name in {xml_file.name}"
                         ))
 
         except Exception as e:
             problems.append(ProblemNotice(
                 test_name="Validate Namespace XML",
-                location=NamespacePathLocation(),
+                location=UnknownProblemLocation(),
                 severity=ProblemSeverity.WARNING,
-                problem=f"Failed to parse {xml_file}: {str(e)}"
+                problem=f"Failed to parse {xml_file.name}: {str(e)}"
             ))
 
         return problems
 
     def test_all_namespace_files(self):
-        """Test all namespace XML files in the 1.4 and 1.4.1 data model directories"""
+        """Test all namespace XML files in the data model namespaces directories"""
         data_model_versions = {
-            "1.4": self.dm_1_4,
-            "1.4.1": self.dm_1_4_1,
+            "1.4": PrebuiltDataModelDirectory.k1_4,
+            "1.4.1": PrebuiltDataModelDirectory.k1_4_1,
         }
 
         for version, dm_path in data_model_versions.items():
-            namespace_path = os.path.join(dm_path, "namespaces")
-            if not os.path.exists(namespace_path):
-                self.print_step("Issue encountered", f"\nSkipping {version} - namespace directory not found")
-                continue
-
-            for filename in os.listdir(namespace_path):
-                if not filename.endswith('.xml'):
-                    continue
-
-                filepath = os.path.join(namespace_path, filename)
-                problems = self.validate_namespace_xml(filepath)
-                
+            try:
+                # First get the namespaces
+                namespaces, problems = build_xml_namespaces(dm_path)
                 if problems:
                     for problem in problems:
-                        self.print_step("problem", problem)
+                        print(f"  - {problem}")
+
+                # Get the directory for validation
+                top = get_data_model_directory(dm_path, DataModelLevel.kNamespace)
                 
-                # Run the same validation we did for generated XML
-                tree = ElementTree.parse(filepath)
-                namespace, parse_problems = parse_namespace(tree.getroot())
-                
-                # Verify namespace has required attributes
-                asserts.assert_true(hasattr(namespace, 'id'), f"Namespace in {filename} missing ID")
-                asserts.assert_true(hasattr(namespace, 'name'), f"Namespace in {filename} missing name")
-                asserts.assert_true(hasattr(namespace, 'tags'), f"Namespace in {filename} missing tags dictionary")
-                
-                # Verify each tag has required attributes
-                for tag_id, tag in namespace.tags.items():
-                    asserts.assert_true(hasattr(tag, 'id'), f"Tag in {filename} missing ID")
-                    asserts.assert_true(hasattr(tag, 'name'), f"Tag in {filename} missing name")
+                # Handle both zip files and directories
+                if isinstance(top, zipfile.Path):
+                    files = [f for f in top.iterdir() if str(f).endswith('.xml')]
+                else:
+                    files = [f for f in top.iterdir() if f.name.endswith('.xml')]
+
+                # Validate each XML file
+                for file in files:
+                    validation_problems = self.validate_namespace_xml(file)
+                    if validation_problems:
+                        for problem in validation_problems:
+                            asserts.assert_false(
+                                problem.severity == ProblemSeverity.ERROR,
+                                f"Error in {file.name}: {problem}"
+                            )
+
+                    # Parse and verify the namespace
+                    with file.open('r', encoding="utf8") as xml:
+                        root = ElementTree.parse(xml).getroot()
+                        namespace, parse_problems = parse_namespace(root)
+                        
+                        # Basic attribute verification
+                        asserts.assert_true(hasattr(namespace, 'id'), 
+                                        f"Namespace in {file.name} missing ID")
+                        asserts.assert_true(hasattr(namespace, 'name'), 
+                                        f"Namespace in {file.name} missing name")
+                        asserts.assert_true(hasattr(namespace, 'tags'), 
+                                        f"Namespace in {file.name} missing tags dictionary")
+
+                        # Verify each tag
+                        for tag_id, tag in namespace.tags.items():
+                            asserts.assert_true(hasattr(tag, 'id'), 
+                                            f"Tag in {file.name} missing ID")
+                            asserts.assert_true(hasattr(tag, 'name'), 
+                                            f"Tag in {file.name} missing name")
+
+            except Exception as e:
+                print(f"Error processing {version}: {str(e)}")
+                raise
 
 if __name__ == "__main__":
     default_matter_test_main()

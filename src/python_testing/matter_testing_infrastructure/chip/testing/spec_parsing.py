@@ -591,6 +591,7 @@ class PrebuiltDataModelDirectory(Enum):
 class DataModelLevel(Enum):
     kCluster = auto()
     kDeviceType = auto()
+    kNamespace = auto()
 
     @property
     def dirname(self):
@@ -598,6 +599,8 @@ class DataModelLevel(Enum):
             return "clusters"
         if self == DataModelLevel.kDeviceType:
             return "device_types"
+        if self == DataModelLevel.kNamespace:
+            return "namespaces"
         raise KeyError("Invalid enum: %r" % self)
 
 
@@ -892,48 +895,71 @@ def parse_namespace(et: ElementTree.Element) -> tuple[XmlNamespace, list[Problem
 
     return namespace, problems
 
-def build_xml_namespaces(data_model_directory: str) -> tuple[dict[int, XmlNamespace], list[ProblemNotice]]:
+def build_xml_namespaces(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable]) -> tuple[dict[int, XmlNamespace], list[ProblemNotice]]:
     """Build a dictionary of namespaces from XML files in the given directory"""
-    namespace_path = os.path.join(data_model_directory, "namespaces")
+    namespace_dir = get_data_model_directory(data_model_directory, DataModelLevel.kNamespace)
     namespaces: dict[int, XmlNamespace] = {}
     problems: list[ProblemNotice] = []
+    
+    found_xmls = 0
 
-    if not os.path.exists(namespace_path):
-        problems.append(ProblemNotice(
-            test_name="Build XML Namespaces",
-            location=UnknownProblemLocation(),
-            severity=ProblemSeverity.WARNING,
-            problem=f"Namespace directory not found: {namespace_path}"
-        ))
-        return namespaces, problems
+    try:
+        # Handle both zip files and directories
+        if isinstance(namespace_dir, zipfile.Path):
+            filenames = [f for f in namespace_dir.iterdir() if str(f).endswith('.xml')]
+        else:
+            filenames = [f for f in namespace_dir.iterdir() if f.name.endswith('.xml')]
 
-    for filename in os.listdir(namespace_path):
-        if not filename.endswith('.xml'):
-            continue
+        for filename in filenames:
+            logging.info('Parsing file %s', str(filename))
+            found_xmls += 1
             
-        filepath = os.path.join(namespace_path, filename)
-        try:
-            tree = ElementTree.parse(filepath)
-            namespace, parse_problems = parse_namespace(tree.getroot())
-            problems.extend(parse_problems)
-            
-            if namespace.id in namespaces:
+            try:
+                with filename.open('r', encoding="utf8") as xml:
+                    root = ElementTree.parse(xml).getroot()
+                    namespace, parse_problems = parse_namespace(root)
+                    problems.extend(parse_problems)
+                    
+                    if namespace.id in namespaces:
+                        problems.append(ProblemNotice(
+                            test_name="Build XML Namespaces",
+                            location=NamespacePathLocation(namespace_id=namespace.id),
+                            severity=ProblemSeverity.WARNING,
+                            problem=f"Duplicate namespace ID 0x{namespace.id:04X} in {filename.name}"
+                        ))
+                    else:
+                        namespaces[namespace.id] = namespace
+                        
+            except Exception as e:
                 problems.append(ProblemNotice(
                     test_name="Build XML Namespaces",
                     location=UnknownProblemLocation(),
                     severity=ProblemSeverity.WARNING,
-                    problem=f"Duplicate namespace ID {namespace.id:04X} in {filename}"
+                    problem=f"Failed to parse {filename.name}: {str(e)}"
                 ))
-            else:
-                namespaces[namespace.id] = namespace
-                
-        except Exception as e:
-            problems.append(ProblemNotice(
-                test_name="Build XML Namespaces",
-                location=UnknownProblemLocation(),
-                severity=ProblemSeverity.WARNING,
-                problem=f"Failed to parse {filename}: {str(e)}"
-            ))
+
+    except Exception as e:
+        problems.append(ProblemNotice(
+            test_name="Build XML Namespaces",
+            location=UnknownProblemLocation(),
+            severity=ProblemSeverity.WARNING,
+            problem=f"Failed to access namespace directory: {str(e)}"
+        ))
+
+    if found_xmls < 1:
+        logging.warning("No XML files found in the specified namespace directory: %r", namespace_dir)
+        problems.append(ProblemNotice(
+            test_name="Build XML Namespaces",
+            location=UnknownProblemLocation(),
+            severity=ProblemSeverity.WARNING,
+            problem=f"No XML files found in namespace directory: {str(namespace_dir)}"
+        ))
+
+    # Print problems for debugging
+    if problems:
+        logging.warning("Found %d problems while parsing namespaces:", len(problems))
+        for problem in problems:
+            logging.warning("  - %s", str(problem))
 
     return namespaces, problems
 
