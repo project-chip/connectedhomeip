@@ -69,7 +69,7 @@ public:
 
     System::Clock::Timestamp GetMRPBaseTimeout() const override { return System::Clock::kZero; }
 
-    System::Clock::Milliseconds32 GetAckTimeout() const override
+    System::Clock::Milliseconds32 GetAckTimeout(bool isFirstMessageOnExchange) const override
     {
         VerifyOrDie(false);
         return System::Clock::Timeout();
@@ -128,7 +128,7 @@ public:
 
     System::Clock::Timestamp GetMRPBaseTimeout() const override { return System::Clock::kZero; }
 
-    System::Clock::Milliseconds32 GetAckTimeout() const override
+    System::Clock::Milliseconds32 GetAckTimeout(bool isFirstMessageOnExchange) const override
     {
         VerifyOrDie(false);
         return System::Clock::Timeout();
