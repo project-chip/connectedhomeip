@@ -25,13 +25,6 @@ public:
     virtual CHIP_ERROR EnableDiagnostics() = 0;
 
     /**
-     * @brief Clear diagnostic data from storage
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, error code otherwise
-     */
-    virtual CHIP_ERROR ClearSentDiagnosticsData() = 0;
-
-    /**
      * @brief Check if diagnostic buffer is empty
      *
      * @return bool true if empty, false otherwise

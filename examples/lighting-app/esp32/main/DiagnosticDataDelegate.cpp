@@ -8,6 +8,8 @@
 #include <tracing/esp32_diagnostic_trace/Diagnostics.h>
 #include <unordered_map>
 
+using namespace chip::Tracing::Diagnostics;
+
 namespace chip {
 namespace Diagnostics {
 
@@ -39,6 +41,7 @@ public:
 
     CHIP_ERROR StartPeriodicDiagnostics(chip::System::Clock::Timeout aTimeout) override
     {
+        printf("Starting periodic diagnostic timer\n");
         if (aTimeout == System::Clock::kZero)
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
@@ -71,15 +74,61 @@ public:
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     CHIP_ERROR EnableDiagnostics() override
     {
+        printf("inside enable diagnostics\n");
         VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INCORRECT_STATE);
         if (IsDiagnosticBufferEmpty())
         {
+            printf("diagnostic buffer is empty\n");
             return CHIP_ERROR_NOT_FOUND;
         }
-        MutableByteSpan span(mRetrievalBuffer, CONFIG_RETRIEVAL_BUFFER_SIZE);
-        CHIP_ERROR err = mStorageInstance->Retrieve(span, mReadDiagnosticEntries);
-        ParseAndSendDiagnostics(span.data(), span.size());
-        return err;
+
+        // First try as trace data
+        Diagnostic<const char*> trace("", "", 0);
+        CHIP_ERROR traceErr = mStorageInstance->RetrieveDecodedEntry(trace);
+        if (traceErr == CHIP_NO_ERROR)
+        {
+            printf("Retrieved trace data - Label: %s, Value: %s\n", 
+                   trace.GetLabel(), trace.GetValue());
+            LogTraceData(trace.GetLabel(), trace.GetValue());
+        }
+        else
+        {
+            printf("Failed to retrieve trace data: %s\n", chip::ErrorStr(traceErr));
+            
+            // If trace retrieval failed, try as uint32
+            Diagnostic<uint32_t> metricUint("", 0, 0);
+            CHIP_ERROR metricUintErr = mStorageInstance->RetrieveDecodedEntry(metricUint);
+            if (metricUintErr == CHIP_NO_ERROR)
+            {
+                printf("Retrieved uint32 metric - Label: %s, Value: %lu\n", 
+                       metricUint.GetLabel(), metricUint.GetValue());
+                LogMetricData(metricUint.GetLabel(), ValueType::kUInt32, metricUint.GetValue());
+            }
+            else
+            {
+                printf("Failed to retrieve uint32 metric: %s\n", chip::ErrorStr(metricUintErr));
+                
+                // Try as int32
+                Diagnostic<int32_t> metricInt("", 0, 0);
+                CHIP_ERROR metricIntErr = mStorageInstance->RetrieveDecodedEntry(metricInt);
+                if (metricIntErr == CHIP_NO_ERROR)
+                {
+                    printf("Retrieved int32 metric - Label: %s, Value: %ld\n", 
+                           metricInt.GetLabel(), metricInt.GetValue());
+                    LogMetricData(metricInt.GetLabel(), ValueType::kInt32, 
+                                static_cast<uint32_t>(metricInt.GetValue()));
+                }
+                else
+                {
+                    printf("Failed to retrieve int32 metric: %s\n", chip::ErrorStr(metricIntErr));
+                    return metricIntErr;
+                }
+            }
+        }
+
+        // Clear buffer after successful processing
+        mStorageInstance->ClearBuffer(1);
+        return CHIP_NO_ERROR;
     }
 #else
     CHIP_ERROR EnableDiagnostics() override
@@ -93,107 +142,10 @@ private:
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     uint8_t mRetrievalBuffer[CONFIG_RETRIEVAL_BUFFER_SIZE];
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-    uint32_t mReadDiagnosticEntries = 0;
     System::Clock::Timeout mTimeout = System::Clock::kZero;
     std::unordered_map<const char *, ValueType> mRegisteredMetrics;
 
-    CHIP_ERROR ClearSentDiagnosticsData() override
-    {
-        VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        if (mReadDiagnosticEntries > 0)
-        {
-            err                    = mStorageInstance->ClearBuffer(mReadDiagnosticEntries);
-            mReadDiagnosticEntries = 0;
-        }
-        return err;
-    }
-
     bool IsDiagnosticBufferEmpty() override { return (mStorageInstance == nullptr) ? true : mStorageInstance->IsBufferEmpty(); }
-
-    CHIP_ERROR ParseAndSendDiagnostics(const uint8_t * inBuffer, uint32_t inBufferSize)
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        printf("Parsing and sending diagnostics\n");
-
-        // Create TLV reader for input buffer
-        TLV::TLVReader reader;
-        reader.Init(inBuffer, inBufferSize);
-
-        while (CHIP_NO_ERROR == (err = reader.Next()))
-        {
-            if (reader.GetType() == TLV::kTLVType_Structure)
-            {
-                TLV::TLVType containerType;
-                ReturnErrorOnFailure(reader.EnterContainer(containerType));
-
-                uint32_t timestamp = 0;
-                char * label       = nullptr;
-                uint32_t labelLen  = 0;
-                uint32_t valueLen  = 0;
-
-                // Read timestamp
-                err = reader.Next(TLV::ContextTag(Tracing::Diagnostics::DiagTag::TIMESTAMP));
-                if (err == CHIP_NO_ERROR)
-                {
-                    ReturnErrorOnFailure(reader.Get(timestamp));
-                }
-
-                // Read label
-                err = reader.Next(TLV::ContextTag(Tracing::Diagnostics::DiagTag::LABEL));
-                if (err == CHIP_NO_ERROR)
-                {
-                    labelLen = reader.GetLength();
-                    label    = (char *) chip::Platform::MemoryAlloc(labelLen + 1);
-                    ReturnErrorOnFailure(reader.GetString(label, labelLen + 1));
-                }
-
-                // Read value
-                err = reader.Next(TLV::ContextTag(Tracing::Diagnostics::DiagTag::VALUE));
-                if (err == CHIP_NO_ERROR)
-                {
-                    switch (reader.GetType())
-                    {
-                    case TLV::kTLVType_UTF8String: {
-                        valueLen     = reader.GetLength();
-                        char * value = (char *) chip::Platform::MemoryAlloc(valueLen + 1);
-                        ReturnErrorOnFailure(reader.GetString(value, valueLen + 1));
-
-                        LogTraceData(label, value);
-                        chip::Platform::MemoryFree((void *) value);
-                        break;
-                    }
-                    case TLV::kTLVType_UnsignedInteger: {
-                        uint32_t intValue;
-                        ReturnErrorOnFailure(reader.Get(intValue));
-
-                        LogMetricData(label, ValueType::kUInt32, intValue);
-                        break;
-                    }
-                    case TLV::kTLVType_SignedInteger: {
-                        int32_t intValue;
-                        ReturnErrorOnFailure(reader.Get(intValue));
-
-                        LogMetricData(label, ValueType::kInt32, intValue);
-                        break;
-                    }
-                    default: {
-                        LogTraceData(label, "<unsupported type>");
-                        break;
-                    }
-                    }
-                }
-                chip::Platform::MemoryFree((void *) label);
-                ReturnErrorOnFailure(reader.ExitContainer(containerType));
-            }
-        }
-
-        if (err == CHIP_END_OF_TLV)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        return err;
-    }
 
     void LogTraceData(const char * label, const char * group)
     {
@@ -295,13 +247,15 @@ private:
 
     static void DiagnosticSamplingHandler(System::Layer * systemLayer, void * context)
     {
+        printf("DiagnosticSamplingHandler\n");
         auto * instance = static_cast<DiagnosticDataDelegateImpl *>(context);
-
-        // Retrieve and send diagnostics
-        instance->EnableDiagnostics();
-
-        // Clear processed diagnostics
-        instance->ClearSentDiagnosticsData();
+        VerifyOrReturn(instance != nullptr);
+        VerifyOrReturn(instance->mStorageInstance != nullptr);
+        
+        while(!instance->mStorageInstance->IsBufferEmpty()) {
+            // Retrieve and send diagnostics
+            instance->EnableDiagnostics();   
+        }
 
         // Schedule next sampling
         DeviceLayer::SystemLayer().StartTimer(instance->mTimeout, DiagnosticSamplingHandler, instance);
