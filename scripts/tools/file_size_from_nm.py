@@ -418,28 +418,42 @@ def symbols_from_objdump(elf_file: str) -> list[Symbol]:
     #    - file information exists (... df *ABS* of 0 size), however pointers inside
     #      if may be slightly off - we need to track these as .text seem to potentially be aligned
     #    - symbols are have size
+ 
+    # TODO: find all source paths!
 
-    LINE_RE = re.compile(r'^(?P<offset>[0-9a-f]{8})\s(?P<flags>.{7})\s+(?P<section>\S+)\s+(?P<size>\S+)\s+(?P<name>.*)$')
+    LINE_RE = re.compile(r'^(?P<offset>[0-9a-f]{8})\s(?P<flags>.{7})\s+(?P<section>\S+)\s+(?P<size>\S+)\s*(?P<name>.*)$')
     current_file_name = None
+
+    offset_file_map = {}
+
 
     for line in items.split("\n"):
         line = line.strip()
+
         m = LINE_RE.match(line)
         if not m:
             continue
 
         captures = m.groupdict()
         size = int(captures['size'], 16)
+        offset = int(captures['offset'], 16)
         if captures['flags'].endswith('df') and captures['section'] == '*ABS*' and size == 0:
             current_file_name = captures['name']
             continue
 
         if size == 0:
-            # FIXME: save offset maybe?
+            if current_file_name:
+                offset_file_map[offset] = current_file_name
             continue
 
+        # find the offset in a file. Either exact or a bit above
+        symbol_file_name = current_file_name
+        if not symbol_file_name:
+            for delta in range(8):
+                if offset - delta in offset_file_map:
+                    symbol_file_name = offset_file_map[offset - delta]
 
-        print('%s: %r' % (current_file_name, m.groupdict()))
+        print('%s: %r' % (symbol_file_name, m.groupdict()))
 
     # TODO: remove once we have real functionality
     import sys
