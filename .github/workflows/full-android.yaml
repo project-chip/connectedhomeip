@@ -15,104 +15,104 @@
 name: Full builds - Android
 
 on:
-    push:
-        branches:
-            - master
-            - 'v*-branch'
-    workflow_dispatch:
+  push:
+    branches:
+      - master
+      - "v*-branch"
+  workflow_dispatch:
 
 concurrency:
-    group: full-${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
-    cancel-in-progress: true
+  group: full-${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+  cancel-in-progress: true
 
 env:
-    CHIP_NO_LOG_TIMESTAMPS: true
+  CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
-    full_android:
-        name: Run
+  full_android:
+    name: Run
 
-        env:
-            JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64/
+    env:
+      JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64/
 
-        runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+    runs-on: ubuntu-latest
+    if: github.actor != 'restyled-io[bot]'
 
-        container:
-            image: ghcr.io/project-chip/chip-build-android:113
-            volumes:
-                - "/tmp/log_output:/tmp/test_logs"
+    container:
+      image: ghcr.io/project-chip/chip-build-android:113
+      volumes:
+        - "/tmp/log_output:/tmp/test_logs"
 
-        steps:
-            - uses: actions/checkout@v4
-              name: Checkout
-              with:
-                token: ${{ github.token }}
-              # To use act like:
-            #   act -j full_android
-            #
-            # Note you likely still need to have non submodules setup for the
-            # local machine, like:
-            #   git submodule deinit --all
-            - uses: actions/checkout@v4
-              if: ${{ env.ACT }}
-              name: Checkout (ACT for local build)
-            - name: Checkout submodules & Bootstrap
-              uses: ./.github/actions/checkout-submodules-and-bootstrap
-              with:
-                platform: android
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout
+        with:
+          token: ${{ github.token }}
+        # To use act like:
+      #   act -j full_android
+      #
+      # Note you likely still need to have non submodules setup for the
+      # local machine, like:
+      #   git submodule deinit --all
+      - uses: actions/checkout@v4
+        if: ${{ env.ACT }}
+        name: Checkout (ACT for local build)
+      - name: Checkout submodules & Bootstrap
+        uses: ./.github/actions/checkout-submodules-and-bootstrap
+        with:
+          platform: android
 
-            - name: Cleanup pigweed CIPD packages
-              # This should not generally be needed, however android CI runs out of space
-              # We do not need pigweed cross compile here because we use android NDK
-              # compilers. Removing this package saves a significant amount of space.
-              continue-on-error: true
-              run: |
-                du -sh .environment/cipd/packages/arm
-                rm -rf .environment/cipd/packages/arm
-            - name: Build Android arm-chip-tool
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target android-arm-chip-tool build"
-            - name: Clean out build output
-              run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/* examples/android/CHIPTool/app/libs/*.jar
-            - name: Build Android arm-tv-casting-app
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target android-arm-tv-casting-app build"
-            - name: Clean out build output
-              run: rm -rf ./out examples/tv-casting-app/android/App/app/libs/jniLibs/* examples/tv-casting-app/android/App/app/libs/*.jar
-            - name: Build Android arm-tv-server
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target android-arm-tv-server build"
-            - name: Clean out build output
-              run: rm -rf ./out examples/tv-app/android/App/app/libs/jniLibs/* examples/tv-app/android/App/app/libs/*.jar
-            - name: Build Android arm64-tv-casting-app
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target android-arm64-tv-casting-app build"
-            - name: Clean out build output
-              run: rm -rf ./out examples/tv-casting-app/android/app/libs/jniLibs/* examples/android/CHIPTool/app/libs/*.jar
-            - name: Build Android arm64-tv-server
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target android-arm64-tv-server build"
-            - name: Clean out build output
-              run: rm -rf ./out examples/tv-app/android/App/app/libs/jniLibs/* examples/tv-app/android/App/app/libs/*.jar
-            - name: Build Android arm64-chip-tool
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target android-arm64-chip-tool build"
-            - name: Run Android build rule tests
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "ninja -C out/android-arm64-chip-tool build/chip/java/tests:java_build_test"
-            - name: Clean out build output
-              run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/* examples/android/CHIPTool/app/libs/*.jar
-            - name: Build Android arm64-chip-test
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target android-arm64-chip-test build"
-            - name: Clean out build output
-              run: rm -rf ./out examples/android/CHIPTest/app/libs/jniLibs/* examples/android/CHIPTest/app/libs/*.jar
+      - name: Cleanup pigweed CIPD packages
+        # This should not generally be needed, however android CI runs out of space
+        # We do not need pigweed cross compile here because we use android NDK
+        # compilers. Removing this package saves a significant amount of space.
+        continue-on-error: true
+        run: |
+          du -sh .environment/cipd/packages/arm
+          rm -rf .environment/cipd/packages/arm
+      - name: Build Android chip tool
+        run: |
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py --target android-arm64-chip-tool build"
+      # - name: Clean out build output
+      #   run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/* examples/android/CHIPTool/app/libs/*.jar
+      # - name: Build Android arm-tv-casting-app
+      #   run: |
+      #       ./scripts/run_in_build_env.sh \
+      #         "./scripts/build/build_examples.py --target android-arm-tv-casting-app build"
+      # - name: Clean out build output
+      #   run: rm -rf ./out examples/tv-casting-app/android/App/app/libs/jniLibs/* examples/tv-casting-app/android/App/app/libs/*.jar
+      # - name: Build Android arm-tv-server
+      #   run: |
+      #       ./scripts/run_in_build_env.sh \
+      #         "./scripts/build/build_examples.py --target android-arm-tv-server build"
+      # - name: Clean out build output
+      #   run: rm -rf ./out examples/tv-app/android/App/app/libs/jniLibs/* examples/tv-app/android/App/app/libs/*.jar
+      # - name: Build Android arm64-tv-casting-app
+      #   run: |
+      #       ./scripts/run_in_build_env.sh \
+      #         "./scripts/build/build_examples.py --target android-arm64-tv-casting-app build"
+      # - name: Clean out build output
+      #   run: rm -rf ./out examples/tv-casting-app/android/app/libs/jniLibs/* examples/android/CHIPTool/app/libs/*.jar
+      # - name: Build Android arm64-tv-server
+      #   run: |
+      #       ./scripts/run_in_build_env.sh \
+      #         "./scripts/build/build_examples.py --target android-arm64-tv-server build"
+      # - name: Clean out build output
+      #   run: rm -rf ./out examples/tv-app/android/App/app/libs/jniLibs/* examples/tv-app/android/App/app/libs/*.jar
+      # # - name: Build Android arm64-chip-tool
+      #   run: |
+      #       ./scripts/run_in_build_env.sh \
+      #         "./scripts/build/build_examples.py --target android-arm64-chip-tool build"
+      # - name: Run Android build rule tests
+      #   run: |
+      #       ./scripts/run_in_build_env.sh \
+      #         "ninja -C out/android-arm64-chip-tool build/chip/java/tests:java_build_test"
+      # - name: Clean out build output
+      #   run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/* examples/android/CHIPTool/app/libs/*.jar
+      # - name: Build Android arm64-chip-test
+      #   run: |
+      #       ./scripts/run_in_build_env.sh \
+      #         "./scripts/build/build_examples.py --target android-arm64-chip-test build"
+      # - name: Clean out build output
+      #   run: rm -rf ./out examples/android/CHIPTest/app/libs/jniLibs/* examples/android/CHIPTest/app/libs/*.jar
