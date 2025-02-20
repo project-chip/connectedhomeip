@@ -79,8 +79,8 @@ __CHART_STYLES__ = {
 class Symbol:
     name: str
     symbol_type: str
-    offset: int
     size: int
+    tree_path: list[str]
 
 
 def tree_display_name(name: str) -> list[str]:
@@ -273,7 +273,7 @@ def build_treemap(
     total_sizes: dict = {}
 
     for symbol in symbols:
-        tree_name = tree_display_name(symbol.name)
+        tree_name = symbol.tree_path
 
         if zoom is not None:
             partial = ""
@@ -356,10 +356,9 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
     for line in items.split("\n"):
         if not line.strip():
             continue
-        offset, size, t, name = line.split(" ")
+        _offset, size, t, name = line.split(" ")
 
         size = int(size, 10)
-        offset = int(offset, 10)
 
         if t in {
             # Text section
@@ -379,7 +378,7 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
             "V",
         }:
             logging.debug("Found %s of size %d", name, size)
-            symbols.append(Symbol(name=name, symbol_type=t, offset=offset, size=size))
+            symbols.append(Symbol(name=name, symbol_type=t, size=size, tree_path = tree_display_name(name)))
         elif t in {
             # BSS - 0-initialized, not code
             "b",
