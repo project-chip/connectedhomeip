@@ -42,6 +42,7 @@
 #    plotly
 
 import logging
+import re
 import subprocess
 from dataclasses import dataclass
 from enum import Enum, auto
@@ -72,6 +73,17 @@ class ChartStyle(Enum):
 __CHART_STYLES__ = {
     "treemap": ChartStyle.TREE_MAP,
     "sunburst": ChartStyle.SUNBURST,
+}
+
+
+class FetchStyle(Enum):
+    NM = auto()
+    OBJDUMP = auto()
+
+
+__FETCH_STYLES__ = {
+    "nm": ChartStyle.TREE_MAP,
+    "objdump": ChartStyle.SUNBURST,
 }
 
 
@@ -338,6 +350,103 @@ def build_treemap(
     fig.update_traces(root_color="lightgray")
     fig.show()
 
+def symbols_from_objdump(elf_file: str) -> list[Symbol]:
+    items = subprocess.check_output(
+        [
+            "objdump",
+            "--syms",
+            "--demangle",
+            elf_file,
+        ]
+    ).decode("utf8")
+
+    # The format looks like:
+    #
+    #     out/qpg-qpg6105-light/chip-qpg6105-lighting-example.out:     file format elf32-little                                                                                          │
+    #                                                                                                                                                                                │
+    #     SYMBOL TABLE:                                                                                                                                                                  │
+    #     04000010 l    d  .bl_user_license   00000000 .bl_user_license                                                                                                                  │
+    #     04000800 l    d  .datajumptable 00000000 .datajumptable                                                                                                                        │
+    #     04000840 l    d  .flashjumptable    00000000 .flashjumptable                                                                                                                   │
+    #     04001600 l    d  .m_flashjumptable  00000000 .m_flashjumptable                                                                                                                 │
+    #     04001800 l    d  .bootloader    00000000 .bootloader                                                                                                                           │
+    #     04003d00 l    d  .rt_flash  00000000 .rt_flash                                                                                                                                 │
+    #     04007000 l    d  .upgrade_image_user_license    00000000 .upgrade_image_user_license                                                                                           │
+    #     04008000 l    d  .loaded_user_license   00000000 .loaded_user_license                                                                                                          │
+    #     04008080 l    d  .extended_user_license 00000000 .extended_user_license                                                                                                        │
+    #     04008100 l    d  .isr_vector    00000000 .isr_vector                                                                                                                           │
+    #     040081c4 l    d  firmware_datafirmwaredata  00000000 firmware_datafirmwaredata
+    #     ....
+    #     00000000 l    df *ABS*  00000000 gpJumpTables_DataTable.c                                                                                                                      │
+    #     04080384 l       .text  00000000 $t                                                                                                                                            │
+    #     0408038c l       .text  00000000 $d                                                                                                                                            │
+    #     04000800 l       .datajumptable 00000000 $d                                                                                                                                    │
+    #     00000000 l    df *ABS*  00000000 gpJumpTables_RomLib_FlashJump_gcc.o                                                                                                           │
+    #     ....
+    #     00000000 l    df *ABS*  00000000 ember-io-storage.cpp                                                                                                                          │
+    #     04012106 l       .text  00000000 $t                                                                                                                                            │
+    #     04012122 l       .text  00000000 $d                                                                                                                                            │
+    #     0401212a l       .text  00000000 $t                                                                                                                                            │
+    #     04012136 l       .text  00000000 $d                                                                                                                                            │
+    #     2003aa70 l       .data  00000000 $d                                                                                                                                            │
+    #     200417a0 l       .bss   00000000 $d                                                                                                                                            │
+    #     04012167 l       .text  00000000 $d                                                                                                                                            │
+    #     04012168 l       .text  00000000 $t
+    #     ...
+    #     200417a0 g     O .bss   00000103 chip::app::Compatibility::Internal::attributeIOBuffer
+    #     04012107 g     F .text  0000008a chip::app::Compatibility::Internal::AttributeBaseType(unsigned char)
+    #
+    # Documentation at https://sourceware.org/binutils/docs/binutils/objdump.html
+    #
+    # Format is:
+    #    - Address
+    #    - set of character and spaces for flags
+    #    - section (or *ABS* or *UND*)
+    #    - alignment or size (common symbos: alignment, otherwise size)
+    #    - Symbol name
+    # Flags are:
+    #   - l,g,u,! => local,global,unique global, none (space) or both local and global (!)
+    #   - w - weak (space is strong)
+    #   - C - constructor
+    #   - W - warning
+    #   - I/i - indirect reference/evaluated during relocation processing
+    #   - D/d - debugging symbol/dynamic debugging symbol
+    #   - F/f/O - name of a function, or a file (F) or an object (O)
+
+    # Logic generally is:
+    #    - can capture segment (.text, .data, .bss seem interesting)
+    #    - file information exists (... df *ABS* of 0 size), however pointers inside
+    #      if may be slightly off - we need to track these as .text seem to potentially be aligned
+    #    - symbols are have size
+
+    LINE_RE = re.compile(r'^(?P<offset>[0-9a-f]{8})\s(?P<flags>.{7})\s+(?P<section>\S+)\s+(?P<size>\S+)\s+(?P<name>.*)$')
+    current_file_name = None
+
+    for line in items.split("\n"):
+        line = line.strip()
+        m = LINE_RE.match(line)
+        if not m:
+            continue
+
+        captures = m.groupdict()
+        size = int(captures['size'], 16)
+        if captures['flags'].endswith('df') and captures['section'] == '*ABS*' and size == 0:
+            current_file_name = captures['name']
+            continue
+
+        if size == 0:
+            # FIXME: save offset maybe?
+            continue
+
+
+        print('%s: %r' % (current_file_name, m.groupdict()))
+
+    # TODO: remove once we have real functionality
+    import sys
+    sys.exit(0)
+
+    return []
+
 def symbols_from_nm(elf_file: str) -> list[Symbol]:
     items = subprocess.check_output(
         [
@@ -407,6 +516,13 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
     help="Style of the chart",
 )
 @click.option(
+    "--fetch-via",
+    default="nm",
+    show_default=True,
+    type=click.Choice(list(__FETCH_STYLES__.keys()), case_sensitive=False),
+    help="How to read the binary symbols",
+)
+@click.option(
     "--max-depth",
     default=4,
     show_default=True,
@@ -428,6 +544,7 @@ def main(
     log_level,
     elf_file: Path,
     display_type: str,
+    fetch_via: str,
     max_depth: int,
     zoom: Optional[str],
     strip: Optional[str],
@@ -435,7 +552,10 @@ def main(
     log_fmt = "%(asctime)s %(levelname)-7s %(message)s"
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
-    symbols = symbols_from_nm(elf_file.absolute().as_posix())
+    if __FETCH_STYLES__[fetch_via] == FetchStyle.NM:
+        symbols = symbols_from_nm(elf_file.absolute().as_posix())
+    else:
+        symbols = symbols_from_objdump(elf_file.absolute().as_posix())
 
     build_treemap(
         elf_file.name, symbols, __CHART_STYLES__[display_type], max_depth, zoom, strip
