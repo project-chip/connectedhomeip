@@ -36,8 +36,8 @@ namespace app {
 namespace Clusters {
 namespace ClosureControl {
 
-/** @brief
- *    Defines methods for implementing application-specific logic for the Closure Control Cluster.
+/**
+ * @brief Defines methods for implementing application-specific logic for the Closure Control Cluster.
  */
 class Delegate
 {
@@ -79,7 +79,7 @@ public:
     virtual CHIP_ERROR EndCurrentErrorListRead()                              = 0;
 
 protected:
-    EndpointId mEndpointId = 0;
+    EndpointId mEndpointId = chip::kInvalidEndpointId;
 };
 
 enum class OptionalAttributes : uint32_t
@@ -90,10 +90,17 @@ enum class OptionalAttributes : uint32_t
 class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs,
-             ClusterId aClusterId) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id),
-        CommandHandlerInterface(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mClusterId(aClusterId), mFeature(aFeature),
+    /**
+     * @brief Creates a closure control cluster instance. The Init() function needs to be called for
+     *        this instance to be registered and called by the interaction model at the appropriate times.
+     * @param[in] aEndpointId The endpoint on which this cluster exists.
+     * @param[in] aDelegate The Delegate used by this Instance.
+     * @param[in] aFeature The bitmask value that identifies which features are supported by this instance.
+     * @param[in] aOptionalAttrs The Enum Value that identifies which optional attributes are supported by this instance.
+     */
+    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs) :
+        AttributeAccessInterface(MakeOptional(aEndpointId), ClosureControl::Id),
+        CommandHandlerInterface(MakeOptional(aEndpointId), ClosureControl::Id), mDelegate(aDelegate), mFeature(aFeature),
         mOptionalAttrs(aOptionalAttrs)
     {
         /* set the base class delegates endpointId */
@@ -109,73 +116,75 @@ public:
 
     // Attribute setters
     /**
-     * Set Main State.
-     * @param aMainState The Main state that should now be the current one.
+     * @brief Set Main State.
+     * @param[in] aMainState The Main state that should now be the current one.
      * @return CHIP_NO_ERROR if set was successful.
      */
     CHIP_ERROR SetMainState(const MainStateEnum & aMainState);
 
     /**
-     * Set OverallState.
-     * @param aMainState The OverallState that should now be the current State.
+     * @brief Set OverallState.
+     * @param[in] aOverallState The OverallState that should now be the current State.
      * @return CHIP_NO_ERROR if set was successful.
      */
     CHIP_ERROR SetOverallState(const GenericOverallState & aOverallState);
 
     /**
-     * Set OverallTarget.
-     * @param aMainState The OverallTarget that should be set.
+     * @brief Set OverallTarget.
+     * @param[in] aOverallTarget The OverallTarget that should now be the Overall Target.
      * @return CHIP_NO_ERROR if set was successful.
      */
     CHIP_ERROR SetOverallTarget(const GenericOverallTarget & aOverallTarget);
 
     // Attribute getters
     /**
-     * Get Main State.
-     * @return The Main State.
+     * @brief Get MainState.
+     * @return Current MainState.
      */
     MainStateEnum GetMainState() const;
 
     /**
-     * Get OverallState.
-     * @return  The GenericOverallState to fill with the current Overall State
+     * @brief Get OverallState.
+     * @return Current OverallState.
      */
     GenericOverallState GetOverallState() const;
 
     /**
-     * Get OverallTarget.
-     * @return The GenericOverallTarget to fill with the current Overall Target
+     * @brief Get OverallTarget.
+     * @return Current OverallTarget.
      */
     GenericOverallTarget GetOverallTarget() const;
 
     /**
-     * @brief Whenever application delegate wants to possibly report a new updated time,
-     *        call this method. The `GetCountdownTime()` method will be called on the delegate.
+     * @brief Whenever application wants to trigger an update to report a new updated time,
+     *        call this method. The `GetCountdownTime()` method will be called on the application.
      */
-    void UpdateCountdownTimeFromDelegate() { UpdateCountdownTime(/* fromDelegate = */ true); }
+    inline void UpdateCountdownTimeFromDelegate() { UpdateCountdownTime(/* fromDelegate = */ true); }
 
     /**
-     * This function returns true if the phase value given exists in the PhaseList attribute, otherwise it returns false.
+     * @brief This function checks if Main State is supported or not based on features supported.
+     * @param[in] aMainState MainState
+     * @return true if State is supported, false if State is not supported
      */
     bool IsSupportedState(MainStateEnum aMainState);
 
 protected:
     /**
-     * Causes reporting/udpating of CountdownTime attribute from driver if sufficient changes have
-     * occurred (based on Q quality definition for operational state). Calls the Delegate::GetCountdownTime() method.
+     * @brief Causes reporting/udpating of CountdownTime attribute from driver if sufficient changes have
+     *        occurred (based on Q quality definition for operational state). Calls the Delegate::GetCountdownTime() method.
      *
-     * @param fromDelegate true if the change notice was triggered by the delegate, false if internal to cluster logic.
+     * @param[in] fromDelegate true if the change notice was triggered by the delegate, false if internal to cluster logic.
      */
     void UpdateCountdownTime(bool fromDelegate);
 
     /**
-     * @brief Whenever the cluster logic thinks time should be updated, call this.
+     * @brief Whenever cluster logic wants to trigger an update to report a new updated time,
+     *        call this method.
      */
-    void UpdateCountdownTimeFromClusterLogic() { UpdateCountdownTime(/* fromDelegate=*/false); }
+    inline void UpdateCountdownTimeFromClusterLogic() { UpdateCountdownTime(/* fromDelegate=*/false); }
 
 private:
     Delegate & mDelegate;
-    const ClusterId mClusterId;
     BitMask<Feature> mFeature;
     BitMask<OptionalAttributes> mOptionalAttrs;
 

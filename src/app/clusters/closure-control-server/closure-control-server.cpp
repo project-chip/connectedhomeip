@@ -74,6 +74,7 @@ bool Instance::IsSupportedState(MainStateEnum aMainState)
     case MainStateEnum::kPendingFallback:
         return HasFeature(Feature::kFallback);
     default:
+    // Remaining MainState have Mandatory conformance,so will be supported.
         return true;
     }
     return true;
@@ -85,25 +86,22 @@ CHIP_ERROR Instance::SetMainState(const MainStateEnum & aMainState)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-
-    MainStateEnum oldMainState = mMainState;
-    mMainState                 = aMainState;
-    if (mMainState != oldMainState)
+    // If the Main State has changed, trigger the attribute change callback
+    if (mMainState != aMainState)
     {
-        MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), mClusterId, Attributes::MainState::Id);
+        mMainState = aMainState;
+        MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), ClosureControl::Id, Attributes::MainState::Id);
     }
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Instance::SetOverallState(const GenericOverallState & aOverallState)
 {
-    GenericOverallState oldOverallState = mOverallState;
-    mOverallState                       = aOverallState;
-
     // If the overall target state has changed, trigger the attribute change callback
-    if (!oldOverallState.IsEqual(mOverallState))
+    if (!mOverallState.IsEqual(aOverallState))
     {
-        MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), mClusterId, Attributes::OverallState::Id);
+        mOverallState = aOverallState;
+        MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), ClosureControl::Id, Attributes::OverallState::Id);
     }
 
     return CHIP_NO_ERROR;
@@ -111,13 +109,11 @@ CHIP_ERROR Instance::SetOverallState(const GenericOverallState & aOverallState)
 
 CHIP_ERROR Instance::SetOverallTarget(const GenericOverallTarget & aOverallTarget)
 {
-    GenericOverallTarget oldOverallTarget = mOverallTarget;
-    mOverallTarget                        = aOverallTarget;
-
     // If the overall target state has changed, trigger the attribute change callback
-    if (!oldOverallTarget.IsEqual(mOverallTarget))
+    if (!mOverallTarget.IsEqual(aOverallTarget))
     {
-        MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), mClusterId, Attributes::OverallTarget::Id);
+        mOverallTarget = aOverallTarget;
+        MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), ClosureControl::Id, Attributes::OverallTarget::Id);
     }
 
     return CHIP_NO_ERROR;
@@ -161,7 +157,7 @@ void Instance::UpdateCountdownTime(bool fromDelegate)
 
     if (markDirty)
     {
-        MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), mClusterId, Attributes::CountdownTime::Id);
+        MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), ClosureControl::Id, Attributes::CountdownTime::Id);
     }
 }
 
@@ -173,53 +169,63 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     switch (aPath.mAttributeId)
     {
     case CountdownTime::Id:
+        // Optional Attribute
         if (SupportsOptAttr(OptionalAttributes::kCountdownTime))
         {
             return aEncoder.Encode(mDelegate.GetCountdownTime());
         }
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+
     case MainState::Id:
         return aEncoder.Encode(GetMainState());
+
     case CurrentErrorList::Id:
         return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return this->EncodeCurrentErrorList(encoder); });
+
     case OverallState::Id:
         return aEncoder.Encode(GetOverallState());
+
     case OverallTarget::Id:
         return aEncoder.Encode(GetOverallTarget());
+
     case RestingProcedure::Id:
         if (HasFeature(Feature::kFallback))
         {
             return aEncoder.Encode(mDelegate.GetRestingProcedure());
         }
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+
     case TriggerCondition::Id:
         if (HasFeature(Feature::kFallback))
         {
             return aEncoder.Encode(mDelegate.GetTriggerCondition());
         }
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+
     case TriggerPosition::Id:
         if (HasFeature(Feature::kFallback))
         {
             return aEncoder.Encode(mDelegate.GetTriggerPosition());
         }
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+
     case WaitingDelay::Id:
         if (HasFeature(Feature::kFallback))
         {
             return aEncoder.Encode(mDelegate.GetWaitingDelay());
         }
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+
     case KickoffTimer::Id:
         if (HasFeature(Feature::kFallback))
         {
             return aEncoder.Encode(mDelegate.GetKickoffTimer());
         }
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+
     /* FeatureMap - is held locally */
     case FeatureMap::Id:
         return aEncoder.Encode(mFeature);
-        // TODO CHECK CLUSTER REVISION
     }
     /* Allow all other unhandled attributes to fall through to Ember */
     return CHIP_NO_ERROR;
@@ -238,8 +244,7 @@ CHIP_ERROR Instance::EncodeCurrentErrorList(const AttributeValueEncoder::ListEnc
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
             // Convert end of list to CHIP_NO_ERROR
-            err = CHIP_NO_ERROR;
-            goto exit;
+            ExitNow(err = CHIP_NO_ERROR);
         }
 
         // Check if another error occurred before trying to encode
@@ -251,14 +256,27 @@ CHIP_ERROR Instance::EncodeCurrentErrorList(const AttributeValueEncoder::ListEnc
 
 exit:
     // Tell the delegate the read is complete
-    err = mDelegate.EndCurrentErrorListRead();
+    ReturnErrorOnFailure(mDelegate.EndCurrentErrorListRead());
     return err;
 }
 
 CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
+    VerifyOrDie(aPath.mClusterId == ClosureControl::Id);
+
     switch (aPath.mAttributeId)
     {
+    case CountdownTime::Id:
+        if (SupportsOptAttr(OptionalAttributes::kCountdownTime))
+        {
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
+        }
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+    case MainState::Id:
+    case CurrentErrorList::Id:
+    case OverallState::Id:
+    case OverallTarget::Id:
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
     default:
         // Unknown attribute; return error.  None of the other attributes for
         // this cluster are writable, so should not be ending up in this code to
@@ -284,11 +302,11 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
-        return;
+        break;
     case MoveTo::Id:
         HandleCommand<MoveTo::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleMoveTo(ctx, commandData); });
-        return;
+        break;
     case Calibrate::Id:
         if (HasFeature(Feature::kCalibration))
         {
@@ -299,7 +317,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
-        return;
+        break;
     case ConfigureFallback::Id:
         if (HasFeature(Feature::kFallback))
         {
@@ -311,7 +329,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
-        return;
+        break;
     case CancelFallback::Id:
         if (HasFeature(Feature::kFallback))
         {
@@ -322,7 +340,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
-        return;
+        break;
     }
 }
 
