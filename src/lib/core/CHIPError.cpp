@@ -178,6 +178,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_TLV_CONTAINER_OPEN.AsInteger():
         desc = "TLV container open";
         break;
+    case CHIP_ERROR_IN_USE.AsInteger():
+        desc = "In use";
+        break;
     case CHIP_ERROR_INVALID_MESSAGE_TYPE.AsInteger():
         desc = "Invalid message type";
         break;
