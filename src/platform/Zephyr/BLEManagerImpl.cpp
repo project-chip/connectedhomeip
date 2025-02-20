@@ -297,7 +297,7 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest()
     static_assert(sizeof(serviceData) == 10, "Unexpected size of BLE advertising data!");
 
     const char * name      = bt_get_name();
-    const uint8_t nameSize = static_cast<uint8_t>(strlen(name));
+    const uint8_t nameSize = static_cast<uint8_t>(strnlen(name, CONFIG_BT_DEVICE_NAME_MAX));
 
     Encoding::LittleEndian::Put16(serviceData.uuid, UUID16_CHIPoBLEService.val);
     ReturnErrorOnFailure(ConfigurationMgr().GetBLEDeviceIdentificationInfo(serviceData.deviceIdInfo));
