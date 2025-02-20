@@ -31,7 +31,7 @@ using namespace Camera;
 // Chime Cluster Methods
 CHIP_ERROR ChimeManager::GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, MutableCharSpan & name)
 {
-    if (chimeIndex >= ArraySize(mChimeSounds))
+    if (chimeIndex >= MATTER_ARRAY_SIZE(mChimeSounds))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -42,7 +42,7 @@ CHIP_ERROR ChimeManager::GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chim
 
 CHIP_ERROR ChimeManager::GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID)
 {
-    if (chimeIndex >= ArraySize(mChimeSounds))
+    if (chimeIndex >= MATTER_ARRAY_SIZE(mChimeSounds))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }

@@ -306,7 +306,7 @@ public:
         DeviceLayer::StackLock lock;
         for (const FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
         {
-            if (count < ArraySize(response.fabric_info))
+            if (count < MATTER_ARRAY_SIZE(response.fabric_info))
             {
                 response.fabric_info[count].fabric_id = fabricInfo.GetFabricId();
                 response.fabric_info[count].node_id   = fabricInfo.GetPeerId().GetNodeId();

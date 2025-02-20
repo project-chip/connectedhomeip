@@ -1414,7 +1414,7 @@ bool IsTreeCompositionForEndpoint(EndpointId endpoint)
 
 EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
 {
-    VerifyOrReturnValue(endpointIndex < ArraySize(emAfEndpoints), EndpointComposition::kInvalid);
+    VerifyOrReturnValue(endpointIndex < MATTER_ARRAY_SIZE(emAfEndpoints), EndpointComposition::kInvalid);
     if (emAfEndpoints[endpointIndex].bitmask.Has(EmberAfEndpointOptions::isFlatComposition))
     {
         return EndpointComposition::kFullFamily;

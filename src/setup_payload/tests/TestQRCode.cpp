@@ -165,7 +165,7 @@ TEST(TestQRCode, TestBase38)
     memset(encodedSpan.data(), '?', encodedSpan.size());
     subSpan = encodedSpan.SubSpan(0, 3);
     base38Encode(inputSpan.SubSpan(0, 1), subSpan);
-    size_t encodedLen = strnlen(encodedSpan.data(), ArraySize(encodedBuf));
+    size_t encodedLen = strnlen(encodedSpan.data(), MATTER_ARRAY_SIZE(encodedBuf));
     EXPECT_EQ(encodedLen, strlen("A0"));
     EXPECT_STREQ(encodedBuf, "A0");
 

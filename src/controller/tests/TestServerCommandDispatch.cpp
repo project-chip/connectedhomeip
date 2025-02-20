@@ -279,7 +279,7 @@ void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType
     //
     // All our endpoints have the same number of clusters, so just pick one.
     //
-    DataVersion dataVersionStorage[ArraySize(testEndpointClusters1)];
+    DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters1)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId, aEndpoint, Span<DataVersion>(dataVersionStorage));
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's

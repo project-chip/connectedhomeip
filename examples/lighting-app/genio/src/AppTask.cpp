@@ -283,10 +283,10 @@ static void RegisterLightCommands()
         },
     };
 
-    sShellLightOnOffSubCommands.RegisterCommands(sLightOnOffSubCommands, ArraySize(sLightOnOffSubCommands));
-    sShellLightSubCommands.RegisterCommands(sLightSubCommands, ArraySize(sLightSubCommands));
+    sShellLightOnOffSubCommands.RegisterCommands(sLightOnOffSubCommands, MATTER_ARRAY_SIZE(sLightOnOffSubCommands));
+    sShellLightSubCommands.RegisterCommands(sLightSubCommands, MATTER_ARRAY_SIZE(sLightSubCommands));
 
-    Engine::Root().RegisterCommands(sLightCommand, ArraySize(sLightCommand));
+    Engine::Root().RegisterCommands(sLightCommand, MATTER_ARRAY_SIZE(sLightCommand));
 }
 #endif // ENABLE_CHIP_SHELL
 
@@ -300,7 +300,7 @@ CHIP_ERROR AppTask::StartAppTask()
     }
 
     // Start App task.
-    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), NULL, 1, appStack, &appTaskStruct);
+    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, MATTER_ARRAY_SIZE(appStack), NULL, 1, appStack, &appTaskStruct);
     if (sAppTaskHandle == nullptr)
         return APP_ERROR_CREATE_TASK_FAILED;
 

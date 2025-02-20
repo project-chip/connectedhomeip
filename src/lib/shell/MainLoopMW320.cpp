@@ -257,7 +257,7 @@ static void RegisterMetaCommands(void)
 
     std::atexit(AtExitShell);
 
-    Engine::Root().RegisterCommands(sCmds, ArraySize(sCmds));
+    Engine::Root().RegisterCommands(sCmds, MATTER_ARRAY_SIZE(sCmds));
 }
 
 // ----

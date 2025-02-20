@@ -583,7 +583,7 @@ CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(const C
         if (!value.nullableList.IsNull())
         {
             ReturnErrorOnFailure(value.nullableList.Value().ComputeSize(&count));
-            VerifyOrReturnError(count <= ArraySize(gSimpleEnums), CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(count <= MATTER_ARRAY_SIZE(gSimpleEnums), CHIP_ERROR_INVALID_ARGUMENT);
             auto iter2       = value.nullableList.Value().begin();
             gSimpleEnumCount = 0;
             while (iter2.Next())

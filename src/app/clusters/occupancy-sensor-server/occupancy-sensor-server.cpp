@@ -136,7 +136,7 @@ Structs::HoldTimeLimitsStruct::Type * GetHoldTimeLimitsForEndpoint(EndpointId en
         return nullptr;
     }
 
-    if (index >= ArraySize(sHoldTimeLimitsStructs))
+    if (index >= MATTER_ARRAY_SIZE(sHoldTimeLimitsStructs))
     {
         ChipLogError(NotSpecified, "Internal error: invalid/unexpected hold time limits index.");
         return nullptr;
@@ -171,7 +171,7 @@ uint16_t * GetHoldTimeForEndpoint(EndpointId endpoint)
         return nullptr;
     }
 
-    if (index >= ArraySize(sHoldTimeLimitsStructs))
+    if (index >= MATTER_ARRAY_SIZE(sHoldTimeLimitsStructs))
     {
         ChipLogError(NotSpecified, "Internal error: invalid/unexpected hold time index.");
         return nullptr;
