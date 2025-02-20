@@ -40,7 +40,7 @@ import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from modebase_cluster_check import ModeBaseClusterChecks
 
-CLUSTER = Clusters.LaundryWasherMode
+cluster_lwm_mode = Clusters.LaundryWasherMode
 
 
 class TC_LWM_1_2(MatterBaseTest, ModeBaseClusterChecks):
@@ -48,7 +48,7 @@ class TC_LWM_1_2(MatterBaseTest, ModeBaseClusterChecks):
     def __init__(self, *args):
         MatterBaseTest.__init__(self, *args)
         ModeBaseClusterChecks.__init__(self,
-                                       modebase_derived_cluster=CLUSTER)
+                                       modebase_derived_cluster=cluster_lwm_mode)
 
     def desc_TC_LWM_1_2(self) -> str:
         return "[TC-LWM-1.2] Cluster attributes with DUT as Server"
@@ -81,13 +81,13 @@ class TC_LWM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         # According to the spec, there should be at least one like
         # Normal, Delicate, Heavy, or Whites
         # tag in the ones supported.
-        additional_tags = [CLUSTER.Enums.ModeTag.kNormal,
-                           CLUSTER.Enums.ModeTag.kDelicate]
+        additional_tags = [cluster_lwm_mode.Enums.ModeTag.kNormal,
+                           cluster_lwm_mode.Enums.ModeTag.kDelicate]
         self.check_tags_in_lists(supported_modes=supported_modes, required_tags=additional_tags)
 
         self.step(3)
         # Verify that the CurrentMode attribute has a valid value.
-        mode = self.cluster.Attributes.CurrentMode
+        mode = cluster_lwm_mode.Attributes.CurrentMode
         await self.read_and_check_mode(endpoint=endpoint, mode=mode, supported_modes=supported_modes)
 
 
