@@ -4615,6 +4615,11 @@ static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(Attribu
                 } else {
                     newElement_0.icac = AsData(entry_0.icac.Value());
                 }
+                if (entry_0.vvsc.HasValue()) {
+                    newElement_0.vvsc = AsData(entry_0.vvsc.Value());
+                } else {
+                    newElement_0.vvsc = nil;
+                }
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
@@ -4651,6 +4656,11 @@ static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(Attribu
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                     *aError = err;
                     return nil;
+                }
+                if (entry_0.vidVerificationStatement.HasValue()) {
+                    newElement_0.vidVerificationStatement = AsData(entry_0.vidVerificationStatement.Value());
+                } else {
+                    newElement_0.vidVerificationStatement = nil;
                 }
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
