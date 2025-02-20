@@ -97,6 +97,63 @@ TEST(TestDefaultOTARequestorStorage, TestDefaultProvidersEmpty)
     EXPECT_FALSE(providers.Begin().Next());
 }
 
+TEST(TestDefaultOTARequestorStorage, TestDefaultProvidersDuplicated)
+{
+    TestPersistentStorageDelegate persistentStorage;
+    DefaultOTARequestorStorage otaStorage;
+    otaStorage.Init(persistentStorage);
+
+    const auto makeProvider = [](FabricIndex fabric, NodeId nodeId, EndpointId endpointId) {
+        OTARequestorStorage::ProviderLocationType provider;
+        provider.fabricIndex    = fabric;
+        provider.providerNodeID = nodeId;
+        provider.endpoint       = endpointId;
+        return provider;
+    };
+
+    ProviderLocationList providers = {};
+
+    EXPECT_EQ(CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, otaStorage.LoadDefaultProviders(providers));
+    auto iterator = providers.Begin();
+    EXPECT_EQ(false, iterator.Next());
+
+    EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(1), NodeId(0x11111111), EndpointId(1))));
+    EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(1), NodeId(0x11111111), EndpointId(1))));
+    EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(2), NodeId(0x22222222), EndpointId(2))));
+    EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(2), NodeId(0x22222222), EndpointId(2))));
+    EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(3), NodeId(0x33333333), EndpointId(3))));
+    EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(3), NodeId(0x33333333), EndpointId(3))));
+    EXPECT_EQ(CHIP_NO_ERROR, otaStorage.StoreDefaultProviders(providers));
+
+    providers = {};
+    EXPECT_EQ(CHIP_NO_ERROR, otaStorage.LoadDefaultProviders(providers));
+
+    iterator = providers.Begin();
+
+    // Check provider #1
+    EXPECT_EQ(true, iterator.Next());
+    OTARequestorStorage::ProviderLocationType provider1 = iterator.GetValue();
+    EXPECT_EQ(FabricIndex(1), provider1.fabricIndex);
+    EXPECT_EQ(NodeId(0x11111111), provider1.providerNodeID);
+    EXPECT_EQ(EndpointId(1), provider1.endpoint);
+
+    // Check provider #2
+    EXPECT_EQ(true, iterator.Next());
+    OTARequestorStorage::ProviderLocationType provider2 = iterator.GetValue();
+    EXPECT_EQ(FabricIndex(2), provider2.fabricIndex);
+    EXPECT_EQ(NodeId(0x22222222), provider2.providerNodeID);
+    EXPECT_EQ(EndpointId(2), provider2.endpoint);
+
+    // Check provider #3
+    EXPECT_EQ(true, iterator.Next());
+    OTARequestorStorage::ProviderLocationType provider3 = iterator.GetValue();
+    EXPECT_EQ(FabricIndex(3), provider3.fabricIndex);
+    EXPECT_EQ(NodeId(0x33333333), provider3.providerNodeID);
+    EXPECT_EQ(EndpointId(3), provider3.endpoint);
+
+    EXPECT_EQ(false, iterator.Next());
+}
+
 TEST(TestDefaultOTARequestorStorage, TestCurrentProviderLocation)
 {
     TestPersistentStorageDelegate persistentStorage;
