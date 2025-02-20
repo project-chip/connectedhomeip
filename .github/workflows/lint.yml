@@ -271,12 +271,26 @@ jobs:
             # to avoid our grep regexp matching itself, as well as excluding the files
             # that implement the type-safe accessors
             - name:
-                  Check for use of 'emberAfReadAttribute' instead of the
-                  type-safe getters
+                  Check for use of 'emberAf' or 'emAf' symbols
+              if: always()
+              run: - name: Check for use of deprecated Ember AF APIs
               if: always()
               run: |
-                  git grep -I -n 'emberAfReadAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/attribute-table.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt' ':(exclude)src/app/util/attribute-table.cpp'  && exit 1 || exit 0
-
+                  # First pattern: emberAf
+                  git grep -I -n '\<emberAf[A-Za-z0-9_]*' -- './*' \
+                    ':(exclude).github/workflows/lint.yml' \
+                    ':(exclude)src/app/util/attribute-table.h' \
+                    ':(exclude)src/app/util/attribute-table.cpp' \
+                    ':(exclude)zzz_generated/app-common/app-common/zap-generated/access/Accessors.h' \
+                    ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt' && exit 1
+                  
+                  # Second pattern: emAf
+                  git grep -I -n '\<emAf[A-Za-z0-9_]*' -- './*' \
+                    ':(exclude).github/workflows/lint.yml' \
+                    ':(exclude)src/app/util/attribute-table.h' \
+                    ':(exclude)src/app/util/attribute-table.cpp' \
+                    ':(exclude)zzz_generated/app-common/app-common/zap-generated/access/Accessors.h' \
+                    ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt' && exit 1 || exit 0
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself, as well as excluding the files
