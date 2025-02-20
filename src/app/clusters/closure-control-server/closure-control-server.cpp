@@ -241,11 +241,8 @@ CHIP_ERROR Instance::EncodeCurrentErrorList(const AttributeValueEncoder::ListEnc
         ClosureErrorEnum error;
 
         err = mDelegate.GetCurrentErrorListAtIndex(i, error);
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-        {
-            // Convert end of list to CHIP_NO_ERROR
-            ExitNow(err = CHIP_NO_ERROR);
-        }
+        // Convert end of list to CHIP_NO_ERROR
+        VerifyOrExit(err != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED, err = CHIP_NO_ERROR);
 
         // Check if another error occurred before trying to encode
         SuccessOrExit(err);
