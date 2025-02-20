@@ -49,7 +49,7 @@ public:
     CHIP_ERROR ClearTargetVersion() override;
 
     /**
-     * Check if a provider is in the lists
+     * Check whether a provider is already present in a list of providers.
      */
     bool ProviderAlreadyInList(ProviderLocationList & listProviders, ProviderLocationType provider);
 
