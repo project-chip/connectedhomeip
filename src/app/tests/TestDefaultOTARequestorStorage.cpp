@@ -112,6 +112,11 @@ TEST(TestDefaultOTARequestorStorage, TestDefaultProvidersDuplicated)
     };
 
     ProviderLocationList providers = {};
+
+    EXPECT_EQ(CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, otaStorage.LoadDefaultProviders(providers));
+    auto iterator = providers.Begin();
+    EXPECT_EQ(false, iterator.Next());
+
     EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(1), NodeId(0x11111111), EndpointId(1))));
     EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(1), NodeId(0x11111111), EndpointId(1))));
     EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(2), NodeId(0x22222222), EndpointId(2))));
@@ -123,7 +128,30 @@ TEST(TestDefaultOTARequestorStorage, TestDefaultProvidersDuplicated)
     providers = {};
     EXPECT_EQ(CHIP_NO_ERROR, otaStorage.LoadDefaultProviders(providers));
 
-    EXPECT_TRUE(providers.GetListSize() == 3U);
+    iterator = providers.Begin();
+
+    // Check provider #1
+    EXPECT_EQ(true, iterator.Next());
+    OTARequestorStorage::ProviderLocationType provider1 = iterator.GetValue();
+    EXPECT_EQ(FabricIndex(1), provider1.fabricIndex);
+    EXPECT_EQ(NodeId(0x11111111), provider1.providerNodeID);
+    EXPECT_EQ(EndpointId(1), provider1.endpoint);
+
+    // Check provider #2
+    EXPECT_EQ(true, iterator.Next());
+    OTARequestorStorage::ProviderLocationType provider2 = iterator.GetValue();
+    EXPECT_EQ(FabricIndex(2), provider2.fabricIndex);
+    EXPECT_EQ(NodeId(0x22222222), provider2.providerNodeID);
+    EXPECT_EQ(EndpointId(2), provider2.endpoint);
+
+    // Check provider #3
+    EXPECT_EQ(true, iterator.Next());
+    OTARequestorStorage::ProviderLocationType provider3 = iterator.GetValue();
+    EXPECT_EQ(FabricIndex(3), provider3.fabricIndex);
+    EXPECT_EQ(NodeId(0x33333333), provider3.providerNodeID);
+    EXPECT_EQ(EndpointId(3), provider3.endpoint);
+
+    EXPECT_EQ(false, iterator.Next());
 }
 
 TEST(TestDefaultOTARequestorStorage, TestCurrentProviderLocation)
@@ -210,40 +238,6 @@ TEST(TestDefaultOTARequestorStorage, TestTargetVersion)
     EXPECT_EQ(targetVersion, 2u);
     EXPECT_EQ(CHIP_NO_ERROR, otaStorage.ClearTargetVersion());
     EXPECT_NE(CHIP_NO_ERROR, otaStorage.LoadTargetVersion(targetVersion));
-}
-
-TEST(TestDefaultOTARequestorStorage, TestDuplicateProvider)
-{
-    ProviderLocationList listProviders = {};
-    OTARequestorStorage::ProviderLocationType provider;
-    TestPersistentStorageDelegate persistentStorage;
-    DefaultOTARequestorStorage otaStorage;
-
-    otaStorage.Init(persistentStorage);
-
-    provider.providerNodeID = 1231524802U;
-    provider.fabricIndex    = 1U;
-    provider.endpoint       = 2U;
-
-    EXPECT_EQ(false, otaStorage.ProviderAlreadyInList(listProviders, provider));
-
-    listProviders.Add(provider);
-    EXPECT_EQ(true, otaStorage.ProviderAlreadyInList(listProviders, provider));
-
-    provider.providerNodeID = 1231524801U;
-    provider.fabricIndex    = 1U;
-    provider.endpoint       = 2U;
-    EXPECT_EQ(false, otaStorage.ProviderAlreadyInList(listProviders, provider));
-
-    provider.providerNodeID = 1231524802U;
-    provider.fabricIndex    = 2U;
-    provider.endpoint       = 2U;
-    EXPECT_EQ(false, otaStorage.ProviderAlreadyInList(listProviders, provider));
-
-    provider.providerNodeID = 1231524802U;
-    provider.fabricIndex    = 1U;
-    provider.endpoint       = 3U;
-    EXPECT_EQ(false, otaStorage.ProviderAlreadyInList(listProviders, provider));
 }
 
 } // namespace
