@@ -14,6 +14,7 @@
 
 import http.server
 import logging
+import socketserver
 import ssl
 from pathlib import Path
 
@@ -65,17 +66,27 @@ def run_server(port: int, config_path: Path, routing_config_dir: Path, cert_path
 
     logging.basicConfig(level=logging.DEBUG, format="[%(levelname)s] %(message)s")
 
+    if not config_path.is_file():
+        raise ValueError(f"'{config_path}' is not a file")
+
+    if not routing_config_dir.is_dir():
+        raise ValueError(f"'{routing_config_dir}' is not a directory")
+
+    if not cert_path.is_file():
+        raise ValueError(f"'{cert_path}' is not a file")
+
+    if not key_path.is_file():
+        raise ValueError(f"'{key_path}' is not a file")
+
     config: Configuration = load_configurations(config_path, routing_config_dir)
-
-    logging.info("Server starting on port %s", port)
-    server_address = ("", port)
-
-    theMockServerHandler = createMockServerHandler(config)
-
-    httpd = http.server.ThreadingHTTPServer(server_address, theMockServerHandler)
-    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    server_address: socketserver._AfInetAddress = ("", port)
+    context: ssl.SSLContext = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     context.load_cert_chain(certfile=cert_path, keyfile=key_path)
 
+    theMockServerHandler = createMockServerHandler(config)
+    httpd = http.server.ThreadingHTTPServer(server_address, theMockServerHandler)
+
+    logging.info("Server starting on port %s", port)
     with context.wrap_socket(httpd.socket, server_side=True) as httpd.socket:
         logging.info("Server started on port %s", port)
         logging.info("HTTPS enabled with cert: %s and key: %s", cert_path, key_path)

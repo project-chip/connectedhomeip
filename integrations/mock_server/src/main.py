@@ -80,4 +80,4 @@ if __name__ == "__main__":
     parser.add_argument("--key", type=str, default="server.key", help="SSL Private Key file")
 
     args = parser.parse_args()
-    run_server(args.port, Path(args.config), Path(args.routing_config_dir), args.cert, args.key)
+    run_server(args.port, Path(args.config), Path(args.routing_config_dir), Path(args.cert), Path(args.key))
