@@ -48,11 +48,12 @@ public:
     CHIP_ERROR LoadTargetVersion(uint32_t & targetVersion) override;
     CHIP_ERROR ClearTargetVersion() override;
 
-private:
     /**
      * Check if a provider is in the lists
      */
     bool ProviderAlreadyInList(ProviderLocationList & listProviders, ProviderLocationType provider);
+
+private:
     CHIP_ERROR Load(const char * key, MutableByteSpan & buffer);
     PersistentStorageDelegate * mPersistentStorage = nullptr;
 };
