@@ -70,6 +70,7 @@ struct LinuxDeviceOptions
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     const char * command                = nullptr;
     const char * PICS                   = nullptr;
+    const char * StorageSpace           = nullptr;
     const char * KVS                    = nullptr;
     chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
