@@ -41,7 +41,7 @@ import string
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_asserts import assert_int_in_range, assert_valid_int8, assert_valid_uint8, assert_valid_uint16, assert_valid_uint64, assert_string_length
+from chip.testing.matter_asserts import assert_int_in_range, assert_valid_uint8, assert_valid_uint16, assert_valid_uint64, assert_string_length
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches, run_if_endpoint_matches, has_feature
 from mobly import asserts
 
@@ -73,6 +73,7 @@ class TC_CNET_4_22(MatterBaseTest):
         assert_valid_uint64(thread_interface.extendedPanId, "Extended PanId")
 
         # NetworkName is a string with a size of 1 to 16 bytes
+        # CHECK BYTES TO INT
         assert_string_length(thread_interface.networkName, "NetworkName", int.from_bytes(
             1, byteorder="big"), int.from_bytes(16, byteorder="big"))
 
@@ -84,9 +85,12 @@ class TC_CNET_4_22(MatterBaseTest):
 
         # ExtendedAddress is a hwaddr with a size of 8 bytes
         try:
+            expected_len_bytes_extended_address = 8
+            # CHECK INT AND BYTES
+            asserts.assert_equal(len(thread_interface.extendedAddress), expected_len_bytes_extended_address,
+                                 f"The hwaddr value is {len(thread_interface.extendedAddress)} bytes long instead of {expected_len_bytes_extended_address}")
             mac = EUI(thread_interface.extendedAddress)
-            # 8 Bytes check
-            logger.info(f"The hwaddr: {thread_interface.extendedAddress} is a valid address")
+            logger.info(f"The hwaddr value: {thread_interface.extendedAddress} is a valid address")
         except AddrFormatError as e:
             logger.error(f"Invalid hwaddr format: {thread_interface.extendedAddress} - {e}")
 
