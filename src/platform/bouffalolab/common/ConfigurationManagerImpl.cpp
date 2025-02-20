@@ -190,6 +190,17 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
     BLConfig::RunConfigUnitTest();
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+void ConfigurationManagerImpl::ClearThreadStack()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    ThreadStackMgr().ClearAllSrpHostAndServices();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    ChipLogProgress(DeviceLayer, "Clearing Thread provision");
+    ThreadStackMgr().ErasePersistentInfo();
+}
+#endif
+
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     CHIP_ERROR err;

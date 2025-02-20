@@ -284,6 +284,26 @@ error_handler:
     return result;
 }
 
+/**
+ * @brief Convert RCPI to RSSI
+
+ * This function converts the Received Channel Power Indicator (RCPI) to
+ * the Received Signal Strength Indicator (RSSI). If the result of the
+ * conversion exceeds the range of a int16_t, it will be clamped to the maximum
+ * or minimum value of int16_t.
+
+ * @param[in]  rcpi: Received Channel Power Indicator value
+
+ * @return RSSI value
+ */
+inline int16_t ConvertRcpiToRssi(uint32_t rcpi)
+{
+    int64_t rssi = (rcpi / 2) - 110;
+    // Checking for overflows
+    VerifyOrReturnValue(rssi <= std::numeric_limits<int16_t>::max(), std::numeric_limits<int16_t>::max());
+    VerifyOrReturnValue(rssi >= std::numeric_limits<int16_t>::min(), std::numeric_limits<int16_t>::min());
+    return rssi;
+}
 } // namespace
 
 CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, MutableByteSpan & address)
@@ -404,7 +424,7 @@ CHIP_ERROR GetAccessPointInfo(wfx_wifi_scan_result_t & info)
     sl_status_t status = sl_wfx_get_signal_strength(&signal_strength);
     VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
 
-    info.rssi = (signal_strength - 220) / 2;
+    info.rssi = ConvertRcpiToRssi(signal_strength);
 
     ChipLogDetail(DeviceLayer, "WIFI:SSID     : %s", ap_info.ssid);
     ChipLogDetail(DeviceLayer, "WIFI:BSSID    : %02x:%02x:%02x:%02x:%02x:%02x", ap_info.bssid[0], ap_info.bssid[1],
@@ -431,6 +451,20 @@ CHIP_ERROR GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & info)
 
     return CHIP_NO_ERROR;
 }
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+CHIP_ERROR ConfigurePowerSave()
+{
+    // TODO: Implement Power save configuration. We do a silent failure to avoid causing problems in higher layers.
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConfigureBroadcastFilter(bool enableBroadcastFilter)
+{
+    // TODO: Implement Broadcast filtering. We do a silent failure to avoid causing problems in higher layers.
+    return CHIP_NO_ERROR;
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 /***************************************************************************
  * @brief
@@ -569,7 +603,7 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
 {
 
     ChipLogDetail(DeviceLayer, "# %2d %2d  %03d %02X:%02X:%02X:%02X:%02X:%02X  %s", scan_count, scan_result->channel,
-                  ((int16_t) (scan_result->rcpi - 220) / 2), scan_result->mac[0], scan_result->mac[1], scan_result->mac[2],
+                  (ConvertRcpiToRssi(scan_result->rcpi)), scan_result->mac[0], scan_result->mac[1], scan_result->mac[2],
                   scan_result->mac[3], scan_result->mac[4], scan_result->mac[5], scan_result->ssid_def.ssid);
 
     chip::ByteSpan requestedSsid(scan_ssid, scan_ssid_length);
@@ -614,7 +648,7 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
     }
 
     ap->scan.chan = scan_result->channel;
-    ap->scan.rssi = (scan_result->rcpi - 220) / 2;
+    ap->scan.rssi = ConvertRcpiToRssi(scan_result->rcpi);
 
     chip::ByteSpan scannedBssid(scan_result->mac, kWifiMacAddressLength);
     chip::MutableByteSpan outputBssid(ap->scan.bssid, kWifiMacAddressLength);

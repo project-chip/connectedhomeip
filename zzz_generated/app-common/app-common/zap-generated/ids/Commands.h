@@ -550,6 +550,18 @@ namespace AddTrustedRootCertificate {
 static constexpr CommandId Id = 0x0000000B;
 } // namespace AddTrustedRootCertificate
 
+namespace SetVidVerificationStatement {
+static constexpr CommandId Id = 0x0000000C;
+} // namespace SetVidVerificationStatement
+
+namespace SignVidVerificationRequest {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace SignVidVerificationRequest
+
+namespace SignVidVerificationResponse {
+static constexpr CommandId Id = 0x0000000E;
+} // namespace SignVidVerificationResponse
+
 } // namespace Commands
 } // namespace OperationalCredentials
 
@@ -1281,6 +1293,32 @@ static constexpr CommandId Id = 0x00000008;
 } // namespace Commands
 } // namespace WindowCovering
 
+namespace ClosureControl {
+namespace Commands {
+
+namespace Stop {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Stop
+
+namespace MoveTo {
+static constexpr CommandId Id = 0x00000001;
+} // namespace MoveTo
+
+namespace Calibrate {
+static constexpr CommandId Id = 0x00000002;
+} // namespace Calibrate
+
+namespace ConfigureFallback {
+static constexpr CommandId Id = 0x00000003;
+} // namespace ConfigureFallback
+
+namespace CancelFallback {
+static constexpr CommandId Id = 0x00000004;
+} // namespace CancelFallback
+
+} // namespace Commands
+} // namespace ClosureControl
+
 namespace ServiceArea {
 namespace Commands {
 
@@ -1970,9 +2008,9 @@ namespace Answer {
 static constexpr CommandId Id = 0x00000002;
 } // namespace Answer
 
-namespace ICECandidate {
+namespace ICECandidates {
 static constexpr CommandId Id = 0x00000003;
-} // namespace ICECandidate
+} // namespace ICECandidates
 
 namespace End {
 static constexpr CommandId Id = 0x00000004;

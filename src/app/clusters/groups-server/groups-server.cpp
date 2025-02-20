@@ -22,7 +22,6 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/reporting/reporting.h>
-#include <app/util/att-storage.h>
 #include <app/util/config.h>
 #include <credentials/GroupDataProvider.h>
 #include <inttypes.h>
@@ -339,7 +338,7 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
         }
         iter->Release();
         ScenesManagement::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, commandPath.mEndpointId,
-                                                                      ZCL_SCENES_GLOBAL_SCENE_GROUP_ID);
+                                                                      ScenesManagement::ScenesServer::kGlobalSceneGroupId);
     }
 #endif
 
