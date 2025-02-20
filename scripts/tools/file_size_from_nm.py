@@ -174,7 +174,6 @@ def tree_display_name(name: str) -> list[str]:
         # Place this as ::EMBER::API (these are internal and public functions from ember)
         return ["EMBER", "API", name]
 
-
     # If the first element contains a space, it is either within `<>` for templates or it means it is a
     # separator of the type. Try to find the type separator
     #
@@ -266,13 +265,13 @@ def test_tree_display_name():
     assert tree_display_name("emberAfTest") == ["EMBER", "API", "emberAfTest"]
     assert tree_display_name("MatterSomeCall") == ["C", "MatterSomeCall"]
 
-    assert tree_display_name("emberAfFooBarClusterServerInitCallback()") ==[
+    assert tree_display_name("emberAfFooBarClusterServerInitCallback()") == [
         "chip", "app", "Clusters", "FooBar", "EMBER", "emberAfFooBarClusterServerInitCallback()"
-                             ]
-    assert tree_display_name("emberAfFooBarClusterInitCallback()") ==[
-        "chip", "app", "Clusters", "FooBar", "EMBER", "emberAfFooBarClusterInitCallback()" 
     ]
-    assert tree_display_name("MatterFooBarClusterServerShutdownCallback()") ==[
+    assert tree_display_name("emberAfFooBarClusterInitCallback()") == [
+        "chip", "app", "Clusters", "FooBar", "EMBER", "emberAfFooBarClusterInitCallback()"
+    ]
+    assert tree_display_name("MatterFooBarClusterServerShutdownCallback()") == [
         "chip", "app", "Clusters", "FooBar", "EMBER", "MatterFooBarClusterServerShutdownCallback()"
     ]
     assert tree_display_name("emberAfFooBarClusterSomeCommandCallback()") == [
