@@ -351,6 +351,37 @@ def build_treemap(
     fig.show()
 
 def symbols_from_objdump(elf_file: str) -> list[Symbol]:
+
+    sources = {}
+    SOURCE_RE = re.compile(r'^(.*third_party/connectedhomeip/)?(?P<path>.*\.(cpp|c|asm)$)')
+
+    # First try to figure out `source paths`. Do the "ugly" way and search for all strings that
+    # seem to match a 'source'
+    for line in subprocess.check_output(["strings", elf_file ]).decode("utf8").split('\n'):
+        if '/' not in line:
+            # want directory paths...
+            continue
+        m = SOURCE_RE.match(line)
+        if not m:
+            continue
+
+        path = m.groupdict()['path']
+
+        # heuristics: 
+        #   - some paths start with relative paths and we remove that
+        #   - remove intermediate ../
+        while path.startswith('../'):
+            path = path[3:]
+
+        parts = []
+        for item in path.split('/'):
+            if item == '..':
+                parts.pop()
+            else:
+                parts.append(item)
+
+        sources[parts[-1]] = parts
+
     items = subprocess.check_output(
         [
             "objdump",
@@ -418,14 +449,12 @@ def symbols_from_objdump(elf_file: str) -> list[Symbol]:
     #    - file information exists (... df *ABS* of 0 size), however pointers inside
     #      if may be slightly off - we need to track these as .text seem to potentially be aligned
     #    - symbols are have size
- 
-    # TODO: find all source paths!
 
     LINE_RE = re.compile(r'^(?P<offset>[0-9a-f]{8})\s(?P<flags>.{7})\s+(?P<section>\S+)\s+(?P<size>\S+)\s*(?P<name>.*)$')
     current_file_name = None
 
     offset_file_map = {}
-
+    symbols = []
 
     for line in items.split("\n"):
         line = line.strip()
@@ -453,13 +482,22 @@ def symbols_from_objdump(elf_file: str) -> list[Symbol]:
                 if offset - delta in offset_file_map:
                     symbol_file_name = offset_file_map[offset - delta]
 
-        print('%s: %r' % (symbol_file_name, m.groupdict()))
+        if symbol_file_name not in sources:
+            logging.warning('Source %s is not known', symbol_file_name)
+            path = [captures['section'], 'UNKNOWN', 'symbol_file_name']
+        else:
+            path = [captures['section']] + sources[symbol_file_name]
 
-    # TODO: remove once we have real functionality
-    import sys
-    sys.exit(0)
+        s = Symbol(
+            name=captures['name'],
+            symbol_type=captures['section'],
+            size=size,
+            tree_path = path,
+        )
 
-    return []
+        symbols.append(s)
+
+    return symbols
 
 def symbols_from_nm(elf_file: str) -> list[Symbol]:
     items = subprocess.check_output(
