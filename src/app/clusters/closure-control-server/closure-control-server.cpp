@@ -74,7 +74,7 @@ bool Instance::IsSupportedState(MainStateEnum aMainState)
     case MainStateEnum::kPendingFallback:
         return HasFeature(Feature::kFallback);
     default:
-    // Remaining MainState have Mandatory conformance,so will be supported.
+        // Remaining MainState have Mandatory conformance,so will be supported.
         return true;
     }
     return true;
