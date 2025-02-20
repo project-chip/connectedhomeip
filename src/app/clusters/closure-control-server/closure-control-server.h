@@ -96,7 +96,7 @@ public:
      * @param[in] aEndpointId The endpoint on which this cluster exists.
      * @param[in] aDelegate The Delegate used by this Instance.
      * @param[in] aFeature The bitmask value that identifies which features are supported by this instance.
-     * @param[in] aOptionalAttrs The Enum Value that identifies which optional attributes are supported by this instance.
+     * @param[in] aOptionalAttrs The bitmask Value that identifies which optional attributes are supported by this instance.
      */
     Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs) :
         AttributeAccessInterface(MakeOptional(aEndpointId), ClosureControl::Id),
