@@ -23,6 +23,16 @@
 #     --max-depth 5                  \
 #     out/nrf-nrf52840dk-light-data-model-enabled/nrfconnect/zephyr/zephyr.elf
 #
+# There are two modes that the script can run over:
+#
+# - "nm" provides object sizes, without "originating source" information. Grouping is done
+#   by c++ namespacing and some "ember" rules.
+#
+# - "objdump" has the ability to find "file names" as symbols are grouped and prefixed
+#   as a "*ABS* associated names". In this case we try to find the "source paths"
+#   in the entire "src". We have duplicated file names for which we do not have a
+#   good way to disambiguate
+#
 
 # Requires:
 #    click
@@ -328,6 +338,59 @@ def build_treemap(
     fig.update_traces(root_color="lightgray")
     fig.show()
 
+def symbols_from_nm(elf_file: str) -> list[Symbol]:
+    items = subprocess.check_output(
+        [
+            "nm",
+            "--print-size",
+            "--size-sort",  # Filters out empty entries
+            "--radix=d",
+            elf_file,
+        ]
+    ).decode("utf8")
+
+    symbols = []
+
+    # OUTPUT FORMAT:
+    # <offset> <size> <type> <name>
+    for line in items.split("\n"):
+        if not line.strip():
+            continue
+        offset, size, t, name = line.split(" ")
+
+        size = int(size, 10)
+        offset = int(offset, 10)
+
+        if t in {
+            # Text section
+            "t",
+            "T",
+            # Weak defines
+            "w",
+            "W",
+            # Initialized data
+            "d",
+            "D",
+            # Readonly
+            "r",
+            "R",
+            # Weak object
+            "v",
+            "V",
+        }:
+            logging.debug("Found %s of size %d", name, size)
+            symbols.append(Symbol(name=name, symbol_type=t, offset=offset, size=size))
+        elif t in {
+            # BSS - 0-initialized, not code
+            "b",
+            "B",
+        }:
+            pass
+        else:
+            logging.error("SKIPPING SECTION %s", t)
+
+    return symbols
+
 
 @click.command()
 @click.option(
@@ -373,55 +436,7 @@ def main(
     log_fmt = "%(asctime)s %(levelname)-7s %(message)s"
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
-    items = subprocess.check_output(
-        [
-            "nm",
-            "--print-size",
-            "--size-sort",  # Filters out empty entries
-            "--radix=d",
-            elf_file.absolute().as_posix(),
-        ]
-    ).decode("utf8")
-
-    symbols = []
-
-    # OUTPUT FORMAT:
-    # <offset> <size> <type> <name>
-    for line in items.split("\n"):
-        if not line.strip():
-            continue
-        offset, size, t, name = line.split(" ")
-
-        size = int(size, 10)
-        offset = int(offset, 10)
-
-        if t in {
-            # Text section
-            "t",
-            "T",
-            # Weak defines
-            "w",
-            "W",
-            # Initialized data
-            "d",
-            "D",
-            # Readonly
-            "r",
-            "R",
-            # Weak object
-            "v",
-            "V",
-        }:
-            logging.debug("Found %s of size %d", name, size)
-            symbols.append(Symbol(name=name, symbol_type=t, offset=offset, size=size))
-        elif t in {
-            # BSS - 0-initialized, not code
-            "b",
-            "B",
-        }:
-            pass
-        else:
-            logging.error("SKIPPING SECTION %s", t)
+    symbols = symbols_from_nm(elf_file.absolute().as_posix())
 
     build_treemap(
         elf_file.name, symbols, __CHART_STYLES__[display_type], max_depth, zoom, strip
