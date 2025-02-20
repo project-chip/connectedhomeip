@@ -132,6 +132,13 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ChipLogError(Controller, "Warning: Device Controller Factory should be with a CHIP Device Layer...");
 #endif // CONFIG_DEVICE_LAYER
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    auto tcpListenParams = Transport::TcpListenParameters(stateParams.tcpEndPointManager)
+                               .SetAddressType(IPAddressType::kIPv6)
+                               .SetListenPort(params.listenPort)
+                               .SetServerListenEnabled(false); // Initialize as a TCP Client
+#endif
+
     if (params.dataModelProvider == nullptr)
     {
         ChipLogError(AppServer, "Device Controller Factory requires a `dataModelProvider` value.");
@@ -179,12 +186,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #endif
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                                             ,
-                                                        Transport::TcpListenParameters(stateParams.tcpEndPointManager)
-                                                            .SetAddressType(IPAddressType::kIPv6)
-                                                            .SetListenPort(params.listenPort)
+                                                        tcpListenParams
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-                                                            ,
+                                                        ,
                                                         Transport::WiFiPAFListenParameters()
 #endif
                                                             ));
@@ -252,15 +257,9 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     chip::app::InteractionModelEngine * interactionModelEngine = chip::app::InteractionModelEngine::GetInstance();
 
-    // Note placement of this BEFORE `InitDataModelHandler` since InitDataModelHandler may
-    // rely on ember (does emberAfInit() and configure which may load data from NVM).
-    //
-    // Expected forward path is that we will move move and more things inside datamodel
-    // provider (e.g. storage settings) so we want datamodelprovider available before
-    // `InitDataModelHandler`.
+    // Initialize the data model now that everything cluster implementations might
+    // depend on is initalized.
     interactionModelEngine->SetDataModelProvider(params.dataModelProvider);
-
-    InitDataModelHandler();
 
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));
 
@@ -290,6 +289,11 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         // Consequently, reach in set the fabric table pointer to point to the right version.
         //
         app::DnssdServer::Instance().SetFabricTable(stateParams.fabricTable);
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        // Disable the TCP Server based on the TCPListenParameters setting.
+        app::DnssdServer::Instance().SetTCPServerEnabled(tcpListenParams.IsServerListenEnabled());
+#endif
     }
 
     stateParams.sessionSetupPool = Platform::New<DeviceControllerSystemStateParams::SessionSetupPool>();

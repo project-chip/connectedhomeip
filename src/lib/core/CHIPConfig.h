@@ -1015,6 +1015,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND
+ *
+ * @brief If true, VerifyOrDie() built with @c CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+ *        generates a short message that includes only the source code location,
+ *        without the condition that fails.
+ */
+#ifndef CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND
+#define CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND 0
+#endif
+
+/**
  * @def CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES
  *
  * @brief Number of devices a controller can be simultaneously connected to
@@ -1082,7 +1093,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
+ * @def CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC
  *
  * @brief Defines the number of groups key sets supported per fabric, see Group Key Management Cluster in specification.
  *
@@ -1855,6 +1866,20 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_TEST_GOOGLETEST
 #define CHIP_CONFIG_TEST_GOOGLETEST 0
 #endif // CHIP_CONFIG_TEST_GOOGLETEST
+
+/**
+ *  @def CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+ *
+ *  @brief
+ *    Enables code for collecting and sending analytic related events for MRP
+ *
+ * The purpose of this macro is to prevent compiling code related to MRP analytics
+ * for devices that are not interested interested to save on flash.
+ */
+
+#ifndef CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+#define CHIP_CONFIG_MRP_ANALYTICS_ENABLED 0
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
 
 /**
  * @}

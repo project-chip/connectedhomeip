@@ -21,4 +21,5 @@ declare_args() {
   config_use_interactive_mode = true
   config_enable_yaml_tests = true
   config_use_local_storage = true
+  config_enable_https_requests = true
 }

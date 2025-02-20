@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -2329,6 +2329,12 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
                                                 Clusters::IcdManagement::Attributes::ActiveModeDuration::Id));
         VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
                                                 Clusters::IcdManagement::Attributes::ActiveModeThreshold::Id));
+
+        // Extra paths requested via CommissioningParameters
+        for (auto const & path : params.GetExtraReadPaths())
+        {
+            VerifyOrReturn(builder.AddAttributePath(path));
+        }
     }();
 
     VerifyOrDie(builder.size() > 0); // our logic is broken if there is nothing to read
@@ -2344,8 +2350,7 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
         mReadCommissioningInfoProgress = kReadProgressNoFurtherAttributes;
     }
 
-    const auto timeout = MakeOptional(app::kExpectedIMProcessingTime); // TODO: Save timeout from PerformCommissioningStep?
-    SendCommissioningReadRequest(mDeviceBeingCommissioned, timeout, builder.paths(), builder.size());
+    SendCommissioningReadRequest(mDeviceBeingCommissioned, mCommissioningStepTimeout, builder.paths(), builder.size());
 }
 
 namespace {
@@ -2364,6 +2369,7 @@ void DeviceCommissioner::FinishReadingCommissioningInfo()
     // up returning an error (e.g. because some mandatory information was missing).
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReadCommissioningInfo info;
+    info.attributes = mAttributeCache.get();
     AccumulateErrors(err, ParseGeneralCommissioningInfo(info));
     AccumulateErrors(err, ParseBasicInformation(info));
     AccumulateErrors(err, ParseNetworkCommissioningInfo(info));
@@ -2796,6 +2802,22 @@ void DeviceCommissioner::OnSetRegulatoryConfigResponse(
     commissioner->CommissioningStageComplete(err, report);
 }
 
+void DeviceCommissioner::OnSetTCAcknowledgementsResponse(
+    void * context, const GeneralCommissioning::Commands::SetTCAcknowledgementsResponse::DecodableType & data)
+{
+    CommissioningDelegate::CommissioningReport report;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ChipLogProgress(Controller, "Received SetTCAcknowledgements response errorCode=%u", to_underlying(data.errorCode));
+    if (data.errorCode != GeneralCommissioning::CommissioningErrorEnum::kOk)
+    {
+        err = CHIP_ERROR_INTERNAL;
+        report.Set<CommissioningErrorInfo>(data.errorCode);
+    }
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    commissioner->CommissioningStageComplete(err, report);
+}
+
 void DeviceCommissioner::OnSetTimeZoneResponse(void * context,
                                                const TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType & data)
 {
@@ -3004,9 +3026,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                         params.GetCompletionStatus().err.AsString());
     }
 
-    mCommissioningStage      = step;
-    mCommissioningDelegate   = delegate;
-    mDeviceBeingCommissioned = proxy;
+    mCommissioningStepTimeout = timeout;
+    mCommissioningStage       = step;
+    mCommissioningDelegate    = delegate;
+    mDeviceBeingCommissioned  = proxy;
 
     // TODO: Extend timeouts to the DAC and Opcert requests.
     // TODO(cecille): We probably want something better than this for breadcrumbs.
@@ -3207,6 +3230,32 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
     }
     break;
+    case CommissioningStage::kConfigureTCAcknowledgments: {
+        ChipLogProgress(Controller, "Setting Terms and Conditions");
+
+        if (!params.GetTermsAndConditionsAcknowledgement().HasValue())
+        {
+            ChipLogProgress(Controller, "Setting Terms and Conditions: Skipped");
+            CommissioningStageComplete(CHIP_NO_ERROR);
+            return;
+        }
+
+        GeneralCommissioning::Commands::SetTCAcknowledgements::Type request;
+        TermsAndConditionsAcknowledgement termsAndConditionsAcknowledgement = params.GetTermsAndConditionsAcknowledgement().Value();
+        request.TCUserResponse = termsAndConditionsAcknowledgement.acceptedTermsAndConditions;
+        request.TCVersion      = termsAndConditionsAcknowledgement.acceptedTermsAndConditionsVersion;
+
+        ChipLogProgress(Controller, "Setting Terms and Conditions: %hu, %hu", request.TCUserResponse, request.TCVersion);
+        CHIP_ERROR err =
+            SendCommissioningCommand(proxy, request, OnSetTCAcknowledgementsResponse, OnBasicFailure, endpoint, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Failed to send SetTCAcknowledgements command: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
+        break;
+    }
     case CommissioningStage::kSendPAICertificateRequest: {
         ChipLogProgress(Controller, "Sending request for PAI certificate");
         CHIP_ERROR err = SendCertificateChainRequestCommand(proxy, CertificateType::kPAI, timeout);

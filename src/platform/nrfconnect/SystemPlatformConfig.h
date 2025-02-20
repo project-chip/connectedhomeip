@@ -52,7 +52,7 @@ struct ChipDeviceEvent;
 #endif
 
 #ifndef CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
-#ifdef CONFIG_WIFI_NRF700X
+#ifdef CONFIG_WIFI_NRF70
 // Minimal mDNS uses Matter packet buffers, so as long as minimal mDNS is used
 // in Nordic's Wi-Fi solution, the packet buffers must be a bit bigger than what
 // is required by Matter.
@@ -62,7 +62,7 @@ struct ChipDeviceEvent;
 // unless for large messages that can be sent over BTP or TCP. But those will
 // likely require a separate buffer pool or employ chained buffers.
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX 1280
-#endif // CONFIG_WIFI_NRF700X
+#endif // CONFIG_WIFI_NRF70
 #endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
 
 // ========== Platform-specific Configuration Overrides =========

@@ -49,32 +49,7 @@ using namespace TLV;
 
 AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 {
-    getICDClientStorage()->Shutdown();
-    mController->Shutdown();
-
-    if (mKeypairBridge != nullptr)
-    {
-        chip::Platform::Delete(mKeypairBridge);
-        mKeypairBridge = nullptr;
-    }
-
-    if (mDeviceAttestationDelegateBridge != nullptr)
-    {
-        delete mDeviceAttestationDelegateBridge;
-        mDeviceAttestationDelegateBridge = nullptr;
-    }
-
-    if (mDeviceAttestationVerifier != nullptr)
-    {
-        delete mDeviceAttestationVerifier;
-        mDeviceAttestationVerifier = nullptr;
-    }
-
-    if (mAttestationTrustStoreBridge != nullptr)
-    {
-        delete mAttestationTrustStoreBridge;
-        mAttestationTrustStoreBridge = nullptr;
-    }
+    Shutdown();
 }
 
 void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)
@@ -184,6 +159,9 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         chip::Credentials::SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
     }
 
+    // Because garbage collection may delay the removal of old controller instances, two instances could temporarily exist.
+    // To avoid issues with the shared ICD client storage, reset the storage before creating a new controller.
+    getICDClientStorage()->Shutdown();
     *errInfoOnFailure = getICDClientStorage()->Init(wrapperStorage, &wrapper->mSessionKeystore);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
@@ -412,14 +390,41 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     {
         return nullptr;
     }
-
+    wrapper->mIsInitialized = true;
     return wrapper.release();
 }
 
 void AndroidDeviceControllerWrapper::Shutdown()
 {
+    VerifyOrReturn(mIsInitialized);
+    getICDClientStorage()->Shutdown();
     mController->Shutdown();
     DeviceControllerFactory::GetInstance().Shutdown();
+
+    if (mKeypairBridge != nullptr)
+    {
+        chip::Platform::Delete(mKeypairBridge);
+        mKeypairBridge = nullptr;
+    }
+
+    if (mDeviceAttestationDelegateBridge != nullptr)
+    {
+        delete mDeviceAttestationDelegateBridge;
+        mDeviceAttestationDelegateBridge = nullptr;
+    }
+
+    if (mDeviceAttestationVerifier != nullptr)
+    {
+        delete mDeviceAttestationVerifier;
+        mDeviceAttestationVerifier = nullptr;
+    }
+
+    if (mAttestationTrustStoreBridge != nullptr)
+    {
+        delete mAttestationTrustStoreBridge;
+        mAttestationTrustStoreBridge = nullptr;
+    }
+    mIsInitialized = false;
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::ApplyNetworkCredentials(chip::Controller::CommissioningParameters & params,

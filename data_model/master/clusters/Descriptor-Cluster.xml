@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -77,7 +77,9 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Revision" type="uint16">
         <mandatoryConform/>
-        <constraint type="min" value="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
       </field>
     </struct>
   </dataTypes>
@@ -85,20 +87,22 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="DeviceTypeList" type="list" default="desc">
       <entry type="DeviceTypeStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="minCount" value="1"/>
+      <constraint>
+        <minCount value="1"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="ServerList" type="list" default="empty">
       <entry type="cluster-id"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="ClientList" type="list" default="empty">
       <entry type="cluster-id"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="PartsList" type="list" default="empty">
@@ -107,19 +111,26 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0004" name="TagList" type="list" default="MS">
-      <entry type="ref_SemTag"/>
+      <entry type="SemanticTagStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="TAGLIST"/>
       </mandatoryConform>
-      <constraint type="countBetween" from="1" to="6"/>
+      <constraint>
+        <countBetween>
+          <from value="1"/>
+          <to value="6"/>
+        </countBetween>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="EndpointUniqueID" type="string">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform/>
-      <constraint type="maxLength" value="32"/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
     </attribute>
   </attributes>
 </cluster>

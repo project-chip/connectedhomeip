@@ -1521,6 +1521,8 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     dispatch_sync(_storageQueue, ^{
         [storageDelegate controller:controller storeValues:testBulkValues securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
     });
+    // Since we messed with the node index, tell the data store to re-sync it's cache.
+    [controller.controllerDataStore unitTestRereadNodeIndex];
     // Verify that the store resulted in the correct values
     NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:@(3001)];
     XCTAssertEqualObjects(dataStoreClusterData, bulkTestClusterDataDictionary);
@@ -1692,6 +1694,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     [self waitForExpectations:@[ newDeviceSubscriptionExpectation ] timeout:60];
     if (!disableStorageBehaviorOptimization) {
         [self waitForExpectations:@[ newDeviceGotClusterDataPersisted ] timeout:60];
+        newDelegate.onClusterDataPersisted = nil;
     }
     newDelegate.onReportEnd = nil;
 
@@ -1762,6 +1765,29 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         totalAttributes += deviceAttributeCounts[nodeID].unsignedIntegerValue;
     }
     XCTAssertTrue(totalAttributes > 300);
+
+    // Now try forgetting this device and make sure all the info we had for it
+    // goes away.
+    NSNumber * deviceID = @(17);
+    __auto_type * dataStore = controller.controllerDataStore;
+    XCTAssertNotNil(deviceAttributeCounts[deviceID]);
+    XCTAssertNotNil([dataStore findResumptionInfoByNodeID:deviceID]);
+    XCTAssertNotNil([dataStore getStoredDeviceDataForNodeID:deviceID]);
+    XCTAssertNotNil([dataStore getStoredClusterDataForNodeID:deviceID]);
+    __auto_type * nodesWithStoredData = [controller nodesWithStoredData];
+    XCTAssertTrue([nodesWithStoredData containsObject:deviceID]);
+    XCTAssertEqualObjects(nodesWithStoredData, [dataStore nodesWithStoredData]);
+    XCTAssertEqualObjects(nodesWithStoredData, deviceAttributeCounts.allKeys);
+
+    [controller forgetDeviceWithNodeID:deviceID];
+    deviceAttributeCounts = [controller unitTestGetDeviceAttributeCounts];
+    XCTAssertNil(deviceAttributeCounts[deviceID]);
+    XCTAssertNil([dataStore findResumptionInfoByNodeID:deviceID]);
+    XCTAssertNil([dataStore getStoredDeviceDataForNodeID:deviceID]);
+    XCTAssertNil([dataStore getStoredClusterDataForNodeID:deviceID]);
+    nodesWithStoredData = [controller nodesWithStoredData];
+    XCTAssertFalse([nodesWithStoredData containsObject:deviceID]);
+    XCTAssertEqualObjects(nodesWithStoredData, [dataStore nodesWithStoredData]);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -1951,6 +1977,128 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     [controller shutdown];
 
     [operationalBrowser shutdown];
+}
+
+- (void)test014_TestDataStoreMTRDeviceInvalidateFlush
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSNumber * nodeID = @(123);
+    NSNumber * fabricID = @(456);
+
+    NSError * error;
+
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration = [MTRDeviceStorageBehaviorConfiguration configurationWithDefaultStorageBehavior];
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer
+                                            storageBehaviorConfiguration:storageBehaviorConfiguration];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // Now commission the device, to test that that works.
+    NSNumber * deviceID = @(17);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    // We should have established CASE using our operational key.
+    XCTAssertEqual(operationalKeys.signatureCount, 1);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+
+    delegate.skipSetupSubscription = YES;
+
+    // Read the base storage key count (case session resumption etc.)
+    NSUInteger baseStorageKeyCount = storageDelegate.count;
+
+    [device setDelegate:delegate queue:queue];
+
+    NSArray<NSDictionary<NSString *, id> *> * attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(1) attributeID:@(1)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : @(1),
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @(1),
+        }
+    } ];
+
+    // Inject first report as priming report, which gets persisted immediately
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+
+    // No additional entries immediately after injected report
+    XCTAssertEqual(storageDelegate.count, baseStorageKeyCount);
+
+    sleep(1);
+
+    // Verify priming report persisted before hitting storage delay
+    XCTAssertGreaterThan(storageDelegate.count, baseStorageKeyCount);
+    // Now set the base count to the after-priming number
+    baseStorageKeyCount = storageDelegate.count;
+
+    NSArray<NSDictionary<NSString *, id> *> * attributeReport2 = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(2) attributeID:@(2)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : @(2),
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @(2),
+        }
+    } ];
+
+    // Inject second report with different cluster
+    [device unitTestInjectAttributeReport:attributeReport2 fromSubscription:YES];
+
+    sleep(1);
+
+    // No additional entries a second after report - under storage delay
+    XCTAssertEqual(storageDelegate.count, baseStorageKeyCount);
+
+    // Immediately shut down controller and force flush to storage
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    // Make sure there are more than base count entries
+    XCTAssertGreaterThan(storageDelegate.count, baseStorageKeyCount);
+
+    // Now restart controller to decommission the device
+    controller = [self startControllerWithRootKeys:rootKeys
+                                   operationalKeys:operationalKeys
+                                          fabricID:fabricID
+                                            nodeID:nodeID
+                                           storage:storageDelegate
+                                             error:&error
+                                 certificateIssuer:&certificateIssuer
+                      storageBehaviorConfiguration:storageBehaviorConfiguration];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // Reset our commissionee.
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+
+    [controller shutdown];
 }
 
 // TODO: This might want to go in a separate test file, with some shared setup
@@ -2437,7 +2585,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
                                 @{
                                     MTRAttributePathKey : globalAttributePath(clusterId1, MTRAttributeIDTypeGlobalAttributeAttributeListID),
                                     MTRDataKey : arrayOfUnsignedIntegersValue(@[
-                                        attributeId1, @(0xFFF8), @(0xFFF9), @(0xFFFB), attributeId2, @(0xFFFC), @(0xFFFD)
+                                        attributeId1, attributeId2, @(0xFFFC), @(0xFFFD), @(0xFFF8), @(0xFFF9), @(0xFFFB)
                                     ]),
                                 },
 
@@ -2464,7 +2612,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
                                 @{
                                     MTRAttributePathKey : globalAttributePath(clusterId2, MTRAttributeIDTypeGlobalAttributeAttributeListID),
                                     MTRDataKey : arrayOfUnsignedIntegersValue(@[
-                                        @0xFFF8, @(0xFFF9), @(0xFFFB), attributeId2, @(0xFFFC), @(0xFFFD)
+                                        attributeId2, @(0xFFFC), @(0xFFFD), @0xFFF8, @(0xFFF9), @(0xFFFB)
                                     ]),
                                 },
 
@@ -2507,7 +2655,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
                                 @{
                                     MTRAttributePathKey : globalAttributePath(@(MTRClusterIDTypeDescriptorID), MTRAttributeIDTypeGlobalAttributeAttributeListID),
                                     MTRDataKey : arrayOfUnsignedIntegersValue(@[
-                                        @(0), @(1), @(2), @(3), @(0xFFF8), @(0xFFF9), @(0xFFFB), @(0xFFFC), @(0xFFFD)
+                                        @(0), @(1), @(2), @(3), @(0xFFFC), @(0xFFFD), @(0xFFF8), @(0xFFF9), @(0xFFFB)
                                     ]),
                                 },
 
@@ -2750,7 +2898,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     // Reset our commissionees.
     for (NSNumber * deviceID in orderedDeviceIDs) {
         __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
-        ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+        ResetCommissioneeWithNodeID(baseDevice, queue, self, kTimeoutInSeconds, deviceID);
     }
 
     [controller shutdown];
@@ -3453,6 +3601,177 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         MTRDeviceClusterData * data = [device unitTestGetClusterDataForPath:path];
         XCTAssertNotNil(data);
     }
+
+    // Reset our commissionee.
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
+- (void)testMTRDeviceDealloc
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_queue_create("test.queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSNumber * nodeID = @(333);
+    NSNumber * fabricID = @(444);
+
+    NSError * error;
+
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // Now commission the device, to test that that works.
+    NSNumber * deviceID = @(22);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    // We should have established CASE using our operational key.
+    XCTAssertEqual(operationalKeys.signatureCount, 1);
+
+    __block BOOL subscriptionReportEnd1 = NO;
+    XCTestExpectation * subscriptionCallbackDeleted = [self expectationWithDescription:@"Subscription callback deleted"];
+    @autoreleasepool {
+        __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+        __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+        XCTestExpectation * subscriptionReportBegin = [self expectationWithDescription:@"Subscription report begin"];
+
+        delegate.onReportBegin = ^{
+            [subscriptionReportBegin fulfill];
+        };
+
+        delegate.onReportEnd = ^{
+            subscriptionReportEnd1 = YES;
+        };
+
+        delegate.onSubscriptionCallbackDelete = ^{
+            [subscriptionCallbackDeleted fulfill];
+        };
+
+        [device setDelegate:delegate queue:queue];
+
+        [self waitForExpectations:@[ subscriptionReportBegin ] timeout:60];
+    }
+
+    // report should still be ongoing
+    XCTAssertFalse(subscriptionReportEnd1);
+
+    // dealloc -> delete should be called soon after the autoreleasepool reaps
+    [self waitForExpectations:@[ subscriptionCallbackDeleted ] timeout:60];
+
+    // Reset our commissionee.
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
+- (void)testMTRDeviceMaybeUnreachableIgnoredIfReceivingFromDevice
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_queue_create("test.queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSNumber * nodeID = @(333);
+    NSNumber * fabricID = @(444);
+
+    NSError * error;
+
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // Now commission the device, to test that that works.
+    NSNumber * deviceID = @(22);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    // We should have established CASE using our operational key.
+    XCTAssertEqual(operationalKeys.signatureCount, 1);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTestExpectation * subscriptionReportBegin = [self expectationWithDescription:@"Subscription report begin"];
+    XCTestExpectation * subscriptionReportEnd = [self expectationWithDescription:@"Subscription report end"];
+
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onReportBegin = ^{
+        [subscriptionReportBegin fulfill];
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onReportBegin = nil;
+    };
+
+    delegate.onReportEnd = ^{
+        [subscriptionReportEnd fulfill];
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onReportEnd = nil;
+    };
+
+    delegate.onSubscriptionReset = ^{
+        XCTFail("Subscription should not be reset from calling _deviceMayBeReachable");
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    // First wait for report to begin coming in
+    [self waitForExpectations:@[ subscriptionReportBegin ] timeout:60];
+
+    // Call _deviceMayBeReachable and expect it to be ignored
+    [device _deviceMayBeReachable];
+
+    [self waitForExpectations:@[ subscriptionReportEnd ] timeout:60];
+
+    [device _deviceMayBeReachable];
+
+    // Since subscription reset runs on the matter queue, synchronously run a block on the matter queue here to prove the reset did not happen
+    [controller syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
 
     // Reset our commissionee.
     __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
