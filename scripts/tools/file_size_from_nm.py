@@ -289,6 +289,8 @@ def build_treemap(
         tree_name = symbol.tree_path
 
         if zoom is not None:
+            if not zoom.startswith(separator):
+                zoom = separator + zoom
             partial = ""
             # try to filter out the tree name. If it contains the zoom item, keep it, otherwise discard
             while tree_name and partial != zoom:
@@ -308,7 +310,10 @@ def build_treemap(
 
         partial = ""
         for name in tree_name[:-1]:
-            next_value = partial + separator + name
+            if not partial:
+                next_value = name
+            else:
+                next_value = partial + separator + name
             if next_value not in known_parents:
                 known_parents.add(next_value)
                 data["name"].append(next_value)
