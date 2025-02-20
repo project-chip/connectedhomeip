@@ -1986,9 +1986,9 @@ namespace ProvideAnswer {
 static constexpr CommandId Id = 0x00000005;
 } // namespace ProvideAnswer
 
-namespace ProvideICECandidate {
+namespace ProvideICECandidates {
 static constexpr CommandId Id = 0x00000006;
-} // namespace ProvideICECandidate
+} // namespace ProvideICECandidates
 
 namespace EndSession {
 static constexpr CommandId Id = 0x00000007;

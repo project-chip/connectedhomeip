@@ -374,7 +374,7 @@ public:
     StreamUsageEnum streamUsage       = static_cast<StreamUsageEnum>(0);
     DataModel::Nullable<uint16_t> videoStreamID;
     DataModel::Nullable<uint16_t> audioStreamID;
-    chip::BitMask<WebRTCMetadataOptions> metadataOptions = static_cast<chip::BitMask<WebRTCMetadataOptions>>(0);
+    chip::BitMask<WebRTCMetadataOptionsBitmap> metadataOptions = static_cast<chip::BitMask<WebRTCMetadataOptionsBitmap>>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -43645,10 +43645,10 @@ struct Type;
 struct DecodableType;
 } // namespace ProvideAnswer
 
-namespace ProvideICECandidate {
+namespace ProvideICECandidates {
 struct Type;
 struct DecodableType;
-} // namespace ProvideICECandidate
+} // namespace ProvideICECandidates
 
 namespace EndSession {
 struct Type;
@@ -43681,7 +43681,7 @@ public:
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::List<const Structs::ICEServerStruct::Type>> ICEServers;
     Optional<chip::CharSpan> ICETransportPolicy;
-    Optional<chip::BitMask<WebRTCMetadataOptions>> metadataOptions;
+    Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -43701,7 +43701,7 @@ public:
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::DecodableList<Structs::ICEServerStruct::DecodableType>> ICEServers;
     Optional<chip::CharSpan> ICETransportPolicy;
-    Optional<chip::BitMask<WebRTCMetadataOptions>> metadataOptions;
+    Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SolicitOffer
@@ -43773,7 +43773,7 @@ public:
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::List<const Structs::ICEServerStruct::Type>> ICEServers;
     Optional<chip::CharSpan> ICETransportPolicy;
-    Optional<chip::BitMask<WebRTCMetadataOptions>> metadataOptions;
+    Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -43795,7 +43795,7 @@ public:
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::DecodableList<Structs::ICEServerStruct::DecodableType>> ICEServers;
     Optional<chip::CharSpan> ICETransportPolicy;
-    Optional<chip::BitMask<WebRTCMetadataOptions>> metadataOptions;
+    Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ProvideOffer
@@ -43815,8 +43815,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
-    uint16_t videoStreamID   = static_cast<uint16_t>(0);
-    uint16_t audioStreamID   = static_cast<uint16_t>(0);
+    Optional<DataModel::Nullable<uint16_t>> videoStreamID;
+    Optional<DataModel::Nullable<uint16_t>> audioStreamID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -43832,8 +43832,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
-    uint16_t videoStreamID   = static_cast<uint16_t>(0);
-    uint16_t audioStreamID   = static_cast<uint16_t>(0);
+    Optional<DataModel::Nullable<uint16_t>> videoStreamID;
+    Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ProvideOfferResponse
@@ -43872,22 +43872,22 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ProvideAnswer
-namespace ProvideICECandidate {
+namespace ProvideICECandidates {
 enum class Fields : uint8_t
 {
     kWebRTCSessionID = 0,
-    kICECandidate    = 1,
+    kICECandidates   = 1,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ProvideICECandidate::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ProvideICECandidates::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
-    chip::CharSpan ICECandidate;
+    DataModel::List<const chip::CharSpan> ICECandidates;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -43899,14 +43899,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::ProvideICECandidate::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ProvideICECandidates::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
-    chip::CharSpan ICECandidate;
+    DataModel::DecodableList<chip::CharSpan> ICECandidates;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace ProvideICECandidate
+}; // namespace ProvideICECandidates
 namespace EndSession {
 enum class Fields : uint8_t
 {
