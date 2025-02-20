@@ -127,16 +127,19 @@ def tree_display_name(name: str) -> list[str]:
     #      - emberAfPluginLevelControlCoupledColorTempChangeCallback
     # The code below splits the above an "ember" namespace
 
-    # First consider the cluster functions:
+    # First consider the cluster functions.
+    # These are technically ember, however place them in `::chip::app::Clusters::<Cluster>::`
+    # so that they are grouped with AAI/CHI
     for expr in _CLUSTER_EXPRESSIONS:
         m = expr.match(name)
-        if m:
-            d = m.groupdict()
-            logging.debug("Ember callback found: %s -> %r", name, d)
-            if 'command' in d:
-                return ["EMBER", "CALLBACKS", d['cluster'], d['command'], name]
-            else:
-               return ["EMBER", "CALLBACKS", d['cluster'], name]
+        if not m:
+            continue
+        d = m.groupdict()
+        logging.debug("Ember callback found: %s -> %r", name, d)
+        if 'command' in d:
+            return ["chip", "app", "Clusters", d['cluster'], "EMBER", d['command'], name]
+        else:
+            return ["chip", "app", "Clusters", d['cluster'], "EMBER", name]
 
     if 'MatterPreAttributeChangeCallback' in name:
         return ["EMBER", "CALLBACKS", name]
