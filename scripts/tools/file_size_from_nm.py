@@ -32,6 +32,7 @@
 #    plotly
 
 import logging
+import re
 import subprocess
 from dataclasses import dataclass
 from enum import Enum, auto
@@ -72,6 +73,32 @@ class Symbol:
     offset: int
     size: int
 
+# These expressions are callbacks defined in
+# callbacks.zapt
+#   - void emberAf{{asUpperCamelCase label}}ClusterInitCallback(chip::EndpointId endpoint);
+#   - void emberAf{{asUpperCamelCase label}}ClusterServerInitCallback(chip::EndpointId endpoint);
+#   - void Matter{{asUpperCamelCase label}}ClusterServerShutdownCallback(chip::EndpointId endpoint);
+#   - void emberAf{{asUpperCamelCase label}}ClusterClientInitCallback(chip::EndpointId endpoint);
+#   - void Matter{{asUpperCamelCase label}}ClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+#   - chip::Protocols::InteractionModel::Status Matter{{asUpperCamelCase label}}ClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+#   - void emberAf{{asUpperCamelCase label}}ClusterServerTickCallback(chip::EndpointId endpoint);
+#
+# and for commands:
+#   - bool emberAf{{asUpperCamelCase parent.label}}Cluster{{asUpperCamelCase name}}Callback
+
+
+_CLUSTER_EXPRESSIONS = [
+    re.compile(r'emberAf(?P<cluster>.+)ClusterClientInitCallback\('),
+    re.compile(r'emberAf(?P<cluster>.+)ClusterInitCallback\('),
+    re.compile(r'emberAf(?P<cluster>.+)ClusterServerInitCallback\('),
+    re.compile(r'emberAf(?P<cluster>.+)ClusterServerTickCallback\('),
+    re.compile(r'Matter(?P<cluster>.+)ClusterServerAttributeChangedCallback\('),
+    re.compile(r'Matter(?P<cluster>.+)ClusterServerPreAttributeChangedCallback\('),
+    re.compile(r'Matter(?P<cluster>.+)ClusterServerShutdownCallback\('),
+    # commands
+    re.compile(r'emberAf(?P<cluster>.+Cluster)(?P<command>.+)Callback\('),
+]
+
 
 def tree_display_name(name: str) -> list[str]:
     """
@@ -88,11 +115,49 @@ def tree_display_name(name: str) -> list[str]:
     if name.startswith("vtable for "):
         name = name[11:]
 
-    # These are C-style methods really, we have no top-level namespaces named
-    # like this but still want to see these differently
-    for special_prefix in {"emberAf", "Matter"}:
-        if name.startswith(special_prefix):
-            return [special_prefix, name]
+    # Ember methods are generally c-style that are in a particular format:
+    #   - emAf* are INTERNAL ember functions
+    #   - emberAf* are PUBLIC (from an ember perspective) functions
+    #   - Several callbacks:
+    #      - Matter<Cluster>ClusterServerInitCallback
+    #      - emberAf<Cluster>ClusterInitCallback
+    #      - Matter<Cluster>serverShutdownCallback
+    #      - MatterPreAttributeChangedCallback
+    #      - Matter<Cluster>PreAttributeChangedCallback
+    #      - emberAfPluginLevelControlCoupledColorTempChangeCallback
+    # The code below splits the above an "ember" namespace
+
+    # First consider the cluster functions:
+    for expr in _CLUSTER_EXPRESSIONS:
+        m = expr.match(name)
+        if m:
+            d = m.groupdict()
+            logging.debug("Ember callback found: %s -> %r", name, d)
+            if 'command' in d:
+                return ["EMBER", "CALLBACKS", d['cluster'], d['command'], name]
+            else:
+               return ["EMBER", "CALLBACKS", d['cluster'], name]
+
+    if 'MatterPreAttributeChangeCallback' in name:
+        return ["EMBER", "CALLBACKS", name]
+
+    if name.startswith("emberAfPlugin"):
+        # these methods are callbacks defined by some clusters to call into application code.
+        # They look like:
+        #   - emberAfPluginTimeFormatLocalizationOnCalendarTypeChange
+        #   - emberAfPluginOnOffClusterServerPostInitCallback
+        #   - emberAfPluginDoorLockGetFaceCredentialLengthConstraints
+        #   - emberAfPluginDoorLockOnOperatingModeChange
+        #   - emberAfPluginColorControlServerXyTransitionEventHandler
+        #
+        # They are generally quite free form and seem to be used instead of "delegates" as
+        # application hook points.
+        return ["EMBER", "CALLBACKS", "PLUGIN", name]
+
+    if name.startswith("emAf") or name.startswith("emberAf"):
+        # Place this as ::EMBER::API (these are internal and public functions from ember)
+        return ["EMBER", "API", name]
+
 
     # If the first element contains a space, it is either within `<>` for templates or it means it is a
     # separator of the type. Try to find the type separator
