@@ -251,7 +251,7 @@ def tree_display_name(name: str) -> list[str]:
             result = ["ot"] + result
         return ["C"] + result
 
-    return result
+    return [r.replace('ANONYMOUS_NAMESPACE', '(anonymous namespace)') for r in result]
 
 
 # TO run the test, install pytest and do
@@ -331,7 +331,7 @@ def test_tree_display_name():
 
     assert tree_display_name(
         "(anonymous namespace)::AccessControlAttribute::Read(args)"
-    ) == ["ANONYMOUS_NAMESPACE", "AccessControlAttribute", "Read(args)"]
+    ) == ["(anonymous namespace)", "AccessControlAttribute", "Read(args)"]
 
 
 def build_treemap(
