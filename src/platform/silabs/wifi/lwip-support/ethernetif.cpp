@@ -306,7 +306,7 @@ void sl_wfx_host_received_frame_callback(sl_wfx_received_ind_t * rx_buffer)
 static SemaphoreHandle_t ethout_sem;
 
 /**
- * @brief Allocates packets for the data bout to be sent
+ * @brief Allocates packets for the data about to be sent
  *
  * TODO: Validate if this warning still applied and fix the associated code
  * WARNING - Taken from RSI and broken up
