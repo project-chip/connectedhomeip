@@ -98,14 +98,14 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
     }
 
     // Ensure Optional attribute bits have been correctly passed.
-    if (SupportsOptAttr(OptionalAttribute::kSupportsHDRModeEnabled))
+    if (SupportsOptAttr(OptionalAttribute::kHDRModeEnabled))
     {
         VerifyOrReturnError(
             HasFeature(Feature::kVideo), CHIP_ERROR_INVALID_ARGUMENT,
             ChipLogError(Zcl, "CameraAVStreamMgmt: Feature configuration error. if HDRModeEnabled, then Video feature required"));
     }
 
-    if (SupportsOptAttr(OptionalAttribute::kSupportsNightVision) || SupportsOptAttr(OptionalAttribute::kSupportsNightVisionIllum))
+    if (SupportsOptAttr(OptionalAttribute::kNightVision) || SupportsOptAttr(OptionalAttribute::kNightVisionIllum))
     {
         VerifyOrReturnError(HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl,
@@ -113,7 +113,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
                                          "Video|Snapshot feature required"));
     }
 
-    if (SupportsOptAttr(OptionalAttribute::kSupportsMicrophoneAGCEnabled))
+    if (SupportsOptAttr(OptionalAttribute::kMicrophoneAGCEnabled))
     {
         VerifyOrReturnError(
             HasFeature(Feature::kAudio), CHIP_ERROR_INVALID_ARGUMENT,
@@ -121,9 +121,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
                          "CameraAVStreamMgmt: Feature configuration error. if MicrophoneAGCEnabled, then Audio feature required"));
     }
 
-    if (SupportsOptAttr(OptionalAttribute::kSupportsImageFlipHorizontal) ||
-        SupportsOptAttr(OptionalAttribute::kSupportsImageFlipVertical) ||
-        SupportsOptAttr(OptionalAttribute::kSupportsImageRotation))
+    if (SupportsOptAttr(OptionalAttribute::kImageFlipHorizontal) ||
+        SupportsOptAttr(OptionalAttribute::kImageFlipVertical) ||
+        SupportsOptAttr(OptionalAttribute::kImageRotation))
     {
         VerifyOrReturnError(HasFeature(Feature::kImageControl), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl,
@@ -412,7 +412,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         ReturnErrorOnFailure(aEncoder.Encode(mCurrentFrameRate));
         break;
     case HDRModeEnabled::Id:
-        VerifyOrReturnError(HasFeature(Feature::kVideo) && SupportsOptAttr(OptionalAttribute::kSupportsHDRModeEnabled),
+        VerifyOrReturnError(HasFeature(Feature::kVideo) && SupportsOptAttr(OptionalAttribute::kHDRModeEnabled),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get HDRModeEnabled, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mHDRModeEnabled));
@@ -466,21 +466,21 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         ReturnErrorOnFailure(aEncoder.Encode(mSoftLivestreamPrivacyModeEnabled));
         break;
     case HardPrivacyModeOn::Id:
-        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kSupportsHardPrivacyModeOn),
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kHardPrivacyModeOn),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get HardPrivacyModeOn, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mHardPrivacyModeOn));
         break;
     case NightVision::Id:
         VerifyOrReturnError((HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot)) &&
-                                SupportsOptAttr(OptionalAttribute::kSupportsNightVision),
+                                SupportsOptAttr(OptionalAttribute::kNightVision),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get NightVision, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mNightVision));
         break;
     case NightVisionIllum::Id:
         VerifyOrReturnError((HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot)) &&
-                                SupportsOptAttr(OptionalAttribute::kSupportsNightVisionIllum),
+                                SupportsOptAttr(OptionalAttribute::kNightVisionIllum),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get NightVisionIllumination, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mNightVisionIllum));
@@ -535,25 +535,25 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         ReturnErrorOnFailure(aEncoder.Encode(mMicrophoneMinLevel));
         break;
     case MicrophoneAGCEnabled::Id:
-        VerifyOrReturnError(HasFeature(Feature::kAudio) && SupportsOptAttr(OptionalAttribute::kSupportsMicrophoneAGCEnabled),
+        VerifyOrReturnError(HasFeature(Feature::kAudio) && SupportsOptAttr(OptionalAttribute::kMicrophoneAGCEnabled),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get MicrophoneAGCEnabled, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mMicrophoneAGCEnabled));
         break;
     case ImageRotation::Id:
-        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttribute::kSupportsImageRotation),
+        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttribute::kImageRotation),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get ImageRotation, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mImageRotation));
         break;
     case ImageFlipHorizontal::Id:
-        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttribute::kSupportsImageFlipHorizontal),
+        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttribute::kImageFlipHorizontal),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get ImageFlipHorizontal, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mImageFlipHorizontal));
         break;
     case ImageFlipVertical::Id:
-        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttribute::kSupportsImageFlipVertical),
+        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttribute::kImageFlipVertical),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get ImageFlipHorizontal, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mImageFlipVertical));
@@ -571,13 +571,13 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         ReturnErrorOnFailure(aEncoder.Encode(mLocalSnapshotRecordingEnabled));
         break;
     case StatusLightEnabled::Id:
-        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kSupportsStatusLightEnabled),
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightEnabled),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get StatusLightEnabled, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mStatusLightEnabled));
         break;
     case StatusLightBrightness::Id:
-        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kSupportsStatusLightBrightness),
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightBrightness),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get StatusLightBrightness, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mStatusLightBrightness));
@@ -595,7 +595,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
     {
     case HDRModeEnabled::Id: {
         // Optional Attribute if Video is supported
-        VerifyOrReturnError(HasFeature(Feature::kVideo) && SupportsOptAttr(OptionalAttribute::kSupportsHDRModeEnabled),
+        VerifyOrReturnError(HasFeature(Feature::kVideo) && SupportsOptAttr(OptionalAttribute::kHDRModeEnabled),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not set HDRModeEnabled, feature is not supported"));
 
@@ -623,7 +623,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
     }
     case NightVision::Id: {
         VerifyOrReturnError((HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot)) &&
-                                SupportsOptAttr(OptionalAttribute::kSupportsNightVision),
+                                SupportsOptAttr(OptionalAttribute::kNightVision),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not set NightVision, feature is not supported"));
 
@@ -633,7 +633,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
     }
     case NightVisionIllum::Id: {
         VerifyOrReturnError((HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot)) &&
-                                SupportsOptAttr(OptionalAttribute::kSupportsNightVisionIllum),
+                                SupportsOptAttr(OptionalAttribute::kNightVisionIllum),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not set NightVisionIllumination, feature is not supported"));
 
@@ -679,7 +679,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
         return SetMicrophoneVolumeLevel(micVolLevel);
     }
     case MicrophoneAGCEnabled::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kAudio) && SupportsOptAttr(OptionalAttribute::kSupportsMicrophoneAGCEnabled),
+        VerifyOrReturnError(HasFeature(Feature::kAudio) && SupportsOptAttr(OptionalAttribute::kMicrophoneAGCEnabled),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not set MicrophoneAGCEnabled, feature is not supported"));
         bool micAGCEnabled;
@@ -687,7 +687,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
         return SetMicrophoneAGCEnabled(micAGCEnabled);
     }
     case ImageRotation::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttribute::kSupportsImageRotation),
+        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttribute::kImageRotation),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not set ImageRotation, feature is not supported"));
         uint16_t imageRotation;
@@ -695,7 +695,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
         return SetImageRotation(imageRotation);
     }
     case ImageFlipHorizontal::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttribute::kSupportsImageFlipHorizontal),
+        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttribute::kImageFlipHorizontal),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not set ImageFlipHorizontal, feature is not supported"));
         bool imageFlipHorizontal;
@@ -703,7 +703,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
         return SetImageFlipHorizontal(imageFlipHorizontal);
     }
     case ImageFlipVertical::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttribute::kSupportsImageFlipVertical),
+        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttribute::kImageFlipVertical),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not set ImageFlipVertical, feature is not supported"));
         bool imageFlipVertical;
@@ -727,7 +727,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
         return SetLocalSnapshotRecordingEnabled(localSnapshotRecEnabled);
     }
     case StatusLightEnabled::Id: {
-        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kSupportsStatusLightEnabled),
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightEnabled),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not set StatusLightEnabled, feature is not supported"));
         bool statusLightEnabled;
@@ -735,7 +735,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
         return SetStatusLightEnabled(statusLightEnabled);
     }
     case StatusLightBrightness::Id: {
-        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kSupportsStatusLightBrightness),
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightBrightness),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not set StatusLightBrightness, feature is not supported"));
         Globals::ThreeLevelAutoEnum statusLightBrightness;
