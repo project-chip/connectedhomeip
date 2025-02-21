@@ -121,8 +121,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
                          "CameraAVStreamMgmt: Feature configuration error. if MicrophoneAGCEnabled, then Audio feature required"));
     }
 
-    if (SupportsOptAttr(OptionalAttribute::kImageFlipHorizontal) ||
-        SupportsOptAttr(OptionalAttribute::kImageFlipVertical) ||
+    if (SupportsOptAttr(OptionalAttribute::kImageFlipHorizontal) || SupportsOptAttr(OptionalAttribute::kImageFlipVertical) ||
         SupportsOptAttr(OptionalAttribute::kImageRotation))
     {
         VerifyOrReturnError(HasFeature(Feature::kImageControl), CHIP_ERROR_INVALID_ARGUMENT,
@@ -466,8 +465,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         ReturnErrorOnFailure(aEncoder.Encode(mSoftLivestreamPrivacyModeEnabled));
         break;
     case HardPrivacyModeOn::Id:
-        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kHardPrivacyModeOn),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kHardPrivacyModeOn), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get HardPrivacyModeOn, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mHardPrivacyModeOn));
         break;
@@ -571,14 +569,12 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         ReturnErrorOnFailure(aEncoder.Encode(mLocalSnapshotRecordingEnabled));
         break;
     case StatusLightEnabled::Id:
-        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightEnabled),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get StatusLightEnabled, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mStatusLightEnabled));
         break;
     case StatusLightBrightness::Id:
-        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightBrightness),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightBrightness), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not get StatusLightBrightness, feature is not supported"));
         ReturnErrorOnFailure(aEncoder.Encode(mStatusLightBrightness));
         break;
@@ -727,16 +723,14 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
         return SetLocalSnapshotRecordingEnabled(localSnapshotRecEnabled);
     }
     case StatusLightEnabled::Id: {
-        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightEnabled),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not set StatusLightEnabled, feature is not supported"));
         bool statusLightEnabled;
         ReturnErrorOnFailure(aDecoder.Decode(statusLightEnabled));
         return SetStatusLightEnabled(statusLightEnabled);
     }
     case StatusLightBrightness::Id: {
-        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightBrightness),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightBrightness), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl, "CameraAVStreamMgmt: can not set StatusLightBrightness, feature is not supported"));
         Globals::ThreeLevelAutoEnum statusLightBrightness;
         ReturnErrorOnFailure(aDecoder.Decode(statusLightBrightness));
@@ -1504,11 +1498,14 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
     });
 
-    VerifyOrReturn(minFrameRate >= 1 && minFrameRate <= maxFrameRate && maxFrameRate >= 1, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+    VerifyOrReturn(minFrameRate >= 1 && minFrameRate <= maxFrameRate && maxFrameRate >= 1,
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
-    VerifyOrReturn(minBitRate >= 1 && minBitRate <= maxBitRate && maxBitRate >= 1, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+    VerifyOrReturn(minBitRate >= 1 && minBitRate <= maxBitRate && maxBitRate >= 1,
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
-    VerifyOrReturn(minFragmentLen <= maxFragmentLen && maxFragmentLen <= kMaxFragmentLenMaxValue, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+    VerifyOrReturn(minFragmentLen <= maxFragmentLen && maxFragmentLen <= kMaxFragmentLenMaxValue,
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
     // Call the delegate
     status =
@@ -1605,7 +1602,7 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    VerifyOrReturn(channelCount >=1 && channelCount <= kMaxChannelCount, {
+    VerifyOrReturn(channelCount >= 1 && channelCount <= kMaxChannelCount, {
         ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid channel count");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });

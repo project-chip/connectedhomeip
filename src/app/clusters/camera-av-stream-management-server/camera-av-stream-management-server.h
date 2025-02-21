@@ -342,8 +342,8 @@ public:
      *                                          full-duplex, etc.
      * @param aSupportedSnapshotParams          Indicates the set of supported snapshot parameters by the device, e.g., the image
      *                                          codec, the resolution and the maximum frame rate.
-     * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth ( in mbps ) that the device would consume for
-     *                                          the transmission of its media streams.
+     * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth ( in mbps ) that the device would consume
+     * for the transmission of its media streams.
      *
      */
     CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeature,
@@ -603,25 +603,13 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    bool IsAudioCodecValid(AudioCodecEnum audioCodec)
-    {
-        return (audioCodec != AudioCodecEnum::kUnknownEnumValue);
-    }
+    bool IsAudioCodecValid(AudioCodecEnum audioCodec) { return (audioCodec != AudioCodecEnum::kUnknownEnumValue); }
 
-    bool IsVideoCodecValid(VideoCodecEnum videoCodec)
-    {
-        return (videoCodec != VideoCodecEnum::kUnknownEnumValue);
-    }
+    bool IsVideoCodecValid(VideoCodecEnum videoCodec) { return (videoCodec != VideoCodecEnum::kUnknownEnumValue); }
 
-    bool IsImageCodecValid(ImageCodecEnum imageCodec)
-    {
-        return (imageCodec != ImageCodecEnum::kUnknownEnumValue);
-    }
+    bool IsImageCodecValid(ImageCodecEnum imageCodec) { return (imageCodec != ImageCodecEnum::kUnknownEnumValue); }
 
-    bool IsStreamUsageValid(StreamUsageEnum streamUsage)
-    {
-        return (streamUsage != StreamUsageEnum::kUnknownEnumValue);
-    }
+    bool IsStreamUsageValid(StreamUsageEnum streamUsage) { return (streamUsage != StreamUsageEnum::kUnknownEnumValue); }
 
     bool IsBitDepthValid(uint8_t bitDepth) { return (bitDepth == 8 || bitDepth == 16 || bitDepth == 24 || bitDepth == 32); }
 
