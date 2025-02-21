@@ -172,7 +172,6 @@ public:
     class GroupListener
     {
     public:
-        virtual ~GroupListener() = default;
         /**
          *  Callback invoked when a new group is added.
          *
@@ -185,6 +184,9 @@ public:
          *  @param[in] old_group  GroupInfo structure of the removed group.
          */
         virtual void OnGroupRemoved(FabricIndex fabric_index, const GroupInfo & old_group) = 0;
+
+    protected:
+        ~GroupListener() = default;
     };
 
     using GroupInfoIterator    = CommonIterator<GroupInfo>;

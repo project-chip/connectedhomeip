@@ -306,11 +306,11 @@ config("strict_warnings") {
     cflags -= [ "-Wshadow" ]
   }
 
-  cflags_cc = [ "-Wnon-virtual-dtor" ]
+  cflags_cc = [ "-Wdelete-non-virtual-dtor" ]
 
   if (current_os == "nuttx") {
     cflags -= [ "-Wshadow" ]
-    cflags_cc -= [ "-Wnon-virtual-dtor" ]
+    cflags_cc -= [ "-Wdelete-non-virtual-dtor" ]
   }
 
   configs = []

@@ -28,8 +28,6 @@ namespace Crypto {
 class OperationalKeystore
 {
 public:
-    virtual ~OperationalKeystore() {}
-
     // ==== API designed for commisionables to support fail-safe (although can be used by controllers) ====
 
     /**
@@ -246,6 +244,9 @@ public:
      * @brief Release an ephemeral keypair previously provided by `AllocateEphemeralKeypairForCASE()`
      */
     virtual void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair) = 0;
+
+protected:
+    ~OperationalKeystore() = default;
 };
 
 } // namespace Crypto

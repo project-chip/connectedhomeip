@@ -69,8 +69,6 @@ class DiagnosticDataProviderImpl;
 class WiFiDiagnosticsDelegate
 {
 public:
-    virtual ~WiFiDiagnosticsDelegate() {}
-
     /**
      * @brief
      *   Called when the Node detects Node’s Wi-Fi connection has been disconnected.
@@ -88,6 +86,9 @@ public:
      *   Called when the Node’s connection status to a Wi-Fi network has changed.
      */
     virtual void OnConnectionStatusChanged(uint8_t connectionStatus) {}
+
+protected:
+    ~WiFiDiagnosticsDelegate() = default;
 };
 
 /**
@@ -96,8 +97,6 @@ public:
 class ThreadDiagnosticsDelegate
 {
 public:
-    virtual ~ThreadDiagnosticsDelegate() {}
-
     /**
      * @brief
      *   Called when the Node’s connection status to a Thread network has changed.
@@ -111,6 +110,9 @@ public:
     virtual void OnNetworkFaultChanged(const GeneralFaults<kMaxNetworkFaults> & previous,
                                        const GeneralFaults<kMaxNetworkFaults> & current)
     {}
+
+protected:
+    ~ThreadDiagnosticsDelegate() {}
 };
 
 /**

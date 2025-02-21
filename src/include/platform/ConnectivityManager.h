@@ -68,14 +68,15 @@ class ConnectivityManagerImpl;
 class ConnectivityManagerDelegate
 {
 public:
-    virtual ~ConnectivityManagerDelegate() {}
-
     /**
      * @brief
      *   Called when any network interface on the Node is changed
      *
      */
     virtual void OnNetworkInfoChanged() {}
+
+protected:
+    ~ConnectivityManagerDelegate() {}
 };
 
 /**
