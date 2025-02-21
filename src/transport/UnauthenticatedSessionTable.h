@@ -155,7 +155,8 @@ public:
 
     System::Clock::Timestamp GetMRPBaseTimeout() const override
     {
-        return IsPeerActive() ? GetRemoteMRPConfig().mActiveRetransTimeout : min(GetRemoteMRPConfig().mActiveRetransTimeout, GetRemoteMRPConfig().mIdleRetransTimeout);
+        return IsPeerActive() ? GetRemoteMRPConfig().mActiveRetransTimeout
+                              : min(GetRemoteMRPConfig().mActiveRetransTimeout, GetRemoteMRPConfig().mIdleRetransTimeout);
     }
 
     void SetRemoteSessionParameters(const SessionParameters & sessionParams) { mRemoteSessionParams = sessionParams; }
