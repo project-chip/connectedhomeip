@@ -14,10 +14,13 @@
  *    limitations under the License.
  */
 
+#import "MTRTestCase.h"
+
+#import "MTRTestKeys.h"
+#import "MTRTestStorage.h"
+
 #include <stdlib.h>
 #include <unistd.h>
-
-#import "MTRTestCase.h"
 
 #if HAVE_NSTASK
 // Tasks that are not scoped to a specific test, but rather to a specific test suite.
@@ -104,6 +107,22 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 #endif // HAVE_NSTASK
 
     [super tearDown];
+}
+
++ (id)createControllerOnTestFabric
+{
+    __auto_type * storage = [[MTRTestStorage alloc] init];
+    __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
+    __auto_type * factory = MTRDeviceControllerFactory.sharedInstance;
+    XCTAssertTrue([factory startControllerFactory:factoryParams error:nil]);
+
+    __auto_type * testKeys = [[MTRTestKeys alloc] init];
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:testKeys.ipk fabricID:@1 nocSigner:testKeys];
+    params.vendorID = @0xFFF1;
+    MTRDeviceController * controller = [factory createControllerOnNewFabric:params error:nil];
+    XCTAssertNotNil(controller);
+
+    return controller;
 }
 
 #if HAVE_NSTASK
