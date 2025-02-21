@@ -41,7 +41,9 @@ extern "C" {
 
 #if SLI_SI91X_MCU_INTERFACE
 #include "USART.h"
+#if defined(SL_SI91X_BOARD_INIT)
 #include "rsi_board.h"
+#endif // SL_SI91X_BOARD_INIT
 #include "rsi_debug.h"
 #include "rsi_rom_egpio.h"
 #else // For EFR32
