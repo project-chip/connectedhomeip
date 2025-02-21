@@ -27,9 +27,9 @@
 
 namespace chip {
 
-using FactoryProvider     = DeviceLayer::FactoryDataProvider;
-using FactoryDataDriver   = DeviceLayer::FactoryDataDriver;
-using Tags                = FactoryProvider::FactoryDataId;
+using FactoryProvider   = DeviceLayer::FactoryDataProvider;
+using FactoryDataDriver = DeviceLayer::FactoryDataDriver;
+using Tags              = FactoryProvider::FactoryDataId;
 
 /**
  * OTA custom payload that uses Matter TLVs.
