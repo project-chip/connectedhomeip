@@ -40,14 +40,47 @@ EndpointCheckFunction = Callable[[Clusters.Attribute.AsyncReadTransaction.ReadRe
 
 
 def get_cluster_from_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> ClusterObjects.Cluster:
+    """Get the Cluster object for an attribute's cluster_id.
+
+    Args:
+        attribute: A ClusterAttributeDescriptor object containing cluster_id
+
+    Returns:
+        ClusterObjects.Cluster: The corresponding Cluster object from ALL_CLUSTERS
+
+    Raises:
+        KeyError: If the attribute's cluster_id is not found in ALL_CLUSTERS dictionary
+    """
     return ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
 
 
 def get_cluster_from_command(command: ClusterObjects.ClusterCommand) -> ClusterObjects.Cluster:
+    """Get the Cluster object for a command's cluster_id.
+
+    Args:
+        command: A ClusterCommand object containing cluster_id
+
+    Returns:
+        ClusterObjects.Cluster: The corresponding Cluster object from ALL_CLUSTERS
+
+    Raises:
+        KeyError: If the command's cluster_id is not found in ALL_CLUSTERS dictionary
+    """
     return ClusterObjects.ALL_CLUSTERS[command.cluster_id]
 
 
 def _has_cluster(wildcard, endpoint, cluster: ClusterObjects.Cluster) -> bool:
+    """Check if a cluster exists on a specific endpoint.
+
+    Args:
+        wildcard: A wildcard read result containing endpoint attributes mapping
+        endpoint: The endpoint ID to check
+        cluster: The Cluster object to look for
+
+    Returns:
+        bool: True if the cluster exists on the endpoint, False otherwise
+            Returns False if endpoint is not found in wildcard attributes
+    """
     try:
         return cluster in wildcard.attributes[endpoint]
     except KeyError:
@@ -78,6 +111,21 @@ def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointChec
 
 
 def _has_attribute(wildcard, endpoint, attribute: ClusterObjects.ClusterAttributeDescriptor) -> bool:
+    """Check if an attribute exists in a cluster's AttributeList on a specific endpoint.
+
+    Args:
+        wildcard: A wildcard read result containing endpoint attributes mapping
+        endpoint: The endpoint ID to check
+        attribute: The ClusterAttributeDescriptor to look for
+
+    Returns:
+        bool: True if the attribute ID exists in the cluster's AttributeList, False otherwise
+            Returns False if endpoint, cluster, or AttributeList is not found
+
+    Raises:
+        ValueError: If AttributeList value is not a list type
+        KeyError: If attribute's cluster_id is not found in ALL_CLUSTERS (from get_cluster_from_attribute)
+    """
     cluster = get_cluster_from_attribute(attribute)
     try:
         attr_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AttributeList]
@@ -113,6 +161,21 @@ def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> Endpo
 
 
 def _has_command(wildcard, endpoint, command: ClusterObjects.ClusterCommand) -> bool:
+    """Check if a command exists in a cluster's AcceptedCommandList on a specific endpoint.
+
+    Args:
+        wildcard: A wildcard read result containing endpoint attributes mapping
+        endpoint: The endpoint ID to check
+        command: The ClusterCommand to look for
+
+    Returns:
+        bool: True if the command ID exists in the cluster's AcceptedCommandList, False otherwise
+            Returns False if endpoint, cluster, or AcceptedCommandList is not found
+
+    Raises:
+        ValueError: If AcceptedCommandList value is not a list type
+        KeyError: If command's cluster_id is not found in ALL_CLUSTERS (from get_cluster_from_command)
+    """
     cluster = get_cluster_from_command(command)
     try:
         cmd_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AcceptedCommandList]
