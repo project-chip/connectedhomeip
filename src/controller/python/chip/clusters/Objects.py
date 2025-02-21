@@ -47318,7 +47318,7 @@ class WebRTCTransportProvider(Cluster):
             kUnknownEnumValue = 12
 
     class Bitmaps:
-        class WebRTCMetadataOptions(IntFlag):
+        class WebRTCMetadataOptionsBitmap(IntFlag):
             kDataTLV = 0x1
 
     class Structs:
@@ -47453,13 +47453,13 @@ class WebRTCTransportProvider(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=1, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=2, Type=typing.Union[None, Nullable, uint]),
                     ])
 
             webRTCSessionID: uint = 0
-            videoStreamID: uint = 0
-            audioStreamID: uint = 0
+            videoStreamID: typing.Union[None, Nullable, uint] = None
+            audioStreamID: typing.Union[None, Nullable, uint] = None
 
         @dataclass
         class ProvideAnswer(ClusterCommand):
@@ -47480,7 +47480,7 @@ class WebRTCTransportProvider(Cluster):
             sdp: str = ""
 
         @dataclass
-        class ProvideICECandidate(ClusterCommand):
+        class ProvideICECandidates(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000553
             command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
@@ -47491,11 +47491,11 @@ class WebRTCTransportProvider(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="ICECandidate", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(Label="ICECandidates", Tag=1, Type=typing.List[str]),
                     ])
 
             webRTCSessionID: uint = 0
-            ICECandidate: str = ""
+            ICECandidates: typing.List[str] = field(default_factory=lambda: [])
 
         @dataclass
         class EndSession(ClusterCommand):
@@ -47668,7 +47668,7 @@ class WebRTCTransportRequestor(Cluster):
             kUnknownEnumValue = 12
 
     class Bitmaps:
-        class WebRTCMetadataOptions(IntFlag):
+        class WebRTCMetadataOptionsBitmap(IntFlag):
             kDataTLV = 0x1
 
     class Structs:
