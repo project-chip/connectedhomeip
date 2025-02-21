@@ -54,11 +54,11 @@ constexpr uint16_t kMaxFragmentLenMaxValue  = 65500;
 constexpr size_t kViewportStructMaxSerializedSize =
     TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t));
 
-// The number of possible values of use case types for the streams, as specified in StreamUsageEnum.
+// The number of possible values of StreamUsageEnum.
 constexpr size_t kNumOfStreamUsageTypes = 4;
 
-// StreamUsageEnum + Anonymous tag(1 byte).
-// Assumes min-size encoding(1 byte) for the integer.
+// StreamUsageEnum + Anonymous tag ( 1 byte ).
+// Assumes min-size encoding ( 1 byte ) for the integer.
 constexpr size_t kStreamUsageTlvSize = sizeof(StreamUsageEnum) + 1;
 
 // 1 control byte + end-of-array marker
@@ -82,25 +82,25 @@ public:
     /**
      *   @brief Handle Command Delegate for Video stream allocation with the provided parameter list.
      *
-     *   @param streamUsage        Indicates the type of usage of stream(Recording, Liveview, etc) that this allocation is for.
+     *   @param streamUsage        Indicates the type of usage of stream ( Recording, Liveview, etc ) that this allocation is for.
      *
      *   @param videoCodec         Indicates the type of video codec the stream should support.
      *
-     *   @param minFrameRate       Indicates the minimum frame rate(frames/second) of the video stream.
+     *   @param minFrameRate       Indicates the minimum frame rate ( frames/second ) of the video stream.
      *
-     *   @param maxFrameRate       Indicates the maximum frame rate(frames/second) of the video stream.
+     *   @param maxFrameRate       Indicates the maximum frame rate ( frames/second ) of the video stream.
      *
      *   @param minResolution      Indicates the minimum resolution of the video stream.
      *
      *   @param maxResolution      Indicates the maximum resolution of the video stream.
      *
-     *   @param minBitRate         Indicates the minimum bit rate(bits/second) of the video stream.
+     *   @param minBitRate         Indicates the minimum bit rate ( bits/second ) of the video stream.
      *
-     *   @param maxBitRate         Indicates the maximum bit rate(bits/second) of the video stream.
+     *   @param maxBitRate         Indicates the maximum bit rate ( bits/second ) of the video stream.
      *
-     *   @param minFragmentLen     Indicates the minimum length(msecs) of a clip fragment for the video stream.
+     *   @param minFragmentLen     Indicates the minimum length ( msecs ) of a clip fragment for the video stream.
      *
-     *   @param maxFragmentLen     Indicates the maximum length(msecs) of a clip fragment for the video stream.
+     *   @param maxFragmentLen     Indicates the maximum length ( msecs ) of a clip fragment for the video stream.
      *
      *   @param waterMarkEnabled   Indicates  whether a watermark can be applied on the video stream.
      *                             Value defaults to false if feature unsupported.
@@ -154,17 +154,17 @@ public:
     /**
      *   @brief Handle Command Delegate for Audio stream allocation.
      *
-     *   @param streamUsage        Indicates the type of usage of stream(Recording, Liveview, etc) that this allocation is for.
+     *   @param streamUsage        Indicates the type of usage of stream ( Recording, Liveview, etc ) that this allocation is for.
      *
      *   @param audioCodec         Indicates the type of audio codec the stream should support.
      *
-     *   @param channelCount       Indicates the the number of channels used by the stream, e.g., Mono(1), Stereo(2), etc.
+     *   @param channelCount       Indicates the the number of channels used by the stream, e.g., Mono ( 1 ), Stereo ( 2 ), etc.
      *
      *   @param sampleRate         Indicates the sampling rate of the audio stream in Hz.
      *
-     *   @param bitRate            Indicates the bitrate(bits/sec) of the specified audio codec.
+     *   @param bitRate            Indicates the bitrate ( bits/sec ) of the specified audio codec.
      *
-     *   @param bitDepth           Indicates the number of information bits(8, 16, 24 or 32) used to represent each sample.
+     *   @param bitDepth           Indicates the number of information bits ( 8, 16, 24 or 32 ) used to represent each sample.
      *
      *   @param outStreamID        Indicates the ID of the allocated Audio Stream.
      *
@@ -192,15 +192,15 @@ public:
      *
      *   @param imageCodec          Indicates the type of image codec to be used by the stream.
      *
-     *   @param frameRate           Indicates the frame rate(frames/second) of the stream.
+     *   @param frameRate           Indicates the frame rate ( frames/second ) of the stream.
      *
-     *   @param bitRate             Indicates the bitrate(bits/sec) of the stream.
+     *   @param bitRate             Indicates the bitrate ( bits/sec ) of the stream.
      *
      *   @param minResolution       Indicates the minimum resolution of the stream.
      *
      *   @param maxResolution       Indicates the maximum resolution of the stream.
      *
-     *   @param quality             Indicates a codec quality metric(integer between 1 and 100) for the stream.
+     *   @param quality             Indicates a codec quality metric ( integer between 1 and 100 ) for the stream.
      *
      *   @param outStreamID         Indicates the ID of the allocated Audio Stream.
      *
@@ -253,7 +253,7 @@ public:
     /**
      *  Delegate functions to load the allocated video, audio, and snapshot streams.
      *  The delegate application is responsible for creating and persisting
-     *  these streams(based on the Allocation commands). These Load APIs would be
+     *  these streams ( based on the Allocation commands ). These Load APIs would be
      *  used to load the pre-allocated stream context information into the cluster server list,
      *  at initialization.
      *  Once loaded, the cluster server would be serving Reads on these
@@ -281,8 +281,8 @@ private:
     CameraAVStreamMgmtServer * mCameraAVStreamMgmtServer = nullptr;
 
     /**
-     * This method is used by the SDK to set the CameraAVStreamMgmtServer pointer. This is done during the instantiation of a
-     * CameraAVStreamMgmtServer object.
+     * This method is used by the SDK to set the CameraAVStreamMgmtServer pointer member in the delegate.
+     * This is done in the ctor during the instantiation of the CameraAVStreamMgmtServer object.
      *
      * @param aCameraAVStreamMgmtServer A pointer to the CameraAVStreamMgmtServer object related to this delegate object.
      */
@@ -297,16 +297,16 @@ protected:
 
 enum class OptionalAttribute : uint32_t
 {
-    kSupportsHDRModeEnabled        = 0x0001,
-    kSupportsHardPrivacyModeOn     = 0x0002,
-    kSupportsNightVision           = 0x0004,
-    kSupportsNightVisionIllum      = 0x0008,
-    kSupportsMicrophoneAGCEnabled  = 0x0010,
-    kSupportsImageRotation         = 0x0020,
-    kSupportsImageFlipHorizontal   = 0x0040,
-    kSupportsImageFlipVertical     = 0x0080,
-    kSupportsStatusLightEnabled    = 0x0100,
-    kSupportsStatusLightBrightness = 0x0200,
+    kHDRModeEnabled        = 0x0001,
+    kHardPrivacyModeOn     = 0x0002,
+    kNightVision           = 0x0004,
+    kNightVisionIllum      = 0x0008,
+    kMicrophoneAGCEnabled  = 0x0010,
+    kImageRotation         = 0x0020,
+    kImageFlipHorizontal   = 0x0040,
+    kImageFlipVertical     = 0x0080,
+    kStatusLightEnabled    = 0x0100,
+    kStatusLightBrightness = 0x0200,
 };
 
 class CameraAVStreamMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface
@@ -342,12 +342,12 @@ public:
      *                                          full-duplex, etc.
      * @param aSupportedSnapshotParams          Indicates the set of supported snapshot parameters by the device, e.g., the image
      *                                          codec, the resolution and the maximum frame rate.
-     * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth (in mbps) that the device would consume for
+     * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth ( in mbps ) that the device would consume for
      *                                          the transmission of its media streams.
      *
      */
     CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeature,
-                             const BitFlags<OptionalAttribute> aOptionalAttr, PersistentStorageDelegate & aPersistentStorage,
+                             const BitFlags<OptionalAttribute> aOptionalAttrs, PersistentStorageDelegate & aPersistentStorage,
                              uint8_t aMaxConcurrentVideoEncoders, uint32_t aMaxEncodedPixelRate,
                              const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionCapable,
                              const VideoResolutionStruct & aMinViewPort,
@@ -605,53 +605,22 @@ private:
 
     bool IsAudioCodecValid(AudioCodecEnum audioCodec)
     {
-        switch (audioCodec)
-        {
-        case AudioCodecEnum::kOpus:
-        case AudioCodecEnum::kAacLc:
-            return true;
-        default:
-            return false;
-        }
+        return (audioCodec != AudioCodecEnum::kUnknownEnumValue);
     }
 
     bool IsVideoCodecValid(VideoCodecEnum videoCodec)
     {
-        switch (videoCodec)
-        {
-        case VideoCodecEnum::kH264:
-        case VideoCodecEnum::kHevc:
-        case VideoCodecEnum::kVvc:
-        case VideoCodecEnum::kAv1:
-            return true;
-        default:
-            return false;
-        }
+        return (videoCodec != VideoCodecEnum::kUnknownEnumValue);
     }
 
     bool IsImageCodecValid(ImageCodecEnum imageCodec)
     {
-        switch (imageCodec)
-        {
-        case ImageCodecEnum::kJpeg:
-            return true;
-        default:
-            return false;
-        }
+        return (imageCodec != ImageCodecEnum::kUnknownEnumValue);
     }
 
     bool IsStreamUsageValid(StreamUsageEnum streamUsage)
     {
-        switch (streamUsage)
-        {
-        case StreamUsageEnum::kInternal:
-        case StreamUsageEnum::kRecording:
-        case StreamUsageEnum::kAnalysis:
-        case StreamUsageEnum::kLiveView:
-            return true;
-        default:
-            return false;
-        }
+        return (streamUsage != StreamUsageEnum::kUnknownEnumValue);
     }
 
     bool IsBitDepthValid(uint8_t bitDepth) { return (bitDepth == 8 || bitDepth == 16 || bitDepth == 24 || bitDepth == 32); }
