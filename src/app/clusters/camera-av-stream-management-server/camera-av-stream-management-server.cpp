@@ -1488,12 +1488,12 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
     VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
 
-    VerifyOrReturn(IsStreamUsageValid(streamUsage), {
+    VerifyOrReturn(streamUsage != StreamUsageEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid stream usage");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
     });
 
-    VerifyOrReturn(IsVideoCodecValid(videoCodec), {
+    VerifyOrReturn(videoCodec != VideoCodecEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid video codec");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
     });
@@ -1577,12 +1577,12 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
     auto & bitDepth        = commandData.bitDepth;
     uint16_t audioStreamID = 0;
 
-    VerifyOrReturn(IsStreamUsageValid(streamUsage), {
+    VerifyOrReturn(streamUsage != StreamUsageEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid stream usage");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    VerifyOrReturn(IsAudioCodecValid(audioCodec), {
+    VerifyOrReturn(audioCodec != AudioCodecEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid audio codec");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
@@ -1646,7 +1646,7 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
     auto & quality            = commandData.quality;
     uint16_t snapshotStreamID = 0;
 
-    VerifyOrReturn(IsImageCodecValid(imageCodec), {
+    VerifyOrReturn(imageCodec != ImageCodecEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid image codec");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
     });

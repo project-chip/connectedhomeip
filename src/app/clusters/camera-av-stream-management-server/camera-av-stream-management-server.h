@@ -603,14 +603,6 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    bool IsAudioCodecValid(AudioCodecEnum audioCodec) { return (audioCodec != AudioCodecEnum::kUnknownEnumValue); }
-
-    bool IsVideoCodecValid(VideoCodecEnum videoCodec) { return (videoCodec != VideoCodecEnum::kUnknownEnumValue); }
-
-    bool IsImageCodecValid(ImageCodecEnum imageCodec) { return (imageCodec != ImageCodecEnum::kUnknownEnumValue); }
-
-    bool IsStreamUsageValid(StreamUsageEnum streamUsage) { return (streamUsage != StreamUsageEnum::kUnknownEnumValue); }
-
     bool IsBitDepthValid(uint8_t bitDepth) { return (bitDepth == 8 || bitDepth == 16 || bitDepth == 24 || bitDepth == 32); }
 
     /**
