@@ -229,6 +229,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::AddToFabricsUsingCamera(FabricIndex aFabric
 {
     mFabricsUsingCamera.insert(aFabricIndex);
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::FabricsUsingCamera::Id);
+    mDelegate.OnAttributeChanged(Attributes::FabricsUsingCamera::Id);
     MatterReportingAttributeChangeCallback(path);
 
     return CHIP_NO_ERROR;
@@ -238,6 +239,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveFromFabricsUsingCamera(FabricIndex aF
 {
     mFabricsUsingCamera.erase(aFabricIndex);
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::FabricsUsingCamera::Id);
+    mDelegate.OnAttributeChanged(Attributes::FabricsUsingCamera::Id);
     MatterReportingAttributeChangeCallback(path);
 
     return CHIP_NO_ERROR;
@@ -250,6 +252,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetRankedVideoStreamPriorities(
 
     ReturnErrorOnFailure(StoreRankedVideoStreamPriorities());
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::RankedVideoStreamPrioritiesList::Id);
+    mDelegate.OnAttributeChanged(Attributes::RankedVideoStreamPrioritiesList::Id);
     MatterReportingAttributeChangeCallback(path);
 
     return CHIP_NO_ERROR;
@@ -259,6 +262,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::AddVideoStream(const VideoStreamStruct & vi
 {
     mAllocatedVideoStreams.push_back(videoStream);
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
+    mDelegate.OnAttributeChanged(Attributes::AllocatedVideoStreams::Id);
     MatterReportingAttributeChangeCallback(path);
 
     return CHIP_NO_ERROR;
@@ -271,6 +275,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveVideoStream(uint16_t videoStreamId)
                        [&](const VideoStreamStruct & vStream) { return vStream.videoStreamID == videoStreamId; }),
         mAllocatedVideoStreams.end());
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
+    mDelegate.OnAttributeChanged(Attributes::AllocatedVideoStreams::Id);
     MatterReportingAttributeChangeCallback(path);
 
     return CHIP_NO_ERROR;
@@ -280,6 +285,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::AddAudioStream(const AudioStreamStruct & au
 {
     mAllocatedAudioStreams.push_back(audioStream);
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedAudioStreams::Id);
+    mDelegate.OnAttributeChanged(Attributes::AllocatedAudioStreams::Id);
     MatterReportingAttributeChangeCallback(path);
 
     return CHIP_NO_ERROR;
@@ -292,6 +298,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveAudioStream(uint16_t audioStreamId)
                        [&](const AudioStreamStruct & aStream) { return aStream.audioStreamID == audioStreamId; }),
         mAllocatedAudioStreams.end());
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedAudioStreams::Id);
+    mDelegate.OnAttributeChanged(Attributes::AllocatedAudioStreams::Id);
     MatterReportingAttributeChangeCallback(path);
 
     return CHIP_NO_ERROR;
@@ -301,6 +308,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::AddSnapshotStream(const SnapshotStreamStruc
 {
     mAllocatedSnapshotStreams.push_back(snapshotStream);
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedSnapshotStreams::Id);
+    mDelegate.OnAttributeChanged(Attributes::AllocatedSnapshotStreams::Id);
     MatterReportingAttributeChangeCallback(path);
 
     return CHIP_NO_ERROR;
@@ -313,6 +321,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveSnapshotStream(uint16_t snapshotStrea
                        [&](const SnapshotStreamStruct & sStream) { return sStream.snapshotStreamID == snapshotStreamId; }),
         mAllocatedSnapshotStreams.end());
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedSnapshotStreams::Id);
+    mDelegate.OnAttributeChanged(Attributes::AllocatedSnapshotStreams::Id);
     MatterReportingAttributeChangeCallback(path);
 
     return CHIP_NO_ERROR;
@@ -776,6 +785,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetNightVision(TriStateAutoEnum aNightVisio
         mNightVision = aNightVision;
         auto path    = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVision::Id);
         ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, to_underlying(mNightVision)));
+        mDelegate.OnAttributeChanged(Attributes::NightVision::Id);
         MatterReportingAttributeChangeCallback(path);
     }
     return CHIP_NO_ERROR;
@@ -788,6 +798,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetNightVisionIllum(TriStateAutoEnum aNight
         mNightVisionIllum = aNightVisionIllum;
         auto path         = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVisionIllum::Id);
         ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, to_underlying(mNightVisionIllum)));
+        mDelegate.OnAttributeChanged(Attributes::NightVisionIllum::Id);
         MatterReportingAttributeChangeCallback(path);
     }
     return CHIP_NO_ERROR;
@@ -799,6 +810,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetViewport(const ViewportStruct & aViewpor
 
     StoreViewport(mViewport);
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::Viewport::Id);
+    mDelegate.OnAttributeChanged(Attributes::Viewport::Id);
     MatterReportingAttributeChangeCallback(path);
 
     return CHIP_NO_ERROR;
@@ -923,6 +935,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetStatusLightBrightness(Globals::ThreeLeve
         mStatusLightBrightness = aStatusLightBrightness;
         auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightBrightness::Id);
         ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, to_underlying(mStatusLightBrightness)));
+        mDelegate.OnAttributeChanged(Attributes::StatusLightBrightness::Id);
         MatterReportingAttributeChangeCallback(path);
     }
     return CHIP_NO_ERROR;
@@ -1472,15 +1485,13 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
     // If Watermark feature is supported, then command should have the
     // isWaterMarkEnabled param. Or, if it is not supported, then command should
     // not have the param.
-    VerifyOrReturn((HasFeature(Feature::kWatermark) && commandData.watermarkEnabled.HasValue()) ||
-                       (!HasFeature(Feature::kWatermark) && !commandData.watermarkEnabled.HasValue()),
+    VerifyOrReturn((HasFeature(Feature::kWatermark) == commandData.watermarkEnabled.HasValue()),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
 
     // If OSD feature is supported, then command should have the
     // isOSDEnabled param. Or, if it is not supported, then command should
     // not have the param.
-    VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) && commandData.OSDEnabled.HasValue()) ||
-                       (!HasFeature(Feature::kOnScreenDisplay) && !commandData.OSDEnabled.HasValue()),
+    VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
 
     VerifyOrReturn(IsStreamUsageValid(streamUsage), {
@@ -1493,11 +1504,11 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
     });
 
-    VerifyOrReturn(minFrameRate <= maxFrameRate, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+    VerifyOrReturn(minFrameRate >= 1 && minFrameRate <= maxFrameRate && maxFrameRate >= 1, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
-    VerifyOrReturn(minBitRate <= maxBitRate, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+    VerifyOrReturn(minBitRate >= 1 && minBitRate <= maxBitRate && maxBitRate >= 1, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
-    VerifyOrReturn(minFragmentLen <= maxFragmentLen, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+    VerifyOrReturn(minFragmentLen <= maxFragmentLen && maxFragmentLen <= kMaxFragmentLenMaxValue, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
     // Call the delegate
     status =
@@ -1530,15 +1541,13 @@ void CameraAVStreamMgmtServer::HandleVideoStreamModify(HandlerContext & ctx,
     // If Watermark feature is supported, then command should have the
     // isWaterMarkEnabled param. Or, if it is not supported, then command should
     // not have the param.
-    VerifyOrReturn((HasFeature(Feature::kWatermark) && commandData.watermarkEnabled.HasValue()) ||
-                       (!HasFeature(Feature::kWatermark) && !commandData.watermarkEnabled.HasValue()),
+    VerifyOrReturn((HasFeature(Feature::kWatermark) == commandData.watermarkEnabled.HasValue()),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
 
     // If OSD feature is supported, then command should have the
     // isOSDEnabled param. Or, if it is not supported, then command should
     // not have the param.
-    VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) && commandData.OSDEnabled.HasValue()) ||
-                       (!HasFeature(Feature::kOnScreenDisplay) && !commandData.OSDEnabled.HasValue()),
+    VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
 
     // Call the delegate
@@ -1550,19 +1559,12 @@ void CameraAVStreamMgmtServer::HandleVideoStreamModify(HandlerContext & ctx,
 void CameraAVStreamMgmtServer::HandleVideoStreamDeallocate(HandlerContext & ctx,
                                                            const Commands::VideoStreamDeallocate::DecodableType & commandData)
 {
-
     auto & videoStreamID = commandData.videoStreamID;
 
     // Call the delegate
     Status status = mDelegate.VideoStreamDeallocate(videoStreamID);
 
-    if (status != Status::Success)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        return;
-    }
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
@@ -1588,8 +1590,13 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    VerifyOrReturn(sampleRate > 0 && bitRate > 0, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid sampleRate or bitRate ");
+    VerifyOrReturn(sampleRate > 0, {
+        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid sampleRate");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+    });
+
+    VerifyOrReturn(bitRate > 0, {
+        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid bitRate ");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
@@ -1598,7 +1605,7 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    VerifyOrReturn(channelCount <= kMaxChannelCount, {
+    VerifyOrReturn(channelCount >=1 && channelCount <= kMaxChannelCount, {
         ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid channel count");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
@@ -1615,7 +1622,6 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
 
     response.audioStreamID = audioStreamID;
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
 }
 
 void CameraAVStreamMgmtServer::HandleAudioStreamDeallocate(HandlerContext & ctx,
@@ -1627,13 +1633,7 @@ void CameraAVStreamMgmtServer::HandleAudioStreamDeallocate(HandlerContext & ctx,
     // Call the delegate
     Status status = mDelegate.AudioStreamDeallocate(audioStreamID);
 
-    if (status != Status::Success)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        return;
-    }
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx,
@@ -1654,8 +1654,13 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
     });
 
-    VerifyOrReturn(maxFrameRate > 0 && bitRate > 0, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid maxFrameRate or bitRate");
+    VerifyOrReturn(maxFrameRate > 0, {
+        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid maxFrameRate");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+    });
+
+    VerifyOrReturn(bitRate > 0, {
+        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid bitRate");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
@@ -1676,7 +1681,6 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
 
     response.snapshotStreamID = snapshotStreamID;
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
 }
 
 void CameraAVStreamMgmtServer::HandleSnapshotStreamDeallocate(HandlerContext & ctx,
@@ -1688,13 +1692,7 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamDeallocate(HandlerContext & c
     // Call the delegate
     Status status = mDelegate.SnapshotStreamDeallocate(snapshotStreamID);
 
-    if (status != Status::Success)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        return;
-    }
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
@@ -1749,7 +1747,6 @@ void CameraAVStreamMgmtServer::HandleCaptureSnapshot(HandlerContext & ctx,
     }
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
 }
 
 } // namespace CameraAvStreamManagement

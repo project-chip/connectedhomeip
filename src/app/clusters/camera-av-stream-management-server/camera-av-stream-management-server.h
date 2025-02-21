@@ -49,6 +49,7 @@ constexpr uint8_t kMaxMicrophoneLevel       = 254;
 constexpr uint16_t kMaxImageRotationDegrees = 359;
 constexpr uint8_t kMaxChannelCount          = 8;
 constexpr uint8_t kMaxImageQualityMetric    = 100;
+constexpr uint16_t kMaxFragmentLenMaxValue  = 65500;
 
 constexpr size_t kViewportStructMaxSerializedSize =
     TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t));
@@ -229,6 +230,12 @@ public:
      *
      */
     virtual void OnRankedStreamPrioritiesChanged() = 0;
+
+    /**
+     *   @brief Delegate callback for notifying change in an attribute.
+     *
+     */
+    virtual void OnAttributeChanged(AttributeId attributeId) = 0;
 
     /**
      *   @brief Handle Command Delegate for CaptureSnapshot.
@@ -590,6 +597,7 @@ private:
             {
                 ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, currentValue));
             }
+            mDelegate.OnAttributeChanged(attributeId);
             MatterReportingAttributeChangeCallback(path);
         }
         return CHIP_NO_ERROR;
