@@ -723,7 +723,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                 if (handler->IsFromSubscriber(*apExchangeContext))
                 {
                     ChipLogProgress(InteractionModel,
-                                    "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
+                                    "Deleting previous active subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
                                     ChipLogValueX64(apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId()),
                                     apExchangeContext->GetSessionHandle()->GetFabricIndex());
                     handler->Close();
@@ -731,6 +731,37 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
 
                 return Loop::Continue;
             });
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+            if (mpSubscriptionResumptionStorage != nullptr)
+            {
+                SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
+                auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    
+                while (iterator->Next(subscriptionInfo))
+                {
+                    if (subscriptionInfo.mNodeId == apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId() &&
+                        subscriptionInfo.mFabricIndex == apExchangeContext->GetSessionHandle()->GetFabricIndex())
+                    {
+                        ChipLogProgress(InteractionModel,
+                                        "Deleting previous non-active subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
+                                        ChipLogValueX64(subscriptionInfo.mNodeId), subscriptionInfo.mFabricIndex);
+                        mpSubscriptionResumptionStorage->Delete(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex,
+                                                                subscriptionInfo.mSubscriptionId);
+                    }
+                }
+                iterator->Release();
+    
+                // If we have no subscriptions to resume, we can cancel the Timer, to make sure it is cleared in the case,
+                // we deleted a subscription in resumption mode.
+                if (!HasSubscriptionsToResume())
+                {
+                    mpExchangeMgr->GetSessionManager()->SystemLayer()->CancelTimer(ResumeSubscriptionsTimerCallback, this);
+                    mSubscriptionResumptionScheduled  = false;
+                    mNumSubscriptionResumptionRetries = 0;
+                }
+            }
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
         }
 
         {
