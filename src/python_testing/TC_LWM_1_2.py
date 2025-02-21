@@ -87,7 +87,7 @@ class TC_LWM_1_2(MatterBaseTest, ModeBaseClusterChecks):
 
         self.step(3)
         # Verify that the CurrentMode attribute has a valid value.
-        mode = cluster_lwm_mode.Attributes.CurrentMode
+        mode = self.cluster.Attributes.CurrentMode
         await self.read_and_check_mode(endpoint=endpoint, mode=mode, supported_modes=supported_modes)
 
 
