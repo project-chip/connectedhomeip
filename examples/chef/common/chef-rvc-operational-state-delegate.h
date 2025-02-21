@@ -121,6 +121,8 @@ void Shutdown();
 } // namespace app
 } // namespace chip
 
+extern std::unique_ptr<chip::app::Clusters::RvcOperationalState::RvcOperationalStateDelegate> gRvcOperationalStateDelegate;
+
 chip::Protocols::InteractionModel::Status chefRvcOperationalStateWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                                                const EmberAfAttributeMetadata * attributeMetadata,
                                                                                uint8_t * buffer);
@@ -128,3 +130,4 @@ chip::Protocols::InteractionModel::Status chefRvcOperationalStateReadCallback(ch
                                                                               const EmberAfAttributeMetadata * attributeMetadata,
                                                                               uint8_t * buffer, uint16_t maxReadLength);
 #endif // MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
+

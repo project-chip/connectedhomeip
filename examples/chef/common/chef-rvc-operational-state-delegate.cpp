@@ -28,7 +28,7 @@ using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::RvcOperationalState;
 using chip::Protocols::InteractionModel::Status;
 
-static std::unique_ptr<RvcOperationalStateDelegate> gRvcOperationalStateDelegate;
+std::unique_ptr<RvcOperationalStateDelegate> gRvcOperationalStateDelegate;
 static std::unique_ptr<RvcOperationalState::Instance> gRvcOperationalStateInstance;
 
 static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data);
@@ -327,3 +327,4 @@ void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
     gRvcOperationalStateInstance->Init();
 }
 #endif // MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
+
