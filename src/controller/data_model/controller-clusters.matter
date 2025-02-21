@@ -10127,7 +10127,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
     kUnknownReason = 11;
   }
 
-  bitmap WebRTCMetadataOptions : bitmap8 {
+  bitmap WebRTCMetadataOptionsBitmap : bitmap8 {
     kDataTLV = 0x1;
   }
 
@@ -10145,7 +10145,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
     StreamUsageEnum streamUsage = 4;
     nullable int16u videoStreamID = 5;
     nullable int16u audioStreamID = 6;
-    WebRTCMetadataOptions metadataOptions = 7;
+    WebRTCMetadataOptionsBitmap metadataOptions = 7;
   }
 
   readonly attribute WebRTCSessionStruct currentSessions[] = 0;
@@ -10162,7 +10162,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
     optional nullable int16u audioStreamID = 2;
     optional ICEServerStruct ICEServers[] = 3;
     optional char_string ICETransportPolicy = 4;
-    optional WebRTCMetadataOptions metadataOptions = 5;
+    optional WebRTCMetadataOptionsBitmap metadataOptions = 5;
   }
 
   response struct SolicitOfferResponse = 2 {
@@ -10180,13 +10180,13 @@ provisional cluster WebRTCTransportProvider = 1363 {
     optional nullable int16u audioStreamID = 4;
     optional ICEServerStruct ICEServers[] = 5;
     optional char_string ICETransportPolicy = 6;
-    optional WebRTCMetadataOptions metadataOptions = 7;
+    optional WebRTCMetadataOptionsBitmap metadataOptions = 7;
   }
 
   response struct ProvideOfferResponse = 4 {
     int16u webRTCSessionID = 0;
-    int16u videoStreamID = 1;
-    int16u audioStreamID = 2;
+    optional nullable int16u videoStreamID = 1;
+    optional nullable int16u audioStreamID = 2;
   }
 
   request struct ProvideAnswerRequest {
@@ -10194,9 +10194,9 @@ provisional cluster WebRTCTransportProvider = 1363 {
     char_string sdp = 1;
   }
 
-  request struct ProvideICECandidateRequest {
+  request struct ProvideICECandidatesRequest {
     int16u webRTCSessionID = 0;
-    char_string ICECandidate = 1;
+    char_string ICECandidates[] = 1;
   }
 
   request struct EndSessionRequest {
@@ -10210,8 +10210,8 @@ provisional cluster WebRTCTransportProvider = 1363 {
   command ProvideOffer(ProvideOfferRequest): ProvideOfferResponse = 3;
   /** This command SHALL be initiated from a Node in response to an Offer that was previously received from a remote peer. */
   command ProvideAnswer(ProvideAnswerRequest): DefaultSuccess = 5;
-  /** This command allows for https://www.rfc-editor.org/rfc/rfc8839#section-4.2.1.2 nominated after the initial Offer / Answer exchange to be added to a session during the gathering phase. */
-  command ProvideICECandidate(ProvideICECandidateRequest): DefaultSuccess = 6;
+  /** This command allows for string based https://rfc-editor.org/rfc/rfc8839#section-5.1 generated after the initial Offer / Answer exchange, via a JSEP https://datatracker.ietf.org/doc/html/rfc9429#section-4.1.20 event, a DOM https://www.w3.org/TR/webrtc/#dom-rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase. */
+  command ProvideICECandidates(ProvideICECandidatesRequest): DefaultSuccess = 6;
   /** This command instructs the stream provider to end the WebRTC session. */
   command EndSession(EndSessionRequest): DefaultSuccess = 7;
 }
@@ -10242,7 +10242,7 @@ provisional cluster WebRTCTransportRequestor = 1364 {
     kUnknownReason = 11;
   }
 
-  bitmap WebRTCMetadataOptions : bitmap8 {
+  bitmap WebRTCMetadataOptionsBitmap : bitmap8 {
     kDataTLV = 0x1;
   }
 
@@ -10260,7 +10260,7 @@ provisional cluster WebRTCTransportRequestor = 1364 {
     StreamUsageEnum streamUsage = 4;
     nullable int16u videoStreamID = 5;
     nullable int16u audioStreamID = 6;
-    WebRTCMetadataOptions metadataOptions = 7;
+    WebRTCMetadataOptionsBitmap metadataOptions = 7;
   }
 
   readonly attribute WebRTCSessionStruct currentSessions[] = 0;
