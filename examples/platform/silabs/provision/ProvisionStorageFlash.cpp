@@ -52,6 +52,10 @@ extern "C" {
 extern uint8_t linker_nvm_end[];
 #endif // SLI_SI91X_MCU_INTERFACE
 
+#if !SL_MATTER_GN_BUILD
+#include <sl_matter_provision_config.h>
+#endif
+
 namespace {
 constexpr size_t kPageSize           = FLASH_PAGE_SIZE;
 constexpr size_t kMaxBinaryValue     = 1024;
