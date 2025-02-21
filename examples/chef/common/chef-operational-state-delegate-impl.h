@@ -161,4 +161,3 @@ chip::Protocols::InteractionModel::Status chefOperationalStateReadCallback(chip:
                                                                            uint8_t * buffer, uint16_t maxReadLength);
 
 #endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
-
