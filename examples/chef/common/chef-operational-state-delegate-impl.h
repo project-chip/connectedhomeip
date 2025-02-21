@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
 
+#include <app/util/attribute-metadata.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
@@ -160,3 +161,4 @@ chip::Protocols::InteractionModel::Status chefOperationalStateReadCallback(chip:
                                                                            uint8_t * buffer, uint16_t maxReadLength);
 
 #endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
+
