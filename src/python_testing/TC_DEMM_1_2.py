@@ -40,7 +40,7 @@ import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from modebase_cluster_check import ModeBaseClusterChecks
 
-CLUSTER = Clusters.DeviceEnergyManagementMode
+cluster_demm_mode = Clusters.DeviceEnergyManagementMode
 
 
 class TC_DEMM_1_2(MatterBaseTest, ModeBaseClusterChecks):
@@ -48,7 +48,7 @@ class TC_DEMM_1_2(MatterBaseTest, ModeBaseClusterChecks):
     def __init__(self, *args):
         MatterBaseTest.__init__(self, *args)
         ModeBaseClusterChecks.__init__(self,
-                                       modebase_derived_cluster=CLUSTER)
+                                       modebase_derived_cluster=cluster_demm_mode)
 
     def desc_TC_DEMM_1_2(self) -> str:
         return "[TC-DEMM-1.2] Cluster attributes with DUT as Server"
@@ -81,8 +81,8 @@ class TC_DEMM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         # According to the spec, there should be at least on like
         # No Optimization, Device Optimization, Local Optimization, or Grid Optimization
         # tag in the ones supported.
-        additional_tags = [CLUSTER.Enums.ModeTag.kNoOptimization,
-                           CLUSTER.Enums.ModeTag.kDeviceOptimization]
+        additional_tags = [cluster_demm_mode.Enums.ModeTag.kNoOptimization,
+                           cluster_demm_mode.Enums.ModeTag.kDeviceOptimization]
         self.check_tags_in_lists(supported_modes=supported_modes, required_tags=additional_tags)
 
         self.step(3)
