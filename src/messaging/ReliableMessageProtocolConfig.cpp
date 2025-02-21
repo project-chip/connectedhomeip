@@ -135,7 +135,7 @@ System::Clock::Timeout GetRetransmissionTimeout(System::Clock::Timeout activeInt
     System::Clock::Timestamp timeout(0);
     for (uint8_t i = 0; i < CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1; i++)
     {
-        auto baseInterval = activeInterval;
+        auto baseInterval = ((timeSinceLastActivity + timeout) < activityThreshold) ? activeInterval : min(activeInterval, idleInterval);
         timeout += Messaging::ReliableMessageMgr::GetBackoff(baseInterval, i, /* computeMaxPossible */ true);
     }
 
