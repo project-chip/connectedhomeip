@@ -49,6 +49,7 @@ amebad
 amebaiot
 AmebaZ
 amebaz2
+ANC
 announcementReason
 AnnounceOTAProvider
 AnnounceOTAProviderRequest
@@ -85,6 +86,7 @@ ASR
 AssertionError
 AST
 ASYNC
+ATL
 ATLs
 atomics
 att
@@ -114,6 +116,7 @@ avahi
 avL
 AwaitNextAction
 AXXXF
+Axxxx
 AYNJV
 babaf
 backend
@@ -330,6 +333,7 @@ CurrentHue
 CurrentLevel
 CurrentSaturation
 customAcl
+customizable
 customizations
 cvfJ
 cxx
@@ -507,6 +511,7 @@ entrypoint
 enum
 Enums
 env
+EP
 epochKey
 epochStartTime
 eq
@@ -538,6 +543,7 @@ ExtendedPAN
 ExtensionEntry
 extern
 extpanid
+Exx
 FabricId
 fabricIdx
 fabricIndex
@@ -585,6 +591,7 @@ fuzzer
 fuzzers
 fuzztest
 FW
+Fxx
 gbl
 gcloud
 GDB
@@ -684,6 +691,7 @@ ICMP
 IDF
 IDL
 IDLs
+IDM
 idt
 idx
 ifconfig
@@ -1053,6 +1061,7 @@ otatesting
 otaURL
 OTBR
 otcli
+OU
 outform
 outgoingCommands
 overridable
@@ -1164,6 +1173,7 @@ PyObject
 pypi
 PyRun
 pytest
+PYTHONPATH
 QEMU
 Qorvo
 QPG
@@ -1235,6 +1245,7 @@ RPi's
 RPis
 RSA
 rsn
+Rsp
 RSSI
 RST
 rsync
@@ -1341,6 +1352,7 @@ SRP
 SRV
 SSBL
 SSID
+SSL
 startoffset
 StartScan
 startsWith
@@ -1508,6 +1520,7 @@ unfocus
 Unicast
 UniFlash
 UnitLocalization
+unittest
 unpair
 unprovisioned
 Unsecure
@@ -1622,6 +1635,7 @@ xFFFF
 xfffff
 xFFFFFFEFFFFFFFFF
 XMLPICSValidator
+XMLs
 xtensa
 xvzf
 xwayland

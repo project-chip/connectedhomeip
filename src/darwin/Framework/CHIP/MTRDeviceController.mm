@@ -151,6 +151,11 @@ using namespace chip::Tracing::DarwinFramework;
     return nil;
 }
 
+- (void)dealloc
+{
+    MTR_LOG("%@ dealloc", self);
+}
+
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@: %p, uuid: %@, suspended: %@>", NSStringFromClass(self.class), self, self.uniqueIdentifier, MTR_YES_NO(self.suspended)];
@@ -507,6 +512,12 @@ using namespace chip::Tracing::DarwinFramework;
     chip::app::DnssdServer::Instance().SetInterfaceId(interfaceId);
 }
 #endif // DEBUG
+
+- (NSArray<NSNumber *> *)nodesWithStoredData
+{
+    MTR_ABSTRACT_METHOD();
+    return @[];
+}
 
 #pragma mark - MTRDeviceControllerDelegate management
 

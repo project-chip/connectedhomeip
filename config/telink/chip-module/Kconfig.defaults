@@ -149,9 +149,6 @@ config BT_BUF_ACL_TX_SIZE
     default 107 if SOC_RISCV_TELINK_TL321X
     default 251
 
-
-#ifdef CONFIG_SOC_RISCV_TELINK_TL321X
-
 config BT_BUF_EVT_RX_COUNT
     default 4
 
@@ -159,11 +156,7 @@ config BT_BUF_ACL_RX_COUNT
     default 4
 
 config BT_GATT_CACHING
-    bool
     default n
-
-
-#endif
 
 config BT_RX_STACK_SIZE
     default 1352 if BT_B9X || BT_TLX
@@ -174,10 +167,9 @@ config BT_HCI_TX_STACK_SIZE
     default 2048 if BT_W91
 
 config BT_DEVICE_NAME_GATT_WRITABLE
-    bool
     default n
 
-if SOC_SERIES_RISCV_TELINK_B9X || SOC_SERIES_RISCV_TELINK_TLX
+if SOC_RISCV_TELINK_B9X || SOC_RISCV_TELINK_TLX
 
 config TL_BLE_CTRL_THREAD_STACK_SIZE
     default 648
@@ -197,7 +189,7 @@ choice TL_BLE_CTRL_MAC_TYPE
     default TL_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
 endchoice
 
-endif # SOC_SERIES_RISCV_TELINK_B9X || SOC_SERIES_RISCV_TELINK_TLX
+endif # SOC_RISCV_TELINK_B9X || SOC_RISCV_TELINK_TLX
 
 
 endif # BT
@@ -206,7 +198,7 @@ endif # BT
 # Cut down the ram cost by matter's change,it can keep ramcode (driver).
 # No need load the ramcode every time in thread mode (retention mode).
 # If the ram is not enough , can change it back , initial setting is n.
-if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9258A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
+if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
 config SOC_SERIES_RISCV_TELINK_B9X_NON_RETENTION_RAM_CODE
     default n if PM
 
@@ -218,9 +210,21 @@ config PWM
 
 endif
 
+if BOARD_TL7218X_RETENTION || BOARD_TL3218X_RETENTION || BOARD_TL3218X
+config SOC_SERIES_RISCV_TELINK_TLX_NON_RETENTION_RAM_CODE
+    default n if PM
+
+config TELINK_TLX_MATTER_RETENTION_LAYOUT
+    default y if PM || BOARD_TL3218X
+
+config PWM
+    default n if PM
+
+endif
+
 # Board non-retention config
 if  BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1 || \
-    BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D || BOARD_TL3218X || BOARD_TL7218X
+    BOARD_TLSR9528A || BOARD_TLSR9518ADK80D || BOARD_TL3218X || BOARD_TL7218X
 config PWM
     default y
 endif
@@ -233,8 +237,8 @@ config CHIP_OTA_REQUESTOR
     default y
 
 config MCUBOOT_SIGNATURE_KEY_FILE
-	default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D
-	depends on BOOTLOADER_MCUBOOT
+    default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D
+    depends on BOOTLOADER_MCUBOOT
 
 # In current config/zephyr/Kconfig
 # next deprecated values are selected
@@ -278,22 +282,22 @@ choice CHIP_THREAD_DEVICE_ROLE
     prompt "Thread network device role"
     default CHIP_THREAD_DEVICE_ROLE_ROUTER
 config CHIP_THREAD_DEVICE_ROLE_ROUTER
-	depends on !PM
-	bool "thread device router"
+    depends on !PM
+    bool "thread device router"
 config CHIP_THREAD_DEVICE_ROLE_END_DEVICE
-	depends on !PM
-	bool "thread end device"
+    depends on !PM
+    bool "thread end device"
 config CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE
-	bool "thread sleepy end device"
+    bool "thread sleepy end device"
 endchoice
 
 choice OPENTHREAD_DEVICE_TYPE
-	default OPENTHREAD_FTD if CHIP_THREAD_DEVICE_ROLE_ROUTER
-	default OPENTHREAD_MTD if CHIP_THREAD_DEVICE_ROLE_END_DEVICE || CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE
+    default OPENTHREAD_FTD if CHIP_THREAD_DEVICE_ROLE_ROUTER
+    default OPENTHREAD_MTD if CHIP_THREAD_DEVICE_ROLE_END_DEVICE || CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE
 endchoice
 
 config CHIP_ENABLE_ICD_SUPPORT
-	default y if CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE
+    default y if CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE
 
 config OPENTHREAD_THREAD_STACK_SIZE
     default 2400 if PM || SOC_RISCV_TELINK_TL321X
@@ -326,7 +330,6 @@ config NET_RX_STACK_SIZE
 
 # Disable certain parts of Zephyr IPv6 stack
 config NET_IPV6_NBR_CACHE
-    bool
     default n
 
 config NET_MAX_CONN
@@ -340,69 +343,69 @@ config NET_CONFIG_INIT_TIMEOUT
 
 
 config CHIP_WIFI
-	bool "Enable Telink Wi-Fi support"
-	default y if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
-	select WIFI_W91
-	select WIFI
-	select NET_STATISTICS
-	select NET_IPV6_ND # enable Neighbor Discovery to handle Router Advertisements
-	select NET_IPV6_NBR_CACHE
-	select NET_STATISTICS_USER_API
+    bool "Enable Telink Wi-Fi support"
+    default y if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
+    select WIFI_W91
+    select WIFI
+    select NET_STATISTICS
+    select NET_IPV6_ND # enable Neighbor Discovery to handle Router Advertisements
+    select NET_IPV6_NBR_CACHE
+    select NET_STATISTICS_USER_API
 
 if CHIP_WIFI
 
 config DEFAULT_WIFI_SSID
-	string "Default WiFi SSID"
-	depends on CHIP_WIFI
-	default ""
-	help
-	  The SSID of network to connect to if no WiFi station configuration exists in NV storage
-	  at the time the device boots.
-	  This option is for testing only and should be disabled in production releases
+    string "Default WiFi SSID"
+    depends on CHIP_WIFI
+    default ""
+    help
+      The SSID of network to connect to if no WiFi station configuration exists in NV storage
+      at the time the device boots.
+      This option is for testing only and should be disabled in production releases
 
 config DEFAULT_WIFI_PASSWORD
-	string "Default WiFi Password"
-	depends on CHIP_WIFI
-	default ""
-	help
-	  The password for the default WiFi network.
-	  This option is for testing only and should be disabled in production releases.
+    string "Default WiFi Password"
+    depends on CHIP_WIFI
+    default ""
+    help
+      The password for the default WiFi network.
+      This option is for testing only and should be disabled in production releases.
 
 config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
-	int "Define the minimum connection recovery time interval in milliseconds"
-	depends on CHIP_WIFI
-	default 500
-	help
-	  Specifies the minimum connection recovery interval (in milliseconds).
+    int "Define the minimum connection recovery time interval in milliseconds"
+    depends on CHIP_WIFI
+    default 500
+    help
+      Specifies the minimum connection recovery interval (in milliseconds).
 
 config CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL
-	int "Define the maximum connection recovery time interval in milliseconds"
-	depends on CHIP_WIFI
-	default 3600000 # 1 hour
-	help
-	  Specifies the maximum connection recovery interval (in milliseconds).
+    int "Define the maximum connection recovery time interval in milliseconds"
+    depends on CHIP_WIFI
+    default 3600000 # 1 hour
+    help
+      Specifies the maximum connection recovery interval (in milliseconds).
 
 config CHIP_WIFI_CONNECTION_RECOVERY_MAX_RETRIES_NUMBER
-	int "Define the maximum amount of connection recovery occurrences"
-	depends on CHIP_WIFI
-	default 0
-	help
-	  Specifies the maximum number of connection recovery attempts.
-	  If set to 0, no limitation is applied and attempts
-	  to recover the connection are performed indefinitely.
+    int "Define the maximum amount of connection recovery occurrences"
+    depends on CHIP_WIFI
+    default 0
+    help
+      Specifies the maximum number of connection recovery attempts.
+      If set to 0, no limitation is applied and attempts
+      to recover the connection are performed indefinitely.
 
 config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
-	int "Define the connection recovery jitter in milliseconds"
-	depends on CHIP_WIFI
-	default 2000
-	help
-	  Specifies the maximum connection recovery jitter interval (in milliseconds).
-	  Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
-	  a random jitter interval is added to it to avoid periodicity. The random jitter is selected
-	  within range [-JITTER; +JITTER].
+    int "Define the connection recovery jitter in milliseconds"
+    depends on CHIP_WIFI
+    default 2000
+    help
+      Specifies the maximum connection recovery jitter interval (in milliseconds).
+      Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
+      a random jitter interval is added to it to avoid periodicity. The random jitter is selected
+      within range [-JITTER; +JITTER].
 
 config NET_MGMT_EVENT_STACK_SIZE
-	default 1128
+    default 1128
 
 endif # CHIP_WIFI
 
@@ -415,7 +418,7 @@ config CHIP_ENABLE_PAIRING_AUTOSTART
 
 # Configure MBEDTLS lib
 config MBEDTLS
-	default y
+    default y
 
 config MBEDTLS_USER_CONFIG_ENABLE
     default y
@@ -424,22 +427,22 @@ config MBEDTLS_USER_CONFIG_FILE
     default "telink-mbedtls-config.h"
 
 config MBEDTLS_CIPHER_CCM_ENABLED
-	default y
+    default y
 
 config MBEDTLS_PK_WRITE_C
     default y
 
 config MBEDTLS_ECP_C
-	default y
+    default y
 
 config MBEDTLS_ECP_DP_SECP256R1_ENABLED
-	default y
+    default y
 
 config MBEDTLS_ECDH_C
-	default y
+    default y
 
 config MBEDTLS_ECDSA_C
-	default y
+    default y
 
 # getopt version
 config GETOPT_LONG

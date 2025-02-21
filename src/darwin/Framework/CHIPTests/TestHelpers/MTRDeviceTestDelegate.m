@@ -40,6 +40,13 @@
     }
 }
 
+- (void)unitTestReportBeginForDevice:(MTRDevice *)device
+{
+    if (self.onReportBegin != nil) {
+        self.onReportBegin();
+    }
+}
+
 - (void)unitTestReportEndForDevice:(MTRDevice *)device
 {
     if (self.onReportEnd != nil) {
@@ -110,6 +117,20 @@
     // unconditionally for now.  If we ever add tests that try to exercise that
     // codepath, we can make this configurable.
     return YES;
+}
+
+- (void)unitTestSubscriptionCallbackDeleteForDevice:(MTRDevice *)device
+{
+    if (self.onSubscriptionCallbackDelete != nil) {
+        self.onSubscriptionCallbackDelete();
+    }
+}
+
+- (void)unitTestSubscriptionResetForDevice:(MTRDevice *)device
+{
+    if (self.onSubscriptionReset != nil) {
+        self.onSubscriptionReset();
+    }
 }
 
 @end
