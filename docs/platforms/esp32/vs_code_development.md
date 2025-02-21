@@ -19,6 +19,7 @@ Follow
 steps to set up Visual Studio Code for Matter development.
 
 (linux)=
+
 ### Linux
 
 For Espressif esp32 devices:
