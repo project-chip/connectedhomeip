@@ -550,6 +550,18 @@ namespace AddTrustedRootCertificate {
 static constexpr CommandId Id = 0x0000000B;
 } // namespace AddTrustedRootCertificate
 
+namespace SetVidVerificationStatement {
+static constexpr CommandId Id = 0x0000000C;
+} // namespace SetVidVerificationStatement
+
+namespace SignVidVerificationRequest {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace SignVidVerificationRequest
+
+namespace SignVidVerificationResponse {
+static constexpr CommandId Id = 0x0000000E;
+} // namespace SignVidVerificationResponse
+
 } // namespace Commands
 } // namespace OperationalCredentials
 
@@ -1974,9 +1986,9 @@ namespace ProvideAnswer {
 static constexpr CommandId Id = 0x00000005;
 } // namespace ProvideAnswer
 
-namespace ProvideICECandidate {
+namespace ProvideICECandidates {
 static constexpr CommandId Id = 0x00000006;
-} // namespace ProvideICECandidate
+} // namespace ProvideICECandidates
 
 namespace EndSession {
 static constexpr CommandId Id = 0x00000007;

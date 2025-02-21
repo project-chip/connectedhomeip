@@ -5221,6 +5221,32 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
+
+  public static class DelegatedOperationalCredentialsClusterSignVidVerificationResponseCallback implements ChipClusters.OperationalCredentialsCluster.SignVidVerificationResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer fabricIndex, Integer fabricBindingVersion, byte[] signature) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo fabricIndexResponseValue = new CommandResponseInfo("fabricIndex", "Integer");
+      responseValues.put(fabricIndexResponseValue, fabricIndex);
+      CommandResponseInfo fabricBindingVersionResponseValue = new CommandResponseInfo("fabricBindingVersion", "Integer");
+      responseValues.put(fabricBindingVersionResponseValue, fabricBindingVersion);
+      CommandResponseInfo signatureResponseValue = new CommandResponseInfo("signature", "byte[]");
+      responseValues.put(signatureResponseValue, signature);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
   public static class DelegatedOperationalCredentialsClusterNOCsAttributeCallback implements ChipClusters.OperationalCredentialsCluster.NOCsAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -20861,14 +20887,14 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer webRTCSessionID, Integer videoStreamID, Integer audioStreamID) {
+    public void onSuccess(Integer webRTCSessionID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo webRTCSessionIDResponseValue = new CommandResponseInfo("webRTCSessionID", "Integer");
       responseValues.put(webRTCSessionIDResponseValue, webRTCSessionID);
-      CommandResponseInfo videoStreamIDResponseValue = new CommandResponseInfo("videoStreamID", "Integer");
+      CommandResponseInfo videoStreamIDResponseValue = new CommandResponseInfo("videoStreamID", "Optional<Integer>");
       responseValues.put(videoStreamIDResponseValue, videoStreamID);
-      CommandResponseInfo audioStreamIDResponseValue = new CommandResponseInfo("audioStreamID", "Integer");
+      CommandResponseInfo audioStreamIDResponseValue = new CommandResponseInfo("audioStreamID", "Optional<Integer>");
       responseValues.put(audioStreamIDResponseValue, audioStreamID);
       callback.onSuccess(responseValues);
     }
@@ -26000,6 +26026,57 @@ public class ClusterInfoMapping {
     );
     operationalCredentialsClusterInteractionInfoMap.put("addTrustedRootCertificate", operationalCredentialsaddTrustedRootCertificateInteractionInfo);
 
+    Map<String, CommandParameterInfo> operationalCredentialssetVidVerificationStatementCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo operationalCredentialssetVidVerificationStatementvendorIDCommandParameterInfo = new CommandParameterInfo("vendorID", Optional.class, Integer.class);
+    operationalCredentialssetVidVerificationStatementCommandParams.put("vendorID",operationalCredentialssetVidVerificationStatementvendorIDCommandParameterInfo);
+
+    CommandParameterInfo operationalCredentialssetVidVerificationStatementvidVerificationStatementCommandParameterInfo = new CommandParameterInfo("vidVerificationStatement", Optional.class, byte[].class);
+    operationalCredentialssetVidVerificationStatementCommandParams.put("vidVerificationStatement",operationalCredentialssetVidVerificationStatementvidVerificationStatementCommandParameterInfo);
+
+    CommandParameterInfo operationalCredentialssetVidVerificationStatementvvscCommandParameterInfo = new CommandParameterInfo("vvsc", Optional.class, byte[].class);
+    operationalCredentialssetVidVerificationStatementCommandParams.put("vvsc",operationalCredentialssetVidVerificationStatementvvscCommandParameterInfo);
+    InteractionInfo operationalCredentialssetVidVerificationStatementInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.OperationalCredentialsCluster) cluster)
+        .setVidVerificationStatement((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("vendorID")
+        , (Optional<byte[]>)
+        commandArguments.get("vidVerificationStatement")
+        , (Optional<byte[]>)
+        commandArguments.get("vvsc")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        operationalCredentialssetVidVerificationStatementCommandParams
+    );
+    operationalCredentialsClusterInteractionInfoMap.put("setVidVerificationStatement", operationalCredentialssetVidVerificationStatementInteractionInfo);
+
+    Map<String, CommandParameterInfo> operationalCredentialssignVidVerificationRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo operationalCredentialssignVidVerificationRequestfabricIndexCommandParameterInfo = new CommandParameterInfo("fabricIndex", Integer.class, Integer.class);
+    operationalCredentialssignVidVerificationRequestCommandParams.put("fabricIndex",operationalCredentialssignVidVerificationRequestfabricIndexCommandParameterInfo);
+
+    CommandParameterInfo operationalCredentialssignVidVerificationRequestclientChallengeCommandParameterInfo = new CommandParameterInfo("clientChallenge", byte[].class, byte[].class);
+    operationalCredentialssignVidVerificationRequestCommandParams.put("clientChallenge",operationalCredentialssignVidVerificationRequestclientChallengeCommandParameterInfo);
+    InteractionInfo operationalCredentialssignVidVerificationRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.OperationalCredentialsCluster) cluster)
+          .signVidVerificationRequest((ChipClusters.OperationalCredentialsCluster.SignVidVerificationResponseCallback) callback
+           , (Integer)
+             commandArguments.get("fabricIndex")
+
+           , (byte[])
+             commandArguments.get("clientChallenge")
+
+            );
+        },
+        () -> new DelegatedOperationalCredentialsClusterSignVidVerificationResponseCallback(),
+        operationalCredentialssignVidVerificationRequestCommandParams
+      );
+    operationalCredentialsClusterInteractionInfoMap.put("signVidVerificationRequest", operationalCredentialssignVidVerificationRequestInteractionInfo);
+
     commandMap.put("operationalCredentials", operationalCredentialsClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> groupKeyManagementClusterInteractionInfoMap = new LinkedHashMap<>();
@@ -31032,27 +31109,27 @@ public class ClusterInfoMapping {
     );
     webRTCTransportProviderClusterInteractionInfoMap.put("provideAnswer", webRTCTransportProviderprovideAnswerInteractionInfo);
 
-    Map<String, CommandParameterInfo> webRTCTransportProviderprovideICECandidateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> webRTCTransportProviderprovideICECandidatesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo webRTCTransportProviderprovideICECandidatewebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
-    webRTCTransportProviderprovideICECandidateCommandParams.put("webRTCSessionID",webRTCTransportProviderprovideICECandidatewebRTCSessionIDCommandParameterInfo);
+    CommandParameterInfo webRTCTransportProviderprovideICECandidateswebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportProviderprovideICECandidatesCommandParams.put("webRTCSessionID",webRTCTransportProviderprovideICECandidateswebRTCSessionIDCommandParameterInfo);
 
-    CommandParameterInfo webRTCTransportProviderprovideICECandidateICECandidateCommandParameterInfo = new CommandParameterInfo("ICECandidate", String.class, String.class);
-    webRTCTransportProviderprovideICECandidateCommandParams.put("ICECandidate",webRTCTransportProviderprovideICECandidateICECandidateCommandParameterInfo);
-    InteractionInfo webRTCTransportProviderprovideICECandidateInteractionInfo = new InteractionInfo(
+    CommandParameterInfo webRTCTransportProviderprovideICECandidatesICECandidatesCommandParameterInfo = new CommandParameterInfo("ICECandidates", ArrayList.class, ArrayList.class);
+    webRTCTransportProviderprovideICECandidatesCommandParams.put("ICECandidates",webRTCTransportProviderprovideICECandidatesICECandidatesCommandParameterInfo);
+    InteractionInfo webRTCTransportProviderprovideICECandidatesInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.WebRTCTransportProviderCluster) cluster)
-        .provideICECandidate((DefaultClusterCallback) callback
+        .provideICECandidates((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("webRTCSessionID")
-        , (String)
-        commandArguments.get("ICECandidate")
+        , (ArrayList<String>)
+        commandArguments.get("ICECandidates")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        webRTCTransportProviderprovideICECandidateCommandParams
+        webRTCTransportProviderprovideICECandidatesCommandParams
     );
-    webRTCTransportProviderClusterInteractionInfoMap.put("provideICECandidate", webRTCTransportProviderprovideICECandidateInteractionInfo);
+    webRTCTransportProviderClusterInteractionInfoMap.put("provideICECandidates", webRTCTransportProviderprovideICECandidatesInteractionInfo);
 
     Map<String, CommandParameterInfo> webRTCTransportProviderendSessionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
