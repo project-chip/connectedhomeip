@@ -71,6 +71,7 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ=${chip_tlv_validate_char_string_on_read}",
     "CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS=${chip_enable_sending_batch_commands}",
     "CHIP_CONFIG_TEST_GOOGLETEST=${chip_build_tests_googletest}",
+    "CHIP_CONFIG_MRP_ANALYTICS_ENABLED=${chip_enable_mrp_analytics}",
   ]
 
   visibility = [ ":chip_config_header" ]
