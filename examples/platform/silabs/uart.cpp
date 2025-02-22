@@ -547,13 +547,13 @@ void uartSendBytes(UartTxStruct_t & bufferStruct)
 {
 #if SLI_SI91X_MCU_INTERFACE
     // ensuring null termination of buffer
-    if (bufferStruct.length < ArraySize(bufferStruct.data) && bufferStruct.data[bufferStruct.length - 1] != '\0')
+    if (bufferStruct.length < MATTER_ARRAY_SIZE(bufferStruct.data) && bufferStruct.data[bufferStruct.length - 1] != '\0')
     {
         bufferStruct.data[bufferStruct.length] = '\0';
     }
     else
     {
-        bufferStruct.data[ArraySize(bufferStruct.data) - 1] = '\0';
+        bufferStruct.data[MATTER_ARRAY_SIZE(bufferStruct.data) - 1] = '\0';
     }
     Board_UARTPutSTR(bufferStruct.data);
 #else
@@ -596,13 +596,13 @@ void uartFlushTxQueue(void)
     {
 #if SLI_SI91X_MCU_INTERFACE
         // ensuring null termination of buffer
-        if (workBuffer.length < ArraySize(workBuffer.data) && workBuffer.data[workBuffer.length - 1] != '\0')
+        if (workBuffer.length < MATTER_ARRAY_SIZE(workBuffer.data) && workBuffer.data[workBuffer.length - 1] != '\0')
         {
             workBuffer.data[workBuffer.length] = '\0';
         }
         else
         {
-            workBuffer.data[ArraySize(workBuffer.data) - 1] = '\0';
+            workBuffer.data[MATTER_ARRAY_SIZE(workBuffer.data) - 1] = '\0';
         }
         Board_UARTPutSTR(workBuffer.data);
 #else

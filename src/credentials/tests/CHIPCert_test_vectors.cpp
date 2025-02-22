@@ -56,7 +56,7 @@ namespace TestCerts {
 
 #define TEST_CERT_ENUM_REF_ENTRY(NAME) TestCert::k##NAME,
 extern const TestCert gTestCerts[] = { ENUMERATE_TEST_CERTS(TEST_CERT_ENUM_REF_ENTRY) };
-extern const size_t gNumTestCerts  = ArraySize(gTestCerts);
+extern const size_t gNumTestCerts  = MATTER_ARRAY_SIZE(gTestCerts);
 
 #define TEST_CERT_SELECT_NAME(NAME)                                                                                                \
     case TestCert::k##NAME:                                                                                                        \
