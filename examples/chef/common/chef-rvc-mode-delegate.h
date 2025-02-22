@@ -122,6 +122,8 @@ void Shutdown();
 } // namespace chip
 
 #ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+extern std::unique_ptr<chip::app::Clusters::ModeBase::Instance> gRvcRunModeInstance;
+
 chip::Protocols::InteractionModel::Status chefRvcRunModeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                                       const EmberAfAttributeMetadata * attributeMetadata,
                                                                       uint8_t * buffer);
@@ -138,3 +140,4 @@ chip::Protocols::InteractionModel::Status chefRvcCleanModeReadCallback(chip::End
                                                                        const EmberAfAttributeMetadata * attributeMetadata,
                                                                        uint8_t * buffer, uint16_t maxReadLength);
 #endif // MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
+

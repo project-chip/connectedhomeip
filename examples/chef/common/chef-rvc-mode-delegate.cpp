@@ -37,7 +37,7 @@ using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::T
 using namespace chip::app::Clusters::RvcRunMode;
 
 static std::unique_ptr<RvcRunModeDelegate> gRvcRunModeDelegate;
-static std::unique_ptr<ModeBase::Instance> gRvcRunModeInstance;
+std::unique_ptr<ModeBase::Instance> gRvcRunModeInstance;
 
 CHIP_ERROR RvcRunModeDelegate::Init()
 {

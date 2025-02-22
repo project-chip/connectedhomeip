@@ -28,6 +28,10 @@ using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::RvcOperationalState;
 using chip::Protocols::InteractionModel::Status;
 
+#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+#include <chef-rvc-mode-delegate.h>
+#endif // MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+
 std::unique_ptr<RvcOperationalStateDelegate> gRvcOperationalStateDelegate;
 static std::unique_ptr<RvcOperationalState::Instance> gRvcOperationalStateInstance;
 
@@ -228,6 +232,10 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
             gRvcOperationalStateDelegate->mRunningTime = 0;
             gRvcOperationalStateDelegate->mPausedTime  = 0;
             gRvcOperationalStateDelegate->mCountdownTime.SetNull();
+
+#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+            gRvcRunModeInstance->UpdateCurrentMode(RvcRunMode::ModeIdle);
+#endif // MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
         }
     }
 }
