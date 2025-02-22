@@ -68,7 +68,7 @@ CHIP_ERROR ChimeServer::Init()
 void ChimeServer::LoadPersistentAttributes()
 {
     // Load Active Chime ID
-    uint8_t storedActiveChimeID;
+    uint8_t storedActiveChimeID = 0;
     CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
         ConcreteAttributePath(GetEndpointId(), Chime::Id, ActiveChimeID::Id), storedActiveChimeID);
     if (err == CHIP_NO_ERROR)
@@ -82,7 +82,7 @@ void ChimeServer::LoadPersistentAttributes()
     }
 
     // Load Enabled
-    bool storedEnabled;
+    bool storedEnabled = false;
     err = GetSafeAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(GetEndpointId(), Chime::Id, Enabled::Id),
                                                                  storedEnabled);
     if (err == CHIP_NO_ERROR)
