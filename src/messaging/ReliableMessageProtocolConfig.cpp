@@ -133,10 +133,14 @@ System::Clock::Timeout GetRetransmissionTimeout(System::Clock::Timeout activeInt
     // Calculate the retransmission timeout and take into account that an active/idle state change can happen
     // in the middle.
     System::Clock::Timestamp timeout(0);
+    System::Clock::Milliseconds32 sitIcdSlowPollMaximum = System::Clock::Milliseconds32(15000);
     for (uint8_t i = 0; i < CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1; i++)
     {
-        auto baseInterval =
-            ((timeSinceLastActivity + timeout) < activityThreshold) ? activeInterval : min(activeInterval, idleInterval);
+        auto baseInterval = activeInterval;
+        if (((timeSinceLastActivity + timeout) >= activityThreshold) && (idleInterval.count() <= sitIcdSlowPollMaximum.count()))
+        {
+            baseInterval = idleInterval;
+        }
         timeout += Messaging::ReliableMessageMgr::GetBackoff(baseInterval, i, /* computeMaxPossible */ true);
     }
 
