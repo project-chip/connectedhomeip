@@ -60,6 +60,11 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
         "TestConfigurationMgr.cpp",
         "TestPlatformTime.cpp",
       ]
+
+      if (chip_device_platform == "esp32") {
+        # On esp32-qemu SleepMillis can sometimes undersleep by as much as 10ms.
+        defines = [ "CONFIG_WIDER_SLEEP_MARGIN" ]
+      }
     }
 
     if (chip_enable_openthread) {

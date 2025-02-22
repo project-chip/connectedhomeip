@@ -55,9 +55,7 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
     mChipTimerActive = false;
 
     // We support calling Shutdown followed by InitChipStack, because some tests
-    // do that.  To keep things simple for existing consumers, we keep not
-    // destroying our lock and queue in shutdown, but rather check whether they
-    // already exist here before trying to create them.
+    // do that.
 
     if (mChipStackLock == NULL)
     {
@@ -245,7 +243,7 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
 
         BaseType_t eventReceived = pdFALSE;
         {
-            // Unlock the CHIP stack, allowing other threads to enter CHIP while
+        // Unlock the CHIP stack, allowing other threads to enter CHIP while
             // the event loop thread is sleeping.
             StackUnlock unlock;
             eventReceived = xQueueReceive(mChipEventQueue, &event, waitTime);
@@ -417,6 +415,16 @@ template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_Shutdown(void)
 {
     GenericPlatformManagerImpl<ImplClass>::_Shutdown();
+
+    if (mChipEventQueue != NULL) {
+        vQueueDelete(mChipEventQueue);
+        mChipEventQueue = NULL;
+    }
+
+    if (mChipStackLock != NULL) {
+        vSemaphoreDelete(mChipStackLock);
+        mChipStackLock = NULL;
+    }
 }
 
 template <class ImplClass>

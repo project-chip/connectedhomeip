@@ -42,7 +42,12 @@ using namespace chip::Logging;
 using namespace chip::System;
 using namespace chip::System::Clock::Literals;
 
+#ifdef CONFIG_WIDER_SLEEP_MARGIN
+// On esp32-qemu SleepMillis can sometimes undersleep by as much as 10ms.
+constexpr Clock::Milliseconds64 kTestTimeMarginMs = 10_ms64;
+#else
 constexpr Clock::Milliseconds64 kTestTimeMarginMs = 2_ms64;
+#endif
 constexpr Clock::Microseconds64 kTestTimeMarginUs = 500_us64;
 
 // =================================
@@ -108,6 +113,7 @@ TEST(TestDevice, GetMonotonicMilliseconds)
                         ChipLogValueX64(Tstart.count()), ChipLogValueX64(Tend.count()), ChipLogValueX64(Tdelta.count()),
                         ChipLogValueX64(Tdelay.count()));
 
+        //printf("+++x Tstart=%llu, Tend=%llu, Tdelta=%llu, (Tdelay=%llu - margin=%llu)=%llu\n", Tstart.count(), Tend.count(), Tdelta.count(), Tdelay.count(), margin.count(), (Tdelay - margin).count());
         // verify that timers don't fire early
         EXPECT_GT(Tdelta, (Tdelay - margin));
         // verify they're not too late

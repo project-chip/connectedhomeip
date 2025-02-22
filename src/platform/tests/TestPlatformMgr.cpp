@@ -85,6 +85,10 @@ TEST_F(TestPlatformMgr, BasicEventLoopTask)
     {
         EXPECT_EQ(PlatformMgr().StartEventLoopTask(), CHIP_NO_ERROR);
 
+        // Sleep for a short time to allow the event loop to start.
+        // Without this some platforms (e.g. esp32-qemu) will error.
+        chip::test_utils::SleepMillis(10);
+
         std::atomic<int> counterSync{ 2 };
 
         // Verify that the event loop will not exit until we tell it to by
@@ -148,10 +152,10 @@ TEST_F(TestPlatformMgr, BasicRunEventLoop)
 
     PlatformMgr().ScheduleWork(StopTheLoop);
 
-    EXPECT_FALSE(stopRan);
+     EXPECT_FALSE(stopRan);
     PlatformMgr().RunEventLoop();
-    EXPECT_TRUE(stopRan);
-    EXPECT_EQ(stopResult, CHIP_NO_ERROR);
+     EXPECT_TRUE(stopRan);
+     EXPECT_EQ(stopResult, CHIP_NO_ERROR);
 
     PlatformMgr().Shutdown();
 }
@@ -207,9 +211,15 @@ TEST_F(TestPlatformMgr, RunEventLoopStopBeforeSleep)
 
 TEST_F(TestPlatformMgr, TryLockChipStack)
 {
+    EXPECT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+
     bool locked = PlatformMgr().TryLockChipStack();
+    EXPECT_TRUE(locked);
+
     if (locked)
         PlatformMgr().UnlockChipStack();
+
+    PlatformMgr().Shutdown();
 }
 
 static int sEventRecieved = 0;

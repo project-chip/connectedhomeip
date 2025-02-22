@@ -119,7 +119,7 @@ if (chip_build_tests) {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/tests" ]
     }
 
-    if (chip_device_platform != "esp32" && chip_device_platform != "ameba") {
+    if (chip_device_platform != "ameba") {
       tests += [ "${chip_root}/src/platform/tests" ]
     }
 
