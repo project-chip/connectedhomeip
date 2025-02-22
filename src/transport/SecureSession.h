@@ -265,8 +265,16 @@ public:
 
     System::Clock::Timestamp GetMRPBaseTimeout() const override
     {
-        return IsPeerActive() ? GetRemoteMRPConfig().mActiveRetransTimeout
-                              : min(GetRemoteMRPConfig().mActiveRetransTimeout, GetRemoteMRPConfig().mIdleRetransTimeout);
+        System::Clock::Milliseconds32 sitIcdSlowPollMaximum = System::Clock::Milliseconds32(15000);
+        if (IsPeerActive())
+        {
+            return GetRemoteMRPConfig().mActiveRetransTimeout;
+        }
+        if (GetRemoteMRPConfig().mIdleRetransTimeout.count() <= sitIcdSlowPollMaximum.count())
+        {
+            return GetRemoteMRPConfig().mIdleRetransTimeout;
+        }
+        return GetRemoteMRPConfig().mActiveRetransTimeout;
     }
 
     CryptoContext & GetCryptoContext() { return mCryptoContext; }
