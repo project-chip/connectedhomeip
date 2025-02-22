@@ -38,11 +38,11 @@ ChimeSoundStructType ChimeCommandDelegate::supportedChimes[] = {
 
 CHIP_ERROR ChimeCommandDelegate::GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, MutableCharSpan & name)
 {
-    if (chimeIndex >= ArraySize(supportedChimes))
+    if (chimeIndex >= MATTER_ARRAY_SIZE(supportedChimes))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-    auto& selectedChime = supportedChimes[chimeIndex];
+    auto & selectedChime = supportedChimes[chimeIndex];
     chip::CopyCharSpanToMutableCharSpan(selectedChime.name, name);
     chimeID = selectedChime.chimeID;
     return CHIP_NO_ERROR;
@@ -50,12 +50,12 @@ CHIP_ERROR ChimeCommandDelegate::GetChimeSoundByIndex(uint8_t chimeIndex, uint8_
 
 CHIP_ERROR ChimeCommandDelegate::GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID)
 {
-    if (chimeIndex >= ArraySize(supportedChimes))
+    if (chimeIndex >= MATTER_ARRAY_SIZE(supportedChimes))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-    auto& selectedChime = supportedChimes[chimeIndex];
-    chimeID = selectedChime.chimeID;
+    auto & selectedChime = supportedChimes[chimeIndex];
+    chimeID              = selectedChime.chimeID;
     return CHIP_NO_ERROR;
 }
 
