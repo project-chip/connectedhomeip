@@ -176,6 +176,11 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
     OperationalState::OperationalStateEnum state =
         static_cast<OperationalState::OperationalStateEnum>(instance->GetCurrentOperationalState());
 
+    if (state == OperationalState::OperationalStateEnum::kStopped) // Do not continue the timer when RVC has stopped.
+    {
+        return;
+    }
+
     if (gRvcOperationalStateDelegate->mCountdownTime.IsNull())
     {
         if (state == OperationalState::OperationalStateEnum::kRunning)
