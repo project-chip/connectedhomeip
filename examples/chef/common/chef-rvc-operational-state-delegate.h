@@ -131,4 +131,3 @@ chip::Protocols::InteractionModel::Status chefRvcOperationalStateReadCallback(ch
                                                                               const EmberAfAttributeMetadata * attributeMetadata,
                                                                               uint8_t * buffer, uint16_t maxReadLength);
 #endif // MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
-

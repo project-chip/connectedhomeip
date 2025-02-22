@@ -329,4 +329,3 @@ void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
     gRvcCleanModeInstance->Init();
 }
 #endif // MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
-

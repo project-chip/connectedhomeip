@@ -140,4 +140,3 @@ chip::Protocols::InteractionModel::Status chefRvcCleanModeReadCallback(chip::End
                                                                        const EmberAfAttributeMetadata * attributeMetadata,
                                                                        uint8_t * buffer, uint16_t maxReadLength);
 #endif // MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
-

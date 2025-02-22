@@ -340,4 +340,3 @@ void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
     gRvcOperationalStateInstance->Init();
 }
 #endif // MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
-
