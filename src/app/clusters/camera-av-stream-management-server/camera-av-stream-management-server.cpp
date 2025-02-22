@@ -80,21 +80,17 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
     VerifyOrReturnError(
         HasFeature(Feature::kVideo) || HasFeature(Feature::kAudio) || HasFeature(Feature::kSnapshot), CHIP_ERROR_INVALID_ARGUMENT,
         ChipLogError(
-            Zcl, "CameraAVStreamMgmt: Feature configuration error. At least one of Audio, Video, or Snapshot feature required"));
+            Zcl,
+            "CameraAVStreamMgmt[ep=%d]: Feature configuration error. At least one of Audio, Video, or Snapshot feature required",
+            mEndpointId));
 
-    if (HasFeature(Feature::kImageControl))
+    if (HasFeature(Feature::kImageControl) || HasFeature(Feature::kWatermark) || HasFeature(Feature::kOnScreenDisplay))
     {
-        VerifyOrReturnError(HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot), CHIP_ERROR_INVALID_ARGUMENT,
+        VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl,
-                                         "CameraAVStreamMgmt: Feature configuration error. If ImageControl, then at least one of "
-                                         "Video, or Snapshot feature required"));
-    }
-
-    if (HasFeature(Feature::kWatermark) || HasFeature(Feature::kOnScreenDisplay))
-    {
-        VerifyOrReturnError(
-            HasFeature(Feature::kVideo), CHIP_ERROR_INVALID_ARGUMENT,
-            ChipLogError(Zcl, "CameraAVStreamMgmt: Feature configuration error. if Watermark or OSD, then Video feature required"));
+                                         "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if ImageControl, Watermark or "
+                                         "OSD, then Video feature required",
+                                         mEndpointId));
     }
 
     // Ensure Optional attribute bits have been correctly passed.
@@ -102,32 +98,50 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
     {
         VerifyOrReturnError(
             HasFeature(Feature::kVideo), CHIP_ERROR_INVALID_ARGUMENT,
-            ChipLogError(Zcl, "CameraAVStreamMgmt: Feature configuration error. if HDRModeEnabled, then Video feature required"));
+            ChipLogError(Zcl,
+                         "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if HDRModeEnabled, then Video feature required",
+                         mEndpointId));
     }
 
     if (SupportsOptAttr(OptionalAttribute::kNightVision) || SupportsOptAttr(OptionalAttribute::kNightVisionIllum))
     {
         VerifyOrReturnError(HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl,
-                                         "CameraAVStreamMgmt: Feature configuration error. if NIghtVision is enabled, then "
-                                         "Video|Snapshot feature required"));
+                                         "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if NIghtVision is enabled, then "
+                                         "Video|Snapshot feature required",
+                                         mEndpointId));
     }
 
     if (SupportsOptAttr(OptionalAttribute::kMicrophoneAGCEnabled))
     {
         VerifyOrReturnError(
             HasFeature(Feature::kAudio), CHIP_ERROR_INVALID_ARGUMENT,
-            ChipLogError(Zcl,
-                         "CameraAVStreamMgmt: Feature configuration error. if MicrophoneAGCEnabled, then Audio feature required"));
+            ChipLogError(
+                Zcl, "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if MicrophoneAGCEnabled, then Audio feature required",
+                mEndpointId));
     }
 
     if (SupportsOptAttr(OptionalAttribute::kImageFlipHorizontal) || SupportsOptAttr(OptionalAttribute::kImageFlipVertical) ||
         SupportsOptAttr(OptionalAttribute::kImageRotation))
     {
-        VerifyOrReturnError(HasFeature(Feature::kImageControl), CHIP_ERROR_INVALID_ARGUMENT,
-                            ChipLogError(Zcl,
-                                         "CameraAVStreamMgmt: Feature configuration error. if ImageFlip or Rotation enabled, then "
-                                         "ImageControl feature required"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kImageControl), CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(Zcl,
+                         "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if ImageFlip or Rotation enabled, then "
+                         "ImageControl feature required",
+                         mEndpointId));
+    }
+
+    if (HasFeature(Feature::kImageControl))
+    {
+        VerifyOrReturnError(
+            SupportsOptAttr(OptionalAttribute::kImageFlipHorizontal) || SupportsOptAttr(OptionalAttribute::kImageFlipVertical) ||
+                SupportsOptAttr(OptionalAttribute::kImageRotation),
+            CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(Zcl,
+                         "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if ImageControl feature supported, then "
+                         "at least one of ImageFlip or Rotation should be supported",
+                         mEndpointId));
     }
 
     LoadPersistentAttributes();
@@ -330,7 +344,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveSnapshotStream(uint16_t snapshotStrea
 CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == CameraAvStreamManagement::Id);
-    ChipLogError(Zcl, "Camera AVStream Management: Reading");
+    ChipLogProgress(Zcl, "Camera AVStream Management[ep=%d]: Reading", mEndpointId);
 
     switch (aPath.mAttributeId)
     {
@@ -340,65 +354,76 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
     case MaxConcurrentVideoEncoders::Id:
         VerifyOrReturnError(
             HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get MaxConcurrentVideoEncoders, feature is not supported"));
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get MaxConcurrentVideoEncoders, feature is not supported",
+                         mEndpointId));
 
         ReturnErrorOnFailure(aEncoder.Encode(mMaxConcurrentVideoEncoders));
         break;
     case MaxEncodedPixelRate::Id:
-        VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get MaxEncodedPixelRate, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get MaxEncodedPixelRate, feature is not supported", mEndpointId));
 
         ReturnErrorOnFailure(aEncoder.Encode(mMaxEncodedPixelRate));
         break;
     case VideoSensorParams::Id:
-        VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get VideoSensorParams, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get VideoSensorParams, feature is not supported", mEndpointId));
 
         ReturnErrorOnFailure(aEncoder.Encode(mVideoSensorParams));
         break;
     case NightVisionCapable::Id:
-        VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get VideoSensorParams, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get VideoSensorParams, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mNightVisionCapable));
         break;
     case MinViewport::Id:
-        VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get MinViewport, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get MinViewport, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mMinViewPort));
         break;
     case RateDistortionTradeOffPoints::Id:
         VerifyOrReturnError(
             HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get RateDistortionTradeOffPoints, feature is not supported"));
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get RateDistortionTradeOffPoints, feature is not supported",
+                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.EncodeList(
             [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeRateDistortionTradeOffPoints(encoder); }));
         break;
     case MaxContentBufferSize::Id:
         VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get MaxContentBufferSize, feature is not supported"));
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not get MaxContentBufferSize, feature is not supported",
+                                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mMaxContentBufferSize));
         break;
     case MicrophoneCapabilities::Id:
         VerifyOrReturnError(HasFeature(Feature::kAudio), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get MicrophoneCapabilities, feature is not supported"));
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not get MicrophoneCapabilities, feature is not supported",
+                                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mMicrophoneCapabilities));
         break;
     case SpeakerCapabilities::Id:
-        VerifyOrReturnError(HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get SpeakerCapabilities, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get SpeakerCapabilities, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mSpeakerCapabilities));
         break;
     case TwoWayTalkSupport::Id:
-        VerifyOrReturnError(HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get TwoWayTalkSupport, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get TwoWayTalkSupport, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mTwoWayTalkSupport));
         break;
     case SupportedSnapshotParams::Id:
         VerifyOrReturnError(
             HasFeature(Feature::kSnapshot), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get RateDistortionTradeOffPoints, feature is not supported"));
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get RateDistortionTradeOffPoints, feature is not supported",
+                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.EncodeList(
             [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeSupportedSnapshotParams(encoder); }));
         break;
@@ -406,32 +431,38 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         ReturnErrorOnFailure(aEncoder.Encode(mMaxNetworkBandwidth));
         break;
     case CurrentFrameRate::Id:
-        VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get CurrentFrameRate, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get CurrentFrameRate, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mCurrentFrameRate));
         break;
     case HDRModeEnabled::Id:
-        VerifyOrReturnError(HasFeature(Feature::kVideo) && SupportsOptAttr(OptionalAttribute::kHDRModeEnabled),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get HDRModeEnabled, feature is not supported"));
+        VerifyOrReturnError(
+            SupportsOptAttr(OptionalAttribute::kHDRModeEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get HDRModeEnabled, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mHDRModeEnabled));
         break;
     case FabricsUsingCamera::Id:
-        VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get FabricsUsingCamera, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get FabricsUsingCamera, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.EncodeList(
             [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeFabricsUsingCamera(encoder); }));
         break;
     case AllocatedVideoStreams::Id:
         VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get AllocatedVideoStreams, feature is not supported"));
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not get AllocatedVideoStreams, feature is not supported",
+                                         mEndpointId));
 
         ReturnErrorOnFailure(aEncoder.EncodeList(
             [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeAllocatedVideoStreams(encoder); }));
         break;
     case AllocatedAudioStreams::Id:
         VerifyOrReturnError(HasFeature(Feature::kAudio), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get AllocatedAudioStreams, feature is not supported"));
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not get AllocatedAudioStreams, feature is not supported",
+                                         mEndpointId));
 
         ReturnErrorOnFailure(aEncoder.EncodeList(
             [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeAllocatedAudioStreams(encoder); }));
@@ -439,7 +470,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
     case AllocatedSnapshotStreams::Id:
         VerifyOrReturnError(
             HasFeature(Feature::kSnapshot), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get AllocatedSnapshotStreams, feature is not supported"));
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get AllocatedSnapshotStreams, feature is not supported",
+                         mEndpointId));
 
         ReturnErrorOnFailure(aEncoder.EncodeList(
             [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeAllocatedSnapshotStreams(encoder); }));
@@ -447,7 +479,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
     case RankedVideoStreamPrioritiesList::Id:
         VerifyOrReturnError(
             HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get RankedVideoStreamPrioritiesList, feature is not supported"));
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get RankedVideoStreamPrioritiesList, feature is not supported",
+                         mEndpointId));
 
         ReturnErrorOnFailure(aEncoder.EncodeList(
             [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeRankedVideoStreamPrioritiesList(encoder); }));
@@ -455,127 +488,141 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
     case SoftRecordingPrivacyModeEnabled::Id:
         VerifyOrReturnError(
             HasFeature(Feature::kPrivacy), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get SoftRecordingPrivacyModeEnabled, feature is not supported"));
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get SoftRecordingPrivacyModeEnabled, feature is not supported",
+                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mSoftRecordingPrivacyModeEnabled));
         break;
     case SoftLivestreamPrivacyModeEnabled::Id:
         VerifyOrReturnError(
             HasFeature(Feature::kPrivacy), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get SoftLivestreamPrivacyModeEnabled, feature is not supported"));
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get SoftLivestreamPrivacyModeEnabled, feature is not supported",
+                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mSoftLivestreamPrivacyModeEnabled));
         break;
     case HardPrivacyModeOn::Id:
-        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kHardPrivacyModeOn), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get HardPrivacyModeOn, feature is not supported"));
+        VerifyOrReturnError(
+            SupportsOptAttr(OptionalAttribute::kHardPrivacyModeOn), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get HardPrivacyModeOn, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mHardPrivacyModeOn));
         break;
     case NightVision::Id:
-        VerifyOrReturnError((HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot)) &&
-                                SupportsOptAttr(OptionalAttribute::kNightVision),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get NightVision, feature is not supported"));
+        VerifyOrReturnError(
+            SupportsOptAttr(OptionalAttribute::kNightVision), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get NightVision, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mNightVision));
         break;
     case NightVisionIllum::Id:
-        VerifyOrReturnError((HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot)) &&
-                                SupportsOptAttr(OptionalAttribute::kNightVisionIllum),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get NightVisionIllumination, feature is not supported"));
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kNightVisionIllum), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not get NightVisionIllumination, feature is not supported",
+                                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mNightVisionIllum));
         break;
     case Viewport::Id:
-        VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get Viewport, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get Viewport, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mViewport));
         break;
     case SpeakerMuted::Id:
-        VerifyOrReturnError(HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get SpeakerMuted, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get SpeakerMuted, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mSpeakerMuted));
         break;
     case SpeakerVolumeLevel::Id:
-        VerifyOrReturnError(HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get SpeakerVolumeLevel, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get SpeakerVolumeLevel, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mSpeakerVolumeLevel));
         break;
     case SpeakerMaxLevel::Id:
-        VerifyOrReturnError(HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get SpeakerMaxLevel, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get SpeakerMaxLevel, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mSpeakerMaxLevel));
         break;
     case SpeakerMinLevel::Id:
-        VerifyOrReturnError(HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get SpeakerMinLevel, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get SpeakerMinLevel, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mSpeakerMinLevel));
         break;
     case MicrophoneMuted::Id:
-        VerifyOrReturnError(HasFeature(Feature::kAudio), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get MicrophoneMuted, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kAudio), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get MicrophoneMuted, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mMicrophoneMuted));
         break;
     case MicrophoneVolumeLevel::Id:
         VerifyOrReturnError(HasFeature(Feature::kAudio), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get MicrophoneVolumeLevel, feature is not supported"));
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not get MicrophoneVolumeLevel, feature is not supported",
+                                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mMicrophoneVolumeLevel));
         break;
     case MicrophoneMaxLevel::Id:
-        VerifyOrReturnError(HasFeature(Feature::kAudio), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get MicrophoneMaxLevel, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kAudio), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get MicrophoneMaxLevel, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mMicrophoneMaxLevel));
         break;
     case MicrophoneMinLevel::Id:
-        VerifyOrReturnError(HasFeature(Feature::kAudio), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get MicrophoneMinLevel, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kAudio), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get MicrophoneMinLevel, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mMicrophoneMinLevel));
         break;
     case MicrophoneAGCEnabled::Id:
-        VerifyOrReturnError(HasFeature(Feature::kAudio) && SupportsOptAttr(OptionalAttribute::kMicrophoneAGCEnabled),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get MicrophoneAGCEnabled, feature is not supported"));
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kMicrophoneAGCEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not get MicrophoneAGCEnabled, feature is not supported",
+                                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mMicrophoneAGCEnabled));
         break;
     case ImageRotation::Id:
-        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttribute::kImageRotation),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get ImageRotation, feature is not supported"));
+        VerifyOrReturnError(
+            SupportsOptAttr(OptionalAttribute::kImageRotation), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get ImageRotation, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mImageRotation));
         break;
     case ImageFlipHorizontal::Id:
-        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttribute::kImageFlipHorizontal),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get ImageFlipHorizontal, feature is not supported"));
+        VerifyOrReturnError(
+            SupportsOptAttr(OptionalAttribute::kImageFlipHorizontal), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get ImageFlipHorizontal, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mImageFlipHorizontal));
         break;
     case ImageFlipVertical::Id:
-        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttribute::kImageFlipVertical),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get ImageFlipHorizontal, feature is not supported"));
+        VerifyOrReturnError(
+            SupportsOptAttr(OptionalAttribute::kImageFlipVertical), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get ImageFlipHorizontal, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mImageFlipVertical));
         break;
     case LocalVideoRecordingEnabled::Id:
         VerifyOrReturnError(
             HasFeature(Feature::kVideo) && HasFeature(Feature::kLocalStorage), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get LocalVideoRecordingEnabled, feature is not supported"));
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get LocalVideoRecordingEnabled, feature is not supported",
+                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mLocalVideoRecordingEnabled));
         break;
     case LocalSnapshotRecordingEnabled::Id:
         VerifyOrReturnError(
             HasFeature(Feature::kSnapshot) && HasFeature(Feature::kLocalStorage), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get LocalSnapshotRecordingEnabled, feature is not supported"));
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get LocalSnapshotRecordingEnabled, feature is not supported",
+                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mLocalSnapshotRecordingEnabled));
         break;
     case StatusLightEnabled::Id:
-        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get StatusLightEnabled, feature is not supported"));
+        VerifyOrReturnError(
+            SupportsOptAttr(OptionalAttribute::kStatusLightEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get StatusLightEnabled, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mStatusLightEnabled));
         break;
     case StatusLightBrightness::Id:
         VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightBrightness), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not get StatusLightBrightness, feature is not supported"));
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not get StatusLightBrightness, feature is not supported",
+                                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mStatusLightBrightness));
         break;
     }
@@ -591,9 +638,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
     {
     case HDRModeEnabled::Id: {
         // Optional Attribute if Video is supported
-        VerifyOrReturnError(HasFeature(Feature::kVideo) && SupportsOptAttr(OptionalAttribute::kHDRModeEnabled),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set HDRModeEnabled, feature is not supported"));
+        VerifyOrReturnError(
+            SupportsOptAttr(OptionalAttribute::kHDRModeEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set HDRModeEnabled, feature is not supported", mEndpointId));
 
         bool hdrModeEnabled;
         ReturnErrorOnFailure(aDecoder.Decode(hdrModeEnabled));
@@ -602,7 +649,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
     case SoftRecordingPrivacyModeEnabled::Id: {
         VerifyOrReturnError(
             HasFeature(Feature::kPrivacy), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set SoftRecordingPrivacyModeEnabled, feature is not supported"));
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set SoftRecordingPrivacyModeEnabled, feature is not supported",
+                         mEndpointId));
 
         bool softRecPrivModeEnabled;
         ReturnErrorOnFailure(aDecoder.Decode(softRecPrivModeEnabled));
@@ -611,97 +659,102 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
     case SoftLivestreamPrivacyModeEnabled::Id: {
         VerifyOrReturnError(
             HasFeature(Feature::kPrivacy), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set SoftLivestreamPrivacyModeEnabled, feature is not supported"));
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set SoftLivestreamPrivacyModeEnabled, feature is not supported",
+                         mEndpointId));
 
         bool softLivestreamPrivModeEnabled;
         ReturnErrorOnFailure(aDecoder.Decode(softLivestreamPrivModeEnabled));
         return SetSoftLivestreamPrivacyModeEnabled(softLivestreamPrivModeEnabled);
     }
     case NightVision::Id: {
-        VerifyOrReturnError((HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot)) &&
-                                SupportsOptAttr(OptionalAttribute::kNightVision),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set NightVision, feature is not supported"));
+        VerifyOrReturnError(
+            SupportsOptAttr(OptionalAttribute::kNightVision), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set NightVision, feature is not supported", mEndpointId));
 
         TriStateAutoEnum nightVision;
         ReturnErrorOnFailure(aDecoder.Decode(nightVision));
         return SetNightVision(nightVision);
     }
     case NightVisionIllum::Id: {
-        VerifyOrReturnError((HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot)) &&
-                                SupportsOptAttr(OptionalAttribute::kNightVisionIllum),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set NightVisionIllumination, feature is not supported"));
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kNightVisionIllum), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not set NightVisionIllumination, feature is not supported",
+                                         mEndpointId));
 
         TriStateAutoEnum nightVisionIllum;
         ReturnErrorOnFailure(aDecoder.Decode(nightVisionIllum));
         return SetNightVisionIllum(nightVisionIllum);
     }
     case Viewport::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set Viewport, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set Viewport, feature is not supported", mEndpointId));
         ViewportStruct viewPort;
         ReturnErrorOnFailure(aDecoder.Decode(viewPort));
         return SetViewport(viewPort);
     }
     case SpeakerMuted::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set SpeakerMuted, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set SpeakerMuted, feature is not supported", mEndpointId));
         bool speakerMuted;
         ReturnErrorOnFailure(aDecoder.Decode(speakerMuted));
         return SetSpeakerMuted(speakerMuted);
     }
     case SpeakerVolumeLevel::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set SpeakerVolumeLevel, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set SpeakerVolumeLevel, feature is not supported", mEndpointId));
         uint8_t speakerVolLevel;
         ReturnErrorOnFailure(aDecoder.Decode(speakerVolLevel));
         return SetSpeakerVolumeLevel(speakerVolLevel);
     }
     case MicrophoneMuted::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kAudio), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set MicrophoneMuted, feature is not supported"));
+        VerifyOrReturnError(
+            HasFeature(Feature::kAudio), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set MicrophoneMuted, feature is not supported", mEndpointId));
         bool micMuted;
         ReturnErrorOnFailure(aDecoder.Decode(micMuted));
         return SetMicrophoneMuted(micMuted);
     }
     case MicrophoneVolumeLevel::Id: {
         VerifyOrReturnError(HasFeature(Feature::kAudio), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set MicrophoneVolumeLevel, feature is not supported"));
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not set MicrophoneVolumeLevel, feature is not supported",
+                                         mEndpointId));
         uint8_t micVolLevel;
         ReturnErrorOnFailure(aDecoder.Decode(micVolLevel));
         return SetMicrophoneVolumeLevel(micVolLevel);
     }
     case MicrophoneAGCEnabled::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kAudio) && SupportsOptAttr(OptionalAttribute::kMicrophoneAGCEnabled),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set MicrophoneAGCEnabled, feature is not supported"));
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kMicrophoneAGCEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not set MicrophoneAGCEnabled, feature is not supported",
+                                         mEndpointId));
         bool micAGCEnabled;
         ReturnErrorOnFailure(aDecoder.Decode(micAGCEnabled));
         return SetMicrophoneAGCEnabled(micAGCEnabled);
     }
     case ImageRotation::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttribute::kImageRotation),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set ImageRotation, feature is not supported"));
+        VerifyOrReturnError(
+            SupportsOptAttr(OptionalAttribute::kImageRotation), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set ImageRotation, feature is not supported", mEndpointId));
         uint16_t imageRotation;
         ReturnErrorOnFailure(aDecoder.Decode(imageRotation));
         return SetImageRotation(imageRotation);
     }
     case ImageFlipHorizontal::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttribute::kImageFlipHorizontal),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set ImageFlipHorizontal, feature is not supported"));
+        VerifyOrReturnError(
+            SupportsOptAttr(OptionalAttribute::kImageFlipHorizontal), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set ImageFlipHorizontal, feature is not supported", mEndpointId));
         bool imageFlipHorizontal;
         ReturnErrorOnFailure(aDecoder.Decode(imageFlipHorizontal));
         return SetImageFlipHorizontal(imageFlipHorizontal);
     }
     case ImageFlipVertical::Id: {
-        VerifyOrReturnError(HasFeature(Feature::kImageControl) && SupportsOptAttr(OptionalAttribute::kImageFlipVertical),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set ImageFlipVertical, feature is not supported"));
+        VerifyOrReturnError(
+            SupportsOptAttr(OptionalAttribute::kImageFlipVertical), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set ImageFlipVertical, feature is not supported", mEndpointId));
         bool imageFlipVertical;
         ReturnErrorOnFailure(aDecoder.Decode(imageFlipVertical));
         return SetImageFlipVertical(imageFlipVertical);
@@ -709,7 +762,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
     case LocalVideoRecordingEnabled::Id: {
         VerifyOrReturnError(
             HasFeature(Feature::kVideo) && HasFeature(Feature::kLocalStorage), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set LocalVideoRecordingEnabled, feature is not supported"));
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set LocalVideoRecordingEnabled, feature is not supported",
+                         mEndpointId));
         bool localVidRecEnabled;
         ReturnErrorOnFailure(aDecoder.Decode(localVidRecEnabled));
         return SetLocalVideoRecordingEnabled(localVidRecEnabled);
@@ -717,21 +771,25 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
     case LocalSnapshotRecordingEnabled::Id: {
         VerifyOrReturnError(
             HasFeature(Feature::kSnapshot) && HasFeature(Feature::kLocalStorage), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set LocalSnapshotRecordingEnabled, feature is not supported"));
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set LocalSnapshotRecordingEnabled, feature is not supported",
+                         mEndpointId));
         bool localSnapshotRecEnabled;
         ReturnErrorOnFailure(aDecoder.Decode(localSnapshotRecEnabled));
         return SetLocalSnapshotRecordingEnabled(localSnapshotRecEnabled);
     }
     case StatusLightEnabled::Id: {
-        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set StatusLightEnabled, feature is not supported"));
+        VerifyOrReturnError(
+            SupportsOptAttr(OptionalAttribute::kStatusLightEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set StatusLightEnabled, feature is not supported", mEndpointId));
         bool statusLightEnabled;
         ReturnErrorOnFailure(aDecoder.Decode(statusLightEnabled));
         return SetStatusLightEnabled(statusLightEnabled);
     }
     case StatusLightBrightness::Id: {
         VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightBrightness), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl, "CameraAVStreamMgmt: can not set StatusLightBrightness, feature is not supported"));
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not set StatusLightBrightness, feature is not supported",
+                                         mEndpointId));
         Globals::ThreeLevelAutoEnum statusLightBrightness;
         ReturnErrorOnFailure(aDecoder.Decode(statusLightBrightness));
         return SetStatusLightBrightness(statusLightBrightness);
@@ -945,11 +1003,12 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         mHDRModeEnabled = storedHDRModeEnabled;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded HDRModeEnabled as %u", mHDRModeEnabled);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded HDRModeEnabled as %u", mEndpointId, mHDRModeEnabled);
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the HDRModeEnabled from the KVS. Defaulting to %u", mHDRModeEnabled);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the HDRModeEnabled from the KVS. Defaulting to %u",
+                      mEndpointId, mHDRModeEnabled);
     }
 
     // Load AllocatedVideoStreams
@@ -964,11 +1023,12 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     err = LoadRankedVideoStreamPriorities();
     if (err == CHIP_NO_ERROR)
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded RankedVideoStreamPrioritiesList");
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded RankedVideoStreamPrioritiesList", mEndpointId);
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the RankedVideoStreamPrioritiesList from the KVS.");
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the RankedVideoStreamPrioritiesList from the KVS.",
+                      mEndpointId);
     }
 
     // Load SoftRecordingPrivacyModeEnabled
@@ -979,12 +1039,14 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         mSoftRecordingPrivacyModeEnabled = softRecordingPrivacyModeEnabled;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded SoftRecordingPrivacyModeEnabled as %u", mSoftRecordingPrivacyModeEnabled);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded SoftRecordingPrivacyModeEnabled as %u", mEndpointId,
+                      mSoftRecordingPrivacyModeEnabled);
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the SoftRecordingPrivacyModeEnabled from the KVS. Defaulting to %u",
-                      mSoftRecordingPrivacyModeEnabled);
+        ChipLogDetail(
+            Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the SoftRecordingPrivacyModeEnabled from the KVS. Defaulting to %u",
+            mEndpointId, mSoftRecordingPrivacyModeEnabled);
     }
 
     // Load SoftLivestreamPrivacyModeEnabled
@@ -995,12 +1057,14 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         mSoftLivestreamPrivacyModeEnabled = softLivestreamPrivacyModeEnabled;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded SoftLivestreamPrivacyModeEnabled as %u", mSoftLivestreamPrivacyModeEnabled);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded SoftLivestreamPrivacyModeEnabled as %u", mEndpointId,
+                      mSoftLivestreamPrivacyModeEnabled);
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the SoftLivestreamPrivacyModeEnabled from the KVS. Defaulting to %u",
-                      mSoftLivestreamPrivacyModeEnabled);
+        ChipLogDetail(
+            Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the SoftLivestreamPrivacyModeEnabled from the KVS. Defaulting to %u",
+            mEndpointId, mSoftLivestreamPrivacyModeEnabled);
     }
 
     // Load NightVision
@@ -1010,11 +1074,11 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         mNightVision = static_cast<TriStateAutoEnum>(nightVision);
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded NightVision as %d", to_underlying(mNightVision));
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded NightVision as %d", mEndpointId, to_underlying(mNightVision));
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the NightVision from the KVS. Defaulting to %d",
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the NightVision from the KVS. Defaulting to %d", mEndpointId,
                       to_underlying(mNightVision));
     }
 
@@ -1025,12 +1089,13 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         mNightVisionIllum = static_cast<TriStateAutoEnum>(nightVisionIllum);
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded NightVisionIllum as %d", to_underlying(mNightVisionIllum));
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded NightVisionIllum as %d", mEndpointId,
+                      to_underlying(mNightVisionIllum));
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the NightVisionIllum from the KVS. Defaulting to %d",
-                      to_underlying(mNightVisionIllum));
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the NightVisionIllum from the KVS. Defaulting to %d",
+                      mEndpointId, to_underlying(mNightVisionIllum));
     }
 
     // Load Viewport
@@ -1039,11 +1104,11 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         mViewport = viewport;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded Viewport");
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded Viewport", mEndpointId);
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the Viewport from the KVS.");
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the Viewport from the KVS.", mEndpointId);
     }
 
     // Load SpeakerMuted
@@ -1053,11 +1118,12 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         mSpeakerMuted = speakerMuted;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded SpeakerMuted as %u", mSpeakerMuted);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded SpeakerMuted as %u", mEndpointId, mSpeakerMuted);
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the SpeakerMuted from the KVS. Defaulting to %u", mSpeakerMuted);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the SpeakerMuted from the KVS. Defaulting to %u", mEndpointId,
+                      mSpeakerMuted);
     }
 
     // Load SpeakerVolumeLevel
@@ -1067,12 +1133,12 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         mSpeakerVolumeLevel = speakerVolumeLevel;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded SpeakerVolumeLevel as %u", mSpeakerVolumeLevel);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded SpeakerVolumeLevel as %u", mEndpointId, mSpeakerVolumeLevel);
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the SpeakerVolumeLevel from the KVS. Defaulting to %u",
-                      mSpeakerVolumeLevel);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the SpeakerVolumeLevel from the KVS. Defaulting to %u",
+                      mEndpointId, mSpeakerVolumeLevel);
     }
 
     // Load MicrophoneMuted
@@ -1082,12 +1148,12 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         mMicrophoneMuted = microphoneMuted;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded MicrophoneMuted as %u", mMicrophoneMuted);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded MicrophoneMuted as %u", mEndpointId, mMicrophoneMuted);
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the MicrophoneMuted from the KVS. Defaulting to %u",
-                      mMicrophoneMuted);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the MicrophoneMuted from the KVS. Defaulting to %u",
+                      mEndpointId, mMicrophoneMuted);
     }
 
     // Load MicrophoneVolumeLevel
@@ -1098,12 +1164,12 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         mMicrophoneVolumeLevel = microphoneVolumeLevel;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded MicrophoneVolumeLevel as %u", mMicrophoneVolumeLevel);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded MicrophoneVolumeLevel as %u", mEndpointId, mMicrophoneVolumeLevel);
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the MicrophoneVolumeLevel from the KVS. Defaulting to %u",
-                      mMicrophoneVolumeLevel);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the MicrophoneVolumeLevel from the KVS. Defaulting to %u",
+                      mEndpointId, mMicrophoneVolumeLevel);
     }
 
     // Load MicrophoneAGCEnabled
@@ -1114,12 +1180,12 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         mMicrophoneAGCEnabled = microphoneAGCEnabled;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded MicrophoneAGCEnabled as %u", mMicrophoneAGCEnabled);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded MicrophoneAGCEnabled as %u", mEndpointId, mMicrophoneAGCEnabled);
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the MicrophoneAGCEnabled from the KVS. Defaulting to %u",
-                      mMicrophoneAGCEnabled);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the MicrophoneAGCEnabled from the KVS. Defaulting to %u",
+                      mEndpointId, mMicrophoneAGCEnabled);
     }
 
     // Load ImageRotation
@@ -1129,11 +1195,12 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         mImageRotation = imageRotation;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded ImageRotation as %u", mImageRotation);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded ImageRotation as %u", mEndpointId, mImageRotation);
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the ImageRotation from the KVS. Defaulting to %u", mImageRotation);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the ImageRotation from the KVS. Defaulting to %u",
+                      mEndpointId, mImageRotation);
     }
 
     // Load ImageFlipHorizontal
@@ -1143,12 +1210,12 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         mImageFlipHorizontal = imageFlipHorizontal;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded ImageFlipHorizontal as %u", mImageFlipHorizontal);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded ImageFlipHorizontal as %u", mEndpointId, mImageFlipHorizontal);
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the ImageFlipHorizontal from the KVS. Defaulting to %u",
-                      mImageFlipHorizontal);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the ImageFlipHorizontal from the KVS. Defaulting to %u",
+                      mEndpointId, mImageFlipHorizontal);
     }
 
     // Load ImageFlipVertical
@@ -1158,12 +1225,12 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         mImageFlipVertical = imageFlipVertical;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded ImageFlipVertical as %u", mImageFlipVertical);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded ImageFlipVertical as %u", mEndpointId, mImageFlipVertical);
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the ImageFlipVertical from the KVS. Defaulting to %u",
-                      mImageFlipVertical);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the ImageFlipVertical from the KVS. Defaulting to %u",
+                      mEndpointId, mImageFlipVertical);
     }
 
     // Load LocalVideoRecordingEnabled
@@ -1174,12 +1241,14 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         mLocalVideoRecordingEnabled = localVideoRecordingEnabled;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded LocalVideoRecordingEnabled as %u", mLocalVideoRecordingEnabled);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded LocalVideoRecordingEnabled as %u", mEndpointId,
+                      mLocalVideoRecordingEnabled);
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the LocalVideoRecordingEnabled from the KVS. Defaulting to %u",
-                      mLocalVideoRecordingEnabled);
+        ChipLogDetail(Zcl,
+                      "CameraAVStreamMgmt[ep=%d]: Unable to load the LocalVideoRecordingEnabled from the KVS. Defaulting to %u",
+                      mEndpointId, mLocalVideoRecordingEnabled);
     }
 
     // Load LocalSnapshotRecordingEnabled
@@ -1190,12 +1259,14 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         mLocalSnapshotRecordingEnabled = localSnapshotRecordingEnabled;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded LocalSnapshotRecordingEnabled as %u", mLocalSnapshotRecordingEnabled);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded LocalSnapshotRecordingEnabled as %u", mEndpointId,
+                      mLocalSnapshotRecordingEnabled);
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the LocalSnapshotRecordingEnabled from the KVS. Defaulting to %u",
-                      mLocalSnapshotRecordingEnabled);
+        ChipLogDetail(Zcl,
+                      "CameraAVStreamMgmt[ep=%d]: Unable to load the LocalSnapshotRecordingEnabled from the KVS. Defaulting to %u",
+                      mEndpointId, mLocalSnapshotRecordingEnabled);
     }
 
     // Load StatusLightEnabled
@@ -1205,12 +1276,12 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         mStatusLightEnabled = statusLightEnabled;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded StatusLightEnabled as %u", mStatusLightEnabled);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded StatusLightEnabled as %u", mEndpointId, mStatusLightEnabled);
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the StatusLightEnabled from the KVS. Defaulting to %u",
-                      mStatusLightEnabled);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the StatusLightEnabled from the KVS. Defaulting to %u",
+                      mEndpointId, mStatusLightEnabled);
     }
 
     // Load StatusLightBrightness
@@ -1221,12 +1292,13 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         mStatusLightBrightness = static_cast<Globals::ThreeLevelAutoEnum>(statusLightBrightness);
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Loaded StatusLightBrightness as %d", to_underlying(mStatusLightBrightness));
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded StatusLightBrightness as %d", mEndpointId,
+                      to_underlying(mStatusLightBrightness));
     }
     else
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Unable to load the StatusLightBrightness from the KVS. Defaulting to %d",
-                      to_underlying(mStatusLightBrightness));
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the StatusLightBrightness from the KVS. Defaulting to %d",
+                      mEndpointId, to_underlying(mStatusLightBrightness));
     }
 
     // Signal delegate that all persistent configuration attributes have been loaded.
@@ -1324,11 +1396,10 @@ CHIP_ERROR CameraAVStreamMgmtServer::LoadRankedVideoStreamPriorities()
 // CommandHandlerInterface
 void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
 {
-    ChipLogDetail(Zcl, "CameraAV: InvokeCommand");
     switch (handlerContext.mRequestPath.mCommandId)
     {
     case Commands::VideoStreamAllocate::Id:
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Allocating Video Stream");
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Allocating Video Stream", mEndpointId);
 
         if (!HasFeature(Feature::kVideo))
         {
@@ -1343,7 +1414,7 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
         return;
 
     case Commands::VideoStreamModify::Id:
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Modifying Video Stream");
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Modifying Video Stream", mEndpointId);
 
         if (!HasFeature(Feature::kVideo))
         {
@@ -1358,7 +1429,7 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
         return;
 
     case Commands::VideoStreamDeallocate::Id:
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Deallocating Video Stream");
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Deallocating Video Stream", mEndpointId);
 
         if (!HasFeature(Feature::kVideo))
         {
@@ -1373,7 +1444,7 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
         return;
 
     case Commands::AudioStreamAllocate::Id:
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Allocating Audio Stream");
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Allocating Audio Stream", mEndpointId);
 
         if (!HasFeature(Feature::kAudio))
         {
@@ -1388,7 +1459,7 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
         return;
 
     case Commands::AudioStreamDeallocate::Id:
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Deallocating Audio Stream");
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Deallocating Audio Stream", mEndpointId);
 
         if (!HasFeature(Feature::kAudio))
         {
@@ -1403,7 +1474,7 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
         return;
 
     case Commands::SnapshotStreamAllocate::Id:
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Allocating Snapshot Stream");
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Allocating Snapshot Stream", mEndpointId);
 
         if (!HasFeature(Feature::kSnapshot))
         {
@@ -1418,7 +1489,7 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
         return;
 
     case Commands::SnapshotStreamDeallocate::Id:
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Deallocating Snapshot Stream");
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Deallocating Snapshot Stream", mEndpointId);
 
         if (!HasFeature(Feature::kSnapshot))
         {
@@ -1433,14 +1504,14 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
         return;
 
     case Commands::SetStreamPriorities::Id:
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Set Stream Priorities");
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Set Stream Priorities", mEndpointId);
         HandleCommand<Commands::SetStreamPriorities::DecodableType>(
             handlerContext,
             [this](HandlerContext & ctx, const auto & commandData) { HandleSetStreamPriorities(ctx, commandData); });
         return;
 
     case Commands::CaptureSnapshot::Id:
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt: Capture Snapshot image");
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Capture Snapshot image", mEndpointId);
 
         if (!HasFeature(Feature::kSnapshot))
         {
@@ -1489,16 +1560,22 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
 
     VerifyOrReturn(streamUsage != StreamUsageEnum::kUnknownEnumValue, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid stream usage");
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
     });
 
     VerifyOrReturn(videoCodec != VideoCodecEnum::kUnknownEnumValue, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid video codec");
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid video codec", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
     });
 
     VerifyOrReturn(minFrameRate >= 1 && minFrameRate <= maxFrameRate && maxFrameRate >= 1,
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+
+    VerifyOrReturn(minResolution.width >= 1 && minResolution.height >= 1,
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+
+    VerifyOrReturn(maxResolution.width >= 1 && maxResolution.height >= 1,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
     VerifyOrReturn(minBitRate >= 1 && minBitRate <= maxBitRate && maxBitRate >= 1,
@@ -1578,32 +1655,32 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
     uint16_t audioStreamID = 0;
 
     VerifyOrReturn(streamUsage != StreamUsageEnum::kUnknownEnumValue, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid stream usage");
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
     VerifyOrReturn(audioCodec != AudioCodecEnum::kUnknownEnumValue, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid audio codec");
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid audio codec", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
     VerifyOrReturn(sampleRate > 0, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid sampleRate");
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid sampleRate", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
     VerifyOrReturn(bitRate > 0, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid bitRate ");
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid bitRate", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
     VerifyOrReturn(IsBitDepthValid(bitDepth), {
-        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid bitDepth");
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid bitDepth", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
     VerifyOrReturn(channelCount >= 1 && channelCount <= kMaxChannelCount, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid channel count");
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid channel count", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
@@ -1647,22 +1724,22 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
     uint16_t snapshotStreamID = 0;
 
     VerifyOrReturn(imageCodec != ImageCodecEnum::kUnknownEnumValue, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid image codec");
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid image codec", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
     });
 
     VerifyOrReturn(maxFrameRate > 0, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid maxFrameRate");
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid maxFrameRate", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
     VerifyOrReturn(bitRate > 0, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid bitRate");
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid bitRate", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
     VerifyOrReturn(quality > 0 && quality <= kMaxImageQualityMetric, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid image quality");
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid image quality", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
@@ -1709,7 +1786,7 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
     }
 
     VerifyOrReturn(i == kNumOfStreamUsageTypes, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt: Invalid num of stream usages");
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid num of stream usages", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
     });
 
