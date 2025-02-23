@@ -2481,6 +2481,9 @@ endpoint 0 {
     handle command UpdateFabricLabel;
     handle command RemoveFabric;
     handle command AddTrustedRootCertificate;
+    handle command SetVidVerificationStatement;
+    handle command SignVidVerificationRequest;
+    handle command SignVidVerificationResponse;
   }
 
   server cluster GroupKeyManagement {
