@@ -93,10 +93,12 @@ CHIP_ERROR ParseAdditionalDataPayload(const char * additionalDataPayload, size_t
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
     size_t additionalDataPayloadBytesLength = additionalDataPayloadLength / 2;
-    std::unique_ptr<uint8_t[]> additionalDataPayloadBytes(new uint8_t[additionalDataPayloadBytesLength]);
+
+    std::vector<uint8_t> additionalDataPayloadBytes;
+    additionalDataPayloadBytes.resize(additionalDataPayloadBytesLength);
     size_t bufferSize = chip::Encoding::HexToBytes(additionalDataPayload, additionalDataPayloadLength,
-                                                   additionalDataPayloadBytes.get(), additionalDataPayloadBytesLength);
-    return AdditionalDataPayloadParser(additionalDataPayloadBytes.get(), bufferSize).populatePayload(outPayload);
+                                                   additionalDataPayloadBytes.data(), additionalDataPayloadBytesLength);
+    return AdditionalDataPayloadParser(additionalDataPayloadBytes.data(), bufferSize).populatePayload(outPayload);
 }
 
 class TestAdditionalDataPayload : public ::testing::Test
