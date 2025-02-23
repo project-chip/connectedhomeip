@@ -150,7 +150,7 @@ public:
      * This is used by callbacks that just look for a particular value in the
      * list.
      */
-    virtual CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback, void * context)
+    virtual CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<CommandId> & builder)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
