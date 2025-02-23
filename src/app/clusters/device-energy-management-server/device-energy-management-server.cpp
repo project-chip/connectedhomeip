@@ -107,7 +107,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
-    using QF = DataModel::CommandQualityFlags; 
+    using QF = DataModel::CommandQualityFlags;
     static const auto kDefaultFlags = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
     static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
 
@@ -147,7 +147,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     {
         ReturnErrorOnFailure(builder.Append({CancelRequest::Id, kDefaultFlags, kDefaultPrivilege})); //TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
     }
-    
+
     return CHIP_NO_ERROR;
 }
 

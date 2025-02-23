@@ -1363,14 +1363,14 @@ void Instance::OnFailSafeTimerExpired()
 CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Clusters::NetworkCommissioning::Commands;
-    using QF = DataModel::CommandQualityFlags; 
+    using QF = DataModel::CommandQualityFlags;
     static const auto kDefaultFlags = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
     static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
 
     bool hasNet = mFeatureFlags.Has(Feature::kThreadNetworkInterface);
     bool hasWifi = mFeatureFlags.Has(Feature::kWiFiNetworkInterface);
     bool hasCred = mFeatureFlags.Has(Feature::kPerDeviceCredentials);
-    auto netId = hasNet? AddOrUpdateThreadNetwork::Id : AddOrUpdateWiFiNetwork::Id; 
+    auto netId = hasNet? AddOrUpdateThreadNetwork::Id : AddOrUpdateWiFiNetwork::Id;
 
     static const DataModel::AcceptedCommandEntry commands [6] = {
         {ScanNetworks::Id, kDefaultFlags, kDefaultPrivilege},

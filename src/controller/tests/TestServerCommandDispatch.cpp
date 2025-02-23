@@ -107,7 +107,7 @@ void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterface
 CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,  DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Clusters::UnitTesting::Commands;
-    using QF = DataModel::CommandQualityFlags; 
+    using QF = DataModel::CommandQualityFlags;
     static const auto kDefaultFlags = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
     static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
 

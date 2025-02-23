@@ -190,10 +190,10 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace ResourceMonitoring::Commands;
-    using QF = DataModel::CommandQualityFlags; 
+    using QF = DataModel::CommandQualityFlags;
     static const auto kDefaultFlags = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
     static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
-    
+
     ChipLogDetail(Zcl, "resourcemonitoring: EnumerateAcceptedCommands");
     if (mResetConditionCommandSupported)
     {
