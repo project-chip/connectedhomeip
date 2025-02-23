@@ -284,21 +284,13 @@ public:
 
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<DataModel::AcceptedCommandEntry>& builder) override
     {
-        return builder.ReferenceExisting(mAccepted);
+        return builder.ReferenceExisting({mAccepted.data(), mAccepted.size()});
     }
 
-    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
+    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<CommandId> & builder) override
     {
         VerifyOrReturnError(mOverrideGenerated, CHIP_ERROR_NOT_IMPLEMENTED);
-
-        for (auto id : mGenerated)
-        {
-            if (callback(id, context) != Loop::Continue)
-            {
-                break;
-            }
-        }
-        return CHIP_NO_ERROR;
+        return builder.AppendElements({mGenerated.data(), mGenerated.size()});
     }
 
     void SetOverrideAccepted(bool o) { mOverrideAccepted = o; }
@@ -1234,6 +1226,10 @@ TEST_F(TestCodegenModelViaMocks, AcceptedGeneratedCommandsOnInvalidEndpoints)
 TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
 {
 
+    using QF = DataModel::CommandQualityFlags; 
+    static const auto kDefaultFlags = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
+    static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
+    
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
@@ -1260,8 +1256,8 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
     ASSERT_TRUE(acceptedBuilder.IsEmpty());
 
     // set some overrides
-    handler.AcceptedVec().push_back(1234);
-    handler.AcceptedVec().push_back(999);
+    handler.AcceptedVec().push_back({1234, kDefaultFlags, kDefaultPrivilege});
+    handler.AcceptedVec().push_back({999, kDefaultFlags, kDefaultPrivilege});
 
     handler.GeneratedVec().push_back(33);
 

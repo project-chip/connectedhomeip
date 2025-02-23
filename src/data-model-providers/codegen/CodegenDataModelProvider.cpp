@@ -373,7 +373,6 @@ CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
     if (interface != nullptr)
     {
-        size_t commandCount = 0;
         CHIP_ERROR err = interface->EnumerateGeneratedCommands(path, builder);
         // if err == CHIP_ERROR_NOT_IMPLEMENTED then continue, else just return whatever err is
         VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);

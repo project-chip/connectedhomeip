@@ -200,7 +200,7 @@ private:
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & handlerContext) override;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,  DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     void HandleDisable(HandlerContext & ctx, const Commands::Disable::DecodableType & commandData);
     void HandleEnableCharging(HandlerContext & ctx, const Commands::EnableCharging::DecodableType & commandData);

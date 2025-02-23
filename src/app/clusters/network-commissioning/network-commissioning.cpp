@@ -1360,64 +1360,51 @@ void Instance::OnFailSafeTimerExpired()
     }
 }
 
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Clusters::NetworkCommissioning::Commands;
+    using QF = DataModel::CommandQualityFlags; 
+    static const auto kDefaultFlags = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
+    static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
 
-    if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
-    {
-        for (auto && cmd : {
-                 ScanNetworks::Id,
-                 AddOrUpdateThreadNetwork::Id,
-                 RemoveNetwork::Id,
-                 ConnectNetwork::Id,
-                 ReorderNetwork::Id,
-             })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
-    }
-    else if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
-    {
-        for (auto && cmd : {
-                 ScanNetworks::Id,
-                 AddOrUpdateWiFiNetwork::Id,
-                 RemoveNetwork::Id,
-                 ConnectNetwork::Id,
-                 ReorderNetwork::Id,
-             })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
+    bool hasNet = mFeatureFlags.Has(Feature::kThreadNetworkInterface);
+    bool hasWifi = mFeatureFlags.Has(Feature::kWiFiNetworkInterface);
+    bool hasCred = mFeatureFlags.Has(Feature::kPerDeviceCredentials);
+    auto netId = hasNet? AddOrUpdateThreadNetwork::Id : AddOrUpdateWiFiNetwork::Id; 
+
+    static const DataModel::AcceptedCommandEntry commands [6] = {
+        {ScanNetworks::Id, kDefaultFlags, kDefaultPrivilege},
+        {netId, kDefaultFlags, kDefaultPrivilege},
+        {RemoveNetwork::Id, kDefaultFlags, kDefaultPrivilege},
+        {ConnectNetwork::Id, kDefaultFlags, kDefaultPrivilege},
+        {ReorderNetwork::Id, kDefaultFlags, kDefaultPrivilege},
+        {QueryIdentity::Id, kDefaultFlags, kDefaultPrivilege}
+    };
+
+    if(hasNet | hasWifi) {
+        //Avoid extra memory allocation
+        return builder.ReferenceExisting({commands, 5 + hasCred? 1 : 0});
+    } else if(hasCred) {
+        return builder.ReferenceExisting({commands + 5, 1});
     }
 
-    if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
-    {
-        VerifyOrExit(callback(QueryIdentity::Id, context) == Loop::Continue, /**/);
-    }
-
-exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<CommandId> & builder)
 {
     using namespace Clusters::NetworkCommissioning::Commands;
 
     if (mFeatureFlags.HasAny(Feature::kWiFiNetworkInterface, Feature::kThreadNetworkInterface))
     {
-        for (auto && cmd : { ScanNetworksResponse::Id, NetworkConfigResponse::Id, ConnectNetworkResponse::Id })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
+        ReturnErrorOnFailure(builder.AppendElements({ ScanNetworksResponse::Id, NetworkConfigResponse::Id, ConnectNetworkResponse::Id }));
     }
 
     if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
     {
-        VerifyOrExit(callback(QueryIdentityResponse::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.Append(QueryIdentityResponse::Id));
     }
 
-exit:
     return CHIP_NO_ERROR;
 }
 

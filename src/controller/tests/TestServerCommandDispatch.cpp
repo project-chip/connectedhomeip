@@ -69,7 +69,7 @@ public:
 
 private:
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & handlerContext) final;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) final;
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,  DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) final;
 
     bool mOverrideAcceptedCommands = false;
     bool mClaimNoCommands          = false;
@@ -104,8 +104,13 @@ void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterface
         });
 }
 
-CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, ListBuilder<AcceptedCommandEntry> & builder)
+CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,  DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
+    using namespace Clusters::UnitTesting::Commands;
+    using QF = DataModel::CommandQualityFlags; 
+    static const auto kDefaultFlags = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
+    static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
+
     if (!mOverrideAcceptedCommands)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -115,9 +120,9 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
     {
         return CHIP_NO_ERROR;
     }
-    builder.get
+
     // We just have one command id.
-    callback(Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id, context);
+    ReturnErrorOnFailure(builder.Append({TestSimpleArgumentRequest::Id, kDefaultFlags, kDefaultPrivilege}));
     return CHIP_NO_ERROR;
 }
 

@@ -104,49 +104,50 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 }
 
 // CommandHandlerInterface
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, ListBuilder<AcceptedCommandEntry> & builder)
+CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
-    using QF = DataModel::CommandQualityFlags;
+    using QF = DataModel::CommandQualityFlags; 
+    static const auto kDefaultFlags = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
+    static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
 
     if (HasFeature(Feature::kPowerAdjustment))
     {
-        VerifyOrExit(builder.AppendElements({
-            {PowerAdjustRequest::Id,       QF::kFabricScoped, Access::Privilege::kOperate}, //TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
-            {CancelPowerAdjustRequest::Id, QF::kFabricScoped, Access::Privilege::kOperate}  //TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
+        ReturnErrorOnFailure(builder.AppendElements({
+            {PowerAdjustRequest::Id,       kDefaultFlags, kDefaultPrivilege}, //TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
+            {CancelPowerAdjustRequest::Id, kDefaultFlags, kDefaultPrivilege}  //TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
         }));
     }
 
     if (HasFeature(Feature::kStartTimeAdjustment))
     {
-        VerifyOrExit(builder.AppendElement({StartTimeAdjustRequest::Id, QF::kFabricScoped})); //TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
+        ReturnErrorOnFailure(builder.Append({StartTimeAdjustRequest::Id, kDefaultFlags, kDefaultPrivilege})); //TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
     }
 
     if (HasFeature(Feature::kPausable))
     {
-        VerifyOrExit(builder.AppendElements({
-            {PauseRequest::Id,  QF::kFabricScoped, Access::Privilege::kOperate},
-            {ResumeRequest::Id, BitFlags<QF>(QF::kFabricScoped), Access::Privilege::kOperate}
+        ReturnErrorOnFailure(builder.AppendElements({
+            {PauseRequest::Id,  kDefaultFlags, kDefaultPrivilege},
+            {ResumeRequest::Id, kDefaultFlags, kDefaultPrivilege}
         }));
     }
 
     if (HasFeature(Feature::kForecastAdjustment))
     {
-        VerifyOrExit(builder.AppendElement({ModifyForecastRequest::Id, QF::kFabricScoped})); //TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
+        ReturnErrorOnFailure(builder.Append({ModifyForecastRequest::Id, kDefaultFlags, kDefaultPrivilege})); //TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
     }
 
     if (HasFeature(Feature::kConstraintBasedAdjustment))
     {
-       VerifyOrExit(builder.AppendElement({ModifyForecastRequest::Id, QF::kFabricScoped})); //TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
+       ReturnErrorOnFailure(builder.Append({ModifyForecastRequest::Id, kDefaultFlags, kDefaultPrivilege})); //TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
     }
 
     if (HasFeature(Feature::kStartTimeAdjustment) || HasFeature(Feature::kForecastAdjustment) ||
         HasFeature(Feature::kConstraintBasedAdjustment))
     {
-        VerifyOrExit(builder.AppendElement({CancelRequest::Id, QF::kFabricScoped})); //TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
+        ReturnErrorOnFailure(builder.Append({CancelRequest::Id, kDefaultFlags, kDefaultPrivilege})); //TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
     }
-
-exit:
+    
     return CHIP_NO_ERROR;
 }
 
