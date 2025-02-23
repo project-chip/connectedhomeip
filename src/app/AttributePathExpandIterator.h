@@ -19,9 +19,9 @@
 
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/data-model/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
+#include <app/data-model/MetadataList.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/LinkedList.h>
 #include <lib/support/Span.h>

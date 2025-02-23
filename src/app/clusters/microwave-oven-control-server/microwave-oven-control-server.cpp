@@ -16,7 +16,7 @@
  *
  */
 
-#include "app/data-model-provider/MetadataList.h"
+#include <app/data-model/MetadataList.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>

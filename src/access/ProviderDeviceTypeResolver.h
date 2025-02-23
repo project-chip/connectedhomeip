@@ -16,9 +16,9 @@
 #pragma once
 
 #include <access/AccessControl.h>
-#include <app/data-model/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
+#include <app/data-model/MetadataList.h>
 
 namespace chip {
 namespace Access {
