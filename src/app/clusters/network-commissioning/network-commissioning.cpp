@@ -1383,9 +1383,9 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
     if(hasNet | hasWifi) {
         //Avoid extra memory allocation
-        return builder.ReferenceExisting({commands, 5z + (hasCred? 1z : 0z)});
+        return builder.ReferenceExisting({commands, size_t{5} + (hasCred? 1 : 0)});
     } else if(hasCred) {
-        return builder.ReferenceExisting({commands + 5z, 1z});
+        return builder.ReferenceExisting({commands + 5, size_t{1}});
     }
 
     return CHIP_NO_ERROR;
