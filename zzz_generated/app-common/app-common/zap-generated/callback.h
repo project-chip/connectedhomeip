@@ -6099,6 +6099,18 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::DecodableType & commandData);
 /**
+ * @brief Operational Credentials Cluster SetVidVerificationStatement Command callback (from client)
+ */
+bool emberAfOperationalCredentialsClusterSetVidVerificationStatementCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::DecodableType & commandData);
+/**
+ * @brief Operational Credentials Cluster SignVidVerificationRequest Command callback (from client)
+ */
+bool emberAfOperationalCredentialsClusterSignVidVerificationRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::DecodableType & commandData);
+/**
  * @brief Group Key Management Cluster KeySetWrite Command callback (from client)
  */
 bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
@@ -7045,11 +7057,11 @@ bool emberAfWebRTCTransportProviderClusterProvideAnswerCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::DecodableType & commandData);
 /**
- * @brief WebRTC Transport Provider Cluster ProvideICECandidate Command callback (from client)
+ * @brief WebRTC Transport Provider Cluster ProvideICECandidates Command callback (from client)
  */
-bool emberAfWebRTCTransportProviderClusterProvideICECandidateCallback(
+bool emberAfWebRTCTransportProviderClusterProvideICECandidatesCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::DecodableType & commandData);
+    const chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::DecodableType & commandData);
 /**
  * @brief WebRTC Transport Provider Cluster EndSession Command callback (from client)
  */
@@ -7069,11 +7081,11 @@ bool emberAfWebRTCTransportRequestorClusterAnswerCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WebRTCTransportRequestor::Commands::Answer::DecodableType & commandData);
 /**
- * @brief WebRTC Transport Requestor Cluster ICECandidate Command callback (from client)
+ * @brief WebRTC Transport Requestor Cluster ICECandidates Command callback (from client)
  */
-bool emberAfWebRTCTransportRequestorClusterICECandidateCallback(
+bool emberAfWebRTCTransportRequestorClusterICECandidatesCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::DecodableType & commandData);
+    const chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidates::DecodableType & commandData);
 /**
  * @brief WebRTC Transport Requestor Cluster End Command callback (from client)
  */

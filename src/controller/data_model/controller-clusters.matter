@@ -2697,12 +2697,14 @@ cluster OperationalCredentials = 62 {
     fabric_id fabricID = 3;
     node_id nodeID = 4;
     char_string<32> label = 5;
+    optional octet_string<85> vidVerificationStatement = 6;
     fabric_idx fabricIndex = 254;
   }
 
   fabric_scoped struct NOCStruct {
-    fabric_sensitive octet_string noc = 1;
-    nullable fabric_sensitive octet_string icac = 2;
+    octet_string noc = 1;
+    nullable octet_string icac = 2;
+    optional octet_string vvsc = 3;
     fabric_idx fabricIndex = 254;
   }
 
@@ -2777,6 +2779,23 @@ cluster OperationalCredentials = 62 {
     octet_string rootCACertificate = 0;
   }
 
+  request struct SetVidVerificationStatementRequest {
+    optional vendor_id vendorID = 0;
+    optional octet_string vidVerificationStatement = 1;
+    optional octet_string vvsc = 2;
+  }
+
+  request struct SignVidVerificationRequestRequest {
+    fabric_idx fabricIndex = 0;
+    octet_string<32> clientChallenge = 1;
+  }
+
+  response struct SignVidVerificationResponse = 14 {
+    fabric_idx fabricIndex = 0;
+    int8u fabricBindingVersion = 1;
+    octet_string signature = 2;
+  }
+
   /** Sender is requesting attestation information from the receiver. */
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
   /** Sender is requesting a device attestation certificate from the receiver. */
@@ -2793,6 +2812,10 @@ cluster OperationalCredentials = 62 {
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   /** This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation. */
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
+  /** This command SHALL be used to update any of the accessing fabric's associated VendorID, VidVerificatioNStatement or VVSC (Vendor Verification Signing Certificate). */
+  fabric command access(invoke: administer) SetVidVerificationStatement(SetVidVerificationStatementRequest): DefaultSuccess = 12;
+  /** This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given. */
+  command access(invoke: administer) SignVidVerificationRequest(SignVidVerificationRequestRequest): SignVidVerificationResponse = 13;
 }
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
@@ -10104,7 +10127,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
     kUnknownReason = 11;
   }
 
-  bitmap WebRTCMetadataOptions : bitmap8 {
+  bitmap WebRTCMetadataOptionsBitmap : bitmap8 {
     kDataTLV = 0x1;
   }
 
@@ -10122,7 +10145,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
     StreamUsageEnum streamUsage = 4;
     nullable int16u videoStreamID = 5;
     nullable int16u audioStreamID = 6;
-    WebRTCMetadataOptions metadataOptions = 7;
+    WebRTCMetadataOptionsBitmap metadataOptions = 7;
   }
 
   readonly attribute WebRTCSessionStruct currentSessions[] = 0;
@@ -10139,7 +10162,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
     optional nullable int16u audioStreamID = 2;
     optional ICEServerStruct ICEServers[] = 3;
     optional char_string ICETransportPolicy = 4;
-    optional WebRTCMetadataOptions metadataOptions = 5;
+    optional WebRTCMetadataOptionsBitmap metadataOptions = 5;
   }
 
   response struct SolicitOfferResponse = 2 {
@@ -10157,13 +10180,13 @@ provisional cluster WebRTCTransportProvider = 1363 {
     optional nullable int16u audioStreamID = 4;
     optional ICEServerStruct ICEServers[] = 5;
     optional char_string ICETransportPolicy = 6;
-    optional WebRTCMetadataOptions metadataOptions = 7;
+    optional WebRTCMetadataOptionsBitmap metadataOptions = 7;
   }
 
   response struct ProvideOfferResponse = 4 {
     int16u webRTCSessionID = 0;
-    int16u videoStreamID = 1;
-    int16u audioStreamID = 2;
+    optional nullable int16u videoStreamID = 1;
+    optional nullable int16u audioStreamID = 2;
   }
 
   request struct ProvideAnswerRequest {
@@ -10171,9 +10194,9 @@ provisional cluster WebRTCTransportProvider = 1363 {
     char_string sdp = 1;
   }
 
-  request struct ProvideICECandidateRequest {
+  request struct ProvideICECandidatesRequest {
     int16u webRTCSessionID = 0;
-    char_string ICECandidate = 1;
+    char_string ICECandidates[] = 1;
   }
 
   request struct EndSessionRequest {
@@ -10187,8 +10210,8 @@ provisional cluster WebRTCTransportProvider = 1363 {
   command ProvideOffer(ProvideOfferRequest): ProvideOfferResponse = 3;
   /** This command SHALL be initiated from a Node in response to an Offer that was previously received from a remote peer. */
   command ProvideAnswer(ProvideAnswerRequest): DefaultSuccess = 5;
-  /** This command allows for https://www.rfc-editor.org/rfc/rfc8839#section-4.2.1.2 nominated after the initial Offer / Answer exchange to be added to a session during the gathering phase. */
-  command ProvideICECandidate(ProvideICECandidateRequest): DefaultSuccess = 6;
+  /** This command allows for string based https://rfc-editor.org/rfc/rfc8839#section-5.1 generated after the initial Offer / Answer exchange, via a JSEP https://datatracker.ietf.org/doc/html/rfc9429#section-4.1.20 event, a DOM https://www.w3.org/TR/webrtc/#dom-rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase. */
+  command ProvideICECandidates(ProvideICECandidatesRequest): DefaultSuccess = 6;
   /** This command instructs the stream provider to end the WebRTC session. */
   command EndSession(EndSessionRequest): DefaultSuccess = 7;
 }
@@ -10219,7 +10242,7 @@ provisional cluster WebRTCTransportRequestor = 1364 {
     kUnknownReason = 11;
   }
 
-  bitmap WebRTCMetadataOptions : bitmap8 {
+  bitmap WebRTCMetadataOptionsBitmap : bitmap8 {
     kDataTLV = 0x1;
   }
 
@@ -10237,7 +10260,7 @@ provisional cluster WebRTCTransportRequestor = 1364 {
     StreamUsageEnum streamUsage = 4;
     nullable int16u videoStreamID = 5;
     nullable int16u audioStreamID = 6;
-    WebRTCMetadataOptions metadataOptions = 7;
+    WebRTCMetadataOptionsBitmap metadataOptions = 7;
   }
 
   readonly attribute WebRTCSessionStruct currentSessions[] = 0;
@@ -10260,9 +10283,9 @@ provisional cluster WebRTCTransportRequestor = 1364 {
     char_string sdp = 1;
   }
 
-  request struct ICECandidateRequest {
+  request struct ICECandidatesRequest {
     int16u webRTCSessionID = 0;
-    char_string ICECandidate = 1;
+    char_string ICECandidates[] = 1;
   }
 
   request struct EndRequest {
@@ -10270,12 +10293,12 @@ provisional cluster WebRTCTransportRequestor = 1364 {
     WebRTCEndReasonEnum reason = 1;
   }
 
-  /** This command provides the stream requestor with WebRTC session details. It is sent following the receipt of a SolicitOffer command or a re-Offer initiated by the Provider. */
+  /** This command provides the stream requestor with WebRTC session details. */
   command Offer(OfferRequest): DefaultSuccess = 1;
-  /** This command provides the stream requestor with the WebRTC session details (i.e. Session ID and SDP answer). It is the next command in the Offer/Answer flow to the ProvideOffer command. */
+  /** This command provides the stream requestor with the WebRTC session details (i.e. Session ID and SDP answer), It is the next command in the Offer/Answer flow to the ProvideOffer command. */
   command Answer(AnswerRequest): DefaultSuccess = 2;
-  /** This command provides an ICE candidate to the stream requestor in a WebRTC session. */
-  command ICECandidate(ICECandidateRequest): DefaultSuccess = 3;
+  /** This command allows for string based https://rfc-editor.org/rfc/rfc8839#section-5.1 generated after the initial Offer / Answer exchange, via a JSEP https://datatracker.ietf.org/doc/html/rfc9429#section-4.1.20 event, a DOM https://www.w3.org/TR/webrtc/#dom-rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase. */
+  command ICECandidates(ICECandidatesRequest): DefaultSuccess = 3;
   /** This command notifies the stream requestor that the provider has ended the WebRTC session. */
   command End(EndRequest): DefaultSuccess = 4;
 }

@@ -3671,6 +3671,8 @@ private:
 | * UpdateFabricLabel                                                 |   0x09 |
 | * RemoveFabric                                                      |   0x0A |
 | * AddTrustedRootCertificate                                         |   0x0B |
+| * SetVidVerificationStatement                                       |   0x0C |
+| * SignVidVerificationRequest                                        |   0x0D |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * NOCs                                                              | 0x0000 |
@@ -3993,6 +3995,87 @@ public:
 
 private:
     chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Type mRequest;
+};
+
+/*
+ * Command SetVidVerificationStatement
+ */
+class OperationalCredentialsSetVidVerificationStatement : public ClusterCommand
+{
+public:
+    OperationalCredentialsSetVidVerificationStatement(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-vid-verification-statement", credsIssuerConfig)
+    {
+        AddArgument("VendorID", 0, UINT16_MAX, &mRequest.vendorID);
+        AddArgument("VidVerificationStatement", &mRequest.vidVerificationStatement);
+        AddArgument("Vvsc", &mRequest.vvsc);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
+        constexpr chip::CommandId commandId =
+            chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
+        constexpr chip::CommandId commandId =
+            chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::Type mRequest;
+};
+
+/*
+ * Command SignVidVerificationRequest
+ */
+class OperationalCredentialsSignVidVerificationRequest : public ClusterCommand
+{
+public:
+    OperationalCredentialsSignVidVerificationRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("sign-vid-verification-request", credsIssuerConfig)
+    {
+        AddArgument("FabricIndex", 0, UINT8_MAX, &mRequest.fabricIndex);
+        AddArgument("ClientChallenge", &mRequest.clientChallenge);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -14706,7 +14789,7 @@ private:
 | * SolicitOffer                                                      |   0x01 |
 | * ProvideOffer                                                      |   0x03 |
 | * ProvideAnswer                                                     |   0x05 |
-| * ProvideICECandidate                                               |   0x06 |
+| * ProvideICECandidates                                              |   0x06 |
 | * EndSession                                                        |   0x07 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -14854,23 +14937,23 @@ private:
 };
 
 /*
- * Command ProvideICECandidate
+ * Command ProvideICECandidates
  */
-class WebRTCTransportProviderProvideICECandidate : public ClusterCommand
+class WebRTCTransportProviderProvideICECandidates : public ClusterCommand
 {
 public:
-    WebRTCTransportProviderProvideICECandidate(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("provide-icecandidate", credsIssuerConfig)
+    WebRTCTransportProviderProvideICECandidates(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("provide-icecandidates", credsIssuerConfig), mComplex_ICECandidates(&mRequest.ICECandidates)
     {
         AddArgument("WebRTCSessionID", 0, UINT16_MAX, &mRequest.webRTCSessionID);
-        AddArgument("ICECandidate", &mRequest.ICECandidate);
+        AddArgument("ICECandidates", &mComplex_ICECandidates);
         ClusterCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WebRTCTransportProvider::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -14880,7 +14963,7 @@ public:
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WebRTCTransportProvider::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -14889,7 +14972,8 @@ public:
     }
 
 private:
-    chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::Type mRequest;
+    chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::CharSpan>> mComplex_ICECandidates;
 };
 
 /*
@@ -14937,7 +15021,7 @@ private:
 | Commands:                                                           |        |
 | * Offer                                                             |   0x01 |
 | * Answer                                                            |   0x02 |
-| * ICECandidate                                                      |   0x03 |
+| * ICECandidates                                                     |   0x03 |
 | * End                                                               |   0x04 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -15034,23 +15118,23 @@ private:
 };
 
 /*
- * Command ICECandidate
+ * Command ICECandidates
  */
-class WebRTCTransportRequestorICECandidate : public ClusterCommand
+class WebRTCTransportRequestorICECandidates : public ClusterCommand
 {
 public:
-    WebRTCTransportRequestorICECandidate(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("icecandidate", credsIssuerConfig)
+    WebRTCTransportRequestorICECandidates(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("icecandidates", credsIssuerConfig), mComplex_ICECandidates(&mRequest.ICECandidates)
     {
         AddArgument("WebRTCSessionID", 0, UINT16_MAX, &mRequest.webRTCSessionID);
-        AddArgument("ICECandidate", &mRequest.ICECandidate);
+        AddArgument("ICECandidates", &mComplex_ICECandidates);
         ClusterCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WebRTCTransportRequestor::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidates::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -15060,7 +15144,7 @@ public:
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WebRTCTransportRequestor::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidates::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -15069,7 +15153,8 @@ public:
     }
 
 private:
-    chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::Type mRequest;
+    chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidates::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::CharSpan>> mComplex_ICECandidates;
 };
 
 /*
@@ -20034,15 +20119,17 @@ void registerClusterOperationalCredentials(Commands & commands, CredentialIssuer
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                              //
-        make_unique<OperationalCredentialsAttestationRequest>(credsIssuerConfig),        //
-        make_unique<OperationalCredentialsCertificateChainRequest>(credsIssuerConfig),   //
-        make_unique<OperationalCredentialsCSRRequest>(credsIssuerConfig),                //
-        make_unique<OperationalCredentialsAddNOC>(credsIssuerConfig),                    //
-        make_unique<OperationalCredentialsUpdateNOC>(credsIssuerConfig),                 //
-        make_unique<OperationalCredentialsUpdateFabricLabel>(credsIssuerConfig),         //
-        make_unique<OperationalCredentialsRemoveFabric>(credsIssuerConfig),              //
-        make_unique<OperationalCredentialsAddTrustedRootCertificate>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                                //
+        make_unique<OperationalCredentialsAttestationRequest>(credsIssuerConfig),          //
+        make_unique<OperationalCredentialsCertificateChainRequest>(credsIssuerConfig),     //
+        make_unique<OperationalCredentialsCSRRequest>(credsIssuerConfig),                  //
+        make_unique<OperationalCredentialsAddNOC>(credsIssuerConfig),                      //
+        make_unique<OperationalCredentialsUpdateNOC>(credsIssuerConfig),                   //
+        make_unique<OperationalCredentialsUpdateFabricLabel>(credsIssuerConfig),           //
+        make_unique<OperationalCredentialsRemoveFabric>(credsIssuerConfig),                //
+        make_unique<OperationalCredentialsAddTrustedRootCertificate>(credsIssuerConfig),   //
+        make_unique<OperationalCredentialsSetVidVerificationStatement>(credsIssuerConfig), //
+        make_unique<OperationalCredentialsSignVidVerificationRequest>(credsIssuerConfig),  //
         //
         // Attributes
         //
@@ -28374,12 +28461,12 @@ void registerClusterWebRTCTransportProvider(Commands & commands, CredentialIssue
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                         //
-        make_unique<WebRTCTransportProviderSolicitOffer>(credsIssuerConfig),        //
-        make_unique<WebRTCTransportProviderProvideOffer>(credsIssuerConfig),        //
-        make_unique<WebRTCTransportProviderProvideAnswer>(credsIssuerConfig),       //
-        make_unique<WebRTCTransportProviderProvideICECandidate>(credsIssuerConfig), //
-        make_unique<WebRTCTransportProviderEndSession>(credsIssuerConfig),          //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                          //
+        make_unique<WebRTCTransportProviderSolicitOffer>(credsIssuerConfig),         //
+        make_unique<WebRTCTransportProviderProvideOffer>(credsIssuerConfig),         //
+        make_unique<WebRTCTransportProviderProvideAnswer>(credsIssuerConfig),        //
+        make_unique<WebRTCTransportProviderProvideICECandidates>(credsIssuerConfig), //
+        make_unique<WebRTCTransportProviderEndSession>(credsIssuerConfig),           //
         //
         // Attributes
         //
@@ -28431,11 +28518,11 @@ void registerClusterWebRTCTransportRequestor(Commands & commands, CredentialIssu
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                   //
-        make_unique<WebRTCTransportRequestorOffer>(credsIssuerConfig),        //
-        make_unique<WebRTCTransportRequestorAnswer>(credsIssuerConfig),       //
-        make_unique<WebRTCTransportRequestorICECandidate>(credsIssuerConfig), //
-        make_unique<WebRTCTransportRequestorEnd>(credsIssuerConfig),          //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                    //
+        make_unique<WebRTCTransportRequestorOffer>(credsIssuerConfig),         //
+        make_unique<WebRTCTransportRequestorAnswer>(credsIssuerConfig),        //
+        make_unique<WebRTCTransportRequestorICECandidates>(credsIssuerConfig), //
+        make_unique<WebRTCTransportRequestorEnd>(credsIssuerConfig),           //
         //
         // Attributes
         //

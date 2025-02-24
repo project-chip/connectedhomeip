@@ -1072,6 +1072,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // The subscription reattempt here eventually asyncs onto the matter queue for session,
     // and should be called after the above ReleaseSession call, to avoid churn.
     if (shouldReattemptSubscription) {
+        std::lock_guard lock(_lock);
         [self _reattemptSubscriptionNowIfNeededWithReason:reason];
     }
 }
@@ -2887,6 +2888,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                    [matterCPPObjectsHolder setReadClient:nullptr subscriptionCallback:nullptr];
 
                                    // OnDone
+                                   std::lock_guard lock(self->_lock);
                                    [self _doHandleSubscriptionReset:nil];
                                },
                                ^(void) {
