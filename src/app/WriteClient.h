@@ -175,8 +175,10 @@ public:
         ReturnErrorOnFailure(EnsureMessage());
 
         // Encode an empty list for the chunking protocol.
-        ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
-
+        if (path.mClusterId != 0x1F)
+        {
+            ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
+        }
         path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
         for (size_t i = 0; i < value.size(); i++)
         {
