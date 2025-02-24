@@ -1370,8 +1370,8 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     bool hasCred = mFeatureFlags.Has(Feature::kPerDeviceCredentials);
     auto netId   = hasNet ? AddOrUpdateThreadNetwork::Id : AddOrUpdateWiFiNetwork::Id;
 
-    static constexpr kNetworkCommands     = 5; // Count of Network Commands
-    static constexpr kCredentialsCommands = 1; // Count of Credential Commands
+    static constexpr size_t kNetworkCommands     = 5; // Count of Network Commands
+    static constexpr size_t kCredentialsCommands = 1; // Count of Credential Commands
 
     static const DataModel::AcceptedCommandEntry commands[] = {
         // A static array of the posible commands
