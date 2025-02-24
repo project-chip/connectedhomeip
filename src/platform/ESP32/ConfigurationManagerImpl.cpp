@@ -30,6 +30,7 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/ESP32/ESP32Utils.h>
+#include <platform/ESP32/ScopedNvsHandle.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
@@ -57,14 +58,9 @@ uint32_t ConfigurationManagerImpl::mTotalOperationalHours = 0;
 
 void ConfigurationManagerImpl::TotalOperationalHoursTimerCallback(TimerHandle_t timer)
 {
-    mTotalOperationalHours++;
-
-    CHIP_ERROR err = ConfigurationMgrImpl().StoreTotalOperationalHours(mTotalOperationalHours);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to store total operational hours: %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    // This function is called from the FreeRTOS timer task. Since the task stack is limited,
+    // we avoid logging error messages here to prevent stack overflows.
+    (void) ConfigurationMgrImpl().StoreTotalOperationalHours(++mTotalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::Init()
@@ -182,6 +178,9 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     }
 
     {
+        // The total-operational-hours is critical information. It intentionally uses the FreeRTOS timer
+        // to increment the value, this ensures it is not affected by PostEvent failures.
+
         // Start a timer which reloads every one hour and bumps the total operational hours
         TickType_t reloadPeriod   = (1000 * 60 * 60) / portTICK_PERIOD_MS;
         TimerHandle_t timerHandle = xTimerCreate("tOpHrs", reloadPeriod, pdPASS, nullptr, TotalOperationalHoursTimerCallback);
@@ -226,7 +225,13 @@ CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOp
 
 CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
 {
-    return WriteConfigValue(ESP32Config::kCounterKey_TotalOperationalHours, totalOperationalHours);
+    ScopedNvsHandle handle;
+    ESP32Config::Key key = ESP32Config::kCounterKey_TotalOperationalHours;
+
+    ReturnErrorOnFailure(handle.Open(key.Namespace, NVS_READWRITE, ESP32Config::GetPartitionLabelByNamespace(key.Namespace)));
+    ReturnMappedErrorOnFailure(nvs_set_u32(handle, key.Name, totalOperationalHours));
+    ReturnMappedErrorOnFailure(nvs_commit(handle));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t bufSize)
@@ -307,7 +312,7 @@ CHIP_ERROR ConfigurationManagerImpl::StoreCountryCode(const char * code, size_t 
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 
-CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan buf)
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan & buf)
 {
     if (GetPrimaryEthernetMACAddress(buf) == CHIP_NO_ERROR)
     {
@@ -317,7 +322,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan buf)
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetPrimaryEthernetMACAddress(MutableByteSpan buf)
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryEthernetMACAddress(MutableByteSpan & buf)
 {
     if (buf.size() < ConfigurationManager::kPrimaryMACAddressLength)
         return CHIP_ERROR_BUFFER_TOO_SMALL;

@@ -122,13 +122,14 @@ int InitRandomStaticAddress(bool idPresent, int & id)
     // generating the address
     addr.type = BT_ADDR_LE_RANDOM;
     error     = sys_csrand_get(addr.a.val, sizeof(addr.a.val));
-    BT_ADDR_SET_STATIC(&addr.a);
 
     if (error)
     {
         ChipLogError(DeviceLayer, "Failed to create BLE address: %d", error);
         return error;
     }
+
+    BT_ADDR_SET_STATIC(&addr.a);
 
     if (!idPresent)
     {

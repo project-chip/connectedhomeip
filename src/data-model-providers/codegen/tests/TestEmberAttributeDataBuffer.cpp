@@ -267,7 +267,7 @@ const EmberAfAttributeMetadata * CreateFakeMeta(EmberAfAttributeType type, bool 
     };
 
     meta.attributeType = type;
-    meta.mask          = nullable ? ATTRIBUTE_MASK_NULLABLE : 0;
+    meta.mask          = nullable ? MATTER_ATTRIBUTE_FLAG_NULLABLE : 0;
 
     return &meta;
 }

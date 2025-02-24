@@ -24,11 +24,10 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/cluster-enums.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/af-types.h>
-#include <app/util/ember-strings.h>
-#include <lib/support/Span.h>
+#include <app/util/MarkAttributeDirty.h>
+#include <app/util/basic-types.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -835,9 +834,14 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace TCAcknowledgementsRequired
 
 namespace TCUpdateDeadline {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // int32u
+Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
+                                        MarkAttributeDirty markDirty);
 } // namespace TCUpdateDeadline
 
 namespace FeatureMap {
@@ -1422,20 +1426,6 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSp
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
 } // namespace UserActiveModeTriggerInstruction
-
-namespace OperatingMode {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::IcdManagement::OperatingModeEnum * value); // OperatingModeEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::IcdManagement::OperatingModeEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::IcdManagement::OperatingModeEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace OperatingMode
-
-namespace FeatureMap {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-} // namespace FeatureMap
 
 namespace ClusterRevision {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
@@ -3089,6 +3079,79 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 
 } // namespace Attributes
 } // namespace WindowCovering
+
+namespace ClosureControl {
+namespace Attributes {
+
+namespace CountdownTime {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // elapsed_s
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
+                                        MarkAttributeDirty markDirty);
+} // namespace CountdownTime
+
+namespace MainState {
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        chip::app::Clusters::ClosureControl::MainStateEnum * value); // MainStateEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureControl::MainStateEnum value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureControl::MainStateEnum value,
+                                        MarkAttributeDirty markDirty);
+} // namespace MainState
+
+namespace RestingProcedure {
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        chip::app::Clusters::ClosureControl::RestingProcedureEnum * value); // RestingProcedureEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureControl::RestingProcedureEnum value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureControl::RestingProcedureEnum value,
+                                        MarkAttributeDirty markDirty);
+} // namespace RestingProcedure
+
+namespace TriggerCondition {
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        chip::app::Clusters::ClosureControl::TriggerConditionEnum * value); // TriggerConditionEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureControl::TriggerConditionEnum value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureControl::TriggerConditionEnum value,
+                                        MarkAttributeDirty markDirty);
+} // namespace TriggerCondition
+
+namespace TriggerPosition {
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        chip::app::Clusters::ClosureControl::TriggerPositionEnum * value); // TriggerPositionEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureControl::TriggerPositionEnum value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureControl::TriggerPositionEnum value,
+                                        MarkAttributeDirty markDirty);
+} // namespace TriggerPosition
+
+namespace WaitingDelay {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // elapsed_s
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace WaitingDelay
+
+namespace KickoffTimer {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // elapsed_s
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace KickoffTimer
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ClosureControl
 
 namespace ServiceArea {
 namespace Attributes {
@@ -5778,6 +5841,60 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Attributes
 } // namespace CameraAvStreamManagement
 
+namespace CameraAvSettingsUserLevelManagement {
+namespace Attributes {
+
+namespace MaxPresets {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace MaxPresets
+
+namespace ZoomMax {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace ZoomMax
+
+namespace TiltMin {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // int16s
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
+} // namespace TiltMin
+
+namespace TiltMax {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // int16s
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
+} // namespace TiltMax
+
+namespace PanMin {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // int16s
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
+} // namespace PanMin
+
+namespace PanMax {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // int16s
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
+} // namespace PanMax
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace CameraAvSettingsUserLevelManagement
+
 namespace WebRTCTransportProvider {
 namespace Attributes {
 
@@ -5813,6 +5930,46 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 
 } // namespace Attributes
 } // namespace WebRTCTransportRequestor
+
+namespace PushAvStreamTransport {
+namespace Attributes {
+
+namespace SupportedContainerFormats {
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::PushAvStreamTransport::SupportedContainerFormatsBitmap> *
+                                            value); // SupportedContainerFormatsBitmap
+Protocols::InteractionModel::Status
+Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::PushAvStreamTransport::SupportedContainerFormatsBitmap> value);
+Protocols::InteractionModel::Status
+Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::PushAvStreamTransport::SupportedContainerFormatsBitmap> value,
+    MarkAttributeDirty markDirty);
+} // namespace SupportedContainerFormats
+
+namespace SupportedIngestMethods {
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::PushAvStreamTransport::SupportedIngestMethodsBitmap> *
+                                            value); // SupportedIngestMethodsBitmap
+Protocols::InteractionModel::Status
+Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::PushAvStreamTransport::SupportedIngestMethodsBitmap> value);
+Protocols::InteractionModel::Status
+Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::PushAvStreamTransport::SupportedIngestMethodsBitmap> value,
+    MarkAttributeDirty markDirty);
+} // namespace SupportedIngestMethods
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace PushAvStreamTransport
 
 namespace Chime {
 namespace Attributes {
@@ -5878,6 +6035,48 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 
 } // namespace Attributes
 } // namespace CommissionerControl
+
+namespace TlsCertificateManagement {
+namespace Attributes {
+
+namespace MaxRootCertificates {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace MaxRootCertificates
+
+namespace CurrentRootCertificates {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace CurrentRootCertificates
+
+namespace MaxClientCertificates {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace MaxClientCertificates
+
+namespace CurrentClientCertificates {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace CurrentClientCertificates
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace TlsCertificateManagement
 
 namespace UnitTesting {
 namespace Attributes {

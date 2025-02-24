@@ -59,12 +59,14 @@ static_library("mt793x") {
     ]
   }
 
-  # "${chip_root}/src/app:app_config",
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   public_deps += [ "${chip_root}/third_party/mt793x_sdk/mDNSResponder" ]
 
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/platform/logging:headers",
+  ]
 
   # mDNS
   if (chip_mdns == "platform") {

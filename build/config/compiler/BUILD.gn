@@ -58,6 +58,9 @@ declare_args() {
 
   # Enable or disable support for C++ exceptions.
   enable_exceptions = false
+
+  # Disable this to allow for overriding built-in defines, such as __FILE__.
+  warn_builtin_macro_redefined = true
 }
 
 if (current_cpu == "arm" || current_cpu == "arm64") {
@@ -239,6 +242,9 @@ config("disabled_warnings") {
       "-Wno-psabi",
       "-Wno-maybe-uninitialized",
     ]
+  }
+  if (!warn_builtin_macro_redefined) {
+    cflags += [ "-Wno-builtin-macro-redefined" ]
   }
 }
 
@@ -530,8 +536,28 @@ config("fuzzing_default") {
 }
 
 config("coverage") {
-  cflags = [ "--coverage" ]
+  if (is_clang) {
+    cflags = [
+      # CLANG builds use the clang-specific coverage, so that versions of lcov/gcov
+      # do not have to match and `llvm-cov export -format=lcov` can be used
+      #
+      # Documentation: https://clang.llvm.org/docs/SourceBasedCodeCoverage.html
+      "-fprofile-instr-generate",
+      "-fcoverage-mapping",
+    ]
+  } else {
+    cflags = [ "--coverage" ]
+  }
   ldflags = cflags
+
+  if (is_clang) {
+    # Looking to add buildid which _could_ be used for coverage
+    # file format using `%b` (see
+    # https://clang.llvm.org/docs/SourceBasedCodeCoverage.html#running-the-instrumented-program)
+    # however at the time of writing this, linux clang used during bootstrap
+    # does not seem to support this.
+    ldflags += [ "-Wl,--build-id" ]
+  }
 }
 
 config("coverage_default") {

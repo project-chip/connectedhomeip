@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 103,
+  "featureLevel": 106,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -41,14 +41,16 @@
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
-        "name": "MA-rootdevice"
+        "name": "MA-rootdevice",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice"
+          "name": "MA-rootdevice",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -2455,14 +2457,16 @@
         "code": 769,
         "profileId": 259,
         "label": "MA-thermostat",
-        "name": "MA-thermostat"
+        "name": "MA-thermostat",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 769,
           "profileId": 259,
           "label": "MA-thermostat",
-          "name": "MA-thermostat"
+          "name": "MA-thermostat",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [

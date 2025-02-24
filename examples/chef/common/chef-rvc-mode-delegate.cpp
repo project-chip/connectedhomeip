@@ -17,6 +17,7 @@
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
+#include <chef-rvc-mode-delegate.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -55,7 +56,7 @@ void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
 
 CHIP_ERROR RvcRunModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -64,7 +65,7 @@ CHIP_ERROR RvcRunModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::Muta
 
 CHIP_ERROR RvcRunModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -74,7 +75,7 @@ CHIP_ERROR RvcRunModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & 
 
 CHIP_ERROR RvcRunModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -188,7 +189,7 @@ void RvcCleanModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Command
 
 CHIP_ERROR RvcCleanModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -197,7 +198,7 @@ CHIP_ERROR RvcCleanModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::Mu
 
 CHIP_ERROR RvcCleanModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -207,7 +208,7 @@ CHIP_ERROR RvcCleanModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t 
 
 CHIP_ERROR RvcCleanModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }

@@ -26,31 +26,39 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Declarations for internal methods
 
+@class MTRCASESessionResumptionInfo;
+
 // MTRDeviceControllerDataStore.h includes C++ header, and so we need to declare the methods separately
 @protocol MTRDeviceControllerDataStoreAttributeStoreMethods
+- (nullable MTRCASESessionResumptionInfo *)findResumptionInfoByNodeID:(NSNumber *)nodeID;
 - (nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)getStoredClusterDataForNodeID:(NSNumber *)nodeID;
 - (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData forNodeID:(NSNumber *)nodeID;
 - (void)clearStoredClusterDataForNodeID:(NSNumber *)nodeID;
 - (void)clearAllStoredClusterData;
 - (void)unitTestPruneEmptyStoredClusterDataBranches;
+- (void)unitTestRereadNodeIndex;
 - (NSString *)_endpointIndexKeyForNodeID:(NSNumber *)nodeID;
 - (NSString *)_clusterIndexKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID;
 - (NSString *)_clusterDataKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
 - (nullable NSArray<NSNumber *> *)_fetchEndpointIndexForNodeID:(NSNumber *)nodeID;
 - (nullable NSArray<NSNumber *> *)_fetchClusterIndexForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID;
 - (nullable MTRDeviceClusterData *)_fetchClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
+- (nullable NSDictionary<NSString *, id> *)getStoredDeviceDataForNodeID:(NSNumber *)nodeID;
+- (NSArray<NSNumber *> *)nodesWithStoredData;
 @end
 
 // Declare internal methods for testing
 @interface MTRDeviceController (Test)
 + (void)forceLocalhostAdvertisingOnly;
 - (void)removeDevice:(MTRDevice *)device;
+- (void)syncRunOnWorkQueue:(void (^)(void))block error:(NSError * __autoreleasing *)error;
 @property (nonatomic, readonly, nullable) id<MTRDeviceControllerDataStoreAttributeStoreMethods> controllerDataStore;
 @end
 
 @interface MTRDevice (Test)
 - (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary;
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
+- (void)_deviceMayBeReachable;
 @end
 
 #pragma mark - Declarations for items compiled only for DEBUG configuration

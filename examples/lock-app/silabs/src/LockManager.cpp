@@ -140,7 +140,7 @@ bool LockManager::ReadConfigValues()
 {
     size_t outLen;
     SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
-                                     sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
+                                     sizeof(EmberAfPluginDoorLockUserInfo) * MATTER_ARRAY_SIZE(mLockUsers), outLen);
 
     SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
                                      sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes, outLen);

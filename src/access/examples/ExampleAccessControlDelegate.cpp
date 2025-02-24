@@ -348,7 +348,7 @@ public:
         {
             ConvertIndex(index, *fabricIndex, ConvertDirection::kRelativeToAbsolute);
         }
-        if (index < ArraySize(acl))
+        if (index < MATTER_ARRAY_SIZE(acl))
         {
             auto * storage = acl + index;
             if (storage->InUse())
@@ -383,7 +383,7 @@ public:
 
     bool InPool() const
     {
-        constexpr auto * end = pool + ArraySize(pool);
+        constexpr auto * end = pool + MATTER_ARRAY_SIZE(pool);
         return pool <= this && this < end;
     }
 
@@ -475,7 +475,7 @@ public:
             }
             absoluteIndex++;
         }
-        index = found ? toIndex : ArraySize(acl);
+        index = found ? toIndex : MATTER_ARRAY_SIZE(acl);
     }
 
     static constexpr size_t kMaxSubjects = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY;
@@ -516,7 +516,7 @@ public:
 
     static bool InPool(const Entry::Delegate & delegate)
     {
-        constexpr auto * end = pool + ArraySize(pool);
+        constexpr auto * end = pool + MATTER_ARRAY_SIZE(pool);
         return pool <= &delegate && &delegate < end;
     }
 
@@ -742,7 +742,7 @@ public:
     void FixAfterDelete(EntryStorage & storage)
     {
         constexpr auto & acl = EntryStorage::acl;
-        constexpr auto * end = acl + ArraySize(acl);
+        constexpr auto * end = acl + MATTER_ARRAY_SIZE(acl);
         if (mStorage == &storage)
         {
             mEntry->ResetDelegate();
@@ -802,7 +802,7 @@ public:
 
     static bool InPool(const EntryIterator::Delegate & delegate)
     {
-        constexpr auto * end = pool + ArraySize(pool);
+        constexpr auto * end = pool + MATTER_ARRAY_SIZE(pool);
         return pool <= &delegate && &delegate < end;
     }
 
@@ -811,7 +811,7 @@ public:
     CHIP_ERROR Next(Entry & entry) override
     {
         constexpr auto & acl = EntryStorage::acl;
-        constexpr auto * end = acl + ArraySize(acl);
+        constexpr auto * end = acl + MATTER_ARRAY_SIZE(acl);
         while (true)
         {
             if (mStorage == nullptr)
@@ -866,7 +866,7 @@ public:
     void FixAfterDelete(EntryStorage & storage)
     {
         constexpr auto & acl = EntryStorage::acl;
-        constexpr auto * end = acl + ArraySize(acl);
+        constexpr auto * end = acl + MATTER_ARRAY_SIZE(acl);
         if (&storage <= mStorage && mStorage < end)
         {
             if (mStorage == acl)
@@ -987,7 +987,7 @@ public:
 
     CHIP_ERROR GetMaxEntryCount(size_t & value) const override
     {
-        value = ArraySize(EntryStorage::acl);
+        value = MATTER_ARRAY_SIZE(EntryStorage::acl);
         return CHIP_NO_ERROR;
     }
 
@@ -1095,7 +1095,7 @@ public:
 
             // ...then go through the access control list starting at the deleted storage...
             constexpr auto & acl = EntryStorage::acl;
-            constexpr auto * end = acl + ArraySize(acl);
+            constexpr auto * end = acl + MATTER_ARRAY_SIZE(acl);
             for (auto * next = storage + 1; storage < end; ++storage, ++next)
             {
                 // ...copying over each storage with its next one...

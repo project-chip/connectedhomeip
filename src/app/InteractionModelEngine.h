@@ -25,9 +25,6 @@
 
 #pragma once
 
-// TODO(#32628): Remove the CHIPCore.h header when the esp32 build is correctly fixed
-#include <lib/core/CHIPCore.h>
-
 #include <access/AccessControl.h>
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
@@ -49,6 +46,7 @@
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
@@ -323,9 +321,17 @@ public:
     /**
      * @brief Function decrements the number of subscriptions to resume counter - mNumOfSubscriptionsToResume.
      *        This should be called after we have completed a re-subscribe attempt on a persisted subscription wether the attempt
-     *        was succesful or not.
+     *        was successful or not.
      */
     void DecrementNumSubscriptionsToResume();
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    /**
+     * @brief Function resets the number of retries of subscriptions resumption - mNumSubscriptionResumptionRetries.
+     *        This should be called after we have completed a re-subscribe attempt successfully on a persisted subscription,
+     *        or when the subscription resumption gets terminated.
+     */
+    void ResetNumSubscriptionsRetries();
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -614,9 +620,12 @@ private:
     void ShutdownMatchingSubscriptions(const Optional<FabricIndex> & aFabricIndex = NullOptional,
                                        const Optional<NodeId> & aPeerNodeId       = NullOptional);
 
-    Status CheckCommandExistence(const ConcreteCommandPath & aCommandPath);
-    Status CheckCommandAccess(const DataModel::InvokeRequest & aRequest);
-    Status CheckCommandFlags(const DataModel::InvokeRequest & aRequest);
+    /**
+     * Validates that the command exists and on success returns the data for the command in `entry`.
+     */
+    Status CheckCommandExistence(const ConcreteCommandPath & aCommandPath, DataModel::AcceptedCommandEntry & entry);
+    Status CheckCommandAccess(const DataModel::InvokeRequest & aRequest, const DataModel::AcceptedCommandEntry & entry);
+    Status CheckCommandFlags(const DataModel::InvokeRequest & aRequest, const DataModel::AcceptedCommandEntry & entry);
 
     /**
      * Check if the given attribute path is a valid path in the data model provider.
@@ -710,7 +719,7 @@ private:
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
-    FabricTable * mpFabricTable;
+    FabricTable * mpFabricTable = nullptr;
 
     CASESessionManager * mpCASESessionMgr = nullptr;
 

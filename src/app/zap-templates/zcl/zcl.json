@@ -22,10 +22,12 @@
         "boolean-state-configuration-cluster.xml",
         "actions-cluster.xml",
         "bridged-device-basic-information.xml",
+        "camera-av-settings-user-level-management-cluster.xml",
         "camera-av-stream-management-cluster.xml",
         "chime-cluster.xml",
         "chip-ota.xml",
         "channel-cluster.xml",
+        "closure-control-cluster.xml",
         "clusters-extensions.xml",
         "color-control-cluster.xml",
         "commissioner-control-cluster.xml",
@@ -76,6 +78,7 @@
         "messages-cluster.xml",
         "mode-base-cluster.xml",
         "mode-select-cluster.xml",
+        "push-av-stream-transport-cluster.xml",
         "semantic-tag-namespace-enums.xml",
         "network-commissioning-cluster.xml",
         "occupancy-sensing-cluster.xml",
@@ -119,6 +122,7 @@
         "time-format-localization-cluster.xml",
         "time-synchronization-cluster.xml",
         "timer-cluster.xml",
+        "tls-certificate-management-cluster.xml",
         "user-label-cluster.xml",
         "unit-localization-cluster.xml",
         "valve-configuration-and-control-cluster.xml",
@@ -191,6 +195,7 @@
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["ActiveChimeID", "Enabled"],
+        "Closure Control": ["OverallState", "OverallTarget"],
         "Descriptor": ["ClusterRevision", "FeatureMap"],
         "Device Energy Management": [
             "ESAType",
@@ -286,7 +291,9 @@
             "RegisteredClients",
             "ICDCounter",
             "ClientsSupportedPerFabric",
-            "MaximumCheckInBackOff"
+            "MaximumCheckInBackOff",
+            "OperatingMode",
+            "FeatureMap"
         ],
         "Occupancy Sensing": [
             "HoldTimeLimits",
@@ -679,7 +686,8 @@
             "MicrophoneCapabilities",
             "SpeakerCapabilities",
             "Viewport"
-        ]
+        ],
+        "Camera AV Settings User Level Management": ["MPTZPosition"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",
