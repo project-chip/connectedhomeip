@@ -37,7 +37,8 @@ namespace GeneratedAccessReadAttribute {
 constexpr ClusterId kCluster[]                 = GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER;
 constexpr AttributeId kAttribute[]             = GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE;
 constexpr chip::Access::Privilege kPrivilege[] = GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE;
-static_assert(ArraySize(kCluster) == ArraySize(kAttribute) && ArraySize(kAttribute) == ArraySize(kPrivilege),
+static_assert(MATTER_ARRAY_SIZE(kCluster) == MATTER_ARRAY_SIZE(kAttribute) &&
+                  MATTER_ARRAY_SIZE(kAttribute) == MATTER_ARRAY_SIZE(kPrivilege),
               "Generated parallel arrays must be same size");
 } // namespace GeneratedAccessReadAttribute
 #endif
@@ -47,7 +48,8 @@ namespace GeneratedAccessWriteAttribute {
 constexpr ClusterId kCluster[]                 = GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER;
 constexpr AttributeId kAttribute[]             = GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE;
 constexpr chip::Access::Privilege kPrivilege[] = GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE;
-static_assert(ArraySize(kCluster) == ArraySize(kAttribute) && ArraySize(kAttribute) == ArraySize(kPrivilege),
+static_assert(MATTER_ARRAY_SIZE(kCluster) == MATTER_ARRAY_SIZE(kAttribute) &&
+                  MATTER_ARRAY_SIZE(kAttribute) == MATTER_ARRAY_SIZE(kPrivilege),
               "Generated parallel arrays must be same size");
 } // namespace GeneratedAccessWriteAttribute
 #endif
@@ -57,7 +59,8 @@ namespace GeneratedAccessInvokeCommand {
 constexpr ClusterId kCluster[]                 = GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER;
 constexpr CommandId kCommand[]                 = GENERATED_ACCESS_INVOKE_COMMAND__COMMAND;
 constexpr chip::Access::Privilege kPrivilege[] = GENERATED_ACCESS_INVOKE_COMMAND__PRIVILEGE;
-static_assert(ArraySize(kCluster) == ArraySize(kCommand) && ArraySize(kCommand) == ArraySize(kPrivilege),
+static_assert(MATTER_ARRAY_SIZE(kCluster) == MATTER_ARRAY_SIZE(kCommand) &&
+                  MATTER_ARRAY_SIZE(kCommand) == MATTER_ARRAY_SIZE(kPrivilege),
               "Generated parallel arrays must be same size");
 } // namespace GeneratedAccessInvokeCommand
 #endif
@@ -67,7 +70,8 @@ namespace GeneratedAccessReadEvent {
 constexpr ClusterId kCluster[]                 = GENERATED_ACCESS_READ_EVENT__CLUSTER;
 constexpr EventId kEvent[]                     = GENERATED_ACCESS_READ_EVENT__EVENT;
 constexpr chip::Access::Privilege kPrivilege[] = GENERATED_ACCESS_READ_EVENT__PRIVILEGE;
-static_assert(ArraySize(kCluster) == ArraySize(kEvent) && ArraySize(kEvent) == ArraySize(kPrivilege),
+static_assert(MATTER_ARRAY_SIZE(kCluster) == MATTER_ARRAY_SIZE(kEvent) &&
+                  MATTER_ARRAY_SIZE(kEvent) == MATTER_ARRAY_SIZE(kPrivilege),
               "Generated parallel arrays must be same size");
 } // namespace GeneratedAccessReadEvent
 #endif
@@ -78,7 +82,7 @@ chip::Access::Privilege MatterGetAccessPrivilegeForReadAttribute(ClusterId clust
 {
 #ifdef GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER
     using namespace GeneratedAccessReadAttribute;
-    for (size_t i = 0; i < ArraySize(kCluster); ++i)
+    for (size_t i = 0; i < MATTER_ARRAY_SIZE(kCluster); ++i)
     {
         if (kCluster[i] == cluster && kAttribute[i] == attribute)
         {
@@ -93,7 +97,7 @@ chip::Access::Privilege MatterGetAccessPrivilegeForWriteAttribute(ClusterId clus
 {
 #ifdef GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER
     using namespace GeneratedAccessWriteAttribute;
-    for (size_t i = 0; i < ArraySize(kCluster); ++i)
+    for (size_t i = 0; i < MATTER_ARRAY_SIZE(kCluster); ++i)
     {
         if (kCluster[i] == cluster && kAttribute[i] == attribute)
         {
@@ -108,7 +112,7 @@ chip::Access::Privilege MatterGetAccessPrivilegeForInvokeCommand(ClusterId clust
 {
 #ifdef GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER
     using namespace GeneratedAccessInvokeCommand;
-    for (size_t i = 0; i < ArraySize(kCluster); ++i)
+    for (size_t i = 0; i < MATTER_ARRAY_SIZE(kCluster); ++i)
     {
         if (kCluster[i] == cluster && kCommand[i] == command)
         {
@@ -123,7 +127,7 @@ chip::Access::Privilege MatterGetAccessPrivilegeForReadEvent(ClusterId cluster, 
 {
 #ifdef GENERATED_ACCESS_READ_EVENT__CLUSTER
     using namespace GeneratedAccessReadEvent;
-    for (size_t i = 0; i < ArraySize(kCluster); ++i)
+    for (size_t i = 0; i < MATTER_ARRAY_SIZE(kCluster); ++i)
     {
         if (kCluster[i] == cluster && kEvent[i] == event)
         {

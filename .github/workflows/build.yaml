@@ -43,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:112
+            image: ghcr.io/project-chip/chip-build:115
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -131,7 +131,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:112
+            image: ghcr.io/project-chip/chip-build:115
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -211,11 +211,16 @@ jobs:
             - name: Find changed files
               id: changed-files
               uses: tj-actions/changed-files@v45
+              with:
+                # Exclude all files under "third_party/"
+                files-ignore: |
+                  third_party/
+
             - name: Clang-tidy validation
               # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
               #       See https://github.com/llvm/llvm-project/issues/97426
               env:
-                  ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+                  ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
               run: |
                   touch out/changed_files.txt
                   for file in ${ALL_CHANGED_FILES}; do
@@ -300,7 +305,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:112
+            image: ghcr.io/project-chip/chip-build:115
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -365,7 +370,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:112
+            image: ghcr.io/project-chip/chip-build:115
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -487,7 +492,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:112
+            image: ghcr.io/project-chip/chip-build:115
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 

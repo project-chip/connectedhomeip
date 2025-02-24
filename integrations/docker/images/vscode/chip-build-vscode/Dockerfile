@@ -53,7 +53,7 @@ COPY --from=nxpzephyr /opt/nxp-zephyr/zephyrproject/ /opt/nxp-zephyr/zephyrproje
 
 COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
 
-COPY --from=ti /opt/ti/sysconfig_1.18.1 /opt/ti/sysconfig_1.18.1
+COPY --from=ti /opt/ti/sysconfig_1.22.0 /opt/ti/sysconfig_1.22.0
 
 COPY --from=openiotsdk /opt/FVP_Corstone_SSE-300/ /opt/FVP_Corstone_SSE-300/
 
@@ -91,7 +91,7 @@ RUN set -x \
 #   - telnet
 #   - srecord
 # For java builds:
-#   - openjdk-17-jdk
+#   - openjdk-11-jdk
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
@@ -119,7 +119,7 @@ ENV WIFI_SDK_ROOT=/opt/silabs/wifi_sdk
 ENV IDF_PATH=/opt/espressif/esp-idf/
 ENV IDF_TOOLS_PATH=/opt/espressif/tools
 ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/6.1-langdale
-ENV JAVA_PATH=/usr/lib/jvm/java-17-openjdk-amd64
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools
 ENV OPENOCD_PATH=/opt/openocd/
 ENV QEMU_ESP32=/opt/espressif/qemu/qemu-system-xtensa
@@ -127,7 +127,7 @@ ENV QEMU_ESP32_DIR=/opt/espressif/qemu
 ENV SYSROOT_AARCH64=/opt/ubuntu-24.04-aarch64-sysroot
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.17.0
-ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.18.1
+ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.22.0
 ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
 ENV ZEPHYR_SDK_INSTALL_DIR=/opt/NordicSemiconductor/nRF5_tools/zephyr-sdk-0.17.0
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb

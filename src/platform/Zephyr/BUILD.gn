@@ -76,13 +76,6 @@ static_library("Zephyr") {
     }
   }
 
-  if (chip_enable_nfc_onboarding_payload) {
-    sources += [
-      "NFCOnboardingPayloadManagerImpl.cpp",
-      "NFCOnboardingPayloadManagerImpl.h",
-    ]
-  }
-
   if (chip_malloc_sys_heap) {
     sources += [ "SysHeapMalloc.cpp" ]
   }

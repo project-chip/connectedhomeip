@@ -157,7 +157,7 @@ void ProcessInput(intptr_t args)
             break;
 
         default:
-            if (sInputLength < ArraySize(sInputBuffer) - 1)
+            if (sInputLength < MATTER_ARRAY_SIZE(sInputBuffer) - 1)
             {
                 sInputBuffer[sInputLength++] = input[i];
             }

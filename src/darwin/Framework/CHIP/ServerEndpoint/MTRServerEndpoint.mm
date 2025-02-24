@@ -27,11 +27,10 @@
 #include <lib/support/SafeInt.h>
 #include <platform/LockTracker.h>
 
-// TODO: These af-types.h and att-storage.h and attribute-storage.h and
+// TODO: These af-types.h and attribute-storage.h and
 // endpoint-config-api.h and probably CodeUtils.h bits are a hack that should
 // eventually go away.
 #include <app/util/af-types.h>
-#include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/CodeUtils.h>
@@ -257,7 +256,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
         metadata.clusterSize = 0; // All our attributes are external.
 
-        metadata.mask = CLUSTER_MASK_SERVER;
+        metadata.mask = MATTER_CLUSTER_FLAG_SERVER;
 
         metadata.functions = nullptr; // None of our clusters, including Descriptor, uses these.
 
@@ -274,11 +273,11 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
         metadata.clusterId = MTRClusterIDTypeDescriptorID;
 
         metadata.attributes = sDescriptorAttributesMetadata;
-        metadata.attributeCount = ArraySize(sDescriptorAttributesMetadata);
+        metadata.attributeCount = MATTER_ARRAY_SIZE(sDescriptorAttributesMetadata);
 
         metadata.clusterSize = 0; // All our attributes are external.
 
-        metadata.mask = CLUSTER_MASK_SERVER;
+        metadata.mask = MATTER_CLUSTER_FLAG_SERVER;
 
         metadata.functions = nullptr; // Descriptor does not use these.
 

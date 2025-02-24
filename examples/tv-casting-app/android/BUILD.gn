@@ -103,6 +103,7 @@ android_library("java") {
     "App/app/src/main/jni/com/matter/casting/core/Endpoint.java",
     "App/app/src/main/jni/com/matter/casting/core/MatterCastingPlayer.java",
     "App/app/src/main/jni/com/matter/casting/core/MatterCastingPlayerDiscovery.java",
+    "App/app/src/main/jni/com/matter/casting/core/MatterEndpoint.java",
     "App/app/src/main/jni/com/matter/casting/support/AppParameters.java",
     "App/app/src/main/jni/com/matter/casting/support/CommissionableData.java",
     "App/app/src/main/jni/com/matter/casting/support/CommissionerDeclaration.java",

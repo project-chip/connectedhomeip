@@ -144,10 +144,10 @@ bool LockManager::ReadConfigValues()
 {
     size_t outLen;
     KeyValueStoreMgr().Get(LockUser, reinterpret_cast<void *>(&mLockUsers),
-                           sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), &outLen);
+                           sizeof(EmberAfPluginDoorLockUserInfo) * MATTER_ARRAY_SIZE(mLockUsers), &outLen);
 
     KeyValueStoreMgr().Get(Credential, reinterpret_cast<void *>(&mLockCredentials),
-                           sizeof(EmberAfPluginDoorLockCredentialInfo) * ArraySize(mLockCredentials), &outLen);
+                           sizeof(EmberAfPluginDoorLockCredentialInfo) * MATTER_ARRAY_SIZE(mLockCredentials), &outLen);
 
     KeyValueStoreMgr().Get(LockUserName, reinterpret_cast<void *>(mUserNames), sizeof(mUserNames), &outLen);
 

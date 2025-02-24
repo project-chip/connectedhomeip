@@ -181,6 +181,24 @@ void ResetDHCPNotificationFlags(void)
     PostWifiPlatformEvent(event);
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
+void GotIPv4Address(uint32_t ip)
+{
+    // Acquire the new IP address
+    for (int i = 0; i < 4; ++i)
+    {
+        wfx_rsi.ip4_addr[i] = (ip >> (i * 8)) & 0xFF;
+    }
+
+    ChipLogDetail(DeviceLayer, "DHCP OK: IP=%d.%d.%d.%d", wfx_rsi.ip4_addr[0], wfx_rsi.ip4_addr[1], wfx_rsi.ip4_addr[2],
+                  wfx_rsi.ip4_addr[3]);
+
+    // Notify the Connectivity Manager - via the app
+    wfx_rsi.dev_state.Set(WifiState::kStationDhcpDone).Set(WifiState::kStationReady);
+    NotifyIPv4Change(true);
+}
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
+
 /*********************************************************************
  * @fn  void wfx_set_wifi_provision(wfx_wifi_provision_t *cfg)
  * @brief

@@ -33,7 +33,7 @@ tests:
           "Step 0: Preparation: TH as server exposes an Actions server cluster
           on EP 1, with one action (supporting all possible commands) and
           corresponding ActionLists and EndpointLists attributes: ActionList:
-          contains one list element (ActionListStruct):  ActionIO = 0xA001  Name
+          contains one list element (ActionListStruct):  ActionID = 0x1001  Name
           = 'some test'  Type = other  EndpointListID =
           0xE001  SupportedCommands = 0x0fff // suppports all commands  State =
           Inactive EndpointLists: contains one list element
@@ -92,13 +92,13 @@ tests:
 
 
           2. Use the above obtained ActionID to verify the following commands
-           ./chip-tool actions instant-action 40961 1 1
+           ./chip-tool actions instant-action 4097 1 1
       disabled: true
 
     - label: "Step 1: DUT issues an InstantAction command to TH"
       PICS: ACT.C.C00.Tx
       verification: |
-          ./chip-tool actions instant-action 40961 1 1
+          ./chip-tool actions instant-action 4097 1 1
 
           Via the TH (bridge-app), verify the InstantAction response that contains ActionID .
 

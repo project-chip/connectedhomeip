@@ -31,6 +31,9 @@ using namespace chip::DeviceLayer;
 
 #define CONVERT_SEC_TO_MS(TimeInS) (TimeInS * 1000)
 
+// TODO: We shouldn't need to have access to a global variable in the interface here
+extern WfxRsi_t wfx_rsi;
+
 // TODO: This is a workaround because we depend on the platform lib which depends on the platform implementation.
 //       As such we can't depend on the platform here as well
 extern void HandleWFXSystemEvent(sl_wfx_generic_message_t * eventData);

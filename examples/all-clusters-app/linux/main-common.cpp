@@ -53,7 +53,6 @@
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 #include <app/server/Server.h>
-#include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/DeviceInstanceInfoProvider.h>

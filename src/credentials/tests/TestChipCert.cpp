@@ -1165,9 +1165,9 @@ TEST_F(TestChipCert, TestChipCert_CertUsage)
         {  2,  sDS,          sSAandCA,        CHIP_NO_ERROR                        },
     };
     // clang-format on
-    size_t sNumUsageTestCases = ArraySize(sUsageTestCases);
+    size_t sNumUsageTestCases = MATTER_ARRAY_SIZE(sUsageTestCases);
 
-    err = certSet.Init(certDataArray, ArraySize(certDataArray));
+    err = certSet.Init(certDataArray, MATTER_ARRAY_SIZE(certDataArray));
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = LoadTestCertSet01(certSet);

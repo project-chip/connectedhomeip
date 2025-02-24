@@ -59,7 +59,7 @@ public:
         mIsCommissioningInProgress = true;
 
         // TODO: Remove High Performance Req during commissioning when sleep issues are resolved
-        // WifiSleepManager::GetInstance().RequestHighPerformance();
+        WifiSleepManager::GetInstance().RequestHighPerformance();
     }
 
     inline void HandleCommissioningSessionStopped()

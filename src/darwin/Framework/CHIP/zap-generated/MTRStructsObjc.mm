@@ -2723,6 +2723,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _label = @"";
 
+        _vidVerificationStatement = nil;
+
         _fabricIndex = @(0);
     }
     return self;
@@ -2737,6 +2739,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.fabricID = self.fabricID;
     other.nodeID = self.nodeID;
     other.label = self.label;
+    other.vidVerificationStatement = self.vidVerificationStatement;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -2744,7 +2747,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rootPublicKey:%@; vendorID:%@; fabricID:%@; nodeID:%@; label:%@; fabricIndex:%@; >", NSStringFromClass([self class]), [_rootPublicKey base64EncodedStringWithOptions:0], _vendorID, _fabricID, _nodeID, _label, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rootPublicKey:%@; vendorID:%@; fabricID:%@; nodeID:%@; label:%@; vidVerificationStatement:%@; fabricIndex:%@; >", NSStringFromClass([self class]), [_rootPublicKey base64EncodedStringWithOptions:0], _vendorID, _fabricID, _nodeID, _label, [_vidVerificationStatement base64EncodedStringWithOptions:0], _fabricIndex];
     return descriptionString;
 }
 
@@ -2795,6 +2798,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _icac = nil;
 
+        _vvsc = nil;
+
         _fabricIndex = @(0);
     }
     return self;
@@ -2806,6 +2811,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.noc = self.noc;
     other.icac = self.icac;
+    other.vvsc = self.vvsc;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -2813,7 +2819,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: noc:%@; icac:%@; fabricIndex:%@; >", NSStringFromClass([self class]), [_noc base64EncodedStringWithOptions:0], [_icac base64EncodedStringWithOptions:0], _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: noc:%@; icac:%@; vvsc:%@; fabricIndex:%@; >", NSStringFromClass([self class]), [_noc base64EncodedStringWithOptions:0], [_icac base64EncodedStringWithOptions:0], [_vvsc base64EncodedStringWithOptions:0], _fabricIndex];
     return descriptionString;
 }
 
@@ -6700,6 +6706,75 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: lockDataType:%@; dataOperationType:%@; operationSource:%@; userIndex:%@; fabricIndex:%@; sourceNode:%@; dataIndex:%@; >", NSStringFromClass([self class]), _lockDataType, _dataOperationType, _operationSource, _userIndex, _fabricIndex, _sourceNode, _dataIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRClosureControlClusterOverallStateStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _positioning = nil;
+
+        _latching = nil;
+
+        _speed = nil;
+
+        _extraInfo = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRClosureControlClusterOverallStateStruct alloc] init];
+
+    other.positioning = self.positioning;
+    other.latching = self.latching;
+    other.speed = self.speed;
+    other.extraInfo = self.extraInfo;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: positioning:%@; latching:%@; speed:%@; extraInfo:%@; >", NSStringFromClass([self class]), _positioning, _latching, _speed, _extraInfo];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRClosureControlClusterOverallTargetStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _tagPosition = nil;
+
+        _tagLatch = nil;
+
+        _speed = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRClosureControlClusterOverallTargetStruct alloc] init];
+
+    other.tagPosition = self.tagPosition;
+    other.tagLatch = self.tagLatch;
+    other.speed = self.speed;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: tagPosition:%@; tagLatch:%@; speed:%@; >", NSStringFromClass([self class]), _tagPosition, _tagLatch, _speed];
     return descriptionString;
 }
 

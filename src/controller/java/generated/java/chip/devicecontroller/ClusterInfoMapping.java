@@ -5221,6 +5221,32 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
+
+  public static class DelegatedOperationalCredentialsClusterSignVidVerificationResponseCallback implements ChipClusters.OperationalCredentialsCluster.SignVidVerificationResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer fabricIndex, Integer fabricBindingVersion, byte[] signature) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo fabricIndexResponseValue = new CommandResponseInfo("fabricIndex", "Integer");
+      responseValues.put(fabricIndexResponseValue, fabricIndex);
+      CommandResponseInfo fabricBindingVersionResponseValue = new CommandResponseInfo("fabricBindingVersion", "Integer");
+      responseValues.put(fabricBindingVersionResponseValue, fabricBindingVersion);
+      CommandResponseInfo signatureResponseValue = new CommandResponseInfo("signature", "byte[]");
+      responseValues.put(signatureResponseValue, signature);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
   public static class DelegatedOperationalCredentialsClusterNOCsAttributeCallback implements ChipClusters.OperationalCredentialsCluster.NOCsAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -12763,6 +12789,174 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedWindowCoveringClusterAttributeListAttributeCallback implements ChipClusters.WindowCoveringCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureControlClusterCountdownTimeAttributeCallback implements ChipClusters.ClosureControlCluster.CountdownTimeAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureControlClusterCurrentErrorListAttributeCallback implements ChipClusters.ClosureControlCluster.CurrentErrorListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureControlClusterOverallStateAttributeCallback implements ChipClusters.ClosureControlCluster.OverallStateAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ClosureControlClusterOverallStateStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureControlClusterOverallStateStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureControlClusterOverallTargetAttributeCallback implements ChipClusters.ClosureControlCluster.OverallTargetAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ClosureControlClusterOverallTargetStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureControlClusterOverallTargetStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureControlClusterGeneratedCommandListAttributeCallback implements ChipClusters.ClosureControlCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureControlClusterAcceptedCommandListAttributeCallback implements ChipClusters.ClosureControlCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureControlClusterEventListAttributeCallback implements ChipClusters.ClosureControlCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureControlClusterAttributeListAttributeCallback implements ChipClusters.ClosureControlCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -20693,14 +20887,14 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer webRTCSessionID, Integer videoStreamID, Integer audioStreamID) {
+    public void onSuccess(Integer webRTCSessionID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo webRTCSessionIDResponseValue = new CommandResponseInfo("webRTCSessionID", "Integer");
       responseValues.put(webRTCSessionIDResponseValue, webRTCSessionID);
-      CommandResponseInfo videoStreamIDResponseValue = new CommandResponseInfo("videoStreamID", "Integer");
+      CommandResponseInfo videoStreamIDResponseValue = new CommandResponseInfo("videoStreamID", "Optional<Integer>");
       responseValues.put(videoStreamIDResponseValue, videoStreamID);
-      CommandResponseInfo audioStreamIDResponseValue = new CommandResponseInfo("audioStreamID", "Integer");
+      CommandResponseInfo audioStreamIDResponseValue = new CommandResponseInfo("audioStreamID", "Optional<Integer>");
       responseValues.put(audioStreamIDResponseValue, audioStreamID);
       callback.onSuccess(responseValues);
     }
@@ -23599,6 +23793,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.WindowCoveringCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("windowCovering", windowCoveringClusterInfo);
 
+    ClusterInfo closureControlClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.ClosureControlCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("closureControl", closureControlClusterInfo);
+
     ClusterInfo serviceAreaClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.ServiceAreaCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("serviceArea", serviceAreaClusterInfo);
@@ -23892,6 +24090,7 @@ public class ClusterInfoMapping {
     destination.get("deviceEnergyManagementMode").combineCommands(source.get("deviceEnergyManagementMode"));
     destination.get("doorLock").combineCommands(source.get("doorLock"));
     destination.get("windowCovering").combineCommands(source.get("windowCovering"));
+    destination.get("closureControl").combineCommands(source.get("closureControl"));
     destination.get("serviceArea").combineCommands(source.get("serviceArea"));
     destination.get("pumpConfigurationAndControl").combineCommands(source.get("pumpConfigurationAndControl"));
     destination.get("thermostat").combineCommands(source.get("thermostat"));
@@ -25826,6 +26025,57 @@ public class ClusterInfoMapping {
         operationalCredentialsaddTrustedRootCertificateCommandParams
     );
     operationalCredentialsClusterInteractionInfoMap.put("addTrustedRootCertificate", operationalCredentialsaddTrustedRootCertificateInteractionInfo);
+
+    Map<String, CommandParameterInfo> operationalCredentialssetVidVerificationStatementCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo operationalCredentialssetVidVerificationStatementvendorIDCommandParameterInfo = new CommandParameterInfo("vendorID", Optional.class, Integer.class);
+    operationalCredentialssetVidVerificationStatementCommandParams.put("vendorID",operationalCredentialssetVidVerificationStatementvendorIDCommandParameterInfo);
+
+    CommandParameterInfo operationalCredentialssetVidVerificationStatementvidVerificationStatementCommandParameterInfo = new CommandParameterInfo("vidVerificationStatement", Optional.class, byte[].class);
+    operationalCredentialssetVidVerificationStatementCommandParams.put("vidVerificationStatement",operationalCredentialssetVidVerificationStatementvidVerificationStatementCommandParameterInfo);
+
+    CommandParameterInfo operationalCredentialssetVidVerificationStatementvvscCommandParameterInfo = new CommandParameterInfo("vvsc", Optional.class, byte[].class);
+    operationalCredentialssetVidVerificationStatementCommandParams.put("vvsc",operationalCredentialssetVidVerificationStatementvvscCommandParameterInfo);
+    InteractionInfo operationalCredentialssetVidVerificationStatementInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.OperationalCredentialsCluster) cluster)
+        .setVidVerificationStatement((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("vendorID")
+        , (Optional<byte[]>)
+        commandArguments.get("vidVerificationStatement")
+        , (Optional<byte[]>)
+        commandArguments.get("vvsc")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        operationalCredentialssetVidVerificationStatementCommandParams
+    );
+    operationalCredentialsClusterInteractionInfoMap.put("setVidVerificationStatement", operationalCredentialssetVidVerificationStatementInteractionInfo);
+
+    Map<String, CommandParameterInfo> operationalCredentialssignVidVerificationRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo operationalCredentialssignVidVerificationRequestfabricIndexCommandParameterInfo = new CommandParameterInfo("fabricIndex", Integer.class, Integer.class);
+    operationalCredentialssignVidVerificationRequestCommandParams.put("fabricIndex",operationalCredentialssignVidVerificationRequestfabricIndexCommandParameterInfo);
+
+    CommandParameterInfo operationalCredentialssignVidVerificationRequestclientChallengeCommandParameterInfo = new CommandParameterInfo("clientChallenge", byte[].class, byte[].class);
+    operationalCredentialssignVidVerificationRequestCommandParams.put("clientChallenge",operationalCredentialssignVidVerificationRequestclientChallengeCommandParameterInfo);
+    InteractionInfo operationalCredentialssignVidVerificationRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.OperationalCredentialsCluster) cluster)
+          .signVidVerificationRequest((ChipClusters.OperationalCredentialsCluster.SignVidVerificationResponseCallback) callback
+           , (Integer)
+             commandArguments.get("fabricIndex")
+
+           , (byte[])
+             commandArguments.get("clientChallenge")
+
+            );
+        },
+        () -> new DelegatedOperationalCredentialsClusterSignVidVerificationResponseCallback(),
+        operationalCredentialssignVidVerificationRequestCommandParams
+      );
+    operationalCredentialsClusterInteractionInfoMap.put("signVidVerificationRequest", operationalCredentialssignVidVerificationRequestInteractionInfo);
 
     commandMap.put("operationalCredentials", operationalCredentialsClusterInteractionInfoMap);
 
@@ -28017,6 +28267,105 @@ public class ClusterInfoMapping {
     windowCoveringClusterInteractionInfoMap.put("goToTiltPercentage", windowCoveringgoToTiltPercentageInteractionInfo);
 
     commandMap.put("windowCovering", windowCoveringClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> closureControlClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> closureControlstopCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo closureControlstopInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ClosureControlCluster) cluster)
+        .stop((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        closureControlstopCommandParams
+    );
+    closureControlClusterInteractionInfoMap.put("stop", closureControlstopInteractionInfo);
+
+    Map<String, CommandParameterInfo> closureControlmoveToCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo closureControlmoveTotagCommandParameterInfo = new CommandParameterInfo("tag", Optional.class, Integer.class);
+    closureControlmoveToCommandParams.put("tag",closureControlmoveTotagCommandParameterInfo);
+
+    CommandParameterInfo closureControlmoveTolatchCommandParameterInfo = new CommandParameterInfo("latch", Optional.class, Integer.class);
+    closureControlmoveToCommandParams.put("latch",closureControlmoveTolatchCommandParameterInfo);
+
+    CommandParameterInfo closureControlmoveTospeedCommandParameterInfo = new CommandParameterInfo("speed", Optional.class, Integer.class);
+    closureControlmoveToCommandParams.put("speed",closureControlmoveTospeedCommandParameterInfo);
+    InteractionInfo closureControlmoveToInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ClosureControlCluster) cluster)
+        .moveTo((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("tag")
+        , (Optional<Integer>)
+        commandArguments.get("latch")
+        , (Optional<Integer>)
+        commandArguments.get("speed")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        closureControlmoveToCommandParams
+    );
+    closureControlClusterInteractionInfoMap.put("moveTo", closureControlmoveToInteractionInfo);
+
+    Map<String, CommandParameterInfo> closureControlcalibrateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo closureControlcalibrateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ClosureControlCluster) cluster)
+        .calibrate((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        closureControlcalibrateCommandParams
+    );
+    closureControlClusterInteractionInfoMap.put("calibrate", closureControlcalibrateInteractionInfo);
+
+    Map<String, CommandParameterInfo> closureControlconfigureFallbackCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo closureControlconfigureFallbackrestingProcedureCommandParameterInfo = new CommandParameterInfo("restingProcedure", Optional.class, Integer.class);
+    closureControlconfigureFallbackCommandParams.put("restingProcedure",closureControlconfigureFallbackrestingProcedureCommandParameterInfo);
+
+    CommandParameterInfo closureControlconfigureFallbacktriggerConditionCommandParameterInfo = new CommandParameterInfo("triggerCondition", Optional.class, Integer.class);
+    closureControlconfigureFallbackCommandParams.put("triggerCondition",closureControlconfigureFallbacktriggerConditionCommandParameterInfo);
+
+    CommandParameterInfo closureControlconfigureFallbacktriggerPositionCommandParameterInfo = new CommandParameterInfo("triggerPosition", Optional.class, Integer.class);
+    closureControlconfigureFallbackCommandParams.put("triggerPosition",closureControlconfigureFallbacktriggerPositionCommandParameterInfo);
+
+    CommandParameterInfo closureControlconfigureFallbackwaitingDelayCommandParameterInfo = new CommandParameterInfo("waitingDelay", Optional.class, Long.class);
+    closureControlconfigureFallbackCommandParams.put("waitingDelay",closureControlconfigureFallbackwaitingDelayCommandParameterInfo);
+    InteractionInfo closureControlconfigureFallbackInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ClosureControlCluster) cluster)
+        .configureFallback((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("restingProcedure")
+        , (Optional<Integer>)
+        commandArguments.get("triggerCondition")
+        , (Optional<Integer>)
+        commandArguments.get("triggerPosition")
+        , (Optional<Long>)
+        commandArguments.get("waitingDelay")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        closureControlconfigureFallbackCommandParams
+    );
+    closureControlClusterInteractionInfoMap.put("configureFallback", closureControlconfigureFallbackInteractionInfo);
+
+    Map<String, CommandParameterInfo> closureControlcancelFallbackCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo closureControlcancelFallbackInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ClosureControlCluster) cluster)
+        .cancelFallback((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        closureControlcancelFallbackCommandParams
+    );
+    closureControlClusterInteractionInfoMap.put("cancelFallback", closureControlcancelFallbackInteractionInfo);
+
+    commandMap.put("closureControl", closureControlClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> serviceAreaClusterInteractionInfoMap = new LinkedHashMap<>();
 
@@ -30760,27 +31109,27 @@ public class ClusterInfoMapping {
     );
     webRTCTransportProviderClusterInteractionInfoMap.put("provideAnswer", webRTCTransportProviderprovideAnswerInteractionInfo);
 
-    Map<String, CommandParameterInfo> webRTCTransportProviderprovideICECandidateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> webRTCTransportProviderprovideICECandidatesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo webRTCTransportProviderprovideICECandidatewebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
-    webRTCTransportProviderprovideICECandidateCommandParams.put("webRTCSessionID",webRTCTransportProviderprovideICECandidatewebRTCSessionIDCommandParameterInfo);
+    CommandParameterInfo webRTCTransportProviderprovideICECandidateswebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportProviderprovideICECandidatesCommandParams.put("webRTCSessionID",webRTCTransportProviderprovideICECandidateswebRTCSessionIDCommandParameterInfo);
 
-    CommandParameterInfo webRTCTransportProviderprovideICECandidateICECandidateCommandParameterInfo = new CommandParameterInfo("ICECandidate", String.class, String.class);
-    webRTCTransportProviderprovideICECandidateCommandParams.put("ICECandidate",webRTCTransportProviderprovideICECandidateICECandidateCommandParameterInfo);
-    InteractionInfo webRTCTransportProviderprovideICECandidateInteractionInfo = new InteractionInfo(
+    CommandParameterInfo webRTCTransportProviderprovideICECandidatesICECandidatesCommandParameterInfo = new CommandParameterInfo("ICECandidates", ArrayList.class, ArrayList.class);
+    webRTCTransportProviderprovideICECandidatesCommandParams.put("ICECandidates",webRTCTransportProviderprovideICECandidatesICECandidatesCommandParameterInfo);
+    InteractionInfo webRTCTransportProviderprovideICECandidatesInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.WebRTCTransportProviderCluster) cluster)
-        .provideICECandidate((DefaultClusterCallback) callback
+        .provideICECandidates((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("webRTCSessionID")
-        , (String)
-        commandArguments.get("ICECandidate")
+        , (ArrayList<String>)
+        commandArguments.get("ICECandidates")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        webRTCTransportProviderprovideICECandidateCommandParams
+        webRTCTransportProviderprovideICECandidatesCommandParams
     );
-    webRTCTransportProviderClusterInteractionInfoMap.put("provideICECandidate", webRTCTransportProviderprovideICECandidateInteractionInfo);
+    webRTCTransportProviderClusterInteractionInfoMap.put("provideICECandidates", webRTCTransportProviderprovideICECandidatesInteractionInfo);
 
     Map<String, CommandParameterInfo> webRTCTransportProviderendSessionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
@@ -30860,27 +31209,27 @@ public class ClusterInfoMapping {
     );
     webRTCTransportRequestorClusterInteractionInfoMap.put("answer", webRTCTransportRequestoranswerInteractionInfo);
 
-    Map<String, CommandParameterInfo> webRTCTransportRequestorICECandidateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> webRTCTransportRequestorICECandidatesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo webRTCTransportRequestorICECandidatewebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
-    webRTCTransportRequestorICECandidateCommandParams.put("webRTCSessionID",webRTCTransportRequestorICECandidatewebRTCSessionIDCommandParameterInfo);
+    CommandParameterInfo webRTCTransportRequestorICECandidateswebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportRequestorICECandidatesCommandParams.put("webRTCSessionID",webRTCTransportRequestorICECandidateswebRTCSessionIDCommandParameterInfo);
 
-    CommandParameterInfo webRTCTransportRequestorICECandidateICECandidateCommandParameterInfo = new CommandParameterInfo("ICECandidate", String.class, String.class);
-    webRTCTransportRequestorICECandidateCommandParams.put("ICECandidate",webRTCTransportRequestorICECandidateICECandidateCommandParameterInfo);
-    InteractionInfo webRTCTransportRequestorICECandidateInteractionInfo = new InteractionInfo(
+    CommandParameterInfo webRTCTransportRequestorICECandidatesICECandidatesCommandParameterInfo = new CommandParameterInfo("ICECandidates", ArrayList.class, ArrayList.class);
+    webRTCTransportRequestorICECandidatesCommandParams.put("ICECandidates",webRTCTransportRequestorICECandidatesICECandidatesCommandParameterInfo);
+    InteractionInfo webRTCTransportRequestorICECandidatesInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.WebRTCTransportRequestorCluster) cluster)
-        .ICECandidate((DefaultClusterCallback) callback
+        .ICECandidates((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("webRTCSessionID")
-        , (String)
-        commandArguments.get("ICECandidate")
+        , (ArrayList<String>)
+        commandArguments.get("ICECandidates")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        webRTCTransportRequestorICECandidateCommandParams
+        webRTCTransportRequestorICECandidatesCommandParams
     );
-    webRTCTransportRequestorClusterInteractionInfoMap.put("ICECandidate", webRTCTransportRequestorICECandidateInteractionInfo);
+    webRTCTransportRequestorClusterInteractionInfoMap.put("ICECandidates", webRTCTransportRequestorICECandidatesInteractionInfo);
 
     Map<String, CommandParameterInfo> webRTCTransportRequestorendCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 

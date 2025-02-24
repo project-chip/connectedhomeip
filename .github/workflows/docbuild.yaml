@@ -46,7 +46,7 @@ jobs:
           touch _build/html/.nojekyll
       - name: Deploy to gh-pages
         if: github.repository == 'project-chip/connectedhomeip' && github.event_name == 'push' && github.ref_name == 'master'
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           deploy_key: ${{ secrets.DOXYGEN_DEPLOY_KEY }}
           external_repository: project-chip/connectedhomeip-doc
