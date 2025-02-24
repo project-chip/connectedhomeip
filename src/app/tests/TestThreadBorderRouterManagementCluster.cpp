@@ -31,6 +31,7 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <optional>
@@ -154,6 +155,7 @@ public:
 
 constexpr EndpointId kTestEndpointId            = 1;
 constexpr FabricIndex kTestAccessingFabricIndex = 1;
+static chip::TestPersistentStorageDelegate sTestStorage;
 static FailSafeContext sTestFailsafeContext;
 static TestDelegate sTestDelegate;
 static ServerInstance sTestSeverInstance(kTestEndpointId, &sTestDelegate, sTestFailsafeContext);
@@ -211,6 +213,7 @@ public:
     {
         ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
         ASSERT_EQ(DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+        ASSERT_EQ(sTestFailsafeContext.Init({ &sTestStorage }), CHIP_NO_ERROR);
     }
 
     static void TearDownTestSuite()

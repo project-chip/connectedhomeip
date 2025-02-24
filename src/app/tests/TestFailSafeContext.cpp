@@ -34,6 +34,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
@@ -66,7 +67,10 @@ public:
 
 TEST_F(TestFailSafeContext, TestFailSafeContext_ArmFailSafe)
 {
+    chip::TestPersistentStorageDelegate testStorage;
     chip::app::FailSafeContext failSafeContext;
+
+    failSafeContext.Init({ &testStorage });
 
     EXPECT_EQ(failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1)), CHIP_NO_ERROR);
     EXPECT_TRUE(failSafeContext.IsFailSafeArmed());
@@ -80,7 +84,10 @@ TEST_F(TestFailSafeContext, TestFailSafeContext_ArmFailSafe)
 
 TEST_F(TestFailSafeContext, TestFailSafeContext_NocCommandInvoked)
 {
+    chip::TestPersistentStorageDelegate testStorage;
     chip::app::FailSafeContext failSafeContext;
+
+    failSafeContext.Init({ &testStorage });
 
     EXPECT_EQ(failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1)), CHIP_NO_ERROR);
     EXPECT_EQ(failSafeContext.GetFabricIndex(), kTestAccessingFabricIndex1);
