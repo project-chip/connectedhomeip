@@ -52,6 +52,7 @@ Please take an example PKI ![Indirect CRL Signing](indirect/indirect-crl.png).
     -   `indirect/Chip-Test-PAI-FFF1-02-Cert.[pem|der]`
         -   DAC:
             `indirect/Chip-Test-DAC-FFF1-8001-Signed-By-Test-PAI-02-Cert.[pem|der]`
+            `indirect/Chip-Test-DAC-02-FFF1-8001-Signed-By-Test-PAI-02-Cert.[pem|der]`
     -   `indirect/Chip-Test-PAI-FFF1-03-Cert.[pem|der]`
 -   PAA Delegate: `indirect/Chip-Test-PAA-Delegate-FFF1-Cert.[pem|der]`
 -   PAA Delegated CRL: `indirect/Chip-Test-PAA-FFF1-Delegated-CRL.[pem|der]`
@@ -65,3 +66,4 @@ Please take an example PKI ![Indirect CRL Signing](indirect/indirect-crl.png).
     -   `indirect/Chip-Test-PAI-Delegate-FFF1-03-Cert.[pem|der]`
 
 -   PAI Delegated CRL: `indirect/Chip-Test-PAI-FFF1-Delegated-CRL.[pem|der]`
+-   PAI Delegated CRL with Certificate Issuer CRL entry extension, only first entry has the extension: `indirect/Chip-Test-PAI-FFF1-Delegated-CRL-With-Cert-Issuer-Extension.[pem|der]`
