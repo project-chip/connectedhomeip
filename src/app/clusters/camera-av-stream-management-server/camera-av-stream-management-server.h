@@ -50,6 +50,9 @@ constexpr uint16_t kMaxImageRotationDegrees = 359;
 constexpr uint8_t kMaxChannelCount          = 8;
 constexpr uint8_t kMaxImageQualityMetric    = 100;
 constexpr uint16_t kMaxFragmentLenMaxValue  = 65500;
+// Conservative room for other fields(resolution + codec) in
+// capture snapshot response. TODO: Make a tighter bound.
+constexpr size_t kMaxSnapshotImageSize = kMaxLargeSecureSduLengthBytes - 100;
 
 constexpr size_t kViewportStructMaxSerializedSize =
     TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t));
@@ -67,6 +70,14 @@ constexpr size_t kArrayTlvOverhead = 2;
 constexpr size_t kRankedVideoStreamPrioritiesTlvSize = kArrayTlvOverhead + kStreamUsageTlvSize * kNumOfStreamUsageTypes;
 
 class CameraAVStreamMgmtServer;
+
+// ImageSnapshot response data for a CaptureSnapshot command.
+struct ImageSnapshot
+{
+    std::vector<uint8_t> data;      // Buffer to hold the image data
+    VideoResolutionStruct imageRes; // Image resolution
+    ImageCodecEnum imageCodec;      // Image codec used
+};
 
 /** @brief
  *  Defines interfaces for implementing application-specific logic for various aspects of the CameraAvStreamManagement Cluster.
@@ -247,8 +258,8 @@ public:
      *   @return Success if the processing of the Command is successful; otherwise, the command SHALL be rejected with an
      * appropriate error.
      */
-    virtual Protocols::InteractionModel::Status CaptureSnapshot(const uint16_t streamID,
-                                                                const VideoResolutionStruct & videoResolution) = 0;
+    virtual Protocols::InteractionModel::Status CaptureSnapshot(const uint16_t streamID, const VideoResolutionStruct & resolution,
+                                                                ImageSnapshot & outImageSnapshot) = 0;
 
     /**
      *  Delegate functions to load the allocated video, audio, and snapshot streams.
@@ -462,7 +473,7 @@ public:
 
     const std::vector<SnapshotStreamStruct> & GetAllocatedSnapshotStreams() const { return mAllocatedSnapshotStreams; }
 
-    const StreamUsageEnum * GetRankedVideoStreamPriorities() const { return mRankedVideoStreamPriorities; }
+    const std::vector<StreamUsageEnum> & GetRankedVideoStreamPriorities() const { return mRankedVideoStreamPriorities; }
 
     bool GetSoftRecordingPrivacyModeEnabled() const { return mSoftRecordingPrivacyModeEnabled; }
 
@@ -515,7 +526,7 @@ public:
 
     CHIP_ERROR RemoveFromFabricsUsingCamera(chip::FabricIndex aFabricIndex);
 
-    CHIP_ERROR SetRankedVideoStreamPriorities(const StreamUsageEnum newPriorities[kNumOfStreamUsageTypes]);
+    CHIP_ERROR SetRankedVideoStreamPriorities(const std::vector<StreamUsageEnum> & newPriorities);
 
     CHIP_ERROR AddVideoStream(const VideoStreamStruct & videoStream);
 
@@ -534,7 +545,6 @@ private:
     EndpointId mEndpointId;
     const BitFlags<Feature> mFeature;
     const BitFlags<OptionalAttribute> mOptionalAttrs;
-    PersistentStorageDelegate * mPersistentStorage = nullptr;
 
     // Attributes
     const uint8_t mMaxConcurrentVideoEncoders;
@@ -579,8 +589,7 @@ private:
     // Managed lists
     std::unordered_set<chip::FabricIndex> mFabricsUsingCamera;
 
-    StreamUsageEnum mRankedVideoStreamPriorities[kNumOfStreamUsageTypes];
-
+    std::vector<StreamUsageEnum> mRankedVideoStreamPriorities;
     std::vector<VideoStreamStruct> mAllocatedVideoStreams;
     std::vector<AudioStreamStruct> mAllocatedAudioStreams;
     std::vector<SnapshotStreamStruct> mAllocatedSnapshotStreams;
@@ -634,7 +643,6 @@ private:
     CHIP_ERROR ReadAndEncodeRankedVideoStreamPrioritiesList(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
     CHIP_ERROR StoreViewport(const ViewportStruct & viewport);
-    CHIP_ERROR ClearViewport();
     CHIP_ERROR LoadViewport(ViewportStruct & viewport);
 
     CHIP_ERROR StoreRankedVideoStreamPriorities();
