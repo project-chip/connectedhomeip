@@ -244,6 +244,12 @@ exit:
 
 void BLEManagerImpl::_Shutdown()
 {
+    if (mFlags.Has(Flags::kBleDeinitializedMemReleased))
+    {
+        ChipLogProgress(DeviceLayer, "Ble already deinitialized, returning from ShutDown flow");
+        return;
+    }
+
     CancelBleAdvTimeoutTimer();
 
     BleLayer::Shutdown();
@@ -729,6 +735,7 @@ void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
         ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
     }
 }
+
 void BLEManagerImpl::DriveBLEState(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -737,6 +744,11 @@ void BLEManagerImpl::DriveBLEState(void)
     if (!mFlags.Has(Flags::kAsyncInitCompleted))
     {
         mFlags.Set(Flags::kAsyncInitCompleted);
+    }
+
+    if (mFlags.Has(Flags::kBleDeinitializedMemReleased))
+    {
+        return;
     }
 
     // Initializes the ESP BLE layer if needed.
@@ -844,7 +856,7 @@ void BLEManagerImpl::DriveBLEState(void)
     if (mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kGATTServiceStarted))
     {
         DeinitESPBleLayer();
-        mFlags.ClearAll();
+        mFlags.ClearAll().Set(Flags::kBleDeinitializedMemReleased);
     }
 
 exit:
@@ -975,12 +987,13 @@ void BLEManagerImpl::DeinitESPBleLayer()
 {
     VerifyOrReturn(DeinitBLE() == CHIP_NO_ERROR);
 #ifdef CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
-    BLEManagerImpl::ClaimBLEMemory(nullptr, nullptr);
+    BLEManagerImpl::ClaimBLEMemory(nullptr, this);
 #endif /* CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING */
 }
 
-void BLEManagerImpl::ClaimBLEMemory(System::Layer *, void *)
+void BLEManagerImpl::ClaimBLEMemory(System::Layer *, void * context)
 {
+    auto * sInstance    = static_cast<BLEManagerImpl *>(context);
     TaskHandle_t handle = xTaskGetHandle("nimble_host");
     if (handle)
     {
@@ -988,7 +1001,7 @@ void BLEManagerImpl::ClaimBLEMemory(System::Layer *, void *)
 
         // Rescheduling it for later, 2 seconds is an arbitrary value, keeping it a bit more so that
         // we dont have to reschedule it again
-        SystemLayer().StartTimer(System::Clock::Seconds32(2), ClaimBLEMemory, nullptr);
+        SystemLayer().StartTimer(System::Clock::Seconds32(2), ClaimBLEMemory, context);
     }
     else
     {
