@@ -56,15 +56,13 @@ bool hasNotifiedIPV4 = false;
  */
 void RetryConnectionTimerHandler(void * arg)
 {
-    if (wfx_connect_to_ap() != SL_STATUS_OK)
+    if (ConnectToAccessPoint() != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed.");
+        ChipLogError(DeviceLayer, "ConnectToAccessPoint() failed.");
     }
 }
 
 } // namespace
-
-/* Updated functions */
 
 void NotifyIPv6Change(bool gotIPv6Addr)
 {
@@ -132,19 +130,12 @@ void ResetIPNotificationStates()
     hasNotifiedIPV4 = false;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
 }
-/* Function to update */
 
-/***********************************************************************************
- * @fn  sl_matter_wifi_task_started(void)
- * @brief
- *       Wifi device started notification
- * @param[in]: None
- * @return None
- *************************************************************************************/
-void sl_matter_wifi_task_started(void)
+void NotifyWifiTaskInitialized(void)
 {
     sl_wfx_startup_ind_t evt = {};
 
+    // TODO: We should move this to the init function and not the notification function
     // Creating a timer which will be used to retry connection with AP
     sRetryTimer = osTimerNew(RetryConnectionTimerHandler, osTimerOnce, NULL, NULL);
     VerifyOrReturn(sRetryTimer != NULL);
@@ -166,16 +157,8 @@ void sl_matter_wifi_task_started(void)
     HandleWFXSystemEvent((sl_wfx_generic_message_t *) &evt);
 }
 
-/**************************************************************************************
- * @fn  void wfx_retry_connection(uint16_t retryAttempt)
- * @brief
- *      During commissioning, we retry to join the network MAX_JOIN_RETRIES_COUNT times.
- *      If DUT is disconnected from the AP or device is power cycled, then retry connection
- *      with AP continously after a certain time interval.
- * @param[in]  retryAttempt
- * @return None
- *************************************************************************************/
-void wfx_retry_connection(uint16_t retryAttempt)
+// TODO: The retry stategy needs to be re-worked
+void ScheduleConnectionAttempt()
 {
     if (retryInterval > kWlanMaxRetryIntervalsInSec)
     {
@@ -185,9 +168,9 @@ void wfx_retry_connection(uint16_t retryAttempt)
     {
         ChipLogProgress(DeviceLayer, "Failed to start retry timer");
         // Sending the join command if retry timer failed to start
-        if (wfx_connect_to_ap() != SL_STATUS_OK)
+        if (ConnectToAccessPoint() != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed.");
+            ChipLogError(DeviceLayer, "ConnectToAccessPoint() failed.");
         }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -201,6 +184,6 @@ void wfx_retry_connection(uint16_t retryAttempt)
     Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-    ChipLogProgress(DeviceLayer, "wfx_retry_connection : Next attempt after %d Seconds", retryInterval);
+    ChipLogProgress(DeviceLayer, "ScheduleConnectionAttempt : Next attempt after %d Seconds", retryInterval);
     retryInterval += retryInterval;
 }
