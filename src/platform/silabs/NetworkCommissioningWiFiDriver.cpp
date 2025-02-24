@@ -148,11 +148,11 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     wifiConfig.Clear();
 
     VerifyOrReturnError(ssidLen <= WFX_MAX_SSID_LENGTH, CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(wifiConfig.ssid.data(), ssid, ssidLen);
+    memcpy(wifiConfig.ssid, ssid, ssidLen);
     wifiConfig.ssidLength = ssidLen;
 
     VerifyOrReturnError(keyLen < WFX_MAX_PASSKEY_LENGTH, CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(wifiConfig.passkey.data(), key, keyLen);
+    memcpy(wifiConfig.passkey, key, keyLen);
     wifiConfig.passkeyLength = keyLen;
 
     wifiConfig.security = WFX_SEC_WPA2;
@@ -337,7 +337,7 @@ CHIP_ERROR GetConnectedNetwork(Network & network)
 
     network.connected = true;
 
-    ByteSpan ssidSpan(wifiConfig.ssid.data(), wifiConfig.ssidLength);
+    ByteSpan ssidSpan(wifiConfig.ssid, wifiConfig.ssidLength);
     MutableByteSpan networkIdSpan(network.networkID, NetworkCommissioning::kMaxNetworkIDLen);
 
     ReturnErrorOnFailure(CopySpanToMutableSpan(ssidSpan, networkIdSpan));
