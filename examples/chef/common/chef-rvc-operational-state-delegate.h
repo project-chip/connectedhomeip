@@ -122,7 +122,7 @@ void Shutdown();
 } // namespace app
 } // namespace chip
 
-extern std::unique_ptr<chip::app::Clusters::RvcOperationalState::RvcOperationalStateDelegate> gRvcOperationalStateDelegate;
+chip::app::Clusters::RvcOperationalState::RvcOperationalStateDelegate * getRvcOperationalStateDelegate();
 
 chip::Protocols::InteractionModel::Status chefRvcOperationalStateWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                                                const EmberAfAttributeMetadata * attributeMetadata,

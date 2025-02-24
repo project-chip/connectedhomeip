@@ -37,7 +37,12 @@ using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::T
 using namespace chip::app::Clusters::RvcRunMode;
 
 static std::unique_ptr<RvcRunModeDelegate> gRvcRunModeDelegate;
-std::unique_ptr<ModeBase::Instance> gRvcRunModeInstance;
+static std::unique_ptr<ModeBase::Instance> gRvcRunModeInstance;
+
+chip::app::Clusters::ModeBase::Instance * getRvcRunModeInstance()
+{
+    return gRvcRunModeInstance.get();
+}
 
 CHIP_ERROR RvcRunModeDelegate::Init()
 {
@@ -63,7 +68,7 @@ void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
         if (currentMode != RvcRunMode::ModeIdle)
         { // Stop existing cycle when going from cleaning/mapping to idle.
             ChipLogProgress(DeviceLayer, "Stopping RVC cycle: %d", currentMode);
-            gRvcOperationalStateDelegate->HandleStopStateCallback(err);
+            getRvcOperationalStateDelegate()->HandleStopStateCallback(err);
         }
     }
     else
@@ -71,7 +76,7 @@ void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
         if (currentMode == RvcRunMode::ModeIdle)
         { // Start a new cycle when going from idle to clening/mapping.
             ChipLogProgress(DeviceLayer, "Starting new RVC cycle: %d", NewMode);
-            gRvcOperationalStateDelegate->HandleStartStateCallback(err);
+            getRvcOperationalStateDelegate()->HandleStartStateCallback(err);
         }
     }
     if (err.IsEqual(OperationalState::GenericOperationalError(to_underlying(OperationalState::ErrorStateEnum::kNoError))))

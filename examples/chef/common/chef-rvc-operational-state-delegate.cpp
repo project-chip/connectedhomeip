@@ -32,8 +32,13 @@ using chip::Protocols::InteractionModel::Status;
 #include <chef-rvc-mode-delegate.h>
 #endif // MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
 
-std::unique_ptr<RvcOperationalStateDelegate> gRvcOperationalStateDelegate;
+static std::unique_ptr<RvcOperationalStateDelegate> gRvcOperationalStateDelegate;
 static std::unique_ptr<RvcOperationalState::Instance> gRvcOperationalStateInstance;
+
+RvcOperationalStateDelegate * getRvcOperationalStateDelegate()
+{
+    return gRvcOperationalStateDelegate.get();
+}
 
 static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data);
 
@@ -234,7 +239,7 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
             gRvcOperationalStateDelegate->mCountdownTime.SetNull();
 
 #ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
-            gRvcRunModeInstance->UpdateCurrentMode(RvcRunMode::ModeIdle);
+            getRvcRunModeInstance()->UpdateCurrentMode(RvcRunMode::ModeIdle);
 #endif // MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
         }
     }

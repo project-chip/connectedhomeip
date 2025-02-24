@@ -123,7 +123,7 @@ void Shutdown();
 } // namespace chip
 
 #ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
-extern std::unique_ptr<chip::app::Clusters::ModeBase::Instance> gRvcRunModeInstance;
+chip::app::Clusters::ModeBase::Instance * getRvcRunModeInstance();
 
 chip::Protocols::InteractionModel::Status chefRvcRunModeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                                       const EmberAfAttributeMetadata * attributeMetadata,
