@@ -571,7 +571,7 @@ void TestWriteChunking::RunTest(Instructions instructions)
     err = writeClient->SendWriteRequest(sessionHandle);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    GetIOContext().DriveIOUntil(sessionHandle->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime) +
+    GetIOContext().DriveIOUntil(sessionHandle->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime, false /*isPeerActive*/) +
                                     System::Clock::Seconds16(1),
                                 [&]() { return GetExchangeManager().GetNumActiveExchanges() == 0; });
 

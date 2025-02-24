@@ -3735,8 +3735,9 @@ void DeviceCommissioner::ExtendFailsafeBeforeNetworkEnable(DeviceProxy * device,
     // Try to make sure we have at least enough time for our expected
     // commissioning bits plus the MRP retries for a Sigma1.
     uint16_t failSafeTimeoutSecs = params.GetFailsafeTimerSeconds().ValueOr(kDefaultFailsafeTimeout);
-    auto sigma1Timeout           = CASESession::ComputeSigma1ResponseTimeout(commissioneeDevice->GetPairing().GetRemoteMRPConfig());
-    uint16_t sigma1TimeoutSecs   = std::chrono::duration_cast<System::Clock::Seconds16>(sigma1Timeout).count();
+    auto sigma1Timeout =
+        CASESession::ComputeSigma1ResponseTimeout(commissioneeDevice->GetPairing().GetRemoteMRPConfig(), false /*isPeerActive*/);
+    uint16_t sigma1TimeoutSecs = std::chrono::duration_cast<System::Clock::Seconds16>(sigma1Timeout).count();
     if (UINT16_MAX - failSafeTimeoutSecs < sigma1TimeoutSecs)
     {
         failSafeTimeoutSecs = UINT16_MAX;

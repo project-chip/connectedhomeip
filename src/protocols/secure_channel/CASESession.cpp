@@ -2611,7 +2611,7 @@ exit:
 
 namespace {
 System::Clock::Timeout ComputeRoundTripTimeout(ExchangeContext::Timeout serverProcessingTime,
-                                               const ReliableMessageProtocolConfig & remoteMrpConfig)
+                                               const ReliableMessageProtocolConfig & remoteMrpConfig, bool isPeerActive)
 {
     // TODO: This is duplicating logic from Session::ComputeRoundTripTimeout.  Unfortunately, it's called by
     // consumers who do not have a session.
@@ -2622,23 +2622,25 @@ System::Clock::Timeout ComputeRoundTripTimeout(ExchangeContext::Timeout serverPr
                                     // Assume peer is idle, as a worst-case assumption (probably true for
                                     // Sigma1, since that will be our initial message on the session, but less
                                     // so for Sigma2).
-                                    System::Clock::kZero, remoteMrpConfig.mActiveThresholdTime) +
+                                    System::Clock::kZero, remoteMrpConfig.mActiveThresholdTime, isPeerActive) +
         serverProcessingTime +
         GetRetransmissionTimeout(localMRPConfig.mActiveRetransTimeout, localMRPConfig.mIdleRetransTimeout,
                                  // Peer will assume we are active, since it's
                                  // responding to our message.
-                                 System::SystemClock().GetMonotonicTimestamp(), localMRPConfig.mActiveThresholdTime);
+                                 System::SystemClock().GetMonotonicTimestamp(), localMRPConfig.mActiveThresholdTime, isPeerActive);
 }
 } // anonymous namespace
 
-System::Clock::Timeout CASESession::ComputeSigma1ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig)
+System::Clock::Timeout CASESession::ComputeSigma1ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig,
+                                                                 bool isPeerActive)
 {
-    return ComputeRoundTripTimeout(kExpectedSigma1ProcessingTime, remoteMrpConfig);
+    return ComputeRoundTripTimeout(kExpectedSigma1ProcessingTime, remoteMrpConfig, isPeerActive);
 }
 
-System::Clock::Timeout CASESession::ComputeSigma2ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig)
+System::Clock::Timeout CASESession::ComputeSigma2ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig,
+                                                                 bool isPeerActive)
 {
-    return ComputeRoundTripTimeout(kExpectedHighProcessingTime, remoteMrpConfig);
+    return ComputeRoundTripTimeout(kExpectedHighProcessingTime, remoteMrpConfig, isPeerActive);
 }
 
 bool CASESession::InvokeBackgroundWorkWatchdog()

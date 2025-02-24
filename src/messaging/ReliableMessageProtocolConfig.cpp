@@ -126,20 +126,22 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
 }
 
 System::Clock::Timeout GetRetransmissionTimeout(System::Clock::Timeout activeInterval, System::Clock::Timeout idleInterval,
-                                                System::Clock::Timeout lastActivityTime, System::Clock::Timeout activityThreshold)
+                                                System::Clock::Timeout lastActivityTime, System::Clock::Timeout activityThreshold,
+                                                bool isPeerActive)
 {
     auto timeSinceLastActivity = (System::SystemClock().GetMonotonicTimestamp() - lastActivityTime);
 
     // Calculate the retransmission timeout and take into account that an active/idle state change can happen
     // in the middle.
     System::Clock::Timestamp timeout(0);
-    System::Clock::Milliseconds32 sitIcdSlowPollMaximum = System::Clock::Milliseconds32(15000);
     for (uint8_t i = 0; i < CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1; i++)
     {
         auto baseInterval = activeInterval;
-        if (((timeSinceLastActivity + timeout) >= activityThreshold) && (idleInterval.count() <= sitIcdSlowPollMaximum.count()))
+        // Check if peer is active, if yes, use ActiveRetransTimeout,
+        // if not, Choose active/idle timeout from PeerActiveMode of session per 4.11.2.1. Retransmissions.
+        if (!isPeerActive)
         {
-            baseInterval = idleInterval;
+            baseInterval = ((timeSinceLastActivity + timeout) < activityThreshold) ? activeInterval : idleInterval;
         }
         timeout += Messaging::ReliableMessageMgr::GetBackoff(baseInterval, i, /* computeMaxPossible */ true);
     }

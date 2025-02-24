@@ -623,7 +623,7 @@ Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(DeviceProxy
     auto sessionHandle = device->GetSecureSession();
     if (sessionHandle.HasValue())
     {
-        timeout = sessionHandle.Value()->ComputeRoundTripTimeout(timeout);
+        timeout = sessionHandle.Value()->ComputeRoundTripTimeout(timeout, false /*isPeerActive*/);
     }
 
     // Enforce the spec minimal timeout.  Maybe this enforcement should live in

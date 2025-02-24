@@ -63,6 +63,7 @@ public:
     CHIP_ERROR EstablishSession(const CASEClientInitParams & params, const ScopedNodeId & peer,
                                 const Transport::PeerAddress & peerAddress, const ReliableMessageProtocolConfig & remoteMRPConfig,
                                 SessionEstablishmentDelegate * delegate);
+    bool IsPeerActive() { return mCASESession.IsPeerActive(); };
 
 private:
     CASESession mCASESession;

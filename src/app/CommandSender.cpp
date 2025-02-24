@@ -125,7 +125,8 @@ CHIP_ERROR CommandSender::SendCommandRequestInternal(const SessionHandle & sessi
     mExchangeCtx.Grab(exchange);
     VerifyOrReturnError(!mExchangeCtx->IsGroupExchangeContext(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    mExchangeCtx->SetResponseTimeout(timeout.ValueOr(session->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime)));
+    mExchangeCtx->SetResponseTimeout(timeout.ValueOr(
+        session->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime, mExchangeCtx.Get()->HasReceivedAtLeastOneMessage())));
 
     if (mTimedInvokeTimeoutMs.HasValue())
     {
