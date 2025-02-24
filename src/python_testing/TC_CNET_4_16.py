@@ -36,15 +36,18 @@ from typing import Optional
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
+
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches, run_if_endpoint_matches, has_feature
 from mobly import asserts
 
 from controller.python.chip import ChipDeviceCtrl
+from python_testing.matter_testing_infrastructure.chip.testing.conversions import bytes_from_hex
 from python_testing.matter_testing_infrastructure.chip.testing.matter_asserts import assert_valid_uint8
 
 logger = logging.getLogger('NetworkCommissioning')
 logger.setLevel(logging.INFO)
 
+# from commissioning_failure_test.py
 # TEST_THREAD_NETWORK_DATASET_TLVS = [bytes.fromhex("0e080000000000010000" +
 #                                                   "000300000c" +
 #                                                   "35060004001fffe0" +
@@ -91,8 +94,10 @@ class TC_CNET_4_16(MatterBaseTest):
         asserts.assert_true('PIXIT.CNET.ENDPOINT_THREAD' in self.matter_test_config.global_test_params,
                             "PIXIT.CNET.ENDPOINT_THREAD must be included on the command line in "
                             "the --int-arg flag as PIXIT.CNET.ENDPOINT_THREAD:<endpoint>")
-        self.endpoint = self.matter_test_config.global_test_params['PIXIT.CNET.ENDPOINT_THREAD']
+        endpoint = self.matter_test_config.global_test_params['PIXIT.CNET.ENDPOINT_THREAD']
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
+        TH1_nodeid = self.matter_test_config.controller_node_id
+        TH2_nodeid = self.matter_test_config.controller_node_id + 1
 
         # Commissioning is already done
         self.step("precondition")
@@ -105,7 +110,7 @@ class TC_CNET_4_16(MatterBaseTest):
         feature_map = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.FeatureMap)
         if not (self.check_pics("CNET.S.F01") or (feature_map & cnet.Bitmaps.Feature.kThreadNetworkInterface)):
             logging.info('Device does not support Thread on endpoint, skipping remaining steps')
-            self.skip_all_remaining_steps(2)
+            self.skip_all_remaining_steps(1)
             return
 
         # DUT is factory reset
@@ -124,10 +129,40 @@ class TC_CNET_4_16(MatterBaseTest):
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900
         self.step(1)
+        response = await commissioner.SendCommand(
+            nodeid=TH1_nodeid,
+            endpoint=endpoint,
+            payload=Clusters.GeneralCommissioning.Commands.ArmFailSafe(
+                expiryLengthSeconds=900),
+        )
+        asserts.assert_equal(
+            response.errorCode,
+            Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+            "ArmFailSafeResponse error code is not OK.",
+        )
 
         # TH sends RemoveNetwork Command to the DUT with NetworkID field set to the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET,
         # which does not match the commissioned network, and Breadcrumb field set to 1
         self.step(2)
+
+        networkList = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.Networks)
+        logger.info(f"Got network list: {networkList}")
+        if len(networkList) != 0:
+            for network in networkList:
+                # TODO: I know this is not ok, but I need real device to test
+                if network.networkIdentifier == bytes_from_hex(PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET):
+                    networkID = await self.read_single_attribute(
+                        dev_ctrl=commissioner, node_id=TH1_nodeid, endpoint=endpoint, attribute=cnet.Structs.ThreadInterfaceScanResultStruct.extendedPanId)
+                    logger.info("Removing existing network")
+                    req = cnet.Commands.RemoveNetwork(networkID=networkID, breadcrumb=1)
+                    res = await commissioner.SendCommand(nodeid=TH1_nodeid, endpoint=endpoint, payload=req)
+                    logger.info(f"Received response: {res}")
+                    # Verify that DUT sends NetworkConfigResponse command to the TH1 with NetworkingStatus field set to NetworkIDNotFound
+                    asserts.assert_equal(res.networkingStatus,
+                                         Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kNetworkIDNotFound,
+                                         f"Expected kNetworkIDNotFound but got: {res.networkingStatus}")
+        else:
+            logger.error(f"NetworkList is Empty")
 
         # TH sends ConnectNetwork Command to the DUT with NetworkID value as the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET,
         # which does not match the commissioned network, and Breadcrumb field set to 1
