@@ -185,6 +185,14 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         SuccessOrExit(err);
     }
 
+    {
+        app::FailSafeContext::InitParams failSafeInitParams;
+        failSafeInitParams.storage = mDeviceStorage;
+
+        err = mFailSafeContext.Init(failSafeInitParams);
+        SuccessOrExit(err);
+    }
+
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
     Access::SetAccessControl(mAccessControl);
 

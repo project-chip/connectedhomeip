@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "lib/core/CHIPPersistentStorageDelegate.h"
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -34,6 +35,14 @@ namespace app {
 class FailSafeContext
 {
 public:
+    struct InitParams
+    {
+        // PersistentStorageDelegate for marker storage (MANDATORY).
+        PersistentStorageDelegate * storage = nullptr;
+    };
+
+    CHIP_ERROR Init(const InitParams & initParams);
+
     // ===== Members for internal use by other Device Layer components.
 
     /**
@@ -105,6 +114,7 @@ public:
     void ForceFailSafeTimerExpiry();
 
 private:
+    PersistentStorageDelegate * mStorage   = nullptr;
     bool mFailSafeArmed                    = false;
     bool mFailSafeBusy                     = false;
     bool mAddNocCommandHasBeenInvoked      = false;
