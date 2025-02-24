@@ -24,6 +24,8 @@
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
+#include <lib/core/TLV.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConnectivityManager.h>
@@ -33,6 +35,20 @@ using namespace chip::DeviceLayer;
 
 namespace chip {
 namespace app {
+
+namespace {
+
+// Tags for AddNOCStartedMarker storage
+constexpr TLV::Tag kAddNOCStartedMarkerFabricIndexTag = TLV::ContextTag(0);
+
+constexpr size_t AddNOCStartedMarkerContextTLVMaxSize()
+{
+    // Add 2x uncommitted uint64_t to leave space for backwards/forwards
+    // versioning for this critical feature that runs at boot.
+    return TLV::EstimateStructOverhead(sizeof(FabricIndex), sizeof(uint64_t), sizeof(uint64_t));
+}
+
+} // namespace
 
 CHIP_ERROR FailSafeContext::Init(const InitParams & initParams)
 {
@@ -162,6 +178,60 @@ void FailSafeContext::ForceFailSafeTimerExpiry()
     DeviceLayer::SystemLayer().CancelTimer(HandleMaxCumulativeFailSafeTimer, this);
 
     FailSafeTimerExpired();
+}
+
+CHIP_ERROR FailSafeContext::GetAddNOCStartedMarker(AddNOCStartedMarker & outMarker)
+{
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    uint8_t tlvBuf[AddNOCStartedMarkerContextTLVMaxSize()];
+    uint16_t tlvSize = sizeof(tlvBuf);
+
+    ReturnErrorOnFailure(
+        mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FailSafeAddNOCStartedMarkerKey().KeyName(), tlvBuf, tlvSize));
+
+    // If buffer was too small, we won't reach here.
+    TLV::ContiguousBufferTLVReader reader;
+    reader.Init(tlvBuf, tlvSize);
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+
+    TLV::TLVType containerType;
+    ReturnErrorOnFailure(reader.EnterContainer(containerType));
+
+    ReturnErrorOnFailure(reader.Next(kAddNOCStartedMarkerFabricIndexTag));
+    ReturnErrorOnFailure(reader.Get(outMarker.fabricIndex));
+
+    // Don't try to exit container: we got all we needed. This allows us to
+    // avoid erroring-out on newer versions.
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FailSafeContext::StoreAddNOCStartedMarker(const AddNOCStartedMarker & marker)
+{
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    uint8_t tlvBuf[AddNOCStartedMarkerContextTLVMaxSize()];
+    TLV::TLVWriter writer;
+    writer.Init(tlvBuf);
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+    ReturnErrorOnFailure(writer.Put(kAddNOCStartedMarkerFabricIndexTag, marker.fabricIndex));
+    ReturnErrorOnFailure(writer.EndContainer(outerType));
+
+    const auto markerContextTLVLength = writer.GetLengthWritten();
+    VerifyOrReturnError(CanCastTo<uint16_t>(markerContextTLVLength), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::FailSafeAddNOCStartedMarkerKey().KeyName(), tlvBuf,
+                                     static_cast<uint16_t>(markerContextTLVLength));
+}
+
+void FailSafeContext::ClearAddNOCStartedMarker()
+{
+    VerifyOrDie(mStorage != nullptr);
+
+    mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FailSafeAddNOCStartedMarkerKey().KeyName());
 }
 
 } // namespace app
