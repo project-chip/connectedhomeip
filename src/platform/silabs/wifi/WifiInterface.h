@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app/icd/server/ICDServerConfig.h>
+#include <array>
 #include <cmsis_os2.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/Span.h>
@@ -105,15 +106,6 @@ typedef enum
     WFX_SEC_WPA_WPA2_MIXED = 6,
 } wfx_sec_t;
 
-typedef struct
-{
-    char ssid[WFX_MAX_SSID_LENGTH + 1];
-    size_t ssid_length;
-    char passkey[WFX_MAX_PASSKEY_LENGTH + 1];
-    size_t passkey_length;
-    wfx_sec_t security;
-} wfx_wifi_provision_t;
-
 typedef struct wfx_wifi_scan_result
 {
     uint8_t ssid[WFX_MAX_SSID_LENGTH]; // excludes null-character
@@ -148,11 +140,43 @@ typedef enum
 } sl_wfx_interface_t;
 #endif
 
+// TODO: Figure out if we need this structure. We have different strcutures for the same use
+struct WifiCredentials
+{
+    std::array<uint8_t, WFX_MAX_SSID_LENGTH> ssid       = { 0 };
+    size_t ssidLength                                   = 0;
+    std::array<uint8_t, WFX_MAX_PASSKEY_LENGTH> passkey = { 0 };
+    size_t passkeyLength                                = 0;
+    wfx_sec_t security                                  = WFX_SEC_UNSPECIFIED;
+
+    WifiCredentials & operator=(const WifiCredentials & other)
+    {
+        if (this != &other)
+        {
+            ssid          = other.ssid;
+            ssidLength    = other.ssidLength;
+            passkey       = other.passkey;
+            passkeyLength = other.passkeyLength;
+            security      = other.security;
+        }
+        return *this;
+    }
+
+    void Clear()
+    {
+        ssid.fill(0);
+        ssidLength = 0;
+        passkey.fill(0);
+        passkeyLength = 0;
+        security      = WFX_SEC_UNSPECIFIED;
+    }
+};
+
 typedef struct wfx_rsi_s
 {
     chip::BitFlags<WifiState> dev_state;
     uint16_t ap_chan; /* The chan our STA is using	*/
-    wfx_wifi_provision_t sec;
+    WifiCredentials credentials;
     ScanCallback scan_cb;
     uint8_t * scan_ssid; /* Which one are we scanning for */
     size_t scan_ssid_length;
@@ -162,7 +186,6 @@ typedef struct wfx_rsi_s
     MacAddress sta_mac;
     MacAddress ap_mac;   /* To which our STA is connected */
     MacAddress ap_bssid; /* To which our STA is connected */
-    uint16_t join_retries;
     uint8_t ip4_addr[4]; /* Not sure if this is enough */
 } WfxRsi_t;
 
@@ -361,6 +384,55 @@ CHIP_ERROR ResetCounters();
  */
 CHIP_ERROR ConfigureBroadcastFilter(bool enableBroadcastFilter);
 
+/**
+ * @brief Clears the stored Wi-Fi crendetials stored in RAM only
+ */
+void ClearWifiCredentials();
+
+/**
+ * @brief Stores the Wi-Fi credentials
+ *
+ * @note Function does not validate if the device already has Wi-Fi credentials.
+ *       It is the responsibility of the caller to ensuret that.
+ *       The function will overwrite any existing Wi-Fi credentials.
+ *
+ * @param[in] credentials
+ */
+void SetWifiCredentials(const WifiCredentials & credentials);
+
+/**
+ * @brief Returns the configured Wi-Fi credentials
+ *
+ * @param[out] credentials stored wifi crendetials
+ *
+ * @return CHIP_ERROR CHIP_ERROR_INCORRECT_STATE, if the device does not have any set credentials
+ *                    CHIP_NO_ERROR, otherwise
+ */
+CHIP_ERROR GetWifiCredentials(WifiCredentials & credentials);
+
+/**
+ * @brief Returns the state of the Wi-Fi network provisionning
+ *        Does the device has Wi-Fi credentials or not
+ *
+ * @return true, the device has Wi-Fi credentials
+ *         false, otherwise
+ */
+bool IsWifiProvisioned();
+
+/**
+ * @brief Triggers a connection attempt the Access Point who's crendetials match the ones store with the SetWifiCredentials API.
+ *        The function triggers an async connection attempt. The upper layers are notified trought a platform event if the
+ *        connection attempt was successful or not.
+ *
+ *        The returned error code only indicates if the connection attempt was triggered or not.
+ *
+ * @return CHIP_ERROR CHIP_NO_ERROR, the connection attempt was succesfully triggered
+ *                    CHIP_ERROR_INCORRECT_STATE, the Wi-Fi station does not have any Wi-Fi credentials
+ *                    CHIP_ERROR_INVALID_ARGUMENT, the provisionned crendetials do not match the Wi-Fi station requirements
+ *                    CHIP_ERROR_INTERNAL, otherwise
+ */
+CHIP_ERROR ConnectToAccessPoint(void);
+
 /* Function to update */
 
 // TODO: Harmonize the Power Save function inputs for all platforms
@@ -373,21 +445,42 @@ CHIP_ERROR ConfigurePowerSave();
 #endif /* (SLI_SI91X_MCU_INTERFACE | EXP_BOARD) */
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-void wfx_set_wifi_provision(wfx_wifi_provision_t * wifiConfig);
-bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig);
-void wfx_clear_wifi_provision(void);
-sl_status_t wfx_connect_to_ap(void);
-
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-bool wfx_have_ipv4_addr(sl_wfx_interface_t);
+/**
+ * @brief Returns IP assignment status
+ *
+
+ * @return true, Wi-Fi station has an IPv4 address
+ *         false, otherwise
+ */
+bool HasAnIPv4Address();
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
-bool wfx_have_ipv6_addr(sl_wfx_interface_t);
-void wfx_cancel_scan(void);
+/**
+ * @brief Returns IP assignment status
+ *
 
-/*
- * Call backs into the Matter Platform code
+ * @return true, Wi-Fi station has an IPv6 address
+ *         false, otherwise
  */
-void sl_matter_wifi_task_started(void);
+bool HasAnIPv6Address();
 
-void wfx_retry_connection(uint16_t retryAttempt);
+/**
+ * @brief Cancels the on-going network scan operation.
+ *        If one isn't in-progress, function doesn't do anything
+ */
+void CancelScanNetworks();
+
+/**
+ * @brief Notifies upper-layers that Wi-Fi initialization has succesfully completed
+ */
+void NotifyWifiTaskInitialized(void);
+
+/**
+ * @brief Function schedules a reconnection attempt with the Access Point
+ *
+ * @note The retry interval increases exponentially with each attempt, starting from a minimum value and doubling each time,
+ *       up to a maximum value. For example, if the initial retry interval is 1 second, the subsequent intervals will be 2 seconds,
+ *       4 seconds, 8 seconds, and so on, until the maximum retry interval is reached.
+ */
+void ScheduleConnectionAttempt();
