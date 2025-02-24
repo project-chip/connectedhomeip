@@ -109,9 +109,6 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
                                                                 DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Clusters::UnitTesting::Commands;
-    using QF                            = DataModel::CommandQualityFlags;
-    static const auto kDefaultFlags     = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
-    static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
 
     if (!mOverrideAcceptedCommands)
     {
@@ -124,7 +121,7 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
     }
 
     // We just have one command id.
-    ReturnErrorOnFailure(builder.Append({ TestSimpleArgumentRequest::Id, kDefaultFlags, kDefaultPrivilege }));
+    ReturnErrorOnFailure(builder.Append({ TestSimpleArgumentRequest::Id, {}}));
     return CHIP_NO_ERROR;
 }
 

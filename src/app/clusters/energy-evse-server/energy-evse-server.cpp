@@ -187,31 +187,30 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 {
     using namespace Commands;
     using QF                            = DataModel::CommandQualityFlags;
-    static const auto kDefaultFlags     = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
     static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
 
     ReturnErrorOnFailure(builder.AppendElements({
-        { Disable::Id, kDefaultFlags, kDefaultPrivilege },
-        { EnableCharging::Id, kDefaultFlags, kDefaultPrivilege },
+        { Disable::Id, QF::kTimed, kDefaultPrivilege },         //
+        { EnableCharging::Id, QF::kTimed, kDefaultPrivilege },  //
     }));
 
     if (HasFeature(Feature::kV2x))
     {
-        ReturnErrorOnFailure(builder.Append({ EnableDischarging::Id, kDefaultFlags, kDefaultPrivilege }));
+        ReturnErrorOnFailure(builder.Append({ EnableDischarging::Id, QF::kTimed, kDefaultPrivilege }));
     }
 
     if (HasFeature(Feature::kChargingPreferences))
     {
         ReturnErrorOnFailure(builder.AppendElements({
-            { SetTargets::Id, kDefaultFlags, kDefaultPrivilege },
-            { GetTargets::Id, kDefaultFlags, kDefaultPrivilege },
-            { ClearTargets::Id, kDefaultFlags, kDefaultPrivilege },
+            { SetTargets::Id,   QF::kTimed, kDefaultPrivilege }, //
+            { GetTargets::Id,   QF::kTimed, kDefaultPrivilege }, //
+            { ClearTargets::Id, QF::kTimed, kDefaultPrivilege }, //
         }));
     }
 
     if (SupportsOptCmd(OptionalCommands::kSupportsStartDiagnostics))
     {
-        ReturnErrorOnFailure(builder.Append({ StartDiagnostics::Id, kDefaultFlags, kDefaultPrivilege }));
+        ReturnErrorOnFailure(builder.Append({ StartDiagnostics::Id, QF::kTimed, kDefaultPrivilege }));
     }
     return CHIP_NO_ERROR;
 }

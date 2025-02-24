@@ -306,7 +306,6 @@ private:
     bool mHandleCommand     = false;
 
     std::vector<AcceptedCommandEntry> mAccepted;
-
     std::vector<CommandId> mGenerated;
 };
 
@@ -1227,10 +1226,6 @@ TEST_F(TestCodegenModelViaMocks, AcceptedGeneratedCommandsOnInvalidEndpoints)
 TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
 {
 
-    using QF                            = DataModel::CommandQualityFlags;
-    static const auto kDefaultFlags     = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
-    static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
-
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
@@ -1257,8 +1252,8 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
     ASSERT_TRUE(acceptedBuilder.IsEmpty());
 
     // set some overrides
-    handler.AcceptedVec().push_back({ 1234, kDefaultFlags, kDefaultPrivilege });
-    handler.AcceptedVec().push_back({ 999, kDefaultFlags, kDefaultPrivilege });
+    handler.AcceptedVec().push_back({ 1234, {}});
+    handler.AcceptedVec().push_back({ 999, {}});
 
     handler.GeneratedVec().push_back(33);
 
