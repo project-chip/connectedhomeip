@@ -117,7 +117,7 @@ TEST(TestDefaultOTARequestorStorage, TestDefaultProvidersDuplicated)
     auto iterator = providers.Begin();
     EXPECT_EQ(false, iterator.Next());
 
-    for(uint8_t i = 0; i < CHIP_CONFIG_MAX_FABRICS; i++)
+    for (uint8_t i = 0; i < CHIP_CONFIG_MAX_FABRICS; i++)
     {
         EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(1), NodeId(0x11111111), EndpointId(1))));
     }
