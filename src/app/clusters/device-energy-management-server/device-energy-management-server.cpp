@@ -111,17 +111,13 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
     if (HasFeature(Feature::kPowerAdjustment))
     {
-        ReturnErrorOnFailure(builder.AppendElements({
-            { PowerAdjustRequest::Id, {} },
-            { CancelPowerAdjustRequest::Id, {} }
-        }));
+        ReturnErrorOnFailure(builder.AppendElements({ { PowerAdjustRequest::Id, {} }, { CancelPowerAdjustRequest::Id, {} } }));
     }
 
     if (HasFeature(Feature::kStartTimeAdjustment))
     {
-        ReturnErrorOnFailure(builder.Append(
-            { StartTimeAdjustRequest::Id, {} } //
-        ));
+        ReturnErrorOnFailure(builder.Append({ StartTimeAdjustRequest::Id, {} } //
+                                            ));
     }
 
     if (HasFeature(Feature::kPausable))
