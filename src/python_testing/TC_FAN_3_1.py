@@ -323,14 +323,16 @@ class TC_FAN_3_1(MatterBaseTest):
             elif write_status == Status.InvalidInState:
                 # Get current attribute value and verify it's equal to the previous value
                 attr_value_current = await self.read_setting(endpoint, attr_to_verify)
+                attr_value_previous = init_attr_to_verify_value if iteration == 1 else attr_value_previous
                 asserts.assert_equal(attr_value_current, attr_value_previous,
                                     f"[FC] Current {attr_to_verify.__name__} attribute value must be equal to the previous one")
-# TODO: Handle iter 1 cases
+
                 # Get current SpeedSetting attribute value and verify it's equal to the previous value (if present)
                 if self.supports_multispeed:
                     speed_setting_current = await self.read_setting(endpoint, attribute.SpeedSetting)
+                    speed_setting_previous = init_speed_setting if iteration == 1 else speed_setting_previous
                     asserts.assert_equal(speed_setting_current, speed_setting_previous,
-                                        "Current SpeedSetting attribute value must be equal to the previous one")
+                                    "Current SpeedSetting attribute value must be equal to the previous one")
 
     async def log_scenario(self, attr_to_update, attr_to_verify, order, init_fan_mode, init_percent_setting, init_speed_setting):
         # Logging the scenario being tested
