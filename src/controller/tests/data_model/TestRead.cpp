@@ -4618,10 +4618,10 @@ System::Clock::Timeout TestRead::ComputeSubscriptionTimeout(System::Clock::Secon
     // Add 1000ms of slack to our max interval to make sure we hit the
     // subscription liveness timer.  100ms was tried in the past and is not
     // sufficient: our process can easily lose the timeslice for 100ms.
-    const auto & ourMrpConfig = GetDefaultMRPConfig();
-    auto publisherTransmissionTimeout =
-        GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
-                                 System::SystemClock().GetMonotonicTimestamp(), ourMrpConfig.mActiveThresholdTime);
+    const auto & ourMrpConfig         = GetDefaultMRPConfig();
+    auto publisherTransmissionTimeout = GetRetransmissionTimeout(
+        ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout, System::SystemClock().GetMonotonicTimestamp(),
+        ourMrpConfig.mActiveThresholdTime, true /* isPeerActive */);
 
     return publisherTransmissionTimeout + aMaxInterval + System::Clock::Milliseconds32(1000);
 }

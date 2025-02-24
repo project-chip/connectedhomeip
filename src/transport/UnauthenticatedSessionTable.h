@@ -92,14 +92,14 @@ public:
 
     bool AllowsLargePayload() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kTcp; }
 
-    System::Clock::Milliseconds32 GetAckTimeout() const override
+    System::Clock::Milliseconds32 GetAckTimeout(bool isPeerActive) const override
     {
         switch (mPeerAddress.GetTransportType())
         {
         case Transport::Type::kUdp: {
             const ReliableMessageProtocolConfig & remoteMRPConfig = mRemoteSessionParams.GetMRPConfig();
             return GetRetransmissionTimeout(remoteMRPConfig.mActiveRetransTimeout, remoteMRPConfig.mIdleRetransTimeout,
-                                            GetLastPeerActivityTime(), remoteMRPConfig.mActiveThresholdTime);
+                                            GetLastPeerActivityTime(), remoteMRPConfig.mActiveThresholdTime, isPeerActive);
         }
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
@@ -111,7 +111,8 @@ public:
         return System::Clock::Timeout();
     }
 
-    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity) const override
+    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity,
+                                                           bool isPeerActive) const override
     {
         switch (mPeerAddress.GetTransportType())
         {
@@ -120,7 +121,7 @@ public:
             const auto & defaultMRRPConfig   = GetDefaultMRPConfig();
             const auto & localMRPConfig      = maybeLocalMRPConfig.ValueOr(defaultMRRPConfig);
             return GetRetransmissionTimeout(localMRPConfig.mActiveRetransTimeout, localMRPConfig.mIdleRetransTimeout,
-                                            ourLastActivity, localMRPConfig.mActiveThresholdTime);
+                                            ourLastActivity, localMRPConfig.mActiveThresholdTime, isPeerActive);
         }
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
@@ -155,16 +156,7 @@ public:
 
     System::Clock::Timestamp GetMRPBaseTimeout() const override
     {
-        System::Clock::Milliseconds32 sitIcdSlowPollMaximum = System::Clock::Milliseconds32(15000);
-        if (IsPeerActive())
-        {
-            return GetRemoteMRPConfig().mActiveRetransTimeout;
-        }
-        if (GetRemoteMRPConfig().mIdleRetransTimeout.count() <= sitIcdSlowPollMaximum.count())
-        {
-            return GetRemoteMRPConfig().mIdleRetransTimeout;
-        }
-        return GetRemoteMRPConfig().mActiveRetransTimeout;
+        return IsPeerActive() ? GetRemoteMRPConfig().mActiveRetransTimeout : GetRemoteMRPConfig().mIdleRetransTimeout;
     }
 
     void SetRemoteSessionParameters(const SessionParameters & sessionParams) { mRemoteSessionParams = sessionParams; }

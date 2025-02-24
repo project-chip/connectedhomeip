@@ -64,7 +64,7 @@ const OutgoingGroupSession * Session::AsConstOutgoingGroupSession() const
     return static_cast<const OutgoingGroupSession *>(this);
 }
 
-System::Clock::Timeout Session::ComputeRoundTripTimeout(System::Clock::Timeout upperlayerProcessingTimeout)
+System::Clock::Timeout Session::ComputeRoundTripTimeout(System::Clock::Timeout upperlayerProcessingTimeout, bool isPeerActive)
 {
     if (IsGroupSession())
     {
@@ -73,7 +73,8 @@ System::Clock::Timeout Session::ComputeRoundTripTimeout(System::Clock::Timeout u
 
     // Treat us as active for purposes of GetMessageReceiptTimeout(), since the
     // other side would be responding to our message.
-    return GetAckTimeout() + upperlayerProcessingTimeout + GetMessageReceiptTimeout(System::SystemClock().GetMonotonicTimestamp());
+    return GetAckTimeout(isPeerActive) + upperlayerProcessingTimeout +
+        GetMessageReceiptTimeout(System::SystemClock().GetMonotonicTimestamp(), isPeerActive);
 }
 
 uint16_t Session::SessionIdForLogging() const

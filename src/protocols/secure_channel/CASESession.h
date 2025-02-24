@@ -157,13 +157,16 @@ public:
 
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
+    bool IsPeerActive() { return mExchangeCtxt.HasValue() && mExchangeCtxt.Value()->HasReceivedAtLeastOneMessage(); };
     // Compute our Sigma1 response timeout.  This can give consumers an idea of
     // how long it will take to detect that our Sigma1 did not get through.
-    static System::Clock::Timeout ComputeSigma1ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig);
+    static System::Clock::Timeout ComputeSigma1ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig,
+                                                               bool isPeerActive);
 
     // Compute our Sigma2 response timeout.  This can give consumers an idea of
     // how long it will take to detect that our Sigma1 did not get through.
-    static System::Clock::Timeout ComputeSigma2ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig);
+    static System::Clock::Timeout ComputeSigma2ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig,
+                                                               bool isPeerActive);
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     /** @brief This function zeroes out and resets the memory used by the object.
