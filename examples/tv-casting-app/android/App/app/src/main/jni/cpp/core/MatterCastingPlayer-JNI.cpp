@@ -165,6 +165,18 @@ JNI_METHOD(void, disconnect)
     castingPlayer->Disconnect();
 }
 
+JNI_METHOD(bool, isPendingPasscodeFromUser)
+(JNIEnv * env, jobject thiz)
+{
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::isPendingPasscodeFromUser()");
+
+    CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
+    VerifyOrReturnValue(castingPlayer != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT));
+
+    return castingPlayer->IsPendingPasscodeFromUser();
+}
+
 JNI_METHOD(jobject, getEndpoints)
 (JNIEnv * env, jobject thiz)
 {

@@ -262,6 +262,22 @@ public class ConnectionExampleFragment extends Fragment {
             });
   }
 
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+
+    // Only stop connection if we are pending passcode confirmation
+    // We cannot stop connection once continueConnecting() is called
+    if (targetCastingPlayer.isPendingPasscodeFromUser()) {
+      MatterError err = targetCastingPlayer.stopConnecting();
+      if (err.hasError()) {
+        Log.e(
+            TAG,
+            "Going back before connection finishes but stopConnecting() failed due to: " + err);
+      }
+    }
+  }
+
   private void displayPasscodeInputDialog(Context context) {
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
