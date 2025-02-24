@@ -21,9 +21,9 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/data-model/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/List.h>
+#include <app/data-model/MetadataList.h>
 #include <lib/support/Span.h>
 
 namespace chip {

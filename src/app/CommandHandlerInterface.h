@@ -30,7 +30,7 @@
 namespace chip {
 namespace app {
 namespace DataModel {
-    struct AcceptedCommandEntry;
+struct AcceptedCommandEntry;
 }
 
 /*
@@ -126,7 +126,8 @@ public:
      * This is used by callbacks that just look for a particular value in the
      * list.
      */
-    virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
+    virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                                 DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }

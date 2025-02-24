@@ -23,9 +23,9 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
-#include <app/data-model/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/List.h>
+#include <app/data-model/MetadataList.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPError.h>

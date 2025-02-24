@@ -182,35 +182,36 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
 }
 
 // CommandHandlerInterface
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,  DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
+CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                               DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
-    using QF = DataModel::CommandQualityFlags;
-    static const auto kDefaultFlags = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
+    using QF                            = DataModel::CommandQualityFlags;
+    static const auto kDefaultFlags     = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
     static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
 
     ReturnErrorOnFailure(builder.AppendElements({
-        {Disable::Id, kDefaultFlags, kDefaultPrivilege},
-        {EnableCharging::Id, kDefaultFlags, kDefaultPrivilege},
+        { Disable::Id, kDefaultFlags, kDefaultPrivilege },
+        { EnableCharging::Id, kDefaultFlags, kDefaultPrivilege },
     }));
 
     if (HasFeature(Feature::kV2x))
     {
-        ReturnErrorOnFailure(builder.Append({EnableDischarging::Id, kDefaultFlags, kDefaultPrivilege}) );
+        ReturnErrorOnFailure(builder.Append({ EnableDischarging::Id, kDefaultFlags, kDefaultPrivilege }));
     }
 
     if (HasFeature(Feature::kChargingPreferences))
     {
         ReturnErrorOnFailure(builder.AppendElements({
-            {SetTargets::Id, kDefaultFlags, kDefaultPrivilege},
-            {GetTargets::Id, kDefaultFlags, kDefaultPrivilege},
-            {ClearTargets::Id, kDefaultFlags, kDefaultPrivilege},
+            { SetTargets::Id, kDefaultFlags, kDefaultPrivilege },
+            { GetTargets::Id, kDefaultFlags, kDefaultPrivilege },
+            { ClearTargets::Id, kDefaultFlags, kDefaultPrivilege },
         }));
     }
 
     if (SupportsOptCmd(OptionalCommands::kSupportsStartDiagnostics))
     {
-        ReturnErrorOnFailure(builder.Append({StartDiagnostics::Id, kDefaultFlags, kDefaultPrivilege}));
+        ReturnErrorOnFailure(builder.Append({ StartDiagnostics::Id, kDefaultFlags, kDefaultPrivilege }));
     }
     return CHIP_NO_ERROR;
 }

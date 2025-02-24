@@ -172,7 +172,9 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     reportBuilder.Checkpoint(checkpoint);
 
     DataModel::ActionReturnStatus status(CHIP_NO_ERROR);
-    AttributeValueEncoder attributeValueEncoder ={reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState};
+    AttributeValueEncoder attributeValueEncoder = {
+        reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState
+    };
 
     // TODO: we explicitly DO NOT validate that path is a valid cluster path (even more, above serverClusterFinder
     //       explicitly ignores that case). This means that global attribute reads as well as ReadAttribute

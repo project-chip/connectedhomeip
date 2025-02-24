@@ -187,17 +187,18 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 }
 
 // List the commands supported by this instance.
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
+CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                               DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace ResourceMonitoring::Commands;
-    using QF = DataModel::CommandQualityFlags;
-    static const auto kDefaultFlags = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
+    using QF                            = DataModel::CommandQualityFlags;
+    static const auto kDefaultFlags     = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
     static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
 
     ChipLogDetail(Zcl, "resourcemonitoring: EnumerateAcceptedCommands");
     if (mResetConditionCommandSupported)
     {
-        return builder.Append({ResetCondition::Id, kDefaultFlags, kDefaultPrivilege});
+        return builder.Append({ ResetCondition::Id, kDefaultFlags, kDefaultPrivilege });
     }
 
     return CHIP_NO_ERROR;

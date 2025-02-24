@@ -62,7 +62,8 @@ public:
 
     void InvokeCommand(HandlerContext & handlerContext) override;
 
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,  DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                         DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 };
 
 SoftwareDiagosticsAttrAccess gAttrAccess;
@@ -168,11 +169,13 @@ void SoftwareDiagnosticsCommandHandler::InvokeCommand(HandlerContext & handlerCo
     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 
-CHIP_ERROR SoftwareDiagnosticsCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
+CHIP_ERROR
+SoftwareDiagnosticsCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                                             DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
-    using QF = DataModel::CommandQualityFlags;
-    static const auto kDefaultFlags = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
+    using QF                            = DataModel::CommandQualityFlags;
+    static const auto kDefaultFlags     = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
     static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
     if (!DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
     {
@@ -180,7 +183,7 @@ CHIP_ERROR SoftwareDiagnosticsCommandHandler::EnumerateAcceptedCommands(const Co
         return CHIP_NO_ERROR;
     }
 
-    return builder.Append({ResetWatermarks::Id, kDefaultFlags, kDefaultPrivilege});
+    return builder.Append({ ResetWatermarks::Id, kDefaultFlags, kDefaultPrivilege });
 }
 
 } // anonymous namespace

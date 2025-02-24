@@ -19,9 +19,9 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
-#include <app/data-model/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/ProviderMetadataTree.h>
+#include <app/data-model/MetadataList.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 

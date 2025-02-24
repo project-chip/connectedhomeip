@@ -16,7 +16,6 @@
  *
  */
 
-#include <app/data-model/MetadataList.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -25,6 +24,7 @@
 #include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model/MetadataList.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 

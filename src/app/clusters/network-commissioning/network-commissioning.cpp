@@ -1360,32 +1360,33 @@ void Instance::OnFailSafeTimerExpired()
     }
 }
 
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
+CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                               DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Clusters::NetworkCommissioning::Commands;
-    using QF = DataModel::CommandQualityFlags;
-    static const auto kDefaultFlags = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
+    using QF                            = DataModel::CommandQualityFlags;
+    static const auto kDefaultFlags     = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
     static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
 
-    bool hasNet = mFeatureFlags.Has(Feature::kThreadNetworkInterface);
+    bool hasNet  = mFeatureFlags.Has(Feature::kThreadNetworkInterface);
     bool hasWifi = mFeatureFlags.Has(Feature::kWiFiNetworkInterface);
     bool hasCred = mFeatureFlags.Has(Feature::kPerDeviceCredentials);
-    auto netId = hasNet? AddOrUpdateThreadNetwork::Id : AddOrUpdateWiFiNetwork::Id;
+    auto netId   = hasNet ? AddOrUpdateThreadNetwork::Id : AddOrUpdateWiFiNetwork::Id;
 
-    static const DataModel::AcceptedCommandEntry commands [6] = {
-        {ScanNetworks::Id, kDefaultFlags, kDefaultPrivilege},
-        {netId, kDefaultFlags, kDefaultPrivilege},
-        {RemoveNetwork::Id, kDefaultFlags, kDefaultPrivilege},
-        {ConnectNetwork::Id, kDefaultFlags, kDefaultPrivilege},
-        {ReorderNetwork::Id, kDefaultFlags, kDefaultPrivilege},
-        {QueryIdentity::Id, kDefaultFlags, kDefaultPrivilege}
+    static const DataModel::AcceptedCommandEntry commands[6] = {
+        { ScanNetworks::Id, kDefaultFlags, kDefaultPrivilege },   { netId, kDefaultFlags, kDefaultPrivilege },
+        { RemoveNetwork::Id, kDefaultFlags, kDefaultPrivilege },  { ConnectNetwork::Id, kDefaultFlags, kDefaultPrivilege },
+        { ReorderNetwork::Id, kDefaultFlags, kDefaultPrivilege }, { QueryIdentity::Id, kDefaultFlags, kDefaultPrivilege }
     };
 
-    if(hasNet | hasWifi) {
-        //Avoid extra memory allocation
-        return builder.ReferenceExisting({commands, size_t{5} + (hasCred? 1 : 0)});
-    } else if(hasCred) {
-        return builder.ReferenceExisting({commands + 5, size_t{1}});
+    if (hasNet | hasWifi)
+    {
+        // Avoid extra memory allocation
+        return builder.ReferenceExisting({ commands, size_t{ 5 } + (hasCred ? 1 : 0) });
+    }
+    else if (hasCred)
+    {
+        return builder.ReferenceExisting({ commands + 5, size_t{ 1 } });
     }
 
     return CHIP_NO_ERROR;
@@ -1397,7 +1398,8 @@ CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & clus
 
     if (mFeatureFlags.HasAny(Feature::kWiFiNetworkInterface, Feature::kThreadNetworkInterface))
     {
-        ReturnErrorOnFailure(builder.AppendElements({ ScanNetworksResponse::Id, NetworkConfigResponse::Id, ConnectNetworkResponse::Id }));
+        ReturnErrorOnFailure(
+            builder.AppendElements({ ScanNetworksResponse::Id, NetworkConfigResponse::Id, ConnectNetworkResponse::Id }));
     }
 
     if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
