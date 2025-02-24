@@ -52,8 +52,6 @@ extern "C" {
 #define BLE_TIMEOUT_MS 400
 #define BLE_SEND_INDICATION_TIMER_PERIOD_MS (5000)
 
-osSemaphoreId_t sl_rs_ble_init_sem;
-
 using namespace ::chip;
 using namespace ::chip::Ble;
 using namespace ::chip::DeviceLayer::Internal;
@@ -234,9 +232,6 @@ void BLEManagerImpl::sl_ble_event_handling_task(void * args)
     sl_status_t status;
     SilabsBleWrapper::BleEvent_t bleEvent;
 
-    //! This semaphore is waiting for wifi module initialization.
-    osSemaphoreAcquire(sl_rs_ble_init_sem, osWaitForever);
-
     // This function initialize BLE and start BLE advertisement.
     sInstance.sl_ble_init();
 
@@ -287,8 +282,6 @@ void BLEManagerImpl::sl_ble_init()
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
-
-    sl_rs_ble_init_sem = osSemaphoreNew(1, 0, NULL);
 
     sBleThread = osThreadNew(sInstance.sl_ble_event_handling_task, NULL, &kBleTaskAttr);
 
@@ -545,7 +538,7 @@ void BLEManagerImpl::DriveBLEState(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Check if BLE stack is initialized ( TODO )
-    VerifyOrExit(mFlags.Has(Flags::kEFRBLEStackInitialized), /* */);
+    VerifyOrExit(mFlags.Has(Flags::kSiLabsBLEStackInitialize), /* */);
 
     // Start advertising if needed...
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled) &&
@@ -699,9 +692,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     mFlags.Clear(Flags::kRestartAdvertising);
 
-    sl_wfx_mac_address_t macaddr;
-    wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &macaddr);
-
     status = sInstance.SendBLEAdvertisementCommand();
 
     if (status == RSI_SUCCESS)
@@ -814,7 +804,7 @@ void BLEManagerImpl::UpdateMtu(const SilabsBleWrapper::sl_wfx_msg_t & evt)
 
 void BLEManagerImpl::HandleBootEvent(void)
 {
-    mFlags.Set(Flags::kEFRBLEStackInitialized);
+    mFlags.Set(Flags::kSiLabsBLEStackInitialize);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 

@@ -50,14 +50,15 @@ from chip.testing.matter_testing import MatterBaseTest, async_test_body, default
 from mobly import asserts
 
 # Commissioning stage numbers - we should find a better way to match these to the C++ code
-kArmFailsafe = 4
-kConfigRegulatory = 5
-kSendPAICertificateRequest = 10
-kSendDACCertificateRequest = 11
-kSendAttestationRequest = 12
-kSendOpCertSigningRequest = 15
-kSendTrustedRootCert = 18
-kSendNOC = 19
+# TODO: https://github.com/project-chip/connectedhomeip/issues/36629
+kArmFailsafe = 3
+kConfigRegulatory = 4
+kSendPAICertificateRequest = 9
+kSendDACCertificateRequest = 10
+kSendAttestationRequest = 11
+kSendOpCertSigningRequest = 14
+kSendTrustedRootCert = 17
+kSendNOC = 18
 
 
 class TC_CGEN_2_4(MatterBaseTest):

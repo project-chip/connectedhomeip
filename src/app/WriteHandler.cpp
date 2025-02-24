@@ -19,11 +19,16 @@
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeValueDecoder.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
 #include <app/MessageDef/StatusIB.h>
+#include <app/RequiredPrivilege.h>
 #include <app/StatusResponse.h>
 #include <app/WriteHandler.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/reporting/Engine.h>
@@ -42,6 +47,8 @@ namespace chip {
 namespace app {
 
 namespace {
+
+using Protocols::InteractionModel::Status;
 
 /// Wraps a EndpointIterator and ensures that `::Release()` is called
 /// for the iterator (assuming it is non-null)
@@ -110,7 +117,9 @@ std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePat
         return std::nullopt;
     }
 
-    auto info = mDataModelProvider->GetAttributeInfo(path);
+    DataModel::AttributeFinder finder(mDataModelProvider);
+    std::optional<DataModel::AttributeEntry> info = finder.Find(path);
+
     if (!info.has_value())
     {
         return std::nullopt;
@@ -751,6 +760,75 @@ void WriteHandler::MoveToState(const State aTargetState)
     ChipLogDetail(DataManagement, "IM WH moving to [%s]", GetStateStr());
 }
 
+DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::SubjectDescriptor & aSubject,
+                                                              const ConcreteAttributePath & aPath)
+{
+    // TODO: ordering is to check writability/existence BEFORE ACL and this seems wrong, however
+    //       existing unit tests (TC_AcessChecker.py) validate that we get UnsupportedWrite instead of UnsupportedAccess
+    //
+    //       This should likely be fixed in spec (probably already fixed by
+    //       https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/9024)
+    //       and tests and implementation
+    //
+    //       Open issue that needs fixing: https://github.com/project-chip/connectedhomeip/issues/33735
+
+    std::optional<DataModel::AttributeEntry> attributeEntry;
+    DataModel::AttributeFinder finder(mDataModelProvider);
+
+    attributeEntry = finder.Find(aPath);
+
+    // if path is not valid, return a spec-compliant return code.
+    if (!attributeEntry.has_value())
+    {
+        // Global lists are not in metadata and not writable. Return the correct error code according to the spec
+        Status attributeErrorStatus =
+            IsSupportedGlobalAttributeNotInMetadata(aPath.mAttributeId) ? Status::UnsupportedWrite : Status::UnsupportedAttribute;
+
+        return DataModel::ValidateClusterPath(mDataModelProvider, aPath, attributeErrorStatus);
+    }
+
+    // Allow writes on writable attributes only
+    VerifyOrReturnValue(attributeEntry->writePrivilege.has_value(), Status::UnsupportedWrite);
+
+    bool checkAcl = true;
+    if (mLastSuccessfullyWrittenPath.has_value())
+    {
+        // only validate ACL if path has changed
+        //
+        // Note that this is NOT operator==: we could do `checkAcl == (aPath != *mLastSuccessfullyWrittenPath)`
+        // however that seems to use more flash.
+        if ((aPath.mEndpointId == mLastSuccessfullyWrittenPath->mEndpointId) &&
+            (aPath.mClusterId == mLastSuccessfullyWrittenPath->mClusterId) &&
+            (aPath.mAttributeId == mLastSuccessfullyWrittenPath->mAttributeId))
+        {
+            checkAcl = false;
+        }
+    }
+
+    if (checkAcl)
+    {
+        Access::RequestPath requestPath{ .cluster     = aPath.mClusterId,
+                                         .endpoint    = aPath.mEndpointId,
+                                         .requestType = Access::RequestType::kAttributeWriteRequest,
+                                         .entityId    = aPath.mAttributeId };
+        CHIP_ERROR err = Access::GetAccessControl().Check(aSubject, requestPath, RequiredPrivilege::ForWriteAttribute(aPath));
+
+        if (err != CHIP_NO_ERROR)
+        {
+            VerifyOrReturnValue(err != CHIP_ERROR_ACCESS_DENIED, Status::UnsupportedAccess);
+            VerifyOrReturnValue(err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL, Status::AccessRestricted);
+
+            return err;
+        }
+    }
+
+    // validate that timed write is enforced
+    VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->flags.Has(DataModel::AttributeQualityFlags::kTimed),
+                        Status::NeedsTimedInteraction);
+
+    return Status::Success;
+}
+
 CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & aSubject, const ConcreteDataAttributePath & aPath,
                                           TLV::TLVReader & aData)
 {
@@ -758,16 +836,21 @@ CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & aSub
     // the write is done via the DataModel interface
     VerifyOrReturnError(mDataModelProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    DataModel::WriteAttributeRequest request;
+    ChipLogDetail(DataManagement, "Writing attribute: Cluster=" ChipLogFormatMEI " Endpoint=0x%x AttributeId=" ChipLogFormatMEI,
+                  ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId));
 
-    request.path                = aPath;
-    request.subjectDescriptor   = &aSubject;
-    request.previousSuccessPath = mLastSuccessfullyWrittenPath;
-    request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
+    DataModel::ActionReturnStatus status = CheckWriteAllowed(aSubject, aPath);
+    if (status.IsSuccess())
+    {
+        DataModel::WriteAttributeRequest request;
 
-    AttributeValueDecoder decoder(aData, aSubject);
+        request.path              = aPath;
+        request.subjectDescriptor = &aSubject;
+        request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
 
-    DataModel::ActionReturnStatus status = mDataModelProvider->WriteAttribute(request, decoder);
+        AttributeValueDecoder decoder(aData, aSubject);
+        status = mDataModelProvider->WriteAttribute(request, decoder);
+    }
 
     mLastSuccessfullyWrittenPath = status.IsSuccess() ? std::make_optional(aPath) : std::nullopt;
 

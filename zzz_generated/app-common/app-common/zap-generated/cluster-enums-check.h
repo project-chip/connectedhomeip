@@ -388,9 +388,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::RelativePositi
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::StreamTypeEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::StreamUsageEnum val)
 {
-    using EnumType = detail::StreamTypeEnum;
+    using EnumType = detail::StreamUsageEnum;
     switch (val)
     {
     case EnumType::kInternal:
@@ -2679,6 +2679,139 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(WindowCovering::Type va
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::ClosureErrorEnum val)
+{
+    using EnumType = ClosureControl::ClosureErrorEnum;
+    switch (val)
+    {
+    case EnumType::kBlocked:
+    case EnumType::kTemperatureLimited:
+    case EnumType::kMaintenanceRequired:
+    case EnumType::kInternalInterference:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::LatchingEnum val)
+{
+    using EnumType = ClosureControl::LatchingEnum;
+    switch (val)
+    {
+    case EnumType::kLatchedAndSecured:
+    case EnumType::kLatchedButNotSecured:
+    case EnumType::kNotLatched:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::MainStateEnum val)
+{
+    using EnumType = ClosureControl::MainStateEnum;
+    switch (val)
+    {
+    case EnumType::kStopped:
+    case EnumType::kMoving:
+    case EnumType::kWaitingForMotion:
+    case EnumType::kError:
+    case EnumType::kCalibrating:
+    case EnumType::kProtected:
+    case EnumType::kDisengaged:
+    case EnumType::kSetupRequired:
+    case EnumType::kPendingFallback:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::PositioningEnum val)
+{
+    using EnumType = ClosureControl::PositioningEnum;
+    switch (val)
+    {
+    case EnumType::kFullyClosed:
+    case EnumType::kFullyOpened:
+    case EnumType::kPartiallyOpened:
+    case EnumType::kOpenedForPedestrian:
+    case EnumType::kOpenedForVentilation:
+    case EnumType::kOpenedAtSignature:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::RestingProcedureEnum val)
+{
+    using EnumType = ClosureControl::RestingProcedureEnum;
+    switch (val)
+    {
+    case EnumType::kDoNothing:
+    case EnumType::kReturnToFullyOpened:
+    case EnumType::kReturnToFullyClosed:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::TagLatchEnum val)
+{
+    using EnumType = ClosureControl::TagLatchEnum;
+    switch (val)
+    {
+    case EnumType::kLatch:
+    case EnumType::kUnlatch:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::TagPositionEnum val)
+{
+    using EnumType = ClosureControl::TagPositionEnum;
+    switch (val)
+    {
+    case EnumType::kCloseInFull:
+    case EnumType::kOpenInFull:
+    case EnumType::kPedestrian:
+    case EnumType::kVentilation:
+    case EnumType::kSignature:
+    case EnumType::kSequenceNextStep:
+    case EnumType::kPedestrianNextStep:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::TriggerConditionEnum val)
+{
+    using EnumType = ClosureControl::TriggerConditionEnum;
+    switch (val)
+    {
+    case EnumType::kAfterDelay:
+    case EnumType::kAfterApplicativeTrigger:
+    case EnumType::kAfterDelayOrApplicativeTrigger:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::TriggerPositionEnum val)
+{
+    using EnumType = ClosureControl::TriggerPositionEnum;
+    switch (val)
+    {
+    case EnumType::kAtFullyClosed:
+    case EnumType::kAtFullyOpened:
+    case EnumType::kInBetween:
+    case EnumType::kAtVentilation:
+    case EnumType::kAtPedestrian:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::OperationalStatusEnum val)
 {
     using EnumType = ServiceArea::OperationalStatusEnum;
@@ -3698,6 +3831,97 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(CameraAvStreamManagemen
     case EnumType::kHevc:
     case EnumType::kVvc:
     case EnumType::kAv1:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::ContainerFormatEnum val)
+{
+    using EnumType = PushAvStreamTransport::ContainerFormatEnum;
+    switch (val)
+    {
+    case EnumType::kCmaf:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::IngestMethodsEnum val)
+{
+    using EnumType = PushAvStreamTransport::IngestMethodsEnum;
+    switch (val)
+    {
+    case EnumType::kCMAFIngest:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::StatusCodeEnum val)
+{
+    using EnumType = PushAvStreamTransport::StatusCodeEnum;
+    switch (val)
+    {
+    case EnumType::kAllocationNotPermitted:
+    case EnumType::kInvalidTLSEndpoint:
+    case EnumType::kInvalidStream:
+    case EnumType::kInvalidURL:
+    case EnumType::kInvalidZone:
+    case EnumType::kUnsupportedContainerFormat:
+    case EnumType::kUnsupportedIngestMethod:
+    case EnumType::kInvalidTriggerType:
+    case EnumType::kInvalidTransportStatus:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::StreamMultiplexingEnum val)
+{
+    using EnumType = PushAvStreamTransport::StreamMultiplexingEnum;
+    switch (val)
+    {
+    case EnumType::kInterleaved:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::TransportStatusEnum val)
+{
+    using EnumType = PushAvStreamTransport::TransportStatusEnum;
+    switch (val)
+    {
+    case EnumType::kActive:
+    case EnumType::kInactive:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::TransportTriggerTypeEnum val)
+{
+    using EnumType = PushAvStreamTransport::TransportTriggerTypeEnum;
+    switch (val)
+    {
+    case EnumType::kCommand:
+    case EnumType::kMotion:
+    case EnumType::kContinuous:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::TriggerActivationReasonEnum val)
+{
+    using EnumType = PushAvStreamTransport::TriggerActivationReasonEnum;
+    switch (val)
+    {
+    case EnumType::kUserInitiated:
+    case EnumType::kAutomation:
+    case EnumType::kEmergency:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

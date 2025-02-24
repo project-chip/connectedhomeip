@@ -15,8 +15,9 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_codegen.gni")
-import("${chip_root}/src/app/codegen-data-model-provider/model.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/app/icd/icd.gni")
+import("${chip_root}/src/data-model-providers/codegen/model.gni")
 import("${chip_root}/src/platform/python.gni")
 
 _app_root = get_path_info(".", "abspath")
@@ -209,7 +210,6 @@ template("chip_data_model") {
         "${_app_root}/util/DataModelHandler.cpp",
         "${_app_root}/util/attribute-storage.cpp",
         "${_app_root}/util/attribute-table.cpp",
-        "${_app_root}/util/ember-global-attribute-access-interface.cpp",
         "${_app_root}/util/ember-io-storage.cpp",
         "${_app_root}/util/util.cpp",
       ]
@@ -341,9 +341,13 @@ template("chip_data_model") {
         deps += [
           "${chip_root}/src/app/icd/server:configuration-data",
           "${chip_root}/src/app/icd/server:icd-server-config",
-          "${chip_root}/src/app/icd/server:monitoring-table",
-          "${chip_root}/src/app/icd/server:notifier",
         ]
+        if (chip_enable_icd_server) {
+          deps += [ "${chip_root}/src/app/icd/server:notifier" ]
+          if (chip_enable_icd_checkin) {
+            deps += [ "${chip_root}/src/app/icd/server:monitoring-table" ]
+          }
+        }
       } else if (cluster == "resource-monitoring-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
@@ -457,11 +461,14 @@ template("chip_data_model") {
       }
     }
 
+    deps += [ "${chip_root}/src/app:attribute-persistence" ]
+
     public_deps += [
       ":${_data_model_name}_codegen",
       ":${_data_model_name}_zapgen",
       "${chip_root}/src/access",
       "${chip_root}/src/app",
+      "${chip_root}/src/app:attribute-persistence",
       "${chip_root}/src/app/cluster-building-blocks",
       "${chip_root}/src/app/common:attribute-type",
       "${chip_root}/src/app/common:cluster-objects",

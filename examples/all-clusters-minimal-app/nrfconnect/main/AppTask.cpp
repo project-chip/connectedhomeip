@@ -22,9 +22,9 @@
 #include "LEDUtil.h"
 #include "binding-handler.h"
 
-#include <app/codegen-data-model-provider/Instance.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <data-model-providers/codegen/Instance.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
@@ -174,7 +174,7 @@ CHIP_ERROR AppTask::Init()
     initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     AppFabricTableDelegate::Init();
 
@@ -408,10 +408,10 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
     switch (event->Type)
     {
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+#ifdef CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
         if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
         {
-            if (NFCMgr().IsTagEmulationStarted())
+            if (NFCOnboardingPayloadMgr().IsTagEmulationStarted())
             {
                 LOG_INF("NFC Tag emulation is already started");
             }
@@ -422,7 +422,7 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
         }
         else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
         {
-            NFCMgr().StopTagEmulation();
+            NFCOnboardingPayloadMgr().StopTagEmulation();
         }
 #endif
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;

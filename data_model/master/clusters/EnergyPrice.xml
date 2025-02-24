@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 
-:xrefstyle: short
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0095" name="Energy Price Cluster" revision="4">
   <revisionHistory>
@@ -74,41 +74,7 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
-    <enum name="PriceComponentSourceEnum">
-      <item value="0" name="Tariff" summary="Tariff">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="IncentiveSignal" summary="Incentive Signal">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <enum name="UnitOfMeasureEnum">
-      <item value="0" name="kWh" summary="Kilowatt Hours">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="m" summary="Cubic meters">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="ft" summary="Cubic feet">
-        <mandatoryConform/>
-      </item>
-      <item value="3" name="CCF" summary="Centum Cubic feet">
-        <mandatoryConform/>
-      </item>
-      <item value="4" name="US" summary="US Gallons">
-        <mandatoryConform/>
-      </item>
-      <item value="5" name="IMP" summary="Imperial Gallons">
-        <mandatoryConform/>
-      </item>
-      <item value="6" name="L" summary="Liters">
-        <mandatoryConform/>
-      </item>
-      <item value="7" name="BTUs" summary="British Thermal Units">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <bitmap name="PriceDetailBitmap">
+    <bitmap name="EnergyPriceDetailBitmap">
       <bitfield name="Description" bit="0" summary="A textual description of a price; e.g. the name of a rate plan.">
         <mandatoryConform/>
       </bitfield>
@@ -116,20 +82,25 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </bitfield>
     </bitmap>
-    <struct name="PriceComponentStruct">
-      <field id="0" name="Price" type="int32">
+    <struct name="EnergyPriceComponentStruct">
+      <field id="0" name="Price" type="money">
         <mandatoryConform/>
       </field>
-      <field id="1" name="Source" type="PriceComponentSourceEnum" default="Tariff">
+      <field id="1" name="Source" type="TariffPriceTypeEnum">
         <mandatoryConform/>
       </field>
       <field id="2" name="Description" type="string">
         <optionalConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
+      </field>
+      <field id="3" name="TariffComponentID" type="uint32">
+        <optionalConform/>
       </field>
       <access fabricScoped="true"/>
     </struct>
-    <struct name="PriceStruct">
+    <struct name="EnergyPriceStruct">
       <field id="0" name="PeriodStart" type="epoch-s">
         <mandatoryConform/>
       </field>
@@ -137,40 +108,37 @@ Davis, CA 95616, USA
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
-      <field id="2" name="Price" type="int32">
+      <field id="2" name="Price" type="PriceStruct">
         <mandatoryConform/>
       </field>
-      <field id="3" name="DecimalPoints" type="uint8" default="0">
-        <mandatoryConform/>
-      </field>
-      <field id="4" name="Currency" type="uint16">
-        <mandatoryConform/>
-        <constraint type="max" value="999"/>
-      </field>
-      <field id="5" name="Description" type="string">
+      <field id="3" name="Description" type="string">
         <optionalConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
-      <field id="6" name="Components" type="list" default="empty">
-        <entry type="PriceComponentStruct"/>
+      <field id="4" name="Components" type="list" default="empty">
+        <entry type="EnergyPriceComponentStruct"/>
         <optionalConform/>
-        <constraint type="maxCount" value="10"/>
+        <constraint>
+          <maxCount value="10"/>
+        </constraint>
       </field>
       <access fabricScoped="true"/>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="UnitOfMeasure" type="UnitOfMeasureEnum" default="null">
+    <attribute id="0x0000" name="MeteringUnit" type="MeteringUnitEnum" default="null">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="CurrentPrice" type="PriceStruct" default="null">
+    <attribute id="0x0001" name="CurrentPrice" type="EnergyPriceStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="PriceForecast" type="list" default="empty">
-      <entry type="PriceStruct"/>
+      <entry type="EnergyPriceStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="FORE"/>
@@ -181,7 +149,7 @@ Davis, CA 95616, USA
     <command id="0x00" name="GetDetailedPriceRequest" direction="commandToServer" response="GetDetailedPriceResponse">
       <access invokePrivilege="operate"/>
       <optionalConform/>
-      <field id="0" name="Details" type="PriceDetailBitmap" default="0">
+      <field id="0" name="Details" type="EnergyPriceDetailBitmap" default="0">
         <mandatoryConform/>
       </field>
     </command>
@@ -189,7 +157,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <command name="GetDetailedPriceRequest"/>
       </mandatoryConform>
-      <field id="0" name="Price" type="PriceStruct" default="null">
+      <field id="0" name="Price" type="EnergyPriceStruct" default="null">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
@@ -199,7 +167,7 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="FORE"/>
       </optionalConform>
-      <field id="0" name="Details" type="PriceDetailBitmap" default="0">
+      <field id="0" name="Details" type="EnergyPriceDetailBitmap" default="0">
         <mandatoryConform/>
       </field>
     </command>
@@ -208,7 +176,7 @@ Davis, CA 95616, USA
         <command name="GetDetailedForecastRequest"/>
       </mandatoryConform>
       <field id="0" name="Price" type="list" default="empty">
-        <entry type="PriceStruct"/>
+        <entry type="EnergyPriceStruct"/>
         <mandatoryConform/>
       </field>
     </command>
@@ -217,7 +185,7 @@ Davis, CA 95616, USA
     <event id="0x00" name="PriceChange" priority="info">
       <access readPrivilege="view"/>
       <optionalConform/>
-      <field id="0" name="Price" type="PriceStruct">
+      <field id="0" name="Price" type="EnergyPriceStruct">
         <mandatoryConform/>
       </field>
     </event>
@@ -225,7 +193,7 @@ Davis, CA 95616, USA
       <access readPrivilege="view"/>
       <optionalConform/>
       <field id="0" name="Forecast" type="list">
-        <entry type="PriceStruct"/>
+        <entry type="EnergyPriceStruct"/>
         <mandatoryConform/>
       </field>
     </event>

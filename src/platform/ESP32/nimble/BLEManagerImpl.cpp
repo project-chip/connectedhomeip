@@ -925,7 +925,8 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     SuccessOrExit(err);
 #endif
 
-    nimble_port_init();
+    err = MapBLEError(nimble_port_init());
+    SuccessOrExit(err);
 
     /* Initialize the NimBLE host configuration. */
     ble_hs_cfg.reset_cb          = bleprph_on_reset;
@@ -973,7 +974,9 @@ exit:
 void BLEManagerImpl::DeinitESPBleLayer()
 {
     VerifyOrReturn(DeinitBLE() == CHIP_NO_ERROR);
+#ifdef CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
     BLEManagerImpl::ClaimBLEMemory(nullptr, nullptr);
+#endif /* CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING */
 }
 
 void BLEManagerImpl::ClaimBLEMemory(System::Layer *, void *)
@@ -1118,7 +1121,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureScanResponseData(ByteSpan data)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     memcpy(scanResponseBuffer, data.data(), data.size());
-    ByteSpan scanResponseSpan(scanResponseBuffer);
+    ByteSpan scanResponseSpan(scanResponseBuffer, data.size());
     mScanResponse = chip::Optional<ByteSpan>(scanResponseSpan);
     return CHIP_NO_ERROR;
 }

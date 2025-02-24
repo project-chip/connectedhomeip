@@ -84,10 +84,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
     SuccessOrExit(err);
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !defined(SLI_SI91X_MCU_INTERFACE)
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !defined(SLI_SI91X_MCU_INTERFACE) && !defined(EXP_BOARD)
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !defined(SLI_SI91X_MCU_INTERFACE)
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !defined(SLI_SI91X_MCU_INTERFACE) && !defined(EXP_BOARD)
 
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 
@@ -141,71 +141,47 @@ void PlatformManagerImpl::_Shutdown()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 // This function needs to be global so it can be used from the platform implementation without depending on the platfrom itself.
 // This is a workaround to avoid a circular dependency.
-void HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wfx_generic_message_t * eventData)
+void HandleWFXSystemEvent(sl_wfx_generic_message_t * eventData)
 {
     using namespace chip;
     using namespace chip::DeviceLayer;
 
     ChipDeviceEvent event;
     memset(&event, 0, sizeof(event));
-    event.Type                              = DeviceEventType::kWFXSystemEvent;
-    event.Platform.WFXSystemEvent.eventBase = eventBase;
+    event.Type = DeviceEventType::kWFXSystemEvent;
 
-    if (eventBase == WIFI_EVENT)
+    switch (eventData->header.id)
     {
-        switch (eventData->header.id)
-        {
-        case SL_WFX_STARTUP_IND_ID:
-            memcpy(&event.Platform.WFXSystemEvent.data.startupEvent, eventData,
-                   sizeof(event.Platform.WFXSystemEvent.data.startupEvent));
-            break;
-        case SL_WFX_CONNECT_IND_ID:
-            memcpy(&event.Platform.WFXSystemEvent.data.connectEvent, eventData,
-                   sizeof(event.Platform.WFXSystemEvent.data.connectEvent));
-            break;
-        case SL_WFX_DISCONNECT_IND_ID:
-            memcpy(&event.Platform.WFXSystemEvent.data.disconnectEvent, eventData,
-                   sizeof(event.Platform.WFXSystemEvent.data.disconnectEvent));
-            break;
-        // case SL_WFX_RECEIVED_IND_ID:
-        //     memcpy(&event.Platform.WFXSystemEvent.data.receivedEvent, eventData,
-        //            sizeof(event.Platform.WFXSystemEvent.data.receivedEvent));
-        //     break;
-        // case SL_WFX_GENERIC_IND_ID:
-        //     memcpy(&event.Platform.WFXSystemEvent.data.genericEvent, eventData,
-        //            sizeof(event.Platform.WFXSystemEvent.data.genericEvent));
-        //     break;
-        // case SL_WFX_EXCEPTION_IND_ID:
-        //     memcpy(&event.Platform.WFXSystemEvent.data.exceptionEvent, eventData,
-        //            sizeof(event.Platform.WFXSystemEvent.data.exceptionEvent));
-        //     break;
-        // case SL_WFX_ERROR_IND_ID:
-        //     memcpy(&event.Platform.WFXSystemEvent.data.errorEvent, eventData,
-        //            sizeof(event.Platform.WFXSystemEvent.data.errorEvent));
-        //     break;
-        default:
-            break;
-        }
-    }
-    else if (eventBase == IP_EVENT)
-    {
-        switch (eventData->header.id)
-        {
-        case IP_EVENT_STA_GOT_IP:
-            memcpy(&event.Platform.WFXSystemEvent.data.genericMsgEvent, eventData,
-                   sizeof(event.Platform.WFXSystemEvent.data.genericMsgEvent));
-            break;
-        case IP_EVENT_GOT_IP6:
-            memcpy(&event.Platform.WFXSystemEvent.data.genericMsgEvent, eventData,
-                   sizeof(event.Platform.WFXSystemEvent.data.genericMsgEvent));
-            break;
-        case IP_EVENT_STA_LOST_IP:
-            memcpy(&event.Platform.WFXSystemEvent.data.genericMsgEvent, eventData,
-                   sizeof(event.Platform.WFXSystemEvent.data.genericMsgEvent));
-            break;
-        default:
-            break;
-        }
+// TODO: Work around until we unify the data structures behind a Matter level common structure
+#if WF200_WIFI
+    case SL_WFX_STARTUP_IND_ID:
+#endif
+    case to_underlying(WifiEvent::kStartUp):
+        memcpy(&event.Platform.WFXSystemEvent.data.startupEvent, eventData,
+               sizeof(event.Platform.WFXSystemEvent.data.startupEvent));
+        // TODO: This is a workaround until we unify the Matter Data structures
+        event.Platform.WFXSystemEvent.data.startupEvent.header.id = to_underlying(WifiEvent::kStartUp);
+        break;
+
+    case to_underlying(WifiEvent::kConnect):
+        memcpy(&event.Platform.WFXSystemEvent.data.connectEvent, eventData,
+               sizeof(event.Platform.WFXSystemEvent.data.connectEvent));
+        break;
+
+    case to_underlying(WifiEvent::kDisconnect):
+        memcpy(&event.Platform.WFXSystemEvent.data.disconnectEvent, eventData,
+               sizeof(event.Platform.WFXSystemEvent.data.disconnectEvent));
+        break;
+
+    case to_underlying(WifiEvent::kGotIPv4):
+    case to_underlying(WifiEvent::kLostIP):
+    case to_underlying(WifiEvent::kGotIPv6):
+        memcpy(&event.Platform.WFXSystemEvent.data.genericMsgEvent, eventData,
+               sizeof(event.Platform.WFXSystemEvent.data.genericMsgEvent));
+        break;
+
+    default:
+        break;
     }
 
     // TODO: We should add error processing here

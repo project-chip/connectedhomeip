@@ -25,8 +25,17 @@
 #include <mbedtls/platform.h>
 
 #ifdef SL_WIFI
-#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
-#endif /* SL_WIFI */
+#include <platform/silabs/wifi/WifiInterface.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <platform/silabs/wifi/icd/WifiSleepManager.h>
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+// TODO: We shouldn't need any platform specific includes in this file
+#if (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
+#include <platform/silabs/SiWx917/SiWxPlatformInterface.h>
+#endif // (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
+#endif // SL_WIFI
 
 #if PW_RPC_ENABLED
 #include "Rpc.h"
@@ -40,11 +49,6 @@
 #include "MemMonitoring.h"
 #endif
 
-#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1
-#include <platform/silabs/SiWx917/SiWxPlatformInterface.h>
-#include <platform/silabs/wifi/wiseconnect-abstraction/WiseconnectInterfaceAbstraction.h>
-#endif // SLI_SI91X_MCU_INTERFACE
-
 #include <crypto/CHIPCryptoPAL.h>
 // If building with the EFR32-provided crypto backend, we can use the
 // opaque keystore
@@ -53,10 +57,10 @@
 static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeystore;
 #endif
 
-#include <ProvisionManager.h>
 #include <app/InteractionModelEngine.h>
 #include <app/TimerDelegates.h>
-#include <app/codegen-data-model-provider/Instance.h>
+#include <data-model-providers/codegen/Instance.h>
+#include <headers/ProvisionManager.h>
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 #include "SilabsTestEventTriggerDelegate.h" // nogncheck
@@ -228,6 +232,10 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     // See comment above about OpenThread memory allocation as to why this is WIFI only here.
     ReturnErrorOnFailure(chip::Platform::MemoryInit());
     ReturnErrorOnFailure(InitWiFi());
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    ReturnErrorOnFailure(DeviceLayer::Silabs::WifiSleepManager::GetInstance().Init());
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif
 
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
@@ -264,6 +272,8 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
     static SilabsTestEventTriggerDelegate sTestEventTriggerDelegate;
+    sTestEventTriggerDelegate.Init(&provision.GetStorage());
+
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 
@@ -276,7 +286,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     // Initialize the remaining (not overridden) providers to the SDK example defaults
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CHIP_ENABLE_OPENTHREAD
     // Set up OpenThread configuration when OpenThread is included
@@ -308,20 +318,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #ifdef SL_WIFI
 CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 {
-#ifdef WF200_WIFI
-    // Start wfx bus communication task.
-    wfx_bus_start();
-#ifdef SL_WFX_USE_SECURE_LINK
-    // start securelink key renegotiation task
-    wfx_securelink_task_start();
-#endif // SL_WFX_USE_SECURE_LINK
-#endif // WF200_WIFI
-
-#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1
-    VerifyOrReturnError(sl_matter_wifi_platform_init() == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
-#endif // SLI_SI91X_MCU_INTERFACE
-
-    return CHIP_NO_ERROR;
+    return InitWiFiStack();
 }
 #endif // SL_WIFI
 
@@ -331,7 +328,9 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 extern "C" void vApplicationIdleHook(void)
 {
 #if (SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER)
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     SiWxPlatformInterface::sl_si91x_btn_event_handler();
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
     SiWxPlatformInterface::sl_si91x_uart_power_requirement_handler();
 #endif
 }

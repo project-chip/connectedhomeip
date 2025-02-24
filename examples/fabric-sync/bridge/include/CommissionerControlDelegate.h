@@ -32,7 +32,9 @@ inline constexpr EndpointId kAggregatorEndpointId = 1;
 class CommissionerControlDelegate : public Delegate
 {
 public:
-    CommissionerControlDelegate(bridge::FabricAdminDelegate * fabricAdmin) : mFabricAdmin(fabricAdmin) {}
+    CommissionerControlDelegate(bridge::FabricAdminDelegate * fabricAdmin) :
+        mFabricAdmin(fabricAdmin), mCommissionerControlServer(this, kAggregatorEndpointId)
+    {}
 
     CHIP_ERROR HandleCommissioningApprovalRequest(const CommissioningApprovalRequest & request) override;
     // TODO(#35627) clientNodeId should move towards ScopedNodeId.
@@ -41,6 +43,8 @@ public:
     CHIP_ERROR HandleCommissionNode(const CommissioningWindowParams & params) override;
 
     ~CommissionerControlDelegate() = default;
+
+    CommissionerControlServer & GetCommissionerControlServer() { return mCommissionerControlServer; }
 
 private:
     enum class Step : uint8_t
@@ -87,6 +91,7 @@ private:
     ByteSpan mPAKEPasscodeVerifier;
 
     bridge::FabricAdminDelegate * mFabricAdmin;
+    CommissionerControlServer mCommissionerControlServer;
 };
 
 } // namespace CommissionerControl
