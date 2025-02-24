@@ -91,44 +91,11 @@ config("siwx917-common-config") {
     defines += [ "HEAP_MONITORING" ]
   }
 
-  ldflags = [ "-Wl,--no-warn-rwx-segment" ]
-}
-
-config("silabs-wifi-config") {
-  defines = []
-  include_dirs = []
-
-  if (chip_default_wifi_ssid != "") {
-    defines += [
-      "SL_ONNETWORK_PAIRING=1",
-      "SL_WIFI_SSID=\"${chip_default_wifi_ssid}\"",
-    ]
-  }
-  if (chip_default_wifi_psk != "") {
-    assert(chip_default_wifi_ssid != "",
-           "ssid can't be null if psk is provided")
-    defines += [ "SL_WIFI_PSK=\"${chip_default_wifi_psk}\"" ]
-  }
-
-  if (sl_wfx_config_softap) {
-    defines += [ "SL_WFX_CONFIG_SOFTAP" ]
-  }
-
-  if (sl_wfx_config_scan) {
-    defines += [ "SL_WFX_CONFIG_SCAN" ]
-  }
-
-  if (chip_enable_wifi_ipv4) {
-    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
-  }
-
-  if (rs91x_wpa3_transition) {
-    defines += [ "WIFI_ENABLE_SECURITY_WPA3_TRANSITION=1" ]
-  }
-
   if (chip_enable_multi_ota_requestor) {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MULTI_OTA_REQUESTOR=1" ]
   }
+
+  ldflags = [ "-Wl,--no-warn-rwx-segment" ]
 }
 
 source_set("siwx917-common") {

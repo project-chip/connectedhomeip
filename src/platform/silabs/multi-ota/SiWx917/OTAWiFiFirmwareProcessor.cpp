@@ -21,7 +21,6 @@
 #include <platform/silabs/multi-ota/SiWx917/OTAWiFiFirmwareProcessor.h>
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
-#include "wfx_host_events.h"
 #include <platform/silabs/SilabsConfig.h>
 #ifdef __cplusplus
 extern "C" {
@@ -37,7 +36,7 @@ extern "C" {
 #define RPS_HEADER 1
 #define RPS_DATA 2
 
-#define SL_STATUS_FW_UPDATE_DONE SL_STATUS_SI91X_NO_AP_FOUND
+#define SL_STATUS_FW_UPDATE_DONE SL_STATUS_SI91X_FW_UPDATE_DONE
 uint8_t flag = RPS_HEADER;
 
 namespace chip {
@@ -47,7 +46,7 @@ bool OTAWiFiFirmwareProcessor::mReset                                           
 
 CHIP_ERROR OTAWiFiFirmwareProcessor::Init()
 {
-    ReturnErrorCodeIf(mCallbackProcessDescriptor == nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
+    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
     mAccumulator.Init(sizeof(Descriptor));
 #if OTA_ENCRYPTION_ENABLE
     mUnalignmentNum = 0;
@@ -162,7 +161,7 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ApplyAction()
         // send system reset request to reset the MCU and upgrade the m4 image
         ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
         // Reboots the device
-        sl_si91x_soc_soft_reset();
+        sl_si91x_soc_nvic_reset();
 #endif
     }
     return CHIP_NO_ERROR;
