@@ -42,11 +42,11 @@ using chip::DeviceLayer::GetDiagnosticDataProvider;
 
 namespace {
 
-class WiFiDiagosticsGlobalInstance : public AttributeAccessInterface, public CommandHandlerInterface
+class WiFiDiagnosticsGlobalInstance : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
     // Register for the WiFiNetworkDiagnostics cluster on all endpoints.
-    WiFiDiagosticsGlobalInstance(DiagnosticDataProvider & diagnosticProvider) :
+    WiFiDiagnosticsGlobalInstance(DiagnosticDataProvider & diagnosticProvider) :
         AttributeAccessInterface(Optional<EndpointId>::Missing(), WiFiNetworkDiagnostics::Id),
         CommandHandlerInterface(Optional<EndpointId>::Missing(), WiFiNetworkDiagnostics::Id),
         mDiagnosticProvider(diagnosticProvider)
@@ -74,8 +74,8 @@ private:
 };
 
 template <typename T, typename Type>
-CHIP_ERROR WiFiDiagosticsGlobalInstance::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &), Type & data,
-                                                         AttributeValueEncoder & aEncoder)
+CHIP_ERROR WiFiDiagnosticsGlobalInstance::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &), Type & data,
+                                                          AttributeValueEncoder & aEncoder)
 {
     T value;
     CHIP_ERROR err = (mDiagnosticProvider.*getter)(value);
@@ -92,7 +92,7 @@ CHIP_ERROR WiFiDiagosticsGlobalInstance::ReadIfSupported(CHIP_ERROR (DiagnosticD
     return aEncoder.Encode(data);
 }
 
-CHIP_ERROR WiFiDiagosticsGlobalInstance::ReadWiFiBssId(AttributeValueEncoder & aEncoder)
+CHIP_ERROR WiFiDiagnosticsGlobalInstance::ReadWiFiBssId(AttributeValueEncoder & aEncoder)
 {
     Attributes::Bssid::TypeInfo::Type bssid;
 
@@ -115,7 +115,7 @@ CHIP_ERROR WiFiDiagosticsGlobalInstance::ReadWiFiBssId(AttributeValueEncoder & a
     return aEncoder.Encode(bssid);
 }
 
-CHIP_ERROR WiFiDiagosticsGlobalInstance::ReadSecurityType(AttributeValueEncoder & aEncoder)
+CHIP_ERROR WiFiDiagnosticsGlobalInstance::ReadSecurityType(AttributeValueEncoder & aEncoder)
 {
     Attributes::SecurityType::TypeInfo::Type securityType;
     SecurityTypeEnum value = SecurityTypeEnum::kUnspecified;
@@ -133,7 +133,7 @@ CHIP_ERROR WiFiDiagosticsGlobalInstance::ReadSecurityType(AttributeValueEncoder 
     return aEncoder.Encode(securityType);
 }
 
-CHIP_ERROR WiFiDiagosticsGlobalInstance::ReadWiFiVersion(AttributeValueEncoder & aEncoder)
+CHIP_ERROR WiFiDiagnosticsGlobalInstance::ReadWiFiVersion(AttributeValueEncoder & aEncoder)
 {
     Attributes::WiFiVersion::TypeInfo::Type version;
     WiFiVersionEnum value = WiFiVersionEnum::kUnknownEnumValue;
@@ -151,7 +151,7 @@ CHIP_ERROR WiFiDiagosticsGlobalInstance::ReadWiFiVersion(AttributeValueEncoder &
     return aEncoder.Encode(version);
 }
 
-CHIP_ERROR WiFiDiagosticsGlobalInstance::ReadChannelNumber(AttributeValueEncoder & aEncoder)
+CHIP_ERROR WiFiDiagnosticsGlobalInstance::ReadChannelNumber(AttributeValueEncoder & aEncoder)
 {
     Attributes::ChannelNumber::TypeInfo::Type channelNumber;
     uint16_t value = 0;
@@ -169,7 +169,7 @@ CHIP_ERROR WiFiDiagosticsGlobalInstance::ReadChannelNumber(AttributeValueEncoder
     return aEncoder.Encode(channelNumber);
 }
 
-CHIP_ERROR WiFiDiagosticsGlobalInstance::ReadWiFiRssi(AttributeValueEncoder & aEncoder)
+CHIP_ERROR WiFiDiagnosticsGlobalInstance::ReadWiFiRssi(AttributeValueEncoder & aEncoder)
 {
     Attributes::Rssi::TypeInfo::Type rssi;
     int8_t value = 0;
@@ -188,7 +188,7 @@ CHIP_ERROR WiFiDiagosticsGlobalInstance::ReadWiFiRssi(AttributeValueEncoder & aE
     return aEncoder.Encode(rssi);
 }
 
-CHIP_ERROR WiFiDiagosticsGlobalInstance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR WiFiDiagnosticsGlobalInstance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != WiFiNetworkDiagnostics::Id)
     {
@@ -252,7 +252,7 @@ CHIP_ERROR WiFiDiagosticsGlobalInstance::Read(const ConcreteReadAttributePath & 
     return CHIP_NO_ERROR;
 }
 
-void WiFiDiagosticsGlobalInstance::InvokeCommand(HandlerContext & handlerContext)
+void WiFiDiagnosticsGlobalInstance::InvokeCommand(HandlerContext & handlerContext)
 {
     switch (handlerContext.mRequestPath.mCommandId)
     {
@@ -266,14 +266,15 @@ void WiFiDiagosticsGlobalInstance::InvokeCommand(HandlerContext & handlerContext
 }
 
 #ifdef WI_FI_NETWORK_DIAGNOSTICS_ENABLE_RESET_COUNTS_CMD
-void WiFiDiagosticsGlobalInstance::HandleResetCounts(HandlerContext & ctx, const Commands::ResetCounts::DecodableType & commandData)
+void WiFiDiagnosticsGlobalInstance::HandleResetCounts(HandlerContext & ctx,
+                                                      const Commands::ResetCounts::DecodableType & commandData)
 {
     mDiagnosticProvider.ResetWiFiNetworkDiagnosticsCounts();
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
 }
 #endif
 
-WiFiDiagosticsGlobalInstance gWiFiDiagosticsInstance(DeviceLayer::GetDiagnosticDataProvider());
+WiFiDiagnosticsGlobalInstance gWiFiDiagnosticsInstance(DeviceLayer::GetDiagnosticDataProvider());
 
 } // anonymous namespace
 
@@ -353,8 +354,8 @@ void WiFiDiagnosticsServer::OnConnectionStatusChanged(uint8_t connectionStatus)
 
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback()
 {
-    AttributeAccessInterfaceRegistry::Instance().Register(&gWiFiDiagosticsInstance);
-    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gWiFiDiagosticsInstance);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gWiFiDiagnosticsInstance);
+    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gWiFiDiagnosticsInstance);
 
     GetDiagnosticDataProvider().SetWiFiDiagnosticsDelegate(&WiFiDiagnosticsServer::Instance());
 }

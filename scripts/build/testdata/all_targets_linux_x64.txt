@@ -17,7 +17,7 @@ nxp-{k32w0,k32w1,rt1060,rt1170,rw61x,rw61x_eth,mcxw71}-{zephyr,freertos}-{lighti
 mbed-cy8cproto_062_4343w-{lock,light,all-clusters,all-clusters-minimal,pigweed,ota-requestor,shell}[-release][-develop][-debug]
 mw320-all-clusters-app
 nrf-{nrf5340dk,nrf52840dk,nrf52840dongle}-{all-clusters,all-clusters-minimal,lock,light,light-switch,shell,pump,pump-controller,window-covering}[-rpc]
-nrf-native-posix-64-tests
+nrf-native-sim-tests
 nuttx-x64-light
 qpg-qpg6105-{lock,light,shell,persistent-storage,light-switch,thermostat}[-updateimage]
 stm32-stm32wb5mm-dk-light
