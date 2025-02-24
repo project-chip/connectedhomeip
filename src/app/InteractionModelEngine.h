@@ -328,7 +328,7 @@ public:
     /**
      * @brief Function resets the number of retries of subscriptions resumption - mNumSubscriptionResumptionRetries.
      *        This should be called after we have completed a re-subscribe attempt successfully on a persisted subscription,
-     *        or when the subscription resumption gets terminated. 
+     *        or when the subscription resumption gets terminated.
      */
     void ResetNumSubscriptionsRetries();
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
