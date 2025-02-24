@@ -362,10 +362,25 @@ source_set("status-response") {
   ]
 }
 
-source_set("command-handler-interface") {
+source_set("command-handler") {
   sources = [
     "CommandHandler.cpp",
     "CommandHandler.h",
+  ]
+
+  public_deps = [
+    ":paths",
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/app/data-model",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/interaction_model",
+  ]
+}
+
+source_set("command-handler-interface") {
+  sources = [
     "CommandHandlerExchangeInterface.h",
     "CommandHandlerInterface.h",
     "CommandHandlerInterfaceRegistry.cpp",
@@ -373,9 +388,11 @@ source_set("command-handler-interface") {
   ]
 
   public_deps = [
+    ":command-handler",
     ":paths",
     "${chip_root}/src/access:types",
     "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
