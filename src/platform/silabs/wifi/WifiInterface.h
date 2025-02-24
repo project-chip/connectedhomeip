@@ -143,19 +143,19 @@ typedef enum
 // TODO: Figure out if we need this structure. We have different strcutures for the same use
 struct WifiCredentials
 {
-    std::array<uint8_t, WFX_MAX_SSID_LENGTH> ssid       = { 0 };
-    size_t ssidLength                                   = 0;
-    std::array<uint8_t, WFX_MAX_PASSKEY_LENGTH> passkey = { 0 };
-    size_t passkeyLength                                = 0;
-    wfx_sec_t security                                  = WFX_SEC_UNSPECIFIED;
+    uint8_t ssid[WFX_MAX_SSID_LENGTH]       = { 0 };
+    size_t ssidLength                       = 0;
+    uint8_t passkey[WFX_MAX_PASSKEY_LENGTH] = { 0 };
+    size_t passkeyLength                    = 0;
+    wfx_sec_t security                      = WFX_SEC_UNSPECIFIED;
 
     WifiCredentials & operator=(const WifiCredentials & other)
     {
         if (this != &other)
         {
-            ssid          = other.ssid;
-            ssidLength    = other.ssidLength;
-            passkey       = other.passkey;
+            memcpy(ssid, other.ssid, WFX_MAX_SSID_LENGTH);
+            ssidLength = other.ssidLength;
+            memcpy(passkey, other.passkey, WFX_MAX_PASSKEY_LENGTH);
             passkeyLength = other.passkeyLength;
             security      = other.security;
         }
@@ -164,9 +164,9 @@ struct WifiCredentials
 
     void Clear()
     {
-        ssid.fill(0);
+        memset(ssid, 0, WFX_MAX_SSID_LENGTH);
         ssidLength = 0;
-        passkey.fill(0);
+        memset(passkey, 0, WFX_MAX_PASSKEY_LENGTH);
         passkeyLength = 0;
         security      = WFX_SEC_UNSPECIFIED;
     }

@@ -517,7 +517,7 @@ CHIP_ERROR ConnectToAccessPoint(void)
     sl_wfx_security_mode_t connect_security_mode;
 
     VerifyOrReturnError(IsWifiProvisioned(), CHIP_ERROR_INCORRECT_STATE);
-    ChipLogDetail(DeviceLayer, "WIFI:JOIN to %s", &wifi_provision.ssid[0]);
+    ChipLogDetail(DeviceLayer, "WIFI:JOIN to %s", wifi_provision.ssid);
 
     ChipLogDetail(DeviceLayer,
                   "WIFI Scan Paramter set to Active channel time %d, Passive Channel "
@@ -544,10 +544,9 @@ CHIP_ERROR ConnectToAccessPoint(void)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    VerifyOrReturnError(sl_wfx_send_join_command(wifi_provision.ssid.data(), wifi_provision.ssidLength, NULL, CHANNEL_0,
-                                                 connect_security_mode, PREVENT_ROAMING, DISABLE_PMF_MODE,
-                                                 wifi_provision.passkey.data(), wifi_provision.passkeyLength, NULL,
-                                                 IE_DATA_LENGTH) == SL_STATUS_OK,
+    VerifyOrReturnError(sl_wfx_send_join_command(wifi_provision.ssid, wifi_provision.ssidLength, NULL, CHANNEL_0,
+                                                 connect_security_mode, PREVENT_ROAMING, DISABLE_PMF_MODE, wifi_provision.passkey,
+                                                 wifi_provision.passkeyLength, NULL, IE_DATA_LENGTH) == SL_STATUS_OK,
                         CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;

@@ -234,7 +234,7 @@ CHIP_ERROR ConnectToAccessPoint()
     // TODO: We should move this validation to where we set the credentials. It is too late here.
     VerifyOrReturnError(wfx_rsi.credentials.ssidLength <= WFX_MAX_SSID_LENGTH, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ChipLogProgress(DeviceLayer, "connect to access point: %s", wfx_rsi.credentials.ssid.data());
+    ChipLogProgress(DeviceLayer, "connect to access point: %s", wfx_rsi.credentials.ssid);
 
     WifiPlatformEvent event = WifiPlatformEvent::kStationStartJoin;
     PostWifiPlatformEvent(event);
