@@ -145,7 +145,10 @@ rt_executable("all_cluster_app") {
     "${common_example_dir}/matter_button/source/ButtonRegistrationEmpty.cpp",
   ]
 
-  deps = [ "${chip_root}/examples/${app_common_folder}" ]
+  deps = [
+    "${chip_root}/examples/${app_common_folder}",
+    "${chip_root}/src/setup_payload:onboarding-codes-utils",
+  ]
 
   sources += [
     "${chip_root}/examples/${app_common_folder}/src/bridged-actions-stub.cpp",

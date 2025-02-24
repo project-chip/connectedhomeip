@@ -3711,6 +3711,18 @@ static id _Nullable DecodeEventPayloadForWindowCoveringCluster(EventId aEventId,
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForClosureControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ClosureControl;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForServiceAreaCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ServiceArea;
@@ -5501,6 +5513,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::WindowCovering::Id: {
         return DecodeEventPayloadForWindowCoveringCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::ClosureControl::Id: {
+        return DecodeEventPayloadForClosureControlCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::ServiceArea::Id: {
         return DecodeEventPayloadForServiceAreaCluster(aPath.mEventId, aReader, aError);

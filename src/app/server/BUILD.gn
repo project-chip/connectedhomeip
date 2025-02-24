@@ -57,8 +57,6 @@ static_library("server") {
     "Dnssd.h",
     "EchoHandler.cpp",
     "EchoHandler.h",
-    "OnboardingCodesUtil.cpp",
-    "OnboardingCodesUtil.h",
     "Server.cpp",
     "Server.h",
   ]
@@ -81,7 +79,6 @@ static_library("server") {
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
     "${chip_root}/src/protocols",
-    "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
 
@@ -94,12 +91,8 @@ static_library("server") {
   #       be updated if this is not really "testing" even though headers are Test*.h)
   public_deps += [ "${chip_root}/src/lib/support:testing" ]
 
-  if (chip_enable_icd_server) {
-    public_deps += [ "${chip_root}/src/app/icd/server:notifier" ]
-
-    if (chip_enable_icd_checkin) {
-      public_deps +=
-          [ "${chip_root}/src/app/icd/server:default-check-in-back-off" ]
-    }
+  if (chip_enable_icd_checkin) {
+    public_deps +=
+        [ "${chip_root}/src/app/icd/server:default-check-in-back-off" ]
   }
 }

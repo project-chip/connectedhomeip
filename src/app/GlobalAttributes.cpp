@@ -97,14 +97,6 @@ DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provide
                 //       and this reduces template variants for Encode, saving flash.
                 ReturnErrorOnFailure(listEncodeHelper.Encode(static_cast<uint64_t>(entry.attributeId)));
             }
-
-            for (auto id : GlobalAttributesNotInMetadata)
-            {
-                // NOTE: cast to u64 because TLV encodes all numbers the same (no TLV sideffects)
-                //       and this reduces template variants for Encode, saving flash.
-                ReturnErrorOnFailure(listEncodeHelper.Encode(static_cast<uint64_t>(id)));
-            }
-
             return CHIP_NO_ERROR;
         });
     }

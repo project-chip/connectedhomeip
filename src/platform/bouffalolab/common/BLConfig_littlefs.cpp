@@ -278,7 +278,7 @@ CHIP_ERROR BLConfig::WriteConfigValue(const char * key, uint8_t * val, size_t si
 
     blconfig_lfs->cfg->lock(blconfig_lfs->cfg);
 
-    ret = lfs_file_open(blconfig_lfs, &file, write_key, LFS_O_CREAT | LFS_O_RDWR);
+    ret = lfs_file_open(blconfig_lfs, &file, write_key, LFS_O_CREAT | LFS_O_RDWR | LFS_O_TRUNC);
     VerifyOrExit(ret == LFS_ERR_OK, err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
     lfs_file_write(blconfig_lfs, &file, val, size);
@@ -353,7 +353,7 @@ CHIP_ERROR BLConfig::FactoryResetConfig(void)
 
     blconfig_lfs->cfg->lock(blconfig_lfs->cfg);
 
-    ret = lfs_file_open(blconfig_lfs, &file, reset_key, LFS_O_CREAT | LFS_O_RDWR);
+    ret = lfs_file_open(blconfig_lfs, &file, reset_key, LFS_O_CREAT | LFS_O_RDWR | LFS_O_TRUNC);
     if (ret != LFS_ERR_OK)
     {
         blconfig_lfs->cfg->unlock(blconfig_lfs->cfg);

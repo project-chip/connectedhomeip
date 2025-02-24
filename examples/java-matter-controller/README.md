@@ -9,8 +9,9 @@ cluster requests to a Matter device
 
 -   [Matter Controller Java App Example](#matter-controller-java-app-example)
     -   [Requirements for building](#requirements-for-building)
+        -   [Linux](#linux)
     -   [Preparing for build](#preparing-for-build)
-    -   [Building & Running the app](#building--running-the-app)
+    -   [Building \& Running the app](#building--running-the-app)
 
 <hr>
 
@@ -46,6 +47,8 @@ system. You can install it through the following command as root:
 ```shell
 sudo apt install default-jdk
 ```
+
+Note: Current matter controller java app example needs java 8+.
 
 You also need to install kotlin compiler on your Ubuntu system:
 
@@ -93,7 +96,7 @@ export PATH="/usr/lib/kotlinc/bin:$PATH"
 ### Linux
 
 ```shell
-export JAVA_PATH=[JDK path]
+export JAVA_HOME=[JDK path]
 ```
 
 <hr>

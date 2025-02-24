@@ -88,17 +88,6 @@ struct WriteAttributeRequest : OperationRequest
 {
     ConcreteDataAttributePath path; // NOTE: this also contains LIST operation options (i.e. "data" path type)
     BitFlags<WriteFlags> writeFlags;
-
-    // The path of the previous successful write in the same write transaction, if any.
-    //
-    // In particular this means that a write to this path has succeeded before (i.e. it passed required ACL checks).
-    // The intent for this is to allow short-cutting ACL checks when ACL is in progress of being updated:
-    //   - During write chunking, list writes can be of the form "reset list" followed by "append item by item"
-    //   - When ACL is updating, a reset to empty would result in the entire ACL being deny and the "append"
-    //     would fail.
-    // callers are expected to keep track of a `previousSuccessPath` whenever a write succeeds (otherwise ACL
-    // checks may fail)
-    std::optional<ConcreteAttributePath> previousSuccessPath;
 };
 
 enum class InvokeFlags : uint32_t

@@ -1,36 +1,42 @@
-<?xml version="1.0" ?>
-<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "https://raw.githubusercontent.com/freedesktop/dbus/master/doc/introspect.dtd">
+<!--
+Copyright (c) 2020 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+This file is constructed based on the wpa_supplicant D-Bus API exposed by the
+wpa_supplicant daemon. The list of methods and properties is available at:
+https://w1.fi/wpa_supplicant/devel/dbus.html
+
+Please note that this file is not a complete representation of the
+wpa_supplicant D-Bus API, but only includes the methods that are relevant for
+the wpa_supplicant integration with the Matter SDK.
+-->
+
+<!DOCTYPE node PUBLIC
+  "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+  "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+
 <node>
     <interface name="fi.w1.wpa_supplicant1">
         <method name="CreateInterface">
             <arg name="args" type="a{sv}" direction="in" />
             <arg name="path" type="o" direction="out" />
         </method>
-        <method name="RemoveInterface">
-            <arg name="path" type="o" direction="in" />
-        </method>
         <method name="GetInterface">
             <arg name="ifname" type="s" direction="in" />
             <arg name="path" type="o" direction="out" />
         </method>
-        <method name="ExpectDisconnect" />
-        <signal name="InterfaceAdded">
-            <arg name="path" type="o" />
-            <arg name="properties" type="a{sv}" />
-        </signal>
-        <signal name="InterfaceRemoved">
-            <arg name="path" type="o" />
-        </signal>
-        <signal name="PropertiesChanged">
-            <arg name="properties" type="a{sv}" />
-        </signal>
-        <property name="DebugLevel" type="s" access="readwrite" />
-        <property name="DebugTimestamp" type="b" access="readwrite" />
-        <property name="DebugShowKeys" type="b" access="readwrite" />
-        <property name="Interfaces" type="ao" access="read" />
-        <property name="EapMethods" type="as" access="read" />
-        <property name="Capabilities" type="as" access="read" />
-        <property name="WFDIEs" type="ay" access="readwrite" />
     </interface>
-    <node name="Interfaces" />
 </node>

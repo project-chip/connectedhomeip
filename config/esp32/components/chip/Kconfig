@@ -228,14 +228,15 @@ menu "CHIP Core"
             help
                 Enable this option to start a UDP Endpoint queue filter for mDNS Broadcast packets
 
-        config ENABLE_LWIP_THREAD_SAFETY
-            bool "Enable LwIP Thread safety options"
+        config USE_TCPIP_CORE_LOCK_FOR_THREAD_SAFETY
+            bool "Use TCPIP core locking for LwIP thread safety"
             default y
             select LWIP_TCPIP_CORE_LOCKING
             select LWIP_CHECK_THREAD_SAFETY
             help
                 CHIP SDK performs LwIP core locking before calling an LwIP API.
                 To make the calls thread safe we have to enable LWIP_TCPIP_CORE_LOCKING.
+                Otherwise CHIP SDK will post LwIP APIs to TCPIP task to ensure thread safety.
                 Here, we are also enabling LWIP_CHECK_THREAD_SAFETY which will assert when
                 LwIP code gets called from any other context or without holding the LwIP lock.
 

@@ -667,8 +667,9 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
         if (globalSceneControl)
         {
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-            ScenesManagement::ScenesServer::Instance().StoreCurrentScene(fabric, endpoint, ZCL_SCENES_GLOBAL_SCENE_GROUP_ID,
-                                                                         ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
+            ScenesManagement::ScenesServer::Instance().StoreCurrentScene(fabric, endpoint,
+                                                                         ScenesManagement::ScenesServer::kGlobalSceneGroupId,
+                                                                         ScenesManagement::ScenesServer::kGlobalSceneId);
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
             OnOff::Attributes::GlobalSceneControl::Set(endpoint, false);
         }
@@ -723,8 +724,8 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
     }
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    ScenesManagement::ScenesServer::Instance().RecallScene(fabric, endpoint, ZCL_SCENES_GLOBAL_SCENE_GROUP_ID,
-                                                           ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
+    ScenesManagement::ScenesServer::Instance().RecallScene(fabric, endpoint, ScenesManagement::ScenesServer::kGlobalSceneGroupId,
+                                                           ScenesManagement::ScenesServer::kGlobalSceneId);
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
     OnOff::Attributes::GlobalSceneControl::Set(endpoint, true);

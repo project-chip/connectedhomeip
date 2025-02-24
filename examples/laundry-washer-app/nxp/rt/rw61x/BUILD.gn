@@ -188,6 +188,7 @@ rt_executable("laundry-washer") {
   deps = [
     "${chip_root}/examples/${app_common_folder}",
     "${chip_root}/src/platform/logging:default",
+    "${chip_root}/src/setup_payload:onboarding-codes-utils",
   ]
 
   sources += [

@@ -1391,7 +1391,7 @@ CHIP_ERROR FabricTable::ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader)
     CHIP_ERROR err;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (mFabricCount >= ArraySize(mStates))
+        if (mFabricCount >= MATTER_ARRAY_SIZE(mStates))
         {
             // We have nowhere to deserialize this fabric info into.
             return CHIP_ERROR_NO_MEMORY;

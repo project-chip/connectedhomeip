@@ -32,7 +32,6 @@ source_set("nullable-primitives") {
 # These headers/cpp only depend on core/common
 source_set("types") {
   sources = [
-    "att-storage.h",
     "attribute-metadata.cpp",
     "attribute-metadata.h",
     "basic-types.h",
@@ -54,7 +53,11 @@ source_set("types") {
 
 # This source set also depends on data-model
 source_set("af-types") {
-  sources = [ "af-types.h" ]
+  sources = [
+    "AttributesChangedListener.h",
+    "MarkAttributeDirty.h",
+    "af-types.h",
+  ]
   deps = [
     ":types",
     "${chip_root}/src/app:paths",

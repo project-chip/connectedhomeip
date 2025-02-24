@@ -5752,6 +5752,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                     XCTAssertNil(error);
                     XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
 
                     // Successful invoke is represented as a value with the relevant
                     // command path and neither data nor error.
@@ -5781,6 +5782,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                     XCTAssertNil(error);
                     XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
 
                     // We should not have anything for groups after the first one
                     XCTAssertEqual(values.count, 2);
@@ -5814,6 +5816,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                     XCTAssertNil(error);
                     XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
 
                     // We should not have anything for groups after the first one
                     __auto_type * expectedValues = @[
@@ -5858,6 +5861,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                     XCTAssertNil(error);
                     XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
 
                     XCTAssertEqual(values.count, 3);
 
@@ -5902,6 +5906,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                     XCTAssertNil(error);
                     XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
 
                     XCTAssertEqual(values.count, 3);
 
@@ -5946,6 +5951,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                     XCTAssertNil(error);
                     XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
 
                     XCTAssertEqual(values.count, 2);
 
@@ -5988,6 +5994,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                     XCTAssertNil(error);
                     XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
 
                     XCTAssertEqual(values.count, 2);
 

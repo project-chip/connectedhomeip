@@ -280,7 +280,7 @@ TEST_F(TestDeviceAttestationConstruction, TestAttestationElements_Deconstruction
         EXPECT_TRUE(attestationNonceDeconstructed.data_equal(ByteSpan(attestationNonceTestVector)));
         EXPECT_EQ(timestampTestVector, timestampDeconstructed);
         EXPECT_TRUE(firmwareInfoDeconstructed.empty());
-        EXPECT_EQ(ArraySize(vendorReservedArrayTestVector), vendorReserved.GetNumberOfElements());
+        EXPECT_EQ(MATTER_ARRAY_SIZE(vendorReservedArrayTestVector), vendorReserved.GetNumberOfElements());
         struct VendorReservedElement element;
 
         while (vendorReserved.GetNextVendorReservedElement(element) == CHIP_NO_ERROR)
@@ -363,7 +363,7 @@ TEST_F(TestDeviceAttestationConstruction, TestVendorReservedData)
     DeviceAttestationVendorReservedConstructor vendorReserved(vendorReservedArray, 6);
     size_t i;
     uint8_t strings[6][50];
-    for (i = 0; i < ArraySize(inputArray); i++)
+    for (i = 0; i < MATTER_ARRAY_SIZE(inputArray); i++)
     {
         snprintf(reinterpret_cast<char *>(strings[i]), sizeof(strings[i]), "Vendor Reserved Data #%d",
                  (int) i); // for debugging use
@@ -383,12 +383,12 @@ TEST_F(TestDeviceAttestationConstruction, TestVendorReservedData)
     EXPECT_TRUE(element);
     EXPECT_TRUE(element = vendorReserved.Next());
 
-    for (i = 0; element && i < ArraySize(desiredOrder); element = vendorReserved.Next(), i++)
+    for (i = 0; element && i < MATTER_ARRAY_SIZE(desiredOrder); element = vendorReserved.Next(), i++)
     {
         EXPECT_TRUE(element->vendorId == desiredOrder[i]->vendorId && element->profileNum == desiredOrder[i]->profileNum &&
                     element->tagNum == desiredOrder[i]->tagNum);
     }
-    EXPECT_EQ(i, ArraySize(desiredOrder)); // check if previous loop matched for every array entry.
+    EXPECT_EQ(i, MATTER_ARRAY_SIZE(desiredOrder)); // check if previous loop matched for every array entry.
 
     // add another element, it should fail
     uint8_t testByteSpan[] = { 0x1, 0x2, 0x3 };
@@ -469,7 +469,7 @@ TEST_F(TestDeviceAttestationConstruction, TestAttestationElements_Deconstruction
     EXPECT_TRUE(attestationNonceDeconstructed.data_equal(ByteSpan(attestationNonceTestVector)));
     EXPECT_EQ(timestampTestVector, timestampDeconstructed);
     EXPECT_TRUE(firmwareInfoDeconstructed.data_equal(ByteSpan(firmwareInfoTestVector)));
-    EXPECT_EQ(ArraySize(vendorReservedArrayTestVector), vendorReserved.GetNumberOfElements());
+    EXPECT_EQ(MATTER_ARRAY_SIZE(vendorReservedArrayTestVector), vendorReserved.GetNumberOfElements());
     struct VendorReservedElement element;
     size_t elementsSeen = 0;
 
@@ -492,7 +492,7 @@ TEST_F(TestDeviceAttestationConstruction, TestAttestationElements_Deconstruction
             break;
         }
     }
-    EXPECT_EQ(elementsSeen, ArraySize(vendorReservedArrayTestVector));
+    EXPECT_EQ(elementsSeen, MATTER_ARRAY_SIZE(vendorReservedArrayTestVector));
 }
 
 TEST_F(TestDeviceAttestationConstruction, TestAttestationElements_DeconstructionUnordered)

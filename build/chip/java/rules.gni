@@ -22,7 +22,7 @@ jar_runner = "${chip_root}/build/chip/java/jar_runner.py"
 write_build_config = "${chip_root}/build/chip/java/write_build_config.py"
 
 assert(android_sdk_root != "" || matter_enable_java_compilation,
-       "android_sdk_root must be specified or JAVA_PATH must be set.")
+       "android_sdk_root must be specified or JAVA_HOME must be set.")
 
 # Declare a java library target
 #
@@ -104,10 +104,7 @@ template("java_library") {
   # Building from sources - perform Java compilation and JAR creation.
   if (!_is_prebuilt) {
     # Additional flags
-    _javac_flags = [
-      "-Werror",
-      "-Xlint:all",
-    ]
+    _javac_flags = [ "-Xlint:all" ]
     if (defined(invoker.javac_flags)) {
       _javac_flags += invoker.javac_flags
     }

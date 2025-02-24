@@ -48,6 +48,55 @@
 #include <tracing/macros.h>
 #include <transport/SessionManager.h>
 
+namespace {
+
+enum class PBKDFParamRequestTags : uint8_t
+{
+    kInitiatorRandom        = 1,
+    kInitiatorSessionId     = 2,
+    kPasscodeId             = 3,
+    kHasPBKDFParameters     = 4,
+    kInitiatorSessionParams = 5,
+};
+
+enum class PBKDFParamResponseTags : uint8_t
+{
+    kInitiatorRandom        = 1,
+    kResponderRandom        = 2,
+    kResponderSessionId     = 3,
+    kPbkdfParameters        = 4,
+    kResponderSessionParams = 5,
+};
+
+enum class PBKDFParameterSetTags : uint8_t
+{
+    kIterations = 1,
+    kSalt       = 2,
+};
+
+enum class Pake1Tags : uint8_t
+{
+    kPa = 1,
+};
+
+enum class Pake2Tags : uint8_t
+{
+    kPb = 1,
+    kCb = 2,
+};
+enum class Pake3Tags : uint8_t
+{
+    kCa = 1,
+};
+
+// Utility to extract the underlying value of TLV Tag enum classes, used in TLV encoding and parsing.
+template <typename Enum>
+constexpr chip::TLV::Tag AsTlvContextTag(Enum e)
+{
+    return chip::TLV::ContextTag(chip::to_underlying(e));
+}
+
+} // namespace
 namespace chip {
 
 using namespace Crypto;
@@ -275,6 +324,23 @@ CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR PASESession::ReadSessionParamsIfPresent(const TLV::Tag & expectedSessionParamsTag,
+                                                   System::PacketBufferTLVReader & tlvReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = tlvReader.Next();
+    if (err == CHIP_NO_ERROR && tlvReader.GetTag() == expectedSessionParamsTag)
+    {
+        ReturnErrorOnFailure(DecodeSessionParametersIfPresent(expectedSessionParamsTag, tlvReader, mRemoteSessionParams));
+        mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
+            GetRemoteSessionParameters());
+
+        err = tlvReader.Next();
+    }
+    return err;
+}
+
 CHIP_ERROR PASESession::SendPBKDFParamRequest()
 {
     MATTER_TRACE_SCOPE("SendPBKDFParamRequest", "PASESession");
@@ -298,13 +364,16 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
 
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
-    ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(1), mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId().Value()));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), kDefaultCommissioningPasscodeId));
-    ReturnErrorOnFailure(tlvWriter.PutBoolean(TLV::ContextTag(4), mHavePBKDFParameters));
+    ReturnErrorOnFailure(tlvWriter.PutBytes(AsTlvContextTag(PBKDFParamRequestTags::kInitiatorRandom), mPBKDFLocalRandomData,
+                                            sizeof(mPBKDFLocalRandomData)));
+    ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(PBKDFParamRequestTags::kInitiatorSessionId), GetLocalSessionId().Value()));
+    ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(PBKDFParamRequestTags::kPasscodeId), kDefaultCommissioningPasscodeId));
+    ReturnErrorOnFailure(tlvWriter.PutBoolean(AsTlvContextTag(PBKDFParamRequestTags::kHasPBKDFParameters), mHavePBKDFParameters));
 
     VerifyOrReturnError(mLocalMRPConfig.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig.Value(), tlvWriter));
+
+    ReturnErrorOnFailure(EncodeSessionParameters(AsTlvContextTag(PBKDFParamRequestTags::kInitiatorSessionParams),
+                                                 mLocalMRPConfig.Value(), tlvWriter));
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&req));
@@ -338,7 +407,6 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
     uint16_t initiatorSessionId;
     uint8_t initiatorRandom[kPBKDFParamRandomNumberSize];
 
-    uint32_t decodeTagIdSeq = 0;
     PasscodeId passcodeId   = kDefaultCommissioningPasscodeId;
     bool hasPBKDFParameters = false;
 
@@ -350,32 +418,34 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
     SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag()));
     SuccessOrExit(err = tlvReader.EnterContainer(containerType));
 
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
+    SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(PBKDFParamRequestTags::kInitiatorRandom)));
+    VerifyOrExit(tlvReader.GetLength() == kPBKDFParamRandomNumberSize, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
     SuccessOrExit(err = tlvReader.GetBytes(initiatorRandom, sizeof(initiatorRandom)));
 
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
+    SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(PBKDFParamRequestTags::kInitiatorSessionId)));
     SuccessOrExit(err = tlvReader.Get(initiatorSessionId));
 
     ChipLogDetail(SecureChannel, "Peer assigned session ID %d", initiatorSessionId);
     SetPeerSessionId(initiatorSessionId);
 
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
+    SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(PBKDFParamRequestTags::kPasscodeId)));
     SuccessOrExit(err = tlvReader.Get(passcodeId));
     VerifyOrExit(passcodeId == kDefaultCommissioningPasscodeId, err = CHIP_ERROR_INVALID_PASE_PARAMETER);
 
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
+    SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(PBKDFParamRequestTags::kHasPBKDFParameters)));
     SuccessOrExit(err = tlvReader.Get(hasPBKDFParameters));
 
-    if (tlvReader.Next() != CHIP_END_OF_TLV)
-    {
-        SuccessOrExit(err = DecodeSessionParametersIfPresent(TLV::ContextTag(5), tlvReader, mRemoteSessionParams));
-        mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
-            GetRemoteSessionParameters());
-    }
+    err = ReadSessionParamsIfPresent(AsTlvContextTag(PBKDFParamRequestTags::kInitiatorSessionParams), tlvReader);
+
+    // Future-proofing: CHIP_NO_ERROR will be returned by Next() within ReadSessionParamsIfPresent() if we have additional
+    // non-parsed TLV Elements, which could happen in the future if additional elements are added to the specification.
+    VerifyOrExit(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, /* No Action */);
+
+    // ExitContainer() acts as a safeguard to ensure that the received encoded message is properly terminated with an EndOfContainer
+    // TLV element. It is called as an extra validation step to enforce input data structure integrity. Without it, the message may
+    // still parse correctly, but malformed or incomplete data might go undetected.
+    // ExitContainer() will return CHIP_END_OF_TLV if the EndOfContainer TLV element terminator is missing.
+    SuccessOrExit(err = tlvReader.ExitContainer(containerType));
 
     err = SendPBKDFParamResponse(ByteSpan(initiatorRandom), hasPBKDFParameters);
     SuccessOrExit(err);
@@ -416,21 +486,24 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
     // The initiator random value is being sent back in the response as required by the specifications
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), initiatorRandom));
-    ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(2), mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), GetLocalSessionId().Value()));
+    ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(PBKDFParamResponseTags::kInitiatorRandom), initiatorRandom));
+    ReturnErrorOnFailure(tlvWriter.PutBytes(AsTlvContextTag(PBKDFParamResponseTags::kResponderRandom), mPBKDFLocalRandomData,
+                                            sizeof(mPBKDFLocalRandomData)));
+    ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(PBKDFParamResponseTags::kResponderSessionId), GetLocalSessionId().Value()));
 
     if (!initiatorHasPBKDFParams)
     {
         TLV::TLVType pbkdfParamContainer;
-        ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::ContextTag(4), TLV::kTLVType_Structure, pbkdfParamContainer));
-        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), mIterationCount));
-        ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(2), mSalt, mSaltLength));
+        ReturnErrorOnFailure(tlvWriter.StartContainer(AsTlvContextTag(PBKDFParamResponseTags::kPbkdfParameters),
+                                                      TLV::kTLVType_Structure, pbkdfParamContainer));
+        ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(PBKDFParameterSetTags::kIterations), mIterationCount));
+        ReturnErrorOnFailure(tlvWriter.PutBytes(AsTlvContextTag(PBKDFParameterSetTags::kSalt), mSalt, mSaltLength));
         ReturnErrorOnFailure(tlvWriter.EndContainer(pbkdfParamContainer));
     }
 
     VerifyOrReturnError(mLocalMRPConfig.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig.Value(), tlvWriter));
+    ReturnErrorOnFailure(EncodeSessionParameters(AsTlvContextTag(PBKDFParamResponseTags::kResponderSessionParams),
+                                                 mLocalMRPConfig.Value(), tlvWriter));
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&resp));
@@ -459,7 +532,6 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
     uint16_t responderSessionId;
     uint8_t random[kPBKDFParamRandomNumberSize];
 
-    uint32_t decodeTagIdSeq = 0;
     ByteSpan salt;
     uint8_t serializedWS[kSpake2p_WS_Length * 2] = { 0 };
 
@@ -471,19 +543,17 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
     SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag()));
     SuccessOrExit(err = tlvReader.EnterContainer(containerType));
 
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
     // Initiator's random value
+    SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(PBKDFParamResponseTags::kInitiatorRandom)));
     SuccessOrExit(err = tlvReader.GetBytes(random, sizeof(random)));
     VerifyOrExit(ByteSpan(random).data_equal(ByteSpan(mPBKDFLocalRandomData)), err = CHIP_ERROR_INVALID_PASE_PARAMETER);
 
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
     // Responder's random value
+    SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(PBKDFParamResponseTags::kResponderRandom)));
+    VerifyOrExit(tlvReader.GetLength() == kPBKDFParamRandomNumberSize, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
     SuccessOrExit(err = tlvReader.GetBytes(random, sizeof(random)));
 
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
+    SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(PBKDFParamResponseTags::kResponderSessionId)));
     SuccessOrExit(err = tlvReader.Get(responderSessionId));
 
     ChipLogDetail(SecureChannel, "Peer assigned session ID %d", responderSessionId);
@@ -491,39 +561,43 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
 
     if (mHavePBKDFParameters)
     {
-        if (tlvReader.Next() != CHIP_END_OF_TLV)
-        {
-            SuccessOrExit(err = DecodeSessionParametersIfPresent(TLV::ContextTag(5), tlvReader, mRemoteSessionParams));
-            mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
-                GetRemoteSessionParameters());
-        }
+        err = ReadSessionParamsIfPresent(AsTlvContextTag(PBKDFParamResponseTags::kResponderSessionParams), tlvReader);
+
+        // Future-proofing: CHIP_NO_ERROR will be returned by Next() within ReadSessionParamsIfPresent() if we have additional
+        // non-parsed TLV Elements, which could happen in the future if additional elements are added to the specification.
+        VerifyOrExit(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, /* No Action */);
 
         // TODO - Add a unit test that exercises mHavePBKDFParameters path
         salt = ByteSpan(mSalt, mSaltLength);
     }
     else
     {
-        SuccessOrExit(err = tlvReader.Next());
+        SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(PBKDFParamResponseTags::kPbkdfParameters)));
         SuccessOrExit(err = tlvReader.EnterContainer(containerType));
-        decodeTagIdSeq = 0;
 
-        SuccessOrExit(err = tlvReader.Next());
-        VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
+        SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(PBKDFParameterSetTags::kIterations)));
         SuccessOrExit(err = tlvReader.Get(mIterationCount));
 
-        SuccessOrExit(err = tlvReader.Next());
-        VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
+        SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(PBKDFParameterSetTags::kSalt)));
+        VerifyOrExit(tlvReader.GetLength() >= kSpake2p_Min_PBKDF_Salt_Length &&
+                         tlvReader.GetLength() <= kSpake2p_Max_PBKDF_Salt_Length,
+                     err = CHIP_ERROR_INVALID_TLV_ELEMENT);
         SuccessOrExit(err = tlvReader.Get(salt));
 
         SuccessOrExit(err = tlvReader.ExitContainer(containerType));
 
-        if (tlvReader.Next() != CHIP_END_OF_TLV)
-        {
-            SuccessOrExit(err = DecodeSessionParametersIfPresent(TLV::ContextTag(5), tlvReader, mRemoteSessionParams));
-            mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
-                GetRemoteSessionParameters());
-        }
+        err = ReadSessionParamsIfPresent(AsTlvContextTag(PBKDFParamResponseTags::kResponderSessionParams), tlvReader);
+
+        // Future-proofing: CHIP_NO_ERROR will be returned by Next() within ReadSessionParamsIfPresent() if we have additional
+        // non-parsed TLV Elements, which could happen in the future if additional elements are added to the specification.
+        VerifyOrExit(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, /* No Action */);
     }
+
+    // ExitContainer() acts as a safeguard to ensure that the received encoded message is properly terminated with an EndOfContainer
+    // TLV element. It is called as an extra validation step to enforce input data structure integrity. Without it, the message may
+    // still parse correctly, but malformed or incomplete data might go undetected.
+    // ExitContainer() will return CHIP_END_OF_TLV if the EndOfContainer TLV element terminator is missing.
+    SuccessOrExit(err = tlvReader.ExitContainer(containerType));
 
     err = SetupSpake2p();
     SuccessOrExit(err);
@@ -562,11 +636,9 @@ CHIP_ERROR PASESession::SendMsg1()
     uint8_t X[kMAX_Point_Length];
     size_t X_len = sizeof(X);
 
-    constexpr uint8_t kPake1_pA = 1;
-
     ReturnErrorOnFailure(mSpake2p.ComputeRoundOne(nullptr, 0, X, &X_len));
     VerifyOrReturnError(X_len == sizeof(X), CHIP_ERROR_INTERNAL);
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kPake1_pA), ByteSpan(X)));
+    ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Pake1Tags::kPa), ByteSpan(X)));
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&msg));
 
@@ -603,10 +675,13 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && ms
     SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag()));
     SuccessOrExit(err = tlvReader.EnterContainer(containerType));
 
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == 1, err = CHIP_ERROR_INVALID_TLV_TAG);
+    SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(Pake1Tags::kPa)));
     X_len = tlvReader.GetLength();
+    VerifyOrExit(X_len == kMAX_Point_Length, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
     SuccessOrExit(err = tlvReader.GetDataPtr(X));
+
+    SuccessOrExit(err = tlvReader.ExitContainer(containerType));
+
     SuccessOrExit(err = mSpake2p.BeginVerifier(nullptr, 0, nullptr, 0, mPASEVerifier.mW0, kP256_FE_Length, mPASEVerifier.mL,
                                                kP256_Point_Length));
 
@@ -616,9 +691,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && ms
     msg1 = nullptr;
 
     {
-        const size_t max_msg_len    = TLV::EstimateStructOverhead(Y_len, verifier_len);
-        constexpr uint8_t kPake2_pB = 1;
-        constexpr uint8_t kPake2_cB = 2;
+        const size_t max_msg_len = TLV::EstimateStructOverhead(Y_len, verifier_len);
 
         System::PacketBufferHandle msg2 = System::PacketBufferHandle::New(max_msg_len);
         VerifyOrExit(!msg2.IsNull(), err = CHIP_ERROR_NO_MEMORY);
@@ -628,8 +701,8 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && ms
 
         TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
-        SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(kPake2_pB), ByteSpan(Y)));
-        SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(kPake2_cB), ByteSpan(verifier, verifier_len)));
+        SuccessOrExit(err = tlvWriter.Put(AsTlvContextTag(Pake2Tags::kPb), ByteSpan(Y)));
+        SuccessOrExit(err = tlvWriter.Put(AsTlvContextTag(Pake2Tags::kCb), ByteSpan(verifier, verifier_len)));
         SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
         SuccessOrExit(err = tlvWriter.Finalize(&msg2));
 
@@ -673,21 +746,25 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
     const uint8_t * peer_verifier;
     size_t peer_verifier_len = 0;
 
-    uint32_t decodeTagIdSeq = 0;
-
     tlvReader.Init(std::move(msg2));
     SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag()));
     SuccessOrExit(err = tlvReader.EnterContainer(containerType));
 
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
+    SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(Pake2Tags::kPb)));
     Y_len = tlvReader.GetLength();
+    VerifyOrExit(Y_len == kMAX_Point_Length, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
     SuccessOrExit(err = tlvReader.GetDataPtr(Y));
 
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
+    SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(Pake2Tags::kCb)));
     peer_verifier_len = tlvReader.GetLength();
+    VerifyOrExit(peer_verifier_len == kMAX_Hash_Length, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
     SuccessOrExit(err = tlvReader.GetDataPtr(peer_verifier));
+
+    // ExitContainer() acts as a safeguard to ensure that the received encoded message is properly terminated with an EndOfContainer
+    // TLV element. It is called as an extra validation step to enforce input data structure integrity. Without it, the message may
+    // still parse correctly, but malformed or incomplete data might go undetected.
+    // ExitContainer() will return CHIP_END_OF_TLV if the EndOfContainer TLV element terminator is missing.
+    SuccessOrExit(err = tlvReader.ExitContainer(containerType));
 
     SuccessOrExit(err = mSpake2p.ComputeRoundTwo(Y, Y_len, verifier, &verifier_len));
 
@@ -695,8 +772,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
     msg2 = nullptr;
 
     {
-        const size_t max_msg_len    = TLV::EstimateStructOverhead(verifier_len);
-        constexpr uint8_t kPake3_cB = 1;
+        const size_t max_msg_len = TLV::EstimateStructOverhead(verifier_len);
 
         System::PacketBufferHandle msg3 = System::PacketBufferHandle::New(max_msg_len);
         VerifyOrExit(!msg3.IsNull(), err = CHIP_ERROR_NO_MEMORY);
@@ -706,7 +782,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
 
         TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
-        SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(kPake3_cB), ByteSpan(verifier, verifier_len)));
+        SuccessOrExit(err = tlvWriter.Put(AsTlvContextTag(Pake3Tags::kCa), ByteSpan(verifier, verifier_len)));
         SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
         SuccessOrExit(err = tlvWriter.Finalize(&msg3));
 
@@ -747,12 +823,16 @@ CHIP_ERROR PASESession::HandleMsg3(System::PacketBufferHandle && msg)
     SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag()));
     SuccessOrExit(err = tlvReader.EnterContainer(containerType));
 
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == 1, err = CHIP_ERROR_INVALID_TLV_TAG);
+    SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(Pake3Tags::kCa)));
     peer_verifier_len = tlvReader.GetLength();
+    VerifyOrExit(peer_verifier_len == kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     SuccessOrExit(err = tlvReader.GetDataPtr(peer_verifier));
 
-    VerifyOrExit(peer_verifier_len == kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    // ExitContainer() acts as a safeguard to ensure that the received encoded message is properly terminated with an EndOfContainer
+    // TLV element. It is called as an extra validation step to enforce input data structure integrity. Without it, the message may
+    // still parse correctly, but malformed or incomplete data might go undetected.
+    // ExitContainer() will return CHIP_END_OF_TLV if the EndOfContainer TLV element terminator is missing.
+    SuccessOrExit(err = tlvReader.ExitContainer(containerType));
 
     SuccessOrExit(err = mSpake2p.KeyConfirm(peer_verifier, peer_verifier_len));
 

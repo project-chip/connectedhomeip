@@ -1,0 +1,1239 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0551" name="Camera AV Stream Management Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial release"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0551" name="Camera AV Stream Management"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="AVSM" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="ADO" name="Audio" summary="Audio Streams supported">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="1" code="VDO" name="Video" summary="Video Streams supported">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="2" code="SNP" name="Snapshot" summary="Snapshot Streams supported">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="3" code="PRIV" name="Privacy" summary="Privacy supported">
+      <optionalConform/>
+    </feature>
+    <feature bit="4" code="SPKR" name="Speaker" summary="Speaker supported">
+      <optionalConform/>
+    </feature>
+    <feature bit="5" code="ICTL" name="ImageControl" summary="Image control supported">
+      <optionalConform/>
+    </feature>
+    <feature bit="6" code="WMARK" name="Watermark" summary="Watermark supported">
+      <optionalConform/>
+    </feature>
+    <feature bit="7" code="OSD" name="OnScreenDisplay" summary="OSD supported">
+      <optionalConform/>
+    </feature>
+    <feature bit="8" code="STOR" name="LocalStorage" summary="Local Storage available">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <number name="AudioStreamID" type="uint16"/>
+    <number name="SnapshotStreamID" type="uint16"/>
+    <number name="VideoStreamID" type="uint16"/>
+    <enum name="AudioCodecEnum">
+      <item value="0" name="OPUS" summary="Open source IETF standard codec.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="AAC-LC" summary="Advanced Audio Coding codec-Low Complexity">
+        <optionalConform/>
+      </item>
+    </enum>
+    <enum name="ImageCodecEnum">
+      <item value="0" name="JPEG" summary="JPEG image codec.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="StreamUsageEnum">
+      <item value="0" name="Internal" summary="Internal video stream.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Recording" summary="Stream for recording clips.">
+        <optionalConform/>
+      </item>
+      <item value="2" name="Analysis" summary="Stream for analysis and entity detection.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="LiveView" summary="Stream for liveview.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="TriStateAutoEnum">
+      <item value="0" name="Off" summary="Off">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="On" summary="On">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Auto" summary="Automatic Operation">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="TwoWayTalkSupportTypeEnum">
+      <item value="0" name="NotSupported" summary="Two-way Talk support is absent.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="HalfDuplex" summary="Audio in one direction at a time.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="FullDuplex" summary="Audio in both directions simultaneously.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="VideoCodecEnum">
+      <item value="0" name="H264" summary="Advanced Video Coding(H.264) codec.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="HEVC" summary="High efficiency Video Coding(H.265) codec.">
+        <optionalConform/>
+      </item>
+      <item value="2" name="VVC" summary="Versatile Video Coding(H.266) codec.">
+        <optionalConform/>
+      </item>
+      <item value="3" name="AV1" summary="AOMedia Video 1 codec.">
+        <optionalConform/>
+      </item>
+    </enum>
+    <struct name="AudioCapabilitiesStruct">
+      <field id="0" name="MaxNumberOfChannels" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="1" name="SupportedCodecs" type="list">
+        <entry type="AudioCodecEnum"/>
+        <mandatoryConform/>
+        <constraint>
+          <minCount value="1"/>
+        </constraint>
+      </field>
+      <field id="2" name="SupportedSampleRates" type="list">
+        <entry type="uint32"/>
+        <mandatoryConform/>
+        <constraint>
+          <minCount value="1"/>
+        </constraint>
+      </field>
+      <field id="3" name="SupportedBitDepths" type="list">
+        <entry type="uint8"/>
+        <mandatoryConform/>
+        <constraint>
+          <minCount value="1"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="AudioStreamStruct">
+      <field id="0" name="AudioStreamID" type="AudioStreamID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="StreamUsage" type="StreamUsageEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="AudioCodec" type="AudioCodecEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="ChannelCount" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="8"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="4" name="SampleRate" type="uint32">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="5" name="BitRate" type="uint32">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="6" name="BitDepth" type="uint8" default="16">
+        <mandatoryConform/>
+        <constraint>
+          <allowed value="8"/>
+        </constraint>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+        <constraint>
+          <allowed value="24"/>
+        </constraint>
+        <constraint>
+          <allowed value="32"/>
+        </constraint>
+      </field>
+      <field id="7" name="ReferenceCount" type="uint8" default="0">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="RateDistortionTradeOffPointsStruct">
+      <field id="0" name="Codec" type="VideoCodecEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Resolution" type="VideoResolutionStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="MinBitRate" type="uint32">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="SnapshotParamsStruct">
+      <field id="0" name="Resolution" type="VideoResolutionStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="MaxFrameRate" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="2" name="ImageCodec" type="ImageCodecEnum">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="SnapshotStreamStruct">
+      <field id="0" name="SnapshotStreamID" type="SnapshotStreamID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ImageCodec" type="ImageCodecEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="FrameRate" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="3" name="BitRate" type="uint32">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="4" name="MinResolution" type="VideoResolutionStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="MaxResolution" type="VideoResolutionStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="6" name="Quality" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="100"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="7" name="ReferenceCount" type="uint8" default="0">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="VideoResolutionStruct">
+      <field id="0" name="Width" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="1" name="Height" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="VideoSensorParamsStruct">
+      <field id="0" name="SensorWidth" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min value="64"/>
+        </constraint>
+      </field>
+      <field id="1" name="SensorHeight" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min value="64"/>
+        </constraint>
+      </field>
+      <field id="2" name="HDRCapable" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="MaxFPS" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="4" name="MaxHDRFPS" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="VideoStreamStruct">
+      <field id="0" name="VideoStreamID" type="VideoStreamID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="StreamUsage" type="StreamUsageEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="VideoCodec" type="VideoCodecEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="MinFrameRate" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <field name="MaxFrameRate"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="4" name="MaxFrameRate" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="5" name="MinResolution" type="VideoResolutionStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="6" name="MaxResolution" type="VideoResolutionStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="7" name="MinBitRate" type="uint32">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <field name="MaxBitRate"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="8" name="MaxBitRate" type="uint32">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="9" name="MinFragmentLen" type="uint16" default="4000">
+        <mandatoryConform/>
+        <constraint>
+          <max>
+            <field name="MaxFragmentLen"/>
+          </max>
+        </constraint>
+      </field>
+      <field id="10" name="MaxFragmentLen" type="uint16" default="4000">
+        <mandatoryConform/>
+        <constraint>
+          <between value="65500">
+            <field name="MinFragmentLen"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="11" name="WatermarkEnabled" type="bool" default="false">
+        <mandatoryConform>
+          <feature name="WMARK"/>
+        </mandatoryConform>
+      </field>
+      <field id="12" name="OSDEnabled" type="bool" default="false">
+        <mandatoryConform>
+          <feature name="OSD"/>
+        </mandatoryConform>
+      </field>
+      <field id="13" name="ReferenceCount" type="uint8" default="0">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="ViewportStruct">
+      <field id="0" name="X1" type="uint16" default="0">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Y1" type="uint16" default="0">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="X2" type="uint16" default="0">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="Y2" type="uint16" default="0">
+        <mandatoryConform/>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="MaxConcurrentVideoEncoders" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="VDO"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0001" name="MaxEncodedPixelRate" type="uint32">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="VDO"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0002" name="VideoSensorParams" type="VideoSensorParamsStruct">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="VDO"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0003" name="NightVisionCapable" type="bool">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="VDO"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0004" name="MinViewport" type="VideoResolutionStruct">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="VDO"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0005" name="RateDistortionTradeOffPoints" type="list">
+      <entry type="RateDistortionTradeOffPointsStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="VDO"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0006" name="MaxContentBufferSize" type="uint32">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="VDO"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0007" name="MicrophoneCapabilities" type="AudioCapabilitiesStruct">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="ADO"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0008" name="SpeakerCapabilities" type="AudioCapabilitiesStruct">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="ADO"/>
+          <feature name="SPKR"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0009" name="TwoWayTalkSupport" type="TwoWayTalkSupportTypeEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="ADO"/>
+          <feature name="SPKR"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x000A" name="SupportedSnapshotParams" type="list">
+      <entry type="SnapshotParamsStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="SNP"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x000B" name="MaxNetworkBandwidth" type="uint32">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x000C" name="CurrentFrameRate" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="VDO"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x000D" name="HDRModeEnabled" type="bool" default="false">
+      <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform>
+        <feature name="VDO"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x000E" name="FabricsUsingCamera" type="list" default="empty">
+      <entry type="fabric-idx"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x000F" name="AllocatedVideoStreams" type="list" default="empty">
+      <entry type="VideoStreamStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="VDO"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0010" name="AllocatedAudioStreams" type="list" default="empty">
+      <entry type="AudioStreamStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="ADO"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0011" name="AllocatedSnapshotStreams" type="list" default="empty">
+      <entry type="SnapshotStreamStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="SNP"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0012" name="RankedVideoStreamPrioritiesList" type="list" default="desc">
+      <entry type="StreamUsageEnum"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="VDO"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0013" name="SoftRecordingPrivacyModeEnabled" type="bool" default="false">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="PRIV"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0014" name="SoftLivestreamPrivacyModeEnabled" type="bool" default="false">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="PRIV"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0015" name="HardPrivacyModeOn" type="bool" default="false">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0016" name="NightVision" type="TriStateAutoEnum">
+      <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform>
+        <orTerm>
+          <feature name="VDO"/>
+          <feature name="SNP"/>
+        </orTerm>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0017" name="NightVisionIllum" type="TriStateAutoEnum">
+      <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform>
+        <orTerm>
+          <feature name="VDO"/>
+          <feature name="SNP"/>
+        </orTerm>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0018" name="Viewport" type="ViewportStruct">
+      <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="VDO"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0019" name="SpeakerMuted" type="bool" default="false">
+      <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="ADO"/>
+          <feature name="SPKR"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x001A" name="SpeakerVolumeLevel" type="uint8">
+      <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="ADO"/>
+          <feature name="SPKR"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <attribute name="SpeakerMinLevel"/>
+          <attribute name="SpeakerMaxLevel"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x001B" name="SpeakerMaxLevel" type="uint8">
+      <access read="true" readPrivilege="manage"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="ADO"/>
+          <feature name="SPKR"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <between value="254">
+          <attribute name="SpeakerMinLevel"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x001C" name="SpeakerMinLevel" type="uint8">
+      <access read="true" readPrivilege="manage"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="ADO"/>
+          <feature name="SPKR"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <max>
+          <attribute name="SpeakerMaxLevel"/>
+        </max>
+      </constraint>
+    </attribute>
+    <attribute id="0x001D" name="MicrophoneMuted" type="bool" default="false">
+      <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="ADO"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x001E" name="MicrophoneVolumeLevel" type="uint8">
+      <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="ADO"/>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <attribute name="MicrophoneMinLevel"/>
+          <attribute name="MicrophoneMaxLevel"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x001F" name="MicrophoneMaxLevel" type="uint8">
+      <access read="true" readPrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="ADO"/>
+      </mandatoryConform>
+      <constraint>
+        <between value="254">
+          <attribute name="MicrophoneMinLevel"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0020" name="MicrophoneMinLevel" type="uint8">
+      <access read="true" readPrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="ADO"/>
+      </mandatoryConform>
+      <constraint>
+        <max>
+          <attribute name="MicrophoneMaxLevel"/>
+        </max>
+      </constraint>
+    </attribute>
+    <attribute id="0x0021" name="MicrophoneAGCEnabled" type="bool" default="true">
+      <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform>
+        <feature name="ADO"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0022" name="ImageRotation" type="uint16">
+      <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform choice="b" more="true" min="1">
+        <feature name="ICTL"/>
+      </optionalConform>
+      <constraint>
+        <max value="359"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0023" name="ImageFlipHorizontal" type="bool" default="false">
+      <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform choice="b" more="true" min="1">
+        <feature name="ICTL"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0024" name="ImageFlipVertical" type="bool" default="false">
+      <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform choice="b" more="true" min="1">
+        <feature name="ICTL"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0025" name="LocalVideoRecordingEnabled" type="bool" default="false">
+      <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="VDO"/>
+          <feature name="STOR"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0026" name="LocalSnapshotRecordingEnabled" type="bool" default="false">
+      <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="SNP"/>
+          <feature name="STOR"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0027" name="StatusLightEnabled" type="bool" default="true">
+      <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0028" name="StatusLightBrightness" type="ThreeLevelAutoEnum">
+      <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="AudioStreamAllocate" direction="commandToServer" response="AudioStreamAllocateResponse">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="ADO"/>
+      </mandatoryConform>
+      <field id="0" name="StreamUsage" type="StreamUsageEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="AudioCodec" type="AudioCodecEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="ChannelCount" type="uint8" default="1">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="8"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="3" name="SampleRate" type="uint32">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="4" name="BitRate" type="uint32">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="5" name="BitDepth" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <allowed value="8"/>
+        </constraint>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+        <constraint>
+          <allowed value="24"/>
+        </constraint>
+        <constraint>
+          <allowed value="32"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x01" name="AudioStreamAllocateResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="ADO"/>
+      </mandatoryConform>
+      <field id="0" name="AudioStreamID" type="AudioStreamID">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x02" name="AudioStreamDeallocate" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="ADO"/>
+      </mandatoryConform>
+      <field id="0" name="AudioStreamID" type="AudioStreamID">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x03" name="VideoStreamAllocate" direction="commandToServer" response="VideoStreamAllocateResponse">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="VDO"/>
+      </mandatoryConform>
+      <field id="1" name="StreamUsage" type="StreamUsageEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="VideoCodec" type="VideoCodecEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="MinFrameRate" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <field name="MaxFrameRate"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="4" name="MaxFrameRate" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="5" name="MinResolution" type="VideoResolutionStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="6" name="MaxResolution" type="VideoResolutionStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="7" name="MinBitRate" type="uint32">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <field name="MaxBitRate"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="8" name="MaxBitRate" type="uint32">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="9" name="MinFragmentLen" type="uint16" default="4000">
+        <mandatoryConform/>
+        <constraint>
+          <max>
+            <field name="MaxFragmentLen"/>
+          </max>
+        </constraint>
+      </field>
+      <field id="10" name="MaxFragmentLen" type="uint16" default="4000">
+        <mandatoryConform/>
+        <constraint>
+          <between value="65500">
+            <field name="MinFragmentLen"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="11" name="WatermarkEnabled" type="bool" default="0">
+        <mandatoryConform>
+          <feature name="WMARK"/>
+        </mandatoryConform>
+      </field>
+      <field id="12" name="OSDEnabled" type="bool" default="0">
+        <mandatoryConform>
+          <feature name="OSD"/>
+        </mandatoryConform>
+      </field>
+    </command>
+    <command id="0x04" name="VideoStreamAllocateResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="VDO"/>
+      </mandatoryConform>
+      <field id="0" name="VideoStreamID" type="VideoStreamID">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x05" name="VideoStreamModify" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="VDO"/>
+          <orTerm>
+            <feature name="WMARK"/>
+            <feature name="OSD"/>
+          </orTerm>
+        </andTerm>
+      </mandatoryConform>
+      <field id="0" name="VideoStreamID" type="VideoStreamID">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="WatermarkEnabled" type="bool">
+        <mandatoryConform>
+          <feature name="WMARK"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="OSDEnabled" type="bool">
+        <mandatoryConform>
+          <feature name="OSD"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x06" name="VideoStreamDeallocate" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="VDO"/>
+      </mandatoryConform>
+      <field id="0" name="VideoStreamID" type="VideoStreamID">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x07" name="SnapshotStreamAllocate" direction="commandToServer" response="SnapshotStreamAllocateResponse">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="SNP"/>
+      </mandatoryConform>
+      <field id="1" name="ImageCodec" type="ImageCodecEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="MaxFrameRate" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="3" name="BitRate" type="uint32">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="4" name="MinResolution" type="VideoResolutionStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="MaxResolution" type="VideoResolutionStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="6" name="Quality" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="100"/>
+          </between>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x08" name="SnapshotStreamAllocateResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="SNP"/>
+      </mandatoryConform>
+      <field id="0" name="SnapshotStreamID" type="SnapshotStreamID">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x09" name="SnapshotStreamDeallocate" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="SNP"/>
+      </mandatoryConform>
+      <field id="0" name="SnapshotStreamID" type="SnapshotStreamID">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x0A" name="SetStreamPriorities" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform/>
+      <field id="0" name="StreamPriorities" type="list">
+        <entry type="StreamUsageEnum"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x0B" name="CaptureSnapshot" direction="commandToServer" response="CaptureSnapshotResponse">
+      <quality largeMessage="true"/>
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="SNP"/>
+      </mandatoryConform>
+      <field id="0" name="SnapshotStreamID" type="SnapshotStreamID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="RequestedResolution" type="VideoResolutionStruct">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x0C" name="CaptureSnapshotResponse" direction="responseFromServer">
+      <quality largeMessage="true"/>
+      <mandatoryConform>
+        <feature name="SNP"/>
+      </mandatoryConform>
+      <field id="0" name="Data" type="octstr">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ImageCodec" type="ImageCodecEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Resolution" type="VideoResolutionStruct">
+        <mandatoryConform/>
+      </field>
+    </command>
+  </commands>
+  <events>
+    <event id="0x00" name="VideoStreamChanged" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="VDO"/>
+      </mandatoryConform>
+      <field id="0" name="VideoStreamID" type="VideoStreamID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="StreamUsage" type="StreamUsageEnum">
+        <optionalConform/>
+      </field>
+      <field id="2" name="VideoCodec" type="VideoCodecEnum">
+        <optionalConform/>
+      </field>
+      <field id="3" name="MinFrameRate" type="uint16">
+        <optionalConform/>
+        <constraint>
+          <between value="1">
+            <field name="MaxFrameRate"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="4" name="MaxFrameRate" type="uint16">
+        <optionalConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="5" name="MinResolution" type="VideoResolutionStruct">
+        <optionalConform/>
+      </field>
+      <field id="6" name="MaxResolution" type="VideoResolutionStruct">
+        <optionalConform/>
+      </field>
+      <field id="7" name="MinBitRate" type="uint32">
+        <optionalConform/>
+        <constraint>
+          <between value="1">
+            <field name="MaxBitRate"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="8" name="MaxBitRate" type="uint32">
+        <optionalConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="9" name="MinFragmentLen" type="uint16">
+        <optionalConform/>
+        <constraint>
+          <max>
+            <field name="MaxFragmentLen"/>
+          </max>
+        </constraint>
+      </field>
+      <field id="10" name="MaxFragmentLen" type="uint16">
+        <optionalConform/>
+        <constraint>
+          <between value="65500">
+            <field name="MinFragmentLen"/>
+          </between>
+        </constraint>
+      </field>
+    </event>
+    <event id="0x01" name="AudioStreamChanged" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="ADO"/>
+      </mandatoryConform>
+      <field id="0" name="AudioStreamID" type="AudioStreamID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="StreamUsage" type="StreamUsageEnum">
+        <optionalConform/>
+      </field>
+      <field id="2" name="AudioCodec" type="AudioCodecEnum">
+        <optionalConform/>
+      </field>
+      <field id="3" name="ChannelCount" type="uint8">
+        <optionalConform/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="8"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="4" name="SampleRate" type="uint32">
+        <optionalConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="5" name="BitRate" type="uint32">
+        <optionalConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="6" name="BitDepth" type="uint8">
+        <optionalConform/>
+        <constraint>
+          <allowed value="8"/>
+        </constraint>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+        <constraint>
+          <allowed value="24"/>
+        </constraint>
+        <constraint>
+          <allowed value="32"/>
+        </constraint>
+      </field>
+    </event>
+    <event id="0x02" name="SnapshotStreamChanged" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="SNP"/>
+      </mandatoryConform>
+      <field id="0" name="SnapshotStreamID" type="SnapshotStreamID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ImageCodec" type="ImageCodecEnum">
+        <optionalConform/>
+      </field>
+      <field id="2" name="FrameRate" type="uint16">
+        <optionalConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="3" name="BitRate" type="uint32">
+        <optionalConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="4" name="MinResolution" type="VideoResolutionStruct">
+        <optionalConform/>
+      </field>
+      <field id="5" name="MaxResolution" type="VideoResolutionStruct">
+        <optionalConform/>
+      </field>
+      <field id="6" name="Quality" type="uint8">
+        <optionalConform/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="100"/>
+          </between>
+        </constraint>
+      </field>
+    </event>
+  </events>
+</cluster>

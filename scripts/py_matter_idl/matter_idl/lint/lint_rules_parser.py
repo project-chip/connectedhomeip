@@ -90,6 +90,9 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
             if 'optional' in attr.attrib and attr.attrib['optional'] == 'true':
                 continue
 
+            if 'apiMaturity' in attr.attrib and attr.attrib['apiMaturity'] == 'provisional':
+                continue
+
             # when introducing access controls, the content of attributes may either be:
             # <attribute ...>myName</attribute>
             # or
@@ -110,6 +113,9 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
                 continue
 
             if 'optional' in cmd.attrib and cmd.attrib['optional'] == 'true':
+                continue
+
+            if 'apiMaturity' in cmd.attrib and cmd.attrib['apiMaturity'] == 'provisional':
                 continue
 
             required_commands.append(RequiredCommand(

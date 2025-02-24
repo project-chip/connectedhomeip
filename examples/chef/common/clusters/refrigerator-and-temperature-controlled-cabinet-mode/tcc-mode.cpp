@@ -42,7 +42,7 @@ void TccModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::Ch
 
 CHIP_ERROR TccModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -51,7 +51,7 @@ CHIP_ERROR TccModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::Mutable
 
 CHIP_ERROR TccModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -61,7 +61,7 @@ CHIP_ERROR TccModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & val
 
 CHIP_ERROR TccModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }

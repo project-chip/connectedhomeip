@@ -24,7 +24,7 @@
 #include "AppTask.h"
 #include "ota.h"
 
-#include <app/server/OnboardingCodesUtil.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Dnssd.h>
@@ -161,7 +161,8 @@ CHIP_ERROR AppTask::StartAppTask()
     }
 
     // Start App task.
-    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), nullptr, 1, appStack, &appTaskStruct);
+    sAppTaskHandle =
+        xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, MATTER_ARRAY_SIZE(appStack), nullptr, 1, appStack, &appTaskStruct);
     if (sAppTaskHandle == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;

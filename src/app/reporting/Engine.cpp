@@ -52,20 +52,6 @@ namespace {
 
 using Protocols::InteractionModel::Status;
 
-Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eventPath)
-{
-    {
-        DataModel::ServerClusterFinder serverClusterFinder(model);
-        if (serverClusterFinder.Find(eventPath).has_value())
-        {
-            return Status::Success;
-        }
-    }
-
-    DataModel::EndpointFinder endpointFinder(model);
-    return endpointFinder.Find(eventPath.mEndpointId).has_value() ? Status::UnsupportedCluster : Status::UnsupportedEndpoint;
-}
-
 /// Returns the status of ACL validation.
 ///   If the return value has a status set, that means the ACL check failed,
 ///   the read must not be performed, and the returned status (which may
@@ -530,7 +516,9 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
         }
 
         ConcreteEventPath path(current->mValue.mEndpointId, current->mValue.mClusterId, current->mValue.mEventId);
-        Status status = EventPathValid(mpImEngine->GetDataModelProvider(), path);
+
+        // A event path is valid only if the cluster is valid
+        Status status = DataModel::ValidateClusterPath(mpImEngine->GetDataModelProvider(), path, Status::Success);
 
         if (status != Status::Success)
         {

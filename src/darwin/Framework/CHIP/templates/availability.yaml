@@ -11426,6 +11426,11 @@
               Feature:
                   - EnergyManagement
                   - TankPercent
+      device types:
+          - BatteryStorage
+          - HeatPump
+          - SolarPower
+          - WaterHeater
   provisional:
       clusters:
           # Targeting camera enablement, not part of Matter 1.4.
@@ -11556,11 +11561,6 @@
                   - SoCReporting
                   - PlugAndCharge
                   - V2X
-      device types:
-          - BatteryStorage
-          - HeatPump
-          - SolarPower
-          - WaterHeater
   removed:
       attributes:
           DishwasherMode:
@@ -11620,3 +11620,12 @@
 
 - release: "Future"
   versions: "future"
+  provisional:
+      clusters:
+          # In-progress for maybe Matter 1.5
+          - ClosureControl
+      device types:
+          # In-progress for maybe Matter 1.5
+          - Camera
+          - MountedOnOffControl
+          - ThermostatController

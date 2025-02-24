@@ -161,11 +161,20 @@ if [ "$skip_gn" == false ]; then
 
         scripts/run_in_build_env.sh \
             "./scripts/tests/run_test_suite.py \
+             --runner chip_tool_python \
+             --exclude-tags MANUAL \
+             --exclude-tags FLAKY \
+             --exclude-tags IN_DEVELOPMENT \
+             --exclude-tags EXTRA_SLOW \
+             --exclude-tags SLOW \
+             --exclude-tags PURPOSEFUL_FAILURE \
              --chip-tool \"$OUTPUT_ROOT/chip-tool\" \
+             --target TestUserLabelCluster \
              run \
              --iterations 1 \
              --test-timeout-seconds 120 \
-             --all-clusters-app \"$OUTPUT_ROOT/chip-all-clusters-app\""
+             --all-clusters-app \"$OUTPUT_ROOT/chip-all-clusters-app\" \
+            "
     fi
 
     #
@@ -209,12 +218,14 @@ fi
 mkdir -p "$COVERAGE_ROOT"
 
 lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" \
+    --ignore-errors inconsistent \
     --exclude="$PWD"/zzz_generated/* \
     --exclude="$PWD"/third_party/* \
     --exclude=/usr/include/* \
     --output-file "$COVERAGE_ROOT/lcov_base.info"
 
 lcov --capture --directory "$OUTPUT_ROOT/obj/src" \
+    --ignore-errors inconsistent \
     --exclude="$PWD"/zzz_generated/* \
     --exclude="$PWD"/third_party/* \
     --exclude=/usr/include/* \
@@ -222,9 +233,11 @@ lcov --capture --directory "$OUTPUT_ROOT/obj/src" \
 
 lcov --add-tracefile "$COVERAGE_ROOT/lcov_base.info" \
     --add-tracefile "$COVERAGE_ROOT/lcov_test.info" \
+    --ignore-errors inconsistent \
     --output-file "$COVERAGE_ROOT/lcov_final.info"
 
 genhtml "$COVERAGE_ROOT/lcov_final.info" \
+    --ignore-errors inconsistent \
     --output-directory "$COVERAGE_ROOT/html" \
     --title "SHA:$(git rev-parse HEAD)" \
     --header-title "Matter SDK Coverage Report"

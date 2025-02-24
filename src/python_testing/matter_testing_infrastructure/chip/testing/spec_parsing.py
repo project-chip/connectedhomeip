@@ -64,6 +64,9 @@ class XmlFeature:
     name: str
     conformance: ConformanceCallable
 
+    def __str__(self):
+        return f'{self.code}: {self.name} conformance {str(self.conformance)}'
+
 
 @dataclass
 class XmlAttribute:
@@ -90,6 +93,9 @@ class XmlCommand:
     id: int
     name: str
     conformance: ConformanceCallable
+
+    def __str__(self):
+        return f'{self.name} id:0x{self.id:02X} {self.id} conformance: {str(self.conformance)}'
 
 
 @dataclass
@@ -582,7 +588,7 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
     return path.joinpath(data_model_level.dirname)
 
 
-def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable] = PrebuiltDataModelDirectory.k1_4_1) -> typing.Tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
+def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable]) -> typing.Tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
     """
     Build XML clusters from the specified data model directory.
     This function supports both pre-built locations and full paths.
@@ -826,7 +832,13 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDe
         clusters = d.iter('cluster')
         for c in clusters:
             try:
-                cid = uint(int(c.attrib['id'], 0))
+                try:
+                    cid = uint(int(c.attrib['id'], 0))
+                except ValueError:
+                    location = DeviceTypePathLocation(device_type_id=id)
+                    problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                    severity=ProblemSeverity.WARNING, problem=f"Unknown cluster id {c.attrib['id']}"))
+                    continue
                 conformance_xml, tmp_problem = get_conformance(c, cid)
                 if tmp_problem:
                     problems.append(tmp_problem)
@@ -851,7 +863,7 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDe
     return device_types, problems
 
 
-def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable] = PrebuiltDataModelDirectory.k1_4_1) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
+def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable]) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     top = get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
     device_types: dict[int, XmlDeviceType] = {}
     problems: list[ProblemNotice] = []
@@ -881,3 +893,26 @@ def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelD
     device_types.pop(-1)
 
     return device_types, problems
+
+
+def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirectory:
+    ''' Returns the data model directory for a given specification revision.
+
+        input: specification revision attribute data from the basic information cluster
+        output: PrebuiltDataModelDirectory
+        raises: ConformanceException if the given specification_version does not conform to a known data model
+    '''
+    # Specification version attribute is 2 bytes major, 2 bytes minor, 2 bytes dot 2 bytes reserved.
+    # However, 1.3 allowed the dot to be any value
+    if specification_version < 0x01040000:
+        specification_version &= 0xFFFF00FF
+
+    version_to_dm = {0x01030000: PrebuiltDataModelDirectory.k1_3,
+                     0x01040000: PrebuiltDataModelDirectory.k1_4,
+                     0x01040100: PrebuiltDataModelDirectory.k1_4_1,
+                     0x01050000: PrebuiltDataModelDirectory.kMaster}
+
+    if specification_version not in version_to_dm.keys():
+        raise ConformanceException(f"Unknown specification_version {specification_version:08X}")
+
+    return version_to_dm[specification_version]

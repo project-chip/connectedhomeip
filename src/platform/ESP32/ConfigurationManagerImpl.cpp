@@ -312,7 +312,7 @@ CHIP_ERROR ConfigurationManagerImpl::StoreCountryCode(const char * code, size_t 
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 
-CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan buf)
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan & buf)
 {
     if (GetPrimaryEthernetMACAddress(buf) == CHIP_NO_ERROR)
     {
@@ -322,7 +322,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan buf)
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetPrimaryEthernetMACAddress(MutableByteSpan buf)
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryEthernetMACAddress(MutableByteSpan & buf)
 {
     if (buf.size() < ConfigurationManager::kPrimaryMACAddressLength)
         return CHIP_ERROR_BUFFER_TOO_SMALL;

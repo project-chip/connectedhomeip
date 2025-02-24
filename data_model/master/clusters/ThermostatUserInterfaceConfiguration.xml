@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0204" name="Thermostat User Interface Configuration Cluster" revision="2">
   <revisionHistory>
@@ -103,20 +105,20 @@ Davis, CA 95616, USA
     </enum>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="TemperatureDisplayMode" type="TemperatureDisplayModeEnum" default="Celsius">
+    <attribute id="0x0000" name="TemperatureDisplayMode" type="TemperatureDisplayModeEnum">
+      <enum default="Celsius"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0001" name="KeypadLockout" type="KeypadLockoutEnum" default="NoLockout">
+    <attribute id="0x0001" name="KeypadLockout" type="KeypadLockoutEnum">
+      <enum default="NoLockout"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0002" name="ScheduleProgrammingVisibility" type="ScheduleProgrammingVisibilityEnum" default="ScheduleProgrammingPermitted">
+    <attribute id="0x0002" name="ScheduleProgrammingVisibility" type="ScheduleProgrammingVisibilityEnum">
+      <enum default="ScheduleProgrammingPermitted"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
-      <constraint type="desc"/>
     </attribute>
   </attributes>
 </cluster>

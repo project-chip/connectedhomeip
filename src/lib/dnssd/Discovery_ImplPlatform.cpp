@@ -353,7 +353,7 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
     size_t addressesFound = 0;
     for (auto & ip : addresses)
     {
-        if (addressesFound == ArraySize(nodeData.resolutionData.ipAddress))
+        if (addressesFound == MATTER_ARRAY_SIZE(nodeData.resolutionData.ipAddress))
         {
             // Out of space.
             ChipLogProgress(Discovery, "Can't add more IPs to ResolvedNodeData");
@@ -396,7 +396,7 @@ void DnssdService::ToDiscoveredCommissionNodeData(const Span<Inet::IPAddress> & 
     size_t addressesFound = 0;
     for (auto & ip : addresses)
     {
-        if (addressesFound == ArraySize(discoveredData.ipAddress))
+        if (addressesFound == MATTER_ARRAY_SIZE(discoveredData.ipAddress))
         {
             // Out of space.
             ChipLogProgress(Discovery, "Can't add more IPs to DiscoveredNodeData");

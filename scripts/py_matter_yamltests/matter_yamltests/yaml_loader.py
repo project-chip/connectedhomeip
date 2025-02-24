@@ -92,8 +92,8 @@ _TEST_STEP_RESPONSE_SCHEMA = {
 _TEST_STEP_RESPONSE_CONSTRAINTS_SCHEMA = {
     'hasValue': bool,
     'type': str,
-    'minLength': int,
-    'maxLength': int,
+    'minLength': (int, str),  # Can be a variable.
+    'maxLength': (int, str),  # Can be a variable.
     'isHexString': bool,
     'startsWith': str,
     'endsWith': str,
