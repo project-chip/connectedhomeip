@@ -69,7 +69,7 @@ def get_cluster_from_command(command: ClusterObjects.ClusterCommand) -> ClusterO
     return ClusterObjects.ALL_CLUSTERS[command.cluster_id]
 
 
-def _has_cluster(wildcard, endpoint, cluster: ClusterObjects.Cluster) -> bool:
+def _has_cluster(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int, cluster: ClusterObjects.Cluster) -> bool:
     """Check if a cluster exists on a specific endpoint.
 
     Args:
@@ -110,7 +110,7 @@ def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointChec
     return partial(_has_cluster, cluster=cluster)
 
 
-def _has_attribute(wildcard, endpoint, attribute: ClusterObjects.ClusterAttributeDescriptor) -> bool:
+def _has_attribute(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor) -> bool:
     """Check if an attribute exists in a cluster's AttributeList on a specific endpoint.
 
     Args:
@@ -160,7 +160,7 @@ def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> Endpo
     return partial(_has_attribute, attribute=attribute)
 
 
-def _has_command(wildcard, endpoint, command: ClusterObjects.ClusterCommand) -> bool:
+def _has_command(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int, command: ClusterObjects.ClusterCommand) -> bool:
     """Check if a command exists in a cluster's AcceptedCommandList on a specific endpoint.
 
     Args:
@@ -210,7 +210,7 @@ def has_command(command: ClusterObjects.ClusterCommand) -> EndpointCheckFunction
     return partial(_has_command, command=command)
 
 
-def _has_feature(wildcard, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> bool:
+def _has_feature(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> bool:
     try:
         feature_map = wildcard.attributes[endpoint][cluster][cluster.Attributes.FeatureMap]
         if not isinstance(feature_map, int):
