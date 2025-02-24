@@ -430,7 +430,7 @@ sl_status_t SetWifiConfigurations()
     // TODO: memcpy for now since the types dont match
     memcpy((char *) &profile.config.ssid.value, wfx_rsi.sec.ssid, wfx_rsi.sec.ssid_length);
 
-    status = sl_net_set_profile((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
+    status = sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
     VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_set_profile failed: 0x%lx", status));
 
     return status;
@@ -486,7 +486,7 @@ sl_status_t JoinWifiNetwork(void)
     chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformance();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-    status = sl_net_up((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
+    status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
 
     if (status == SL_STATUS_OK || status == SL_STATUS_IN_PROGRESS)
     {
@@ -515,7 +515,7 @@ sl_status_t JoinWifiNetwork(void)
 
 sl_status_t TriggerPlatformWifiDisconnection()
 {
-    return sl_net_down((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE);
+    return sl_net_down(SL_NET_WIFI_CLIENT_INTERFACE);
 }
 
 CHIP_ERROR GetAccessPointInfo(wfx_wifi_scan_result_t & info)
@@ -582,7 +582,7 @@ CHIP_ERROR InitWiFiStack(void)
 {
     sl_status_t status = SL_STATUS_OK;
 
-    status = sl_net_init((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
+    status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
     VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
 
     // Create Sempaphore for scan completion
