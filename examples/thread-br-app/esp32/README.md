@@ -16,6 +16,7 @@ guides to get started.
 -   [OpenThread CLI](#openthread-cli)
 -   [Setup Thread Network](#setup-thread-network)
 -   [Commissioning Thread End Devices](#commissioning-thread-end-devices)
+-   [Generate OTA Firmware For BR](#generate-ota-firmware-for-br)
 
 ---
 
@@ -92,3 +93,15 @@ the Thread network.
 ```
 ./chip-tool pairing ble-wifi 2 hex:<dataset_tlvs> <pincode> <discriminator>
 ```
+
+### Generate OTA Firmware For BR
+
+Can use this python
+[script](https://github.com/espressif/esp-thread-br/blob/main/components/esp_rcp_update/create_ota_image.py)
+to merge thread border router firmware and the RCP firmware
+
+```
+python create_ota_image.py --rcp-build-dir /path/to/rcp_image/dir --br-firmware /path/to/br_image --target-file ota_target_file.bin
+```
+
+Then can use the generated bin file to create a Matter OTA file normally.
