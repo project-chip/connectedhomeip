@@ -919,7 +919,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
     InArgs.publish_id = publish_id;
 
     g_signal_connect(mWpaSupplicant.iface, "nanreplied",
-                     G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
+                     G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
                          return self->OnReplied(obj);
                      }),
                      this);
@@ -931,8 +931,9 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
                      this);
     g_signal_connect(
         mWpaSupplicant.iface, "nanpublish-terminated",
-        G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, guint term_publish_id, gchar * reason,
-                       ConnectivityManagerImpl * self) { return self->OnNanPublishTerminated(term_publish_id, reason); }),
+        G_CALLBACK(+[](WpaSupplicant1Interface * proxy, guint term_publish_id, gchar * reason, ConnectivityManagerImpl * self) {
+            return self->OnNanPublishTerminated(term_publish_id, reason);
+        }),
         this);
     return CHIP_NO_ERROR;
 }
@@ -1697,8 +1698,9 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const SetupDiscriminator &
 
     g_signal_connect(
         mWpaSupplicant.iface, "nansubscribe-terminated",
-        G_CALLBACK(+[](WpaSupplicant1Interface * proxy, guint term_subscribe_id, gchar * reason,
-                       ConnectivityManagerImpl * self) { return self->OnNanSubscribeTerminated(term_subscribe_id, reason); }),
+        G_CALLBACK(+[](WpaSupplicant1Interface * proxy, guint term_subscribe_id, gchar * reason, ConnectivityManagerImpl * self) {
+            return self->OnNanSubscribeTerminated(term_subscribe_id, reason);
+        }),
         this);
 
     return CHIP_NO_ERROR;
@@ -1710,8 +1712,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelSubscribe(uint32_t SubscribeId
 
     ChipLogProgress(DeviceLayer, "WiFi-PAF: cancel subscribe_id: %d ! ", SubscribeId);
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-    wpa_supplicant_1_interface_call_nancancel_subscribe_sync(mWpaSupplicant.iface, SubscribeId, nullptr,
-                                                                      &err.GetReceiver());
+    wpa_supplicant_1_interface_call_nancancel_subscribe_sync(mWpaSupplicant.iface, SubscribeId, nullptr, &err.GetReceiver());
     return CHIP_NO_ERROR;
 }
 
@@ -1769,9 +1770,8 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSend(const WiFiPAF::WiFiPAFSession &
     g_variant_builder_add(&builder, "{sv}", "req_instance_id", g_variant_new_uint32(TxInfo.peer_id));
     g_variant_builder_add(&builder, "{sv}", "peer_addr", g_variant_new_string(peer_mac));
     g_variant_builder_add(&builder, "{sv}", "ssi", ssi_array_variant);
-    args = g_variant_builder_end(&builder);
-    gboolean result =
-        wpa_supplicant_1_interface_call_nantransmit_sync(mWpaSupplicant.iface, args, nullptr, &err.GetReceiver());
+    args            = g_variant_builder_end(&builder);
+    gboolean result = wpa_supplicant_1_interface_call_nantransmit_sync(mWpaSupplicant.iface, args, nullptr, &err.GetReceiver());
     if (!result)
     {
         ChipLogError(DeviceLayer, "WiFi-PAF: Failed to send message: %s", err == nullptr ? "unknown error" : err->message);
