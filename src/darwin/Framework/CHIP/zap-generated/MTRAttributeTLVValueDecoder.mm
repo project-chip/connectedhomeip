@@ -10748,22 +10748,38 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
         } else {
             value = [MTRClosureControlClusterOverallStateStruct new];
             if (cppValue.Value().positioning.HasValue()) {
-                value.positioning = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().positioning.Value())];
+                if (cppValue.Value().positioning.Value().IsNull()) {
+                    value.positioning = nil;
+                } else {
+                    value.positioning = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().positioning.Value().Value())];
+                }
             } else {
                 value.positioning = nil;
             }
             if (cppValue.Value().latching.HasValue()) {
-                value.latching = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().latching.Value())];
+                if (cppValue.Value().latching.Value().IsNull()) {
+                    value.latching = nil;
+                } else {
+                    value.latching = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().latching.Value().Value())];
+                }
             } else {
                 value.latching = nil;
             }
             if (cppValue.Value().speed.HasValue()) {
-                value.speed = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().speed.Value())];
+                if (cppValue.Value().speed.Value().IsNull()) {
+                    value.speed = nil;
+                } else {
+                    value.speed = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().speed.Value().Value())];
+                }
             } else {
                 value.speed = nil;
             }
             if (cppValue.Value().extraInfo.HasValue()) {
-                value.extraInfo = [NSNumber numberWithUnsignedInt:cppValue.Value().extraInfo.Value()];
+                if (cppValue.Value().extraInfo.Value().IsNull()) {
+                    value.extraInfo = nil;
+                } else {
+                    value.extraInfo = [NSNumber numberWithUnsignedInt:cppValue.Value().extraInfo.Value().Value()];
+                }
             } else {
                 value.extraInfo = nil;
             }
@@ -10782,15 +10798,15 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
             value = nil;
         } else {
             value = [MTRClosureControlClusterOverallTargetStruct new];
-            if (cppValue.Value().tagPosition.HasValue()) {
-                value.tagPosition = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().tagPosition.Value())];
+            if (cppValue.Value().position.HasValue()) {
+                value.position = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().position.Value())];
             } else {
-                value.tagPosition = nil;
+                value.position = nil;
             }
-            if (cppValue.Value().tagLatch.HasValue()) {
-                value.tagLatch = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().tagLatch.Value())];
+            if (cppValue.Value().latch.HasValue()) {
+                value.latch = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().latch.Value())];
             } else {
-                value.tagLatch = nil;
+                value.latch = nil;
             }
             if (cppValue.Value().speed.HasValue()) {
                 value.speed = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().speed.Value())];
@@ -10798,61 +10814,6 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
                 value.speed = nil;
             }
         }
-        return value;
-    }
-    case Attributes::RestingProcedure::Id: {
-        using TypeInfo = Attributes::RestingProcedure::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
-        return value;
-    }
-    case Attributes::TriggerCondition::Id: {
-        using TypeInfo = Attributes::TriggerCondition::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
-        return value;
-    }
-    case Attributes::TriggerPosition::Id: {
-        using TypeInfo = Attributes::TriggerPosition::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
-        return value;
-    }
-    case Attributes::WaitingDelay::Id: {
-        using TypeInfo = Attributes::WaitingDelay::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedInt:cppValue];
-        return value;
-    }
-    case Attributes::KickoffTimer::Id: {
-        using TypeInfo = Attributes::KickoffTimer::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedInt:cppValue];
         return value;
     }
     default: {

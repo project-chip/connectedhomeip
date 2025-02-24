@@ -37632,11 +37632,6 @@ public class ChipClusters {
     private static final long CURRENT_ERROR_LIST_ATTRIBUTE_ID = 2L;
     private static final long OVERALL_STATE_ATTRIBUTE_ID = 3L;
     private static final long OVERALL_TARGET_ATTRIBUTE_ID = 4L;
-    private static final long RESTING_PROCEDURE_ATTRIBUTE_ID = 5L;
-    private static final long TRIGGER_CONDITION_ATTRIBUTE_ID = 6L;
-    private static final long TRIGGER_POSITION_ATTRIBUTE_ID = 7L;
-    private static final long WAITING_DELAY_ATTRIBUTE_ID = 8L;
-    private static final long KICKOFF_TIMER_ATTRIBUTE_ID = 9L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -37670,17 +37665,17 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void moveTo(DefaultClusterCallback callback, Optional<Integer> tag, Optional<Integer> latch, Optional<Integer> speed) {
-      moveTo(callback, tag, latch, speed, 0);
+    public void moveTo(DefaultClusterCallback callback, Optional<Integer> position, Optional<Integer> latch, Optional<Integer> speed) {
+      moveTo(callback, position, latch, speed, 0);
     }
 
-    public void moveTo(DefaultClusterCallback callback, Optional<Integer> tag, Optional<Integer> latch, Optional<Integer> speed, int timedInvokeTimeoutMs) {
+    public void moveTo(DefaultClusterCallback callback, Optional<Integer> position, Optional<Integer> latch, Optional<Integer> speed, int timedInvokeTimeoutMs) {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long tagFieldID = 0L;
-      BaseTLVType tagtlvValue = tag.<BaseTLVType>map((nonOptionaltag) -> new UIntType(nonOptionaltag)).orElse(new EmptyType());
-      elements.add(new StructElement(tagFieldID, tagtlvValue));
+      final long positionFieldID = 0L;
+      BaseTLVType positiontlvValue = position.<BaseTLVType>map((nonOptionalposition) -> new UIntType(nonOptionalposition)).orElse(new EmptyType());
+      elements.add(new StructElement(positionFieldID, positiontlvValue));
 
       final long latchFieldID = 1L;
       BaseTLVType latchtlvValue = latch.<BaseTLVType>map((nonOptionallatch) -> new UIntType(nonOptionallatch)).orElse(new EmptyType());
@@ -37704,54 +37699,6 @@ public class ChipClusters {
 
     public void calibrate(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void configureFallback(DefaultClusterCallback callback, Optional<Integer> restingProcedure, Optional<Integer> triggerCondition, Optional<Integer> triggerPosition, Optional<Long> waitingDelay) {
-      configureFallback(callback, restingProcedure, triggerCondition, triggerPosition, waitingDelay, 0);
-    }
-
-    public void configureFallback(DefaultClusterCallback callback, Optional<Integer> restingProcedure, Optional<Integer> triggerCondition, Optional<Integer> triggerPosition, Optional<Long> waitingDelay, int timedInvokeTimeoutMs) {
-      final long commandId = 3L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long restingProcedureFieldID = 0L;
-      BaseTLVType restingProceduretlvValue = restingProcedure.<BaseTLVType>map((nonOptionalrestingProcedure) -> new UIntType(nonOptionalrestingProcedure)).orElse(new EmptyType());
-      elements.add(new StructElement(restingProcedureFieldID, restingProceduretlvValue));
-
-      final long triggerConditionFieldID = 1L;
-      BaseTLVType triggerConditiontlvValue = triggerCondition.<BaseTLVType>map((nonOptionaltriggerCondition) -> new UIntType(nonOptionaltriggerCondition)).orElse(new EmptyType());
-      elements.add(new StructElement(triggerConditionFieldID, triggerConditiontlvValue));
-
-      final long triggerPositionFieldID = 2L;
-      BaseTLVType triggerPositiontlvValue = triggerPosition.<BaseTLVType>map((nonOptionaltriggerPosition) -> new UIntType(nonOptionaltriggerPosition)).orElse(new EmptyType());
-      elements.add(new StructElement(triggerPositionFieldID, triggerPositiontlvValue));
-
-      final long waitingDelayFieldID = 3L;
-      BaseTLVType waitingDelaytlvValue = waitingDelay.<BaseTLVType>map((nonOptionalwaitingDelay) -> new UIntType(nonOptionalwaitingDelay)).orElse(new EmptyType());
-      elements.add(new StructElement(waitingDelayFieldID, waitingDelaytlvValue));
-
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void cancelFallback(DefaultClusterCallback callback) {
-      cancelFallback(callback, 0);
-    }
-
-    public void cancelFallback(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
-      final long commandId = 4L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       StructType commandArgs = new StructType(elements);
@@ -37922,136 +37869,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, OVERALL_TARGET_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRestingProcedureAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RESTING_PROCEDURE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RESTING_PROCEDURE_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeRestingProcedureAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RESTING_PROCEDURE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RESTING_PROCEDURE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readTriggerConditionAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TRIGGER_CONDITION_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, TRIGGER_CONDITION_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeTriggerConditionAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TRIGGER_CONDITION_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, TRIGGER_CONDITION_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readTriggerPositionAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TRIGGER_POSITION_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, TRIGGER_POSITION_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeTriggerPositionAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TRIGGER_POSITION_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, TRIGGER_POSITION_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readWaitingDelayAttribute(
-        LongAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, WAITING_DELAY_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, WAITING_DELAY_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeWaitingDelayAttribute(
-        LongAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, WAITING_DELAY_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, WAITING_DELAY_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readKickoffTimerAttribute(
-        LongAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, KICKOFF_TIMER_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, KICKOFF_TIMER_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeKickoffTimerAttribute(
-        LongAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, KICKOFF_TIMER_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, KICKOFF_TIMER_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

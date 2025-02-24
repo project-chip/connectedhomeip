@@ -7801,7 +7801,7 @@ class ChipClusters:
                 "commandId": 0x00000001,
                 "commandName": "MoveTo",
                 "args": {
-                    "tag": "int",
+                    "position": "int",
                     "latch": "int",
                     "speed": "int",
                 },
@@ -7809,22 +7809,6 @@ class ChipClusters:
             0x00000002: {
                 "commandId": 0x00000002,
                 "commandName": "Calibrate",
-                "args": {
-                },
-            },
-            0x00000003: {
-                "commandId": 0x00000003,
-                "commandName": "ConfigureFallback",
-                "args": {
-                    "restingProcedure": "int",
-                    "triggerCondition": "int",
-                    "triggerPosition": "int",
-                    "waitingDelay": "int",
-                },
-            },
-            0x00000004: {
-                "commandId": 0x00000004,
-                "commandName": "CancelFallback",
                 "args": {
                 },
             },
@@ -7858,36 +7842,6 @@ class ChipClusters:
                 "attributeName": "OverallTarget",
                 "attributeId": 0x00000004,
                 "type": "",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "RestingProcedure",
-                "attributeId": 0x00000005,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "TriggerCondition",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "TriggerPosition",
-                "attributeId": 0x00000007,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "WaitingDelay",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "KickoffTimer",
-                "attributeId": 0x00000009,
-                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {

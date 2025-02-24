@@ -4271,19 +4271,19 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     Json::Value valueCopy(value);
 
     char labelWithMember[kMaxLabelLength];
-    if (value.isMember("tagPosition"))
+    if (value.isMember("position"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "tagPosition");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.tagPosition, value["tagPosition"]));
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "position");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.position, value["position"]));
     }
-    valueCopy.removeMember("tagPosition");
+    valueCopy.removeMember("position");
 
-    if (value.isMember("tagLatch"))
+    if (value.isMember("latch"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "tagLatch");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.tagLatch, value["tagLatch"]));
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "latch");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.latch, value["latch"]));
     }
-    valueCopy.removeMember("tagLatch");
+    valueCopy.removeMember("latch");
 
     if (value.isMember("speed"))
     {
@@ -4297,8 +4297,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
 void ComplexArgumentParser::Finalize(chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.tagPosition);
-    ComplexArgumentParser::Finalize(request.tagLatch);
+    ComplexArgumentParser::Finalize(request.position);
+    ComplexArgumentParser::Finalize(request.latch);
     ComplexArgumentParser::Finalize(request.speed);
 }
 

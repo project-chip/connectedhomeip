@@ -4007,12 +4007,11 @@ enum class MainStateEnum : uint8_t
     kProtected        = 0x05,
     kDisengaged       = 0x06,
     kSetupRequired    = 0x07,
-    kPendingFallback  = 0x08,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 9,
+    kUnknownEnumValue = 8,
 };
 
 // Enum for PositioningEnum
@@ -4031,21 +4030,8 @@ enum class PositioningEnum : uint8_t
     kUnknownEnumValue = 6,
 };
 
-// Enum for RestingProcedureEnum
-enum class RestingProcedureEnum : uint8_t
-{
-    kDoNothing           = 0x00,
-    kReturnToFullyOpened = 0x01,
-    kReturnToFullyClosed = 0x02,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
-};
-
-// Enum for TagLatchEnum
-enum class TagLatchEnum : uint8_t
+// Enum for TargetLatchEnum
+enum class TargetLatchEnum : uint8_t
 {
     kLatch   = 0x00,
     kUnlatch = 0x01,
@@ -4056,44 +4042,14 @@ enum class TagLatchEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Enum for TagPositionEnum
-enum class TagPositionEnum : uint8_t
+// Enum for TargetPositionEnum
+enum class TargetPositionEnum : uint8_t
 {
-    kCloseInFull        = 0x00,
-    kOpenInFull         = 0x01,
-    kPedestrian         = 0x02,
-    kVentilation        = 0x03,
-    kSignature          = 0x04,
-    kSequenceNextStep   = 0x05,
-    kPedestrianNextStep = 0x06,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 7,
-};
-
-// Enum for TriggerConditionEnum
-enum class TriggerConditionEnum : uint8_t
-{
-    kAfterDelay                     = 0x00,
-    kAfterApplicativeTrigger        = 0x01,
-    kAfterDelayOrApplicativeTrigger = 0x02,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
-};
-
-// Enum for TriggerPositionEnum
-enum class TriggerPositionEnum : uint8_t
-{
-    kAtFullyClosed = 0x00,
-    kAtFullyOpened = 0x01,
-    kInBetween     = 0x02,
-    kAtVentilation = 0x03,
-    kAtPedestrian  = 0x04,
+    kCloseInFull = 0x00,
+    kOpenInFull  = 0x01,
+    kPedestrian  = 0x02,
+    kVentilation = 0x03,
+    kSignature   = 0x04,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -4113,7 +4069,6 @@ enum class Feature : uint32_t
     kCalibration      = 0x40,
     kProtection       = 0x80,
     kManuallyOperable = 0x100,
-    kFallback         = 0x200,
 };
 } // namespace ClosureControl
 

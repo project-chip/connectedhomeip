@@ -3102,42 +3102,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
                                         MarkAttributeDirty markDirty);
 } // namespace MainState
 
-namespace RestingProcedure {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::ClosureControl::RestingProcedureEnum * value); // RestingProcedureEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureControl::RestingProcedureEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureControl::RestingProcedureEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace RestingProcedure
-
-namespace TriggerCondition {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::ClosureControl::TriggerConditionEnum * value); // TriggerConditionEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureControl::TriggerConditionEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureControl::TriggerConditionEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace TriggerCondition
-
-namespace TriggerPosition {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::ClosureControl::TriggerPositionEnum * value); // TriggerPositionEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureControl::TriggerPositionEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureControl::TriggerPositionEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace TriggerPosition
-
-namespace WaitingDelay {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // elapsed_s
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-} // namespace WaitingDelay
-
-namespace KickoffTimer {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // elapsed_s
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-} // namespace KickoffTimer
-
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
