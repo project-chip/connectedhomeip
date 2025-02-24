@@ -117,12 +117,11 @@ TEST(TestDefaultOTARequestorStorage, TestDefaultProvidersDuplicated)
     auto iterator = providers.Begin();
     EXPECT_EQ(false, iterator.Next());
 
-    EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(1), NodeId(0x11111111), EndpointId(1))));
-    EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(1), NodeId(0x11111111), EndpointId(1))));
-    EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(2), NodeId(0x22222222), EndpointId(2))));
-    EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(2), NodeId(0x22222222), EndpointId(2))));
-    EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(3), NodeId(0x33333333), EndpointId(3))));
-    EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(3), NodeId(0x33333333), EndpointId(3))));
+    for(uint8_t i = 0; i < CHIP_CONFIG_MAX_FABRICS; i++)
+    {
+        EXPECT_EQ(CHIP_NO_ERROR, providers.Add(makeProvider(FabricIndex(1), NodeId(0x11111111), EndpointId(1))));
+    }
+
     EXPECT_EQ(CHIP_NO_ERROR, otaStorage.StoreDefaultProviders(providers));
 
     providers = {};
@@ -136,20 +135,6 @@ TEST(TestDefaultOTARequestorStorage, TestDefaultProvidersDuplicated)
     EXPECT_EQ(FabricIndex(1), provider1.fabricIndex);
     EXPECT_EQ(NodeId(0x11111111), provider1.providerNodeID);
     EXPECT_EQ(EndpointId(1), provider1.endpoint);
-
-    // Check provider #2
-    EXPECT_EQ(true, iterator.Next());
-    OTARequestorStorage::ProviderLocationType provider2 = iterator.GetValue();
-    EXPECT_EQ(FabricIndex(2), provider2.fabricIndex);
-    EXPECT_EQ(NodeId(0x22222222), provider2.providerNodeID);
-    EXPECT_EQ(EndpointId(2), provider2.endpoint);
-
-    // Check provider #3
-    EXPECT_EQ(true, iterator.Next());
-    OTARequestorStorage::ProviderLocationType provider3 = iterator.GetValue();
-    EXPECT_EQ(FabricIndex(3), provider3.fabricIndex);
-    EXPECT_EQ(NodeId(0x33333333), provider3.providerNodeID);
-    EXPECT_EQ(EndpointId(3), provider3.endpoint);
 
     EXPECT_EQ(false, iterator.Next());
 }
