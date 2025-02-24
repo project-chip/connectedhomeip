@@ -66,7 +66,8 @@ namespace app {
 using Access::SubjectDescriptor;
 using Protocols::InteractionModel::Status;
 
-void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj)
+void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj,
+                                  bool aClusterIsValid)
 {
     // This command passed ServerClusterCommandExists so we know it's one of our
     // supported commands.
