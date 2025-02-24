@@ -22,13 +22,19 @@
 #define HAVE_NSTASK 1
 #endif
 
+@class MTRDeviceController;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRTestCase : XCTestCase
+
 // It would be nice to do the leak-detection automatically, but running "leaks"
 // on every single sub-test is slow, and some of our tests seem to have leaks
 // outside Matter.framework.  So have it be opt-in for now, and improve later.
 @property (nonatomic) BOOL detectLeaks;
+
+// Creates a device controller on a new fabric with test keys and test storage.
++ (MTRDeviceController *)createControllerOnTestFabric;
 
 #if HAVE_NSTASK
 /**
