@@ -26,12 +26,6 @@
 #include "sl_status.h"
 #include <stdbool.h>
 
-/* LwIP includes. */
-#include "lwip/ip_addr.h"
-#include "lwip/netif.h"
-#include "lwip/netifapi.h"
-#include "lwip/tcpip.h"
-
 #if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #include "rsi_common_apis.h"
 #include "sl_si91x_types.h"
@@ -171,9 +165,6 @@ typedef struct wfx_rsi_s
     uint16_t join_retries;
     uint8_t ip4_addr[4]; /* Not sure if this is enough */
 } WfxRsi_t;
-
-// TODO: We shouldn't need to have access to a global variable in the interface here
-extern WfxRsi_t wfx_rsi;
 
 /* Updated functions */
 
@@ -399,34 +390,4 @@ void wfx_cancel_scan(void);
  */
 void sl_matter_wifi_task_started(void);
 
-/* Implemented for LWIP */
-void wfx_lwip_set_sta_link_up(void);
-void wfx_lwip_set_sta_link_down(void);
-void sl_matter_lwip_start(void);
-struct netif * wfx_get_netif(sl_wfx_interface_t interface);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-void wfx_dhcp_got_ipv4(uint32_t);
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 void wfx_retry_connection(uint16_t retryAttempt);
-
-#ifdef RS911X_WIFI
-#if !(EXP_BOARD) // for RS9116
-void * wfx_rsi_alloc_pkt(void);
-/* RSI for LWIP */
-void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off);
-int32_t wfx_rsi_send_data(void * p, uint16_t len);
-#endif //!(EXP_BOARD)
-#endif // RS911X_WIFI
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifdef WF200_WIFI
-void sl_wfx_host_gpio_init(void);
-#endif /* WF200_WIFI */
-
-#ifdef __cplusplus
-}
-#endif

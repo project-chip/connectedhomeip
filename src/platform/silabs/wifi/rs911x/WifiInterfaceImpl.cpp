@@ -27,6 +27,7 @@
 #include <platform/silabs/wifi/WifiInterface.h>
 #include <platform/silabs/wifi/lwip-support/dhcp_client.h>
 #include <platform/silabs/wifi/lwip-support/ethernetif.h>
+#include <platform/silabs/wifi/lwip-support/lwip_netif.h>
 #include <platform/silabs/wifi/wiseconnect-interface/WiseconnectWifiInterface.h>
 
 extern "C" {
@@ -493,7 +494,7 @@ void HandleDHCPPolling(void)
 {
     struct netif * sta_netif;
 
-    sta_netif = wfx_get_netif(SL_WFX_STA_INTERFACE);
+    sta_netif = chip::DeviceLayer::Silabs::Lwip::GetNetworkInterface(SL_WFX_STA_INTERFACE);
     if (sta_netif == NULL)
     {
         // TODO: Notify the application that the interface is not set up or Chipdie here because we
@@ -505,8 +506,7 @@ void HandleDHCPPolling(void)
     uint8_t dhcp_state = dhcpclient_poll(sta_netif);
     if (dhcp_state == DHCP_ADDRESS_ASSIGNED && !HasNotifiedIPv4Change())
     {
-        wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
-        NotifyIPv4Change(true);
+        GotIPv4Address((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
         NotifyConnectivity();
     }
     else if (dhcp_state == DHCP_OFF)
@@ -558,7 +558,7 @@ void ProcessEvent(WifiPlatformEvent event)
         ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationConnect");
         wfx_rsi.dev_state.Set(WifiState::kStationConnected);
         ResetDHCPNotificationFlags();
-        wfx_lwip_set_sta_link_up();
+        chip::DeviceLayer::Silabs::Lwip::SetLwipStationLinkUp();
     }
     break;
     case WifiPlatformEvent::kStationDisconnect: {
@@ -569,7 +569,7 @@ void ProcessEvent(WifiPlatformEvent event)
         wfx_rsi.dev_state.Clear(flagsToClear);
         /* TODO: Implement disconnect notify */
         ResetDHCPNotificationFlags();
-        wfx_lwip_set_sta_link_down();
+        chip::DeviceLayer::Silabs::Lwip::SetLwipStationLinkDown();
 
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
         NotifyIPv4Change(false);
@@ -611,8 +611,8 @@ void ProcessEvent(WifiPlatformEvent event)
             ap.security = static_cast<wfx_sec_t>(scan.security_mode);
             ap.rssi     = (-1) * scan.rssi_val;
 
-            configASSERT(sizeof(ap.bssid) == kWifiMacAddressLength);
-            configASSERT(sizeof(scan.bssid) == kWifiMacAddressLength);
+            VerifyOrDie(sizeof(ap.bssid) == kWifiMacAddressLength);
+            VerifyOrDie(sizeof(scan.bssid) == kWifiMacAddressLength);
 
             chip::MutableByteSpan bssidSpan(ap.bssid, kWifiMacAddressLength);
             chip::ByteSpan scanBssidSpan(scan.bssid, kWifiMacAddressLength);
@@ -674,7 +674,7 @@ void MatterWifiTask(void * arg)
 {
     (void) arg;
     WifiPlatformEvent event;
-    sl_matter_lwip_start();
+    chip::DeviceLayer::Silabs::Lwip::InitializeLwip();
     sl_matter_wifi_task_started();
 
     ChipLogProgress(DeviceLayer, "MatterWifiTask: starting event loop");
@@ -690,117 +690,4 @@ void MatterWifiTask(void * arg)
             ChipLogProgress(DeviceLayer, "MatterWifiTask: get event failed: %x", status);
         }
     }
-}
-
-#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-/********************************************************************************************
- * @fn   void wfx_dhcp_got_ipv4(uint32_t ip)
- * @brief
- *        Acquire the new ip address
- * @param[in] ip: internet protocol
- * @return
- *        None
- **********************************************************************************************/
-void wfx_dhcp_got_ipv4(uint32_t ip)
-{
-    /*
-     * Acquire the new IP address
-     */
-    wfx_rsi.ip4_addr[0] = (ip) &0xFF;
-    wfx_rsi.ip4_addr[1] = (ip >> 8) & 0xFF;
-    wfx_rsi.ip4_addr[2] = (ip >> 16) & 0xFF;
-    wfx_rsi.ip4_addr[3] = (ip >> 24) & 0xFF;
-    ChipLogProgress(DeviceLayer, "DHCP OK: IP=%d.%d.%d.%d", wfx_rsi.ip4_addr[0], wfx_rsi.ip4_addr[1], wfx_rsi.ip4_addr[2],
-                    wfx_rsi.ip4_addr[3]);
-    /* Notify the Connectivity Manager - via the app */
-    wfx_rsi.dev_state.Set(WifiState::kStationDhcpDone, WifiState::kStationReady);
-    NotifyIPv4Change(true);
-}
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-
-/*
- * WARNING - Taken from RSI and broken up
- * This is my own RSI stuff for not copying code and allocating an extra
- * level of indirection - when using LWIP buffers
- * see also: int32_t rsi_wlan_send_data_xx(uint8_t *buffer, uint32_t length)
- */
-/********************************************************************************************
- * @fn   void *wfx_rsi_alloc_pkt(void)
- * @brief
- *       Allocate packet to send data
- * @param[in] None
- * @return
- *        None
- **********************************************************************************************/
-void * wfx_rsi_alloc_pkt(void)
-{
-    rsi_pkt_t * pkt;
-
-    // Allocate packet to send data
-    if ((pkt = rsi_pkt_alloc(&rsi_driver_cb->wlan_cb->wlan_tx_pool)) == NULL)
-    {
-        return (void *) 0;
-    }
-
-    return (void *) pkt;
-}
-
-/********************************************************************************************
- * @fn   void wfx_rsi_pkt_add_data(void *p, uint8_t *buf, uint16_t len, uint16_t off)
- * @brief
- *       add the data into packet
- * @param[in]  p:
- * @param[in]  buf:
- * @param[in]  len:
- * @param[in]  off:
- * @return
- *        None
- **********************************************************************************************/
-void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off)
-{
-    rsi_pkt_t * pkt;
-
-    pkt = (rsi_pkt_t *) p;
-    memcpy(((char *) pkt->data) + off, buf, len);
-}
-
-/********************************************************************************************
- * @fn   int32_t wfx_rsi_send_data(void *p, uint16_t len)
- * @brief
- *       Driver send a data
- * @param[in]  p:
- * @param[in]  len:
- * @return
- *        None
- **********************************************************************************************/
-int32_t wfx_rsi_send_data(void * p, uint16_t len)
-{
-    int32_t status;
-    uint8_t * host_desc;
-    rsi_pkt_t * pkt;
-
-    pkt       = (rsi_pkt_t *) p;
-    host_desc = pkt->desc;
-    memset(host_desc, 0, RSI_HOST_DESC_LENGTH);
-    rsi_uint16_to_2bytes(host_desc, (len & 0xFFF));
-
-    // Fill packet type
-    host_desc[1] |= (RSI_WLAN_DATA_Q << 4);
-    host_desc[2] |= 0x01;
-
-    rsi_enqueue_pkt(&rsi_driver_cb->wlan_tx_q, pkt);
-
-#ifndef RSI_SEND_SEM_BITMAP
-    rsi_driver_cb_non_rom->send_wait_bitmap |= BIT(0);
-#endif
-    // Set TX packet pending event
-    rsi_set_event(RSI_TX_EVENT);
-
-    if (rsi_wait_on_wlan_semaphore(&rsi_driver_cb_non_rom->send_data_sem, RSI_SEND_DATA_RESPONSE_WAIT_TIME) != RSI_ERROR_NONE)
-    {
-        return RSI_ERROR_RESPONSE_TIMEOUT;
-    }
-    status = rsi_wlan_get_status();
-
-    return status;
 }
