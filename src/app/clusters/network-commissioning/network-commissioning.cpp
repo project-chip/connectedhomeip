@@ -1364,23 +1364,23 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
                                                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Clusters::NetworkCommissioning::Commands;
-    using QF                            = DataModel::CommandQualityFlags;
-    static const auto kDefaultFlags     = chip::BitFlags<QF>();
-    static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
 
     bool hasNet  = mFeatureFlags.Has(Feature::kThreadNetworkInterface);
     bool hasWifi = mFeatureFlags.Has(Feature::kWiFiNetworkInterface);
     bool hasCred = mFeatureFlags.Has(Feature::kPerDeviceCredentials);
     auto netId   = hasNet ? AddOrUpdateThreadNetwork::Id : AddOrUpdateWiFiNetwork::Id;
 
-    static constexpr kNetworkCommands                       = 5; // Count of Network Commands
-    static constexpr kCredentialsCommands                   = 1; // Count of Credential Commands
-    static const DataModel::AcceptedCommandEntry commands[] = { { ScanNetworks::Id, kDefaultFlags, kDefaultPrivilege },   //
-                                                                { netId, kDefaultFlags, kDefaultPrivilege },              //
-                                                                { RemoveNetwork::Id, kDefaultFlags, kDefaultPrivilege },  //
-                                                                { ConnectNetwork::Id, kDefaultFlags, kDefaultPrivilege }, //
-                                                                { ReorderNetwork::Id, kDefaultFlags, kDefaultPrivilege }, //
-                                                                { QueryIdentity::Id, kDefaultFlags, kDefaultPrivilege } };
+    static constexpr kNetworkCommands     = 5; // Count of Network Commands
+    static constexpr kCredentialsCommands = 1; // Count of Credential Commands
+
+    static const DataModel::AcceptedCommandEntry commands[] = { // A static array of the posible commands 
+        { ScanNetworks::Id, {} },   //
+        { netId, {} },              //
+        { RemoveNetwork::Id, {} },  //
+        { ConnectNetwork::Id, {} }, //
+        { ReorderNetwork::Id, {} }, //
+        { QueryIdentity::Id, {} }   //
+    };
 
     if (hasNet | hasWifi)
     {

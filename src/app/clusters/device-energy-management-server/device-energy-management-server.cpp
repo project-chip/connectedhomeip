@@ -108,49 +108,44 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
                                                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
-    using QF                            = DataModel::CommandQualityFlags;
-    static const auto kDefaultFlags     = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
-    static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
 
     if (HasFeature(Feature::kPowerAdjustment))
     {
         ReturnErrorOnFailure(builder.AppendElements({
-            { PowerAdjustRequest::Id, kDefaultFlags,
-              kDefaultPrivilege }, // TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
-            { CancelPowerAdjustRequest::Id, kDefaultFlags,
-              kDefaultPrivilege } // TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
+            { PowerAdjustRequest::Id, {} },
+            { CancelPowerAdjustRequest::Id, {} }
         }));
     }
 
     if (HasFeature(Feature::kStartTimeAdjustment))
     {
-        ReturnErrorOnFailure(builder.Append({ StartTimeAdjustRequest::Id, kDefaultFlags,
-                                              kDefaultPrivilege })); // TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
+        ReturnErrorOnFailure(builder.Append(
+            { StartTimeAdjustRequest::Id, {} } //
+        ));
     }
 
     if (HasFeature(Feature::kPausable))
     {
-        ReturnErrorOnFailure(builder.AppendElements(
-            { { PauseRequest::Id, kDefaultFlags, kDefaultPrivilege }, { ResumeRequest::Id, kDefaultFlags, kDefaultPrivilege } }));
+        ReturnErrorOnFailure(builder.AppendElements({
+            { PauseRequest::Id, {} }, //
+            { ResumeRequest::Id, {} } //
+        }));
     }
 
     if (HasFeature(Feature::kForecastAdjustment))
     {
-        ReturnErrorOnFailure(builder.Append({ ModifyForecastRequest::Id, kDefaultFlags,
-                                              kDefaultPrivilege })); // TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
+        ReturnErrorOnFailure(builder.Append({ ModifyForecastRequest::Id, {} }));
     }
 
     if (HasFeature(Feature::kConstraintBasedAdjustment))
     {
-        ReturnErrorOnFailure(builder.Append({ ModifyForecastRequest::Id, kDefaultFlags,
-                                              kDefaultPrivilege })); // TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
+        ReturnErrorOnFailure(builder.Append({ RequestConstraintBasedForecast::Id, {} }));
     }
 
     if (HasFeature(Feature::kStartTimeAdjustment) || HasFeature(Feature::kForecastAdjustment) ||
         HasFeature(Feature::kConstraintBasedAdjustment))
     {
-        ReturnErrorOnFailure(builder.Append({ CancelRequest::Id, kDefaultFlags,
-                                              kDefaultPrivilege })); // TODO:: WHAT IS THE NEEDED PRIVILEGE AND CommandQualityFlags
+        ReturnErrorOnFailure(builder.Append({ CancelRequest::Id, {} }));
     }
 
     return CHIP_NO_ERROR;

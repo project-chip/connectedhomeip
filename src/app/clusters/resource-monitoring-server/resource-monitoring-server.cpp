@@ -191,11 +191,10 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
                                                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace ResourceMonitoring::Commands;
-    using QF = DataModel::CommandQualityFlags;
     ChipLogDetail(Zcl, "resourcemonitoring: EnumerateAcceptedCommands");
     if (mResetConditionCommandSupported)
     {
-        return builder.Append({ ResetCondition::Id, chip::BitFlags<QF>() });
+        return builder.Append({ ResetCondition::Id, {} });
     }
 
     return CHIP_NO_ERROR;

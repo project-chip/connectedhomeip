@@ -174,16 +174,14 @@ SoftwareDiagnosticsCommandHandler::EnumerateAcceptedCommands(const ConcreteClust
                                                              DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
-    using QF                            = DataModel::CommandQualityFlags;
-    static const auto kDefaultFlags     = chip::BitFlags<QF>(QF::kTimed, QF::kLargeMessage, QF::kFabricScoped);
-    static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
+    using Privilege = chip::Access::Privilege;
     if (!DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
     {
         // No commmands.
         return CHIP_NO_ERROR;
     }
 
-    return builder.Append({ ResetWatermarks::Id, kDefaultFlags, kDefaultPrivilege });
+    return builder.Append({ ResetWatermarks::Id, {}, Privilege::kOperate }); // From Matter Spec
 }
 
 } // anonymous namespace
