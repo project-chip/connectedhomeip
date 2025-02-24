@@ -55,12 +55,7 @@
         "Test_TC_BDX_2_4",
         "Test_TC_BDX_2_5"
     ],
-    "bridge": [
-        "Test_TC_BR_1",
-        "Test_TC_BR_2",
-        "Test_TC_BR_3",
-        "Test_TC_BR_4"
-    ],
+    "bridge": ["Test_TC_BR_1", "Test_TC_BR_2", "Test_TC_BR_3", "Test_TC_BR_4"],
     "DeviceAttestation": [
         "Test_TC_DA_1_1",
         "Test_TC_DA_1_3",
@@ -113,25 +108,13 @@
         "Test_TC_DLOG_2_2",
         "Test_TC_DLOG_3_1"
     ],
-    "Descriptor": [
-        "Test_TC_DESC_2_1"
-    ],
-    "DeviceEnergyManagementMode": [
-        "Test_TC_DEMM_1_2"
-    ],
-    "EnergyEVSEMode": [
-        "Test_TC_EEVSEM_1_2"
-    ],
+    "Descriptor": ["Test_TC_DESC_2_1"],
+    "DeviceEnergyManagementMode": ["Test_TC_DEMM_1_2"],
+    "EnergyEVSEMode": ["Test_TC_EEVSEM_1_2"],
     "FanControl": [],
-    "GeneralCommissioning": [
-        "Test_TC_CGEN_2_2"
-    ],
-    "GeneralDiagnostics": [
-        "Test_TC_DGGEN_2_2"
-    ],
-    "Identify": [
-        "Test_TC_I_3_2"
-    ],
+    "GeneralCommissioning": ["Test_TC_CGEN_2_2"],
+    "GeneralDiagnostics": ["Test_TC_DGGEN_2_2"],
+    "Identify": ["Test_TC_I_3_2"],
     "IcdManagement": [],
     "IlluminanceMeasurement": [],
     "InteractionDataModel": [
@@ -201,11 +184,7 @@
         "Test_TC_CADMIN_1_25",
         "Test_TC_CADMIN_1_26"
     ],
-    "ModeSelect": [
-        "Test_TC_MOD_1_2",
-        "Test_TC_MOD_1_3",
-        "Test_TC_MOD_2_2"
-    ],
+    "ModeSelect": ["Test_TC_MOD_1_2", "Test_TC_MOD_1_3", "Test_TC_MOD_2_2"],
     "OTASoftwareUpdate": [
         "Test_TC_SU_1_1",
         "Test_TC_SU_2_1",
@@ -223,9 +202,7 @@
         "Test_TC_SU_4_1",
         "Test_TC_SU_4_2"
     ],
-    "PowerSourceConfiguration": [
-        "Test_TC_PSCFG_2_2"
-    ],
+    "PowerSourceConfiguration": ["Test_TC_PSCFG_2_2"],
     "PressureMeasurement": [],
     "SecureChannel": [
         "Test_TC_SC_1_1",
@@ -258,25 +235,13 @@
         "Test_TC_DGSW_2_3"
     ],
     "EthernetNetworkDiagnostics": [],
-    "WiFiNetworkDiagnostics": [
-        "Test_TC_DGWIFI_2_2"
-    ],
+    "WiFiNetworkDiagnostics": ["Test_TC_DGWIFI_2_2"],
     "WindowCovering": [],
-    "FlowMeasurement": [
-        "Test_TC_FLW_2_2"
-    ],
-    "GroupKeyManagement": [
-        "Test_TC_GRPKEY_5_4"
-    ],
-    "OccupancySensing": [
-        "Test_TC_OCC_3_1"
-    ],
-    "PowerSource": [
-        "Test_TC_PS_2_2"
-    ],
-    "BooleanState": [
-        "Test_TC_BOOL_2_2"
-    ],
+    "FlowMeasurement": ["Test_TC_FLW_2_2"],
+    "GroupKeyManagement": ["Test_TC_GRPKEY_5_4"],
+    "OccupancySensing": ["Test_TC_OCC_3_1"],
+    "PowerSource": ["Test_TC_PS_2_2"],
+    "BooleanState": ["Test_TC_BOOL_2_2"],
     "ColorControl": [
         "Test_TC_CC_3_1",
         "Test_TC_CC_7_1",
@@ -284,74 +249,34 @@
         "Test_TC_CC_9_2",
         "Test_TC_CC_9_3"
     ],
-    "DoorLock": [
-        "Test_TC_DRLK_2_10",
-        "Test_TC_DRLK_3_2"
-    ],
-    "DeviceEnergyManagement": [
-        "Test_TC_DEM_1_1"
-    ],
+    "DoorLock": ["Test_TC_DRLK_2_10", "Test_TC_DRLK_3_2"],
+    "DeviceEnergyManagement": ["Test_TC_DEM_1_1"],
     "LocalizationConfiguration": [],
     "LevelControl": [],
-    "LaundryWasherMode": [
-        "Test_TC_LWM_1_2"
-    ],
-    "OnOff": [
-        "Test_TC_OO_2_3"
-    ],
-    "RelativeHumidityMeasurement": [
-        "Test_TC_RH_2_2"
-    ],
+    "LaundryWasherMode": ["Test_TC_LWM_1_2"],
+    "OnOff": ["Test_TC_OO_2_3"],
+    "RelativeHumidityMeasurement": ["Test_TC_RH_2_2"],
     "SmokeCOAlarm": [],
-    "RefrigeratorAlarm": [
-        "Test_TC_REFALM_2_2",
-        "Test_TC_REFALM_2_3"
-    ],
-    "RVCCleanMode": [
-        "Test_TC_RVCCLEANM_3_3"
-    ],
-    "RVCOperationalState": [
-        "Test_TC_RVCOPSTATE_2_2"
-    ],
-    "RVCRunMode": [
-        "Test_TC_RVCRUNM_3_3"
-    ],
+    "RefrigeratorAlarm": ["Test_TC_REFALM_2_2", "Test_TC_REFALM_2_3"],
+    "RVCCleanMode": ["Test_TC_RVCCLEANM_3_3"],
+    "RVCOperationalState": ["Test_TC_RVCOPSTATE_2_2"],
+    "RVCRunMode": ["Test_TC_RVCRUNM_3_3"],
     "TemperatureControlledCabinetMode": [
         "Test_TC_TCCM_1_2",
         "Test_TC_TCCM_2_1"
     ],
-    "Switch": [
-        "Test_TC_SWTCH_3_2"
-    ],
+    "Switch": ["Test_TC_SWTCH_3_2"],
     "TemperatureControl": [],
-    "TemperatureMeasurement": [
-        "Test_TC_TMP_2_2"
-    ],
-    "Thermostat": [
-        "Test_TC_TSTAT_3_2"
-    ],
+    "TemperatureMeasurement": ["Test_TC_TMP_2_2"],
+    "Thermostat": ["Test_TC_TSTAT_3_2"],
     "ThermostatUserConfiguration": [],
-    "ThreadNetworkDiagnostics": [
-        "Test_TC_DGTHREAD_2_5"
-    ],
-    "Actions": [
-        "Test_TC_ACT_2_1",
-        "Test_TC_ACT_2_2",
-        "Test_TC_ACT_3_2"
-    ],
+    "ThreadNetworkDiagnostics": ["Test_TC_DGTHREAD_2_5"],
+    "Actions": ["Test_TC_ACT_2_1", "Test_TC_ACT_2_2", "Test_TC_ACT_3_2"],
     "TimeFormatLocalization": [],
     "TimeSynchronization": [],
     "UnitLocalization": [],
-    "Binding": [
-        "Test_TC_BIND_2_1",
-        "Test_TC_BIND_2_2",
-        "Test_TC_BIND_2_3"
-    ],
-    "ScenesManagement": [
-        "Test_TC_S_2_5",
-        "Test_TC_S_2_6",
-        "Test_TC_S_3_1"
-    ],
+    "Binding": ["Test_TC_BIND_2_1", "Test_TC_BIND_2_2", "Test_TC_BIND_2_3"],
+    "ScenesManagement": ["Test_TC_S_2_5", "Test_TC_S_2_6", "Test_TC_S_3_1"],
     "PumpConfigurationControl": [],
     "AccessControl": [],
     "UserLabel": [],
@@ -360,23 +285,11 @@
         "Test_TC_BRBINFO_3_1"
     ],
     "LaundryWasherControl": [],
-    "OvenMode": [
-        "Test_TC_OTCCM_1_2",
-        "Test_TC_OTCCM_3_2",
-        "Test_TC_OTCCM_3_3"
-    ],
+    "OvenMode": ["Test_TC_OTCCM_1_2", "Test_TC_OTCCM_3_2", "Test_TC_OTCCM_3_3"],
     "AccessControlEnforcement": [],
-    "OvenMode": [
-        "Test_TC_OTCCM_1_1",
-        "Test_TC_OTCCM_1_2"
-    ],
-    "EnergyEVSE": [
-        "Test_TC_EEVSE_1_1",
-        "Test_TC_EEVSE_2_1"
-    ],
-    "PowerTopology": [
-        "Test_TC_PWRTL_1_1"
-    ],
+    "OvenMode": ["Test_TC_OTCCM_1_1", "Test_TC_OTCCM_1_2"],
+    "EnergyEVSE": ["Test_TC_EEVSE_1_1", "Test_TC_EEVSE_2_1"],
+    "PowerTopology": ["Test_TC_PWRTL_1_1"],
     "collection": [
         "DeviceDiscovery",
         "Groups",
