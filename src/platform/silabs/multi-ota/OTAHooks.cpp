@@ -69,15 +69,9 @@ CHIP_ERROR chip::OTAMultiImageProcessorImpl::OtaHookInit()
     customProcessor2.RegisterDescriptorCallback(ProcessDescriptor);
     customProcessor3.RegisterDescriptorCallback(ProcessDescriptor);
 
-<<<<<<< HEAD
     ReturnErrorOnFailure(imageProcessor.RegisterProcessor(8, &customProcessor1));
     ReturnErrorOnFailure(imageProcessor.RegisterProcessor(9, &customProcessor2));
     ReturnErrorOnFailure(imageProcessor.RegisterProcessor(10, &customProcessor3));
-=======
-    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kCustomProcessor1), &customProcessor1));
-    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kCustomProcessor2), &customProcessor2));
-    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kCustomProcessor3), &customProcessor3));
->>>>>>> d7d9418cbb (Added changes for builkd issue with EFR32 multi OTA)
 #endif
 
 #ifdef SL_WIFI
