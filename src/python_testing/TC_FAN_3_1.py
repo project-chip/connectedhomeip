@@ -344,7 +344,7 @@ class TC_FAN_3_1(MatterBaseTest):
         logging.info(
             f"[FC] *** Fan initial state: FanMode ({init_fan_mode}:{init_fan_mode.name}), PercentSetting ({init_percent_setting}){speed_setting_log}")
 
-        # Loging supported fan modes
+        # Logging supported fan modes
         logging.info(f"[FC] *** Supported fan modes: {self.fan_mode_sequence.name}")
 
     def pics_TC_FAN_3_1(self) -> list[str]:
