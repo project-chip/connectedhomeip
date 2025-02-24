@@ -159,9 +159,6 @@ private:
 
     struct CHIPoBLEConState
     {
-#if !(SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-        bd_addr address;
-#endif
         uint16_t mtu : 10;
         uint16_t allocated : 1;
         uint16_t subscribed : 1;
