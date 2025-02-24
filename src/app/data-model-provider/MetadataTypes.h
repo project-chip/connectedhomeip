@@ -35,42 +35,6 @@ namespace DataModel {
  typedef uint32_t AttributeMask;
 
 
- // Attribute masks modify how attributes are used by the framework
- //
- // Read Privilege stored on the first trio of significant binary digits
- //
- // Attribute mask for any Read Privilege value set
- constexpr uint8_t ATTRIBUTE_MASK_READ_PRVLG_ANY_VALUE = 0x07; // == 0b00000111
- // Attribute mask for Read Privilege kView value
- constexpr uint8_t ATTRIBUTE_MASK_READ_PRVLG_KVIEW_VALUE = 0x01;
- // Attribute mask for Read Privilege kProxyView value
- constexpr uint8_t ATTRIBUTE_MASK_READ_PRVLG_KPROXYVIEW_VALUE = 0x02;
- // Attribute mask for Read Privilege kOperate value
- constexpr uint8_t ATTRIBUTE_MASK_READ_PRVLG_KOPERATE_VALUE = 0x03;
- // Attribute mask for Read Privilege kManage value
- constexpr uint8_t ATTRIBUTE_MASK_READ_PRVLG_KMANAGE_VALUE = 0x04;
- // Attribute mask for Read Privilege kAdminister value
- constexpr uint8_t ATTRIBUTE_MASK_READ_PRVLG_KADMINISTER_VALUE = 0x05;
- 
- 
- 
- // Write Privilege stored on the second trio of significant binary digits
- //
- // Attribute mask for any Write Privilege value set
- constexpr uint8_t ATTRIBUTE_MASK_WRITE_PRVLG_ANY_VALUE = 0x38;  // == 0b00111000
- // Attribute mask for Write Privilege kView value
- constexpr uint8_t ATTRIBUTE_MASK_WRITE_PRVLG_KVIEW_VALUE = 0x08;
- // Attribute mask for Write Privilege kProxyView value
- constexpr uint8_t ATTRIBUTE_MASK_WRITE_PRVLG_KPROXYVIEW_VALUE = 0x10;
- // Attribute mask for Write Privilege kOperate value
- constexpr uint8_t ATTRIBUTE_MASK_WRITE_PRVLG_KOPERATE_VALUE = 0x18;
- // Attribute mask for Write Privilege kManage value
- constexpr uint8_t ATTRIBUTE_MASK_WRITE_PRVLG_KMANAGE_VALUE = 0x20;
- // Attribute mask for Write Privilege kAdminister value
- constexpr uint8_t ATTRIBUTE_MASK_WRITE_PRVLG_KADMINISTER_VALUE = 0x28;
- 
-
-
 
 /// Represents various endpoint composition patters as defined in the spec
 /// as `9.2.1. Endpoint Composition patterns`
@@ -132,176 +96,41 @@ enum class AttributeQualityFlags : uint32_t
 struct AttributeEntry
 {
     AttributeId attributeId;
-
-
-    /**
-     * Checks if readPrivilege has a value.
-     */
-     bool readPrivilegeHasValue() const { return (mask & ATTRIBUTE_MASK_READ_PRVLG_ANY_VALUE); }
-
-    /**
-     * Checks if writePrivilege has a value.
-     */
-     bool writePrivilegeHasValue() const { return (mask & ATTRIBUTE_MASK_WRITE_PRVLG_ANY_VALUE); }
-
-
-     /**
-      * Getter for readPrivilege.
-      */
-     Access::Privilege GetReadPrivilege() const 
-     {
- 
-         if ( (mask &  ATTRIBUTE_MASK_READ_PRVLG_KVIEW_VALUE) ==  ATTRIBUTE_MASK_READ_PRVLG_KVIEW_VALUE ) 
-           return (Access::Privilege::kView);
-         else
-         if ( (mask &  ATTRIBUTE_MASK_READ_PRVLG_KPROXYVIEW_VALUE) ==  ATTRIBUTE_MASK_READ_PRVLG_KPROXYVIEW_VALUE ) 
-           return (Access::Privilege::kProxyView);
-         else
-         if ( (mask &  ATTRIBUTE_MASK_READ_PRVLG_KOPERATE_VALUE) ==  ATTRIBUTE_MASK_READ_PRVLG_KOPERATE_VALUE ) 
-           return (Access::Privilege::kOperate);
-         else
-         if ( (mask &  ATTRIBUTE_MASK_READ_PRVLG_KMANAGE_VALUE) ==  ATTRIBUTE_MASK_READ_PRVLG_KMANAGE_VALUE ) 
-           return (Access::Privilege::kManage);
-         else
-         if ( (mask &  ATTRIBUTE_MASK_READ_PRVLG_KADMINISTER_VALUE) ==  ATTRIBUTE_MASK_READ_PRVLG_KADMINISTER_VALUE ) 
-           return (Access::Privilege::kAdminister);
- 
-         return(Access::Privilege::kView); // generally defaults to View if readable
-         
-     }
-
-
-     /**
-      * Setter for readPrivilege.
-      */
-      void SetReadPrivilege(Access::Privilege const& readPrivilege) 
-      {
-        constexpr uint8_t clean_read_privilege_mask = 0b11111000;
-
-        switch(readPrivilege)
-        {
-          case Access::Privilege::kView :
-              mask &= clean_read_privilege_mask;
-              mask |= ATTRIBUTE_MASK_READ_PRVLG_KVIEW_VALUE;
-              break;
-
-          case Access::Privilege::kProxyView :
-              mask &= clean_read_privilege_mask;
-              mask |= ATTRIBUTE_MASK_READ_PRVLG_KPROXYVIEW_VALUE;
-              break;
-
-          case Access::Privilege::kOperate :
-              mask &= clean_read_privilege_mask;
-              mask |= ATTRIBUTE_MASK_READ_PRVLG_KOPERATE_VALUE;
-              break;
-
-          case Access::Privilege::kManage :
-              mask &= clean_read_privilege_mask;
-              mask |= ATTRIBUTE_MASK_READ_PRVLG_KMANAGE_VALUE;
-              break;
-
-          case Access::Privilege::kAdminister :
-              mask &= clean_read_privilege_mask;
-              mask |= ATTRIBUTE_MASK_READ_PRVLG_KADMINISTER_VALUE;
-              break;
-
-          default:
-                // No flag was set, so do nothing.
-              break;
-        }
-
-          
-      }
- 
-
-
-     /**
-      * Getter for writePrivilege.
-      */
-     Access::Privilege GetWritePrivilege() const 
-     {
-         std::optional<Access::Privilege> writePrivilege;
- 
-         if ( (mask &  ATTRIBUTE_MASK_WRITE_PRVLG_KVIEW_VALUE) ==  ATTRIBUTE_MASK_WRITE_PRVLG_KVIEW_VALUE ) 
-           return (writePrivilege.emplace(Access::Privilege::kView));
-         else
-         if ( (mask &  ATTRIBUTE_MASK_WRITE_PRVLG_KPROXYVIEW_VALUE) ==  ATTRIBUTE_MASK_WRITE_PRVLG_KPROXYVIEW_VALUE ) 
-           return (writePrivilege.emplace(Access::Privilege::kProxyView));
-         else
-         if ( (mask &  ATTRIBUTE_MASK_WRITE_PRVLG_KOPERATE_VALUE) ==  ATTRIBUTE_MASK_WRITE_PRVLG_KOPERATE_VALUE ) 
-           return (writePrivilege.emplace(Access::Privilege::kOperate));
-         else
-         if ( (mask &  ATTRIBUTE_MASK_WRITE_PRVLG_KMANAGE_VALUE) ==  ATTRIBUTE_MASK_WRITE_PRVLG_KMANAGE_VALUE ) 
-           return (writePrivilege.emplace(Access::Privilege::kManage));
-         else
-         if ( (mask &  ATTRIBUTE_MASK_WRITE_PRVLG_KADMINISTER_VALUE) ==  ATTRIBUTE_MASK_WRITE_PRVLG_KADMINISTER_VALUE ) 
-           return (writePrivilege.emplace(Access::Privilege::kAdminister));
- 
-         return(writePrivilege.emplace(Access::Privilege::kOperate)); // generally defaults to Operate if writable
-         
-     }
- 
- 
-     /**
-      * Setter for writePrivilege.
-      */
-      void SetWritePrivilege(Access::Privilege const& writePrivilege) 
-      {
-        constexpr uint8_t clean_write_privilege_mask = 0b11000111;
-
-        switch(writePrivilege)
-        {
-          case Access::Privilege::kView :
-              mask &= clean_write_privilege_mask;
-              mask |= ATTRIBUTE_MASK_WRITE_PRVLG_KVIEW_VALUE;
-              break;
-
-          case Access::Privilege::kProxyView :
-              mask &= clean_write_privilege_mask;
-              mask |= ATTRIBUTE_MASK_WRITE_PRVLG_KPROXYVIEW_VALUE;
-              break;
-
-          case Access::Privilege::kOperate :
-              mask &= clean_write_privilege_mask;
-              mask |= ATTRIBUTE_MASK_WRITE_PRVLG_KOPERATE_VALUE;
-              break;
-
-          case Access::Privilege::kManage :
-              mask &= clean_write_privilege_mask;
-              mask |= ATTRIBUTE_MASK_WRITE_PRVLG_KMANAGE_VALUE;
-              break;
-
-          case Access::Privilege::kAdminister :
-              mask &= clean_write_privilege_mask;
-              mask |= ATTRIBUTE_MASK_WRITE_PRVLG_KADMINISTER_VALUE;
-              break;
-
-          default:
-                // No flag was set, so do nothing.
-              break;
-        }
-
-          
-      }
- 
-
-
-
-
     BitFlags<AttributeQualityFlags> flags;
 
-    private:
-    /**
-     * Attribute mask.
-     */
-    AttributeMask mask {0};
 
+
+    void SetReadPrivilege(Access::Privilege r)
+    {
+        readPrivilege = chip::to_underlying(r);
+    }
+
+    Access::Privilege GetReadPrivilege()
+    {
+        return static_cast< Access::Privilege >(readPrivilege);
+    }
+
+    void SetWritePrivilege(Access::Privilege w)
+    {
+        writePrivilege = chip::to_underlying(w);
+    }
+
+    Access::Privilege GetWritePrivilege()
+    {
+        return static_cast< Access::Privilege >(writePrivilege);
+    }
+
+    bool readPrivilegeHasValue() {return readPrivilege;}
+    bool writePrivilegeHasValue() {return writePrivilege;}
+
+
+    private:
 
     // read/write access will be missing if read/write is NOT allowed
     //
     // NOTE: this should be compacted for size
-//    std::optional<Access::Privilege> readPrivilege;  // generally defaults to View if readable
-//    std::optional<Access::Privilege> writePrivilege; // generally defaults to Operate if writable
+    std::underlying_type_t<Access::Privilege> readPrivilege : 5 ;  // generally defaults to View if readable
+    std::underlying_type_t<Access::Privilege> writePrivilege : 5 ; // generally defaults to Operate if writable
 };
 
 // Bitmask values for different Command qualities.
