@@ -746,8 +746,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                         ChipLogProgress(InteractionModel,
                                         "Deleting previous non-active subscription from NodeId: " ChipLogFormatX64
                                         ", FabricIndex: %u, SubscriptionId: 0x%" PRIx32,
-                                        ChipLogValueX64(subscriptionInfo.mNodeId), 
-                                        subscriptionInfo.mFabricIndex, 
+                                        ChipLogValueX64(subscriptionInfo.mNodeId),
+                                        subscriptionInfo.mFabricIndex,
                                         subscriptionInfo.mSubscriptionId);
                         mpSubscriptionResumptionStorage->Delete(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex,
                                                                 subscriptionInfo.mSubscriptionId);
