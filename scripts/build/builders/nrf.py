@@ -118,7 +118,7 @@ class NrfBoard(Enum):
     NRF52840DK = auto()
     NRF52840DONGLE = auto()
     NRF5340DK = auto()
-    NATIVE_POSIX_64 = auto()
+    NATIVE_SIM = auto()
 
     def GnArgName(self):
         if self == NrfBoard.NRF52840DK:
@@ -127,8 +127,8 @@ class NrfBoard(Enum):
             return 'nrf52840dongle_nrf52840'
         elif self == NrfBoard.NRF5340DK:
             return 'nrf5340dk_nrf5340_cpuapp'
-        elif self == NrfBoard.NATIVE_POSIX_64:
-            return 'native_posix_64'
+        elif self == NrfBoard.NATIVE_SIM:
+            return 'native_sim'
         else:
             raise Exception('Unknown board type: %r' % self)
 
