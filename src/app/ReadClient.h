@@ -352,9 +352,10 @@ public:
      *
      *  When subscribing to LIT-ICD and liveness timeout reached and OnResubscriptionNeeded returns
      *  CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT, the read client will move to the InactiveICDSubscription state and the
-     * subscription is put on hold. resubscription can be triggered via OnActiveModeNotification(). When CASE connection fails or
-     * client fails in subscription priming stage, client will move to FailedICDSubscription state and subscription is still
-     * retrying with back-off algorithm, the pending subscription can be triggered via OnActiveModeNotification().
+     *  subscription is put on hold, resubscription can be triggered via OnActiveModeNotification(). 
+     *  When client encounters various timeouts, whether that be exchange timeout, CASE setup timeout, or lack of getting a report on time, 
+     *  client will move to FailedICDSubscription state and subscription is still retrying with back-off algorithm, 
+     *  the pending subscription can be canceled, and new subscription can be rescheduled immediately via OnActiveModeNotification().
      *
      */
     void OnActiveModeNotification();
@@ -577,7 +578,7 @@ private:
     CHIP_ERROR ComputeLivenessCheckTimerTimeout(System::Clock::Timeout * aTimeout);
     void CancelLivenessCheckTimer();
     void CancelResubscribeTimer();
-    void CloseSession();
+    void TriggerResubscriptionForLivenessTimeout(CHIP_ERROR aReason);
     void MoveToState(const ClientState aTargetState);
     CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ConcreteDataAttributePath & aClusterInfo);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload, ReportType aReportType);

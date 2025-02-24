@@ -837,15 +837,7 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_TLV_CONTAINER_OPEN                          CHIP_CORE_ERROR(0x27)
 
-/**
- *  @def CHIP_ERROR_LIT_CASE_SUBSCRIBE_PRIMING_TIMEOUT
- *
- *  @brief
- *    CASE fails to be established or subscription fails to be established
- *
- */
-#define CHIP_ERROR_LIT_CASE_SUBSCRIBE_PRIMING_TIMEOUT                  CHIP_CORE_ERROR(0x28)
-
+// AVAILABLE: 0x28
 // AVAILABLE: 0x29
 
 /**
