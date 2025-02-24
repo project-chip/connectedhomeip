@@ -245,14 +245,15 @@ CHIP_ERROR ConnectToAccessPoint()
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
 bool HasAnIPv4Address()
 {
-    VerifyOrReturnError(which_if == SL_WFX_STA_INTERFACE, false);
     return wfx_rsi.dev_state.Has(WifiState::kStationDhcpDone);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
 bool HasAnIPv6Address()
 {
-    return wfx_rsi.dev_state.Has(WifiState::kStationDhcpDone);
+    // TODO: WifiState::kStationConnected does not guarantee SLAAC IPv6 LLA, maybe use a different FLAG
+    // Once connect is sync instead of async, this should be fine
+    return wfx_rsi.dev_state.Has(WifiState::kStationConnected);
 }
 
 void CancelScanNetworks()
