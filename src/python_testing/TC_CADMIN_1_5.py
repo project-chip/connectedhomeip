@@ -52,7 +52,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
         )
         return comm_service
 
-    async def SnakeCase(self, setup_code: int, discriminator: int, expected_error: int = 0):
+    async def commission_on_network(self, setup_code: int, discriminator: int, expected_error: int = 0):
         # This is expected to error as steps 4 and 7 expects timeout issue or pase connection error to occur due to commissioning window being closed already
         if expected_error == 50:
             try:
