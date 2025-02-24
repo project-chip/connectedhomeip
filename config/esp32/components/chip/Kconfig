@@ -191,6 +191,27 @@ menu "CHIP Core"
                 Enable dynamic server to handle a different interaction model dispatch.
                 Can be implied when users do not want to use the same server clusters.
 
+        choice CHIP_MEM_ALLOC_MODE
+            prompt "Memory allocation strategy"
+            default CHIP_MEM_ALLOC_MODE_DEFAULT
+            help
+                Strategy for Matter memory management
+                - Internal DRAM memory only
+                - External SPIRAM memory only
+                - Either internal or external memory based on default malloc() behavior in ESP-IDF
+
+            config CHIP_MEM_ALLOC_MODE_INTERNAL
+                bool "Internal memory"
+
+            config CHIP_MEM_ALLOC_MODE_EXTERNAL
+                bool "External SPIRAM"
+                depends on SPIRAM_USE_CAPS_ALLOC || SPIRAM_USE_MALLOC
+
+            config CHIP_MEM_ALLOC_MODE_DEFAULT
+                bool "Default alloc mode"
+
+        endchoice # CHIP_MEM_ALLOC_MODE
+
     endmenu # "General Options"
 
     menu "Networking Options"

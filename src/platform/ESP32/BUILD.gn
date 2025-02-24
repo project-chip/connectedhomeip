@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/inet/inet.gni")
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
 assert(chip_device_platform == "esp32")
@@ -33,6 +34,7 @@ declare_args() {
   chip_use_esp32_ecdsa_peripheral = false
   chip_enable_ethernet = false
   chip_enable_route_hook = false
+  chip_memory_alloc_mode = "default"
 }
 
 defines = [
@@ -80,6 +82,16 @@ static_library("ESP32") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]
+
+  if (chip_config_memory_management == "platform") {
+    if (chip_memory_alloc_mode == "internal") {
+      sources += [ "CHIPMem-PlatformInternal.cpp" ]
+    } else if (chip_memory_alloc_mode == "external") {
+      sources += [ "CHIPMem-PlatformExternal.cpp" ]
+    } else {
+      sources += [ "CHIPMem-PlatformDefault.cpp" ]
+    }
+  }
 
   if (chip_enable_ota_requestor) {
     sources += [
