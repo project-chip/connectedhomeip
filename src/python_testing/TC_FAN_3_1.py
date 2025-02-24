@@ -76,16 +76,6 @@ class TC_FAN_3_1(MatterBaseTest):
                          "Update the value of the FanMode attribute iteratively, in descending order, from the number of available fan modes specified by the FanModeSequence attribute excluding modes beyond 3 (High) to 0 (Off). For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. If SUCCESS and a PercentSetting (and/or SpeedSetting if present) attribute value change is triggered. Verify that the current value(s) is less than the previous one. If INVALID_IN_STATE, no update operation occurred. Verify that the current value(s) is the same as the previous one"),
                 ]
 
-    @staticmethod
-    async def get_attribute_value_from_queue(queue, attribute, timeout_sec: float) -> Any:
-        start_time = time.time()
-        while time.time() - start_time < timeout_sec:
-            for q in list(queue):
-                if q.attribute == attribute:
-                    return q.value
-            await asyncio.sleep(0.0001)
-        return None
-
     async def read_setting(self, endpoint, attribute):
         cluster = Clusters.Objects.FanControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -106,30 +96,38 @@ class TC_FAN_3_1(MatterBaseTest):
                                 f"[FC] Mismatch between written and read attribute value ({attribute.__name__} - written: {value}, read: {value_read})")
         return write_status
 
-    async def get_fan_modes(self, endpoint, max_high: bool = False) -> list[int]:
+    @staticmethod
+    async def get_attribute_value_from_queue(queue, attribute, timeout_sec: float) -> Any:
+        start_time = time.time()
+        while time.time() - start_time < timeout_sec:
+            for q in list(queue):
+                if q.attribute == attribute:
+                    return q.value
+            await asyncio.sleep(0.0001)
+        return None
+
+    async def get_fan_modes(self, endpoint, max_high: bool = False):
         # Read FanModeSequence attribute value
         fan_mode_sequence_attr = Clusters.FanControl.Attributes.FanModeSequence
         fm_enum = Clusters.FanControl.Enums.FanModeEnum
         fms_enum = Clusters.FanControl.Enums.FanModeSequenceEnum
-        fan_mode_sequence = await self.read_setting(endpoint, fan_mode_sequence_attr)
-        
-        # Verify response contains a FanModeSequenceEnum
-        asserts.assert_is_instance(fan_mode_sequence, fms_enum, f"[FC] FanModeSequence result isn't of enum type {fms_enum.__name__}")
+        self.fan_mode_sequence = await self.read_setting(endpoint, fan_mode_sequence_attr)
 
-        logging.info(f"[FC] Supported fan modes: {fan_mode_sequence.name}")
+        # Verify response contains a FanModeSequenceEnum
+        asserts.assert_is_instance(self.fan_mode_sequence, fms_enum, f"[FC] FanModeSequence result isn't of enum type {fms_enum.__name__}")
 
         fan_modes = None
-        if fan_mode_sequence == 0:
+        if self.fan_mode_sequence == 0:
             fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kMedium, fm_enum.kHigh]
-        elif fan_mode_sequence == 1:
+        elif self.fan_mode_sequence == 1:
             fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kHigh]
-        elif fan_mode_sequence == 2:
+        elif self.fan_mode_sequence == 2:
             fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kMedium, fm_enum.kHigh, fm_enum.kAuto]
-        elif fan_mode_sequence == 3:
+        elif self.fan_mode_sequence == 3:
             fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kHigh, fm_enum.kAuto]
-        elif fan_mode_sequence == 4:
+        elif self.fan_mode_sequence == 4:
             fan_modes = [fm_enum.kOff, fm_enum.kHigh, fm_enum.kAuto]
-        elif fan_mode_sequence == 5:
+        elif self.fan_mode_sequence == 5:
             fan_modes = [fm_enum.kOff, fm_enum.kHigh]
 
         if max_high:
@@ -137,7 +135,7 @@ class TC_FAN_3_1(MatterBaseTest):
                 high_index = fan_modes.index(fm_enum.kHigh)
                 fan_modes = fan_modes[:high_index + 1]  # Keep only modes up to and including kHigh
 
-        return fan_modes
+        self.fan_modes = fan_modes
 
     async def get_initialization_parametes(self, endpoint, attr_to_update, order):
         cluster = Clusters.FanControl
@@ -162,23 +160,8 @@ class TC_FAN_3_1(MatterBaseTest):
 
         return attr_to_verify, iteration_range, init_fan_mode, init_percent_setting, init_speed_setting
 
-    def verify_attribute_change(self, attr_to_verify, value_current, value_previous, order) -> None:
-        if order == OrderEnum.Ascending:
-            # Verify that the current attribute value is greater than the previous attribute value
-            asserts.assert_greater(value_current, value_previous,
-                                f"[FC] Current {attr_to_verify.__name__} must be greater than previous {attr_to_verify.__name__}")
-        else:
-            # Verify that the current attribute value is less than the previous attribute value
-            asserts.assert_less(value_current, value_previous,
-                                    f"[FC] Current {attr_to_verify.__name__} must be less than previous {attr_to_verify.__name__}")
-
-        # Logging attribute value change details
-        sub_text = f"({value_previous}) to ({value_current})"
-        if attr_to_verify == Clusters.FanControl.Attributes.FanMode:
-            sub_text = f"({value_previous}:{value_previous.name}) to ({value_current}:{value_current.name})"
-        logging.info(f"\t\t[FC] {attr_to_verify.__name__} changed from {sub_text}")
-
-    def handle_iteration_one_edge_cases(self, attr_to_update, attr_to_verify, order, attr_to_verify_value_current, init_fan_mode, init_percent_setting, init_speed_setting):
+    @staticmethod
+    def handle_iteration_one_edge_cases(attr_to_update, attr_to_verify, order, attr_to_verify_value_current, init_fan_mode, init_percent_setting, init_speed_setting):
         cluster = Clusters.FanControl
         attribute = cluster.Attributes
         fm_enum = cluster.Enums.FanModeEnum
@@ -243,17 +226,22 @@ class TC_FAN_3_1(MatterBaseTest):
                 elif order == OrderEnum.Descending:
                     asserts.assert_greater(attr_to_verify_value_current, init_setting, f"[FC] Current {attr_to_verify.__name__} attribute value must be greater than the initial value")
 
-    async def log_scenario(self, attr_to_update, attr_to_verify, order, init_fan_mode, init_percent_setting, init_speed_setting, ):
-        # Logging the scenario being tested
-        logging.info("[FC] ====================================================================")
-        speed_setting_scenario = " and SpeedSetting" if self.supports_multispeed else ""
-        logging.info(
-            f"[FC] *** Update {attr_to_update.__name__} {order.name}, verify {attr_to_verify.__name__}{speed_setting_scenario}")
+    @staticmethod
+    def verify_attribute_change(attr_to_verify, value_current, value_previous, order) -> None:
+        if order == OrderEnum.Ascending:
+            # Verify that the current attribute value is greater than the previous attribute value
+            asserts.assert_greater(value_current, value_previous,
+                                f"[FC] Current {attr_to_verify.__name__} must be greater than previous {attr_to_verify.__name__}")
+        else:
+            # Verify that the current attribute value is less than the previous attribute value
+            asserts.assert_less(value_current, value_previous,
+                                    f"[FC] Current {attr_to_verify.__name__} must be less than previous {attr_to_verify.__name__}")
 
-        # Logging fan initial state (FanMode, PercentSetting, SpeedSetting if present)
-        speed_setting_log = f", SpeedSetting({init_speed_setting})" if self.supports_multispeed else ""
-        logging.info(
-            f"[FC] *** Fan initial state: FanMode ({init_fan_mode}:{init_fan_mode.name}), PercentSetting ({init_percent_setting}){speed_setting_log}")
+        # Logging attribute value change details
+        sub_text = f"({value_previous}) to ({value_current})"
+        if attr_to_verify == Clusters.FanControl.Attributes.FanMode:
+            sub_text = f"({value_previous}:{value_previous.name}) to ({value_current}:{value_current.name})"
+        logging.info(f"\t\t[FC] {attr_to_verify.__name__} changed from {sub_text}")
 
     async def verify_fan_control_attribute_progression(self, endpoint, attr_to_update, order) -> None:
         cluster = Clusters.FanControl
@@ -344,6 +332,21 @@ class TC_FAN_3_1(MatterBaseTest):
                     asserts.assert_equal(speed_setting_current, speed_setting_previous,
                                         "Current SpeedSetting attribute value must be equal to the previous one")
 
+    async def log_scenario(self, attr_to_update, attr_to_verify, order, init_fan_mode, init_percent_setting, init_speed_setting):
+        # Logging the scenario being tested
+        logging.info("[FC] ====================================================================")
+        speed_setting_scenario = " and SpeedSetting" if self.supports_multispeed else ""
+        logging.info(
+            f"[FC] *** Update {attr_to_update.__name__} {order.name}, verify {attr_to_verify.__name__}{speed_setting_scenario}")
+
+        # Logging fan initial state (FanMode, PercentSetting, SpeedSetting if present)
+        speed_setting_log = f", SpeedSetting({init_speed_setting})" if self.supports_multispeed else ""
+        logging.info(
+            f"[FC] *** Fan initial state: FanMode ({init_fan_mode}:{init_fan_mode.name}), PercentSetting ({init_percent_setting}){speed_setting_log}")
+
+        # Loging supported fan modes
+        logging.info(f"[FC] *** Supported fan modes: {self.fan_mode_sequence.name}")
+
     def pics_TC_FAN_3_1(self) -> list[str]:
         return ["FAN.S"]
 
@@ -361,7 +364,7 @@ class TC_FAN_3_1(MatterBaseTest):
         # *** STEP 2 ***
         # TH reads the FanModeSequence attribute from the DUT
         self.step(2)
-        self.fan_modes = await self.get_fan_modes(ep, max_high=True)
+        await self.get_fan_modes(ep, max_high=True)
 
         # *** STEP 3 ***
         # TH checks the DUT for support of the MultiSpeed feature
