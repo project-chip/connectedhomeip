@@ -744,7 +744,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                         subscriptionInfo.mFabricIndex == apExchangeContext->GetSessionHandle()->GetFabricIndex())
                     {
                         ChipLogProgress(InteractionModel,
-                                        "Deleting previous non-active subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
+                                        "Deleting previous non-active subscription from NodeId: " ChipLogFormatX64
+                                        ", FabricIndex: %u",
                                         ChipLogValueX64(subscriptionInfo.mNodeId), subscriptionInfo.mFabricIndex);
                         mpSubscriptionResumptionStorage->Delete(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex,
                                                                 subscriptionInfo.mSubscriptionId);
