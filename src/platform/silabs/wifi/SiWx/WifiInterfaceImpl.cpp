@@ -352,7 +352,7 @@ sl_status_t InitiateScan()
 
     ssid.length = wfx_rsi.credentials.ssidLength;
 
-    chip::ByteSpan requestedSsidSpan(wfx_rsi.credentials.ssid.data(), wfx_rsi.credentials.ssidLength);
+    chip::ByteSpan requestedSsidSpan(wfx_rsi.credentials.ssid, wfx_rsi.credentials.ssidLength);
     chip::MutableByteSpan ssidSpan(ssid.value, ssid.length);
     chip::CopySpanToMutableSpan(requestedSsidSpan, ssidSpan);
 
@@ -525,7 +525,7 @@ CHIP_ERROR GetAccessPointInfo(wfx_wifi_scan_result_t & info)
     info.chan     = wfx_rsi.ap_chan;
 
     chip::MutableByteSpan output(info.ssid, WFX_MAX_SSID_LENGTH);
-    chip::ByteSpan ssid(wfx_rsi.credentials.ssid.data(), wfx_rsi.credentials.ssidLength);
+    chip::ByteSpan ssid(wfx_rsi.credentials.ssid, wfx_rsi.credentials.ssidLength);
     chip::CopySpanToMutableSpan(ssid, output);
     info.ssid_length = output.size();
 
