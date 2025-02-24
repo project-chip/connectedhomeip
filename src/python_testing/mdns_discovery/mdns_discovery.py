@@ -504,6 +504,7 @@ class MdnsDiscovery:
             service_type (MdnsServiceType): The enum representing the type of mDNS service to discover.
             log_output (bool): Logs the discovered services to the console. Defaults to False.
             discovery_timeout_sec (float): Defaults to 15 seconds.
+            expected_value (str): Defaults to none as currently only utilized to gather specific record in multiple discovery records if available
 
         Returns:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo representing the discovered service, if
