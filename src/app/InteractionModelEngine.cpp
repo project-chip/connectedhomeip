@@ -737,7 +737,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             {
                 SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
                 auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
-    
+
                 while (iterator->Next(subscriptionInfo))
                 {
                     if (subscriptionInfo.mNodeId == apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId() &&
@@ -751,7 +751,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                     }
                 }
                 iterator->Release();
-    
+
                 // If we have no subscriptions to resume, we can cancel the Timer, to make sure it is cleared in the case,
                 // we deleted a subscription in resumption mode.
                 if (!HasSubscriptionsToResume())
