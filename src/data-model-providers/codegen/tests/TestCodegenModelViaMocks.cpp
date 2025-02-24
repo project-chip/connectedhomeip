@@ -1252,8 +1252,8 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
     ASSERT_TRUE(acceptedBuilder.IsEmpty());
 
     // set some overrides
-    handler.AcceptedVec().push_back({ 1234, {}});
-    handler.AcceptedVec().push_back({ 999, {}});
+    handler.AcceptedVec().push_back({ 1234, {} });
+    handler.AcceptedVec().push_back({ 999, {} });
 
     handler.GeneratedVec().push_back(33);
 

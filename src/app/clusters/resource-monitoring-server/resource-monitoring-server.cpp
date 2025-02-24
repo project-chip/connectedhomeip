@@ -195,7 +195,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     ChipLogDetail(Zcl, "resourcemonitoring: EnumerateAcceptedCommands");
     if (mResetConditionCommandSupported)
     {
-        return builder.Append({ ResetCondition::Id, chip::BitFlags<QF>()});
+        return builder.Append({ ResetCondition::Id, chip::BitFlags<QF>() });
     }
 
     return CHIP_NO_ERROR;

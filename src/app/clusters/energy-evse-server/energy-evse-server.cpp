@@ -190,8 +190,8 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
 
     ReturnErrorOnFailure(builder.AppendElements({
-        { Disable::Id, QF::kTimed, kDefaultPrivilege },         //
-        { EnableCharging::Id, QF::kTimed, kDefaultPrivilege },  //
+        { Disable::Id, QF::kTimed, kDefaultPrivilege },        //
+        { EnableCharging::Id, QF::kTimed, kDefaultPrivilege }, //
     }));
 
     if (HasFeature(Feature::kV2x))
@@ -202,8 +202,8 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     if (HasFeature(Feature::kChargingPreferences))
     {
         ReturnErrorOnFailure(builder.AppendElements({
-            { SetTargets::Id,   QF::kTimed, kDefaultPrivilege }, //
-            { GetTargets::Id,   QF::kTimed, kDefaultPrivilege }, //
+            { SetTargets::Id, QF::kTimed, kDefaultPrivilege },   //
+            { GetTargets::Id, QF::kTimed, kDefaultPrivilege },   //
             { ClearTargets::Id, QF::kTimed, kDefaultPrivilege }, //
         }));
     }
