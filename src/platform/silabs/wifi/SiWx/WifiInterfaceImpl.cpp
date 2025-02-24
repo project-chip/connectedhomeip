@@ -428,8 +428,10 @@ sl_status_t SetWifiConfigurations()
             .ip = {{{0}}},
         }
     };
-    // Copy the full SSID buffer
-    std::copy(wfx_rsi.credentials.ssid.begin(), wfx_rsi.credentials.ssid.end(), profile.config.ssid.value);
+
+    chip::MutableByteSpan output(profile.config.ssid.value, WFX_MAX_SSID_LENGTH);
+    chip::ByteSpan input(wfx_rsi.credentials.ssid, wfx_rsi.credentials.ssidLength);
+    chip::CopySpanToMutableSpan(input, output);
 
     status = sl_net_set_profile((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
     VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_set_profile failed: 0x%lx", status));
