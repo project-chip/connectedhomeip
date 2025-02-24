@@ -34,6 +34,15 @@ using namespace chip::DeviceLayer;
 namespace chip {
 namespace app {
 
+CHIP_ERROR FailSafeContext::Init(const InitParams & initParams)
+{
+    VerifyOrReturnError(initParams.storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    mStorage = initParams.storage;
+
+    return CHIP_NO_ERROR;
+}
+
 void FailSafeContext::HandleArmFailSafeTimer(System::Layer * layer, void * aAppState)
 {
     FailSafeContext * failSafeContext = reinterpret_cast<FailSafeContext *>(aAppState);
