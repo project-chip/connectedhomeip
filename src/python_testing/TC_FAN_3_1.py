@@ -274,7 +274,7 @@ class TC_FAN_3_1(MatterBaseTest):
         init_attr_to_verify_value = init_fan_mode if attr_to_verify == attribute.FanMode else init_percent_setting
 
         # *** NEXT STEP ***
-        # TH performs the testing scenario defined previously
+        # TH performs one of the testing scenarios previously defined
         self.step(self.current_step_index + 1)
 
         # Logging the scenario being tested
@@ -306,13 +306,13 @@ class TC_FAN_3_1(MatterBaseTest):
                 if attr_value_current is not None:
                     # Handle iteration 1 edge cases where:
                     #   - The fan can be in any initial state
-                    #   - The attribute's previous-value becomes the
-                    #     attributes initial state value or max value
+                    #   - The attribute's previous-value becomes
+                    #     the attributes initial-state value
                     #     (as opposed to the value written in the preceding iteration)
                     if iteration == 1:
                         self.handle_iteration_one_edge_cases(attr_to_update, attr_to_verify, order, attr_value_current, init_fan_mode, init_percent_setting, init_speed_setting)
                     else:
-                        # The attribute's previous value may be None in some scenarios, defaulting to the attribute's initial state value if so
+                        # The attribute's previous-value may be None in some cases, defaulting to the attribute's initial state value if so
                         attr_value_previous = init_attr_to_verify_value if attr_value_previous is None else attr_value_previous
 
                         # Verify attribute progression
@@ -337,7 +337,7 @@ class TC_FAN_3_1(MatterBaseTest):
                 attr_value_current = await self.read_setting(endpoint, attr_to_verify)
                 asserts.assert_equal(attr_value_current, attr_value_previous,
                                     f"[FC] Current {attr_to_verify.__name__} attribute value must be equal to the previous one")
-
+# TODO: Handle iter 1 cases
                 # Get current SpeedSetting attribute value and verify it's equal to the previous value (if present)
                 if self.supports_multispeed:
                     speed_setting_current = await self.read_setting(endpoint, attribute.SpeedSetting)
