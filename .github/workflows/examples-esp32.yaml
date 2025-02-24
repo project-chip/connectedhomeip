@@ -129,7 +129,7 @@ jobs:
         name: ESP32_1
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' &&  github.repository_owner == 'espressif'
+        if: github.actor != 'restyled-io[bot]'
 
         container:
             image: ghcr.io/project-chip/chip-build-esp32:115
