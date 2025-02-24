@@ -1377,7 +1377,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     static constexpr kNetworkCommands = 5;     // Count of Network Commands
     static constexpr kCredentialsCommands = 1; // Count of Credential Commands
     static const DataModel::AcceptedCommandEntry commands[] = {
-        { ScanNetworks::Id, kDefaultFlags, kDefaultPrivilege },   // 
+        { ScanNetworks::Id, kDefaultFlags, kDefaultPrivilege },   //
         { netId, kDefaultFlags, kDefaultPrivilege },              //
         { RemoveNetwork::Id, kDefaultFlags, kDefaultPrivilege },  //
         { ConnectNetwork::Id, kDefaultFlags, kDefaultPrivilege }, //
