@@ -156,7 +156,7 @@ CHIP-REPL is slightly easier to interact with when dealing with some of the
 complex structures.
 
 There are several test scripts provided for EVSE (in
-[src/python_testing](src/python_testing)):
+[src/python_testing](/src/python_testing)):
 
 -   `TC_EEVSE_2_2`: This validates the primary functionality
 -   `TC_EEVSE_2_3`: This validates Get/Set/Clear target commands

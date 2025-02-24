@@ -28,12 +28,12 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <assert.h>
 #include <lib/support/BitMask.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
@@ -133,7 +133,7 @@ AppTask AppTask::sAppTask;
 
 EndpointId GetEnergyDeviceEndpointId()
 {
-#if defined(SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE)
+#if SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
     return kWaterHeaterEndpoint;
 #else
     return kEvseEndpoint;

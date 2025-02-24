@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
@@ -34,8 +35,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
-#include <optional>
 #include <protocols/interaction_model/StatusCode.h>
+
+#include <optional>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck
@@ -49,16 +51,6 @@ namespace reporting {
 namespace {
 
 using Protocols::InteractionModel::Status;
-
-Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eventPath)
-{
-    if (!model->GetServerClusterInfo(eventPath).has_value())
-    {
-        return model->EndpointExists(eventPath.mEndpointId) ? Status::UnsupportedCluster : Status::UnsupportedEndpoint;
-    }
-
-    return Status::Success;
-}
 
 /// Returns the status of ACL validation.
 ///   If the return value has a status set, that means the ACL check failed,
@@ -77,7 +69,9 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
                              .requestType = RequestType::kAttributeReadRequest,
                              .entityId    = path.mAttributeId };
 
-    std::optional<DataModel::AttributeInfo> info = dataModel->GetAttributeInfo(path);
+    DataModel::AttributeFinder finder(dataModel);
+
+    std::optional<DataModel::AttributeEntry> info = finder.Find(path);
 
     // If the attribute exists, we know whether it is readable (readPrivilege has value)
     // and what the required access privilege is. However for attributes missing from the metatada
@@ -148,8 +142,10 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     readRequest.subjectDescriptor = &subjectDescriptor;
     readRequest.path              = path;
 
+    DataModel::ServerClusterFinder serverClusterFinder(dataModel);
+
     DataVersion version = 0;
-    if (std::optional<DataModel::ClusterInfo> clusterInfo = dataModel->GetServerClusterInfo(path); clusterInfo.has_value())
+    if (auto clusterInfo = serverClusterFinder.Find(path); clusterInfo.has_value())
     {
         version = clusterInfo->dataVersion;
     }
@@ -164,9 +160,21 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     DataModel::ActionReturnStatus status(CHIP_NO_ERROR);
     AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
 
+    // TODO: we explicitly DO NOT validate that path is a valid cluster path (even more, above serverClusterFinder
+    //       explicitly ignores that case). This means that global attribute reads as well as ReadAttribute
+    //       can be passed invalid paths when an invalid Read is detected and must handle them.
+    //
+    //       See https://github.com/project-chip/connectedhomeip/issues/37410
+
     if (auto access_status = ValidateReadAttributeACL(dataModel, subjectDescriptor, path); access_status.has_value())
     {
         status = *access_status;
+    }
+    else if (IsSupportedGlobalAttributeNotInMetadata(readRequest.path.mAttributeId))
+    {
+        // Global attributes are NOT directly handled by data model providers, instead
+        // the are routed through metadata.
+        status = ReadGlobalAttributeFromMetadata(dataModel, readRequest.path, attributeValueEncoder);
     }
     else
     {
@@ -209,13 +217,10 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
 
 bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const ConcreteClusterPath & path, DataVersion dataVersion)
 {
-    std::optional<DataModel::ClusterInfo> info = dataModel->GetServerClusterInfo(path);
-    if (!info.has_value())
-    {
-        return false;
-    }
+    DataModel::ServerClusterFinder serverClusterFinder(dataModel);
+    auto info = serverClusterFinder.Find(path);
 
-    return (info->dataVersion == dataVersion);
+    return info.has_value() && (info->dataVersion == dataVersion);
 }
 
 } // namespace
@@ -511,7 +516,9 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
         }
 
         ConcreteEventPath path(current->mValue.mEndpointId, current->mValue.mClusterId, current->mValue.mEventId);
-        Status status = EventPathValid(mpImEngine->GetDataModelProvider(), path);
+
+        // A event path is valid only if the cluster is valid
+        Status status = DataModel::ValidateClusterPath(mpImEngine->GetDataModelProvider(), path, Status::Success);
 
         if (status != Status::Success)
         {

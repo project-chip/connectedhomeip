@@ -76,8 +76,11 @@ public:
     {
         kButtonId_ExampleAction = 1,
         kButtonId_FactoryReset,
-        kButtonId_StartWiFi,
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         kButtonId_StartThread,
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        kButtonId_StartWiFi,
+#endif
         kButtonId_StartBleAdv
     } ButtonId;
 #endif

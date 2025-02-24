@@ -21,15 +21,15 @@ import("${chip_root}/src/platform/device.gni")
 import("${silabs_sdk_build_root}/efr32_sdk.gni")
 import("${silabs_sdk_build_root}/silabs_board.gni")
 
+import("${matter_support_root}/provision/args.gni")  # Seperate import since the
+                                                     # matter_support_root is
+                                                     # defined in the
+                                                     # ef32_sdk.gni
 declare_args() {
   enable_heap_monitoring = false
 
   # OTA timeout in seconds
   ota_periodic_query_timeout_sec = 86400
-
-  # The EnableKey in hex string format used by TestEventTrigger command in
-  # GeneralDiagnostics cluster. The length of the string should be 16 bytes.
-  sl_test_event_trigger_enable_key = "00112233445566778899AABBCCDDEEFF"
 }
 
 import("${silabs_common_plat_dir}/args.gni")
@@ -54,29 +54,6 @@ config("chip_examples_project_config") {
     "-Wl,--wrap=_realloc_r",
     "-Wl,--wrap=_free_r",
     "-Wl,--wrap=_calloc_r",
-  ]
-}
-
-config("test-event-trigger-config") {
-  defines = [ "SL_MATTER_TEST_EVENT_TRIGGER_ENABLED" ]
-
-  if (is_debug) {
-    defines += [ "SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY=\"${sl_test_event_trigger_enable_key}\"" ]
-  }
-}
-
-source_set("test-event-trigger") {
-  sources = [
-    "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.cpp",
-    "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.h",
-  ]
-
-  deps = [ "${chip_root}/src/platform/silabs/provision:provision-headers" ]
-  public_configs = [ ":test-event-trigger-config" ]
-  public_deps = [
-    "${chip_root}/src/app:test-event-trigger",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
   ]
 }
 
@@ -225,7 +202,7 @@ source_set("efr32-common") {
   ]
 
   if (sl_enable_test_event_trigger) {
-    public_deps += [ ":test-event-trigger" ]
+    public_deps += [ "${silabs_common_plat_dir}/test-event-trigger:sources" ]
   }
 
   if (sl_enable_si70xx_sensor) {

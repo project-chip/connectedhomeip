@@ -182,7 +182,7 @@ config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
 endif #CHIP_FACTORY_DATA_BUILD
 
 # See config/zephyr/Kconfig for full definition
-config CHIP_FACTORY_RESET_ERASE_NVS
+config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	bool
 	default n
 
@@ -225,15 +225,7 @@ config CHIP_ENABLE_PM_DURING_BLE
 	help
 	  Enable PM during BLE operation.
 
-config CHIP_OPENTHREAD_TX_POWER
-	int "OpenThread Transmission power"
-	range -30 9
-	default 0
-	help
-	  OpenThread Transmission power in dBm.
-
 config SHELL_BACKEND_SERIAL_RX_RING_BUFFER_SIZE
-	int
 	default 255 if SHELL_BACKEND_SERIAL
 
 config CHIP_ENABLE_POWER_ON_FACTORY_RESET
@@ -252,5 +244,5 @@ config CHIP_TASK_STACK_SIZE
 
 config CHIP_USE_MARS_SENSOR
 	bool "Use Mars board sensor"
-	depends on SOC_SERIES_RISCV_TELINK_B9X && (BOARD_TLSR9518ADK80D || BOARD_TLSR9518ADK80D_RETENTION)
+	depends on SOC_RISCV_TELINK_B9X && (BOARD_TLSR9518ADK80D || BOARD_TLSR9518ADK80D_RETENTION)
 	default n

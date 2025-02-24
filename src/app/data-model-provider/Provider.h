@@ -16,20 +16,19 @@
  */
 #pragma once
 
-#include "access/SubjectDescriptor.h"
-#include "app/EventPathParams.h"
-#include "lib/core/CHIPError.h"
+#include <lib/core/CHIPError.h>
 #include <lib/core/TLVReader.h>
 #include <lib/core/TLVWriter.h>
 
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
+#include <app/EventPathParams.h>
 
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/Context.h>
-#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
+#include <app/data-model-provider/ProviderMetadataTree.h>
 
 namespace chip {
 namespace app {
@@ -59,8 +58,12 @@ public:
     // event emitting, path marking and other operations
     virtual InteractionModelContext CurrentContext() const { return mContext; }
 
-    /// TEMPORARY/TRANSITIONAL requirement for transitioning from ember-specific code
-    ///   ReadAttribute is REQUIRED to respond to GlobalAttribute read requests
+    /// NOTE: this code is NOT required to handle `List` global attributes:
+    ///       AcceptedCommandsList, GeneratedCommandsList OR AttributeList
+    ///
+    ///       Users of DataModel::Provider are expected to get these lists
+    ///       from ProviderMetadataTree (in particular IM Reads of these
+    ///       attributes will the automatically filled from metadata).
     ///
     /// Return value notes:
     ///   ActionReturnStatus::IsOutOfSpaceEncodingResponse
@@ -73,18 +76,26 @@ public:
     ///
     /// When this is invoked, caller is expected to have already done some validations:
     ///    - cluster `data version` has been checked for the incoming request if applicable
-    ///
-    /// TEMPORARY/TRANSITIONAL requirement for transitioning from ember-specific code
-    ///   WriteAttribute is REQUIRED to perform:
-    ///     - ACL validation (see notes on OperationFlags::kInternal)
-    ///     - Validation of readability/writability (also controlled by OperationFlags::kInternal)
-    ///     - Validation of timed interaction required (also controlled by OperationFlags::kInternal)
+    ///    - validation of ACL/timed interaction flags/writability, if those checks are desired.
     virtual ActionReturnStatus WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder) = 0;
 
     /// `handler` is used to send back the reply.
     ///    - returning `std::nullopt` means that return value was placed in handler directly.
     ///      This includes cases where command handling and value return will be done asynchronously.
     ///    - returning a value other than Success implies an error reply (error and data are mutually exclusive)
+    ///
+    /// Preconditions:
+    ///    - `request.path` MUST refer to a command that actually exists.  This is because in practice
+    ///       callers must do ACL and flag checks (e.g. for timed invoke) before calling this function.
+    ///
+    ///       Callers that do not care about those checks should use `ProviderMetadataTree::AcceptedCommands`
+    ///       to check for command existence.
+    ///
+    ///    - TODO: as interfaces are updated, we may want to make the above requirement more
+    ///            relaxed, as it seems desirable for users of this interface to have guaranteed
+    ///            behavior (like error on invalid paths) whereas today this seems unclear as some
+    ///            command intercepts do not validate that the command is in fact accepted on the
+    ///            endpoint provided.
     ///
     /// Return value expectations:
     ///   - if a response has been placed into `handler` then std::nullopt MUST be returned. In particular

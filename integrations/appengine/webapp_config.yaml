@@ -3,6 +3,9 @@ handlers:
     - url: /
       static_files: html/index.html
       upload: html/index.html
+    - url: /conformance/
+      static_files: html/conformance_report.html
+      upload: html/conformance_report.html
     - url: /(.*)
       static_files: html/\1
       upload: html/(.*)
