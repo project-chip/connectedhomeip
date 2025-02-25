@@ -72,7 +72,7 @@ tests:
 
     - label:
           "Step 2b: TH sends StepHue command to DUT with StepMode=0x01 (up),
-          StepSize=60 and TransitionTime=200 (20s)"
+          StepSize=80 and TransitionTime=200 (20s)"
       PICS: CC.S.F00 && CC.S.C02.Rsp
       command: "StepHue"
       arguments:
@@ -174,7 +174,7 @@ tests:
 
     - label:
           "Step 3b: TH sends StepHue command to DUT with StepMode=0x03 (down),
-          StepSize=60 and TransitionTime=200 (20s)"
+          StepSize=100 and TransitionTime=200 (20s)"
       PICS: CC.S.F00 && CC.S.C02.Rsp
       command: "StepHue"
       arguments:
