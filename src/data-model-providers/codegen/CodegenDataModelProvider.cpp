@@ -335,7 +335,9 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
     if (interface != nullptr)
     {
-        return interface->EnumerateAcceptedCommands(path, builder);
+        CHIP_ERROR err = interface->EnumerateAcceptedCommands(path, builder);
+        // if err == CHIP_ERROR_NOT_IMPLEMENTED then continue, else just return whatever err is
+        VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
 
     VerifyOrReturnError(serverCluster->acceptedCommandList != nullptr, CHIP_NO_ERROR);
