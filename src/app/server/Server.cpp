@@ -475,6 +475,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         }
     }
 
+    // Run fail-safe check for marker. If marker is present, then device was reset while fail-safe was armed
+    // and we need to trigger a cleanup.
+    GetFailSafeContext().CheckAddNOCStartedMarker();
+
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT // support UDC port for commissioner declaration msgs
     mUdcTransportMgr = Platform::New<UdcTransportMgr>();
     ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
