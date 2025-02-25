@@ -694,14 +694,14 @@ def compute_symbol_diff(orig: list[Symbol], base: list[Symbol]) -> list[Symbol]:
 
             result.append(replace(base_symbol,
                 name=f"REMOVED: {base_symbol.name}",
-                tree_path = ["REMOVED"] + base_symbol.tree_path,
+                tree_path = ["DECREASE"] + base_symbol.tree_path,
             ))
             continue
 
         if not base_symbol:
             result.append(replace(orig_symbol,
                 name=f"ADDED: {orig_symbol.name}",
-                tree_path = ["ADDED"] + orig_symbol.tree_path,
+                tree_path = ["INCREASE"] + orig_symbol.tree_path,
             ))
             continue
 
@@ -709,10 +709,20 @@ def compute_symbol_diff(orig: list[Symbol], base: list[Symbol]) -> list[Symbol]:
             # symbols are identical
             continue
 
-        result.append(replace(orig_symbol,
-            name=f"CHANGED: {orig_symbol.name}",
-            tree_path = ["CHANGED"] + orig_symbol.tree_path,
-        ))
+        size_delta = orig_symbol.size - base_symbol.size
+
+        if size_delta > 0:
+            result.append(replace(orig_symbol,
+                name=f"CHANGED: {orig_symbol.name}",
+                tree_path = ["INCREASE"] + orig_symbol.tree_path,
+                size=size_delta,
+            ))
+        else:
+            result.append(replace(orig_symbol,
+                name=f"CHANGED: {orig_symbol.name}",
+                tree_path = ["DECREASE"] + orig_symbol.tree_path,
+                size=-size_delta,
+            ))
 
     return result
 
