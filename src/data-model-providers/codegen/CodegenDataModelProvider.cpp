@@ -58,7 +58,7 @@ DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(const ConcreteCommandPat
     DataModel::AcceptedCommandEntry entry;
 
     entry.commandId       = path.mCommandId;
-    entry.invokePrivilege = RequiredPrivilege::ForInvokeCommand(path);
+    entry.SetInvokePrivilege( RequiredPrivilege::ForInvokeCommand(path) );
     entry.flags.Set(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(path.mClusterId, commandId));
     entry.flags.Set(DataModel::CommandQualityFlags::kFabricScoped, CommandIsFabricScoped(path.mClusterId, commandId));
     entry.flags.Set(DataModel::CommandQualityFlags::kLargeMessage, CommandHasLargePayload(path.mClusterId, commandId));

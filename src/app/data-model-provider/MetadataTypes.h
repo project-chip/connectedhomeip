@@ -99,13 +99,15 @@ struct AttributeEntry
     BitFlags<AttributeQualityFlags> flags;
 
 
+    // Constructor
+    AttributeEntry() : readPrivilege(0), writePrivilege(0) {}
 
     void SetReadPrivilege(Access::Privilege r)
     {
         readPrivilege = chip::to_underlying(r);
     }
 
-    Access::Privilege GetReadPrivilege()
+    Access::Privilege GetReadPrivilege() const
     {
         return static_cast< Access::Privilege >(readPrivilege);
     }
@@ -115,7 +117,7 @@ struct AttributeEntry
         writePrivilege = chip::to_underlying(w);
     }
 
-    Access::Privilege GetWritePrivilege()
+    Access::Privilege GetWritePrivilege() const
     {
         return static_cast< Access::Privilege >(writePrivilege);
     }
@@ -148,7 +150,26 @@ struct AcceptedCommandEntry
     // TODO: this can be more compact (use some flags for privilege)
     //       to make this compact, add a compact enum and make flags/invokePrivilege getters (to still be type safe)
     BitFlags<CommandQualityFlags> flags;
-    Access::Privilege invokePrivilege = Access::Privilege::kOperate;
+
+
+    // Constructor
+    AcceptedCommandEntry() : 
+        invokePrivilege(chip::to_underlying(Access::Privilege::kOperate)) {}
+ 
+        
+    Access::Privilege GetInvokePrivilege() const
+    {
+        return static_cast< Access::Privilege >(invokePrivilege);
+    }
+    
+    void SetInvokePrivilege(Access::Privilege i)
+    {
+        invokePrivilege = chip::to_underlying(i);
+    }
+
+    
+    private:
+    std::underlying_type_t<Access::Privilege> invokePrivilege : 5 ;
 };
 
 /// Represents a device type that resides on an endpoint
