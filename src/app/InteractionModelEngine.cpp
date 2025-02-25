@@ -1701,7 +1701,7 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
     request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, apCommandObj.IsTimedInvoke());
     request.subjectDescriptor = &subjectDescriptor;
 
-    std::optional<DataModel::ActionReturnStatus> status = GetDataModelProvider()->Invoke(request, apPayload, &apCommandObj);
+    std::optional<DataModel::ActionReturnStatus> status = GetDataModelProvider()->InvokeCommand(request, apPayload, &apCommandObj);
 
     // Provider indicates that handler status or data was already set (or will be set asynchronously) by
     // returning std::nullopt. If any other value is returned, it is requesting that a status is set. This
