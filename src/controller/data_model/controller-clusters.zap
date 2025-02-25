@@ -2087,6 +2087,40 @@
           ]
         },
         {
+          "name": "Closure Control",
+          "code": 260,
+          "mfgCode": null,
+          "define": "CLOSURE_CONTROL_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "commands": [
+            {
+              "name": "Stop",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "MoveTo",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "Calibrate",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            }
+          ]
+        },
+        {
           "name": "Pump Configuration and Control",
           "code": 512,
           "mfgCode": null,
