@@ -52,7 +52,6 @@ import click
 import coloredlogs
 import cxxfilt
 import plotly.express as px
-import plotly.graph_objects as go
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
@@ -466,39 +465,29 @@ def build_treemap(
 
             data["name_with_size"][idx] = f"{short_name}: {data["size"][idx]}"
 
+
     match style:
         case ChartStyle.TREE_MAP:
-            fig = go.Figure(
-                go.Treemap(
-                    labels=data["name_with_size"],
-                    ids=data["name"],
-                    parents=data["parent"],
-                    values=data["size"],
-                    textinfo="label+value+percent parent+percent root",
-                    hovertext=data["hover"],
-                    maxdepth=max_depth,
-                )
-            )
+            figure_generator = px.treemap
         case ChartStyle.SUNBURST:
-            fig = px.sunburst(
-                data,
-                names="name_with_size",
-                ids="name",
-                parents="parent",
-                values="size",
-                maxdepth=max_depth,
-            )
+            figure_generator = px.sunburst
         case ChartStyle.ICICLE:
-            fig = px.icicle(
+            figure_generator = px.icicle
+
+    fig = figure_generator(
                 data,
                 names="name_with_size",
                 ids="name",
                 parents="parent",
                 values="size",
                 maxdepth=max_depth,
-            )
+    )
 
-    fig.update_traces(root_color="lightgray")
+    fig.update_traces(
+        root_color="lightgray",
+        textinfo="label+value+percent parent+percent root",
+        hovertext="hover",
+    )
     fig.show()
 
 
