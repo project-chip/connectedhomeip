@@ -67,11 +67,13 @@ __LOG_LEVELS__ = {
 class ChartStyle(Enum):
     TREE_MAP = auto()
     SUNBURST = auto()
+    ICICLE = auto()
 
 
 __CHART_STYLES__ = {
     "treemap": ChartStyle.TREE_MAP,
     "sunburst": ChartStyle.SUNBURST,
+    "icicle": ChartStyle.ICICLE,
 }
 
 
@@ -440,8 +442,17 @@ def build_treemap(
                 maxdepth=max_depth,
             )
         )
-    else:
+    elif style == ChartStyle.SUNBURST:
         fig = px.sunburst(
+            data,
+            names="name",
+            parents="parent",
+            values="size",
+            maxdepth=max_depth,
+        )
+    else:
+        assert(style == ChartStyle.ICICLE)
+        fig = px.icicle(
             data,
             names="name",
             parents="parent",
