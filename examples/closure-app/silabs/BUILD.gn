@@ -130,107 +130,107 @@ if (wifi_soc) {
 }
 silabs_executable("closure-app") {
   output_name = "matter-silabs-closure-example.out"
-  include_dirs = [ "include",
-                    "${example_closure_dir}/closure-common/closure-control/include",
-                    "${example_closure_dir}/closure-common/common/include", ]
+  include_dirs = [
+    "include",
+    "${example_closure_dir}/closure-common/closure-control/include",
+    "${example_closure_dir}/closure-common/common/include",
+  ]
   defines = []
 
-if (silabs_board == "BRD2704A") {
-  defines += [ "SL_STATUS_LED=0" ]
-}
-
-sources = [
-  "${example_closure_dir}/closure-common/common/src/ClosureAppCommonMain.cpp",
-  "${example_closure_dir}/closure-common/closure-control/src/ClosureControlDelegateImpl.cpp",
-  "${example_closure_dir}/closure-common/closure-control/src/ClosureControlInstance.cpp",
-  "${example_closure_dir}/closure-common/closure-control/src/ClosureControlMain.cpp",
-  "${examples_common_plat_dir}/main.cpp",
-  "src/AppTask.cpp",
-  "src/DataModelCallbacks.cpp",
-]
-  
-deps = [
-  ":sdk",
-]
-
-if (wifi_soc) {
-  deps += [ "${examples_plat_dir}:siwx917-common" ]
-} else {
-  deps += [ "${examples_plat_dir}:efr32-common" ]
-}
-
-if (chip_enable_pw_rpc) {
-  defines += [
-    "PW_RPC_ENABLED",
-    "PW_RPC_ATTRIBUTE_SERVICE=1",
-    "PW_RPC_BUTTON_SERVICE=1",
-    "PW_RPC_DESCRIPTOR_SERVICE=1",
-    "PW_RPC_DEVICE_SERVICE=1",
-    "PW_RPC_LIGHTING_SERVICE=1",
-    "PW_RPC_OTCLI_SERVICE=1",
-    "PW_RPC_THREAD_SERVICE=1",
-    "PW_RPC_TRACING_SERVICE=1",
-  ]
-
-  sources += [
-    "${chip_root}/examples/common/pigweed/RpcService.cpp",
-    "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-    "${examples_common_plat_dir}/PigweedLogger.cpp",
-    "${examples_common_plat_dir}/Rpc.cpp",
-  ]
-
-  deps += [
-    "$dir_pw_hdlc:rpc_channel_output",
-    "$dir_pw_stream:sys_io_stream",
-    "$dir_pw_trace",
-    "$dir_pw_trace_tokenized",
-    "$dir_pw_trace_tokenized:trace_rpc_service",
-    "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
-    "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
-    "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
-    "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
-    "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
-    "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
-    "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
-    "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
-  ]
-
-  if (wifi_soc) {
-    deps += [ "${examples_plat_dir}/pw_sys_io:pw_sys_io_siwx917" ]
-  } else {
-    deps += [ "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs" ]
+  if (silabs_board == "BRD2704A") {
+    defines += [ "SL_STATUS_LED=0" ]
   }
 
-  deps += pw_build_LINK_DEPS
-
-  include_dirs += [
-    "${chip_root}/examples/common",
-    "${chip_root}/examples/common/pigweed/efr32",
+  sources = [
+    "${example_closure_dir}/closure-common/closure-control/src/ClosureControlDelegateImpl.cpp",
+    "${example_closure_dir}/closure-common/closure-control/src/ClosureControlInstance.cpp",
+    "${example_closure_dir}/closure-common/closure-control/src/ClosureControlMain.cpp",
+    "${example_closure_dir}/closure-common/common/src/ClosureAppCommonMain.cpp",
+    "${examples_common_plat_dir}/main.cpp",
+    "src/AppTask.cpp",
+    "src/DataModelCallbacks.cpp",
   ]
-}
 
-ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+  deps = [ ":sdk" ]
 
-inputs = [ ldscript ]
+  if (wifi_soc) {
+    deps += [ "${examples_plat_dir}:siwx917-common" ]
+  } else {
+    deps += [ "${examples_plat_dir}:efr32-common" ]
+  }
 
-ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+  if (chip_enable_pw_rpc) {
+    defines += [
+      "PW_RPC_ENABLED",
+      "PW_RPC_ATTRIBUTE_SERVICE=1",
+      "PW_RPC_BUTTON_SERVICE=1",
+      "PW_RPC_DESCRIPTOR_SERVICE=1",
+      "PW_RPC_DEVICE_SERVICE=1",
+      "PW_RPC_LIGHTING_SERVICE=1",
+      "PW_RPC_OTCLI_SERVICE=1",
+      "PW_RPC_THREAD_SERVICE=1",
+      "PW_RPC_TRACING_SERVICE=1",
+    ]
 
-if (chip_print_memory_usage) {
-  ldflags += [
-    "-Wl,--print-memory-usage",
-    "-fstack-usage",
-  ]
-}
+    sources += [
+      "${chip_root}/examples/common/pigweed/RpcService.cpp",
+      "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
+      "${examples_common_plat_dir}/PigweedLogger.cpp",
+      "${examples_common_plat_dir}/Rpc.cpp",
+    ]
 
-# WiFi Settings
-if (chip_enable_wifi) {
-  ldflags += [
-    "-Wl,--defsym",
-    "-Wl,SILABS_WIFI=1",
-  ]
-}
+    deps += [
+      "$dir_pw_hdlc:rpc_channel_output",
+      "$dir_pw_stream:sys_io_stream",
+      "$dir_pw_trace",
+      "$dir_pw_trace_tokenized",
+      "$dir_pw_trace_tokenized:trace_rpc_service",
+      "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
+    ]
 
-output_dir = root_out_dir
+    if (wifi_soc) {
+      deps += [ "${examples_plat_dir}/pw_sys_io:pw_sys_io_siwx917" ]
+    } else {
+      deps += [ "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs" ]
+    }
+
+    deps += pw_build_LINK_DEPS
+
+    include_dirs += [
+      "${chip_root}/examples/common",
+      "${chip_root}/examples/common/pigweed/efr32",
+    ]
+  }
+
+  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  if (chip_print_memory_usage) {
+    ldflags += [
+      "-Wl,--print-memory-usage",
+      "-fstack-usage",
+    ]
+  }
+
+  # WiFi Settings
+  if (chip_enable_wifi) {
+    ldflags += [
+      "-Wl,--defsym",
+      "-Wl,SILABS_WIFI=1",
+    ]
+  }
+
+  output_dir = root_out_dir
 }
 
 group("silabs") {
