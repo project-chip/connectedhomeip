@@ -63,9 +63,8 @@ class TAG:
     APPLICATION = 1
     BOOTLOADER = 2
     FACTORY_DATA = 3
-    WIFI_917_NCP_TA = 4
-    WIFI_917_SOC_COMBINED = 5
-    WIFI_917_NCP_COMBINED = 6
+    WIFI_917_TA_M4 = 4
+
 
 def set_logger():
     stdout_handler = logging.StreamHandler(stream=sys.stdout)
@@ -74,6 +73,7 @@ def set_logger():
         format='[%(levelname)s] %(message)s',
         handlers=[stdout_handler]
     )
+
 
 def write_to_temp(path: str, payload: bytearray):
     with open(path, "wb") as _handle:
@@ -285,8 +285,8 @@ def create_image(args: object):
         input_files += generate_bootloader(args)
 
     if args.app_input_file:
-        input_files += generate_app(args)    
-        
+        input_files += generate_app(args)
+
     if args.wifi_input_file:
         input_files += generate_wifi_image(args)
 
