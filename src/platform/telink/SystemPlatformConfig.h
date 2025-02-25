@@ -55,10 +55,15 @@ struct ChipDeviceEvent;
 #define CHIP_SYSTEM_CONFIG_USE_SOCKETS 1
 
 // Reduce packet buffer pool size (default 15) to reduce ram consumption
-#if defined CONFIG_PM || defined CONFIG_SOC_RISCV_TELINK_TL321X
+#if defined(CONFIG_PM) || defined(CONFIG_SOC_RISCV_TELINK_TL321X)
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 0
 #else
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 8
 #endif
 
 // ========== Platform-specific Configuration Overrides =========
+
+// Disable Zephyr Socket extensions module, as the Zephyr RTOS now implements recvmsg()
+#if !defined(CONFIG_ZEPHYR_VERSION_3_3)
+#define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS 0
+#endif
