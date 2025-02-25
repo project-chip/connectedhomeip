@@ -46,7 +46,7 @@ import re
 import subprocess
 from dataclasses import dataclass, replace
 from enum import Enum, auto
-from typing import Optional, Tuple
+from typing import Callable, Optional, Tuple
 
 import click
 import coloredlogs
@@ -63,16 +63,10 @@ __LOG_LEVELS__ = {
 }
 
 
-class ChartStyle(Enum):
-    TREE_MAP = auto()
-    SUNBURST = auto()
-    ICICLE = auto()
-
-
 __CHART_STYLES__ = {
-    "treemap": ChartStyle.TREE_MAP,
-    "sunburst": ChartStyle.SUNBURST,
-    "icicle": ChartStyle.ICICLE,
+    "treemap": px.treemap,
+    "sunburst": px.sunburst,
+    "icicle": px.icicle,
 }
 
 
@@ -363,7 +357,7 @@ def build_treemap(
     name: str,
     symbols: list[Symbol],
     separator: str,
-    style: ChartStyle,
+    figure_generator: Callable,
     max_depth: int,
     zoom: Optional[str],
     strip: Optional[str],
@@ -464,15 +458,6 @@ def build_treemap(
                 short_name = short_name[separate_idx+2:]
 
             data["name_with_size"][idx] = f"{short_name}: {data["size"][idx]}"
-
-
-    match style:
-        case ChartStyle.TREE_MAP:
-            figure_generator = px.treemap
-        case ChartStyle.SUNBURST:
-            figure_generator = px.sunburst
-        case ChartStyle.ICICLE:
-            figure_generator = px.icicle
 
     fig = figure_generator(
                 data,
