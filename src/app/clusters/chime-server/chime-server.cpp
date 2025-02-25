@@ -69,7 +69,7 @@ void ChimeServer::LoadPersistentAttributes()
 {
     // Load Active Chime ID
     uint8_t storedActiveChimeID = 0;
-    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+    CHIP_ERROR err              = GetSafeAttributePersistenceProvider()->ReadScalarValue(
         ConcreteAttributePath(GetEndpointId(), Chime::Id, ActiveChimeID::Id), storedActiveChimeID);
     if (err == CHIP_NO_ERROR)
     {
