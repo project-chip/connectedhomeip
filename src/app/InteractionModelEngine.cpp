@@ -754,8 +754,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                 }
                 iterator->Release();
 
-                // If we have no subscriptions to resume, we can cancel the Timer, to make sure it is cleared in the case,
-                // we deleted a subscription in resumption mode.
+                // If we have no subscriptions to resume, we can cancel the timer, which might be armed
+                // if one of the subscriptions we deleted was about to be resumed.
                 if (!HasSubscriptionsToResume())
                 {
                     mpExchangeMgr->GetSessionManager()->SystemLayer()->CancelTimer(ResumeSubscriptionsTimerCallback, this);
