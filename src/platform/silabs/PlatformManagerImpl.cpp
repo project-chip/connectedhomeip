@@ -30,6 +30,7 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_CMSISOS.ipp>
 #include <platform/silabs/DiagnosticDataProviderImpl.h>
+#include <platform/silabs/wifi/WifiInterface.h>
 
 #if defined(SL_MBEDTLS_USE_TINYCRYPT)
 #include "tinycrypt/ecc.h"
@@ -40,6 +41,7 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 using namespace chip::DeviceLayer::Internal;
+using namespace chip::DeviceLayer::Silabs;
 
 namespace chip {
 namespace DeviceLayer {
@@ -156,26 +158,26 @@ void HandleWFXSystemEvent(sl_wfx_generic_message_t * eventData)
 #if WF200_WIFI
     case SL_WFX_STARTUP_IND_ID:
 #endif
-    case to_underlying(WifiEvent::kStartUp):
+    case to_underlying(WifiInterface::WifiEvent::kStartUp):
         memcpy(&event.Platform.WFXSystemEvent.data.startupEvent, eventData,
                sizeof(event.Platform.WFXSystemEvent.data.startupEvent));
         // TODO: This is a workaround until we unify the Matter Data structures
-        event.Platform.WFXSystemEvent.data.startupEvent.header.id = to_underlying(WifiEvent::kStartUp);
+        event.Platform.WFXSystemEvent.data.startupEvent.header.id = to_underlying(WifiInterface::WifiEvent::kStartUp);
         break;
 
-    case to_underlying(WifiEvent::kConnect):
+    case to_underlying(WifiInterface::WifiEvent::kConnect):
         memcpy(&event.Platform.WFXSystemEvent.data.connectEvent, eventData,
                sizeof(event.Platform.WFXSystemEvent.data.connectEvent));
         break;
 
-    case to_underlying(WifiEvent::kDisconnect):
+    case to_underlying(WifiInterface::WifiEvent::kDisconnect):
         memcpy(&event.Platform.WFXSystemEvent.data.disconnectEvent, eventData,
                sizeof(event.Platform.WFXSystemEvent.data.disconnectEvent));
         break;
 
-    case to_underlying(WifiEvent::kGotIPv4):
-    case to_underlying(WifiEvent::kLostIP):
-    case to_underlying(WifiEvent::kGotIPv6):
+    case to_underlying(WifiInterface::WifiEvent::kGotIPv4):
+    case to_underlying(WifiInterface::WifiEvent::kLostIP):
+    case to_underlying(WifiInterface::WifiEvent::kGotIPv6):
         memcpy(&event.Platform.WFXSystemEvent.data.genericMsgEvent, eventData,
                sizeof(event.Platform.WFXSystemEvent.data.genericMsgEvent));
         break;
