@@ -378,7 +378,7 @@ def build_treemap(
     root = f"FILE: {name}"
     if zoom:
         root = root + f" (FILTER: {zoom})"
-    data: dict[str, list] = dict(name=[root], parent=[""], size=[0], hover=[""])
+    data: dict[str, list] = dict(name=[root], parent=[""], size=[0], hover=[""], name_with_size=[""])
 
     known_parents: set[str] = set()
     total_sizes: dict = {}
@@ -418,6 +418,7 @@ def build_treemap(
                 data["parent"].append(partial if partial else root)
                 data["size"].append(0)
                 data["hover"].append(next_value)
+                data["name_with_size"].append("")
             total_sizes[next_value] = total_sizes.get(next_value, 0) + symbol.size
             partial = next_value
 
@@ -426,15 +427,19 @@ def build_treemap(
         data["parent"].append(partial if partial else root)
         data["size"].append(symbol.size)
         data["hover"].append(f"{symbol.name} of type {symbol.symbol_type}")
+        data["name_with_size"].append("")
 
     for idx, label in enumerate(data["name"]):
         if data["size"][idx] == 0:
-            data["hover"][idx] = f"{label}: {total_sizes.get(label, 0)}"
+            total_size = total_sizes.get(label, 0)
+            data["hover"][idx] = f"{label}: {total_size}"
+            data["name_with_size"][idx] = f"{label}: {total_size}"
 
     if style == ChartStyle.TREE_MAP:
         fig = go.Figure(
             go.Treemap(
-                labels=data["name"],
+                labels=data["name_with_size"],
+                ids=data["name"],
                 parents=data["parent"],
                 values=data["size"],
                 textinfo="label+value+percent parent+percent root",
@@ -445,7 +450,8 @@ def build_treemap(
     elif style == ChartStyle.SUNBURST:
         fig = px.sunburst(
             data,
-            names="name",
+            names="name_with_size",
+            ids="name",
             parents="parent",
             values="size",
             maxdepth=max_depth,
@@ -454,7 +460,8 @@ def build_treemap(
         assert(style == ChartStyle.ICICLE)
         fig = px.icicle(
             data,
-            names="name",
+            names="name_with_size",
+            ids="name",
             parents="parent",
             values="size",
             maxdepth=max_depth,
