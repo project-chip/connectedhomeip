@@ -38,6 +38,7 @@ pw_python_package("chip-testing-module") {
     "chip/testing/apps.py",
     "chip/testing/basic_composition.py",
     "chip/testing/choice_conformance.py",
+    "chip/testing/commissioning.py",
     "chip/testing/conformance.py",
     "chip/testing/conversions.py",
     "chip/testing/global_attribute_ids.py",

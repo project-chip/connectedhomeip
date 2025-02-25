@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+import shlex
 from enum import Enum, auto
 from platform import uname
 from typing import Optional
@@ -87,6 +88,7 @@ class HostApp(Enum):
     ENERGY_MANAGEMENT = auto()
     WATER_LEAK_DETECTOR = auto()
     TERMS_AND_CONDITIONS = auto()
+    CAMERA = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -163,6 +165,8 @@ class HostApp(Enum):
             return 'water-leak-detector-app/linux'
         elif self == HostApp.TERMS_AND_CONDITIONS:
             return 'terms-and-conditions-app/linux'
+        elif self == HostApp.CAMERA:
+            return 'camera-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -284,6 +288,9 @@ class HostApp(Enum):
         elif self == HostApp.TERMS_AND_CONDITIONS:
             yield 'chip-terms-and-conditions-app'
             yield 'chip-terms-and-conditions-app.map'
+        elif self == HostApp.CAMERA:
+            yield 'chip-camera-app'
+            yield 'chip-camera-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -547,6 +554,13 @@ class HostBuilder(GnBuilder):
         if self.board == HostBoard.ARM64:
             self.build_env['PKG_CONFIG_PATH'] = os.path.join(
                 self.SysRootPath('SYSROOT_AARCH64'), 'lib/aarch64-linux-gnu/pkgconfig')
+        if self.app == HostApp.TESTS and self.use_coverage and self.use_clang:
+            # Every test is expected to have a distinct build ID, so `%m` will be
+            # distinct.
+            #
+            # Output is relative to "oputput_dir" since that is where GN executs
+            self.build_env['LLVM_PROFILE_FILE'] = os.path.join("coverage", "profiles", "run_%b.profraw")
+
         return self.build_env
 
     def SysRootPath(self, name):
@@ -620,6 +634,60 @@ class HostBuilder(GnBuilder):
                            ], title="Final coverage info")
             self._Execute(['genhtml', os.path.join(self.coverage_dir, 'lcov_final.info'), '--output-directory',
                            os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
+
+        # coverage for clang works by having perfdata for every test run, which are in "*.profraw" files
+        if self.app == HostApp.TESTS and self.use_coverage and self.use_clang:
+            # Clang coverage config generates "coverage/{name}.profraw" for each test indivdually
+            # Here we are merging ALL raw profiles into a single indexed file
+
+            _indexed_instrumentation = shlex.quote(os.path.join(self.coverage_dir, "merged.profdata"))
+
+            self._Execute([
+                "bash",
+                "-c",
+                f'find {shlex.quote(self.coverage_dir)} -name "*.profraw"'
+                + f' | xargs -n 10240 llvm-profdata merge -sparse -o {_indexed_instrumentation}'
+            ],
+                title="Generating merged coverage data")
+
+            _lcov_data = os.path.join(self.coverage_dir, "merged.lcov")
+
+            self._Execute([
+                "bash",
+                "-c",
+                f'find {shlex.quote(self.coverage_dir)} -name "*.profraw"'
+                + ' | xargs -n1 basename | sed "s/\\.profraw//" '
+                + f' | xargs -I @ echo -object {shlex.quote(os.path.join(self.output_dir, "tests", "@"))}'
+                + f' | xargs -n 10240 llvm-cov export -format=lcov --instr-profile {_indexed_instrumentation} '
+                # only care about SDK code. third_party is not considered sdk
+                + ' --ignore-filename-regex "/third_party/"'
+                # about 75K lines with almost 0% coverage
+                + ' --ignore-filename-regex "/zzz_generated/"'
+                # generated interface files. about 8K lines with little coverage
+                + ' --ignore-filename-regex "/out/.*/Linux/dbus/"'
+                # 100% coverage for 1K lines, but not relevant (test code)
+                + ' --ignore-filename-regex "/out/.*/clang_static_coverage_config/"'
+                # Tests are likely 100% or close to, want to see only "functionality tested"
+                + ' --ignore-filename-regex "/tests/"'
+                # Ignore system includes
+                + ' --ignore-filename-regex "/usr/include/"'
+                + ' --ignore-filename-regex "/usr/lib/"'
+                + f' | cat >{shlex.quote(_lcov_data)}'
+            ],
+                title="Generating lcov data")
+
+            self._Execute([
+                "genhtml",
+                "--ignore-errors",
+                "inconsistent",
+                "--ignore-errors",
+                "range",
+                # "--hierarchical" <- this may be interesting
+                "--output",
+                os.path.join(self.output_dir, "html"),
+                os.path.join(self.coverage_dir, "merged.lcov"),
+            ],
+                title="Generating HTML coverage report")
 
         if self.app == HostApp.JAVA_MATTER_CONTROLLER:
             self.createJavaExecutable("java-matter-controller")

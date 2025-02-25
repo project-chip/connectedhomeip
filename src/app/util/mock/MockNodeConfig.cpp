@@ -19,7 +19,6 @@
 #include "app/util/af-types.h"
 #include <app/util/mock/MockNodeConfig.h>
 
-#include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
 #include <initializer_list>
 #include <lib/support/CodeUtils.h>
@@ -130,11 +129,11 @@ MockClusterConfig::MockClusterConfig(ClusterId aId, std::initializer_list<MockAt
 
     if (side.Has(MockClusterSide::kServer))
     {
-        mEmberCluster.mask |= CLUSTER_MASK_SERVER;
+        mEmberCluster.mask |= MATTER_CLUSTER_FLAG_SERVER;
     }
     if (side.Has(MockClusterSide::kClient))
     {
-        mEmberCluster.mask |= CLUSTER_MASK_CLIENT;
+        mEmberCluster.mask |= MATTER_CLUSTER_FLAG_CLIENT;
     }
     mEmberCluster.clusterId      = id;
     mEmberCluster.attributeCount = static_cast<uint16_t>(attributes.size());

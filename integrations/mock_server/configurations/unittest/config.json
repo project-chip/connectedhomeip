@@ -1,0 +1,17 @@
+{
+    "routes": [
+        {
+            "method": "GET",
+            "path": "/api/data",
+            "response": {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "message": "Hello, World!"
+                }
+            }
+        }
+    ]
+}

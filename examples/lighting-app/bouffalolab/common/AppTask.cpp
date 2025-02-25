@@ -94,8 +94,9 @@ StaticTask_t AppTask::appTaskStruct;
 
 void StartAppTask(void)
 {
-    GetAppTask().sAppTaskHandle = xTaskCreateStatic(GetAppTask().AppTaskMain, APP_TASK_NAME, ArraySize(GetAppTask().appStack), NULL,
-                                                    APP_TASK_PRIORITY, GetAppTask().appStack, &GetAppTask().appTaskStruct);
+    GetAppTask().sAppTaskHandle =
+        xTaskCreateStatic(GetAppTask().AppTaskMain, APP_TASK_NAME, MATTER_ARRAY_SIZE(GetAppTask().appStack), NULL,
+                          APP_TASK_PRIORITY, GetAppTask().appStack, &GetAppTask().appTaskStruct);
     if (GetAppTask().sAppTaskHandle == NULL)
     {
         ChipLogError(NotSpecified, "Failed to create app task");

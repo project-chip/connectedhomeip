@@ -23,6 +23,16 @@
 #     --max-depth 5                  \
 #     out/nrf-nrf52840dk-light-data-model-enabled/nrfconnect/zephyr/zephyr.elf
 #
+# There are two modes that the script can run over:
+#
+# - "nm" provides object sizes, without "originating source" information. Grouping is done
+#   by c++ namespacing and some "ember" rules.
+#
+# - "objdump" has the ability to find "file names" as symbols are grouped and prefixed
+#   as a "*ABS* associated names". In this case we try to find the "source paths"
+#   in the entire "src". We have duplicated file names for which we do not have a
+#   good way to disambiguate
+#
 
 # Requires:
 #    click
@@ -32,6 +42,7 @@
 #    plotly
 
 import logging
+import re
 import subprocess
 from dataclasses import dataclass
 from enum import Enum, auto
@@ -65,12 +76,52 @@ __CHART_STYLES__ = {
 }
 
 
+class FetchStyle(Enum):
+    NM = auto()
+    OBJDUMP = auto()
+
+
+__FETCH_STYLES__ = {
+    "nm": ChartStyle.TREE_MAP,
+    "objdump": ChartStyle.SUNBURST,
+}
+
+
 @dataclass
 class Symbol:
     name: str
     symbol_type: str
-    offset: int
     size: int
+    tree_path: list[str]
+
+# These expressions are callbacks defined in
+# callbacks.zapt
+#   - void emberAf{{asUpperCamelCase label}}ClusterInitCallback(chip::EndpointId endpoint);
+#   - void emberAf{{asUpperCamelCase label}}ClusterServerInitCallback(chip::EndpointId endpoint);
+#   - void Matter{{asUpperCamelCase label}}ClusterServerShutdownCallback(chip::EndpointId endpoint);
+#   - void emberAf{{asUpperCamelCase label}}ClusterClientInitCallback(chip::EndpointId endpoint);
+#   - void Matter{{asUpperCamelCase label}}ClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+#   - chip::Protocols::InteractionModel::Status Matter{{asUpperCamelCase label}}ClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+#   - void emberAf{{asUpperCamelCase label}}ClusterServerTickCallback(chip::EndpointId endpoint);
+#
+# and for commands:
+#   - bool emberAf{{asUpperCamelCase parent.label}}Cluster{{asUpperCamelCase name}}Callback
+
+
+_CLUSTER_EXPRESSIONS = [
+    re.compile(r'emberAf(?P<cluster>.+)ClusterClientInitCallback\('),
+    re.compile(r'emberAf(?P<cluster>.+)ClusterInitCallback\('),
+    re.compile(r'emberAf(?P<cluster>.+)ClusterServerInitCallback\('),
+
+
+
+    re.compile(r'emberAf(?P<cluster>.+)ClusterServerTickCallback\('),
+    re.compile(r'Matter(?P<cluster>.+)ClusterServerAttributeChangedCallback\('),
+    re.compile(r'Matter(?P<cluster>.+)ClusterServerPreAttributeChangedCallback\('),
+    re.compile(r'Matter(?P<cluster>.+)ClusterServerShutdownCallback\('),
+    # commands
+    re.compile(r'emberAf(?P<cluster>.+)Cluster(?P<command>.+)Callback\('),
+]
 
 
 def tree_display_name(name: str) -> list[str]:
@@ -88,11 +139,61 @@ def tree_display_name(name: str) -> list[str]:
     if name.startswith("vtable for "):
         name = name[11:]
 
-    # These are C-style methods really, we have no top-level namespaces named
-    # like this but still want to see these differently
-    for special_prefix in {"emberAf", "Matter"}:
-        if name.startswith(special_prefix):
-            return [special_prefix, name]
+    # Known variables for ember:
+    for variable_name in ['::generatedAttributes', '::generatedClusters', '::generatedEmberAfEndpointTypes', '::fixedDeviceTypeList', '::generatedCommands']:
+        if variable_name in name:
+            return ["EMBER", "METADATA", name]
+
+    # to abvoid treating '(anonymous namespace)::' as special because of space,
+    # replace it with something that looks similar
+    name = name.replace('(anonymous namespace)::', 'ANONYMOUS_NAMESPACE::')
+
+    # Ember methods are generally c-style that are in a particular format:
+    #   - emAf* are INTERNAL ember functions
+    #   - emberAf* are PUBLIC (from an ember perspective) functions
+    #   - Several callbacks:
+    #      - Matter<Cluster>ClusterServerInitCallback
+    #      - emberAf<Cluster>ClusterInitCallback
+    #      - Matter<Cluster>serverShutdownCallback
+    #      - MatterPreAttributeChangedCallback
+    #      - Matter<Cluster>PreAttributeChangedCallback
+    #      - emberAfPluginLevelControlCoupledColorTempChangeCallback
+    # The code below splits the above an "ember" namespace
+
+    # First consider the cluster functions.
+    # These are technically ember, however place them in `::chip::app::Clusters::<Cluster>::`
+    # so that they are grouped with AAI/CHI
+    for expr in _CLUSTER_EXPRESSIONS:
+        m = expr.match(name)
+        if not m:
+            continue
+        d = m.groupdict()
+        logging.debug("Ember callback found: %s -> %r", name, d)
+        if 'command' in d:
+            return ["chip", "app", "Clusters", d['cluster'], "EMBER", d['command'], name]
+        else:
+            return ["chip", "app", "Clusters", d['cluster'], "EMBER", name]
+
+    if 'MatterPreAttributeChangeCallback' in name:
+        return ["EMBER", "CALLBACKS", name]
+
+    if name.startswith("emberAfPlugin"):
+        # these methods are callbacks defined by some clusters to call into application code.
+        # They look like:
+        #   - emberAfPluginTimeFormatLocalizationOnCalendarTypeChange
+        #   - emberAfPluginOnOffClusterServerPostInitCallback
+        #   - emberAfPluginDoorLockGetFaceCredentialLengthConstraints
+        #   - emberAfPluginDoorLockOnOperatingModeChange
+        #   - emberAfPluginColorControlServerXyTransitionEventHandler
+        #
+        # They are generally quite free form and seem to be used instead of "delegates" as
+        # application hook points.
+        return ["EMBER", "CALLBACKS", "PLUGIN", name]
+
+    # We also capture '(anonymous namespace)::emAfWriteAttribute or similar
+    if name.startswith("emAf") or name.startswith("emberAf") or ("::emAf" in name) or ('::emberAf' in name):
+        # Place this as ::EMBER::API (these are internal and public functions from ember)
+        return ["EMBER", "API", name]
 
     # If the first element contains a space, it is either within `<>` for templates or it means it is a
     # separator of the type. Try to find the type separator
@@ -172,18 +273,32 @@ def tree_display_name(name: str) -> list[str]:
 
     if len(result) == 1:
         if result[0].startswith("ot"):  # Show openthread methods a bit grouped
-            result = ["ot"] + result
+            return ["ot", "C"] + result
         return ["C"] + result
 
-    return result
+    return [r.replace('ANONYMOUS_NAMESPACE', '(anonymous namespace)') for r in result]
 
 
 # TO run the test, install pytest and do
 # pytest file_size_from_nm.py
 def test_tree_display_name():
     assert tree_display_name("fooBar") == ["C", "fooBar"]
-    assert tree_display_name("emberAfTest") == ["emberAf", "emberAfTest"]
-    assert tree_display_name("MatterSomeCall") == ["Matter", "MatterSomeCall"]
+    assert tree_display_name("emberAfTest") == ["EMBER", "API", "emberAfTest"]
+    assert tree_display_name("MatterSomeCall") == ["C", "MatterSomeCall"]
+
+    assert tree_display_name("emberAfFooBarClusterServerInitCallback()") == [
+        "chip", "app", "Clusters", "FooBar", "EMBER", "emberAfFooBarClusterServerInitCallback()"
+    ]
+    assert tree_display_name("emberAfFooBarClusterInitCallback()") == [
+        "chip", "app", "Clusters", "FooBar", "EMBER", "emberAfFooBarClusterInitCallback()"
+    ]
+    assert tree_display_name("MatterFooBarClusterServerShutdownCallback()") == [
+        "chip", "app", "Clusters", "FooBar", "EMBER", "MatterFooBarClusterServerShutdownCallback()"
+    ]
+    assert tree_display_name("emberAfFooBarClusterSomeCommandCallback()") == [
+        "chip", "app", "Clusters", "FooBar", "EMBER", "SomeCommand", "emberAfFooBarClusterSomeCommandCallback()"
+    ]
+
     assert tree_display_name("chip::Some::Constructor()") == [
         "chip",
         "Some",
@@ -239,10 +354,15 @@ def test_tree_display_name():
         "void foo::bar<baz>::method(my::arg name, other::arg::type)"
     ) == ["foo", "bar<baz>", "void method(my::arg name, other::arg::type)"]
 
+    assert tree_display_name(
+        "(anonymous namespace)::AccessControlAttribute::Read(args)"
+    ) == ["(anonymous namespace)", "AccessControlAttribute", "Read(args)"]
+
 
 def build_treemap(
     name: str,
     symbols: list[Symbol],
+    separator: str,
     style: ChartStyle,
     max_depth: int,
     zoom: Optional[str],
@@ -263,13 +383,15 @@ def build_treemap(
     total_sizes: dict = {}
 
     for symbol in symbols:
-        tree_name = tree_display_name(symbol.name)
+        tree_name = symbol.tree_path
 
         if zoom is not None:
+            if not zoom.startswith(separator):
+                zoom = separator + zoom
             partial = ""
             # try to filter out the tree name. If it contains the zoom item, keep it, otherwise discard
             while tree_name and partial != zoom:
-                partial += "::" + tree_name[0]
+                partial += separator + tree_name[0]
                 tree_name = tree_name[1:]
             if not tree_name:
                 continue
@@ -277,7 +399,7 @@ def build_treemap(
         if strip is not None:
             partial = ""
             for part_name in tree_name:
-                partial = "::" + part_name
+                partial = separator + part_name
                 if partial == strip:
                     break
             if partial == strip:
@@ -285,7 +407,10 @@ def build_treemap(
 
         partial = ""
         for name in tree_name[:-1]:
-            next_value = partial + "::" + name
+            if not partial:
+                next_value = name
+            else:
+                next_value = partial + separator + name
             if next_value not in known_parents:
                 known_parents.add(next_value)
                 data["name"].append(next_value)
@@ -329,6 +454,212 @@ def build_treemap(
     fig.show()
 
 
+def symbols_from_objdump(elf_file: str) -> list[Symbol]:
+
+    sources = {}
+    SOURCE_RE = re.compile(r'^(.*third_party/connectedhomeip/)?(?P<path>.*\.(cpp|c|asm)$)')
+
+    # First try to figure out `source paths`. Do the "ugly" way and search for all strings that
+    # seem to match a 'source'
+    for line in subprocess.check_output(["strings", elf_file]).decode("utf8").split('\n'):
+        if '/' not in line:
+            # want directory paths...
+            continue
+        m = SOURCE_RE.match(line)
+        if not m:
+            continue
+
+        path = m.groupdict()['path']
+
+        # heuristics:
+        #   - some paths start with relative paths and we remove that
+        #   - remove intermediate ../
+        while path.startswith('../'):
+            path = path[3:]
+
+        parts = []
+        for item in path.split('/'):
+            if item == '..':
+                parts.pop()
+            else:
+                parts.append(item)
+
+        sources[parts[-1]] = parts
+
+    items = subprocess.check_output(
+        [
+            "objdump",
+            "--syms",
+            "--demangle",
+            elf_file,
+        ]
+    ).decode("utf8")
+
+    # The format looks like:
+    #
+    #     out/qpg-qpg6105-light/chip-qpg6105-lighting-example.out:     file format elf32-little                                                                                          │
+    #                                                                                                                                                                                │
+    #     SYMBOL TABLE:                                                                                                                                                                  │
+    #     04000010 l    d  .bl_user_license   00000000 .bl_user_license                                                                                                                  │
+    #     04000800 l    d  .datajumptable 00000000 .datajumptable                                                                                                                        │
+    #     04000840 l    d  .flashjumptable    00000000 .flashjumptable                                                                                                                   │
+    #     04001600 l    d  .m_flashjumptable  00000000 .m_flashjumptable                                                                                                                 │
+    #     04001800 l    d  .bootloader    00000000 .bootloader                                                                                                                           │
+    #     04003d00 l    d  .rt_flash  00000000 .rt_flash                                                                                                                                 │
+    #     04007000 l    d  .upgrade_image_user_license    00000000 .upgrade_image_user_license                                                                                           │
+    #     04008000 l    d  .loaded_user_license   00000000 .loaded_user_license                                                                                                          │
+    #     04008080 l    d  .extended_user_license 00000000 .extended_user_license                                                                                                        │
+    #     04008100 l    d  .isr_vector    00000000 .isr_vector                                                                                                                           │
+    #     040081c4 l    d  firmware_datafirmwaredata  00000000 firmware_datafirmwaredata
+    #     ....
+    #     00000000 l    df *ABS*  00000000 gpJumpTables_DataTable.c                                                                                                                      │
+    #     04080384 l       .text  00000000 $t                                                                                                                                            │
+    #     0408038c l       .text  00000000 $d                                                                                                                                            │
+    #     04000800 l       .datajumptable 00000000 $d                                                                                                                                    │
+    #     00000000 l    df *ABS*  00000000 gpJumpTables_RomLib_FlashJump_gcc.o                                                                                                           │
+    #     ....
+    #     00000000 l    df *ABS*  00000000 ember-io-storage.cpp                                                                                                                          │
+    #     04012106 l       .text  00000000 $t                                                                                                                                            │
+    #     04012122 l       .text  00000000 $d                                                                                                                                            │
+    #     0401212a l       .text  00000000 $t                                                                                                                                            │
+    #     04012136 l       .text  00000000 $d                                                                                                                                            │
+    #     2003aa70 l       .data  00000000 $d                                                                                                                                            │
+    #     200417a0 l       .bss   00000000 $d                                                                                                                                            │
+    #     04012167 l       .text  00000000 $d                                                                                                                                            │
+    #     04012168 l       .text  00000000 $t
+    #     ...
+    #     200417a0 g     O .bss   00000103 chip::app::Compatibility::Internal::attributeIOBuffer
+    #     04012107 g     F .text  0000008a chip::app::Compatibility::Internal::AttributeBaseType(unsigned char)
+    #
+    # Documentation at https://sourceware.org/binutils/docs/binutils/objdump.html
+    #
+    # Format is:
+    #    - Address
+    #    - set of character and spaces for flags
+    #    - section (or *ABS* or *UND*)
+    #    - alignment or size (common symbos: alignment, otherwise size)
+    #    - Symbol name
+    # Flags are:
+    #   - l,g,u,! => local,global,unique global, none (space) or both local and global (!)
+    #   - w - weak (space is strong)
+    #   - C - constructor
+    #   - W - warning
+    #   - I/i - indirect reference/evaluated during relocation processing
+    #   - D/d - debugging symbol/dynamic debugging symbol
+    #   - F/f/O - name of a function, or a file (F) or an object (O)
+
+    # Logic generally is:
+    #    - can capture segment (.text, .data, .bss seem interesting)
+    #    - file information exists (... df *ABS* of 0 size), however pointers inside
+    #      if may be slightly off - we need to track these as .text seem to potentially be aligned
+    #    - symbols are have size
+
+    LINE_RE = re.compile(r'^(?P<offset>[0-9a-f]{8})\s(?P<flags>.{7})\s+(?P<section>\S+)\s+(?P<size>\S+)\s*(?P<name>.*)$')
+    current_file_name = None
+
+    offset_file_map = {}
+    symbols = []
+    unknown_file_names = set()
+
+    for line in items.split("\n"):
+        line = line.strip()
+
+        m = LINE_RE.match(line)
+        if not m:
+            continue
+
+        captures = m.groupdict()
+        size = int(captures['size'], 16)
+        offset = int(captures['offset'], 16)
+        if captures['flags'].endswith('df') and captures['section'] == '*ABS*' and size == 0:
+            current_file_name = captures['name']
+            continue
+
+        if size == 0:
+            if current_file_name:
+                offset_file_map[offset] = current_file_name
+            continue
+
+        # find the offset in a file. Either exact or a bit above
+        symbol_file_name = current_file_name
+        if not symbol_file_name:
+            for delta in range(8):
+                if offset - delta in offset_file_map:
+                    symbol_file_name = offset_file_map[offset - delta]
+
+        if symbol_file_name not in sources:
+            if symbol_file_name not in unknown_file_names:
+                logging.warning('Source %r is not known', symbol_file_name)
+                unknown_file_names.add(symbol_file_name)
+            path = [captures['section'], 'UNKNOWN', symbol_file_name, captures['name']]
+        else:
+            path = [captures['section']] + sources[symbol_file_name] + [captures['name']]
+
+        s = Symbol(
+            name=captures['name'],
+            symbol_type=captures['section'],
+            size=size,
+            tree_path=path,
+        )
+
+        symbols.append(s)
+
+    return symbols
+
+
+def symbols_from_nm(elf_file: str) -> list[Symbol]:
+    items = subprocess.check_output(
+        [
+            "nm",
+            "--print-size",
+            "--size-sort",  # Filters out empty entries
+            "--radix=d",
+            elf_file,
+        ]
+    ).decode("utf8")
+
+    symbols = []
+
+    # OUTPUT FORMAT:
+    # <offset> <size> <type> <name>
+    for line in items.split("\n"):
+        if not line.strip():
+            continue
+        _, size, t, name = line.split(" ")
+
+        size = int(size, 10)
+
+        if t in {
+            # Text section
+            "t",
+            "T",
+            # Weak defines
+            "w",
+            "W",
+            # Initialized data
+            "d",
+            "D",
+            # Readonly
+            "r",
+            "R",
+            # Weak object
+            "v",
+            "V",
+        }:
+            logging.debug("Found %s of size %d", name, size)
+            symbols.append(Symbol(name=name, symbol_type=t, size=size, tree_path=tree_display_name(name)))
+        elif t in {
+            # BSS - 0-initialized, not code
+            "b",
+            "B",
+        }:
+            pass
+        else:
+            logging.error("SKIPPING SECTION %s", t)
+
+    return symbols
+
+
 @click.command()
 @click.option(
     "--log-level",
@@ -343,6 +674,13 @@ def build_treemap(
     show_default=True,
     type=click.Choice(list(__CHART_STYLES__.keys()), case_sensitive=False),
     help="Style of the chart",
+)
+@click.option(
+    "--fetch-via",
+    default="nm",
+    show_default=True,
+    type=click.Choice(list(__FETCH_STYLES__.keys()), case_sensitive=False),
+    help="How to read the binary symbols",
 )
 @click.option(
     "--max-depth",
@@ -366,6 +704,7 @@ def main(
     log_level,
     elf_file: Path,
     display_type: str,
+    fetch_via: str,
     max_depth: int,
     zoom: Optional[str],
     strip: Optional[str],
@@ -373,58 +712,15 @@ def main(
     log_fmt = "%(asctime)s %(levelname)-7s %(message)s"
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
-    items = subprocess.check_output(
-        [
-            "nm",
-            "--print-size",
-            "--size-sort",  # Filters out empty entries
-            "--radix=d",
-            elf_file.absolute().as_posix(),
-        ]
-    ).decode("utf8")
-
-    symbols = []
-
-    # OUTPUT FORMAT:
-    # <offset> <size> <type> <name>
-    for line in items.split("\n"):
-        if not line.strip():
-            continue
-        offset, size, t, name = line.split(" ")
-
-        size = int(size, 10)
-        offset = int(offset, 10)
-
-        if t in {
-            # Text section
-            "t",
-            "T",
-            # Weak defines
-            "w",
-            "W",
-            # Initialized data
-            "d",
-            "D",
-            # Readonly
-            "r",
-            "R",
-            # Weak object
-            "v",
-            "V",
-        }:
-            logging.debug("Found %s of size %d", name, size)
-            symbols.append(Symbol(name=name, symbol_type=t, offset=offset, size=size))
-        elif t in {
-            # BSS - 0-initialized, not code
-            "b",
-            "B",
-        }:
-            pass
-        else:
-            logging.error("SKIPPING SECTION %s", t)
+    if __FETCH_STYLES__[fetch_via] == FetchStyle.NM:
+        symbols = symbols_from_nm(elf_file.absolute().as_posix())
+        separator = "::"
+    else:
+        symbols = symbols_from_objdump(elf_file.absolute().as_posix())
+        separator = "/"
 
     build_treemap(
-        elf_file.name, symbols, __CHART_STYLES__[display_type], max_depth, zoom, strip
+        elf_file.name, symbols, separator, __CHART_STYLES__[display_type], max_depth, zoom, strip
     )
 
 
