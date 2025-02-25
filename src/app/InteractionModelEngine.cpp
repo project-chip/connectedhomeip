@@ -2140,14 +2140,10 @@ bool InteractionModelEngine::HasSubscriptionsToResume()
 void InteractionModelEngine::DecrementNumSubscriptionsToResume()
 {
     VerifyOrReturn(mNumOfSubscriptionsToResume > 0);
-#if CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
-    VerifyOrDie(mICDManager);
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
-
     mNumOfSubscriptionsToResume--;
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
-    if (!mNumOfSubscriptionsToResume)
+    if (mICDManager && !mNumOfSubscriptionsToResume)
     {
         mICDManager->SetBootUpResumeSubscriptionExecuted();
     }
