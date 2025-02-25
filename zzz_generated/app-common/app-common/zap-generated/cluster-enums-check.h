@@ -2719,7 +2719,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::MainSta
     case EnumType::kProtected:
     case EnumType::kDisengaged:
     case EnumType::kSetupRequired:
-    case EnumType::kPendingFallback:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -2741,22 +2740,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::Positio
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::RestingProcedureEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::TargetLatchEnum val)
 {
-    using EnumType = ClosureControl::RestingProcedureEnum;
-    switch (val)
-    {
-    case EnumType::kDoNothing:
-    case EnumType::kReturnToFullyOpened:
-    case EnumType::kReturnToFullyClosed:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::TagLatchEnum val)
-{
-    using EnumType = ClosureControl::TagLatchEnum;
+    using EnumType = ClosureControl::TargetLatchEnum;
     switch (val)
     {
     case EnumType::kLatch:
@@ -2766,9 +2752,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::TagLatc
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::TagPositionEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::TargetPositionEnum val)
 {
-    using EnumType = ClosureControl::TagPositionEnum;
+    using EnumType = ClosureControl::TargetPositionEnum;
     switch (val)
     {
     case EnumType::kCloseInFull:
@@ -2776,36 +2762,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::TagPosi
     case EnumType::kPedestrian:
     case EnumType::kVentilation:
     case EnumType::kSignature:
-    case EnumType::kSequenceNextStep:
-    case EnumType::kPedestrianNextStep:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::TriggerConditionEnum val)
-{
-    using EnumType = ClosureControl::TriggerConditionEnum;
-    switch (val)
-    {
-    case EnumType::kAfterDelay:
-    case EnumType::kAfterApplicativeTrigger:
-    case EnumType::kAfterDelayOrApplicativeTrigger:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::TriggerPositionEnum val)
-{
-    using EnumType = ClosureControl::TriggerPositionEnum;
-    switch (val)
-    {
-    case EnumType::kAtFullyClosed:
-    case EnumType::kAtFullyOpened:
-    case EnumType::kInBetween:
-    case EnumType::kAtVentilation:
-    case EnumType::kAtPedestrian:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

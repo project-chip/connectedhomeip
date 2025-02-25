@@ -2736,16 +2736,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "OverallState";
         case chip::app::Clusters::ClosureControl::Attributes::OverallTarget::Id:
             return "OverallTarget";
-        case chip::app::Clusters::ClosureControl::Attributes::RestingProcedure::Id:
-            return "RestingProcedure";
-        case chip::app::Clusters::ClosureControl::Attributes::TriggerCondition::Id:
-            return "TriggerCondition";
-        case chip::app::Clusters::ClosureControl::Attributes::TriggerPosition::Id:
-            return "TriggerPosition";
-        case chip::app::Clusters::ClosureControl::Attributes::WaitingDelay::Id:
-            return "WaitingDelay";
-        case chip::app::Clusters::ClosureControl::Attributes::KickoffTimer::Id:
-            return "KickoffTimer";
         case chip::app::Clusters::ClosureControl::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ClosureControl::Attributes::AcceptedCommandList::Id:
@@ -5480,10 +5470,6 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "MoveTo";
         case chip::app::Clusters::ClosureControl::Commands::Calibrate::Id:
             return "Calibrate";
-        case chip::app::Clusters::ClosureControl::Commands::ConfigureFallback::Id:
-            return "ConfigureFallback";
-        case chip::app::Clusters::ClosureControl::Commands::CancelFallback::Id:
-            return "CancelFallback";
         default:
             return "Unknown";
         }

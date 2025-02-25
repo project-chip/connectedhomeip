@@ -8814,22 +8814,6 @@ MTR_PROVISIONALLY_AVAILABLE
 - (void)calibrateWithParams:(MTRClosureControlClusterCalibrateParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)calibrateWithCompletion:(MTRStatusCompletion)completion
     MTR_PROVISIONALLY_AVAILABLE;
-/**
- * Command ConfigureFallback
- *
- * Upon receipt, this SHALL configure the Fallback feature behavior using the data as follows:
- */
-- (void)configureFallbackWithParams:(MTRClosureControlClusterConfigureFallbackParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)configureFallbackWithCompletion:(MTRStatusCompletion)completion
-    MTR_PROVISIONALLY_AVAILABLE;
-/**
- * Command CancelFallback
- *
- * Upon receipt, this SHALL cancel the current PendingFallback.
- */
-- (void)cancelFallbackWithParams:(MTRClosureControlClusterCancelFallbackParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)cancelFallbackWithCompletion:(MTRStatusCompletion)completion
-    MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeCountdownTimeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeCountdownTimeWithParams:(MTRSubscribeParams *)params
@@ -8860,36 +8844,6 @@ MTR_PROVISIONALLY_AVAILABLE
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(MTRClosureControlClusterOverallTargetStruct * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeOverallTargetWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRClosureControlClusterOverallTargetStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
-- (void)readAttributeRestingProcedureWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeRestingProcedureWithParams:(MTRSubscribeParams *)params
-                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeRestingProcedureWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
-- (void)readAttributeTriggerConditionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeTriggerConditionWithParams:(MTRSubscribeParams *)params
-                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeTriggerConditionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
-- (void)readAttributeTriggerPositionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeTriggerPositionWithParams:(MTRSubscribeParams *)params
-                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeTriggerPositionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
-- (void)readAttributeWaitingDelayWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeWaitingDelayWithParams:(MTRSubscribeParams *)params
-                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeWaitingDelayWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
-- (void)readAttributeKickoffTimerWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeKickoffTimerWithParams:(MTRSubscribeParams *)params
-                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeKickoffTimerWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
@@ -19178,7 +19132,6 @@ typedef NS_ENUM(uint8_t, MTRClosureControlMainState) {
     MTRClosureControlMainStateProtected MTR_PROVISIONALLY_AVAILABLE = 0x05,
     MTRClosureControlMainStateDisengaged MTR_PROVISIONALLY_AVAILABLE = 0x06,
     MTRClosureControlMainStateSetupRequired MTR_PROVISIONALLY_AVAILABLE = 0x07,
-    MTRClosureControlMainStatePendingFallback MTR_PROVISIONALLY_AVAILABLE = 0x08,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRClosureControlPositioning) {
@@ -19190,39 +19143,17 @@ typedef NS_ENUM(uint8_t, MTRClosureControlPositioning) {
     MTRClosureControlPositioningOpenedAtSignature MTR_PROVISIONALLY_AVAILABLE = 0x05,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRClosureControlRestingProcedure) {
-    MTRClosureControlRestingProcedureDoNothing MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRClosureControlRestingProcedureReturnToFullyOpened MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRClosureControlRestingProcedureReturnToFullyClosed MTR_PROVISIONALLY_AVAILABLE = 0x02,
+typedef NS_ENUM(uint8_t, MTRClosureControlTargetLatch) {
+    MTRClosureControlTargetLatchLatch MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRClosureControlTargetLatchUnlatch MTR_PROVISIONALLY_AVAILABLE = 0x01,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRClosureControlTagLatch) {
-    MTRClosureControlTagLatchLatch MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRClosureControlTagLatchUnlatch MTR_PROVISIONALLY_AVAILABLE = 0x01,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_ENUM(uint8_t, MTRClosureControlTagPosition) {
-    MTRClosureControlTagPositionCloseInFull MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRClosureControlTagPositionOpenInFull MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRClosureControlTagPositionPedestrian MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRClosureControlTagPositionVentilation MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRClosureControlTagPositionSignature MTR_PROVISIONALLY_AVAILABLE = 0x04,
-    MTRClosureControlTagPositionSequenceNextStep MTR_PROVISIONALLY_AVAILABLE = 0x05,
-    MTRClosureControlTagPositionPedestrianNextStep MTR_PROVISIONALLY_AVAILABLE = 0x06,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_ENUM(uint8_t, MTRClosureControlTriggerCondition) {
-    MTRClosureControlTriggerConditionAfterDelay MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRClosureControlTriggerConditionAfterApplicativeTrigger MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRClosureControlTriggerConditionAfterDelayOrApplicativeTrigger MTR_PROVISIONALLY_AVAILABLE = 0x02,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_ENUM(uint8_t, MTRClosureControlTriggerPosition) {
-    MTRClosureControlTriggerPositionAtFullyClosed MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRClosureControlTriggerPositionAtFullyOpened MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRClosureControlTriggerPositionInBetween MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRClosureControlTriggerPositionAtVentilation MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRClosureControlTriggerPositionAtPedestrian MTR_PROVISIONALLY_AVAILABLE = 0x04,
+typedef NS_ENUM(uint8_t, MTRClosureControlTargetPosition) {
+    MTRClosureControlTargetPositionCloseInFull MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRClosureControlTargetPositionOpenInFull MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRClosureControlTargetPositionPedestrian MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRClosureControlTargetPositionVentilation MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRClosureControlTargetPositionSignature MTR_PROVISIONALLY_AVAILABLE = 0x04,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRClosureControlFeature) {
@@ -19235,7 +19166,6 @@ typedef NS_OPTIONS(uint32_t, MTRClosureControlFeature) {
     MTRClosureControlFeatureCalibration MTR_PROVISIONALLY_AVAILABLE = 0x40,
     MTRClosureControlFeatureProtection MTR_PROVISIONALLY_AVAILABLE = 0x80,
     MTRClosureControlFeatureManuallyOperable MTR_PROVISIONALLY_AVAILABLE = 0x100,
-    MTRClosureControlFeatureFallback MTR_PROVISIONALLY_AVAILABLE = 0x200,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRServiceAreaOperationalStatus) {

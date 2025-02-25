@@ -9224,8 +9224,6 @@ private:
 | * Stop                                                              |   0x00 |
 | * MoveTo                                                            |   0x01 |
 | * Calibrate                                                         |   0x02 |
-| * ConfigureFallback                                                 |   0x03 |
-| * CancelFallback                                                    |   0x04 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * CountdownTime                                                     | 0x0000 |
@@ -9233,11 +9231,6 @@ private:
 | * CurrentErrorList                                                  | 0x0002 |
 | * OverallState                                                      | 0x0003 |
 | * OverallTarget                                                     | 0x0004 |
-| * RestingProcedure                                                  | 0x0005 |
-| * TriggerCondition                                                  | 0x0006 |
-| * TriggerPosition                                                   | 0x0007 |
-| * WaitingDelay                                                      | 0x0008 |
-| * KickoffTimer                                                      | 0x0009 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -9291,7 +9284,7 @@ class ClosureControlMoveTo : public ClusterCommand
 public:
     ClosureControlMoveTo(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("move-to", credsIssuerConfig)
     {
-        AddArgument("Tag", 0, UINT8_MAX, &mRequest.tag);
+        AddArgument("Position", 0, UINT8_MAX, &mRequest.position);
         AddArgument("Latch", 0, UINT8_MAX, &mRequest.latch);
         AddArgument("Speed", 0, UINT8_MAX, &mRequest.speed);
         ClusterCommand::AddArguments();
@@ -9356,84 +9349,6 @@ public:
 
 private:
     chip::app::Clusters::ClosureControl::Commands::Calibrate::Type mRequest;
-};
-
-/*
- * Command ConfigureFallback
- */
-class ClosureControlConfigureFallback : public ClusterCommand
-{
-public:
-    ClosureControlConfigureFallback(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("configure-fallback", credsIssuerConfig)
-    {
-        AddArgument("RestingProcedure", 0, UINT8_MAX, &mRequest.restingProcedure);
-        AddArgument("TriggerCondition", 0, UINT8_MAX, &mRequest.triggerCondition);
-        AddArgument("TriggerPosition", 0, UINT8_MAX, &mRequest.triggerPosition);
-        AddArgument("WaitingDelay", 0, UINT32_MAX, &mRequest.waitingDelay);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::ClosureControl::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ClosureControl::Commands::ConfigureFallback::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::ClosureControl::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ClosureControl::Commands::ConfigureFallback::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::ClosureControl::Commands::ConfigureFallback::Type mRequest;
-};
-
-/*
- * Command CancelFallback
- */
-class ClosureControlCancelFallback : public ClusterCommand
-{
-public:
-    ClosureControlCancelFallback(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("cancel-fallback", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::ClosureControl::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ClosureControl::Commands::CancelFallback::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::ClosureControl::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ClosureControl::Commands::CancelFallback::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::ClosureControl::Commands::CancelFallback::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -24069,12 +23984,10 @@ void registerClusterClosureControl(Commands & commands, CredentialIssuerCommands
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),              //
-        make_unique<ClosureControlStop>(credsIssuerConfig),              //
-        make_unique<ClosureControlMoveTo>(credsIssuerConfig),            //
-        make_unique<ClosureControlCalibrate>(credsIssuerConfig),         //
-        make_unique<ClosureControlConfigureFallback>(credsIssuerConfig), //
-        make_unique<ClosureControlCancelFallback>(credsIssuerConfig),    //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),      //
+        make_unique<ClosureControlStop>(credsIssuerConfig),      //
+        make_unique<ClosureControlMoveTo>(credsIssuerConfig),    //
+        make_unique<ClosureControlCalibrate>(credsIssuerConfig), //
         //
         // Attributes
         //
@@ -24084,11 +23997,6 @@ void registerClusterClosureControl(Commands & commands, CredentialIssuerCommands
         make_unique<ReadAttribute>(Id, "current-error-list", Attributes::CurrentErrorList::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "overall-state", Attributes::OverallState::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "overall-target", Attributes::OverallTarget::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "resting-procedure", Attributes::RestingProcedure::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "trigger-condition", Attributes::TriggerCondition::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "trigger-position", Attributes::TriggerPosition::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "waiting-delay", Attributes::WaitingDelay::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "kickoff-timer", Attributes::KickoffTimer::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -24109,19 +24017,6 @@ void registerClusterClosureControl(Commands & commands, CredentialIssuerCommands
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::Type>>>(
             Id, "overall-target", Attributes::OverallTarget::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ClosureControl::RestingProcedureEnum>>(
-            Id, "resting-procedure", 0, UINT8_MAX, Attributes::RestingProcedure::Id, WriteCommandType::kForceWrite,
-            credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ClosureControl::TriggerConditionEnum>>(
-            Id, "trigger-condition", 0, UINT8_MAX, Attributes::TriggerCondition::Id, WriteCommandType::kForceWrite,
-            credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ClosureControl::TriggerPositionEnum>>(
-            Id, "trigger-position", 0, UINT8_MAX, Attributes::TriggerPosition::Id, WriteCommandType::kForceWrite,
-            credsIssuerConfig), //
-        make_unique<WriteAttribute<uint32_t>>(Id, "waiting-delay", 0, UINT32_MAX, Attributes::WaitingDelay::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint32_t>>(Id, "kickoff-timer", 0, UINT32_MAX, Attributes::KickoffTimer::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -24139,11 +24034,6 @@ void registerClusterClosureControl(Commands & commands, CredentialIssuerCommands
         make_unique<SubscribeAttribute>(Id, "current-error-list", Attributes::CurrentErrorList::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "overall-state", Attributes::OverallState::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "overall-target", Attributes::OverallTarget::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "resting-procedure", Attributes::RestingProcedure::Id, credsIssuerConfig),          //
-        make_unique<SubscribeAttribute>(Id, "trigger-condition", Attributes::TriggerCondition::Id, credsIssuerConfig),          //
-        make_unique<SubscribeAttribute>(Id, "trigger-position", Attributes::TriggerPosition::Id, credsIssuerConfig),            //
-        make_unique<SubscribeAttribute>(Id, "waiting-delay", Attributes::WaitingDelay::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "kickoff-timer", Attributes::KickoffTimer::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //

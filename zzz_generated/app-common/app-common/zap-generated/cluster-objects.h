@@ -27487,10 +27487,10 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    Optional<PositioningEnum> positioning;
-    Optional<LatchingEnum> latching;
-    Optional<Globals::ThreeLevelAutoEnum> speed;
-    Optional<uint32_t> extraInfo;
+    Optional<DataModel::Nullable<PositioningEnum>> positioning;
+    Optional<DataModel::Nullable<LatchingEnum>> latching;
+    Optional<DataModel::Nullable<Globals::ThreeLevelAutoEnum>> speed;
+    Optional<DataModel::Nullable<uint32_t>> extraInfo;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -27505,16 +27505,16 @@ using DecodableType = Type;
 namespace OverallTargetStruct {
 enum class Fields : uint8_t
 {
-    kTagPosition = 0,
-    kTagLatch    = 1,
-    kSpeed       = 2,
+    kPosition = 0,
+    kLatch    = 1,
+    kSpeed    = 2,
 };
 
 struct Type
 {
 public:
-    Optional<TagPositionEnum> tagPosition;
-    Optional<TagLatchEnum> tagLatch;
+    Optional<TargetPositionEnum> position;
+    Optional<TargetLatchEnum> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -27546,16 +27546,6 @@ namespace Calibrate {
 struct Type;
 struct DecodableType;
 } // namespace Calibrate
-
-namespace ConfigureFallback {
-struct Type;
-struct DecodableType;
-} // namespace ConfigureFallback
-
-namespace CancelFallback {
-struct Type;
-struct DecodableType;
-} // namespace CancelFallback
 
 } // namespace Commands
 
@@ -27591,9 +27581,9 @@ public:
 namespace MoveTo {
 enum class Fields : uint8_t
 {
-    kTag   = 0,
-    kLatch = 1,
-    kSpeed = 2,
+    kPosition = 0,
+    kLatch    = 1,
+    kSpeed    = 2,
 };
 
 struct Type
@@ -27603,8 +27593,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveTo::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
 
-    Optional<TagPositionEnum> tag;
-    Optional<TagLatchEnum> latch;
+    Optional<TargetPositionEnum> position;
+    Optional<TargetLatchEnum> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -27620,8 +27610,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveTo::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
 
-    Optional<TagPositionEnum> tag;
-    Optional<TagLatchEnum> latch;
+    Optional<TargetPositionEnum> position;
+    Optional<TargetLatchEnum> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -27654,75 +27644,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Calibrate
-namespace ConfigureFallback {
-enum class Fields : uint8_t
-{
-    kRestingProcedure = 0,
-    kTriggerCondition = 1,
-    kTriggerPosition  = 2,
-    kWaitingDelay     = 3,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ConfigureFallback::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-
-    Optional<RestingProcedureEnum> restingProcedure;
-    Optional<TriggerConditionEnum> triggerCondition;
-    Optional<TriggerPositionEnum> triggerPosition;
-    Optional<uint32_t> waitingDelay;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ConfigureFallback::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-
-    Optional<RestingProcedureEnum> restingProcedure;
-    Optional<TriggerConditionEnum> triggerCondition;
-    Optional<TriggerPositionEnum> triggerPosition;
-    Optional<uint32_t> waitingDelay;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ConfigureFallback
-namespace CancelFallback {
-enum class Fields : uint8_t
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::CancelFallback::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::CancelFallback::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace CancelFallback
 } // namespace Commands
 
 namespace Attributes {
@@ -27791,66 +27712,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OverallTarget
-namespace RestingProcedure {
-struct TypeInfo
-{
-    using Type             = chip::app::Clusters::ClosureControl::RestingProcedureEnum;
-    using DecodableType    = chip::app::Clusters::ClosureControl::RestingProcedureEnum;
-    using DecodableArgType = chip::app::Clusters::ClosureControl::RestingProcedureEnum;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RestingProcedure::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RestingProcedure
-namespace TriggerCondition {
-struct TypeInfo
-{
-    using Type             = chip::app::Clusters::ClosureControl::TriggerConditionEnum;
-    using DecodableType    = chip::app::Clusters::ClosureControl::TriggerConditionEnum;
-    using DecodableArgType = chip::app::Clusters::ClosureControl::TriggerConditionEnum;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::TriggerCondition::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace TriggerCondition
-namespace TriggerPosition {
-struct TypeInfo
-{
-    using Type             = chip::app::Clusters::ClosureControl::TriggerPositionEnum;
-    using DecodableType    = chip::app::Clusters::ClosureControl::TriggerPositionEnum;
-    using DecodableArgType = chip::app::Clusters::ClosureControl::TriggerPositionEnum;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::TriggerPosition::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace TriggerPosition
-namespace WaitingDelay {
-struct TypeInfo
-{
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::WaitingDelay::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace WaitingDelay
-namespace KickoffTimer {
-struct TypeInfo
-{
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::KickoffTimer::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace KickoffTimer
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -27896,14 +27757,6 @@ struct TypeInfo
         Attributes::CurrentErrorList::TypeInfo::DecodableType currentErrorList;
         Attributes::OverallState::TypeInfo::DecodableType overallState;
         Attributes::OverallTarget::TypeInfo::DecodableType overallTarget;
-        Attributes::RestingProcedure::TypeInfo::DecodableType restingProcedure =
-            static_cast<chip::app::Clusters::ClosureControl::RestingProcedureEnum>(0);
-        Attributes::TriggerCondition::TypeInfo::DecodableType triggerCondition =
-            static_cast<chip::app::Clusters::ClosureControl::TriggerConditionEnum>(0);
-        Attributes::TriggerPosition::TypeInfo::DecodableType triggerPosition =
-            static_cast<chip::app::Clusters::ClosureControl::TriggerPositionEnum>(0);
-        Attributes::WaitingDelay::TypeInfo::DecodableType waitingDelay = static_cast<uint32_t>(0);
-        Attributes::KickoffTimer::TypeInfo::DecodableType kickoffTimer = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
