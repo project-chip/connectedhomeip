@@ -3,6 +3,8 @@
 not_automated:
     - name: MinimalRepresentation.py
       reason: Code/Test not being used or not shared code for any other tests
+    - name: TC_CNET_4_3.py
+      reason: CI is not configured for running CNET tests
     - name: TC_CNET_4_4.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_DGGEN_3_2.py
