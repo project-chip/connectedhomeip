@@ -143,6 +143,11 @@ static CHIP_ERROR addParameter(SetupPayload & setupPayload, const SetupPayloadPa
 
 CHIP_ERROR loadPayloadFromFile(SetupPayload & setupPayload, const std::string & filePath)
 {
+#if defined(_LIBCPP_HAS_FILESYSTEM) && _LIBCPP_HAS_FILESYSTEM == 0
+    (void) setupPayload;
+    (void) filePath;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#else
     std::ifstream fileStream(filePath);
     VerifyOrReturnError(!fileStream.fail(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -165,6 +170,7 @@ CHIP_ERROR loadPayloadFromFile(SetupPayload & setupPayload, const std::string & 
         ReturnErrorOnFailure(addParameter(setupPayload, parameter));
     }
     return CHIP_NO_ERROR;
+#endif
 }
 
 CHIP_ERROR generateQRCodeFromFilePath(std::string filePath, std::string & outCode)
