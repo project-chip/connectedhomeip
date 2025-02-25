@@ -67,7 +67,8 @@ public:
         // The outgoing message counter associated with the event. If there is no outgoing message counter
         // this value will be 0.
         uint32_t messageCounter = 0;
-        // If the eventType is kRetransmission this value will be populated with which retransmission attempt this is.
+        // If the eventType is kRetransmission, this value will be populated with the number of the
+        // retransmission attempt
         std::optional<uint8_t> retransmissionCount;
     };
 
