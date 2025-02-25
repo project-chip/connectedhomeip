@@ -56,11 +56,21 @@ public:
      * @brief Cleanly disarm failsafe timer, such as on CommissioningComplete
      */
     void DisarmFailSafe();
+
+    bool SetAddNocCommandStarted(FabricIndex nocFabricIndex)
+    {
+        mFabricIndex = nocFabricIndex;
+
+        AddNOCStartedMarker marker{ mFabricIndex };
+        return StoreAddNOCStartedMarker(marker) == CHIP_NO_ERROR;
+    }
+
     void SetAddNocCommandInvoked(FabricIndex nocFabricIndex)
     {
         mAddNocCommandHasBeenInvoked = true;
         mFabricIndex                 = nocFabricIndex;
     }
+
     void SetUpdateNocCommandInvoked() { mUpdateNocCommandHasBeenInvoked = true; }
     void SetAddTrustedRootCertInvoked() { mAddTrustedRootCertHasBeenInvoked = true; }
     void SetCsrRequestForUpdateNoc(bool isForUpdateNoc) { mIsCsrRequestForUpdateNoc = isForUpdateNoc; }
@@ -167,6 +177,8 @@ private:
         mFailSafeBusy                           = false;
         mIsCsrRequestForUpdateNoc               = false;
         mUpdateTermsAndConditionsHasBeenInvoked = false;
+
+        ClearAddNOCStartedMarker();
     }
 
     void FailSafeTimerExpired();
