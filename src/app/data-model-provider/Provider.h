@@ -79,6 +79,15 @@ public:
     ///    - validation of ACL/timed interaction flags/writability, if those checks are desired.
     virtual ActionReturnStatus WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder) = 0;
 
+    ///   Indicates the start/end of a series of list operations. This function will be called either before the first
+    ///   Write operation or after the last one of a series of consecutive attribute data of the same attribute.
+    ///
+    ///   1) This function will be called if the client tries to set a nullable list attribute to null.
+    ///   2) This function will only be called for a series of consecutive attribute data (regardless the kind of list
+    ///   operation) of the same attribute at the beggining or end of the Write operations.
+    ///   3) The opType argument indicates the type of notification (Start, Failure, Success).
+    virtual void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, BitFlags<ListWriteOperation> opType) = 0;
+
     /// `handler` is used to send back the reply.
     ///    - returning `std::nullopt` means that return value was placed in handler directly.
     ///      This includes cases where command handling and value return will be done asynchronously.
