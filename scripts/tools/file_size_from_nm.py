@@ -488,7 +488,7 @@ def build_treemap(
             maxdepth=max_depth,
         )
     else:
-        assert(style == ChartStyle.ICICLE)
+        assert (style == ChartStyle.ICICLE)
         fig = px.icicle(
             data,
             names="name_with_size",
@@ -716,6 +716,7 @@ def fetch_symbols(elf_file: str, fetch: FetchStyle) -> Tuple[list[Symbol], str]:
     else:
         return symbols_from_objdump(elf_file), '/'
 
+
 def list_id(l: list[str]) -> str:
     return "->".join(l)
 
@@ -745,16 +746,16 @@ def compute_symbol_diff(orig: list[Symbol], base: list[Symbol]) -> list[Symbol]:
                 raise AssertionError("Internal logic error: paths should be valid somewhere")
 
             result.append(replace(base_symbol,
-                name=f"REMOVED: {base_symbol.name}",
-                tree_path = ["DECREASE"] + base_symbol.tree_path,
-            ))
+                                  name=f"REMOVED: {base_symbol.name}",
+                                  tree_path=["DECREASE"] + base_symbol.tree_path,
+                                  ))
             continue
 
         if not base_symbol:
             result.append(replace(orig_symbol,
-                name=f"ADDED: {orig_symbol.name}",
-                tree_path = ["INCREASE"] + orig_symbol.tree_path,
-            ))
+                                  name=f"ADDED: {orig_symbol.name}",
+                                  tree_path=["INCREASE"] + orig_symbol.tree_path,
+                                  ))
             continue
 
         if orig_symbol.size == base_symbol.size:
@@ -765,20 +766,18 @@ def compute_symbol_diff(orig: list[Symbol], base: list[Symbol]) -> list[Symbol]:
 
         if size_delta > 0:
             result.append(replace(orig_symbol,
-                name=f"CHANGED: {orig_symbol.name}",
-                tree_path = ["INCREASE"] + orig_symbol.tree_path,
-                size=size_delta,
-            ))
+                                  name=f"CHANGED: {orig_symbol.name}",
+                                  tree_path=["INCREASE"] + orig_symbol.tree_path,
+                                  size=size_delta,
+                                  ))
         else:
             result.append(replace(orig_symbol,
-                name=f"CHANGED: {orig_symbol.name}",
-                tree_path = ["DECREASE"] + orig_symbol.tree_path,
-                size=-size_delta,
-            ))
+                                  name=f"CHANGED: {orig_symbol.name}",
+                                  tree_path=["DECREASE"] + orig_symbol.tree_path,
+                                  size=-size_delta,
+                                  ))
 
     return result
-
-
 
 
 @click.command()
