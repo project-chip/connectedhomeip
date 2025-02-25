@@ -50,7 +50,6 @@ import ota_image_tool  # noqa: E402 isort:skip
 from chip.tlv import TLVWriter  # noqa: E402 isort:skip
 from custom import CertDeclaration, DacCert, DacPKey, PaiCert  # noqa: E402 isort:skip
 from default import InputArgument  # noqa: E402 isort:skip
-from generate import set_logger  # noqa: E402 isort:skip
 
 OTA_APP_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_app_tlv.bin")
 OTA_BOOTLOADER_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_ssbl_tlv.bin")
