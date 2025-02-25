@@ -97,7 +97,7 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "Step 2c: TH reads CurrentHue attribute from DUT" # Expects 220 (200 + 80*(5/20)) with a tolerance of +/- 3 (15% of 20), so the expected value is in the range (217, 221)
+    - label: "Step 2c: TH reads CurrentHue attribute from DUT" # Expects 220 (200 + 80*(5/20)) with a tolerance of +/- 3 (15% of 20), so the expected value is in the range (217, 223)
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
