@@ -712,12 +712,12 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
         conformance = or_operation([conformance_support.attribute(presents_id, presets_name),
                                    conformance_support.attribute(schedules_id, schedules_name)])
 
-    clusters[thermostat_id].accepted_commands[atomic_request_cmd_id] = XmlCommand(
-        id=atomic_request_cmd_id, name=atomic_request_name, conformance=conformance, privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate)
-    clusters[thermostat_id].generated_commands[atomic_response_cmd_id] = XmlCommand(
-        id=atomic_response_cmd_id, name=atomic_response_name, conformance=conformance, privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate)
-    clusters[thermostat_id].command_map[atomic_request_name] = atomic_request_cmd_id
-    clusters[thermostat_id].command_map[atomic_response_name] = atomic_response_cmd_id
+        clusters[thermostat_id].accepted_commands[atomic_request_cmd_id] = XmlCommand(
+            id=atomic_request_cmd_id, name=atomic_request_name, conformance=conformance, privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate)
+        clusters[thermostat_id].generated_commands[atomic_response_cmd_id] = XmlCommand(
+            id=atomic_response_cmd_id, name=atomic_response_name, conformance=conformance, privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate)
+        clusters[thermostat_id].command_map[atomic_request_name] = atomic_request_cmd_id
+        clusters[thermostat_id].command_map[atomic_response_name] = atomic_response_cmd_id
 
     check_clusters_for_unknown_commands(clusters, problems)
 
