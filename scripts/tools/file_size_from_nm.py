@@ -466,37 +466,37 @@ def build_treemap(
 
             data["name_with_size"][idx] = f"{short_name}: {data["size"][idx]}"
 
-    if style == ChartStyle.TREE_MAP:
-        fig = go.Figure(
-            go.Treemap(
-                labels=data["name_with_size"],
-                ids=data["name"],
-                parents=data["parent"],
-                values=data["size"],
-                textinfo="label+value+percent parent+percent root",
-                hovertext=data["hover"],
+    match style:
+        case ChartStyle.TREE_MAP:
+            fig = go.Figure(
+                go.Treemap(
+                    labels=data["name_with_size"],
+                    ids=data["name"],
+                    parents=data["parent"],
+                    values=data["size"],
+                    textinfo="label+value+percent parent+percent root",
+                    hovertext=data["hover"],
+                    maxdepth=max_depth,
+                )
+            )
+        case ChartStyle.SUNBURST:
+            fig = px.sunburst(
+                data,
+                names="name_with_size",
+                ids="name",
+                parents="parent",
+                values="size",
                 maxdepth=max_depth,
             )
-        )
-    elif style == ChartStyle.SUNBURST:
-        fig = px.sunburst(
-            data,
-            names="name_with_size",
-            ids="name",
-            parents="parent",
-            values="size",
-            maxdepth=max_depth,
-        )
-    else:
-        assert style == ChartStyle.ICICLE
-        fig = px.icicle(
-            data,
-            names="name_with_size",
-            ids="name",
-            parents="parent",
-            values="size",
-            maxdepth=max_depth,
-        )
+        case ChartStyle.ICICLE:
+            fig = px.icicle(
+                data,
+                names="name_with_size",
+                ids="name",
+                parents="parent",
+                values="size",
+                maxdepth=max_depth,
+            )
 
     fig.update_traces(root_color="lightgray")
     fig.show()
@@ -711,11 +711,11 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
 def fetch_symbols(elf_file: str, fetch: FetchStyle) -> Tuple[list[Symbol], str]:
     """Returns the sumbol list and the separator used to split symbols
     """
-    if fetch == FetchStyle.NM:
-        return symbols_from_nm(elf_file), "::"
-
-    assert fetch == FetchStyle.OBJDUMP
-    return symbols_from_objdump(elf_file), '/'
+    match fetch:
+        case FetchStyle.NM:
+            return symbols_from_nm(elf_file), "::"
+        case FetchStyle.OBJDUMP:
+            return symbols_from_objdump(elf_file), '/'
 
 
 def list_id(tree_path: list[str]) -> str:
