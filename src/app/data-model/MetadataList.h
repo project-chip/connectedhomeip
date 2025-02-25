@@ -178,6 +178,16 @@ public:
     /// via `Take`)
     CHIP_ERROR AppendElements(SpanType span) { return AppendElementArrayRaw(span.data(), span.size()); }
 
+    /// Append always attempts to append/extend existing memory.
+    ///
+    /// Automatically attempts to allocate sufficient space to fulfill the element
+    /// requirements.
+    ///
+    /// `span` MUST NOT point inside "own" buffer (and generally will not
+    /// as this class does not expose buffer access except by releasing ownership
+    /// via `Take`)
+    CHIP_ERROR AppendElements(std::initializer_list<T> span) { return AppendElementArrayRaw(span.begin(), span.size()); }
+
     /// Append a single element.
     /// Sufficent append capacity MUST exist.
     CHIP_ERROR Append(const T & value) { return AppendSingleElementRaw(&value); }

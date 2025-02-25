@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/data-model-provider/MetadataList.h>
+#include <app/data-model/MetadataList.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>

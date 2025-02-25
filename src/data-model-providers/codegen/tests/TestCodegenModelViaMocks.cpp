@@ -33,7 +33,6 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/GlobalAttributes.h>
 #include <app/MessageDef/ReportDataMessage.h>
-#include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
@@ -44,6 +43,7 @@
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
+#include <app/data-model/MetadataList.h>
 #include <app/data-model/Nullable.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage-null-handling.h>
@@ -282,38 +282,22 @@ public:
 
     void SetHandleCommands(bool handle) { mHandleCommand = handle; }
 
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                         DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) override
     {
-        VerifyOrReturnError(mOverrideAccepted, CHIP_ERROR_NOT_IMPLEMENTED);
-
-        for (auto id : mAccepted)
-        {
-            if (callback(id, context) != Loop::Continue)
-            {
-                break;
-            }
-        }
-        return CHIP_NO_ERROR;
+        return builder.ReferenceExisting({ mAccepted.data(), mAccepted.size() });
     }
 
-    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
+    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<CommandId> & builder) override
     {
         VerifyOrReturnError(mOverrideGenerated, CHIP_ERROR_NOT_IMPLEMENTED);
-
-        for (auto id : mGenerated)
-        {
-            if (callback(id, context) != Loop::Continue)
-            {
-                break;
-            }
-        }
-        return CHIP_NO_ERROR;
+        return builder.AppendElements({ mGenerated.data(), mGenerated.size() });
     }
 
     void SetOverrideAccepted(bool o) { mOverrideAccepted = o; }
     void SetOverrideGenerated(bool o) { mOverrideGenerated = o; }
 
-    std::vector<CommandId> & AcceptedVec() { return mAccepted; }
+    std::vector<AcceptedCommandEntry> & AcceptedVec() { return mAccepted; }
     std::vector<CommandId> & GeneratedVec() { return mGenerated; }
 
 private:
@@ -321,7 +305,7 @@ private:
     bool mOverrideGenerated = false;
     bool mHandleCommand     = false;
 
-    std::vector<CommandId> mAccepted;
+    std::vector<AcceptedCommandEntry> mAccepted;
     std::vector<CommandId> mGenerated;
 };
 
@@ -1283,8 +1267,8 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
     ASSERT_TRUE(acceptedBuilder.IsEmpty());
 
     // set some overrides
-    handler.AcceptedVec().push_back(1234);
-    handler.AcceptedVec().push_back(999);
+    handler.AcceptedVec().push_back({ 1234, {} });
+    handler.AcceptedVec().push_back({ 999, {} });
 
     handler.GeneratedVec().push_back(33);
 

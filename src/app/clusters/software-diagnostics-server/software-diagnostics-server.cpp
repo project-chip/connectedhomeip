@@ -62,7 +62,8 @@ public:
 
     void InvokeCommand(HandlerContext & handlerContext) override;
 
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                         DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 };
 
 SoftwareDiagnosticsAttrAccess gAttrAccess;
@@ -168,18 +169,19 @@ void SoftwareDiagnosticsCommandHandler::InvokeCommand(HandlerContext & handlerCo
     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 
-CHIP_ERROR SoftwareDiagnosticsCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                                                        CommandIdCallback callback, void * context)
+CHIP_ERROR
+SoftwareDiagnosticsCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                                             DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
+    using namespace Commands;
+    using Privilege = chip::Access::Privilege;
     if (!DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
     {
         // No commmands.
         return CHIP_NO_ERROR;
     }
 
-    callback(Commands::ResetWatermarks::Id, context);
-
-    return CHIP_NO_ERROR;
+    return builder.Append({ ResetWatermarks::Id, {}, Privilege::kOperate }); // From Matter Spec
 }
 
 } // anonymous namespace

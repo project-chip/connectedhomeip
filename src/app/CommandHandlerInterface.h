@@ -22,12 +22,16 @@
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Decode.h>
-#include <app/data-model/List.h> // So we can encode lists
+#include <app/data-model/List.h>         // So we can encode lists
+#include <app/data-model/MetadataList.h> // So we can get filled buffers
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Iterators.h>
 
 namespace chip {
 namespace app {
+namespace DataModel {
+struct AcceptedCommandEntry;
+}
 
 /*
  * This interface permits applications to register a server-side command handler
@@ -122,7 +126,8 @@ public:
      * This is used by callbacks that just look for a particular value in the
      * list.
      */
-    virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+    virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                                 DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -146,7 +151,7 @@ public:
      * This is used by callbacks that just look for a particular value in the
      * list.
      */
-    virtual CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+    virtual CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<CommandId> & builder)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
