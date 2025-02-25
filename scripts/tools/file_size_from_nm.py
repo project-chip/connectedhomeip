@@ -475,13 +475,13 @@ def build_treemap(
         extra_args['color'] = "size"
 
     fig = figure_generator(
-                data,
-                names="name_with_size",
-                ids="name",
-                parents="parent",
-                values="size",
-                maxdepth=max_depth,
-                **extra_args,
+        data,
+        names="name_with_size",
+        ids="name",
+        parents="parent",
+        values="size",
+        maxdepth=max_depth,
+        **extra_args,
     )
 
     fig.update_traces(
