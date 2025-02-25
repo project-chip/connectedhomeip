@@ -21,8 +21,10 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 
+#include "ColorFormat.h"
 #include "LEDWidget.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -54,7 +56,7 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 
 namespace {
-LEDWidget sLightLED;
+RGBLEDWidget sLightLED;
 }
 
 using namespace chip::TLV;
@@ -175,6 +177,60 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     }
 }
 
+#ifdef SL_MATTER_RGB_LED_ENABLED
+void AppTask::LightControlEventHandler(AppEvent * aEvent)
+{
+    uint8_t light_action = aEvent->LightControlEvent.Action;
+    uint32_t value       = *reinterpret_cast<uint32_t *>(aEvent->LightControlEvent.Value);
+    uint8_t brightness   = 1;
+    PlatformMgr().LockChipStack();
+    Protocols::InteractionModel::Status status;
+    app::DataModel::Nullable<uint8_t> currentlevel;
+    // Read currentlevel value
+    status = Clusters::LevelControl::Attributes::CurrentLevel::Get(1, currentlevel);
+    PlatformMgr().UnlockChipStack();
+    if (status == Protocols::InteractionModel::Status::Success && !currentlevel.IsNull())
+    {
+        brightness = currentlevel.Value();
+    }
+    SILABS_LOG("brightness : %d ", brightness);
+    switch (light_action)
+    {
+    case LightingManager::COLOR_ACTION_XY: {
+        RgbColor_t rgb;
+        XyColor_t xy = *reinterpret_cast<XyColor_t *>(&value);
+        rgb          = XYToRgb(brightness, xy.x, xy.y);
+        sLightLED.SetColor(rgb.r, rgb.g, rgb.b);
+        ChipLogProgress(Zcl, "XY to RGB: X: %u, Y: %u | R: %u, G: %u, B: %u", xy.x, xy.y, rgb.r, rgb.g, rgb.b);
+    }
+    break;
+    case LightingManager::COLOR_ACTION_HSV: {
+        RgbColor_t rgb;
+        HsvColor_t hsv = *reinterpret_cast<HsvColor_t *>(&value);
+        SILABS_LOG("Color hue : %u ", hsv.h);
+        SILABS_LOG("Color Saturation : %u ", hsv.s);
+        hsv.v = brightness;
+        rgb   = HsvToRgb(hsv);
+        sLightLED.SetColor(rgb.r, rgb.g, rgb.b);
+        ChipLogProgress(Zcl, "HSV to RGB: H: %u, S: %u, V: %u | R: %u, G: %u, B: %u", hsv.h, hsv.s, hsv.v, rgb.r, rgb.g, rgb.b);
+    }
+    break;
+    case LightingManager::COLOR_ACTION_CT: {
+        RgbColor_t rgb;
+        CtColor_t ct;
+        ct.ctMireds = *reinterpret_cast<uint16_t *>(&value);
+        rgb         = CTToRgb(ct);
+        ChipLogProgress(Zcl, "CT to RGB: ct: %u | R: %u, G: %u, B: %u", ct.ctMireds, rgb.r, rgb.g, rgb.b);
+        sLightLED.SetColor(rgb.r, rgb.g, rgb.b);
+    }
+    break;
+    default:
+        ChipLogProgress(NotSpecified, "LightMgr:Unknown");
+        break;
+    }
+}
+#endif // SL_MATTER_RGB_LED_ENABLED
+
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
     AppEvent button_event           = {};
@@ -239,6 +295,18 @@ void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t a
     event.Handler           = LightActionEventHandler;
     PostEvent(&event);
 }
+#ifdef SL_MATTER_RGB_LED_ENABLED
+void AppTask::PostLightControlActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint32_t * aValue)
+{
+    AppEvent light_event                 = {};
+    light_event.Type                     = AppEvent::kEventType_Light;
+    light_event.LightControlEvent.Actor  = aActor;
+    light_event.LightControlEvent.Action = aAction;
+    light_event.LightControlEvent.Value  = aValue;
+    light_event.Handler                  = LightControlEventHandler;
+    PostEvent(&light_event);
+}
+#endif // SL_MATTER_RGB_LED_ENABLED
 
 void AppTask::UpdateClusterState(intptr_t context)
 {
