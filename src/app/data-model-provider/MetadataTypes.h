@@ -29,12 +29,6 @@ namespace DataModel {
 
 
 
-/**
- * @brief Type for the attribute mask
- */
- typedef uint32_t AttributeMask;
-
-
 
 /// Represents various endpoint composition patters as defined in the spec
 /// as `9.2.1. Endpoint Composition patterns`
