@@ -17181,10 +17181,10 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kActive   = 0,
-    kInactive = 1,
-    kState    = 2,
-    kMask     = 3,
+    kActive   = 1,
+    kInactive = 2,
+    kState    = 3,
+    kMask     = 4,
 };
 
 struct Type

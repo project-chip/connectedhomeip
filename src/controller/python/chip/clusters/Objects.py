@@ -18493,10 +18493,10 @@ class DishwasherAlarm(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="active", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="inactive", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="state", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="mask", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="active", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="inactive", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="state", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="mask", Tag=4, Type=uint),
                     ])
 
             active: uint = 0
