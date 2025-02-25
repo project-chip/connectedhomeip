@@ -42,6 +42,8 @@ public:
 
     CHIP_ERROR Init(const InitParams & initParams);
 
+    void CheckAddNOCStartedMarker();
+
     // ===== Members for internal use by other Device Layer components.
 
     /**
