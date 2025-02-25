@@ -80,7 +80,7 @@ class TC_SEAR_1_6(MatterBaseTest):
 
         return progress
 
-    def TC_SEAR_1_6(self) -> list[str]:
+    def pics_TC_SEAR_1_6(self) -> list[str]:
         return ["SEAR.S", "SEAR.S.A0005", "SEAR.S.A0000", "SEAR.S.A0002", "SEAR.S.M.HAS_MANUAL_OPERATING_STATE_CONTROL"]
 
     @async_test_body
@@ -93,6 +93,17 @@ class TC_SEAR_1_6(MatterBaseTest):
             if app_pid == 0:
                 asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
             self.app_pipe = self.app_pipe + str(app_pid)
+
+        attributes = Clusters.ServiceArea.Attributes
+
+        if not await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.SupportedAreas):
+            asserts.fail("Supported areas attribute required in attribute list to run test")
+
+        if not await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.SelectedAreas):
+            asserts.fail("Selected areas attribute required in attribute list to run test")
+
+        if not await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.Progress):
+            asserts.fail("Progress attribute required in attribute list to run test")
 
         self.print_step(1, "Commissioning, already done")
 
