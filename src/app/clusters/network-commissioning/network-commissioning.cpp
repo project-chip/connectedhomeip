@@ -1408,6 +1408,7 @@ CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & clus
 
     if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
     {
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
         ReturnErrorOnFailure(builder.Append(QueryIdentityResponse::Id));
     }
 

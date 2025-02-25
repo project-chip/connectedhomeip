@@ -116,8 +116,8 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
     if (HasFeature(Feature::kStartTimeAdjustment))
     {
-        ReturnErrorOnFailure(builder.Append({ StartTimeAdjustRequest::Id, {} } //
-                                            ));
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
+        ReturnErrorOnFailure(builder.Append({ StartTimeAdjustRequest::Id, {} }));
     }
 
     if (HasFeature(Feature::kPausable))
@@ -130,17 +130,20 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
     if (HasFeature(Feature::kForecastAdjustment))
     {
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
         ReturnErrorOnFailure(builder.Append({ ModifyForecastRequest::Id, {} }));
     }
 
     if (HasFeature(Feature::kConstraintBasedAdjustment))
     {
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
         ReturnErrorOnFailure(builder.Append({ RequestConstraintBasedForecast::Id, {} }));
     }
 
     if (HasFeature(Feature::kStartTimeAdjustment) || HasFeature(Feature::kForecastAdjustment) ||
         HasFeature(Feature::kConstraintBasedAdjustment))
     {
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
         ReturnErrorOnFailure(builder.Append({ CancelRequest::Id, {} }));
     }
 

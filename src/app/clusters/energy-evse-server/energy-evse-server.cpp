@@ -196,6 +196,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
     if (HasFeature(Feature::kV2x))
     {
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
         ReturnErrorOnFailure(builder.Append({ EnableDischarging::Id, QF::kTimed, kDefaultPrivilege }));
     }
 
@@ -210,6 +211,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
     if (SupportsOptCmd(OptionalCommands::kSupportsStartDiagnostics))
     {
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
         ReturnErrorOnFailure(builder.Append({ StartDiagnostics::Id, QF::kTimed, kDefaultPrivilege }));
     }
     return CHIP_NO_ERROR;

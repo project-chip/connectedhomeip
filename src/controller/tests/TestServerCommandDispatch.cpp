@@ -121,6 +121,7 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
     }
 
     // We just have one command id.
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
     ReturnErrorOnFailure(builder.Append({ TestSimpleArgumentRequest::Id, {} }));
     return CHIP_NO_ERROR;
 }
