@@ -1121,21 +1121,21 @@ TEST_F(TestCodegenModelViaMocks, FindAttribute)
     EXPECT_FALSE(info->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
 
     // Mocks always set everything as R/W with administrative privileges
-    EXPECT_EQ(info->readPrivilege, chip::Access::Privilege::kAdminister);  // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(info->writePrivilege, chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info->GetReadPrivilege(), chip::Access::Privilege::kAdminister);  // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info->GetWritePrivilege(), chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
 
     info = finder.Find(ConcreteAttributePath(kMockEndpoint2, MockClusterId(2), MockAttributeId(2)));
     ASSERT_TRUE(info.has_value());
     EXPECT_TRUE(info->flags.Has(AttributeQualityFlags::kListAttribute));   // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(info->readPrivilege, chip::Access::Privilege::kAdminister);  // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(info->writePrivilege, chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info->GetReadPrivilege(), chip::Access::Privilege::kAdminister);  // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info->GetWritePrivilege(), chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
 
     // test a read-only attribute, which will not have a write privilege
     info = finder.Find(ConcreteAttributePath(kMockEndpoint3, MockClusterId(3), kReadOnlyAttributeId));
     ASSERT_TRUE(info.has_value());
     EXPECT_FALSE(info->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(info->readPrivilege, chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_FALSE(info->writePrivilege.has_value());                       // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info->GetReadPrivilege(), chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_FALSE(info->writePrivilegeHasValue());                       // NOLINT(bugprone-unchecked-optional-access)
 }
 
 // global attributes are EXPLICITLY supported

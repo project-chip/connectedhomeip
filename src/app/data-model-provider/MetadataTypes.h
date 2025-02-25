@@ -89,11 +89,41 @@ struct AttributeEntry
     AttributeId attributeId;
     BitFlags<AttributeQualityFlags> flags;
 
+
+    // Constructor
+    AttributeEntry() : readPrivilege(0), writePrivilege(0) {}
+
+    void SetReadPrivilege(Access::Privilege r)
+    {
+        readPrivilege = chip::to_underlying(r);
+    }
+
+    Access::Privilege GetReadPrivilege() const
+    {
+        return static_cast< Access::Privilege >(readPrivilege);
+    }
+
+    void SetWritePrivilege(Access::Privilege w)
+    {
+        writePrivilege = chip::to_underlying(w);
+    }
+
+    Access::Privilege GetWritePrivilege() const
+    {
+        return static_cast< Access::Privilege >(writePrivilege);
+    }
+
+    bool readPrivilegeHasValue() {return readPrivilege;}
+    bool writePrivilegeHasValue() {return writePrivilege;}
+
+
+    private:
+
     // read/write access will be missing if read/write is NOT allowed
     //
     // NOTE: this should be compacted for size
-    std::optional<Access::Privilege> readPrivilege;  // generally defaults to View if readable
-    std::optional<Access::Privilege> writePrivilege; // generally defaults to Operate if writable
+    std::underlying_type_t<Access::Privilege> readPrivilege : 5 ;  // generally defaults to View if readable
+    std::underlying_type_t<Access::Privilege> writePrivilege : 5 ; // generally defaults to Operate if writable
 };
 
 // Bitmask values for different Command qualities.
@@ -111,7 +141,26 @@ struct AcceptedCommandEntry
     // TODO: this can be more compact (use some flags for privilege)
     //       to make this compact, add a compact enum and make flags/invokePrivilege getters (to still be type safe)
     BitFlags<CommandQualityFlags> flags;
-    Access::Privilege invokePrivilege = Access::Privilege::kOperate;
+
+
+    // Constructor
+    AcceptedCommandEntry() : 
+        invokePrivilege(chip::to_underlying(Access::Privilege::kOperate)) {}
+ 
+        
+    Access::Privilege GetInvokePrivilege() const
+    {
+        return static_cast< Access::Privilege >(invokePrivilege);
+    }
+    
+    void SetInvokePrivilege(Access::Privilege i)
+    {
+        invokePrivilege = chip::to_underlying(i);
+    }
+
+    
+    private:
+    std::underlying_type_t<Access::Privilege> invokePrivilege : 5 ;
 };
 
 /// Represents a device type that resides on an endpoint

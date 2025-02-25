@@ -1745,7 +1745,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(c
                                      .requestType = Access::RequestType::kCommandInvokeRequest,
                                      .entityId    = aRequest.path.mCommandId };
 
-    CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, entry.invokePrivilege);
+    CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, entry.GetInvokePrivilege());
     if (err != CHIP_NO_ERROR)
     {
         if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
