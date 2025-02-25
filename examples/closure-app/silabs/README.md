@@ -4,16 +4,16 @@ An example showing the use of CHIP on the Silicon Labs SiWx917
 
 <hr>
 
-- [Matter SiWx917 Closure Example](#matter-siwx917-closure-example)
-  - [Introduction](#introduction)
-  - [Building](#building)
-  - [Flashing the Application](#flashing-the-application)
-  - [Running the Complete Example](#running-the-complete-example)
-  - [Group Communication (Multicast)](#group-communication-multicast)
-  - [Building options](#building-options)
-    - [Disabling logging](#disabling-logging)
-    - [Debug build / release build](#debug-build--release-build)
-    - [KVS maximum entry count](#kvs-maximum-entry-count)
+-   [Matter SiWx917 Closure Example](#matter-siwx917-closure-example)
+    -   [Introduction](#introduction)
+    -   [Building](#building)
+    -   [Flashing the Application](#flashing-the-application)
+    -   [Running the Complete Example](#running-the-complete-example)
+    -   [Group Communication (Multicast)](#group-communication-multicast)
+    -   [Building options](#building-options)
+        -   [Disabling logging](#disabling-logging)
+        -   [Debug build / release build](#debug-build--release-build)
+        -   [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
@@ -25,13 +25,13 @@ An example showing the use of CHIP on the Silicon Labs SiWx917
 
 ## Introduction
 
-The SiWx917 Closure example provides a baseline demonstration of a closure
-base device type, built using Matter and the Silicon Labs gecko SDK. It
-can be controlled by a Chip controller over Wifi network.
+The SiWx917 Closure example provides a baseline demonstration of a closure base
+device type, built using Matter and the Silicon Labs gecko SDK. It can be
+controlled by a Chip controller over Wifi network.
 
-The SiWx917 device can be commissioned over Bluetooth Low Energy where the device
-and the Chip controller will exchange security information with the Rendez-vous
-procedure.
+The SiWx917 device can be commissioned over Bluetooth Low Energy where the
+device and the Chip controller will exchange security information with the
+Rendez-vous procedure.
 
 The Closure examples are intended to serve both as a means to explore the
 workings of Matter Closure as well as a template for creating real products
@@ -61,7 +61,7 @@ based on the Silicon Labs platform.
         > in the Silicon Labs Matter Github Repo
 
     917SoC boards :
-    
+
     -   BRD4338A
 
 *   Build the example application:
@@ -98,18 +98,21 @@ arguments
 
 ## Flashing the Application
 
--   SiWx917 SoC device support is available in the latest Simplicity Commander. The SiWx917 SOC board will support .rps as the only file to flash.
+-   SiWx917 SoC device support is available in the latest Simplicity Commander.
+    The SiWx917 SOC board will support .rps as the only file to flash.
 
 -   Or with the Ozone debugger, just load the .out file.
 
-All SiWx917 boards require a connectivity firmware, see Silicon Labs documentation for more
-info. Pre-built bootloader binaries are available in the Assets section of the
-Releases page on
+All SiWx917 boards require a connectivity firmware, see Silicon Labs
+documentation for more info. Pre-built bootloader binaries are available in the
+Assets section of the Releases page on
 [Silabs Matter Github](https://github.com/SiliconLabs/matter/releases) .
 
 ## Running the Complete Example
 
--   To run a Matter over Wi-Fi application, you must first create a Matter network using the chip-tool, and then control the Matter device from the chip-tool.
+-   To run a Matter over Wi-Fi application, you must first create a Matter
+    network using the chip-tool, and then control the Matter device from the
+    chip-tool.
 
 **Creating the Matter Network**
 
@@ -120,7 +123,7 @@ Releases page on
      - The Silicon Labs device will join the Wi-Fi network and get an IP address. It then starts providing mDNS records on IPv4 and IPv6.
      - Future communications (tests) will then happen over Wi-Fi.
 
-*   You can provision and control the Chip device using the python controller,
+-   You can provision and control the Chip device using the python controller,
     Chip tool standalone, Android or iOS app
 
     [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
@@ -129,7 +132,7 @@ Releases page on
 
           $ chip-tool pairing ble-wifi 1 <SSID> <Password> 20202021 3840
 
--   User interface :
+*   User interface :
 
     **Push Button 0**
 
@@ -145,8 +148,8 @@ Releases page on
 
 ## Group Communication (Multicast)
 
-With this Closure example you can also use group communication to send
-Closure commands to multiples devices at once. Please refer to the
+With this Closure example you can also use group communication to send Closure
+commands to multiples devices at once. Please refer to the
 [chip-tool documentation](../../chip-tool/README.md) _Configuring the server
 side for Group Commands_ and _Using the Client to Send Group (Multicast) Matter
 Commands_
