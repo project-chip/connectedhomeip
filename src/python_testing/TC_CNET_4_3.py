@@ -118,8 +118,9 @@ class TC_CNET_4_3(MatterBaseTest):
         last_network_id = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkID)
-        asserts.assert_is(last_network_id, NullValue,
-                          "Verify that the LastNetworkID attribute value is null")
+        matching_networks_count = sum(map(lambda x: x.networkID == last_network_id, networks))
+        asserts.assert_equal(matching_networks_count, 1,
+                             "Verify that LastNetworkID attribute matches the NetworkID value of one of the entries")
 
         self.step(8)
         last_connect_error_value = await self.read_single_attribute_check_success(
