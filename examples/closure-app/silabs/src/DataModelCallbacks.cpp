@@ -52,6 +52,6 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
 /* Forwards all attributes changes */
 void MatterClosureControlClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
-    ChipLogProgress(Zcl, "Closure cluster ID: " ChipLogFormatMEI , ChipLogValueMEI(attributePath.mAttributeId));
-    //Attribute changes handling will done in later.
+    ChipLogProgress(Zcl, "Closure cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mAttributeId));
+    // Attribute changes handling will done in later.
 }

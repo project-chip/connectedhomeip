@@ -37,5 +37,4 @@ void ClosureApplicationShutdown()
 {
     ChipLogDetail(AppServer, "Closure App Shutting down: ClosureApplicationShutdown()");
     ClosureControlShutdown();
-
 }

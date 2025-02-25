@@ -18,12 +18,12 @@
 
 #include <ClosureControlInstance.h>
 
+#include "silabs_utils.h"
+#include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app-common/zap-generated/cluster-enums.h>
 #include <app/clusters/closure-control-server/closure-control-server.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include "silabs_utils.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -64,8 +64,8 @@ CHIP_ERROR ClosureControlInit(EndpointId endpointId)
     }
 
     /* Manufacturer may optionally not support all features, commands & attributes */
-    gClosureCtrlInstance = std::make_unique<ClosureControlInstance>(
-        EndpointId(endpointId), *gClosureCtrlDelegate, Feature::kCalibration, OptionalAttributes::kCountdownTime);
+    gClosureCtrlInstance = std::make_unique<ClosureControlInstance>(EndpointId(endpointId), *gClosureCtrlDelegate,
+                                                                    Feature::kCalibration, OptionalAttributes::kCountdownTime);
     if (!gClosureCtrlInstance)
     {
         ChipLogError(AppServer, "Failed to allocate memory for ClosureControlInstance");

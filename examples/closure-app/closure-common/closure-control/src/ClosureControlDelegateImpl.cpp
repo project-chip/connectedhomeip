@@ -15,8 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/closure-control-server/closure-control-server.h>
 #include <ClosureControlDelegate.h>
+#include <app/clusters/closure-control-server/closure-control-server.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
@@ -26,7 +26,7 @@ using namespace chip::app::Clusters::ClosureControl;
 
 using Protocols::InteractionModel::Status;
 
-//Mock Error List generated for sample application usage.
+// Mock Error List generated for sample application usage.
 const ClosureErrorEnum kCurrentErrorList[] = {
     {
         ClosureErrorEnum::kBlocked,
@@ -42,9 +42,7 @@ const ClosureErrorEnum kCurrentErrorList[] = {
     },
 };
 
-ClosureControlDelegate::ClosureControlDelegate(EndpointId clustersEndpoint) :
-    mpClosureControlInstance(nullptr)
-{}
+ClosureControlDelegate::ClosureControlDelegate(EndpointId clustersEndpoint) : mpClosureControlInstance(nullptr) {}
 
 void ClosureControlDelegate::SetClosureControlInstance(ClosureControl::Instance & instance)
 {
@@ -61,31 +59,31 @@ DataModel::Nullable<uint32_t> ClosureControlDelegate::GetCountdownTime()
     return DataModel::Nullable<uint32_t>();
 }
 
-//Below Function will be removed along removal of Fallback feature from closure control cluster
+// Below Function will be removed along removal of Fallback feature from closure control cluster
 RestingProcedureEnum ClosureControlDelegate::GetRestingProcedure()
 {
     return RestingProcedureEnum::kDoNothing;
 }
 
-//Below Function will be removed along removal of Fallback feature from closure control cluster
+// Below Function will be removed along removal of Fallback feature from closure control cluster
 TriggerConditionEnum ClosureControlDelegate::GetTriggerCondition()
 {
     return TriggerConditionEnum::kAfterDelay;
 }
 
-//Below Function will be removed along removal of Fallback feature from closure control cluster
+// Below Function will be removed along removal of Fallback feature from closure control cluster
 TriggerPositionEnum ClosureControlDelegate::GetTriggerPosition()
 {
     return TriggerPositionEnum::kAtFullyClosed;
 }
 
-//Below Function will be removed along removal of Fallback feature from closure control cluster
+// Below Function will be removed along removal of Fallback feature from closure control cluster
 uint32_t ClosureControlDelegate::GetWaitingDelay()
 {
     return 0;
 }
 
-//Below Function will be removed along removal of Fallback feature from closure control cluster
+// Below Function will be removed along removal of Fallback feature from closure control cluster
 uint32_t ClosureControlDelegate::GetKickoffTimer()
 {
     return 0;
@@ -111,12 +109,14 @@ CHIP_ERROR ClosureControlDelegate::EndCurrentErrorListRead()
     return CHIP_NO_ERROR;
 }
 
-Protocols::InteractionModel::Status ClosureControlDelegate::Stop(){
+Protocols::InteractionModel::Status ClosureControlDelegate::Stop()
+{
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status ClosureControlDelegate::MoveTo(const Optional<TagPositionEnum> tag, const Optional<TagLatchEnum> latch,
-                                                       const Optional<Globals::ThreeLevelAutoEnum> speed)
+Protocols::InteractionModel::Status ClosureControlDelegate::MoveTo(const Optional<TagPositionEnum> tag,
+                                                                   const Optional<TagLatchEnum> latch,
+                                                                   const Optional<Globals::ThreeLevelAutoEnum> speed)
 {
     return Status::Success;
 }
@@ -126,16 +126,16 @@ Protocols::InteractionModel::Status ClosureControlDelegate::Calibrate()
     return Status::Success;
 }
 
-//Below Function will be removed along removal of Fallback feature from closure control cluster
+// Below Function will be removed along removal of Fallback feature from closure control cluster
 Protocols::InteractionModel::Status ClosureControlDelegate::ConfigureFallback(const Optional<RestingProcedureEnum> restingProcedure,
-    const Optional<TriggerConditionEnum> triggerCondition,
-    const Optional<TriggerPositionEnum> triggerPosition,
-    const Optional<uint32_t> waitingDelay)
+                                                                              const Optional<TriggerConditionEnum> triggerCondition,
+                                                                              const Optional<TriggerPositionEnum> triggerPosition,
+                                                                              const Optional<uint32_t> waitingDelay)
 {
     return Status::Success;
 }
 
-//Below Function will be removed along removal of Fallback feature from closure control cluster
+// Below Function will be removed along removal of Fallback feature from closure control cluster
 Protocols::InteractionModel::Status ClosureControlDelegate::CancelFallback()
 {
     return Status::Success;

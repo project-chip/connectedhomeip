@@ -33,19 +33,19 @@
 #include <app/util/endpoint-config-api.h>
 #include <assert.h>
 #include <lib/support/BitMask.h>
-#include <setup_payload/OnboardingCodesUtil.h>
-#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
-#include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <setup_payload/SetupPayload.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+#include <setup_payload/OnboardingCodesUtil.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <setup_payload/SetupPayload.h>
 
 #define APP_FUNCTION_BUTTON 0
 #define APP_ClOSURE_BUTTON 1
 
 namespace {
 
- constexpr chip::EndpointId kClosureBaseEndpoint        = 1;
+constexpr chip::EndpointId kClosureBaseEndpoint = 1;
 
 } // namespace
 
@@ -64,14 +64,14 @@ namespace app {
 namespace Clusters {
 namespace ClosureControl {
 
- static chip::BitMask<Feature> sFeatureMap(Feature::kCalibration);
+static chip::BitMask<Feature> sFeatureMap(Feature::kCalibration);
 
 } // namespace ClosureControl
 } // namespace Clusters
 } // namespace app
 } // namespace chip
 
- AppTask AppTask::sAppTask;
+AppTask AppTask::sAppTask;
 
 EndpointId GetClosureDeviceEndpointId()
 {
@@ -147,6 +147,6 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     AppEvent button_event           = {};
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
-    button_event.Handler = BaseApplication::ButtonHandler;
+    button_event.Handler            = BaseApplication::ButtonHandler;
     AppTask::GetAppTask().PostEvent(&button_event);
- }
+}

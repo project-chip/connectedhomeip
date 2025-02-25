@@ -57,7 +57,7 @@
  *
  * 0x8005: example Closure app
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8005 //TODO allocate new product ID
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8005 // TODO allocate new product ID
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

@@ -21,14 +21,13 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/closure-control-server/closure-control-server.h>
 
-#include <protocols/interaction_model/StatusCode.h>
 #include <lib/core/CHIPError.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ClosureControl {
-
 
 // This is an application level delegate to handle operational state commands according to the specific business logic.
 class ClosureControlDelegate : public ClosureControl::Delegate
@@ -45,12 +44,12 @@ public:
      *********************************************************************************/
     Protocols::InteractionModel::Status Stop() override;
     Protocols::InteractionModel::Status MoveTo(const Optional<TagPositionEnum> tag, const Optional<TagLatchEnum> latch,
-                                                       const Optional<Globals::ThreeLevelAutoEnum> speed) override;
+                                               const Optional<Globals::ThreeLevelAutoEnum> speed) override;
     Protocols::InteractionModel::Status Calibrate() override;
     Protocols::InteractionModel::Status ConfigureFallback(const Optional<RestingProcedureEnum> restingProcedure,
-        const Optional<TriggerConditionEnum> triggerCondition,
-        const Optional<TriggerPositionEnum> triggerPosition,
-        const Optional<uint32_t> waitingDelay) override;
+                                                          const Optional<TriggerConditionEnum> triggerCondition,
+                                                          const Optional<TriggerPositionEnum> triggerPosition,
+                                                          const Optional<uint32_t> waitingDelay) override;
     Protocols::InteractionModel::Status CancelFallback() override;
 
     // ------------------------------------------------------------------

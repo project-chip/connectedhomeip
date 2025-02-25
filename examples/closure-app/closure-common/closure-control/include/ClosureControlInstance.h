@@ -32,8 +32,9 @@ using namespace chip::app::Clusters::ClosureControl;
 class ClosureControlInstance : public Instance
 {
 public:
-    ClosureControlInstance(EndpointId aEndpointId, ClosureControlDelegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttributes) :
-    ClosureControl::Instance(aEndpointId, aDelegate, aFeature, aOptionalAttributes)
+    ClosureControlInstance(EndpointId aEndpointId, ClosureControlDelegate & aDelegate, Feature aFeature,
+                           OptionalAttributes aOptionalAttributes) :
+        ClosureControl::Instance(aEndpointId, aDelegate, aFeature, aOptionalAttributes)
     {
         mDelegate = &aDelegate;
     }
