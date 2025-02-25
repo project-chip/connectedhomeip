@@ -50,6 +50,7 @@ import ota_image_tool  # noqa: E402 isort:skip
 from chip.tlv import TLVWriter  # noqa: E402 isort:skip
 from custom import CertDeclaration, DacCert, DacPKey, PaiCert  # noqa: E402 isort:skip
 from default import InputArgument  # noqa: E402 isort:skip
+from generate import set_logger  # noqa: E402 isort:skip
 
 OTA_APP_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_app_tlv.bin")
 OTA_BOOTLOADER_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_ssbl_tlv.bin")
@@ -62,6 +63,7 @@ class TAG:
     APPLICATION = 1
     BOOTLOADER = 2
     FACTORY_DATA = 3
+    WIFI_917_TA_M4 = 4
 
 
 def set_logger():
@@ -163,6 +165,32 @@ def generate_app(args: object):
         return [OTA_APP_TLV_TEMP, args.app_input_file]
 
 
+def generate_wifi_image(args: object):
+    """
+    Generate app payload with descriptor. If a certain option is not specified, use the default values.
+    """
+    logging.info("App descriptor information:")
+
+    descriptor = generate_descriptor(args.app_version, args.app_version_str, args.app_build_date)
+    logging.info(f"App encryption enable: {args.enc_enable}")
+    if args.enc_enable:
+        inputFile = open(args.wifi_input_file, "rb")
+        enc_file = crypto_utils.encryptData(inputFile.read(), args.input_ota_key, INITIALIZATION_VECTOR)
+        enc_file1 = bytes([ord(x) for x in enc_file])
+        file_size = len(enc_file1)
+        payload = generate_header(TAG.WIFI_917_TA_M4, len(descriptor) + file_size) + descriptor + enc_file1
+    else:
+        file_size = os.path.getsize(args.wifi_input_file)
+        logging.info(f"file size: {file_size}")
+        payload = generate_header(TAG.WIFI_917_TA_M4, len(descriptor) + file_size) + descriptor
+
+    write_to_temp(OTA_APP_TLV_TEMP, payload)
+    if args.enc_enable:
+        return [OTA_APP_TLV_TEMP]
+    else:
+        return [OTA_APP_TLV_TEMP, args.wifi_input_file]
+
+
 def generate_bootloader(args: object):
     """
     Generate SSBL payload with descriptor. If a certain option is not specified, use the default values.
@@ -259,6 +287,9 @@ def create_image(args: object):
     if args.app_input_file:
         input_files += generate_app(args)
 
+    if args.wifi_input_file:
+        input_files += generate_wifi_image(args)
+
     if len(input_files) == 0:
         print("Please specify an input option.")
         sys.exit(1)
@@ -312,6 +343,8 @@ def main():
 
     create_parser.add_argument('-app', "--app-input-file",
                                help='Path to application input file')
+    create_parser.add_argument('-wifi', "--wifi-input-file",
+                               help='Path to OTA image for SiWx917 (TA/M4/Combined file)')
     create_parser.add_argument('--app-version', type=any_base_int,
                                help='Application Software version (numeric)')
     create_parser.add_argument('--app-version-str', type=str,
