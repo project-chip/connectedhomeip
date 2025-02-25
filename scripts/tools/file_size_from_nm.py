@@ -378,7 +378,7 @@ def build_treemap(
     root = f"FILE: {name}"
     if zoom:
         root = root + f" (FILTER: {zoom})"
-    data: dict[str, list] = dict(name=[root], parent=[""], size=[0], hover=[""], name_with_size=[""])
+    data: dict[str, list] = dict(name=[root], parent=[""], size=[0], hover=[""], name_with_size=[""], short_name=[""])
 
     known_parents: set[str] = set()
     total_sizes: dict = {}
@@ -419,6 +419,7 @@ def build_treemap(
                 data["size"].append(0)
                 data["hover"].append(next_value)
                 data["name_with_size"].append("")
+                data["short_name"].append(name)
             total_sizes[next_value] = total_sizes.get(next_value, 0) + symbol.size
             partial = next_value
 
@@ -428,12 +429,42 @@ def build_treemap(
         data["size"].append(symbol.size)
         data["hover"].append(f"{symbol.name} of type {symbol.symbol_type}")
         data["name_with_size"].append("")
+        data["short_name"].append(tree_name[-1])
 
     for idx, label in enumerate(data["name"]):
         if data["size"][idx] == 0:
             total_size = total_sizes.get(label, 0)
             data["hover"][idx] = f"{label}: {total_size}"
-            data["name_with_size"][idx] = f"{label}: {total_size}"
+            if idx == 0:
+                data["name_with_size"][idx] = f"{label}: {total_size}"
+            else:
+                # The "full name" is generally quite long, so shorten it...
+                data["name_with_size"][idx] = f"{data["short_name"][idx]}: {total_size}"
+        else:
+            # When using object files, the paths hare are the full "foo::bar::....::method"
+            # so clean them up a bit
+            short_name = data["short_name"][idx]
+
+            # remove namespaces, but keep template parts
+            # This tries to convert:
+            #   foo::bar::baz(int, double) -> baz(int, double)
+            #   foo::bar::baz<x::y>(int, double) -> baz<x::y>(int, double)
+            #   foo::bar::baz(some::ns:bit, double) -> baz(some::ns::bit, double)
+            #   foo::bar::baz<x::y>(some::ns:bit, double) -> baz<x::y>(some::ns::bit, double)
+            #
+            # Remove all before '::', however '::' found before the first of < or (
+            #
+            limit1 = short_name.find('<')
+            limit2 = short_name.find('(')
+            if limit1 >= 0 and limit1 < limit2:
+                limit = limit1
+            else:
+                limit = limit2
+            separate_idx = short_name.rfind('::', 0, limit)
+            if separate_idx:
+                short_name = short_name[separate_idx+2:]
+
+            data["name_with_size"][idx] = f"{short_name}: {data["size"][idx]}"
 
     if style == ChartStyle.TREE_MAP:
         fig = go.Figure(
