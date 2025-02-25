@@ -45,6 +45,7 @@ function show_help() {
     echo
     echo "Options:"
     echo "  -h, --help                 Display this information"
+    echo "  --cpu                      Comma separated list of CPUs. Like `arm` or `arm64`"
     echo "  --tizen-sdk-path           Set directory for Tizen SDK installation. Default is $TIZEN_SDK_ROOT"
     echo "  --tizen-sdk-data-path      Set directory for Tizen SDK runtime data. Default is $TIZEN_SDK_DATA_PATH"
     echo "  --install-dependencies     This option installs all required dependencies"
@@ -141,8 +142,8 @@ function cleanup() {
 }
 
 # ------------------------------------------------------------------------------
-# Function for installing Tizen SDK.
-function install_tizen_sdk() {
+# Function for installing Tizen SDK (arm).
+function install_tizen_sdk_arm() {
 
     mkdir -p "$TIZEN_SDK_ROOT" || return
 
@@ -209,17 +210,9 @@ function install_tizen_sdk() {
         'app-core-common-*.rpm'
         'aul-0*.armv7l.rpm'
         'aul-devel-*.armv7l.rpm'
-        'bluetooth-frwk-0*.armv7l.rpm'
         'bundle-0*.armv7l.rpm'
         'bundle-devel-*.armv7l.rpm'
         'buxton2-*.armv7l.rpm'
-        'capi-network-bluetooth-0*.armv7l.rpm'
-        'capi-network-bluetooth-devel-*.armv7l.rpm'
-        'capi-network-nsd-*.armv7l.rpm'
-        'capi-network-thread-*.armv7l.rpm'
-        'capi-system-peripheral-io-*.armv7l.rpm'
-        'capi-system-peripheral-io-devel-*.armv7l.rpm'
-        'capi-system-resource-1*.armv7l.rpm'
         'cynara-devel-*.armv7l.rpm'
         'dbus-1*.armv7l.rpm'
         'dbus-devel-*.armv7l.rpm'
@@ -232,23 +225,26 @@ function install_tizen_sdk() {
         'libcynara-commons-*.armv7l.rpm'
         'libdns_sd-*.armv7l.rpm'
         'libjson-glib-*.armv7l.rpm'
-        'libnsd-dns-sd-*.armv7l.rpm'
         'libsessiond-0*.armv7l.rpm'
         'libsystemd-*.armv7l.rpm'
         'libtzplatform-config-*.armv7l.rpm'
         'parcel-0*.armv7l.rpm'
         'parcel-devel-*.armv7l.rpm'
         'pkgmgr-info-*.armv7l.rpm'
-        'sensord-*.armv7l.rpm'
         'sensord-devel-*.armv7l.rpm'
         'sensord-dummy-*.armv7l.rpm'
         'vconf-compat-*.armv7l.rpm'
-        'vconf-internal-keys-devel-*.armv7l.rpm')
-    download "$URL" "${PKG_ARR[@]}"
-
-    # Unified packages (snapshots)
-    URL="http://download.tizen.org/snapshots/TIZEN/Tizen/Tizen-Unified/latest/repos/standard/packages/armv7l/"
-    PKG_ARR=()
+        'vconf-internal-keys-devel-*.armv7l.rpm'
+        'bluetooth-frwk-0*.armv7l.rpm'
+        'capi-network-bluetooth-0*.armv7l.rpm'
+        'capi-network-bluetooth-devel-*.armv7l.rpm'
+        'capi-network-nsd-*.armv7l.rpm'
+        'capi-network-thread-*.armv7l.rpm'
+        'capi-system-peripheral-io-*.armv7l.rpm'
+        'capi-system-peripheral-io-devel-*.armv7l.rpm'
+        'capi-system-resource-1*.armv7l.rpm'
+        'libnsd-dns-sd-*.armv7l.rpm'
+        'sensord-*.armv7l.rpm')
     download "$URL" "${PKG_ARR[@]}"
 
     # Tizen Developer Platform Certificate
@@ -304,11 +300,184 @@ function install_tizen_sdk() {
     echo -n "$COLOR_NONE"
 }
 
+# Function for installing Tizen SDK (arm64).
+function install_tizen_sdk_arm64() {
+
+    mkdir -p "$TIZEN_SDK_ROOT" || return
+
+    info "Tizen SDK installation directory: $TIZEN_SDK_ROOT"
+
+    TIZEN_SDK_SYSROOT="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device64.core"
+
+    cd "$TMP_DIR" || return
+
+    # Get Tizen Studio CLI
+    info "Downloading Tizen Studio CLI..."
+
+    # Download
+    URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
+    PKG_ARR=(
+        'certificate-encryptor_1.0.10_ubuntu-64.zip'
+        'certificate-generator_0.1.4_ubuntu-64.zip'
+        'new-common-cli_2.5.64_ubuntu-64.zip'
+        'new-native-cli_2.5.64_ubuntu-64.zip'
+        'sdb_4.2.23_ubuntu-64.zip')
+    download "$URL" "${PKG_ARR[@]}"
+
+    # Get toolchain
+    info "Downloading Tizen toolchain..."
+
+    # Download
+    URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
+    PKG_ARR=(
+        "cross-aarch64-gcc-9.2_0.1.9_ubuntu-64.zip"
+        "sbi-toolchain-gcc-9.2.cpp.app_2.2.16_ubuntu-64.zip")
+    download "$URL" "${PKG_ARR[@]}"
+
+    # Get Tizen sysroot
+    info "Downloading Tizen sysroot..."
+
+    # Base sysroot
+    # Different versions of Tizen have different rootstrap versions
+    URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
+    PKG_ARR=(
+        "tizen-$TIZEN_VERSION-core-add-ons_*_ubuntu-64.zip"
+        "tizen-$TIZEN_VERSION-rs-device64.core_*_ubuntu-64.zip")
+    download "$URL" "${PKG_ARR[@]}"
+
+    # Base packages
+    URL="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Base/latest/repos/standard/packages/aarch64/"
+    PKG_ARR=(
+        'iniparser-*.aarch64.rpm'
+        'libblkid-devel-*.aarch64.rpm'
+        'libcap-*.aarch64.rpm'
+        'libffi-devel-*.aarch64.rpm'
+        'liblzma-*.aarch64.rpm'
+        'libmount-devel-*.aarch64.rpm'
+        'libncurses6-*.aarch64.rpm'
+        'libreadline-*.aarch64.rpm'
+        'libuuid-*.aarch64.rpm'
+        'pcre-devel-*.aarch64.rpm'
+        'readline-devel-*.aarch64.rpm'
+        'xdgmime-*.aarch64.rpm')
+    download "$URL" "${PKG_ARR[@]}"
+
+    # Unified packages
+    URL="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/packages/aarch64/"
+    PKG_ARR=(
+        'app-core-common-*.rpm'
+        'aul-0*.aarch64.rpm'
+        'aul-devel-*.aarch64.rpm'
+        'bundle-0*.aarch64.rpm'
+        'bundle-devel-*.aarch64.rpm'
+        'buxton2-*.aarch64.rpm'
+        'cynara-devel-*.aarch64.rpm'
+        'dbus-1*.aarch64.rpm'
+        'dbus-devel-*.aarch64.rpm'
+        'dbus-libs-1*.aarch64.rpm'
+        'glib2-devel-2*.aarch64.rpm'
+        'hal-api-common-*.aarch64.rpm'
+        'hal-api-sensor-*.aarch64.rpm'
+        'json-glib-devel-*.aarch64.rpm'
+        'libcynara-client-*.aarch64.rpm'
+        'libcynara-commons-*.aarch64.rpm'
+        'libdns_sd-*.aarch64.rpm'
+        'libjson-glib-*.aarch64.rpm'
+        'libsessiond-0*.aarch64.rpm'
+        'libsystemd-*.aarch64.rpm'
+        'libtzplatform-config-*.aarch64.rpm'
+        'parcel-0*.aarch64.rpm'
+        'parcel-devel-*.aarch64.rpm'
+        'pkgmgr-info-*.aarch64.rpm'
+        'sensord-devel-*.aarch64.rpm'
+        'sensord-dummy-*.aarch64.rpm'
+        'vconf-compat-*.aarch64.rpm'
+        'vconf-internal-keys-devel-*.aarch64.rpm'
+        'bluetooth-frwk-0*.aarch64.rpm'
+        'capi-network-bluetooth-0*.aarch64.rpm'
+        'capi-network-bluetooth-devel-*.aarch64.rpm'
+        'capi-network-nsd-*.aarch64.rpm'
+        'capi-network-thread-*.aarch64.rpm'
+        'capi-system-peripheral-io-*.aarch64.rpm'
+        'capi-system-peripheral-io-devel-*.aarch64.rpm'
+        'capi-system-resource-1*.aarch64.rpm'
+        'libnsd-dns-sd-*.aarch64.rpm'
+        'sensord-*.aarch64.rpm')
+    download "$URL" "${PKG_ARR[@]}"
+
+    # Tizen Developer Platform Certificate
+    URL="http://download.tizen.org/sdk/extensions/Tizen_IoT_Headless/binary/"
+    # Tizen site does not have this package available in version 8.0.
+    # Certificates are the same for 7.0 and 8.0, though.
+    PKG_ARR=(
+        "7.0-iot-things-add-ons_*_ubuntu-64.zip")
+    download "$URL" "${PKG_ARR[@]}"
+
+    # Install all
+    info "Installing Tizen SDK..."
+
+    unzip -o '*.zip'
+    cp -rf data/* "$TIZEN_SDK_ROOT"
+
+    unrpm *.rpm
+    cp -rf lib64 usr "$TIZEN_SDK_SYSROOT"
+
+    # Install secret tool or not
+    if ("$SECRET_TOOL"); then
+        info "Overriding secret tool..."
+        install "$SCRIPT_DIR/secret-tool.py" "$TIZEN_SDK_ROOT/tools/certificate-encryptor/secret-tool"
+    fi
+
+    # Configure Tizen CLI
+    echo "TIZEN_SDK_INSTALLED_PATH=$TIZEN_SDK_ROOT" >"$TIZEN_SDK_ROOT/sdk.info"
+    echo "TIZEN_SDK_DATA_PATH=$TIZEN_SDK_DATA_PATH" >>"$TIZEN_SDK_ROOT/sdk.info"
+    ln -sf "$TIZEN_SDK_DATA_PATH/.tizen-cli-config" "$TIZEN_SDK_ROOT/tools/.tizen-cli-config"
+
+    # Use Tizen developer platform certificate as defaultls
+    cp "$TIZEN_SDK_ROOT"/tools/certificate-generator/certificates/distributor/sdk-platform/* \
+        "$TIZEN_SDK_ROOT"/tools/certificate-generator/certificates/distributor/
+
+    # Make symbolic links relative
+    find "$TIZEN_SDK_SYSROOT/usr/lib64" -maxdepth 1 -type l | while IFS= read -r LNK; do
+        ln -sf "$(basename "$(readlink "$LNK")")" "$LNK"
+    done
+
+    ln -sf ../../lib64/libcap.so.2 "$TIZEN_SDK_SYSROOT/usr/lib64/libcap.so"
+    ln -sf openssl3.pc "$TIZEN_SDK_SYSROOT/usr/lib64/pkgconfig/openssl.pc"
+
+    info "Done."
+    echo
+
+    # Information on necessary environment variables
+    warning "Before proceeding with Matter export environment variables as follows:"
+    echo -n "$COLOR_YELLOW"
+    echo "export TIZEN_VERSION=\"$TIZEN_VERSION\""
+    echo "export TIZEN_SDK_ROOT=\"$(realpath "$TIZEN_SDK_ROOT")\""
+    echo "export TIZEN_SDK_TOOLCHAIN_ARM64=\"\$TIZEN_SDK_ROOT/tools/aarch64-linux-gnu-gcc-9.2\""
+    echo "export TIZEN_SDK_SYSROOT_ARM64=\"\$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device64.core\""
+    echo "export PATH=\"\$TIZEN_SDK_TOOLCHAIN_ARM64/bin:\$TIZEN_SDK_ROOT/tools/ide/bin:\$TIZEN_SDK_ROOT/tools:\$PATH\""
+    echo -n "$COLOR_NONE"
+}
+
 while (($#)); do
     case $1 in
         -h | --help)
             show_help
             exit 0
+            ;;
+        --cpu)
+            IFS=',' read -r -a array <<< "$2"
+            for CPU in "${array[@]}"; do
+                if [ "$CPU" == "arm" ]; then
+                    INSTALL_ARM=true
+                elif [ "$CPU" == "arm64" ]; then
+                    INSTALL_ARM64=true
+                else
+                    error "Invalid CPU: $CPU. Use --help"
+                    exit 1
+                fi
+            done
+            shift
             ;;
         --tizen-sdk-path)
             TIZEN_SDK_ROOT="$2"
@@ -368,4 +537,11 @@ fi
 
 # ------------------------------------------------------------------------------
 # Installation Tizen SDK
-install_tizen_sdk
+
+if [ "$INSTALL_ARM" = true ]; then
+    install_tizen_sdk_arm
+fi
+
+if [ "$INSTALL_ARM64" = true ]; then
+    install_tizen_sdk_arm64
+fi

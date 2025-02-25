@@ -26,6 +26,7 @@ ENV TIZEN_SDK_ROOT /opt/tizen-sdk
 COPY tizen-sdk-installer $TIZEN_SDK_ROOT/files/installer
 RUN set -x \
     && bash $TIZEN_SDK_ROOT/files/installer/install.sh \
+    --cpu arm,arm64 \
     --tizen-sdk-path $TIZEN_SDK_ROOT \
     --tizen-sdk-data-path /home/ubuntu/tizen-sdk-data \
     --tizen-version $TIZEN_VERSION  \
@@ -37,6 +38,10 @@ RUN set -x \
 ENV TIZEN_SDK_TOOLCHAIN $TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2
 ENV TIZEN_SDK_SYSROOT $TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core
 ENV PATH="$TIZEN_SDK_TOOLCHAIN/bin:$TIZEN_SDK_ROOT/tools/ide/bin:$TIZEN_SDK_ROOT/tools:$PATH"
+
+ENV TIZEN_SDK_TOOLCHAIN_ARM64 $TIZEN_SDK_ROOT/tools/aarch64-linux-gnu-gcc-9.2
+ENV TIZEN_SDK_SYSROOT_ARM64 $TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device64.core
+ENV PATH="$TIZEN_SDK_TOOLCHAIN_ARM64/bin:$PATH"
 
 # ------------------------------------------------------------------------------
 # Switch to the non-root user
