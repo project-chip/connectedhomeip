@@ -29,7 +29,6 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -48,13 +47,6 @@ class TC_CNET_4_3(MatterBaseTest):
 
     def desc_TC_CNET_4_3(self) -> str:
         return "[TC-CNET-4.3] [Ethernet] Verification for attributes check [DUT-Server]"
-
-    def pics_TC_CNET_4_3(self) -> list[str]:
-        """Return the PICS definitions associated with this test."""
-        pics = [
-            "CNET.S.F02"
-        ]
-        return pics
 
     def steps_TC_CNET_4_3(self) -> list[TestStep]:
         steps = [
