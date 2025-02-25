@@ -136,6 +136,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/media-input-server/media-input-delegate.h': {'list'},
     'src/app/clusters/media-playback-server/media-playback-delegate.h': {'list'},
     'src/app/clusters/target-navigator-server/target-navigator-delegate.h': {'list'},
+    'src/app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h': {'vector'},
 
     'src/credentials/attestation_verifier/FileAttestationTrustStore.h': {'vector'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.cpp': {'string'},
