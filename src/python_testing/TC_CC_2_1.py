@@ -36,9 +36,10 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from typing import Any, Optional, Union
+from typing import Optional
 
 import chip.clusters as Clusters
+from chip.clusters import Attribute
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.testing import matter_asserts
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -49,7 +50,7 @@ logger = logging.getLogger(__name__)
 
 class TC_CC_2_1(MatterBaseTest):
 
-    def TC_CC_2_1(self) -> str:
+    def desc_TC_CC_2_1(self) -> str:
         return "25.2.1. [TC-CC-2.1] Attributes with server as DUT"
 
     def pics_TC_CC_2_1(self):
@@ -132,89 +133,59 @@ class TC_CC_2_1(MatterBaseTest):
 
         return steps
 
-    async def _guard_and_read_attribute(self, attribute: str) -> Union[bool, Any]:
-        """Check using guard and reads the attribute value.
-        Args:
-            attribute (str): Attribute name from the cluster.
-        Returns:
-            Union[bool, Any]: Return the guard_status and value from the attribute if reached.
-        """
-        tmp_attr = None
-        attr_val = None
-        try:
-            tmp_attr = getattr(Clusters.ColorControl.Attributes, attribute)
-        except AttributeError as e:
-            asserts.fail(f"Error retrieving the attribute {str(e)}")
-
-        logger.info(f"Trying guard on {attribute}")
-        guard_status = self.attribute_guard(self.endpoint, tmp_attr)
-        if guard_status:
-            attr_val = await self.read_single_attribute_check_success(
-                endpoint=self.endpoint,
-                cluster=self.cluster,
-                attribute=tmp_attr
-            )
-            logger.info(f"Value for attribute {attribute} is {attr_val}")
-        return guard_status, attr_val
-
-    async def _verify_attribute(self, attribute: str, data_type: str, enum_range: Optional[list] = None, min_len: Optional[int] = None, max_len: Optional[int] = None, skip_verification: bool = False):
+    async def _verify_attribute(self, attribute: Attribute, data_type: str, enum_range: Optional[list] = None, min_len: Optional[int] = None, max_len: Optional[int] = None):
         """Verify the attribute exists and value is the specific type of value.
 
         Args:
-            attribute (str): Name of the attribute we want to retrieve
+            attribute (Attribute): Name of the attribute we want to retrieve
             data_type (str): type of data we want to validate against (uint8,uint16,uint32,string,enum)
             enum_range (list, optional): Range that the enum may have. 0-2 or 0-5. Defaults to Optional[list].
             min_len (int, optional): If present verify the low range of the attribute.
             max_len (int, optional): If present verify the high range of the attribute.
         """
         # If attribute_guard return false it set the current step as skipped so we can finish the step here.
-        guard_status, attr_val = await self._guard_and_read_attribute(attribute=attribute)
-        if not guard_status:
-            return
+        # guard_status, attr_val = await self._guard_and_read_attribute(attribute=attribute)
+        logger.info(f"Verifying the attribute :  {attribute}")
+        # Verify if the attribute is implemented in the current cluster.
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=attribute):
+            # it is so retrieve the value to check the type.
+            attr_val = await self.read_single_attribute_check_success(cluster=self.cluster, attribute=attribute, endpoint=self.endpoint)
+            logger.info(f"Current value for {attribute} is {attr_val}")
+            if data_type == self.UINT8:
+                logger.info("Checkng is uint8")
+                matter_asserts.assert_valid_uint8(attr_val, "Is not uint8")
+            elif data_type == self.UINT16:
+                logger.info("Checkng is uint16")
+                matter_asserts.assert_valid_uint16(attr_val, "Is not uint16")
+            elif data_type == self.UINT32:
+                logger.info("Checkng is uint32")
+                matter_asserts.assert_valid_uint32(attr_val, "Is not uint32")
+            elif data_type == self.ENUM:
+                if len(enum_range) >= 0:
+                    logger.info(f"Checking for enum with range {enum_range}")
+                    asserts.assert_in(attr_val, enum_range, f"Value is not in range for enum with range {enum_range}")
+                else:
+                    asserts.fail("Range list is empty")
+            elif data_type == self.STRING and isinstance(attr_val, str):
+                if max_len > 0:
+                    logger.info(f"Validating string with a max len of {max_len}")
+                    asserts.assert_true((len(attr_val) <= max_len), "String len is out of range.")
+                else:
+                    asserts.fail("FAILED")
+            else:
+                asserts.fail("Validation not possible as not data type provided.")
 
-        if not skip_verification:
-            logger.info(f"Vefirying the attribute {attribute} should be {data_type}")
+            # if we land at this point it mean validation had passed
+            # check if string has uint and verify is we need to compare against a min or max value
+            if 'uint' in data_type and (max_len is not None or min_len is not None):
+                if isinstance(max_len, int):
+                    logger.info(f"Max len defined validation max range for uint {max_len}")
+                    asserts.assert_true((attr_val <= max_len), f"Attribute {attribute} is out of range (max): {max_len}")
+                if isinstance(min_len, int):
+                    logger.info(f"Min len defined validation max range for uint {max_len}")
+                    asserts.assert_true((attr_val >= min_len), f"Attribute {attribute} is out of range (min): {min_len}")
 
-        if skip_verification:
-            logger.info(f"Skipping verification for attribute {attribute}, current value is : {attr_val}")
             return attr_val
-
-        logger.info(f"Current value for {attribute} is {attr_val}")
-        if data_type == self.UINT8:
-            logger.info("Checkng is uint8")
-            matter_asserts.assert_valid_uint8(attr_val, "Is not uint8")
-        elif data_type == self.UINT16:
-            logger.info("Checkng is uint16")
-            matter_asserts.assert_valid_uint16(attr_val, "Is not uint16")
-        elif data_type == self.UINT32:
-            logger.info("Checkng is uint32")
-            matter_asserts.assert_valid_uint32(attr_val, "Is not uint32")
-        elif data_type == self.ENUM:
-            if len(enum_range) >= 0:
-                logger.info(f"Checking for enum with range {enum_range}")
-                asserts.assert_in(attr_val, enum_range, f"Value is not in range for enum with range {enum_range}")
-            else:
-                asserts.fail("Range list is empty")
-        elif data_type == self.STRING and isinstance(attr_val, str):
-            if max_len > 0:
-                logger.info(f"Validating string with a max len of {max_len}")
-                asserts.assert_true((len(attr_val) <= max_len), "String len is out of range.")
-            else:
-                asserts.fail("FAILED")
-        else:
-            asserts.fail("Validation not possible as not data type provided.")
-
-        # if we land at this point it mean validation had passed
-        # check if string has uint and verify is we need to compare against a min or max value
-        if 'uint' in data_type and (max_len is not None or min_len is not None):
-            if isinstance(max_len, int):
-                logger.info(f"Max len defined validation max range for uint {max_len}")
-                asserts.assert_true((attr_val <= max_len), f"Attribute {attribute} is out of range (max): {max_len}")
-            if isinstance(min_len, int):
-                logger.info(f"Min len defined validation max range for uint {max_len}")
-                asserts.assert_true((attr_val >= min_len), f"Attribute {attribute} is out of range (min): {min_len}")
-
-        return attr_val
 
     def _verify_for_numberofprimaries_value(self, numberofprimaries_value: Optional[int] = None, numberofprimaries_condition: int = 0) -> bool:
         """Verify the numbrofprimaries attribute value against the condition. Return the status to skip tests.
@@ -251,168 +222,148 @@ class TC_CC_2_1(MatterBaseTest):
         self.ENUM = "enum"
         self.cluster = Clusters.ColorControl
         self.endpoint = self.get_endpoint(1)
+        self.attributes = Clusters.ColorControl.Attributes
 
         self.step(1)
 
         self.step(2)
-        await self._verify_attribute("CurrentHue", self.UINT8)
+        await self._verify_attribute(self.attributes.CurrentHue, self.UINT8)
 
         self.step(3)
-        await self._verify_attribute("CurrentSaturation", self.UINT8)
+        await self._verify_attribute(self.attributes.CurrentSaturation, self.UINT8)
 
         self.step(4)
-        await self._verify_attribute("RemainingTime", self.UINT16)
+        await self._verify_attribute(self.attributes.RemainingTime, self.UINT16)
 
         self.step(5)
-        await self._verify_attribute("CurrentX", self.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.CurrentX, self.UINT16, max_len=0xfeff)
 
         self.step(6)
-        await self._verify_attribute("CurrentY", self.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.CurrentY, self.UINT16, max_len=0xfeff)
 
         self.step(7)
-        await self._verify_attribute("DriftCompensation", self.ENUM, enum_range=range(0, 5))
+        await self._verify_attribute(self.attributes.DriftCompensation, self.ENUM, enum_range=range(0, 5))
 
         self.step(8)
-        await self._verify_attribute("CompensationText", self.STRING, max_len=254)
+        await self._verify_attribute(self.attributes.CompensationText, self.STRING, max_len=254)
 
         self.step(9)
-        await self._verify_attribute("ColorTemperatureMireds", self.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.ColorTemperatureMireds, self.UINT16, max_len=0xfeff)
 
         self.step(10)
-        await self._verify_attribute("ColorMode", self.ENUM, enum_range=range(0, 3))
+        await self._verify_attribute(self.attributes.ColorMode, self.ENUM, enum_range=range(0, 3))
 
         self.step(11)
-        await self._verify_attribute("Options", self.UINT8, max_len=4)
+        await self._verify_attribute(self.attributes.Options, self.UINT8, max_len=4)
 
         self.step(12)
-        await self._verify_attribute("EnhancedCurrentHue", self.UINT16)
+        await self._verify_attribute(self.attributes.EnhancedCurrentHue, self.UINT16)
 
         self.step(13)
-        await self._verify_attribute("EnhancedColorMode", self.ENUM, enum_range=range(0, 4))
+        await self._verify_attribute(self.attributes.EnhancedColorMode, self.ENUM, enum_range=range(0, 4))
 
         self.step(14)
-        await self._verify_attribute("ColorLoopActive", self.UINT8)
+        await self._verify_attribute(self.attributes.ColorLoopActive, self.UINT8)
 
         self.step(15)
-        await self._verify_attribute("ColorLoopDirection", self.UINT8)
+        await self._verify_attribute(self.attributes.ColorLoopDirection, self.UINT8)
 
         self.step(16)
-        await self._verify_attribute("ColorLoopTime", self.UINT16)
+        await self._verify_attribute(self.attributes.ColorLoopTime, self.UINT16)
 
         self.step(17)
-        await self._verify_attribute("ColorLoopStartEnhancedHue", self.UINT16)
+        await self._verify_attribute(self.attributes.ColorLoopStartEnhancedHue, self.UINT16)
 
         self.step(18)
-        await self._verify_attribute("ColorLoopStoredEnhancedHue", self.UINT16)
+        await self._verify_attribute(self.attributes.ColorLoopStoredEnhancedHue, self.UINT16)
 
         self.step("18.a")
         # read and save FeatureMap attribute
-        guard_status, feature_map_value = await self._guard_and_read_attribute("FeatureMap")
+        feature_map_value = await self.read_single_attribute_check_success(cluster=self.cluster, endpoint=self.endpoint, attribute=self.attributes.FeatureMap)
 
         self.step(19)
-        color_capabilities_value = await self._verify_attribute("ColorCapabilities", self.UINT16, max_len=0x001f)
+        color_capabilities_value = await self._verify_attribute(self.attributes.ColorCapabilities, self.UINT16, max_len=0x001f)
         # verify the first 4 bits of colorcapabilities are the same on FeatureMap
         self._verify_first_4bits(feature_map_value, color_capabilities_value)
 
         self.step(20)
-        await self._verify_attribute("ColorTempPhysicalMinMireds", self.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.ColorTempPhysicalMinMireds, self.UINT16, max_len=0xfeff)
 
         self.step(21)
-        await self._verify_attribute("ColorTempPhysicalMaxMireds", self.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.ColorTempPhysicalMaxMireds, self.UINT16, max_len=0xfeff)
 
         self.step(22)
-        await self._verify_attribute("CoupleColorTempToLevelMinMireds", self.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.CoupleColorTempToLevelMinMireds, self.UINT16, max_len=0xfeff)
 
         self.step(23)
-        guard_status, sctmr_val = await self._guard_and_read_attribute("StartUpColorTemperatureMireds")
-        if guard_status:
+        # Manual check
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=self.attributes.StartUpColorTemperatureMireds):
+            sctmr_val = await self.read_single_attribute_check_success(cluster=self.cluster, endpoint=self.endpoint, attribute=self.attributes.StartUpColorTemperatureMireds)
             asserts.assert_true(sctmr_val is None or (sctmr_val >= 1) and (sctmr_val <= 65279), "Value is out of range.")
 
+        # NumberofPrimaries will be used to verify Primary<n>[X|Y|Intensity]
+        # Number of primaries cant be 0, it should be greater or equal than 1.
+        # Issue: #9103 to address remove 0 in NumberofPrimaries.
+        # After this is resolved, check not 0.
         self.step(24)
-        numberofprimaries_value = await self._verify_attribute("NumberOfPrimaries", self.UINT16, max_len=6)
-
-        # verify for numberofprimaries section
-        skip_steps_verifyp1 = self._verify_for_numberofprimaries_value(numberofprimaries_value, 1)
-        self.step(25)
-        await self._verify_attribute("Primary1X", self.UINT16, max_len=0xfeff, skip_verification=skip_steps_verifyp1)
-        self.step(26)
-        await self._verify_attribute("Primary1Y", self.UINT16, max_len=0xfeff, skip_verification=skip_steps_verifyp1)
-        self.step(27)
-        await self._verify_attribute("Primary1Intensity", self.UINT16, max_len=0xfeff, skip_verification=skip_steps_verifyp1)
-
-        skip_steps_verifyp2 = self._verify_for_numberofprimaries_value(numberofprimaries_value, 2)
-        self.step(28)
-        await self._verify_attribute("Primary2X", self.UINT16, max_len=0xfeff, skip_verification=skip_steps_verifyp2)
-        self.step(29)
-        await self._verify_attribute("Primary2Y", self.UINT16, max_len=0xfeff, skip_verification=skip_steps_verifyp2)
-        self.step(30)
-        await self._verify_attribute("Primary2Intensity", self.UINT16, max_len=0xfeff, skip_verification=skip_steps_verifyp2)
-
-        skip_steps_verifyp3 = self._verify_for_numberofprimaries_value(numberofprimaries_value, 3)
-        self.step(31)
-        await self._verify_attribute("Primary3X", self.UINT16, max_len=0xfeff, skip_verification=skip_steps_verifyp3)
-        self.step(32)
-        await self._verify_attribute("Primary3Y", self.UINT16, max_len=0xfeff, skip_verification=skip_steps_verifyp3)
-        self.step(33)
-        await self._verify_attribute("Primary3Intensity", self.UINT16, max_len=0xfeff, skip_verification=skip_steps_verifyp3)
-
-        skip_steps_verifyp4 = self._verify_for_numberofprimaries_value(numberofprimaries_value, 4)
-        self.step(34)
-        await self._verify_attribute("Primary4X", self.UINT16, max_len=0xfeff, skip_verification=skip_steps_verifyp4)
-        self.step(35)
-        await self._verify_attribute("Primary4Y", self.UINT16, max_len=0xfeff, skip_verification=skip_steps_verifyp4)
-        self.step(36)
-        await self._verify_attribute("Primary4Intensity", self.UINT16, max_len=0xfeff, skip_verification=skip_steps_verifyp4)
-
-        skip_steps_verifyp5 = self._verify_for_numberofprimaries_value(numberofprimaries_value, 5)
-        self.step(37)
-        await self._verify_attribute("Primary5X", self.UINT16, max_len=0xfeff, skip_verification=skip_steps_verifyp5)
-        self.step(38)
-        await self._verify_attribute("Primary5Y", self.UINT16, max_len=0xfeff, skip_verification=skip_steps_verifyp5)
-        self.step(39)
-        await self._verify_attribute("Primary5Intensity", self.UINT16, max_len=0xfeff, skip_verification=skip_steps_verifyp5)
-
-        skip_steps_verifyp6 = self._verify_for_numberofprimaries_value(numberofprimaries_value, 6)
-        self.step(40)
-        await self._verify_attribute("Primary6X", self.UINT16, max_len=0xfeff, skip_verification=skip_steps_verifyp6)
-        self.step(41)
-        await self._verify_attribute("Primary6Y", self.UINT16, max_len=0xfeff, skip_verification=skip_steps_verifyp6)
-        self.step(42)
-        await self._verify_attribute("Primary6Intensity", self.UINT16, max_len=0xfeff, skip_verification=skip_steps_verifyp6)
-        # no more check numberofprimaries at this point
+        numberofprimaries_value = await self._verify_attribute(self.attributes.NumberOfPrimaries, self.UINT8, max_len=6)
+        # Verify for numberofprimaries section
+        # We are at 24 steps before all the number of primaries checks
+        current_step = 24
+        # Must start at 1 and max in the spec is 6.
+        for primariesindex in range(1, 7):
+            skip_steps_verifynp = self._verify_for_numberofprimaries_value(numberofprimaries_value, primariesindex)
+            if skip_steps_verifynp:
+                # Skip the 3 steps
+                logger.info(f"Skipping for NumberofPrimaries {primariesindex}")
+                for i in range(1, 4):
+                    current_step += 1
+                    self.skip_step(current_step)
+                continue
+            # Verify the attributes
+            current_step += 1
+            self.step(current_step)
+            await self._verify_attribute(getattr(self.attributes, f"Primary{primariesindex}X"), self.UINT16, max_len=0xfeff)
+            current_step += 1
+            self.step(current_step)
+            await self._verify_attribute(getattr(self.attributes, f"Primary{primariesindex}Y"), self.UINT16, max_len=0xfeff)
+            current_step += 1
+            self.step(current_step)
+            await self._verify_attribute(getattr(self.attributes, f"Primary{primariesindex}Intensity"), self.UINT16, max_len=0xfeff)
+        # No more check numberofprimaries at this point
 
         self.step(43)
-        await self._verify_attribute("WhitePointX", self.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.WhitePointX, self.UINT16, max_len=0xfeff)
 
         self.step(44)
-        await self._verify_attribute("WhitePointY", self.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.WhitePointY, self.UINT16, max_len=0xfeff)
 
         self.step(45)
-        await self._verify_attribute("ColorPointRX", self.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.ColorPointRX, self.UINT16, max_len=0xfeff)
 
         self.step(46)
-        await self._verify_attribute("ColorPointRY", self.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.ColorPointRY, self.UINT16, max_len=0xfeff)
 
         self.step(47)
-        await self._verify_attribute("ColorPointRIntensity", self.UINT8)
+        await self._verify_attribute(self.attributes.ColorPointRIntensity, self.UINT8)
 
         self.step(48)
-        await self._verify_attribute("ColorPointGX", self.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.ColorPointGX, self.UINT16, max_len=0xfeff)
 
         self.step(49)
-        await self._verify_attribute("ColorPointGY", self.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.ColorPointGY, self.UINT16, max_len=0xfeff)
 
         self.step(50)
-        await self._verify_attribute("ColorPointGIntensity", self.UINT8)
+        await self._verify_attribute(self.attributes.ColorPointGIntensity, self.UINT8)
 
         self.step(51)
-        await self._verify_attribute("ColorPointBX", self.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.ColorPointBX, self.UINT16, max_len=0xfeff)
 
         self.step(52)
-        await self._verify_attribute("ColorPointBY", self.UINT16, max_len=0xfeff)
+        await self._verify_attribute(self.attributes.ColorPointBY, self.UINT16, max_len=0xfeff)
 
         self.step(53)
-        await self._verify_attribute("ColorPointBIntensity", self.UINT8)
+        await self._verify_attribute(self.attributes.ColorPointBIntensity, self.UINT8)
 
 
 if __name__ == "__main__":
