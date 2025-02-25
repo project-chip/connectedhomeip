@@ -717,8 +717,9 @@ def fetch_symbols(elf_file: str, fetch: FetchStyle) -> Tuple[list[Symbol], str]:
         return symbols_from_objdump(elf_file), '/'
 
 
-def list_id(l: list[str]) -> str:
-    return "->".join(l)
+def list_id(tree_path: list[str]) -> str:
+    """Converts a tree path in to a single string (so that it is hashable)"""
+    return "->".join(tree_path)
 
 
 def compute_symbol_diff(orig: list[Symbol], base: list[Symbol]) -> list[Symbol]:
