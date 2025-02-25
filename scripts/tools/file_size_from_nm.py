@@ -46,7 +46,6 @@ import re
 import subprocess
 from dataclasses import dataclass, replace
 from enum import Enum, auto
-from pathlib import Path
 from typing import Optional, Tuple
 
 import click
@@ -87,7 +86,7 @@ __FETCH_STYLES__ = {
 }
 
 
-@dataclass
+@dataclass(frozen=True)
 class Symbol:
     name: str
     symbol_type: str
@@ -660,13 +659,17 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
     return symbols
 
 
-def fetch_symbols(elf_file: Path, fetch: FetchStyle) -> Tuple[list[Symbol], str]:
+def fetch_symbols(elf_file: str, fetch: FetchStyle) -> Tuple[list[Symbol], str]:
     """Returns the sumbol list and the separator used to split symbols
     """
     if fetch == FetchStyle.NM:
-        return symbols_from_nm(elf_file.absolute().as_posix()), "::"
+        return symbols_from_nm(elf_file), "::"
     else:
-        return symbols_from_objdump(elf_file.absolute().as_posix()), '/'
+        return symbols_from_objdump(elf_file), '/'
+
+def list_id(l: list[str]) -> str:
+    return "->".join(l)
+
 
 def compute_symbol_diff(orig: list[Symbol], base: list[Symbol]) -> list[Symbol]:
     """
@@ -677,8 +680,8 @@ def compute_symbol_diff(orig: list[Symbol], base: list[Symbol]) -> list[Symbol]:
 
     Symbols are the same if their "name" if the have the same tree path.
     """
-    orig_items = dict([(v.tree_path, v) for v in orig])
-    base_items = dict([(v.tree_path, v) for v in base])
+    orig_items = dict([(list_id(v.tree_path), v) for v in orig])
+    base_items = dict([(list_id(v.tree_path), v) for v in base])
 
     unique_paths = set(orig_items.keys()).union(set(base_items.keys()))
 
@@ -777,25 +780,27 @@ def compute_symbol_diff(orig: list[Symbol], base: list[Symbol]) -> list[Symbol]:
 @click.argument("elf-file", type=click.Path(file_okay=True, dir_okay=False, exists=True))
 def main(
     log_level,
-    elf_file: Path,
+    elf_file: str,
     display_type: str,
     fetch_via: str,
     max_depth: int,
     zoom: Optional[str],
     strip: Optional[str],
-    diff: Optional[Path],
+    diff: Optional[str],
 ):
     log_fmt = "%(asctime)s %(levelname)-7s %(message)s"
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     symbols, separator = fetch_symbols(elf_file, __FETCH_STYLES__[fetch_via])
+    title = elf_file
 
     if diff:
         diff_symbols, _ = fetch_symbols(diff, __FETCH_STYLES__[fetch_via])
         symbols = compute_symbol_diff(symbols, diff_symbols)
+        title = f"{elf_file} COMPARED TO {diff}"
 
     build_treemap(
-        elf_file.name, symbols, separator, __CHART_STYLES__[display_type], max_depth, zoom, strip
+        title, symbols, separator, __CHART_STYLES__[display_type], max_depth, zoom, strip
     )
 
 
