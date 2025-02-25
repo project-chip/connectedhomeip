@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
+#include <string>
 #include <vector>
 
 namespace chip {
@@ -41,77 +42,69 @@ class Delegate
 public:
     virtual ~Delegate() = default;
 
+    struct SolicitOfferRequestArgs
+    {
+        uint16_t id;
+        StreamUsageEnum streamUsage;
+        Optional<DataModel::Nullable<uint16_t>> videoStreamId;
+        Optional<DataModel::Nullable<uint16_t>> audioStreamId;
+        Optional<DataModel::DecodableList<ICEServerStruct>> iceServers;
+        Optional<chip::CharSpan> iceTransportPolicy;
+        Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
+        NodeId peerNodeId;
+        FabricIndex peerFabricIndex;
+    };
+
+    struct ProvideOfferRequestArgs
+    {
+        uint16_t id;
+        StreamUsageEnum streamUsage;
+        chip::CharSpan sdp;
+        Optional<DataModel::Nullable<uint16_t>> videoStreamId;
+        Optional<DataModel::Nullable<uint16_t>> audioStreamId;
+        Optional<DataModel::DecodableList<ICEServerStruct>> iceServers;
+        Optional<chip::CharSpan> iceTransportPolicy;
+        Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
+        NodeId peerNodeId;
+        FabricIndex peerFabricIndex;
+    };
+
     /**
      * @brief
-     *   This method is called when the server receives the SolicitOffer command.
+     *     This method is called when the server receives the SolicitOffer command.
      *
-     *   It is used by the requestor to ask the provider to initiate a new Offer/Answer
-     *   negotiation. The specification states that the provider may be in a standby mode
-     *   (low power), thus a "deferred offer" scenario might occur if the device needs time
-     *   to fully power resources needed for streaming.
+     *     It is used by the requestor to ask the provider to initiate a new Offer/Answer
+     *     negotiation. The specification states that the provider may be in a standby mode
+     *     (low power), thus a "deferred offer" scenario might occur if the device needs time
+     *     to fully power resources needed for streaming.
      *
-     * @param[in]  id               A local ID for the session being allocated
-     * @param[in]  streamUsage      Indicates the usage for this session
-     * @param[in]  videoStreamId    The requested VideoStreamID:
-     *                                - Not present => No video requested
-     *                                - Null => Automatic assignment requested
-     *                                - Valid => Use the specified ID
-     * @param[in]  audioStreamId    The requested AudioStreamID:
-     *                                - Not present => No audio requested
-     *                                - Null => Automatic assignment requested
-     *                                - Valid => Use the specified ID
-     * @param[in]  iceServers       Optional list of ICE server configurations (TURN/STUN).
-     * @param[in]  iceTransportPolicy  If present, indicates whether ICE transport is 'all' or 'relay' only.
-     * @param[in]  metadataOptions  Reserved for future use (value = 0).
-     * @param[in]  peerNodeId       The Node ID of the controller or requestor.
-     * @param[in]  peerFabricIndex  The FabricIndex of the requestor.
+     * @param[in]  args             Structure containing all input arguments for the command.
      * @param[out] outSession       On success, must be populated with the new session's details.
      * @param[out] outDeferredOffer True if the device is in standby or needs to defer generating an Offer.
      *
      * @return CHIP_ERROR
-     *   - CHIP_NO_ERROR if a session was successfully created or prepared for negotiation
-     *   - Appropriate error otherwise (e.g. out of resources)
+     *     - CHIP_NO_ERROR if a session was successfully created or prepared for negotiation
+     *     - Appropriate error otherwise (e.g. out of resources)
      */
-    virtual CHIP_ERROR HandleSolicitOffer(uint16_t id, StreamUsageEnum streamUsage,
-                                          const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                          const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
-                                          const Optional<DataModel::DecodableList<ICEServerStruct>> & iceServers,
-                                          const Optional<chip::CharSpan> & iceTransportPolicy,
-                                          const Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> & metadataOptions,
-                                          NodeId peerNodeId, FabricIndex peerFabricIndex, WebRTCSessionStruct & outSession,
+    virtual CHIP_ERROR HandleSolicitOffer(const SolicitOfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                           bool & outDeferredOffer) = 0;
 
     /**
      * @brief
-     *   This method is called when the server receives the ProvideOffer command.
+     *     This method is called when the server receives the ProvideOffer command.
      *
-     *   ProvideOffer is used by a requestor to either:
-     *     - Create a brand new session by sending an SDP Offer
-     *     - Re-offer an SDP to modify an existing session (e.g., enabling two-way talk).
+     *     ProvideOffer is used by a requestor to either:
+     *       - Create a brand new session by sending an SDP Offer
+     *       - Re-offer an SDP to modify an existing session (e.g., enabling two-way talk).
      *
-     * @param[in]  id                The existing session ID or 0 if new (depending on your usage).
-     * @param[in]  streamUsage       The stream usage (camera feed, doorbell, etc.).
-     * @param[in]  sdp               The SDP Offer (RFC 8866).
-     * @param[in]  videoStreamId     Requested or existing VideoStreamID.
-     * @param[in]  audioStreamId     Requested or existing AudioStreamID.
-     * @param[in]  iceServers        Optional ICE server list.
-     * @param[in]  iceTransportPolicy If present, indicates 'all' or 'relay' for candidate gathering.
-     * @param[in]  metadataOptions   Reserved (value = 0).
-     * @param[in]  peerNodeId        Requestor’s NodeId.
-     * @param[in]  peerFabricIndex   Requestor’s FabricIndex.
-     * @param[out] outSession        Must be populated with the final session info (session ID, streams, etc.).
+     * @param[in]  args          Structure containing all input arguments for the command.
+     * @param[out] outSession      Must be populated with the final session info (session ID, streams, etc.).
      *
      * @return CHIP_ERROR
-     *   - CHIP_NO_ERROR on success
-     *   - Appropriate error if the request is invalid or resources are exhausted
+     *     - CHIP_NO_ERROR on success
+     *     - Appropriate error if the request is invalid or resources are exhausted
      */
-    virtual CHIP_ERROR HandleProvideOffer(uint16_t id, StreamUsageEnum streamUsage, const chip::CharSpan & sdp,
-                                          const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                          const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
-                                          const Optional<DataModel::DecodableList<ICEServerStruct>> & iceServers,
-                                          const Optional<chip::CharSpan> & iceTransportPolicy,
-                                          const Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> & metadataOptions,
-                                          NodeId peerNodeId, FabricIndex peerFabricIndex, WebRTCSessionStruct & outSession) = 0;
+    virtual CHIP_ERROR HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession) = 0;
 
     /**
      * @brief

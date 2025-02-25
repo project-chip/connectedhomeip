@@ -214,24 +214,22 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         return;
     }
 
-    // Extract command fields from the request.
-    auto streamUsage        = req.streamUsage;
-    auto videoStreamID      = req.videoStreamID;
-    auto audioStreamID      = req.audioStreamID;
-    auto iceServers         = req.ICEServers;
-    auto iceTransportPolicy = req.ICETransportPolicy;
-    auto metadataOptions    = req.metadataOptions;
-
-    NodeId peerNodeId           = GetNodeIdFromCtx(ctx.mCommandHandler);
-    FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
+    // Prepare arguments for Delegate::HandleSolicitOffer using SolicitOfferRequestArgs struct
+    Delegate::SolicitOfferRequestArgs args;
+    args.id                 = GenerateSessionID();
+    args.streamUsage        = req.streamUsage;
+    args.videoStreamId      = req.videoStreamID;
+    args.audioStreamId      = req.audioStreamID;
+    args.iceServers         = req.ICEServers;
+    args.iceTransportPolicy = req.ICETransportPolicy;
+    args.metadataOptions    = req.metadataOptions;
+    args.peerNodeId         = GetNodeIdFromCtx(ctx.mCommandHandler);
+    args.peerFabricIndex    = ctx.mCommandHandler.GetAccessingFabricIndex();
 
     // Delegate processing
     WebRTCSessionStruct outSession;
     bool deferredOffer = false;
-    uint16_t sessionId = GenerateSessionID();
-    CHIP_ERROR err =
-        mDelegate->HandleSolicitOffer(sessionId, streamUsage, videoStreamID, audioStreamID, iceServers, iceTransportPolicy,
-                                      metadataOptions, peerNodeId, peerFabricIndex, outSession, deferredOffer);
+    CHIP_ERROR err     = mDelegate->HandleSolicitOffer(args, outSession, deferredOffer);
 
     // Convert the CHIP_ERROR to an Interaction Model status code
     Protocols::InteractionModel::Status status = StatusIB(err).mStatus;
@@ -251,7 +249,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     Commands::SolicitOfferResponse::Type resp;
     resp.webRTCSessionID = outSession.id;
     resp.deferredOffer   = deferredOffer;
-    resp.audioStreamID.SetValue(outSession.videoStreamID);
+    resp.videoStreamID.SetValue(outSession.videoStreamID);
     resp.audioStreamID.SetValue(outSession.audioStreamID);
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, resp);
@@ -260,14 +258,9 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
 void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, const Commands::ProvideOffer::DecodableType & req)
 {
     // Extract command fields from the request.
-    auto webRTCSessionID    = req.webRTCSessionID;
-    auto sdpOffer           = req.sdp;
-    auto streamUsage        = req.streamUsage;
-    auto videoStreamID      = req.videoStreamID;
-    auto audioStreamID      = req.audioStreamID;
-    auto iceServers         = req.ICEServers;
-    auto iceTransportPolicy = req.ICETransportPolicy;
-    auto metadataOptions    = req.metadataOptions;
+    auto webRTCSessionID = req.webRTCSessionID;
+    auto videoStreamID   = req.videoStreamID;
+    auto audioStreamID   = req.audioStreamID;
 
     NodeId peerNodeId           = GetNodeIdFromCtx(ctx.mCommandHandler);
     FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
@@ -311,8 +304,20 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
 
     // Delegate processing
     WebRTCSessionStruct outSession;
-    CHIP_ERROR err = mDelegate->HandleProvideOffer(sessionId, streamUsage, sdpOffer, videoStreamID, audioStreamID, iceServers,
-                                                   iceTransportPolicy, metadataOptions, peerNodeId, peerFabricIndex, outSession);
+
+    Delegate::ProvideOfferRequestArgs args;
+    args.id                 = sessionId;
+    args.streamUsage        = req.streamUsage;
+    args.sdp                = req.sdp;
+    args.videoStreamId      = videoStreamID;
+    args.audioStreamId      = audioStreamID;
+    args.iceServers         = req.ICEServers;
+    args.iceTransportPolicy = req.ICETransportPolicy;
+    args.metadataOptions    = req.metadataOptions;
+    args.peerNodeId         = GetNodeIdFromCtx(ctx.mCommandHandler);
+    args.peerFabricIndex    = ctx.mCommandHandler.GetAccessingFabricIndex();
+
+    CHIP_ERROR err = mDelegate->HandleProvideOffer(args, outSession);
 
     // Convert the CHIP_ERROR to an Interaction Model status code
     Protocols::InteractionModel::Status status = StatusIB(err).mStatus;
