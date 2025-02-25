@@ -20,6 +20,10 @@
 
 #import <lib/support/logging/CHIPLogging.h>
 
+#if TARGET_OS_MACCATALYST || TARGET_OS_IOS
+#import "HomeKitConnector.h"
+#endif
+
 @interface XPCServerImpl : NSObject <MTRXPCServerProtocol_MTRDevice>
 @property (nonatomic, strong) id<MTRXPCClientProtocol> clientProxy;
 @property (nonatomic, strong) NSArray<MTRDeviceController *> * controllers;
@@ -239,19 +243,26 @@
 
 - (void)stop
 {
+#if TARGET_OS_MACCATALYST || TARGET_OS_IOS
+    [[HomeKitConnector sharedInstance] stop];
+#endif
 }
 
 - (MTRDeviceController *)createController:(NSString *)controllerID serviceName:(NSString *)serviceName error:(NSError * __autoreleasing *)error
 {
-    __auto_type connectBlock = ^NSXPCConnection *
-    {
+    NSXPCConnection * (^connectBlock)(void) = nil;
 #if TARGET_OS_OSX
+    connectBlock = ^NSXPCConnection *
+    {
         return [[NSXPCConnection alloc] initWithMachServiceName:serviceName options:0];
-#else
-        ChipLogError(chipTool, "NSXPCConnection::initWithMachServiceName is not supported on this platform.");
-        return nil;
-#endif // TARGET_OS_OSX
     };
+#elif TARGET_OS_MACCATALYST || TARGET_OS_IOS
+    connectBlock = [[HomeKitConnector sharedInstance] connectBlockFor:controllerID];
+    controllerID = [[HomeKitConnector sharedInstance] homeControllerIDFor:controllerID];
+#endif
+
+    VerifyOrReturnValue(nil != connectBlock, nil, ChipLogError(chipTool, "XPCServerWithServiceName is not supported on this platform."));
+
     __auto_type * uniqueIdentifier = [[NSUUID alloc] initWithUUIDString:controllerID];
     __auto_type * xpcParams = [[MTRXPCDeviceControllerParameters alloc] initWithXPConnectionBlock:connectBlock uniqueIdentifier:uniqueIdentifier];
     return [[MTRDeviceController alloc] initWithParameters:xpcParams error:error];
