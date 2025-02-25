@@ -437,7 +437,7 @@ def build_treemap(
                 labels=data["name"],
                 parents=data["parent"],
                 values=data["size"],
-                textinfo="label+value+percent parent",
+                textinfo="label+value+percent parent+percent root",
                 hovertext=data["hover"],
                 maxdepth=max_depth,
             )
