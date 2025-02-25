@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include "silabs_utils.h"
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -29,8 +28,6 @@
 using namespace chip;
 using namespace chip::DeviceLayer;
 
-#define CONVERT_SEC_TO_MS(TimeInS) (TimeInS * 1000)
-
 // TODO: We shouldn't need to have access to a global variable in the interface here
 extern WfxRsi_t wfx_rsi;
 
@@ -43,20 +40,17 @@ namespace {
 constexpr uint8_t kWlanMinRetryIntervalsInSec = 1;
 constexpr uint8_t kWlanMaxRetryIntervalsInSec = 60;
 uint8_t retryInterval                         = kWlanMinRetryIntervalsInSec;
-osTimerId_t sRetryTimer;
 
-bool hasNotifiedIPV6 = false;
-#if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-bool hasNotifiedIPV4 = false;
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-
-/*
- * Notifications to the upper-layer
- * All done in the context of the RSI/WiFi task (rsi_if.c)
+/**
+ * @brief Retry timer callback that triggers a reconnection attempt
+ *
+ * TODO: The structure of the retry needs to be redone
+ *
+ * @param arg
  */
 void RetryConnectionTimerHandler(void * arg)
 {
-    if (ConnectToAccessPoint() != CHIP_NO_ERROR)
+    if (chip::DeviceLayer::Silabs::WifiInterface::GetInstance().ConnectToAccessPoint() != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "ConnectToAccessPoint() failed.");
     }
@@ -64,9 +58,13 @@ void RetryConnectionTimerHandler(void * arg)
 
 } // namespace
 
-void NotifyIPv6Change(bool gotIPv6Addr)
+namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+
+void WifiInterface::NotifyIPv6Change(bool gotIPv6Addr)
 {
-    hasNotifiedIPV6 = gotIPv6Addr;
+    mHasNotifiedIPv6 = gotIPv6Addr;
 
     sl_wfx_generic_message_t eventData = {};
     eventData.header.id                = gotIPv6Addr ? to_underlying(WifiEvent::kGotIPv6) : to_underlying(WifiEvent::kLostIP);
@@ -75,9 +73,9 @@ void NotifyIPv6Change(bool gotIPv6Addr)
     HandleWFXSystemEvent(&eventData);
 }
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-void NotifyIPv4Change(bool gotIPv4Addr)
+void WifiInterface::NotifyIPv4Change(bool gotIPv4Addr)
 {
-    hasNotifiedIPV4 = gotIPv4Addr;
+    mHasNotifiedIPv4 = gotIPv4Addr;
 
     sl_wfx_generic_message_t eventData;
 
@@ -88,7 +86,7 @@ void NotifyIPv4Change(bool gotIPv4Addr)
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
 
-void NotifyDisconnection(WifiDisconnectionReasons reason)
+void WifiInterface::NotifyDisconnection(WifiDisconnectionReasons reason)
 {
     sl_wfx_disconnect_ind_t evt = {};
     evt.header.id               = to_underlying(WifiEvent::kDisconnect);
@@ -98,7 +96,7 @@ void NotifyDisconnection(WifiDisconnectionReasons reason)
     HandleWFXSystemEvent((sl_wfx_generic_message_t *) &evt);
 }
 
-void NotifyConnection(const MacAddress & ap)
+void WifiInterface::NotifyConnection(const MacAddress & ap)
 {
     sl_wfx_connect_ind_t evt = {};
     evt.header.id            = to_underlying(WifiEvent::kConnect);
@@ -111,27 +109,15 @@ void NotifyConnection(const MacAddress & ap)
     HandleWFXSystemEvent((sl_wfx_generic_message_t *) &evt);
 }
 
-bool HasNotifiedIPv6Change()
+void WifiInterface::ResetIPNotificationStates()
 {
-    return hasNotifiedIPV6;
-}
-
+    mHasNotifiedIPv6 = false;
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-bool HasNotifiedIPv4Change()
-{
-    return hasNotifiedIPV4;
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
-
-void ResetIPNotificationStates()
-{
-    hasNotifiedIPV6 = false;
-#if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-    hasNotifiedIPV4 = false;
+    mHasNotifiedIPv4 = false;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
 }
 
-void NotifyWifiTaskInitialized(void)
+void WifiInterface::NotifyWifiTaskInitialized(void)
 {
     sl_wfx_startup_ind_t evt = {};
 
@@ -158,13 +144,14 @@ void NotifyWifiTaskInitialized(void)
 }
 
 // TODO: The retry stategy needs to be re-worked
-void ScheduleConnectionAttempt()
+void WifiInterface::ScheduleConnectionAttempt()
 {
     if (retryInterval > kWlanMaxRetryIntervalsInSec)
     {
         retryInterval = kWlanMaxRetryIntervalsInSec;
     }
-    if (osTimerStart(sRetryTimer, pdMS_TO_TICKS(CONVERT_SEC_TO_MS(retryInterval))) != osOK)
+
+    if (osTimerStart(sRetryTimer, pdMS_TO_TICKS(retryInterval * 1000)) != osOK)
     {
         ChipLogProgress(DeviceLayer, "Failed to start retry timer");
         // Sending the join command if retry timer failed to start
@@ -187,3 +174,7 @@ void ScheduleConnectionAttempt()
     ChipLogProgress(DeviceLayer, "ScheduleConnectionAttempt : Next attempt after %d Seconds", retryInterval);
     retryInterval += retryInterval;
 }
+
+} // namespace Silabs
+} // namespace DeviceLayer
+} // namespace chip

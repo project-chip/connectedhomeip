@@ -37,12 +37,13 @@ constexpr osThreadAttr_t kWlanTaskAttr = { .name       = "wlan_rsi",
                                            .stack_size = kWlanTaskSize,
                                            .priority   = osPriorityAboveNormal7 };
 
-osTimerId_t sDHCPTimer;
-bool hasNotifiedWifiConnectivity = false;
-
 } // namespace
 
-CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, chip::MutableByteSpan & address)
+namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+
+CHIP_ERROR WiseconnectWifiInterface::GetMacAddress(sl_wfx_interface_t interface, chip::MutableByteSpan & address)
 {
     VerifyOrReturnError(address.size() >= kWifiMacAddressLength, CHIP_ERROR_BUFFER_TOO_SMALL);
 
@@ -55,7 +56,7 @@ CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, chip::MutableByteSpan & a
     return CopySpanToMutableSpan(byteSpan, address);
 }
 
-CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback)
+CHIP_ERROR WiseconnectWifiInterface::StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback)
 {
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!wfx_rsi.dev_state.Has(WifiState::kScanStarted), CHIP_ERROR_IN_PROGRESS);
@@ -86,7 +87,7 @@ CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR StartWifiTask()
+CHIP_ERROR WiseconnectWifiInterface::StartWifiTask()
 {
     // Verify that the Wifi task has not already been started.
     VerifyOrReturnError(!(wfx_rsi.dev_state.Has(WifiState::kStationStarted)), CHIP_NO_ERROR);
@@ -99,27 +100,27 @@ CHIP_ERROR StartWifiTask()
     return CHIP_NO_ERROR;
 }
 
-void ConfigureStationMode()
+void WiseconnectWifiInterface::ConfigureStationMode()
 {
     wfx_rsi.dev_state.Set(WifiState::kStationMode);
 }
 
-bool IsStationModeEnabled()
+bool WiseconnectWifiInterface::IsStationModeEnabled()
 {
     return wfx_rsi.dev_state.Has(WifiState::kStationMode);
 }
 
-bool IsStationConnected()
+bool WiseconnectWifiInterface::IsStationConnected()
 {
     return wfx_rsi.dev_state.Has(WifiState::kStationConnected);
 }
 
-bool IsStationReady()
+bool WiseconnectWifiInterface::IsStationReady()
 {
     return wfx_rsi.dev_state.Has(WifiState::kStationInit);
 }
 
-CHIP_ERROR TriggerDisconnection()
+CHIP_ERROR WiseconnectWifiInterface::TriggerDisconnection()
 {
     VerifyOrReturnError(TriggerPlatformWifiDisconnection() == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
     wfx_rsi.dev_state.Clear(WifiState::kStationConnected);
@@ -127,62 +128,56 @@ CHIP_ERROR TriggerDisconnection()
     return CHIP_NO_ERROR;
 }
 
-void DHCPTimerEventHandler(void * arg)
+void WiseconnectWifiInterface::DHCPTimerEventHandler(void * arg)
 {
     WifiPlatformEvent event = WifiPlatformEvent::kStationDhcpPoll;
-    PostWifiPlatformEvent(event);
+    WiseconnectWifiInterface::GetInstance().PostWifiPlatformEvent(event);
 }
 
-void CancelDHCPTimer(void)
+void WiseconnectWifiInterface::CancelDHCPTimer(void)
 {
-    VerifyOrReturn(osTimerIsRunning(sDHCPTimer), ChipLogDetail(DeviceLayer, "CancelDHCPTimer: timer not running"));
-    VerifyOrReturn(osTimerStop(sDHCPTimer) == osOK, ChipLogError(DeviceLayer, "CancelDHCPTimer: failed to stop timer"));
+    VerifyOrReturn(osTimerIsRunning(mDHCPTimer), ChipLogDetail(DeviceLayer, "CancelDHCPTimer: timer not running"));
+    VerifyOrReturn(osTimerStop(mDHCPTimer) == osOK, ChipLogError(DeviceLayer, "CancelDHCPTimer: failed to stop timer"));
 }
 
-void StartDHCPTimer(uint32_t timeout)
+void WiseconnectWifiInterface::StartDHCPTimer(uint32_t timeout)
 {
     // Cancel timer if already started
     CancelDHCPTimer();
 
-    VerifyOrReturn(osTimerStart(sDHCPTimer, pdMS_TO_TICKS(timeout)) == osOK,
+    VerifyOrReturn(osTimerStart(mDHCPTimer, pdMS_TO_TICKS(timeout)) == osOK,
                    ChipLogError(DeviceLayer, "StartDHCPTimer: failed to start timer"));
 }
 
-void NotifyConnectivity(void)
+void WiseconnectWifiInterface::NotifyConnectivity(void)
 {
-    VerifyOrReturn(!hasNotifiedWifiConnectivity);
+    VerifyOrReturn(!mHasNotifiedWifiConnectivity);
 
     NotifyConnection(wfx_rsi.ap_mac);
-    hasNotifiedWifiConnectivity = true;
+    mHasNotifiedWifiConnectivity = true;
 }
 
-sl_status_t CreateDHCPTimer()
+sl_status_t WiseconnectWifiInterface::CreateDHCPTimer()
 {
     // TODO: Use LWIP timer instead of creating a new one here
-    sDHCPTimer = osTimerNew(DHCPTimerEventHandler, osTimerPeriodic, nullptr, nullptr);
-    VerifyOrReturnError(sDHCPTimer != nullptr, SL_STATUS_ALLOCATION_FAILED);
+    mDHCPTimer = osTimerNew(DHCPTimerEventHandler, osTimerPeriodic, nullptr, nullptr);
+    VerifyOrReturnError(mDHCPTimer != nullptr, SL_STATUS_ALLOCATION_FAILED);
 
     return SL_STATUS_OK;
 }
 
-/**
- * @brief Reset the flags that are used to notify the application about DHCP connectivity
- *        and emits a WifiPlatformEvent::kStationDoDhcp event to trigger DHCP polling checks.
- *
- * TODO: This function should be moved to the protected section once the class structure is done.
- */
-void ResetDHCPNotificationFlags(void)
+void WiseconnectWifiInterface::ResetDHCPNotificationFlags(void)
 {
 
     ResetIPNotificationStates();
-    hasNotifiedWifiConnectivity = false;
+    mHasNotifiedWifiConnectivity = false;
 
     WifiPlatformEvent event = WifiPlatformEvent::kStationDoDhcp;
     PostWifiPlatformEvent(event);
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-void GotIPv4Address(uint32_t ip)
+void WiseconnectWifiInterface::GotIPv4Address(uint32_t ip)
 {
     // Acquire the new IP address
     for (int i = 0; i < 4; ++i)
@@ -199,7 +194,7 @@ void GotIPv4Address(uint32_t ip)
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
-void ClearWifiCredentials()
+void WiseconnectWifiInterface::ClearWifiCredentials()
 {
     ChipLogProgress(DeviceLayer, "Clear WiFi Provision");
 
@@ -207,7 +202,7 @@ void ClearWifiCredentials()
     wfx_rsi.dev_state.Clear(WifiState::kStationProvisioned);
 }
 
-CHIP_ERROR GetWifiCredentials(WifiCredentials & credentials)
+CHIP_ERROR WiseconnectWifiInterface::GetWifiCredentials(WifiCredentials & credentials)
 {
     VerifyOrReturnError(wfx_rsi.dev_state.Has(WifiState::kStationProvisioned), CHIP_ERROR_INCORRECT_STATE);
     credentials = wfx_rsi.credentials;
@@ -215,18 +210,18 @@ CHIP_ERROR GetWifiCredentials(WifiCredentials & credentials)
     return CHIP_NO_ERROR;
 }
 
-bool IsWifiProvisioned()
+bool WiseconnectWifiInterface::IsWifiProvisioned()
 {
     return wfx_rsi.dev_state.Has(WifiState::kStationProvisioned);
 }
 
-void SetWifiCredentials(const WifiCredentials & credentials)
+void WiseconnectWifiInterface::SetWifiCredentials(const WifiCredentials & credentials)
 {
     wfx_rsi.credentials = credentials;
     wfx_rsi.dev_state.Set(WifiState::kStationProvisioned);
 }
 
-CHIP_ERROR ConnectToAccessPoint()
+CHIP_ERROR WiseconnectWifiInterface::ConnectToAccessPoint()
 {
     VerifyOrReturnError(IsWifiProvisioned(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(wfx_rsi.credentials.ssidLength, CHIP_ERROR_INCORRECT_STATE);
@@ -243,20 +238,24 @@ CHIP_ERROR ConnectToAccessPoint()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-bool HasAnIPv4Address()
+bool WiseconnectWifiInterface::HasAnIPv4Address()
 {
     return wfx_rsi.dev_state.Has(WifiState::kStationDhcpDone);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
-bool HasAnIPv6Address()
+bool WiseconnectWifiInterface::HasAnIPv6Address()
 {
     // TODO: WifiState::kStationConnected does not guarantee SLAAC IPv6 LLA, maybe use a different FLAG
     // Once connect is sync instead of async, this should be fine
     return wfx_rsi.dev_state.Has(WifiState::kStationConnected);
 }
 
-void CancelScanNetworks()
+void WiseconnectWifiInterface::CancelScanNetworks()
 {
     // TODO: Implement cancel scan
 }
+
+} // namespace Silabs
+} // namespace DeviceLayer
+} // namespace chip
