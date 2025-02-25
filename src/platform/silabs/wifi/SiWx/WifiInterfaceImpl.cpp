@@ -346,16 +346,16 @@ sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_res
 
 sl_status_t InitiateScan()
 {
-    sl_status_t status = SL_STATUS_OK;
-
-    sl_wifi_ssid_t ssid = { 0 };
-
+    sl_status_t status                                   = SL_STATUS_OK;
+    sl_wifi_ssid_t ssid                                  = { 0 };
     sl_wifi_scan_configuration_t wifi_scan_configuration = default_wifi_scan_configuration;
 
-    ssid.length = wfx_rsi.sec.ssid_length;
+    ssid.length = wfx_rsi.credentials.ssidLength;
 
-    // TODO: workaround because the string management with the null termination is flawed
-    chip::Platform::CopyString((char *) &ssid.value[0], ssid.length + 1, wfx_rsi.sec.ssid);
+    chip::ByteSpan requestedSsidSpan(wfx_rsi.credentials.ssid, wfx_rsi.credentials.ssidLength);
+    chip::MutableByteSpan ssidSpan(ssid.value, ssid.length);
+    chip::CopySpanToMutableSpan(requestedSsidSpan, ssidSpan);
+
     sl_wifi_set_scan_callback(ScanCallback, NULL);
 
     osSemaphoreAcquire(sScanInProgressSemaphore, osWaitForever);
@@ -394,10 +394,10 @@ sl_status_t SetWifiConfigurations()
     VerifyOrReturnError(status == SL_STATUS_OK, status);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-    if (wfx_rsi.sec.passkey_length != 0)
+    if (wfx_rsi.credentials.passkeyLength != 0)
     {
-        status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID, SL_NET_WIFI_PSK, &wfx_rsi.sec.passkey[0],
-                                       wfx_rsi.sec.passkey_length);
+        status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID, SL_NET_WIFI_PSK, &wfx_rsi.credentials.passkey[0],
+                                       wfx_rsi.credentials.passkeyLength);
         VerifyOrReturnError(status == SL_STATUS_OK, status,
                             ChipLogError(DeviceLayer, "sl_net_set_credential failed: 0x%lx", status));
     }
@@ -405,8 +405,9 @@ sl_status_t SetWifiConfigurations()
     sl_net_wifi_client_profile_t profile = {
         .config = {
             .ssid = {
+                .value  = { 0 },
                 //static cast because the types dont match
-                .length = static_cast<uint8_t>(wfx_rsi.sec.ssid_length),
+                .length = static_cast<uint8_t>(wfx_rsi.credentials.ssidLength),
             },
             .channel = {
                 .channel = SL_WIFI_AUTO_CHANNEL,
@@ -427,10 +428,12 @@ sl_status_t SetWifiConfigurations()
             .ip = {{{0}}},
         }
     };
-    // TODO: memcpy for now since the types dont match
-    memcpy((char *) &profile.config.ssid.value, wfx_rsi.sec.ssid, wfx_rsi.sec.ssid_length);
 
-    status = sl_net_set_profile((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
+    chip::MutableByteSpan output(profile.config.ssid.value, WFX_MAX_SSID_LENGTH);
+    chip::ByteSpan input(wfx_rsi.credentials.ssid, wfx_rsi.credentials.ssidLength);
+    chip::CopySpanToMutableSpan(input, output);
+
+    status = sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
     VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_set_profile failed: 0x%lx", status));
 
     return status;
@@ -460,7 +463,7 @@ sl_status_t JoinCallback(sl_wifi_event_t event, char * result, uint32_t resultLe
         status = *reinterpret_cast<sl_status_t *>(result);
         ChipLogError(DeviceLayer, "JoinCallback: failed: 0x%lx", status);
         wfx_rsi.dev_state.Clear(WifiState::kStationConnected);
-        wfx_retry_connection(++wfx_rsi.join_retries);
+        ScheduleConnectionAttempt();
     }
 
     return status;
@@ -486,7 +489,7 @@ sl_status_t JoinWifiNetwork(void)
     chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformance();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-    status = sl_net_up((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
+    status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
 
     if (status == SL_STATUS_OK || status == SL_STATUS_IN_PROGRESS)
     {
@@ -504,9 +507,7 @@ sl_status_t JoinWifiNetwork(void)
     ChipLogError(DeviceLayer, "sl_wifi_connect failed: 0x%lx", static_cast<uint32_t>(status));
 
     wfx_rsi.dev_state.Clear(WifiState::kStationConnecting).Clear(WifiState::kStationConnected);
-
-    ChipLogProgress(DeviceLayer, "Connection retry attempt %d", wfx_rsi.join_retries);
-    wfx_retry_connection(++wfx_rsi.join_retries);
+    ScheduleConnectionAttempt();
 
     return status;
 }
@@ -515,19 +516,18 @@ sl_status_t JoinWifiNetwork(void)
 
 sl_status_t TriggerPlatformWifiDisconnection()
 {
-    return sl_net_down((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE);
+    return sl_net_down(SL_NET_WIFI_CLIENT_INTERFACE);
 }
 
 CHIP_ERROR GetAccessPointInfo(wfx_wifi_scan_result_t & info)
 {
     // TODO: Convert this to a int8
     int32_t rssi  = 0;
-    info.security = wfx_rsi.sec.security;
+    info.security = wfx_rsi.credentials.security;
     info.chan     = wfx_rsi.ap_chan;
 
     chip::MutableByteSpan output(info.ssid, WFX_MAX_SSID_LENGTH);
-    // Cast is a workaround until the wfx_rsi structure is refactored
-    chip::ByteSpan ssid(reinterpret_cast<uint8_t *>(wfx_rsi.sec.ssid), wfx_rsi.sec.ssid_length);
+    chip::ByteSpan ssid(wfx_rsi.credentials.ssid, wfx_rsi.credentials.ssidLength);
     chip::CopySpanToMutableSpan(ssid, output);
     info.ssid_length = output.size();
 
@@ -582,7 +582,7 @@ CHIP_ERROR InitWiFiStack(void)
 {
     sl_status_t status = SL_STATUS_OK;
 
-    status = sl_net_init((sl_net_interface_t) SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
+    status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
     VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
 
     // Create Sempaphore for scan completion
@@ -793,7 +793,7 @@ void MatterWifiTask(void * arg)
     VerifyOrReturn(status == SL_STATUS_OK,
                    ChipLogError(DeviceLayer, "MatterWifiTask: sl_wifi_siwx917_init failed: 0x%lx", static_cast<uint32_t>(status)));
 
-    sl_matter_wifi_task_started();
+    NotifyWifiTaskInitialized();
 
     ChipLogDetail(DeviceLayer, "MatterWifiTask: starting event loop");
     for (;;)

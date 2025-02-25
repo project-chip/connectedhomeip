@@ -28,8 +28,17 @@ using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::RvcOperationalState;
 using chip::Protocols::InteractionModel::Status;
 
+#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+#include <chef-rvc-mode-delegate.h>
+#endif // MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+
 static std::unique_ptr<RvcOperationalStateDelegate> gRvcOperationalStateDelegate;
 static std::unique_ptr<RvcOperationalState::Instance> gRvcOperationalStateInstance;
+
+RvcOperationalStateDelegate * getRvcOperationalStateDelegate()
+{
+    return gRvcOperationalStateDelegate.get();
+}
 
 static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data);
 
@@ -176,6 +185,11 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
     OperationalState::OperationalStateEnum state =
         static_cast<OperationalState::OperationalStateEnum>(instance->GetCurrentOperationalState());
 
+    if (state == OperationalState::OperationalStateEnum::kStopped) // Do not continue the timer when RVC has stopped.
+    {
+        return;
+    }
+
     if (gRvcOperationalStateDelegate->mCountdownTime.IsNull())
     {
         if (state == OperationalState::OperationalStateEnum::kRunning)
@@ -223,6 +237,10 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
             gRvcOperationalStateDelegate->mRunningTime = 0;
             gRvcOperationalStateDelegate->mPausedTime  = 0;
             gRvcOperationalStateDelegate->mCountdownTime.SetNull();
+
+#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+            getRvcRunModeInstance()->UpdateCurrentMode(RvcRunMode::ModeIdle);
+#endif // MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
         }
     }
 }
