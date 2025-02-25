@@ -201,10 +201,10 @@ MTR_DIRECT_MEMBERS
     MTR_LOG("%@ added delegate info %@", self, newDelegateInfo);
 
     // Call hook to allow subclasses to act on delegate addition.
-    [self _delegateAdded];
+    [self _delegateAdded:delegate];
 }
 
-- (void)_delegateAdded
+- (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -233,6 +233,16 @@ MTR_DIRECT_MEMBERS
         [_delegates minusSet:delegatesToRemove];
         MTR_LOG("%@ removeDelegate: removed %lu", self, static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
     }
+
+    // Call hook to allow subclasses to act on delegate addition.
+    [self _delegateRemoved:delegate];
+}
+
+- (void)_delegateRemoved:(id<MTRDeviceDelegate>)delegate
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    // Nothing to do for now. At the moment this is a hook for subclasses.
 }
 
 - (void)invalidate
@@ -241,6 +251,12 @@ MTR_DIRECT_MEMBERS
 
     [_delegates removeAllObjects];
     [self _cancelAllAttributeValueWaiters];
+}
+
+- (BOOL)delegateExists
+{
+    std::lock_guard lock(_lock);
+    return [self _delegateExists];
 }
 
 - (BOOL)_delegateExists
@@ -521,6 +537,16 @@ MTR_DIRECT_MEMBERS
            serverSideProcessingTimeout:serverSideProcessingTimeout
                                  queue:queue
                             completion:responseHandler];
+}
+
+- (void)invokeCommands:(NSArray<NSArray<MTRCommandWithRequiredResponse *> *> *)commands
+                 queue:(dispatch_queue_t)queue
+            completion:(MTRDeviceResponseHandler)completion
+{
+    MTR_ABSTRACT_METHOD();
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+    });
 }
 
 - (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode

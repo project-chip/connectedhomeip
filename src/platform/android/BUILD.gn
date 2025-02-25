@@ -142,5 +142,5 @@ android_library("java") {
 }
 
 java_prebuilt("android_sdk") {
-  jar_path = "${android_sdk_root}/platforms/android-26/android.jar"
+  jar_path = "${android_sdk_root}/platforms/android-30/android.jar"
 }

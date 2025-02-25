@@ -94,7 +94,7 @@ public:
     // Copies the primary MAC into a mutable span, which must be of size kPrimaryMACAddressLength.
     // Upon success, the span will be reduced to the size of the MAC address being returned, which
     // can be less than kPrimaryMACAddressLength on a device that supports Thread.
-    virtual CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) = 0;
+    virtual CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan & buf) = 0;
 
     // Copies the primary WiFi MAC into a buffer of size kEthernetMACAddressLength
     virtual CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) = 0;

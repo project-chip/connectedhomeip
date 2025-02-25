@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
   
-  <struct name="ThreadNetworkStruct" apiMaturity="provisional">
+  <struct name="ThreadNetworkStruct">
     <cluster code="0x0453"/>
     <item name="ExtendedPanID" type="octet_string" length="8"/>
     <item name="NetworkName" type="char_string" length="16"/>
@@ -25,7 +25,7 @@ limitations under the License.
     <item name="ActiveTimestamp" type="int64u"/>
   </struct>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <domain>Network Infrastructure</domain>
     <name>Thread Network Directory</name>
     <code>0x0453</code>

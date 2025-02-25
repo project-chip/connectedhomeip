@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,10 +17,53 @@
 
 /**
  *    @file
- *      Provides an implementation of the NFCOnboardingPayloadManager interface for nRF Connect
- *      SDK platform, by including Zephyr platform implementation.
+ *      Platform-specific NFCOnboardingPayloadManager implementation for nrfconnect.
  */
 
 #pragma once
 
-#include <platform/Zephyr/NFCOnboardingPayloadManagerImpl.h>
+#include <cstddef>
+#include <cstdint>
+
+namespace chip {
+namespace DeviceLayer {
+
+class NFCOnboardingPayloadManagerImpl final : public NFCOnboardingPayloadManager
+{
+    friend class NFCOnboardingPayloadManager;
+
+private:
+    // ===== Members that implement the NFCOnboardingPayloadManager internal interface.
+
+    CHIP_ERROR _Init();
+    CHIP_ERROR _StartTagEmulation(const char * payload, size_t payloadLength);
+    CHIP_ERROR _StopTagEmulation();
+    bool _IsTagEmulationStarted() const { return mIsStarted; };
+
+    // ===== Members for internal use by this class.
+
+    constexpr static uint8_t kNdefBufferSize = 128;
+
+    uint8_t mNdefBuffer[kNdefBufferSize];
+    bool mIsStarted;
+
+    // ===== Members for internal use by the following friends.
+
+    friend NFCOnboardingPayloadManager & NFCOnboardingPayloadMgr();
+    friend NFCOnboardingPayloadManagerImpl & NFCOnboardingPayloadMgrImpl();
+
+    static NFCOnboardingPayloadManagerImpl sInstance;
+};
+
+inline NFCOnboardingPayloadManager & NFCOnboardingPayloadMgr()
+{
+    return NFCOnboardingPayloadManagerImpl::sInstance;
+}
+
+inline NFCOnboardingPayloadManagerImpl & NFCOnboardingPayloadMgrImpl()
+{
+    return NFCOnboardingPayloadManagerImpl::sInstance;
+}
+
+} // namespace DeviceLayer
+} // namespace chip
