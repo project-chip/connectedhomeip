@@ -28,7 +28,6 @@ source_set("app2") {
 
   sources = [
     "../../resource-monitoring-delegates.cpp",
-    "../../src/bridged-actions-stub.cpp",
     "../../static-supported-modes-manager.cpp",
   ]
 

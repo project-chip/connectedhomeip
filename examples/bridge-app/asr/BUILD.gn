@@ -78,7 +78,6 @@ asr_executable("bridge_app") {
     "${examples_plat_dir}/shell/matter_shell.cpp",
     "src/AppTask.cpp",
     "src/DeviceCallbacks.cpp",
-    "src/bridged-actions-stub.cpp",
     "src/main.cpp",
     "subdevice/SubDevice.cpp",
     "subdevice/SubDeviceManager.cpp",
