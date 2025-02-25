@@ -25,6 +25,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/LinkedList.h>
 #include <lib/support/Span.h>
+#include <messaging/ExchangeContext.h>
 
 #include <limits>
 

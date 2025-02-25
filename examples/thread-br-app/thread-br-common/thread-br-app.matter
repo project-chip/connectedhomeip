@@ -1380,19 +1380,19 @@ cluster UserLabel = 65 {
 }
 
 /** Manage the Thread network of Thread Border Router */
-provisional cluster ThreadBorderRouterManagement = 1106 {
+cluster ThreadBorderRouterManagement = 1106 {
   revision 1;
 
   bitmap Feature : bitmap32 {
     kPANChange = 0x1;
   }
 
-  provisional readonly attribute char_string<63> borderRouterName = 0;
-  provisional readonly attribute octet_string<254> borderAgentID = 1;
-  provisional readonly attribute int16u threadVersion = 2;
-  provisional readonly attribute boolean interfaceEnabled = 3;
-  provisional readonly attribute nullable int64u activeDatasetTimestamp = 4;
-  provisional readonly attribute nullable int64u pendingDatasetTimestamp = 5;
+  readonly attribute char_string<63> borderRouterName = 0;
+  readonly attribute octet_string<254> borderAgentID = 1;
+  readonly attribute int16u threadVersion = 2;
+  readonly attribute boolean interfaceEnabled = 3;
+  readonly attribute nullable int64u activeDatasetTimestamp = 4;
+  readonly attribute nullable int64u pendingDatasetTimestamp = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
