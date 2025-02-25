@@ -684,7 +684,7 @@ sl_status_t WifiInterfaceImpl::JoinWifiNetwork(void)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
         WiseconnectWifiInterface::WifiPlatformEvent event = WiseconnectWifiInterface::WifiPlatformEvent::kStationConnect;
-        WiseconnectWifiInterface::PostWifiPlatformEvent(event);
+        PostWifiPlatformEvent(event);
         return status;
     }
 
@@ -754,7 +754,7 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & i
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ResetCounters()
+CHIP_ERROR WifiInterfaceImpl::ResetCounters()
 {
     sl_wifi_statistics_t test = { 0 };
 

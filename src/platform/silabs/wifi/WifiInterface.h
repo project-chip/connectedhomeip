@@ -145,6 +145,8 @@ public:
     // TODO: Figure out if we need this structure. We have different strcutures for the same use
     struct WifiCredentials
     {
+        WifiCredentials() { Clear(); }
+
         uint8_t ssid[WFX_MAX_SSID_LENGTH]       = { 0 };
         size_t ssidLength                       = 0;
         uint8_t passkey[WFX_MAX_PASSKEY_LENGTH] = { 0 };
