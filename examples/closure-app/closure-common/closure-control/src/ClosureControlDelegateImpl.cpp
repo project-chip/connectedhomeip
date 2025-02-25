@@ -93,7 +93,7 @@ uint32_t ClosureControlDelegate::GetKickoffTimer()
 
 CHIP_ERROR ClosureControlDelegate::StartCurrentErrorListRead()
 {
-    return CHIP_NO_ERROR;    
+    return CHIP_NO_ERROR;
 }
 CHIP_ERROR ClosureControlDelegate::GetCurrentErrorListAtIndex(size_t Index, ClosureErrorEnum & closureError)
 {
@@ -103,8 +103,8 @@ CHIP_ERROR ClosureControlDelegate::GetCurrentErrorListAtIndex(size_t Index, Clos
     }
 
     closureError = kCurrentErrorList[Index];
-    
-    return CHIP_NO_ERROR; 
+
+    return CHIP_NO_ERROR;
 }
 CHIP_ERROR ClosureControlDelegate::EndCurrentErrorListRead()
 {
@@ -116,9 +116,9 @@ Protocols::InteractionModel::Status ClosureControlDelegate::Stop(){
 }
 
 Protocols::InteractionModel::Status ClosureControlDelegate::MoveTo(const Optional<TagPositionEnum> tag, const Optional<TagLatchEnum> latch,
-                                                       const Optional<Globals::ThreeLevelAutoEnum> speed) 
+                                                       const Optional<Globals::ThreeLevelAutoEnum> speed)
 {
-    return Status::Success;                                                       
+    return Status::Success;
 }
 
 Protocols::InteractionModel::Status ClosureControlDelegate::Calibrate()
@@ -130,13 +130,13 @@ Protocols::InteractionModel::Status ClosureControlDelegate::Calibrate()
 Protocols::InteractionModel::Status ClosureControlDelegate::ConfigureFallback(const Optional<RestingProcedureEnum> restingProcedure,
     const Optional<TriggerConditionEnum> triggerCondition,
     const Optional<TriggerPositionEnum> triggerPosition,
-    const Optional<uint32_t> waitingDelay) 
+    const Optional<uint32_t> waitingDelay)
 {
-    return Status::Success;   
+    return Status::Success;
 }
 
 //Below Function will be removed along removal of Fallback feature from closure control cluster
 Protocols::InteractionModel::Status ClosureControlDelegate::CancelFallback()
 {
-    return Status::Success;   
+    return Status::Success;
 }

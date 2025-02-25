@@ -80,7 +80,7 @@ public:
 
 private:
     static AppTask sAppTask;
-    
+
     /**
      * @brief AppTask initialisation function
      *

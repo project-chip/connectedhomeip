@@ -35,7 +35,7 @@ class ClosureControlDelegate : public ClosureControl::Delegate
 {
 public:
     ClosureControlDelegate(EndpointId clustersEndpoint);
-    
+
     void SetClosureControlInstance(ClosureControl::Instance & instance);
 
     /*********************************************************************************
@@ -55,7 +55,7 @@ public:
 
     // ------------------------------------------------------------------
     // Get attribute methods
- 
+
     DataModel::Nullable<uint32_t> GetCountdownTime() override;
     RestingProcedureEnum GetRestingProcedure() override;
     TriggerConditionEnum GetTriggerCondition() override;
@@ -78,7 +78,7 @@ private:
      * ClosureControlDelegate specific variables
      *
      ***************************************************************************/
-    
+
     // Need the following so can determine which features are supported
     ClosureControl::Instance * mpClosureControlInstance;
 };

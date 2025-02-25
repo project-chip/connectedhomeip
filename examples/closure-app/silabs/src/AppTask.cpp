@@ -39,16 +39,16 @@
 #include <setup_payload/SetupPayload.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
- 
+
 #define APP_FUNCTION_BUTTON 0
 #define APP_ClOSURE_BUTTON 1
- 
+
 namespace {
- 
+
  constexpr chip::EndpointId kClosureBaseEndpoint        = 1;
- 
+
 } // namespace
- 
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -58,26 +58,26 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace chip::TLV;
- 
+
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ClosureControl {
- 
+
  static chip::BitMask<Feature> sFeatureMap(Feature::kCalibration);
- 
+
 } // namespace ClosureControl
 } // namespace Clusters
 } // namespace app
 } // namespace chip
- 
+
  AppTask AppTask::sAppTask;
- 
+
 EndpointId GetClosureDeviceEndpointId()
 {
     return kClosureBaseEndpoint;
 }
- 
+
 void ApplicationInit()
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -87,36 +87,36 @@ void ApplicationInit()
     SILABS_LOG("==================================================");
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
- 
+
 void ApplicationShutdown()
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     ClosureApplicationShutdown();
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
- 
+
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
- 
+
     err = BaseApplication::Init();
     if (err != CHIP_NO_ERROR)
     {
         SILABS_LOG("BaseApplication::Init() failed");
         appError(err);
     }
- 
+
     ApplicationInit();
- 
+
     return err;
 }
- 
+
 CHIP_ERROR AppTask::StartAppTask()
 {
     return BaseApplication::StartAppTask(AppTaskMain);
 }
- 
+
 void AppTask::AppTaskMain(void * pvParameter)
 {
     AppEvent event;
@@ -128,9 +128,9 @@ void AppTask::AppTaskMain(void * pvParameter)
         SILABS_LOG("AppTask.Init() failed");
         appError(err);
     }
- 
+
     SILABS_LOG("App Task started");
- 
+
     while (true)
     {
         osStatus_t eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, osWaitForever);
@@ -141,7 +141,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         }
     }
 }
- 
+
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
     AppEvent button_event           = {};
@@ -149,4 +149,4 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     button_event.ButtonEvent.Action = btnAction;
     button_event.Handler = BaseApplication::ButtonHandler;
     AppTask::GetAppTask().PostEvent(&button_event);
- } 
+ }
