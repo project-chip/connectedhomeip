@@ -3676,12 +3676,10 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         // Expected the test device was added and removed
         MTRPerControllerStorageTestsDeallocDelegate * controllerDelegate = [[MTRPerControllerStorageTestsDeallocDelegate alloc] init];
         __block NSUInteger lastDeviceCount = controller.devices.count;
-        NSLog(@"JEFFTEST: first count %@", @(lastDeviceCount));
         controllerDelegate.onDevicesChanged = ^{
             // Use self as lock for lastDeviceCount access, so sanitizer doesn't complain
             @synchronized(self) {
                 NSArray<MTRDevice *> * devices = controller.devices;
-                NSLog(@"JEFFTEST: devices changed: %@", devices);
                 if (devices.count > lastDeviceCount) {
                     [controllerAddedDevice fulfill];
                 } else if (devices.count < lastDeviceCount) {
