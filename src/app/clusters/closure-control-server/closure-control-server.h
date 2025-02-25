@@ -44,19 +44,20 @@ class Delegate
 public:
     virtual ~Delegate() = default;
 
+    // Only Cluster Instance should be calling the SetEdpointId.
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
     EndpointId GetEndpointId() { return mEndpointId; }
 
     // ------------------------------------------------------------------
     // Commands
     virtual Protocols::InteractionModel::Status Stop()                                                    = 0;
-    virtual Protocols::InteractionModel::Status MoveTo(const Optional<TagPositionEnum> tag, const Optional<TagLatchEnum> latch,
-                                                       const Optional<Globals::ThreeLevelAutoEnum> speed) = 0;
+    virtual Protocols::InteractionModel::Status MoveTo(const Optional<TagPositionEnum> & tag, const Optional<TagLatchEnum> & latch,
+                                                       const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
     virtual Protocols::InteractionModel::Status Calibrate()                                               = 0;
-    virtual Protocols::InteractionModel::Status ConfigureFallback(const Optional<RestingProcedureEnum> restingProcedure,
-                                                                  const Optional<TriggerConditionEnum> triggerCondition,
-                                                                  const Optional<TriggerPositionEnum> triggerPosition,
-                                                                  const Optional<uint32_t> waitingDelay)  = 0;
+    virtual Protocols::InteractionModel::Status ConfigureFallback(const Optional<RestingProcedureEnum> & restingProcedure,
+                                                                  const Optional<TriggerConditionEnum> & triggerCondition,
+                                                                  const Optional<TriggerPositionEnum> & triggerPosition,
+                                                                  const Optional<uint32_t> & waitingDelay)  = 0;
     virtual Protocols::InteractionModel::Status CancelFallback()                                          = 0;
 
     // ------------------------------------------------------------------
@@ -71,8 +72,9 @@ public:
     /* These functions are called by the ReadAttribute handler to iterate through lists
      * The cluster server will call Start<Type>Read to allow the delegate to create a temporary
      * lock on the data.
+     * The delegate is expected to send CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to notify end of list.
      * The delegate is expected to not change these values once Start<Type>Read has been called
-     * until the End<Type>Read() has been called (e.g. releasing a lock on the data)
+     * until the End<Type>Read() has been called (i.e. releasing a lock on the data)
      */
     virtual CHIP_ERROR StartCurrentErrorListRead()                            = 0;
     virtual CHIP_ERROR GetCurrentErrorListAtIndex(size_t, ClosureErrorEnum &) = 0;
@@ -82,7 +84,7 @@ protected:
     EndpointId mEndpointId = chip::kInvalidEndpointId;
 };
 
-enum class OptionalAttributes : uint32_t
+enum class OptionalAttribute : uint32_t
 {
     kCountdownTime = 0x1
 };
@@ -98,7 +100,7 @@ public:
      * @param[in] aFeature The bitmask value that identifies which features are supported by this instance.
      * @param[in] aOptionalAttrs The bitmask Value that identifies which optional attributes are supported by this instance.
      */
-    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs) :
+    Instance(EndpointId aEndpointId, Delegate & aDelegate,  BitMask<Feature> aFeature, BitMask<OptionalAttribute> aOptionalAttrs) :
         AttributeAccessInterface(MakeOptional(aEndpointId), ClosureControl::Id),
         CommandHandlerInterface(MakeOptional(aEndpointId), ClosureControl::Id), mDelegate(aDelegate), mFeature(aFeature),
         mOptionalAttrs(aOptionalAttrs)
@@ -112,7 +114,7 @@ public:
     void Shutdown();
 
     bool HasFeature(Feature aFeature) const;
-    bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
+    bool SupportsOptAttr(OptionalAttribute aOptionalAttrs) const;
 
     // Attribute setters
     /**
@@ -120,7 +122,7 @@ public:
      * @param[in] aMainState The Main state that should now be the current one.
      * @return CHIP_NO_ERROR if set was successful.
      */
-    CHIP_ERROR SetMainState(const MainStateEnum & aMainState);
+    CHIP_ERROR SetMainState(MainStateEnum aMainState);
 
     /**
      * @brief Set OverallState.
@@ -147,13 +149,13 @@ public:
      * @brief Get OverallState.
      * @return Current OverallState.
      */
-    GenericOverallState GetOverallState() const;
+    const GenericOverallState & GetOverallState() const;
 
     /**
      * @brief Get OverallTarget.
      * @return Current OverallTarget.
      */
-    GenericOverallTarget GetOverallTarget() const;
+    const GenericOverallTarget & GetOverallTarget() const;
 
     /**
      * @brief Whenever application wants to trigger an update to report a new updated time,
@@ -186,7 +188,7 @@ protected:
 private:
     Delegate & mDelegate;
     BitMask<Feature> mFeature;
-    BitMask<OptionalAttributes> mOptionalAttrs;
+    BitMask<OptionalAttribute> mOptionalAttrs;
 
     app::QuieterReportingAttribute<uint32_t> mCountdownTime{ DataModel::NullNullable };
     MainStateEnum mMainState;

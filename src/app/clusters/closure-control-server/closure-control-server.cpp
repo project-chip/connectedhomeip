@@ -56,7 +56,7 @@ bool Instance::HasFeature(Feature aFeature) const
     return mFeature.Has(aFeature);
 }
 
-bool Instance::SupportsOptAttr(OptionalAttributes aOptionalAttrs) const
+bool Instance::SupportsOptAttr(OptionalAttribute aOptionalAttrs) const
 {
     return mOptionalAttrs.Has(aOptionalAttrs);
 }
@@ -80,7 +80,7 @@ bool Instance::IsSupportedState(MainStateEnum aMainState)
     return true;
 }
 
-CHIP_ERROR Instance::SetMainState(const MainStateEnum & aMainState)
+CHIP_ERROR Instance::SetMainState(MainStateEnum  aMainState)
 {
     if (!IsSupportedState(aMainState))
     {
@@ -91,6 +91,7 @@ CHIP_ERROR Instance::SetMainState(const MainStateEnum & aMainState)
     {
         mMainState = aMainState;
         MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), ClosureControl::Id, Attributes::MainState::Id);
+        UpdateCountdownTimeFromClusterLogic();
     }
     return CHIP_NO_ERROR;
 }
@@ -124,12 +125,12 @@ MainStateEnum Instance::GetMainState() const
     return mMainState;
 }
 
-GenericOverallState Instance::GetOverallState() const
+const GenericOverallState & Instance::GetOverallState() const
 {
     return mOverallState;
 }
 
-GenericOverallTarget Instance::GetOverallTarget() const
+const GenericOverallTarget & Instance::GetOverallTarget() const
 {
     return mOverallTarget;
 }
@@ -170,7 +171,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     {
     case CountdownTime::Id:
         // Optional Attribute
-        if (SupportsOptAttr(OptionalAttributes::kCountdownTime))
+        if (SupportsOptAttr(OptionalAttribute::kCountdownTime))
         {
             return aEncoder.Encode(mDelegate.GetCountdownTime());
         }
@@ -264,7 +265,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
     switch (aPath.mAttributeId)
     {
     case CountdownTime::Id:
-        if (SupportsOptAttr(OptionalAttributes::kCountdownTime))
+        if (SupportsOptAttr(OptionalAttribute::kCountdownTime))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
         }
