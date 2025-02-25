@@ -287,7 +287,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
     }
 
     if (needsDescriptorAttributes) {
-        attributeCount += ArraySize(sDescriptorAttributesMetadata);
+        attributeCount += MATTER_ARRAY_SIZE(sDescriptorAttributesMetadata);
     }
 
     // And add one for ClusterRevision

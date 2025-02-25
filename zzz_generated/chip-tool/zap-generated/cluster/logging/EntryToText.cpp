@@ -5861,8 +5861,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "ProvideOffer";
         case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Id:
             return "ProvideAnswer";
-        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::Id:
-            return "ProvideICECandidate";
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Id:
+            return "ProvideICECandidates";
         case chip::app::Clusters::WebRTCTransportProvider::Commands::EndSession::Id:
             return "EndSession";
         default:
@@ -6713,6 +6713,34 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Window Covering";
     case 0x00000203:
         return "Window Covering Controller";
+    case 0x00000230:
+        return "ClosureBase";
+    case 0x00000231:
+        return "Window";
+    case 0x00000232:
+        return "Shutter";
+    case 0x00000233:
+        return "Shade";
+    case 0x00000234:
+        return "Curtain";
+    case 0x00000235:
+        return "Blind";
+    case 0x00000236:
+        return "Screen";
+    case 0x00000237:
+        return "Awning";
+    case 0x00000238:
+        return "Pergola";
+    case 0x00000239:
+        return "Door";
+    case 0x0000023A:
+        return "GarageDoor";
+    case 0x0000023B:
+        return "Gate";
+    case 0x0000023C:
+        return "Barrier";
+    case 0x0000023D:
+        return "Cabinet";
     case 0x00000300:
         return "Heating/Cooling Unit";
     case 0x00000301:

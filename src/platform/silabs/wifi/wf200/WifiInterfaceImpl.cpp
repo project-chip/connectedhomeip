@@ -33,6 +33,8 @@
 #include <platform/silabs/wifi/WifiInterface.h>
 #include <platform/silabs/wifi/lwip-support/dhcp_client.h>
 #include <platform/silabs/wifi/lwip-support/ethernetif.h>
+#include <platform/silabs/wifi/lwip-support/lwip_netif.h>
+#include <platform/silabs/wifi/wf200/ncp/efr_spi.h>
 #include <platform/silabs/wifi/wf200/ncp/sl_wfx_board.h>
 #include <platform/silabs/wifi/wf200/ncp/sl_wfx_host.h>
 #include <platform/silabs/wifi/wf200/ncp/sl_wfx_task.h>
@@ -102,12 +104,10 @@ uint8_t softap_channel                 = SOFTAP_CHANNEL_DEFAULT;
 
 /* station network interface structures */
 struct netif * sta_netif;
-wfx_wifi_provision_t wifi_provision;
+WifiCredentials wifi_provision;
 #define PUT_COUNTER(name) ChipLogDetail(DeviceLayer, "%-24s %lu", #name, (unsigned long) counters->body.count_##name);
 
 bool hasNotifiedWifiConnectivity = false;
-static uint8_t retryJoin         = 0;
-bool retryInProgress             = false;
 
 static struct scan_result_holder
 {
@@ -304,6 +304,22 @@ inline int16_t ConvertRcpiToRssi(uint32_t rcpi)
     VerifyOrReturnValue(rssi >= std::numeric_limits<int16_t>::min(), std::numeric_limits<int16_t>::min());
     return rssi;
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
+/**
+ * @brief Updates the IPv4 address in the Wi-Fi interface and notifies the application layer about the new IP address.
+ *
+ * @param[in] ip New IPv4 address
+ */
+void GotIPv4Address(uint32_t ip)
+{
+    ChipLogDetail(DeviceLayer, "DHCP IP=%d.%d.%d.%d", (ip & 0xFF), (ip >> 8 & 0xFF), (ip >> 16 & 0xFF), (ip >> 24 & 0xFF));
+    sta_ip = ip;
+
+    NotifyIPv4Change(true);
+}
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
+
 } // namespace
 
 CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, MutableByteSpan & address)
@@ -465,6 +481,107 @@ CHIP_ERROR ConfigureBroadcastFilter(bool enableBroadcastFilter)
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+CHIP_ERROR ResetCounters()
+{
+    // TODO: Implement the function
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+void ClearWifiCredentials()
+{
+    wifi_provision.Clear();
+}
+
+CHIP_ERROR GetWifiCredentials(WifiCredentials & credentials)
+{
+    VerifyOrReturnError(IsWifiProvisioned(), CHIP_ERROR_INCORRECT_STATE);
+    credentials = wifi_provision;
+
+    return CHIP_NO_ERROR;
+}
+
+bool IsWifiProvisioned()
+{
+    // TODO: We need a better way of checking if we are provisioned or not
+    return wifi_provision.ssid[0] != 0;
+}
+
+void SetWifiCredentials(const WifiCredentials & credentials)
+{
+    wifi_provision = credentials;
+}
+
+CHIP_ERROR ConnectToAccessPoint(void)
+{
+    sl_wfx_security_mode_t connect_security_mode;
+
+    VerifyOrReturnError(IsWifiProvisioned(), CHIP_ERROR_INCORRECT_STATE);
+    ChipLogDetail(DeviceLayer, "WIFI:JOIN to %s", wifi_provision.ssid);
+
+    ChipLogDetail(DeviceLayer,
+                  "WIFI Scan Paramter set to Active channel time %d, Passive Channel "
+                  "Time: %d, Number of prob: %d",
+                  ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
+    (void) sl_wfx_set_scan_parameters(ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
+    switch (wifi_provision.security)
+    {
+    case WFX_SEC_WEP:
+        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WEP;
+        break;
+    case WFX_SEC_WPA:
+    case WFX_SEC_WPA2:
+        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA2_WPA1_PSK;
+        break;
+    case WFX_SEC_WPA3:
+        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA3_SAE;
+        break;
+    case WFX_SEC_NONE:
+        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_OPEN;
+        break;
+    default:
+        ChipLogError(DeviceLayer, "error: unknown security type.");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    VerifyOrReturnError(sl_wfx_send_join_command(wifi_provision.ssid, wifi_provision.ssidLength, NULL, CHANNEL_0,
+                                                 connect_security_mode, PREVENT_ROAMING, DISABLE_PMF_MODE, wifi_provision.passkey,
+                                                 wifi_provision.passkeyLength, NULL, IE_DATA_LENGTH) == SL_STATUS_OK,
+                        CHIP_ERROR_INTERNAL);
+
+    return CHIP_NO_ERROR;
+}
+
+bool HasAnIPv4Address()
+{
+    return (sta_ip == STA_IP_FAIL) ? false : true;
+}
+
+bool HasAnIPv6Address()
+{
+    return IsStationConnected();
+}
+
+void CancelScanNetworks()
+{
+    struct scan_result_holder *hp, *next;
+    /* Not possible */
+    VerifyOrReturn(scan_cb != nullptr);
+    sl_wfx_send_stop_scan_command();
+    for (hp = scan_save; hp; hp = next)
+    {
+        next = hp->next;
+        chip::Platform::MemoryFree(hp);
+    }
+    scan_save  = (struct scan_result_holder *) 0;
+    scan_count = 0;
+    if (scan_ssid)
+    {
+        chip::Platform::MemoryFree(scan_ssid);
+        scan_ssid = nullptr;
+    }
+    scan_cb = nullptr;
+}
 
 /***************************************************************************
  * @brief
@@ -719,11 +836,7 @@ static void sl_wfx_connect_callback(sl_wfx_connect_ind_body_t connect_indication
 
     if (status != WFM_STATUS_SUCCESS)
     {
-        retryJoin += 1;
-        retryInProgress = false;
-        ChipLogProgress(DeviceLayer, "Retry to connect to network count: %d", retryJoin);
-
-        wfx_retry_connection(retryJoin);
+        ScheduleConnectionAttempt();
     }
 }
 
@@ -739,8 +852,7 @@ static void sl_wfx_disconnect_callback(uint8_t * mac, uint16_t reason)
     ChipLogProgress(DeviceLayer, "Disconnected %d", reason);
     wifi_extra.Clear(WifiState::kStationConnected);
 
-    retryInProgress = false;
-    wfx_retry_connection(retryJoin);
+    ScheduleConnectionAttempt();
 }
 
 #ifdef SL_WFX_CONFIG_SOFTAP
@@ -828,7 +940,7 @@ static void wfx_events_task(void * p_arg)
     EventBits_t flags;
     (void) p_arg;
 
-    sta_netif      = wfx_get_netif(SL_WFX_STA_INTERFACE);
+    sta_netif      = chip::DeviceLayer::Silabs::Lwip::GetNetworkInterface(SL_WFX_STA_INTERFACE);
     last_dhcp_poll = xTaskGetTickCount();
     while (true)
     {
@@ -842,7 +954,7 @@ static void wfx_events_task(void * p_arg)
         if (flags & SL_WFX_RETRY_CONNECT)
         {
             ChipLogProgress(DeviceLayer, "sending the connect command");
-            wfx_connect_to_ap();
+            ConnectToAccessPoint();
         }
 
         if (wifi_extra.Has(WifiState::kStationConnected))
@@ -854,8 +966,7 @@ static void wfx_events_task(void * p_arg)
 
                 if ((dhcp_state == DHCP_ADDRESS_ASSIGNED) && !HasNotifiedIPv4Change())
                 {
-                    wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
-                    NotifyIPv4Change(true);
+                    GotIPv4Address((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
                     if (!hasNotifiedWifiConnectivity)
                     {
                         ChipLogProgress(DeviceLayer, "will notify WiFi connectivity");
@@ -890,8 +1001,7 @@ static void wfx_events_task(void * p_arg)
             hasNotifiedWifiConnectivity = false;
             ChipLogProgress(DeviceLayer, "connected to AP");
             wifi_extra.Set(WifiState::kStationConnected);
-            retryJoin = 0;
-            wfx_lwip_set_sta_link_up();
+            chip::DeviceLayer::Silabs::Lwip::SetLwipStationLinkUp();
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
             if (!(wifi_extra.Has(WifiState::kAPReady)))
             {
@@ -912,7 +1022,7 @@ static void wfx_events_task(void * p_arg)
             NotifyIPv6Change(false);
             hasNotifiedWifiConnectivity = false;
             wifi_extra.Clear(WifiState::kStationConnected);
-            wfx_lwip_set_sta_link_down();
+            chip::DeviceLayer::Silabs::Lwip::SetLwipStationLinkDown();
         }
 
         if (flags & SL_WFX_SCAN_START)
@@ -1046,178 +1156,13 @@ static sl_status_t wfx_wifi_hw_start(void)
 
     /* Initialize the LwIP stack */
     ChipLogDetail(DeviceLayer, "WF200:Start LWIP");
-    sl_matter_lwip_start();
-    sl_matter_wifi_task_started();
+    chip::DeviceLayer::Silabs::Lwip::InitializeLwip();
+    NotifyWifiTaskInitialized();
 
     ChipLogDetail(DeviceLayer, "WF200:ready.");
     wifi_extra.Set(WifiState::kStationStarted);
 
     return SL_STATUS_OK;
-}
-
-CHIP_ERROR ResetCounters()
-{
-    // TODO: Implement the function
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-/****************************************************************************
- * @brief
- * set the wifi provision
- * @param[in] wifiConfig: configuration of wifi
- *****************************************************************************/
-void wfx_set_wifi_provision(wfx_wifi_provision_t * wifiConfig)
-{
-    Platform::CopyString(wifi_provision.ssid, sizeof(wifi_provision.ssid), wifiConfig->ssid);
-    Platform::CopyString(wifi_provision.passkey, sizeof(wifi_provision.passkey), wifiConfig->passkey);
-    wifi_provision.security = wifiConfig->security;
-    ChipLogProgress(DeviceLayer, "WIFI: Provision SSID=%s", &wifi_provision.ssid[0]);
-}
-
-/****************************************************************************
- * @brief
- * get the wifi provision
- * @param[in] wifiConfig: configuration of wifi
- * @return returns true if successful,
- *         false otherwise
- *****************************************************************************/
-bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig)
-{
-    VerifyOrReturnError(wifiConfig != nullptr, false);
-    memcpy(wifiConfig, &wifi_provision, sizeof(wfx_wifi_provision_t));
-    return true;
-}
-
-/****************************************************************************
- * @brief
- * clear the wifi provision
- * @return returns true if successful,
- *         false otherwise
- *****************************************************************************/
-void wfx_clear_wifi_provision(void)
-{
-    memset(&wifi_provision, 0, sizeof(wifi_provision));
-}
-
-/****************************************************************************
- * @fn  sl_status_t wfx_connect_to_ap(void)
- * @brief
- *  driver connect to ap
- * @return returns SL_STATUS_NOT_AVAILABLE
- *****************************************************************************/
-sl_status_t wfx_connect_to_ap(void)
-{
-    sl_status_t result;
-    sl_wfx_security_mode_t connect_security_mode;
-
-    VerifyOrReturnError(wifi_provision.ssid[0], SL_STATUS_NOT_AVAILABLE);
-    ChipLogDetail(DeviceLayer, "WIFI:JOIN to %s", &wifi_provision.ssid[0]);
-
-    ChipLogDetail(DeviceLayer,
-                  "WIFI Scan Paramter set to Active channel time %d, Passive Channel "
-                  "Time: %d, Number of prob: %d",
-                  ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
-    (void) sl_wfx_set_scan_parameters(ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
-    switch (wifi_provision.security)
-    {
-    case WFX_SEC_WEP:
-        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WEP;
-        break;
-    case WFX_SEC_WPA:
-    case WFX_SEC_WPA2:
-        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA2_WPA1_PSK;
-        break;
-    case WFX_SEC_WPA3:
-        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA3_SAE;
-        break;
-    case WFX_SEC_NONE:
-        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_OPEN;
-        break;
-    default:
-        ChipLogError(DeviceLayer, "error: unknown security type.");
-        return SL_STATUS_INVALID_STATE;
-    }
-    result = sl_wfx_send_join_command((uint8_t *) wifi_provision.ssid, strlen(wifi_provision.ssid), NULL, CHANNEL_0,
-                                      connect_security_mode, PREVENT_ROAMING, DISABLE_PMF_MODE, (uint8_t *) wifi_provision.passkey,
-                                      strlen(wifi_provision.passkey), NULL, IE_DATA_LENGTH);
-
-    return result;
-}
-
-/****************************************************************************
- * @brief
- *     function called when driver have ipv4 address
- * @param[in]  which_if:
- * @return returns false if sucessful,
- *         true otherwise
- *****************************************************************************/
-bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
-{
-    VerifyOrReturnError(which_if == SL_WFX_STA_INTERFACE, false);
-    return (sta_ip == STA_IP_FAIL) ? false : true;
-}
-
-/****************************************************************************
- * @brief
- *     function called when driver have ipv6 address
- * @param[in]  which_if:
- * @return returns false if sucessful,
- *         true otherwise
- *****************************************************************************/
-bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
-{
-    VerifyOrReturnError(which_if == SL_WFX_STA_INTERFACE, false);
-    return IsStationConnected();
-}
-
-#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-/*****************************************************************************
- * @brief
- *    function called when dhcp got ipv4
- * @param[in]  ip : internet protocol
- ******************************************************************************/
-void wfx_dhcp_got_ipv4(uint32_t ip)
-{
-    /*
-     * Acquire the new IP address
-     */
-    uint8_t ip4_addr[4];
-
-    ip4_addr[0] = (ip) &0xFF;
-    ip4_addr[1] = (ip >> 8) & 0xFF;
-    ip4_addr[2] = (ip >> 16) & 0xFF;
-    ip4_addr[3] = (ip >> 24) & 0xFF;
-
-    ChipLogDetail(DeviceLayer, "DHCP IP=%d.%d.%d.%d", ip4_addr[0], ip4_addr[1], ip4_addr[2], ip4_addr[3]);
-    sta_ip = ip;
-
-    NotifyIPv4Change(true);
-}
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-
-/****************************************************************************
- * @brief
- * driver scan cancelation
- *****************************************************************************/
-void wfx_cancel_scan(void)
-{
-    struct scan_result_holder *hp, *next;
-    /* Not possible */
-    VerifyOrReturn(scan_cb != nullptr);
-    sl_wfx_send_stop_scan_command();
-    for (hp = scan_save; hp; hp = next)
-    {
-        next = hp->next;
-        chip::Platform::MemoryFree(hp);
-    }
-    scan_save  = (struct scan_result_holder *) 0;
-    scan_count = 0;
-    if (scan_ssid)
-    {
-        chip::Platform::MemoryFree(scan_ssid);
-        scan_ssid = nullptr;
-    }
-    scan_cb = nullptr;
 }
 
 CHIP_ERROR InitWiFiStack(void)

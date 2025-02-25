@@ -149,6 +149,7 @@ source_set("wifi-platform") {
       "${silabs_platform_dir}/wifi/lwip-support/ethernetif.cpp",
       "${silabs_platform_dir}/wifi/lwip-support/ethernetif.h",
       "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.cpp",
+      "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.h",
     ]
   }
 
