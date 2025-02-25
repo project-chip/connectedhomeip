@@ -33,40 +33,11 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from mobly import asserts
 
+# conditional import to avoid circular dependency but still allow type checking
 if TYPE_CHECKING:
     from chip.testing.matter_testing import MatterBaseTest
 
 EndpointCheckFunction = Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
-
-
-def get_cluster_from_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> ClusterObjects.Cluster:
-    """Get the Cluster object for an attribute's cluster_id.
-
-    Args:
-        attribute: A ClusterAttributeDescriptor object containing cluster_id
-
-    Returns:
-        ClusterObjects.Cluster: The corresponding Cluster object from ALL_CLUSTERS
-
-    Raises:
-        KeyError: If the attribute's cluster_id is not found in ALL_CLUSTERS dictionary
-    """
-    return ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
-
-
-def get_cluster_from_command(command: ClusterObjects.ClusterCommand) -> ClusterObjects.Cluster:
-    """Get the Cluster object for a command's cluster_id.
-
-    Args:
-        command: A ClusterCommand object containing cluster_id
-
-    Returns:
-        ClusterObjects.Cluster: The corresponding Cluster object from ALL_CLUSTERS
-
-    Raises:
-        KeyError: If the command's cluster_id is not found in ALL_CLUSTERS dictionary
-    """
-    return ClusterObjects.ALL_CLUSTERS[command.cluster_id]
 
 
 def _has_cluster(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int, cluster: ClusterObjects.Cluster) -> bool:
@@ -81,10 +52,7 @@ def _has_cluster(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse,
         bool: True if the cluster exists on the endpoint, False otherwise
             Returns False if endpoint is not found in wildcard attributes
     """
-    try:
-        return cluster in wildcard.attributes[endpoint]
-    except KeyError:
-        return False
+    return endpoint in wildcard.attributes and cluster in wildcard.attributes[endpoint]
 
 
 def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointCheckFunction:
@@ -124,17 +92,25 @@ def _has_attribute(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadRespons
 
     Raises:
         ValueError: If AttributeList value is not a list type
-        KeyError: If attribute's cluster_id is not found in ALL_CLUSTERS (from get_cluster_from_attribute)
+        KeyError: If attribute's cluster_id is not found in ALL_CLUSTERS
     """
-    cluster = get_cluster_from_attribute(attribute)
-    try:
-        attr_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AttributeList]
-        if not isinstance(attr_list, list):
-            raise ValueError(
-                f"Failed to read mandatory AttributeList attribute value for cluster {cluster} on endpoint {endpoint}: {attr_list}.")
-        return attribute.attribute_id in attr_list
-    except KeyError:
+    cluster = ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
+    
+    if endpoint not in wildcard.attributes:
         return False
+    
+    if cluster not in wildcard.attributes[endpoint]:
+        return False
+    
+    if cluster.Attributes.AttributeList not in wildcard.attributes[endpoint][cluster]:
+        return False
+    
+    attr_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AttributeList]
+    if not isinstance(attr_list, list):
+        raise ValueError(
+            f"Failed to read mandatory AttributeList attribute value for cluster {cluster} on endpoint {endpoint}: {attr_list}.")
+    
+    return attribute.attribute_id in attr_list
 
 
 def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> EndpointCheckFunction:
@@ -174,17 +150,25 @@ def _has_command(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse,
 
     Raises:
         ValueError: If AcceptedCommandList value is not a list type
-        KeyError: If command's cluster_id is not found in ALL_CLUSTERS (from get_cluster_from_command)
+        KeyError: If command's cluster_id is not found in ALL_CLUSTERS
     """
-    cluster = get_cluster_from_command(command)
-    try:
-        cmd_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AcceptedCommandList]
-        if not isinstance(cmd_list, list):
-            raise ValueError(
-                f"Failed to read mandatory AcceptedCommandList command value for cluster {cluster} on endpoint {endpoint}: {cmd_list}.")
-        return command.command_id in cmd_list
-    except KeyError:
+    cluster = ClusterObjects.ALL_CLUSTERS[command.cluster_id]
+    
+    if endpoint not in wildcard.attributes:
         return False
+    
+    if cluster not in wildcard.attributes[endpoint]:
+        return False
+    
+    if cluster.Attributes.AcceptedCommandList not in wildcard.attributes[endpoint][cluster]:
+        return False
+    
+    cmd_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AcceptedCommandList]
+    if not isinstance(cmd_list, list):
+        raise ValueError(
+            f"Failed to read mandatory AcceptedCommandList command value for cluster {cluster} on endpoint {endpoint}: {cmd_list}.")
+    
+    return command.command_id in cmd_list
 
 
 def has_command(command: ClusterObjects.ClusterCommand) -> EndpointCheckFunction:
@@ -211,14 +195,21 @@ def has_command(command: ClusterObjects.ClusterCommand) -> EndpointCheckFunction
 
 
 def _has_feature(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> bool:
-    try:
-        feature_map = wildcard.attributes[endpoint][cluster][cluster.Attributes.FeatureMap]
-        if not isinstance(feature_map, int):
-            raise ValueError(
-                f"Failed to read mandatory FeatureMap attribute value for cluster {cluster} on endpoint {endpoint}: {feature_map}.")
-        return (feature & feature_map) != 0
-    except KeyError:
+    if endpoint not in wildcard.attributes:
         return False
+    
+    if cluster not in wildcard.attributes[endpoint]:
+        return False
+    
+    if cluster.Attributes.FeatureMap not in wildcard.attributes[endpoint][cluster]:
+        return False
+    
+    feature_map = wildcard.attributes[endpoint][cluster][cluster.Attributes.FeatureMap]
+    if not isinstance(feature_map, int):
+        raise ValueError(
+            f"Failed to read mandatory FeatureMap attribute value for cluster {cluster} on endpoint {endpoint}: {feature_map}.")
+    
+    return (feature & feature_map) != 0
 
 
 def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> EndpointCheckFunction:
