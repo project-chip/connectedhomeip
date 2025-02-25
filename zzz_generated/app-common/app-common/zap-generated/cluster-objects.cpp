@@ -37432,6 +37432,26 @@ bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
     {
         return true;
     }
+    if ((aCluster == Clusters::PushAvStreamTransport::Id) &&
+        (aCommand == Clusters::PushAvStreamTransport::Commands::AllocatePushTransport::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::PushAvStreamTransport::Id) &&
+        (aCommand == Clusters::PushAvStreamTransport::Commands::AllocatePushTransportResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::PushAvStreamTransport::Id) &&
+        (aCommand == Clusters::PushAvStreamTransport::Commands::FindTransport::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::PushAvStreamTransport::Id) &&
+        (aCommand == Clusters::PushAvStreamTransport::Commands::FindTransportResponse::Id))
+    {
+        return true;
+    }
     return false;
 }
 
