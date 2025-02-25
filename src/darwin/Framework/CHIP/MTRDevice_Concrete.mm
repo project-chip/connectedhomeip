@@ -3663,7 +3663,15 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         for (MTRCommandWithRequiredResponse * command in [commandGroup reverseObjectEnumerator]) {
             auto commandInvokeBlock = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * previousResponses) {
                 mtr_strongify(self);
-                VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands commandInvokeBlock called back with nil MTRDevice"));
+                if (!self) {
+                    MTR_LOG_DEBUG("invokeCommands commandInvokeBlock called back with nil MTRDevice");
+                    // Object is gone, but make sure next completion gets called appropriately.
+                    nextCompletion(NO, [previousResponses arrayByAddingObject:@{
+                        MTRCommandPathKey : command.path,
+                        MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL],
+                    }]);
+                    return;
+                }
 
                 [self invokeCommandWithEndpointID:command.path.endpoint
                                         clusterID:command.path.cluster
