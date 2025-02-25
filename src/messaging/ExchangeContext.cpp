@@ -77,7 +77,7 @@ void ExchangeContext::SetResponseExpected(bool inResponseExpected)
 
 void ExchangeContext::UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout)
 {
-    SetResponseTimeout(mSession->ComputeRoundTripTimeout(applicationProcessingTimeout));
+    SetResponseTimeout(mSession->ComputeRoundTripTimeout(applicationProcessingTimeout, HasReceivedAtLeastOneMessage()));
 }
 
 void ExchangeContext::SetResponseTimeout(Timeout timeout)
