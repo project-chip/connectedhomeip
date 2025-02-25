@@ -70,6 +70,15 @@ __CHART_STYLES__ = {
 }
 
 
+# Scales from https://plotly.com/python/builtin-colorscales/
+__COLOR_SCALES__ = {
+    "none": None,
+    "tempo": px.colors.sequential.tempo,
+    "blues": px.colors.sequential.Blues,
+    "plasma": px.colors.sequential.Plasma_r,
+}
+
+
 class FetchStyle(Enum):
     NM = auto()
     OBJDUMP = auto()
@@ -358,6 +367,7 @@ def build_treemap(
     symbols: list[Symbol],
     separator: str,
     figure_generator: Callable,
+    color: Optional[list[str]],
     max_depth: int,
     zoom: Optional[str],
     strip: Optional[str],
@@ -459,6 +469,11 @@ def build_treemap(
 
             data["name_with_size"][idx] = f"{short_name}: {data["size"][idx]}"
 
+    extra_args = {}
+    if color is not None:
+        extra_args['color_continuous_scale'] = color
+        extra_args['color'] = "size"
+
     fig = figure_generator(
                 data,
                 names="name_with_size",
@@ -466,6 +481,7 @@ def build_treemap(
                 parents="parent",
                 values="size",
                 maxdepth=max_depth,
+                **extra_args,
     )
 
     fig.update_traces(
@@ -772,6 +788,13 @@ def compute_symbol_diff(orig: list[Symbol], base: list[Symbol]) -> list[Symbol]:
     help="Style of the chart",
 )
 @click.option(
+    "--color",
+    default="None",
+    show_default=True,
+    type=click.Choice(list(__COLOR_SCALES__.keys()), case_sensitive=False),
+    help="Color display (if any)",
+)
+@click.option(
     "--fetch-via",
     default="nm",
     show_default=True,
@@ -806,6 +829,7 @@ def main(
     log_level,
     elf_file: str,
     display_type: str,
+    color: str,
     fetch_via: str,
     max_depth: int,
     zoom: Optional[str],
@@ -824,7 +848,7 @@ def main(
         title = f"{elf_file} COMPARED TO {diff}"
 
     build_treemap(
-        title, symbols, separator, __CHART_STYLES__[display_type], max_depth, zoom, strip
+        title, symbols, separator, __CHART_STYLES__[display_type], __COLOR_SCALES__[color], max_depth, zoom, strip
     )
 
 
