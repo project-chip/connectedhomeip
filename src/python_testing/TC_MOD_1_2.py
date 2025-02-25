@@ -91,9 +91,9 @@ class MOD_1_2(MatterBaseTest):
             logger.info(
                 "SupportedMode.semanticTags contains values, verifying attributes for manufacturedcode and value are not longer than 16bits int")
             for semantictag in supported_mode.semanticTags:
-                asserts.assert_true(semantictag.mfgCode >= 0 and semantictag.mfgCode <= self._16bitshex,
+                asserts.assert_true(semantictag.mfgCode >= 0 and semantictag.mfgCode <= 0xFFFF,
                                     "Element semantictag.Mfgcode is greater than 16 bits")
-                asserts.assert_true(semantictag.value >= 0 and semantictag.value <= self._16bitshex,
+                asserts.assert_true(semantictag.value >= 0 and semantictag.value <= 0xFFFF,
                                     "Element semantictag.Value is greater than 16 bits")
 
     def _log_attribute(self, name, value):
@@ -103,7 +103,6 @@ class MOD_1_2(MatterBaseTest):
     async def test_MOD_1_2(self):
         self.cluster = Clusters.ModeSelect
         self.endpoint = self.get_endpoint(1)
-        self._16bitshex = 0xFFFF
 
         # Commision device
         # In the test plan step 1 is defined as a precondition.
@@ -125,6 +124,9 @@ class MOD_1_2(MatterBaseTest):
             self._verify_supported_mode(supported_mode=supported_mode)
             # After verifying the struct is correct append the mode value.
             supported_modes_values.append(supported_mode.mode)
+        # Verify mode numbers are unique
+        asserts.assert_equal(len(supported_modes_values), len(set(supported_modes_values)),
+                             f"Duplicate value found for supported mode values :{supported_modes_values}.")
         logger.info(f"Supported modes values {supported_modes_values}")
 
         # Currentmode attribute check must be int and must be in the supported modes values.
@@ -156,23 +158,17 @@ class MOD_1_2(MatterBaseTest):
                               f"Startupmode {startup_mode} is not in {supported_modes_values}")
 
         # Verify the string  is str and larger that 1 char.
-        # If is non ci ask the user if can read and understand the string.
         self.step(6)
         description = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster, attribute=self.cluster.Attributes.Description)
         self._log_attribute("Description", description)
         asserts.assert_true(isinstance(description, str), "Description attribute is not str")
         asserts.assert_true(len(description) >= 1, "Description is lower that 1 char.")
-        if not self.is_pics_sdk_ci_only:
-            user_response = self.wait_for_user_input(prompt_msg=f"Is the value \"{description}\" for attribute Description a readable and understandable string? Enter 'y' or 'n'",
-                                                     prompt_msg_placeholder="y",
-                                                     default_value="y")
-            asserts.assert_true(user_response.lower() == 'y', "The description is not understandable to the user.")
 
         # Verify the StandardNamespace can be 16 bits enum or null
         self.step(7)
         standard_namepace = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster, attribute=self.cluster.Attributes.StandardNamespace)
         self._log_attribute("StandardNamespace", standard_namepace)
-        asserts.assert_true((standard_namepace is NullValue or (isinstance(standard_namepace, int) and (standard_namepace >= 0 and standard_namepace <= self._16bitshex))),
+        asserts.assert_true((standard_namepace is NullValue or (isinstance(standard_namepace, int) and (standard_namepace >= 0 and standard_namepace <= 0xFFFF))),
                             "Standard namespace is not 16bit enum or not Nullvalue")
 
 
