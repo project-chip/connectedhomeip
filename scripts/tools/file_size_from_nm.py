@@ -94,6 +94,35 @@ class Symbol:
     size: int
     tree_path: list[str]
 
+# These expressions are callbacks defined in
+# callbacks.zapt
+#   - void emberAf{{asUpperCamelCase label}}ClusterInitCallback(chip::EndpointId endpoint);
+#   - void emberAf{{asUpperCamelCase label}}ClusterServerInitCallback(chip::EndpointId endpoint);
+#   - void Matter{{asUpperCamelCase label}}ClusterServerShutdownCallback(chip::EndpointId endpoint);
+#   - void emberAf{{asUpperCamelCase label}}ClusterClientInitCallback(chip::EndpointId endpoint);
+#   - void Matter{{asUpperCamelCase label}}ClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+#   - chip::Protocols::InteractionModel::Status Matter{{asUpperCamelCase label}}ClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+#   - void emberAf{{asUpperCamelCase label}}ClusterServerTickCallback(chip::EndpointId endpoint);
+#
+# and for commands:
+#   - bool emberAf{{asUpperCamelCase parent.label}}Cluster{{asUpperCamelCase name}}Callback
+
+
+_CLUSTER_EXPRESSIONS = [
+    re.compile(r'emberAf(?P<cluster>.+)ClusterClientInitCallback\('),
+    re.compile(r'emberAf(?P<cluster>.+)ClusterInitCallback\('),
+    re.compile(r'emberAf(?P<cluster>.+)ClusterServerInitCallback\('),
+
+
+
+    re.compile(r'emberAf(?P<cluster>.+)ClusterServerTickCallback\('),
+    re.compile(r'Matter(?P<cluster>.+)ClusterServerAttributeChangedCallback\('),
+    re.compile(r'Matter(?P<cluster>.+)ClusterServerPreAttributeChangedCallback\('),
+    re.compile(r'Matter(?P<cluster>.+)ClusterServerShutdownCallback\('),
+    # commands
+    re.compile(r'emberAf(?P<cluster>.+)Cluster(?P<command>.+)Callback\('),
+]
+
 
 def tree_display_name(name: str) -> list[str]:
     """
@@ -110,11 +139,61 @@ def tree_display_name(name: str) -> list[str]:
     if name.startswith("vtable for "):
         name = name[11:]
 
-    # These are C-style methods really, we have no top-level namespaces named
-    # like this but still want to see these differently
-    for special_prefix in {"emberAf", "Matter"}:
-        if name.startswith(special_prefix):
-            return [special_prefix, name]
+    # Known variables for ember:
+    for variable_name in ['::generatedAttributes', '::generatedClusters', '::generatedEmberAfEndpointTypes', '::fixedDeviceTypeList', '::generatedCommands']:
+        if variable_name in name:
+            return ["EMBER", "METADATA", name]
+
+    # to abvoid treating '(anonymous namespace)::' as special because of space,
+    # replace it with something that looks similar
+    name = name.replace('(anonymous namespace)::', 'ANONYMOUS_NAMESPACE::')
+
+    # Ember methods are generally c-style that are in a particular format:
+    #   - emAf* are INTERNAL ember functions
+    #   - emberAf* are PUBLIC (from an ember perspective) functions
+    #   - Several callbacks:
+    #      - Matter<Cluster>ClusterServerInitCallback
+    #      - emberAf<Cluster>ClusterInitCallback
+    #      - Matter<Cluster>serverShutdownCallback
+    #      - MatterPreAttributeChangedCallback
+    #      - Matter<Cluster>PreAttributeChangedCallback
+    #      - emberAfPluginLevelControlCoupledColorTempChangeCallback
+    # The code below splits the above an "ember" namespace
+
+    # First consider the cluster functions.
+    # These are technically ember, however place them in `::chip::app::Clusters::<Cluster>::`
+    # so that they are grouped with AAI/CHI
+    for expr in _CLUSTER_EXPRESSIONS:
+        m = expr.match(name)
+        if not m:
+            continue
+        d = m.groupdict()
+        logging.debug("Ember callback found: %s -> %r", name, d)
+        if 'command' in d:
+            return ["chip", "app", "Clusters", d['cluster'], "EMBER", d['command'], name]
+        else:
+            return ["chip", "app", "Clusters", d['cluster'], "EMBER", name]
+
+    if 'MatterPreAttributeChangeCallback' in name:
+        return ["EMBER", "CALLBACKS", name]
+
+    if name.startswith("emberAfPlugin"):
+        # these methods are callbacks defined by some clusters to call into application code.
+        # They look like:
+        #   - emberAfPluginTimeFormatLocalizationOnCalendarTypeChange
+        #   - emberAfPluginOnOffClusterServerPostInitCallback
+        #   - emberAfPluginDoorLockGetFaceCredentialLengthConstraints
+        #   - emberAfPluginDoorLockOnOperatingModeChange
+        #   - emberAfPluginColorControlServerXyTransitionEventHandler
+        #
+        # They are generally quite free form and seem to be used instead of "delegates" as
+        # application hook points.
+        return ["EMBER", "CALLBACKS", "PLUGIN", name]
+
+    # We also capture '(anonymous namespace)::emAfWriteAttribute or similar
+    if name.startswith("emAf") or name.startswith("emberAf") or ("::emAf" in name) or ('::emberAf' in name):
+        # Place this as ::EMBER::API (these are internal and public functions from ember)
+        return ["EMBER", "API", name]
 
     # If the first element contains a space, it is either within `<>` for templates or it means it is a
     # separator of the type. Try to find the type separator
@@ -194,18 +273,32 @@ def tree_display_name(name: str) -> list[str]:
 
     if len(result) == 1:
         if result[0].startswith("ot"):  # Show openthread methods a bit grouped
-            result = ["ot"] + result
+            return ["ot", "C"] + result
         return ["C"] + result
 
-    return result
+    return [r.replace('ANONYMOUS_NAMESPACE', '(anonymous namespace)') for r in result]
 
 
 # TO run the test, install pytest and do
 # pytest file_size_from_nm.py
 def test_tree_display_name():
     assert tree_display_name("fooBar") == ["C", "fooBar"]
-    assert tree_display_name("emberAfTest") == ["emberAf", "emberAfTest"]
-    assert tree_display_name("MatterSomeCall") == ["Matter", "MatterSomeCall"]
+    assert tree_display_name("emberAfTest") == ["EMBER", "API", "emberAfTest"]
+    assert tree_display_name("MatterSomeCall") == ["C", "MatterSomeCall"]
+
+    assert tree_display_name("emberAfFooBarClusterServerInitCallback()") == [
+        "chip", "app", "Clusters", "FooBar", "EMBER", "emberAfFooBarClusterServerInitCallback()"
+    ]
+    assert tree_display_name("emberAfFooBarClusterInitCallback()") == [
+        "chip", "app", "Clusters", "FooBar", "EMBER", "emberAfFooBarClusterInitCallback()"
+    ]
+    assert tree_display_name("MatterFooBarClusterServerShutdownCallback()") == [
+        "chip", "app", "Clusters", "FooBar", "EMBER", "MatterFooBarClusterServerShutdownCallback()"
+    ]
+    assert tree_display_name("emberAfFooBarClusterSomeCommandCallback()") == [
+        "chip", "app", "Clusters", "FooBar", "EMBER", "SomeCommand", "emberAfFooBarClusterSomeCommandCallback()"
+    ]
+
     assert tree_display_name("chip::Some::Constructor()") == [
         "chip",
         "Some",
@@ -260,6 +353,10 @@ def test_tree_display_name():
     assert tree_display_name(
         "void foo::bar<baz>::method(my::arg name, other::arg::type)"
     ) == ["foo", "bar<baz>", "void method(my::arg name, other::arg::type)"]
+
+    assert tree_display_name(
+        "(anonymous namespace)::AccessControlAttribute::Read(args)"
+    ) == ["(anonymous namespace)", "AccessControlAttribute", "Read(args)"]
 
 
 def build_treemap(

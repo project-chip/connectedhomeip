@@ -90,7 +90,7 @@ CHIP_ERROR GetAccessPointInfo(wfx_wifi_scan_result_t & info)
     int32_t status = RSI_SUCCESS;
     uint8_t rssi   = 0;
 
-    info.security = wfx_rsi.sec.security;
+    info.security = wfx_rsi.credentials.security;
     info.chan     = wfx_rsi.ap_chan;
     memcpy(&(info.bssid[0]), wfx_rsi.ap_mac.data(), kWifiMacAddressLength);
 
@@ -192,11 +192,7 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
     wfx_rsi.dev_state.Clear(WifiState::kStationConnecting);
     if (status != RSI_SUCCESS)
     {
-        /*
-         * We should enable retry.. (Need config variable for this)
-         */
-        ChipLogProgress(DeviceLayer, "wfx_rsi_join_cb: failed. retry: %d", wfx_rsi.join_retries);
-        wfx_retry_connection(++wfx_rsi.join_retries);
+        ScheduleConnectionAttempt();
         return;
     }
 
@@ -207,7 +203,6 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
     memset(&temp_reset, 0, sizeof(wfx_wifi_scan_ext_t));
     WifiPlatformEvent event = WifiPlatformEvent::kStationConnect;
     PostWifiPlatformEvent(event);
-    wfx_rsi.join_retries = 0;
 }
 
 /******************************************************************
@@ -223,7 +218,6 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
 static void wfx_rsi_join_fail_cb(uint16_t status, uint8_t * buf, uint32_t len)
 {
     ChipLogError(DeviceLayer, "wfx_rsi_join_fail_cb: status: %d", status);
-    wfx_rsi.join_retries += 1;
 
     wfx_rsi.dev_state.Clear(WifiState::kStationConnecting).Clear(WifiState::kStationConnected);
 
@@ -369,59 +363,59 @@ static void wfx_rsi_save_ap_info(void) // translation
     int32_t status;
     rsi_rsp_scan_t rsp;
 
-    status =
-        rsi_wlan_scan_with_bitmap_options((int8_t *) &wfx_rsi.sec.ssid[0], AP_CHANNEL_NO_0, &rsp, sizeof(rsp), SCAN_BITMAP_OPTN_1);
+    status = rsi_wlan_scan_with_bitmap_options((int8_t *) &wfx_rsi.credentials.ssid[0], AP_CHANNEL_NO_0, &rsp, sizeof(rsp),
+                                               SCAN_BITMAP_OPTN_1);
     if (status != RSI_SUCCESS)
     {
         /*
          * Scan is done - failed
          */
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
-        wfx_rsi.sec.security = WFX_SEC_WPA3;
+        wfx_rsi.credentials.security = WFX_SEC_WPA3;
 #else  /* !WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
-        wfx_rsi.sec.security = WFX_SEC_WPA2;
+        wfx_rsi.credentials.security = WFX_SEC_WPA2;
 #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
         ChipLogProgress(DeviceLayer, "warn: scan failed: %ld", status);
         return;
     }
-    wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
-    wfx_rsi.ap_chan      = rsp.scan_info->rf_channel;
+    wfx_rsi.credentials.security = WFX_SEC_UNSPECIFIED;
+    wfx_rsi.ap_chan              = rsp.scan_info->rf_channel;
     memcpy(wfx_rsi.ap_mac.data(), &rsp.scan_info->bssid[0], kWifiMacAddressLength);
 
     switch (rsp.scan_info->security_mode)
     {
     case SME_OPEN:
-        wfx_rsi.sec.security = WFX_SEC_NONE;
+        wfx_rsi.credentials.security = WFX_SEC_NONE;
         break;
     case SME_WPA:
     case SME_WPA_ENTERPRISE:
-        wfx_rsi.sec.security = WFX_SEC_WPA;
+        wfx_rsi.credentials.security = WFX_SEC_WPA;
         break;
     case SME_WPA2:
     case SME_WPA2_ENTERPRISE:
-        wfx_rsi.sec.security = WFX_SEC_WPA2;
+        wfx_rsi.credentials.security = WFX_SEC_WPA2;
         break;
     case SME_WPA_WPA2_MIXED_MODE:
-        wfx_rsi.sec.security = WFX_SEC_WPA_WPA2_MIXED;
+        wfx_rsi.credentials.security = WFX_SEC_WPA_WPA2_MIXED;
         break;
     case SME_WEP:
-        wfx_rsi.sec.security = WFX_SEC_WEP;
+        wfx_rsi.credentials.security = WFX_SEC_WEP;
         break;
     case SME_WPA3_PERSONAL_TRANSITION:
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
     case SME_WPA3_PERSONAL:
-        wfx_rsi.sec.security = WFX_SEC_WPA3;
+        wfx_rsi.credentials.security = WFX_SEC_WPA3;
 #else
-        wfx_rsi.sec.security = WFX_SEC_WPA2;
+        wfx_rsi.credentials.security = WFX_SEC_WPA2;
 #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
         break;
     default:
-        wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
+        wfx_rsi.credentials.security = WFX_SEC_UNSPECIFIED;
         break;
     }
 
-    ChipLogProgress(DeviceLayer, "wfx_rsi_save_ap_info: connecting to %s, sec=%d, status=%ld", &wfx_rsi.sec.ssid[0],
-                    wfx_rsi.sec.security, status);
+    ChipLogProgress(DeviceLayer, "wfx_rsi_save_ap_info: connecting to %s, sec=%d, status=%ld", &wfx_rsi.credentials.ssid[0],
+                    wfx_rsi.credentials.security, status);
 }
 
 /********************************************************************************************
@@ -438,7 +432,7 @@ static void sl_wifi_platform_join_network(void)
 
     VerifyOrReturn(!wfx_rsi.dev_state.HasAny(WifiState::kStationConnecting, WifiState::kStationConnected));
 
-    switch (wfx_rsi.sec.security)
+    switch (wfx_rsi.credentials.security)
     {
     case WFX_SEC_WEP:
         connect_security_mode = RSI_WEP;
@@ -461,8 +455,8 @@ static void sl_wifi_platform_join_network(void)
         return;
     }
 
-    ChipLogProgress(DeviceLayer, "sl_wifi_platform_join_network: connecting to %s, sec=%d", &wfx_rsi.sec.ssid[0],
-                    wfx_rsi.sec.security);
+    ChipLogProgress(DeviceLayer, "sl_wifi_platform_join_network: connecting to %s, sec=%d", &wfx_rsi.credentials.ssid[0],
+                    wfx_rsi.credentials.security);
 
     /*
      * Join the network
@@ -480,13 +474,11 @@ static void sl_wifi_platform_join_network(void)
     /* Try to connect Wifi with given Credentials
      * until there is a success or maximum number of tries allowed
      */
-    if ((status = rsi_wlan_connect_async((int8_t *) &wfx_rsi.sec.ssid[0], connect_security_mode, &wfx_rsi.sec.passkey[0],
-                                         wfx_rsi_join_cb)) != RSI_SUCCESS)
+    if ((status = rsi_wlan_connect_async((int8_t *) &wfx_rsi.credentials.ssid[0], connect_security_mode,
+                                         &wfx_rsi.credentials.passkey[0], wfx_rsi_join_cb)) != RSI_SUCCESS)
     {
         wfx_rsi.dev_state.Clear(WifiState::kStationConnecting);
-        ChipLogProgress(DeviceLayer, "sl_wifi_platform_join_network: rsi_wlan_connect_async failed: %ld on try %d", status,
-                        wfx_rsi.join_retries);
-        wfx_retry_connection(++wfx_rsi.join_retries);
+        ScheduleConnectionAttempt();
     }
 }
 
@@ -675,7 +667,7 @@ void MatterWifiTask(void * arg)
     (void) arg;
     WifiPlatformEvent event;
     chip::DeviceLayer::Silabs::Lwip::InitializeLwip();
-    sl_matter_wifi_task_started();
+    NotifyWifiTaskInitialized();
 
     ChipLogProgress(DeviceLayer, "MatterWifiTask: starting event loop");
     for (;;)

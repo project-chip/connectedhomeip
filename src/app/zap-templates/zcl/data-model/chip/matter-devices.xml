@@ -1289,7 +1289,7 @@ limitations under the License.
                 <requireAttribute>Capacity</requireAttribute>
                 <requireAttribute>OperationMode</requireAttribute>
             </include>
-            <include cluster="Level Control" client="false" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Level Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="false" serverLocked="false"></include>
             <include cluster="Pressure Measurement" client="false" server="false" clientLocked="false" serverLocked="false"></include>
             <include cluster="Flow Measurement" client="false" server="false" clientLocked="false" serverLocked="false"></include>
