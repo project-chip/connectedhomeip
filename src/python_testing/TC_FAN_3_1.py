@@ -76,11 +76,38 @@ class TC_FAN_3_1(MatterBaseTest):
                          "Update the value of the FanMode attribute iteratively, in descending order, from the number of available fan modes specified by the FanModeSequence attribute excluding modes beyond 3 (High) to 0 (Off). For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. If SUCCESS and a PercentSetting (and/or SpeedSetting if present) attribute value change is triggered. Verify that the current value(s) is less than the previous one. If INVALID_IN_STATE, no update operation occurred. Verify that the current value(s) is the same as the previous one"),
                 ]
 
-    async def read_setting(self, endpoint, attribute):
+    async def read_setting(self, endpoint: int, attribute: Any) -> Any:
+        """
+        Asynchronously reads a specified attribute from the FanControl cluster at a given endpoint.
+
+        Args:
+            endpoint (int): The endpoint identifier for the fan device.
+            attribute (Any): The attribute to be read.
+
+        Returns:
+            Any: The value of the specified attribute if the read operation is successful.
+
+        Raises:
+            AssertionError: If the read operation fails.
+        """
         cluster = Clusters.Objects.FanControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     async def write_setting(self, endpoint, attribute, value) -> Status:
+        """
+        Writes a specified attribute value.
+
+        Args:
+            endpoint (int): The endpoint identifier for the fan device.
+            attribute (Callable): The attribute to be written.
+            value (Any): The value to write to the attribute.
+
+        Returns:
+            Status: The status of the write operation.
+
+        Raises:
+            AssertionError: If the write status is neither SUCCESS nor INVALID_IN_STATE.
+        """
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attribute(value))])
         write_status = result[0].Status
         write_status_success = (write_status == Status.Success) or (write_status == Status.InvalidInState)
@@ -88,7 +115,21 @@ class TC_FAN_3_1(MatterBaseTest):
                             f"[FC] {attribute.__name__} write did not return a result of either SUCCESS or INVALID_IN_STATE ({write_status.name})")
         return write_status
 
-    async def write_and_verify_attribute(self, endpoint, attribute, value) -> Any:
+    async def write_and_verify_attribute(self, endpoint, attribute, value) -> Status:
+        """
+        Writes a value to a specified attribute on a given endpoint and verifies the write operation by reading back the value.
+
+        Args:
+            endpoint (Any): The endpoint identifier for the fan device.
+            attribute (Any): The attribute to be written.
+            value (Any): The value to write to the attribute.
+
+        Returns:
+            Status: The status of the write operation.
+
+        Raises:
+            AssertionError: If the value read back does not match the value written.
+        """
         write_status = await self.write_setting(endpoint, attribute, value)
         if write_status == Status.Success:
             value_read = await self.read_setting(endpoint, attribute)
@@ -98,6 +139,17 @@ class TC_FAN_3_1(MatterBaseTest):
 
     @staticmethod
     async def get_attribute_value_from_queue(queue, attribute, timeout_sec: float) -> Any:
+        """
+        Retrieve the value of a specific attribute from a queue within a given timeout.
+
+        Args:
+            queue (asyncio.Queue): The queue to search for the attribute.
+            attribute (str): The attribute to search for in the queue.
+            timeout_sec (float): The maximum time to wait for the attribute value.
+
+        Returns:
+            Any: The value of the attribute if found within the timeout, otherwise None.
+        """
         start_time = time.time()
         while time.time() - start_time < timeout_sec:
             for q in list(queue):
@@ -107,6 +159,19 @@ class TC_FAN_3_1(MatterBaseTest):
         return None
 
     async def get_fan_modes(self, endpoint, max_high: bool = False):
+        """
+        Asynchronously retrieves the fan modes based on the FanModeSequence attribute value.
+
+        Args:
+            endpoint (int): The endpoint identifier for the fan device.
+            max_high (bool, optional): If True, limits the fan modes to those up to and including 'High'. Defaults to False.
+
+        Raises:
+            AssertionError: If the FanModeSequence attribute value is not an instance of FanModeSequenceEnum.
+
+        Returns:
+            None: The fan modes are stored in the instance variable `self.fan_modes`.
+        """
         # Read FanModeSequence attribute value
         fan_mode_sequence_attr = Clusters.FanControl.Attributes.FanModeSequence
         fm_enum = Clusters.FanControl.Enums.FanModeEnum
@@ -137,7 +202,27 @@ class TC_FAN_3_1(MatterBaseTest):
 
         self.fan_modes = fan_modes
 
-    async def get_initialization_parametes(self, endpoint, attr_to_update, order):
+    async def get_initialization_parametes(self, endpoint, attr_to_update, order) -> tuple:
+        """
+        Initializes parameters for fan control attribute updates.
+
+        This method sets up the necessary parameters for updating fan control attributes
+        such as PercentSetting and FanMode. It determines the attribute to verify, the
+        iteration range for updates, and retrieves the initial state of the fan.
+
+        Args:
+            endpoint (int): The endpoint identifier for the fan device.
+            attr_to_update (attribute): The attribute to be updated (PercentSetting or FanMode).
+            order (OrderEnum): The order of updates (ascending or descending).
+
+        Returns:
+            tuple: A tuple containing:
+                - attr_to_verify (attribute): The attribute to verify during updates.
+                - iteration_range (range): The range of iterations for attribute updates.
+                - init_fan_mode (int): The initial FanMode setting.
+                - init_percent_setting (int): The initial PercentSetting value.
+                - init_speed_setting (int or None): The initial SpeedSetting value if present, otherwise None.
+        """
         cluster = Clusters.FanControl
         attribute = cluster.Attributes
         percent_setting_max_value = 100  # PercentSetting max value is 100 as per the spec
@@ -161,7 +246,24 @@ class TC_FAN_3_1(MatterBaseTest):
         return attr_to_verify, iteration_range, init_fan_mode, init_percent_setting, init_speed_setting
 
     @staticmethod
-    def handle_iteration_one_edge_cases(attr_to_update, attr_to_verify, order, attr_to_verify_value_current, init_fan_mode, init_percent_setting, init_speed_setting):
+    def handle_iteration_one_edge_cases(attr_to_update, attr_to_verify, order, attr_to_verify_value_current, init_fan_mode, init_percent_setting, init_speed_setting) -> None:
+        """
+        Handles edge cases for the first iteration of fan control attribute updates and verifications.
+
+        Parameters:
+        attr_to_update (Attribute): The attribute that is being updated.
+        attr_to_verify (Attribute): The attribute that is being verified.
+        order (OrderEnum): The order of the update (Ascending or Descending).
+        attr_to_verify_value_current (int/Enum): The current value of the attribute to verify.
+        init_fan_mode (FanModeEnum): The initial fan mode.
+        init_percent_setting (int): The initial percent setting.
+        init_speed_setting (int): The initial speed setting.
+
+        Returns:
+        None
+
+        Logs the changes in attribute values and asserts the correctness of the updated values based on the initial fan mode and the order of update.
+        """
         cluster = Clusters.FanControl
         attribute = cluster.Attributes
         fm_enum = cluster.Enums.FanModeEnum
@@ -228,6 +330,21 @@ class TC_FAN_3_1(MatterBaseTest):
 
     @staticmethod
     def verify_attribute_change(attr_to_verify, value_current, value_previous, order) -> None:
+        """
+        Verifies that an attribute value has changed in the expected order and logs the change details.
+
+        Args:
+            attr_to_verify (Attribute): The attribute to verify.
+            value_current (Any): The current value of the attribute.
+            value_previous (Any): The previous value of the attribute.
+            order (OrderEnum): The expected order of the attribute change (Ascending or Descending).
+
+        Raises:
+            AssertionError: If the current attribute value does not follow the expected order compared to the previous value.
+
+        Logs:
+            Logs the attribute value change details
+        """
         if order == OrderEnum.Ascending:
             # Verify that the current attribute value is greater than the previous attribute value
             asserts.assert_greater(value_current, value_previous,
@@ -244,6 +361,30 @@ class TC_FAN_3_1(MatterBaseTest):
         logging.info(f"\t\t[FC] {attr_to_verify.__name__} changed from {sub_text}")
 
     async def verify_fan_control_attribute_progression(self, endpoint, attr_to_update, order) -> None:
+        """
+        Verify the progression of the fan control attributes.
+
+        This method tests the progression of the fan control attributes by updating
+        the specified attribute in a given order and monitoring the corresponding
+        attributes to ensure they change correctly.
+
+        Args:
+            endpoint (int): The endpoint identifier for the fan device.
+            attr_to_update (Any): The attribute to be updated during the test.
+            order (OrderEnum): The order in which the attribute should be updated (ascending or descending).
+
+        Returns:
+            None
+
+        Raises:
+            AssertionError: If the attribute values do not progress as expected.
+
+        The test scenarios include:
+            - Updating the PercentSetting attribute in ascending order and monitoring the FanMode (and SpeedSetting, if present) attributes.
+            - Updating the PercentSetting attribute in descending order and monitoring the FanMode (and SpeedSetting, if present) attributes.
+            - Updating the FanMode attribute in ascending order and monitoring the PercentSetting (and SpeedSetting, if present) attributes.
+            - Updating the FanMode attribute in descending order and monitoring the PercentSetting (and SpeedSetting, if present) attributes.
+        """
         cluster = Clusters.FanControl
         attribute = cluster.Attributes
         timeout_sec = 0.0001  # Timeout given for item retreival from the attribute queue
@@ -358,6 +499,11 @@ class TC_FAN_3_1(MatterBaseTest):
         ep = self.get_endpoint(default=1)
         cluster = Clusters.FanControl
         attributes = cluster.Attributes
+
+
+        res = await self.read_single_attribute_check_success(endpoint=ep, cluster=cluster, attribute=attributes.FanModeSequence)
+        print(f"[FC] Read FanModeSequence attribute: {res}, type: {type(res)}")
+
 
         # *** STEP 1 ***
         # Commissioning already done
