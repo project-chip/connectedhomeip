@@ -488,7 +488,7 @@ def build_treemap(
             maxdepth=max_depth,
         )
     else:
-        assert (style == ChartStyle.ICICLE)
+        assert style == ChartStyle.ICICLE
         fig = px.icicle(
             data,
             names="name_with_size",
@@ -713,8 +713,9 @@ def fetch_symbols(elf_file: str, fetch: FetchStyle) -> Tuple[list[Symbol], str]:
     """
     if fetch == FetchStyle.NM:
         return symbols_from_nm(elf_file), "::"
-    else:
-        return symbols_from_objdump(elf_file), '/'
+
+    assert fetch == FetchStyle.OBJDUMP
+    return symbols_from_objdump(elf_file), '/'
 
 
 def list_id(tree_path: list[str]) -> str:
