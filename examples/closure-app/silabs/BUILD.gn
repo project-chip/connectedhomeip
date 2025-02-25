@@ -146,12 +146,8 @@ sources = [
   "${example_closure_dir}/closure-common/closure-control/src/ClosureControlMain.cpp",
   "${examples_common_plat_dir}/main.cpp",
   "src/AppTask.cpp",
-  "src/ZclCallbacks.cpp",
+  "src/DataModelCallbacks.cpp",
 ]
-
-if (!disable_lcd) {
-  sources += [ "src/LcdPainter.cpp" ]
-}
   
 deps = [
   ":sdk",
