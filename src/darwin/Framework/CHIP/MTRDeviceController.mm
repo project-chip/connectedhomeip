@@ -430,7 +430,7 @@ using namespace chip::Tracing::DarwinFramework;
         [devicesToReturn addObject:device];
     }
 
-    return [devicesToReturn copy];
+    return devicesToReturn;
 }
 
 - (void)deviceDeallocated
