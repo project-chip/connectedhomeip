@@ -44,10 +44,10 @@
 import logging
 import re
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import Enum, auto
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Tuple
 
 import click
 import coloredlogs
@@ -82,8 +82,8 @@ class FetchStyle(Enum):
 
 
 __FETCH_STYLES__ = {
-    "nm": ChartStyle.TREE_MAP,
-    "objdump": ChartStyle.SUNBURST,
+    "nm": FetchStyle.NM,
+    "objdump": FetchStyle.OBJDUMP,
 }
 
 
@@ -660,6 +660,65 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
     return symbols
 
 
+def fetch_symbols(elf_file: Path, fetch: FetchStyle) -> Tuple[list[Symbol], str]:
+    """Returns the sumbol list and the separator used to split symbols
+    """
+    if fetch == FetchStyle.NM:
+        return symbols_from_nm(elf_file.absolute().as_posix()), "::"
+    else:
+        return symbols_from_objdump(elf_file.absolute().as_posix()), '/'
+
+def compute_symbol_diff(orig: list[Symbol], base: list[Symbol]) -> list[Symbol]:
+    """
+    Generates a NEW set of symbols for the difference between original and base.
+
+    Two symbols with the same name are assumed different IF AND ONLY IF they have a different size
+    between original and base.
+
+    Symbols are the same if their "name" if the have the same tree path.
+    """
+    orig_items = dict([(v.tree_path, v) for v in orig])
+    base_items = dict([(v.tree_path, v) for v in base])
+
+    unique_paths = set(orig_items.keys()).union(set(base_items.keys()))
+
+    result = []
+
+    for path in unique_paths:
+        orig_symbol = orig_items.get(path, None)
+        base_symbol = base_items.get(path, None)
+
+        if not orig_symbol:
+            if not base_symbol:
+                raise AssertionError("Internal logic error: paths should be valid somewhere")
+
+            result.append(replace(base_symbol,
+                name=f"REMOVED: {base_symbol.name}",
+                tree_path = ["REMOVED"] + base_symbol.tree_path,
+            ))
+            continue
+
+        if not base_symbol:
+            result.append(replace(orig_symbol,
+                name=f"ADDED: {orig_symbol.name}",
+                tree_path = ["ADDED"] + orig_symbol.tree_path,
+            ))
+            continue
+
+        if orig_symbol.size == base_symbol.size:
+            # symbols are identical
+            continue
+
+        result.append(replace(orig_symbol,
+            name=f"CHANGED: {orig_symbol.name}",
+            tree_path = ["CHANGED"] + orig_symbol.tree_path,
+        ))
+
+    return result
+
+
+
+
 @click.command()
 @click.option(
     "--log-level",
@@ -699,7 +758,13 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
     default=None,
     help="Strip out a tree subset (e.g. ::C)",
 )
-@click.argument("elf-file", type=Path)
+@click.option(
+    "--diff",
+    default=None,
+    type=click.Path(file_okay=True, dir_okay=False, exists=True),
+    help="Diff against the given file (changes symbols to increase/decrease)",
+)
+@click.argument("elf-file", type=click.Path(file_okay=True, dir_okay=False, exists=True))
 def main(
     log_level,
     elf_file: Path,
@@ -708,16 +773,16 @@ def main(
     max_depth: int,
     zoom: Optional[str],
     strip: Optional[str],
+    diff: Optional[Path],
 ):
     log_fmt = "%(asctime)s %(levelname)-7s %(message)s"
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
-    if __FETCH_STYLES__[fetch_via] == FetchStyle.NM:
-        symbols = symbols_from_nm(elf_file.absolute().as_posix())
-        separator = "::"
-    else:
-        symbols = symbols_from_objdump(elf_file.absolute().as_posix())
-        separator = "/"
+    symbols, separator = fetch_symbols(elf_file, __FETCH_STYLES__[fetch_via])
+
+    if diff:
+        diff_symbols, _ = fetch_symbols(diff, __FETCH_STYLES__[fetch_via])
+        symbols = compute_symbol_diff(symbols, diff_symbols)
 
     build_treemap(
         elf_file.name, symbols, separator, __CHART_STYLES__[display_type], max_depth, zoom, strip
