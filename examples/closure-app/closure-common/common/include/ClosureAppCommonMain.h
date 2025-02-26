@@ -22,7 +22,7 @@
 #include <lib/core/DataModelTypes.h>
 
 // This app is configured by default with EP1 for ClosureBase  with only one endpoint
-// enabled for now. it cna be expanded to multiple endpoints
+// enabled for now. it can be expanded to multiple endpoints
 chip::EndpointId GetClosureDeviceEndpointId();
 
 void ClosureApplicationInit();

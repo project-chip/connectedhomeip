@@ -4,16 +4,16 @@ An example showing the use of CHIP on the Silicon Labs SiWx917
 
 <hr>
 
--   [Matter SiWx917 Closure Example](#matter-siwx917-closure-example)
-    -   [Introduction](#introduction)
-    -   [Building](#building)
-    -   [Flashing the Application](#flashing-the-application)
-    -   [Running the Complete Example](#running-the-complete-example)
-    -   [Group Communication (Multicast)](#group-communication-multicast)
-    -   [Building options](#building-options)
-        -   [Disabling logging](#disabling-logging)
-        -   [Debug build / release build](#debug-build--release-build)
-        -   [KVS maximum entry count](#kvs-maximum-entry-count)
+- [Matter SiWx917 Closure Example](#matter-siwx917-closure-example)
+  - [Introduction](#introduction)
+  - [Building](#building)
+  - [Flashing the Application](#flashing-the-application)
+  - [Running the Complete Example](#running-the-complete-example)
+  - [Group Communication (Multicast)](#group-communication-multicast)
+  - [Building options](#building-options)
+    - [Disabling logging](#disabling-logging)
+    - [Debug build / release build](#debug-build--release-build)
+    - [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
@@ -177,7 +177,7 @@ passed to the build scripts.
 
 `kvs_max_entries`
 
-    Set the maximum Kvs entries that can be stored in NVM (Default 75)
-    Thresholds: 30 <= kvs_max_entries <= 255
+    Set the maximum Kvs entries that can be stored in NVM (Default 255)
+    Thresholds: 30 <= kvs_max_entries <= 511
 
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/closure-app/silabs ./out/closure-app BRD4338A kvs_max_entries=50
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/closure-app/silabs ./out/closure-app BRD4338A kvs_max_entries=355

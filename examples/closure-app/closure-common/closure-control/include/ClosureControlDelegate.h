@@ -29,7 +29,7 @@ namespace app {
 namespace Clusters {
 namespace ClosureControl {
 
-// This is an application level delegate to handle operational state commands according to the specific business logic.
+// This is an application level delegate to handle Closure Control commands according to the specific business logic.
 class ClosureControlDelegate : public ClosureControl::Delegate
 {
 public:

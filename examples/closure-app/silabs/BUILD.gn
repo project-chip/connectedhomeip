@@ -102,8 +102,6 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
-      "${chip_root}/examples/closure-app/closure-common/common/include",
-      "${chip_root}/examples/closure-app/closure-common/closure-control/include",
     ]
 
     if (use_wf200) {
@@ -190,7 +188,6 @@ silabs_executable("closure-app") {
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
-      "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
     ]
