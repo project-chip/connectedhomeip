@@ -18,20 +18,6 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --passcode 20202021 --KVS kvs1
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --discriminator 1234
-#       --passcode 20202021
-#       --endpoint 1
-#       --commissioning-method on-network
-#     factory-reset: true
-#     quiet: true
-# === END CI TEST ARGUMENTS ===
 
 import asyncio
 
@@ -39,7 +25,7 @@ from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_bod
 from mobly import asserts
 
 
-class TC_CreateNewController(MatterBaseTest):
+class TestCreateNewController(MatterBaseTest):
     # Using get_code and a modified version of setup_class_helper functions from chip.testing.basic_composition module
     def get_code(self, dev_ctrl):
         created_codes = []
@@ -86,26 +72,24 @@ class TC_CreateNewController(MatterBaseTest):
         # All endpoints in "full object" indexing format
         self.endpoints = wildcard_read.attributes
 
-    def steps_TC_CreateNewController(self) -> list[TestStep]:
+    def steps_TestCreateNewController(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Checking create new controller on new fabric"),
             TestStep(3, "Remove new fabric from TH to verify it can be removed after creation"),
             TestStep(4, "Checking create new controller on existing fabric"),
             TestStep(5, "Remove fabric from TH to verify it can be removed after creation")
         ]
 
-    def TC_TestAttrAvail(self) -> list[str]:
-        return ["RVCOPSTATE.S"]
-
     @async_test_body
     async def setup_class(self):
-        super().setup_class()
-        await self.setup_class_helper()
+        self.commissioner = None
+        self.commissioned = False
+        return super().setup_class()
 
     # ======= START OF ACTUAL TESTS =======
     @async_test_body
-    async def test_TC_CreateNewController(self):
+    async def test_TestCreateNewController(self):
         self.step(1)
         self.endpoint = self.get_endpoint()
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
@@ -119,10 +103,9 @@ class TC_CreateNewController(MatterBaseTest):
 
         self.step(4)
         self.th3 = self.certificate_authority_manager.create_new_controller(ca_List=0, new_Fabric=False, node_Id=2)
-
+        
         self.step(5)
         self.th3.Shutdown()
-
 
 if __name__ == "__main__":
     default_matter_test_main()
