@@ -22,6 +22,7 @@
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/MetadataList.h> // So we can get filled buffers
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/List.h> // So we can encode lists
 #include <lib/core/DataModelTypes.h>
@@ -29,10 +30,6 @@
 
 namespace chip {
 namespace app {
-namespace DataModel {
-struct AcceptedCommandEntry;
-}
-
 /*
  * This interface permits applications to register a server-side command handler
  * at run-time for a given cluster. The handler can either be configured to handle all endpoints
