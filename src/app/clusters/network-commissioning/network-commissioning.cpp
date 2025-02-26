@@ -1364,8 +1364,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
                                                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Clusters::NetworkCommissioning::Commands;
-    static constexpr size_t kNetworkCommands     = 5; // Count of Network Commands
-    static constexpr size_t kCredentialsCommands = 1; // Count of Credential Commands
+    static constexpr size_t kNetworkCommands = 5; // Count of Network Commands
 
     bool hasNet  = mFeatureFlags.Has(Feature::kThreadNetworkInterface);
     bool hasWifi = mFeatureFlags.Has(Feature::kWiFiNetworkInterface);
