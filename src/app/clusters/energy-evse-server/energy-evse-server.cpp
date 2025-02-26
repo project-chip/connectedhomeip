@@ -186,33 +186,33 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
                                                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
-    using QF                            = DataModel::CommandQualityFlags;
-    static const auto kDefaultPrivilege = chip::Access::Privilege::kOperate;
+    using QF   = DataModel::CommandQualityFlags;
+    using Priv = chip::Access::Privilege;
 
     ReturnErrorOnFailure(builder.AppendElements({
-        { Disable::Id, QF::kTimed, kDefaultPrivilege },        //
-        { EnableCharging::Id, QF::kTimed, kDefaultPrivilege }, //
+        { Disable::Id, QF::kTimed, Priv::kOperate },        //
+        { EnableCharging::Id, QF::kTimed, Priv::kOperate }, //
     }));
 
     if (HasFeature(Feature::kV2x))
     {
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
-        ReturnErrorOnFailure(builder.Append({ EnableDischarging::Id, QF::kTimed, kDefaultPrivilege }));
+        ReturnErrorOnFailure(builder.Append({ EnableDischarging::Id, QF::kTimed, Priv::kOperate }));
     }
 
     if (HasFeature(Feature::kChargingPreferences))
     {
         ReturnErrorOnFailure(builder.AppendElements({
-            { SetTargets::Id, QF::kTimed, kDefaultPrivilege },   //
-            { GetTargets::Id, QF::kTimed, kDefaultPrivilege },   //
-            { ClearTargets::Id, QF::kTimed, kDefaultPrivilege }, //
+            { SetTargets::Id, QF::kTimed, Priv::kOperate },   //
+            { GetTargets::Id, QF::kTimed, Priv::kOperate },   //
+            { ClearTargets::Id, QF::kTimed, Priv::kOperate }, //
         }));
     }
 
     if (SupportsOptCmd(OptionalCommands::kSupportsStartDiagnostics))
     {
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
-        ReturnErrorOnFailure(builder.Append({ StartDiagnostics::Id, QF::kTimed, kDefaultPrivilege }));
+        ReturnErrorOnFailure(builder.Append({ StartDiagnostics::Id, QF::kTimed, Priv::kOperate }));
     }
     return CHIP_NO_ERROR;
 }

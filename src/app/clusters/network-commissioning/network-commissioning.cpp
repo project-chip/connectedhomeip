@@ -1364,6 +1364,8 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
                                                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Clusters::NetworkCommissioning::Commands;
+    using Priv = chip::Access::Privilege;
+
     static constexpr size_t kNetworkCommands = 5; // Count of Network Commands
 
     bool hasNet  = mFeatureFlags.Has(Feature::kThreadNetworkInterface);
@@ -1373,17 +1375,18 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     {
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(kNetworkCommands));
         ReturnErrorOnFailure(builder.AppendElements({
-            { ScanNetworks::Id, {} },   //
-            { RemoveNetwork::Id, {} },  //
-            { ConnectNetwork::Id, {} }, //
-            { ReorderNetwork::Id, {} }, //
+            { ScanNetworks::Id, {}, Priv::kAdminister },   //
+            { RemoveNetwork::Id, {}, Priv::kAdminister },  //
+            { ConnectNetwork::Id, {}, Priv::kAdminister }, //
+            { ReorderNetwork::Id, {}, Priv::kAdminister }, //
         }));
-        ReturnErrorOnFailure(builder.Append({ hasNet ? AddOrUpdateThreadNetwork::Id : AddOrUpdateWiFiNetwork::Id, {} }));
+        ReturnErrorOnFailure(
+            builder.Append({ hasNet ? AddOrUpdateThreadNetwork::Id : AddOrUpdateWiFiNetwork::Id, {}, Priv::kAdminister }));
     }
 
     if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
-    { // Skip the network commands send the rest
-        return builder.Append({ QueryIdentity::Id, {} });
+    {
+        ReturnErrorOnFailure(builder.Append({ QueryIdentity::Id, {} }));
     }
 
     return CHIP_NO_ERROR;

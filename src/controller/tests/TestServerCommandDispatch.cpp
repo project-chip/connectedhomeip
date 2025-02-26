@@ -109,6 +109,7 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
                                                                 DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Clusters::UnitTesting::Commands;
+    using Priv = chip::Access::Privilege;
 
     if (!mOverrideAcceptedCommands)
     {
@@ -120,7 +121,7 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
         return CHIP_NO_ERROR;
     }
 
-    DataModel::AcceptedCommandEntry entries[] = { { TestSimpleArgumentRequest::Id, {} } };
+    DataModel::AcceptedCommandEntry entries[] = { { TestSimpleArgumentRequest::Id, {}, Priv::kOperate } };
     return builder.ReferenceExisting({ entries, std::size(entries) });
 }
 

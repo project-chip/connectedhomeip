@@ -108,43 +108,47 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
                                                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
+    using Priv = chip::Access::Privilege;
 
     if (HasFeature(Feature::kPowerAdjustment))
     {
-        ReturnErrorOnFailure(builder.AppendElements({ { PowerAdjustRequest::Id, {} }, { CancelPowerAdjustRequest::Id, {} } }));
+        ReturnErrorOnFailure(builder.AppendElements({
+            { PowerAdjustRequest::Id, {}, Priv::kOperate },      //
+            { CancelPowerAdjustRequest::Id, {}, Priv::kOperate } //
+        }));
     }
 
     if (HasFeature(Feature::kStartTimeAdjustment))
     {
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
-        ReturnErrorOnFailure(builder.Append({ StartTimeAdjustRequest::Id, {} }));
+        ReturnErrorOnFailure(builder.Append({ StartTimeAdjustRequest::Id, {}, Priv::kOperate }));
     }
 
     if (HasFeature(Feature::kPausable))
     {
         ReturnErrorOnFailure(builder.AppendElements({
-            { PauseRequest::Id, {} }, //
-            { ResumeRequest::Id, {} } //
+            { PauseRequest::Id, {}, Priv::kOperate }, //
+            { ResumeRequest::Id, {}, Priv::kOperate } //
         }));
     }
 
     if (HasFeature(Feature::kForecastAdjustment))
     {
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
-        ReturnErrorOnFailure(builder.Append({ ModifyForecastRequest::Id, {} }));
+        ReturnErrorOnFailure(builder.Append({ ModifyForecastRequest::Id, {}, Priv::kOperate }));
     }
 
     if (HasFeature(Feature::kConstraintBasedAdjustment))
     {
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
-        ReturnErrorOnFailure(builder.Append({ RequestConstraintBasedForecast::Id, {} }));
+        ReturnErrorOnFailure(builder.Append({ RequestConstraintBasedForecast::Id, {}, Priv::kOperate }));
     }
 
     if (HasFeature(Feature::kStartTimeAdjustment) || HasFeature(Feature::kForecastAdjustment) ||
         HasFeature(Feature::kConstraintBasedAdjustment))
     {
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
-        ReturnErrorOnFailure(builder.Append({ CancelRequest::Id, {} }));
+        ReturnErrorOnFailure(builder.Append({ CancelRequest::Id, {}, Priv::kOperate }));
     }
 
     return CHIP_NO_ERROR;
