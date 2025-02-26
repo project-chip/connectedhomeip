@@ -174,13 +174,21 @@ public:
 
         ReturnErrorOnFailure(EnsureMessage());
 
+        bool emptyListNotEncoded = true;
         // Encode an empty list for the chunking protocol.
         if (path.mClusterId != 0x1F)
         {
             ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
+            emptyListNotEncoded = false;
+        }
+        else
+        {
+            // When we are trying to Encode ACL, we encode the first entry instead of an empty list
+            ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<T>(value.data(), 1)));
+            emptyListNotEncoded = true;
         }
         path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
-        for (size_t i = 0; i < value.size(); i++)
+        for (size_t i = static_cast<size_t>(emptyListNotEncoded); i < value.size(); i++)
         {
             ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, value.data()[i]));
         }
