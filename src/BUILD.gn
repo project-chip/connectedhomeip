@@ -51,9 +51,9 @@ if (chip_build_tests) {
     deps = []
     tests = [
       "${chip_root}/src/access/tests",
-      "${chip_root}/src/app/data-model/tests",
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/data-model-provider/tests",
+      "${chip_root}/src/app/data-model/tests",
       "${chip_root}/src/app/icd/server/tests",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
@@ -108,6 +108,9 @@ if (chip_build_tests) {
         # https://github.com/project-chip/connectedhomeip/issues/35624
         "${chip_root}/src/credentials/tests",
         "${chip_root}/src/lib/support/tests",
+
+        # Disabled on EFR32 since "include <random>" fails with `::fabs` not defined
+        "${chip_root}/src/app/server-cluster/tests",
       ]
     }
 

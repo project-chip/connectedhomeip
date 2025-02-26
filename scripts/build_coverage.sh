@@ -222,6 +222,7 @@ lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" \
     --exclude="$PWD"/zzz_generated/* \
     --exclude="$PWD"/third_party/* \
     --exclude=/usr/include/* \
+    --ignore-errors inconsistent \
     --output-file "$COVERAGE_ROOT/lcov_base.info"
 
 lcov --capture --directory "$OUTPUT_ROOT/obj/src" \
@@ -229,9 +230,11 @@ lcov --capture --directory "$OUTPUT_ROOT/obj/src" \
     --exclude="$PWD"/zzz_generated/* \
     --exclude="$PWD"/third_party/* \
     --exclude=/usr/include/* \
+    --ignore-errors inconsistent \
     --output-file "$COVERAGE_ROOT/lcov_test.info"
 
-lcov --add-tracefile "$COVERAGE_ROOT/lcov_base.info" \
+lcov --ignore-errors inconsistent \
+    --add-tracefile "$COVERAGE_ROOT/lcov_base.info" \
     --add-tracefile "$COVERAGE_ROOT/lcov_test.info" \
     --ignore-errors inconsistent \
     --output-file "$COVERAGE_ROOT/lcov_final.info"

@@ -403,10 +403,11 @@ public:
         return &instance;
     }
 
-    TestCommandInteractionModel() {}
+    TestCommandInteractionModel() = default;
 
-    std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request,
-                                                        chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override
     {
         DispatchSingleClusterCommand(request.path, input_arguments, handler);
         return std::nullopt; // handler status is set by the dispatch

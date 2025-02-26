@@ -470,8 +470,8 @@ ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest &
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-std::optional<ActionReturnStatus> CustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
-                                                          CommandHandler * handler)
+std::optional<ActionReturnStatus> CustomDataModel::InvokeCommand(const InvokeRequest & request,
+                                                                 chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
     DispatchSingleClusterCommand(request.path, input_arguments, handler);
     return std::nullopt; // handler status is set by the dispatch

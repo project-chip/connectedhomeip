@@ -39,6 +39,8 @@ codegen_data_model_SOURCES = [
 codegen_data_model_PUBLIC_DEPS = [
   "${chip_root}/src/app/common:attribute-type",
   "${chip_root}/src/app/data-model-provider",
+  "${chip_root}/src/app/server-cluster",
   "${chip_root}/src/data-model-providers/codegen:instance-header",
+  "${chip_root}/src/data-model-providers/codegen:registry",
   "${chip_root}/src/app/util/persistence",
 ]
