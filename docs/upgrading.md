@@ -189,5 +189,5 @@ Changes for implementation:
 
 Important Notes:
 
-Careful to use `EnsureAppendCapacity` before single element Append
+Be sure to use `EnsureAppendCapacity` before single element Append
 `ListBuilder::Append` as it will not grow the buffer if not available already
