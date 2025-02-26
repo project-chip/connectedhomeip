@@ -136,6 +136,8 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/media-input-server/media-input-delegate.h': {'list'},
     'src/app/clusters/media-playback-server/media-playback-delegate.h': {'list'},
     'src/app/clusters/target-navigator-server/target-navigator-delegate.h': {'list'},
+    # Camera AV Stream Management cluster is expected to run on resource-capable devices
+    'src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h': {'vector'},
 
     'src/credentials/attestation_verifier/FileAttestationTrustStore.h': {'vector'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.cpp': {'string'},
