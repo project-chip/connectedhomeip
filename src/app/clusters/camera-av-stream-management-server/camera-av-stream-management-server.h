@@ -90,47 +90,57 @@ public:
 
     virtual ~CameraAVStreamMgmtDelegate() = default;
 
+    struct VideoStreamAllocateArgs
+    {
+        StreamUsageEnum
+            streamUsage; // Indicates the type of usage of stream ( Recording, Liveview, etc ) that this allocation is for.
+        VideoCodecEnum videoCodec;               //  Indicates the type of video codec the stream should support.
+        uint16_t minFrameRate;                   // Indicates the minimum frame rate ( frames/second ) of the video stream.
+        uint16_t maxFrameRate;                   // Indicates the maximum frame rate ( frames/second ) of the video stream.
+        VideoResolutionStruct minResolution;     // Indicates the minimum resolution of the video stream.
+        VideoResolutionStruct maxResolution;     // Indicates the maximum resolution of the video stream.
+        uint32_t minBitRate;                     // Indicates the minimum bit rate ( bits/second ) of the video stream.
+        uint32_t maxBitRate;                     // Indicates the maximum bit rate ( bits/second ) of the video stream.
+        uint16_t minFragmentLen;                 // Indicates the minimum length ( msecs ) of a clip fragment for the video stream.
+        uint16_t maxFragmentLen;                 // Indicates the maximum length ( msecs ) of a clip fragment for the video stream.
+        chip::Optional<bool> isWaterMarkEnabled; // Indicates  whether a watermark can be applied on the video stream.
+        chip::Optional<bool> isOSDEnabled;       // Indicates  whether the on-screen display can be applied on the video stream.
+    };
+
+    struct AudioStreamAllocateArgs
+    {
+        StreamUsageEnum
+            streamUsage; // Indicates the type of usage of stream ( Recording, Liveview, etc ) that this allocation is for.
+        AudioCodecEnum audioCodec; // Indicates the type of audio codec the stream should support.
+        uint8_t channelCount;      // Indicates the the number of channels used by the stream, e.g., Mono ( 1 ), Stereo ( 2 ), etc.
+        uint32_t sampleRate;       // Indicates the sampling rate of the audio stream in Hz.
+        uint32_t bitRate;          // Indicates the bitrate ( bits/sec ) of the specified audio codec.
+        uint8_t bitDepth;          // Indicates the number of information bits ( 8, 16, 24 or 32 ) used to represent each sample.
+    };
+
+    struct SnapshotStreamAllocateArgs
+    {
+        ImageCodecEnum imageCodec;           // Indicates the type of image codec to be used by the stream.
+        uint16_t maxFrameRate;               // Indicates the frame rate ( frames/second ) of the stream.
+        uint32_t bitRate;                    // Indicates the bitrate ( bits/sec ) of the stream.
+        VideoResolutionStruct minResolution; // Indicates the minimum resolution of the stream.
+        VideoResolutionStruct maxResolution; // Indicates the maximum resolution of the stream.
+        uint8_t quality;                     // Indicates a codec quality metric ( integer between 1 and 100 ) for the stream.
+    };
+
     /**
      *   @brief Handle Command Delegate for Video stream allocation with the provided parameter list.
      *
-     *   @param streamUsage        Indicates the type of usage of stream ( Recording, Liveview, etc ) that this allocation is for.
+     *   @param[in]  allocateArgs   Structure with parameters for video stream allocation.
      *
-     *   @param videoCodec         Indicates the type of video codec the stream should support.
-     *
-     *   @param minFrameRate       Indicates the minimum frame rate ( frames/second ) of the video stream.
-     *
-     *   @param maxFrameRate       Indicates the maximum frame rate ( frames/second ) of the video stream.
-     *
-     *   @param minResolution      Indicates the minimum resolution of the video stream.
-     *
-     *   @param maxResolution      Indicates the maximum resolution of the video stream.
-     *
-     *   @param minBitRate         Indicates the minimum bit rate ( bits/second ) of the video stream.
-     *
-     *   @param maxBitRate         Indicates the maximum bit rate ( bits/second ) of the video stream.
-     *
-     *   @param minFragmentLen     Indicates the minimum length ( msecs ) of a clip fragment for the video stream.
-     *
-     *   @param maxFragmentLen     Indicates the maximum length ( msecs ) of a clip fragment for the video stream.
-     *
-     *   @param waterMarkEnabled   Indicates  whether a watermark can be applied on the video stream.
-     *                             Value defaults to false if feature unsupported.
-     *
-     *   @param osdEnabled         Indicates  whether the on-screen display can be applied on the video stream.
-     *                             Value defaults to false if feature unsupported.
-     *
-     *   @param outStreamID        Indicates the ID of the allocated Video Stream.
+     *   @param[out] outStreamID    Indicates the ID of the allocated Video Stream.
      *
      *   @return Success if the allocation is successful and a VideoStreamID was
      *   produced; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
-    virtual Protocols::InteractionModel::Status
-    VideoStreamAllocate(StreamUsageEnum streamUsage, VideoCodecEnum videoCodec, const uint16_t minFrameRate,
-                        const uint16_t maxFrameRate, const VideoResolutionStruct & minResolution,
-                        const VideoResolutionStruct & maxResolution, const uint32_t minBitRate, const uint32_t maxBitRate,
-                        const uint16_t minFragmentLen, const uint16_t maxFragmentLen, const chip::Optional<bool> waterMarkEnabled,
-                        const chip::Optional<bool> osdEnabled, uint16_t & outStreamID) = 0;
+    virtual Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamAllocateArgs & allocateArgs,
+                                                                    uint16_t & outStreamID) = 0;
 
     /**
      *   @brief Handle Command Delegate for Video stream modification.
@@ -165,27 +175,15 @@ public:
     /**
      *   @brief Handle Command Delegate for Audio stream allocation.
      *
-     *   @param streamUsage        Indicates the type of usage of stream ( Recording, Liveview, etc ) that this allocation is for.
+     *   @param[in]  allocateArgs   Structure with parameters for audio stream allocation.
      *
-     *   @param audioCodec         Indicates the type of audio codec the stream should support.
-     *
-     *   @param channelCount       Indicates the the number of channels used by the stream, e.g., Mono ( 1 ), Stereo ( 2 ), etc.
-     *
-     *   @param sampleRate         Indicates the sampling rate of the audio stream in Hz.
-     *
-     *   @param bitRate            Indicates the bitrate ( bits/sec ) of the specified audio codec.
-     *
-     *   @param bitDepth           Indicates the number of information bits ( 8, 16, 24 or 32 ) used to represent each sample.
-     *
-     *   @param outStreamID        Indicates the ID of the allocated Audio Stream.
+     *   @param[out] outStreamID    Indicates the ID of the allocated Audio Stream.
      *
      *   @return Success if the allocation is successful and an AudioStreamID was
      *   produced; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
-    virtual Protocols::InteractionModel::Status AudioStreamAllocate(StreamUsageEnum streamUsage, AudioCodecEnum audioCodec,
-                                                                    const uint8_t channelCount, const uint32_t sampleRate,
-                                                                    const uint32_t bitRate, const uint8_t bitDepth,
+    virtual Protocols::InteractionModel::Status AudioStreamAllocate(const AudioStreamAllocateArgs & allocateArgs,
                                                                     uint16_t & outStreamID) = 0;
 
     /**
@@ -201,30 +199,17 @@ public:
     /**
      *   @brief Handle Command Delegate for Snapshot stream allocation.
      *
-     *   @param imageCodec          Indicates the type of image codec to be used by the stream.
+     *   @param[in]  allocateArgs   Structure with parameters for snapshot stream allocation.
      *
-     *   @param frameRate           Indicates the frame rate ( frames/second ) of the stream.
-     *
-     *   @param bitRate             Indicates the bitrate ( bits/sec ) of the stream.
-     *
-     *   @param minResolution       Indicates the minimum resolution of the stream.
-     *
-     *   @param maxResolution       Indicates the maximum resolution of the stream.
-     *
-     *   @param quality             Indicates a codec quality metric ( integer between 1 and 100 ) for the stream.
-     *
-     *   @param outStreamID         Indicates the ID of the allocated Audio Stream.
+     *   @param[out] outStreamID    Indicates the ID of the allocated Audio Stream.
      *
      *
      *   @return Success if the allocation is successful and a SnapshotStreamID was
      *   produced; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
-    virtual Protocols::InteractionModel::Status SnapshotStreamAllocate(ImageCodecEnum imageCodec, const uint16_t frameRate,
-                                                                       const uint32_t bitRate,
-                                                                       const VideoResolutionStruct & minResolution,
-                                                                       const VideoResolutionStruct & maxResolution,
-                                                                       const uint8_t quality, uint16_t & outStreamID) = 0;
+    virtual Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
+                                                                       uint16_t & outStreamID) = 0;
 
     /**
      *   @brief Handle Command Delegate for Snapshot stream deallocation.
@@ -271,20 +256,17 @@ public:
      *  attributes. The list is updatable via the Add/Remove functions for the
      *  respective streams.
      */
-    virtual Protocols::InteractionModel::Status
-    LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams) = 0;
+    virtual CHIP_ERROR LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams) = 0;
 
-    virtual Protocols::InteractionModel::Status
-    LoadAllocatedAudioStreams(std::vector<AudioStreamStruct> & allocatedAudioStreams) = 0;
+    virtual CHIP_ERROR LoadAllocatedAudioStreams(std::vector<AudioStreamStruct> & allocatedAudioStreams) = 0;
 
-    virtual Protocols::InteractionModel::Status
-    LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams) = 0;
+    virtual CHIP_ERROR LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams) = 0;
 
     /**
      *  @brief Callback into the delegate once persistent attributes managed by
      *  the Cluster have been loaded from Storage.
      */
-    virtual Protocols::InteractionModel::Status PersistentAttributesLoadedCallback() = 0;
+    virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
 
 private:
     friend class CameraAVStreamMgmtServer;

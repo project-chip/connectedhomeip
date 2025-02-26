@@ -1011,20 +1011,27 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     }
 
     // Load AllocatedVideoStreams
-    mDelegate.LoadAllocatedVideoStreams(mAllocatedVideoStreams);
-
+    err = mDelegate.LoadAllocatedVideoStreams(mAllocatedVideoStreams);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load allocated video streams from the KVS.", mEndpointId);
+    }
     // Load AllocatedAudioStreams
-    mDelegate.LoadAllocatedAudioStreams(mAllocatedAudioStreams);
+    err = mDelegate.LoadAllocatedAudioStreams(mAllocatedAudioStreams);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load allocated audio streams from the KVS.", mEndpointId);
+    }
 
     // Load AllocatedSnapshotStreams
-    mDelegate.LoadAllocatedSnapshotStreams(mAllocatedSnapshotStreams);
+    err = mDelegate.LoadAllocatedSnapshotStreams(mAllocatedSnapshotStreams);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load allocated snapshot streams from the KVS.", mEndpointId);
+    }
 
     err = LoadRankedVideoStreamPriorities();
-    if (err == CHIP_NO_ERROR)
-    {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded RankedVideoStreamPrioritiesList", mEndpointId);
-    }
-    else
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the RankedVideoStreamPrioritiesList from the KVS.",
                       mEndpointId);
@@ -1527,19 +1534,7 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
     Status status = Status::Success;
 
     Commands::VideoStreamAllocateResponse::Type response;
-    auto & streamUsage        = commandData.streamUsage;
-    auto & videoCodec         = commandData.videoCodec;
-    auto & minFrameRate       = commandData.minFrameRate;
-    auto & maxFrameRate       = commandData.maxFrameRate;
-    auto & minResolution      = commandData.minResolution;
-    auto & maxResolution      = commandData.maxResolution;
-    auto & minBitRate         = commandData.minBitRate;
-    auto & maxBitRate         = commandData.maxBitRate;
-    auto & minFragmentLen     = commandData.minFragmentLen;
-    auto & maxFragmentLen     = commandData.maxFragmentLen;
-    auto & isWaterMarkEnabled = commandData.watermarkEnabled;
-    auto & isOSDEnabled       = commandData.OSDEnabled;
-    uint16_t videoStreamID    = 0;
+    uint16_t videoStreamID = 0;
 
     // If Watermark feature is supported, then command should have the
     // isWaterMarkEnabled param. Or, if it is not supported, then command should
@@ -1553,35 +1548,49 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
     VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
 
-    VerifyOrReturn(streamUsage != StreamUsageEnum::kUnknownEnumValue, {
+    VerifyOrReturn(commandData.streamUsage != StreamUsageEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
     });
 
-    VerifyOrReturn(videoCodec != VideoCodecEnum::kUnknownEnumValue, {
+    VerifyOrReturn(commandData.videoCodec != VideoCodecEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid video codec", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
     });
 
-    VerifyOrReturn(minFrameRate >= 1 && minFrameRate <= maxFrameRate && maxFrameRate >= 1,
+    VerifyOrReturn(commandData.minFrameRate >= 1 && commandData.minFrameRate <= commandData.maxFrameRate &&
+                       commandData.maxFrameRate >= 1,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
-    VerifyOrReturn(minResolution.width >= 1 && minResolution.height >= 1,
+    VerifyOrReturn(commandData.minResolution.width >= 1 && commandData.minResolution.height >= 1,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
-    VerifyOrReturn(maxResolution.width >= 1 && maxResolution.height >= 1,
+    VerifyOrReturn(commandData.maxResolution.width >= 1 && commandData.maxResolution.height >= 1,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
-    VerifyOrReturn(minBitRate >= 1 && minBitRate <= maxBitRate && maxBitRate >= 1,
+    VerifyOrReturn(commandData.minBitRate >= 1 && commandData.minBitRate <= commandData.maxBitRate && commandData.maxBitRate >= 1,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
-    VerifyOrReturn(minFragmentLen <= maxFragmentLen && maxFragmentLen <= kMaxFragmentLenMaxValue,
+    VerifyOrReturn(commandData.minFragmentLen <= commandData.maxFragmentLen &&
+                       commandData.maxFragmentLen <= kMaxFragmentLenMaxValue,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+
+    CameraAVStreamMgmtDelegate::VideoStreamAllocateArgs videoStreamArgs;
+    videoStreamArgs.streamUsage        = commandData.streamUsage;
+    videoStreamArgs.videoCodec         = commandData.videoCodec;
+    videoStreamArgs.minFrameRate       = commandData.minFrameRate;
+    videoStreamArgs.maxFrameRate       = commandData.maxFrameRate;
+    videoStreamArgs.minResolution      = commandData.minResolution;
+    videoStreamArgs.maxResolution      = commandData.maxResolution;
+    videoStreamArgs.minBitRate         = commandData.minBitRate;
+    videoStreamArgs.maxBitRate         = commandData.maxBitRate;
+    videoStreamArgs.minFragmentLen     = commandData.minFragmentLen;
+    videoStreamArgs.maxFragmentLen     = commandData.maxFragmentLen;
+    videoStreamArgs.isWaterMarkEnabled = commandData.watermarkEnabled;
+    videoStreamArgs.isOSDEnabled       = commandData.OSDEnabled;
 
     // Call the delegate
-    status =
-        mDelegate.VideoStreamAllocate(streamUsage, videoCodec, minFrameRate, maxFrameRate, minResolution, maxResolution, minBitRate,
-                                      maxBitRate, minFragmentLen, maxFragmentLen, isWaterMarkEnabled, isOSDEnabled, videoStreamID);
+    status = mDelegate.VideoStreamAllocate(videoStreamArgs, videoStreamID);
 
     if (status == Status::Success)
     {
@@ -1640,47 +1649,48 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
 {
 
     Commands::AudioStreamAllocateResponse::Type response;
-    auto & streamUsage     = commandData.streamUsage;
-    auto & audioCodec      = commandData.audioCodec;
-    auto & channelCount    = commandData.channelCount;
-    auto & sampleRate      = commandData.sampleRate;
-    auto & bitRate         = commandData.bitRate;
-    auto & bitDepth        = commandData.bitDepth;
     uint16_t audioStreamID = 0;
 
-    VerifyOrReturn(streamUsage != StreamUsageEnum::kUnknownEnumValue, {
+    VerifyOrReturn(commandData.streamUsage != StreamUsageEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    VerifyOrReturn(audioCodec != AudioCodecEnum::kUnknownEnumValue, {
+    VerifyOrReturn(commandData.audioCodec != AudioCodecEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid audio codec", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    VerifyOrReturn(sampleRate > 0, {
+    VerifyOrReturn(commandData.sampleRate > 0, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid sampleRate", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    VerifyOrReturn(bitRate > 0, {
+    VerifyOrReturn(commandData.bitRate > 0, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid bitRate", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    VerifyOrReturn(IsBitDepthValid(bitDepth), {
+    VerifyOrReturn(IsBitDepthValid(commandData.bitDepth), {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid bitDepth", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    VerifyOrReturn(channelCount >= 1 && channelCount <= kMaxChannelCount, {
+    VerifyOrReturn(commandData.channelCount >= 1 && commandData.channelCount <= kMaxChannelCount, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid channel count", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
+    CameraAVStreamMgmtDelegate::AudioStreamAllocateArgs audioStreamArgs;
+    audioStreamArgs.streamUsage  = commandData.streamUsage;
+    audioStreamArgs.audioCodec   = commandData.audioCodec;
+    audioStreamArgs.channelCount = commandData.channelCount;
+    audioStreamArgs.sampleRate   = commandData.sampleRate;
+    audioStreamArgs.bitRate      = commandData.bitRate;
+    audioStreamArgs.bitDepth     = commandData.bitDepth;
+
     // Call the delegate
-    Status status =
-        mDelegate.AudioStreamAllocate(streamUsage, audioCodec, channelCount, sampleRate, bitRate, bitDepth, audioStreamID);
+    Status status = mDelegate.AudioStreamAllocate(audioStreamArgs, audioStreamID);
 
     if (status != Status::Success)
     {
@@ -1709,37 +1719,38 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
 {
 
     Commands::SnapshotStreamAllocateResponse::Type response;
-    auto & imageCodec         = commandData.imageCodec;
-    auto & maxFrameRate       = commandData.maxFrameRate;
-    auto & bitRate            = commandData.bitRate;
-    auto & minResolution      = commandData.minResolution;
-    auto & maxResolution      = commandData.maxResolution;
-    auto & quality            = commandData.quality;
     uint16_t snapshotStreamID = 0;
 
-    VerifyOrReturn(imageCodec != ImageCodecEnum::kUnknownEnumValue, {
+    VerifyOrReturn(commandData.imageCodec != ImageCodecEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid image codec", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
     });
 
-    VerifyOrReturn(maxFrameRate > 0, {
+    VerifyOrReturn(commandData.maxFrameRate > 0, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid maxFrameRate", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    VerifyOrReturn(bitRate > 0, {
+    VerifyOrReturn(commandData.bitRate > 0, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid bitRate", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    VerifyOrReturn(quality > 0 && quality <= kMaxImageQualityMetric, {
+    VerifyOrReturn(commandData.quality > 0 && commandData.quality <= kMaxImageQualityMetric, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid image quality", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
+    CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs snapshotStreamArgs;
+    snapshotStreamArgs.imageCodec    = commandData.imageCodec;
+    snapshotStreamArgs.maxFrameRate  = commandData.maxFrameRate;
+    snapshotStreamArgs.bitRate       = commandData.bitRate;
+    snapshotStreamArgs.minResolution = commandData.minResolution;
+    snapshotStreamArgs.maxResolution = commandData.maxResolution;
+    snapshotStreamArgs.quality       = commandData.quality;
+
     // Call the delegate
-    Status status = mDelegate.SnapshotStreamAllocate(imageCodec, maxFrameRate, bitRate, minResolution, maxResolution, quality,
-                                                     snapshotStreamID);
+    Status status = mDelegate.SnapshotStreamAllocate(snapshotStreamArgs, snapshotStreamID);
 
     if (status != Status::Success)
     {
