@@ -21,6 +21,8 @@ import("${chip_root}/build/config/compiler/compiler.gni")
 import("${chip_root}/build/config/mac/mac_sdk.gni")
 import("${chip_root}/examples//chip-tool/chip-tool.gni")
 
+import("${build_root}/config/linux/pkg_config.gni")
+
 if (config_use_interactive_mode) {
   import("//build_overrides/editline.gni")
 }
@@ -182,6 +184,10 @@ config("config") {
   ]
 }
 
+pkg_config("openssl_config") {
+  packages = [ "openssl" ]
+}
+
 executable("darwin-framework-tool") {
   sources = [
     "${chip_root}/examples/chip-tool/commands/common/Command.cpp",
@@ -191,6 +197,7 @@ executable("darwin-framework-tool") {
     "${chip_root}/examples/chip-tool/commands/common/HexConversion.h",
     "${chip_root}/examples/chip-tool/commands/dcl/DCLClient.cpp",
     "${chip_root}/examples/chip-tool/commands/dcl/DisplayTermsAndConditions.cpp",
+    "${chip_root}/examples/chip-tool/commands/dcl/HTTPSRequest.cpp",
     "${chip_root}/examples/chip-tool/commands/dcl/JsonSchemaMacros.cpp",
     "${chip_root}/examples/common/websocket-server/WebSocketServer.cpp",
     "${chip_root}/examples/common/websocket-server/WebSocketServer.h",
@@ -226,7 +233,6 @@ executable("darwin-framework-tool") {
     "commands/configuration/ResetMRPParametersCommand.mm",
     "commands/configuration/SetMRPParametersCommand.h",
     "commands/configuration/SetMRPParametersCommand.mm",
-    "commands/dcl/HTTPSRequest.mm",
     "commands/delay/Commands.h",
     "commands/delay/SleepCommand.h",
     "commands/delay/SleepCommand.mm",
@@ -293,7 +299,10 @@ executable("darwin-framework-tool") {
     "${root_out_dir}/macos_framework_output/Build/Intermediates.noindex/Matter.build/${output_sdk_type}/Matter.build/out/gen/include",
   ]
 
-  defines = [ "CHIP_HAVE_CONFIG_H=1" ]
+  defines = [
+    "CHIP_HAVE_CONFIG_H=1",
+    "CONFIG_ENABLE_HTTPS_REQUESTS",
+  ]
 
   frameworks += [
     "CoreFoundation.framework",
@@ -317,7 +326,10 @@ executable("darwin-framework-tool") {
     defines += [ "DFT_ENABLE_LEAK_CHECKING=1" ]
   }
 
-  public_configs = [ ":config" ]
+  public_configs = [
+    ":config",
+    ":openssl_config",
+  ]
 
   output_dir = root_out_dir
 }
