@@ -50,7 +50,7 @@ static const struct test_streamer_vector test_vector_streamer_out[] = {
 
 TEST(TestShellStreamerStdio, TestStreamer_Output)
 {
-    int numOfTestVectors = ArraySize(test_vector_streamer_out);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(test_vector_streamer_out);
     int numOfTestsRan    = 0;
     const struct test_streamer_vector * test_params;
 

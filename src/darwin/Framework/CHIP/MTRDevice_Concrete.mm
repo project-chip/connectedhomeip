@@ -708,8 +708,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     mtr_weakify(self);
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (nextUpdateInSeconds * NSEC_PER_SEC)), self.queue, ^{
-        MTR_LOG_DEBUG("%@ Timer expired, start Device Time Update", self);
         mtr_strongify(self);
+        MTR_LOG_DEBUG("%@ Timer expired, start Device Time Update", self);
         if (self) {
             [self _performScheduledTimeUpdate];
         } else {
@@ -1072,6 +1072,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // The subscription reattempt here eventually asyncs onto the matter queue for session,
     // and should be called after the above ReleaseSession call, to avoid churn.
     if (shouldReattemptSubscription) {
+        std::lock_guard lock(_lock);
         [self _reattemptSubscriptionNowIfNeededWithReason:reason];
     }
 }
@@ -2887,6 +2888,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                    [matterCPPObjectsHolder setReadClient:nullptr subscriptionCallback:nullptr];
 
                                    // OnDone
+                                   std::lock_guard lock(self->_lock);
                                    [self _doHandleSubscriptionReset:nil];
                                },
                                ^(void) {
@@ -3657,8 +3659,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     for (NSArray<MTRCommandWithRequiredResponse *> * commandGroup in [commands reverseObjectEnumerator]) {
         // We want to invoke all the commands in the group in order, propagating along the list of
         // current responses.  Build up that linked list of command invokes via chaining the completions.
+        mtr_weakify(self);
         for (MTRCommandWithRequiredResponse * command in [commandGroup reverseObjectEnumerator]) {
             auto commandInvokeBlock = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * previousResponses) {
+                mtr_strongify(self);
+                VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands commandInvokeBlock called back with nil MTRDevice"));
+
                 [self invokeCommandWithEndpointID:command.path.endpoint
                                         clusterID:command.path.cluster
                                         commandID:command.path.command
@@ -3667,6 +3673,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                             expectedValueInterval:nil
                                             queue:self.queue
                                        completion:^(NSArray<NSDictionary<NSString *, id> *> * responses, NSError * error) {
+                                           mtr_strongify(self);
+                                           VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands invokeCommandWithEndpointID completion called back with nil MTRDevice"));
                                            if (error != nil) {
                                                nextCompletion(NO, [previousResponses arrayByAddingObject:@ {
                                                    MTRCommandPathKey : command.path,
@@ -3699,6 +3707,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
 
         auto commandGroupInvokeBlock = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * previousResponses) {
+            mtr_strongify(self);
+            VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands commandGroupInvokeBlock called back with nil MTRDevice"));
+
             if (allSucceededSoFar == NO) {
                 // Don't start a new command group if something failed in the
                 // previous one.  Note that we might be running on self.queue here, so make sure we

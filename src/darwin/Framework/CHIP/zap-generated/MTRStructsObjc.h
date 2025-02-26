@@ -751,6 +751,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy) NSNumber * _Nonnull nodeID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 @property (nonatomic, copy) NSNumber * _Nonnull nodeId MTR_DEPRECATED("Please use nodeID", ios(16.4, 16.4), macos(13.3, 13.3), watchos(9.4, 9.4), tvos(16.4, 16.4));
 @property (nonatomic, copy) NSString * _Nonnull label MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@property (nonatomic, copy) NSData * _Nullable vidVerificationStatement MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 @end
 
@@ -765,6 +766,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROperationalCredentialsClusterNOCStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSData * _Nonnull noc MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @property (nonatomic, copy) NSData * _Nullable icac MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) NSData * _Nullable vvsc MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
