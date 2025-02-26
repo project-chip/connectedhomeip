@@ -21,9 +21,9 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/data-model-provider/MetadataList.h> // So we can get filled buffers
 #include <app/data-model/Decode.h>
-#include <app/data-model/List.h>         // So we can encode lists
-#include <app/data-model/MetadataList.h> // So we can get filled buffers
+#include <app/data-model/List.h> // So we can encode lists
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Iterators.h>
 

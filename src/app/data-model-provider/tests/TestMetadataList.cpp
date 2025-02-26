@@ -22,7 +22,7 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/data-model/MetadataList.h>
+#include <app/data-model-provider/MetadataList.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>

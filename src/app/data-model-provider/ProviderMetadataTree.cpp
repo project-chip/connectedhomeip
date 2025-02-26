@@ -17,7 +17,7 @@
 
 #include <app/data-model-provider/ProviderMetadataTree.h>
 
-#include <app/data-model/MetadataList.h>
+#include <app/data-model-provider/MetadataList.h>
 
 namespace chip {
 namespace app {
