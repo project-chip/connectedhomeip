@@ -23,6 +23,7 @@
 #include "AppTask.h"
 #include <FreeRTOS.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <support/CodeUtils.h>
 
 using namespace chip;
 using BeeConfig = chip::DeviceLayer::Internal::BeeConfig;
@@ -71,13 +72,13 @@ bool BoltLockManager::ReadConfigValues()
 {
     size_t outLen;
     BeeConfig::ReadConfigValueBin(BeeConfig::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(mUsers),
-                                  sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mUsers), outLen);
+                                  sizeof(EmberAfPluginDoorLockUserInfo) * MATTER_ARRAY_SIZE(mUsers), outLen);
 
     BeeConfig::ReadConfigValueBin(BeeConfig::kConfigKey_LockUserData, reinterpret_cast<uint8_t *>(mUserData),
-                                  sizeof(UserData) * ArraySize(mUserData), outLen);
+                                  sizeof(UserData) * MATTER_ARRAY_SIZE(mUserData), outLen);
 
     BeeConfig::ReadConfigValueBin(BeeConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(mCredentials),
-                                  sizeof(EmberAfPluginDoorLockCredentialInfo) * ArraySize(mCredentials), outLen);
+                                  sizeof(EmberAfPluginDoorLockCredentialInfo) * MATTER_ARRAY_SIZE(mCredentials), outLen);
 
     BeeConfig::ReadConfigValueBin(BeeConfig::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
                                   sizeof(mCredentialData), outLen);

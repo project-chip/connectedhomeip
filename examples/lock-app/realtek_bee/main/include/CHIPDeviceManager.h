@@ -28,15 +28,11 @@
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
-#include <platform/CHIPDeviceLayer.h>
-
 #include <lib/support/DLLUtil.h>
-
+#include <platform/CHIPDeviceLayer.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <app/util/af-types.h>
 
 namespace chip {
 namespace DeviceManager {

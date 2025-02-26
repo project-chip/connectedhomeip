@@ -53,7 +53,7 @@ class RealtekApp(Enum):
         elif self == RealtekApp.LIGHT_SWITCH:
             return 'matter-cli-mtd'
         elif self == RealtekApp.LOCK:
-            return 'matter-cli-ftd'
+            return 'matter-cli-mtd'
         elif self == RealtekApp.WINDOW:
             return 'matter-cli-mtd'
         else:

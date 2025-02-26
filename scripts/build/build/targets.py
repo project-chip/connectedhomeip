@@ -827,7 +827,7 @@ def BuildRealtekTarget():
 
     # apps
     target.AppendFixedTargets([
-        TargetPart('light', app=RealtekApp.LIGHT),
+        TargetPart('lighting', app=RealtekApp.LIGHT),
         TargetPart('light-switch', app=RealtekApp.LIGHT_SWITCH),
         TargetPart('lock', app=RealtekApp.LOCK),
         TargetPart('window', app=RealtekApp.WINDOW),

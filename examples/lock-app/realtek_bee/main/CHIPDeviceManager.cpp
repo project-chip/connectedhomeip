@@ -25,18 +25,10 @@
 #include <stdlib.h>
 
 #include "CHIPDeviceManager.h"
-#include <app/util/basic-types.h>
 #include <core/ErrorStr.h>
 #include <platform/Realtek_bee/FactoryDataProvider.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/util/af-types.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/util.h>
 
 using namespace ::chip;
 
