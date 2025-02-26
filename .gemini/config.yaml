@@ -1,6 +1,7 @@
 have_fun: false
 code_review:
-  disable: false
+  # Disabled until we have clarity/guidance at a CSA level
+  disable: true
   comment_severity_threshold: MEDIUM
   max_review_comments: -1
   pull_request_opened:
