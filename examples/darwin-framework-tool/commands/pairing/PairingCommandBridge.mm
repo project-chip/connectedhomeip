@@ -103,10 +103,8 @@ void PairingCommandBridge::MaybeDisplayTermsAndConditions(MTRCommissioningParame
     VerifyOrReturn(mUseDCL.ValueOr(false));
 
     Json::Value tc;
-    auto securityMode =
-        mDCLDisableHttps.ValueOr(false) ? tool::https::HttpsSecurityMode::kDisableHttps :
-        mDCLDisableHttpsValidation.ValueOr(false) ? tool::https::HttpsSecurityMode::kDisableValidation :
-        tool::https::HttpsSecurityMode::kDefault;
+    auto securityMode = mDCLDisableHttps.ValueOr(false) ? tool::https::HttpsSecurityMode::kDisableHttps : mDCLDisableHttpsValidation.ValueOr(false) ? tool::https::HttpsSecurityMode::kDisableValidation
+                                                                                                                                                    : tool::https::HttpsSecurityMode::kDefault;
     auto client = tool::dcl::DCLClient(mDCLHostName, mDCLPort, securityMode);
     CHIP_ERROR err = client.TermsAndConditions(mOnboardingPayload, tc);
 

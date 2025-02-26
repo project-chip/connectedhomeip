@@ -61,8 +61,8 @@ namespace tool {
             constexpr const char * kErrorDigestMismatch = "The response digest does not match the expected digest";
 
             constexpr sec_protocol_verify_t NULL_VERIFIER = ^(sec_protocol_metadata_t metadata,
-                                                              sec_trust_t trust_ref,
-                                                              sec_protocol_verify_complete_t complete) {
+                sec_trust_t trust_ref,
+                sec_protocol_verify_complete_t complete) {
                 complete(true);
             };
 
@@ -86,23 +86,22 @@ namespace tool {
                     __auto_type endpoint = nw_endpoint_create_host(hostname.c_str(), std::to_string(port).c_str());
 
                     nw_parameters_configure_protocol_block_t tls_options;
-                    switch (securityMode)
-                    {
-                        case HttpsSecurityMode::kDefault: {
-                            tls_options = NW_PARAMETERS_DEFAULT_CONFIGURATION;
-                            break;
-                        }
-                        case HttpsSecurityMode::kDisableValidation: {
-                            tls_options = ^(nw_protocol_options_t tls_options) {
-                                sec_protocol_options_t sec_options = nw_tls_copy_sec_protocol_options(tls_options);
-                                sec_protocol_options_set_verify_block(sec_options, NULL_VERIFIER, queue);
-                            };
-                            break;
-                        }
-                        case HttpsSecurityMode::kDisableHttps: {
-                            tls_options = NW_PARAMETERS_DISABLE_PROTOCOL;
-                            break;
-                        }
+                    switch (securityMode) {
+                    case HttpsSecurityMode::kDefault: {
+                        tls_options = NW_PARAMETERS_DEFAULT_CONFIGURATION;
+                        break;
+                    }
+                    case HttpsSecurityMode::kDisableValidation: {
+                        tls_options = ^(nw_protocol_options_t tls_options) {
+                            sec_protocol_options_t sec_options = nw_tls_copy_sec_protocol_options(tls_options);
+                            sec_protocol_options_set_verify_block(sec_options, NULL_VERIFIER, queue);
+                        };
+                        break;
+                    }
+                    case HttpsSecurityMode::kDisableHttps: {
+                        tls_options = NW_PARAMETERS_DISABLE_PROTOCOL;
+                        break;
+                    }
                     }
 
                     // NW_PARAMETERS_DISABLE_PROTOCOL
@@ -320,7 +319,7 @@ namespace tool {
         } // namespace
 
         CHIP_ERROR Request(std::string url, Json::Value & jsonResponse, const Optional<uint32_t> & optionalExpectedSize,
-                           const Optional<const char *> & optionalExpectedDigest, HttpsSecurityMode securityMode)
+            const Optional<const char *> & optionalExpectedDigest, HttpsSecurityMode securityMode)
         {
             std::string hostname;
             uint16_t port;
@@ -337,15 +336,15 @@ namespace tool {
 
             char const * protocol;
             switch (securityMode) {
-                case HttpsSecurityMode::kDefault:
-                    protocol = "HTTPS";
-                    break;
-                case HttpsSecurityMode::kDisableValidation:
-                    protocol = "HTTPS (no validation)";
-                    break;
-                case HttpsSecurityMode::kDisableHttps:
-                    protocol = "HTTP";
-                    break;
+            case HttpsSecurityMode::kDefault:
+                protocol = "HTTPS";
+                break;
+            case HttpsSecurityMode::kDisableValidation:
+                protocol = "HTTPS (no validation)";
+                break;
+            case HttpsSecurityMode::kDisableHttps:
+                protocol = "HTTP";
+                break;
             }
             ChipLogDetail(chipTool, "%s request to %s:%u%s", protocol, hostname.c_str(), port, path.c_str());
 

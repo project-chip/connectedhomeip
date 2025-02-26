@@ -159,12 +159,9 @@ CHIP_ERROR RequestTermsAndConditions(const Json::Value & json, Json::Value & tc,
 
 } // namespace
 
-DCLClient::DCLClient(Optional<const char *> hostname, Optional<uint16_t> port, https::HttpsSecurityMode httpsSecurityMode)
-    : mHostName(hostname.ValueOr(kDefaultDCLHostName)),
-      mPort(port.ValueOr(0)),
-      mHttpsSecurityMode(httpsSecurityMode)
-{
-}
+DCLClient::DCLClient(Optional<const char *> hostname, Optional<uint16_t> port, https::HttpsSecurityMode httpsSecurityMode) :
+    mHostName(hostname.ValueOr(kDefaultDCLHostName)), mPort(port.ValueOr(0)), mHttpsSecurityMode(httpsSecurityMode)
+{}
 
 CHIP_ERROR DCLClient::Model(const char * onboardingPayload, Json::Value & outModel)
 {
