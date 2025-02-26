@@ -1388,7 +1388,8 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
         // Avoid extra memory allocation
         return builder.ReferenceExisting({ commands, kNetworkCommands + (hasCred ? kCredentialsCommands : 0) });
     }
-    else if (hasCred)
+
+    if (hasCred)
     { // Skip the network commands send the rest
         return builder.ReferenceExisting({ commands + kNetworkCommands, kCredentialsCommands });
     }
