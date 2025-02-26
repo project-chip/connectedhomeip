@@ -1787,9 +1787,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     XCTAssertNotNil([dataStore findResumptionInfoByNodeID:deviceID]);
     XCTAssertNotNil([dataStore getStoredDeviceDataForNodeID:deviceID]);
     XCTAssertNotNil([dataStore getStoredClusterDataForNodeID:deviceID]);
-    __auto_type * nodesWithStoredData = [controller nodesWithStoredData];
+    __auto_type * nodesWithStoredData = controller.nodesWithStoredData;
     XCTAssertTrue([nodesWithStoredData containsObject:deviceID]);
-    XCTAssertEqualObjects(nodesWithStoredData, [dataStore nodesWithStoredData]);
+    XCTAssertEqualObjects(nodesWithStoredData, dataStore.nodesWithStoredData);
     XCTAssertEqualObjects(nodesWithStoredData, deviceAttributeCounts.allKeys);
 
     [controller forgetDeviceWithNodeID:deviceID];
@@ -1798,9 +1798,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     XCTAssertNil([dataStore findResumptionInfoByNodeID:deviceID]);
     XCTAssertNil([dataStore getStoredDeviceDataForNodeID:deviceID]);
     XCTAssertNil([dataStore getStoredClusterDataForNodeID:deviceID]);
-    nodesWithStoredData = [controller nodesWithStoredData];
+    nodesWithStoredData = controller.nodesWithStoredData;
     XCTAssertFalse([nodesWithStoredData containsObject:deviceID]);
-    XCTAssertEqualObjects(nodesWithStoredData, [dataStore nodesWithStoredData]);
+    XCTAssertEqualObjects(nodesWithStoredData, dataStore.nodesWithStoredData);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
