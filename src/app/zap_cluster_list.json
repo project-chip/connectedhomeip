@@ -252,7 +252,9 @@
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
-        "PUSH_AV_STREAM_TRANSPORT_CLUSTER": [],
+        "PUSH_AV_STREAM_TRANSPORT_CLUSTER": [
+            "push-av-stream-transport-server"
+        ],
         "SAMPLE_MEI_CLUSTER": ["sample-mei-server"],
         "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
         "ON_OFF_CLUSTER": ["on-off-server"],
