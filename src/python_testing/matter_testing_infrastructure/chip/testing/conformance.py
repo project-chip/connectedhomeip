@@ -113,6 +113,10 @@ def is_disallowed(conformance: Callable):
     return conformance(0, [], []).decision == ConformanceDecision.DISALLOWED
 
 
+def is_provisional(conformance: Callable):
+    return conformance(0, [], []).decision == ConformanceDecision.PROVISIONAL
+
+
 @dataclass
 class Conformance(Callable):
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
@@ -182,7 +186,7 @@ class provisional(Conformance):
 
 class literal(Conformance):
     def __init__(self, value: str):
-        self.value = int(value)
+        self.value = int(value, 0)
 
     def __call__(self):
         # This should never be called
