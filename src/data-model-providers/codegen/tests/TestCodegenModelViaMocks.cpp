@@ -218,6 +218,44 @@ public:
     bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return true; }
 };
 
+class MockCommandHandler : public CommandHandler
+{
+public:
+    CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath,
+                                 const Protocols::InteractionModel::ClusterStatusCode & aStatus,
+                                 const char * context = nullptr) override
+    {
+        // MOCK: do not do anything here
+        return CHIP_NO_ERROR;
+    }
+
+    void AddStatus(const ConcreteCommandPath & aRequestCommandPath, const Protocols::InteractionModel::ClusterStatusCode & aStatus,
+                   const char * context = nullptr) override
+    {
+        // MOCK: do not do anything here
+    }
+
+    FabricIndex GetAccessingFabricIndex() const override { return 1; }
+
+    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                               const DataModel::EncodableToTLV & aEncodable) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                     const DataModel::EncodableToTLV & aEncodable) override
+    {}
+
+    bool IsTimedInvoke() const override { return false; }
+
+    void FlushAcksRightAwayOnSlowCommand() override {}
+
+    Access::SubjectDescriptor GetSubjectDescriptor() const override { return kAdminSubjectDescriptor; }
+
+    Messaging::ExchangeContext * GetExchangeContext() const override { return nullptr; }
+};
+
 /// Overrides Enumerate*Commands in the CommandHandlerInterface to allow
 /// testing of behaviors when command enumeration is done in the interace.
 class CustomListCommandHandler : public CommandHandlerInterface
@@ -229,7 +267,20 @@ public:
     }
     ~CustomListCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
 
-    void InvokeCommand(HandlerContext & handlerContext) override { handlerContext.SetCommandNotHandled(); }
+    void InvokeCommand(HandlerContext & handlerContext) override
+    {
+        if (mHandleCommand)
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::Success);
+            handlerContext.SetCommandHandled();
+        }
+        else
+        {
+            handlerContext.SetCommandNotHandled();
+        }
+    }
+
+    void SetHandleCommands(bool handle) { mHandleCommand = handle; }
 
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
     {
@@ -268,6 +319,7 @@ public:
 private:
     bool mOverrideAccepted  = false;
     bool mOverrideGenerated = false;
+    bool mHandleCommand     = false;
 
     std::vector<CommandId> mAccepted;
     std::vector<CommandId> mGenerated;
@@ -285,11 +337,12 @@ private:
 
 #define MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(zcl_type) MockAttributeId(zcl_type + 0x1000)
 #define MOCK_ATTRIBUTE_CONFIG_NULLABLE(zcl_type)                                                                                   \
-    MockAttributeConfig(MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(zcl_type), zcl_type, ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE)
+    MockAttributeConfig(MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(zcl_type), zcl_type,                                                   \
+                        MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_NULLABLE)
 
 #define MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(zcl_type) MockAttributeId(zcl_type + 0x2000)
 #define MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(zcl_type)                                                                               \
-    MockAttributeConfig(MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(zcl_type), zcl_type, ATTRIBUTE_MASK_WRITABLE)
+    MockAttributeConfig(MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(zcl_type), zcl_type, MATTER_ATTRIBUTE_FLAG_WRITABLE)
 
 // clang-format off
 const MockNodeConfig gTestNodeConfig({
@@ -356,7 +409,7 @@ const MockNodeConfig gTestNodeConfig({
             MockAttributeConfig(
               kReadOnlyAttributeId,
               ZCL_INT32U_ATTRIBUTE_TYPE,
-              ATTRIBUTE_MASK_NULLABLE    // NOTE: explicltly NOT ATTRIBUTE_MASK_WRITABLE
+              MATTER_ATTRIBUTE_FLAG_NULLABLE    // NOTE: explicltly NOT MATTER_ATTRIBUTE_FLAG_WRITABLE
             )
         }),
         MockClusterConfig(MockClusterId(4), {
@@ -512,7 +565,7 @@ const MockNodeConfig gTestNodeConfig({
 
             // Special case handling
             MockAttributeConfig(kAttributeIdReadOnly, ZCL_INT32S_ATTRIBUTE_TYPE, 0),
-            MockAttributeConfig(kAttributeIdTimedWrite, ZCL_INT32S_ATTRIBUTE_TYPE, ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_MUST_USE_TIMED_WRITE),
+            MockAttributeConfig(kAttributeIdTimedWrite, ZCL_INT32S_ATTRIBUTE_TYPE, MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE),
         }),
     }),
 });
@@ -1021,7 +1074,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAttributes)
 
     EXPECT_EQ(model.Attributes(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)), builder), CHIP_NO_ERROR);
     auto attributes = builder.TakeBuffer();
-    ASSERT_EQ(attributes.size(), 4u);
+    ASSERT_EQ(attributes.size(), 7u);
 
     ASSERT_EQ(attributes[0].attributeId, ClusterRevision::Id);
     ASSERT_FALSE(attributes[0].flags.Has(AttributeQualityFlags::kListAttribute));
@@ -1034,6 +1087,16 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAttributes)
 
     ASSERT_EQ(attributes[3].attributeId, MockAttributeId(2));
     ASSERT_TRUE(attributes[3].flags.Has(AttributeQualityFlags::kListAttribute));
+
+    // Ends with global list attributes
+    ASSERT_EQ(attributes[4].attributeId, GeneratedCommandList::Id);
+    ASSERT_TRUE(attributes[4].flags.Has(AttributeQualityFlags::kListAttribute));
+
+    ASSERT_EQ(attributes[5].attributeId, AcceptedCommandList::Id);
+    ASSERT_TRUE(attributes[5].flags.Has(AttributeQualityFlags::kListAttribute));
+
+    ASSERT_EQ(attributes[6].attributeId, AttributeList::Id);
+    ASSERT_TRUE(attributes[6].flags.Has(AttributeQualityFlags::kListAttribute));
 }
 
 TEST_F(TestCodegenModelViaMocks, FindAttribute)
@@ -1075,7 +1138,7 @@ TEST_F(TestCodegenModelViaMocks, FindAttribute)
     EXPECT_FALSE(info->writePrivilege.has_value());                       // NOLINT(bugprone-unchecked-optional-access)
 }
 
-// global attributes are EXPLICITLY not supported
+// global attributes are EXPLICITLY supported
 TEST_F(TestCodegenModelViaMocks, GlobalAttributeInfo)
 {
     UseMockNodeConfig config(gTestNodeConfig);
@@ -1086,10 +1149,14 @@ TEST_F(TestCodegenModelViaMocks, GlobalAttributeInfo)
     std::optional<AttributeEntry> info = finder.Find(
         ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id));
 
-    ASSERT_FALSE(info.has_value());
+    ASSERT_TRUE(info.has_value());
 
     info = finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id));
-    ASSERT_FALSE(info.has_value());
+    ASSERT_TRUE(info.has_value());
+
+    info = finder.Find(
+        ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AcceptedCommandList::Id));
+    ASSERT_TRUE(info.has_value());
 }
 
 TEST_F(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
@@ -1154,6 +1221,37 @@ TEST_F(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
     cmds                                = builder.TakeBuffer();
     const CommandId expectedCommands3[] = { 4, 6 };
     ASSERT_TRUE(cmds.data_equal(Span<const CommandId>(expectedCommands3)));
+}
+
+TEST_F(TestCodegenModelViaMocks, AcceptedGeneratedCommandsOnInvalidEndpoints)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    // register a CHI on ALL endpoints
+    CustomListCommandHandler handler(chip::NullOptional, MockClusterId(1));
+    handler.SetHandleCommands(true);
+
+    DataModel::ListBuilder<CommandId> generatedBuilder;
+    DataModel::ListBuilder<DataModel::AcceptedCommandEntry> acceptedBuilder;
+
+    // valid endpoint will result in valid data (even though list is empty)
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), generatedBuilder), CHIP_NO_ERROR);
+    ASSERT_TRUE(generatedBuilder.IsEmpty());
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), acceptedBuilder), CHIP_NO_ERROR);
+    ASSERT_TRUE(acceptedBuilder.IsEmpty());
+
+    // Invalid endpoint fails - we will get no commands there (even though CHI is registered)
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1)), generatedBuilder),
+              CHIP_ERROR_NOT_FOUND);
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1)), acceptedBuilder),
+              CHIP_ERROR_NOT_FOUND);
+
+    // same for invalid cluster ID
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(0x1123)), generatedBuilder),
+              CHIP_ERROR_NOT_FOUND);
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(0x1123)), acceptedBuilder),
+              CHIP_ERROR_NOT_FOUND);
 }
 
 TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
@@ -1822,85 +1920,6 @@ TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceListIncrementalRead)
     }
 }
 
-TEST_F(TestCodegenModelViaMocks, ReadGlobalAttributeAttributeList)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    ReadOperation testRequest(kMockEndpoint2, MockClusterId(3), AttributeList::Id);
-    testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-    // Data read via the encoder
-    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
-    ASSERT_EQ(model.ReadAttribute(testRequest.GetRequest(), *encoder), CHIP_NO_ERROR);
-    ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
-
-    // Validate after read
-    std::vector<DecodedAttributeData> attribute_data;
-    ASSERT_EQ(testRequest.GetEncodedIBs().Decode(attribute_data), CHIP_NO_ERROR);
-    ASSERT_EQ(attribute_data.size(), 1u);
-
-    DecodedAttributeData & encodedData = attribute_data[0];
-    ASSERT_EQ(encodedData.attributePath, testRequest.GetRequest().path);
-
-    ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_Array);
-
-    std::vector<AttributeId> items;
-    ASSERT_EQ(DecodeList(encodedData.dataReader, items), CHIP_NO_ERROR);
-
-    // Mock data contains ClusterRevision and FeatureMap.
-    // After this, Global attributes are auto-added
-    std::vector<AttributeId> expected;
-
-    // Encoding in global-attribute-access-interface has a logic of:
-    //   - Append global attributes in front of the first specified
-    //     large number global attribute.
-    // Since ClusterRevision and FeatureMap are
-    // global attributes, the order here is reversed for them
-    for (AttributeId id : GlobalAttributesNotInMetadata)
-    {
-        expected.push_back(id);
-    }
-    expected.push_back(ClusterRevision::Id);
-    expected.push_back(FeatureMap::Id);
-    expected.push_back(MockAttributeId(1));
-    expected.push_back(MockAttributeId(2));
-    expected.push_back(MockAttributeId(3));
-
-    ASSERT_EQ(items.size(), expected.size());
-
-    // Since we have no std::vector formatter, comparing element by element is somewhat
-    // more readable in case of failure.
-    for (unsigned i = 0; i < items.size(); i++)
-    {
-        EXPECT_EQ(items[i], expected[i]);
-    }
-}
-
-TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteAclDeny)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    /* Using this path is also failing existence checks, so this cannot be enabled
-     * until we fix ordering of ACL to be done before existence checks
-
-      WriteOperation test(kMockEndpoint1, MockClusterId(1), MockAttributeId(10));
-      AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
-
-      ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::UnsupportedAccess);
-      ASSERT_TRUE(model.ChangeListener().DirtyList().empty());
-    */
-
-    WriteOperation test(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_INT32U_ATTRIBUTE_TYPE));
-    AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
-
-    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::UnsupportedAccess);
-    ASSERT_TRUE(model.ChangeListener().DirtyList().empty());
-}
-
 TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteBasicTypes)
 {
     TestEmberScalarTypeWrite<uint8_t, ZCL_INT8U_ATTRIBUTE_TYPE>(0x12);
@@ -2179,42 +2198,6 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteLongBytes)
     EXPECT_EQ(writtenData[2], 11u);
     EXPECT_EQ(writtenData[3], 12u);
     EXPECT_EQ(writtenData[4], 13u);
-}
-
-TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteTimedWrite)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    WriteOperation test(kMockEndpoint3, MockClusterId(4), kAttributeIdTimedWrite);
-    test.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-    AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
-
-    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::NeedsTimedInteraction);
-
-    // writing as timed should be fine
-    test.SetWriteFlags(WriteFlags::kTimed);
-    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_NO_ERROR);
-}
-
-TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteReadOnlyAttribute)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    WriteOperation test(kMockEndpoint3, MockClusterId(4), kAttributeIdReadOnly);
-    test.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-    AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
-
-    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::UnsupportedWrite);
-
-    // Internal writes bypass the read only requirement
-    test.SetOperationFlags(OperationFlags::kInternal);
-    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_NO_ERROR);
 }
 
 TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteDataVersion)

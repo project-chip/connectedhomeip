@@ -18,13 +18,17 @@
 
 #include "HTTPSRequest.h"
 
+#if CHIP_HAVE_CONFIG_H
 #include <crypto/CryptoBuildConfig.h>
+#endif // CHIP_HAVE_CONFIG_H
+
 #include <lib/support/Base64.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemError.h>
 
+#ifdef CONFIG_ENABLE_HTTPS_REQUESTS
 #if (CHIP_CRYPTO_OPENSSL || CHIP_CRYPTO_BORINGSSL)
 #include <netdb.h>
 #include <openssl/ssl.h>
@@ -33,6 +37,7 @@
 #define USE_CHIP_CRYPTO 1
 #endif
 #endif //(CHIP_CRYPTO_OPENSSL || CHIP_CRYPTO_BORINGSSL)
+#endif // CONFIG_ENABLE_HTTPS_REQUESTS
 
 namespace {
 constexpr const char * kHttpsPrefix        = "https://";
@@ -59,7 +64,7 @@ namespace {
 class HTTPSSessionHolder
 {
 public:
-    CHIP_ERROR Init(std::string & hostname, uint16_t port) { return LogNotImplementedError(); }
+    CHIP_ERROR Init(std::string & hostname, uint16_t port, HttpsSecurityMode securityMode) { return LogNotImplementedError(); }
 
     CHIP_ERROR SendRequest(std::string & request) { return LogNotImplementedError(); }
 
@@ -68,9 +73,18 @@ public:
 private:
     CHIP_ERROR LogNotImplementedError() const
     {
+#ifndef CONFIG_ENABLE_HTTPS_REQUESTS
+        ChipLogError(chipTool, "HTTPS requests are disabled via build configuration (config_enable_https_requests=false).");
+#elif !(CHIP_CRYPTO_OPENSSL || CHIP_CRYPTO_BORINGSSL)
         ChipLogError(chipTool,
                      "HTTPS requests are not available because neither OpenSSL nor BoringSSL is enabled. Contributions for "
                      "alternative implementations are welcome!");
+#elif !defined(SHA256_DIGEST_LENGTH)
+        ChipLogError(chipTool,
+                     "HTTPS requests are not available because SHA256_DIGEST_LENGTH is not defined, meaning response integrity "
+                     "verification via SHA-256 digest checking cannot be performed.");
+#endif
+
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 };
@@ -83,6 +97,38 @@ constexpr const char * kErrorSSLContextCreate    = "Failed to create SSL context
 constexpr const char * kErrorSSLObjectCreate     = "Failed to create SSL object";
 constexpr const char * kErrorSSLHandshake        = "SSL handshake failed";
 constexpr const char * kErrorDigestMismatch      = "The response digest does not match the expected digest";
+class AddressInfoHolder
+{
+public:
+    AddressInfoHolder(std::string & hostname, uint16_t port)
+    {
+        struct addrinfo hints                       = {};
+        hints.ai_family                             = AF_INET;
+        hints.ai_socktype                           = SOCK_STREAM;
+        int err                                     = getaddrinfo(hostname.c_str(), std::to_string(port).c_str(), &hints, &mRes);
+#if CHIP_ERROR_LOGGING
+        constexpr const char * kErrorGetAddressInfo = "Failed to get address info: ";
+        VerifyOrDo(nullptr != mRes, ChipLogError(chipTool, "%s%s", kErrorGetAddressInfo, gai_strerror(err)));
+#else
+        (void) err;
+#endif
+    }
+
+    ~AddressInfoHolder()
+    {
+        if (mRes != nullptr)
+        {
+            freeaddrinfo(mRes);
+        }
+    }
+
+    bool HasInfo() const { return mRes != nullptr; }
+    struct addrinfo * Get() const { return mRes; }
+
+private:
+    struct addrinfo * mRes = nullptr;
+};
+
 class HTTPSSessionHolder
 {
 public:
@@ -90,19 +136,26 @@ public:
 
     ~HTTPSSessionHolder()
     {
-        VerifyOrReturn(nullptr != mContext);
-        SSL_free(mSSL);
-        SSL_CTX_free(mContext);
-        close(mSock);
+        if (nullptr != mContext)
+        {
+            SSL_free(mSSL);
+            SSL_CTX_free(mContext);
+        }
+
+        if (mSock >= 0)
+        {
+            close(mSock);
+        }
 
 #if !defined(OPENSSL_IS_BORINGSSL)
         EVP_cleanup();
 #endif
     }
 
-    CHIP_ERROR Init(std::string & hostname, uint16_t port)
+    CHIP_ERROR Init(std::string & hostname, uint16_t port, HttpsSecurityMode securityMode)
     {
         int sock;
+        VerifyOrReturnError(securityMode == HttpsSecurityMode::kDefault, CHIP_ERROR_NOT_IMPLEMENTED);
         ReturnErrorOnFailure(InitSocket(hostname, port, sock));
         ReturnErrorOnFailure(InitSSL(sock));
         return CHIP_NO_ERROR;
@@ -134,23 +187,30 @@ public:
 private:
     CHIP_ERROR InitSocket(std::string & hostname, uint16_t port, int & sock)
     {
-        auto * server = gethostbyname(hostname.c_str());
-        VerifyOrReturnError(nullptr != server, CHIP_ERROR_NOT_CONNECTED);
+        AddressInfoHolder addressInfoHolder(hostname, port);
+        VerifyOrReturnError(addressInfoHolder.HasInfo(), CHIP_ERROR_NOT_CONNECTED);
 
-        sock = socket(AF_INET, SOCK_STREAM, 0);
-        VerifyOrReturnError(sock >= 0, CHIP_ERROR_NOT_CONNECTED);
+        auto * res = addressInfoHolder.Get();
+        for (struct addrinfo * p = res; p != nullptr; p = p->ai_next)
+        {
+            sock = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+            if (sock < 0)
+            {
+                continue; // Try the next address
+            }
 
-        struct sockaddr_in server_addr;
-        memset(&server_addr, 0, sizeof(server_addr));
-        server_addr.sin_family = AF_INET;
-        server_addr.sin_port   = htons(port);
-        memcpy(&server_addr.sin_addr.s_addr, server->h_addr, (size_t) server->h_length);
+            if (connect(sock, p->ai_addr, p->ai_addrlen) != 0)
+            {
+                close(sock);
+                sock = -1;
+                continue; // Try the next address
+            }
 
-        int rv = connect(sock, (struct sockaddr *) &server_addr, sizeof(server_addr));
-        VerifyOrReturnError(rv >= 0, CHIP_ERROR_POSIX(errno),
-                            ChipLogError(chipTool, "%s%s:%u", kErrorConnection, hostname.c_str(), port));
+            return CHIP_NO_ERROR;
+        }
 
-        return CHIP_NO_ERROR;
+        ChipLogError(chipTool, "%s%s:%u", kErrorConnection, hostname.c_str(), port);
+        return CHIP_ERROR_NOT_CONNECTED;
     }
 
     CHIP_ERROR InitSSL(int sock)
@@ -304,17 +364,18 @@ CHIP_ERROR ExtractHostNamePortPath(std::string url, std::string & outHostName, u
 } // namespace
 
 CHIP_ERROR Request(std::string url, Json::Value & jsonResponse, const Optional<uint32_t> & optionalExpectedSize,
-                   const Optional<const char *> & optionalExpectedDigest)
+                   const Optional<const char *> & optionalExpectedDigest, HttpsSecurityMode securityMode)
 {
     std::string hostname;
     uint16_t port;
     std::string path;
     ReturnErrorOnFailure(ExtractHostNamePortPath(url, hostname, port, path));
-    return Request(hostname, port, path, jsonResponse, optionalExpectedSize, optionalExpectedDigest);
+    return Request(hostname, port, path, jsonResponse, optionalExpectedSize, optionalExpectedDigest, securityMode);
 }
 
 CHIP_ERROR Request(std::string hostname, uint16_t port, std::string path, Json::Value & jsonResponse,
-                   const Optional<uint32_t> & optionalExpectedSize, const Optional<const char *> & optionalExpectedDigest)
+                   const Optional<uint32_t> & optionalExpectedSize, const Optional<const char *> & optionalExpectedDigest,
+                   HttpsSecurityMode securityMode)
 {
     VerifyOrDo(port != 0, port = kHttpsPort);
 
@@ -324,7 +385,7 @@ CHIP_ERROR Request(std::string hostname, uint16_t port, std::string path, Json::
     std::string response;
 
     HTTPSSessionHolder session;
-    ReturnErrorOnFailure(session.Init(hostname, port));
+    ReturnErrorOnFailure(session.Init(hostname, port, securityMode));
     ReturnErrorOnFailure(session.SendRequest(request));
     ReturnErrorOnFailure(session.ReceiveResponse(response));
     ReturnErrorOnFailure(RemoveHeader(response));

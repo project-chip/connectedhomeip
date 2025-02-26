@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 103,
+  "featureLevel": 106,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -41,14 +41,16 @@
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
-        "name": "MA-rootdevice"
+        "name": "MA-rootdevice",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice"
+          "name": "MA-rootdevice",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -4369,10 +4371,10 @@
               "side": "server",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x0000",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -4405,14 +4407,16 @@
         "code": 259,
         "profileId": 259,
         "label": "MA-onofflightswitch",
-        "name": "MA-onofflightswitch"
+        "name": "MA-onofflightswitch",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 259,
           "profileId": 259,
           "label": "MA-onofflightswitch",
-          "name": "MA-onofflightswitch"
+          "name": "MA-onofflightswitch",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -5175,14 +5179,16 @@
         "code": 15,
         "profileId": 259,
         "label": "MA-genericswitch",
-        "name": "MA-genericswitch"
+        "name": "MA-genericswitch",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 15,
           "profileId": 259,
           "label": "MA-genericswitch",
-          "name": "MA-genericswitch"
+          "name": "MA-genericswitch",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [

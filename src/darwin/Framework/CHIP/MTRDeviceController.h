@@ -22,6 +22,7 @@
 #import <Matter/MTROperationalCertificateIssuer.h>
 
 @class MTRBaseDevice;
+@class MTRDevice;
 @class MTRServerEndpoint; // Defined in MTRServerEndpoint.h, which imports MTRAccessGrant.h, which imports MTRBaseClusters.h, which imports this file, so we can't import it.
 
 @class MTRDeviceControllerAbstractParameters;
@@ -81,6 +82,12 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  */
 @property (readonly, nonatomic, nullable)
     NSNumber * controllerNodeID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Returns the list of MTRDevice instances that this controller has loaded
+ * into memory. Returns an empty array if no devices are in memory.
+ */
+@property (readonly, nonatomic) NSArray<MTRDevice *> * devices MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 /**
  * Set up a commissioning session for a device, using the provided setup payload
@@ -308,6 +315,13 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * there does not need to be a resume call to match every suspend call.
  */
 - (void)resume MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
+
+/**
+ * Returns the list of node IDs for which this controller has stored
+ * information.  Returns empty list if the controller does not have any
+ * information stored.
+ */
+@property (readonly, nonatomic) NSArray<NSNumber *> * nodesWithStoredData MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 /**
  * Shut down the controller. Calls to shutdown after the first one are NO-OPs.

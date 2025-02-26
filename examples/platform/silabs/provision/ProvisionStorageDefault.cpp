@@ -14,9 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "AttestationKey.h"
-#include "ProvisionStorage.h"
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <headers/AttestationKey.h>
+#include <headers/ProvisionStorage.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
@@ -25,7 +25,6 @@
 #include <nvm3_default.h>
 #include <nvm3_hal_flash.h>
 #include <platform/CHIPDeviceConfig.h>
-#include <platform/silabs/MigrationManager.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <silabs_creds.h>
@@ -34,9 +33,9 @@
 #include <sl_matter_test_event_trigger_config.h>
 #endif // defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && (SL_MATTER_GN_BUILD == 0)
 #endif // NDEBUG
-#ifdef OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
-#endif // OTA_ENCRYPTION_ENABLE
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 #ifndef SLI_SI91X_MCU_INTERFACE
 #include <psa/crypto.h>
 #endif
@@ -474,7 +473,7 @@ CHIP_ERROR Storage::GetCertificationDeclaration(MutableByteSpan & value)
         err = ReadFileByOffset(*this, "GetDeviceAttestationCert", SL_CREDENTIALS_CD_OFFSET, SL_CREDENTIALS_CD_SIZE, value);
     }
 #endif
-#ifdef CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#ifdef SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     if (CHIP_ERROR_NOT_FOUND == err)
     {
         // Example CD
@@ -502,7 +501,7 @@ CHIP_ERROR Storage::GetProductAttestationIntermediateCert(MutableByteSpan & valu
         err = ReadFileByOffset(*this, "GetDeviceAttestationCert", SL_CREDENTIALS_PAI_OFFSET, SL_CREDENTIALS_PAI_SIZE, value);
     }
 #endif
-#ifdef CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#ifdef SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     if (CHIP_ERROR_NOT_FOUND == err)
     {
         // Example PAI
@@ -530,7 +529,7 @@ CHIP_ERROR Storage::GetDeviceAttestationCert(MutableByteSpan & value)
         err = ReadFileByOffset(*this, "GetDeviceAttestationCert", SL_CREDENTIALS_DAC_OFFSET, SL_CREDENTIALS_DAC_SIZE, value);
     }
 #endif
-#ifdef CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#ifdef SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     if (CHIP_ERROR_NOT_FOUND == err)
     {
         // Example DAC
@@ -569,7 +568,7 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
     }
     else
     {
-#ifdef CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#ifdef SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
         // Example DAC key
         return Examples::GetExampleDACProvider()->SignWithDeviceAttestationKey(message, signature);
 #else
@@ -605,7 +604,7 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
         AttestationKey key(kid);
         err = key.SignMessage(message, signature);
     }
-#ifdef CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#ifdef SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     else
     {
         // Example DAC key
@@ -663,23 +662,18 @@ CHIP_ERROR Storage::GetProvisionRequest(bool & value)
     return SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_Provision_Request, value);
 }
 
-#if OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
 CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
 {
     chip::DeviceLayer::Silabs::OtaTlvEncryptionKey::OtaTlvEncryptionKey key;
     ReturnErrorOnFailure(key.Import(value.data(), value.size()));
     return SilabsConfig::WriteConfigValue(SilabsConfig::kOtaTlvEncryption_KeyId, key.GetId());
 }
-#endif // OTA_ENCRYPTION_ENABLE
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
-/**
- * @brief Reads the test event trigger key from NVM. If the key isn't present, returns default value if defined.
- *
- * @param[out] keySpan output buffer. Must be at least large enough for 16 bytes (ken length)
- * @return CHIP_ERROR
- */
 CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 {
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
     constexpr size_t kEnableKeyLength = 16; // Expected byte size of the EnableKey
     CHIP_ERROR err                    = CHIP_NO_ERROR;
     size_t keyLength                  = 0;
@@ -689,7 +683,7 @@ CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
     err = SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_Test_Event_Trigger_Key, keySpan.data(), kEnableKeyLength,
                                            keyLength);
 #ifndef NDEBUG
-#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
 
@@ -702,36 +696,17 @@ CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
         }
         err = CHIP_NO_ERROR;
     }
-#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY
 #endif // NDEBUG
 
     keySpan.reduce_size(kEnableKeyLength);
     return err;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 }
 
 } // namespace Provision
-
-void MigrateDacProvider(void)
-{
-    constexpr uint32_t kOldKey_Creds_KeyId      = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x21);
-    constexpr uint32_t kOldKey_Creds_Base_Addr  = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x22);
-    constexpr uint32_t kOldKey_Creds_DAC_Offset = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x23);
-    constexpr uint32_t kOldKey_Creds_DAC_Size   = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x24);
-    constexpr uint32_t kOldKey_Creds_PAI_Size   = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x26);
-    constexpr uint32_t kOldKey_Creds_PAI_Offset = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x25);
-    constexpr uint32_t kOldKey_Creds_CD_Offset  = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x27);
-    constexpr uint32_t kOldKey_Creds_CD_Size    = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x28);
-
-    MigrationManager::MigrateUint32(kOldKey_Creds_KeyId, SilabsConfig::kConfigKey_Creds_KeyId);
-    MigrationManager::MigrateUint32(kOldKey_Creds_Base_Addr, SilabsConfig::kConfigKey_Creds_Base_Addr);
-    MigrationManager::MigrateUint32(kOldKey_Creds_DAC_Offset, SilabsConfig::kConfigKey_Creds_DAC_Offset);
-    MigrationManager::MigrateUint32(kOldKey_Creds_DAC_Size, SilabsConfig::kConfigKey_Creds_DAC_Size);
-    MigrationManager::MigrateUint32(kOldKey_Creds_PAI_Offset, SilabsConfig::kConfigKey_Creds_PAI_Offset);
-    MigrationManager::MigrateUint32(kOldKey_Creds_PAI_Size, SilabsConfig::kConfigKey_Creds_PAI_Size);
-    MigrationManager::MigrateUint32(kOldKey_Creds_CD_Offset, SilabsConfig::kConfigKey_Creds_CD_Offset);
-    MigrationManager::MigrateUint32(kOldKey_Creds_CD_Size, SilabsConfig::kConfigKey_Creds_CD_Size);
-}
-
 } // namespace Silabs
 } // namespace DeviceLayer
 } // namespace chip

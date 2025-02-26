@@ -79,8 +79,7 @@ def BuildHostFakeTarget():
         "-clang").ExceptIfRe('-libfuzzer')
     target.AppendModifier("pw-fuzztest", fuzzing_type=HostFuzzingType.PW_FUZZTEST).OnlyIfRe(
         "-clang").ExceptIfRe('-(libfuzzer|ossfuzz|asan)')
-    target.AppendModifier('coverage', use_coverage=True).OnlyIfRe(
-        '-(chip-tool|all-clusters)')
+    target.AppendModifier('coverage', use_coverage=True)
     target.AppendModifier('dmalloc', use_dmalloc=True)
     target.AppendModifier('clang', use_clang=True)
 
@@ -149,6 +148,7 @@ def BuildHostTarget():
         TargetPart('energy-management', app=HostApp.ENERGY_MANAGEMENT),
         TargetPart('water-leak-detector', app=HostApp.WATER_LEAK_DETECTOR),
         TargetPart('terms-and-conditions', app=HostApp.TERMS_AND_CONDITIONS),
+        TargetPart('camera', app=HostApp.CAMERA),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -186,8 +186,7 @@ def BuildHostTarget():
         "-clang").ExceptIfRe('-libfuzzer')
     target.AppendModifier("pw-fuzztest", fuzzing_type=HostFuzzingType.PW_FUZZTEST).OnlyIfRe(
         "-clang").ExceptIfRe('-(libfuzzer|ossfuzz|asan)')
-    target.AppendModifier('coverage', use_coverage=True).OnlyIfRe(
-        '-(chip-tool|all-clusters|tests)')
+    target.AppendModifier('coverage', use_coverage=True)
     target.AppendModifier('dmalloc', use_dmalloc=True)
     target.AppendModifier('clang', use_clang=True)
     target.AppendModifier('test', extra_tests=True)
@@ -305,8 +304,8 @@ def BuildNrfNativeTarget():
     target = BuildTarget('nrf', NrfConnectBuilder)
 
     target.AppendFixedTargets([
-        TargetPart('native-posix-64-tests',
-                   board=NrfBoard.NATIVE_POSIX_64, app=NrfApp.UNIT_TESTS),
+        TargetPart('native-sim-tests',
+                   board=NrfBoard.NATIVE_SIM, app=NrfApp.UNIT_TESTS),
     ])
 
     return target

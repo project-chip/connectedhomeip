@@ -22,7 +22,7 @@
 
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
-#if OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
 #include <platform/silabs/SilabsConfig.h>
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #endif
@@ -31,7 +31,7 @@ using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
 
-#if OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
 constexpr uint8_t au8Iv[] = { 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x00, 0x00, 0x00, 0x00 };
 #endif
 CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
@@ -66,7 +66,7 @@ void OTATlvProcessor::ClearInternal()
     mLength          = 0;
     mProcessedLength = 0;
     mWasSelected     = false;
-#if OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
     mIVOffset = 0;
 #endif
 }
@@ -105,7 +105,7 @@ CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-#if OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
 CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & block)
 {
     uint32_t keyId;

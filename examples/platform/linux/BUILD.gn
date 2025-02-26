@@ -108,13 +108,14 @@ source_set("app-main") {
     ":wifi-diagnostics-test-event-trigger",
     "${chip_root}/src/data-model-providers/codegen:instance-header",
     "${chip_root}/src/lib",
-    "${chip_root}/src/platform/logging:default",
+    "${chip_root}/src/platform/logging:stdio",
   ]
   deps = [
     ":ota-test-event-trigger",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/tests/suites/credentials:dac_provider",
+    "${chip_root}/src/setup_payload:onboarding-codes-utils",
   ]
 
   if (current_os != "nuttx") {

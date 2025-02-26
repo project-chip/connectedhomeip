@@ -23,7 +23,7 @@
 
 #include "Options.h"
 
-#include <app/server/OnboardingCodesUtil.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <json/json.h>
@@ -741,7 +741,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
                                                                          Inet::FaultInjection::GetManager,
                                                                          System::FaultInjection::GetManager };
         Platform::ScopedMemoryString mutableArg(aValue, strlen(aValue)); // ParseFaultInjectionStr may mutate
-        if (!nl::FaultInjection::ParseFaultInjectionStr(mutableArg.Get(), faultManagerFns, ArraySize(faultManagerFns)))
+        if (!nl::FaultInjection::ParseFaultInjectionStr(mutableArg.Get(), faultManagerFns, MATTER_ARRAY_SIZE(faultManagerFns)))
         {
             PrintArgError("%s: Invalid fault injection specification\n", aProgram);
             retval = false;
