@@ -70,6 +70,9 @@
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
 
+// Not declared in any header file, hence requires a forward declaration.
+extern "C" void ble_store_config_init(void);
+
 #define MAX_ADV_DATA_LEN 31
 #define CHIP_ADV_DATA_TYPE_FLAGS 0x01
 #define CHIP_ADV_DATA_FLAGS 0x06
@@ -956,6 +959,7 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
         }
     }
 
+    ble_store_config_init();
     nimble_port_freertos_init(bleprph_host_task);
 
     xSemaphoreTake(semaphoreHandle, portMAX_DELAY);
