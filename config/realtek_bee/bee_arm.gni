@@ -14,8 +14,4 @@
 
 arm_arch = "armv8.1-m.main+dsp+mve+fp"
 
-#arm_abi = "aapcs"
-#arm_cpu = "cortex-m4"
-
 arm_float_abi = "hard"
-#arm_fpu = "fpv5-sp-d16"

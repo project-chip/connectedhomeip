@@ -18,12 +18,12 @@
 
 #include "BindingHandler.h"
 #include "AppConfig.h"
-#include "app/CommandSender.h"
-#include "app/clusters/bindings/BindingManager.h"
-#include "app/server/Server.h"
-#include "controller/InvokeInteraction.h"
-#include "controller/ReadInteraction.h"
-#include "platform/CHIPDeviceLayer.h"
+#include <app/CommandSender.h>
+#include <app/clusters/bindings/BindingManager.h>
+#include <app/server/Server.h>
+#include <controller/InvokeInteraction.h>
+#include <controller/ReadInteraction.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <app/clusters/bindings/bindings.h>
 #include <lib/support/CodeUtils.h>
 
@@ -31,8 +31,8 @@ using namespace chip;
 using namespace chip::app;
 
 #if CONFIG_ENABLE_CHIP_SHELL
-#include "lib/shell/Engine.h"
-#include "lib/shell/commands/Help.h"
+#include <lib/shell/Engine.h>
+#include <lib/shell/commands/Help.h>
 
 using Shell::Engine;
 using Shell::shell_command_t;

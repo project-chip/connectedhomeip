@@ -40,16 +40,9 @@ chip_enable_nfc_onboarding_payload = false
 chip_build_libshell = false
 chip_enable_ota_requestor = false
 
-#chip_inet_config_enable_tcp_endpoint = true
-#chip_inet_config_enable_udp_endpoint = true
-#chip_system_config_use_open_thread_inet_endpoints = true
-#chip_with_lwip = false
 openthread_root = ""
 
 chip_config_network_layer_ble = true
 
 custom_toolchain =
     "//third_party/connectedhomeip/config/realtek_bee/toolchain:realtek_bee"
-#pw_build_PIP_CONSTRAINTS =
-#    [ "//third_party/connectedhomeip/scripts/setup/constraints.txt" ]
-#cpp_standard = "c++17"
