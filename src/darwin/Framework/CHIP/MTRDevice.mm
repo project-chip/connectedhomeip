@@ -133,6 +133,8 @@ MTR_DIRECT_MEMBERS
     // TODO: retain cycle and clean up https://github.com/project-chip/connectedhomeip/issues/34267
     MTR_LOG("MTRDevice dealloc: %p", self);
 
+    [_deviceController deviceDeallocated];
+
     // Locking because _cancelAllAttributeValueWaiters has os_unfair_lock_assert_owner(&_lock)
     std::lock_guard lock(_lock);
     [self _cancelAllAttributeValueWaiters];

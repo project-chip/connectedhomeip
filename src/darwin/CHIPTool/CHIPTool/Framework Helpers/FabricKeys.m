@@ -227,7 +227,7 @@ static const NSString * MTRCAKeyChainLabel = @"matter-tool.nodeopcerts.CA:0";
         return nil;
     }
 
-    return (__bridge_transfer NSData *) outData;
+    return (__bridge_transfer NSData *) cfData;
 }
 
 - (void)dealloc
