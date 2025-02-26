@@ -56,6 +56,8 @@ class TC_CGEN_2_2(MatterBaseTest):
     cluster_opcreds = Clusters.OperationalCredentials
     cluster_cgen = Clusters.GeneralCommissioning
 
+    CERT_FAILSAFE_EXPIRATION_TIME_SECONDS = 1
+
     async def set_failsafe_timer(self, dev_ctrl, node_id, expiration_time_seconds):
         '''
         Triggering the failsafe expiry to clean up resources like fabric tables, NOCs (Node Operational Credentials),
@@ -290,11 +292,6 @@ class TC_CGEN_2_2(MatterBaseTest):
     @async_test_body
     async def test_TC_CGEN_2_2(self):
 
-        # PIXIT.CGEN.FailsafeExpiryLengthSeconds:
-        # Timeout used in test steps to verify failsafe. Must be less than DUT MaxCumulativeFailsafeSeconds
-        failsafe_expiration_seconds = self.matter_test_config.global_test_params['PIXIT.CGEN.FailsafeExpiryLengthSeconds']
-        logger.info(f'Value of PIXIT.CGEN.FailsafeExpiryLengthSeconds: {failsafe_expiration_seconds}')
-
         self.step(0)
 
         # Read the Steps
@@ -313,6 +310,18 @@ class TC_CGEN_2_2(MatterBaseTest):
             attribute=self.cluster_cgen.Attributes.BasicCommissioningInfo)
         maxFailsafe = basic_commissioning_info.maxCumulativeFailsafeSeconds
         logger.info(f'Step #2: The MaxCumulativeFailsafeSeconds (max_fail_safe): {maxFailsafe}')
+
+        if self.is_pics_sdk_ci_only:
+            run_type = "CI Test"
+            failsafe_expiration_seconds = self.matter_test_config.global_test_params['PIXIT.CGEN.FailsafeExpiryLengthSeconds']
+        else:
+            run_type = "Cert Test"
+            failsafe_expiration_seconds = self.CERT_FAILSAFE_EXPIRATION_TIME_SECONDS
+
+        # Timeout used in test steps to verify failsafe. Must be less than DUT MaxCumulativeFailsafeSeconds
+        asserts.assert_less(failsafe_expiration_seconds, maxFailsafe,
+                            "failsafe_expiration_seconds should be less than MaxCumulativeFailsafeSeconds.")
+        logger.info(f'Step #2: {run_type} - Value of FailsafeExpiryLengthSeconds: {failsafe_expiration_seconds}')
 
         # TH1 steps #3 through #5 using the function run_steps_3_to_5
         self.step('3-5')
@@ -353,17 +362,17 @@ class TC_CGEN_2_2(MatterBaseTest):
                 node_id=self.dut_node_id,
                 expiration_time_seconds=failsafe_expiration_seconds)
             logger.info(
-                f'Step #7 {run_type} - Failsafe timer expiration bypassed for TH1 by setting expiration time to {failsafe_expiration_seconds} seconds. '
+                f'Step #7: {run_type} - Failsafe timer expiration bypassed for TH1 by setting expiration time to {failsafe_expiration_seconds} seconds. '
                 f'Test continues without the original wait.'
             )
         else:
             # Running identifier
             run_type = "Cert Test"
-            # PIXIT.CGEN.FailsafeExpiryLengthSeconds, adjusted to avoid long waits
+            # # FAILSAFE_EXPIRATION_SECONDS constant, adjusted to avoid long waits
             logger.info(
-                f'Step #7: {run_type} - Waiting for Failsafe timer to expire for PIXIT.CGEN.FailsafeExpiryLengthSeconds: {failsafe_expiration_seconds} seconds...')
+                f'Step #7: {run_type} - Waiting for Failsafe timer to expire for FAILSAFE_EXPIRATION_SECONDS constant: {failsafe_expiration_seconds} seconds...')
 
-            # Wait for the full duration of the PIXIT.CGEN.FailsafeExpiryLengthSeconds time with an additional 0.5-second buffer
+            # Wait for the full duration of the FAILSAFE_EXPIRATION_SECONDS constant time with an additional 0.5-second buffer
             await asyncio.sleep(failsafe_expiration_seconds + .5)
 
         # TH1 steps #8 through #9 using the function run_steps_8_to_9
@@ -645,8 +654,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         logger.info(f'Step #32: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
 
         self.step(33)
-
-        # Set the failsafe expiration timeout to PIXIT.CGEN.FailsafeExpiryLengthSeconds seconds, must be less than maxFailsafe (max_fail_safe).
+        # Set the failsafe expiration timeout to PIXIT.CGEN.FailsafeExpiryLengthSeconds seconds fpr CI or FAILSAFE_EXPIRATION_SECONDS constant for Cert, must be less than maxFailsafe (max_fail_safe).
         failsafe_timeout_less_than_max = failsafe_expiration_seconds
         # Verify that failsafe_timeout_less_than_max is less than max_fail_safe
         asserts.assert_less(failsafe_timeout_less_than_max, maxFailsafe)
@@ -670,9 +678,9 @@ class TC_CGEN_2_2(MatterBaseTest):
 
             logger.info(
                 f'Step #33: {run_type} - Waiting for the failsafe timer '
-                f'(PIXIT.CGEN.FailsafeExpiryLengthSeconds) to approach expiration, '
+                f'(FAILSAFE_EXPIRATION_SECONDS constant) to approach expiration, '
                 f'but not allowing it to fully expire. Waiting for: {failsafe_timeout_less_than_max} seconds.')
-            # Wait PIXIT.CGEN.FailsafeExpiryLengthSeconds time with an additional 0.5-second buffer, not allowing the fully exire (max_fail_safe).
+            # Wait FAILSAFE_EXPIRATION_SECONDS constant time with an additional 0.5-second buffer, not allowing the fully exire (max_fail_safe).
             await asyncio.sleep(failsafe_timeout_less_than_max + .5)
 
         self.step(34)
@@ -752,7 +760,7 @@ class TC_CGEN_2_2(MatterBaseTest):
                              "Unexpected number of entries in the TrustedRootCertificates table after update")
 
         self.step(41)
-        # Limit maxFailsafe to PIXIT.CGEN.FailsafeExpiryLengthSeconds seconds to prevent excessively long waits in tests (due maxFailsafe = 900 seconds).
+        # Limit maxFailsafe to PIXIT.CGEN.FailsafeExpiryLengthSeconds seconds for CI or FAILSAFE_EXPIRATION_SECONDS constant for Cert to prevent excessively long waits in tests (due maxFailsafe = 900 seconds).
         maxFailsafe_original = maxFailsafe
         maxFailsafe = failsafe_expiration_seconds
         if self.is_pics_sdk_ci_only:
