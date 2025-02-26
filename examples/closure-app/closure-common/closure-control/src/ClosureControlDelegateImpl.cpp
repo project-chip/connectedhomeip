@@ -114,9 +114,9 @@ Protocols::InteractionModel::Status ClosureControlDelegate::Stop()
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status ClosureControlDelegate::MoveTo(const Optional<TagPositionEnum> tag,
-                                                                   const Optional<TagLatchEnum> latch,
-                                                                   const Optional<Globals::ThreeLevelAutoEnum> speed)
+Protocols::InteractionModel::Status ClosureControlDelegate::MoveTo(const Optional<TagPositionEnum> & tag,
+                                                                   const Optional<TagLatchEnum> & latch,
+                                                                   const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     return Status::Success;
 }
@@ -127,10 +127,10 @@ Protocols::InteractionModel::Status ClosureControlDelegate::Calibrate()
 }
 
 // Below Function will be removed along removal of Fallback feature from closure control cluster
-Protocols::InteractionModel::Status ClosureControlDelegate::ConfigureFallback(const Optional<RestingProcedureEnum> restingProcedure,
-                                                                              const Optional<TriggerConditionEnum> triggerCondition,
-                                                                              const Optional<TriggerPositionEnum> triggerPosition,
-                                                                              const Optional<uint32_t> waitingDelay)
+Protocols::InteractionModel::Status ClosureControlDelegate::ConfigureFallback(const Optional<RestingProcedureEnum> & restingProcedure,
+                                                                              const Optional<TriggerConditionEnum> & triggerCondition,
+                                                                              const Optional<TriggerPositionEnum> & triggerPosition,
+                                                                              const Optional<uint32_t> & waitingDelay)
 {
     return Status::Success;
 }

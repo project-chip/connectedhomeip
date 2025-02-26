@@ -43,13 +43,13 @@ public:
      *
      *********************************************************************************/
     Protocols::InteractionModel::Status Stop() override;
-    Protocols::InteractionModel::Status MoveTo(const Optional<TagPositionEnum> tag, const Optional<TagLatchEnum> latch,
-                                               const Optional<Globals::ThreeLevelAutoEnum> speed) override;
+    Protocols::InteractionModel::Status MoveTo(const Optional<TagPositionEnum> & tag, const Optional<TagLatchEnum> & latch,
+                                               const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     Protocols::InteractionModel::Status Calibrate() override;
-    Protocols::InteractionModel::Status ConfigureFallback(const Optional<RestingProcedureEnum> restingProcedure,
-                                                          const Optional<TriggerConditionEnum> triggerCondition,
-                                                          const Optional<TriggerPositionEnum> triggerPosition,
-                                                          const Optional<uint32_t> waitingDelay) override;
+    Protocols::InteractionModel::Status ConfigureFallback(const Optional<RestingProcedureEnum> & restingProcedure,
+                                                          const Optional<TriggerConditionEnum> & triggerCondition,
+                                                          const Optional<TriggerPositionEnum> & triggerPosition,
+                                                          const Optional<uint32_t> & waitingDelay) override;
     Protocols::InteractionModel::Status CancelFallback() override;
 
     // ------------------------------------------------------------------
