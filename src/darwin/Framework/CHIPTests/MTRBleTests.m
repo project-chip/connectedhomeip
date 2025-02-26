@@ -114,8 +114,6 @@ MTRDeviceController * sController;
 
 - (void)testBleCommissionAfterStopBrowseUAF
 {
-    XCTSkip(@"Skip reproducer for known UAF crash");
-
     __block MTRCommissionableBrowserResult * device;
     XCTestExpectation * didFindDevice = [self expectationWithDescription:@"did find device"];
     TestBrowserDelegate * delegate = [[TestBrowserDelegate alloc] init];
