@@ -44,6 +44,7 @@
 #include <zephyr/random/random.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
+#include <zephyr/version.h>
 
 #ifdef CONFIG_BT_BONDABLE
 #include <zephyr/settings/settings.h>
@@ -61,8 +62,14 @@ namespace Internal {
 
 namespace {
 
+#if KERNEL_VERSION_MAJOR >= 4
+// In Zephyr 4.0 BT_LE_ADV_OPT_CONNECTABLE and BT_LE_ADV_OPT_ONE_TIME have been deprecated
+// and replaced with BT_LE_ADV_OPT_CONN.
+constexpr uint32_t kAdvertisingOptions = BT_LE_ADV_OPT_CONN;
+#else
 constexpr uint32_t kAdvertisingOptions = BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME;
-constexpr uint8_t kAdvertisingFlags    = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
+#endif
+constexpr uint8_t kAdvertisingFlags = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
 
 const bt_uuid_128 UUID128_CHIPoBLEChar_RX =
     BT_UUID_INIT_128(0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18);
