@@ -20,7 +20,6 @@ silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 chip_enable_openthread = false
 import("${chip_root}/src/platform/silabs/wifi/args.gni")
 
-chip_enable_ota_requestor = true
 app_data_model = "${chip_root}/examples/lit-icd-app/lit-icd-common"
 
 sl_enable_test_event_trigger = true
