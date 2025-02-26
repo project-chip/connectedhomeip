@@ -107,3 +107,87 @@ To use default attribute persistence, you need to pass in a
 `PersistentStorageDelegate` to `CodegenDataModelProviderInstance`. See example
 changes in [36658](https://github.com/project-chip/connectedhomeip/pull/36658)
 ).
+
+### Decoupling of Command Handler Interface from Ember
+
+#### EnumerateGeneratedCommands
+
+Changed the old callback based iteration, into a ListBuilder based approach for
+the Enumeration of Generated Commands
+
+`CommandHandlerInterface::EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)`
+becomes
+`CommandHandlerInterface::EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, ListBuilder<CommandId> & builder)`
+
+Changes for implementation
+
+-   old
+
+```cpp
+   for (auto && cmd : { ScanNetworksResponse::Id, NetworkConfigResponse::Id, ConnectNetworkResponse::Id })
+   {
+       VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
+   }
+```
+
+-   new
+
+```cpp
+   ReturnErrorOnFailure(
+        builder.AppendElements({ ScanNetworksResponse::Id, NetworkConfigResponse::Id, ConnectNetworkResponse::Id })
+   )
+```
+
+#### EnumerateAcceptedCommands
+
+Expanded `EnumerateAcceptedCommands` Interface to provide Attributes and
+Privileges using a ListBuilder
+
+`CommandHandlerInterface::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)`
+becomes
+`CommandHandlerInterface::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, ListBuilder<AcceptedCommandEntry> & builder)`
+
+Changes for implementation:
+
+-   Old
+
+```cpp
+    for (auto && cmd : {
+             Disable::Id,
+             EnableCharging::Id,
+         })
+    {
+        VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
+    }
+
+    if (HasFeature(Feature::kV2x))
+    {
+        VerifyOrExit(callback(EnableDischarging::Id, context) == Loop::Continue, /**/);
+    }
+```
+
+-   new
+
+```cpp
+    using QF   = DataModel::CommandQualityFlags;
+    using Priv = chip::Access::Privilege;
+
+    ReturnErrorOnFailure(builder.AppendElements({
+        { Disable::Id,        QF::kTimed, Priv::kOperate },
+        { EnableCharging::Id, QF::kTimed, Priv::kOperate },
+    }));
+
+    if (HasFeature(Feature::kV2x))
+    {
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
+        ReturnErrorOnFailure(
+            builder.Append({ EnableDischarging::Id, QF::kTimed, Priv::kOperate})
+        );
+    }
+
+```
+
+Important Notes:
+
+Careful to use `EnsureAppendCapacity` before single element Append
+`ListBuilder::Append` as it will not grow the buffer if not available already
