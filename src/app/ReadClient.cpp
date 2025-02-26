@@ -495,7 +495,7 @@ void ReadClient::OnActiveModeNotification()
 
     if (mIsResubscriptionScheduled)
     {
-        // If a subscription fails and resubscription is scheduled, a check-in message should cancel 
+        // If a subscription fails and resubscription is scheduled, a check-in message should cancel
         // the pending resubscription and initiate a new subscription immediately."
         mNumRetries = 0;
         CancelResubscribeTimer();
