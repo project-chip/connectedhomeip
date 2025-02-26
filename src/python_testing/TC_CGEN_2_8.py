@@ -125,10 +125,10 @@ class TC_CGEN_2_8(MatterBaseTest):
             self.skip_all_remaining_steps(6)
             return
 
+        self.wait_for_user_input(prompt_msg="Manually trigger factory reset on the DUT, then continue")
+
         # Close the commissioner session with the device to clean up resources
         commissioner.CloseSession(nodeid=self.dut_node_id)
-
-        self.wait_for_user_input(prompt_msg="Manually trigger factory reset on the DUT, then continue")
 
         # Step 6: Put device in commissioning mode (requiring user input, so skip in CI)
         self.step(6)
