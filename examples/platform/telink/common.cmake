@@ -23,6 +23,10 @@ if(${ZEPHYR_VERSION_STRING} MATCHES "^3\\.3")
   file(WRITE ${ZEPHYR_VERSION_OVERLAY_FILE} "CONFIG_ZEPHYR_VERSION_3_3=y\n")
 
   # Add required MbedTLS defines for Zephyr 3.3
+  include(${CHIP_ROOT}/config/common/cmake/chip_gn_args.cmake)
+  matter_add_flags(-DMBEDTLS_HKDF_C=1)
+  matter_add_flags(-DMBEDTLS_X509_CREATE_C=1)
+  matter_add_flags(-DMBEDTLS_X509_CSR_WRITE_C=1)
   add_definitions(-DMBEDTLS_HKDF_C -DMBEDTLS_X509_CREATE_C -DMBEDTLS_X509_CSR_WRITE_C)
 endif()
 
