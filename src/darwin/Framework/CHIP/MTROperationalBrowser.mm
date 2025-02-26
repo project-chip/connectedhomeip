@@ -17,6 +17,7 @@
 #import <Foundation/Foundation.h>
 
 #import "MTRDeviceControllerFactory_Internal.h"
+#import "MTRLogging_Internal.h"
 #import "MTROperationalBrowser.h"
 
 #include <cinttypes>
@@ -125,15 +126,17 @@ void MTROperationalBrowser::OnBrowse(DNSServiceRef aServiceRef, DNSServiceFlags 
         return;
     }
 
-    if (!(aFlags & kDNSServiceFlagsAdd)) {
-        // We only care about new things appearing.
-        return;
-    }
-
     chip::PeerId peerId;
     CHIP_ERROR err = chip::Dnssd::ExtractIdFromInstanceName(aName, &peerId);
     if (err != CHIP_NO_ERROR) {
         ChipLogError(Controller, "Invalid instance name: '%s'\n", aName);
+        return;
+    }
+
+    if (!(aFlags & kDNSServiceFlagsAdd)) {
+        // We mostly only care about new things appearing, but log it when things
+        // disappear.
+        MTR_LOG("Matter operational instance advertisement removed: '%s'\n", aName);
         return;
     }
 

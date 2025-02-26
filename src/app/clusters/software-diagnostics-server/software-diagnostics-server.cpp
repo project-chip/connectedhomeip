@@ -41,11 +41,11 @@ using chip::DeviceLayer::GetDiagnosticDataProvider;
 
 namespace {
 
-class SoftwareDiagosticsAttrAccess : public AttributeAccessInterface
+class SoftwareDiagnosticsAttrAccess : public AttributeAccessInterface
 {
 public:
     // Register for the SoftwareDiagnostics cluster on all endpoints.
-    SoftwareDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), SoftwareDiagnostics::Id) {}
+    SoftwareDiagnosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), SoftwareDiagnostics::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
@@ -66,11 +66,11 @@ public:
                                          DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 };
 
-SoftwareDiagosticsAttrAccess gAttrAccess;
+SoftwareDiagnosticsAttrAccess gAttrAccess;
 
 SoftwareDiagnosticsCommandHandler gCommandHandler;
 
-CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR SoftwareDiagnosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != SoftwareDiagnostics::Id)
     {
@@ -104,8 +104,8 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(uint64_t &),
-                                                         AttributeValueEncoder & aEncoder)
+CHIP_ERROR SoftwareDiagnosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(uint64_t &),
+                                                          AttributeValueEncoder & aEncoder)
 {
     uint64_t data;
     CHIP_ERROR err = (DeviceLayer::GetDiagnosticDataProvider().*getter)(data);
@@ -121,7 +121,7 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticD
     return aEncoder.Encode(data);
 }
 
-CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadThreadMetrics(AttributeValueEncoder & aEncoder)
+CHIP_ERROR SoftwareDiagnosticsAttrAccess::ReadThreadMetrics(AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     DeviceLayer::ThreadMetrics * threadMetrics;

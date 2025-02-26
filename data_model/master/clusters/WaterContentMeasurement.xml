@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -57,39 +57,53 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Water Content Measurement Clusters" revision="3">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Water Content Measurement Clusters" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="CCB 2241"/>
     <revision revision="3" summary="New data model format and notation"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0405" name="Relative Humidity Measurement"/>
+    <clusterId id="0x0405" name="Relative Humidity Measurement" picsCode="RH"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="RH" scope="Endpoint"/>
   <attributes>
     <attribute id="0x0000" name="MeasuredValue" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" reportable="true"/>
       <mandatoryConform/>
-      <constraint type="between" from="MinMeasuredValue" to="MaxMeasuredValue"/>
+      <constraint>
+        <between>
+          <attribute name="MinMeasuredValue"/>
+          <attribute name="MaxMeasuredValue"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="MinMeasuredValue" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="max" value="9999"/>
+      <constraint>
+        <max value="9999"/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="MaxMeasuredValue" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="between" from="MinMeasuredValue + 1" to="10000"/>
+      <constraint>
+        <between>
+          <from value="MinMeasuredValue + 1"/>
+          <to value="10000"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="Tolerance" type="uint16">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
-      <constraint type="max" value="2048"/>
+      <constraint>
+        <max value="2048"/>
+      </constraint>
     </attribute>
   </attributes>
 </cluster>

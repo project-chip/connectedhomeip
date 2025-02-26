@@ -76,8 +76,7 @@ class TC_CGEN_2_9(MatterBaseTest):
 
     def steps_TC_CGEN_2_9(self) -> list[TestStep]:
         return [
-            TestStep(0, description="", expectation="", is_commissioning=False),
-            TestStep(1, "TH begins commissioning the DUT and performs the following steps in order:\n* Security setup using PASE\n* Setup fail-safe timer, with ExpiryLengthSeconds field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb value as 1\n* Configure information- UTC time, regulatory, etc."),
+            TestStep(1, "TH begins commissioning the DUT and performs the following steps in order:\n* Security setup using PASE\n* Setup fail-safe timer, with ExpiryLengthSeconds field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb value as 1\n* Configure information- UTC time, regulatory, etc.", is_commissioning=False),
             TestStep(2, "TH sends SetTCAcknowledgements to DUT with the following values:\n* TCVersion: PIXIT.CGEN.TCRevision\n* TCUserResponse: PIXIT.CGEN.RequiredTCAcknowledgements"),
             TestStep(3, "TH continues commissioning with the DUT and performs the steps from 'Operation CSR exchange' through 'Security setup using CASE'"),
             TestStep(4, "TH sends CommissioningComplete to DUT."),
@@ -94,7 +93,6 @@ class TC_CGEN_2_9(MatterBaseTest):
         tc_version_to_simulate = self.matter_test_config.global_test_params['PIXIT.CGEN.TCRevision']
         tc_user_response_to_simulate = self.matter_test_config.global_test_params['PIXIT.CGEN.RequiredTCAcknowledgements']
 
-        self.step(0)
         if not self.check_pics("CGEN.S.F00"):
             asserts.skip('Root endpoint does not support the [commissioning] feature under test')
             return
@@ -158,6 +156,9 @@ class TC_CGEN_2_9(MatterBaseTest):
         # Step 5: Remove all fabrics
         self.step(5)
         await self.remove_commissioner_fabric()
+
+        # Close the commissioner session with the device to clean up resources
+        commissioner.CloseSession(nodeid=self.dut_node_id)
 
         # Step 6: Put device in commissioning mode (requiring user input, so skip in CI)
         self.step(6)

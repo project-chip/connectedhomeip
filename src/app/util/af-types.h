@@ -23,10 +23,11 @@
  * @{
  */
 
-#include "att-storage.h"
 #include <stdbool.h> // For bool
 #include <stdint.h>  // For various uint*_t types
 
+#include <app/util/AttributesChangedListener.h>
+#include <app/util/MarkAttributeDirty.h>
 #include <app/util/basic-types.h>
 #include <app/util/types_stub.h> // For various types.
 
@@ -45,11 +46,6 @@
 #include <protocols/interaction_model/StatusCode.h>
 
 /**
- * @brief Type for the cluster mask
- */
-typedef uint8_t EmberAfClusterMask;
-
-/**
  * @brief Generic function type, used for either of the cluster function.
  *
  * This type is used for the array of the cluster functions, and should
@@ -62,6 +58,21 @@ typedef void (*EmberAfGenericClusterFunction)(void);
  * absence of a manufacturer-specific cluster, command, or attribute.
  */
 #define MATTER_DM_NULL_MANUFACTURER_CODE 0x0000
+
+// The following define names are relevant to the ZAP_CLUSTER_MASK macro.
+#define MATTER_CLUSTER_FLAG_INIT_FUNCTION 0x01
+#define MATTER_CLUSTER_FLAG_ATTRIBUTE_CHANGED_FUNCTION 0x02
+// Bit 2 (0x04)  and Bit3 (0x08) are free.
+#define MATTER_CLUSTER_FLAG_SHUTDOWN_FUNCTION 0x10
+#define MATTER_CLUSTER_FLAG_PRE_ATTRIBUTE_CHANGED_FUNCTION 0x20
+#define MATTER_CLUSTER_FLAG_SERVER 0x40
+#define MATTER_CLUSTER_FLAG_CLIENT 0x80
+
+/**
+ * @brief Type for the cluster mask
+ *  Value of the mask represents a single, or aggregated, MATTER_CLUSTER_FLAG_X
+ */
+typedef uint8_t EmberAfClusterMask;
 
 /**
  * @brief Struct describing cluster
@@ -120,9 +131,9 @@ struct EmberAfCluster
      */
     uint16_t eventCount;
 
-    bool IsServer() const { return (mask & CLUSTER_MASK_SERVER) != 0; }
+    bool IsServer() const { return (mask & MATTER_CLUSTER_FLAG_SERVER) != 0; }
 
-    bool IsClient() const { return (mask & CLUSTER_MASK_CLIENT) != 0; }
+    bool IsClient() const { return (mask & MATTER_CLUSTER_FLAG_CLIENT) != 0; }
 };
 
 using EmberAfDeviceType = chip::app::DataModel::DeviceTypeEntry;
@@ -227,30 +238,6 @@ struct EmberAfDefinedEndpoint
     chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList;
 };
 
-// Cluster specific types
-
-/**
- * @brief Indicates the absence of a Scene table entry.
- */
-#define MATTER_DM_SCENE_TABLE_NULL_INDEX 0xFF
-/**
- * @brief Value used when setting or getting the endpoint in a Scene table
- * entry.  It indicates that the entry is not in use.
- */
-#define MATTER_DM_SCENE_TABLE_UNUSED_ENDPOINT_ID 0x00
-/**
- * @brief Maximum length of Scene names, not including the length byte.
- */
-#define ZCL_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH 16
-/**
- * @brief The group identifier for the global scene.
- */
-#define ZCL_SCENES_GLOBAL_SCENE_GROUP_ID 0x0000
-/**
- * @brief The scene identifier for the global scene.
- */
-#define ZCL_SCENES_GLOBAL_SCENE_SCENE_ID 0x00
-
 /**
  * @brief Type for referring to the tick callback for cluster.
  *
@@ -295,30 +282,3 @@ typedef chip::Protocols::InteractionModel::Status (*EmberAfClusterPreAttributeCh
 #define MAX_INT16U_VALUE (0xFFFF)
 
 /** @} END addtogroup */
-
-namespace chip {
-namespace app {
-
-enum class MarkAttributeDirty
-{
-    kIfChanged,
-    kNo,
-    // kYes might need to be used if the attribute value was previously changed
-    // without reporting, and now is being set in a situation where we know
-    // reporting needs to be triggered (e.g. because QuieterReportingAttribute
-    // indicated that).
-    kYes,
-};
-
-/// Notification object of a specific path being changed
-class AttributesChangedListener
-{
-public:
-    virtual ~AttributesChangedListener() = default;
-
-    /// Called when the set of attributes identified by AttributePathParams (which may contain wildcards) is to be considered dirty.
-    virtual void MarkDirty(const AttributePathParams & path) = 0;
-};
-
-} // namespace app
-} // namespace chip
