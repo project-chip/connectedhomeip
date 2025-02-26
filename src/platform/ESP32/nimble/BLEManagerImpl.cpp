@@ -69,6 +69,8 @@
 #include "nimble/nimble_port_freertos.h"
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
+#include <tracing/macros.h>
+#include <tracing/metric_event.h>
 
 // Not declared in any header file, hence requires a forward declaration.
 extern "C" void ble_store_config_init(void);
@@ -212,6 +214,7 @@ void BLEManagerImpl::ConnectDevice(const ble_addr_t & addr, uint16_t timeout)
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
+    MATTER_TRACE_INSTANT("BLE_mode", "Nimble");
 
     // Initialize the Chip BleLayer.
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
@@ -247,7 +250,10 @@ exit:
 
 void BLEManagerImpl::_Shutdown()
 {
+    constexpr chip::Tracing::MetricKey kMetricBluetoothConnections = "ble_con_count";
+    MATTER_LOG_METRIC(kMetricBluetoothConnections, mNumGAPCons);
     CancelBleAdvTimeoutTimer();
+    MATTER_TRACE_INSTANT("BLE", "Shutdown");
 
     BleLayer::Shutdown();
 
@@ -283,6 +289,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(System::Layer *, void *)
     if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
         ChipLogProgress(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
+        MATTER_TRACE_INSTANT("BLE_adv", "Slow");
         BLEMgrImpl().mFlags.Set(Flags::kFastAdvertisingEnabled, 0);
         BLEMgrImpl().mFlags.Set(Flags::kAdvertisingRefreshNeeded, 1);
 
@@ -295,6 +302,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(System::Layer *, void *)
     else
     {
         ChipLogProgress(DeviceLayer, "bleAdv Timeout : Start extended advertisement");
+        MATTER_TRACE_INSTANT("BLE_adv", "Extended");
         BLEMgrImpl().mFlags.Set(Flags::kAdvertising);
         BLEMgrImpl().mFlags.Set(Flags::kExtAdvertisingEnabled);
         BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
@@ -1018,6 +1026,7 @@ void BLEManagerImpl::ClaimBLEMemory(System::Layer *, void *)
 CHIP_ERROR BLEManagerImpl::DeinitBLE()
 {
     esp_err_t err = ESP_OK;
+    MATTER_TRACE_INSTANT("BLE", "Deinit");
     VerifyOrReturnError(ble_hs_is_enabled(), CHIP_ERROR_INCORRECT_STATE, ChipLogProgress(DeviceLayer, "BLE already deinited"));
     VerifyOrReturnError(0 == nimble_port_stop(), MapBLEError(ESP_FAIL), ChipLogError(DeviceLayer, "nimble_port_stop() failed"));
 
@@ -1795,6 +1804,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
     mIsCentral = aIsCentral;
     if (mIsCentral)
     {
+        MATTER_TRACE_INSTANT("BLE_role", "Central");
         int rc = peer_init(MYNEWT_VAL(BLE_MAX_CONNECTIONS), 64, 64, 64);
         assert(rc == 0);
     }
