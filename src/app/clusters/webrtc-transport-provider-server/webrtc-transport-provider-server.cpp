@@ -162,27 +162,46 @@ WebRTCSessionStruct * WebRTCTransportProviderServer::FindSession(uint16_t sessio
 
 void WebRTCTransportProviderServer::AddOrUpdateSession(const WebRTCSessionStruct & session)
 {
-    // Search for a session with the same ID
+    bool found = false;
+
+    // Search for a session with the same ID and update if found
     for (auto & existing : mCurrentSessions)
     {
         if (existing.id == session.id)
         {
-            // Update it in-place
             existing = session;
-            return;
+            found    = true;
+            break;
         }
     }
 
     // If not found, add a new entry
-    mCurrentSessions.push_back(session);
+    if (!found)
+    {
+        mCurrentSessions.push_back(session);
+    }
+
+    // Notify the stack that the CurrentSessions attribute has changed
+    MatterReportingAttributeChangeCallback(AttributeAccessInterface::GetEndpointId().Value(), WebRTCTransportProvider::Id,
+                                           WebRTCTransportProvider::Attributes::CurrentSessions::Id);
 }
 
 void WebRTCTransportProviderServer::RemoveSession(uint16_t sessionId)
 {
+    size_t originalSize = mCurrentSessions.size();
+
     // Erase-Remove idiom
     mCurrentSessions.erase(std::remove_if(mCurrentSessions.begin(), mCurrentSessions.end(),
                                           [sessionId](const WebRTCSessionStruct & s) { return s.id == sessionId; }),
                            mCurrentSessions.end());
+
+    // If a session was removed, the size will be smaller.
+    if (mCurrentSessions.size() < originalSize)
+    {
+        // Notify the stack that the CurrentSessions attribute has changed.
+        MatterReportingAttributeChangeCallback(AttributeAccessInterface::GetEndpointId().Value(), WebRTCTransportProvider::Id,
+                                               WebRTCTransportProvider::Attributes::CurrentSessions::Id);
+    }
 }
 
 uint16_t WebRTCTransportProviderServer::GenerateSessionID()
@@ -208,6 +227,8 @@ uint16_t WebRTCTransportProviderServer::GenerateSessionID()
 // Command Handlers
 void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, const Commands::SolicitOffer::DecodableType & req)
 {
+    // According to the Matter WebRTC Transport Provider specification,
+    // at least one of VideoStreamID or AudioStreamID must be present.
     if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);

@@ -97,7 +97,7 @@ public:
      *       - Create a brand new session by sending an SDP Offer
      *       - Re-offer an SDP to modify an existing session (e.g., enabling two-way talk).
      *
-     * @param[in]  args          Structure containing all input arguments for the command.
+     * @param[in]  args            Structure containing all input arguments for the command.
      * @param[out] outSession      Must be populated with the final session info (session ID, streams, etc.).
      *
      * @return CHIP_ERROR
