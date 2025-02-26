@@ -362,7 +362,8 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
     if (interface != nullptr)
     {
         CHIP_ERROR err = interface->EnumerateAcceptedCommands(path, builder);
-        // if err == CHIP_ERROR_NOT_IMPLEMENTED then continue, else just return whatever err is
+        // if enumeration returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal procesing
+        // otherwise we finished
         VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
 
@@ -402,7 +403,8 @@ CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath
     if (interface != nullptr)
     {
         CHIP_ERROR err = interface->EnumerateGeneratedCommands(path, builder);
-        // if err == CHIP_ERROR_NOT_IMPLEMENTED then continue, else just return whatever err is
+        // If enumeration returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal procesing
+        // otherwise we finished
         VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
 
