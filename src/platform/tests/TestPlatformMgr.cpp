@@ -210,7 +210,9 @@ TEST_F(TestPlatformMgr, TryLockChipStack)
     EXPECT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
     bool locked = PlatformMgr().TryLockChipStack();
+#ifndef CONFIG_DISABLE_LOCK_CHECK
     EXPECT_TRUE(locked);
+#endif
 
     if (locked)
         PlatformMgr().UnlockChipStack();
