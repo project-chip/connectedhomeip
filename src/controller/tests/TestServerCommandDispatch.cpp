@@ -121,7 +121,7 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
         return CHIP_NO_ERROR;
     }
 
-    DataModel::AcceptedCommandEntry entries[] = { { TestSimpleArgumentRequest::Id, {}, Priv::kOperate } };
+    static constexpr DataModel::AcceptedCommandEntry entries[] = { { TestSimpleArgumentRequest::Id, {}, Priv::kOperate } };
     return builder.ReferenceExisting({ entries, std::size(entries) });
 }
 
