@@ -103,9 +103,10 @@ class TestCreateNewController(MatterBaseTest):
 
         self.step(4)
         self.th3 = self.certificate_authority_manager.create_new_controller(ca_List=0, new_Fabric=False, node_Id=2)
-        
+
         self.step(5)
         self.th3.Shutdown()
+
 
 if __name__ == "__main__":
     default_matter_test_main()
