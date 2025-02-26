@@ -40,14 +40,7 @@ namespace app {
 class ServerClusterInterface
 {
 public:
-    ServerClusterInterface()          = default;
     virtual ~ServerClusterInterface() = default;
-
-    ServerClusterInterface(ServerClusterInterface && other)             = default;
-    ServerClusterInterface & operator=(ServerClusterInterface && other) = default;
-
-    ServerClusterInterface(const ServerClusterInterface & other)             = delete;
-    ServerClusterInterface & operator=(const ServerClusterInterface & other) = delete;
 
     ///////////////////////////////////// Cluster Metadata Support //////////////////////////////////////////////////
     [[nodiscard]] virtual ClusterId GetClusterId() const = 0;

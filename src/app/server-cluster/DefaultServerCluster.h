@@ -38,12 +38,6 @@ public:
     DefaultServerCluster();
     ~DefaultServerCluster() override = default;
 
-    DefaultServerCluster(DefaultServerCluster && other)             = default;
-    DefaultServerCluster & operator=(DefaultServerCluster && other) = default;
-
-    DefaultServerCluster(const DefaultServerCluster & other)             = delete;
-    DefaultServerCluster & operator=(const DefaultServerCluster & other) = delete;
-
     void IncreaseDataVersion() { mDataVersion++; }
 
     //////////////////////////// ServerClusterInterface implementation ////////////////////////////////////////
