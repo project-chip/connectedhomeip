@@ -59,6 +59,8 @@ NSString * kControllerIdPrefixStr = @(kControllerIdPrefix);
 
     // Wait until homeManagerDidUpdateHomes is called or timeout
     dispatch_group_wait(_homeManagerReadyGroup, dispatch_time(DISPATCH_TIME_NOW, kHomeManagerSetupTimeout));
+
+    [self printHomes];
 }
 
 - (void)stop
@@ -98,6 +100,73 @@ NSString * kControllerIdPrefixStr = @(kControllerIdPrefix);
     }
 
     return homes[index];
+}
+
+- (NSString *)paddedString:(NSString *)string width:(NSUInteger)width
+{
+    // Using length might not account for all unicode width details, but it's a simple approximation.
+    NSUInteger length = string.length;
+    if (length >= width) {
+        return string;
+    }
+    NSMutableString * result = [NSMutableString stringWithString:string];
+    for (NSUInteger i = 0; i < (width - length); i++) {
+        [result appendString:@" "];
+    }
+    return result;
+}
+
+- (NSString *)repeatString:(NSString *)string count:(NSUInteger)count
+{
+    NSMutableString * result = [NSMutableString string];
+    for (NSUInteger i = 0; i < count; i++) {
+        [result appendString:string];
+    }
+    return result;
+}
+
+- (void)printHomes
+{
+    for (HMHome * home in _homeManager.homes) {
+        NSUInteger maxNameLength = 0;
+        NSUInteger maxNodeIDLength = 0;
+        NSUInteger maxManufacturerLength = 0;
+        NSUInteger maxModelLength = 0;
+
+        __auto_type * sortedAccessories = [home.accessories sortedArrayUsingComparator:^NSComparisonResult(HMAccessory * a, HMAccessory * b) {
+            return [a.name localizedCaseInsensitiveCompare:b.name];
+        }];
+
+        for (HMAccessory * accessory in sortedAccessories) {
+            maxNameLength = MAX(maxNameLength, accessory.name.length);
+            maxManufacturerLength = MAX(maxManufacturerLength, accessory.manufacturer.length);
+            maxModelLength = MAX(maxModelLength, accessory.model.length);
+            maxNodeIDLength = MAX(maxNodeIDLength, [accessory.matterNodeID stringValue].length);
+        }
+
+        __auto_type * rows = [NSMutableArray arrayWithCapacity:sortedAccessories.count];
+        [sortedAccessories enumerateObjectsUsingBlock:^(HMAccessory * accessory, NSUInteger idx, BOOL * stop) {
+            if (accessory.matterNodeID == nil || [accessory.matterNodeID integerValue] == 0) {
+                return;
+            }
+
+            __auto_type * name = [self paddedString:accessory.name width:maxNameLength];
+            __auto_type * manufacturer = [self paddedString:accessory.manufacturer width:maxManufacturerLength];
+            __auto_type * model = [self paddedString:accessory.model width:maxModelLength];
+            __auto_type * nodeID = [self paddedString:[accessory.matterNodeID stringValue] width:maxNodeIDLength];
+            __auto_type * formattedString = [NSString stringWithFormat:@" %@ │ %@ │ %@ │ %@ ", name, manufacturer, model, nodeID];
+            [rows addObject:formattedString];
+        }];
+
+        NSUInteger tableWidth = 1 + maxNameLength + 3 + maxManufacturerLength + 3 + maxModelLength + 3 + maxNodeIDLength + 1;
+        NSLog(@"╔%@╗", [self repeatString:@"═" count:tableWidth]);
+        NSLog(@"║%@║", [self paddedString:[NSString stringWithFormat:@" %@ [%@] ", home.name, home.matterControllerID] width:tableWidth]);
+        NSLog(@"╠%@╣", [self repeatString:@"═" count:tableWidth]);
+        for (NSString * row in rows) {
+            NSLog(@"║%@║", row);
+        }
+        NSLog(@"╚%@╝", [self repeatString:@"═" count:tableWidth]);
+    }
 }
 
 - (NSString *)homeControllerIDFor:(NSString *)controllerID
