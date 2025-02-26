@@ -55,7 +55,7 @@ class TC_CNET_4_11(MatterBaseTest):
             TestStep(4, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1"),
             TestStep(5, "TH sends AddOrUpdateWiFiNetwork command to the DUT with SSID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, Credentials field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS and Breadcrumb field set to 1"),
             TestStep(6, "TH reads Networks attribute from the DUT"),
-            # TestStep(7, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 2"),
+            TestStep(7, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 2"),
             # TestStep(8, "TH changes its WiFi connection to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"),
             # TestStep(9, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network"),
             # TestStep(10, "TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT"),
@@ -186,7 +186,8 @@ class TC_CNET_4_11(MatterBaseTest):
         logger.info(f"Received response: {res}")
         networkList = res[endpoint][cnet].networks
         # 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
-        isPresent, isConnected = False, False
+        isPresent = False
+        isConnected = False
         for network in networkList:
             if network.networkId == PIXIT_CNET_WIFI_2ND_ACCESSPOINT_CREDENTIALS:
                 isPresent = True
@@ -197,80 +198,10 @@ class TC_CNET_4_11(MatterBaseTest):
         # 2. Connected is of type bool and is FALSE
         asserts.assert_true(not isConnected, "Expected isConnected to be False, but got True")
 
-        #
-        # self.step(7)
-        # breadcrumb = await self.read_single_attribute_check_success(cluster=Clusters.GeneralCommissioning, attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb, endpoint=0)
-        # asserts.assert_equal(breadcrumb, 2, "Incorrect breadcrumb value")
-
-        # await scan_and_check(ssid_to_scan=known_ssid, breadcrumb=2, expect_results=True)
-
-        # breadcrumb = await self.read_single_attribute_check_success(cluster=Clusters.GeneralCommissioning, attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb, endpoint=0)
-        # asserts.assert_equal(breadcrumb, 1, "Incorrect breadcrumb value")
-
-        # logger.info(f"NumNetworks: {numNetworks}, Networks: {networkList}")
-        # logger.info(f"NetworkID: {networks[0].networkID}, Connected: {networks[0].connected}")
-        # asserts.assert_true(PIXIT_CNET_WIFI_1ST_ACCESSPOINT_SSID ==
-        #                     networks[0].networkID, f"Expected NetworkID to be: {PIXIT_CNET_WIFI_1ST_ACCESSPOINT_SSID}, but got: {networks[0].networkID}")
-        # asserts.assert_true(networks[0].connected, f"network {networks[0].networkID} IS NOT connected")
-
-        # supported_wifi_bands = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.SupportedWiFiBands)
-        # print(f"---------------- supported_wifi_bands: {supported_wifi_bands}")
-        # networks = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.Networks)
-        # print(f"---------------- networks: {networks}")
-        # connected = [network for network in networks if network.connected is True]
-        # asserts.assert_greater_equal(len(connected), 1, "Did not find any connected networks on a commissioned device")
-        # known_ssid = connected[0].networkID
-
-        # async def scan_and_check(ssid_to_scan: Optional[bytes], breadcrumb: int, expect_results: bool = True):
-        #     all_security = 0
-        #     for security_bitmask in cnet.Bitmaps.WiFiSecurityBitmap:
-        #         all_security |= security_bitmask
-
-        #     ssid = ssid_to_scan if ssid_to_scan is not None else NullValue
-        #     print(f"---------------- ssid: {ssid}")
-        #     cmd = cnet.Commands.ScanNetworks(ssid=ssid, breadcrumb=breadcrumb)
-        #     scan_results = await self.send_single_cmd(cmd=cmd)
-        #     print(f"---------------- scan_results: {scan_results}")
-        #     asserts.assert_true(type_matches(scan_results, cnet.Commands.ScanNetworksResponse),
-        #                         "Unexpected value returned from scan network")
-        #     logging.info(f"Scan results: {scan_results}")
-
-        #     if scan_results.debugText:
-        #         debug_text_len = len(scan_results.debug_text)
-        #         asserts.assert_less_equal(debug_text_len, 512, f"DebugText length {debug_text_len} was out of range")
-
-        #     if expect_results:
-        #         asserts.assert_equal(scan_results.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
-        #                              f"ScanNetworks was expected to have succeeded, got {scan_results.networkingStatus} instead")
-        #         asserts.assert_greater_equal(len(scan_results.wiFiScanResults), 1, "No responses returned from ScanNetwork command")
-        #     else:
-        #         asserts.assert_equal(scan_results.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kNetworkNotFound,
-        #                              f"ScanNetworks was expected to received NetworkNotFound(5), got {scan_results.networkingStatus} instead")
-        #         return
-
-        #     print(f"---------------- scan_results.wiFiScanResults: {scan_results.wiFiScanResults}")
-        #     for network in scan_results.wiFiScanResults:
-        #         print(f"---------------- network: {network}")
-        #         asserts.assert_true((network.security & ~all_security) == 0, "Unexpected bitmap in the security field")
-        #         asserts.assert_less_equal(len(network.ssid), 32, f"Returned SSID {network.ssid} is too long")
-        #         if ssid_to_scan is not None:
-        #             print(f"---------------- ssid_to_scan: {ssid_to_scan}")
-        #             asserts.assert_equal(network.ssid, ssid_to_scan, "Unexpected SSID returned in directed scan")
-        #         asserts.assert_true(type_matches(network.bssid, bytes), "Incorrect type for BSSID")
-        #         asserts.assert_equal(len(network.bssid), 6, "Unexpected length of BSSID")
-        #         # TODO: this is inherited from the old test plan, but we should match the channel to the supported band. This range is unreasonably large.
-        #         asserts.assert_less_equal(network.channel, 65535, "Unexpected channel value")
-        #         if network.wiFiBand:
-        #             asserts.assert_true(network.wiFiBand in supported_wifi_bands,
-        #                                 "Listed wiFiBand is not in supported_wifi_bands")
-        #         if network.rssi:
-        #             asserts.assert_greater_equal(network.rssi, -120, "RSSI out of range")
-        #             asserts.assert_less_equal(network.rssi, 0, "RSSI out of range")
+        # TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 2
+        self.step(7)
 
         # self.step(8)
-        # random_ssid = ''.join(random.choice(string.ascii_letters) for _ in range(31)).encode("utf-8")
-        # await scan_and_check(ssid_to_scan=random_ssid, breadcrumb=2, expect_results=False)
-
         # self.step(9)
         # self.step(10)
         # self.step(11)
