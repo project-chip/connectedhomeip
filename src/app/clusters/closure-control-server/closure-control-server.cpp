@@ -99,7 +99,7 @@ CHIP_ERROR Instance::SetMainState(MainStateEnum  aMainState)
 CHIP_ERROR Instance::SetOverallState(const GenericOverallState & aOverallState)
 {
     // If the overall target state has changed, trigger the attribute change callback
-    if (!mOverallState.IsEqual(aOverallState))
+    if (!(mOverallState == aOverallState))
     {
         mOverallState = aOverallState;
         MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), ClosureControl::Id, Attributes::OverallState::Id);
@@ -111,7 +111,7 @@ CHIP_ERROR Instance::SetOverallState(const GenericOverallState & aOverallState)
 CHIP_ERROR Instance::SetOverallTarget(const GenericOverallTarget & aOverallTarget)
 {
     // If the overall target state has changed, trigger the attribute change callback
-    if (!mOverallTarget.IsEqual(aOverallTarget))
+    if (!(mOverallTarget == aOverallTarget))
     {
         mOverallTarget = aOverallTarget;
         MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), ClosureControl::Id, Attributes::OverallTarget::Id);

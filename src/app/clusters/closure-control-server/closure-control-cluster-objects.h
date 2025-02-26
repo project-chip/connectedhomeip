@@ -56,7 +56,7 @@ struct GenericOverallState : public Structs::OverallStateStruct::Type
         extraInfo = extraInfoValue;
     }
 
-    bool IsEqual(const Structs::OverallStateStruct::Type & rhs) const
+    bool operator==(const Structs::OverallStateStruct::Type & rhs) const
     {
         if (positioning.HasValue() != rhs.positioning.HasValue() || latching.HasValue() != rhs.latching.HasValue() ||
             speed.HasValue() != rhs.speed.HasValue() || extraInfo.HasValue() != rhs.extraInfo.HasValue())
@@ -113,7 +113,7 @@ struct GenericOverallTarget : public Structs::OverallTargetStruct::Type
         speed = speedValue;
     }
 
-    bool IsEqual(const Structs::OverallTargetStruct::Type & rhs) const
+    bool operator==(const Structs::OverallTargetStruct::Type & rhs) const
     {
         if (tagPosition.HasValue() != rhs.tagPosition.HasValue() || tagLatch.HasValue() != rhs.tagLatch.HasValue() ||
             speed.HasValue() != rhs.speed.HasValue())
