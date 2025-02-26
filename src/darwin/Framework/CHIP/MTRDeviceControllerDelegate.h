@@ -106,6 +106,12 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  */
 - (void)controller:(MTRDeviceController *)controller
     suspendedChangedTo:(BOOL)suspended MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
+
+/**
+ * Notify the delegate when the list of MTRDevice objects in memory has changed.
+ */
+- (void)devicesChangedForController:(MTRDeviceController *)controller MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
 @end
 
 typedef NS_ENUM(NSUInteger, MTRPairingStatus) {

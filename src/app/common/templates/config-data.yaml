@@ -54,6 +54,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Software Diagnostics
     - Wi-Fi Network Diagnostics
     - Administrator Commissioning
+    - Actions
     - Closure Control
 
 # We need a more configurable way of deciding which clusters have which init functions....
