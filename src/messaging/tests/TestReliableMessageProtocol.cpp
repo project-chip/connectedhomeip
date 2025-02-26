@@ -2166,12 +2166,12 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(messageCounter, thirdTransmitEvent.messageCounter);
 
     testAnalyticsDelegate.mTransmitEvents.pop();
-    auto forthTransmitEvent = testAnalyticsDelegate.mTransmitEvents.front();
-    EXPECT_EQ(forthTransmitEvent.nodeId, expectedNodeId);
-    EXPECT_EQ(forthTransmitEvent.fabricIndex, expectedFabricIndex);
-    EXPECT_EQ(forthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
-    EXPECT_EQ(forthTransmitEvent.retransmissionCount, 3);
-    EXPECT_EQ(messageCounter, forthTransmitEvent.messageCounter);
+    auto fourthTransmitEvent = testAnalyticsDelegate.mTransmitEvents.front();
+    EXPECT_EQ(fourthTransmitEvent.nodeId, expectedNodeId);
+    EXPECT_EQ(fourthTransmitEvent.fabricIndex, expectedFabricIndex);
+    EXPECT_EQ(fourthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
+    EXPECT_EQ(fourthTransmitEvent.retransmissionCount, 3);
+    EXPECT_EQ(messageCounter, fourthTransmitEvent.messageCounter);
 
     testAnalyticsDelegate.mTransmitEvents.pop();
     auto fifthTransmitEvent = testAnalyticsDelegate.mTransmitEvents.front();
@@ -2308,12 +2308,12 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitFail
     EXPECT_EQ(messageCounter, thirdTransmitEvent.messageCounter);
 
     testAnalyticsDelegate.mTransmitEvents.pop();
-    auto forthTransmitEvent = testAnalyticsDelegate.mTransmitEvents.front();
-    EXPECT_EQ(forthTransmitEvent.nodeId, expectedNodeId);
-    EXPECT_EQ(forthTransmitEvent.fabricIndex, expectedFabricIndex);
-    EXPECT_EQ(forthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
-    EXPECT_EQ(forthTransmitEvent.retransmissionCount, 3);
-    EXPECT_EQ(messageCounter, forthTransmitEvent.messageCounter);
+    auto fourthTransmitEvent = testAnalyticsDelegate.mTransmitEvents.front();
+    EXPECT_EQ(fourthTransmitEvent.nodeId, expectedNodeId);
+    EXPECT_EQ(fourthTransmitEvent.fabricIndex, expectedFabricIndex);
+    EXPECT_EQ(fourthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
+    EXPECT_EQ(fourthTransmitEvent.retransmissionCount, 3);
+    EXPECT_EQ(messageCounter, fourthTransmitEvent.messageCounter);
 
     testAnalyticsDelegate.mTransmitEvents.pop();
     auto fifthTransmitEvent = testAnalyticsDelegate.mTransmitEvents.front();
