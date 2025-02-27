@@ -375,8 +375,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         if (mDelegate->HasConflictWriteRequests(this, dataAttributePath) ||
             // Per chunking protocol, we are processing the list entries, but the initial empty list is not processed, so we reject
             // it with Busy status code.
-            (dataAttributePath.IsListItemOperation() && !IsSameAttribute(mProcessingAttributePath, dataAttributePath) &&
-             dataAttributePath.mClusterId != 0x1F))
+            (dataAttributePath.IsListItemOperation() && !IsSameAttribute(mProcessingAttributePath, dataAttributePath)))
         {
             err = AddStatusInternal(dataAttributePath, StatusIB(Status::Busy));
             continue;

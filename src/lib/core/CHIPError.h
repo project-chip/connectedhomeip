@@ -837,7 +837,15 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_TLV_CONTAINER_OPEN                          CHIP_CORE_ERROR(0x27)
 
-// AVAILABLE: 0x28
+/**
+ *  @def CHIP_ERROR_FIRST_ACL_ENTRY_NOT_ADMIN
+ *
+ *  @brief
+ *    The first ACL entry provided by the controller must have Administer privileges. This ensures at least one
+ *    administrator exists to manage the ACL. The provided list did not meet this requirement.
+ */
+#define CHIP_ERROR_FIRST_ACL_ENTRY_NOT_ADMIN                          CHIP_CORE_ERROR(0x28)
+
 // AVAILABLE: 0x29
 
 /**
