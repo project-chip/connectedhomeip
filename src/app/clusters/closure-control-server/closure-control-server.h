@@ -97,6 +97,10 @@ public:
     {
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
+        /* set Countdown Time quiet reporting policy as per reporting requirements in specification */
+        mCountdownTime.policy()
+        .Set(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement)
+        .Set(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
     }
     ~Instance() { Shutdown(); }
 
