@@ -101,5 +101,20 @@ the wpa_supplicant integration with the Matter SDK.
         <property name="AuthStatusCode" type="i" access="read" />
         <property name="AssocStatusCode" type="i" access="read" />
 
+        <signal name="ScanDone">
+            <arg name="success" type="b" />
+        </signal>
+        <signal name="NanDiscoveryresult">
+            <arg name="result" type="b" />
+            <arg name="discov_info" type="a{sv}" />
+        </signal>
+        <signal name="NanReceive">
+            <arg name="nanrx" type="a{sv}" />
+        </signal>
+        <signal name="NanSubscribeterminated">
+            <arg name="term_subscribe_id" type="i" />
+            <arg name="reason" type="i" />
+        </signal>
+
     </interface>
 </node>
