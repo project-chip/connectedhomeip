@@ -48,7 +48,7 @@ public:
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     /**
-     * @brief
+     * @brief Processes the wifi platform events for the SiWx platform
      *
      * TODO: Current inheritance structure with the task creation in the parent forces this function to be public when it shouldn't
      *       be. This isn't the best practice and we should try to move this to protected.
@@ -97,7 +97,7 @@ private:
     sl_status_t JoinWifiNetwork();
 
     /**
-     * @brief TODO
+     * @brief Processing function responsible of executing the DHCP polling operation until we have an IPv6 or IPv4 address
      *
      */
     void HandleDHCPPolling();

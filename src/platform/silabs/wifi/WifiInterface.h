@@ -464,8 +464,9 @@ protected:
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
     bool mHasNotifiedIPv4 = false;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
+
 private:
-    osTimerId_t sRetryTimer;
+    osTimerId_t mRetryTimer;
 };
 
 } // namespace Silabs

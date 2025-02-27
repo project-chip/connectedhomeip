@@ -72,6 +72,7 @@ void WifiInterface::NotifyIPv6Change(bool gotIPv6Addr)
 
     HandleWFXSystemEvent(&eventData);
 }
+
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
 void WifiInterface::NotifyIPv4Change(bool gotIPv4Addr)
 {
@@ -119,12 +120,12 @@ void WifiInterface::ResetIPNotificationStates()
 
 void WifiInterface::NotifyWifiTaskInitialized(void)
 {
-    sl_wfx_startup_ind_t evt = {};
+    sl_wfx_startup_ind_t evt = { 0 };
 
     // TODO: We should move this to the init function and not the notification function
     // Creating a timer which will be used to retry connection with AP
-    sRetryTimer = osTimerNew(RetryConnectionTimerHandler, osTimerOnce, NULL, NULL);
-    VerifyOrReturn(sRetryTimer != NULL);
+    mRetryTimer = osTimerNew(RetryConnectionTimerHandler, osTimerOnce, NULL, NULL);
+    VerifyOrReturn(mRetryTimer != NULL);
 
     evt.header.id     = to_underlying(WifiEvent::kStartUp);
     evt.header.length = sizeof evt;
@@ -151,7 +152,7 @@ void WifiInterface::ScheduleConnectionAttempt()
         retryInterval = kWlanMaxRetryIntervalsInSec;
     }
 
-    if (osTimerStart(sRetryTimer, pdMS_TO_TICKS(retryInterval * 1000)) != osOK)
+    if (osTimerStart(mRetryTimer, pdMS_TO_TICKS(retryInterval * 1000)) != osOK)
     {
         ChipLogProgress(DeviceLayer, "Failed to start retry timer");
         // Sending the join command if retry timer failed to start

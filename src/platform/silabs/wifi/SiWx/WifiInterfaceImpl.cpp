@@ -246,7 +246,7 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t 
     return SL_STATUS_OK;
 }
 
-sl_status_t sl_wifi_siwx917_init(void)
+sl_status_t SiWxPlatformInit(void)
 {
     sl_status_t status = SL_STATUS_OK;
 
@@ -451,9 +451,9 @@ void WiseconnectWifiInterface::MatterWifiTask(void * arg)
     WiseconnectWifiInterface::WifiPlatformEvent event;
     sl_status_t status = SL_STATUS_OK;
 
-    status = sl_wifi_siwx917_init();
+    status = SiWxPlatformInit();
     VerifyOrReturn(status == SL_STATUS_OK,
-                   ChipLogError(DeviceLayer, "MatterWifiTask: sl_wifi_siwx917_init failed: 0x%lx", static_cast<uint32_t>(status)));
+                   ChipLogError(DeviceLayer, "MatterWifiTask: SiWxPlatformInit failed: 0x%lx", static_cast<uint32_t>(status)));
 
     WifiInterfaceImpl::GetInstance().NotifyWifiTaskInitialized();
 

@@ -30,6 +30,13 @@ class WifiInterfaceImpl final : public WifiInterface
 public:
     static WifiInterfaceImpl & GetInstance() { return mInstance; }
 
+    WifiInterfaceImpl(const WifiInterfaceImpl &)             = delete;
+    WifiInterfaceImpl & operator=(const WifiInterfaceImpl &) = delete;
+
+    /*
+     * WifiInterface Impl
+     */
+
     CHIP_ERROR InitWiFiStack(void) override;
     CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, chip::MutableByteSpan & addr) override;
     CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback) override;
@@ -59,9 +66,8 @@ public:
 
     /**
      * @brief Callback function passed to the Wi-Fi stack to notify the application of a connection event.
-     *
-     * @note Function is public to allow the Wi-Fi stack to call it. In practice, it should be private but the callback structure
-     *       needs to be reworked
+     *        Function is public to allow the Wi-Fi stack to call it. In practice, it should be private but the callback structure
+     *        needs to be reworked first.
      *
      * @param connect_indication_body Connection callback data
      */
@@ -69,6 +75,8 @@ public:
 
     /**
      * @brief Callback function to the Wi-Fi stack to notify the application of a disconnection event.
+     *        Function is public to allow the Wi-Fi stack to call it. In practice, it should be private but the callback
+     *        structure needs to be reworked first.
      *
      * @note See the sl_wfx_disconnect_ind_body_t structure for the reason values.
      *
@@ -78,6 +86,9 @@ public:
     void DisconnectionEventCallback(uint8_t * mac, uint16_t reason);
 
 private:
+    WifiInterfaceImpl()  = default;
+    ~WifiInterfaceImpl() = default;
+
     /**
      * @brief Initialize the WF200 platform
      *        Function triggers the platform int and the LwIP init.
@@ -96,14 +107,13 @@ private:
 
     /**
      * @brief Creates a new task to process Wi-Fi events
-     *
      */
     void StartWifiProcessTask(void);
 
     /**
      * @brief Wf200 Wifi Init
      *
-     * TODO: We have multiple init function when we could have only one
+     * TODO: We have multiple init function when we could have only one.
      *
      * @return sl_status_t SL_STATUS_OK if the platform is initialized successfully,
      *                     SL_STATUS_WIFI_INVALID_KEY, If the firmware keyset is invalid

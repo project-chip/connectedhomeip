@@ -70,27 +70,26 @@ private:
     ~WifiInterfaceImpl() = default;
 
     /**
-     * @brief
+     * @brief Callback function on a succesfull join operation
      *
-     * @param status
-     * @param buf
-     * @param len
+     *        See the third_party/silabs/wiseconnect-wifi-bt-sdk/sapi/wlan/rsi_wlan_apis.c
+     *        rsi_wlan_connect_async documentation for the argument definitions
      */
     static void JoinCallback(uint16_t status, const uint8_t * buf, const uint16_t len);
 
     /**
-     * @brief
+     * @brief Callback function for a failed join operation
      *
-     * @param status
-     * @param buf
-     * @param len
+     *        See the third_party/silabs/wiseconnect-wifi-bt-sdk/sapi/wlan/rsi_wlan_apis.c
+     *        rsi_wlan_register_callbacks documentation for the argument definitions
      */
     static void JoinFailCallback(uint16_t status, uint8_t * buf, uint32_t len);
 
     /**
-     * @brief
+     * @brief Platform Init for the RS911x platform
      *
-     * @return int32_t
+     * @return int32_t RSI_SUCCESS, on succesfull init
+     *                 RSI_FAILURE, otherwise
      */
     int32_t Rs911xPlatformInit();
 
@@ -100,8 +99,8 @@ private:
     void JoinWifiNetwork();
 
     /**
-     * @brief
-     *
+     * @brief Processing function responsible of executing the DHCP polling operation
+     *        until we have an IPv6 or IPv4 address
      */
     void HandleDHCPPolling();
 
