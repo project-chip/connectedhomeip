@@ -22,12 +22,16 @@ if(${ZEPHYR_VERSION_STRING} MATCHES "^3\\.3")
   set(ZEPHYR_VERSION_OVERLAY_FILE "${CMAKE_BINARY_DIR}/zephyr_version.conf")
   file(WRITE ${ZEPHYR_VERSION_OVERLAY_FILE} "CONFIG_ZEPHYR_VERSION_3_3=y\n")
 
+  function(add_compile_definitions)
+    foreach(flag IN LISTS ARGN)
+      add_definitions(-D${flag})
+      list(APPEND MATTER_CFLAGS "-D${flag}")
+    endforeach()
+    set(MATTER_CFLAGS "${MATTER_CFLAGS}" PARENT_SCOPE)
+  endfunction()
+
   # Add required MbedTLS defines for Zephyr 3.3
-  include(${CHIP_ROOT}/config/common/cmake/chip_gn_args.cmake)
-  matter_add_flags(-DMBEDTLS_HKDF_C=1)
-  matter_add_flags(-DMBEDTLS_X509_CREATE_C=1)
-  matter_add_flags(-DMBEDTLS_X509_CSR_WRITE_C=1)
-  add_definitions(-DMBEDTLS_HKDF_C -DMBEDTLS_X509_CREATE_C -DMBEDTLS_X509_CSR_WRITE_C)
+  add_compile_definitions(MBEDTLS_HKDF_C MBEDTLS_X509_CREATE_C MBEDTLS_X509_CSR_WRITE_C)
 endif()
 
 string(REPLACE "_retention" "" BASE_BOARD ${BOARD})
