@@ -404,6 +404,8 @@ Protocols::InteractionModel::Status ChefFanControlManager::OffCommand(EndpointId
         return Status::Success;
     }
 
+    Status status;
+
     uint8_t speedCurrent;
     status = SpeedCurrent::Get(endpointId, &speedCurrent);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
