@@ -228,7 +228,6 @@ static_library("interaction-model") {
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
-    "${chip_root}/src/app/icd/server:manager",
     "${chip_root}/src/app/icd/server:observer",
     "${chip_root}/src/app/util:af-types",
     "${chip_root}/src/app/util:callbacks",
@@ -239,6 +238,10 @@ static_library("interaction-model") {
     "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
   ]
+
+  if (chip_enable_icd_server) {
+    public_deps += [ "${chip_root}/src/app/icd/server:manager" ]
+  }
 
   public_configs = [ "${chip_root}/src:includes" ]
 
@@ -359,10 +362,25 @@ source_set("status-response") {
   ]
 }
 
-source_set("command-handler-interface") {
+source_set("command-handler") {
   sources = [
     "CommandHandler.cpp",
     "CommandHandler.h",
+  ]
+
+  public_deps = [
+    ":paths",
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/app/data-model",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/interaction_model",
+  ]
+}
+
+source_set("command-handler-interface") {
+  sources = [
     "CommandHandlerExchangeInterface.h",
     "CommandHandlerInterface.h",
     "CommandHandlerInterfaceRegistry.cpp",
@@ -370,9 +388,11 @@ source_set("command-handler-interface") {
   ]
 
   public_deps = [
+    ":command-handler",
     ":paths",
     "${chip_root}/src/access:types",
     "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
@@ -446,6 +466,18 @@ source_set("attribute-persistence") {
   ]
 }
 
+source_set("generic-test-event-trigger-handler") {
+  sources = [
+    "GenericEventManagementTestEventTriggerHandler.cpp",
+    "GenericEventManagementTestEventTriggerHandler.h",
+  ]
+
+  public_deps = [
+    ":test-event-trigger",
+    "${chip_root}/src/platform",
+  ]
+}
+
 # Note to developpers, instead of continuously adding files in the app librabry, it is recommand to create smaller source_sets that app can depend on.
 # This way, we can have a better understanding of dependencies and other componenets can depend on the different source_sets without needing to depend on the entire app library.
 static_library("app") {
@@ -461,8 +493,6 @@ static_library("app") {
     "EventManagement.h",
     "FailSafeContext.cpp",
     "FailSafeContext.h",
-    "GenericEventManagementTestEventTriggerHandler.cpp",
-    "GenericEventManagementTestEventTriggerHandler.h",
     "OTAUserConsentCommon.h",
     "ReadHandler.cpp",
     "TimerDelegates.cpp",

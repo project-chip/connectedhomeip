@@ -1,0 +1,521 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Closure Dimension Cluster Clusters" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0105" name="Closure 1st Dimension" picsCode="CLDIMA"/>
+    <clusterId id="0x0106" name="Closure 2nd Dimension" picsCode="CLDIMB"/>
+    <clusterId id="0x0107" name="Closure 3rd Dimension" picsCode="CLDIMC"/>
+    <clusterId id="0x0108" name="Closure 4th Dimension" picsCode="CLDIMD"/>
+    <clusterId id="0x0109" name="Closure 5th Dimension" picsCode="CLDIME"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="CLDIM" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="PS" name="Positioning" summary="Supports positioning in the range from 0.00% to 100.00%">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="1" code="LT" name="MotionLatching" summary="Supports a latch (securing a position, a state ...)">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="2" code="UT" name="Unit" summary="Supports additional data (in mm, degrees ...) to enhance control">
+      <optionalConform>
+        <feature name="PS"/>
+      </optionalConform>
+    </feature>
+    <feature bit="3" code="LM" name="Limitation" summary="Supports the limitation of the operating range">
+      <optionalConform>
+        <feature name="PS"/>
+      </optionalConform>
+    </feature>
+    <feature bit="4" code="SP" name="Speed" summary="Supports speed motion throttling.">
+      <optionalConform>
+        <feature name="PS"/>
+      </optionalConform>
+    </feature>
+    <feature bit="5" code="TR" name="Translation" summary="Drives a translation motion">
+      <optionalConform choice="b">
+        <feature name="PS"/>
+      </optionalConform>
+    </feature>
+    <feature bit="6" code="RO" name="Rotation" summary="Drives a rotation motion">
+      <optionalConform choice="b">
+        <feature name="PS"/>
+      </optionalConform>
+    </feature>
+    <feature bit="7" code="MD" name="Modulation" summary="Modulates a particular flow level (light, air, privacy ...)">
+      <optionalConform choice="b">
+        <feature name="PS"/>
+      </optionalConform>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="ClosureUnitEnum">
+      <item value="0" name="Millimeter" summary="Millimeter used as unit">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Degree" summary="Degree used as unit">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="LatchingAxisEnum">
+      <item value="0" name="VerticalTranslation" summary="Vertical translation latching">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="HorizontalTranslation" summary="Horizontal translation latching">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="DepthTranslation" summary="Depth translation latching">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="VerticalRotation" summary="Vertical rotation latching">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="HorizontalRotation" summary="Horizontal rotation latching">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="DepthRotation" summary="Depth rotation latching">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="Turnstile" summary="Turnstile rotation latching">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="Revolving" summary="Revolving rotation latching">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="ModulationTypeEnum">
+      <item value="0" name="SlatsOrientation" summary="Orientation of the slats">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="SlatsOpenwork" summary="Aperture of the slats">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="StripesAlignment" summary="Alignment of blind stripes (Zebra)">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Opacity" summary="Opacity of a surface">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="Ventilation" summary="Ventilation control">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="OverflowEnum">
+      <item value="0" name="NoOverflow" summary="No overflow">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Inside" summary="Inside overflow">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Outside" summary="Outside overflow">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="TopInside" summary="Top inside overflow">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="TopOutside" summary="Top outside overflow">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="BottomInside" summary="Bottom inside overflow">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="BottomOutside" summary="Bottom outside overflow">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="LeftInside" summary="Left inside overflow">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="LeftOutside" summary="Left outside overflow">
+        <mandatoryConform/>
+      </item>
+      <item value="9" name="RightInside" summary="Right inside overflow">
+        <mandatoryConform/>
+      </item>
+      <item value="10" name="RightOutside" summary="Right outside overflow">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="RotationAxisEnum">
+      <item value="0" name="Left" summary="Left rotation axis">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="CenteredVertical" summary="Vertically centered rotation axis">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="LeftAndRight" summary="Left &amp; Right rotation axis">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Right" summary="Right rotation axis">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="Top" summary="Top rotation axis">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="CenteredHorizontal" summary="Horizontally centered rotation axis">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="TopAndBottom" summary="Top &amp; Bottom rotation axis">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="Bottom" summary="Bottom rotation axis">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="LeftBarrier" summary="Left side barrier rotation axis">
+        <mandatoryConform/>
+      </item>
+      <item value="9" name="LeftAndRightBarriers" summary="Left &amp; Right barriers rotation axis">
+        <mandatoryConform/>
+      </item>
+      <item value="10" name="RightBarrier" summary="Right side barrier rotation axis">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="StepDirectionEnum">
+      <item value="0" name="Decrease" summary="Decrease towards 0.00%">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Increase" summary="Increase towards 100.00%">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="TranslationDirectionEnum">
+      <item value="0" name="Downward" summary="Downward translation">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Upward" summary="Upward translation">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="VerticalMask" summary="Vertical mask translation">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="VerticalSymmetry" summary="Vertical symmetry translation">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="Leftward" summary="Leftward translation">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="Rightward" summary="Rightward translation">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="HorizontalMask" summary="Horizontal mask translation">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="HorizontalSymmetry" summary="Horizontal symmetry translation">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="Forward" summary="Forward translation">
+        <mandatoryConform/>
+      </item>
+      <item value="9" name="Backward" summary="Backward translation">
+        <mandatoryConform/>
+      </item>
+      <item value="10" name="DepthMask" summary="Depth mask translation">
+        <mandatoryConform/>
+      </item>
+      <item value="11" name="DepthSymmetry" summary="Depth symmetry translation">
+        <mandatoryConform/>
+      </item>
+      <item value="12" name="CeilingSimple" summary="Ceiling simple translation">
+        <mandatoryConform/>
+      </item>
+      <item value="13" name="CeilingMask" summary="Ceiling mask translation">
+        <mandatoryConform/>
+      </item>
+      <item value="14" name="CeilingSidedSymmetry" summary="Ceiling sided symmetry translation">
+        <mandatoryConform/>
+      </item>
+      <item value="15" name="CeilingCenteredSymmetry" summary="Ceiling centered simple translation">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <struct name="CurrentStruct">
+      <field id="0" name="Position" type="percent100ths">
+        <mandatoryConform>
+          <feature name="PS"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="Latching" type="LatchingEnum" default="NotLatched">
+        <mandatoryConform>
+          <feature name="LT"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="Speed" type="ThreeLevelAutoEnum" default="Auto">
+        <mandatoryConform>
+          <feature name="SP"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="RangePercent100thsStruct">
+      <field id="0" name="Min" type="percent100ths">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Max" type="percent100ths">
+        <mandatoryConform/>
+        <constraint>
+          <between value="100">
+            <field name="Min"/>
+          </between>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="TargetStruct">
+      <field id="0" name="Position" type="percent100ths">
+        <mandatoryConform>
+          <feature name="PS"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="TagLatch" type="TagLatchEnum">
+        <mandatoryConform>
+          <feature name="LT"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="Speed" type="ThreeLevelAutoEnum" default="Auto">
+        <mandatoryConform>
+          <feature name="SP"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="UnitRangeStruct">
+      <field id="0" name="Min" type="int16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Max" type="int16">
+        <mandatoryConform/>
+        <constraint>
+          <between value="32767">
+            <field name="Min"/>
+          </between>
+        </constraint>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="TagList" type="list" default="MS">
+      <entry type="SemanticTagStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <optionalConform/>
+      <constraint>
+        <countBetween>
+          <from value="1"/>
+          <to value="2"/>
+        </countBetween>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="Current" type="CurrentStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="Target" type="TargetStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="Resolution" type="percent100ths">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="PS"/>
+      </mandatoryConform>
+      <constraint>
+        <min value="0.01"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="StepValue" type="percent100ths">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="PS"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0005" name="Unit" type="ClosureUnitEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="UT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0006" name="UnitRange" type="UnitRangeStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="UT"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0007" name="LimitRange" type="RangePercent100thsStruct">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="LM"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0008" name="TranslationDirection" type="TranslationDirectionEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="TR"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0009" name="RotationAxis" type="RotationAxisEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="RO"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x000A" name="Overflow" type="OverflowEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="RO"/>
+        </mandatoryConform>
+        <optionalConform>
+          <feature name="LT"/>
+        </optionalConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute id="0x000B" name="ModulationType" type="ModulationTypeEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="MD"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x000C" name="LatchingAxis" type="LatchingAxisEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="LT"/>
+          <notTerm>
+            <feature name="TR"/>
+          </notTerm>
+          <notTerm>
+            <feature name="RO"/>
+          </notTerm>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="SetTarget" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="Position" type="percent100ths">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+      <field id="1" name="TagLatch" type="TagLatchEnum">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+      <field id="2" name="Speed" type="ThreeLevelAutoEnum">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+    </command>
+    <command id="0x01" name="Step" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="PS"/>
+      </mandatoryConform>
+      <field id="0" name="Direction" type="StepDirectionEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="NumberOfSteps" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="2" name="Speed" type="ThreeLevelAutoEnum" default="MS">
+        <optionalConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+  </commands>
+</cluster>

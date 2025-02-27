@@ -133,6 +133,8 @@ MTR_DIRECT_MEMBERS
     // TODO: retain cycle and clean up https://github.com/project-chip/connectedhomeip/issues/34267
     MTR_LOG("MTRDevice dealloc: %p", self);
 
+    [_deviceController deviceDeallocated];
+
     // Locking because _cancelAllAttributeValueWaiters has os_unfair_lock_assert_owner(&_lock)
     std::lock_guard lock(_lock);
     [self _cancelAllAttributeValueWaiters];
@@ -201,10 +203,10 @@ MTR_DIRECT_MEMBERS
     MTR_LOG("%@ added delegate info %@", self, newDelegateInfo);
 
     // Call hook to allow subclasses to act on delegate addition.
-    [self _delegateAdded];
+    [self _delegateAdded:delegate];
 }
 
-- (void)_delegateAdded
+- (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -233,6 +235,16 @@ MTR_DIRECT_MEMBERS
         [_delegates minusSet:delegatesToRemove];
         MTR_LOG("%@ removeDelegate: removed %lu", self, static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
     }
+
+    // Call hook to allow subclasses to act on delegate addition.
+    [self _delegateRemoved:delegate];
+}
+
+- (void)_delegateRemoved:(id<MTRDeviceDelegate>)delegate
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    // Nothing to do for now. At the moment this is a hook for subclasses.
 }
 
 - (void)invalidate
@@ -241,6 +253,12 @@ MTR_DIRECT_MEMBERS
 
     [_delegates removeAllObjects];
     [self _cancelAllAttributeValueWaiters];
+}
+
+- (BOOL)delegateExists
+{
+    std::lock_guard lock(_lock);
+    return [self _delegateExists];
 }
 
 - (BOOL)_delegateExists
