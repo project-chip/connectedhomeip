@@ -24,8 +24,10 @@ using namespace chip::app::Clusters::Actions;
 using namespace chip::app::Clusters::Actions::Attributes;
 using namespace chip::Protocols::InteractionModel;
 
+namespace {
 Clusters::Actions::ActionsDelegateImpl * sActionsDelegateImpl = nullptr;
 Clusters::Actions::ActionsServer * sActionsServer             = nullptr;
+} // namespace
 
 CHIP_ERROR ActionsDelegateImpl::ReadActionAtIndex(uint16_t index, ActionStructStorage & action)
 {

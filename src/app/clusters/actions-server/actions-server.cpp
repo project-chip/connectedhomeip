@@ -45,9 +45,6 @@ void ActionsServer::Shutdown()
 
 CHIP_ERROR ActionsServer::Init()
 {
-    // Check if the cluster has been selected in zap
-    VerifyOrDie(emberAfContainsServer(mEndpointId, Actions::Id) == true);
-
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
@@ -111,7 +108,6 @@ CHIP_ERROR ActionsServer::ReadActionListAttribute(const ConcreteReadAttributePat
     {
         ActionStructStorage action;
         CHIP_ERROR err = mDelegate->ReadActionAtIndex(i, action);
-
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
             return CHIP_NO_ERROR;
@@ -128,7 +124,6 @@ CHIP_ERROR ActionsServer::ReadEndpointListAttribute(const ConcreteReadAttributeP
     for (uint16_t i = 0; i < kMaxEndpointListLength; i++)
     {
         EndpointListStorage epList;
-
         CHIP_ERROR err = mDelegate->ReadEndpointListAtIndex(i, epList);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
