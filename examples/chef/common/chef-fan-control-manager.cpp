@@ -88,6 +88,21 @@ static std::unique_ptr<ChefFanControlManager> mFanControlManager;
 
 Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff)
 {
+
+    bool fanIsOn;
+    // read current on/off value
+    Status status = OnOff::Attributes::OnOff::Get(mEndpoint, &fanIsOn);
+    if (status != Status::Success)
+    {
+        ChipLogError(DeviceLayer, "ERR: reading on/off %x", to_underlying(status));
+        return status;
+    }
+    if (!fanIsOn)
+    {
+        ChipLogError(DeviceLayer, "Can't step when device is Off.");
+        return Status::InvalidAction;
+    }
+
     ChipLogProgress(NotSpecified, "ChefFanControlManager::HandleStep aDirection %d, aWrap %d, aLowestOff %d",
                     to_underlying(aDirection), aWrap, aLowestOff);
 
