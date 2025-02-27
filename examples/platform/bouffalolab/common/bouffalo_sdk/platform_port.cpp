@@ -56,6 +56,8 @@ extern "C" void vAssertCalled(void)
         printf("vAssertCalled, ra = %p in task %s\r\n", (void *) ra, pcTaskGetName(NULL));
     }
 
+    abort();
+
     while (true)
         ;
 }

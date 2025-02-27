@@ -584,32 +584,37 @@ static void RegisterSwitchCommands()
 
     // Register groups command
     sShellSwitchGroupsIdentifySubCommands.RegisterCommands(sSwitchGroupsIdentifySubCommands,
-                                                           ArraySize(sSwitchGroupsIdentifySubCommands));
-    sShellSwitchGroupsOnOffSubCommands.RegisterCommands(sSwitchGroupsOnOffSubCommands, ArraySize(sSwitchGroupsOnOffSubCommands));
+                                                           MATTER_ARRAY_SIZE(sSwitchGroupsIdentifySubCommands));
+    sShellSwitchGroupsOnOffSubCommands.RegisterCommands(sSwitchGroupsOnOffSubCommands,
+                                                        MATTER_ARRAY_SIZE(sSwitchGroupsOnOffSubCommands));
     sShellSwitchGroupsLevelControlSubCommands.RegisterCommands(sSwitchGroupsLevelControlSubCommands,
-                                                               ArraySize(sSwitchGroupsLevelControlSubCommands));
+                                                               MATTER_ARRAY_SIZE(sSwitchGroupsLevelControlSubCommands));
     sShellSwitchGroupsColorControlSubCommands.RegisterCommands(sSwitchGroupsColorControlSubCommands,
-                                                               ArraySize(sSwitchGroupsColorControlSubCommands));
+                                                               MATTER_ARRAY_SIZE(sSwitchGroupsColorControlSubCommands));
     sShellSwitchGroupsThermostatSubCommands.RegisterCommands(sSwitchGroupsThermostatSubCommands,
-                                                             ArraySize(sSwitchGroupsThermostatSubCommands));
+                                                             MATTER_ARRAY_SIZE(sSwitchGroupsThermostatSubCommands));
 
     // Register commands
-    sShellSwitchIdentifySubCommands.RegisterCommands(sSwitchIdentifySubCommands, ArraySize(sSwitchIdentifySubCommands));
-    sShellSwitchIdentifyReadSubCommands.RegisterCommands(sSwitchIdentifyReadSubCommands, ArraySize(sSwitchIdentifyReadSubCommands));
-    sShellSwitchOnOffSubCommands.RegisterCommands(sSwitchOnOffSubCommands, ArraySize(sSwitchOnOffSubCommands));
-    sShellSwitchOnOffReadSubCommands.RegisterCommands(sSwitchOnOffReadSubCommands, ArraySize(sSwitchOnOffReadSubCommands));
-    sShellSwitchLevelControlSubCommands.RegisterCommands(sSwitchLevelControlSubCommands, ArraySize(sSwitchLevelControlSubCommands));
+    sShellSwitchIdentifySubCommands.RegisterCommands(sSwitchIdentifySubCommands, MATTER_ARRAY_SIZE(sSwitchIdentifySubCommands));
+    sShellSwitchIdentifyReadSubCommands.RegisterCommands(sSwitchIdentifyReadSubCommands,
+                                                         MATTER_ARRAY_SIZE(sSwitchIdentifyReadSubCommands));
+    sShellSwitchOnOffSubCommands.RegisterCommands(sSwitchOnOffSubCommands, MATTER_ARRAY_SIZE(sSwitchOnOffSubCommands));
+    sShellSwitchOnOffReadSubCommands.RegisterCommands(sSwitchOnOffReadSubCommands, MATTER_ARRAY_SIZE(sSwitchOnOffReadSubCommands));
+    sShellSwitchLevelControlSubCommands.RegisterCommands(sSwitchLevelControlSubCommands,
+                                                         MATTER_ARRAY_SIZE(sSwitchLevelControlSubCommands));
     sShellSwitchLevelControlReadSubCommands.RegisterCommands(sSwitchLevelControlReadSubCommands,
-                                                             ArraySize(sSwitchLevelControlReadSubCommands));
-    sShellSwitchColorControlSubCommands.RegisterCommands(sSwitchColorControlSubCommands, ArraySize(sSwitchColorControlSubCommands));
+                                                             MATTER_ARRAY_SIZE(sSwitchLevelControlReadSubCommands));
+    sShellSwitchColorControlSubCommands.RegisterCommands(sSwitchColorControlSubCommands,
+                                                         MATTER_ARRAY_SIZE(sSwitchColorControlSubCommands));
     sShellSwitchColorControlReadSubCommands.RegisterCommands(sSwitchColorControlReadSubCommands,
-                                                             ArraySize(sSwitchColorControlReadSubCommands));
-    sShellSwitchThermostatSubCommands.RegisterCommands(sSwitchThermostatSubCommands, ArraySize(sSwitchThermostatSubCommands));
+                                                             MATTER_ARRAY_SIZE(sSwitchColorControlReadSubCommands));
+    sShellSwitchThermostatSubCommands.RegisterCommands(sSwitchThermostatSubCommands,
+                                                       MATTER_ARRAY_SIZE(sSwitchThermostatSubCommands));
     sShellSwitchThermostatReadSubCommands.RegisterCommands(sSwitchThermostatReadSubCommands,
-                                                           ArraySize(sSwitchThermostatReadSubCommands));
-    sShellSwitchGroupsSubCommands.RegisterCommands(sSwitchGroupsSubCommands, ArraySize(sSwitchGroupsSubCommands));
-    sShellSwitchBindingSubCommands.RegisterCommands(sSwitchBindingSubCommands, ArraySize(sSwitchBindingSubCommands));
-    sShellSwitchSubCommands.RegisterCommands(sSwitchSubCommands, ArraySize(sSwitchSubCommands));
+                                                           MATTER_ARRAY_SIZE(sSwitchThermostatReadSubCommands));
+    sShellSwitchGroupsSubCommands.RegisterCommands(sSwitchGroupsSubCommands, MATTER_ARRAY_SIZE(sSwitchGroupsSubCommands));
+    sShellSwitchBindingSubCommands.RegisterCommands(sSwitchBindingSubCommands, MATTER_ARRAY_SIZE(sSwitchBindingSubCommands));
+    sShellSwitchSubCommands.RegisterCommands(sSwitchSubCommands, MATTER_ARRAY_SIZE(sSwitchSubCommands));
 
     Engine::Root().RegisterCommands(&sSwitchCommand, 1);
 }

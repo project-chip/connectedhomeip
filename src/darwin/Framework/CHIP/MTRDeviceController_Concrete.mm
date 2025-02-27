@@ -1429,6 +1429,28 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return NO;
 }
 
+- (BOOL)definitelyUsesThreadForDevice:(chip::NodeId)nodeID
+{
+    if (!chip::IsOperationalNodeId(nodeID)) {
+        return NO;
+    }
+
+    // Get the corresponding MTRDevice object for the node id
+    MTRDevice * device = [self deviceForNodeID:@(nodeID)];
+
+    // TODO: Can we not just assume this isKindOfClass test is true?  Would be
+    // really nice if we had compile-time checking for this somehow...
+    if (![device isKindOfClass:MTRDevice_Concrete.class]) {
+        MTR_LOG_ERROR("%@ somehow has %@ instead of MTRDevice_Concrete for node ID 0x%016llX (%llu)", self, device, nodeID, nodeID);
+        return NO;
+    }
+
+    auto * concreteDevice = static_cast<MTRDevice_Concrete *>(device);
+
+    BOOL usesThread = [concreteDevice deviceUsesThread];
+    return usesThread;
+}
+
 - (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
 {
     // TODO: Figure out whether the synchronization here makes sense.  What
@@ -1440,22 +1462,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return;
     }
 
-    // Get the corresponding MTRDevice object to determine if the case/subscription pool is to be used
-    MTRDevice * device = [self deviceForNodeID:@(nodeID)];
-
-    // TODO: Can we not just assume this isKindOfClass test is true?  Would be
-    // really nice if we had compile-time checking for this somehow...
-    if (![device isKindOfClass:MTRDevice_Concrete.class]) {
-        MTR_LOG_ERROR("%@ somehow has %@ instead of MTRDevice_Concrete for node ID 0x%016llX (%llu)", self, device, nodeID, nodeID);
-        completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
-        return;
-    }
-
-    auto * concreteDevice = static_cast<MTRDevice_Concrete *>(device);
-
     // In the case that this device is known to use thread, queue this with subscription attempts as well, to
     // help with throttling Thread traffic.
-    if ([concreteDevice deviceUsesThread]) {
+    if ([self definitelyUsesThreadForDevice:nodeID]) {
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull workItemCompletion) {
             MTRInternalDeviceConnectionCallback completionWrapper = ^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
@@ -1666,6 +1675,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)operationalInstanceAdded:(NSNumber *)nodeID
 {
+    MTR_LOG("%@ at fabric index %u notified about new operational node 0x%016llx (%llu)", self, self.fabricIndex,
+        nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue);
+
     // If we don't have an existing MTRDevice for this node ID, that's fine;
     // nothing to do.
     MTRDevice * device = [self _deviceForNodeID:nodeID createIfNeeded:NO];
@@ -1748,7 +1760,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return @[];
     }
 
-    return [self.controllerDataStore nodesWithStoredData];
+    return self.controllerDataStore.nodesWithStoredData;
 }
 
 @end

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -51,16 +51,17 @@ are the sole property of their respective owners.
 
 This notice and disclaimer must be included on all copies of this document.
 
-Connectivity Standards Alliance +
-508 Second Street, Suite 206 +
+Connectivity Standards Alliance
+508 Second Street, Suite 206
 Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0061" name="RVC Operational State Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0061" name="RVC Operational State Cluster" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="The Pause and Resume commands are usable in all compatible states. Deprecate the Start and Stop commands. Add the GoHome command."/>
+    <revision revision="3" summary="Add several operational states and errors"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0061" name="RVC Operational State"/>
@@ -68,6 +69,18 @@ Davis, CA 95616, USA
   <classification hierarchy="derived" baseCluster="Operational State" role="application" picsCode="RVCOPSTATE" scope="Endpoint"/>
   <dataTypes>
     <enum name="ErrorStateEnum">
+      <item value="0x00" name="NoError" summary="The device is not in an error state">
+        <mandatoryConform/>
+      </item>
+      <item value="0x01" name="UnableToStartOrResume" summary="The device is unable to start or resume operation">
+        <mandatoryConform/>
+      </item>
+      <item value="0x02" name="UnableToCompleteOperation" summary="The device was unable to complete the current operation">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="CommandInvalidInState" summary="The device cannot process the command in its current state">
+        <mandatoryConform/>
+      </item>
       <item value="0x40" name="FailedToFindChargingDock" summary="The device has failed to find or reach the charging dock">
         <mandatoryConform/>
       </item>
@@ -80,10 +93,10 @@ Davis, CA 95616, USA
       <item value="0x43" name="DustBinFull" summary="The device has detected that its dust bin is full">
         <mandatoryConform/>
       </item>
-      <item value="0x44" name="WaterTankEmpty" summary="The device has detected that its water tank is empty">
+      <item value="0x44" name="WaterTankEmpty" summary="The device has detected that its clean water tank is empty">
         <mandatoryConform/>
       </item>
-      <item value="0x45" name="WaterTankMissing" summary="The device has detected that its water tank is missing">
+      <item value="0x45" name="WaterTankMissing" summary="The device has detected that its clean water tank is missing">
         <mandatoryConform/>
       </item>
       <item value="0x46" name="WaterTankLidOpen" summary="The device has detected that its water tank lid is open">
@@ -92,8 +105,41 @@ Davis, CA 95616, USA
       <item value="0x47" name="MopCleaningPadMissing" summary="The device has detected that its cleaning pad is missing">
         <mandatoryConform/>
       </item>
+      <item value="0x48" name="LowBattery" summary="The device is unable to start or to continue operating due to a low battery">
+        <mandatoryConform/>
+      </item>
+      <item value="0x49" name="CannotReachTargetArea" summary="The device is unable to move to an area where it was asked to operate, such as by setting the ServiceArea cluster&apos;s SelectedAreas attribute, due to an obstruction. For example, the obstruction might be a closed door or objects blocking the mapped path.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x4A" name="DirtyWaterTankFull" summary="The device has detected that its dirty water tank is full">
+        <mandatoryConform/>
+      </item>
+      <item value="0x4B" name="DirtyWaterTankMissing" summary="The device has detected that its dirty water tank is full">
+        <mandatoryConform/>
+      </item>
+      <item value="0x4C" name="WheelsJammed" summary="The device has detected that one or more wheels are jammed by an object">
+        <mandatoryConform/>
+      </item>
+      <item value="0x4D" name="BrushJammed" summary="The device has detected that its brush is jammed by an object">
+        <mandatoryConform/>
+      </item>
+      <item value="0x4E" name="NavigationSensorObscured" summary="The device has detected that one of its sensors, such as LiDAR, infrared, or camera is obscured and needs to be cleaned">
+        <mandatoryConform/>
+      </item>
     </enum>
     <enum name="OperationalStateEnum">
+      <item value="0x00" name="Stopped" summary="The device is stopped">
+        <mandatoryConform/>
+      </item>
+      <item value="0x01" name="Running" summary="The device is operating">
+        <mandatoryConform/>
+      </item>
+      <item value="0x02" name="Paused" summary="The device is paused during an operation">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="Error" summary="The device is in an error state">
+        <mandatoryConform/>
+      </item>
       <item value="0x40" name="SeekingCharger" summary="The device is en route to the charging dock">
         <mandatoryConform/>
       </item>
@@ -102,6 +148,18 @@ Davis, CA 95616, USA
       </item>
       <item value="0x42" name="Docked" summary="The device is on the dock, not charging">
         <mandatoryConform/>
+      </item>
+      <item value="0x43" name="EmptyingDustBin" summary="The device is automatically emptying its own dust bin, such as to a dock">
+        <optionalConform/>
+      </item>
+      <item value="0x44" name="CleaningMop" summary="The device is automatically cleaning its own mopping device, such as on a dock">
+        <optionalConform/>
+      </item>
+      <item value="0x45" name="FillingWaterTank" summary="The device is automatically filling its own clean water tank for use when mopping, such as from a dock">
+        <optionalConform/>
+      </item>
+      <item value="0x46" name="UpdatingMaps" summary="The device is processing acquired data to update its maps">
+        <optionalConform/>
       </item>
     </enum>
   </dataTypes>
@@ -117,10 +175,7 @@ Davis, CA 95616, USA
     <command id="0x04" name="OperationalCommandResponse"/>
     <command id="0x80" name="GoHome" direction="commandToServer" response="OperationalCommandResponse">
       <access invokePrivilege="operate"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </command>
   </commands>
 </cluster>
