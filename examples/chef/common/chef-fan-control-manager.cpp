@@ -351,29 +351,12 @@ void emberAfFanControlClusterInitCallback(EndpointId endpoint)
 
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
 
-Protocols::InteractionModel::Status ChefFanControlManager::OnCommand(const app::ConcreteCommandPath & commandPath)
+Protocols::InteractionModel::Status ChefFanControlManager::OnCommand(EndpointId endpointId)
 {
     ChipLogProgress(DeviceLayer, "ChefFanControlManager::OnCommand");
 
-    bool currentValue;
-    // read current on/off value
-    Status status = OnOff::Attributes::OnOff::Get(commandPath.mEndpointId, &currentValue);
-    if (status != Status::Success)
-    {
-        ChipLogError(DeviceLayer, "ERR: reading on/off %x", to_underlying(status));
-        return status;
-    }
-
-    if (currentValue) // Already On. Nothing to do.
-    {
-        return Status::Success;
-    }
-
-    OnOff::Attributes::OnOff::Set(commandPath.mEndpointId, true);
-    MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OnOff::Id, OnOff::Attributes::OnOff::Id);
-
     FanControl::FanModeEnum fanMode;
-    FanControl::Attributes::FanMode::Get(commandPath.mEndpointId, &fanMode);
+    FanControl::Attributes::FanMode::Get(endpointId, &fanMode);
 
     if (fanMode == FanControl::FanModeEnum::kOff) // Off mode implies Speed/Percent setting values are 0.
     {
@@ -384,54 +367,37 @@ Protocols::InteractionModel::Status ChefFanControlManager::OnCommand(const app::
 
     if (!speedSetting.IsNull() && speedSetting.Value())
     {
-        status = FanControl::Attributes::SpeedCurrent::Set(commandPath.mEndpointId, speedSetting.Value());
+        status = FanControl::Attributes::SpeedCurrent::Set(endpointId, speedSetting.Value());
         if (status != Status::Success)
         {
             ChipLogError(DeviceLayer, "Error setting SpeedCurrent: %d", to_underlying(status));
             return status;
         }
-        MatterReportingAttributeChangeCallback(commandPath.mEndpointId, FanControl::Id, FanControl::Attributes::SpeedCurrent::Id);
+        MatterReportingAttributeChangeCallback(endpointId, FanControl::Id, FanControl::Attributes::SpeedCurrent::Id);
     }
 
     DataModel::Nullable<uint8_t> percentSetting(GetPercentSetting());
 
     if (!percentSetting.IsNull() && percentSetting.Value())
     {
-        status = FanControl::Attributes::PercentCurrent::Set(commandPath.mEndpointId, percentSetting.Value());
+        status = FanControl::Attributes::PercentCurrent::Set(endpointId, percentSetting.Value());
         if (status != Status::Success)
         {
             ChipLogError(DeviceLayer, "Error setting PercentCurrent: %d", to_underlying(status));
             return status;
         }
-        MatterReportingAttributeChangeCallback(commandPath.mEndpointId, FanControl::Id, FanControl::Attributes::PercentCurrent::Id);
+        MatterReportingAttributeChangeCallback(endpointId, FanControl::Id, FanControl::Attributes::PercentCurrent::Id);
     }
 
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status ChefFanControlManager::OffCommand(const app::ConcreteCommandPath & commandPath)
+Protocols::InteractionModel::Status ChefFanControlManager::OffCommand(EndpointId endpointId)
 {
     ChipLogProgress(DeviceLayer, "ChefFanControlManager::OffCommand");
 
-    bool currentValue;
-    // read current on/off value
-    Status status = OnOff::Attributes::OnOff::Get(commandPath.mEndpointId, &currentValue);
-    if (status != Status::Success)
-    {
-        ChipLogError(DeviceLayer, "ERR: reading on/off %x", to_underlying(status));
-        return status;
-    }
-
-    if (!currentValue) // Already Off. Nothing to do.
-    {
-        return Status::Success;
-    }
-
-    OnOff::Attributes::OnOff::Set(commandPath.mEndpointId, false);
-    MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OnOff::Id, OnOff::Attributes::OnOff::Id);
-
     FanControl::FanModeEnum fanMode;
-    FanControl::Attributes::FanMode::Get(commandPath.mEndpointId, &fanMode);
+    FanControl::Attributes::FanMode::Get(endpointId, &fanMode);
 
     if (fanMode == FanControl::FanModeEnum::kOff) // Off mode implies Speed/Percent current values are 0.
     {
@@ -439,52 +405,44 @@ Protocols::InteractionModel::Status ChefFanControlManager::OffCommand(const app:
     }
 
     uint8_t speedCurrent;
-    status = SpeedCurrent::Get(commandPath.mEndpointId, &speedCurrent);
+    status = SpeedCurrent::Get(endpointId, &speedCurrent);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
 
     if (speedCurrent)
     {
-        status = FanControl::Attributes::SpeedCurrent::Set(commandPath.mEndpointId, 0);
+        status = FanControl::Attributes::SpeedCurrent::Set(endpointId, 0);
         if (status != Status::Success)
         {
             ChipLogError(DeviceLayer, "Error setting SpeedCurrent: %d", to_underlying(status));
             return status;
         }
-        MatterReportingAttributeChangeCallback(commandPath.mEndpointId, FanControl::Id, FanControl::Attributes::SpeedCurrent::Id);
+        MatterReportingAttributeChangeCallback(endpointId, FanControl::Id, FanControl::Attributes::SpeedCurrent::Id);
     }
 
     uint8_t percentCurrent;
-    status = PercentCurrent::Get(commandPath.mEndpointId, &percentCurrent);
+    status = PercentCurrent::Get(endpointId, &percentCurrent);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
 
     if (percentCurrent)
     {
-        status = FanControl::Attributes::PercentCurrent::Set(commandPath.mEndpointId, 0);
+        status = FanControl::Attributes::PercentCurrent::Set(endpointId, 0);
         if (status != Status::Success)
         {
             ChipLogError(DeviceLayer, "Error setting PercentCurrent: %d", to_underlying(status));
             return status;
         }
-        MatterReportingAttributeChangeCallback(commandPath.mEndpointId, FanControl::Id, FanControl::Attributes::PercentCurrent::Id);
+        MatterReportingAttributeChangeCallback(endpointId, FanControl::Id, FanControl::Attributes::PercentCurrent::Id);
     }
 
     return Status::Success;
 }
 
-bool emberAfOnOffClusterOnCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                   const OnOff::Commands::On::DecodableType & commandData)
+void HandleOnOffAttributeChangeForFan(EndpointId endpointId, bool value)
 {
-    Status status = mFanControlManager->OnCommand(commandPath);
-    commandObj->AddStatus(commandPath, status);
-    return true;
-}
-
-bool emberAfOnOffClusterOffCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                    const OnOff::Commands::Off::DecodableType & commandData)
-{
-    Status status = mFanControlManager->OffCommand(commandPath);
-    commandObj->AddStatus(commandPath, status);
-    return true;
+    if (value)
+        mFanControlManager->OnCommand(endpointId);
+    else
+        mFanControlManager->OffCommand(endpointId);
 }
 #endif
 

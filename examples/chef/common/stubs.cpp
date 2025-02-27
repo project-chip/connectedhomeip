@@ -261,6 +261,12 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     {
         HandleFanControlAttributeChange(attributeId, type, size, value);
     }
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+    else if (clusterId == OnOff::Id)
+    {
+        HandleOnOffAttributeChangeForFan(attributePath.mEndpointId, bool(*value));
+    }
+#endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
 #endif // MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
 }
 
