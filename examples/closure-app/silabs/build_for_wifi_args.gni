@@ -19,5 +19,5 @@ import("${chip_root}/src/platform/silabs/wifi/args.gni")
 
 sl_enable_test_event_trigger = false
 chip_enable_ota_requestor = false
-disable_lcd = true
+disable_lcd = false
 app_data_model = "${chip_root}/examples/closure-app/closure-common"

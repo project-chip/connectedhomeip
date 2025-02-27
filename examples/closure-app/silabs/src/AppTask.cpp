@@ -21,6 +21,14 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
+
+#ifdef DISPLAY_ENABLED
+#include "lcd.h"
+#ifdef QR_CODE_ENABLED
+#include "qrcodegen.h"
+#endif // QR_CODE_ENABLED
+#endif // DISPLAY_ENABLED
+
 #include <ClosureAppCommonMain.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -100,6 +108,10 @@ CHIP_ERROR AppTask::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
 
+#ifdef DISPLAY_ENABLED
+    GetLCD().Init((uint8_t *) "Closure-App");
+#endif
+
     err = BaseApplication::Init();
     if (err != CHIP_NO_ERROR)
     {
@@ -108,6 +120,21 @@ CHIP_ERROR AppTask::Init()
     }
 
     ApplicationInit();
+
+// Update the LCD with the Stored value. Show QR Code if not provisioned
+#ifdef DISPLAY_ENABLED
+    GetLCD().WriteDemoUI(false);
+#ifdef QR_CODE_ENABLED
+#ifdef SL_WIFI
+    if (!ConnectivityMgr().IsWiFiStationProvisioned())
+#else
+    if (!ConnectivityMgr().IsThreadProvisioned())
+#endif /* !SL_WIFI */
+    {
+        GetLCD().ShowQRCode(true);
+    }
+#endif // QR_CODE_ENABLED
+#endif
 
     return err;
 }
