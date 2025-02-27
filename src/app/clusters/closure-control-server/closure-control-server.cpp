@@ -188,12 +188,12 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
     case OverallTarget::Id:
         return aEncoder.Encode(GetOverallTarget());
-        
+
     /* FeatureMap - is held locally */
     case FeatureMap::Id:
         return aEncoder.Encode(mFeatures);
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
