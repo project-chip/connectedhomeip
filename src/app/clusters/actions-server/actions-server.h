@@ -114,11 +114,24 @@ class ActionsServer : public AttributeAccessInterface, public CommandHandlerInte
 {
 public:
     // Register for the Actions cluster on all endpoints.
-    ActionsServer() :
-        AttributeAccessInterface(Optional<EndpointId>::Missing(), Actions::Id),
-        CommandHandlerInterface(Optional<EndpointId>::Missing(), Actions::Id)
+    ActionsServer(EndpointId aEndpointId, Delegate * aDelegate) :
+        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Actions::Id),
+        CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Actions::Id), mDelegate(aDelegate), mEndpointId(aEndpointId)
     {}
-    static ActionsServer & Instance();
+
+    ~ActionsServer();
+
+    /**
+     * Initialise the Actions server instance.
+     * @return Returns an error if the given endpoint and cluster have not been enabled in zap, if the
+     * AttributeAccessInterface or AttributeAccessInterface registration fails returns an error.
+     */
+    CHIP_ERROR Init();
+
+    /**
+     * Unregisters the CommandHandlerInterface and AttributeAccessInterface.
+     */
+    void Shutdown();
 
     /**
      * @brief
@@ -152,6 +165,8 @@ public:
     void EndpointListModified(EndpointId aEndpoint);
 
 private:
+    Delegate * mDelegate;
+    EndpointId mEndpointId;
     static ActionsServer sInstance;
     static constexpr size_t kMaxEndpointListLength = 256u;
     static constexpr size_t kMaxActionListLength   = 256u;

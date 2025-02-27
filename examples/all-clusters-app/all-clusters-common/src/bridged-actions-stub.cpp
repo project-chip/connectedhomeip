@@ -24,6 +24,9 @@ using namespace chip::app::Clusters::Actions;
 using namespace chip::app::Clusters::Actions::Attributes;
 using namespace chip::Protocols::InteractionModel;
 
+Clusters::Actions::ActionsDelegateImpl * sActionsDelegateImpl = nullptr;
+Clusters::Actions::ActionsServer * sActionsServer             = nullptr;
+
 CHIP_ERROR ActionsDelegateImpl::ReadActionAtIndex(uint16_t index, ActionStructStorage & action)
 {
     if (index >= kActionList.size())
@@ -128,4 +131,13 @@ Status ActionsDelegateImpl::HandleDisableActionWithDuration(uint16_t actionId, u
 {
     // Not implemented
     return Status::NotFound;
+}
+
+void emberAfActionsClusterInitCallback(EndpointId endpoint)
+{
+    VerifyOrReturn(endpoint == 1);
+    VerifyOrReturn(sActionsDelegateImpl == nullptr && sActionsServer == nullptr);
+    sActionsDelegateImpl = new Actions::ActionsDelegateImpl;
+    sActionsServer       = new Actions::ActionsServer(endpoint, sActionsDelegateImpl);
+    sActionsServer->Init();
 }

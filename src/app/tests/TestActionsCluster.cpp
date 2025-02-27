@@ -44,17 +44,11 @@ namespace app {
 using namespace Clusters::Actions;
 using namespace chip::Protocols::InteractionModel;
 
-class TestActionsCluster : public ::testing::Test
-{
-public:
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
-};
+class TestActionsDelegateImpl;
 
 class TestActionsDelegateImpl : public Clusters::Actions::Delegate
 {
 public:
-    EndpointId endpointId                               = 0;
     static constexpr uint8_t kMaxActionNameLength       = 128u;
     static constexpr uint8_t kMaxEndpointListNameLength = 128u;
     static constexpr uint16_t kEndpointListMaxSize      = 256u;
@@ -176,7 +170,26 @@ public:
     }
 };
 
-TestActionsDelegateImpl delegate;
+static TestActionsDelegateImpl * sActionsDelegateImpl;
+static ActionsServer * sActionsServer;
+
+class TestActionsCluster : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        sActionsDelegateImpl = new TestActionsDelegateImpl;
+        sActionsServer       = new ActionsServer(0, sActionsDelegateImpl);
+        sActionsServer->Init();
+    }
+    static void TearDownTestSuite()
+    {
+        sActionsServer->Shutdown();
+        chip::Platform::MemoryShutdown();
+    }
+};
+
 TEST_F(TestActionsCluster, TestActionListConstraints)
 {
     // Test 1: Action name length constraint
@@ -186,6 +199,7 @@ TEST_F(TestActionsCluster, TestActionListConstraints)
 
     ActionStructStorage actionWithLongName(1, CharSpan::fromCharString(longName), ActionTypeEnum::kScene, 0, BitMask<CommandBits>(),
                                            ActionStateEnum::kInactive);
+    TestActionsDelegateImpl delegate = *sActionsDelegateImpl;
 
     // Add action and verify it was added successfully
     EXPECT_EQ(delegate.AddTestAction(actionWithLongName), CHIP_NO_ERROR);
@@ -221,6 +235,7 @@ TEST_F(TestActionsCluster, TestEndpointListConstraints)
     EndpointListStorage epListWithLongName(1, CharSpan::fromCharString(longName), EndpointListTypeEnum::kOther,
                                            DataModel::List<const EndpointId>(endpoints));
 
+    TestActionsDelegateImpl delegate = *sActionsDelegateImpl;
     // Add endpoint list and verify it was added successfully
     EXPECT_EQ(delegate.AddTestEndpointList(epListWithLongName), CHIP_NO_ERROR);
 
@@ -264,8 +279,8 @@ TEST_F(TestActionsCluster, TestEndpointListConstraints)
 
 TEST_F(TestActionsCluster, TestActionListAttributeAccess)
 {
-    ActionsServer::Instance().SetDefaultDelegate(delegate.endpointId, &delegate);
-    delegate.mNumActions = 0;
+    TestActionsDelegateImpl delegate = *sActionsDelegateImpl;
+    delegate.mNumActions             = 0;
 
     // Add test actions
     ActionStructStorage action1(1, CharSpan::fromCharString("FirstAction"), ActionTypeEnum::kScene, 0, BitMask<CommandBits>(),
@@ -286,14 +301,14 @@ TEST_F(TestActionsCluster, TestActionListAttributeAccess)
     AttributeReportIBs::Builder builder;
     builder.Init(&tlvWriter);
 
-    ConcreteAttributePath path(delegate.endpointId, Clusters::Actions::Id, Clusters::Actions::Attributes::ActionList::Id);
+    ConcreteAttributePath path(0, Clusters::Actions::Id, Clusters::Actions::Attributes::ActionList::Id);
     ConcreteReadAttributePath readPath(path);
     chip::DataVersion dataVersion(0);
     Access::SubjectDescriptor subjectDescriptor;
     AttributeValueEncoder encoder(builder, subjectDescriptor, path, dataVersion);
 
     // Read the action list using the Actions cluster's Read function
-    EXPECT_EQ(ActionsServer::Instance().Read(readPath, encoder), CHIP_NO_ERROR);
+    EXPECT_EQ(sActionsServer->Read(readPath, encoder), CHIP_NO_ERROR);
 
     TLV::TLVReader reader;
     reader.Init(buf);
@@ -342,15 +357,12 @@ TEST_F(TestActionsCluster, TestActionListAttributeAccess)
     EXPECT_EQ(action.endpointListID, 1);
     EXPECT_EQ(action.supportedCommands.Raw(), 0);
     EXPECT_EQ(action.state, ActionStateEnum::kActive);
-
-    // Cleanup
-    ActionsServer::Instance().SetDefaultDelegate(delegate.endpointId, nullptr);
 }
 
 TEST_F(TestActionsCluster, TestEndpointListAttributeAccess)
 {
-    ActionsServer::Instance().SetDefaultDelegate(delegate.endpointId, &delegate);
-    delegate.mNumEndpointLists = 0;
+    TestActionsDelegateImpl delegate = *sActionsDelegateImpl;
+    delegate.mNumEndpointLists       = 0;
 
     // Add test endpoint lists
     const EndpointId endpoints1[] = { 1, 2 };
@@ -376,13 +388,14 @@ TEST_F(TestActionsCluster, TestEndpointListAttributeAccess)
     AttributeReportIBs::Builder builder;
     builder.Init(&tlvWriter);
 
-    ConcreteAttributePath path(delegate.endpointId, Clusters::Actions::Id, Clusters::Actions::Attributes::EndpointLists::Id);
+    ConcreteAttributePath path(0, Clusters::Actions::Id, Clusters::Actions::Attributes::EndpointLists::Id);
     ConcreteReadAttributePath readPath(path);
     chip::DataVersion dataVersion(0);
     Access::SubjectDescriptor subjectDescriptor;
     AttributeValueEncoder encoder(builder, subjectDescriptor, path, dataVersion);
 
-    EXPECT_EQ(ActionsServer::Instance().Read(path, encoder), CHIP_NO_ERROR);
+    // Read the endpoint lists using the Actions cluster's Read function
+    EXPECT_EQ(sActionsServer->Read(path, encoder), CHIP_NO_ERROR);
 
     TLV::TLVReader reader;
     reader.Init(buf);
@@ -443,9 +456,6 @@ TEST_F(TestActionsCluster, TestEndpointListAttributeAccess)
             EXPECT_EQ(endpoints2[i++], it.GetValue());
         }
     }
-
-    // Cleanup
-    ActionsServer::Instance().SetDefaultDelegate(delegate.endpointId, nullptr);
 }
 
 } // namespace app
