@@ -1366,14 +1366,14 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     using namespace Clusters::NetworkCommissioning::Commands;
     using Priv = chip::Access::Privilege;
 
-    static constexpr size_t kNetworkCommands = 5; // Count of Network Commands
+    static constexpr size_t kNetworkCommands = 7; // Count of max possible commands assuming all features
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(kNetworkCommands));
 
-    bool hasNet  = mFeatureFlags.Has(Feature::kThreadNetworkInterface);
-    bool hasWifi = mFeatureFlags.Has(Feature::kWiFiNetworkInterface);
+    bool hasThread = mFeatureFlags.Has(Feature::kThreadNetworkInterface);
+    bool hasWifi   = mFeatureFlags.Has(Feature::kWiFiNetworkInterface);
 
-    if (hasNet | hasWifi)
+    if (hasThread | hasWifi)
     {
-        ReturnErrorOnFailure(builder.EnsureAppendCapacity(kNetworkCommands));
         ReturnErrorOnFailure(builder.AppendElements({
             { ScanNetworks::Id, {}, Priv::kAdminister },   //
             { RemoveNetwork::Id, {}, Priv::kAdminister },  //
@@ -1381,7 +1381,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
             { ReorderNetwork::Id, {}, Priv::kAdminister }, //
         }));
         ReturnErrorOnFailure(
-            builder.Append({ hasNet ? AddOrUpdateThreadNetwork::Id : AddOrUpdateWiFiNetwork::Id, {}, Priv::kAdminister }));
+            builder.Append({ hasThread ? AddOrUpdateThreadNetwork::Id : AddOrUpdateWiFiNetwork::Id, {}, Priv::kAdminister }));
     }
 
     if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
@@ -1396,6 +1396,9 @@ CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & clus
 {
     using namespace Clusters::NetworkCommissioning::Commands;
 
+    static constexpr size_t kCommands = 5; // Count of max possible commands assuming all features
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(kCommands));
+
     if (mFeatureFlags.HasAny(Feature::kWiFiNetworkInterface, Feature::kThreadNetworkInterface))
     {
         ReturnErrorOnFailure(
@@ -1404,7 +1407,6 @@ CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & clus
 
     if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
     {
-        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
         ReturnErrorOnFailure(builder.Append(QueryIdentityResponse::Id));
     }
 

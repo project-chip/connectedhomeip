@@ -188,6 +188,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     using namespace Commands;
     using QF   = DataModel::CommandQualityFlags;
     using Priv = chip::Access::Privilege;
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(7));
 
     ReturnErrorOnFailure(builder.AppendElements({
         { Disable::Id, QF::kTimed, Priv::kOperate },        //
@@ -196,7 +197,6 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
     if (HasFeature(Feature::kV2x))
     {
-        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
         ReturnErrorOnFailure(builder.Append({ EnableDischarging::Id, QF::kTimed, Priv::kOperate }));
     }
 
@@ -211,7 +211,6 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
     if (SupportsOptCmd(OptionalCommands::kSupportsStartDiagnostics))
     {
-        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
         ReturnErrorOnFailure(builder.Append({ StartDiagnostics::Id, QF::kTimed, Priv::kOperate }));
     }
     return CHIP_NO_ERROR;

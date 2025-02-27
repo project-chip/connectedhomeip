@@ -110,6 +110,8 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     using namespace Commands;
     using Priv = chip::Access::Privilege;
 
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(8)); // Ensure we have capacity for all possible commands
+
     if (HasFeature(Feature::kPowerAdjustment))
     {
         ReturnErrorOnFailure(builder.AppendElements({
@@ -120,7 +122,6 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
     if (HasFeature(Feature::kStartTimeAdjustment))
     {
-        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
         ReturnErrorOnFailure(builder.Append({ StartTimeAdjustRequest::Id, {}, Priv::kOperate }));
     }
 
@@ -134,20 +135,17 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
     if (HasFeature(Feature::kForecastAdjustment))
     {
-        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
         ReturnErrorOnFailure(builder.Append({ ModifyForecastRequest::Id, {}, Priv::kOperate }));
     }
 
     if (HasFeature(Feature::kConstraintBasedAdjustment))
     {
-        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
         ReturnErrorOnFailure(builder.Append({ RequestConstraintBasedForecast::Id, {}, Priv::kOperate }));
     }
 
     if (HasFeature(Feature::kStartTimeAdjustment) || HasFeature(Feature::kForecastAdjustment) ||
         HasFeature(Feature::kConstraintBasedAdjustment))
     {
-        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
         ReturnErrorOnFailure(builder.Append({ CancelRequest::Id, {}, Priv::kOperate }));
     }
 
