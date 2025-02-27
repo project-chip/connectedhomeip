@@ -35,9 +35,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
-from collections import deque
 import logging
-import pprint
 import time
 from enum import Enum
 from typing import Any, Optional
@@ -53,6 +51,7 @@ from mobly import asserts
 class OrderEnum(Enum):
     Ascending = 1
     Descending = 2
+
 
 logger = logging.getLogger(__name__)
 
@@ -136,7 +135,7 @@ class TC_FAN_3_1(MatterBaseTest):
         if write_status == Status.Success:
             value_read = await self.read_setting(endpoint, attribute)
             asserts.assert_equal(value_read, value,
-                                f"[FC] Mismatch between written and read attribute value ({attribute.__name__} - written: {value}, read: {value_read})")
+                                 f"[FC] Mismatch between written and read attribute value ({attribute.__name__} - written: {value}, read: {value_read})")
         return write_status
 
     async def get_attribute_value_from_queue(self, attribute) -> Optional[Any]:
@@ -203,7 +202,8 @@ class TC_FAN_3_1(MatterBaseTest):
         self.fan_mode_sequence = await self.read_setting(endpoint, fan_mode_sequence_attr)
 
         # Verify response contains a FanModeSequenceEnum
-        asserts.assert_is_instance(self.fan_mode_sequence, fms_enum, f"[FC] FanModeSequence result isn't of enum type {fms_enum.__name__}")
+        asserts.assert_is_instance(self.fan_mode_sequence, fms_enum,
+                                   f"[FC] FanModeSequence result isn't of enum type {fms_enum.__name__}")
 
         fan_modes = None
         if self.fan_mode_sequence == 0:
@@ -265,7 +265,7 @@ class TC_FAN_3_1(MatterBaseTest):
         init_fan_mode = await self.read_setting(endpoint, attribute.FanMode)
         init_percent_setting = await self.read_setting(endpoint, attribute.PercentSetting)
         init_speed_setting = await self.read_setting(endpoint, attribute.SpeedSetting) if self.supports_multispeed else None
-        
+
         # Determine the initial values of the attributes to update and verify
         init_attr_to_update_value = init_percent_setting if attr_to_update == attribute.PercentSetting else init_fan_mode
         init_attr_to_verify_value = init_fan_mode if attr_to_verify == attribute.FanMode else init_percent_setting
@@ -313,41 +313,53 @@ class TC_FAN_3_1(MatterBaseTest):
         if init_fan_mode == fm_enum.kOff:
             if attr_to_update == attribute.PercentSetting:
                 if order == OrderEnum.Ascending:
-                    asserts.assert_equal(attr_to_verify_value_current, init_setting, f"[FC] Current {attr_to_verify.__name__} attribute value must be equal to the previous value")
+                    asserts.assert_equal(attr_to_verify_value_current, init_setting,
+                                         f"[FC] Current {attr_to_verify.__name__} attribute value must be equal to the previous value")
                 elif order == OrderEnum.Descending:
-                    asserts.assert_greater(attr_to_verify_value_current, init_setting, f"[FC] Current {attr_to_verify.__name__} attribute value must be greater than the previous value")
+                    asserts.assert_greater(attr_to_verify_value_current, init_setting,
+                                         f"[FC] Current {attr_to_verify.__name__} attribute value must be greater than the previous value")
             if attr_to_update == attribute.FanMode:
                 if order == OrderEnum.Ascending:
-                    asserts.assert_equal(attr_to_verify_value_current, init_setting, f"[FC] Current {attr_to_verify.__name__} attribute value must be equal to the previous value")
+                    asserts.assert_equal(attr_to_verify_value_current, init_setting,
+                                         f"[FC] Current {attr_to_verify.__name__} attribute value must be equal to the previous value")
                 elif order == OrderEnum.Descending:
-                    asserts.assert_greater(attr_to_verify_value_current, init_setting, f"[FC] Current {attr_to_verify.__name__} attribute value must be greater than the previous value")
+                    asserts.assert_greater(attr_to_verify_value_current, init_setting,
+                                           f"[FC] Current {attr_to_verify.__name__} attribute value must be greater than the previous value")
 
         # The fan's general state is High
         elif init_fan_mode == fm_enum.kHigh:
             if attr_to_update == attribute.PercentSetting:
                 if order == OrderEnum.Ascending:
-                    asserts.assert_less(attr_to_verify_value_current, init_setting, f"[FC] Current {attr_to_verify.__name__} attribute value must be less than the previous value")
+                    asserts.assert_less(attr_to_verify_value_current, init_setting,
+                                        f"[FC] Current {attr_to_verify.__name__} attribute value must be less than the previous value")
                 elif order == OrderEnum.Descending:
-                    asserts.assert_greater_equal(attr_to_verify_value_current, init_setting, f"[FC] Current {attr_to_verify.__name__} attribute value must be greater or equal to the previous value")
+                    asserts.assert_greater_equal(attr_to_verify_value_current, init_setting,
+                                                 f"[FC] Current {attr_to_verify.__name__} attribute value must be greater or equal to the previous value")
             if attr_to_update == attribute.FanMode:
                 # init_setting = init_speed_setting if attr_to_verify == attribute.SpeedSetting else init_percent_setting
                 if order == OrderEnum.Ascending:
-                    asserts.assert_less(attr_to_verify_value_current, init_setting, f"[FC] Current {attr_to_verify.__name__} attribute value must be less than the previous value")
+                    asserts.assert_less(attr_to_verify_value_current, init_setting,
+                                        f"[FC] Current {attr_to_verify.__name__} attribute value must be less than the previous value")
                 elif order == OrderEnum.Descending:
-                    asserts.assert_equal(attr_to_verify_value_current, init_setting, f"[FC] Current {attr_to_verify.__name__} attribute value must be equal to the previous value")
+                    asserts.assert_equal(attr_to_verify_value_current, init_setting,
+                                         f"[FC] Current {attr_to_verify.__name__} attribute value must be equal to the previous value")
 
         # The fan's general state is in between Off and High
         else:
             if attr_to_update == attribute.PercentSetting:
                 if order == OrderEnum.Ascending:
-                    asserts.assert_less(attr_to_verify_value_current, init_setting, f"[FC] Current {attr_to_verify.__name__} attribute value must be less than the previous value")
+                    asserts.assert_less(attr_to_verify_value_current, init_setting,
+                                        f"[FC] Current {attr_to_verify.__name__} attribute value must be less than the previous value")
                 elif order == OrderEnum.Descending:
-                    asserts.assert_greater(attr_to_verify_value_current, init_setting, f"[FC] Current {attr_to_verify.__name__} attribute value must be greater than the previous value")
+                    asserts.assert_greater(attr_to_verify_value_current, init_setting,
+                                           f"[FC] Current {attr_to_verify.__name__} attribute value must be greater than the previous value")
             if attr_to_update == attribute.FanMode:
                 if order == OrderEnum.Ascending:
-                    asserts.assert_less(attr_to_verify_value_current, init_setting, f"[FC] Current {attr_to_verify.__name__} attribute value must be less than the previous value")
+                    asserts.assert_less(attr_to_verify_value_current, init_setting,
+                                        f"[FC] Current {attr_to_verify.__name__} attribute value must be less than the previous value")
                 elif order == OrderEnum.Descending:
-                    asserts.assert_greater(attr_to_verify_value_current, init_setting, f"[FC] Current {attr_to_verify.__name__} attribute value must be greater than the previous value")
+                    asserts.assert_greater(attr_to_verify_value_current, init_setting,
+                                           f"[FC] Current {attr_to_verify.__name__} attribute value must be greater than the previous value")
 
     @staticmethod
     def verify_attribute_change(attr_to_verify, value_current, value_previous, order) -> None:
@@ -369,11 +381,11 @@ class TC_FAN_3_1(MatterBaseTest):
         if order == OrderEnum.Ascending:
             # Verify that the current attribute value is greater than the previous attribute value
             asserts.assert_greater(value_current, value_previous,
-                                f"[FC] Current {attr_to_verify.__name__} must be greater than previous {attr_to_verify.__name__}")
+                                   f"[FC] Current {attr_to_verify.__name__} must be greater than previous {attr_to_verify.__name__}")
         else:
             # Verify that the current attribute value is less than the previous attribute value
             asserts.assert_less(value_current, value_previous,
-                                    f"[FC] Current {attr_to_verify.__name__} must be less than previous {attr_to_verify.__name__}")
+                                f"[FC] Current {attr_to_verify.__name__} must be less than previous {attr_to_verify.__name__}")
 
         # Logging attribute value change details
         sub_text = f"({value_previous}) to ({value_current})"
@@ -498,7 +510,7 @@ class TC_FAN_3_1(MatterBaseTest):
         # Get current attribute-to-update value and verify it's equal to the previous value
         attr_to_verify_value_previous = init_attr_to_verify_value if iteration == 1 else attr_to_verify_value_previous
         asserts.assert_equal(attr_to_verify_value_current, attr_to_verify_value_previous,
-                            f"[FC] Current {attr_to_verify.__name__} attribute value ({attr_to_verify_value_current}) must be equal to the previous value ({attr_to_verify_value_previous})")
+                             f"[FC] Current {attr_to_verify.__name__} attribute value ({attr_to_verify_value_current}) must be equal to the previous value ({attr_to_verify_value_previous})")
 
     async def verify_attribute_success(self, attr_to_update, attr_to_verify, order, init_fan_mode, init_percent_setting, init_speed_setting, init_attr_to_verify_value, attr_to_verify_value_current, attr_to_verify_value_previous, iteration) -> tuple[Any, Any]:
         """
@@ -535,7 +547,8 @@ class TC_FAN_3_1(MatterBaseTest):
             #     the attributes initial-state value
             #     (as opposed to the value written in the preceding iteration)
             if iteration == 1:
-                self.handle_iteration_one_edge_cases(attr_to_update, attr_to_verify, order, attr_to_verify_value_current, init_fan_mode, init_percent_setting, init_speed_setting)
+                self.handle_iteration_one_edge_cases(
+                    attr_to_update, attr_to_verify, order, attr_to_verify_value_current, init_fan_mode, init_percent_setting, init_speed_setting)
             else:
                 # The attribute's previous-value may be None in some cases, defaulting to the attribute's initial state value if so
                 attr_to_verify_value_previous = init_attr_to_verify_value if attr_to_verify_value_previous is None else attr_to_verify_value_previous
@@ -611,28 +624,28 @@ class TC_FAN_3_1(MatterBaseTest):
         await self.attribute_subscription.start(self.default_controller, self.dut_node_id, ep)
 
         # *** STEP 5 ***
-        # TH tests the following scenario: 
+        # TH tests the following scenario:
         #   - Attribute to update: PercentSetting
         #   - Attribute to verify: PercentSetting, FanMode and SpeedSetting (if present)
         #   - Update order: Ascending
         await self.update_and_verify_attribute_progression(ep, attributes.PercentSetting, OrderEnum.Ascending)
 
         # *** STEP 6 ***
-        # TH tests the following scenario: 
+        # TH tests the following scenario:
         #   - Attribute to update: PercentSetting
         #   - Attribute to verify: PercentSetting, FanMode and SpeedSetting (if present)
         #   - Update order: Descending
         await self.update_and_verify_attribute_progression(ep, attributes.PercentSetting, OrderEnum.Descending)
 
         # *** STEP 7 ***
-        # TH tests the following scenario: 
+        # TH tests the following scenario:
         #   - Attribute to update: FanMode
         #   - Attribute to verify: FanMode, PercentSetting and SpeedSetting (if present)
         #   - Update order: Ascending
         await self.update_and_verify_attribute_progression(ep, attributes.FanMode, OrderEnum.Ascending)
 
         # *** STEP 8 ***
-        # TH tests the following scenario: 
+        # TH tests the following scenario:
         #   - Attribute to update: FanMode
         #   - Attribute to verify: FanMode, PercentSetting and SpeedSetting (if present)
         #   - Update order: Descending
