@@ -98,7 +98,7 @@ CHIP_ERROR Instance::SetMainState(MainStateEnum  aMainState)
 
 CHIP_ERROR Instance::SetOverallState(const GenericOverallState & aOverallState)
 {
-    // If the overall target state has changed, trigger the attribute change callback
+    // If the overall state has changed, trigger the attribute change callback
     if (!(mOverallState == aOverallState))
     {
         mOverallState = aOverallState;
@@ -110,7 +110,7 @@ CHIP_ERROR Instance::SetOverallState(const GenericOverallState & aOverallState)
 
 CHIP_ERROR Instance::SetOverallTarget(const GenericOverallTarget & aOverallTarget)
 {
-    // If the overall target state has changed, trigger the attribute change callback
+    // If the overall target has changed, trigger the attribute change callback
     if (!(mOverallTarget == aOverallTarget))
     {
         mOverallTarget = aOverallTarget;
@@ -241,9 +241,6 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
     case OverallTarget::Id:
         return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
     default:
-        // Unknown attribute; return error.  None of the other attributes for
-        // this cluster are writable, so should not be ending up in this code to
-        // start with.
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
 }
@@ -286,8 +283,6 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 
 void Instance::HandleStop(HandlerContext & ctx, const Commands::Stop::DecodableType & commandData)
 {
-    // No parameters for this command
-    // Call the delegate
     Status status = mDelegate.Stop();
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
@@ -295,20 +290,13 @@ void Instance::HandleStop(HandlerContext & ctx, const Commands::Stop::DecodableT
 
 void Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::DecodableType & commandData)
 {
-    const Optional<TagPositionEnum> tag               = commandData.tag;
-    const Optional<TagLatchEnum> latch                = commandData.latch;
-    const Optional<Globals::ThreeLevelAutoEnum> speed = commandData.speed;
-
-    // Call the delegate
-    Status status = mDelegate.MoveTo(tag, latch, speed);
+    Status status = mDelegate.MoveTo(commandData.tag, commandData.latch, commandData.speed);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void Instance::HandleCalibrate(HandlerContext & ctx, const Commands::Calibrate::DecodableType & commandData)
 {
-    // No parameters for this command
-    // Call the delegate
     Status status = mDelegate.Calibrate();
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
