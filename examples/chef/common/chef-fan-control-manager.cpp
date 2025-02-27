@@ -50,8 +50,8 @@ public:
     DataModel::Nullable<Percent> GetPercentSetting();
 
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
-    Protocols::InteractionModel::Status OnCommand(const app::ConcreteCommandPath & commandPath);
-    Protocols::InteractionModel::Status OffCommand(const app::ConcreteCommandPath & commandPath);
+    Protocols::InteractionModel::Status OnCommand(EndpointId endpointId);
+    Protocols::InteractionModel::Status OffCommand(EndpointId endpointId);
 #endif
 
 private:
