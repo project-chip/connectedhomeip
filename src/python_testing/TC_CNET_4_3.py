@@ -125,7 +125,8 @@ class TC_CNET_4_3(MatterBaseTest):
         matching_networks_count = sum(map(lambda x: x.networkID == last_network_id, networks))
         asserts.assert_equal(matching_networks_count, 1,
                              "Verify that LastNetworkID attribute matches the NetworkID value of one of the entries")
-        asserts.assert_true(isinstance(last_network_id, bytes) and 1 <= len(last_network_id) <= 32)
+        asserts.assert_true(isinstance(last_network_id, bytes) and 1 <= len(last_network_id) <= 32,
+                            "Verify LastNetworkID attribute value will be of type octstr with a length range of 1 to 32")
 
         self.step(8)
         last_connect_error_value = await self.read_single_attribute_check_success(
