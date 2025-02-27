@@ -96,8 +96,8 @@ class TC_CNET_4_3(MatterBaseTest):
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks)
         asserts.assert_true(networks, "NetworkInfoStruct list should not be empty")
-        matter_asserts.assert_list_element_type(networks, "All elements in list are of type NetworkInfoStruct",
-                                                Clusters.NetworkCommissioning.Structs.NetworkInfoStruct)
+        matter_asserts.assert_list_element_type(networks, Clusters.NetworkCommissioning.Structs.NetworkInfoStruct,
+                                                "All elements in list are of type NetworkInfoStruct")
         matter_asserts.assert_all(networks, lambda x: isinstance(x.networkID, bytes) and 1 <= len(x.networkID) <= 32,
                                   "NetworkID field is an octet string within a length range 1 to 32")
         connected_networks_count = sum(map(lambda x: x.connected, networks))
