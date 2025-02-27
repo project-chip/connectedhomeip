@@ -3471,21 +3471,6 @@ static BOOL AttributeIsSpecifiedInClosureControlCluster(AttributeId aAttributeId
     case Attributes::OverallTarget::Id: {
         return YES;
     }
-    case Attributes::RestingProcedure::Id: {
-        return YES;
-    }
-    case Attributes::TriggerCondition::Id: {
-        return YES;
-    }
-    case Attributes::TriggerPosition::Id: {
-        return YES;
-    }
-    case Attributes::WaitingDelay::Id: {
-        return YES;
-    }
-    case Attributes::KickoffTimer::Id: {
-        return YES;
-    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

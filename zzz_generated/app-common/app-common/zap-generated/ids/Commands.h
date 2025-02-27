@@ -1308,14 +1308,6 @@ namespace Calibrate {
 static constexpr CommandId Id = 0x00000002;
 } // namespace Calibrate
 
-namespace ConfigureFallback {
-static constexpr CommandId Id = 0x00000003;
-} // namespace ConfigureFallback
-
-namespace CancelFallback {
-static constexpr CommandId Id = 0x00000004;
-} // namespace CancelFallback
-
 } // namespace Commands
 } // namespace ClosureControl
 
