@@ -53,7 +53,7 @@ void Instance::Shutdown()
 
 bool Instance::HasFeature(Feature aFeatures) const
 {
-    return mFeature.Has(aFeatures);
+    return mFeatures.Has(aFeatures);
 }
 
 bool Instance::SupportsOptAttr(OptionalAttribute aOptionalAttrs) const
@@ -226,7 +226,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
     /* FeatureMap - is held locally */
     case FeatureMap::Id:
-        return aEncoder.Encode(mFeature);
+        return aEncoder.Encode(mFeatures);
     }
     /* Allow all other unhandled attributes to fall through to Ember */
     return CHIP_NO_ERROR;

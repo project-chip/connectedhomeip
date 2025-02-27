@@ -102,7 +102,7 @@ public:
      */
     Instance(EndpointId aEndpointId, Delegate & aDelegate,  BitMask<Feature> aFeatures, BitMask<OptionalAttribute> aOptionalAttrs) :
         AttributeAccessInterface(MakeOptional(aEndpointId), ClosureControl::Id),
-        CommandHandlerInterface(MakeOptional(aEndpointId), ClosureControl::Id), mDelegate(aDelegate), mFeature(aFeatures),
+        CommandHandlerInterface(MakeOptional(aEndpointId), ClosureControl::Id), mDelegate(aDelegate), mFeatures(aFeatures),
         mOptionalAttrs(aOptionalAttrs)
     {
         /* set the base class delegates endpointId */
@@ -187,7 +187,7 @@ protected:
 
 private:
     Delegate & mDelegate;
-    BitMask<Feature> mFeature;
+    BitMask<Feature> mFeatures;
     BitMask<OptionalAttribute> mOptionalAttrs;
 
     app::QuieterReportingAttribute<uint32_t> mCountdownTime{ DataModel::NullNullable };
