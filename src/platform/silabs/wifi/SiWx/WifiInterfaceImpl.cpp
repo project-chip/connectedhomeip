@@ -25,7 +25,7 @@
 #include <app/icd/server/ICDServerConfig.h>
 #include <inet/IPAddress.h>
 #include <lib/support/CHIPMem.h>
-#include <src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.h>
+#include <platform/silabs/wifi/SiWx/WifiInterfaceImpl.h>
 
 extern "C" {
 #include "sl_si91x_driver.h"
