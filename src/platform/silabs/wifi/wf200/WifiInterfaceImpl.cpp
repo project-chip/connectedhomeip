@@ -1078,7 +1078,7 @@ sl_status_t WifiInterfaceImpl::InitWf200Platform()
 {
     sl_status_t status = SL_STATUS_OK;
 
-    VerifyOrReturnValue(wifi_extra.Has(WifiInterface::WifiState::kStationStarted), SL_STATUS_OK);
+    VerifyOrReturnValue(!wifi_extra.Has(WifiInterface::WifiState::kStationStarted), SL_STATUS_OK);
 
     ChipLogDetail(DeviceLayer, "STARTING WF200");
 
