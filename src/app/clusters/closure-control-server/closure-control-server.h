@@ -50,24 +50,14 @@ public:
 
     // ------------------------------------------------------------------
     // Commands
-    virtual Protocols::InteractionModel::Status Stop()                                                    = 0;
+    virtual Protocols::InteractionModel::Status Stop()                                                      = 0;
     virtual Protocols::InteractionModel::Status MoveTo(const Optional<TagPositionEnum> & tag, const Optional<TagLatchEnum> & latch,
                                                        const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
-    virtual Protocols::InteractionModel::Status Calibrate()                                               = 0;
-    virtual Protocols::InteractionModel::Status ConfigureFallback(const Optional<RestingProcedureEnum> & restingProcedure,
-                                                                  const Optional<TriggerConditionEnum> & triggerCondition,
-                                                                  const Optional<TriggerPositionEnum> & triggerPosition,
-                                                                  const Optional<uint32_t> & waitingDelay)  = 0;
-    virtual Protocols::InteractionModel::Status CancelFallback()                                          = 0;
+    virtual Protocols::InteractionModel::Status Calibrate()                                                 = 0;
 
     // ------------------------------------------------------------------
     // Get attribute methods
     virtual DataModel::Nullable<uint32_t> GetCountdownTime() = 0;
-    virtual RestingProcedureEnum GetRestingProcedure()       = 0;
-    virtual TriggerConditionEnum GetTriggerCondition()       = 0;
-    virtual TriggerPositionEnum GetTriggerPosition()         = 0;
-    virtual uint32_t GetWaitingDelay()                       = 0;
-    virtual uint32_t GetKickoffTimer()                       = 0;
 
     /* These functions are called by the ReadAttribute handler to iterate through lists
      * The cluster server will call Start<Type>Read to allow the delegate to create a temporary
@@ -207,8 +197,6 @@ private:
     void HandleStop(HandlerContext & ctx, const Commands::Stop::DecodableType & commandData);
     void HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::DecodableType & commandData);
     void HandleCalibrate(HandlerContext & ctx, const Commands::Calibrate::DecodableType & commandData);
-    void HandleConfigureFallback(HandlerContext & ctx, const Commands::ConfigureFallback::DecodableType & commandData);
-    void HandleCancelFallback(HandlerContext & ctx, const Commands::CancelFallback::DecodableType & commandData);
 };
 
 } // namespace ClosureControl

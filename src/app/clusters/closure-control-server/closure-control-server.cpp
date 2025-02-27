@@ -188,47 +188,12 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
     case OverallTarget::Id:
         return aEncoder.Encode(GetOverallTarget());
-
-    case RestingProcedure::Id:
-        if (HasFeature(Feature::kFallback))
-        {
-            return aEncoder.Encode(mDelegate.GetRestingProcedure());
-        }
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-
-    case TriggerCondition::Id:
-        if (HasFeature(Feature::kFallback))
-        {
-            return aEncoder.Encode(mDelegate.GetTriggerCondition());
-        }
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-
-    case TriggerPosition::Id:
-        if (HasFeature(Feature::kFallback))
-        {
-            return aEncoder.Encode(mDelegate.GetTriggerPosition());
-        }
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-
-    case WaitingDelay::Id:
-        if (HasFeature(Feature::kFallback))
-        {
-            return aEncoder.Encode(mDelegate.GetWaitingDelay());
-        }
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-
-    case KickoffTimer::Id:
-        if (HasFeature(Feature::kFallback))
-        {
-            return aEncoder.Encode(mDelegate.GetKickoffTimer());
-        }
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-
+        
     /* FeatureMap - is held locally */
     case FeatureMap::Id:
         return aEncoder.Encode(mFeatures);
     }
-    /* Allow all other unhandled attributes to fall through to Ember */
+    
     return CHIP_NO_ERROR;
 }
 
@@ -316,29 +281,6 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
         break;
-    case ConfigureFallback::Id:
-        if (HasFeature(Feature::kFallback))
-        {
-            HandleCommand<ConfigureFallback::DecodableType>(handlerContext, [this](HandlerContext & ctx, const auto & commandData) {
-                HandleConfigureFallback(ctx, commandData);
-            });
-        }
-        else
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
-        }
-        break;
-    case CancelFallback::Id:
-        if (HasFeature(Feature::kFallback))
-        {
-            HandleCommand<CancelFallback::DecodableType>(
-                handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleCancelFallback(ctx, commandData); });
-        }
-        else
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
-        }
-        break;
     }
 }
 
@@ -368,28 +310,6 @@ void Instance::HandleCalibrate(HandlerContext & ctx, const Commands::Calibrate::
     // No parameters for this command
     // Call the delegate
     Status status = mDelegate.Calibrate();
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-void Instance::HandleConfigureFallback(HandlerContext & ctx, const Commands::ConfigureFallback::DecodableType & commandData)
-{
-    const Optional<RestingProcedureEnum> restingProcedure = commandData.restingProcedure;
-    const Optional<TriggerConditionEnum> triggerCondition = commandData.triggerCondition;
-    const Optional<TriggerPositionEnum> triggerPosition   = commandData.triggerPosition;
-    const Optional<uint32_t> waitingDelay                 = commandData.waitingDelay;
-
-    // Call the delegate
-    Status status = mDelegate.ConfigureFallback(restingProcedure, triggerCondition, triggerPosition, waitingDelay);
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-void Instance::HandleCancelFallback(HandlerContext & ctx, const Commands::CancelFallback::DecodableType & commandData)
-{
-    // No parameters for this command
-    // Call the delegate
-    Status status = mDelegate.CancelFallback();
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
