@@ -50,8 +50,8 @@ public:
     DataModel::Nullable<Percent> GetPercentSetting();
 
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
-    Status OnCommand(const app::ConcreteCommandPath & commandPath);
-    Status OffCommand(const app::ConcreteCommandPath & commandPath);
+    Protocols::InteractionModel::Status OnCommand(const app::ConcreteCommandPath & commandPath);
+    Protocols::InteractionModel::Status OffCommand(const app::ConcreteCommandPath & commandPath);
 #endif
 
 private:
@@ -351,7 +351,7 @@ void emberAfFanControlClusterInitCallback(EndpointId endpoint)
 
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
 
-Status ChefFanControlManager::OnCommand(const app::ConcreteCommandPath & commandPath)
+Protocols::InteractionModel::Status ChefFanControlManager::OnCommand(const app::ConcreteCommandPath & commandPath)
 {
     ChipLogProgress(DeviceLayer, "ChefFanControlManager::OnCommand");
 
@@ -409,9 +409,9 @@ Status ChefFanControlManager::OnCommand(const app::ConcreteCommandPath & command
     return Status::Success;
 }
 
-Status ChefFanControlManager::OffCommand(const app::ConcreteCommandPath & commandPath)
+Protocols::InteractionModel::Status ChefFanControlManager::OffCommand(const app::ConcreteCommandPath & commandPath)
 {
-    ChipLogProgress(DeviceLayer, "ChefFanControlManager::OnCommand");
+    ChipLogProgress(DeviceLayer, "ChefFanControlManager::OffCommand");
 
     bool currentValue;
     // read current on/off value
