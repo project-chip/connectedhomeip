@@ -87,7 +87,7 @@ class TC_G_2_2(MatterBaseTest):
         th1 = self.default_controller
 
         maxgroups: int = await self.read_single_attribute(
-            dev_ctrl=th1,node_id=self.dut_node_id,
+            dev_ctrl=th1, node_id=self.dut_node_id,
             endpoint=0,
             attribute=Clusters.GroupKeyManagement.Attributes.MaxGroupsPerFabric)
 
