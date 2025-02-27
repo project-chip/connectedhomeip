@@ -86,8 +86,13 @@ class TC_G_2_2(MatterBaseTest):
         self.step(0)
         th1 = self.default_controller
 
+        maxgroups: int = await self.read_single_attribute(
+            dev_ctrl=th1,node_id=self.dut_node_id,
+            endpoint=0,
+            attribute=Clusters.GroupKeyManagement.Attributes.MaxGroupsPerFabric)
+
         self.step("1a")
-        kGroupKeySetID = 0x0001
+        kGroupKeySetID = 1
         groupKey = Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
             groupKeySetID=kGroupKeySetID,
             groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
@@ -102,55 +107,8 @@ class TC_G_2_2(MatterBaseTest):
         resp = await self.send_single_cmd(dev_ctrl=th1, node_id=self.dut_node_id, cmd=cmd)
 
         self.step("1b")
-        kGroupId1 = 0x0001
-        kGroupId2 = 0x0002
-        kGroupId3 = 0x0003
-        kGroupId4 = 0x0004
-        kGroupId5 = 0x0005
-        kGroupId6 = 0x0006
-        kGroupId7 = 0x0007
-        kGroupId8 = 0x0008
-        kGroupId9 = 0x0009
-        kGroupId10 = 0x000A
-        kGroupId11 = 0x000B
-        kGroupId12 = 0x000C
-        groupKeyMapStruct: List[Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct] = []
-        groupKeyMapStruct.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
-            groupId=kGroupId1,
-            groupKeySetID=kGroupKeySetID))
-        groupKeyMapStruct.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
-            groupId=kGroupId2,
-            groupKeySetID=kGroupKeySetID))
-        groupKeyMapStruct.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
-            groupId=kGroupId3,
-            groupKeySetID=kGroupKeySetID))
-        groupKeyMapStruct.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
-            groupId=kGroupId4,
-            groupKeySetID=kGroupKeySetID))
-        groupKeyMapStruct.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
-            groupId=kGroupId5,
-            groupKeySetID=kGroupKeySetID))
-        groupKeyMapStruct.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
-            groupId=kGroupId6,
-            groupKeySetID=kGroupKeySetID))
-        groupKeyMapStruct.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
-            groupId=kGroupId7,
-            groupKeySetID=kGroupKeySetID))
-        groupKeyMapStruct.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
-            groupId=kGroupId8,
-            groupKeySetID=kGroupKeySetID))
-        groupKeyMapStruct.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
-            groupId=kGroupId9,
-            groupKeySetID=kGroupKeySetID))
-        groupKeyMapStruct.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
-            groupId=kGroupId10,
-            groupKeySetID=kGroupKeySetID))
-        groupKeyMapStruct.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
-            groupId=kGroupId11,
-            groupKeySetID=kGroupKeySetID))
-        groupKeyMapStruct.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
-            groupId=kGroupId12,
-            groupKeySetID=kGroupKeySetID))
+        GroupKeyMapStruct = Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct
+        groupKeyMapStruct = [GroupKeyMapStruct(groupId=i, groupKeySetID=kGroupKeySetID) for i in range(1, maxgroups+1)]
         resp = await th1.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(groupKeyMapStruct))])
         asserts.assert_equal(resp[0].Status, Status.Success, "GroupKeyMap attribute write failed")
 
@@ -160,6 +118,7 @@ class TC_G_2_2(MatterBaseTest):
 
         self.step("1d")
         kGroupName1 = "Gp1"
+        kGroupId1 = 1
         cmd = Clusters.Groups.Commands.AddGroup(kGroupId1, kGroupName1)
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
@@ -176,6 +135,7 @@ class TC_G_2_2(MatterBaseTest):
 
         self.step("3")
         kGroupName2 = "Gp2"
+        kGroupId2 = 2
         result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId2, kGroupName2))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0002 failed")
 
@@ -189,43 +149,43 @@ class TC_G_2_2(MatterBaseTest):
 
         self.step("5")
         kGroupName3 = "Gp3"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId3, kGroupName3))
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[2].groupId, kGroupName3))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0003 failed")
 
         kGroupName4 = "Gp4"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId4, kGroupName4))
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[3].groupId, kGroupName4))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0004 failed")
 
         kGroupName5 = "Gp5"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId5, kGroupName5))
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[4].groupId, kGroupName5))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0005 failed")
 
         kGroupName6 = "Gp6"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId6, kGroupName6))
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[5].groupId, kGroupName6))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0006 failed")
 
         kGroupName7 = "Gp7"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId7, kGroupName7))
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[6].groupId, kGroupName7))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0007 failed")
 
         kGroupName8 = "Gp8"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId8, kGroupName8))
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[7].groupId, kGroupName8))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0008 failed")
 
         kGroupName9 = "Gp9"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId9, kGroupName9))
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[8].groupId, kGroupName9))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0009 failed")
 
         kGroupName10 = "Gp10"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId10, kGroupName10))
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[9].groupId, kGroupName10))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x000A failed")
 
         kGroupName11 = "Gp11"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId11, kGroupName11))
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[10].groupId, kGroupName11))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x000B failed")
 
         kGroupName12 = "Gp12"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId12, kGroupName12))
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[11].groupId, kGroupName12))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x000C failed")
 
         self.step("6")
@@ -234,7 +194,7 @@ class TC_G_2_2(MatterBaseTest):
 
         self.step("7a")
         # TH binds GroupID (maxgroups+1) == 13 || 0x000d with GroupKeySetID 1
-        kGroupId13 = 0x000D
+        kGroupId13 = 13
         groupKeyMapStructMaxGroup: Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct = [
             {"groupId": kGroupId13, "groupKeySetID": kGroupKeySetID, "fabricIndex": 1}]
         resp = await th1.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(groupKeyMapStructMaxGroup))])
@@ -257,7 +217,7 @@ class TC_G_2_2(MatterBaseTest):
         asserts.assert_equal(result.status, Status.ConstraintError, "GroupId must be not in the range of 0x0001 to 0xffff")
 
         self.step("10")
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId5, kGroupName5))
+        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[4].groupId, kGroupName5))
         asserts.assert_equal(result.status, Status.UnsupportedAccess,
                              "Must be get an UNSUPPORTED_ACCESS as groupID in the AddGroup command does not have the security key")
 
