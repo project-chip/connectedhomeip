@@ -392,7 +392,7 @@ function install_tizen_sdk_arm64() {
         'sensord-dummy-*.aarch64.rpm'
         'vconf-compat-*.aarch64.rpm'
         'vconf-internal-keys-devel-*.aarch64.rpm'
-        )
+    )
     download "$URL" "${PKG_ARR[@]}"
 
     # Unified packages (snapshots)
@@ -461,7 +461,7 @@ while (($#)); do
             exit 0
             ;;
         --cpu)
-            IFS=',' read -r -a array <<< "$2"
+            IFS=',' read -r -a array <<<"$2"
             for CPU in "${array[@]}"; do
                 if [ "$CPU" == "arm" ]; then
                     INSTALL_ARM=true
