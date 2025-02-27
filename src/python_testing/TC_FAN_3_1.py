@@ -317,7 +317,7 @@ class TC_FAN_3_1(MatterBaseTest):
                                          f"[FC] Current {attr_to_verify.__name__} attribute value must be equal to the previous value")
                 elif order == OrderEnum.Descending:
                     asserts.assert_greater(attr_to_verify_value_current, init_setting,
-                                         f"[FC] Current {attr_to_verify.__name__} attribute value must be greater than the previous value")
+                                           f"[FC] Current {attr_to_verify.__name__} attribute value must be greater than the previous value")
             if attr_to_update == attribute.FanMode:
                 if order == OrderEnum.Ascending:
                     asserts.assert_equal(attr_to_verify_value_current, init_setting,
