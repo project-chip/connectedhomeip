@@ -353,7 +353,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
     args.sdp                = std::string(req.sdp.data(), req.sdp.size());
 
     auto status = Protocols::InteractionModel::ClusterStatusCode(mDelegate->HandleProvideOffer(args, outSession));
-    if (status != Protocols::InteractionModel::ClusterStatusCode(Status::Success))
+    if (!status.IsSuccess())
     {
         // Delegate encountered a problem (out of resources, invalid data, etc.)
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
