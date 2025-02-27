@@ -261,7 +261,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     bool deferredOffer = false;
 
     auto status = Protocols::InteractionModel::ClusterStatusCode(mDelegate->HandleSolicitOffer(args, outSession, deferredOffer));
-    if (status != Protocols::InteractionModel::ClusterStatusCode(Status::Success))
+    if (!status.IsSuccess())
     {
         // Delegate encountered a problem (out of resources, invalid data, etc.)
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
