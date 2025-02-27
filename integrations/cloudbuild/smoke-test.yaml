@@ -1,6 +1,5 @@
 steps:
     - name: "ghcr.io/project-chip/chip-build-vscode:119"
-
       entrypoint: "bash"
       args:
           - "-c"
