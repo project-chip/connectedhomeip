@@ -99,6 +99,23 @@ namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+static void StopSignalHandler(int signum)
+{
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer()->Shutdown([](uint32_t id, WiFiPAF::WiFiPafRole role) {
+        switch (role)
+        {
+        case WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher:
+            DeviceLayer::ConnectivityMgr().WiFiPAFCancelPublish(id);
+            break;
+        case WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber:
+            DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(id);
+            break;
+        }
+    });
+}
+#endif
+
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -147,6 +164,12 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     pmWiFiPAF = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
     pmWiFiPAF->Init(&DeviceLayer::SystemLayer());
+
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = SA_RESETHAND;
+    sigaction(SIGINT, &sa, nullptr);
+    sigaction(SIGTERM, &sa, nullptr);
 #endif
 
     return CHIP_NO_ERROR;

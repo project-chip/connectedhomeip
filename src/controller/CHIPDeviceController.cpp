@@ -707,23 +707,6 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, co
                                        resolutionData);
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-static void StopSignalHandler(int signum)
-{
-    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer()->Shutdown([](uint32_t id, WiFiPAF::WiFiPafRole role) {
-        switch (role)
-        {
-        case WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher:
-            DeviceLayer::ConnectivityMgr().WiFiPAFCancelPublish(id);
-            break;
-        case WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber:
-            DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(id);
-            break;
-        }
-    });
-}
-#endif
-
 CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, RendezvousParameters & params)
 {
     MATTER_TRACE_SCOPE("EstablishPASEConnection", "DeviceCommissioner");
@@ -862,9 +845,6 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(nodeId, discriminator);
             DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(params.GetSetupDiscriminator().value(), reinterpret_cast<void *>(this),
                                                             OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
-            signal(SIGINT, StopSignalHandler);
-            signal(SIGTERM, StopSignalHandler);
-
             ExitNow(CHIP_NO_ERROR);
         }
     }
