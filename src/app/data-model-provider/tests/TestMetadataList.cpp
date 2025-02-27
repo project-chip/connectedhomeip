@@ -218,7 +218,7 @@ TEST_F(TestMetadataList, BufferMoveOperationsWork)
         movedFromList.Append(11);
         movedFromList.Append(12);
 
-        LIST movedToList{std::move(movedFromList)};
+        LIST movedToList{ std::move(movedFromList) };
 
         ASSERT_EQ(movedFromList.Size(), size_t{ 0 }); // NOLINT(bugprone-use-after-move)
         ASSERT_TRUE(movedFromList.IsEmpty());         // NOLINT(bugprone-use-after-move)

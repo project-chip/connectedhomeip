@@ -156,7 +156,7 @@ public:
     ListBuilder(const ListBuilder &)                   = delete;
     ListBuilder & operator=(const ListBuilder & other) = delete;
 
-    ListBuilder(ListBuilder && other) : GenericAppendOnlyBuffer{std::move(other)} {}
+    ListBuilder(ListBuilder && other) : GenericAppendOnlyBuffer{ std::move(other) } {}
 
     ListBuilder & operator=(ListBuilder && other)
     {
