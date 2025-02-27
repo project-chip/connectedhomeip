@@ -51,13 +51,22 @@
           "label": "MA-rootdevice",
           "name": "MA-rootdevice",
           "deviceTypeOrder": 0
+        },
+        {
+          "code": 18,
+          "profileId": 259,
+          "label": "MA-otarequestor",
+          "name": "MA-otarequestor",
+          "deviceTypeOrder": 1
         }
       ],
       "deviceVersions": [
+        1,
         1
       ],
       "deviceIdentifiers": [
-        22
+        22,
+        18
       ],
       "deviceTypeName": "MA-rootdevice",
       "deviceTypeCode": 22,
@@ -98,7 +107,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -114,7 +123,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -130,7 +139,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -236,7 +245,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -390,7 +399,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -406,7 +415,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -422,7 +431,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -438,7 +447,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -454,7 +463,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -470,7 +479,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -486,7 +495,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -502,7 +511,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -518,7 +527,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -534,7 +543,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -550,7 +559,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -973,7 +982,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -989,7 +998,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -1095,7 +1104,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -1771,7 +1780,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -2132,6 +2141,30 @@
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "SetVidVerificationStatement",
+              "code": 12,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "SignVidVerificationRequest",
+              "code": 13,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "SignVidVerificationResponse",
+              "code": 14,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
               "isEnabled": 1
             }
           ],

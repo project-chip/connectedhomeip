@@ -2577,6 +2577,7 @@ provisional cluster DeviceEnergyManagementMode = 159 {
 
 endpoint 0 {
   device type ma_rootdevice = 22, version 1;
+  device type ma_otarequestor = 18, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2762,6 +2763,9 @@ endpoint 0 {
     handle command UpdateFabricLabel;
     handle command RemoveFabric;
     handle command AddTrustedRootCertificate;
+    handle command SetVidVerificationStatement;
+    handle command SignVidVerificationRequest;
+    handle command SignVidVerificationResponse;
   }
 
   server cluster GroupKeyManagement {
