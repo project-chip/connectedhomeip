@@ -51,14 +51,14 @@ struct GenericOverallState : public Structs::OverallStateStruct::Type
              Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional, Optional<uint32_t> extraInfoValue = NullOptional)
     {
         positioning = positioningValue;
-        latching = latchingValue;
-        speed = speedValue;
-        extraInfo = extraInfoValue;
+        latching    = latchingValue;
+        speed       = speedValue;
+        extraInfo   = extraInfoValue;
     }
 
     bool operator==(const Structs::OverallStateStruct::Type & rhs) const
     {
-        return positioning == rhs.positioning && latching == rhs.latching && speed == rhs.speed &&  extraInfo == rhs.extraInfo;
+        return positioning == rhs.positioning && latching == rhs.latching && speed == rhs.speed && extraInfo == rhs.extraInfo;
     }
 };
 
@@ -86,13 +86,13 @@ struct GenericOverallTarget : public Structs::OverallTargetStruct::Type
              Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
         tagPosition = tagPositionValue;
-        tagLatch = tagLatchValue;
-        speed = speedValue;
+        tagLatch    = tagLatchValue;
+        speed       = speedValue;
     }
 
     bool operator==(const Structs::OverallTargetStruct::Type & rhs) const
     {
-        return tagPosition == rhs.tagPosition &&  tagLatch == rhs.tagLatch &&  speed == rhs.speed;
+        return tagPosition == rhs.tagPosition && tagLatch == rhs.tagLatch && speed == rhs.speed;
     }
 };
 

@@ -65,7 +65,7 @@ public:
      * The delegate is expected to not change these values once Start<Type>Read has been called
      * until the End<Type>Read() has been called (i.e. releasing a lock on the data)
      */
-    virtual CHIP_ERROR StartCurrentErrorListRead()                            = 0;
+    virtual CHIP_ERROR StartCurrentErrorListRead() = 0;
     // The delegate is expected to return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to indicate end of list.
     virtual CHIP_ERROR GetCurrentErrorListAtIndex(size_t, ClosureErrorEnum &) = 0;
     virtual CHIP_ERROR EndCurrentErrorListRead()                              = 0;
@@ -90,7 +90,7 @@ public:
      * @param[in] aFeatures The bitmask value that identifies which features are supported by this instance.
      * @param[in] aOptionalAttrs The bitmask Value that identifies which optional attributes are supported by this instance.
      */
-    Instance(EndpointId aEndpointId, Delegate & aDelegate,  BitMask<Feature> aFeatures, BitMask<OptionalAttribute> aOptionalAttrs) :
+    Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeatures, BitMask<OptionalAttribute> aOptionalAttrs) :
         AttributeAccessInterface(MakeOptional(aEndpointId), ClosureControl::Id),
         CommandHandlerInterface(MakeOptional(aEndpointId), ClosureControl::Id), mDelegate(aDelegate), mFeatures(aFeatures),
         mOptionalAttrs(aOptionalAttrs)
@@ -99,8 +99,8 @@ public:
         mDelegate.SetEndpointId(aEndpointId);
         /* set Countdown Time quiet reporting policy as per reporting requirements in specification */
         mCountdownTime.policy()
-        .Set(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement)
-        .Set(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
+            .Set(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement)
+            .Set(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
     }
     ~Instance() { Shutdown(); }
 

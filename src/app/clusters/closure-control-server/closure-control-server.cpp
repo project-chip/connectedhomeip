@@ -80,7 +80,7 @@ bool Instance::IsSupportedState(MainStateEnum aMainState)
     return true;
 }
 
-CHIP_ERROR Instance::SetMainState(MainStateEnum  aMainState)
+CHIP_ERROR Instance::SetMainState(MainStateEnum aMainState)
 {
     if (!IsSupportedState(aMainState))
     {
