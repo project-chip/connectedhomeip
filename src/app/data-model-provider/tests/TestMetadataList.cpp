@@ -207,63 +207,52 @@ TEST_F(TestMetadataList, ListBuilderConvertersWorks)
 
 TEST_F(TestMetadataList, BufferMoveOperationsWork)
 {
-
     {
-        ListBuilder<int> list;
+        using LIST = ListBuilder<int>;
 
-        ASSERT_EQ(list.EnsureAppendCapacity(3), CHIP_NO_ERROR);
+        LIST movedFromList{};
 
-        list.Append(10);
-        list.Append(11);
-        list.Append(12);
+        ASSERT_EQ(movedFromList.EnsureAppendCapacity(3), CHIP_NO_ERROR);
 
-        // Get a ListBuilder base class object
-        GenericAppendOnlyBuffer originalBuffer{ static_cast<GenericAppendOnlyBuffer &&>(std::move(list)) };
+        movedFromList.Append(10);
+        movedFromList.Append(11);
+        movedFromList.Append(12);
 
-        ASSERT_EQ(originalBuffer.Size(), size_t{ 3 });
-        ASSERT_FALSE(originalBuffer.IsEmpty());
+        LIST movedToList{std::move(movedFromList)};
 
-        /// move constructor called for the second time here
-        GenericAppendOnlyBuffer newBuffer{ std::move(originalBuffer) };
+        ASSERT_EQ(movedFromList.Size(), size_t{ 0 }); // NOLINT(bugprone-use-after-move)
+        ASSERT_TRUE(movedFromList.IsEmpty());         // NOLINT(bugprone-use-after-move)
 
-        ASSERT_EQ(originalBuffer.Size(), size_t{ 0 }); // NOLINT(bugprone-use-after-move)
-        ASSERT_TRUE(originalBuffer.IsEmpty());         // NOLINT(bugprone-use-after-move)
+        ASSERT_EQ(movedToList.Size(), size_t{ 3 });
+        ASSERT_FALSE(movedToList.IsEmpty());
 
-        ASSERT_EQ(newBuffer.Size(), size_t{ 3 });
-        ASSERT_FALSE(newBuffer.IsEmpty());
+        auto movedToListSpan = movedToList.TakeBuffer();
+
+        EXPECT_EQ(movedToListSpan[0], 10);
+        EXPECT_EQ(movedToListSpan[1], 11);
+        EXPECT_EQ(movedToListSpan[2], 12);
     }
 
     {
-        ListBuilder<int> list1;
+        using LIST = ListBuilder<int>;
 
-        ASSERT_EQ(list1.EnsureAppendCapacity(3), CHIP_NO_ERROR);
+        LIST movedFromList{};
+        LIST movedToList{};
 
-        list1.Append(10);
-        list1.Append(11);
-        list1.Append(12);
+        ASSERT_EQ(movedFromList.EnsureAppendCapacity(3), CHIP_NO_ERROR);
+        ASSERT_EQ(movedToList.EnsureAppendCapacity(3), CHIP_NO_ERROR);
 
-        ListBuilder<int> list2;
+        movedFromList.Append(10);
+        movedFromList.Append(11);
+        movedFromList.Append(12);
 
-        ASSERT_EQ(list2.EnsureAppendCapacity(2), CHIP_NO_ERROR);
+        movedToList = std::move(movedFromList);
 
-        list2.Append(20);
-        list2.Append(21);
+        ASSERT_EQ(movedFromList.Size(), size_t{ 0 }); // NOLINT(bugprone-use-after-move)
+        ASSERT_TRUE(movedFromList.IsEmpty());         // NOLINT(bugprone-use-after-move)
 
-        // Get a ListBuilder base class object
-        GenericAppendOnlyBuffer originalBuffer{ static_cast<GenericAppendOnlyBuffer &&>(std::move(list1)) };
-
-        // Get another ListBuilder base class object
-        GenericAppendOnlyBuffer anotherBuffer{ static_cast<GenericAppendOnlyBuffer &&>(std::move(list2)) };
-
-        ASSERT_EQ(originalBuffer.Size(), size_t{ 3 });
-        ASSERT_EQ(anotherBuffer.Size(), size_t{ 2 });
-
-        // move assignemnt operator called here
-        originalBuffer = std::move(anotherBuffer);
-
-        ASSERT_EQ(originalBuffer.Size(), size_t{ 2 });
-        ASSERT_EQ(anotherBuffer.Size(), size_t{ 0 }); // NOLINT(bugprone-use-after-move)
-        ASSERT_TRUE(anotherBuffer.IsEmpty());         // NOLINT(bugprone-use-after-move)
+        ASSERT_EQ(movedToList.Size(), size_t{ 3 });
+        ASSERT_FALSE(movedToList.IsEmpty());
     }
 }
 } // namespace
