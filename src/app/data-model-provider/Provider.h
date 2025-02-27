@@ -83,10 +83,10 @@ public:
     ///   Write operation or after the last one of a series of consecutive attribute data of the same attribute.
     ///
     ///   1) This function will be called if the client tries to set a nullable list attribute to null.
-    ///   2) This function will only be called at the beginning and end of a series of consecutive attribute data 
+    ///   2) This function will only be called at the beginning and end of a series of consecutive attribute data
     ///   blocks for the same attribute, no matter what list operations those data blocks represent.
     ///   3) The opType argument indicates the type of notification (Start, Failure, Success).
-    virtual void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, BitFlags<ListWriteOperation> opType) = 0;
+    virtual void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, ListWriteOperation opType) = 0;
 
     /// `handler` is used to send back the reply.
     ///    - returning `std::nullopt` means that return value was placed in handler directly.
