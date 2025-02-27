@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,7 @@
 #include <ClosureControlMain.h>
 #include <lib/core/DataModelTypes.h>
 
-// This app is configured by default with EP1 for ClosureBase  with only one endpoint
+// This app is configured by default with EP1 for ClosureBase with only one endpoint
 // enabled for now. it can be expanded to multiple endpoints
 chip::EndpointId GetClosureDeviceEndpointId();
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,45 +54,20 @@ void ClosureControlDelegate::SetClosureControlInstance(ClosureControl::Instance 
  * Methods implementing the ClosureControl::Delegate interace
  *
  *********************************************************************************/
+
+// Return default value, will add timers and attribute handling in next phase 
 DataModel::Nullable<uint32_t> ClosureControlDelegate::GetCountdownTime()
 {
     return DataModel::Nullable<uint32_t>();
 }
 
-// Below Function will be removed along removal of Fallback feature from closure control cluster
-RestingProcedureEnum ClosureControlDelegate::GetRestingProcedure()
-{
-    return RestingProcedureEnum::kDoNothing;
-}
-
-// Below Function will be removed along removal of Fallback feature from closure control cluster
-TriggerConditionEnum ClosureControlDelegate::GetTriggerCondition()
-{
-    return TriggerConditionEnum::kAfterDelay;
-}
-
-// Below Function will be removed along removal of Fallback feature from closure control cluster
-TriggerPositionEnum ClosureControlDelegate::GetTriggerPosition()
-{
-    return TriggerPositionEnum::kAtFullyClosed;
-}
-
-// Below Function will be removed along removal of Fallback feature from closure control cluster
-uint32_t ClosureControlDelegate::GetWaitingDelay()
-{
-    return 0;
-}
-
-// Below Function will be removed along removal of Fallback feature from closure control cluster
-uint32_t ClosureControlDelegate::GetKickoffTimer()
-{
-    return 0;
-}
-
+// Return default value, will add attribute handling in next phase 
 CHIP_ERROR ClosureControlDelegate::StartCurrentErrorListRead()
 {
     return CHIP_NO_ERROR;
 }
+
+// Return emualted error list, will add attribute handling in next phase 
 CHIP_ERROR ClosureControlDelegate::GetCurrentErrorListAtIndex(size_t Index, ClosureErrorEnum & closureError)
 {
     if (Index >= MATTER_ARRAY_SIZE(kCurrentErrorList))
@@ -104,16 +79,20 @@ CHIP_ERROR ClosureControlDelegate::GetCurrentErrorListAtIndex(size_t Index, Clos
 
     return CHIP_NO_ERROR;
 }
+
+// Return default value, will add attribute handling in next phase
 CHIP_ERROR ClosureControlDelegate::EndCurrentErrorListRead()
 {
     return CHIP_NO_ERROR;
 }
 
+// Return default success, will add command handling in next phase 
 Protocols::InteractionModel::Status ClosureControlDelegate::Stop()
 {
     return Status::Success;
 }
 
+// Return default success, will add command handling in next phase 
 Protocols::InteractionModel::Status ClosureControlDelegate::MoveTo(const Optional<TagPositionEnum> & tag,
                                                                    const Optional<TagLatchEnum> & latch,
                                                                    const Optional<Globals::ThreeLevelAutoEnum> & speed)
@@ -121,22 +100,8 @@ Protocols::InteractionModel::Status ClosureControlDelegate::MoveTo(const Optiona
     return Status::Success;
 }
 
+// Return default success, will add command handling in next phase
 Protocols::InteractionModel::Status ClosureControlDelegate::Calibrate()
-{
-    return Status::Success;
-}
-
-// Below Function will be removed along removal of Fallback feature from closure control cluster
-Protocols::InteractionModel::Status ClosureControlDelegate::ConfigureFallback(const Optional<RestingProcedureEnum> & restingProcedure,
-                                                                              const Optional<TriggerConditionEnum> & triggerCondition,
-                                                                              const Optional<TriggerPositionEnum> & triggerPosition,
-                                                                              const Optional<uint32_t> & waitingDelay)
-{
-    return Status::Success;
-}
-
-// Below Function will be removed along removal of Fallback feature from closure control cluster
-Protocols::InteractionModel::Status ClosureControlDelegate::CancelFallback()
 {
     return Status::Success;
 }

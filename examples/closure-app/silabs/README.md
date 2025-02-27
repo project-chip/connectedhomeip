@@ -13,6 +13,7 @@ An example showing the use of CHIP on the Silicon Labs SiWx917
   - [Building options](#building-options)
     - [Disabling logging](#disabling-logging)
     - [Debug build / release build](#debug-build--release-build)
+    - [Disabling QR CODE](#disabling-qr-code)
     - [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
@@ -172,6 +173,12 @@ passed to the build scripts.
 `is_debug`
 
     $ ./scripts/examples/gn_silabs_example.sh ./examples/closure-app/silabs ./out/closure-app BRD4338A "is_debug=false"
+
+### Disabling QR CODE
+
+show_qr_code
+
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/window-app/silabs ./out/window-app BRD4164A "show_qr_code=false"
 
 ### KVS maximum entry count
 

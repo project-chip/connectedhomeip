@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,21 +46,11 @@ public:
     Protocols::InteractionModel::Status MoveTo(const Optional<TagPositionEnum> & tag, const Optional<TagLatchEnum> & latch,
                                                const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     Protocols::InteractionModel::Status Calibrate() override;
-    Protocols::InteractionModel::Status ConfigureFallback(const Optional<RestingProcedureEnum> & restingProcedure,
-                                                          const Optional<TriggerConditionEnum> & triggerCondition,
-                                                          const Optional<TriggerPositionEnum> & triggerPosition,
-                                                          const Optional<uint32_t> & waitingDelay) override;
-    Protocols::InteractionModel::Status CancelFallback() override;
 
     // ------------------------------------------------------------------
     // Get attribute methods
 
     DataModel::Nullable<uint32_t> GetCountdownTime() override;
-    RestingProcedureEnum GetRestingProcedure() override;
-    TriggerConditionEnum GetTriggerCondition() override;
-    TriggerPositionEnum GetTriggerPosition() override;
-    uint32_t GetWaitingDelay() override;
-    uint32_t GetKickoffTimer() override;
 
     /***************************************************************************
      *
