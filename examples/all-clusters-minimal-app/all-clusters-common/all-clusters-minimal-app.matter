@@ -2719,7 +2719,7 @@ cluster ModeSelect = 80 {
 
 /** Attributes and commands for configuring the temperature control, and reporting temperature. */
 cluster TemperatureControl = 86 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   bitmap Feature : bitmap32 {
     kTemperatureNumber = 0x1;
@@ -2745,7 +2745,7 @@ cluster TemperatureControl = 86 {
     optional int8u targetTemperatureLevel = 1;
   }
 
-  /** Set Temperature */
+  /** The SetTemperature command SHALL have the following data fields: */
   command SetTemperature(SetTemperatureRequest): DefaultSuccess = 0;
 }
 
