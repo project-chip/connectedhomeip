@@ -44,16 +44,14 @@
 import logging
 import re
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import Enum, auto
-from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional, Tuple
 
 import click
 import coloredlogs
 import cxxfilt
 import plotly.express as px
-import plotly.graph_objects as go
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
@@ -65,14 +63,19 @@ __LOG_LEVELS__ = {
 }
 
 
-class ChartStyle(Enum):
-    TREE_MAP = auto()
-    SUNBURST = auto()
-
-
 __CHART_STYLES__ = {
-    "treemap": ChartStyle.TREE_MAP,
-    "sunburst": ChartStyle.SUNBURST,
+    "treemap": px.treemap,
+    "sunburst": px.sunburst,
+    "icicle": px.icicle,
+}
+
+
+# Scales from https://plotly.com/python/builtin-colorscales/
+__COLOR_SCALES__ = {
+    "none": None,
+    "tempo": px.colors.sequential.tempo,
+    "blues": px.colors.sequential.Blues,
+    "plasma": px.colors.sequential.Plasma_r,
 }
 
 
@@ -82,12 +85,12 @@ class FetchStyle(Enum):
 
 
 __FETCH_STYLES__ = {
-    "nm": ChartStyle.TREE_MAP,
-    "objdump": ChartStyle.SUNBURST,
+    "nm": FetchStyle.NM,
+    "objdump": FetchStyle.OBJDUMP,
 }
 
 
-@dataclass
+@dataclass(frozen=True)
 class Symbol:
     name: str
     symbol_type: str
@@ -363,7 +366,8 @@ def build_treemap(
     name: str,
     symbols: list[Symbol],
     separator: str,
-    style: ChartStyle,
+    figure_generator: Callable,
+    color: Optional[list[str]],
     max_depth: int,
     zoom: Optional[str],
     strip: Optional[str],
@@ -377,7 +381,7 @@ def build_treemap(
     root = f"FILE: {name}"
     if zoom:
         root = root + f" (FILTER: {zoom})"
-    data: dict[str, list] = dict(name=[root], parent=[""], size=[0], hover=[""])
+    data: dict[str, list] = dict(name=[root], parent=[""], size=[0], hover=[""], name_with_size=[""], short_name=[""])
 
     known_parents: set[str] = set()
     total_sizes: dict = {}
@@ -417,6 +421,8 @@ def build_treemap(
                 data["parent"].append(partial if partial else root)
                 data["size"].append(0)
                 data["hover"].append(next_value)
+                data["name_with_size"].append("")
+                data["short_name"].append(name)
             total_sizes[next_value] = total_sizes.get(next_value, 0) + symbol.size
             partial = next_value
 
@@ -425,32 +431,64 @@ def build_treemap(
         data["parent"].append(partial if partial else root)
         data["size"].append(symbol.size)
         data["hover"].append(f"{symbol.name} of type {symbol.symbol_type}")
+        data["name_with_size"].append("")
+        data["short_name"].append(tree_name[-1])
 
     for idx, label in enumerate(data["name"]):
         if data["size"][idx] == 0:
-            data["hover"][idx] = f"{label}: {total_sizes.get(label, 0)}"
+            total_size = total_sizes.get(label, 0)
+            data["hover"][idx] = f"{label}: {total_size}"
+            if idx == 0:
+                data["name_with_size"][idx] = f"{label}: {total_size}"
+            else:
+                # The "full name" is generally quite long, so shorten it...
+                data["name_with_size"][idx] = f"{data["short_name"][idx]}: {total_size}"
+        else:
+            # When using object files, the paths hare are the full "foo::bar::....::method"
+            # so clean them up a bit
+            short_name = data["short_name"][idx]
 
-    if style == ChartStyle.TREE_MAP:
-        fig = go.Figure(
-            go.Treemap(
-                labels=data["name"],
-                parents=data["parent"],
-                values=data["size"],
-                textinfo="label+value+percent parent",
-                hovertext=data["hover"],
-                maxdepth=max_depth,
-            )
-        )
-    else:
-        fig = px.sunburst(
-            data,
-            names="name",
-            parents="parent",
-            values="size",
-            maxdepth=max_depth,
-        )
+            # remove namespaces, but keep template parts
+            # This tries to convert:
+            #   foo::bar::baz(int, double) -> baz(int, double)
+            #   foo::bar::baz<x::y>(int, double) -> baz<x::y>(int, double)
+            #   foo::bar::baz(some::ns:bit, double) -> baz(some::ns::bit, double)
+            #   foo::bar::baz<x::y>(some::ns:bit, double) -> baz<x::y>(some::ns::bit, double)
+            #
+            # Remove all before '::', however '::' found before the first of < or (
+            #
+            limit1 = short_name.find('<')
+            limit2 = short_name.find('(')
+            if limit1 >= 0 and limit1 < limit2:
+                limit = limit1
+            else:
+                limit = limit2
+            separate_idx = short_name.rfind('::', 0, limit)
+            if separate_idx:
+                short_name = short_name[separate_idx+2:]
 
-    fig.update_traces(root_color="lightgray")
+            data["name_with_size"][idx] = f"{short_name}: {data["size"][idx]}"
+
+    extra_args = {}
+    if color is not None:
+        extra_args['color_continuous_scale'] = color
+        extra_args['color'] = "size"
+
+    fig = figure_generator(
+        data,
+        names="name_with_size",
+        ids="name",
+        parents="parent",
+        values="size",
+        maxdepth=max_depth,
+        **extra_args,
+    )
+
+    fig.update_traces(
+        root_color="lightgray",
+        textinfo="label+value+percent parent+percent root",
+        hovertext="hover",
+    )
     fig.show()
 
 
@@ -660,6 +698,80 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
     return symbols
 
 
+def fetch_symbols(elf_file: str, fetch: FetchStyle) -> Tuple[list[Symbol], str]:
+    """Returns the sumbol list and the separator used to split symbols
+    """
+    match fetch:
+        case FetchStyle.NM:
+            return symbols_from_nm(elf_file), "::"
+        case FetchStyle.OBJDUMP:
+            return symbols_from_objdump(elf_file), '/'
+
+
+def list_id(tree_path: list[str]) -> str:
+    """Converts a tree path in to a single string (so that it is hashable)"""
+    return "->".join(tree_path)
+
+
+def compute_symbol_diff(orig: list[Symbol], base: list[Symbol]) -> list[Symbol]:
+    """
+    Generates a NEW set of symbols for the difference between original and base.
+
+    Two symbols with the same name are assumed different IF AND ONLY IF they have a different size
+    between original and base.
+
+    Symbols are the same if their "name" if the have the same tree path.
+    """
+    orig_items = dict([(list_id(v.tree_path), v) for v in orig])
+    base_items = dict([(list_id(v.tree_path), v) for v in base])
+
+    unique_paths = set(orig_items.keys()).union(set(base_items.keys()))
+
+    result = []
+
+    for path in unique_paths:
+        orig_symbol = orig_items.get(path, None)
+        base_symbol = base_items.get(path, None)
+
+        if not orig_symbol:
+            if not base_symbol:
+                raise AssertionError("Internal logic error: paths should be valid somewhere")
+
+            result.append(replace(base_symbol,
+                                  name=f"REMOVED: {base_symbol.name}",
+                                  tree_path=["DECREASE"] + base_symbol.tree_path,
+                                  ))
+            continue
+
+        if not base_symbol:
+            result.append(replace(orig_symbol,
+                                  name=f"ADDED: {orig_symbol.name}",
+                                  tree_path=["INCREASE"] + orig_symbol.tree_path,
+                                  ))
+            continue
+
+        if orig_symbol.size == base_symbol.size:
+            # symbols are identical
+            continue
+
+        size_delta = orig_symbol.size - base_symbol.size
+
+        if size_delta > 0:
+            result.append(replace(orig_symbol,
+                                  name=f"CHANGED: {orig_symbol.name}",
+                                  tree_path=["INCREASE"] + orig_symbol.tree_path,
+                                  size=size_delta,
+                                  ))
+        else:
+            result.append(replace(orig_symbol,
+                                  name=f"CHANGED: {orig_symbol.name}",
+                                  tree_path=["DECREASE"] + orig_symbol.tree_path,
+                                  size=-size_delta,
+                                  ))
+
+    return result
+
+
 @click.command()
 @click.option(
     "--log-level",
@@ -674,6 +786,13 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
     show_default=True,
     type=click.Choice(list(__CHART_STYLES__.keys()), case_sensitive=False),
     help="Style of the chart",
+)
+@click.option(
+    "--color",
+    default="None",
+    show_default=True,
+    type=click.Choice(list(__COLOR_SCALES__.keys()), case_sensitive=False),
+    help="Color display (if any)",
 )
 @click.option(
     "--fetch-via",
@@ -699,28 +818,37 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
     default=None,
     help="Strip out a tree subset (e.g. ::C)",
 )
-@click.argument("elf-file", type=Path)
+@click.option(
+    "--diff",
+    default=None,
+    type=click.Path(file_okay=True, dir_okay=False, exists=True),
+    help="Diff against the given file (changes symbols to increase/decrease)",
+)
+@click.argument("elf-file", type=click.Path(file_okay=True, dir_okay=False, exists=True))
 def main(
     log_level,
-    elf_file: Path,
+    elf_file: str,
     display_type: str,
+    color: str,
     fetch_via: str,
     max_depth: int,
     zoom: Optional[str],
     strip: Optional[str],
+    diff: Optional[str],
 ):
     log_fmt = "%(asctime)s %(levelname)-7s %(message)s"
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
-    if __FETCH_STYLES__[fetch_via] == FetchStyle.NM:
-        symbols = symbols_from_nm(elf_file.absolute().as_posix())
-        separator = "::"
-    else:
-        symbols = symbols_from_objdump(elf_file.absolute().as_posix())
-        separator = "/"
+    symbols, separator = fetch_symbols(elf_file, __FETCH_STYLES__[fetch_via])
+    title = elf_file
+
+    if diff:
+        diff_symbols, _ = fetch_symbols(diff, __FETCH_STYLES__[fetch_via])
+        symbols = compute_symbol_diff(symbols, diff_symbols)
+        title = f"{elf_file} COMPARED TO {diff}"
 
     build_treemap(
-        elf_file.name, symbols, separator, __CHART_STYLES__[display_type], max_depth, zoom, strip
+        title, symbols, separator, __CHART_STYLES__[display_type], __COLOR_SCALES__[color], max_depth, zoom, strip
     )
 
 
