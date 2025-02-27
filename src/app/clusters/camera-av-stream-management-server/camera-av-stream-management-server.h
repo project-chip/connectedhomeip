@@ -21,12 +21,15 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/StatusResponse.h>
 #include <app/reporting/reporting.h>
 
 #include <app/SafeAttributePersistenceProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TypeTraits.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <unordered_set>
+#include <vector>
 
 namespace chip {
 namespace app {
