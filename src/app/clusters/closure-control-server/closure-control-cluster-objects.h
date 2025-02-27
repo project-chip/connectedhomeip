@@ -58,30 +58,7 @@ struct GenericOverallState : public Structs::OverallStateStruct::Type
 
     bool operator==(const Structs::OverallStateStruct::Type & rhs) const
     {
-        if (positioning.HasValue() != rhs.positioning.HasValue() || latching.HasValue() != rhs.latching.HasValue() ||
-            speed.HasValue() != rhs.speed.HasValue() || extraInfo.HasValue() != rhs.extraInfo.HasValue())
-        {
-            return false;
-        }
-
-        if (positioning.HasValue() && positioning.Value() != rhs.positioning.Value())
-        {
-            return false;
-        }
-        if (latching.HasValue() && latching.Value() != rhs.latching.Value())
-        {
-            return false;
-        }
-        if (speed.HasValue() && speed.Value() != rhs.speed.Value())
-        {
-            return false;
-        }
-        if (extraInfo.HasValue() && extraInfo.Value() != rhs.extraInfo.Value())
-        {
-            return false;
-        }
-
-        return true;
+        return positioning == rhs.positioning && latching == rhs.latching && speed == rhs.speed &&  extraInfo == rhs.extraInfo;
     }
 };
 
@@ -115,26 +92,7 @@ struct GenericOverallTarget : public Structs::OverallTargetStruct::Type
 
     bool operator==(const Structs::OverallTargetStruct::Type & rhs) const
     {
-        if (tagPosition.HasValue() != rhs.tagPosition.HasValue() || tagLatch.HasValue() != rhs.tagLatch.HasValue() ||
-            speed.HasValue() != rhs.speed.HasValue())
-        {
-            return false;
-        }
-
-        if (tagPosition.HasValue() && tagPosition.Value() != rhs.tagPosition.Value())
-        {
-            return false;
-        }
-        if (tagLatch.HasValue() && tagLatch.Value() != rhs.tagLatch.Value())
-        {
-            return false;
-        }
-        if (speed.HasValue() && speed.Value() != rhs.speed.Value())
-        {
-            return false;
-        }
-
-        return true;
+        return tagPosition == rhs.tagPosition &&  tagLatch == rhs.tagLatch &&  speed == rhs.speed;
     }
 };
 

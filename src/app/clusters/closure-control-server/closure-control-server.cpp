@@ -51,9 +51,9 @@ void Instance::Shutdown()
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
-bool Instance::HasFeature(Feature aFeature) const
+bool Instance::HasFeature(Feature aFeatures) const
 {
-    return mFeature.Has(aFeature);
+    return mFeature.Has(aFeatures);
 }
 
 bool Instance::SupportsOptAttr(OptionalAttribute aOptionalAttrs) const

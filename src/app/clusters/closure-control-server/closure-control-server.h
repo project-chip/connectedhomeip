@@ -44,7 +44,7 @@ class Delegate
 public:
     virtual ~Delegate() = default;
 
-    // Only Cluster Instance should be calling the SetEdpointId.
+    // Only Cluster Instance should be calling SetEdpointId.
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
     EndpointId GetEndpointId() { return mEndpointId; }
 
@@ -72,11 +72,11 @@ public:
     /* These functions are called by the ReadAttribute handler to iterate through lists
      * The cluster server will call Start<Type>Read to allow the delegate to create a temporary
      * lock on the data.
-     * The delegate is expected to send CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to notify end of list.
      * The delegate is expected to not change these values once Start<Type>Read has been called
      * until the End<Type>Read() has been called (i.e. releasing a lock on the data)
      */
     virtual CHIP_ERROR StartCurrentErrorListRead()                            = 0;
+    // The delegate is expected to return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to indicate end of list.
     virtual CHIP_ERROR GetCurrentErrorListAtIndex(size_t, ClosureErrorEnum &) = 0;
     virtual CHIP_ERROR EndCurrentErrorListRead()                              = 0;
 
@@ -97,12 +97,12 @@ public:
      *        this instance to be registered and called by the interaction model at the appropriate times.
      * @param[in] aEndpointId The endpoint on which this cluster exists.
      * @param[in] aDelegate The Delegate used by this Instance.
-     * @param[in] aFeature The bitmask value that identifies which features are supported by this instance.
+     * @param[in] aFeatures The bitmask value that identifies which features are supported by this instance.
      * @param[in] aOptionalAttrs The bitmask Value that identifies which optional attributes are supported by this instance.
      */
-    Instance(EndpointId aEndpointId, Delegate & aDelegate,  BitMask<Feature> aFeature, BitMask<OptionalAttribute> aOptionalAttrs) :
+    Instance(EndpointId aEndpointId, Delegate & aDelegate,  BitMask<Feature> aFeatures, BitMask<OptionalAttribute> aOptionalAttrs) :
         AttributeAccessInterface(MakeOptional(aEndpointId), ClosureControl::Id),
-        CommandHandlerInterface(MakeOptional(aEndpointId), ClosureControl::Id), mDelegate(aDelegate), mFeature(aFeature),
+        CommandHandlerInterface(MakeOptional(aEndpointId), ClosureControl::Id), mDelegate(aDelegate), mFeature(aFeatures),
         mOptionalAttrs(aOptionalAttrs)
     {
         /* set the base class delegates endpointId */
@@ -113,7 +113,7 @@ public:
     CHIP_ERROR Init();
     void Shutdown();
 
-    bool HasFeature(Feature aFeature) const;
+    bool HasFeature(Feature aFeatures) const;
     bool SupportsOptAttr(OptionalAttribute aOptionalAttrs) const;
 
     // Attribute setters
