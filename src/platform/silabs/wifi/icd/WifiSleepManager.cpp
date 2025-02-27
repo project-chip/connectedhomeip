@@ -20,6 +20,8 @@
 #include <platform/silabs/wifi/WifiInterface.h>
 #include <platform/silabs/wifi/icd/WifiSleepManager.h>
 
+using namespace chip::DeviceLayer::Silabs;
+
 namespace {
 
 // TODO: Once the platform sleep calls are unified, we can removed this ifdef
@@ -33,10 +35,10 @@ namespace {
  */
 CHIP_ERROR ConfigureDTIMBasedSleep()
 {
-    ReturnLogErrorOnFailure(ConfigureBroadcastFilter(false));
+    ReturnLogErrorOnFailure(WifiInterface::GetInstance().ConfigureBroadcastFilter(false));
 
     // Allowing the device to go to sleep must be the last actions to avoid configuration failures.
-    ReturnLogErrorOnFailure(ConfigurePowerSave(RSI_SLEEP_MODE_2, ASSOCIATED_POWER_SAVE, 0));
+    ReturnLogErrorOnFailure(WifiInterface::GetInstance().ConfigurePowerSave(RSI_SLEEP_MODE_2, ASSOCIATED_POWER_SAVE, 0));
 
     return CHIP_NO_ERROR;
 }
@@ -49,7 +51,7 @@ CHIP_ERROR ConfigureDTIMBasedSleep()
  */
 CHIP_ERROR ConfigureDeepSleep()
 {
-    ReturnLogErrorOnFailure(ConfigurePowerSave(RSI_SLEEP_MODE_8, DEEP_SLEEP_WITH_RAM_RETENTION, 0));
+    ReturnLogErrorOnFailure(WifiInterface::GetInstance().ConfigurePowerSave(RSI_SLEEP_MODE_8, DEEP_SLEEP_WITH_RAM_RETENTION, 0));
     return CHIP_NO_ERROR;
 }
 
@@ -61,7 +63,7 @@ CHIP_ERROR ConfigureDeepSleep()
  */
 CHIP_ERROR ConfigureHighPerformance()
 {
-    ReturnLogErrorOnFailure(ConfigurePowerSave(RSI_ACTIVE, HIGH_PERFORMANCE, 0));
+    ReturnLogErrorOnFailure(WifiInterface::GetInstance().ConfigurePowerSave(RSI_ACTIVE, HIGH_PERFORMANCE, 0));
     return CHIP_NO_ERROR;
 }
 #endif // SLI_SI917
@@ -148,7 +150,7 @@ CHIP_ERROR WifiSleepManager::VerifyAndTransitionToLowPowerMode(PowerEvent event)
         return CHIP_NO_ERROR;
     }
 
-    if (!IsWifiProvisioned())
+    if (!WifiInterface::GetInstance().IsWifiProvisioned())
     {
         return ConfigureDeepSleep();
     }
@@ -156,7 +158,7 @@ CHIP_ERROR WifiSleepManager::VerifyAndTransitionToLowPowerMode(PowerEvent event)
     return ConfigureDTIMBasedSleep();
 
 #else
-    ReturnErrorOnFailure(ConfigurePowerSave());
+    ReturnErrorOnFailure(WifiInterface::GetInstance().ConfigurePowerSave());
     return CHIP_NO_ERROR;
 #endif
 }

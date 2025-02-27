@@ -43,8 +43,7 @@ public:
     CHIP_ERROR ResetCounters() override;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     CHIP_ERROR ConfigureBroadcastFilter(bool enableBroadcastFilter) override;
-    CHIP_ERROR ConfigurePowerSave(rsi_power_save_profile_mode_t sl_si91x_ble_state,
-                                  sl_si91x_performance_profile_t sl_si91x_wifi_state, uint32_t listenInterval) override;
+    CHIP_ERROR ConfigurePowerSave() override;
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     /**

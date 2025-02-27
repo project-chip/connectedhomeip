@@ -30,7 +30,10 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_CMSISOS.ipp>
 #include <platform/silabs/DiagnosticDataProviderImpl.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #include <platform/silabs/wifi/WifiInterface.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 
 #if defined(SL_MBEDTLS_USE_TINYCRYPT)
 #include "tinycrypt/ecc.h"
@@ -41,7 +44,6 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 using namespace chip::DeviceLayer::Internal;
-using namespace chip::DeviceLayer::Silabs;
 
 namespace chip {
 namespace DeviceLayer {
@@ -147,6 +149,7 @@ void HandleWFXSystemEvent(sl_wfx_generic_message_t * eventData)
 {
     using namespace chip;
     using namespace chip::DeviceLayer;
+    using namespace chip::DeviceLayer::Silabs;
 
     ChipDeviceEvent event;
     memset(&event, 0, sizeof(event));

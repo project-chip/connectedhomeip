@@ -26,6 +26,9 @@
 #include <sl_status.h>
 
 #if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
+#include "rsi_common_apis.h"
+#include "sl_si91x_types.h"
+#include "sl_wifi_constants.h"
 #include "sl_wifi_device.h"
 #endif // (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 
