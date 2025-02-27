@@ -363,6 +363,8 @@ Protocols::InteractionModel::Status ChefFanControlManager::OnCommand(EndpointId 
         return Status::Success;
     }
 
+    Status status;
+
     DataModel::Nullable<uint8_t> speedSetting(GetSpeedSetting());
 
     if (!speedSetting.IsNull() && speedSetting.Value())
