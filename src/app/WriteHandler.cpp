@@ -125,7 +125,7 @@ std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePat
         return std::nullopt;
     }
 
-    return info->flags.Has(DataModel::AttributeQualityFlags::kListAttribute);
+    return info->FlagsHas(DataModel::AttributeQualityFlags::kListAttribute);
 }
 
 Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
@@ -823,7 +823,7 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     }
 
     // validate that timed write is enforced
-    VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->flags.Has(DataModel::AttributeQualityFlags::kTimed),
+    VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->FlagsHas(DataModel::AttributeQualityFlags::kTimed),
                         Status::NeedsTimedInteraction);
 
     return Status::Success;

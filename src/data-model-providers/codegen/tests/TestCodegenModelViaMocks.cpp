@@ -1077,26 +1077,26 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAttributes)
     ASSERT_EQ(attributes.size(), 7u);
 
     ASSERT_EQ(attributes[0].attributeId, ClusterRevision::Id);
-    ASSERT_FALSE(attributes[0].flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_FALSE(attributes[0].FlagsHas(AttributeQualityFlags::kListAttribute));
 
     ASSERT_EQ(attributes[1].attributeId, FeatureMap::Id);
-    ASSERT_FALSE(attributes[1].flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_FALSE(attributes[1].FlagsHas(AttributeQualityFlags::kListAttribute));
 
     ASSERT_EQ(attributes[2].attributeId, MockAttributeId(1));
-    ASSERT_FALSE(attributes[2].flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_FALSE(attributes[2].FlagsHas(AttributeQualityFlags::kListAttribute));
 
     ASSERT_EQ(attributes[3].attributeId, MockAttributeId(2));
-    ASSERT_TRUE(attributes[3].flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_TRUE(attributes[3].FlagsHas(AttributeQualityFlags::kListAttribute));
 
     // Ends with global list attributes
     ASSERT_EQ(attributes[4].attributeId, GeneratedCommandList::Id);
-    ASSERT_TRUE(attributes[4].flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_TRUE(attributes[4].FlagsHas(AttributeQualityFlags::kListAttribute));
 
     ASSERT_EQ(attributes[5].attributeId, AcceptedCommandList::Id);
-    ASSERT_TRUE(attributes[5].flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_TRUE(attributes[5].FlagsHas(AttributeQualityFlags::kListAttribute));
 
     ASSERT_EQ(attributes[6].attributeId, AttributeList::Id);
-    ASSERT_TRUE(attributes[6].flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_TRUE(attributes[6].FlagsHas(AttributeQualityFlags::kListAttribute));
 }
 
 TEST_F(TestCodegenModelViaMocks, FindAttribute)
@@ -1118,7 +1118,7 @@ TEST_F(TestCodegenModelViaMocks, FindAttribute)
     // valid info
     std::optional<AttributeEntry> info = finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), FeatureMap::Id));
     ASSERT_TRUE(info.has_value());
-    EXPECT_FALSE(info->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_FALSE(info->FlagsHas(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
 
     // Mocks always set everything as R/W with administrative privileges
     EXPECT_EQ(info->GetReadPrivilege(), chip::Access::Privilege::kAdminister);  // NOLINT(bugprone-unchecked-optional-access)
@@ -1126,14 +1126,14 @@ TEST_F(TestCodegenModelViaMocks, FindAttribute)
 
     info = finder.Find(ConcreteAttributePath(kMockEndpoint2, MockClusterId(2), MockAttributeId(2)));
     ASSERT_TRUE(info.has_value());
-    EXPECT_TRUE(info->flags.Has(AttributeQualityFlags::kListAttribute));   // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_TRUE(info->FlagsHas(AttributeQualityFlags::kListAttribute));   // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(info->GetReadPrivilege(), chip::Access::Privilege::kAdminister);  // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(info->GetWritePrivilege(), chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
 
     // test a read-only attribute, which will not have a write privilege
     info = finder.Find(ConcreteAttributePath(kMockEndpoint3, MockClusterId(3), kReadOnlyAttributeId));
     ASSERT_TRUE(info.has_value());
-    EXPECT_FALSE(info->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_FALSE(info->FlagsHas(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(info->GetReadPrivilege(), chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_FALSE(info->writePrivilegeHasValue());                       // NOLINT(bugprone-unchecked-optional-access)
 }

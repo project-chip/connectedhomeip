@@ -1761,8 +1761,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(c
 Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(const DataModel::InvokeRequest & aRequest,
                                                                               const DataModel::AcceptedCommandEntry & entry)
 {
-    const bool commandNeedsTimedInvoke = entry.flags.Has(DataModel::CommandQualityFlags::kTimed);
-    const bool commandIsFabricScoped   = entry.flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
+    const bool commandNeedsTimedInvoke = entry.FlagsHas(DataModel::CommandQualityFlags::kTimed);
+    const bool commandIsFabricScoped   = entry.FlagsHas(DataModel::CommandQualityFlags::kFabricScoped);
 
     if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
     {

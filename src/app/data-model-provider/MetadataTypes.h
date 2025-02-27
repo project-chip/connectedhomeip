@@ -22,6 +22,7 @@
 #include <access/Privilege.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
+#include <assert.h>
 
 namespace chip {
 namespace app {
@@ -84,47 +85,101 @@ enum class AttributeQualityFlags : uint32_t
     kTimed           = 0x0040, // `T` quality on attributes (writes require timed interactions)
 };
 
+
+struct attribute_entry_mask_t {
+
+    // attribute quality flags
+    //
+    std::underlying_type_t<AttributeQualityFlags> flags : 7 ;  // generally defaults to View if readable
+
+    // read/write access privilege variables
+    //
+    std::underlying_type_t<Access::Privilege> readPrivilege : 5 ;  // generally defaults to View if readable
+    std::underlying_type_t<Access::Privilege> writePrivilege : 5 ; // generally defaults to Operate if writable
+
+};
+
+
+// Static ASSERT to check size of mask type.
+static_assert(sizeof(attribute_entry_mask_t) <= 4, "Size of attribute_entry_mask_t is not as expected.");
+
+// zero is not a valid privilege, just a default initial value for privileges
+constexpr std::underlying_type_t<Access::Privilege> kNoPrivilege(0) ;
+
+
 struct AttributeEntry
 {
     AttributeId attributeId;
-    BitFlags<AttributeQualityFlags> flags;
-
 
     // Constructor
-    AttributeEntry() : readPrivilege(0), writePrivilege(0) {}
+    constexpr AttributeEntry() : attributeId(0), mask{ 0, kNoPrivilege, kNoPrivilege } {}
 
+    
     void SetReadPrivilege(Access::Privilege r)
     {
-        readPrivilege = chip::to_underlying(r);
+        // Static ASSERT to check size of readPrivilege type vs entry parameter.
+        static_assert(sizeof(std::underlying_type_t<Access::Privilege>) >= 
+                      sizeof(chip::to_underlying(r)),
+                      "Size of readPrivilege is not able to accomodate parameter (r).");
+
+        // ASSERT to validate entry parameter value.
+        assert(kNoPrivilege != chip::to_underlying(r));
+
+
+        mask.readPrivilege = chip::to_underlying(r);
     }
 
     Access::Privilege GetReadPrivilege() const
     {
-        return static_cast< Access::Privilege >(readPrivilege);
+        return static_cast< Access::Privilege >(mask.readPrivilege);
     }
 
     void SetWritePrivilege(Access::Privilege w)
     {
-        writePrivilege = chip::to_underlying(w);
+        // Static ASSERT to check size of writePrivilege type vs entry parameter.
+        static_assert(sizeof(std::underlying_type_t<Access::Privilege>) >= 
+                      sizeof(chip::to_underlying(w)),
+                      "Size of writePrivilege is not able to accomodate parameter (w).");
+
+        // ASSERT to validate entry parameter value.
+        assert(kNoPrivilege != chip::to_underlying(w));
+
+        mask.writePrivilege = chip::to_underlying(w);
     }
 
     Access::Privilege GetWritePrivilege() const
     {
-        return static_cast< Access::Privilege >(writePrivilege);
+        return static_cast< Access::Privilege >(mask.writePrivilege);
     }
 
-    bool readPrivilegeHasValue() {return readPrivilege;}
-    bool writePrivilegeHasValue() {return writePrivilege;}
+
+    AttributeQualityFlags SetFlags(AttributeQualityFlags f)
+    {
+        return static_cast< AttributeQualityFlags >( mask.flags |= chip::to_underlying(f) ) ;
+    }
+
+
+    AttributeQualityFlags SetFlags(AttributeQualityFlags f, bool isSet)
+    {
+        return isSet ? 
+          SetFlags(f) : 
+          static_cast< AttributeQualityFlags >( mask.flags &= ~chip::to_underlying(f) );
+    }
+
+
+    constexpr bool FlagsHas(AttributeQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }   
+
+    bool readPrivilegeHasValue() {return mask.readPrivilege;}
+    bool writePrivilegeHasValue() {return mask.writePrivilege;}
 
 
     private:
 
-    // read/write access will be missing if read/write is NOT allowed
-    //
-    // NOTE: this should be compacted for size
-    std::underlying_type_t<Access::Privilege> readPrivilege : 5 ;  // generally defaults to View if readable
-    std::underlying_type_t<Access::Privilege> writePrivilege : 5 ; // generally defaults to Operate if writable
+       attribute_entry_mask_t mask;
+
 };
+
+
 
 // Bitmask values for different Command qualities.
 enum class CommandQualityFlags : uint32_t
@@ -134,33 +189,77 @@ enum class CommandQualityFlags : uint32_t
     kLargeMessage = 0x0004, // `L` quality on commands
 };
 
+
+
+struct accepted_command_entry_mask_t {
+
+    // command quality flags
+    //
+    std::underlying_type_t<CommandQualityFlags> flags : 3 ;  // generally defaults to View if readable
+
+    // invoke privilege variable
+    //
+    std::underlying_type_t<Access::Privilege> invokePrivilege : 5 ;
+
+};
+
+
+// Static ASSERT to check size of mask type.
+static_assert(sizeof(accepted_command_entry_mask_t) <= 4, "Size of accepted_command_entry_mask_t is not as expected.");
+
+
+
 struct AcceptedCommandEntry
 {
     CommandId commandId;
 
-    // TODO: this can be more compact (use some flags for privilege)
-    //       to make this compact, add a compact enum and make flags/invokePrivilege getters (to still be type safe)
-    BitFlags<CommandQualityFlags> flags;
-
 
     // Constructor
-    AcceptedCommandEntry() : 
-        invokePrivilege(chip::to_underlying(Access::Privilege::kOperate)) {}
+    constexpr AcceptedCommandEntry() : commandId(0),
+                                       mask{ 0, chip::to_underlying(Access::Privilege::kOperate) } {}
  
-        
-    Access::Privilege GetInvokePrivilege() const
-    {
-        return static_cast< Access::Privilege >(invokePrivilege);
-    }
-    
+
     void SetInvokePrivilege(Access::Privilege i)
     {
-        invokePrivilege = chip::to_underlying(i);
+        // Static ASSERT to check size of invokePrivilege type vs entry parameter.
+        static_assert(sizeof(std::underlying_type_t<Access::Privilege>) >= 
+                      sizeof(chip::to_underlying(i)),
+                      "Size of invokePrivilege is not able to accomodate parameter (i).");
+
+        // ASSERT to validate entry parameter value.
+        assert(kNoPrivilege != chip::to_underlying(i));
+
+        mask.invokePrivilege = chip::to_underlying(i);
     }
+                                       
+
+    Access::Privilege GetInvokePrivilege() const
+    {
+        return static_cast< Access::Privilege >(mask.invokePrivilege);
+    }
+    
+ 
+    CommandQualityFlags SetFlags(CommandQualityFlags f)
+    {
+        return static_cast< CommandQualityFlags >( mask.flags |= chip::to_underlying(f) ) ;
+    }
+
+
+    CommandQualityFlags SetFlags(CommandQualityFlags f, bool isSet)
+    {
+        return isSet ? 
+          SetFlags(f) : 
+          static_cast< CommandQualityFlags >( mask.flags &= ~chip::to_underlying(f) );
+    }
+   
+
+    constexpr bool FlagsHas(CommandQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }   
 
     
     private:
-    std::underlying_type_t<Access::Privilege> invokePrivilege : 5 ;
+
+       accepted_command_entry_mask_t mask;
+       
 };
 
 /// Represents a device type that resides on an endpoint

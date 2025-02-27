@@ -59,9 +59,9 @@ DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(const ConcreteCommandPat
 
     entry.commandId       = path.mCommandId;
     entry.SetInvokePrivilege( RequiredPrivilege::ForInvokeCommand(path) );
-    entry.flags.Set(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(path.mClusterId, commandId));
-    entry.flags.Set(DataModel::CommandQualityFlags::kFabricScoped, CommandIsFabricScoped(path.mClusterId, commandId));
-    entry.flags.Set(DataModel::CommandQualityFlags::kLargeMessage, CommandHasLargePayload(path.mClusterId, commandId));
+    entry.SetFlags(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(path.mClusterId, commandId));
+    entry.SetFlags(DataModel::CommandQualityFlags::kFabricScoped, CommandIsFabricScoped(path.mClusterId, commandId));
+    entry.SetFlags(DataModel::CommandQualityFlags::kLargeMessage, CommandHasLargePayload(path.mClusterId, commandId));
 
     return entry;
 }
@@ -105,8 +105,8 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
         entry.SetWritePrivilege(RequiredPrivilege::ForWriteAttribute(attributePath));
     }
 
-    entry.flags.Set(DataModel::AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));
-    entry.flags.Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite());
+    entry.SetFlags(DataModel::AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));
+    entry.SetFlags(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite());
 
     // NOTE: we do NOT provide additional info for:
     //    - IsExternal/IsSingleton/IsAutomaticallyPersisted is not used by IM handling
@@ -295,7 +295,7 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
     DataModel::AttributeEntry globalListEntry;
 
     globalListEntry.SetReadPrivilege(Access::Privilege::kView);
-    globalListEntry.flags.Set(DataModel::AttributeQualityFlags::kListAttribute);
+    globalListEntry.SetFlags(DataModel::AttributeQualityFlags::kListAttribute);
 
     for (auto & attribute : GlobalAttributesNotInMetadata)
     {
