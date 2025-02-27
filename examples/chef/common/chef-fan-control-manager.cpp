@@ -91,11 +91,11 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
 
     bool fanIsOn;
     // read current on/off value
-    Status status = OnOff::Attributes::OnOff::Get(mEndpoint, &fanIsOn);
-    if (status != Status::Success)
+    Status result = OnOff::Attributes::OnOff::Get(mEndpoint, &fanIsOn);
+    if (result != Status::Success)
     {
-        ChipLogError(DeviceLayer, "ERR: reading on/off %x", to_underlying(status));
-        return status;
+        ChipLogError(DeviceLayer, "ERR: reading on/off %x", to_underlying(result));
+        return result;
     }
     if (!fanIsOn)
     {
@@ -369,11 +369,11 @@ Status ChefFanControlManager::OnCommand(const app::ConcreteCommandPath & command
         return Status::Success;
     }
 
-    OnOff::Attributes::OnOff::Set(true);
+    OnOff::Attributes::OnOff::Set(commandPath.mEndpointId, true);
     MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OnOff::Id, OnOff::Attributes::OnOff::Id);
 
     FanControl::FanModeEnum fanMode;
-    FanControl::Attributes::FanMode::Get(commandPath.mEndpointId, fanMode);
+    FanControl::Attributes::FanMode::Get(commandPath.mEndpointId, &fanMode);
 
     if (fanMode == FanControl::FanModeEnum::kOff) // Off mode implies Speed/Percent setting values are 0.
     {
@@ -409,7 +409,7 @@ Status ChefFanControlManager::OnCommand(const app::ConcreteCommandPath & command
     return Status::Success;
 }
 
-Status ChefFanControlManager::OffCommand(const app::ConcreteCommandPath & commandPath);
+Status ChefFanControlManager::OffCommand(const app::ConcreteCommandPath & commandPath)
 {
     ChipLogProgress(DeviceLayer, "ChefFanControlManager::OnCommand");
 
@@ -427,11 +427,11 @@ Status ChefFanControlManager::OffCommand(const app::ConcreteCommandPath & comman
         return Status::Success;
     }
 
-    OnOff::Attributes::OnOff::Set(false);
+    OnOff::Attributes::OnOff::Set(commandPath.mEndpointId, false);
     MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OnOff::Id, OnOff::Attributes::OnOff::Id);
 
     FanControl::FanModeEnum fanMode;
-    FanControl::Attributes::FanMode::Get(commandPath.mEndpointId, fanMode);
+    FanControl::Attributes::FanMode::Get(commandPath.mEndpointId, &fanMode);
 
     if (fanMode == FanControl::FanModeEnum::kOff) // Off mode implies Speed/Percent current values are 0.
     {
@@ -472,7 +472,7 @@ Status ChefFanControlManager::OffCommand(const app::ConcreteCommandPath & comman
 }
 
 bool emberAfOnOffClusterOnCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                   const Commands::On::DecodableType & commandData)
+                                   const OnOff::Commands::On::DecodableType & commandData)
 {
     Status status = mFanControlManager->OffCommand(commandPath);
     commandObj->AddStatus(commandPath, status);
@@ -480,7 +480,7 @@ bool emberAfOnOffClusterOnCallback(app::CommandHandler * commandObj, const app::
 }
 
 bool emberAfOnOffClusterOffCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                    const Commands::Off::DecodableType & commandData)
+                                    const OnOff::Commands::Off::DecodableType & commandData)
 {
     Status status = mFanControlManager->OffCommand(commandPath);
     commandObj->AddStatus(commandPath, status);
