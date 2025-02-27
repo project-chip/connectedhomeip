@@ -28,8 +28,8 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
 
-using ICEServerStruct     = Structs::ICEServerStruct::DecodableType;
-using WebRTCSessionStruct = Structs::WebRTCSessionStruct::Type;
+using ICEServerDecodableTypeStruct = Structs::ICEServerStruct::DecodableType;
+using WebRTCSessionTypeStruct      = Structs::WebRTCSessionStruct::Type;
 
 /**
  * @brief
@@ -42,31 +42,22 @@ class Delegate
 public:
     virtual ~Delegate() = default;
 
-    struct SolicitOfferRequestArgs
+    struct OfferRequestArgs
     {
         uint16_t id;
         StreamUsageEnum streamUsage;
-        Optional<DataModel::Nullable<uint16_t>> videoStreamId;
-        Optional<DataModel::Nullable<uint16_t>> audioStreamId;
-        Optional<DataModel::DecodableList<ICEServerStruct>> iceServers;
+        Optional<DataModel::Nullable<uint16_t>> videoStreamID;
+        Optional<DataModel::Nullable<uint16_t>> audioStreamID;
+        Optional<DataModel::DecodableList<ICEServerDecodableTypeStruct>> iceServers;
         Optional<chip::CharSpan> iceTransportPolicy;
         Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
-        NodeId peerNodeId;
+        NodeId peerNodeID;
         FabricIndex peerFabricIndex;
     };
 
-    struct ProvideOfferRequestArgs
+    struct ProvideOfferRequestArgs : OfferRequestArgs
     {
-        uint16_t id;
-        StreamUsageEnum streamUsage;
-        chip::CharSpan sdp;
-        Optional<DataModel::Nullable<uint16_t>> videoStreamId;
-        Optional<DataModel::Nullable<uint16_t>> audioStreamId;
-        Optional<DataModel::DecodableList<ICEServerStruct>> iceServers;
-        Optional<chip::CharSpan> iceTransportPolicy;
-        Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
-        NodeId peerNodeId;
-        FabricIndex peerFabricIndex;
+        std::string sdp;
     };
 
     /**
@@ -78,33 +69,46 @@ public:
      *     (low power), thus a "deferred offer" scenario might occur if the device needs time
      *     to fully power resources needed for streaming.
      *
-     * @param[in]  args             Structure containing all input arguments for the command.
-     * @param[out] outSession       On success, must be populated with the new session's details.
-     * @param[out] outDeferredOffer True if the device is in standby or needs to defer generating an Offer.
+     * @param[in]  args
+     *     Structure containing all input arguments for the command.
+     *
+     * @param[out] outSession
+     *     On success (`CHIP_NO_ERROR`), must be populated with the new session's details.
+     *
+     * @param[out] outDeferredOffer
+     *     On success (`CHIP_NO_ERROR`), set to `true` if the device is in standby
+     *     or needs to defer generating an Offer; otherwise, `false`.
+     *     If an error is returned, this value is not relevant.
      *
      * @return CHIP_ERROR
-     *     - CHIP_NO_ERROR if a session was successfully created or prepared for negotiation
-     *     - Appropriate error otherwise (e.g. out of resources)
+     *     - CHIP_NO_ERROR if a session was successfully created or prepared for negotiation.
+     *     - CHIP_ERROR_NO_MEMORY if the device cannot allocate a new session.
+     *     - Appropriate error otherwise.
+     *
+     * The combination of `outDeferredOffer == true` with an error return code is invalid
+     * (the device cannot be "deferring" if it is failing the command).
      */
-    virtual CHIP_ERROR HandleSolicitOffer(const SolicitOfferRequestArgs & args, WebRTCSessionStruct & outSession,
+    virtual CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionTypeStruct & outSession,
                                           bool & outDeferredOffer) = 0;
 
     /**
      * @brief
-     *     This method is called when the server receives the ProvideOffer command.
+     *   Handles the ProvideOffer command received by the server.
      *
-     *     ProvideOffer is used by a requestor to either:
-     *       - Create a brand new session by sending an SDP Offer
-     *       - Re-offer an SDP to modify an existing session (e.g., enabling two-way talk).
+     * @param[in]  args
+     *   Contains all input arguments for the command, including the SDP Offer, session usage, etc.
      *
-     * @param[in]  args            Structure containing all input arguments for the command.
-     * @param[out] outSession      Must be populated with the final session info (session ID, streams, etc.).
+     * @param[out] outSession
+     *   Must be populated with the final session details (session ID, stream IDs, etc.) when this
+     *   method returns `CHIP_NO_ERROR`. If an error is returned, `outSession` is left unmodified or
+     *   set to an invalid state.
      *
-     * @return CHIP_ERROR
-     *     - CHIP_NO_ERROR on success
-     *     - Appropriate error if the request is invalid or resources are exhausted
+     * @return
+     *   - CHIP_NO_ERROR if the request succeeds and `outSession` is populated
+     *   - CHIP_ERROR_NO_MEMORY if the device cannot allocate a new session.
+     *   - Appropriate error otherwise.
      */
-    virtual CHIP_ERROR HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession) = 0;
+    virtual CHIP_ERROR HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionTypeStruct & outSession) = 0;
 
     /**
      * @brief
@@ -121,7 +125,7 @@ public:
      *   - CHIP_NO_ERROR if the Answer is accepted
      *   - Appropriate error if invalid or unexpected
      */
-    virtual CHIP_ERROR HandleProvideAnswer(uint16_t sessionId, const chip::CharSpan & sdpAnswer) = 0;
+    virtual CHIP_ERROR HandleProvideAnswer(uint16_t sessionId, const std::string & sdpAnswer) = 0;
 
     /**
      * @brief
@@ -175,21 +179,32 @@ public:
 
     /**
      * @brief
-     *   Initializes this server instance.
-     *
+     *   Registers the command handler and attribute interface with the Matter Stack.
      * @return CHIP_ERROR
-     *   - CHIP_NO_ERROR on successful registration
-     *   - Error code if the registration failed
+     *   - CHIP_NO_ERROR on successful registration.
+     *   - Other CHIP_ERROR codes if registration fails.
      */
     CHIP_ERROR Init();
 
+    /**
+     * @brief
+     *   Unregisters the command handler and attribute interface, releasing resources.
+     */
+    void Shutdown();
+
 private:
+    enum class UpsertResultEnum : uint8_t
+    {
+        kInserted = 0x00,
+        kUpdated  = 0x01,
+    };
+
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     void InvokeCommand(HandlerContext & ctx) override;
 
     // Helper functions
-    WebRTCSessionStruct * FindSession(uint16_t sessionId);
-    void AddOrUpdateSession(const WebRTCSessionStruct & session);
+    WebRTCSessionTypeStruct * FindSession(uint16_t sessionId);
+    UpsertResultEnum UpsertSession(const WebRTCSessionTypeStruct & session);
     void RemoveSession(uint16_t sessionId);
     uint16_t GenerateSessionID();
 
@@ -201,7 +216,7 @@ private:
     void HandleEndSession(HandlerContext & ctx, const Commands::EndSession::DecodableType & req);
 
     Delegate * mDelegate = nullptr;
-    std::vector<WebRTCSessionStruct> mCurrentSessions;
+    std::vector<WebRTCSessionTypeStruct> mCurrentSessions;
 };
 
 } // namespace WebRTCTransportProvider

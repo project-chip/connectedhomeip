@@ -39,6 +39,8 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
+static constexpr uint16_t kMaxSessionId = 65534;
+
 NodeId GetNodeIdFromCtx(const CommandHandler & commandHandler)
 {
     auto descriptor = commandHandler.GetSubjectDescriptor();
@@ -64,29 +66,31 @@ WebRTCTransportProviderServer::WebRTCTransportProviderServer(Delegate * delegate
 
 WebRTCTransportProviderServer::~WebRTCTransportProviderServer()
 {
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+    Shutdown();
 }
 
 CHIP_ERROR WebRTCTransportProviderServer::Init()
 {
-    // Register ourselves for attribute read/write
-    AttributeAccessInterfaceRegistry::Instance().Register(this);
-
-    // Register ourselves as the command handler
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
 
     return CHIP_NO_ERROR;
+}
+
+void WebRTCTransportProviderServer::Shutdown()
+{
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 // AttributeAccessInterface
 CHIP_ERROR WebRTCTransportProviderServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     // The only attribute from the spec is "CurrentSessions" (attribute ID 0x0000),
-    // which is a list[WebRTCSessionStruct].
+    // which is a list[WebRTCSessionTypeStruct].
     if (aPath.mClusterId == Id && aPath.mAttributeId == Attributes::CurrentSessions::Id)
     {
-        // We encode mCurrentSessions as a list of WebRTCSessionStruct::Type
+        // We encode mCurrentSessions as a list of WebRTCSessionTypeStruct
         return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
             for (auto & session : mCurrentSessions)
             {
@@ -147,7 +151,7 @@ void WebRTCTransportProviderServer::InvokeCommand(HandlerContext & ctx)
 }
 
 // Helper functions
-WebRTCSessionStruct * WebRTCTransportProviderServer::FindSession(uint16_t sessionId)
+WebRTCSessionTypeStruct * WebRTCTransportProviderServer::FindSession(uint16_t sessionId)
 {
     for (auto & session : mCurrentSessions)
     {
@@ -160,30 +164,31 @@ WebRTCSessionStruct * WebRTCTransportProviderServer::FindSession(uint16_t sessio
     return nullptr;
 }
 
-void WebRTCTransportProviderServer::AddOrUpdateSession(const WebRTCSessionStruct & session)
+WebRTCTransportProviderServer::UpsertResultEnum
+WebRTCTransportProviderServer::UpsertSession(const WebRTCSessionTypeStruct & session)
 {
-    bool found = false;
+    // Use std::find_if to locate a matching session ID in mCurrentSessions
+    auto it = std::find_if(mCurrentSessions.begin(), mCurrentSessions.end(),
+                           [id = session.id](const auto & existing) { return existing.id == id; });
 
-    // Search for a session with the same ID and update if found
-    for (auto & existing : mCurrentSessions)
+    if (it != mCurrentSessions.end())
     {
-        if (existing.id == session.id)
-        {
-            existing = session;
-            found    = true;
-            break;
-        }
+        // Found an existing session with the same ID; update it
+        *it = session;
+
+        MatterReportingAttributeChangeCallback(AttributeAccessInterface::GetEndpointId().Value(), WebRTCTransportProvider::Id,
+                                               WebRTCTransportProvider::Attributes::CurrentSessions::Id);
+
+        return UpsertResultEnum::kUpdated;
     }
 
-    // If not found, add a new entry
-    if (!found)
-    {
-        mCurrentSessions.push_back(session);
-    }
+    // If not found, insert a new entry
+    mCurrentSessions.push_back(session);
 
-    // Notify the stack that the CurrentSessions attribute has changed
     MatterReportingAttributeChangeCallback(AttributeAccessInterface::GetEndpointId().Value(), WebRTCTransportProvider::Id,
                                            WebRTCTransportProvider::Attributes::CurrentSessions::Id);
+
+    return UpsertResultEnum::kInserted;
 }
 
 void WebRTCTransportProviderServer::RemoveSession(uint16_t sessionId)
@@ -192,7 +197,7 @@ void WebRTCTransportProviderServer::RemoveSession(uint16_t sessionId)
 
     // Erase-Remove idiom
     mCurrentSessions.erase(std::remove_if(mCurrentSessions.begin(), mCurrentSessions.end(),
-                                          [sessionId](const WebRTCSessionStruct & s) { return s.id == sessionId; }),
+                                          [sessionId](const WebRTCSessionTypeStruct & s) { return s.id == sessionId; }),
                            mCurrentSessions.end());
 
     // If a session was removed, the size will be smaller.
@@ -210,15 +215,19 @@ uint16_t WebRTCTransportProviderServer::GenerateSessionID()
     uint16_t candidateId          = lastSessionId++;
 
     // Handle wrap-around per spec
-    if (lastSessionId > 65534)
+    if (lastSessionId > kMaxSessionId)
+    {
         lastSessionId = 0;
+    }
 
     // Ensure uniqueness
     while (FindSession(candidateId) != nullptr)
     {
         candidateId = lastSessionId++;
-        if (lastSessionId > 65534)
+        if (lastSessionId > kMaxSessionId)
+        {
             lastSessionId = 0;
+        }
     }
 
     return candidateId;
@@ -235,36 +244,39 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         return;
     }
 
-    // Prepare arguments for Delegate::HandleSolicitOffer using SolicitOfferRequestArgs struct
-    Delegate::SolicitOfferRequestArgs args;
+    // Prepare arguments for Delegate::HandleSolicitOffer using OfferRequestArgs struct
+    Delegate::OfferRequestArgs args;
     args.id                 = GenerateSessionID();
     args.streamUsage        = req.streamUsage;
-    args.videoStreamId      = req.videoStreamID;
-    args.audioStreamId      = req.audioStreamID;
+    args.videoStreamID      = req.videoStreamID;
+    args.audioStreamID      = req.audioStreamID;
     args.iceServers         = req.ICEServers;
     args.iceTransportPolicy = req.ICETransportPolicy;
     args.metadataOptions    = req.metadataOptions;
-    args.peerNodeId         = GetNodeIdFromCtx(ctx.mCommandHandler);
+    args.peerNodeID         = GetNodeIdFromCtx(ctx.mCommandHandler);
     args.peerFabricIndex    = ctx.mCommandHandler.GetAccessingFabricIndex();
 
     // Delegate processing
-    WebRTCSessionStruct outSession;
+    WebRTCSessionTypeStruct outSession;
     bool deferredOffer = false;
-    CHIP_ERROR err     = mDelegate->HandleSolicitOffer(args, outSession, deferredOffer);
 
-    // Convert the CHIP_ERROR to an Interaction Model status code
-    Protocols::InteractionModel::Status status = StatusIB(err).mStatus;
-    if (status != Protocols::InteractionModel::Status::Success)
+    auto status = Protocols::InteractionModel::ClusterStatusCode(mDelegate->HandleSolicitOffer(args, outSession, deferredOffer));
+    if (status != Protocols::InteractionModel::ClusterStatusCode(Status::Success))
     {
-        // If the delegate could not allocate or encountered a problem,
-        // respond with the appropriate status. For example, if out of resources,
-        // the delegate might return an error that maps to ResourceExhausted or Failure.
+        // Delegate encountered a problem (out of resources, invalid data, etc.)
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
 
-    // Store the WebRTCSessionStruct in the CurrentSessions
-    AddOrUpdateSession(outSession);
+    // Store or update the WebRTCSessionTypeStruct in the CurrentSessions
+    if (UpsertSession(outSession) == UpsertResultEnum::kInserted)
+    {
+        ChipLogProgress(Zcl, "WebRTCTransportProvider: Inserted a new session with ID=%u.", outSession.id);
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "WebRTCTransportProvider: Updated existing session with ID=%u.", outSession.id);
+    }
 
     // Send the response
     Commands::SolicitOfferResponse::Type resp;
@@ -304,11 +316,13 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
     else
     {
         // This is a re-offer. Check if the session ID is in our provider list
-        sessionId                             = webRTCSessionID.Value();
-        WebRTCSessionStruct * existingSession = FindSession(sessionId);
+        sessionId                                 = webRTCSessionID.Value();
+        WebRTCSessionTypeStruct * existingSession = FindSession(sessionId);
 
         if (!existingSession)
         {
+            ChipLogError(Zcl, "HandleProvideOffer: No existing session with ID=%u.", sessionId);
+
             // If WebRTCSessionID is not null and does not match a value in current sessions.
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
             return;
@@ -324,35 +338,37 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
     }
 
     // Delegate processing
-    WebRTCSessionStruct outSession;
+    WebRTCSessionTypeStruct outSession;
 
     Delegate::ProvideOfferRequestArgs args;
     args.id                 = sessionId;
     args.streamUsage        = req.streamUsage;
-    args.sdp                = req.sdp;
-    args.videoStreamId      = videoStreamID;
-    args.audioStreamId      = audioStreamID;
+    args.videoStreamID      = videoStreamID;
+    args.audioStreamID      = audioStreamID;
     args.iceServers         = req.ICEServers;
     args.iceTransportPolicy = req.ICETransportPolicy;
     args.metadataOptions    = req.metadataOptions;
-    args.peerNodeId         = GetNodeIdFromCtx(ctx.mCommandHandler);
+    args.peerNodeID         = GetNodeIdFromCtx(ctx.mCommandHandler);
     args.peerFabricIndex    = ctx.mCommandHandler.GetAccessingFabricIndex();
+    args.sdp                = std::string(req.sdp.data(), req.sdp.size());
 
-    CHIP_ERROR err = mDelegate->HandleProvideOffer(args, outSession);
-
-    // Convert the CHIP_ERROR to an Interaction Model status code
-    Protocols::InteractionModel::Status status = StatusIB(err).mStatus;
-    if (status != Protocols::InteractionModel::Status::Success)
+    auto status = Protocols::InteractionModel::ClusterStatusCode(mDelegate->HandleProvideOffer(args, outSession));
+    if (status != Protocols::InteractionModel::ClusterStatusCode(Status::Success))
     {
-        // If the delegate could not allocate or encountered a problem,
-        // respond with the appropriate status. For example, if out of resources,
-        // the delegate might return an error that maps to ResourceExhausted or Failure.
+        // Delegate encountered a problem (out of resources, invalid data, etc.)
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
 
-    // Store the WebRTCSessionStruct in the CurrentSessions
-    AddOrUpdateSession(outSession);
+    // Store or update the WebRTCSessionTypeStruct in the CurrentSessions
+    if (UpsertSession(outSession) == UpsertResultEnum::kInserted)
+    {
+        ChipLogProgress(Zcl, "WebRTCTransportProvider: Inserted a new session with ID=%u.", outSession.id);
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "WebRTCTransportProvider: Updated existing session with ID=%u.", outSession.id);
+    }
 
     // Send the response
     Commands::ProvideOfferResponse::Type resp;
@@ -367,15 +383,17 @@ void WebRTCTransportProviderServer::HandleProvideAnswer(HandlerContext & ctx, co
 {
     // Extract command fields from the request.
     uint16_t sessionId = req.webRTCSessionID;
-    auto sdpAnswer     = req.sdp;
+    auto sdpSpan       = req.sdp;
 
     NodeId peerNodeId           = GetNodeIdFromCtx(ctx.mCommandHandler);
     FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
 
-    WebRTCSessionStruct * existingSession = FindSession(sessionId);
+    WebRTCSessionTypeStruct * existingSession = FindSession(sessionId);
 
     if (!existingSession)
     {
+        ChipLogError(Zcl, "HandleProvideAnswer: No existing session with ID=%u.", sessionId);
+
         // If WebRTCSessionID is not null and does not match a value in current sessions.
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
         return;
@@ -389,14 +407,9 @@ void WebRTCTransportProviderServer::HandleProvideAnswer(HandlerContext & ctx, co
         return;
     }
 
-    Status status  = Protocols::InteractionModel::Status::Success;
-    CHIP_ERROR err = mDelegate->HandleProvideAnswer(sessionId, sdpAnswer);
-    if (err != CHIP_NO_ERROR)
-    {
-        status = StatusIB(err).mStatus;
-    }
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    std::string sdpAnswer(sdpSpan.data(), sdpSpan.size());
+    ctx.mCommandHandler.AddStatus(
+        ctx.mRequestPath, Protocols::InteractionModel::ClusterStatusCode(mDelegate->HandleProvideAnswer(sessionId, sdpAnswer)));
 }
 
 void WebRTCTransportProviderServer::HandleProvideICECandidates(HandlerContext & ctx,
@@ -419,10 +432,12 @@ void WebRTCTransportProviderServer::HandleProvideICECandidates(HandlerContext & 
         candidates.emplace_back(candidateSpan.data(), candidateSpan.size());
     }
 
-    WebRTCSessionStruct * existingSession = FindSession(sessionId);
+    WebRTCSessionTypeStruct * existingSession = FindSession(sessionId);
 
     if (!existingSession)
     {
+        ChipLogError(Zcl, "HandleProvideICECandidates: No existing session with ID=%u.", sessionId);
+
         // If WebRTCSessionID is not null and does not match a value in current sessions.
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
         return;
@@ -436,14 +451,9 @@ void WebRTCTransportProviderServer::HandleProvideICECandidates(HandlerContext & 
         return;
     }
 
-    Status status  = Protocols::InteractionModel::Status::Success;
-    CHIP_ERROR err = mDelegate->HandleProvideICECandidates(sessionId, candidates);
-    if (err != CHIP_NO_ERROR)
-    {
-        status = StatusIB(err).mStatus;
-    }
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    ctx.mCommandHandler.AddStatus(
+        ctx.mRequestPath,
+        Protocols::InteractionModel::ClusterStatusCode(mDelegate->HandleProvideICECandidates(sessionId, candidates)));
 }
 
 void WebRTCTransportProviderServer::HandleEndSession(HandlerContext & ctx, const Commands::EndSession::DecodableType & req)
@@ -455,10 +465,12 @@ void WebRTCTransportProviderServer::HandleEndSession(HandlerContext & ctx, const
     NodeId peerNodeId           = GetNodeIdFromCtx(ctx.mCommandHandler);
     FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
 
-    WebRTCSessionStruct * existingSession = FindSession(sessionId);
+    WebRTCSessionTypeStruct * existingSession = FindSession(sessionId);
 
     if (!existingSession)
     {
+        ChipLogError(Zcl, "HandleEndSession: No existing session with ID=%u.", sessionId);
+
         // If WebRTCSessionID is not null and does not match a value in current sessions.
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
         return;
@@ -472,14 +484,8 @@ void WebRTCTransportProviderServer::HandleEndSession(HandlerContext & ctx, const
         return;
     }
 
-    Status status  = Protocols::InteractionModel::Status::Success;
-    CHIP_ERROR err = mDelegate->HandleEndSession(sessionId, reason);
-    if (err != CHIP_NO_ERROR)
-    {
-        status = StatusIB(err).mStatus;
-    }
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath,
+                                  Protocols::InteractionModel::ClusterStatusCode(mDelegate->HandleEndSession(sessionId, reason)));
 
     RemoveSession(sessionId);
 }
