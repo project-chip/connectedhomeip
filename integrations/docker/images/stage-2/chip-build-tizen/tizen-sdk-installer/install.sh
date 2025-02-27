@@ -45,7 +45,7 @@ function show_help() {
     echo
     echo "Options:"
     echo "  -h, --help                 Display this information"
-    echo "  --cpu                      Comma separated list of CPUs. Like `arm` or `arm64`"
+    echo "  --cpu                      Comma separated list of CPUs. Like $(arm) or $(arm64)"
     echo "  --tizen-sdk-path           Set directory for Tizen SDK installation. Default is $TIZEN_SDK_ROOT"
     echo "  --tizen-sdk-data-path      Set directory for Tizen SDK runtime data. Default is $TIZEN_SDK_DATA_PATH"
     echo "  --install-dependencies     This option installs all required dependencies"
