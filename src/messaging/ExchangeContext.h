@@ -178,8 +178,7 @@ public:
     // Applies a suggested response timeout value based on the session type and the given upper layer processing time for
     // the next message to the exchange. The exchange context must have a valid session when calling this function.
     //
-    // This function is an equivalent of SetResponseTimeout(mSession->ComputeRoundTripTimeout(applicationProcessingTimeout,
-    // HasReceivedAtLeastOneMessage()))
+    // This function is an equivalent of SetResponseTimeout(mSession->ComputeRoundTripTimeout(applicationProcessingTimeout))
     void UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout);
 
     // Set the response timeout for the exchange context, regardless of the underlying session type. Using

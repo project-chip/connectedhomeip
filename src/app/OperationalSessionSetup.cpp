@@ -776,9 +776,7 @@ CHIP_ERROR OperationalSessionSetup::ScheduleSessionSetupReattempt(System::Clock:
         // but in practice if the other side is using its local config to
         // compute Sigma2 response timeouts, then it's also returning useful
         // values with BUSY, so we will wait long enough.
-        bool isPeerActive = (mCASEClient != nullptr) && mCASEClient->IsPeerActive();
-        auto additionalTimeout =
-            CASESession::ComputeSigma2ResponseTimeout(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()), isPeerActive);
+        auto additionalTimeout = CASESession::ComputeSigma2ResponseTimeout(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
         actualTimerDelay += additionalTimeout;
     }
     timerDelay = std::chrono::duration_cast<System::Clock::Seconds16>(actualTimerDelay);
@@ -837,8 +835,7 @@ void OperationalSessionSetup::NotifyRetryHandlers(CHIP_ERROR error, const Reliab
 {
     // Compute the time we are likely to need to detect that the retry has
     // failed.
-    bool isPeerActive                     = (mCASEClient != nullptr) && mCASEClient->IsPeerActive();
-    System::Clock::Timeout messageTimeout = CASESession::ComputeSigma1ResponseTimeout(remoteMrpConfig, isPeerActive);
+    System::Clock::Timeout messageTimeout = CASESession::ComputeSigma1ResponseTimeout(remoteMrpConfig);
     auto timeoutSecs                      = std::chrono::duration_cast<System::Clock::Seconds16>(messageTimeout);
     // Add 1 second in case we had fractional milliseconds in messageTimeout.
     using namespace chip::System::Clock::Literals;

@@ -71,7 +71,7 @@ uint32_t pychip_DeviceProxy_ComputeRoundTripTimeout(DeviceProxy * device, uint32
 
     return deviceProxy->GetSecureSession()
         .Value()
-        ->ComputeRoundTripTimeout(System::Clock::Milliseconds32(upperLayerProcessingTimeoutMs), false /*isPeerActive*/)
+        ->ComputeRoundTripTimeout(System::Clock::Milliseconds32(upperLayerProcessingTimeoutMs))
         .count();
 }
 

@@ -166,14 +166,16 @@ public:
 
     bool AllowsLargePayload() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kTcp; }
 
-    System::Clock::Milliseconds32 GetAckTimeout(bool isPeerActive) const override
+    System::Clock::Milliseconds32 GetAckTimeout() const override
     {
         switch (mPeerAddress.GetTransportType())
         {
         case Transport::Type::kUdp: {
             const ReliableMessageProtocolConfig & remoteMRPConfig = mRemoteSessionParams.GetMRPConfig();
+            // The MRP machinery on our side will assume the peer is active regardless of what the session state is and
+            // treat this is non-initial message and set it IsInital as false.
             return GetRetransmissionTimeout(remoteMRPConfig.mActiveRetransTimeout, remoteMRPConfig.mIdleRetransTimeout,
-                                            GetLastPeerActivityTime(), remoteMRPConfig.mActiveThresholdTime, isPeerActive);
+                                            GetLastPeerActivityTime(), remoteMRPConfig.mActiveThresholdTime, false /*IsInitial*/);
         }
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
@@ -185,8 +187,7 @@ public:
         return System::Clock::Timeout();
     }
 
-    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity,
-                                                           bool isPeerActive) const override
+    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity, bool isInitial) const override
     {
         switch (mPeerAddress.GetTransportType())
         {
@@ -195,7 +196,7 @@ public:
             const auto & defaultMRRPConfig   = GetDefaultMRPConfig();
             const auto & localMRPConfig      = maybeLocalMRPConfig.ValueOr(defaultMRRPConfig);
             return GetRetransmissionTimeout(localMRPConfig.mActiveRetransTimeout, localMRPConfig.mIdleRetransTimeout,
-                                            ourLastActivity, localMRPConfig.mActiveThresholdTime, isPeerActive);
+                                            ourLastActivity, localMRPConfig.mActiveThresholdTime, isInitial);
         }
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);

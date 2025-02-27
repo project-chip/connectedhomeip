@@ -986,15 +986,14 @@ CHIP_ERROR ReadClient::ComputeLivenessCheckTimerTimeout(System::Clock::Timeout *
     //
     // So recompute the round-trip timeout directly.  Assume MRP, since in practice that is likely what is happening.
     auto & peerMRPConfig = mReadPrepareParams.mSessionHolder->GetRemoteMRPConfig();
-    // Peer will assume we are idle (hence we pass kZero to GetMessageReceiptTimeout()), but will assume we treat it as active
-    // for the response, so to match the retransmission timeout computation for the message back to the peer, we should treat
-    // it as active.
-    auto roundTripTimeout = mReadPrepareParams.mSessionHolder->GetMessageReceiptTimeout(
-                                System::Clock::kZero, mExchange.Get()->HasReceivedAtLeastOneMessage()) +
+    // Peer will assume we are idle and will send initial message(hence we pass kZero to GetMessageReceiptTimeout()), but will
+    // treat it as active for the response, so to match the retransmission timeout computation for the message back to the
+    // peer, and further set isInitial as false for GetRetransmissionTimeout
+    auto roundTripTimeout = mReadPrepareParams.mSessionHolder->GetMessageReceiptTimeout(System::Clock::kZero, true /*isInitial*/) +
         kExpectedIMProcessingTime +
         GetRetransmissionTimeout(peerMRPConfig.mActiveRetransTimeout, peerMRPConfig.mIdleRetransTimeout,
                                  System::SystemClock().GetMonotonicTimestamp(), peerMRPConfig.mActiveThresholdTime,
-                                 mExchange.Get()->HasReceivedAtLeastOneMessage());
+                                 false /*isInitial*/);
     *aTimeout = System::Clock::Seconds16(mMaxInterval) + roundTripTimeout;
     return CHIP_NO_ERROR;
 }

@@ -100,8 +100,7 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
             {
                 // The delay should be however long we think it will take for
                 // that to time out.
-                auto sigma2Timeout = CASESession::ComputeSigma2ResponseTimeout(GetSession().GetRemoteMRPConfig(),
-                                                                               ec->HasReceivedAtLeastOneMessage());
+                auto sigma2Timeout = CASESession::ComputeSigma2ResponseTimeout(GetSession().GetRemoteMRPConfig());
                 if (sigma2Timeout < System::Clock::Milliseconds16::max())
                 {
                     delay = std::chrono::duration_cast<System::Clock::Milliseconds16>(sigma2Timeout);
