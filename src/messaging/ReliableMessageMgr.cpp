@@ -126,6 +126,12 @@ void ReliableMessageMgr::NotifyMessageSendAnalytics(const RetransTableEntry & en
                                                                   ReliableMessageAnalyticsDelegate::SessionType::kEstablishedCase,
                                                               .eventType      = eventType,
                                                               .messageCounter = messageCounter };
+
+    if (eventType == ReliableMessageAnalyticsDelegate::EventType::kRetransmission)
+    {
+        event.retransmissionCount = entry.sendCount;
+    }
+
     mAnalyticsDelegate->OnTransmitEvent(event);
 }
 #endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
