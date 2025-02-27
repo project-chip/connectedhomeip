@@ -474,7 +474,7 @@ Protocols::InteractionModel::Status ChefFanControlManager::OffCommand(const app:
 bool emberAfOnOffClusterOnCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                    const OnOff::Commands::On::DecodableType & commandData)
 {
-    Status status = mFanControlManager->OffCommand(commandPath);
+    Status status = mFanControlManager->OnCommand(commandPath);
     commandObj->AddStatus(commandPath, status);
     return true;
 }
