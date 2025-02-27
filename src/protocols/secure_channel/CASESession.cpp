@@ -2611,7 +2611,7 @@ exit:
 
 namespace {
 System::Clock::Timeout ComputeRoundTripTimeout(ExchangeContext::Timeout serverProcessingTime,
-                                               const ReliableMessageProtocolConfig & remoteMrpConfig, isInitial)
+                                               const ReliableMessageProtocolConfig & remoteMrpConfig, bool isInitial)
 {
     // TODO: This is duplicating logic from Session::ComputeRoundTripTimeout.  Unfortunately, it's called by
     // consumers who do not have a session.
@@ -2622,7 +2622,7 @@ System::Clock::Timeout ComputeRoundTripTimeout(ExchangeContext::Timeout serverPr
                                     // Assume peer is idle, as a worst-case assumption (probably true for
                                     // Sigma1, since that will be our initial message on the session, but less
                                     // so for Sigma2).
-                                    System::Clock::kZero, remoteMrpConfig.mActiveThresholdTime, isInitial) +
+                                    System::Clock::kZero, remoteMrpConfig.mActiveThresholdTime, true /*isInitial*/) +
         serverProcessingTime +
         GetRetransmissionTimeout(localMRPConfig.mActiveRetransTimeout, localMRPConfig.mIdleRetransTimeout,
                                  // Peer will assume we are active, since it's

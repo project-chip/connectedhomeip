@@ -138,7 +138,7 @@ System::Clock::Timeout GetRetransmissionTimeout(System::Clock::Timeout activeInt
     {
         auto baseInterval = activeInterval;
         // If we are calculating the timeout for the initial message, we never know whether the peer is active or not, choose
-        // active/idle interval from PeerActiveMode of session per 4.11.2.1. Retransmissions. 
+        // active/idle interval from PeerActiveMode of session per 4.11.2.1. Retransmissions.
         // if we are calculating the timeout for response message, we know the peer is active, always choose active interval
         if (isInitial)
         {
