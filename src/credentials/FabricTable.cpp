@@ -1046,12 +1046,17 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
         }
     }
 
-    // Only return error after trying really hard to remove everything we could
-    ReturnErrorOnFailure(metadataErr);
-    ReturnErrorOnFailure(opKeyErr);
-    ReturnErrorOnFailure(opCertsErr);
+    if (fabricIsInitialized)
+    {
+        // Only return error after trying really hard to remove everything we could
+        ReturnErrorOnFailure(metadataErr);
+        ReturnErrorOnFailure(opKeyErr);
+        ReturnErrorOnFailure(opCertsErr);
 
-    return CHIP_NO_ERROR;
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 void FabricTable::DeleteAllFabrics()
