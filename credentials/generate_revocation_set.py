@@ -179,7 +179,7 @@ def is_self_signed_certificate(cert: x509.Certificate) -> bool:
         return True
     else:
         logging.debug(
-                f"Certificate with subject: {cert.subject.rfc4514_string()} is not a valid self-signed certificate. Result: {result.name}")
+            f"Certificate with subject: {cert.subject.rfc4514_string()} is not a valid self-signed certificate. Result: {result.name}")
     return False
 
 
@@ -197,20 +197,20 @@ def validate_cert_chain(crl_signer: x509.Certificate, crl_signer_delegator: x509
         result_signer = verify_cert(crl_signer, crl_signer_delegator)
         if not result_signer == CertVerificationResult.SUCCESS:
             logging.debug(
-                    f"Cannot verify certificate subject: {crl_signer.subject.rfc4514_string()} issued by certificate subject: {crl_signer_delegator.subject.rfc4514_string()}. Result: {result_signer.name}")
+                f"Cannot verify certificate subject: {crl_signer.subject.rfc4514_string()} issued by certificate subject: {crl_signer_delegator.subject.rfc4514_string()}. Result: {result_signer.name}")
             return False
 
         result_delegator = verify_cert(crl_signer_delegator, paa)
         if not result_delegator == CertVerificationResult.SUCCESS:
             logging.debug(
-                    f"Cannot verify certificate subject: {crl_signer_delegator.subject.rfc4514_string()} issued by certificate subject: {paa.subject.rfc4514_string()}. Result: {result.name}")
+                f"Cannot verify certificate subject: {crl_signer_delegator.subject.rfc4514_string()} issued by certificate subject: {paa.subject.rfc4514_string()}. Result: {result.name}")
             return False
         return True
     else:
         result = verify_cert(crl_signer, paa)
         if not result == CertVerificationResult.SUCCESS:
             logging.debug(
-                    f"Cannot verify certificate subject: {crl_signer.subject.rfc4514_string()} issued by certificate subject: {paa.subject.rfc4514_string()}. Result: {result.name}")
+                f"Cannot verify certificate subject: {crl_signer.subject.rfc4514_string()} issued by certificate subject: {paa.subject.rfc4514_string()}. Result: {result.name}")
             return False
         return True
 
@@ -606,7 +606,6 @@ class RestDclClient(DclClientInterface):
         '''
 
         response = self.send_get_request(f"{self.rest_node_url}/dcl/pki/revocation-points")
-        
         return [RevocationPoint(**r) for r in response["PkiRevocationDistributionPoint"]]
 
     def get_revocation_points_by_skid(self, issuer_subject_key_id) -> list[RevocationPoint]:
@@ -1072,4 +1071,3 @@ if __name__ == "__main__":
         cli.main(['--help'])
     else:
         cli()
-
