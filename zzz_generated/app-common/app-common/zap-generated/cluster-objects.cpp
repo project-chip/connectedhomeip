@@ -32096,12 +32096,29 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TransportOptionsStruct
 
 namespace TransportConfigurationStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
+    return DoEncode(aWriter, aTag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+{
+    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
+{
+
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+
     encoder.Encode(to_underlying(Fields::kConnectionID), connectionID);
     encoder.Encode(to_underlying(Fields::kTransportStatus), transportStatus);
     encoder.Encode(to_underlying(Fields::kTransportOptions), transportOptions);
+    if (aAccessingFabricIndex.HasValue())
+    {
+        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    }
+
     return encoder.Finalize();
 }
 
@@ -32130,6 +32147,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kTransportOptions))
         {
             err = DataModel::Decode(reader, transportOptions);
+        }
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
@@ -32181,9 +32202,7 @@ namespace AllocatePushTransportResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kConnectionID), connectionID);
-    encoder.Encode(to_underlying(Fields::kTransportOptions), transportOptions);
-    encoder.Encode(to_underlying(Fields::kTransportStatus), transportStatus);
+    encoder.Encode(to_underlying(Fields::kTransportConfiguration), transportConfiguration);
     return encoder.Finalize();
 }
 
@@ -32201,17 +32220,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kConnectionID))
+        if (__context_tag == to_underlying(Fields::kTransportConfiguration))
         {
-            err = DataModel::Decode(reader, connectionID);
-        }
-        else if (__context_tag == to_underlying(Fields::kTransportOptions))
-        {
-            err = DataModel::Decode(reader, transportOptions);
-        }
-        else if (__context_tag == to_underlying(Fields::kTransportStatus))
-        {
-            err = DataModel::Decode(reader, transportStatus);
+            err = DataModel::Decode(reader, transportConfiguration);
         }
         else
         {
@@ -32415,7 +32426,7 @@ namespace FindTransportResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kStreamConfigurations), streamConfigurations);
+    encoder.Encode(to_underlying(Fields::kTransportConfigurations), transportConfigurations);
     return encoder.Finalize();
 }
 
@@ -32433,9 +32444,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kStreamConfigurations))
+        if (__context_tag == to_underlying(Fields::kTransportConfigurations))
         {
-            err = DataModel::Decode(reader, streamConfigurations);
+            err = DataModel::Decode(reader, transportConfigurations);
         }
         else
         {
@@ -37316,6 +37327,18 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     case Clusters::PushAvStreamTransport::Id: {
         switch (aCommand)
         {
+        case Clusters::PushAvStreamTransport::Commands::AllocatePushTransport::Id:
+            return true;
+        case Clusters::PushAvStreamTransport::Commands::DeallocatePushTransport::Id:
+            return true;
+        case Clusters::PushAvStreamTransport::Commands::ModifyPushTransport::Id:
+            return true;
+        case Clusters::PushAvStreamTransport::Commands::SetTransportStatus::Id:
+            return true;
+        case Clusters::PushAvStreamTransport::Commands::ManuallyTriggerTransport::Id:
+            return true;
+        case Clusters::PushAvStreamTransport::Commands::FindTransport::Id:
+            return true;
         default:
             return false;
         }
