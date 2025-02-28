@@ -66,11 +66,6 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
         # SleepMillis can undersleep by as much as 10ms on esp32-qemu.
         defines += [ "CONFIG_WIDER_SLEEP_MARGIN" ]
       }
-
-      if (chip_device_platform == "darwin") {
-        # Issue #37789: TryLockChipStack returns false on Darwin.  Disable that check for now.
-        defines += [ "CONFIG_DISABLE_LOCK_CHECK" ]
-      }
     }
 
     if (chip_enable_openthread) {
