@@ -67,6 +67,14 @@ static bool trueFormat(char * buf, uint16_t bufSize, CHIP_ERROR err)
     return true; // means I handled it
 }
 
+TEST(TestErrorStr, CheckRegisterDeregisterSingleErrorFormatter)
+{
+    static ErrorFormatter falseFormatter = { falseFormat, nullptr };
+
+    RegisterErrorFormatter(&falseFormatter);
+    DeregisterErrorFormatter(&falseFormatter);
+}
+
 TEST(TestErrorStr, CheckRegisterDeregisterErrorFormatter)
 {
     static ErrorFormatter falseFormatter  = { falseFormat, nullptr };
@@ -114,11 +122,20 @@ TEST(TestErrorStr, CheckRegisterDeregisterErrorFormatter)
 
     // verify this doesn't crash
     DeregisterErrorFormatter(&trueFormatter);
+    DeregisterErrorFormatter(&falseFormatter);
+    DeregisterErrorFormatter(&falseFormatter2);
 }
 
 TEST(TestErrorStr, CheckNoError)
 {
     EXPECT_STREQ(CHECK_AND_SKIP_SOURCE(ErrorStr(CHIP_NO_ERROR)), CHIP_NO_ERROR_STRING);
+}
+
+TEST(TestErrorStr, CheckErrorWithProvidedStorage)
+{
+    ErrorStrStorage storage;
+    EXPECT_STREQ(CHECK_AND_SKIP_SOURCE(ErrorStr(CHIP_NO_ERROR, true, storage)), CHIP_NO_ERROR_STRING);
+    EXPECT_STREQ(CHECK_AND_SKIP_SOURCE(ErrorStr(CHIP_ERROR_INTERNAL, true, storage)), "Error 0x000000AC");
 }
 
 TEST(TestErrorStr, CheckFormatErr)

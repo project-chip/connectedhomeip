@@ -20,99 +20,111 @@
 using namespace chip;
 
 namespace {
-enum class DeviceTypeClass {
-    Utility,
-    Simple,
-    Node, // Might not be a real class, but we have it for Root Node for now.
-    // If new classes get added, plase audit MTRIsKnownUtilityDeviceType below.
+
+// Not constexpr in the strict sense because NSString * is not a literal
+// type, but the array is in fact constant initialized by the compiler.
+static /* constexpr */ const MTRDeviceTypeData knownDeviceTypes[] = {
+    { 0x0000000A, MTRDeviceTypeClass::Simple, @"Door Lock" },
+    { 0x0000000B, MTRDeviceTypeClass::Simple, @"Door Lock Controller" },
+    { 0x0000000E, MTRDeviceTypeClass::Simple, @"Aggregator" },
+    { 0x0000000F, MTRDeviceTypeClass::Simple, @"Generic Switch" },
+    { 0x00000011, MTRDeviceTypeClass::Utility, @"Power Source" },
+    { 0x00000012, MTRDeviceTypeClass::Utility, @"OTA Requestor" },
+    { 0x00000013, MTRDeviceTypeClass::Utility, @"Bridged Node" },
+    { 0x00000014, MTRDeviceTypeClass::Utility, @"OTA Provider" },
+    { 0x00000015, MTRDeviceTypeClass::Simple, @"Contact Sensor" },
+    { 0x00000016, MTRDeviceTypeClass::Node, @"Root Node" },
+    { 0x00000017, MTRDeviceTypeClass::Simple, @"Solar Power" },
+    { 0x00000018, MTRDeviceTypeClass::Simple, @"Battery Storage" },
+    { 0x00000019, MTRDeviceTypeClass::Utility, @"Secondary Network Interface" },
+    { 0x00000022, MTRDeviceTypeClass::Simple, @"Speaker" },
+    { 0x00000023, MTRDeviceTypeClass::Simple, @"Casting Video Player" },
+    { 0x00000024, MTRDeviceTypeClass::Simple, @"Content App" },
+    { 0x00000027, MTRDeviceTypeClass::Simple, @"Mode Select" },
+    { 0x00000028, MTRDeviceTypeClass::Simple, @"Basic Video Player" },
+    { 0x00000029, MTRDeviceTypeClass::Simple, @"Casting Video Client" },
+    { 0x0000002A, MTRDeviceTypeClass::Simple, @"Video Remote Control" },
+    { 0x0000002B, MTRDeviceTypeClass::Simple, @"Fan" },
+    { 0x0000002C, MTRDeviceTypeClass::Simple, @"Air Quality Sensor" },
+    { 0x0000002D, MTRDeviceTypeClass::Simple, @"Air Purifier" },
+    { 0x00000041, MTRDeviceTypeClass::Simple, @"Water Freeze Detector" },
+    { 0x00000042, MTRDeviceTypeClass::Simple, @"Water Valve" },
+    { 0x00000043, MTRDeviceTypeClass::Simple, @"Water Leak Detector" },
+    { 0x00000044, MTRDeviceTypeClass::Simple, @"Rain Sensor" },
+    { 0x00000070, MTRDeviceTypeClass::Simple, @"Refrigerator" },
+    { 0x00000071, MTRDeviceTypeClass::Simple, @"Temperature Controlled Cabinet" },
+    { 0x00000072, MTRDeviceTypeClass::Simple, @"Room Air Conditioner" },
+    { 0x00000073, MTRDeviceTypeClass::Simple, @"Laundry Washer" },
+    { 0x00000074, MTRDeviceTypeClass::Simple, @"Robotic Vacuum Cleaner" },
+    { 0x00000075, MTRDeviceTypeClass::Simple, @"Dishwasher" },
+    { 0x00000076, MTRDeviceTypeClass::Simple, @"Smoke CO Alarm" },
+    { 0x00000077, MTRDeviceTypeClass::Simple, @"Cook Surface" },
+    { 0x00000078, MTRDeviceTypeClass::Simple, @"Cooktop" },
+    { 0x00000079, MTRDeviceTypeClass::Simple, @"Microwave Oven" },
+    { 0x0000007A, MTRDeviceTypeClass::Simple, @"Extractor Hood" },
+    { 0x0000007B, MTRDeviceTypeClass::Simple, @"Oven" },
+    { 0x0000007C, MTRDeviceTypeClass::Simple, @"Laundry Dryer" },
+    { 0x00000090, MTRDeviceTypeClass::Simple, @"Network Infrastructure Manager" },
+    { 0x00000091, MTRDeviceTypeClass::Simple, @"Thread Border Router" },
+    { 0x00000100, MTRDeviceTypeClass::Simple, @"On/Off Light" },
+    { 0x00000101, MTRDeviceTypeClass::Simple, @"Dimmable Light" },
+    { 0x00000103, MTRDeviceTypeClass::Simple, @"On/Off Light Switch" },
+    { 0x00000104, MTRDeviceTypeClass::Simple, @"Dimmer Switch" },
+    { 0x00000105, MTRDeviceTypeClass::Simple, @"Color Dimmer Switch" },
+    { 0x00000106, MTRDeviceTypeClass::Simple, @"Light Sensor" },
+    { 0x00000107, MTRDeviceTypeClass::Simple, @"Occupancy Sensor" },
+    { 0x0000010A, MTRDeviceTypeClass::Simple, @"On/Off Plug-in Unit" },
+    { 0x0000010B, MTRDeviceTypeClass::Simple, @"Dimmable Plug-in Unit" },
+    { 0x0000010C, MTRDeviceTypeClass::Simple, @"Color Temperature Light" },
+    { 0x0000010D, MTRDeviceTypeClass::Simple, @"Extended Color Light" },
+    { 0x0000010F, MTRDeviceTypeClass::Simple, @"Mounted On/Off Control" },
+    { 0x00000110, MTRDeviceTypeClass::Simple, @"Mounted Dimmable Load Control" },
+    { 0x00000142, MTRDeviceTypeClass::Simple, @"Camera" },
+    { 0x00000202, MTRDeviceTypeClass::Simple, @"Window Covering" },
+    { 0x00000203, MTRDeviceTypeClass::Simple, @"Window Covering Controller" },
+    { 0x00000230, MTRDeviceTypeClass::Simple, @"ClosureBase" },
+    { 0x00000231, MTRDeviceTypeClass::Simple, @"Window" },
+    { 0x00000232, MTRDeviceTypeClass::Simple, @"Shutter" },
+    { 0x00000233, MTRDeviceTypeClass::Simple, @"Shade" },
+    { 0x00000234, MTRDeviceTypeClass::Simple, @"Curtain" },
+    { 0x00000235, MTRDeviceTypeClass::Simple, @"Blind" },
+    { 0x00000236, MTRDeviceTypeClass::Simple, @"Screen" },
+    { 0x00000237, MTRDeviceTypeClass::Simple, @"Awning" },
+    { 0x00000238, MTRDeviceTypeClass::Simple, @"Pergola" },
+    { 0x00000239, MTRDeviceTypeClass::Simple, @"Door" },
+    { 0x0000023A, MTRDeviceTypeClass::Simple, @"GarageDoor" },
+    { 0x0000023B, MTRDeviceTypeClass::Simple, @"Gate" },
+    { 0x0000023C, MTRDeviceTypeClass::Simple, @"Barrier" },
+    { 0x0000023D, MTRDeviceTypeClass::Simple, @"Cabinet" },
+    { 0x00000300, MTRDeviceTypeClass::Simple, @"Heating/Cooling Unit" },
+    { 0x00000301, MTRDeviceTypeClass::Simple, @"Thermostat" },
+    { 0x00000302, MTRDeviceTypeClass::Simple, @"Temperature Sensor" },
+    { 0x00000303, MTRDeviceTypeClass::Simple, @"Pump" },
+    { 0x00000304, MTRDeviceTypeClass::Simple, @"Pump Controller" },
+    { 0x00000305, MTRDeviceTypeClass::Simple, @"Pressure Sensor" },
+    { 0x00000306, MTRDeviceTypeClass::Simple, @"Flow Sensor" },
+    { 0x00000307, MTRDeviceTypeClass::Simple, @"Humidity Sensor" },
+    { 0x00000309, MTRDeviceTypeClass::Simple, @"Heat Pump" },
+    { 0x0000030A, MTRDeviceTypeClass::Simple, @"Thermostat Controller" },
+    { 0x0000050C, MTRDeviceTypeClass::Simple, @"EVSE" },
+    { 0x0000050D, MTRDeviceTypeClass::Utility, @"Device Energy Management" },
+    { 0x0000050F, MTRDeviceTypeClass::Simple, @"Water Heater" },
+    { 0x00000510, MTRDeviceTypeClass::Utility, @"Electrical Sensor" },
+    { 0x00000840, MTRDeviceTypeClass::Simple, @"Control Bridge" },
+    { 0x00000850, MTRDeviceTypeClass::Simple, @"On/Off Sensor" },
 };
 
-struct DeviceTypeData {
-    DeviceTypeId id;
-    DeviceTypeClass deviceClass;
-    const char * name;
-};
-
-constexpr DeviceTypeData knownDeviceTypes[] = {
-    { 0x0000000A, DeviceTypeClass::Simple, "Matter Door Lock" },
-    { 0x0000000B, DeviceTypeClass::Simple, "Matter Door Lock Controller" },
-    { 0x0000000E, DeviceTypeClass::Simple, "Matter Aggregator" },
-    { 0x0000000F, DeviceTypeClass::Simple, "Matter Generic Switch" },
-    { 0x00000011, DeviceTypeClass::Utility, "Matter Power Source" },
-    { 0x00000012, DeviceTypeClass::Utility, "Matter OTA Requestor" },
-    { 0x00000013, DeviceTypeClass::Utility, "Matter Bridged Node" },
-    { 0x00000014, DeviceTypeClass::Utility, "Matter OTA Provider" },
-    { 0x00000015, DeviceTypeClass::Simple, "Matter Contact Sensor" },
-    { 0x00000016, DeviceTypeClass::Node, "Matter Root Node" },
-    { 0x00000019, DeviceTypeClass::Utility, "Matter Secondary Network Interface" },
-    { 0x00000022, DeviceTypeClass::Simple, "Matter Speaker" },
-    { 0x00000023, DeviceTypeClass::Simple, "Matter Casting Video Player" },
-    { 0x00000024, DeviceTypeClass::Simple, "Matter Content App" },
-    { 0x00000027, DeviceTypeClass::Simple, "Matter Mode Select" },
-    { 0x00000028, DeviceTypeClass::Simple, "Matter Basic Video Player" },
-    { 0x00000029, DeviceTypeClass::Simple, "Matter Casting Video Client" },
-    { 0x0000002A, DeviceTypeClass::Simple, "Matter Video Remote Control" },
-    { 0x0000002B, DeviceTypeClass::Simple, "Matter Fan" },
-    { 0x0000002C, DeviceTypeClass::Simple, "Matter Air Quality Sensor" },
-    { 0x0000002D, DeviceTypeClass::Simple, "Matter Air Purifier" },
-    { 0x00000041, DeviceTypeClass::Simple, "Matter Water Freeze Detector" },
-    { 0x00000042, DeviceTypeClass::Simple, "Matter Water Valve" },
-    { 0x00000043, DeviceTypeClass::Simple, "Matter Water Leak Detector" },
-    { 0x00000044, DeviceTypeClass::Simple, "Matter Rain Sensor" },
-    { 0x00000070, DeviceTypeClass::Simple, "Matter Refrigerator" },
-    { 0x00000071, DeviceTypeClass::Simple, "Matter Temperature Controlled Cabinet" },
-    { 0x00000072, DeviceTypeClass::Simple, "Matter Room Air Conditioner" },
-    { 0x00000073, DeviceTypeClass::Simple, "Matter Laundry Washer" },
-    { 0x00000074, DeviceTypeClass::Simple, "Matter Robotic Vacuum Cleaner" },
-    { 0x00000075, DeviceTypeClass::Simple, "Matter Dishwasher" },
-    { 0x00000076, DeviceTypeClass::Simple, "Matter Smoke CO Alarm" },
-    { 0x00000077, DeviceTypeClass::Simple, "Matter Cook Surface" },
-    { 0x00000078, DeviceTypeClass::Simple, "Matter Cooktop" },
-    { 0x00000079, DeviceTypeClass::Simple, "Matter Microwave Oven" },
-    { 0x0000007A, DeviceTypeClass::Simple, "Matter Extractor Hood" },
-    { 0x0000007B, DeviceTypeClass::Simple, "Matter Oven" },
-    { 0x0000007C, DeviceTypeClass::Simple, "Matter Laundry Dryer" },
-    { 0x00000090, DeviceTypeClass::Simple, "Matter Network Infrastructure Manager" },
-    { 0x00000091, DeviceTypeClass::Simple, "Matter Thread Border Router" },
-    { 0x00000100, DeviceTypeClass::Simple, "Matter On/Off Light" },
-    { 0x00000101, DeviceTypeClass::Simple, "Matter Dimmable Light" },
-    { 0x00000103, DeviceTypeClass::Simple, "Matter On/Off Light Switch" },
-    { 0x00000104, DeviceTypeClass::Simple, "Matter Dimmer Switch" },
-    { 0x00000105, DeviceTypeClass::Simple, "Matter Color Dimmer Switch" },
-    { 0x00000106, DeviceTypeClass::Simple, "Matter Light Sensor" },
-    { 0x00000107, DeviceTypeClass::Simple, "Matter Occupancy Sensor" },
-    { 0x0000010A, DeviceTypeClass::Simple, "Matter On/Off Plug-in Unit" },
-    { 0x0000010B, DeviceTypeClass::Simple, "Matter Dimmable Plug-in Unit" },
-    { 0x0000010C, DeviceTypeClass::Simple, "Matter Color Temperature Light" },
-    { 0x0000010D, DeviceTypeClass::Simple, "Matter Extended Color Light" },
-    { 0x00000202, DeviceTypeClass::Simple, "Matter Window Covering" },
-    { 0x00000203, DeviceTypeClass::Simple, "Matter Window Covering Controller" },
-    { 0x00000300, DeviceTypeClass::Simple, "Matter Heating/Cooling Unit" },
-    { 0x00000301, DeviceTypeClass::Simple, "Matter Thermostat" },
-    { 0x00000302, DeviceTypeClass::Simple, "Matter Temperature Sensor" },
-    { 0x00000303, DeviceTypeClass::Simple, "Matter Pump" },
-    { 0x00000304, DeviceTypeClass::Simple, "Matter Pump Controller" },
-    { 0x00000305, DeviceTypeClass::Simple, "Matter Pressure Sensor" },
-    { 0x00000306, DeviceTypeClass::Simple, "Matter Flow Sensor" },
-    { 0x00000307, DeviceTypeClass::Simple, "Matter Humidity Sensor" },
-    { 0x0000050C, DeviceTypeClass::Simple, "Matter EVSE" },
-    { 0x0000050D, DeviceTypeClass::Simple, "Matter Device Energy Management" },
-    { 0x00000510, DeviceTypeClass::Utility, "Matter Electrical Sensor" },
-    { 0x00000840, DeviceTypeClass::Simple, "Matter Control Bridge" },
-    { 0x00000850, DeviceTypeClass::Simple, "Matter On/Off Sensor" },
-};
-
-static_assert(ExtractVendorFromMEI(0xFFF10001) != 0, "Must have class defined for \"Matter Orphan Clusters\" if it's a standard device type");
-static_assert(ExtractVendorFromMEI(0xFFF10003) != 0, "Must have class defined for \"Matter All-clusters-app Server Example\" if it's a standard device type");
+static_assert(ExtractVendorFromMEI(0xFFF10001) != 0, "Must have class defined for \"Orphan Clusters\" if it's a standard device type");
+static_assert(ExtractVendorFromMEI(0xFFF10003) != 0, "Must have class defined for \"All-clusters-app Server Example\" if it's a standard device type");
 
 } // anonymous namespace
 
-BOOL MTRIsKnownUtilityDeviceType(DeviceTypeId aDeviceTypeId)
+const MTRDeviceTypeData * _Nullable MTRDeviceTypeDataForID(chip::DeviceTypeId aDeviceTypeId)
 {
     for (auto & deviceType : knownDeviceTypes) {
         if (deviceType.id == aDeviceTypeId) {
-            return deviceType.deviceClass != DeviceTypeClass::Simple;
+            return &deviceType;
         }
     }
-    return NO;
+    return nullptr;
 }

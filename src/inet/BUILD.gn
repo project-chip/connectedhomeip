@@ -78,6 +78,12 @@ source_set("impl_header") {
   public_deps = [ "${chip_root}/src/system:system_config_header" ]
 }
 
+source_set("inet_zephyr_socket") {
+  sources = [ "ZephyrSocket.h" ]
+  public_configs = [ "${chip_root}/src:includes" ]
+  public_deps = [ "${chip_root}/src/system:system_config_header" ]
+}
+
 static_library("inet") {
   output_name = "libInetLayer"
 
@@ -158,16 +164,19 @@ static_library("inet") {
       "EndpointQueueFilter.h",
       "UDPEndPoint.cpp",
       "UDPEndPoint.h",
-      "UDPEndPointImpl${chip_system_config_inet}.cpp",
       "UDPEndPointImpl${chip_system_config_inet}.h",
       "UDPEndPointImpl.h",
     ]
 
-    if (chip_system_config_inet == "Sockets") {
-      # TODO: dependency on this one is not clear as it is only ever
-      #       enabled through CMakeLists.txt. Added here for completeness
-      sources += [ "ZephyrSocket.h" ]
+    if (chip_system_config_use_network_framework) {
+      sources += [ "UDPEndPointImpl${chip_system_config_inet}.mm" ]
+    } else {
+      sources += [ "UDPEndPointImpl${chip_system_config_inet}.cpp" ]
     }
+  }
+
+  if (current_os == "zephyr") {
+    public_deps += [ ":inet_zephyr_socket" ]
   }
 
   if (chip_with_nlfaultinjection) {
@@ -187,5 +196,7 @@ static_library("inet") {
   cflags = [ "-Wconversion" ]
   if (current_os == "nuttx") {
     cflags -= [ "-Wconversion" ]
+  } else if (chip_system_config_use_network_framework) {
+    cflags += [ "-fobjc-arc" ]
   }
 }

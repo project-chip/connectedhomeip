@@ -22,15 +22,34 @@
 # test-runner-runs:
 #   run1:
 #     app: examples/fabric-admin/scripts/fabric-sync-app.py
-#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --discriminator=1234
 #     app-ready-pattern: "Successfully opened pairing window on the device"
+#     app-stdin-pipe: dut-fsa-stdin
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP} dut_fsa_stdin_pipe:dut-fsa-stdin
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --string-arg dut_fsa_stdin_pipe:dut-fsa-stdin
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${FABRIC_SYNC_APP}
+#     app-args: --discriminator=1234
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --bool-arg unified_fabric_sync_app:true
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --string-arg dut_fsa_stdin_pipe:dut-fsa-stdin
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -47,8 +66,9 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
 from chip.testing.apps import AppServerSubprocess
+from chip.testing.matter_testing import (MatterBaseTest, SetupParameters, TestStep, async_test_body, default_matter_test_main,
+                                         type_matches)
 from chip.tlv import uint
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
 
@@ -91,22 +111,26 @@ class TC_ECOINFO_2_1(MatterBaseTest):
         logging.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_server_port = 5544
-        self.th_server_discriminator = random.randint(0, 4095)
-        self.th_server_passcode = 20202021
+        self.th_server_setup_params = SetupParameters(
+            discriminator=random.randint(0, 4095),
+            passcode=20202021)
 
         # Start the server app.
         self.th_server = AppServerSubprocess(
             th_server_app,
             storage_dir=self.storage.name,
             port=self.th_server_port,
-            discriminator=self.th_server_discriminator,
-            passcode=self.th_server_passcode)
+            discriminator=self.th_server_setup_params.discriminator,
+            passcode=self.th_server_setup_params.passcode)
         self.th_server.start(
             expected_output="Server initialization complete",
             timeout=30)
 
         # Add some server to the DUT_FSA's Aggregator/Bridge.
-        self.dut_fsa_stdin.write(f"pairing onnetwork 2 {self.th_server_passcode}\n")
+        if self.user_params.get("unified_fabric_sync_app"):
+            self.dut_fsa_stdin.write(f"app pair-device 2 {self.th_server_setup_params.qr_code}\n")
+        else:
+            self.dut_fsa_stdin.write(f"pairing onnetwork 2 {self.th_server_setup_params.passcode}\n")
         self.dut_fsa_stdin.flush()
         # Wait for the commissioning to complete.
         await asyncio.sleep(5)

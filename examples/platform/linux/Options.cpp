@@ -23,7 +23,7 @@
 
 #include "Options.h"
 
-#include <app/server/OnboardingCodesUtil.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <json/json.h>
@@ -34,6 +34,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
+#include <app/tests/suites/credentials/TestHarnessDACProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #if ENABLE_TRACING
@@ -44,6 +45,10 @@
 #include <inet/InetFaultInjection.h>
 #include <lib/support/CHIPFaultInjection.h>
 #include <system/SystemFaultInjection.h>
+#endif
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#include <messaging/ReliableMessageProtocolConfig.h>
 #endif
 
 using namespace chip;
@@ -112,12 +117,20 @@ enum
     kDeviceOption_WiFiSupports5g,
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     kDeviceOption_SubscriptionResumptionRetryIntervalSec,
+    kDeviceOption_IdleRetransmitTimeout,
+    kDeviceOption_ActiveRetransmitTimeout,
+    kDeviceOption_ActiveThresholdTime,
 #endif
 #if CHIP_WITH_NLFAULTINJECTION
     kDeviceOption_FaultInjection,
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     kDeviceOption_WiFi_PAF,
+#endif
+    kDeviceOption_DacProvider,
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    kDeviceOption_TermsAndConditions_Version,
+    kDeviceOption_TermsAndConditions_Required,
 #endif
 };
 
@@ -133,7 +146,7 @@ OptionDef sDeviceOptionDefs[] = {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     { "wifipaf", kArgumentRequired, kDeviceOption_WiFi_PAF },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if CHIP_ENABLE_OPENTHREAD
     { "thread", kNoArgument, kDeviceOption_Thread },
 #endif // CHIP_ENABLE_OPENTHREAD
@@ -187,9 +200,17 @@ OptionDef sDeviceOptionDefs[] = {
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     { "subscription-capacity", kArgumentRequired, kDeviceOption_SubscriptionCapacity },
     { "subscription-resumption-retry-interval", kArgumentRequired, kDeviceOption_SubscriptionResumptionRetryIntervalSec },
+    { "idle-retransmit-timeout", kArgumentRequired, kDeviceOption_IdleRetransmitTimeout },
+    { "active-retransmit-timeout", kArgumentRequired, kDeviceOption_ActiveRetransmitTimeout },
+    { "active-threshold-time", kArgumentRequired, kDeviceOption_ActiveThresholdTime },
 #endif
 #if CHIP_WITH_NLFAULTINJECTION
     { "faults", kArgumentRequired, kDeviceOption_FaultInjection },
+#endif
+    { "dac_provider", kArgumentRequired, kDeviceOption_DacProvider },
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    { "tc-version", kArgumentRequired, kDeviceOption_TermsAndConditions_Version },
+    { "tc-required", kArgumentRequired, kDeviceOption_TermsAndConditions_Required },
 #endif
     {}
 };
@@ -335,11 +356,35 @@ const char * sDeviceOptionHelp =
     "       Max number of subscriptions the device will allow\n"
     "  --subscription-resumption-retry-interval\n"
     "       subscription timeout resumption retry interval in seconds\n"
+    "  --idle-retransmit-timeout <timeout>\n"
+    "      Sets the MRP idle retry interval (in milliseconds).\n"
+    "      This interval is used by the peer to calculate the retransmission timeout when the current device is considered idle.\n"
+    "\n"
+    "  --active-retransmit-timeout <timeout>\n"
+    "      Sets the MRP active retry interval (in milliseconds).\n"
+    "      This interval is used by the peer to calculate the retransmission timeout when the current device is considered "
+    "active.\n"
+    "\n"
+    "  --active-threshold-time <time>\n"
+    "      Sets the MRP active threshold (in milliseconds).\n"
+    "      Specifies the time after which the device transitions from active to idle.\n"
+    "\n"
+#endif
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    "  --tc-version\n"
+    "       Sets the minimum required version of the Terms and Conditions\n"
+    "\n"
+    "  --tc-required\n"
+    "       Sets the required acknowledgements for the Terms and Conditions as a 16-bit enumeration.\n"
+    "       Each bit represents an ordinal corresponding to a specific acknowledgment requirement.\n"
+    "\n"
 #endif
 #if CHIP_WITH_NLFAULTINJECTION
     "  --faults <fault-string,...>\n"
     "       Inject specified fault(s) at runtime.\n"
 #endif
+    "   --dac_provider <filepath>\n"
+    "       A json file with data used by the example dac provider to validate device attestation procedure.\n"
     "\n";
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
@@ -663,6 +708,32 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kDeviceOption_SubscriptionResumptionRetryIntervalSec:
         LinuxDeviceOptions::GetInstance().subscriptionResumptionRetryIntervalSec = static_cast<int32_t>(atoi(aValue));
         break;
+    case kDeviceOption_IdleRetransmitTimeout: {
+        auto mrpConfig            = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
+        auto idleRetransTimeout   = System::Clock::Milliseconds32(static_cast<uint32_t>(strtoul(aValue, nullptr, 0)));
+        auto activeRetransTimeout = mrpConfig.mActiveRetransTimeout;
+        auto activeThresholdTime  = mrpConfig.mActiveThresholdTime;
+        OverrideLocalMRPConfig(idleRetransTimeout, activeRetransTimeout, activeThresholdTime);
+        break;
+    }
+
+    case kDeviceOption_ActiveRetransmitTimeout: {
+        auto mrpConfig            = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
+        auto idleRetransTimeout   = mrpConfig.mIdleRetransTimeout;
+        auto activeRetransTimeout = System::Clock::Milliseconds32(static_cast<uint32_t>(strtoul(aValue, nullptr, 0)));
+        auto activeThresholdTime  = mrpConfig.mActiveThresholdTime;
+        OverrideLocalMRPConfig(idleRetransTimeout, activeRetransTimeout, activeThresholdTime);
+        break;
+    }
+
+    case kDeviceOption_ActiveThresholdTime: {
+        auto mrpConfig            = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
+        auto idleRetransTimeout   = mrpConfig.mIdleRetransTimeout;
+        auto activeRetransTimeout = mrpConfig.mActiveRetransTimeout;
+        auto activeThresholdTime  = System::Clock::Milliseconds16(static_cast<uint16_t>(strtoul(aValue, nullptr, 0)));
+        OverrideLocalMRPConfig(idleRetransTimeout, activeRetransTimeout, activeThresholdTime);
+        break;
+    }
 #endif
 #if CHIP_WITH_NLFAULTINJECTION
     case kDeviceOption_FaultInjection: {
@@ -670,7 +741,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
                                                                          Inet::FaultInjection::GetManager,
                                                                          System::FaultInjection::GetManager };
         Platform::ScopedMemoryString mutableArg(aValue, strlen(aValue)); // ParseFaultInjectionStr may mutate
-        if (!nl::FaultInjection::ParseFaultInjectionStr(mutableArg.Get(), faultManagerFns, ArraySize(faultManagerFns)))
+        if (!nl::FaultInjection::ParseFaultInjectionStr(mutableArg.Get(), faultManagerFns, MATTER_ARRAY_SIZE(faultManagerFns)))
         {
             PrintArgError("%s: Invalid fault injection specification\n", aProgram);
             retval = false;
@@ -682,6 +753,25 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kDeviceOption_WiFi_PAF: {
         LinuxDeviceOptions::GetInstance().mWiFiPAF        = true;
         LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds = aValue;
+        break;
+    }
+#endif
+    case kDeviceOption_DacProvider: {
+        LinuxDeviceOptions::GetInstance().dacProviderFile.SetValue(aValue);
+        static chip::Credentials::Examples::TestHarnessDACProvider testDacProvider;
+        testDacProvider.Init(gDeviceOptions.dacProviderFile.Value().c_str());
+
+        LinuxDeviceOptions::GetInstance().dacProvider = &testDacProvider;
+        break;
+    }
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    case kDeviceOption_TermsAndConditions_Version: {
+        LinuxDeviceOptions::GetInstance().tcVersion.SetValue(static_cast<uint16_t>(atoi(aValue)));
+        break;
+    }
+
+    case kDeviceOption_TermsAndConditions_Required: {
+        LinuxDeviceOptions::GetInstance().tcRequired.SetValue(static_cast<uint16_t>(atoi(aValue)));
         break;
     }
 #endif
@@ -728,5 +818,6 @@ LinuxDeviceOptions & LinuxDeviceOptions::GetInstance()
     {
         gDeviceOptions.dacProvider = chip::Credentials::Examples::GetExampleDACProvider();
     }
+
     return gDeviceOptions;
 }

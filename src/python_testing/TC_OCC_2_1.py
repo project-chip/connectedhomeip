@@ -43,7 +43,7 @@
 import logging
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -83,7 +83,7 @@ class TC_OCC_2_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_OCC_2_1(self):
-        endpoint = self.matter_test_config.endpoint
+        endpoint = self.get_endpoint()
         cluster = Clusters.Objects.OccupancySensing
         attributes = cluster.Attributes
 

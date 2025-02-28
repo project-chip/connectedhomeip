@@ -24,6 +24,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelDelegatePointers.h>
 #include <app/MessageDef/WriteResponseMessage.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/Provider.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
@@ -185,6 +186,14 @@ private:
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
+    /// Validate that a write is acceptable on the given path.
+    ///
+    /// Validates that ACL, writability and Timed interaction settings are ok.
+    ///
+    /// Returns a success status if all is ok, failure otherwise.
+    DataModel::ActionReturnStatus CheckWriteAllowed(const Access::SubjectDescriptor & aSubject,
+                                                    const ConcreteAttributePath & aPath);
+
     // Write the given data to the given path
     CHIP_ERROR WriteClusterData(const Access::SubjectDescriptor & aSubject, const ConcreteDataAttributePath & aPath,
                                 TLV::TLVReader & aData);
@@ -200,10 +209,8 @@ private:
     Optional<ConcreteAttributePath> mProcessingAttributePath;
     Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
 
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     DataModel::Provider * mDataModelProvider = nullptr;
     std::optional<ConcreteAttributePath> mLastSuccessfullyWrittenPath;
-#endif
 
     // This may be a "fake" pointer or a real delegate pointer, depending
     // on CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE setting.

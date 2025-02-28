@@ -264,6 +264,7 @@ CHIP_ERROR EcosystemInformationServer::AddDeviceInfo(EndpointId aEndpoint, std::
 
     auto & deviceInfo = mDevicesMap[aEndpoint];
     deviceInfo.mDeviceDirectory.push_back(std::move(aDevice));
+    mMatterContext.MarkDirty(aEndpoint, Attributes::DeviceDirectory::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -282,6 +283,7 @@ CHIP_ERROR EcosystemInformationServer::AddLocationInfo(EndpointId aEndpoint, con
     VerifyOrReturnError((deviceInfo.mLocationDirectory.find(key) == deviceInfo.mLocationDirectory.end()),
                         CHIP_ERROR_INVALID_ARGUMENT);
     deviceInfo.mLocationDirectory[key] = std::move(aLocation);
+    mMatterContext.MarkDirty(aEndpoint, Attributes::LocationDirectory::Id);
     return CHIP_NO_ERROR;
 }
 

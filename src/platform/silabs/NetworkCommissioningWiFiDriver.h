@@ -18,7 +18,7 @@
 #pragma once
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #include <platform/NetworkCommissioning.h>
-#include <wfx_host_events.h>
+#include <platform/silabs/wifi/WifiInterface.h>
 
 namespace chip {
 namespace DeviceLayer {

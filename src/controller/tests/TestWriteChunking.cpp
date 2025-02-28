@@ -21,14 +21,13 @@
 
 #include <pw_unit_test/framework.h>
 
-#include "app-common/zap-generated/ids/Attributes.h"
-#include "app-common/zap-generated/ids/Clusters.h"
-#include "app/ConcreteAttributePath.h"
-#include "protocols/interaction_model/Constants.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/WriteClient.h>
 #include <app/data-model/Decode.h>
@@ -36,9 +35,11 @@
 #include <app/util/DataModelHandler.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <protocols/interaction_model/Constants.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -97,8 +98,8 @@ protected:
 
 //clang-format off
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint)
-DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute, ARRAY, 1, ATTRIBUTE_MASK_WRITABLE),
-    DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute2, ARRAY, 1, ATTRIBUTE_MASK_WRITABLE), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute, ARRAY, 1, MATTER_ATTRIBUTE_FLAG_WRITABLE),
+    DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute2, ARRAY, 1, MATTER_ATTRIBUTE_FLAG_WRITABLE), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
 DECLARE_DYNAMIC_CLUSTER(Clusters::UnitTesting::Id, testClusterAttrsOnEndpoint, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
@@ -106,7 +107,7 @@ DECLARE_DYNAMIC_CLUSTER(Clusters::UnitTesting::Id, testClusterAttrsOnEndpoint, Z
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 
-DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
+DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
 
 //clang-format on
 
@@ -211,6 +212,7 @@ TEST_F(TestWriteChunking, TestListChunking)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -231,7 +233,7 @@ TEST_F(TestWriteChunking, TestListChunking)
         CHIP_ERROR err = CHIP_NO_ERROR;
         TestWriteCallback writeCallback;
 
-        ChipLogDetail(DataManagement, "Running iteration %d\n", i);
+        ChipLogDetail(DataManagement, "Running iteration %d\n", static_cast<int>(i));
 
         gIterationCount = i;
 
@@ -284,6 +286,7 @@ TEST_F(TestWriteChunking, TestBadChunking)
     bool atLeastOneRequestFailed = false;
 
     // Initialize the ember side server logic
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -363,6 +366,7 @@ TEST_F(TestWriteChunking, TestConflictWrite)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -437,6 +441,7 @@ TEST_F(TestWriteChunking, TestNonConflictWrite)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -585,6 +590,7 @@ void TestWriteChunking::RunTest(Instructions instructions)
 TEST_F(TestWriteChunking, TestTransactionalList)
 {
     // Initialize the ember side server logic
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.

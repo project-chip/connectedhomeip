@@ -99,7 +99,7 @@ CHIP_ERROR AlarmEventHandler(int argc, char ** argv)
     if (argc >= 2)
     {
         ChipLogError(Zcl, "Too many arguments provided to function %s, line %d", __func__, __LINE__);
-        return APP_ERROR_TOO_MANY_SHELL_ARGUMENTS;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     AlarmEventData * data = Platform::New<AlarmEventData>();
@@ -131,7 +131,7 @@ CHIP_ERROR DoorStateEventHandler(int argc, char ** argv)
     if (argc >= 2)
     {
         ChipLogError(Zcl, "Too many arguments provided to function %s, line %d", __func__, __LINE__);
-        return APP_ERROR_TOO_MANY_SHELL_ARGUMENTS;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     DoorStateEventData * data = Platform::New<DoorStateEventData>();
@@ -170,13 +170,14 @@ CHIP_ERROR RegisterLockEvents()
     static const shell_command_t sDoorLockCommand = { &DoorlockCommandHandler, "doorlock",
                                                       "doorlock commands. Usage: doorlock <subcommand>" };
 
-    sShellDoorlockEventAlarmSubCommands.RegisterCommands(sDoorlockEventAlarmSubCommands, ArraySize(sDoorlockEventAlarmSubCommands));
+    sShellDoorlockEventAlarmSubCommands.RegisterCommands(sDoorlockEventAlarmSubCommands,
+                                                         MATTER_ARRAY_SIZE(sDoorlockEventAlarmSubCommands));
 
     sShellDoorlockEventDoorStateSubCommands.RegisterCommands(sDoorlockEventDoorStateSubCommands,
-                                                             ArraySize(sDoorlockEventDoorStateSubCommands));
+                                                             MATTER_ARRAY_SIZE(sDoorlockEventDoorStateSubCommands));
 
-    sShellDoorlockEventSubCommands.RegisterCommands(sDoorlockEventSubCommands, ArraySize(sDoorlockEventSubCommands));
-    sShellDoorlockSubCommands.RegisterCommands(sDoorlockSubCommands, ArraySize(sDoorlockSubCommands));
+    sShellDoorlockEventSubCommands.RegisterCommands(sDoorlockEventSubCommands, MATTER_ARRAY_SIZE(sDoorlockEventSubCommands));
+    sShellDoorlockSubCommands.RegisterCommands(sDoorlockSubCommands, MATTER_ARRAY_SIZE(sDoorlockSubCommands));
 
     Engine::Root().RegisterCommands(&sDoorLockCommand, 1);
 

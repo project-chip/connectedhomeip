@@ -100,14 +100,6 @@ mcxw71_k32w1_sdk("sdk") {
   defines += [
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
   ]
-
-  if (chip_key_storage == "littlefs") {
-    include_dirs += [ "${example_platform_dir}/board" ]
-    sources += [
-      "${example_platform_dir}/board/peripherals.c",
-      "${example_platform_dir}/board/peripherals.h",
-    ]
-  }
 }
 
 mcxw71_k32w1_executable("light_app") {
@@ -195,7 +187,7 @@ mcxw71_k32w1_executable("light_app") {
     sources += [ "${example_platform_dir}/rpc/AppRpc.cpp" ]
   }
 
-  if (chip_with_factory_data == 1) {
+  if (nxp_use_factory_data) {
     include_dirs +=
         [ "${chip_root}/src/platform/nxp/common/factory_data/legacy" ]
     deps += [ "${chip_root}/src/platform/nxp:nxp_factory_data" ]
@@ -216,9 +208,10 @@ mcxw71_k32w1_executable("light_app") {
   deps += [
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/platform/logging:default",
+    "${chip_root}/src/setup_payload:onboarding-codes-utils",
   ]
 
-  if (chip_config_dimmable_led) {
+  if (nxp_config_dimmable_led) {
     defines += [ "LIGHTING_MANAGER_ENABLE_DIMMABLE_LED=1" ]
     sources += [
       "${common_example_dir}/led_widget/include/LedDimmer.h",
@@ -246,7 +239,7 @@ mcxw71_k32w1_executable("light_app") {
     ]
   }
 
-  if (use_smu2_static) {
+  if (nxp_use_smu2_static) {
     ldscript = "${example_platform_dir}/app/ldscripts/app.ld"
     base_ldscript_dir = "${nxp_sdk_root}/middleware/wireless/framework/Common/devices/kw45_k32w1/gcc"
   } else {
@@ -263,11 +256,11 @@ mcxw71_k32w1_executable("light_app") {
     "-T" + rebase_path(ldscript, root_build_dir),
   ]
 
-  if (chip_with_factory_data == 1) {
+  if (nxp_use_factory_data) {
     ldflags += [ "-Wl,--defsym=gUseFactoryData_d=1" ]
   }
 
-  if (use_smu2_static) {
+  if (nxp_use_smu2_static) {
     ldflags += [ "-L" + rebase_path(base_ldscript_dir, root_build_dir) ]
   }
 

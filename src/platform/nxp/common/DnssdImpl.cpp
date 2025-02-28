@@ -33,15 +33,25 @@ namespace Dnssd {
 
 CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
-    NxpChipDnssdInit(initCallback, errorCallback, context);
-    OpenThreadDnssdInit(initCallback, errorCallback, context);
+    if (ConnectivityMgr().IsWiFiStationConnected())
+    {
+        ReturnErrorOnFailure(NxpChipDnssdInit(initCallback, errorCallback, context));
+    }
+    else if (ConnectivityMgr().IsThreadProvisioned())
+    {
+        ReturnErrorOnFailure(OpenThreadDnssdInit(initCallback, errorCallback, context));
+    }
+    else
+    {
+        initCallback(context, CHIP_ERROR_INCORRECT_STATE);
+    }
 
     return CHIP_NO_ERROR;
 }
 
 void ChipDnssdShutdown()
 {
-    NxpChipDnssdShutdown();
+    // Empty implementation. Intentionally left blank
 }
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
@@ -89,7 +99,7 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
                            chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
                            intptr_t * browseIdentifier)
 {
-    if (ConnectivityMgr().IsWiFiStationConnected()) //|| ESP32Utils::HasIPv6LinkLocalAddress(ESP32Utils::kDefaultEthernetNetifKey))
+    if (ConnectivityMgr().IsWiFiStationConnected())
     {
         ReturnErrorOnFailure(NxpChipDnssdBrowse(type, protocol, addressType, interface, callback, context, browseIdentifier));
     }
@@ -109,7 +119,7 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
                             void * context)
 {
-    if (ConnectivityMgr().IsWiFiStationConnected()) //|| ESP32Utils::HasIPv6LinkLocalAddress(ESP32Utils::kDefaultEthernetNetifKey))
+    if (ConnectivityMgr().IsWiFiStationConnected())
     {
         ReturnErrorOnFailure(NxpChipDnssdResolve(service, interface, callback, context));
     }

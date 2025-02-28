@@ -39,7 +39,7 @@
 
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from TC_OpstateCommon import TC_OPSTATE_BASE, TestInfo
 
 
@@ -62,7 +62,7 @@ class TC_OPSTATE_2_6(MatterBaseTest, TC_OPSTATE_BASE):
 
     @async_test_body
     async def test_TC_OPSTATE_2_6(self):
-        endpoint = self.matter_test_config.endpoint
+        endpoint = self.get_endpoint(default=1)
 
         await self.TEST_TC_OPSTATE_BASE_2_6(endpoint=endpoint)
 

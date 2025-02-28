@@ -26,8 +26,9 @@
 #include <app/server/Dnssd.h>
 #include <lib/dnssd/Advertiser.h>
 
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>
+#include <data-model-providers/codegen/Instance.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
 
@@ -75,6 +76,7 @@
 
 #if CONFIG_LOW_POWER
 #include "LowPower.h"
+#include "PWR_Interface.h"
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -184,6 +186,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
     initParams.operationalKeystore = chip::NXP::App::OperationalKeystore::GetInstance();
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CONFIG_NET_L2_OPENTHREAD
     // Init ZCL Data Model and start server
@@ -429,6 +432,20 @@ void chip::NXP::App::AppTaskBase::FactoryResetHandler(void)
     /* Emit the ShutDown event before factory reset */
     chip::Server::GetInstance().GenerateShutDownEvent();
     chip::Server::GetInstance().ScheduleFactoryReset();
+}
+
+void chip::NXP::App::AppTaskBase::AppMatter_DisallowDeviceToSleep(void)
+{
+#if CONFIG_LOW_POWER
+    PWR_DisallowDeviceToSleep();
+#endif
+}
+
+void chip::NXP::App::AppTaskBase::AppMatter_AllowDeviceToSleep(void)
+{
+#if CONFIG_LOW_POWER
+    PWR_AllowDeviceToSleep();
+#endif
 }
 
 void chip::NXP::App::AppTaskBase::PrintOnboardingInfo()

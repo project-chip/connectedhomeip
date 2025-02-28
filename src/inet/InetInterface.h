@@ -85,7 +85,7 @@ public:
     static constexpr size_t kMaxIfNameLength = 13; // Names are formatted as %c%c%d
 #endif                                             // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+#if (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK) && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
     using PlatformType                       = unsigned int;
     static constexpr size_t kMaxIfNameLength = IF_NAMESIZE;
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS

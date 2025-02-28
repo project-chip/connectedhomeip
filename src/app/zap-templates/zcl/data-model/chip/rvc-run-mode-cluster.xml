@@ -73,8 +73,12 @@ limitations under the License.
     </features>
 
     <!-- Base data types -->
-    <attribute side="server" code="0x0000" define="SUPPORTED_MODES"  type="array" entryType="ModeOptionStruct" writable="false" optional="false" isNullable="false" length="255">SupportedModes</attribute>
-    <attribute side="server" code="0x0001" define="CURRENT_MODE"     type="int8u"                              writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>
+    <attribute side="server" code="0x0000" name="SupportedModes" define="SUPPORTED_MODES" type="array" entryType="ModeOptionStruct" length="255">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="CurrentMode" define="CURRENT_MODE" type="int8u" reportable="true">
+      <mandatoryConform/>
+    </attribute>
     <!-- Attribute OnMode with code 0x0003 is deprecated -->
 
     <!-- Commands -->
@@ -84,6 +88,7 @@ limitations under the License.
         On receipt of this command the device SHALL respond with a ChangeToModeResponse command.
       </description>
       <arg name="NewMode" type="int8u" optional="false"/>
+      <mandatoryConform/>
     </command>
 
     <command source="server" code="0x01" name="ChangeToModeResponse" disableDefaultResponse="true" optional="false">
@@ -92,6 +97,7 @@ limitations under the License.
       </description>
       <arg name="Status"     type="enum8"                   optional="false"/>
       <arg name="StatusText" type="char_string" lenght="64" optional="true"/>
+      <mandatoryConform/>
     </command>
   </cluster>
 </configurator>

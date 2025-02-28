@@ -501,7 +501,7 @@ public:
      */
     CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, FabricIndex * fabricIndex = nullptr)
     {
-        ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->CreateEntry(index, entry, fabricIndex);
     }
@@ -551,7 +551,7 @@ public:
      */
     CHIP_ERROR UpdateEntry(size_t index, const Entry & entry, const FabricIndex * fabricIndex = nullptr)
     {
-        ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->UpdateEntry(index, entry, fabricIndex);
     }

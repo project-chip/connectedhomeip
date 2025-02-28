@@ -76,17 +76,8 @@ Protocols::InteractionModel::Status chefConcentrationMeasurementWriteCallback(
 
     if (attributeId == measuredValueId)
     {
-        float newValue  = 0;
-        uint16_t tlvLen = *(uint16_t *) buffer;
-        chip::TLV::TLVReader reader;
-        reader.Init(buffer + sizeof(uint16_t), tlvLen);
-        reader.Next();
-        reader.Get(newValue);
-
-        ChipLogDetail(DeviceLayer, "TLV Type %d, Length %d \n", static_cast<int>(reader.GetType()), tlvLen);
-        // 2 bytes buf length + 5 bytes TLV for float
-        ChipLogDetail(DeviceLayer, "buffer: %02x%02x%02x%02x%02x%02x%02x \n", buffer[0], buffer[1], buffer[2], buffer[3], buffer[4],
-                      buffer[5], buffer[6]);
+        float newValue;
+        std::memcpy(&newValue, buffer, sizeof(float)); // Copy buffer content to float
 
         CHIP_ERROR err = clusterInstance->SetMeasuredValue(MakeNullable(newValue));
         if (CHIP_NO_ERROR == err)
@@ -315,7 +306,7 @@ void emberAfPm1ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 void emberAfPm10ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
     gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
-        EndpointId(endpoint), Pm10ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+        EndpointId(endpoint), Pm10ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kUgm3);
     gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
     gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(50.0f));
     gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(1.0f));

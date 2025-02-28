@@ -48,7 +48,9 @@
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <system/SystemTimer.h>
 
+#ifndef CONFIG_IDF_TARGET_ESP32P4
 #include "esp_bt.h"
+#endif
 #include "esp_log.h"
 
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
@@ -67,6 +69,9 @@
 #include "nimble/nimble_port_freertos.h"
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
+
+// Not declared in any header file, hence requires a forward declaration.
+extern "C" void ble_store_config_init(void);
 
 #define MAX_ADV_DATA_LEN 31
 #define CHIP_ADV_DATA_TYPE_FLAGS 0x01
@@ -242,6 +247,12 @@ exit:
 
 void BLEManagerImpl::_Shutdown()
 {
+    if (mFlags.Has(Flags::kBleDeinitAndMemReleased))
+    {
+        ChipLogProgress(DeviceLayer, "Ble already deinitialized, returning from ShutDown flow");
+        return;
+    }
+
     CancelBleAdvTimeoutTimer();
 
     BleLayer::Shutdown();
@@ -710,6 +721,7 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
         return CHIP_ERROR(ChipError::Range::kPlatform, CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN + bleErr);
     }
 }
+
 void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
 {
     if (SystemLayer().IsTimerActive(BleAdvTimeoutHandler, nullptr))
@@ -717,6 +729,7 @@ void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
         SystemLayer().CancelTimer(BleAdvTimeoutHandler, nullptr);
     }
 }
+
 void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
 {
     CancelBleAdvTimeoutTimer();
@@ -727,6 +740,7 @@ void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
         ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
     }
 }
+
 void BLEManagerImpl::DriveBLEState(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -735,6 +749,11 @@ void BLEManagerImpl::DriveBLEState(void)
     if (!mFlags.Has(Flags::kAsyncInitCompleted))
     {
         mFlags.Set(Flags::kAsyncInitCompleted);
+    }
+
+    if (mFlags.Has(Flags::kBleDeinitAndMemReleased))
+    {
+        return;
     }
 
     // Initializes the ESP BLE layer if needed.
@@ -842,7 +861,7 @@ void BLEManagerImpl::DriveBLEState(void)
     if (mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kGATTServiceStarted))
     {
         DeinitESPBleLayer();
-        mFlags.ClearAll();
+        mFlags.ClearAll().Set(Flags::kBleDeinitAndMemReleased);
     }
 
 exit:
@@ -923,7 +942,8 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     SuccessOrExit(err);
 #endif
 
-    nimble_port_init();
+    err = MapBLEError(nimble_port_init());
+    SuccessOrExit(err);
 
     /* Initialize the NimBLE host configuration. */
     ble_hs_cfg.reset_cb          = bleprph_on_reset;
@@ -954,6 +974,7 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
         }
     }
 
+    ble_store_config_init();
     nimble_port_freertos_init(bleprph_host_task);
 
     xSemaphoreTake(semaphoreHandle, portMAX_DELAY);
@@ -971,7 +992,9 @@ exit:
 void BLEManagerImpl::DeinitESPBleLayer()
 {
     VerifyOrReturn(DeinitBLE() == CHIP_NO_ERROR);
+#ifdef CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
     BLEManagerImpl::ClaimBLEMemory(nullptr, nullptr);
+#endif /* CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING */
 }
 
 void BLEManagerImpl::ClaimBLEMemory(System::Layer *, void *)
@@ -1020,6 +1043,11 @@ CHIP_ERROR BLEManagerImpl::DeinitBLE()
 
     return MapBLEError(err);
 }
+
+#ifdef CONFIG_IDF_TARGET_ESP32P4
+// Stub function to avoid link error
+extern "C" void ble_transport_ll_deinit(void) {}
+#endif
 
 CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 {
@@ -1111,7 +1139,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureScanResponseData(ByteSpan data)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     memcpy(scanResponseBuffer, data.data(), data.size());
-    ByteSpan scanResponseSpan(scanResponseBuffer);
+    ByteSpan scanResponseSpan(scanResponseBuffer, data.size());
     mScanResponse = chip::Optional<ByteSpan>(scanResponseSpan);
     return CHIP_NO_ERROR;
 }

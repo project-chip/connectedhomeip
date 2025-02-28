@@ -199,10 +199,12 @@ public:
 private:
     struct UnlatchContext
     {
+        static constexpr uint8_t kMaxPinLength = UINT8_MAX;
+        uint8_t mPinBuffer[kMaxPinLength];
+        uint8_t mPinLength;
         chip::EndpointId mEndpointId;
         Nullable<chip::FabricIndex> mFabricIdx;
         Nullable<chip::NodeId> mNodeId;
-        Optional<chip::ByteSpan> mPin;
         OperationErrorEnum mErr;
 
         void Update(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
@@ -211,8 +213,18 @@ private:
             mEndpointId = endpointId;
             mFabricIdx  = fabricIdx;
             mNodeId     = nodeId;
-            mPin        = pin;
             mErr        = err;
+
+            if (pin.HasValue())
+            {
+                memcpy(mPinBuffer, pin.Value().data(), pin.Value().size());
+                mPinLength = static_cast<uint8_t>(pin.Value().size());
+            }
+            else
+            {
+                memset(mPinBuffer, 0, kMaxPinLength);
+                mPinLength = 0;
+            }
         }
     };
     UnlatchContext mUnlatchContext;
@@ -238,15 +250,11 @@ private:
     YearDayScheduleInfo mYeardaySchedule[kMaxUsers][kMaxYeardaySchedulesPerUser];
     HolidayScheduleInfo mHolidaySchedule[kMaxHolidaySchedules];
 
-    char mUserNames[ArraySize(mLockUsers)][DOOR_LOCK_MAX_USER_NAME_SIZE];
+    char mUserNames[MATTER_ARRAY_SIZE(mLockUsers)][DOOR_LOCK_MAX_USER_NAME_SIZE];
     uint8_t mCredentialData[kNumCredentialTypes][kMaxCredentials][kMaxCredentialSize];
     CredentialStruct mCredentials[kMaxUsers][kMaxCredentials];
 
-    static LockManager sLock;
     EFR32DoorLock::LockInitParams::LockParam LockParams;
 };
 
-inline LockManager & LockMgr()
-{
-    return LockManager::sLock;
-}
+LockManager & LockMgr();

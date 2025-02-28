@@ -59,39 +59,75 @@ limitations under the License.
 
     <!-- min max definition for attribute size larger than 2 bytes is not allowed by zap codegen https://github.com/project-chip/zap/issues/1187 -->
     <!-- Therefore, this check needs to be done in code. -->
-    <attribute side="server" code="0x0000" define="OPEN_DURATION" type="elapsed_s" isNullable="true" writable="false" optional="false">OpenDuration</attribute>
+    <attribute side="server" code="0x0000" name="OpenDuration" define="OPEN_DURATION" type="elapsed_s" isNullable="true">
+      <mandatoryConform/>
+    </attribute>
     <!-- min max definition for attribute size larger than 2 bytes is not allowed by zap codegen https://github.com/project-chip/zap/issues/1187 -->
     <!-- Therefore, this check needs to be done in code. -->
-    <attribute side="server" code="0x0001" define="DEFAULT_OPEN_DURATION" type="elapsed_s" isNullable="true" writable="true" optional="false">DefaultOpenDuration</attribute>
-    <attribute side="server" code="0x0002" define="AUTO_CLOSE_TIME" type="epoch_us" isNullable="true" writable="false" optional="true">AutoCloseTime</attribute>
-    <attribute side="server" code="0x0003" define="REMAINING_DURATION" type="elapsed_s" isNullable="true" writable="false" optional="false">RemainingDuration</attribute>
-    <attribute side="server" code="0x0004" define="CURRENT_STATE" type="ValveStateEnum" isNullable="true" writable="false" optional="false">CurrentState</attribute>
-    <attribute side="server" code="0x0005" define="TARGET_STATE" type="ValveStateEnum" isNullable="true" writable="false" optional="false">TargetState</attribute>
-    <attribute side="server" code="0x0006" define="CURRENT_LEVEL" type="percent" isNullable="true" min="0" max="100" writable="false" optional="true">CurrentLevel</attribute>
-    <attribute side="server" code="0x0007" define="TARGET_LEVEL" type="percent" isNullable="true" min="0" max="100" writable="false" optional="true">TargetLevel</attribute>
-    <attribute side="server" code="0x0008" define="DEFAULT_OPEN_LEVEL" type="percent" isNullable="false" min="1" max="100" writable="true" default="100" optional="true">DefaultOpenLevel</attribute>
-    <attribute side="server" code="0x0009" define="VALVE_FAULT" type="ValveFaultBitmap" isNullable="false" writable="false" optional="true">ValveFault</attribute>
-    <attribute side="server" code="0x000A" define="LEVEL_STEP" type="int8u" min="1" max="50" isNullable="false" writable="false" optional="true">LevelStep</attribute>
-
+    <attribute side="server" code="0x0001" name="DefaultOpenDuration" define="DEFAULT_OPEN_DURATION" type="elapsed_s" isNullable="true" writable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0002" name="AutoCloseTime" define="AUTO_CLOSE_TIME" type="epoch_us" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="TS"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0003" name="RemainingDuration" define="REMAINING_DURATION" type="elapsed_s" isNullable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0004" name="CurrentState" define="CURRENT_STATE" type="ValveStateEnum" isNullable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0005" name="TargetState" define="TARGET_STATE" type="ValveStateEnum" isNullable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0006" name="CurrentLevel" define="CURRENT_LEVEL" type="percent" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="LVL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0007" name="TargetLevel" define="TARGET_LEVEL" type="percent" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="LVL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0008" name="DefaultOpenLevel" define="DEFAULT_OPEN_LEVEL" type="percent" min="1" max="100" writable="true" default="100" optional="true">
+      <optionalConform>
+        <feature name="LVL"/>
+      </optionalConform>
+    </attribute>
+    <attribute side="server" code="0x0009" name="ValveFault" define="VALVE_FAULT" type="ValveFaultBitmap" optional="true">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x000A" name="LevelStep" define="LEVEL_STEP" type="int8u" min="1" max="50" optional="true">
+      <optionalConform>
+        <feature name="LVL"/>
+      </optionalConform>
+    </attribute>
+    
     <command source="client" code="0x00" name="Open" optional="false">
       <description>This command is used to set the valve to its open position.</description>
       <arg name="OpenDuration" type="elapsed_s" optional="true" isNullable="true"/>
       <arg name="TargetLevel" type="percent" optional="true"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x01" name="Close" optional="false">
       <description>This command is used to set the valve to its closed position.</description>
+      <mandatoryConform/>
     </command>
 
     <event side="server" code="0x00" priority="info" name="ValveStateChanged" optional="true">
       <description>This event SHALL be generated when the valve state changed.</description>
       <field id="0" name="ValveState" type="ValveStateEnum"/>
       <field id="1" name="ValveLevel" type="percent" optional="true"/>
+      <optionalConform/>
     </event>
 
     <event side="server" code="0x01" priority="info" name="ValveFault" optional="true">
       <description>This event SHALL be generated when the valve registers or clears a fault.</description>
       <field id="0" name="ValveFault" type="ValveFaultBitmap"/>
+      <optionalConform/>
     </event>
   </cluster>
 </configurator>

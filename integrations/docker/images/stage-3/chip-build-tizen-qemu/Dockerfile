@@ -39,7 +39,7 @@ RUN set -x \
     && wget --progress=dot:giga -r -nd --no-parent -e robots=off -A 'rpi4-linux-kernel-*.src.rpm' \
     http://download.tizen.org/snapshots/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/source/ \
     # Prepare kernel source (Linux kernel + Tizen patchset)
-    && unrpm rpi4-linux-kernel-*.src.rpm \
+    && 7z x -so rpi4-linux-kernel-*.src.rpm | cpio -idmv \
     && rm rpi4-linux-kernel-*.src.rpm \
     && tar -xJf linux-kernel-*.tar.xz \
     && rm linux-kernel-*.tar.xz \
@@ -182,9 +182,13 @@ RUN set -x \
     && echo -n \
     "#!/bin/bash\n" \
     "grep -q 'rootshell' /proc/cmdline && exit\n" \
-    "if [[ -x /mnt/chip/runner.sh ]]; then\n" \
+    "runner=\$(grep -o 'runner=[^ ]*' /proc/cmdline | sed 's/runner=//')\n" \
+    "if [[ -z \"\$runner\" ]]; then\n" \
+    "  runner='/mnt/chip/runner.sh' \n" \
+    "fi\n" \
+    "if [[ -x \"\$runner\" ]]; then\n" \
     "  echo '### RUNNER START ###'\n" \
-    "  /mnt/chip/runner.sh\n" \
+    "  \"\$runner\"\n" \
     "  echo '### RUNNER STOP:' \$?\n" \
     "else\n" \
     "  read -r -t 5 -p 'Press ENTER to access root shell...' && exit || echo ' timeout.'\n" \

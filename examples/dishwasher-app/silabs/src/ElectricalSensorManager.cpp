@@ -196,12 +196,12 @@ void ElectricalSensorManager::UpdateEPMAttributes(OperationalStateEnum state)
 {
     if (gEPMDelegate)
     {
-        uint16_t updateState       = to_underlying(state);
-        uint16_t ERROR_STATE_INDEX = ArraySize(kAttributes) - 1;
+        uint8_t updateState = to_underlying(state);
+
         // Check state range
-        if ((updateState < 0) || (updateState > ERROR_STATE_INDEX))
+        if (updateState >= MATTER_ARRAY_SIZE(kAttributes))
         {
-            updateState = ERROR_STATE_INDEX;
+            updateState = MATTER_ARRAY_SIZE(kAttributes) - 1;
         }
 
         ChipLogDetail(AppServer, "UpdateAllAttributes to Operational State : %d", updateState);

@@ -52,45 +52,80 @@ limitations under the License.
         </otherwiseConform>
       </feature>
     </features>
-    <attribute side="server" code="0x00" define="BREADCRUMB" type="int64u" writable="true" default="0x0000000000000000" optional="false">
-      <description>Breadcrumb</description>
+    <attribute side="server" code="0x00" name="Breadcrumb" define="BREADCRUMB" type="int64u" writable="true" default="0x0000000000000000" optional="false">
       <access op="read" privilege="view"/>
       <access op="write" privilege="administer"/>
+      <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x01" define="BASIC_COMMISSIONING_INFO" type="BasicCommissioningInfo" writable="false" optional="false">BasicCommissioningInfo</attribute>
-    <attribute side="server" code="0x02" define="REGULATORY_CONFIG" type="RegulatoryLocationTypeEnum" writable="false" optional="false">RegulatoryConfig</attribute>
-    <attribute side="server" code="0x03" define="LOCATION_CAPABILITY" type="RegulatoryLocationTypeEnum" writable="false" optional="false">LocationCapability</attribute>
-    <attribute side="server" code="0x04" define="SUPPORTS_CONCURRENT_CONNECTION" type="boolean" writable="false" default="1" optional="false">SupportsConcurrentConnection</attribute>
-    <attribute side="server" code="0x05" define="TC_ACCEPTED_VERSION" type="int16u" writable="false" optional="true" apiMaturity="provisional">
-      <description>TCAcceptedVersion</description>
-      <access op="read" privilege="administer"/>
+    <attribute side="server" code="0x01" name="BasicCommissioningInfo" define="BASIC_COMMISSIONING_INFO" type="BasicCommissioningInfo">
+      <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x06" define="TC_MIN_REQUIRED_VERSION" type="int16u" writable="false" optional="true" apiMaturity="provisional">
-      <description>TCMinRequiredVersion</description>
-      <access op="read" privilege="administer"/>
+    <attribute side="server" code="0x02" name="RegulatoryConfig" define="REGULATORY_CONFIG" type="RegulatoryLocationTypeEnum">
+      <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x07" define="TC_ACKNOWLEDGEMENTS" type="bitmap16" writable="false" default="0x0000" optional="true" apiMaturity="provisional">
-      <description>TCAcknowledgements</description>
-      <access op="read" privilege="administer"/>
+    <attribute side="server" code="0x03" name="LocationCapability" define="LOCATION_CAPABILITY" type="RegulatoryLocationTypeEnum">
+      <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x08" define="TC_ACKNOWLEDGEMENTS_REQUIRED" type="boolean" writable="false" optional="true" apiMaturity="provisional">
-      <description>TCAcknowledgementsRequired</description>
-      <access op="read" privilege="administer"/>
+    <attribute side="server" code="0x04" name="SupportsConcurrentConnection" define="SUPPORTS_CONCURRENT_CONNECTION" type="boolean" default="1">
+      <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x09" define="TC_UPDATE_DEADLINE" type="int32u" writable="false" optional="true" apiMaturity="provisional">
-      <description>TCUpdateDeadline</description>
+    <attribute side="server" code="0x05" name="TCAcceptedVersion" define="TC_ACCEPTED_VERSION" type="int16u" optional="true" apiMaturity="provisional">
       <access op="read" privilege="administer"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="TC"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute side="server" code="0x06" name="TCMinRequiredVersion" define="TC_MIN_REQUIRED_VERSION" type="int16u" writable="false" optional="true" apiMaturity="provisional">
+      <access op="read" privilege="administer"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="TC"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute side="server" code="0x07" name="TCAcknowledgements" define="TC_ACKNOWLEDGEMENTS" type="bitmap16" writable="false" default="0x0000" optional="true" apiMaturity="provisional">
+      <access op="read" privilege="administer"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="TC"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute side="server" code="0x08" name="TCAcknowledgementsRequired" define="TC_ACKNOWLEDGEMENTS_REQUIRED" type="boolean" writable="false" optional="true" apiMaturity="provisional">
+      <access op="read" privilege="administer"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="TC"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute side="server" code="0x09" name="TCUpdateDeadline" define="TC_UPDATE_DEADLINE" type="int32u" writable="false" optional="true" isNullable="true" apiMaturity="provisional">
+      <access op="read" privilege="administer"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="TC"/>
+        </mandatoryConform>
+      </otherwiseConform>
     </attribute>
     <command source="client" code="0x00" name="ArmFailSafe" response="ArmFailSafeResponse" optional="false" cli="chip fabric_commissioning armfailsafe">
       <description>Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock</description>
       <arg name="ExpiryLengthSeconds" type="int16u"/>
       <arg name="Breadcrumb" type="int64u"/>
       <access op="invoke" privilege="administer"/>
+      <mandatoryConform/>
     </command>
     <command source="server" code="0x01" name="ArmFailSafeResponse" optional="false" cli="chip fabric_commissioning armfailsaferesponse">
       <description>Success/failure response for ArmFailSafe command</description>
       <arg name="ErrorCode" type="CommissioningErrorEnum"/>
       <arg name="DebugText" type="char_string" length="128"/>
+      <mandatoryConform/>
     </command>
     <command source="client" code="0x02" name="SetRegulatoryConfig" response="SetRegulatoryConfigResponse" cli="chip fabric_commissioning setregulatoryconfig">
       <description>Set the regulatory configuration to be used during commissioning</description>
@@ -98,30 +133,46 @@ limitations under the License.
       <arg name="CountryCode" type="char_string" length="2"/>
       <arg name="Breadcrumb" type="int64u"/>
       <access op="invoke" privilege="administer"/>
+      <mandatoryConform/>
     </command>
     <command source="server" code="0x03" name="SetRegulatoryConfigResponse" cli="chip fabric_commissioning setregulatoryconfigresponse">
       <description>Success/failure response for SetRegulatoryConfig command</description>
       <arg name="ErrorCode" type="CommissioningErrorEnum"/>
       <arg name="DebugText" type="char_string"/>
+      <mandatoryConform/>
     </command>
     <command source="client" code="0x04" name="CommissioningComplete" response="CommissioningCompleteResponse" isFabricScoped="true" optional="false" cli="chip fabric_commissioning commissioningcomplete">
       <description>Signals the Server that the Client has successfully completed all steps of Commissioning/Recofiguration needed during fail-safe period.</description>
       <access op="invoke" privilege="administer"/>
+      <mandatoryConform/>
     </command>
     <command source="server" code="0x05" name="CommissioningCompleteResponse" optional="false" cli="chip fabric_commissioning commissioningcompleteresponse">
       <description>Indicates to client whether CommissioningComplete command succeeded</description>
       <arg name="ErrorCode" type="CommissioningErrorEnum"/>
       <arg name="DebugText" type="char_string"/>
+      <mandatoryConform/>
     </command>
     <command source="client" code="0x06" name="SetTCAcknowledgements" optional="true" response="SetTCAcknowledgementsResponse" cli="chip fabric_commissioning settcacknowledgements" apiMaturity="provisional">
       <description>This command sets the user acknowledgements received in the Enhanced Setup Flow Terms and Conditions into the node.</description>
       <arg name="TCVersion" type="int16u"/>
       <arg name="TCUserResponse" type="bitmap16"/>
       <access op="invoke" privilege="administer"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="TC"/>
+        </mandatoryConform>
+      </otherwiseConform>
     </command>
     <command source="server" code="0x07" name="SetTCAcknowledgementsResponse" optional="true" cli="chip fabric_commissioning settcacknowledgementsresponse" apiMaturity="provisional">
       <description>This command is used to convey the result from SetTCAcknowledgements.</description>
       <arg name="ErrorCode" type="CommissioningErrorEnum"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="TC"/>
+        </mandatoryConform>
+      </otherwiseConform>
     </command>
   </cluster>
 </configurator>

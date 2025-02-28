@@ -45,8 +45,14 @@ function(chip_ota_image TARGET_NAME)
     set(app_version_patchlevel ${CMAKE_MATCH_1})
     string(REGEX MATCH "VERSION_TWEAK = ([0-9]*)" _ ${ver})
     set(app_version_tweak ${CMAKE_MATCH_1})
+    string(REGEX MATCH "EXTRAVERSION = ([a-z0-9]*)" _ ${ver})
+    set(app_version_extra ${CMAKE_MATCH_1})
 
-    set(APP_VERSION_STRING "${app_version_major}.${app_version_minor}.${app_version_patchlevel}+${app_version_tweak}")
+    if(app_version_extra)
+      set(APP_VERSION_STRING "${app_version_major}.${app_version_minor}.${app_version_patchlevel}-${app_version_extra}+${app_version_tweak}")
+    else()
+      set(APP_VERSION_STRING "${app_version_major}.${app_version_minor}.${app_version_patchlevel}+${app_version_tweak}")
+    endif()
     math(EXPR APPVERSION "(${app_version_major} << 24) | (${app_version_minor} << 16) | (${app_version_patchlevel} << 8) | ${app_version_tweak}" OUTPUT_FORMAT HEXADECIMAL)
 
     set(OTA_ARGS

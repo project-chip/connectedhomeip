@@ -48,7 +48,6 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE=${chip_log_message_max_size}",
     "CHIP_AUTOMATION_LOGGING=${chip_automation_logging}",
     "CHIP_PW_TOKENIZER_LOGGING=${chip_pw_tokenizer_logging}",
-    "CHIP_USE_PW_LOGGING=${chip_use_pw_logging}",
     "CHIP_EXCHANGE_NODE_ID_LOGGING=${chip_exchange_node_id_logging}",
     "CHIP_CONFIG_SHORT_ERROR_STR=${chip_config_short_error_str}",
     "CHIP_CONFIG_ENABLE_ARG_PARSER=${chip_config_enable_arg_parser}",
@@ -71,6 +70,8 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_WRITE=${chip_tlv_validate_char_string_on_write}",
     "CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ=${chip_tlv_validate_char_string_on_read}",
     "CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS=${chip_enable_sending_batch_commands}",
+    "CHIP_CONFIG_TEST_GOOGLETEST=${chip_build_tests_googletest}",
+    "CHIP_CONFIG_MRP_ANALYTICS_ENABLED=${chip_enable_mrp_analytics}",
   ]
 
   visibility = [ ":chip_config_header" ]
@@ -116,6 +117,7 @@ source_set("string-builder-adapters") {
   public_deps = [
     ":error",
     "$dir_pw_string",
+    "$dir_pw_unit_test",
   ]
 }
 
@@ -203,10 +205,7 @@ static_library("core") {
   ]
 }
 
-static_library("vectortlv") {
-  output_name = "libVectorTlv"
-  output_dir = "${root_out_dir}/lib"
-
+source_set("vectortlv") {
   sources = [
     "TLVVectorWriter.cpp",
     "TLVVectorWriter.h",

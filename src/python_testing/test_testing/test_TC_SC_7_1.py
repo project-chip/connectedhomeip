@@ -16,20 +16,14 @@
 #    limitations under the License.
 #
 
-import os
 import sys
+from pathlib import Path
 from random import randbytes
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
-from MockTestRunner import MockTestRunner
-
-try:
-    from matter_testing_support import MatterTestConfig
-except ImportError:
-    sys.path.append(os.path.abspath(
-        os.path.join(os.path.dirname(__file__), '..')))
-    from matter_testing_support import MatterTestConfig
+from chip.testing.matter_testing import MatterTestConfig
+from chip.testing.runner import MockTestRunner
 
 
 def read_trusted_root(filled: bool) -> Attribute.AsyncReadTransaction.ReadResponse:
@@ -50,7 +44,8 @@ def main():
     manual_3333_20202021 = '31693312339'
     manual_2222_20202024 = '20055212333'
 
-    test_runner = MockTestRunner('TC_SC_7_1', 'TC_SC_7_1', 'test_TC_SC_7_1', 0)
+    test_runner = MockTestRunner(Path(__file__).parent / '../TC_SC_7_1.py',
+                                 'TC_SC_7_1', 'test_TC_SC_7_1', 0)
     failures = []
 
     # Tests with no code specified should fail

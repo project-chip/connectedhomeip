@@ -5,23 +5,13 @@
 using namespace chip;
 
 namespace {
-enum class DeviceTypeClass {
-  Utility,
-  Simple,
-  Node, // Might not be a real class, but we have it for Root Node for now.
-  // If new classes get added, plase audit MTRIsKnownUtilityDeviceType below.
-};
 
-struct DeviceTypeData {
-  DeviceTypeId id;
-  DeviceTypeClass deviceClass;
-  const char * name;
-};
-
-constexpr DeviceTypeData knownDeviceTypes[] = {
+// Not constexpr in the strict sense because NSString * is not a literal
+// type, but the array is in fact constant initialized by the compiler.
+static /* constexpr */ const MTRDeviceTypeData knownDeviceTypes[] = {
   {{#zcl_device_types}}
   {{#if class}}
-  { {{asHex code 8}}, DeviceTypeClass::{{class}}, "{{caption}}" },
+  { {{asHex code 8}}, MTRDeviceTypeClass::{{class}}, @"{{caption}}" },
   {{/if}}
   {{/zcl_device_types}}
 };
@@ -34,12 +24,12 @@ static_assert(ExtractVendorFromMEI({{asHex code 8}}) != 0, "Must have class defi
 
 } // anonymous namespace
 
-BOOL MTRIsKnownUtilityDeviceType(DeviceTypeId aDeviceTypeId)
+const MTRDeviceTypeData * _Nullable MTRDeviceTypeDataForID(chip::DeviceTypeId aDeviceTypeId)
 {
     for (auto & deviceType : knownDeviceTypes) {
         if (deviceType.id == aDeviceTypeId) {
-            return deviceType.deviceClass != DeviceTypeClass::Simple;
+            return &deviceType;
         }
     }
-    return NO;
+    return nullptr;
 }

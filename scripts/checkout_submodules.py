@@ -51,6 +51,7 @@ ALL_PLATFORMS = set([
     'genio',
     'openiotsdk',
     'silabs_docker',
+    'unit_tests'
 ])
 
 Module = namedtuple('Module', 'name path platforms recursive')
@@ -66,6 +67,18 @@ def load_module_info() -> None:
             platforms = set(filter(None, platforms))
             assert not (
                 platforms - ALL_PLATFORMS), "Submodule's platform not contained in ALL_PLATFORMS"
+
+            # Check for explicitly excluded platforms
+            excluded_platforms = module.get('excluded-platforms', '').split(',')
+            excluded_platforms = set(filter(None, excluded_platforms))
+            assert not (
+                excluded_platforms - ALL_PLATFORMS), "Submodule excluded on platforms not contained in ALL_PLATFORMS"
+
+            if len(excluded_platforms) != 0:
+                if len(platforms) == 0:
+                    platforms = ALL_PLATFORMS
+                platforms = platforms - excluded_platforms
+
             recursive = module.getboolean('recursive', False)
             name = name.replace('submodule "', '').replace('"', '')
             yield Module(name=name, path=module['path'], platforms=platforms, recursive=recursive)
@@ -101,7 +114,8 @@ def checkout_modules(modules: list, shallow: bool, force: bool, recursive: bool,
     names = ', '.join([module.name for module in modules])
     logging.info(f'Checking out: {names}')
 
-    cmd = ['git', '-C', CHIP_ROOT, 'submodule', '--quiet', 'update', '--init']
+    cmd = ['git', '-c', 'core.symlinks=true', '-C', CHIP_ROOT]
+    cmd += ['submodule', '--quiet', 'update', '--init']
     cmd += ['--depth', '1'] if shallow else []
     cmd += ['--force'] if force else []
     cmd += ['--recursive'] if recursive else []

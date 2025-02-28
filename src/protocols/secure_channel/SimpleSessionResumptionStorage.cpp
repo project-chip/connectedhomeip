@@ -99,7 +99,7 @@ CHIP_ERROR SimpleSessionResumptionStorage::LoadIndex(SessionIndex & index)
     CHIP_ERROR err;
     while ((err = reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag())) == CHIP_NO_ERROR)
     {
-        if (count >= ArraySize(index.mNodes))
+        if (count >= MATTER_ARRAY_SIZE(index.mNodes))
         {
             return CHIP_ERROR_NO_MEMORY;
         }

@@ -41,8 +41,8 @@ import string
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from drlk_2_x_common import DRLK_COMMON
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -379,7 +379,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         self.maxrfidcodelength = None
         self.minrfidcodelength = None
 
-        self.endpoint = self.user_params.get("endpoint", 1)
+        self.endpoint = self.get_endpoint(default=1)
         print("endpoint", self.endpoint)
 
         # Aliro Keys for setting Aliro configuration and credential

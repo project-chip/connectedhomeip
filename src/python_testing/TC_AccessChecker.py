@@ -23,13 +23,13 @@ from enum import Enum, auto
 from typing import Optional
 
 import chip.clusters as Clusters
-from basic_composition_support import BasicCompositionTests
 from chip.interaction_model import Status
+from chip.testing.basic_composition import BasicCompositionTests
+from chip.testing.global_attribute_ids import GlobalAttributeIds
+from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, MatterBaseTest, TestStep, async_test_body,
+                                         default_matter_test_main)
+from chip.testing.spec_parsing import XmlCluster
 from chip.tlv import uint
-from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, MatterBaseTest, TestStep, async_test_body,
-                                    default_matter_test_main)
-from spec_parsing_support import XmlCluster, build_xml_clusters
 
 
 class AccessTestType(Enum):
@@ -72,7 +72,8 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         self.user_params["use_pase_only"] = False
         super().setup_class()
         await self.setup_class_helper()
-        self.xml_clusters, self.problems = build_xml_clusters()
+        self.build_spec_xmls()
+
         acl_attr = Clusters.AccessControl.Attributes.Acl
         self.default_acl = await self.read_single_attribute_check_success(cluster=Clusters.AccessControl, attribute=acl_attr)
         self._record_errors()

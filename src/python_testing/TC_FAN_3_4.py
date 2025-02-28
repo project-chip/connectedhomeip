@@ -38,7 +38,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 # import time
@@ -94,7 +94,7 @@ class TC_FAN_3_4(MatterBaseTest):
             logger.info("Test skipped because PICS FAN.S.F03 is not set")
             return
 
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.get_endpoint(default=1)
 
         self.step(1)
 

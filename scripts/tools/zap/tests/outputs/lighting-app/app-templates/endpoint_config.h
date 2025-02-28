@@ -118,14 +118,12 @@
         /* Endpoint: 1, Cluster: On/Off (server) */                                                                                \
         { (uint16_t) 0xFF, (uint16_t) 0x0, (uint16_t) 0x2 }, /* StartUpOnOff */                                                    \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Level Control (server) */                                                                     \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x3 },   /* Options */                                                    \
-            { (uint16_t) 0x32, (uint16_t) 0x1, (uint16_t) 0xFF }, /* DefaultMoveRate */                                            \
+        /* Endpoint: 1, Cluster: Level Control (server) */                                                                         \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x3 },   /* Options */                                                        \
+        { (uint16_t) 0x32, (uint16_t) 0x1, (uint16_t) 0xFF }, /* DefaultMoveRate */                                                \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Color Control (server) */                                                                         \
-        {                                                                                                                          \
-            (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF                                                                      \
-        } /* StartUpColorTemperatureMireds */                                                                                      \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF } /* StartUpColorTemperatureMireds */                                  \
     }
 
 // This is an array of EmberAfAttributeMetadata structures.
@@ -1233,13 +1231,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define FIXED_PROFILE_IDS { 0x0103, 0x0103 }
 
 // Array of device types
-#define FIXED_DEVICE_TYPES                                                                                                         \
-    {                                                                                                                              \
-        { 0x00000016, 1 },                                                                                                         \
-        {                                                                                                                          \
-            0x00000101, 1                                                                                                          \
-        }                                                                                                                          \
-    }
+#define FIXED_DEVICE_TYPES { { 0x00000016, 1 }, { 0x00000101, 1 } }
 
 // Array of device type offsets
 #define FIXED_DEVICE_TYPE_OFFSETS { 0, 1 }

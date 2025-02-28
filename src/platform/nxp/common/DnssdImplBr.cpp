@@ -28,6 +28,8 @@
 #include <openthread/mdns.h>
 #include <openthread/srp_server.h>
 
+#include <DnssdImplBr.h>
+
 using namespace ::chip::DeviceLayer;
 using namespace chip::DeviceLayer::Internal;
 
@@ -144,23 +146,17 @@ static uint32_t mServiceListFreeIndex;
 
 CHIP_ERROR NxpChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
-    CHIP_ERROR error            = CHIP_NO_ERROR;
-    otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
-    struct netif * extNetif     = (ConnectivityManagerImpl().GetExternalInterface()).GetPlatformInterface();
-
-    // Don't try to do anything until the mDNS server is started
-    VerifyOrExit(otMdnsIsEnabled(thrInstancePtr), error = CHIP_ERROR_INCORRECT_STATE);
+    struct netif * extNetif = (ConnectivityManagerImpl().GetExternalInterface()).GetPlatformInterface();
 
     mNetifIndex = netif_get_index(extNetif);
+    initCallback(context, CHIP_NO_ERROR);
 
-exit:
-    initCallback(context, error);
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 void NxpChipDnssdShutdown()
 {
-    otMdnsSetEnabled(ThreadStackMgrImpl().OTInstance(), false, 0);
+    // Empty implementation. Intentionally left blank
 }
 #if USE_MDNS_NEXT_SERVICE_API
 CHIP_ERROR NxpChipDnssdRemoveServices()
@@ -230,7 +226,7 @@ CHIP_ERROR NxpChipDnssdRemoveServices()
 
 CHIP_ERROR NxpChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
-    ReturnErrorCodeIf(service == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
     uint32_t txtBufferOffset    = 0;
@@ -369,6 +365,11 @@ CHIP_ERROR NxpChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, 
     if (type == nullptr || callback == nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
+    if (mBrowseContext != nullptr)
+    {
+        NxpChipDnssdStopBrowse(reinterpret_cast<intptr_t>(mBrowseContext));
+    }
+
     mBrowseContext = Platform::New<mDnsQueryCtx>(context, callback);
     VerifyOrReturnError(mBrowseContext != nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -418,7 +419,8 @@ CHIP_ERROR NxpChipDnssdStopBrowse(intptr_t browseIdentifier)
     // that has been freed in DispatchBrowseEmpty.
     if ((true == bBrowseInProgress) && (browseContext))
     {
-        browseContext->error = MapOpenThreadError(otMdnsStopBrowser(thrInstancePtr, &browseContext->mBrowseInfo));
+        error                = otMdnsStopBrowser(thrInstancePtr, &browseContext->mBrowseInfo);
+        browseContext->error = MapOpenThreadError(error);
 
         // browse context will be freed in DispatchBrowseEmpty
         DispatchBrowseEmpty(reinterpret_cast<intptr_t>(browseContext));
@@ -435,6 +437,13 @@ CHIP_ERROR NxpChipDnssdResolve(DnssdService * browseResult, Inet::InterfaceId in
         return CHIP_ERROR_INVALID_ARGUMENT;
 
     otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
+
+    if (mResolveContext != nullptr)
+    {
+        // In case there is an ongoing query and NxpChipDnssdResolveNoLongerNeeded has not been called yet
+        // free the allocated context and do a proper cleanup of the previous transaction
+        NxpChipDnssdResolveNoLongerNeeded(mResolveContext->mMdnsService.mName);
+    }
 
     mResolveContext = Platform::New<mDnsQueryCtx>(context, callback);
     VerifyOrReturnError(mResolveContext != nullptr, CHIP_ERROR_NO_MEMORY);
@@ -456,12 +465,16 @@ CHIP_ERROR NxpChipDnssdResolve(DnssdService * browseResult, Inet::InterfaceId in
         mResolveContext->mSrvInfo.mServiceInstance = mResolveContext->mMdnsService.mName;
         mResolveContext->mSrvInfo.mServiceType     = mResolveContext->mServiceType;
 
-        return MapOpenThreadError(otMdnsStartSrvResolver(thrInstancePtr, &mResolveContext->mSrvInfo));
+        error = MapOpenThreadError(otMdnsStartSrvResolver(thrInstancePtr, &mResolveContext->mSrvInfo));
     }
-    else
+
+    if (error != CHIP_NO_ERROR)
     {
-        return error;
+        Platform::Delete<mDnsQueryCtx>(mResolveContext);
+        mResolveContext = nullptr;
     }
+
+    return error;
 }
 void NxpChipDnssdResolveNoLongerNeeded(const char * instanceName)
 {
@@ -566,7 +579,7 @@ CHIP_ERROR FromSrpCacheToMdnsData(const otSrpServerService * service, const otSr
         tmpName = otSrpServerServiceGetInstanceName(service);
         // Extract from the <instance>.<type>.<protocol>.<domain-name>. the <instance> part
         size_t substringSize = strchr(tmpName, '.') - tmpName;
-        if (substringSize >= ArraySize(mdnsService.mName))
+        if (substringSize >= MATTER_ARRAY_SIZE(mdnsService.mName))
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
@@ -575,7 +588,7 @@ CHIP_ERROR FromSrpCacheToMdnsData(const otSrpServerService * service, const otSr
         // Extract from the <instance>.<type>.<protocol>.<domain-name>. the <type> part.
         tmpName       = tmpName + substringSize + 1;
         substringSize = strchr(tmpName, '.') - tmpName;
-        if (substringSize >= ArraySize(mdnsService.mType))
+        if (substringSize >= MATTER_ARRAY_SIZE(mdnsService.mType))
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
@@ -605,7 +618,7 @@ CHIP_ERROR FromSrpCacheToMdnsData(const otSrpServerService * service, const otSr
     // Extract from the <hostname>.<domain-name>. the <hostname> part.
     tmpName       = otSrpServerHostGetFullName(host);
     substringSize = strchr(tmpName, '.') - tmpName;
-    if (substringSize >= ArraySize(mdnsService.mHostName))
+    if (substringSize >= MATTER_ARRAY_SIZE(mdnsService.mHostName))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -640,7 +653,7 @@ CHIP_ERROR FromSrpCacheToMdnsData(const otSrpServerService * service, const otSr
             entryIndex++;
         }
 
-        ReturnErrorCodeIf(alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(!alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
         mdnsService.mTextEntries   = serviceTxtEntries.mTxtEntries;
         mdnsService.mTextEntrySize = entryIndex;
@@ -664,11 +677,11 @@ static CHIP_ERROR FromServiceTypeToMdnsData(chip::Dnssd::DnssdService & mdnsServ
 
     // Extract from the <type>.<protocol> the <type> part.
     substringSize = strchr(aServiceType, '.') - aServiceType;
-    if (substringSize >= ArraySize(mdnsService.mType))
+    if (substringSize >= MATTER_ARRAY_SIZE(mdnsService.mType))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    Platform::CopyString(mdnsService.mType, ArraySize(mdnsService.mType), aServiceType);
+    Platform::CopyString(mdnsService.mType, MATTER_ARRAY_SIZE(mdnsService.mType), aServiceType);
 
     // Extract from the <type>.<protocol>. the .<protocol> part.
     protocolSubstringStart = aServiceType + substringSize;
@@ -681,11 +694,11 @@ static CHIP_ERROR FromServiceTypeToMdnsData(chip::Dnssd::DnssdService & mdnsServ
 
     // Jump over '.' in protocolSubstringStart and substract the string terminator from the size
     substringSize = strlen(++protocolSubstringStart) - 1;
-    if (substringSize >= ArraySize(protocol))
+    if (substringSize >= MATTER_ARRAY_SIZE(protocol))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    Platform::CopyString(protocol, ArraySize(protocol), protocolSubstringStart);
+    Platform::CopyString(protocol, MATTER_ARRAY_SIZE(protocol), protocolSubstringStart);
 
     if (strncmp(protocol, "_udp", chip::Dnssd::kDnssdProtocolTextMaxSize) == 0)
     {

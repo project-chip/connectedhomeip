@@ -43,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:81
+            image: ghcr.io/project-chip/chip-build:119
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -76,19 +76,11 @@ jobs:
               with:
                   languages: "cpp"
             - name: Setup Build
-              run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false chip_data_model_check_die_on_failure=true"
+              run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false"
             - name: Run Build
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Run Tests
               run: scripts/tests/gn_tests.sh
-            # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
-            # TODO https://github.com/project-chip/connectedhomeip/issues/1512
-            # - name: Run Code Coverage
-            #   if: ${{ contains('main', env.BUILD_TYPE) }}
-            #   run: scripts/tools/codecoverage.sh
-            # - name: Upload Code Coverage
-            #   if: ${{ contains('main', env.BUILD_TYPE) }}
-            #   run: bash <(curl -s https://codecov.io/bash)
             - name: Set up Build Without Detail Logging
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false"
             - name: Run Build Without Detail Logging
@@ -139,7 +131,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:81
+            image: ghcr.io/project-chip/chip-build:119
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -183,7 +175,7 @@ jobs:
                   scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
             - name: Setup Build, Run Build and Run Tests
               run: |
-                  BUILD_TYPE=gcc_release scripts/build/gn_gen.sh --args="is_debug=false chip_data_model_check_die_on_failure=true"
+                  BUILD_TYPE=gcc_release scripts/build/gn_gen.sh --args="is_debug=false"
                   scripts/run_in_build_env.sh "ninja -C ./out/gcc_release"
                   BUILD_TYPE=gcc_release scripts/tests/gn_tests.sh
             - name: Clean output
@@ -205,25 +197,30 @@ jobs:
                       esac
 
                       rm -rf ./out/sanitizers
-                      BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS chip_data_model_check_die_on_failure=true" --export-compile-commands
+                      BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS" --add-export-compile-commands=*
                       BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
                   done
             - name: Generate tests with sanitizers (for tidy)
               if: github.event.pull_request.number != null
               run: |
                   rm -rf ./out/sanitizers
-                  BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="is_clang=true is_asan=true chip_data_model_check_die_on_failure=true" --export-compile-commands
+                  BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="is_clang=true is_asan=true" --add-export-compile-commands=*
             - name: Ensure codegen is done for sanitize
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/sanitizers"
             - name: Find changed files
               id: changed-files
               uses: tj-actions/changed-files@v45
+              with:
+                # Exclude all files under "third_party/"
+                files-ignore: |
+                  third_party/
+
             - name: Clang-tidy validation
               # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
               #       See https://github.com/llvm/llvm-project/issues/97426
               env:
-                  ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+                  ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
               run: |
                   touch out/changed_files.txt
                   for file in ${ALL_CHANGED_FILES}; do
@@ -308,7 +305,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:81
+            image: ghcr.io/project-chip/chip-build:119
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -333,7 +330,7 @@ jobs:
 
             - name: Setup Build, Run Build and Run Tests
               run: |
-                  scripts/build/gn_gen.sh --args="enable_rtti=true chip_config_memory_debug_checks=false chip_config_memory_debug_dmalloc=false chip_generate_link_map_file=false chip_data_model_check_die_on_failure=true"
+                  scripts/build/gn_gen.sh --args="enable_rtti=true chip_config_memory_debug_checks=false chip_config_memory_debug_dmalloc=false chip_generate_link_map_file=false"
                   scripts/run_in_build_env.sh "ninja -C ./out"
                   scripts/tests/gn_tests.sh
             - name: Setup test python environment
@@ -363,6 +360,8 @@ jobs:
                   python -m ensurepip --upgrade
                   python -m pip install -r scripts/setup/requirements.setuppayload.txt
                   python3 src/setup_payload/tests/run_python_setup_payload_test.py out/chip-tool
+            - name: Run revocation set generation tests
+              run: scripts/run_in_build_env.sh 'python3 -m unittest -v credentials/generate_revocation_set.py'
 
     build_linux_python_lighting_device:
         name: Build on Linux (python lighting-app)
@@ -371,7 +370,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:81
+            image: ghcr.io/project-chip/chip-build:119
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -439,7 +438,7 @@ jobs:
                   # We want to build various standalone example apps (similar to what examples-linux-standalone.yaml
                   # does), so use target_os="all" to get those picked up as part of the "unified" build.  But then
                   # to save CI resources we want to exclude the "host clang" build, which uses the pigweed clang.
-                  scripts/build/gn_gen.sh --args='target_os="all" is_asan=true enable_host_clang_build=false chip_data_model_check_die_on_failure=true' --export-compile-commands
+                  scripts/build/gn_gen.sh --args='target_os="all" is_asan=true enable_host_clang_build=false' --add-export-compile-commands=*
                   scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
                   scripts/tests/gn_tests.sh
             - name: Ensure codegen is done for default
@@ -486,16 +485,16 @@ jobs:
     build_linux_gcc_coverage:
         name: Build on Linux (coverage)
 
-        runs-on: ubuntu-latest
+        env:
+            TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
+
         if: github.actor != 'restyled-io[bot]'
+        runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:81
-            volumes:
-                - "/:/runner-root-volume"
-                - "/tmp/log_output:/tmp/test_logs"
+            image: ghcr.io/project-chip/chip-build:119
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
-                net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+                net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
         steps:
             - name: Checkout
@@ -504,6 +503,7 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
+                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}                
 
             - name: Run Build Coverage
-              run: ./scripts/build_coverage.sh
+              run: ./scripts/build_coverage.sh --yaml

@@ -98,6 +98,8 @@ char GetAuthModeStringForLogging(AuthMode authMode)
     {
     case AuthMode::kNone:
         return 'n';
+    case AuthMode::kInternalDeviceAccess:
+        return 'i';
     case AuthMode::kPase:
         return 'p';
     case AuthMode::kCase:
@@ -232,7 +234,7 @@ CHIP_ERROR AccessControl::CreateEntry(const SubjectDescriptor * subjectDescripto
 
     VerifyOrReturnError((count + 1) <= maxCount, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
 
     size_t i = 0;
     ReturnErrorOnFailure(mDelegate->CreateEntry(&i, entry, &fabric));
@@ -250,7 +252,7 @@ CHIP_ERROR AccessControl::UpdateEntry(const SubjectDescriptor * subjectDescripto
                                       const Entry & entry)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(mDelegate->UpdateEntry(index, entry, &fabric));
     NotifyEntryChanged(subjectDescriptor, fabric, index, &entry, EntryListener::ChangeType::kUpdated);
     return CHIP_NO_ERROR;

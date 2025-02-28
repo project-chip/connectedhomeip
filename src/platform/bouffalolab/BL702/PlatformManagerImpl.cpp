@@ -79,8 +79,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     ot_radioInit(opt);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-    ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
-
     err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16);
     SuccessOrExit(err);
 

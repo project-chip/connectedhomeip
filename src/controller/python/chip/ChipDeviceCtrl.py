@@ -48,6 +48,7 @@ import dacite  # type: ignore
 from . import FabricAdmin
 from . import clusters as Clusters
 from . import discovery
+from .bdx import Bdx
 from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
 from .clusters import Command as ClusterCommand
@@ -60,6 +61,8 @@ __all__ = ["ChipDeviceController", "CommissioningParameters"]
 
 # Defined in $CHIP_ROOT/src/lib/core/CHIPError.h
 CHIP_ERROR_TIMEOUT: int = 50
+
+_RCACCallbackType = CFUNCTYPE(None, POINTER(c_uint8), c_size_t)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -478,6 +481,7 @@ class ChipDeviceControllerBase():
 
             if err.is_success:
                 self._commissioning_context.future.set_result(nodeId)
+
             else:
                 self._commissioning_context.future.set_exception(err.to_exception())
 
@@ -549,6 +553,7 @@ class ChipDeviceControllerBase():
 
         self.cbHandleCommissioningCompleteFunct = _DevicePairingDelegate_OnCommissioningCompleteFunct(
             HandleCommissioningComplete)
+
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
             self.pairingDelegate, self.cbHandleCommissioningCompleteFunct)
 
@@ -1343,6 +1348,36 @@ class ChipDeviceControllerBase():
         # An empty list is the expected return for sending group write attribute.
         return []
 
+    def TestOnlyPrepareToReceiveBdxData(self) -> asyncio.Future:
+        '''
+        Sets up the system to expect a node to initiate a BDX transfer. The transfer will send data here.
+
+        Returns:
+            - a future that will yield a BdxTransfer with the init message from the transfer.
+        '''
+        self.CheckIsActive()
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        Bdx.PrepareToReceiveBdxData(future).raise_on_error()
+        return future
+
+    def TestOnlyPrepareToSendBdxData(self, data: bytes) -> asyncio.Future:
+        '''
+        Sets up the system to expect a node to initiate a BDX transfer. The transfer will send data to the node.
+
+        Returns:
+            - a future that will yield a BdxTransfer with the init message from the transfer.
+        '''
+        self.CheckIsActive()
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        Bdx.PrepareToSendBdxData(future, data).raise_on_error()
+        return future
+
     def _parseAttributePathTuple(self, pathTuple: typing.Union[
         None,  # Empty tuple, all wildcard
         typing.Tuple[int],  # Endpoint
@@ -1550,8 +1585,7 @@ class ChipDeviceControllerBase():
 
         if result := transaction.GetSubscriptionHandler():
             return result
-        else:
-            return transaction.GetReadResponse()
+        return transaction.GetReadResponse()
 
     async def ReadAttribute(
         self,
@@ -1928,6 +1962,10 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_GetCompletionError.argtypes = []
             self._dmLib.pychip_GetCompletionError.restype = PyChipError
 
+            self._dmLib.pychip_GetCommissioningRCACData.argtypes = [ctypes.POINTER(
+                ctypes.c_uint8), ctypes.POINTER(ctypes.c_size_t), ctypes.c_size_t]
+            self._dmLib.pychip_GetCommissioningRCACData.restype = None
+
             self._dmLib.pychip_DeviceController_IssueNOCChain.argtypes = [
                 c_void_p, py_object, c_char_p, c_size_t, c_uint64]
             self._dmLib.pychip_DeviceController_IssueNOCChain.restype = PyChipError
@@ -1973,6 +2011,15 @@ class ChipDeviceControllerBase():
 
             self._dmLib.pychip_CreateManualCode.restype = PyChipError
             self._dmLib.pychip_CreateManualCode.argtypes = [c_uint16, c_uint32, c_char_p, c_size_t, POINTER(c_size_t)]
+
+            self._dmLib.pychip_DeviceController_SetSkipCommissioningComplete.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetSkipCommissioningComplete.argtypes = [c_bool]
+
+            self._dmLib.pychip_DeviceController_SetTermsAcknowledgements.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetTermsAcknowledgements.argtypes = [c_uint16, c_uint16]
+
+            self._dmLib.pychip_DeviceController_SetDACRevocationSetPath.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetDACRevocationSetPath.argtypes = [c_char_p]
 
 
 class ChipDeviceController(ChipDeviceControllerBase):
@@ -2102,6 +2149,20 @@ class ChipDeviceController(ChipDeviceControllerBase):
             lambda: self._dmLib.pychip_DeviceController_SetDSTOffset(offset, validStarting, validUntil)
         ).raise_on_error()
 
+    def SetTCAcknowledgements(self, tcAcceptedVersion: int, tcUserResponse: int):
+        ''' Set the TC acknowledgements to set during commissioning'''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetTermsAcknowledgements(tcAcceptedVersion, tcUserResponse)
+        ).raise_on_error()
+
+    def SetSkipCommissioningComplete(self, skipCommissioningComplete: bool):
+        ''' Set whether to skip the commissioning complete callback'''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetSkipCommissioningComplete(skipCommissioningComplete)
+        ).raise_on_error()
+
     def SetDefaultNTP(self, defaultNTP: str):
         ''' Set the DefaultNTP to set during commissioning'''
         self.CheckIsActive()
@@ -2199,6 +2260,34 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
             return await asyncio.futures.wrap_future(ctx.future)
 
+    def get_rcac(self):
+        ''' 
+        Passes captured RCAC data back to Python test modules for validation
+        - Setting buffer size to max size mentioned in spec:
+        - Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/policies/matter_certificate_policy.adoc#615-key-sizes
+        '''
+        rcac_size = 400
+        rcac_buffer = (ctypes.c_uint8 * rcac_size)()  # Allocate buffer
+
+        actual_rcac_size = ctypes.c_size_t()
+
+        # Now calling the C++ function with the buffer size set as an additional parameter
+        self._dmLib.pychip_GetCommissioningRCACData(
+            ctypes.cast(rcac_buffer, ctypes.POINTER(ctypes.c_uint8)),
+            ctypes.byref(actual_rcac_size),
+            ctypes.c_size_t(rcac_size)  # Pass the buffer size
+        )
+
+        # Check if data is available
+        if actual_rcac_size.value > 0:
+            # Convert the data to a Python bytes object
+            rcac_data = bytearray(rcac_buffer[:actual_rcac_size.value])
+            rcac_bytes = bytes(rcac_data)
+        else:
+            LOGGER.exception("RCAC returned from C++ did not contain any data")
+            return None
+        return rcac_bytes
+
     async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:
         ''' Commission with the given nodeid from the setupPayload.
             setupPayload may be a QR or manual code.
@@ -2257,6 +2346,18 @@ class ChipDeviceController(ChipDeviceControllerBase):
             )
 
             return await asyncio.futures.wrap_future(ctx.future)
+
+    def SetDACRevocationSetPath(self, dacRevocationSetPath: typing.Optional[str]):
+        ''' Set the path to the device attestation revocation set JSON file.
+
+        Args:
+            dacRevocationSetPath: Path to the JSON file containing the device attestation revocation set
+        '''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetDACRevocationSetPath(
+                c_char_p(str.encode(dacRevocationSetPath) if dacRevocationSetPath else None))
+        ).raise_on_error()
 
 
 class BareChipDeviceController(ChipDeviceControllerBase):

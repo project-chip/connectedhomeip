@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,8 +30,12 @@
 
 #ifdef DEBUG
 #define MTR_TESTABLE MTR_EXPORT
+#define MTR_TESTABLE_DIRECT
+#define MTR_TESTABLE_DIRECT_MEMBERS
 #else
 #define MTR_TESTABLE
+#define MTR_TESTABLE_DIRECT MTR_DIRECT
+#define MTR_TESTABLE_DIRECT_MEMBERS MTR_DIRECT_MEMBERS
 #endif
 
 // clang-format off
@@ -65,6 +69,11 @@ typedef struct {} variable_hidden_by_mtr_hide;
 // Default timed interaction timeout, in ms, if another one is not provided.
 #define MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS 10000
 
+// Useful building block for type-checking machinery.  Uses C-style cast so it
+// can be used in .m files as well.
+#define MTR_SAFE_CAST(object, classname) \
+    ([object isKindOfClass:[classname class]] ? (classname *) (object) : nil)
+
 #pragma mark - XPC Defines
 
 #define MTR_SIMPLE_REMOTE_XPC_GETTER(XPC_CONNECTION, NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, PREFIX)   \
@@ -77,13 +86,14 @@ typedef struct {} variable_hidden_by_mtr_hide;
                                                                                                        \
         @try {                                                                                         \
             [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) { \
-                MTR_LOG_ERROR("Error: %@", error);                                                     \
+                MTR_LOG_ERROR("%@ Error in %@ getter: %@", self, NSStringFromSelector(_cmd), error);   \
             }] PREFIX                                                                                  \
                 GETTER_NAME:^(TYPE returnValue) {                                                      \
                     outValue = returnValue;                                                            \
                 }];                                                                                    \
         } @catch (NSException * exception) {                                                           \
-            MTR_LOG_ERROR("Exception sending XPC messsage: %@", exception);                            \
+            MTR_LOG_ERROR("%@ Exception sending XPC messsage for %@ getter: %@", self,                 \
+                NSStringFromSelector(_cmd), exception);                                                \
             outValue = DEFAULT_VALUE;                                                                  \
         }                                                                                              \
         return outValue;                                                                               \
@@ -97,10 +107,11 @@ typedef struct {} variable_hidden_by_mtr_hide;
                                                                                                       \
         @try {                                                                                        \
             [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {           \
-                MTR_LOG_ERROR("Error: %@", error);                                                    \
+                MTR_LOG_ERROR("%@ Error in %@: %@", self, NSStringFromSelector(_cmd), error);         \
             }] PREFIX ADDITIONAL_ARGUMENTS];                                                          \
         } @catch (NSException * exception) {                                                          \
-            MTR_LOG_ERROR("Exception sending XPC messsage: %@", exception);                           \
+            MTR_LOG_ERROR("%@ Exception sending XPC messsage for %@: %@", self,                       \
+                NSStringFromSelector(_cmd), exception);                                               \
         }                                                                                             \
     }
 
@@ -113,12 +124,13 @@ typedef struct {} variable_hidden_by_mtr_hide;
                                                                                                                     \
         @try {                                                                                                      \
             [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {              \
-                MTR_LOG_ERROR("Error: %@", error);                                                                  \
+                MTR_LOG_ERROR("%@ Error in %@: %@", self, NSStringFromSelector(_cmd), error);                       \
             }] PREFIX ADDITIONAL_ARGUMENTS:^(TYPE returnValue) {                                                    \
                 outValue = returnValue;                                                                             \
             }];                                                                                                     \
         } @catch (NSException * exception) {                                                                        \
-            MTR_LOG_ERROR("Exception sending XPC messsage: %@", exception);                                         \
+            MTR_LOG_ERROR("%@ Exception sending XPC messsage for %@: %@", self, NSStringFromSelector(_cmd),         \
+                exception);                                                                                         \
             outValue = DEFAULT_VALUE;                                                                               \
         }                                                                                                           \
                                                                                                                     \
@@ -179,3 +191,15 @@ typedef struct {} variable_hidden_by_mtr_hide;
 
 #define MTR_ABSTRACT_METHOD() \
     _MTR_ABSTRACT_METHOD_IMPL("%@ or some ancestor must implement %@", self.class, NSStringFromSelector(_cmd))
+
+#pragma mark - Typedefs for some commonly used types.
+
+/**
+ * A data-value as defined in MTRBaseDevice.h.
+ */
+typedef NSDictionary<NSString *, id> * MTRDeviceDataValueDictionary;
+
+/**
+ * A response-value as defined in MTRBaseDevice.h.
+ */
+typedef NSDictionary<NSString *, id> * MTRDeviceResponseValueDictionary;

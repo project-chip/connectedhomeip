@@ -34,6 +34,18 @@ TODO: Make these structures global rather than defining them for each cluster.
     <item name="High" value="0x02"/>
     <item name="Automatic" value="0x03"/>
   </enum>
+
+  <enum name="StreamUsageEnum" type="enum8">
+    <cluster code="0x0551"/>
+    <cluster code="0x0553"/>
+    <cluster code="0x0554"/>
+    <cluster code="0x0555"/>
+    <item name="Internal" value="0x00"/>
+    <item name="Recording" value="0x01"/>
+    <item name="Analysis" value="0x02"/>
+    <item name="LiveView" value="0x03"/>
+  </enum>
+
   <!--
     These are test global items (no cluster attached) for testing only.
     Their usage is defined for UnitTestCluster only.
@@ -43,5 +55,4 @@ TODO: Make these structures global rather than defining them for each cluster.
     <item name="SomeOtherValue" value="0x01"/>
     <item name="FinalValue" value="0x02"/>
   </enum>
-
 </configurator>

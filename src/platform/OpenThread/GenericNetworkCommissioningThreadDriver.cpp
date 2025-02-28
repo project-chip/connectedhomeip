@@ -95,7 +95,7 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
 
     // If no backup could be found, it means that the network configuration has not been modified
     // since the fail-safe was armed, so return with no error.
-    ReturnErrorCodeIf(error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
+    VerifyOrReturnError(error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
 
     if (!GetEnabled())
     {
@@ -189,6 +189,7 @@ void GenericThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * c
         status = Status::kUnknownError;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     if (status == Status::kSuccess && ThreadStackMgrImpl().IsThreadAttached())
     {
         Thread::OperationalDataset currentDataset;
@@ -206,6 +207,7 @@ void GenericThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * c
             status = Status::kUnknownError;
         }
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     if (status == Status::kSuccess &&
         DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork, callback) != CHIP_NO_ERROR)

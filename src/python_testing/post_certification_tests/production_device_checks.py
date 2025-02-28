@@ -36,6 +36,7 @@
 # pip install opencv-python requests click_option_group
 # python src/python_testing/post_certification_tests/production_device_checks.py
 
+import asyncio
 import base64
 import hashlib
 import importlib
@@ -59,15 +60,15 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
 try:
-    from basic_composition_support import BasicCompositionTests
-    from matter_testing_support import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
-                                        run_tests_no_exit)
+    from chip.testing.basic_composition import BasicCompositionTests
+    from chip.testing.matter_testing import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
+                                             run_tests_no_exit)
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-    from basic_composition_support import BasicCompositionTests
-    from matter_testing_support import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
-                                        run_tests_no_exit)
+    from chip.testing.basic_composition import BasicCompositionTests
+    from chip.testing.matter_testing import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
+                                             run_tests_no_exit)
 
 try:
     import fetch_paa_certs_from_dcl
@@ -390,9 +391,9 @@ def run_test(test_class: MatterBaseTest, tests: typing.List[str], test_config: T
     stack = test_config.get_stack()
     controller = test_config.get_controller()
     matter_config = test_config.get_config(tests)
-    ok = run_tests_no_exit(test_class, matter_config, hooks, controller, stack)
-    if not ok:
-        print(f"Test failure. Failed on step: {hooks.get_failures()}")
+    with asyncio.Runner() as runner:
+        if not run_tests_no_exit(test_class, matter_config, runner.get_loop(), hooks, controller, stack):
+            print(f"Test failure. Failed on step: {hooks.get_failures()}")
     return hooks.get_failures()
 
 

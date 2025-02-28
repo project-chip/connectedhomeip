@@ -25,10 +25,17 @@
 #include <cstring>
 #include <lib/support/logging/CHIPLogging.h>
 
-LockManager LockManager::sLock;
-
 using namespace ::chip::DeviceLayer::Internal;
 using namespace EFR32DoorLock::LockInitParams;
+
+namespace {
+LockManager sLock;
+} // namespace
+
+LockManager & LockMgr()
+{
+    return sLock;
+}
 
 CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state, LockParam lockParam)
 {
@@ -133,7 +140,7 @@ bool LockManager::ReadConfigValues()
 {
     size_t outLen;
     SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
-                                     sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
+                                     sizeof(EmberAfPluginDoorLockUserInfo) * MATTER_ARRAY_SIZE(mLockUsers), outLen);
 
     SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
                                      sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes, outLen);
@@ -257,8 +264,11 @@ void LockManager::UnlockAfterUnlatch()
     bool succes = false;
     if (mUnlatchContext.mEndpointId != kInvalidEndpointId)
     {
+        Optional<chip::ByteSpan> pin = (mUnlatchContext.mPinLength)
+            ? MakeOptional(chip::ByteSpan(mUnlatchContext.mPinBuffer, mUnlatchContext.mPinLength))
+            : Optional<chip::ByteSpan>::Missing();
         succes = setLockState(mUnlatchContext.mEndpointId, mUnlatchContext.mFabricIdx, mUnlatchContext.mNodeId,
-                              DlLockState::kUnlocked, mUnlatchContext.mPin, mUnlatchContext.mErr);
+                              DlLockState::kUnlocked, pin, mUnlatchContext.mErr);
     }
 
     if (!succes)

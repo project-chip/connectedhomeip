@@ -44,6 +44,8 @@
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
+#include <credentials/attestation_verifier/TestDACRevocationDelegateImpl.h>
+#include <cstddef> // Added for size_t
 
 using namespace chip;
 
@@ -59,6 +61,15 @@ const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStor
     static chip::Credentials::FileAttestationTrustStore attestationTrustStore{ paaTrustStorePath };
 
     return &attestationTrustStore;
+}
+
+Credentials::DeviceAttestationRevocationDelegate * GetTestAttestationRevocationDelegate(const char * dacRevocationSetPath)
+{
+    VerifyOrReturnValue(dacRevocationSetPath != nullptr, nullptr);
+
+    static Credentials::TestDACRevocationDelegateImpl testDacRevocationDelegate;
+    testDacRevocationDelegate.SetDeviceAttestationRevocationSetPath(dacRevocationSetPath);
+    return &testDacRevocationDelegate;
 }
 
 chip::Python::PlaceholderOperationalCredentialsIssuer sPlaceholderOperationalCredentialsIssuer;
@@ -82,6 +93,8 @@ public:
     }
 
     void SetMaximallyLargeCertsUsed(bool enabled) { mExampleOpCredsIssuer.SetMaximallyLargeCertsUsed(enabled); }
+
+    void SetCertificateValidityPeriod(uint32_t validity) { mExampleOpCredsIssuer.SetCertificateValidityPeriod(validity); }
 
 private:
     CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
@@ -112,6 +125,7 @@ class TestCommissioner : public chip::Controller::AutoCommissioner
 public:
     TestCommissioner() { Reset(); }
     ~TestCommissioner() {}
+
     CHIP_ERROR SetCommissioningParameters(const chip::Controller::CommissioningParameters & params) override
     {
         mIsWifi   = false;
@@ -149,6 +163,31 @@ public:
             return CHIP_NO_ERROR;
         }
 
+        if (report.stageCompleted == chip::Controller::CommissioningStage::kGenerateNOCChain)
+        {
+            if (report.Is<chip::Controller::NocChain>())
+            {
+
+                auto nocChain = report.Get<chip::Controller::NocChain>().rcac;
+
+                // Convert RCAC to CHIP cert format to be deciphered by TLV later in python3
+                std::vector<uint8_t> chipRcac(Credentials::kMaxCHIPCertLength);
+                MutableByteSpan chipRcacSpan(chipRcac.data(), chipRcac.size());
+                chip::Credentials::ConvertX509CertToChipCert(nocChain, chipRcacSpan);
+
+                mCHIPRCACData.assign(chipRcacSpan.data(), chipRcacSpan.data() + chipRcacSpan.size());
+
+                if (!mCHIPRCACData.empty())
+                {
+                    ChipLogProgress(Controller, "RCAC data converted and stored.");
+                }
+                else
+                {
+                    ChipLogError(Controller, "RCAC data is empty. No data to log.");
+                }
+            }
+        }
+
         if (mPrematureCompleteAfter != chip::Controller::CommissioningStage::kError &&
             report.stageCompleted == chip::Controller::CommissioningStage::kSendComplete)
         {
@@ -162,7 +201,7 @@ public:
                 mCompletionError = err;
             }
         }
-        if (report.stageCompleted == chip::Controller::CommissioningStage::kReadCommissioningInfo2)
+        if (report.stageCompleted == chip::Controller::CommissioningStage::kReadCommissioningInfo)
         {
             mReadCommissioningInfo = report.Get<chip::Controller::ReadCommissioningInfo>();
         }
@@ -262,7 +301,9 @@ public:
         mCompletionError        = CHIP_NO_ERROR;
     }
     bool GetTestCommissionerUsed() { return mTestCommissionerUsed; }
+
     void OnCommissioningSuccess(chip::PeerId peerId) { mReceivedCommissioningSuccess = true; }
+
     void OnCommissioningFailure(chip::PeerId peerId, CHIP_ERROR error, chip::Controller::CommissioningStage stageFailed,
                                 chip::Optional<chip::Credentials::AttestationVerificationResult> additionalErrorInfo)
     {
@@ -294,7 +335,10 @@ public:
 
     CHIP_ERROR GetCompletionError() { return mCompletionError; }
 
+    const std::vector<uint8_t> & GetCHIPRCACData() const { return mCHIPRCACData; }
+
 private:
+    std::vector<uint8_t> mCHIPRCACData;
     static constexpr uint8_t kNumCommissioningStages = chip::to_underlying(chip::Controller::CommissioningStage::kCleanup) + 1;
     chip::Controller::CommissioningStage mSimulateFailureOnStage            = chip::Controller::CommissioningStage::kError;
     chip::Controller::CommissioningStage mFailOnReportAfterStage            = chip::Controller::CommissioningStage::kError;
@@ -391,6 +435,7 @@ void pychip_OnCommissioningSuccess(PeerId peerId)
 {
     sTestCommissioner.OnCommissioningSuccess(peerId);
 }
+
 void pychip_OnCommissioningFailure(chip::PeerId peerId, CHIP_ERROR error, chip::Controller::CommissioningStage stageFailed,
                                    chip::Optional<chip::Credentials::AttestationVerificationResult> additionalErrorInfo)
 {
@@ -413,9 +458,9 @@ PyChipError pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(
     uint8_t * rcac, uint32_t rcacLen, const uint8_t * ipk, uint32_t ipkLen, chip::VendorId adminVendorId,
     bool enableServerInteractions)
 {
-    ReturnErrorCodeIf(nocLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
-    ReturnErrorCodeIf(icacLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
-    ReturnErrorCodeIf(rcacLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(nocLen <= Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(icacLen <= Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(rcacLen <= Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
 
     ChipLogDetail(Controller, "Creating New Device Controller");
 
@@ -490,7 +535,8 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
 
     // Initialize device attestation verifier
     const chip::Credentials::AttestationTrustStore * testingRootStore = GetTestFileAttestationTrustStore(paaTrustStorePath);
-    SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+    chip::Credentials::DeviceAttestationVerifier * dacVerifier        = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
+    SetDeviceAttestationVerifier(dacVerifier);
 
     chip::Crypto::P256Keypair ephemeralKey;
     chip::Crypto::P256Keypair * controllerKeyPair;
@@ -507,15 +553,15 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     }
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
-    ReturnErrorCodeIf(!noc.Alloc(Controller::kMaxCHIPDERCertLength), ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(noc.Alloc(Controller::kMaxCHIPDERCertLength), ToPyChipError(CHIP_ERROR_NO_MEMORY));
     MutableByteSpan nocSpan(noc.Get(), Controller::kMaxCHIPDERCertLength);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
-    ReturnErrorCodeIf(!icac.Alloc(Controller::kMaxCHIPDERCertLength), ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(icac.Alloc(Controller::kMaxCHIPDERCertLength), ToPyChipError(CHIP_ERROR_NO_MEMORY));
     MutableByteSpan icacSpan(icac.Get(), Controller::kMaxCHIPDERCertLength);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
-    ReturnErrorCodeIf(!rcac.Alloc(Controller::kMaxCHIPDERCertLength), ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(rcac.Alloc(Controller::kMaxCHIPDERCertLength), ToPyChipError(CHIP_ERROR_NO_MEMORY));
     MutableByteSpan rcacSpan(rcac.Get(), Controller::kMaxCHIPDERCertLength);
 
     CATValues catValues;
@@ -544,6 +590,7 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     initParams.controllerVendorId                   = adminVendorId;
     initParams.permitMultiControllerFabrics         = true;
     initParams.hasExternallyOwnedOperationalKeypair = operationalKey != nullptr;
+    initParams.deviceAttestationVerifier            = dacVerifier;
 
     if (useTestCommissioner)
     {
@@ -601,6 +648,15 @@ PyChipError pychip_OpCreds_SetMaximallyLargeCertsUsed(OpCredsContext * context, 
     VerifyOrReturnError(context != nullptr && context->mAdapter != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
 
     context->mAdapter->SetMaximallyLargeCertsUsed(enabled);
+
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_OpCreds_SetCertificateValidityPeriod(OpCredsContext * context, uint32_t validity)
+{
+    VerifyOrReturnError(context != nullptr && context->mAdapter != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
+
+    context->mAdapter->SetCertificateValidityPeriod(validity);
 
     return ToPyChipError(CHIP_NO_ERROR);
 }
@@ -687,4 +743,44 @@ PyChipError pychip_GetCompletionError()
     return ToPyChipError(sTestCommissioner.GetCompletionError());
 }
 
+PyChipError pychip_DeviceController_SetDACRevocationSetPath(const char * dacRevocationSetPath)
+{
+    Credentials::DeviceAttestationRevocationDelegate * dacRevocationDelegate =
+        GetTestAttestationRevocationDelegate(dacRevocationSetPath);
+    VerifyOrReturnError(dacRevocationDelegate != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    Credentials::DeviceAttestationVerifier * dacVerifier = Credentials::GetDeviceAttestationVerifier();
+    VerifyOrReturnError(dacVerifier != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
+
+    return ToPyChipError(dacVerifier->SetRevocationDelegate(dacRevocationDelegate));
+}
+
+extern "C" {
+// Function to get the RCAC data from the sTestCommissioner
+void pychip_GetCommissioningRCACData(uint8_t * rcacDataPtr, size_t * rcacSize, size_t bufferSize)
+{
+    // Attempting to get Python RCAC data in C++
+    const auto & rcacData = sTestCommissioner.GetCHIPRCACData();
+
+    if (rcacData.empty())
+    {
+        ChipLogError(Controller, "RCAC data is empty in C++. Nothing to return.");
+        *rcacSize = 0;
+        return;
+    }
+
+    // Check if the provided buffer is too small
+    if (bufferSize < rcacData.size())
+    {
+        ChipLogError(Controller, "Allocated buffer size (%lu) is too small. RCAC data was size (%lu). Returning zero-sized buffer.",
+                     static_cast<unsigned long>(bufferSize), static_cast<unsigned long>(rcacData.size()));
+        *rcacSize = 0;
+        return;
+    }
+
+    // Copy the data from C++ to Python's allocated memory
+    std::memcpy(rcacDataPtr, rcacData.data(), rcacData.size());
+    *rcacSize = rcacData.size();
+}
+}
 } // extern "C"

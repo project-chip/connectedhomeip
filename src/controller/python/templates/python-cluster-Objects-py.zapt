@@ -6,6 +6,7 @@
 # Users are not expected to import this file, instead, users can use import chip.clusters,
 # which will import all symbols from this file and can get a readable, pretty naming like
 # clusters.OnOff.commands.OnCommand
+from __future__ import annotations
 
 import typing
 from dataclasses import dataclass, field
@@ -76,9 +77,9 @@ class {{asUpperCamelCase name}}(Cluster):
 
 {{#zcl_attributes_server}}
 {{#if entryType}}
-    {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}' = None
+    {{ asLowerCamelCase label }}: {{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}} = {{getPythonFieldDefault entryType ns=(asUpperCamelCase parent.name)}}
 {{else}}
-    {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}' = None
+    {{ asLowerCamelCase label }}: {{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}} = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.name)}}
 {{/if}}
 {{/zcl_attributes_server}}
 
@@ -121,7 +122,7 @@ class {{asUpperCamelCase name}}(Cluster):
             {{~#if responseName}}
             response_type: typing.ClassVar[str] = '{{asUpperCamelCase responseName}}'
             {{else}}
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
             {{/if}}
 
             @ChipUtility.classproperty
@@ -142,7 +143,7 @@ class {{asUpperCamelCase name}}(Cluster):
             {{#first}}
 
             {{/first}}
-            {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
+            {{ asLowerCamelCase label }}: {{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}} = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
             {{/zcl_command_arguments}}
 
 {{/zcl_commands}}
@@ -175,9 +176,9 @@ class {{asUpperCamelCase name}}(Cluster):
             {{/if}}
 
             {{#if entryType}}
-            value: '{{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}' = {{getPythonFieldDefault entryType ns=(asUpperCamelCase parent.name)}}
+            value: {{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}} = {{getPythonFieldDefault entryType ns=(asUpperCamelCase parent.name)}}
             {{else}}
-            value: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.name)}}
+            value: {{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}} = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.name)}}
             {{/if}}
 
 {{/zcl_attributes_server}}
@@ -207,7 +208,7 @@ class {{asUpperCamelCase name}}(Cluster):
             {{#first}}
 
             {{/first}}
-            {{ asLowerCamelCase name }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
+            {{ asLowerCamelCase name }}: {{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}} = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
             {{/zcl_event_fields}}
 
 {{/zcl_events}}

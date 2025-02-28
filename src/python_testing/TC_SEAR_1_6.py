@@ -41,7 +41,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -85,7 +85,7 @@ class TC_SEAR_1_6(MatterBaseTest):
 
     @async_test_body
     async def test_TC_SEAR_1_6(self):
-        self.endpoint = self.matter_test_config.endpoint
+        self.endpoint = self.get_endpoint()
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         if self.is_ci:

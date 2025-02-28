@@ -34,7 +34,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
-#       --endpoint 1
+#       --endpoint 2
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -45,7 +45,7 @@
 import logging
 
 import chip.clusters as Clusters
-from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EWATERHTRBase import EWATERHTRBase
 
@@ -166,7 +166,7 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
         events_callback = EventChangeCallback(Clusters.WaterHeaterManagement)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
-                                    self.matter_test_config.endpoint)
+                                    self.get_endpoint())
 
         self.step("3")
         await self.check_test_event_triggers_enabled()

@@ -616,6 +616,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTROperationalCredentialsClusterSetVidVerificationStatementParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTROperationalCredentialsClusterSignVidVerificationRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTROperationalCredentialsClusterSignVidVerificationResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRGroupKeyManagementClusterKeySetWriteParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -706,12 +724,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTROvenCavityOperationalStateClusterPauseParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
 @interface MTROvenCavityOperationalStateClusterStopParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -719,12 +731,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTROvenCavityOperationalStateClusterStartParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTROvenCavityOperationalStateClusterResumeParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
@@ -1420,6 +1426,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRClosureControlClusterStopParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRClosureControlClusterMoveToParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRClosureControlClusterCalibrateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRClosureControlClusterConfigureFallbackParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRClosureControlClusterCancelFallbackParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRServiceAreaClusterSelectAreasParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -2068,6 +2104,126 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRCameraAVStreamManagementClusterAudioStreamAllocateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterAudioStreamAllocateResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamAllocateResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterAudioStreamDeallocateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterVideoStreamAllocateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterVideoStreamAllocateResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamAllocateResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterVideoStreamModifyParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterVideoStreamDeallocateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterSnapshotStreamAllocateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterSnapshotStreamAllocateResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamAllocateResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterSnapshotStreamDeallocateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterSetStreamPrioritiesParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterCaptureSnapshotParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterCaptureSnapshotResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshotResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRCameraAVSettingsUserLevelManagementClusterMPTZSetPositionParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVSettingsUserLevelManagementClusterMPTZRelativeMoveParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVSettingsUserLevelManagementClusterMPTZMoveToPresetParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVSettingsUserLevelManagementClusterMPTZSavePresetParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVSettingsUserLevelManagementClusterMPTZRemovePresetParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVSettingsUserLevelManagementClusterDPTZSetViewportParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVSettingsUserLevelManagementClusterDPTZRelativeMoveParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRWebRTCTransportProviderClusterSolicitOfferParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -2098,7 +2254,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRWebRTCTransportProviderClusterProvideICECandidateParams (InternalMethods)
+@interface MTRWebRTCTransportProviderClusterProvideICECandidatesParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
@@ -2122,7 +2278,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRWebRTCTransportRequestorClusterICECandidateParams (InternalMethods)
+@interface MTRWebRTCTransportRequestorClusterICECandidatesParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
@@ -2131,6 +2287,54 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRWebRTCTransportRequestorClusterEndParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRPushAVStreamTransportClusterAllocatePushTransportParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRPushAVStreamTransportClusterAllocatePushTransportResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::PushAvStreamTransport::Commands::AllocatePushTransportResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRPushAVStreamTransportClusterDeallocatePushTransportParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRPushAVStreamTransportClusterModifyPushTransportParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRPushAVStreamTransportClusterSetTransportStatusParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRPushAVStreamTransportClusterManuallyTriggerTransportParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRPushAVStreamTransportClusterFindTransportParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRPushAVStreamTransportClusterFindTransportResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::PushAvStreamTransport::Commands::FindTransportResponse::DecodableType &)decodableStruct;
 
 @end
 
@@ -2155,6 +2359,102 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRCommissionerControlClusterReverseOpenCommissioningWindowParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CommissionerControl::Commands::ReverseOpenCommissioningWindow::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRTLSCertificateManagementClusterProvisionRootCertificateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRTLSCertificateManagementClusterProvisionRootCertificateResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificateResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRTLSCertificateManagementClusterFindRootCertificateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRTLSCertificateManagementClusterFindRootCertificateResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::FindRootCertificateResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRTLSCertificateManagementClusterLookupRootCertificateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRTLSCertificateManagementClusterLookupRootCertificateResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::LookupRootCertificateResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRTLSCertificateManagementClusterRemoveRootCertificateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRTLSCertificateManagementClusterTLSClientCSRParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRTLSCertificateManagementClusterTLSClientCSRResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSRResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRTLSCertificateManagementClusterProvisionClientCertificateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRTLSCertificateManagementClusterProvisionClientCertificateResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificateResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRTLSCertificateManagementClusterFindClientCertificateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRTLSCertificateManagementClusterFindClientCertificateResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRTLSCertificateManagementClusterLookupClientCertificateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRTLSCertificateManagementClusterLookupClientCertificateResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificateResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRTLSCertificateManagementClusterRemoveClientCertificateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 

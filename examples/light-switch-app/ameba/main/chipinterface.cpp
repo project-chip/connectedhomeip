@@ -17,6 +17,7 @@
 
 #include <platform_stdlib.h>
 
+#include "AmebaObserver.h"
 #include "BindingHandler.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
@@ -28,12 +29,13 @@
 
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/endpoint-config-api.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/ErrorStr.h>
 #include <platform/Ameba/AmebaConfig.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #if CONFIG_ENABLE_AMEBA_CRYPTO
 #include <platform/Ameba/crypto/AmebaPersistentStorageOperationalKeystore.h>
 #endif
@@ -103,12 +105,15 @@ static void InitServer(intptr_t context)
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 #if CONFIG_ENABLE_AMEBA_CRYPTO
     ChipLogProgress(DeviceLayer, "platform crypto enabled!");
     static chip::AmebaPersistentStorageOperationalKeystore sAmebaPersistentStorageOpKeystore;
     VerifyOrDie((sAmebaPersistentStorageOpKeystore.Init(initParams.persistentStorageDelegate)) == CHIP_NO_ERROR);
     initParams.operationalKeystore = &sAmebaPersistentStorageOpKeystore;
 #endif
+    static AmebaObserver sAmebaObserver;
+    initParams.appDelegate = &sAmebaObserver;
     chip::Server::GetInstance().Init(initParams);
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
@@ -124,6 +129,7 @@ static void InitServer(intptr_t context)
 #if CONFIG_ENABLE_CHIP_SHELL
     InitBindingHandler();
 #endif
+    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);
 }
 
 extern "C" void ChipTest(void)

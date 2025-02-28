@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 103,
+  "featureLevel": 106,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -41,14 +41,16 @@
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
-        "name": "MA-rootdevice"
+        "name": "MA-rootdevice",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice"
+          "name": "MA-rootdevice",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -2349,14 +2351,16 @@
         "code": 773,
         "profileId": 259,
         "label": "MA-pressuresensor",
-        "name": "MA-pressuresensor"
+        "name": "MA-pressuresensor",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 773,
           "profileId": 259,
           "label": "MA-pressuresensor",
-          "name": "MA-pressuresensor"
+          "name": "MA-pressuresensor",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -2721,7 +2725,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0xfffe",
+              "defaultValue": "32767",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

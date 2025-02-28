@@ -62,9 +62,24 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[]   
 #include "chef-dishwasher-mode-delegate-impl.h"
 #endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
 
+#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
+#include "chef-laundry-washer-mode.h"
+#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_CONTROLS_SERVER
+#include "chef-laundry-washer-controls-delegate-impl.h"
+#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_CONTROLS_SERVER
+
 #ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
 #include "chef-operational-state-delegate-impl.h"
 #endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
+#include "chef-fan-control-manager.h"
+#endif // MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
+#ifdef MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
+#include "temperature-control/static-supported-temperature-levels.h"
+#endif // MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
 
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
@@ -124,6 +139,10 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
     case chip::app::Clusters::DishwasherMode::Id:
         return chefDishwasherModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
 #endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
+#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
+    case chip::app::Clusters::LaundryWasherMode::Id:
+        return chefLaundryWasherModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
 #ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::OperationalState::Id:
         return chefOperationalStateReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
@@ -202,6 +221,10 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     case chip::app::Clusters::DishwasherMode::Id:
         return chefDishwasherModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
 #endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
+#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
+    case chip::app::Clusters::LaundryWasherMode::Id:
+        return chefLaundryWasherModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
 #ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::OperationalState::Id:
         return chefOperationalStateWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
@@ -233,6 +256,12 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
         // WIP Apply attribute change to Light
     }
+#ifdef MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
+    else if (clusterId == FanControl::Id)
+    {
+        HandleFanControlAttributeChange(attributeId, type, size, value);
+    }
+#endif // MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
 }
 
 /** @brief OnOff Cluster Init
@@ -249,17 +278,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  *
  */
 void emberAfOnOffClusterInitCallback(EndpointId endpoint) {}
-
-#ifdef MATTER_DM_PLUGIN_AUDIO_OUTPUT_SERVER
-#include "audio-output/AudioOutputManager.h"
-static AudioOutputManager audioOutputManager;
-
-void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Linux App: AudioOutput::SetDefaultDelegate");
-    AudioOutput::SetDefaultDelegate(endpoint, &audioOutputManager);
-}
-#endif
 
 #ifdef MATTER_DM_PLUGIN_CHANNEL_SERVER
 #include "channel/ChannelManager.h"
@@ -318,11 +336,11 @@ void emberAfWakeOnLanClusterInitCallback(EndpointId endpoint)
 
 void ApplicationInit()
 {
-    ChipLogProgress(NotSpecified, "Chef Application Init !!!")
+    ChipLogProgress(NotSpecified, "Chef Application Init !!!");
 
 #ifdef MATTER_DM_PLUGIN_REFRIGERATOR_ALARM_SERVER
-        // set Parent Endpoint and Composition Type for an Endpoint
-        EndpointId kRefEndpointId       = 1;
+    // set Parent Endpoint and Composition Type for an Endpoint
+    EndpointId kRefEndpointId           = 1;
     EndpointId kColdCabinetEndpointId   = 2;
     EndpointId kFreezeCabinetEndpointId = 3;
     SetTreeCompositionForEndpoint(kRefEndpointId);
@@ -336,7 +354,7 @@ void ApplicationInit()
 
 void ApplicationShutdown()
 {
-    ChipLogProgress(NotSpecified, "Chef Application Down !!!")
+    ChipLogProgress(NotSpecified, "Chef Application Down !!!");
 }
 
 // No-op function, used to force linking this file,

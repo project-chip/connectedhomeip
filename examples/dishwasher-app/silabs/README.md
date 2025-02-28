@@ -10,6 +10,7 @@ An example showing the use of Matter on the Silicon Labs EFR32 MG24 boards.
     -   [Flashing the Application](#flashing-the-application)
     -   [Viewing Logging Output](#viewing-logging-output)
     -   [Running the Complete Example](#running-the-complete-example)
+        -   [Commissioning](#commissioning)
 
 <hr>
 
@@ -211,6 +212,7 @@ combination with JLinkRTTClient as follows:
         -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
             for 30 seconds. The device will then switch to a slower interval advertisement.
             After 15 minutes, the advertisement stops.
+            Additionally, it will cycle through the QR code, application status screen and device status screen, respectively.
 
         -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
             Releasing the button within the 6-second window cancels the factory reset
@@ -228,7 +230,7 @@ You can provision and control the Matter device using the python controller,
 Silabs provides `chip-tool` as a wrapper function and more user-friendly method
 of using [chip-tool](../../chip-tool/README.md) within the pre-built Raspberry
 Pi image. For more info on using `chip-tool`, see
-[Chiptool](../../../docs/guides/chip_tool_guide.md).
+[Chiptool](../../../docs/development_controllers/chip-tool/chip_tool_guide.md).
 
 Here is an example using `chip-tool`:
 

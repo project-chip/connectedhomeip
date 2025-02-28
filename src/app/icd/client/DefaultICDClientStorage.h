@@ -120,6 +120,18 @@ public:
     CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo,
                                      Protocols::SecureChannel::CounterType & counter) override;
 
+    /**
+     * Shut down DefaultICDClientStorage
+     *
+     */
+    void Shutdown();
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    size_t GetFabricListSize() { return mFabricList.size(); }
+
+    PersistentStorageDelegate * GetClientInfoStore() { return mpClientInfoStore; }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
 protected:
     enum class ClientInfoTag : uint8_t
     {
@@ -173,8 +185,11 @@ protected:
 
 private:
     friend class ICDClientInfoIteratorImpl;
+    CHIP_ERROR StoreFabricList();
     CHIP_ERROR LoadFabricList();
     CHIP_ERROR LoadCounter(FabricIndex fabricIndex, size_t & count, size_t & clientInfoSize);
+
+    bool FabricExists(FabricIndex fabricIndex);
 
     CHIP_ERROR IncreaseEntryCountForFabric(FabricIndex fabricIndex);
     CHIP_ERROR DecreaseEntryCountForFabric(FabricIndex fabricIndex);

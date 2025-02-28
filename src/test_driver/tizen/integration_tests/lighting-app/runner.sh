@@ -21,6 +21,10 @@ set -e
 # Print CHIP logs on stdout
 dlogutil CHIP &
 
+# Set the correct path for .gcda files
+export GCOV_PREFIX=/mnt/chip
+export GCOV_PREFIX_STRIP=5
+
 # Install lighting Matter app
 pkgcmd -i -t tpk -p /mnt/chip/org.tizen.matter.*/out/org.tizen.matter.*.tpk
 # Launch lighting Matter app
