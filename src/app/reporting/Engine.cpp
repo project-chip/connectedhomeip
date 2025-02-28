@@ -79,7 +79,7 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
     // privilege and default to kView (this is correct for global attributes and a reasonable check
     // for others)
     Privilege requiredPrivilege = Privilege::kView;
-    if (info.has_value() && info->readPrivilegeHasValue())
+    if (info.has_value() && info->ReadAllowed())
     {
         // attribute exists and is readable, set the correct read privilege
         requiredPrivilege = info->GetReadPrivilege();
@@ -108,7 +108,7 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
         //             this SHOULD be done here when info does not have a value. This was not done as a first pass to
         //             minimize amount of delta in the initial PR.
         //           - "write-only" attributes should return UNSUPPORTED_READ (this is done here)
-        if (info.has_value() && !info->readPrivilegeHasValue())
+        if (info.has_value() && !info->ReadAllowed())
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedRead);
         }

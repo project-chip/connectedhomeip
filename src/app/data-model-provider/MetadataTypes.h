@@ -22,7 +22,6 @@
 #include <access/Privilege.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
-#include <assert.h>
 
 namespace chip {
 namespace app {
@@ -86,29 +85,13 @@ enum class AttributeQualityFlags : uint32_t
 };
 
 
-struct attribute_entry_mask_t {
-
-    // attribute quality flags
-    //
-    std::underlying_type_t<AttributeQualityFlags> flags : 7 ;  // generally defaults to View if readable
-
-    // read/write access privilege variables
-    //
-    std::underlying_type_t<Access::Privilege> readPrivilege : 5 ;  // generally defaults to View if readable
-    std::underlying_type_t<Access::Privilege> writePrivilege : 5 ; // generally defaults to Operate if writable
-
-};
-
-
-// Static ASSERT to check size of mask type.
-static_assert(sizeof(attribute_entry_mask_t) <= 4, "Size of attribute_entry_mask_t is not as expected.");
-
 // zero is not a valid privilege, just a default initial value for privileges
 constexpr std::underlying_type_t<Access::Privilege> kNoPrivilege(0) ;
 
 
 struct AttributeEntry
 {
+
     AttributeId attributeId;
 
     // Constructor
@@ -121,10 +104,6 @@ struct AttributeEntry
         static_assert(sizeof(std::underlying_type_t<Access::Privilege>) >= 
                       sizeof(chip::to_underlying(r)),
                       "Size of readPrivilege is not able to accomodate parameter (r).");
-
-        // ASSERT to validate entry parameter value.
-        assert(kNoPrivilege != chip::to_underlying(r));
-
 
         mask.readPrivilege = chip::to_underlying(r);
     }
@@ -140,9 +119,6 @@ struct AttributeEntry
         static_assert(sizeof(std::underlying_type_t<Access::Privilege>) >= 
                       sizeof(chip::to_underlying(w)),
                       "Size of writePrivilege is not able to accomodate parameter (w).");
-
-        // ASSERT to validate entry parameter value.
-        assert(kNoPrivilege != chip::to_underlying(w));
 
         mask.writePrivilege = chip::to_underlying(w);
     }
@@ -169,13 +145,30 @@ struct AttributeEntry
 
     constexpr bool FlagsHas(AttributeQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }   
 
-    bool readPrivilegeHasValue() {return mask.readPrivilege;}
-    bool writePrivilegeHasValue() {return mask.writePrivilege;}
+    bool ReadAllowed() {return mask.readPrivilege != kNoPrivilege;}
+    bool WriteAllowed() {return mask.writePrivilege != kNoPrivilege;}
 
 
     private:
 
-       attribute_entry_mask_t mask;
+        struct attribute_entry_mask_t {
+
+            // attribute quality flags
+            //
+            std::underlying_type_t<AttributeQualityFlags> flags : 7 ;
+
+            // read/write access privilege variables
+            //
+            std::underlying_type_t<Access::Privilege> readPrivilege : 5 ;
+            std::underlying_type_t<Access::Privilege> writePrivilege : 5 ;
+
+        };
+
+        
+        // Static ASSERT to check size of mask type "attribute_entry_mask_t".
+        static_assert(sizeof(attribute_entry_mask_t) <= 4, "Size of attribute_entry_mask_t is not as expected.");
+
+        attribute_entry_mask_t mask;
 
 };
 
@@ -188,24 +181,6 @@ enum class CommandQualityFlags : uint32_t
     kTimed        = 0x0002, // `T` quality on commands
     kLargeMessage = 0x0004, // `L` quality on commands
 };
-
-
-
-struct accepted_command_entry_mask_t {
-
-    // command quality flags
-    //
-    std::underlying_type_t<CommandQualityFlags> flags : 3 ;  // generally defaults to View if readable
-
-    // invoke privilege variable
-    //
-    std::underlying_type_t<Access::Privilege> invokePrivilege : 5 ;
-
-};
-
-
-// Static ASSERT to check size of mask type.
-static_assert(sizeof(accepted_command_entry_mask_t) <= 4, "Size of accepted_command_entry_mask_t is not as expected.");
 
 
 
@@ -225,9 +200,6 @@ struct AcceptedCommandEntry
         static_assert(sizeof(std::underlying_type_t<Access::Privilege>) >= 
                       sizeof(chip::to_underlying(i)),
                       "Size of invokePrivilege is not able to accomodate parameter (i).");
-
-        // ASSERT to validate entry parameter value.
-        assert(kNoPrivilege != chip::to_underlying(i));
 
         mask.invokePrivilege = chip::to_underlying(i);
     }
@@ -258,7 +230,23 @@ struct AcceptedCommandEntry
     
     private:
 
-       accepted_command_entry_mask_t mask;
+        struct accepted_command_entry_mask_t {
+
+            // command quality flags
+            //
+            std::underlying_type_t<CommandQualityFlags> flags : 3 ;  // generally defaults to View if readable
+
+            // invoke privilege variable
+            //
+            std::underlying_type_t<Access::Privilege> invokePrivilege : 5 ;
+
+        };
+
+
+        // Static ASSERT to check size of mask type "accepted_command_entry_mask_t".
+        static_assert(sizeof(accepted_command_entry_mask_t) <= 4, "Size of accepted_command_entry_mask_t is not as expected.");
+    
+        accepted_command_entry_mask_t mask;
        
 };
 
