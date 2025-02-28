@@ -4,7 +4,7 @@ not_automated:
     - name: MinimalRepresentation.py
       reason: Code/Test not being used or not shared code for any other tests
     - name: TC_CNET_4_3.py
-      reason: 
+      reason:
           network commissioning cluster does not return expected values on linux example apps -
           https://github.com/project-chip/connectedhomeip/issues/37824
     - name: TC_CNET_4_4.py
