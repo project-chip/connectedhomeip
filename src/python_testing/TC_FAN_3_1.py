@@ -592,7 +592,7 @@ class TC_FAN_3_1(MatterBaseTest):
 
         # Logging supported fan modes
         logging.info(f"[FC] *** Supported fan modes: {self.fan_mode_sequence.name}")
-        
+
         # Logging MultiSpeed feature support
         logging.info(f"[FC] *** MultiSpeed feature supported: {self.supports_multispeed}")
 
