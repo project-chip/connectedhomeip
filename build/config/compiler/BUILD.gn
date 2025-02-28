@@ -673,5 +673,7 @@ config("specs_default") {
 }
 
 config("link_as_needed") {
-  ldflags = [ "-Wl,--as-needed" ]
+  if (current_os == "linux" and is_clang) {
+    ldflags = [ "-Wl,--as-needed" ]
+  }
 }
