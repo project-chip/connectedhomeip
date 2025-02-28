@@ -156,6 +156,8 @@ class TC_CNET_4_1(MatterBaseTest):
         supported_wifi_bands = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.SupportedWiFiBands)
+        matter_asserts.assert_list_element_type(supported_wifi_bands, Clusters.NetworkCommissioning.Enums.WiFiBandEnum,
+                                                "Verify that SupportedWiFiBands attribute value has 1 or more entries, all of which are in the range of WiFiBandEnum.")
 
 
 if __name__ == "__main__":
