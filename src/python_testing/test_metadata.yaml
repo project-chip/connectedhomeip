@@ -51,6 +51,8 @@ not_automated:
           run against an app
     - name: TestIdChecks.py
       reason: Unit test - does not run against an app
+    - name: TestCreateNewController.py
+      reason: Unit test - does not run against an app
     - name: TestSpecParsingDeviceType.py
       reason: Unit test - does not run against an app
     - name: TestConformanceTest.py
