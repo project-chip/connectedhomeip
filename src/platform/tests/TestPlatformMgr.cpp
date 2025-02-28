@@ -205,7 +205,6 @@ TEST_F(TestPlatformMgr, RunEventLoopStopBeforeSleep)
     PlatformMgr().Shutdown();
 }
 
-// Disabled for systems that do not support stack locking (e.g. Darwin).
 #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
 TEST_F(TestPlatformMgr, TryLockChipStack)
 {
