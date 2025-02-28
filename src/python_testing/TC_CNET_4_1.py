@@ -115,13 +115,14 @@ class TC_CNET_4_1(MatterBaseTest):
         scan_max_time_seconds = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.ScanMaxTimeSeconds)
-        matter_asserts.assert_int_in_range(max_networks_count, min_value=1, max_value=255, description="ScanMaxTimeSeconds")
+        matter_asserts.assert_int_in_range(scan_max_time_seconds, min_value=1, max_value=255, description="ScanMaxTimeSeconds")
 
         self.step(6)
-        scan_max_time_seconds = await self.read_single_attribute_check_success(
+        connect_max_time_seconds = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.ConnectMaxTimeSeconds)
-        matter_asserts.assert_int_in_range(max_networks_count, min_value=1, max_value=255, description="ConnectMaxTimeSeconds")
+        matter_asserts.assert_int_in_range(connect_max_time_seconds, min_value=1,
+                                           max_value=255, description="ConnectMaxTimeSeconds")
 
         self.step(7)
         interface_enabled = await self.read_single_attribute_check_success(
