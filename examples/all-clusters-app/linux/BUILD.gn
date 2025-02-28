@@ -34,6 +34,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/boolcfg-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/chime-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/dishwasher-alarm-stub.cpp",
