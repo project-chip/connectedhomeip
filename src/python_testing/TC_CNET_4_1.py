@@ -112,19 +112,31 @@ class TC_CNET_4_1(MatterBaseTest):
                                   "Number of entries in the Networks attribute is less than or equal to 'MaxNetworksValue'")
 
         self.step(5)
+        scan_max_time_seconds = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.ScanMaxTimeSeconds)
+        matter_asserts.assert_int_in_range(max_networks_count, min_value=1, max_value=255, description="ScanMaxTimeSeconds")
+
+        self.step(6)
+        scan_max_time_seconds = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.ConnectMaxTimeSeconds)
+        matter_asserts.assert_int_in_range(max_networks_count, min_value=1, max_value=255, description="ConnectMaxTimeSeconds")
+
+        self.step(7)
         interface_enabled = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.InterfaceEnabled)
         asserts.assert_true(interface_enabled, "Verify that InterfaceEnabled attribute value is true")
 
-        self.step(6)
+        self.step(8)
         last_networking_status = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkingStatus)
         expected_status = Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess
         asserts.assert_is(last_networking_status, expected_status, "Verify that LastNetworkingStatus attribute value is success")
 
-        self.step(7)
+        self.step(9)
         last_network_id = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkID)
@@ -134,11 +146,16 @@ class TC_CNET_4_1(MatterBaseTest):
         asserts.assert_true(isinstance(last_network_id, bytes) and 1 <= len(last_network_id) <= 32,
                             "Verify LastNetworkID attribute value will be of type octstr with a length range of 1 to 32")
 
-        self.step(8)
+        self.step(10)
         last_connect_error_value = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.LastConnectErrorValue)
         asserts.assert_is(last_connect_error_value, NullValue, "Verify that LastConnectErrorValue attribute value is null")
+
+        self.step(11)
+        supported_wifi_bands = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.SupportedWiFiBands)
 
 
 if __name__ == "__main__":
