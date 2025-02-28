@@ -1,4 +1,3 @@
-"""TODO: braydenhass - DO NOT SUBMIT without one-line documentation for generate_revocation_set2.
 #!/usr/bin/env python3
 #
 # Copyright (c) 2023-2024 Project CHIP Authors
@@ -1061,19 +1060,3 @@ if __name__ == "__main__":
         cli.main(['--help'])
     else:
         cli()
-
-TODO: braydenhass - DO NOT SUBMIT without a detailed description of generate_revocation_set2.
-"""
-
-from collections.abc import Sequence
-
-from absl import app
-
-
-def main(argv: Sequence[str]) -> None:
-  if len(argv) > 1:
-    raise app.UsageError("Too many command-line arguments.")
-
-
-if __name__ == "__main__":
-  app.run(main)
