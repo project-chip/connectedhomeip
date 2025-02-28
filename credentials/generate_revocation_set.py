@@ -1,3 +1,4 @@
+"""TODO: braydenhass - DO NOT SUBMIT without one-line documentation for generate_revocation_set2.
 #!/usr/bin/env python3
 #
 # Copyright (c) 2023-2024 Project CHIP Authors
@@ -21,7 +22,6 @@
 #     python ./credentials/generate-revocation-set.py --help
 
 import base64
-import dataclasses
 import json
 import logging
 import os
@@ -29,6 +29,7 @@ import subprocess
 import sys
 import unittest
 from enum import Enum
+import dataclasses 
 from typing import Optional
 
 import click
@@ -53,7 +54,6 @@ __LOG_LEVELS__ = {
 class RevocationType(Enum):
     CRL = 1
 
-
 class CertVerificationResult(Enum):
     SUCCESS = 1
     SKID_NOT_FOUND = 2
@@ -61,7 +61,6 @@ class CertVerificationResult(Enum):
     SIGNATURE_VERIFICATION_FAILED = 4
     ISSUER_MISMATCH = 5
     AKID_MISMATCH = 6
-
 
 @dataclasses.dataclass
 class RevocationPoint:
@@ -79,7 +78,6 @@ class RevocationPoint:
     schemaVersion: int
     crlSignerDelegator: str
 
-
 @dataclasses.dataclass
 class RevocationSet:
     type: str
@@ -88,10 +86,10 @@ class RevocationSet:
     revoked_serial_numbers: [str]
     crl_signer_cert: str
     crl_signer_delegator: str = None
-
+    
     def asDict(self):
         return dataclasses.asdict(self)
-
+    
 
 OID_VENDOR_ID = x509.ObjectIdentifier("1.3.6.1.4.1.37244.2.1")
 OID_PRODUCT_ID = x509.ObjectIdentifier("1.3.6.1.4.1.37244.2.2")
@@ -178,8 +176,7 @@ def is_self_signed_certificate(cert: x509.Certificate) -> bool:
     if result == CertVerificationResult.SUCCESS:
         return True
     else:
-        logging.debug(
-            f"Certificate with subject: {cert.subject.rfc4514_string()} is not a valid self-signed certificate. Result: {result.name}")
+        logging.debug(f"Certificate with subject: {cert.subject.rfc4514_string()} is not a valid self-signed certificate. Result: {result.name}")
     return False
 
 
@@ -196,21 +193,18 @@ def validate_cert_chain(crl_signer: x509.Certificate, crl_signer_delegator: x509
     if crl_signer_delegator:
         result_signer = verify_cert(crl_signer, crl_signer_delegator)
         if not result_signer == CertVerificationResult.SUCCESS:
-            logging.debug(
-                f"Cannot verify certificate subject: {crl_signer.subject.rfc4514_string()} issued by certificate subject: {crl_signer_delegator.subject.rfc4514_string()}. Result: {result_signer.name}")
+            logging.debug(f"Cannot verify certificate subject: {crl_signer.subject.rfc4514_string()} issued by certificate subject: {crl_signer_delegator.subject.rfc4514_string()}. Result: {result_signer.name}")
             return False
 
         result_delegator = verify_cert(crl_signer_delegator, paa)
         if not result_delegator == CertVerificationResult.SUCCESS:
-            logging.debug(
-                f"Cannot verify certificate subject: {crl_signer_delegator.subject.rfc4514_string()} issued by certificate subject: {paa.subject.rfc4514_string()}. Result: {result.name}")
+            logging.debug(f"Cannot verify certificate subject: {crl_signer_delegator.subject.rfc4514_string()} issued by certificate subject: {paa.subject.rfc4514_string()}. Result: {result.name}")
             return False
         return True
     else:
         result = verify_cert(crl_signer, paa)
         if not result == CertVerificationResult.SUCCESS:
-            logging.debug(
-                f"Cannot verify certificate subject: {crl_signer.subject.rfc4514_string()} issued by certificate subject: {paa.subject.rfc4514_string()}. Result: {result.name}")
+            logging.debug(f"Cannot verify certificate subject: {crl_signer.subject.rfc4514_string()} issued by certificate subject: {paa.subject.rfc4514_string()}. Result: {result.name}")
             return False
         return True
 
@@ -358,7 +352,6 @@ def fetch_crl_from_url(url: str, timeout: int) -> x509.CertificateRevocationList
         return x509.load_der_x509_crl(r.content)
     except Exception as e:
         logging.error('Failed to fetch a valid CRL', e)
-
 
 class DclClientInterface:
     '''
@@ -606,7 +599,7 @@ class RestDclClient(DclClientInterface):
         '''
 
         response = self.send_get_request(f"{self.rest_node_url}/dcl/pki/revocation-points")
-
+        
         return [RevocationPoint(**r) for r in response["PkiRevocationDistributionPoint"]]
 
     def get_revocation_points_by_skid(self, issuer_subject_key_id) -> list[RevocationPoint]:
@@ -674,8 +667,7 @@ class LocalFilesDclClient(DclClientInterface):
         logging.debug(f"Loading crls from {crls}")
         logging.debug(f"Loading revocation points response from {revocation_points_response_file}")
         self.crls = self.get_crls(crls)
-        self.revocation_points = [RevocationPoint(**r)
-                                  for r in json.load(revocation_points_response_file)["PkiRevocationDistributionPoint"]]
+        self.revocation_points = [RevocationPoint(**r) for r in json.load(revocation_points_response_file)["PkiRevocationDistributionPoint"]]
         self.authoritative_certs = self.get_authoritative_certificates(dcl_certificates)
 
     def get_lookup_key(self, certificate: x509.Certificate) -> str:
@@ -851,7 +843,6 @@ class LocalFilesDclClient(DclClientInterface):
                 return crl
         return None
 
-
 @click.group()
 def cli():
     pass
@@ -995,7 +986,6 @@ def from_dcl(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: 
     with open(output, 'w+') as outfile:
         json.dump([revocation.asDict() for revocation in revocation_set], outfile, indent=4)
 
-
 class TestRevocationSetGeneration(unittest.TestCase):
     """Test class for revocation set generation"""
 
@@ -1062,7 +1052,6 @@ class TestRevocationSetGeneration(unittest.TestCase):
             'test/revoked-attestation-certificates/revocation-sets/revocation-set-for-pai.json'
         )
 
-
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == 'test':
         # Remove the 'test' argument and run tests
@@ -1072,3 +1061,19 @@ if __name__ == "__main__":
         cli.main(['--help'])
     else:
         cli()
+
+TODO: braydenhass - DO NOT SUBMIT without a detailed description of generate_revocation_set2.
+"""
+
+from collections.abc import Sequence
+
+from absl import app
+
+
+def main(argv: Sequence[str]) -> None:
+  if len(argv) > 1:
+    raise app.UsageError("Too many command-line arguments.")
+
+
+if __name__ == "__main__":
+  app.run(main)
