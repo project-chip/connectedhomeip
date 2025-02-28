@@ -5,11 +5,36 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: Mock Server Tests",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "unittest",
+            "args": [
+                "${workspaceFolder}/integrations/mock_server/tests/test_mock_server.py"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/integrations/mock_server/src:${PYTHONPATH}"
+            },
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
+        },
+        {
             "name": "Python Debugger: test_dcl_server",
             "type": "debugpy",
             "request": "launch",
-            "program": "/workspace/connectedhomeip/examples/chip-tool/commands/dcl/test_dcl_server.py",
-            "args": [],
+            "program": "${workspaceFolder}/integrations/mock_server/src/main.py",
+            "args": [
+                "--port",
+                "8443",
+                "--config",
+                "${workspaceFolder}/integrations/mock_server/configurations/server_config.json",
+                "--routing-config-dir",
+                "${workspaceFolder}/integrations/mock_server/configurations/fake_distributed_compliance_ledger",
+                "--cert",
+                "${workspaceFolder}/server.crt",
+                "--key",
+                "${workspaceFolder}/server.key"
+            ],
             "console": "integratedTerminal"
         },
         {
@@ -525,6 +550,25 @@
             "runToEntryPoint": "main",
             "preLaunchTask": "Debug Open IoT SDK unit-tests",
             "showDevDebugOutput": "parsed"
+        },
+        {
+            "name": "Zephyr native tests",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/nrf-native-sim-tests/nrfconnect/zephyr/zephyr.exe",
+            "args": ["-testargs"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/out/nrf-native-sim-tests/nrfconnect",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
         }
     ],
     "inputs": [

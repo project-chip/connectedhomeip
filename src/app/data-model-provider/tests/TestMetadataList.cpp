@@ -32,6 +32,7 @@
 
 using namespace chip;
 using namespace chip::app::DataModel;
+using namespace chip::app::DataModel::detail;
 
 namespace {
 
@@ -204,4 +205,54 @@ TEST_F(TestMetadataList, ListBuilderConvertersWorks)
     }
 }
 
+TEST_F(TestMetadataList, BufferMoveOperationsWork)
+{
+    {
+        using LIST = ListBuilder<int>;
+
+        LIST movedFromList{};
+
+        ASSERT_EQ(movedFromList.EnsureAppendCapacity(3), CHIP_NO_ERROR);
+
+        movedFromList.Append(10);
+        movedFromList.Append(11);
+        movedFromList.Append(12);
+
+        LIST movedToList{ std::move(movedFromList) };
+
+        ASSERT_EQ(movedFromList.Size(), size_t{ 0 }); // NOLINT(bugprone-use-after-move)
+        ASSERT_TRUE(movedFromList.IsEmpty());         // NOLINT(bugprone-use-after-move)
+
+        ASSERT_EQ(movedToList.Size(), size_t{ 3 });
+        ASSERT_FALSE(movedToList.IsEmpty());
+
+        auto movedToListSpan = movedToList.TakeBuffer();
+
+        EXPECT_EQ(movedToListSpan[0], 10);
+        EXPECT_EQ(movedToListSpan[1], 11);
+        EXPECT_EQ(movedToListSpan[2], 12);
+    }
+
+    {
+        using LIST = ListBuilder<int>;
+
+        LIST movedFromList{};
+        LIST movedToList{};
+
+        ASSERT_EQ(movedFromList.EnsureAppendCapacity(3), CHIP_NO_ERROR);
+        ASSERT_EQ(movedToList.EnsureAppendCapacity(3), CHIP_NO_ERROR);
+
+        movedFromList.Append(10);
+        movedFromList.Append(11);
+        movedFromList.Append(12);
+
+        movedToList = std::move(movedFromList);
+
+        ASSERT_EQ(movedFromList.Size(), size_t{ 0 }); // NOLINT(bugprone-use-after-move)
+        ASSERT_TRUE(movedFromList.IsEmpty());         // NOLINT(bugprone-use-after-move)
+
+        ASSERT_EQ(movedToList.Size(), size_t{ 3 });
+        ASSERT_FALSE(movedToList.IsEmpty());
+    }
+}
 } // namespace

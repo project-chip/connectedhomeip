@@ -39,7 +39,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-ameba:112
+            image: ghcr.io/project-chip/chip-build-ameba:119
             options: --user root
 
         steps:

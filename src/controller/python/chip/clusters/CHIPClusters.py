@@ -3333,6 +3333,23 @@ class ChipClusters:
                     "rootCACertificate": "bytes",
                 },
             },
+            0x0000000C: {
+                "commandId": 0x0000000C,
+                "commandName": "SetVidVerificationStatement",
+                "args": {
+                    "vendorID": "int",
+                    "vidVerificationStatement": "bytes",
+                    "vvsc": "bytes",
+                },
+            },
+            0x0000000D: {
+                "commandId": 0x0000000D,
+                "commandName": "SignVidVerificationRequest",
+                "args": {
+                    "fabricIndex": "int",
+                    "clientChallenge": "bytes",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -13098,10 +13115,10 @@ class ChipClusters:
             },
             0x00000006: {
                 "commandId": 0x00000006,
-                "commandName": "ProvideICECandidate",
+                "commandName": "ProvideICECandidates",
                 "args": {
                     "webRTCSessionID": "int",
-                    "ICECandidate": "str",
+                    "ICECandidates": "str",
                 },
             },
             0x00000007: {
@@ -13176,10 +13193,10 @@ class ChipClusters:
             },
             0x00000003: {
                 "commandId": 0x00000003,
-                "commandName": "ICECandidate",
+                "commandName": "ICECandidates",
                 "args": {
                     "webRTCSessionID": "int",
-                    "ICECandidate": "str",
+                    "ICECandidates": "str",
                 },
             },
             0x00000004: {
