@@ -358,29 +358,37 @@ enum class Fields : uint8_t
 {
     kId              = 1,
     kPeerNodeID      = 2,
-    kPeerFabricIndex = 3,
-    kStreamUsage     = 4,
-    kVideoStreamID   = 5,
-    kAudioStreamID   = 6,
-    kMetadataOptions = 7,
+    kStreamUsage     = 3,
+    kVideoStreamID   = 4,
+    kAudioStreamID   = 5,
+    kMetadataOptions = 6,
+    kFabricIndex     = 254,
 };
 
 struct Type
 {
 public:
-    uint16_t id                       = static_cast<uint16_t>(0);
-    chip::NodeId peerNodeID           = static_cast<chip::NodeId>(0);
-    chip::FabricIndex peerFabricIndex = static_cast<chip::FabricIndex>(0);
-    StreamUsageEnum streamUsage       = static_cast<StreamUsageEnum>(0);
+    uint16_t id                 = static_cast<uint16_t>(0);
+    chip::NodeId peerNodeID     = static_cast<chip::NodeId>(0);
+    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
     DataModel::Nullable<uint16_t> videoStreamID;
     DataModel::Nullable<uint16_t> audioStreamID;
     chip::BitMask<WebRTCMetadataOptionsBitmap> metadataOptions = static_cast<chip::BitMask<WebRTCMetadataOptionsBitmap>>(0);
+    chip::FabricIndex fabricIndex                              = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
 };
 
 using DecodableType = Type;

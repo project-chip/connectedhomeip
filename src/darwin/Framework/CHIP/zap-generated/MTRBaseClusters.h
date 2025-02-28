@@ -14778,7 +14778,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Cluster WebRTC Transport Provider
  *
- * The WebRTC transport provider cluster provides a way for stream providers (e.g. Cameras) to stream or receive their data through WebRTC.
+ *
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRBaseClusterWebRTCTransportProvider : MTRGenericBaseCluster
@@ -14814,7 +14814,7 @@ MTR_PROVISIONALLY_AVAILABLE
  */
 - (void)endSessionWithParams:(MTRWebRTCTransportProviderClusterEndSessionParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeCurrentSessionsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeCurrentSessionsWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeCurrentSessionsWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
@@ -14870,7 +14870,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Cluster WebRTC Transport Requestor
  *
- * The WebRTC transport requestor cluster provides a way for stream consumers (e.g. Matter Stream Viewer) to establish a WebRTC connection with a stream provider.
+ *
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRBaseClusterWebRTCTransportRequestor : MTRGenericBaseCluster
@@ -14900,7 +14900,7 @@ MTR_PROVISIONALLY_AVAILABLE
  */
 - (void)endWithParams:(MTRWebRTCTransportRequestorClusterEndParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeCurrentSessionsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeCurrentSessionsWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeCurrentSessionsWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;

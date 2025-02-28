@@ -63138,6 +63138,11 @@ public class ChipClusters {
 
     public void readCurrentSessionsAttribute(
         CurrentSessionsAttributeCallback callback) {
+      readCurrentSessionsAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readCurrentSessionsAttributeWithFabricFilter(
+        CurrentSessionsAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_SESSIONS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -63146,7 +63151,7 @@ public class ChipClusters {
             List<ChipStructs.WebRTCTransportProviderClusterWebRTCSessionStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, CURRENT_SESSIONS_ATTRIBUTE_ID, true);
+        }, CURRENT_SESSIONS_ATTRIBUTE_ID, isFabricFiltered);
     }
 
     public void subscribeCurrentSessionsAttribute(
@@ -63466,6 +63471,11 @@ public class ChipClusters {
 
     public void readCurrentSessionsAttribute(
         CurrentSessionsAttributeCallback callback) {
+      readCurrentSessionsAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readCurrentSessionsAttributeWithFabricFilter(
+        CurrentSessionsAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_SESSIONS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -63474,7 +63484,7 @@ public class ChipClusters {
             List<ChipStructs.WebRTCTransportRequestorClusterWebRTCSessionStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, CURRENT_SESSIONS_ATTRIBUTE_ID, true);
+        }, CURRENT_SESSIONS_ATTRIBUTE_ID, isFabricFiltered);
     }
 
     public void subscribeCurrentSessionsAttribute(
