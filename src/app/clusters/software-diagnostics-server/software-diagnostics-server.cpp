@@ -181,7 +181,7 @@ SoftwareDiagnosticsCommandHandler::EnumerateAcceptedCommands(const ConcreteClust
         return CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
-    return builder.Append({ ResetWatermarks::Id, {}, Privilege::kOperate }); // From Matter Spec
+    return builder.Append({ ResetWatermarks::Id, {}, Privilege::kManage });
 }
 
 } // anonymous namespace
