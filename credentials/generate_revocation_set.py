@@ -16,6 +16,7 @@
 #
 # Note: py cryptography supports indirect CRLs trom version 44.0.0 and above.
 #       You may need to update your cryptography version.
+#
 # Generates a basic RevocationSet from TestNet
 # Usage:
 #     python ./credentials/generate-revocation-set.py --help
