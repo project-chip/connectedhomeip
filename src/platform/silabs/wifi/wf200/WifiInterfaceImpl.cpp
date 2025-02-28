@@ -1085,7 +1085,7 @@ sl_status_t WifiInterfaceImpl::InitWf200Platform()
     sl_wfx_host_gpio_init();
 
     status = wfx_init();
-    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "WF200:init failed"));
+    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "WF200:init failed: %ld", status));
 
     /* Initialize the LwIP stack */
     ChipLogDetail(DeviceLayer, "WF200:Start LWIP");
