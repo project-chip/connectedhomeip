@@ -49,8 +49,8 @@ public:
         Optional<DataModel::Nullable<uint16_t>> videoStreamID;
         Optional<DataModel::Nullable<uint16_t>> audioStreamID;
         Optional<DataModel::DecodableList<ICEServerDecodableTypeStruct>> iceServers;
-        Optional<chip::CharSpan> iceTransportPolicy;
-        Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
+        Optional<CharSpan> iceTransportPolicy;
+        Optional<BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
         NodeId peerNodeID;
         FabricIndex peerFabricIndex;
     };
