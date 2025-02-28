@@ -170,7 +170,7 @@ Changes for implementation:
 
 ```cpp
     using QF   = DataModel::CommandQualityFlags;
-    using Priv = chip::Access::Privilege;
+    using Priv = Access::Privilege;
 
     ReturnErrorOnFailure(builder.AppendElements({
         { Disable::Id,        QF::kTimed, Priv::kOperate },
@@ -189,5 +189,5 @@ Changes for implementation:
 
 Important Notes:
 
-Be sure to use `EnsureAppendCapacity` before single element Append
-`ListBuilder::Append` as it will not grow the buffer if not available already
+Use `EnsureAppendCapacity` before `ListBuilder::Append` to prevent buffer
+overflow when appending a single element, this function never allocates.
