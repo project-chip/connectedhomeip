@@ -29,10 +29,6 @@ using namespace ::chip::DeviceLayer::Internal;
 
 static chip::OTAMultiImageProcessorImpl gImageProcessor;
 
-#if SL_WIFI
-#include <platform/silabs/wifi/ncp/spi_multiplex.h>
-#endif // SL_WIFI
-
 extern "C" {
 #if SL_BTLCTRL_MUX
 #include "btl_interface.h"
@@ -40,12 +36,8 @@ extern "C" {
 #endif // SL_BTLCTRL_MUX
 #include "em_bus.h" // For CORE_CRITICAL_SECTION
 #ifndef SLI_SI91X_MCU_INTERFACE // required for 917 NCP
-#include "spi_multiplex.h"
 #include "btl_interface.h"
 #endif // SLI_SI91X_MCU_INTERFACE
-#ifdef CHIP_9117
-#include "spi_multiplex.h"
-#endif // CHIP_9117
 }
 
 namespace chip {

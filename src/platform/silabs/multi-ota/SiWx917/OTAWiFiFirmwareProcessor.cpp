@@ -75,6 +75,7 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
     // Used to tranfer other block to processor
     static uint8_t writeDataBuffer[1024] __attribute__((aligned(4))) = { 0 };
 
+    ChipLogProgress(SoftwareUpdate,"ProcessInternal WiFi Block processing");
     if (!mDescriptorProcessed)
     {
         ReturnErrorOnFailure(ProcessDescriptor(block));

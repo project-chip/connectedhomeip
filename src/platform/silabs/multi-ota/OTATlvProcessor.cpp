@@ -36,9 +36,7 @@ typedef enum
     APPLICATION,
     BOOTLOADER,
     FACTORY_DATA,
-    WIFI_917_NCP_TA,
-    WIFI_917_SOC_TA, /* This is used as scan result and start */
-    WIFI_917_NCP_COMBINED
+    WIFI_917_TA_M4_COMBINED,
 } OTAImageType;
 
 #if SL_MATTER_ENABLE_OTA_ENCRYPTION
