@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2024 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +38,6 @@
 
 import json
 import logging
-import queue
 import typing
 from dataclasses import dataclass
 from time import sleep
@@ -48,8 +47,8 @@ import chip.clusters as Clusters
 from chip import ChipUtility
 from chip.clusters.ClusterObjects import ClusterCommand, ClusterObjectDescriptor, ClusterObjectFieldDescriptor
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import (MatterBaseTest, SimpleEventCallback, TestStep, async_test_body, default_matter_test_main,
-                                         type_matches)
+from chip.testing import matter_asserts
+from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from chip.tlv import uint
 from mobly import asserts
 
@@ -98,7 +97,7 @@ class FakeModifyEnabledAlarms(ClusterCommand):
 class TC_REFALM_2_2(MatterBaseTest):
     """Implementation of test case TC_REFALM_2_2."""
 
-    def TC_REFALM_2_2(self) -> str:
+    def desc_TC_REFALM_2_2(self) -> str:
         return "223.2.2. [TC-REFALM-2.2] Primary functionality with DUT as Server"
 
     def pics_TC_REFALM_2_2(self):
@@ -113,40 +112,35 @@ class TC_REFALM_2_2(MatterBaseTest):
         steps = [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
             TestStep(2, "Ensure that the door on the DUT is closed"),
-            TestStep(3, "TH reads from the DUT the State attribute"),
+            TestStep(3, "TH reads from the DUT the State attribute",
+                     "Verify that the DUT response contains a 32-bit value with bit 0 set to 0"),
             TestStep(4, "Manually open the door on the DUT"),
             TestStep(5, "Wait for the time defined in PIXIT.REFALM.AlarmThreshold"),
-            TestStep(6, "TH reads from the DUT the State attribute"),
+            TestStep(6, "TH reads from the DUT the State attribute",
+                     "Verify that the DUT response contains a 32-bit value with bit 0 set to 1"),
             TestStep(7, "Ensure that the door on the DUT is closed"),
-            TestStep(8, "TH reads from the DUT the State attribute"),
-            TestStep(9, "TH sends Reset command to the DUT"),
-            TestStep(10, "TH sends ModifyEnabledAlarms command to the DUT"),
+            TestStep(8, "TH reads from the DUT the State attribute",
+                     "Verify that the DUT response contains a 32-bit value with bit 0 set to 0"),
+            TestStep(9, "TH sends Reset command to the DUT", "Verify DUT responds w/ status UNSUPPORTED_COMMAND(0x81)"),
+            TestStep(10, "TH sends ModifyEnabledAlarms command to the DUT",
+                     "Verify DUT responds w/ status UNSUPPORTED_COMMAND(0x81)"),
             TestStep(11, "Set up subscription to the Notify event"),
-            TestStep("12.a", "Repeating step 4 Manually open the door on the DUT"),
-            TestStep("12.b", "Step 12b: Repeat step 5 Wait for the time defined in PIXIT.REFALM.AlarmThreshold"),
-            TestStep("12.c", "After step 5 (repeated), receive a Notify event with the State attribute bit 0 set to 1."),
-            TestStep("13.a", "Repeat step 7 Ensure that the door on the DUT is closed"),
-            TestStep("13.b", "Receive a Notify event with the State attribute bit 0 set to 0"),
+            TestStep(12, "Repeat steps 4 and then 5",
+                     "After step 5 (repeated), receive a Notify event with the State attribute bit 0 set to 1."),
+            TestStep(13, "Repeat step 7",
+                     "Receive a Notify event with the State attribute bit 0 set to 0."),
         ]
 
         return steps
 
-    async def _get_command_status(self, cmd: ClusterCommand, cmd_str: str = ""):
+    async def _get_command_status(self, cmd: ClusterCommand):
         """Return the status of the executed command. By default the status is 0x0 unless a different 
         status on InteractionModel is returned. For this test we consider the status 0x0 as not succesfull."""
         cmd_status = Status.Success
-        if self.is_pics_sdk_ci_only:
-            try:
-                await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=self.endpoint, payload=cmd)
-            except InteractionModelError as uc:
-                cmd_status = uc.status
-        else:
-            user_response = self.wait_for_user_input(prompt_msg=f"{cmd_str} command is implemented in the DUT?. Enter 'y' or 'n' to confirm.",
-                                                     default_value="n")
-            asserts.assert_equal(user_response.lower(), "n")
-            if user_response.lower() == "n":
-                cmd_status = Status.UnsupportedCommand
-
+        try:
+            await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=self.endpoint, payload=cmd)
+        except InteractionModelError as uc:
+            cmd_status = uc.status
         return cmd_status
 
     def _ask_for_closed_door(self):
@@ -224,6 +218,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         # reads the state attribute , must be a bitMap32 ( list wich values are 32 bits)
         device_state = await self._read_refalm_state_attribute()
         logger.info(f"The device state is {device_state}")
+        matter_asserts.assert_valid_uint32(device_state, "State")
         asserts.assert_equal(device_state, 0)
 
         # # open the door manually
@@ -238,6 +233,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         self.step(6)
         device_state = await self._read_refalm_state_attribute()
         logger.info(f"The device state is {device_state}")
+        matter_asserts.assert_valid_uint32(device_state, "State")
         asserts.assert_equal(device_state, 1)
 
         # # # ensure the door is closed
@@ -249,54 +245,43 @@ class TC_REFALM_2_2(MatterBaseTest):
         device_status = await self._read_refalm_state_attribute()
         logger.info(f"The device state is {device_state}")
         asserts.assert_equal(device_status, 0)
+        matter_asserts.assert_valid_uint32(device_state, "State")
 
         self.step(9)
-        cmd_status = await self._get_command_status(cmd=FakeReset(), cmd_str="Reset")
+        cmd_status = await self._get_command_status(cmd=FakeReset())
         asserts.assert_equal(Status.UnsupportedCommand, cmd_status,
                              msg=f"Command status is not {Status.UnsupportedCommand}, is {cmd_status}")
 
         self.step(10)
-        cmd_status = await self._get_command_status(cmd=FakeModifyEnabledAlarms(), cmd_str="ModifyEnabledAlarms")
+        cmd_status = await self._get_command_status(cmd=FakeModifyEnabledAlarms())
         asserts.assert_equal(Status.UnsupportedCommand, cmd_status,
                              msg=f"Command status is not {Status.UnsupportedCommand}, is {cmd_status}")
 
         # Subscribe to Notify Event
         self.step(11)
-        self.q = queue.Queue()
-        notify_event = Clusters.RefrigeratorAlarm.Events.Notify
-        cb = SimpleEventCallback("Notify", notify_event.cluster_id, notify_event.event_id, self.q)
-        urgent = 1
-        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, notify_event, urgent)], reportInterval=[2, 10])
-        subscription.SetEventUpdateCallback(callback=cb)
+        event_callback = EventChangeCallback(Clusters.RefrigeratorAlarm)
+        await event_callback.start(self.default_controller,
+                                   self.dut_node_id,
+                                   self.get_endpoint(1))
 
-        self.step("12.a")
+        self.step(12)
+        # repeat step 4 and 5
+        logger.info("Manually open the door on the DUT")
         self._ask_for_open_door()
-
-        self.step("12.b")
+        logger.info("Wait for the time defined in PIXIT.REFALM.AlarmThreshold")
         self._wait_thresshold()
-
-        self.step("12.c")
         # Wait for the Notify event with the State value.
-        try:
-            ret = self.q.get(block=True, timeout=5)
-            logger.info(f"Event data {ret}")
-            asserts.assert_true(type_matches(ret.Data, cluster.Events.Notify), "Unexpected event type returned")
-            asserts.assert_equal(ret.Data.state, 1, "Unexpected value for State returned")
-        except queue.Empty:
-            asserts.fail("Did not receive Notify event")
+        event_data = event_callback.wait_for_event_report(cluster.Events.Notify, timeout_sec=5)
+        logger.info(f"Event data {event_data}")
+        asserts.assert_equal(event_data.state, 1, "Unexpected value for State returned")
 
-        self.step("13.a")
+        self.step(13)
+        logger.info("Ensure that the door on the DUT is closed")
         self._ask_for_closed_door()
-
-        self.step("13.b")
         # Wait for the Notify event with the State value.
-        try:
-            ret = self.q.get(block=True, timeout=5)
-            logger.info(f"Event data {ret}")
-            asserts.assert_true(type_matches(ret.Data, cluster.Events.Notify), "Unexpected event type returned")
-            asserts.assert_equal(ret.Data.state, 0, "Unexpected value for State returned")
-        except queue.Empty:
-            asserts.fail("Did not receive Notify event")
+        event_data = event_callback.wait_for_event_report(cluster.Events.Notify, timeout_sec=5)
+        logger.info(f"Event data {event_data}")
+        asserts.assert_equal(event_data.state, 0, "Unexpected value for State returned")
 
 
 if __name__ == "__main__":
