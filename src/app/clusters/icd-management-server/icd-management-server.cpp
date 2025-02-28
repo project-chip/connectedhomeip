@@ -25,7 +25,9 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/icd/server/ICDNotifier.h>
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+#include <app/icd/server/ICDNotifier.h> // nogncheck
+#endif
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
@@ -464,6 +466,7 @@ bool emberAfIcdManagementClusterUnregisterClientCallback(CommandHandler * comman
 bool emberAfIcdManagementClusterStayActiveRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                           const Commands::StayActiveRequest::DecodableType & commandData)
 {
+// TODO(#32321): Remove #if after issue is resolved
 // Note: We only need this #if statement for platform examples that enable the ICD management server without building the sample
 // as an ICD. Since this is not spec compliant, we should remove this #if statement once we stop compiling the ICD management
 // server in those examples.

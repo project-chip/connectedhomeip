@@ -84,7 +84,7 @@ jobs:
 
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build-doxygen:112
+            image: ghcr.io/project-chip/chip-build-doxygen:119
 
         if: github.actor != 'restyled-io[bot]'
 
@@ -101,7 +101,7 @@ jobs:
               id: extract_branch
             - name: Deploy if master
               if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
-              uses: peaceiris/actions-gh-pages@v3
+              uses: peaceiris/actions-gh-pages@v4
               with:
                   deploy_key: ${{ secrets.DOXYGEN_DEPLOY_KEY }}
                   external_repository: project-chip/connectedhomeip-doc

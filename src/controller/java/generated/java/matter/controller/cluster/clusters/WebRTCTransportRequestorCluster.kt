@@ -164,9 +164,9 @@ class WebRTCTransportRequestorCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun ICECandidate(
+  suspend fun ICECandidates(
     webRTCSessionID: UShort,
-    ICECandidate: String,
+    ICECandidates: List<String>,
     timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 3u
@@ -177,8 +177,12 @@ class WebRTCTransportRequestorCluster(
     val TAG_WEB_RTC_SESSION_ID_REQ: Int = 0
     tlvWriter.put(ContextSpecificTag(TAG_WEB_RTC_SESSION_ID_REQ), webRTCSessionID)
 
-    val TAG_ICE_CANDIDATE_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_ICE_CANDIDATE_REQ), ICECandidate)
+    val TAG_ICE_CANDIDATES_REQ: Int = 1
+    tlvWriter.startArray(ContextSpecificTag(TAG_ICE_CANDIDATES_REQ))
+    for (item in ICECandidates.iterator()) {
+      tlvWriter.put(AnonymousTag, item)
+    }
+    tlvWriter.endArray()
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
