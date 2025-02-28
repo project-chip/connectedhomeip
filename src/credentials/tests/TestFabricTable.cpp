@@ -3058,6 +3058,8 @@ TEST_F(TestFabricTable, Delete)
     fabricTable.Delete(newFabricIndex);
     EXPECT_TRUE(fabricDelegate.willBeRemovedCalled);
     EXPECT_TRUE(fabricDelegate.onRemovedCalled);
+
+    fabricTable.RemoveFabricDelegate(&fabricDelegate);
 }
 
 } // namespace
