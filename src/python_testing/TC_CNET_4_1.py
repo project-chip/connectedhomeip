@@ -61,14 +61,20 @@ class TC_CNET_4_1(MatterBaseTest):
                       The connected field is of type bool \n\
                       Verify that only one entry has connected status as TRUE \n\
                       Verify that the number of entries in the Networks attribute is less than or equal to 'MaxNetworksValue'"),
-            TestStep(5, "TH reads InterfaceEnabled attribute from the DUT", "Verify that InterfaceEnabled attribute value is true"),
-            TestStep(6, "TH reads LastNetworkingStatus attribute from the DUT",
+            TestStep(5, "TH reads ScanMaxTimeSeconds attribute from the DUT",
+                     "Verify that ScanMaxTimeSeconds attribute value is within the range of 1 to 255 seconds"),
+            TestStep(6, "TH reads ConnectMaxTimeSeconds Attribute from the DUT",
+                     "Verify that ConnectMaxTimeSeconds attribute value is within the range of 1 to 255 seconds"),
+            TestStep(7, "TH reads InterfaceEnabled attribute from the DUT", "Verify that InterfaceEnabled attribute value is true"),
+            TestStep(8, "TH reads LastNetworkingStatus attribute from the DUT",
                      "LastNetworkingStatus attribute value will be within any one of the following values \
                       Success, NetworkNotFound, OutOfRange, RegulatoryError, UnknownError, null"),
-            TestStep(7, "TH reads the LastNetworkID attribute from the DUT",
+            TestStep(9, "TH reads the LastNetworkID attribute from the DUT",
                      "Verify that LastNetworkID attribute matches the NetworkID value of one of the entries in the Networks attribute list"),
-            TestStep(8, "TH reads the LastConnectErrorValue attribute from the DUT",
-                     "Verify that LastConnectErrorValue attribute value is null")
+            TestStep(10, "TH reads the LastConnectErrorValue attribute from the DUT",
+                     "Verify that LastConnectErrorValue attribute value is null"),
+            TestStep(11, "TH reads the SupportedWiFiBands attribute from the DUT",
+                     "Verify that SupportedWiFiBands attribute value has 1 or more entries, all of which are in the range of WiFiBandEnum.")
         ]
         return steps
 
