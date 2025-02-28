@@ -28,7 +28,7 @@ import subprocess
 import sys
 import unittest
 from enum import Enum
-from dataclasses import dataclass
+import dataclasses 
 from typing import Optional
 
 import click
@@ -61,7 +61,7 @@ class CertVerificationResult(Enum):
     ISSUER_MISMATCH = 5
     AKID_MISMATCH = 6
 
-@dataclass
+@dataclasses.dataclass
 class RevocationPoint:
     vid: int
     label: str
@@ -75,7 +75,20 @@ class RevocationPoint:
     dataDigestType: int
     revocationType: int
     schemaVersion: int
-    crlSignerDelegator: str = ""
+    crlSignerDelegator: str
+
+@dataclasses.dataclass
+class RevocationSet:
+    type: str
+    issuer_subject_key_id: str
+    issuer_name: str
+    revoked_serial_numbers: [str]
+    crl_signer_cert: str
+    crl_signer_delegator: str = None
+    
+    def asDict(self):
+        return dataclasses.asdict(self)
+    
 
 OID_VENDOR_ID = x509.ObjectIdentifier("1.3.6.1.4.1.37244.2.1")
 OID_PRODUCT_ID = x509.ObjectIdentifier("1.3.6.1.4.1.37244.2.2")
@@ -197,7 +210,8 @@ def validate_cert_chain(crl_signer: x509.Certificate, crl_signer_delegator: x509
 
 def validate_vid_pid(revocation_point: RevocationPoint, crl_signer_certificate: x509.Certificate, crl_signer_delegator_certificate: x509.Certificate) -> bool:
     crl_signer_vid, crl_signer_pid = parse_vid_pid_from_distinguished_name(crl_signer_certificate.subject)
-
+    logging.debug(f"vid: {revocation_point.vid})")
+    logging.debug(f"crl_signer_vid: {crl_signer_vid})")
     if revocation_point.isPAA:
         if crl_signer_vid is not None:
             if revocation_point.vid != crl_signer_vid:
@@ -210,7 +224,8 @@ def validate_vid_pid(revocation_point: RevocationPoint, crl_signer_certificate: 
         # if the CRL Signer is delegated then match the VID and PID of the CRL Signer Delegator
         if crl_signer_delegator_certificate:
             vid_to_match, pid_to_match = parse_vid_pid_from_distinguished_name(crl_signer_delegator_certificate.subject)
-
+        logging.debug(f"vid_to_match: {vid_to_match})")
+        logging.debug(f"pid_to_match: {pid_to_match})")
         if vid_to_match is None or revocation_point.vid != vid_to_match:
             logging.warning("VID in CRL Signer Certificate does not match with VID in revocation point, continue...")
             return False
@@ -227,7 +242,7 @@ def generate_revocation_set_from_crl(crl_file: x509.CertificateRevocationList,
                                      crl_signer_certificate: x509.Certificate,
                                      certificate_authority_name: x509.Name,
                                      certificate_akid_hex: str,
-                                     crl_signer_delegator_cert: x509.Certificate) -> dict:
+                                     crl_signer_delegator_cert: x509.Certificate) -> RevocationSet:
     """Generate a revocation set from a CRL file.
 
     Args:
@@ -238,7 +253,7 @@ def generate_revocation_set_from_crl(crl_file: x509.CertificateRevocationList,
         crl_signer_delegator_cert: crl signer delegator certificate object
 
     Returns:
-        dict: A dictionary containing the revocation set data with fields:
+        RevocationSet containing the revocation set data with fields:
             - type: "revocation_set"
             - issuer_subject_key_id: Authority Key Identifier (hex)
             - issuer_name: Issuer name (base64)
@@ -268,16 +283,16 @@ def generate_revocation_set_from_crl(crl_file: x509.CertificateRevocationList,
         serialnumber = serialnumber if len(serialnumber) % 2 == 0 else '0' + serialnumber
         serialnumber_list.append(serialnumber)
 
-    entry = {
-        "type": "revocation_set",
-        "issuer_subject_key_id": certificate_akid_hex,
-        "issuer_name": get_b64_name(certificate_authority_name),
-        "revoked_serial_numbers": serialnumber_list,
-        "crl_signer_cert": base64.b64encode(crl_signer_certificate.public_bytes(serialization.Encoding.DER)).decode('utf-8'),
-    }
+    entry = RevocationSet(
+        type='revocation_set',
+        issuer_subject_key_id=certificate_akid_hex,
+        issuer_name=get_b64_name(certificate_authority_name),
+        revoked_serial_numbers=serialnumber_list,
+        crl_signer_cert=base64.b64encode(crl_signer_certificate.public_bytes(serialization.Encoding.DER)).decode('utf-8'),
+    )
 
     if crl_signer_delegator_cert:
-        entry["crl_signer_delegator"] = base64.b64encode(
+        entry.crl_signer_delegator = base64.b64encode(
             crl_signer_delegator_cert.public_bytes(serialization.Encoding.DER)).decode('utf-8')
 
     return entry
@@ -336,7 +351,6 @@ def fetch_crl_from_url(url: str, timeout: int) -> x509.CertificateRevocationList
         return x509.load_der_x509_crl(r.content)
     except Exception as e:
         logging.error('Failed to fetch a valid CRL', e)
-
 
 class DclClientInterface:
     '''
@@ -584,6 +598,7 @@ class RestDclClient(DclClientInterface):
         '''
 
         response = self.send_get_request(f"{self.rest_node_url}/dcl/pki/revocation-points")
+        
         return [RevocationPoint(**r) for r in response["PkiRevocationDistributionPoint"]]
 
     def get_revocation_points_by_skid(self, issuer_subject_key_id) -> list[RevocationPoint]:
@@ -827,7 +842,6 @@ class LocalFilesDclClient(DclClientInterface):
                 return crl
         return None
 
-
 @click.group()
 def cli():
     pass
@@ -868,7 +882,6 @@ def from_dcl(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: 
 
     revocation_point_list = dcld_client.get_revocation_points()
     revocation_set = []
-
     for revocation_point in revocation_point_list:
         # 1. Validate Revocation Type
         if revocation_point.revocationType != RevocationType.CRL.value:
@@ -970,32 +983,7 @@ def from_dcl(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: 
         revocation_set.append(entry)
 
     with open(output, 'w+') as outfile:
-        json.dump(revocation_set, outfile, indent=4)
-
-
-@cli.command('from-crl')
-@click.option('--crl', required=True, type=click.File('rb'), help='Path to the CRL file')
-@click.option('--crl-signer', required=True, type=click.File('rb'), help='Path to the signer certificate')
-@click.option('--delegator', type=click.File('rb'), help='Path to the delegator certificate (optional)')
-@click.option('--paa', type=click.File('rb'), help='Path to the PAA certificate (optional)')
-@click.option('--output', default='revocation_set.json', type=click.File('w'), help='Output filename (default: revocation_set.json)')
-@click.option('--is-paa', default=False, is_flag=True, help='Indicates if the CRL issuer is the PAA')
-def from_crl(crl, crl_signer, delegator, paa, output, is_paa):
-    '''
-    Generate revocation set from a single CRL file for a single authority (PAA or PAI) without the need
-    to create a fake get-revocation-points json response file. This does NOT run the full validation algorithm
-    from Matter Spec section 6.2.4.1. To extract the complete revocation set for a PAA and one or more PAI(s)
-    and test against the full algorithm use the `from-dcl`command with the `--use-local-data` flag instead.
-    '''
-    crl = x509.load_pem_x509_crl(crl.read())
-    crl_signer = x509.load_pem_x509_certificate(crl_signer.read())
-    delegator = x509.load_pem_x509_certificate(delegator.read()) if delegator else None
-    paa = x509.load_pem_x509_certificate(paa.read()) if paa else None
-
-    ca_name_b64, ca_akid_hex = get_certificate_authority_details(crl_signer, delegator, paa, is_paa)
-    revocation_set = generate_revocation_set_from_crl(crl, crl_signer, ca_name_b64, ca_akid_hex, delegator)
-    output.write(json.dumps([revocation_set], indent=4))
-
+        json.dump([revocation.asDict() for revocation in revocation_set], outfile, indent=4)
 
 class TestRevocationSetGeneration(unittest.TestCase):
     """Test class for revocation set generation"""
@@ -1009,25 +997,23 @@ class TestRevocationSetGeneration(unittest.TestCase):
 
     def compare_revocation_sets(self, generated_set, expected_file):
         with open(os.path.join(self.test_base_dir, expected_file), 'r') as f:
-            expected_set = json.load(f)
+            expected_set = [RevocationSet(**r) for r in json.load(f)]
 
         # Compare the contents
         self.assertEqual(len([generated_set]), len(expected_set))
         expected = expected_set[0]
 
         # Compare required fields
-        self.assertEqual(generated_set['type'], expected['type'])
-        self.assertEqual(generated_set['issuer_subject_key_id'], expected['issuer_subject_key_id'])
-        self.assertEqual(generated_set['issuer_name'], expected['issuer_name'])
-        self.assertEqual(set(generated_set['revoked_serial_numbers']), set(expected['revoked_serial_numbers']))
-        self.assertEqual(generated_set['crl_signer_cert'], expected['crl_signer_cert'])
+        self.assertEqual(generated_set.type, expected.type)
+        self.assertEqual(generated_set.issuer_subject_key_id, expected.issuer_subject_key_id)
+        self.assertEqual(generated_set.issuer_name, expected.issuer_name)
+        self.assertEqual(set(generated_set.revoked_serial_numbers), set(expected.revoked_serial_numbers))
+        self.assertEqual(generated_set.crl_signer_cert, expected.crl_signer_cert)
 
         # Compare optional fields if present in either set
-        if 'crl_signer_delegator' in generated_set and 'crl_signer_delegator' in expected:
-            self.assertEqual(generated_set['crl_signer_delegator'], expected['crl_signer_delegator'],
-                             "CRL signer delegator certificates do not match")
-        elif 'crl_signer_delegator' in generated_set or 'crl_signer_delegator' in expected:
-            self.fail("CRL signer delegator certificate is missing in one of the sets")
+        if generated_set.crl_signer_delegator or expected.crl_signer_delegator:
+            self.assertEqual(generated_set.crl_signer_delegator, expected.crl_signer_delegator,
+                             f'CRL signer delegator certificates do not match, expected: {expected.crl_signer_delegator}, actual: {generated_set.crl_signer_delegator}')
 
     def test_paa_revocation_set(self):
         """Test generation of PAA revocation set"""
@@ -1064,7 +1050,6 @@ class TestRevocationSetGeneration(unittest.TestCase):
             revocation_set,
             'test/revoked-attestation-certificates/revocation-sets/revocation-set-for-pai.json'
         )
-
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == 'test':
