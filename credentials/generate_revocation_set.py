@@ -21,6 +21,7 @@
 #     python ./credentials/generate-revocation-set.py --help
 
 import base64
+import dataclasses
 import json
 import logging
 import os
@@ -28,7 +29,6 @@ import subprocess
 import sys
 import unittest
 from enum import Enum
-import dataclasses
 from typing import Optional
 
 import click
