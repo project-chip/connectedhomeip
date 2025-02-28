@@ -177,7 +177,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     }
 }
 
-#ifdef SL_MATTER_RGB_LED_ENABLED
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 void AppTask::LightControlEventHandler(AppEvent * aEvent)
 {
     uint8_t light_action = aEvent->LightControlEvent.Action;
@@ -229,7 +229,7 @@ void AppTask::LightControlEventHandler(AppEvent * aEvent)
         break;
     }
 }
-#endif // SL_MATTER_RGB_LED_ENABLED
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
 
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
@@ -295,7 +295,7 @@ void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t a
     event.Handler           = LightActionEventHandler;
     PostEvent(&event);
 }
-#ifdef SL_MATTER_RGB_LED_ENABLED
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 void AppTask::PostLightControlActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint32_t * aValue)
 {
     AppEvent light_event                 = {};
@@ -306,7 +306,7 @@ void AppTask::PostLightControlActionRequest(int32_t aActor, LightingManager::Act
     light_event.Handler                  = LightControlEventHandler;
     PostEvent(&light_event);
 }
-#endif // SL_MATTER_RGB_LED_ENABLED
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
 
 void AppTask::UpdateClusterState(intptr_t context)
 {

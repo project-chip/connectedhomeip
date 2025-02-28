@@ -55,7 +55,7 @@ const sl_rgb_led_t * ledPinArray[SL_LED_COUNT] = { &led_led0 };
 #include "sl_si91x_led_instances.h"
 #define SL_LED_COUNT SL_SI91x_LED_COUNT
 uint8_t ledPinArray[SL_LED_COUNT] = { SL_LED_LED0_PIN, SL_LED_LED1_PIN };
-#endif // SL_MATTER_RGB_LED_ENABLED
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
 #endif // ENABLE_WSTK_LEDS
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
@@ -130,7 +130,7 @@ CHIP_ERROR SilabsPlatform::SetLed(bool state, uint8_t led)
     (state) ? sl_si91x_simple_rgb_led_on(SL_RGB_LED_INSTANCE(led)) : sl_si91x_simple_rgb_led_off(SL_RGB_LED_INSTANCE(led));
 #else
     (state) ? sl_si91x_led_set(ledPinArray[led]) : sl_si91x_led_clear(ledPinArray[led]);
-#endif // defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
     return CHIP_NO_ERROR;
 }
 
@@ -138,7 +138,7 @@ bool SilabsPlatform::GetLedState(uint8_t led)
 {
     // TODO
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-    return sl_si91x_simple_rgb_led_get_current_state(&led_led0);
+    return sl_si91x_simple_rgb_led_get_current_state(SL_RGB_LED_INSTANCE(led));
 #else
     return SilabsPlatformAbstractionBase::GetLedState(led);
 #endif //(defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
@@ -151,7 +151,7 @@ CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
     sl_si91x_simple_rgb_led_toggle(SL_RGB_LED_INSTANCE(led));
 #else
     sl_si91x_led_toggle(ledPinArray[led]);
-#endif // defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
     return CHIP_NO_ERROR;
 }
 #endif // ENABLE_WSTK_LEDS
@@ -169,7 +169,7 @@ CHIP_ERROR SilabsPlatform::GetLedColor(uint8_t led, uint16_t r, uint16_t g, uint
     sl_si91x_simple_rgb_led_get_colour(SL_RGB_LED_INSTANCE(led), &r, &g, &b);
     return CHIP_NO_ERROR;
 }
-#endif // defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
 
 void SilabsPlatform::StartScheduler()
 {

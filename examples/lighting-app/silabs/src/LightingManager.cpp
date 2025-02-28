@@ -307,21 +307,13 @@ void LightingManager::OnTriggerOffWithEffect(OnOffEffect * effect)
     LightMgr().mOffEffectArmed = true;
     LightMgr().StartTimer(offEffectDuration);
 }
-#ifdef SL_MATTER_RGB_LED_ENABLED
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 bool LightingManager::InitiateLightAction(int32_t aActor, Action_t aAction, uint16_t size, uint32_t * value)
 {
     bool action_initiated = false;
-    switch (aAction)
-    {
-    case COLOR_ACTION_HSV:
-    case COLOR_ACTION_CT:
-    case COLOR_ACTION_XY:
-        action_initiated = true;
-        AppTask::GetAppTask().PostLightControlActionRequest(aActor, aAction, value);
-        break;
-    default:
-        break;
-    }
+    // VerifyOrReturnError(aAction == INVALID_ACTION);
+    action_initiated = true;
+    AppTask::GetAppTask().PostLightControlActionRequest(aActor, aAction, value);
     return action_initiated;
 }
-#endif // SL_MATTER_RGB_LED_ENABLED
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)

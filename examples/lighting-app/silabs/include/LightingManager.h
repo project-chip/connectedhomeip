@@ -55,9 +55,9 @@ public:
     void SetAutoTurnOffDuration(uint32_t aDurationInSecs);
     bool IsActionInProgress();
     bool InitiateAction(int32_t aActor, Action_t aAction);
-#ifdef SL_MATTER_RGB_LED_ENABLED
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
     bool InitiateLightAction(int32_t aActor, Action_t aAction, uint16_t size, uint32_t * value);
-#endif // SL_MATTER_RGB_LED_ENABLED
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
     typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
     typedef void (*Callback_fn_completed)(Action_t);
     void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);

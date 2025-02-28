@@ -77,9 +77,9 @@ public:
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
     void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);
-#ifdef SL_MATTER_RGB_LED_ENABLED
-    void PostLightControlActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint32_t *aValue);
-#endif  //SL_MATTER_RGB_LED_ENABLED
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+    void PostLightControlActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint32_t * aValue);
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
 
 private:
     static AppTask sAppTask;
@@ -88,9 +88,9 @@ private:
     static void ActionCompleted(LightingManager::Action_t aAction);
     static void LightActionEventHandler(AppEvent * aEvent);
 
-#ifdef SL_MATTER_RGB_LED_ENABLED
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
     static void LightControlEventHandler(AppEvent * aEvent);
-#endif  //SL_MATTER_RGB_LED_ENABLED
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
 
     static void UpdateClusterState(intptr_t context);
 
