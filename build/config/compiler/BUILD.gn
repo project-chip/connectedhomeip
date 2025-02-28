@@ -671,3 +671,7 @@ config("specs_default") {
     ldflags = cflags
   }
 }
+
+config("link_as_needed") {
+  ldflags = [ "-Wl,--as-needed" ]
+}
