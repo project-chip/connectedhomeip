@@ -204,7 +204,7 @@ def validate_cert_chain(crl_signer: x509.Certificate, crl_signer_delegator: x509
         result_delegator = verify_cert(crl_signer_delegator, paa)
         if not result_delegator == CertVerificationResult.SUCCESS:
             logging.debug(
-                f"Cannot verify certificate subject: {crl_signer_delegator.subject.rfc4514_string()} issued by certificate subject: {paa.subject.rfc4514_string()}. Result: {result.name}")
+                f"Cannot verify certificate subject: {crl_signer_delegator.subject.rfc4514_string()} issued by certificate subject: {paa.subject.rfc4514_string()}. Result: {result_delegator.name}")
             return False
         return True
     else:
