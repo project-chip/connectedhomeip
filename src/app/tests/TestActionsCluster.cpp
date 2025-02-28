@@ -173,7 +173,7 @@ public:
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
         sActionsDelegateImpl = new TestActionsDelegateImpl;
-        sActionsServer       = new ActionsServer(1, sActionsDelegateImpl);
+        sActionsServer       = new ActionsServer(1, *sActionsDelegateImpl);
         sActionsServer->Init();
     }
     static void TearDownTestSuite()

@@ -114,9 +114,9 @@ class ActionsServer : public AttributeAccessInterface, public CommandHandlerInte
 {
 public:
     // Register for the Actions cluster on all endpoints.
-    ActionsServer(EndpointId aEndpointId, Delegate * aDelegate) :
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Actions::Id),
-        CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Actions::Id), mDelegate(aDelegate), mEndpointId(aEndpointId)
+    ActionsServer(EndpointId aEndpointId, Delegate & aDelegate) :
+        AttributeAccessInterface(MakeOptional(aEndpointId), Actions::Id),
+        CommandHandlerInterface(MakeOptional(aEndpointId), Actions::Id), mDelegate(aDelegate), mEndpointId(aEndpointId)
     {}
 
     ~ActionsServer();
@@ -165,7 +165,7 @@ public:
     void EndpointListModified(EndpointId aEndpoint);
 
 private:
-    Delegate * mDelegate;
+    Delegate & mDelegate;
     EndpointId mEndpointId;
     static ActionsServer sInstance;
     static constexpr size_t kMaxEndpointListLength = 256u;

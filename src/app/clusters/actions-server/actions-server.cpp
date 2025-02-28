@@ -107,7 +107,7 @@ CHIP_ERROR ActionsServer::ReadActionListAttribute(const ConcreteReadAttributePat
     for (uint16_t i = 0; i < kMaxActionListLength; i++)
     {
         ActionStructStorage action;
-        CHIP_ERROR err = mDelegate->ReadActionAtIndex(i, action);
+        CHIP_ERROR err = mDelegate.ReadActionAtIndex(i, action);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
             return CHIP_NO_ERROR;
@@ -124,7 +124,7 @@ CHIP_ERROR ActionsServer::ReadEndpointListAttribute(const ConcreteReadAttributeP
     for (uint16_t i = 0; i < kMaxEndpointListLength; i++)
     {
         EndpointListStorage epList;
-        CHIP_ERROR err = mDelegate->ReadEndpointListAtIndex(i, epList);
+        CHIP_ERROR err = mDelegate.ReadEndpointListAtIndex(i, epList);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
             return CHIP_NO_ERROR;
@@ -137,7 +137,7 @@ CHIP_ERROR ActionsServer::ReadEndpointListAttribute(const ConcreteReadAttributeP
 
 bool ActionsServer::HaveActionWithId(EndpointId aEndpointId, uint16_t aActionId, uint16_t & aActionIndex)
 {
-    return mDelegate->HaveActionWithId(aActionId, aActionIndex);
+    return mDelegate.HaveActionWithId(aActionId, aActionIndex);
 }
 
 template <typename RequestT, typename FuncT>
@@ -170,7 +170,7 @@ void ActionsServer::HandleCommand(HandlerContext & handlerContext, FuncT func)
         if (actionIndex != kMaxActionListLength)
         {
             ActionStructStorage action;
-            mDelegate->ReadActionAtIndex(actionIndex, action);
+            mDelegate.ReadActionAtIndex(actionIndex, action);
             // Check if the command bit is set in the SupportedCommands of an ations.
             if (!(action.supportedCommands.Raw() & (1 << handlerContext.mRequestPath.mCommandId)))
             {
@@ -186,90 +186,79 @@ void ActionsServer::HandleCommand(HandlerContext & handlerContext, FuncT func)
 
 void ActionsServer::HandleInstantAction(HandlerContext & ctx, const Commands::InstantAction::DecodableType & commandData)
 {
-    Status status = Status::InvalidInState;
-    status        = mDelegate->HandleInstantAction(commandData.actionID, commandData.invokeID);
+    Status status = mDelegate.HandleInstantAction(commandData.actionID, commandData.invokeID);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void ActionsServer::HandleInstantActionWithTransition(HandlerContext & ctx,
                                                       const Commands::InstantActionWithTransition::DecodableType & commandData)
 {
-    Status status = Status::InvalidInState;
-    status = mDelegate->HandleInstantActionWithTransition(commandData.actionID, commandData.transitionTime, commandData.invokeID);
+    Status status =
+        mDelegate.HandleInstantActionWithTransition(commandData.actionID, commandData.transitionTime, commandData.invokeID);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void ActionsServer::HandleStartAction(HandlerContext & ctx, const Commands::StartAction::DecodableType & commandData)
 {
-    Status status = Status::InvalidInState;
-    status        = mDelegate->HandleStartAction(commandData.actionID, commandData.invokeID);
+    Status status = mDelegate.HandleStartAction(commandData.actionID, commandData.invokeID);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void ActionsServer::HandleStartActionWithDuration(HandlerContext & ctx,
                                                   const Commands::StartActionWithDuration::DecodableType & commandData)
 {
-    Status status = Status::InvalidInState;
-    status        = mDelegate->HandleStartActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
+    Status status = mDelegate.HandleStartActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void ActionsServer::HandleStopAction(HandlerContext & ctx, const Commands::StopAction::DecodableType & commandData)
 {
-    Status status = Status::InvalidInState;
-    status        = mDelegate->HandleStopAction(commandData.actionID, commandData.invokeID);
+    Status status = mDelegate.HandleStopAction(commandData.actionID, commandData.invokeID);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void ActionsServer::HandlePauseAction(HandlerContext & ctx, const Commands::PauseAction::DecodableType & commandData)
 {
-    Status status = Status::InvalidInState;
-    status        = mDelegate->HandlePauseAction(commandData.actionID, commandData.invokeID);
+    Status status = mDelegate.HandlePauseAction(commandData.actionID, commandData.invokeID);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void ActionsServer::HandlePauseActionWithDuration(HandlerContext & ctx,
                                                   const Commands::PauseActionWithDuration::DecodableType & commandData)
 {
-    Status status = Status::InvalidInState;
-    status        = mDelegate->HandlePauseActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
+    Status status = mDelegate.HandlePauseActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void ActionsServer::HandleResumeAction(HandlerContext & ctx, const Commands::ResumeAction::DecodableType & commandData)
 {
-    Status status = Status::InvalidInState;
-    status        = mDelegate->HandleResumeAction(commandData.actionID, commandData.invokeID);
+    Status status = mDelegate.HandleResumeAction(commandData.actionID, commandData.invokeID);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void ActionsServer::HandleEnableAction(HandlerContext & ctx, const Commands::EnableAction::DecodableType & commandData)
 {
-    Status status = Status::InvalidInState;
-    status        = mDelegate->HandleEnableAction(commandData.actionID, commandData.invokeID);
+    Status status = mDelegate.HandleEnableAction(commandData.actionID, commandData.invokeID);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void ActionsServer::HandleEnableActionWithDuration(HandlerContext & ctx,
                                                    const Commands::EnableActionWithDuration::DecodableType & commandData)
 {
-    Status status = Status::InvalidInState;
-    status        = mDelegate->HandleEnableActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
+    Status status = mDelegate.HandleEnableActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void ActionsServer::HandleDisableAction(HandlerContext & ctx, const Commands::DisableAction::DecodableType & commandData)
 {
-    Status status = Status::InvalidInState;
-    status        = mDelegate->HandleDisableAction(commandData.actionID, commandData.invokeID);
+    Status status = mDelegate.HandleDisableAction(commandData.actionID, commandData.invokeID);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void ActionsServer::HandleDisableActionWithDuration(HandlerContext & ctx,
                                                     const Commands::DisableActionWithDuration::DecodableType & commandData)
 {
-    Status status = Status::InvalidInState;
-    status        = mDelegate->HandleDisableActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
+    Status status = mDelegate.HandleDisableActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 

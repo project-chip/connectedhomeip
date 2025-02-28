@@ -25,8 +25,8 @@ using namespace chip::app::Clusters::Actions::Attributes;
 using namespace chip::Protocols::InteractionModel;
 
 namespace {
-Clusters::Actions::ActionsDelegateImpl * sActionsDelegateImpl = nullptr;
-Clusters::Actions::ActionsServer * sActionsServer             = nullptr;
+std::unique_ptr<Clusters::Actions::ActionsDelegateImpl> sActionsDelegateImpl;
+std::unique_ptr<Clusters::Actions::ActionsServer> sActionsServer;
 } // namespace
 
 CHIP_ERROR ActionsDelegateImpl::ReadActionAtIndex(uint16_t index, ActionStructStorage & action)
@@ -138,8 +138,11 @@ Status ActionsDelegateImpl::HandleDisableActionWithDuration(uint16_t actionId, u
 void emberAfActionsClusterInitCallback(EndpointId endpoint)
 {
     VerifyOrReturn(endpoint == 1);
-    VerifyOrReturn(sActionsDelegateImpl == nullptr && sActionsServer == nullptr);
-    sActionsDelegateImpl = new Actions::ActionsDelegateImpl;
-    sActionsServer       = new Actions::ActionsServer(endpoint, sActionsDelegateImpl);
+    VerifyOrDie(emberAfContainsServer(endpoint, Actions::Id));
+    VerifyOrReturn(!sActionsDelegateImpl && !sActionsServer);
+
+    sActionsDelegateImpl = std::make_unique<Actions::ActionsDelegateImpl>();
+    sActionsServer       = std::make_unique<Actions::ActionsServer>(endpoint, *sActionsDelegateImpl.get());
+
     sActionsServer->Init();
 }
