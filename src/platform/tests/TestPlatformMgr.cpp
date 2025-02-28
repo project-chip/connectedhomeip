@@ -205,20 +205,18 @@ TEST_F(TestPlatformMgr, RunEventLoopStopBeforeSleep)
     PlatformMgr().Shutdown();
 }
 
-#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
 TEST_F(TestPlatformMgr, TryLockChipStack)
 {
     EXPECT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
     bool locked = PlatformMgr().TryLockChipStack();
-    EXPECT_TRUE(locked);
+    EXPECT_EQ(locked, !CHIP_SYSTEM_CONFIG_NO_LOCKING);
 
     if (locked)
         PlatformMgr().UnlockChipStack();
 
     PlatformMgr().Shutdown();
 }
-#endif
 
 static int sEventRecieved = 0;
 
