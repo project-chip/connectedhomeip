@@ -1372,7 +1372,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     bool hasThread = mFeatureFlags.Has(Feature::kThreadNetworkInterface);
     bool hasWifi   = mFeatureFlags.Has(Feature::kWiFiNetworkInterface);
 
-    if (hasThread | hasWifi)
+    if (hasThread || hasWifi)
     {
         ReturnErrorOnFailure(builder.AppendElements({
             { ScanNetworks::Id, {}, Priv::kAdminister },   //
