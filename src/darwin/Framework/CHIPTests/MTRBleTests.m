@@ -150,14 +150,12 @@ MTRDeviceController * sController;
 
 - (void)testShutdownBlePowerOffRaceUAF
 {
-    XCTSkip(@"Skip reproducer for known UAF crash");
-
     // Attempt a PASE connection over BLE, this will call BleConnectionDelegateImpl::NewConnection()
     MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:@54321 discriminator:@0xb1e];
     payload.discoveryCapabilities = MTRDiscoveryCapabilitiesBLE;
-    NSError *error;
+    NSError * error;
     XCTAssertTrue([sController setupCommissioningSessionWithPayload:payload newNodeID:@999 error:&error],
-                  "setupCommissioningSessionWithPayload failed: %@", error);
+        "setupCommissioningSessionWithPayload failed: %@", error);
 
     // Create a race between shutdown and a CBManager callback that provokes a UAF
     // Note that on the order of 100 iterations can be necessary to reproduce the crash.
