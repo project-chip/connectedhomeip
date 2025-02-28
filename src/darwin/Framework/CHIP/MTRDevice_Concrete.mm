@@ -708,8 +708,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     mtr_weakify(self);
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (nextUpdateInSeconds * NSEC_PER_SEC)), self.queue, ^{
-        MTR_LOG_DEBUG("%@ Timer expired, start Device Time Update", self);
         mtr_strongify(self);
+        MTR_LOG_DEBUG("%@ Timer expired, start Device Time Update", self);
         if (self) {
             [self _performScheduledTimeUpdate];
         } else {
@@ -884,11 +884,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     return self.suspended == NO && ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
 }
 
-- (void)_delegateAdded
+- (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    [super _delegateAdded];
+    [super _delegateAdded:delegate];
 
     [self _ensureSubscriptionForExistingDelegates:@"delegate is set"];
 }
@@ -1031,8 +1031,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // in fact be reachable yet; we won't know until we have managed to
     // establish a CASE session.  And at that point, our subscription will
     // trigger the state change as needed.
+    BOOL shouldReattemptSubscription = NO;
     if (self.reattemptingSubscription) {
-        [self _reattemptSubscriptionNowIfNeededWithReason:reason];
+        shouldReattemptSubscription = YES;
     } else {
         readClientToResubscribe = self.matterCPPObjectsHolder.readClient;
         subscriptionCallback = self.matterCPPObjectsHolder.subscriptionCallback;
@@ -1048,9 +1049,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             subscriptionCallback->ResetResubscriptionBackoff();
         }
         readClientToResubscribe->TriggerResubscribeIfScheduled(reason.UTF8String);
-    } else if (_internalDeviceState == MTRInternalDeviceStateSubscribing && nodeLikelyReachable) {
+    } else if (((_internalDeviceState == MTRInternalDeviceStateSubscribing) || shouldReattemptSubscription) && nodeLikelyReachable) {
         // If we have reason to suspect that the node is now reachable and we haven't established a
         // CASE session yet, let's consider it to be stalled and invalidate the pairing session.
+
+        // Reset back off for framework resubscription
+        os_unfair_lock_lock(&self->_lock);
+        [self _setLastSubscriptionAttemptWait:0];
+        os_unfair_lock_unlock(&self->_lock);
+
         mtr_weakify(self);
         [self._concreteController asyncGetCommissionerOnMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
             mtr_strongify(self);
@@ -1060,6 +1067,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             VerifyOrDie(caseSessionMgr != nullptr);
             caseSessionMgr->ReleaseSession(commissioner->GetPeerScopedId(self->_nodeID.unsignedLongLongValue));
         } errorHandler:nil /* not much we can do */];
+    }
+
+    // The subscription reattempt here eventually asyncs onto the matter queue for session,
+    // and should be called after the above ReleaseSession call, to avoid churn.
+    if (shouldReattemptSubscription) {
+        std::lock_guard lock(_lock);
+        [self _reattemptSubscriptionNowIfNeededWithReason:reason];
     }
 }
 
@@ -2874,6 +2888,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                    [matterCPPObjectsHolder setReadClient:nullptr subscriptionCallback:nullptr];
 
                                    // OnDone
+                                   std::lock_guard lock(self->_lock);
                                    [self _doHandleSubscriptionReset:nil];
                                },
                                ^(void) {
@@ -3644,8 +3659,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     for (NSArray<MTRCommandWithRequiredResponse *> * commandGroup in [commands reverseObjectEnumerator]) {
         // We want to invoke all the commands in the group in order, propagating along the list of
         // current responses.  Build up that linked list of command invokes via chaining the completions.
+        mtr_weakify(self);
         for (MTRCommandWithRequiredResponse * command in [commandGroup reverseObjectEnumerator]) {
             auto commandInvokeBlock = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * previousResponses) {
+                mtr_strongify(self);
+                VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands commandInvokeBlock called back with nil MTRDevice"));
+
                 [self invokeCommandWithEndpointID:command.path.endpoint
                                         clusterID:command.path.cluster
                                         commandID:command.path.command
@@ -3654,6 +3673,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                             expectedValueInterval:nil
                                             queue:self.queue
                                        completion:^(NSArray<NSDictionary<NSString *, id> *> * responses, NSError * error) {
+                                           mtr_strongify(self);
+                                           VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands invokeCommandWithEndpointID completion called back with nil MTRDevice"));
                                            if (error != nil) {
                                                nextCompletion(NO, [previousResponses arrayByAddingObject:@ {
                                                    MTRCommandPathKey : command.path,
@@ -3686,6 +3707,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
 
         auto commandGroupInvokeBlock = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * previousResponses) {
+            mtr_strongify(self);
+            VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands commandGroupInvokeBlock called back with nil MTRDevice"));
+
             if (allSucceededSoFar == NO) {
                 // Don't start a new command group if something failed in the
                 // previous one.  Note that we might be running on self.queue here, so make sure we

@@ -29,6 +29,10 @@
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
+#if !SL_MATTER_GN_BUILD
+#include <sl_matter_provision_config.h>
+#endif
+
 using namespace chip::Credentials;
 
 #if SLI_SI91X_MCU_INTERFACE

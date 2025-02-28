@@ -39,7 +39,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-android:113
+            image: ghcr.io/project-chip/chip-build-android:119
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 

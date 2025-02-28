@@ -40,7 +40,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:112
+            image: ghcr.io/project-chip/chip-build-nrf-platform:119
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -198,7 +198,7 @@ jobs:
               run: |
                   # Temporarily fix link issue
                   sed -i '151s/<LINK_FLAGS> //' /opt/NordicSemiconductor/nrfconnect/zephyr/cmake/linker/ld/target.cmake
-                  scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target nrf-native-posix-64-tests build"
+                  scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target nrf-native-sim-tests build"
             - name: Uploading Failed Test Logs
               uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}

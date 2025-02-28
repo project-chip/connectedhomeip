@@ -27,11 +27,11 @@ The CHIP demo application is supported on
 
 -   Pull docker image:
 
-          $ docker pull ghcr.io/project-chip/chip-build-ameba:112
+          $ docker pull ghcr.io/project-chip/chip-build-ameba:119
 
 -   Run docker container:
 
-          $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-ameba:112
+          $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-ameba:119
 
 -   Setup build environment:
 

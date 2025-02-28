@@ -1,5 +1,5 @@
 steps:
-    - name: "ghcr.io/project-chip/chip-build-vscode:112"
+    - name: "ghcr.io/project-chip/chip-build-vscode:119"
       entrypoint: "bash"
       args:
           - "-c"
@@ -7,7 +7,7 @@ steps:
               git config --global --add safe.directory "*"
               python scripts/checkout_submodules.py --shallow --recursive --platform esp32 nrfconnect silabs linux android 
       id: Submodules
-    - name: "ghcr.io/project-chip/chip-build-vscode:112"
+    - name: "ghcr.io/project-chip/chip-build-vscode:119"
       # NOTE: silabs boostrap is NOT done with the rest as it requests a conflicting
       #       jinja2 version (asks for 3.1.3 when constraints.txt asks for 3.0.3)
       env:
@@ -24,7 +24,7 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:112"
+    - name: "ghcr.io/project-chip/chip-build-vscode:119"
       id: ESP32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -44,7 +44,7 @@ steps:
       volumes:
           - name: pwenv
             path: /pwenv
-    - name: "ghcr.io/project-chip/chip-build-vscode:112"
+    - name: "ghcr.io/project-chip/chip-build-vscode:119"
       id: NRFConnect
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -65,7 +65,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:112"
+    - name: "ghcr.io/project-chip/chip-build-vscode:119"
       id: EFR32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -87,7 +87,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:112"
+    - name: "ghcr.io/project-chip/chip-build-vscode:119"
       id: Linux
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -140,7 +140,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:113"
+    - name: "ghcr.io/project-chip/chip-build-vscode:119"
       id: Android
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
