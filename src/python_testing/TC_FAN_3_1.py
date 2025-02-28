@@ -565,7 +565,8 @@ class TC_FAN_3_1(MatterBaseTest):
 
     async def log_scenario(self, attr_to_update, attr_to_verify, order, init_fan_mode, init_percent_setting, init_speed_setting) -> None:
         """
-        Logs the scenario being tested, including the initial state of the fan and supported fan modes.
+        Logs the scenario being tested, including the initial state of the fan,
+        supported fan modes, and MultiSpeed feature support.
 
         Args:
             attr_to_update (Enum): The attribute to be updated.
@@ -591,6 +592,9 @@ class TC_FAN_3_1(MatterBaseTest):
 
         # Logging supported fan modes
         logging.info(f"[FC] *** Supported fan modes: {self.fan_mode_sequence.name}")
+        
+        # Logging MultiSpeed feature support
+        logging.info(f"[FC] *** MultiSpeed feature supported: {self.supports_multispeed}")
 
     def pics_TC_FAN_3_1(self) -> list[str]:
         return ["FAN.S"]
