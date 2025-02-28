@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,61 +12,146 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-name: X.2.1. [TC-MTRID-2.1] Attributes with server as DUT
+name: X.2.1. [TC-MTRID-2.1] Attributes with DUT as Server
 
 PICS:
-    - MTRID.S
+  - MTRID.S
 
 config:
-    nodeId: 0x12344321
-    cluster: "Meter Identification"
-    endpoint: 1
+  nodeId: 0x12344321
+  cluster: "Meter Identification"
+  endpoint: 1
+  TEST_EVENT_TRIGGER_KEY:
+    type: octet_string
+    defaultValue: "hex:00112233445566778899aabbccddeeff"
+  TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE:
+    type: int64u
+    defaultValue: "0x0b06000000000000"
+  TEST_EVENT_TRIGGER_TEST_EVENT_CLEAR:
+    type: int64u
+    defaultValue: "0x0b06000000000001"
 
 tests:
-    - label: "Step 1: Commission DUT to TH"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+  - label: "Step 1: Commission DUT to TH"
+    cluster: "DelayCommands"
+    command: "WaitForCommissionee"
+    arguments:
+      values:
+        - name: "nodeId"
+          value: nodeId
 
-    - label: "Step 2: TH reads the MeterType attribute from the DUT"
-      command: "readAttribute"
-      attribute: "MeterType"
-      response:
-          constraints:
-              type: MeterTypeEnum
+  - label: "Step 2: TH reads the MeterType attribute from the DUT"
+    command: "readAttribute"
+    attribute: "MeterType"
+    response:
+      value: null
 
-    - label: "Step 3: TH reads UtilityName attribute from DUT"
-      command: "readAttribute"
-      attribute: "UtilityName"
-      response:
-          constraints:
-              type: char_string
-              maxLength: 16
+  - label: "Step 3: TH reads the PointOfDelivery attribute from the DUT"
+    command: "readAttribute"
+    attribute: "PointOfDelivery"
+    response:
+      value: null
 
-    - label: "Step 4: TH reads PointOfDelivery attribute from DUT"
-      command: "readAttribute"
-      attribute: "PointOfDelivery"
-      response:
-          constraints:
-              type: char_string
-              maxLength: 16
+  - label: "Step 4: TH reads the MeterSerialNumber attribute from the DUT"
+    command: "readAttribute"
+    attribute: "MeterSerialNumber"
+    response:
+      value: null
 
-    - label: "Step 5: TH reads PowerThreshold attribute from DUT"
-      PICS: MTRID.S.A0003
-      command: "readAttribute"
-      attribute: "PowerThreshold"
-      response:
-          constraints:
-              type: power-mW
+  - label: "Step 5: TH reads the ProtocolVersion attribute from the DUT"
+    PICS: MTRID.S.A0003
+    command: "readAttribute"
+    attribute: "ProtocolVersion"
+    response:
+      value: null
 
-    - label: "Step 6: TH reads PowerThresholdSource attribute from DUT"
-      PICS: MTRID.S.A0004
-      command: "readAttribute"
-      attribute: "PowerThresholdSource"
-      response:
-          constraints:
-              type: PowerThresholdSourceEnum
+  - label: "Step 6: TH reads the PowerThreshold attribute from the DUT"
+    PICS: MTRID.S.A0004
+    command: "readAttribute"
+    attribute: "PowerThreshold"
+    response:
+      value: null
+
+  - label: "Step 7: TH reads TestEventTriggersEnabled attribute from General
+      Diagnostics Cluster"
+    PICS: DGGEN.S.A0008
+    cluster: "General Diagnostics"
+    endpoint: 0
+    command: "readAttribute"
+    attribute: "TestEventTriggersEnabled"
+    response:
+      value: 1
+
+  - label: "Step 8: TH sends TestEventTrigger command to General Diagnostics
+      Cluster on Endpoint 0 with EnableKey field set to
+      PIXIT.MTRID.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+      PIXIT.MTRID.TEST_EVENT_TRIGGER for Attributes Value Update Test Event"
+    PICS: DGGEN.S.C00.Rsp
+    cluster: "General Diagnostics"
+    endpoint: 0
+    command: "TestEventTrigger"
+    arguments:
+      values:
+        - name: "EnableKey"
+          value: TEST_EVENT_TRIGGER_KEY
+        - name: "EventTrigger"
+          value: TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE
+
+  - label: "Step 9: TH reads the MeterType attribute from the DUT"
+    command: "readAttribute"
+    attribute: "MeterType"
+    response:
+      constraints:
+        type: "MeterTypeEnum"
+        anyOf: [0, 1, 2]
+
+  - label: "Step 10: TH reads the PointOfDelivery attribute from the DUT"
+    command: "readAttribute"
+    attribute: "PointOfDelivery"
+    response:
+      constraints:
+        type: char_string
+        minLength: 0
+        maxLength: 64
+
+  - label: "Step 11: TH reads the MeterSerialNumber attribute from the DUT"
+    command: "readAttribute"
+    attribute: "MeterSerialNumber"
+    response:
+      constraints:
+        type: char_string
+        minLength: 0
+        maxLength: 64
+
+  - label: "Step 12: TH reads the ProtocolVersion attribute from the DUT"
+    PICS: MTRID.S.A0003
+    command: "readAttribute"
+    attribute: "ProtocolVersion"
+    response:
+      constraints:
+        type: char_string
+        minLength: 0
+        maxLength: 64
+
+  - label: "Step 13: TH reads the PowerThreshold attribute from the DUT"
+    PICS: MTRID.S.A0004
+    command: "readAttribute"
+    attribute: "PowerThreshold"
+    response:
+      constraints:
+        type: "PowerThresholdStruct"
+
+  - label: "Step 14: TH sends TestEventTrigger command to General Diagnostics
+      Cluster on Endpoint 0 with EnableKey field set to
+      PIXIT.MTRID.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+      PIXIT.MTRID.TEST_EVENT_TRIGGER for Test Event Clear"
+    PICS: DGGEN.S.C00.Rsp
+    cluster: "General Diagnostics"
+    endpoint: 0
+    command: "TestEventTrigger"
+    arguments:
+      values:
+        - name: "EnableKey"
+          value: TEST_EVENT_TRIGGER_KEY
+        - name: "EventTrigger"
+          value: TEST_EVENT_TRIGGER_TEST_EVENT_CLEAR
