@@ -140,8 +140,8 @@ Changes for implementation
 
 #### EnumerateAcceptedCommands
 
-Expanded `EnumerateAcceptedCommands` Interface to provide Attributes and
-Privileges using a ListBuilder
+Expanded `EnumerateAcceptedCommands` Interface to provide the Access Information
+(Attributes and Qualities) using a ListBuilder
 
 `CommandHandlerInterface::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)`
 becomes

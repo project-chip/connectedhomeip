@@ -1386,7 +1386,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
     if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
     {
-        ReturnErrorOnFailure(builder.Append({ QueryIdentity::Id, {} }));
+        ReturnErrorOnFailure(builder.Append({ QueryIdentity::Id, {}, Priv::kAdminister }));
     }
 
     return CHIP_NO_ERROR;
