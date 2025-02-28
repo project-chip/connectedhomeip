@@ -3388,7 +3388,7 @@ cluster RvcCleanMode = 85 {
 
 /** Attributes and commands for configuring the temperature control, and reporting temperature. */
 cluster TemperatureControl = 86 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   bitmap Feature : bitmap32 {
     kTemperatureNumber = 0x1;
@@ -3414,7 +3414,7 @@ cluster TemperatureControl = 86 {
     optional int8u targetTemperatureLevel = 1;
   }
 
-  /** Set Temperature */
+  /** The SetTemperature command SHALL have the following data fields: */
   command SetTemperature(SetTemperatureRequest): DefaultSuccess = 0;
 }
 
@@ -3506,7 +3506,7 @@ cluster DishwasherMode = 89 {
 
 /** Attributes for reporting air quality classification */
 cluster AirQuality = 91 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum AirQualityEnum : enum8 {
     kUnknown = 0;
@@ -7014,6 +7014,28 @@ cluster LowPower = 1288 {
   command Sleep(): DefaultSuccess = 0;
 }
 
+/** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
+provisional cluster Chime = 1366 {
+  revision 1;
+
+  struct ChimeSoundStruct {
+    int8u chimeID = 0;
+    char_string<48> name = 1;
+  }
+
+  readonly attribute ChimeSoundStruct installedChimeSounds[] = 0;
+  attribute int8u activeChimeID = 1;
+  attribute boolean enabled = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  command PlayChimeSound(): DefaultSuccess = 0;
+}
+
 /** The Test Cluster is meant to validate the generated code */
 internal cluster UnitTesting = 4294048773 {
   revision 1; // NOTE: Default/not specifically set
@@ -9289,6 +9311,19 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command Sleep;
+  }
+
+  server cluster Chime {
+    callback attribute installedChimeSounds;
+    callback attribute activeChimeID;
+    callback attribute enabled;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command PlayChimeSound;
   }
 
   server cluster UnitTesting {
