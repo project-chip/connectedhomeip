@@ -1704,7 +1704,7 @@ cluster GroupKeyManagement = 63 {
 
 /** Attributes for reporting air quality classification */
 cluster AirQuality = 91 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum AirQualityEnum : enum8 {
     kUnknown = 0;

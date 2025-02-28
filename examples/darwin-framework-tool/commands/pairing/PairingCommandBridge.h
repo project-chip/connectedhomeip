@@ -17,7 +17,10 @@
  */
 
 #pragma once
+
 #include "../common/CHIPCommandBridge.h"
+#include <commands/dcl/HTTPSRequest.h>
+
 #import <Matter/Matter.h>
 
 enum class PairingMode
@@ -66,6 +69,8 @@ public:
             AddArgument("dcl-hostname", &mDCLHostName,
                         "Hostname of the DCL server to fetch information from. Defaults to 'on.dcl.csa-iot.org'.");
             AddArgument("dcl-port", 0, UINT16_MAX, &mDCLPort, "Port number for connecting to the DCL server. Defaults to '443'.");
+            AddArgument("dcl-disable-https", 0, 1, &mDCLDisableHttps, "Disable HTTPS (use plain HTTP)");
+            AddArgument("dcl-disable-https-validation", 0, 1, &mDCLDisableHttpsValidation, "Disable HTTPS validation");
             AddArgument("use-dcl", 0, 1, &mUseDCL, "Use DCL to fetch onboarding information");
             break;
         case PairingMode::Ble:
@@ -121,5 +126,7 @@ private:
     chip::Optional<char *> mCountryCode;
     chip::Optional<char *> mDCLHostName;
     chip::Optional<uint16_t> mDCLPort;
+    chip::Optional<bool> mDCLDisableHttps;
+    chip::Optional<bool> mDCLDisableHttpsValidation;
     chip::Optional<bool> mUseDCL;
 };
