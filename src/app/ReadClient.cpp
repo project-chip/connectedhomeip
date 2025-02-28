@@ -494,7 +494,6 @@ void ReadClient::OnActiveModeNotification()
     }
 
     TriggerResubscribeIfScheduled("check-in message");
-    return;
 }
 
 void ReadClient::OnPeerTypeChange(PeerType aType)
