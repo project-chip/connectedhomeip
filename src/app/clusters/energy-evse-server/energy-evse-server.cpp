@@ -187,7 +187,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 {
     using namespace Commands;
     using QF   = DataModel::CommandQualityFlags;
-    using Priv = chip::Access::Privilege;
+    using Priv = Access::Privilege;
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(7));
 
     ReturnErrorOnFailure(builder.AppendElements({

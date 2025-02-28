@@ -109,7 +109,7 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
                                                                 DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Clusters::UnitTesting::Commands;
-    using Priv = chip::Access::Privilege;
+    using Priv = Access::Privilege;
 
     if (!mOverrideAcceptedCommands)
     {

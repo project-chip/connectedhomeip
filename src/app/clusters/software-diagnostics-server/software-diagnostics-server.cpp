@@ -174,14 +174,14 @@ SoftwareDiagnosticsCommandHandler::EnumerateAcceptedCommands(const ConcreteClust
                                                              DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
-    using Privilege = chip::Access::Privilege;
+    using Priv = Access::Privilege;
     if (!DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
     {
         // No commmands.
         return CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
-    return builder.Append({ ResetWatermarks::Id, {}, Privilege::kManage });
+    return builder.Append({ ResetWatermarks::Id, {}, Priv::kManage });
 }
 
 } // anonymous namespace

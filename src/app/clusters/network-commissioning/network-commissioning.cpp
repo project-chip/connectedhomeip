@@ -1364,7 +1364,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
                                                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Clusters::NetworkCommissioning::Commands;
-    using Priv = chip::Access::Privilege;
+    using Priv = Access::Privilege;
 
     static constexpr size_t kNetworkCommands = 7; // Count of max possible commands assuming all features
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(kNetworkCommands));
@@ -1396,7 +1396,7 @@ CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & clus
 {
     using namespace Clusters::NetworkCommissioning::Commands;
 
-    static constexpr size_t kCommands = 5; // Count of max possible commands assuming all features
+    static constexpr size_t kCommands = 4; // Count of max possible commands assuming all features
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(kCommands));
 
     if (mFeatureFlags.HasAny(Feature::kWiFiNetworkInterface, Feature::kThreadNetworkInterface))
