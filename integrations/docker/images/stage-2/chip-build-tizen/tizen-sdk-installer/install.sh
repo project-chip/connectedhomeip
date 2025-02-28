@@ -162,6 +162,21 @@ function install_tizen_sdk_common() {
         'new-native-cli_2.5.64_ubuntu-64.zip'
         'sdb_4.2.23_ubuntu-64.zip')
     download "$URL" "${PKG_ARR[@]}"
+
+    # Base sysroot
+    # Different versions of Tizen have different rootstrap versions
+    URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
+    PKG_ARR=(
+        "tizen-$TIZEN_VERSION-core-add-ons_*_ubuntu-64.zip")
+    download "$URL" "${PKG_ARR[@]}"
+
+    # Tizen Developer Platform Certificate
+    URL="http://download.tizen.org/sdk/extensions/Tizen_IoT_Headless/binary/"
+    # Tizen site does not have this package available in version 8.0.
+    # Certificates are the same for 7.0 and 8.0, though.
+    PKG_ARR=(
+        "7.0-iot-things-add-ons_*_ubuntu-64.zip")
+    download "$URL" "${PKG_ARR[@]}"
 }
 
 # Function for installing Tizen SDK (arm).
@@ -186,7 +201,6 @@ function install_tizen_sdk_arm() {
     # Different versions of Tizen have different rootstrap versions
     URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
     PKG_ARR=(
-        "tizen-$TIZEN_VERSION-core-add-ons_*_ubuntu-64.zip"
         "tizen-$TIZEN_VERSION-rs-device.core_*_ubuntu-64.zip")
     download "$URL" "${PKG_ARR[@]}"
 
@@ -255,14 +269,6 @@ function install_tizen_sdk_arm() {
     PKG_ARR=()
     download "$URL" "${PKG_ARR[@]}"
 
-    # Tizen Developer Platform Certificate
-    URL="http://download.tizen.org/sdk/extensions/Tizen_IoT_Headless/binary/"
-    # Tizen site does not have this package available in version 8.0.
-    # Certificates are the same for 7.0 and 8.0, though.
-    PKG_ARR=(
-        "7.0-iot-things-add-ons_*_ubuntu-64.zip")
-    download "$URL" "${PKG_ARR[@]}"
-
     # Install all
     info "Installing Tizen SDK..."
 
@@ -303,7 +309,6 @@ function install_tizen_sdk_arm64() {
     # Different versions of Tizen have different rootstrap versions
     URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
     PKG_ARR=(
-        "tizen-$TIZEN_VERSION-core-add-ons_*_ubuntu-64.zip"
         "tizen-$TIZEN_VERSION-rs-device64.core_*_ubuntu-64.zip")
     download "$URL" "${PKG_ARR[@]}"
 
@@ -371,14 +376,6 @@ function install_tizen_sdk_arm64() {
     # Unified packages (snapshots)
     URL="http://download.tizen.org/snapshots/TIZEN/Tizen/Tizen-Unified/latest/repos/standard/packages/aarch64/"
     PKG_ARR=()
-    download "$URL" "${PKG_ARR[@]}"
-
-    # Tizen Developer Platform Certificate
-    URL="http://download.tizen.org/sdk/extensions/Tizen_IoT_Headless/binary/"
-    # Tizen site does not have this package available in version 8.0.
-    # Certificates are the same for 7.0 and 8.0, though.
-    PKG_ARR=(
-        "7.0-iot-things-add-ons_*_ubuntu-64.zip")
     download "$URL" "${PKG_ARR[@]}"
 
     # Install all
