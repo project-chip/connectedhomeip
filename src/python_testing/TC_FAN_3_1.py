@@ -30,6 +30,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --timeout 600
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -429,7 +430,7 @@ class TC_FAN_3_1(MatterBaseTest):
 
         # *** NEXT STEP ***
         # TH performs one of the testing scenarios previously defined
-        # self.step(self.current_step_index + 1)
+        self.step(self.current_step_index + 1)
 
         # Logging the scenario being tested
         await self.log_scenario(attr_to_update, attr_to_verify, order, init_fan_mode, init_percent_setting, init_speed_setting)
@@ -600,7 +601,7 @@ class TC_FAN_3_1(MatterBaseTest):
         ep = self.get_endpoint(default=1)
         cluster = Clusters.FanControl
         attributes = cluster.Attributes
-        self.timeout_sec = 0.1  # Timeout given for item retreival from the attribute queue
+        self.timeout_sec = 0.01  # Timeout given for item retreival from the attribute queue
 
         # *** STEP 1 ***
         # Commissioning already done
