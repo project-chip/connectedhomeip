@@ -35,10 +35,15 @@ RUN set -x \
 
 # ------------------------------------------------------------------------------
 # Set environment
+# Tools
+ENV PATH="$TIZEN_SDK_ROOT/tools/ide/bin:$TIZEN_SDK_ROOT/tools:$PATH"
+
+# ARM
 ENV TIZEN_SDK_TOOLCHAIN $TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2
 ENV TIZEN_SDK_SYSROOT $TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core
-ENV PATH="$TIZEN_SDK_TOOLCHAIN/bin:$TIZEN_SDK_ROOT/tools/ide/bin:$TIZEN_SDK_ROOT/tools:$PATH"
+ENV PATH="$TIZEN_SDK_TOOLCHAIN/bin:$PATH"
 
+# ARM64
 ENV TIZEN_SDK_TOOLCHAIN_ARM64 $TIZEN_SDK_ROOT/tools/aarch64-linux-gnu-gcc-9.2
 ENV TIZEN_SDK_SYSROOT_ARM64 $TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device64.core
 ENV PATH="$TIZEN_SDK_TOOLCHAIN_ARM64/bin:$PATH"

@@ -45,7 +45,7 @@ function show_help() {
     echo
     echo "Options:"
     echo "  -h, --help                 Display this information"
-    echo "  --cpu                      Comma separated list of CPUs. Like $(arm) or $(arm64)"
+    echo "  --cpu                      Comma separated list of CPU architectures. Like arm or arm64"
     echo "  --tizen-sdk-path           Set directory for Tizen SDK installation. Default is $TIZEN_SDK_ROOT"
     echo "  --tizen-sdk-data-path      Set directory for Tizen SDK runtime data. Default is $TIZEN_SDK_DATA_PATH"
     echo "  --install-dependencies     This option installs all required dependencies"
@@ -272,40 +272,13 @@ function install_tizen_sdk_arm() {
     unrpm *.rpm
     cp -rf lib usr "$TIZEN_SDK_SYSROOT"
 
-    # Install secret tool or not
-    if ("$SECRET_TOOL"); then
-        info "Overriding secret tool..."
-        install "$SCRIPT_DIR/secret-tool.py" "$TIZEN_SDK_ROOT/tools/certificate-encryptor/secret-tool"
-    fi
-
-    # Configure Tizen CLI
-    echo "TIZEN_SDK_INSTALLED_PATH=$TIZEN_SDK_ROOT" >"$TIZEN_SDK_ROOT/sdk.info"
-    echo "TIZEN_SDK_DATA_PATH=$TIZEN_SDK_DATA_PATH" >>"$TIZEN_SDK_ROOT/sdk.info"
-    ln -sf "$TIZEN_SDK_DATA_PATH/.tizen-cli-config" "$TIZEN_SDK_ROOT/tools/.tizen-cli-config"
-
-    # Use Tizen developer platform certificate as default
-    cp "$TIZEN_SDK_ROOT"/tools/certificate-generator/certificates/distributor/sdk-platform/* \
-        "$TIZEN_SDK_ROOT"/tools/certificate-generator/certificates/distributor/
-
     # Make symbolic links relative
     find "$TIZEN_SDK_SYSROOT/usr/lib" -maxdepth 1 -type l | while IFS= read -r LNK; do
         ln -sf "$(basename "$(readlink "$LNK")")" "$LNK"
     done
+
     ln -sf ../../lib/libcap.so.2 "$TIZEN_SDK_SYSROOT/usr/lib/libcap.so"
     ln -sf openssl3.pc "$TIZEN_SDK_SYSROOT/usr/lib/pkgconfig/openssl.pc"
-
-    info "Done."
-    echo
-
-    # Information on necessary environment variables
-    warning "Before proceeding with Matter export environment variables as follows:"
-    echo -n "$COLOR_YELLOW"
-    echo "export TIZEN_VERSION=\"$TIZEN_VERSION\""
-    echo "export TIZEN_SDK_ROOT=\"$(realpath "$TIZEN_SDK_ROOT")\""
-    echo "export TIZEN_SDK_TOOLCHAIN=\"\$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2\""
-    echo "export TIZEN_SDK_SYSROOT=\"\$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core\""
-    echo "export PATH=\"\$TIZEN_SDK_TOOLCHAIN/bin:\$TIZEN_SDK_ROOT/tools/ide/bin:\$TIZEN_SDK_ROOT/tools:\$PATH\""
-    echo -n "$COLOR_NONE"
 }
 
 # Function for installing Tizen SDK (arm64).
@@ -417,6 +390,16 @@ function install_tizen_sdk_arm64() {
     unrpm *.rpm
     cp -rf lib64 usr "$TIZEN_SDK_SYSROOT"
 
+    # Make symbolic links relative
+    find "$TIZEN_SDK_SYSROOT/usr/lib64" -maxdepth 1 -type l | while IFS= read -r LNK; do
+        ln -sf "$(basename "$(readlink "$LNK")")" "$LNK"
+    done
+
+    ln -sf ../../lib64/libcap.so.2 "$TIZEN_SDK_SYSROOT/usr/lib64/libcap.so"
+    ln -sf openssl3.pc "$TIZEN_SDK_SYSROOT/usr/lib64/pkgconfig/openssl.pc"
+}
+
+function install_tizen_sdk_finalize() {
     # Install secret tool or not
     if ("$SECRET_TOOL"); then
         info "Overriding secret tool..."
@@ -432,25 +415,26 @@ function install_tizen_sdk_arm64() {
     cp "$TIZEN_SDK_ROOT"/tools/certificate-generator/certificates/distributor/sdk-platform/* \
         "$TIZEN_SDK_ROOT"/tools/certificate-generator/certificates/distributor/
 
-    # Make symbolic links relative
-    find "$TIZEN_SDK_SYSROOT/usr/lib64" -maxdepth 1 -type l | while IFS= read -r LNK; do
-        ln -sf "$(basename "$(readlink "$LNK")")" "$LNK"
-    done
-
-    ln -sf ../../lib64/libcap.so.2 "$TIZEN_SDK_SYSROOT/usr/lib64/libcap.so"
-    ln -sf openssl3.pc "$TIZEN_SDK_SYSROOT/usr/lib64/pkgconfig/openssl.pc"
-
     info "Done."
     echo
 
-    # Information on necessary environment variables
     warning "Before proceeding with Matter export environment variables as follows:"
     echo -n "$COLOR_YELLOW"
     echo "export TIZEN_VERSION=\"$TIZEN_VERSION\""
     echo "export TIZEN_SDK_ROOT=\"$(realpath "$TIZEN_SDK_ROOT")\""
-    echo "export TIZEN_SDK_TOOLCHAIN_ARM64=\"\$TIZEN_SDK_ROOT/tools/aarch64-linux-gnu-gcc-9.2\""
-    echo "export TIZEN_SDK_SYSROOT_ARM64=\"\$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device64.core\""
-    echo "export PATH=\"\$TIZEN_SDK_TOOLCHAIN_ARM64/bin:\$TIZEN_SDK_ROOT/tools/ide/bin:\$TIZEN_SDK_ROOT/tools:\$PATH\""
+
+    if [ "$INSTALL_ARM" = true ]; then
+        echo "export TIZEN_SDK_TOOLCHAIN=\"\$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2\""
+        echo "export TIZEN_SDK_SYSROOT=\"\$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core\""
+        echo "export PATH=\"\$TIZEN_SDK_TOOLCHAIN/bin:\$TIZEN_SDK_ROOT/tools/ide/bin:\$TIZEN_SDK_ROOT/tools:\$PATH\""
+    fi
+
+    if [ "$INSTALL_ARM64" = true ]; then
+        echo "export TIZEN_SDK_TOOLCHAIN_ARM64=\"\$TIZEN_SDK_ROOT/tools/aarch64-linux-gnu-gcc-9.2\""
+        echo "export TIZEN_SDK_SYSROOT_ARM64=\"\$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device64.core\""
+        echo "export PATH=\"\$TIZEN_SDK_TOOLCHAIN_ARM64/bin:\$TIZEN_SDK_ROOT/tools/ide/bin:\$TIZEN_SDK_ROOT/tools:\$PATH\""
+    fi
+
     echo -n "$COLOR_NONE"
 }
 
@@ -503,7 +487,7 @@ done
 # ------------------------------------------------------------------------------
 # Verify passed arguments and flags
 if [ -z "$INSTALL_ARM" ] && [ -z "$INSTALL_ARM64" ]; then
-    echo "No CPU architecture provided. Use --help."
+    error "No CPU architecture provided. Use --help."
     exit 1
 fi
 
@@ -548,3 +532,5 @@ fi
 if [ "$INSTALL_ARM64" = true ]; then
     install_tizen_sdk_arm64
 fi
+
+install_tizen_sdk_finalize
