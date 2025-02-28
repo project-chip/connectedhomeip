@@ -2422,12 +2422,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRTLSCertificateManagementClusterProvisionClientCertificateResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificateResponse::DecodableType &)decodableStruct;
-
-@end
-
 @interface MTRTLSCertificateManagementClusterFindClientCertificateParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

@@ -33114,11 +33114,28 @@ namespace TlsCertificateManagement {
 namespace Structs {
 
 namespace TLSCertStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
+    return DoEncode(aWriter, aTag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+{
+    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
+{
+
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+
     encoder.Encode(to_underlying(Fields::kCaid), caid);
     encoder.Encode(to_underlying(Fields::kCertificate), certificate);
+    if (aAccessingFabricIndex.HasValue())
+    {
+        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    }
+
     return encoder.Finalize();
 }
 
@@ -33144,6 +33161,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, certificate);
         }
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
+        }
         else
         {
         }
@@ -33155,12 +33176,29 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TLSCertStruct
 
 namespace TLSClientCertificateDetailStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
+    return DoEncode(aWriter, aTag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+{
+    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
+{
+
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+
     encoder.Encode(to_underlying(Fields::kCcdid), ccdid);
     encoder.Encode(to_underlying(Fields::kClientCertificate), clientCertificate);
     encoder.Encode(to_underlying(Fields::kIntermediateCertificates), intermediateCertificates);
+    if (aAccessingFabricIndex.HasValue())
+    {
+        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    }
+
     return encoder.Finalize();
 }
 
@@ -33189,6 +33227,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kIntermediateCertificates))
         {
             err = DataModel::Decode(reader, intermediateCertificates);
+        }
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
@@ -33562,40 +33604,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace ProvisionClientCertificate.
-namespace ProvisionClientCertificateResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kCcdid), ccdid);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kCcdid))
-        {
-            err = DataModel::Decode(reader, ccdid);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-} // namespace ProvisionClientCertificateResponse.
 namespace FindClientCertificate {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -33775,12 +33783,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     {
     case Attributes::MaxRootCertificates::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, maxRootCertificates);
-    case Attributes::CurrentRootCertificates::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentRootCertificates);
+    case Attributes::ProvisionedRootCertificates::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, provisionedRootCertificates);
     case Attributes::MaxClientCertificates::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, maxClientCertificates);
-    case Attributes::CurrentClientCertificates::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentClientCertificates);
+    case Attributes::ProvisionedClientCertificates::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, provisionedClientCertificates);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
@@ -37337,6 +37345,24 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     case Clusters::TlsCertificateManagement::Id: {
         switch (aCommand)
         {
+        case Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificate::Id:
+            return true;
+        case Clusters::TlsCertificateManagement::Commands::FindRootCertificate::Id:
+            return true;
+        case Clusters::TlsCertificateManagement::Commands::LookupRootCertificate::Id:
+            return true;
+        case Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id:
+            return true;
+        case Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id:
+            return true;
+        case Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Id:
+            return true;
+        case Clusters::TlsCertificateManagement::Commands::FindClientCertificate::Id:
+            return true;
+        case Clusters::TlsCertificateManagement::Commands::LookupClientCertificate::Id:
+            return true;
+        case Clusters::TlsCertificateManagement::Commands::RemoveClientCertificate::Id:
+            return true;
         default:
             return false;
         }
@@ -37449,6 +37475,81 @@ bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
     }
     if ((aCluster == Clusters::PushAvStreamTransport::Id) &&
         (aCommand == Clusters::PushAvStreamTransport::Commands::FindTransportResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificate::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificateResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::FindRootCertificate::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::FindRootCertificateResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::LookupRootCertificate::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::LookupRootCertificateResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::TLSClientCSRResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::FindClientCertificate::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::LookupClientCertificate::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::LookupClientCertificateResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::RemoveClientCertificate::Id))
     {
         return true;
     }

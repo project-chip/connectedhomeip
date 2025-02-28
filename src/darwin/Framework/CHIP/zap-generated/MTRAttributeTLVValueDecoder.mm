@@ -18315,15 +18315,37 @@ static id _Nullable DecodeAttributeValueForTLSCertificateManagementCluster(Attri
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
-    case Attributes::CurrentRootCertificates::Id: {
-        using TypeInfo = Attributes::CurrentRootCertificates::TypeInfo;
+    case Attributes::ProvisionedRootCertificates::Id: {
+        using TypeInfo = Attributes::ProvisionedRootCertificates::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRTLSCertificateManagementClusterTLSCertStruct * newElement_0;
+                newElement_0 = [MTRTLSCertificateManagementClusterTLSCertStruct new];
+                newElement_0.caid = [NSNumber numberWithUnsignedShort:entry_0.caid];
+                if (entry_0.certificate.HasValue()) {
+                    newElement_0.certificate = AsData(entry_0.certificate.Value());
+                } else {
+                    newElement_0.certificate = nil;
+                }
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
         return value;
     }
     case Attributes::MaxClientCertificates::Id: {
@@ -18337,15 +18359,57 @@ static id _Nullable DecodeAttributeValueForTLSCertificateManagementCluster(Attri
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
-    case Attributes::CurrentClientCertificates::Id: {
-        using TypeInfo = Attributes::CurrentClientCertificates::TypeInfo;
+    case Attributes::ProvisionedClientCertificates::Id: {
+        using TypeInfo = Attributes::ProvisionedClientCertificates::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRTLSCertificateManagementClusterTLSClientCertificateDetailStruct * newElement_0;
+                newElement_0 = [MTRTLSCertificateManagementClusterTLSClientCertificateDetailStruct new];
+                newElement_0.ccdid = [NSNumber numberWithUnsignedShort:entry_0.ccdid];
+                if (entry_0.clientCertificate.HasValue()) {
+                    newElement_0.clientCertificate = AsData(entry_0.clientCertificate.Value());
+                } else {
+                    newElement_0.clientCertificate = nil;
+                }
+                if (entry_0.intermediateCertificates.HasValue()) {
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_0.intermediateCertificates.Value().begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            NSData * newElement_3;
+                            newElement_3 = AsData(entry_3);
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_0.intermediateCertificates = array_3;
+                    }
+                } else {
+                    newElement_0.intermediateCertificates = nil;
+                }
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
         return value;
     }
     default: {

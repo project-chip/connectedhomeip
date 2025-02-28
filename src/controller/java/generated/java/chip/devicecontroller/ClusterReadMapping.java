@@ -19630,17 +19630,17 @@ public class ClusterReadMapping {
           readTlsCertificateManagementMaxRootCertificatesCommandParams
         );
         result.put("readMaxRootCertificatesAttribute", readTlsCertificateManagementMaxRootCertificatesAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readTlsCertificateManagementCurrentRootCertificatesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readTlsCertificateManagementCurrentRootCertificatesAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readTlsCertificateManagementProvisionedRootCertificatesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTlsCertificateManagementProvisionedRootCertificatesAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.TlsCertificateManagementCluster) cluster).readCurrentRootCertificatesAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
+            ((ChipClusters.TlsCertificateManagementCluster) cluster).readProvisionedRootCertificatesAttribute(
+              (ChipClusters.TlsCertificateManagementCluster.ProvisionedRootCertificatesAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readTlsCertificateManagementCurrentRootCertificatesCommandParams
+          () -> new ClusterInfoMapping.DelegatedTlsCertificateManagementClusterProvisionedRootCertificatesAttributeCallback(),
+          readTlsCertificateManagementProvisionedRootCertificatesCommandParams
         );
-        result.put("readCurrentRootCertificatesAttribute", readTlsCertificateManagementCurrentRootCertificatesAttributeInteractionInfo);
+        result.put("readProvisionedRootCertificatesAttribute", readTlsCertificateManagementProvisionedRootCertificatesAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readTlsCertificateManagementMaxClientCertificatesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readTlsCertificateManagementMaxClientCertificatesAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -19652,17 +19652,17 @@ public class ClusterReadMapping {
           readTlsCertificateManagementMaxClientCertificatesCommandParams
         );
         result.put("readMaxClientCertificatesAttribute", readTlsCertificateManagementMaxClientCertificatesAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readTlsCertificateManagementCurrentClientCertificatesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readTlsCertificateManagementCurrentClientCertificatesAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readTlsCertificateManagementProvisionedClientCertificatesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTlsCertificateManagementProvisionedClientCertificatesAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.TlsCertificateManagementCluster) cluster).readCurrentClientCertificatesAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
+            ((ChipClusters.TlsCertificateManagementCluster) cluster).readProvisionedClientCertificatesAttribute(
+              (ChipClusters.TlsCertificateManagementCluster.ProvisionedClientCertificatesAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readTlsCertificateManagementCurrentClientCertificatesCommandParams
+          () -> new ClusterInfoMapping.DelegatedTlsCertificateManagementClusterProvisionedClientCertificatesAttributeCallback(),
+          readTlsCertificateManagementProvisionedClientCertificatesCommandParams
         );
-        result.put("readCurrentClientCertificatesAttribute", readTlsCertificateManagementCurrentClientCertificatesAttributeInteractionInfo);
+        result.put("readProvisionedClientCertificatesAttribute", readTlsCertificateManagementProvisionedClientCertificatesAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readTlsCertificateManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readTlsCertificateManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

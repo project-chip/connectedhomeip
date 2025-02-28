@@ -65002,9 +65002,9 @@ public class ChipClusters {
     public static final long CLUSTER_ID = 2049L;
 
     private static final long MAX_ROOT_CERTIFICATES_ATTRIBUTE_ID = 0L;
-    private static final long CURRENT_ROOT_CERTIFICATES_ATTRIBUTE_ID = 1L;
+    private static final long PROVISIONED_ROOT_CERTIFICATES_ATTRIBUTE_ID = 1L;
     private static final long MAX_CLIENT_CERTIFICATES_ATTRIBUTE_ID = 2L;
-    private static final long CURRENT_CLIENT_CERTIFICATES_ATTRIBUTE_ID = 3L;
+    private static final long PROVISIONED_CLIENT_CERTIFICATES_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -65180,11 +65180,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void provisionClientCertificate(ProvisionClientCertificateResponseCallback callback, Integer ccdid, ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct clientCertificateDetails) {
+    public void provisionClientCertificate(DefaultClusterCallback callback, Integer ccdid, ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct clientCertificateDetails) {
       provisionClientCertificate(callback, ccdid, clientCertificateDetails, 0);
     }
 
-    public void provisionClientCertificate(ProvisionClientCertificateResponseCallback callback, Integer ccdid, ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct clientCertificateDetails, int timedInvokeTimeoutMs) {
+    public void provisionClientCertificate(DefaultClusterCallback callback, Integer ccdid, ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct clientCertificateDetails, int timedInvokeTimeoutMs) {
       final long commandId = 9L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -65200,30 +65200,20 @@ public class ChipClusters {
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          final long ccdidFieldID = 0L;
-          Integer ccdid = null;
-          for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == ccdidFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-                UIntType castingValue = element.value(UIntType.class);
-                ccdid = castingValue.value(Integer.class);
-              }
-            }
-          }
-          callback.onSuccess(ccdid);
+          callback.onSuccess();
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void findClientCertificate(FindClientCertificateResponseCallback callback, Integer ccdid) {
+    public void findClientCertificate(FindClientCertificateResponseCallback callback, @Nullable Integer ccdid) {
       findClientCertificate(callback, ccdid, 0);
     }
 
-    public void findClientCertificate(FindClientCertificateResponseCallback callback, Integer ccdid, int timedInvokeTimeoutMs) {
-      final long commandId = 11L;
+    public void findClientCertificate(FindClientCertificateResponseCallback callback, @Nullable Integer ccdid, int timedInvokeTimeoutMs) {
+      final long commandId = 10L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long ccdidFieldID = 0L;
-      BaseTLVType ccdidtlvValue = new UIntType(ccdid);
+      BaseTLVType ccdidtlvValue = ccdid != null ? new UIntType(ccdid) : new NullType();
       elements.add(new StructElement(ccdidFieldID, ccdidtlvValue));
 
       StructType commandArgs = new StructType(elements);
@@ -65249,7 +65239,7 @@ public class ChipClusters {
     }
 
     public void lookupClientCertificate(LookupClientCertificateResponseCallback callback, byte[] fingerprint, int timedInvokeTimeoutMs) {
-      final long commandId = 13L;
+      final long commandId = 12L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long fingerprintFieldID = 0L;
@@ -65279,7 +65269,7 @@ public class ChipClusters {
     }
 
     public void removeClientCertificate(DefaultClusterCallback callback, Integer ccdid, int timedInvokeTimeoutMs) {
-      final long commandId = 15L;
+      final long commandId = 14L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long ccdidFieldID = 0L;
@@ -65310,16 +65300,20 @@ public class ChipClusters {
       void onSuccess(Integer ccdid, byte[] csr, byte[] nonce);
     }
 
-    public interface ProvisionClientCertificateResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer ccdid);
-    }
-
     public interface FindClientCertificateResponseCallback extends BaseClusterCallback {
       void onSuccess(ArrayList<ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct> certificateDetails);
     }
 
     public interface LookupClientCertificateResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer ccdid);
+    }
+
+    public interface ProvisionedRootCertificatesAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.TlsCertificateManagementClusterTLSCertStruct> value);
+    }
+
+    public interface ProvisionedClientCertificatesAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -65364,30 +65358,35 @@ public class ChipClusters {
         }, MAX_ROOT_CERTIFICATES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readCurrentRootCertificatesAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_ROOT_CERTIFICATES_ATTRIBUTE_ID);
+    public void readProvisionedRootCertificatesAttribute(
+        ProvisionedRootCertificatesAttributeCallback callback) {
+      readProvisionedRootCertificatesAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readProvisionedRootCertificatesAttributeWithFabricFilter(
+        ProvisionedRootCertificatesAttributeCallback callback, boolean isFabricFiltered) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PROVISIONED_ROOT_CERTIFICATES_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.TlsCertificateManagementClusterTLSCertStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, CURRENT_ROOT_CERTIFICATES_ATTRIBUTE_ID, true);
+        }, PROVISIONED_ROOT_CERTIFICATES_ATTRIBUTE_ID, isFabricFiltered);
     }
 
-    public void subscribeCurrentRootCertificatesAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_ROOT_CERTIFICATES_ATTRIBUTE_ID);
+    public void subscribeProvisionedRootCertificatesAttribute(
+        ProvisionedRootCertificatesAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PROVISIONED_ROOT_CERTIFICATES_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.TlsCertificateManagementClusterTLSCertStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, CURRENT_ROOT_CERTIFICATES_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, PROVISIONED_ROOT_CERTIFICATES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readMaxClientCertificatesAttribute(
@@ -65416,30 +65415,35 @@ public class ChipClusters {
         }, MAX_CLIENT_CERTIFICATES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readCurrentClientCertificatesAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_CLIENT_CERTIFICATES_ATTRIBUTE_ID);
+    public void readProvisionedClientCertificatesAttribute(
+        ProvisionedClientCertificatesAttributeCallback callback) {
+      readProvisionedClientCertificatesAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readProvisionedClientCertificatesAttributeWithFabricFilter(
+        ProvisionedClientCertificatesAttributeCallback callback, boolean isFabricFiltered) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PROVISIONED_CLIENT_CERTIFICATES_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, CURRENT_CLIENT_CERTIFICATES_ATTRIBUTE_ID, true);
+        }, PROVISIONED_CLIENT_CERTIFICATES_ATTRIBUTE_ID, isFabricFiltered);
     }
 
-    public void subscribeCurrentClientCertificatesAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_CLIENT_CERTIFICATES_ATTRIBUTE_ID);
+    public void subscribeProvisionedClientCertificatesAttribute(
+        ProvisionedClientCertificatesAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PROVISIONED_CLIENT_CERTIFICATES_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, CURRENT_CLIENT_CERTIFICATES_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, PROVISIONED_CLIENT_CERTIFICATES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

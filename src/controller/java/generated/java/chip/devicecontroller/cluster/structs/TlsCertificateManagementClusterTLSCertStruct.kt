@@ -17,16 +17,22 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class TlsCertificateManagementClusterTLSCertStruct(val caid: UInt, val certificate: ByteArray) {
+class TlsCertificateManagementClusterTLSCertStruct(
+  val caid: UInt,
+  val certificate: Optional<ByteArray>,
+  val fabricIndex: UInt,
+) {
   override fun toString(): String = buildString {
     append("TlsCertificateManagementClusterTLSCertStruct {\n")
     append("\tcaid : $caid\n")
     append("\tcertificate : $certificate\n")
+    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -34,7 +40,11 @@ class TlsCertificateManagementClusterTLSCertStruct(val caid: UInt, val certifica
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CAID), caid)
-      put(ContextSpecificTag(TAG_CERTIFICATE), certificate)
+      if (certificate.isPresent) {
+        val optcertificate = certificate.get()
+        put(ContextSpecificTag(TAG_CERTIFICATE), optcertificate)
+      }
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
@@ -42,15 +52,22 @@ class TlsCertificateManagementClusterTLSCertStruct(val caid: UInt, val certifica
   companion object {
     private const val TAG_CAID = 0
     private const val TAG_CERTIFICATE = 1
+    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): TlsCertificateManagementClusterTLSCertStruct {
       tlvReader.enterStructure(tlvTag)
       val caid = tlvReader.getUInt(ContextSpecificTag(TAG_CAID))
-      val certificate = tlvReader.getByteArray(ContextSpecificTag(TAG_CERTIFICATE))
+      val certificate =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CERTIFICATE))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CERTIFICATE)))
+        } else {
+          Optional.empty()
+        }
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
-      return TlsCertificateManagementClusterTLSCertStruct(caid, certificate)
+      return TlsCertificateManagementClusterTLSCertStruct(caid, certificate, fabricIndex)
     }
   }
 }

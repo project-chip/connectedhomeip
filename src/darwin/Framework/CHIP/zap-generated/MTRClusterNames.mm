@@ -8274,16 +8274,16 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"MaxRootCertificates";
             break;
 
-        case MTRAttributeIDTypeClusterTLSCertificateManagementAttributeCurrentRootCertificatesID:
-            result = @"CurrentRootCertificates";
+        case MTRAttributeIDTypeClusterTLSCertificateManagementAttributeProvisionedRootCertificatesID:
+            result = @"ProvisionedRootCertificates";
             break;
 
         case MTRAttributeIDTypeClusterTLSCertificateManagementAttributeMaxClientCertificatesID:
             result = @"MaxClientCertificates";
             break;
 
-        case MTRAttributeIDTypeClusterTLSCertificateManagementAttributeCurrentClientCertificatesID:
-            result = @"CurrentClientCertificates";
+        case MTRAttributeIDTypeClusterTLSCertificateManagementAttributeProvisionedClientCertificatesID:
+            result = @"ProvisionedClientCertificates";
             break;
 
         case MTRAttributeIDTypeClusterTLSCertificateManagementAttributeGeneratedCommandListID:
@@ -13004,10 +13004,6 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
 
         case MTRCommandIDTypeClusterTLSCertificateManagementCommandTLSClientCSRResponseID:
             result = @"TLSClientCSRResponse";
-            break;
-
-        case MTRCommandIDTypeClusterTLSCertificateManagementCommandProvisionClientCertificateResponseID:
-            result = @"ProvisionClientCertificateResponse";
             break;
 
         case MTRCommandIDTypeClusterTLSCertificateManagementCommandFindClientCertificateResponseID:
