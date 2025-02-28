@@ -95,34 +95,48 @@ struct AttributeEntry
     AttributeId attributeId;
 
     // Constructor
-    constexpr AttributeEntry() : attributeId(0), mask{ 0, kNoPrivilege, kNoPrivilege } {}
+    constexpr AttributeEntry(AttributeId id = 0,
+                             std::underlying_type_t<AttributeQualityFlags> attrQualityFlags = 0,
+                             std::underlying_type_t<Access::Privilege> readPriv = kNoPrivilege,
+                             std::underlying_type_t<Access::Privilege> writePriv = kNoPrivilege
+                            ) : attributeId(id), mask{ attrQualityFlags, readPriv, writePriv } {}
 
-    
-    void SetReadPrivilege(Access::Privilege r)
+
+
+    // Overload assignment operator for mask.readPrivilege
+    AttributeEntry& operator=(Access::Privilege value) 
     {
         // Static ASSERT to check size of readPrivilege type vs entry parameter.
         static_assert(sizeof(std::underlying_type_t<Access::Privilege>) >= 
-                      sizeof(chip::to_underlying(r)),
-                      "Size of readPrivilege is not able to accomodate parameter (r).");
+                      sizeof(chip::to_underlying(value)),
+                      "Size of readPrivilege is not able to accomodate parameter (value).");
 
-        mask.readPrivilege = chip::to_underlying(r);
+        this->mask.readPrivilege = chip::to_underlying(value);
+        return *this;
     }
 
+
+    // Overload assignment operator for mask.writePrivilege
+    AttributeEntry& operator=(std::underlying_type_t<Access::Privilege> value)
+    {
+        // Static ASSERT to check size of writePrivilege type vs entry parameter.
+        static_assert(sizeof(std::underlying_type_t<Access::Privilege>) >= 
+                      sizeof(value),
+                      "Size of writePrivilege is not able to accomodate parameter (value).");
+
+        this->mask.writePrivilege = value;
+        return *this;
+    }
+
+
+    // Getter for mask.readPrivilege
     Access::Privilege GetReadPrivilege() const
     {
         return static_cast< Access::Privilege >(mask.readPrivilege);
     }
 
-    void SetWritePrivilege(Access::Privilege w)
-    {
-        // Static ASSERT to check size of writePrivilege type vs entry parameter.
-        static_assert(sizeof(std::underlying_type_t<Access::Privilege>) >= 
-                      sizeof(chip::to_underlying(w)),
-                      "Size of writePrivilege is not able to accomodate parameter (w).");
-
-        mask.writePrivilege = chip::to_underlying(w);
-    }
-
+    
+    // Getter for mask.writePrivilege
     Access::Privilege GetWritePrivilege() const
     {
         return static_cast< Access::Privilege >(mask.writePrivilege);
@@ -186,25 +200,31 @@ enum class CommandQualityFlags : uint32_t
 
 struct AcceptedCommandEntry
 {
+
     CommandId commandId;
 
-
     // Constructor
-    constexpr AcceptedCommandEntry() : commandId(0),
-                                       mask{ 0, chip::to_underlying(Access::Privilege::kOperate) } {}
+    constexpr AcceptedCommandEntry(CommandId id = 0,
+                                   std::underlying_type_t<CommandQualityFlags> cmdQualityFlags = 0,
+                                   std::underlying_type_t<Access::Privilege> invokePriv = kNoPrivilege
+                                ) : commandId(id), mask{ cmdQualityFlags, invokePriv } {}
  
 
-    void SetInvokePrivilege(Access::Privilege i)
+
+    // Overload assignment operator for mask.invokePrivilege
+    AcceptedCommandEntry& operator=(Access::Privilege value)
     {
         // Static ASSERT to check size of invokePrivilege type vs entry parameter.
         static_assert(sizeof(std::underlying_type_t<Access::Privilege>) >= 
-                      sizeof(chip::to_underlying(i)),
-                      "Size of invokePrivilege is not able to accomodate parameter (i).");
+                             sizeof(chip::to_underlying(value)),
+                             "Size of invokePrivilege is not able to accomodate parameter (value).");
 
-        mask.invokePrivilege = chip::to_underlying(i);
+        this->mask.invokePrivilege = chip::to_underlying(value);
+        return *this;
     }
-                                       
+                            
 
+    // Getter for mask.invokePrivilege
     Access::Privilege GetInvokePrivilege() const
     {
         return static_cast< Access::Privilege >(mask.invokePrivilege);

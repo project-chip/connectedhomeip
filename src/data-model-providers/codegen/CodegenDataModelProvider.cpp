@@ -58,7 +58,7 @@ DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(const ConcreteCommandPat
     DataModel::AcceptedCommandEntry entry;
 
     entry.commandId       = path.mCommandId;
-    entry.SetInvokePrivilege( RequiredPrivilege::ForInvokeCommand(path) );
+    entry = RequiredPrivilege::ForInvokeCommand(path);
     entry.SetFlags(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(path.mClusterId, commandId));
     entry.SetFlags(DataModel::CommandQualityFlags::kFabricScoped, CommandIsFabricScoped(path.mClusterId, commandId));
     entry.SetFlags(DataModel::CommandQualityFlags::kLargeMessage, CommandHasLargePayload(path.mClusterId, commandId));
@@ -99,10 +99,10 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
     const ConcreteAttributePath attributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
 
     entry.attributeId   = attribute.attributeId;
-    entry.SetReadPrivilege(RequiredPrivilege::ForReadAttribute(attributePath));
+    entry = RequiredPrivilege::ForReadAttribute(attributePath);
     if (!attribute.IsReadOnly())
     {
-        entry.SetWritePrivilege(RequiredPrivilege::ForWriteAttribute(attributePath));
+        entry = chip::to_underlying(RequiredPrivilege::ForWriteAttribute(attributePath));
     }
 
     entry.SetFlags(DataModel::AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));
@@ -294,7 +294,7 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
     //   - fixed value (no such flag exists, so this is not a quality flag we set/track)
     DataModel::AttributeEntry globalListEntry;
 
-    globalListEntry.SetReadPrivilege(Access::Privilege::kView);
+    globalListEntry = Access::Privilege::kView;
     globalListEntry.SetFlags(DataModel::AttributeQualityFlags::kListAttribute);
 
     for (auto & attribute : GlobalAttributesNotInMetadata)
