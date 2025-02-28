@@ -41729,9 +41729,8 @@ enum class Fields : uint8_t
 {
     kSensorWidth  = 0,
     kSensorHeight = 1,
-    kHDRCapable   = 2,
-    kMaxFPS       = 3,
-    kMaxHDRFPS    = 4,
+    kMaxFPS       = 2,
+    kMaxHDRFPS    = 3,
 };
 
 struct Type
@@ -41739,9 +41738,8 @@ struct Type
 public:
     uint16_t sensorWidth  = static_cast<uint16_t>(0);
     uint16_t sensorHeight = static_cast<uint16_t>(0);
-    bool HDRCapable       = static_cast<bool>(0);
     uint16_t maxFPS       = static_cast<uint16_t>(0);
-    uint16_t maxHDRFPS    = static_cast<uint16_t>(0);
+    Optional<uint16_t> maxHDRFPS;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -41803,6 +41801,11 @@ namespace SnapshotStreamAllocateResponse {
 struct Type;
 struct DecodableType;
 } // namespace SnapshotStreamAllocateResponse
+
+namespace SnapshotStreamModify {
+struct Type;
+struct DecodableType;
+} // namespace SnapshotStreamModify
 
 namespace SnapshotStreamDeallocate {
 struct Type;
@@ -42108,12 +42111,14 @@ public:
 namespace SnapshotStreamAllocate {
 enum class Fields : uint8_t
 {
-    kImageCodec    = 0,
-    kMaxFrameRate  = 1,
-    kBitRate       = 2,
-    kMinResolution = 3,
-    kMaxResolution = 4,
-    kQuality       = 5,
+    kImageCodec       = 0,
+    kMaxFrameRate     = 1,
+    kBitRate          = 2,
+    kMinResolution    = 3,
+    kMaxResolution    = 4,
+    kQuality          = 5,
+    kWatermarkEnabled = 6,
+    kOSDEnabled       = 7,
 };
 
 struct Type
@@ -42129,6 +42134,8 @@ public:
     Structs::VideoResolutionStruct::Type minResolution;
     Structs::VideoResolutionStruct::Type maxResolution;
     uint8_t quality = static_cast<uint8_t>(0);
+    Optional<bool> watermarkEnabled;
+    Optional<bool> OSDEnabled;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -42149,6 +42156,8 @@ public:
     Structs::VideoResolutionStruct::DecodableType minResolution;
     Structs::VideoResolutionStruct::DecodableType maxResolution;
     uint8_t quality = static_cast<uint8_t>(0);
+    Optional<bool> watermarkEnabled;
+    Optional<bool> OSDEnabled;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SnapshotStreamAllocate
@@ -42184,6 +42193,44 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SnapshotStreamAllocateResponse
+namespace SnapshotStreamModify {
+enum class Fields : uint8_t
+{
+    kSnapshotStreamID = 0,
+    kWatermarkEnabled = 1,
+    kOSDEnabled       = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SnapshotStreamModify::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
+
+    uint16_t snapshotStreamID = static_cast<uint16_t>(0);
+    Optional<bool> watermarkEnabled;
+    Optional<bool> OSDEnabled;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SnapshotStreamModify::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
+
+    uint16_t snapshotStreamID = static_cast<uint16_t>(0);
+    Optional<bool> watermarkEnabled;
+    Optional<bool> OSDEnabled;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SnapshotStreamModify
 namespace SnapshotStreamDeallocate {
 enum class Fields : uint8_t
 {
@@ -42499,18 +42546,19 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace HDRModeEnabled
-namespace FabricsUsingCamera {
+namespace SupportedStreamUsages {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::FabricIndex>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::FabricIndex>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::FabricIndex> &;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FabricsUsingCamera::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedStreamUsages::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace FabricsUsingCamera
+} // namespace SupportedStreamUsages
 namespace AllocatedVideoStreams {
 struct TypeInfo
 {
@@ -42885,7 +42933,7 @@ struct TypeInfo
         Attributes::MaxNetworkBandwidth::TypeInfo::DecodableType maxNetworkBandwidth = static_cast<uint32_t>(0);
         Attributes::CurrentFrameRate::TypeInfo::DecodableType currentFrameRate       = static_cast<uint16_t>(0);
         Attributes::HDRModeEnabled::TypeInfo::DecodableType HDRModeEnabled           = static_cast<bool>(0);
-        Attributes::FabricsUsingCamera::TypeInfo::DecodableType fabricsUsingCamera;
+        Attributes::SupportedStreamUsages::TypeInfo::DecodableType supportedStreamUsages;
         Attributes::AllocatedVideoStreams::TypeInfo::DecodableType allocatedVideoStreams;
         Attributes::AllocatedAudioStreams::TypeInfo::DecodableType allocatedAudioStreams;
         Attributes::AllocatedSnapshotStreams::TypeInfo::DecodableType allocatedSnapshotStreams;
@@ -42924,173 +42972,6 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
-namespace Events {
-namespace VideoStreamChanged {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-enum class Fields : uint8_t
-{
-    kVideoStreamID  = 0,
-    kStreamUsage    = 1,
-    kVideoCodec     = 2,
-    kMinFrameRate   = 3,
-    kMaxFrameRate   = 4,
-    kMinResolution  = 5,
-    kMaxResolution  = 6,
-    kMinBitRate     = 7,
-    kMaxBitRate     = 8,
-    kMinFragmentLen = 9,
-    kMaxFragmentLen = 10,
-};
-
-struct Type
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::VideoStreamChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    uint16_t videoStreamID = static_cast<uint16_t>(0);
-    Optional<StreamUsageEnum> streamUsage;
-    Optional<VideoCodecEnum> videoCodec;
-    Optional<uint16_t> minFrameRate;
-    Optional<uint16_t> maxFrameRate;
-    Optional<Structs::VideoResolutionStruct::Type> minResolution;
-    Optional<Structs::VideoResolutionStruct::Type> maxResolution;
-    Optional<uint32_t> minBitRate;
-    Optional<uint32_t> maxBitRate;
-    Optional<uint16_t> minFragmentLen;
-    Optional<uint16_t> maxFragmentLen;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::VideoStreamChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-
-    uint16_t videoStreamID = static_cast<uint16_t>(0);
-    Optional<StreamUsageEnum> streamUsage;
-    Optional<VideoCodecEnum> videoCodec;
-    Optional<uint16_t> minFrameRate;
-    Optional<uint16_t> maxFrameRate;
-    Optional<Structs::VideoResolutionStruct::DecodableType> minResolution;
-    Optional<Structs::VideoResolutionStruct::DecodableType> maxResolution;
-    Optional<uint32_t> minBitRate;
-    Optional<uint32_t> maxBitRate;
-    Optional<uint16_t> minFragmentLen;
-    Optional<uint16_t> maxFragmentLen;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace VideoStreamChanged
-namespace AudioStreamChanged {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-enum class Fields : uint8_t
-{
-    kAudioStreamID = 0,
-    kStreamUsage   = 1,
-    kAudioCodec    = 2,
-    kChannelCount  = 3,
-    kSampleRate    = 4,
-    kBitRate       = 5,
-    kBitDepth      = 6,
-};
-
-struct Type
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::AudioStreamChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    uint16_t audioStreamID = static_cast<uint16_t>(0);
-    Optional<StreamUsageEnum> streamUsage;
-    Optional<AudioCodecEnum> audioCodec;
-    Optional<uint8_t> channelCount;
-    Optional<uint32_t> sampleRate;
-    Optional<uint32_t> bitRate;
-    Optional<uint8_t> bitDepth;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::AudioStreamChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-
-    uint16_t audioStreamID = static_cast<uint16_t>(0);
-    Optional<StreamUsageEnum> streamUsage;
-    Optional<AudioCodecEnum> audioCodec;
-    Optional<uint8_t> channelCount;
-    Optional<uint32_t> sampleRate;
-    Optional<uint32_t> bitRate;
-    Optional<uint8_t> bitDepth;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace AudioStreamChanged
-namespace SnapshotStreamChanged {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-enum class Fields : uint8_t
-{
-    kSnapshotStreamID = 0,
-    kImageCodec       = 1,
-    kFrameRate        = 2,
-    kBitRate          = 3,
-    kMinResolution    = 4,
-    kMaxResolution    = 5,
-    kQuality          = 6,
-};
-
-struct Type
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::SnapshotStreamChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    uint16_t snapshotStreamID = static_cast<uint16_t>(0);
-    Optional<ImageCodecEnum> imageCodec;
-    Optional<uint16_t> frameRate;
-    Optional<uint32_t> bitRate;
-    Optional<Structs::VideoResolutionStruct::Type> minResolution;
-    Optional<Structs::VideoResolutionStruct::Type> maxResolution;
-    Optional<uint8_t> quality;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::SnapshotStreamChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-
-    uint16_t snapshotStreamID = static_cast<uint16_t>(0);
-    Optional<ImageCodecEnum> imageCodec;
-    Optional<uint16_t> frameRate;
-    Optional<uint32_t> bitRate;
-    Optional<Structs::VideoResolutionStruct::DecodableType> minResolution;
-    Optional<Structs::VideoResolutionStruct::DecodableType> maxResolution;
-    Optional<uint8_t> quality;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace SnapshotStreamChanged
-} // namespace Events
 } // namespace CameraAvStreamManagement
 namespace CameraAvSettingsUserLevelManagement {
 namespace Structs {

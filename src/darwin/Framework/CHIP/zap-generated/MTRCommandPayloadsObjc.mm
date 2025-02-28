@@ -33206,6 +33206,10 @@ NS_ASSUME_NONNULL_BEGIN
         _maxResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
 
         _quality = @(0);
+
+        _watermarkEnabled = nil;
+
+        _osdEnabled = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -33222,6 +33226,8 @@ NS_ASSUME_NONNULL_BEGIN
     other.minResolution = self.minResolution;
     other.maxResolution = self.maxResolution;
     other.quality = self.quality;
+    other.watermarkEnabled = self.watermarkEnabled;
+    other.osdEnabled = self.osdEnabled;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -33230,7 +33236,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: imageCodec:%@; maxFrameRate:%@; bitRate:%@; minResolution:%@; maxResolution:%@; quality:%@; >", NSStringFromClass([self class]), _imageCodec, _maxFrameRate, _bitRate, _minResolution, _maxResolution, _quality];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: imageCodec:%@; maxFrameRate:%@; bitRate:%@; minResolution:%@; maxResolution:%@; quality:%@; watermarkEnabled:%@; osdEnabled:%@; >", NSStringFromClass([self class]), _imageCodec, _maxFrameRate, _bitRate, _minResolution, _maxResolution, _quality, _watermarkEnabled, _osdEnabled];
     return descriptionString;
 }
 
@@ -33261,6 +33267,18 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         encodableStruct.quality = self.quality.unsignedCharValue;
+    }
+    {
+        if (self.watermarkEnabled != nil) {
+            auto & definedValue_0 = encodableStruct.watermarkEnabled.Emplace();
+            definedValue_0 = self.watermarkEnabled.boolValue;
+        }
+    }
+    {
+        if (self.osdEnabled != nil) {
+            auto & definedValue_0 = encodableStruct.OSDEnabled.Emplace();
+            definedValue_0 = self.osdEnabled.boolValue;
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -33378,6 +33396,103 @@ NS_ASSUME_NONNULL_BEGIN
     return CHIP_NO_ERROR;
 }
 
+@end
+
+@implementation MTRCameraAVStreamManagementClusterSnapshotStreamModifyParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _snapshotStreamID = @(0);
+
+        _watermarkEnabled = nil;
+
+        _osdEnabled = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRCameraAVStreamManagementClusterSnapshotStreamModifyParams alloc] init];
+
+    other.snapshotStreamID = self.snapshotStreamID;
+    other.watermarkEnabled = self.watermarkEnabled;
+    other.osdEnabled = self.osdEnabled;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: snapshotStreamID:%@; watermarkEnabled:%@; osdEnabled:%@; >", NSStringFromClass([self class]), _snapshotStreamID, _watermarkEnabled, _osdEnabled];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCameraAVStreamManagementClusterSnapshotStreamModifyParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamModify::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.snapshotStreamID = self.snapshotStreamID.unsignedShortValue;
+    }
+    {
+        if (self.watermarkEnabled != nil) {
+            auto & definedValue_0 = encodableStruct.watermarkEnabled.Emplace();
+            definedValue_0 = self.watermarkEnabled.boolValue;
+        }
+    }
+    {
+        if (self.osdEnabled != nil) {
+            auto & definedValue_0 = encodableStruct.OSDEnabled.Emplace();
+            definedValue_0 = self.osdEnabled.boolValue;
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
 @end
 
 @implementation MTRCameraAVStreamManagementClusterSnapshotStreamDeallocateParams

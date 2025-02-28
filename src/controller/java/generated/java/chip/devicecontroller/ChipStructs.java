@@ -14105,25 +14105,21 @@ public static class CameraAvStreamManagementClusterAudioStreamStruct {
 public static class CameraAvStreamManagementClusterVideoSensorParamsStruct {
   public Integer sensorWidth;
   public Integer sensorHeight;
-  public Boolean HDRCapable;
   public Integer maxFPS;
-  public Integer maxHDRFPS;
+  public Optional<Integer> maxHDRFPS;
   private static final long SENSOR_WIDTH_ID = 0L;
   private static final long SENSOR_HEIGHT_ID = 1L;
-  private static final long HDR_CAPABLE_ID = 2L;
-  private static final long MAX_FPS_ID = 3L;
-  private static final long MAX_HDRFPS_ID = 4L;
+  private static final long MAX_FPS_ID = 2L;
+  private static final long MAX_HDRFPS_ID = 3L;
 
   public CameraAvStreamManagementClusterVideoSensorParamsStruct(
     Integer sensorWidth,
     Integer sensorHeight,
-    Boolean HDRCapable,
     Integer maxFPS,
-    Integer maxHDRFPS
+    Optional<Integer> maxHDRFPS
   ) {
     this.sensorWidth = sensorWidth;
     this.sensorHeight = sensorHeight;
-    this.HDRCapable = HDRCapable;
     this.maxFPS = maxFPS;
     this.maxHDRFPS = maxHDRFPS;
   }
@@ -14132,9 +14128,8 @@ public static class CameraAvStreamManagementClusterVideoSensorParamsStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(SENSOR_WIDTH_ID, new UIntType(sensorWidth)));
     values.add(new StructElement(SENSOR_HEIGHT_ID, new UIntType(sensorHeight)));
-    values.add(new StructElement(HDR_CAPABLE_ID, new BooleanType(HDRCapable)));
     values.add(new StructElement(MAX_FPS_ID, new UIntType(maxFPS)));
-    values.add(new StructElement(MAX_HDRFPS_ID, new UIntType(maxHDRFPS)));
+    values.add(new StructElement(MAX_HDRFPS_ID, maxHDRFPS.<BaseTLVType>map((nonOptionalmaxHDRFPS) -> new UIntType(nonOptionalmaxHDRFPS)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -14145,9 +14140,8 @@ public static class CameraAvStreamManagementClusterVideoSensorParamsStruct {
     }
     Integer sensorWidth = null;
     Integer sensorHeight = null;
-    Boolean HDRCapable = null;
     Integer maxFPS = null;
-    Integer maxHDRFPS = null;
+    Optional<Integer> maxHDRFPS = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == SENSOR_WIDTH_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -14159,11 +14153,6 @@ public static class CameraAvStreamManagementClusterVideoSensorParamsStruct {
           UIntType castingValue = element.value(UIntType.class);
           sensorHeight = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == HDR_CAPABLE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
-          BooleanType castingValue = element.value(BooleanType.class);
-          HDRCapable = castingValue.value(Boolean.class);
-        }
       } else if (element.contextTagNum() == MAX_FPS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
@@ -14172,14 +14161,13 @@ public static class CameraAvStreamManagementClusterVideoSensorParamsStruct {
       } else if (element.contextTagNum() == MAX_HDRFPS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          maxHDRFPS = castingValue.value(Integer.class);
+          maxHDRFPS = Optional.of(castingValue.value(Integer.class));
         }
       }
     }
     return new CameraAvStreamManagementClusterVideoSensorParamsStruct(
       sensorWidth,
       sensorHeight,
-      HDRCapable,
       maxFPS,
       maxHDRFPS
     );
@@ -14194,9 +14182,6 @@ public static class CameraAvStreamManagementClusterVideoSensorParamsStruct {
     output.append("\n");
     output.append("\tsensorHeight: ");
     output.append(sensorHeight);
-    output.append("\n");
-    output.append("\tHDRCapable: ");
-    output.append(HDRCapable);
     output.append("\n");
     output.append("\tmaxFPS: ");
     output.append(maxFPS);

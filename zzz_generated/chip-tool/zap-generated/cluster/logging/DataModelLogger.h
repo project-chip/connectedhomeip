@@ -783,13 +783,6 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ZoneManagement::Events::ZoneStopped::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::CameraAvStreamManagement::Events::VideoStreamChanged::DecodableType & value);
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::CameraAvStreamManagement::Events::AudioStreamChanged::DecodableType & value);
-static CHIP_ERROR
-LogValue(const char * label, size_t indent,
-         const chip::app::Clusters::CameraAvStreamManagement::Events::SnapshotStreamChanged::DecodableType & value);
-static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::PushAvStreamTransport::Events::PushTransportBegin::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::PushAvStreamTransport::Events::PushTransportEnd::DecodableType & value);

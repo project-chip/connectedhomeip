@@ -6544,11 +6544,7 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoSensorParamsStruct.sensorHeight", "sensorHeight",
                                                                   value.isMember("sensorHeight")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("VideoSensorParamsStruct.HDRCapable", "HDRCapable", value.isMember("HDRCapable")));
-    ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("VideoSensorParamsStruct.maxFPS", "maxFPS", value.isMember("maxFPS")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("VideoSensorParamsStruct.maxHDRFPS", "maxHDRFPS", value.isMember("maxHDRFPS")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "sensorWidth");
@@ -6559,16 +6555,15 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.sensorHeight, value["sensorHeight"]));
     valueCopy.removeMember("sensorHeight");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "HDRCapable");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.HDRCapable, value["HDRCapable"]));
-    valueCopy.removeMember("HDRCapable");
-
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxFPS");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxFPS, value["maxFPS"]));
     valueCopy.removeMember("maxFPS");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxHDRFPS");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxHDRFPS, value["maxHDRFPS"]));
+    if (value.isMember("maxHDRFPS"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxHDRFPS");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxHDRFPS, value["maxHDRFPS"]));
+    }
     valueCopy.removeMember("maxHDRFPS");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
@@ -6579,7 +6574,6 @@ void ComplexArgumentParser::Finalize(
 {
     ComplexArgumentParser::Finalize(request.sensorWidth);
     ComplexArgumentParser::Finalize(request.sensorHeight);
-    ComplexArgumentParser::Finalize(request.HDRCapable);
     ComplexArgumentParser::Finalize(request.maxFPS);
     ComplexArgumentParser::Finalize(request.maxHDRFPS);
 }

@@ -6877,6 +6877,12 @@ bool emberAfCameraAvStreamManagementClusterSnapshotStreamAllocateCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamAllocate::DecodableType & commandData);
 /**
+ * @brief Camera AV Stream Management Cluster SnapshotStreamModify Command callback (from client)
+ */
+bool emberAfCameraAvStreamManagementClusterSnapshotStreamModifyCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamModify::DecodableType & commandData);
+/**
  * @brief Camera AV Stream Management Cluster SnapshotStreamDeallocate Command callback (from client)
  */
 bool emberAfCameraAvStreamManagementClusterSnapshotStreamDeallocateCallback(

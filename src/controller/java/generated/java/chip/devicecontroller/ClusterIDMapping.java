@@ -17284,7 +17284,7 @@ public class ClusterIDMapping {
             MaxNetworkBandwidth(11L),
             CurrentFrameRate(12L),
             HDRModeEnabled(13L),
-            FabricsUsingCamera(14L),
+            SupportedStreamUsages(14L),
             AllocatedVideoStreams(15L),
             AllocatedAudioStreams(16L),
             AllocatedSnapshotStreams(17L),
@@ -17336,10 +17336,7 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {
-            VideoStreamChanged(0L),
-            AudioStreamChanged(1L),
-            SnapshotStreamChanged(2L),;
+        public enum Event {;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -17366,9 +17363,10 @@ public class ClusterIDMapping {
             VideoStreamModify(5L),
             VideoStreamDeallocate(6L),
             SnapshotStreamAllocate(7L),
-            SnapshotStreamDeallocate(9L),
-            SetStreamPriorities(10L),
-            CaptureSnapshot(11L),;
+            SnapshotStreamModify(9L),
+            SnapshotStreamDeallocate(10L),
+            SetStreamPriorities(11L),
+            CaptureSnapshot(12L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -17471,7 +17469,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum SnapshotStreamAllocateCommandField {ImageCodec(0),MaxFrameRate(1),BitRate(2),MinResolution(3),MaxResolution(4),Quality(5),;
+                }public enum SnapshotStreamAllocateCommandField {ImageCodec(0),MaxFrameRate(1),BitRate(2),MinResolution(3),MaxResolution(4),Quality(5),WatermarkEnabled(6),OSDEnabled(7),;
                     private final int id;
                     SnapshotStreamAllocateCommandField(int id) {
                         this.id = id;
@@ -17482,6 +17480,23 @@ public class ClusterIDMapping {
                     }
                     public static SnapshotStreamAllocateCommandField value(int id) throws NoSuchFieldError {
                         for (SnapshotStreamAllocateCommandField field : SnapshotStreamAllocateCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SnapshotStreamModifyCommandField {SnapshotStreamID(0),WatermarkEnabled(1),OSDEnabled(2),;
+                    private final int id;
+                    SnapshotStreamModifyCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SnapshotStreamModifyCommandField value(int id) throws NoSuchFieldError {
+                        for (SnapshotStreamModifyCommandField field : SnapshotStreamModifyCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

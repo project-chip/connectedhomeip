@@ -4662,7 +4662,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxNetworkBandwidthID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeCurrentFrameRateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeHDRModeEnabledID MTR_PROVISIONALLY_AVAILABLE = 0x0000000D,
-    MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeFabricsUsingCameraID MTR_PROVISIONALLY_AVAILABLE = 0x0000000E,
+    MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSupportedStreamUsagesID MTR_PROVISIONALLY_AVAILABLE = 0x0000000E,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedVideoStreamsID MTR_PROVISIONALLY_AVAILABLE = 0x0000000F,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedAudioStreamsID MTR_PROVISIONALLY_AVAILABLE = 0x00000010,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedSnapshotStreamsID MTR_PROVISIONALLY_AVAILABLE = 0x00000011,
@@ -6973,10 +6973,11 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterCameraAVStreamManagementCommandVideoStreamDeallocateID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
     MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamAllocateID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
     MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamAllocateResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
-    MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamDeallocateID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
-    MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetStreamPrioritiesID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
-    MTRCommandIDTypeClusterCameraAVStreamManagementCommandCaptureSnapshotID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
-    MTRCommandIDTypeClusterCameraAVStreamManagementCommandCaptureSnapshotResponseID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
+    MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamModifyID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
+    MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamDeallocateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
+    MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetStreamPrioritiesID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
+    MTRCommandIDTypeClusterCameraAVStreamManagementCommandCaptureSnapshotID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
+    MTRCommandIDTypeClusterCameraAVStreamManagementCommandCaptureSnapshotResponseID MTR_PROVISIONALLY_AVAILABLE = 0x0000000D,
 
     // Cluster CameraAVSettingsUserLevelManagement commands
     MTRCommandIDTypeClusterCameraAVSettingsUserLevelManagementCommandMPTZSetPositionID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -7617,11 +7618,6 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     // Cluster ZoneManagement events
     MTREventIDTypeClusterZoneManagementEventZoneTriggeredID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTREventIDTypeClusterZoneManagementEventZoneStoppedID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-
-    // Cluster CameraAVStreamManagement events
-    MTREventIDTypeClusterCameraAVStreamManagementEventVideoStreamChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTREventIDTypeClusterCameraAVStreamManagementEventAudioStreamChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTREventIDTypeClusterCameraAVStreamManagementEventSnapshotStreamChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
 
     // Cluster PushAVStreamTransport events
     MTREventIDTypeClusterPushAVStreamTransportEventPushTransportBeginID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,

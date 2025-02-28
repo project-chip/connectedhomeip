@@ -6988,9 +6988,9 @@ namespace HDRModeEnabled {
 static constexpr AttributeId Id = 0x0000000D;
 } // namespace HDRModeEnabled
 
-namespace FabricsUsingCamera {
+namespace SupportedStreamUsages {
 static constexpr AttributeId Id = 0x0000000E;
-} // namespace FabricsUsingCamera
+} // namespace SupportedStreamUsages
 
 namespace AllocatedVideoStreams {
 static constexpr AttributeId Id = 0x0000000F;

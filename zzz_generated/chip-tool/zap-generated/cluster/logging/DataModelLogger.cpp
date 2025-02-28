@@ -5814,14 +5814,6 @@ CHIP_ERROR DataModelLogger::LogValue(
         }
     }
     {
-        CHIP_ERROR err = LogValue("HDRCapable", indent + 1, value.HDRCapable);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'HDRCapable'");
-            return err;
-        }
-    }
-    {
         CHIP_ERROR err = LogValue("MaxFPS", indent + 1, value.maxFPS);
         if (err != CHIP_NO_ERROR)
         {
@@ -9271,230 +9263,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Reason'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const CameraAvStreamManagement::Events::VideoStreamChanged::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("VideoStreamID", indent + 1, value.videoStreamID);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'VideoStreamID'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("StreamUsage", indent + 1, value.streamUsage);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'StreamUsage'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("VideoCodec", indent + 1, value.videoCodec);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'VideoCodec'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("MinFrameRate", indent + 1, value.minFrameRate);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'MinFrameRate'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("MaxFrameRate", indent + 1, value.maxFrameRate);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'MaxFrameRate'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("MinResolution", indent + 1, value.minResolution);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'MinResolution'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("MaxResolution", indent + 1, value.maxResolution);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'MaxResolution'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("MinBitRate", indent + 1, value.minBitRate);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'MinBitRate'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("MaxBitRate", indent + 1, value.maxBitRate);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'MaxBitRate'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("MinFragmentLen", indent + 1, value.minFragmentLen);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'MinFragmentLen'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("MaxFragmentLen", indent + 1, value.maxFragmentLen);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'MaxFragmentLen'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const CameraAvStreamManagement::Events::AudioStreamChanged::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("AudioStreamID", indent + 1, value.audioStreamID);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AudioStreamID'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("StreamUsage", indent + 1, value.streamUsage);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'StreamUsage'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("AudioCodec", indent + 1, value.audioCodec);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AudioCodec'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("ChannelCount", indent + 1, value.channelCount);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ChannelCount'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("SampleRate", indent + 1, value.sampleRate);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'SampleRate'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("BitRate", indent + 1, value.bitRate);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'BitRate'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("BitDepth", indent + 1, value.bitDepth);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'BitDepth'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const CameraAvStreamManagement::Events::SnapshotStreamChanged::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("SnapshotStreamID", indent + 1, value.snapshotStreamID);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'SnapshotStreamID'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("ImageCodec", indent + 1, value.imageCodec);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ImageCodec'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("FrameRate", indent + 1, value.frameRate);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'FrameRate'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("BitRate", indent + 1, value.bitRate);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'BitRate'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("MinResolution", indent + 1, value.minResolution);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'MinResolution'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("MaxResolution", indent + 1, value.maxResolution);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'MaxResolution'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("Quality", indent + 1, value.quality);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Quality'");
             return err;
         }
     }
@@ -19351,10 +19119,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("HDRModeEnabled", 1, value);
         }
-        case CameraAvStreamManagement::Attributes::FabricsUsingCamera::Id: {
-            chip::app::DataModel::DecodableList<chip::FabricIndex> value;
+        case CameraAvStreamManagement::Attributes::SupportedStreamUsages::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FabricsUsingCamera", 1, value);
+            return DataModelLogger::LogValue("SupportedStreamUsages", 1, value);
         }
         case CameraAvStreamManagement::Attributes::AllocatedVideoStreams::Id: {
             chip::app::DataModel::DecodableList<
@@ -22094,27 +21862,6 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::ZoneManagement::Events::ZoneStopped::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ZoneStopped", 1, value);
-        }
-        }
-        break;
-    }
-    case CameraAvStreamManagement::Id: {
-        switch (header.mPath.mEventId)
-        {
-        case CameraAvStreamManagement::Events::VideoStreamChanged::Id: {
-            chip::app::Clusters::CameraAvStreamManagement::Events::VideoStreamChanged::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("VideoStreamChanged", 1, value);
-        }
-        case CameraAvStreamManagement::Events::AudioStreamChanged::Id: {
-            chip::app::Clusters::CameraAvStreamManagement::Events::AudioStreamChanged::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AudioStreamChanged", 1, value);
-        }
-        case CameraAvStreamManagement::Events::SnapshotStreamChanged::Id: {
-            chip::app::Clusters::CameraAvStreamManagement::Events::SnapshotStreamChanged::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SnapshotStreamChanged", 1, value);
         }
         }
         break;

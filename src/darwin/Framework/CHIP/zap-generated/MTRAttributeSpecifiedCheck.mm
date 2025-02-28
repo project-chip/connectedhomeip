@@ -5667,7 +5667,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::HDRModeEnabled::Id: {
         return YES;
     }
-    case Attributes::FabricsUsingCamera::Id: {
+    case Attributes::SupportedStreamUsages::Id: {
         return YES;
     }
     case Attributes::AllocatedVideoStreams::Id: {

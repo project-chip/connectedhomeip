@@ -17022,9 +17022,12 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
         value = [MTRCameraAVStreamManagementClusterVideoSensorParamsStruct new];
         value.sensorWidth = [NSNumber numberWithUnsignedShort:cppValue.sensorWidth];
         value.sensorHeight = [NSNumber numberWithUnsignedShort:cppValue.sensorHeight];
-        value.hdrCapable = [NSNumber numberWithBool:cppValue.HDRCapable];
         value.maxFPS = [NSNumber numberWithUnsignedShort:cppValue.maxFPS];
-        value.maxHDRFPS = [NSNumber numberWithUnsignedShort:cppValue.maxHDRFPS];
+        if (cppValue.maxHDRFPS.HasValue()) {
+            value.maxHDRFPS = [NSNumber numberWithUnsignedShort:cppValue.maxHDRFPS.Value()];
+        } else {
+            value.maxHDRFPS = nil;
+        }
         return value;
     }
     case Attributes::NightVisionCapable::Id: {
@@ -17288,8 +17291,8 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
         value = [NSNumber numberWithBool:cppValue];
         return value;
     }
-    case Attributes::FabricsUsingCamera::Id: {
-        using TypeInfo = Attributes::FabricsUsingCamera::TypeInfo;
+    case Attributes::SupportedStreamUsages::Id: {
+        using TypeInfo = Attributes::SupportedStreamUsages::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -17302,7 +17305,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
                 NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
