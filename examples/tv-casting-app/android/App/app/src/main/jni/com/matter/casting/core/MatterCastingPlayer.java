@@ -32,6 +32,7 @@ import java.util.Objects;
  */
 public class MatterCastingPlayer implements CastingPlayer {
   private static final String TAG = MatterCastingPlayer.class.getSimpleName();
+
   /**
    * Time (in sec) to keep the commissioning window open, if commissioning is required. Must be >= 3
    * minutes.
@@ -269,5 +270,9 @@ public class MatterCastingPlayer implements CastingPlayer {
   public native void disconnect();
 
   @Override
-  public native boolean isPendingPasscodeFromUser();
+  public ConnectionState getConnectionState() {
+      return ConnectionState.valueOf(getConnectionStateNative());
+  }
+
+  public native String getConnectionStateNative();
 }

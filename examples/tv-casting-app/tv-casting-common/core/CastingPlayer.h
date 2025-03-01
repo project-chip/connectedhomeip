@@ -143,14 +143,6 @@ public:
     bool IsConnected() const { return mConnectionState == CASTING_PLAYER_CONNECTED; }
 
     /**
-     * @return true if this CastingPlayer is still pending pass code from user and therefore is not ready
-     */
-    bool IsPendingPasscodeFromUser() const
-    {
-        return mConnectionState == CASTING_PLAYER_CONNECTING && !mIdOptions.mCommissionerPasscodeReady;
-    }
-
-    /**
      * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new commissioning session request. If the
      * CastingApp does not have the nodeId and fabricIndex of this CastingPlayer cached on disk, this will execute the User Directed
      * Commissioning (UDC) process by sending an IdentificationDeclaration message to the CastingPlayer/Commissioner. For certain

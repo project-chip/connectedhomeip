@@ -165,16 +165,30 @@ JNI_METHOD(void, disconnect)
     castingPlayer->Disconnect();
 }
 
-JNI_METHOD(bool, isPendingPasscodeFromUser)
+JNI_METHOD(jstring, getConnectionStateNative)
 (JNIEnv * env, jobject thiz)
 {
     chip::DeviceLayer::StackLock lock;
-    ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::isPendingPasscodeFromUser()");
+    ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::getConnectionState()");
 
     CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
-    VerifyOrReturnValue(castingPlayer != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnValue(castingPlayer != nullptr, env->NewStringUTF("Cast Player is nullptr"));
 
-    return castingPlayer->IsPendingPasscodeFromUser();
+    matter::casting::core::ConnectionState state = castingPlayer->GetConnectionState();
+    switch (state)
+    {
+    case matter::casting::core::ConnectionState::CASTING_PLAYER_NOT_CONNECTED:
+        return env->NewStringUTF("NOT_CONNECTED");
+    case matter::casting::core::ConnectionState::CASTING_PLAYER_CONNECTING:
+        return env->NewStringUTF("CONNECTING");
+    case matter::casting::core::ConnectionState::CASTING_PLAYER_CONNECTED:
+        return env->NewStringUTF("CONNECTED");
+    default: {
+        char error_str[50];
+        snprintf(error_str, sizeof(error_str), "Unsupported Connection State: %d", state);
+        return env->NewStringUTF(error_str);
+    }
+    }
 }
 
 JNI_METHOD(jobject, getEndpoints)

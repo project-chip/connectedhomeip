@@ -263,12 +263,11 @@ public class ConnectionExampleFragment extends Fragment {
   }
 
   @Override
-  public void onDestroy() {
-    super.onDestroy();
-
-    // Only stop connection if we are pending passcode confirmation
-    // We cannot stop connection once continueConnecting() is called
-    if (targetCastingPlayer.isPendingPasscodeFromUser()) {
+  public void onStop() {
+    super.onStop();
+    // Only stop connection if we are still connecting to the device
+    if (targetCastingPlayer.getConnectionState() == CastingPlayer.ConnectionState.CONNECTING) {
+      // NOTE, once stopConnecting() is called, the targetCastingPlayer's native object is freed
       MatterError err = targetCastingPlayer.stopConnecting();
       if (err.hasError()) {
         Log.e(
@@ -352,18 +351,12 @@ public class ConnectionExampleFragment extends Fragment {
                         connectionFragmentStatusTextView.setText(
                             "Casting Player CONTINUE CONNECTING failed due to: "
                                 + finalErr
-                                + "\n\n");
+                                + ". Route back to disconnect & try again. \n\n");
                       });
               Log.e(
                   TAG,
-                  "displayPasscodeInputDialog() continueConnecting() failed, calling stopConnecting() due to: "
+                  "displayPasscodeInputDialog() continueConnecting() failed due to: "
                       + err);
-              // Since continueConnecting() failed, Attempt to cancel the connection attempt with
-              // the CastingPlayer/Commissioner.
-              err = targetCastingPlayer.stopConnecting();
-              if (err.hasError()) {
-                Log.e(TAG, "displayPasscodeInputDialog() stopConnecting() failed due to: " + err);
-              }
             }
           }
         });
@@ -375,20 +368,9 @@ public class ConnectionExampleFragment extends Fragment {
           public void onClick(DialogInterface dialog, int which) {
             Log.i(
                 TAG,
-                "displayPasscodeInputDialog() user cancelled the CastingPlayer/Commissioner-Generated Passcode input dialog. Calling stopConnecting()");
+                "displayPasscodeInputDialog() user cancelled the CastingPlayer/Commissioner-Generated Passcode input dialog");
             connectionFragmentStatusTextView.setText(
-                "Connection attempt with Casting Player cancelled by the Casting Client/Commissionee user. \n\nRoute back to exit. \n\n");
-            MatterError err = targetCastingPlayer.stopConnecting();
-            if (err.hasError()) {
-              MatterError finalErr = err;
-              getActivity()
-                  .runOnUiThread(
-                      () -> {
-                        connectionFragmentStatusTextView.setText(
-                            "Casting Player CANCEL failed due to: " + finalErr + "\n\n");
-                      });
-              Log.e(TAG, "displayPasscodeInputDialog() stopConnecting() failed due to: " + err);
-            }
+                "Connection attempt with Casting Player cancelled by the Casting Client/Commissionee user. \n\nRoute back to disconnect & exit. \n\n");
             dialog.cancel();
           }
         });

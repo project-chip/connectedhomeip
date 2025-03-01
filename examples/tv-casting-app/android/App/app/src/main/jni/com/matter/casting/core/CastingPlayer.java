@@ -29,6 +29,13 @@ import java.util.List;
  * about the service discovered/resolved.
  */
 public interface CastingPlayer {
+
+  public enum ConnectionState {
+    NOT_CONNECTED,
+    CONNECTING,
+    CONNECTED,
+  }
+
   boolean isConnected();
 
   String getDeviceId();
@@ -157,5 +164,7 @@ public interface CastingPlayer {
    * @return true if this CastingPlayer is still pending pass code from user and therefore is not
    *     ready
    */
-  boolean isPendingPasscodeFromUser();
+  ConnectionState getConnectionState();
+
+  String getConnectionStateNative();
 }
