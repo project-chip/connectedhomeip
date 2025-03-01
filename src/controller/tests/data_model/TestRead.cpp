@@ -2527,6 +2527,69 @@ TEST_F(TestRead, TestSubscribe_OnActiveModeNotification)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
+TEST_F(TestRead, TestSubscribeFailed_OnActiveModeNotification)
+{
+    auto sessionHandle = GetSessionBobToAlice();
+
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
+
+        callback.mScheduleLITResubscribeImmediately = false;
+        callback.SetReadClient(&readClient);
+
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+
+        AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
+
+        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
+        readPrepareParams.mIsPeerLIT                 = true;
+
+        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        GetLoopback().mNumMessagesToDrop = LoopbackTransport::kUnlimitedMessageCount;
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(6000),
+                                    [&]() { return callback.mOnResubscriptionsAttempted == 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 0);
+
+        GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+        InteractionModelEngine::GetInstance()->OnActiveModeNotification(
+            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()));
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+
+        //
+        // With re-sub enabled, we shouldn't have encountered any errors
+        //
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnDone, 0);
+
+        GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+    }
+
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
+
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
 /**
  * When the liveness timeout of a subscription to ICD is reached, the subscription will enter "InactiveICDSubscription" state, the
  * client should call "OnActiveModeNotification" to re-activate it again when the check-in message is received from the ICD.
