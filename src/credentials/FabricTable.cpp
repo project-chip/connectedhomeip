@@ -1466,7 +1466,7 @@ CHIP_ERROR FabricTable::StoreCommitMarker(const CommitMarker & commitMarker)
     const auto markerContextTLVLength = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(markerContextTLVLength), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::FailSafeCommitMarkerKey().KeyName(), tlvBuf,
+    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::FabricTableCommitMarkerKey().KeyName(), tlvBuf,
                                      static_cast<uint16_t>(markerContextTLVLength));
 }
 
@@ -1475,7 +1475,7 @@ CHIP_ERROR FabricTable::GetCommitMarker(CommitMarker & outCommitMarker)
     uint8_t tlvBuf[CommitMarkerContextTLVMaxSize()];
     uint16_t tlvSize = sizeof(tlvBuf);
     ReturnErrorOnFailure(
-        mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FailSafeCommitMarkerKey().KeyName(), tlvBuf, tlvSize));
+        mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricTableCommitMarkerKey().KeyName(), tlvBuf, tlvSize));
 
     // If buffer was too small, we won't reach here.
     TLV::ContiguousBufferTLVReader reader;
@@ -1499,7 +1499,7 @@ CHIP_ERROR FabricTable::GetCommitMarker(CommitMarker & outCommitMarker)
 
 void FabricTable::ClearCommitMarker()
 {
-    mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FailSafeCommitMarkerKey().KeyName());
+    mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricTableCommitMarkerKey().KeyName());
 }
 
 bool FabricTable::HasOperationalKeyForFabric(FabricIndex fabricIndex) const
