@@ -516,12 +516,6 @@ void ReadClient::OnPeerTypeChange(PeerType aType)
     mIsPeerLIT = (aType == PeerType::kLITICD);
 
     ChipLogProgress(DataManagement, "Peer is now %s LIT ICD.", mIsPeerLIT ? "a" : "not a");
-
-    // If the peer is no longer LIT, try to wake up the subscription and do resubscribe when necessary.
-    if (!mIsPeerLIT)
-    {
-        OnActiveModeNotification();
-    }
 }
 
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
