@@ -484,6 +484,7 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
 
 void ReadClient::OnActiveModeNotification()
 {
+    // Note: this API only works when issuing subscription via SendAutoResubscribeRequest.
     VerifyOrDie(mpImEngine->InActiveReadClientList(this));
     // When we reach here, the subscription definitely exceeded the liveness timeout. Just continue the unfinished resubscription
     // logic in `OnLivenessTimeoutCallback`.
@@ -493,6 +494,18 @@ void ReadClient::OnActiveModeNotification()
         return;
     }
 
+    // If the server sends out check-in message, and there is no reschedule subscription yet in client side at the same time, it means
+    // current client does not realize subscription has gone, and we should forcibly timeout current subscription, and schedule a new one.
+    if (!mIsResubscriptionScheduled)
+    {
+        // Closing will ultimately trigger ScheduleResubscription with the aReestablishCASE argument set to true, effectively 
+        // rendering the session defunct.
+        Close(CHIP_ERROR_TIMEOUT);
+        return;
+    }
+
+    // If the server sends a check-in message and a subscription is already scheduled, it indicates a client-side subscription timeout or failure.
+    // Cancel the scheduled subscription and initiate a new one immediately.
     TriggerResubscribeIfScheduled("check-in message");
 }
 
