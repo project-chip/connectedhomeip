@@ -58,7 +58,7 @@ void ClosureControlDelegate::SetClosureControlInstance(ClosureControl::Instance 
 // Return default value, will add timers and attribute handling in next phase 
 DataModel::Nullable<uint32_t> ClosureControlDelegate::GetCountdownTime()
 {
-    return NullNullable;
+    return DataModel::NullNullable;
 }
 
 // Return default value, will add attribute handling in next phase 
