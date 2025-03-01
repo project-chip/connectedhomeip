@@ -4,17 +4,17 @@ An example showing the use of CHIP on the Silicon Labs SiWx917
 
 <hr>
 
-- [Matter SiWx917 Closure Example](#matter-siwx917-closure-example)
-  - [Introduction](#introduction)
-  - [Building](#building)
-  - [Flashing the Application](#flashing-the-application)
-  - [Running the Complete Example](#running-the-complete-example)
-  - [Group Communication (Multicast)](#group-communication-multicast)
-  - [Building options](#building-options)
-    - [Disabling logging](#disabling-logging)
-    - [Debug build / release build](#debug-build--release-build)
-    - [Disabling QR CODE](#disabling-qr-code)
-    - [KVS maximum entry count](#kvs-maximum-entry-count)
+-   [Matter SiWx917 Closure Example](#matter-siwx917-closure-example)
+    -   [Introduction](#introduction)
+    -   [Building](#building)
+    -   [Flashing the Application](#flashing-the-application)
+    -   [Running the Complete Example](#running-the-complete-example)
+    -   [Group Communication (Multicast)](#group-communication-multicast)
+    -   [Building options](#building-options)
+        -   [Disabling logging](#disabling-logging)
+        -   [Debug build / release build](#debug-build--release-build)
+        -   [Disabling QR CODE](#disabling-qr-code)
+        -   [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
