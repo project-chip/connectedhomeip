@@ -1957,7 +1957,7 @@ endpoint 1 {
   }
 
   server cluster OnOff {
-    ram      attribute onOff default = 1;
+    ram      attribute onOff default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
