@@ -271,7 +271,7 @@ public class MatterCastingPlayer implements CastingPlayer {
 
   @Override
   public ConnectionState getConnectionState() {
-      return ConnectionState.valueOf(getConnectionStateNative());
+    return ConnectionState.valueOf(getConnectionStateNative());
   }
 
   public native String getConnectionStateNative();
