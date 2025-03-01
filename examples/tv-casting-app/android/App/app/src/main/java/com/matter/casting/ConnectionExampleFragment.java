@@ -353,10 +353,7 @@ public class ConnectionExampleFragment extends Fragment {
                                 + finalErr
                                 + ". Route back to disconnect & try again. \n\n");
                       });
-              Log.e(
-                  TAG,
-                  "displayPasscodeInputDialog() continueConnecting() failed due to: "
-                      + err);
+              Log.e(TAG, "displayPasscodeInputDialog() continueConnecting() failed due to: " + err);
             }
           }
         });
