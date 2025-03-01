@@ -55,19 +55,19 @@ void ClosureControlDelegate::SetClosureControlInstance(ClosureControl::Instance 
  *
  *********************************************************************************/
 
-// Return default value, will add timers and attribute handling in next phase 
+// Return default value, will add timers and attribute handling in next phase
 DataModel::Nullable<uint32_t> ClosureControlDelegate::GetCountdownTime()
 {
     return DataModel::NullNullable;
 }
 
-// Return default value, will add attribute handling in next phase 
+// Return default value, will add attribute handling in next phase
 CHIP_ERROR ClosureControlDelegate::StartCurrentErrorListRead()
 {
     return CHIP_NO_ERROR;
 }
 
-// Return emualted error list, will add attribute handling in next phase 
+// Return emualted error list, will add attribute handling in next phase
 CHIP_ERROR ClosureControlDelegate::GetCurrentErrorListAtIndex(size_t Index, ClosureErrorEnum & closureError)
 {
     if (Index >= MATTER_ARRAY_SIZE(kCurrentErrorList))
@@ -86,13 +86,13 @@ CHIP_ERROR ClosureControlDelegate::EndCurrentErrorListRead()
     return CHIP_NO_ERROR;
 }
 
-// Return default success, will add command handling in next phase 
+// Return default success, will add command handling in next phase
 Protocols::InteractionModel::Status ClosureControlDelegate::Stop()
 {
     return Status::Success;
 }
 
-// Return default success, will add command handling in next phase 
+// Return default success, will add command handling in next phase
 Protocols::InteractionModel::Status ClosureControlDelegate::MoveTo(const Optional<TagPositionEnum> & tag,
                                                                    const Optional<TagLatchEnum> & latch,
                                                                    const Optional<Globals::ThreeLevelAutoEnum> & speed)
