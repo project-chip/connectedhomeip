@@ -28,7 +28,7 @@ void ClosureApplicationInit()
 {
     ChipLogDetail(AppServer, "==================================================");
     auto endpointId = GetClosureDeviceEndpointId();
-    ChipLogDetail(AppServer, "Closure-app ClosureControlInit starting. Endpoint 0x%08d", endpointId);
+    ChipLogDetail(AppServer, "Closure-app ClosureControlInit starting. Endpoint 0x%d", endpointId);
     VerifyOrDie(ClosureControlInit(endpointId) == CHIP_NO_ERROR);
     ChipLogDetail(AppServer, "==================================================");
 }
