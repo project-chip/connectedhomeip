@@ -48,11 +48,8 @@ public:
     Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
     DataModel::Nullable<uint8_t> GetSpeedSetting();
     DataModel::Nullable<Percent> GetPercentSetting();
-
-#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
     Protocols::InteractionModel::Status OnCommand(EndpointId endpointId);
     Protocols::InteractionModel::Status OffCommand(EndpointId endpointId);
-#endif
 
 private:
     uint8_t mPercentCurrent = 0;
@@ -334,8 +331,6 @@ void emberAfFanControlClusterInitCallback(EndpointId endpoint)
     mFanControlManager->Init();
 }
 
-#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
-
 Protocols::InteractionModel::Status ChefFanControlManager::OnCommand(EndpointId endpointId)
 {
     ChipLogProgress(DeviceLayer, "ChefFanControlManager::OnCommand");
@@ -343,9 +338,39 @@ Protocols::InteractionModel::Status ChefFanControlManager::OnCommand(EndpointId 
     FanControl::FanModeEnum fanMode;
     FanControl::Attributes::FanMode::Get(endpointId, &fanMode);
 
-    if (fanMode == FanControl::FanModeEnum::kOff) // Off mode implies Speed/Percent setting values are 0.
+    if (fanMode == FanControl::FanModeEnum::kOff) // Off mode implies Speed/Percent setting values are 0. Set fan to HIGH.
     {
-        return Status::Success;
+        uint8_t speedMax;
+        Status status = SpeedMax::Get(mEndpoint, &speedMax);
+        if (status == Status::Success)
+        {
+            status = FanControl::Attributes::SpeedSetting::Set(mEndpoint, speedMax);
+            if (status == Status::Success)
+            {
+                // Atribute change handler sets SpeedCurrent equal to SpeedSetting and updates FanMode.
+                MatterReportingAttributeChangeCallback(endpointId, FanControl::Id, FanControl::Attributes::SpeedSetting::Id);
+            }
+            else
+            {
+                ChipLogError(DeviceLayer, "Error setting SpeedSetting: %d", to_underlying(status));
+                return status; // Speed is enabled since SpeedMax read was successful. So return failed status.
+            }
+        }
+        else
+        {
+            // Not returning error as speed is optional.
+            ChipLogError(DeviceLayer, "Error getting SpeedMax: %d", to_underlying(status));
+        }
+        status = FanControl::Attributes::PercentSetting::Set(mEndpoint, 100);
+        if (status == Status::Success)
+        {
+            // Atribute change handler sets PercentCurrent equal to PercentSetting.
+            MatterReportingAttributeChangeCallback(endpointId, FanControl::Id, FanControl::Attributes::PercentSetting::Id);
+        }
+        else
+        {
+            return status; // Percent is mandatory. So return failed status.
+        }
     }
 
     Status status;
@@ -395,9 +420,8 @@ Protocols::InteractionModel::Status ChefFanControlManager::OffCommand(EndpointId
 
     uint8_t speedCurrent;
     status = SpeedCurrent::Get(endpointId, &speedCurrent);
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
 
-    if (speedCurrent)
+    if (status == Protocols::InteractionModel::Status::Success && speedCurrent)
     {
         status = FanControl::Attributes::SpeedCurrent::Set(endpointId, 0);
         if (status != Status::Success)
@@ -433,7 +457,6 @@ void HandleOnOffAttributeChangeForFan(EndpointId endpointId, bool value)
     else
         mFanControlManager->OffCommand(endpointId);
 }
-#endif
 
 void HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
 {
