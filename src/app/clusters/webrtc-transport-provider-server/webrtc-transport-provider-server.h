@@ -52,7 +52,6 @@ public:
         Optional<std::string> iceTransportPolicy;
         Optional<BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
         NodeId peerNodeId;
-        FabricIndex peerFabricIndex;
     };
 
     struct ProvideOfferRequestArgs : OfferRequestArgs
@@ -103,6 +102,10 @@ public:
      *
      * @param[in]  args
      *   Contains all input arguments for the command, including the SDP Offer, session usage, etc.
+     *   If the video stream ID is missing, the delegate MUST automatically select a matching video stream.
+     *   If the audio stream ID is missing, the delegate MUST automatically select a matching audio stream.
+     *   In either case, upon successful selection, the delegate is responsible for internally incrementing
+     *   the reference count on any used video and audio streams.
      *
      * @param[out] outSession
      *   Must be populated with the final session details (session ID, stream IDs, etc.) when this
@@ -110,7 +113,7 @@ public:
      *   set to an invalid state.
      *
      * @return
-     *   - CHIP_NO_ERROR if the request succeeds and `outSession` is populated
+     *   - CHIP_NO_ERROR if the request succeeds and `outSession` is populated.
      *   - CHIP_ERROR_NO_MEMORY if the device cannot allocate a new session.
      *   - Appropriate error otherwise.
      */
@@ -154,14 +157,21 @@ public:
      * @brief
      *   Called when the server or the requestor ends a session via the EndSession command.
      *
-     * @param[in] sessionId  The ID of the session to end.
-     * @param[in] reasonCode Reason for ending the session (e.g. normal closure, resource limit).
+     *   Internally decrement the ReferenceCount on any used video streams.
+     *   Internally decrement the ReferenceCount on any used audio streams.
+     *
+     * @param[in] sessionId      The ID of the session to end.
+     * @param[in] reasonCode     Reason for ending the session (e.g. normal closure, resource limit).
+     * @param[in] videoStreamID  The nullable ID of the video stream associated with the session.
+     * @param[in] audioStreamID  The nullable ID of the audio stream associated with the session.
      *
      * @return CHIP_ERROR
      *   - CHIP_NO_ERROR on success
      *   - Error if no matching session is found or some cleanup error occurs
      */
-    virtual CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode) = 0;
+    virtual CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode,
+                                        DataModel::Nullable<uint16_t> videoStreamID,
+                                        DataModel::Nullable<uint16_t> audioStreamID) = 0;
 
     /**
      * @brief Validates the requested stream usage against the camera's resource management
@@ -231,7 +241,7 @@ private:
     WebRTCSessionStruct * FindSession(uint16_t sessionId);
     UpsertResultEnum UpsertSession(const WebRTCSessionStruct & session);
     void RemoveSession(uint16_t sessionId);
-    uint16_t GenerateSessionID();
+    uint16_t GenerateSessionId();
 
     // Command Handlers
     void HandleSolicitOffer(HandlerContext & ctx, const Commands::SolicitOffer::DecodableType & req);

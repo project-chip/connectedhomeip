@@ -199,7 +199,7 @@ void WebRTCTransportProviderServer::RemoveSession(uint16_t sessionId)
     }
 }
 
-uint16_t WebRTCTransportProviderServer::GenerateSessionID()
+uint16_t WebRTCTransportProviderServer::GenerateSessionId()
 {
     static uint16_t lastSessionId = 0;
 
@@ -223,14 +223,6 @@ uint16_t WebRTCTransportProviderServer::GenerateSessionID()
 // Command Handlers
 void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, const Commands::SolicitOffer::DecodableType & req)
 {
-    // According to the Matter WebRTC Transport Provider specification, at least one of VideoStreamID
-    // or AudioStreamID must be present.
-    if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
-        return;
-    }
-
     // Validate the StreamUsageEnum for this session per resource management and stream priorities.
     Protocols::InteractionModel::ClusterStatusCode status = Protocols::InteractionModel::ClusterStatusCode(
         mDelegate.ValidateStreamUsage(req.streamUsage, req.videoStreamID, req.audioStreamID));
@@ -243,13 +235,12 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
 
     // Prepare the arguments for the delegate.
     Delegate::OfferRequestArgs args;
-    args.sessionId       = GenerateSessionID();
+    args.sessionId       = GenerateSessionId();
     args.streamUsage     = req.streamUsage;
     args.videoStreamId   = req.videoStreamID;
     args.audioStreamId   = req.audioStreamID;
     args.metadataOptions = req.metadataOptions;
     args.peerNodeId      = GetNodeIdFromCtx(ctx.mCommandHandler);
-    args.peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
 
     if (req.ICEServers.HasValue())
     {
@@ -259,7 +250,8 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
             args.iceServers.Value().push_back(iterator.GetValue());
         }
     }
-    .if (req.ICETransportPolicy.HasValue())
+
+    if (req.ICETransportPolicy.HasValue())
     {
         args.iceTransportPolicy.SetValue(std::string(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size()));
     }
@@ -269,6 +261,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     // - Populate a new WebRTCSessionStruct with the requested values.
     // - If in standby mode, set deferredOffer to true (and perform steps to exit standby within 30 seconds).
     // - If not in standby mode, ensure that VideoStreamID and AudioStreamID are valid (or allocate/select new streams if null).
+    // - Internally increment the ReferenceCount on any used video/audio streams.
     // - If resources cannot be allocated, invoke End with Reason OutOfResources.
     WebRTCSessionStruct outSession;
     bool deferredOffer = false;
@@ -297,15 +290,22 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
 
     // Conformance:
     // If DeferredOffer is FALSE, then VideoStreamID and AudioStreamID SHALL be valid.
-    // If DeferredOffer is TRUE, they MAY be valid if stream mapping logic can be done while in low-power mode.
-    if (!deferredOffer || (deferredOffer && outSession.videoStreamID != 0))
+    // If DeferredOffer is TRUE, they MAY be valid if stream mapping logic can be done in low-power mode.
+    if (!deferredOffer)
     {
         resp.videoStreamID.SetValue(outSession.videoStreamID);
-    }
-
-    if (!deferredOffer || (deferredOffer && outSession.audioStreamID != 0))
-    {
         resp.audioStreamID.SetValue(outSession.audioStreamID);
+    }
+    else
+    {
+        if (!outSession.videoStreamID.IsNull())
+        {
+            resp.videoStreamID.SetValue(outSession.videoStreamID);
+        }
+        if (!outSession.audioStreamID.IsNull())
+        {
+            resp.audioStreamID.SetValue(outSession.audioStreamID);
+        }
     }
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, resp);
@@ -313,29 +313,26 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
 
 void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, const Commands::ProvideOffer::DecodableType & req)
 {
-    // Extract command fields from the request.
     auto webRTCSessionID = req.webRTCSessionID;
     auto videoStreamID   = req.videoStreamID;
     auto audioStreamID   = req.audioStreamID;
 
-    NodeId peerNodeId           = GetNodeIdFromCtx(ctx.mCommandHandler);
-    FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
+    NodeId peerNodeId = GetNodeIdFromCtx(ctx.mCommandHandler);
 
-    uint16_t sessionId = 0;
+    WebRTCSessionStruct outSession;
 
-    // Determine if this is a new session or a re-Offer
+    // New session request: webRTCSessionID is null.
     if (webRTCSessionID.IsNull())
     {
-        // This is a request for a new session
-        // If both the VideoStreamID and AudioStreamID are not present
+        // If both video and audio stream IDs are missing, return CONSTRAINT_ERROR.
         if (!videoStreamID.HasValue() && !audioStreamID.HasValue())
         {
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
             return;
         }
 
-        // Validate the StreamUsageEnum for this session according to Resource Management and Stream Priorities.
-        Protocols::InteractionModel::ClusterStatusCode status = Protocols::InteractionModel::ClusterStatusCode(
+        // Validate the stream usage according to resource management and stream priorities.
+        auto status = Protocols::InteractionModel::ClusterStatusCode(
             mDelegate.ValidateStreamUsage(req.streamUsage, req.videoStreamID, req.audioStreamID));
         if (!status.IsSuccess())
         {
@@ -344,83 +341,73 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
             return;
         }
 
-        sessionId = GenerateSessionID();
+        // Prepare delegate arguments.
+        Delegate::ProvideOfferRequestArgs args;
+        args.sessionId       = GenerateSessionId();
+        args.streamUsage     = req.streamUsage;
+        args.videoStreamId   = videoStreamID;
+        args.audioStreamId   = audioStreamID;
+        args.metadataOptions = req.metadataOptions;
+        args.peerNodeId      = peerNodeId;
+        args.sdp             = std::string(req.sdp.data(), req.sdp.size());
+
+        // Convert ICE servers list from DecodableList to vector.
+        if (req.ICEServers.HasValue())
+        {
+            auto iterator = req.ICEServers.Value().begin();
+            while (iterator.Next())
+            {
+                args.iceServers.Value().push_back(iterator.GetValue());
+            }
+        }
+
+        // Convert ICETransportPolicy from CharSpan to std::string.
+        if (req.ICETransportPolicy.HasValue())
+        {
+            args.iceTransportPolicy.SetValue(
+                std::string(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size()));
+        }
+
+        // Delegate processing: process the SDP offer, gather ICE candidates, create SDP answer, etc.
+        auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleProvideOffer(args, outSession));
+        if (!delegateStatus.IsSuccess())
+        {
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
+            return;
+        }
+
+        // Store the new WebRTCSessionStruct in CurrentSessions.
+        UpsertSession(outSession);
     }
     else
     {
-        // This is a re-offer. Check if the session ID is in our provider list
-        sessionId                             = webRTCSessionID.Value();
+        // Re-offer: webRTCSessionID is not null.
+        uint16_t sessionId                    = webRTCSessionID.Value();
         WebRTCSessionStruct * existingSession = FindSession(sessionId);
 
+        // If the session does not exist, respond with NOT_FOUND.
         if (!existingSession)
         {
             ChipLogError(Zcl, "HandleProvideOffer: No existing session with ID=%u.", sessionId);
-
-            // If WebRTCSessionID is not null and does not match a value in current sessions.
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
             return;
         }
 
-        // Also check that the existing session belongs to the same PeerNodeID / Fabric
-        // If it doesn’t match, respond with CONSTRAINT_ERROR
-        if (peerNodeId != existingSession->peerNodeID || peerFabricIndex != existingSession->peerFabricIndex)
+        // Verify that the session belongs to the accessing peer.
+        if (peerNodeId != existingSession->peerNodeID)
         {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
             return;
         }
+
+        // Use the existing session for further processing.
+        outSession = *existingSession;
     }
 
-    // Delegate processing
-    WebRTCSessionStruct outSession;
-
-    Delegate::ProvideOfferRequestArgs args;
-    args.sessionId       = sessionId;
-    args.streamUsage     = req.streamUsage;
-    args.videoStreamId   = videoStreamID;
-    args.audioStreamId   = audioStreamID;
-    args.metadataOptions = req.metadataOptions;
-    args.peerNodeId      = GetNodeIdFromCtx(ctx.mCommandHandler);
-    args.peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
-    args.sdp             = std::string(req.sdp.data(), req.sdp.size());
-
-    // Conversion from DecodableList to vector
-    if (req.ICEServers.HasValue())
-    {
-        auto iterator = req.ICEServers.Value().begin();
-        while (iterator.Next())
-        {
-            args.iceServers.Value().push_back(iterator.GetValue());
-        }
-    }
-
-    // Conversion from CharSpan to string
-    if (req.ICETransportPolicy.HasValue())
-    {
-        args.iceTransportPolicy.SetValue(std::string(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size()));
-    }
-
-    auto status = Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleProvideOffer(args, outSession));
-    if (!status.IsSuccess())
-    {
-        // Delegate encountered a problem (out of resources, invalid data, etc.)
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        return;
-    }
-
-    // Store or update the WebRTCSessionStruct in the CurrentSessions
-    if (UpsertSession(outSession) == UpsertResultEnum::kInserted)
-    {
-        ChipLogProgress(Zcl, "WebRTCTransportProvider: Inserted a new session with ID=%u.", outSession.id);
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "WebRTCTransportProvider: Updated existing session with ID=%u.", outSession.id);
-    }
-
-    // Send the response
+    // Build and send the ProvideOfferResponse.
     Commands::ProvideOfferResponse::Type resp;
     resp.webRTCSessionID = outSession.id;
-    resp.audioStreamID.SetValue(outSession.videoStreamID);
+    resp.videoStreamID.SetValue(outSession.videoStreamID);
     resp.audioStreamID.SetValue(outSession.audioStreamID);
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, resp);
@@ -432,8 +419,7 @@ void WebRTCTransportProviderServer::HandleProvideAnswer(HandlerContext & ctx, co
     uint16_t sessionId = req.webRTCSessionID;
     auto sdpSpan       = req.sdp;
 
-    NodeId peerNodeId           = GetNodeIdFromCtx(ctx.mCommandHandler);
-    FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
+    NodeId peerNodeId = GetNodeIdFromCtx(ctx.mCommandHandler);
 
     WebRTCSessionStruct * existingSession = FindSession(sessionId);
 
@@ -446,7 +432,7 @@ void WebRTCTransportProviderServer::HandleProvideAnswer(HandlerContext & ctx, co
     }
 
     // Verify that the session's PeerNodeID and FabricIndex match those from the secure session context.
-    if (peerNodeId != existingSession->peerNodeID || peerFabricIndex != existingSession->peerFabricIndex)
+    if (peerNodeId != existingSession->peerNodeID)
     {
         ChipLogError(Zcl, "HandleProvideAnswer: Session ID=%u does not match PeerNodeID or FabricIndex.", sessionId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::NotFound);
@@ -464,39 +450,45 @@ void WebRTCTransportProviderServer::HandleProvideICECandidates(HandlerContext & 
     // Extract command fields from the request.
     uint16_t sessionId = req.webRTCSessionID;
 
-    NodeId peerNodeId           = GetNodeIdFromCtx(ctx.mCommandHandler);
-    FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
+    NodeId peerNodeId = GetNodeIdFromCtx(ctx.mCommandHandler);
 
     std::vector<std::string> candidates;
     auto iter = req.ICECandidates.begin();
     while (iter.Next())
     {
-        // Get current CharSpan
-        const chip::CharSpan & candidateSpan = iter.GetValue();
-
-        // Convert to std::string
+        // Get current candidate CharSpan and convert to std::string.
+        const CharSpan & candidateSpan = iter.GetValue();
         candidates.emplace_back(candidateSpan.data(), candidateSpan.size());
+    }
+
+    // Check the validity of the list.
+    CHIP_ERROR listErr = iter.GetStatus();
+    if (listErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HandleProvideICECandidates: ICECandidates list error: %s", chip::ErrorStr(listErr));
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
+        return;
     }
 
     WebRTCSessionStruct * existingSession = FindSession(sessionId);
 
+    // If WebRTCSessionID is not valid, respond with NOT_FOUND.
     if (!existingSession)
     {
         ChipLogError(Zcl, "HandleProvideICECandidates: No existing session with ID=%u.", sessionId);
-
-        // If WebRTCSessionID is not null and does not match a value in current sessions.
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::NotFound);
         return;
     }
 
-    // Also check that the existing session belongs to the same PeerNodeID / Fabric
-    // If it doesn’t match, respond with CONSTRAINT_ERROR
-    if (peerNodeId != existingSession->peerNodeID || peerFabricIndex != existingSession->peerFabricIndex)
+    // Verify that the session belongs to the accessing peer.
+    // If it doesn't match, respond with NOT_FOUND.
+    if (peerNodeId != existingSession->peerNodeID)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::NotFound);
         return;
     }
 
+    // Delegate the handling of ICE candidates.
     ctx.mCommandHandler.AddStatus(
         ctx.mRequestPath,
         Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleProvideICECandidates(sessionId, candidates)));
@@ -508,31 +500,39 @@ void WebRTCTransportProviderServer::HandleEndSession(HandlerContext & ctx, const
     uint16_t sessionId = req.webRTCSessionID;
     auto reason        = req.reason;
 
-    NodeId peerNodeId           = GetNodeIdFromCtx(ctx.mCommandHandler);
-    FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
+    // Validate the reason field against the allowed enum values.
+    if (reason == WebRTCEndReasonEnum::kUnknownEnumValue)
+    {
+        ChipLogError(Zcl, "HandleEndSession: Invalid reason value %u.", static_cast<uint8_t>(reason));
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
+        return;
+    }
+
+    NodeId peerNodeId = GetNodeIdFromCtx(ctx.mCommandHandler);
 
     WebRTCSessionStruct * existingSession = FindSession(sessionId);
 
+    // If the session does not exist, respond with NOT_FOUND.
     if (!existingSession)
     {
         ChipLogError(Zcl, "HandleEndSession: No existing session with ID=%u.", sessionId);
-
-        // If WebRTCSessionID is not null and does not match a value in current sessions.
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::NotFound);
         return;
     }
 
-    // Also check that the existing session belongs to the same PeerNodeID / Fabric
-    // If it doesn’t match, respond with CONSTRAINT_ERROR
-    if (peerNodeId != existingSession->peerNodeID || peerFabricIndex != existingSession->peerFabricIndex)
+    // Verify that the session belongs to the accessing peer.
+    if (peerNodeId != existingSession->peerNodeID)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::NotFound);
         return;
     }
 
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath,
-                                  Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleEndSession(sessionId, reason)));
+    // Delegate handles decrementing reference counts on video/audio streams if applicable.
+    CHIP_ERROR err = mDelegate.HandleEndSession(sessionId, reason, existingSession->videoStreamID, existingSession->audioStreamID);
 
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::ClusterStatusCode(err));
+
+    // Remove the session entry from CurrentSessions.
     RemoveSession(sessionId);
 }
 
