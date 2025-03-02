@@ -2329,7 +2329,7 @@ TEST_F(TestRead, TestSubscribe_OnActiveModeNotification)
 
         GetLoopback().mNumMessagesToDrop = 0;
         callback.ClearCounters();
-        InteractionModelEngine::GetInstance()->OnActiveModeNotification(
+        InteractionModelEngine::GetInstance()->OnActiveModeNotification(readClient.GetLocalScopedNodeId().Value(),
             ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()));
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
         EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);

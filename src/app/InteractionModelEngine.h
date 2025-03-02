@@ -236,10 +236,9 @@ public:
     /**
      *  Activate the idle subscriptions.
      *
-     *  When subscribing to ICD and liveness timeout reached, the read client will move to `InactiveICDSubscription` state and
-     * resubscription can be triggered via OnActiveModeNotification().
+     *  See ReadClient::OnActiveModeNotification
      */
-    void OnActiveModeNotification(ScopedNodeId aPeer);
+    void OnActiveModeNotification(ScopedNodeId aCheckInNode, ScopedNodeId aPeer);
 
     /**
      *  Used to notify when a peer becomes LIT ICD or vice versa.
