@@ -511,7 +511,7 @@ public:
 
     Optional<ScopedNodeId> GetLocalScopedNodeId() const 
     { 
-        VerifyOrReturnValue(aReadPrepareParams.mSessionHolder, NullOptional);
+        VerifyOrReturnValue(mReadPrepareParams.mSessionHolder, NullOptional);
         return MakeOptional(mReadPrepareParams.mSessionHolder->AsSecureSession()->GetLocalScopedNodeId()); 
     }
 

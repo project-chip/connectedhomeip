@@ -2392,7 +2392,7 @@ TEST_F(TestRead, TestSubscribeFailed_OnActiveModeNotification)
 
         GetLoopback().mNumMessagesToDrop = 0;
         callback.ClearCounters();
-        InteractionModelEngine::GetInstance()->OnActiveModeNotification(
+        InteractionModelEngine::GetInstance()->OnActiveModeNotification(readClient.GetLocalScopedNodeId().Value(),
             ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()));
         //
         // Drive servicing IO till we have established a subscription.

@@ -488,7 +488,7 @@ void ReadClient::OnActiveModeNotification()
 
     // Note: this API only works when issuing subscription via SendAutoResubscribeRequest, when SendAutoResubscribeRequest is called,
     // either mEventPathParamsListSize or mAttributePathParamsListSize is not 0.
-    VerifyOrDie(mReadPrepareParams.mEventPathParamsListSize != 0 || mReadPrepareParams.mAttributePathParamsListSize != 0)
+    VerifyOrDie(mReadPrepareParams.mEventPathParamsListSize != 0 || mReadPrepareParams.mAttributePathParamsListSize != 0);
 
     // When we reach here, the subscription definitely exceeded the liveness timeout. Just continue the unfinished resubscription
     // logic in `OnLivenessTimeoutCallback`.
