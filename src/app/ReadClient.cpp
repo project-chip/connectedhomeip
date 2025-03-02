@@ -502,7 +502,7 @@ void ReadClient::OnActiveModeNotification()
     // current client does not realize subscription has gone, and we should forcibly timeout current subscription, and schedule a new one.
     if (!mIsResubscriptionScheduled)
     {
-        // Closing will ultimately trigger ScheduleResubscription with the aReestablishCASE argument set to true, effectively 
+        // Closing will ultimately trigger ScheduleResubscription with the aReestablishCASE argument set to true, effectively
         // rendering the session defunct.
         Close(CHIP_ERROR_TIMEOUT);
         return;

@@ -1076,7 +1076,7 @@ void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aCheckInNode,
         auto pNextItem = pListItem->GetNextClient();
         // It is possible that pListItem is destroyed by the app in OnActiveModeNotification.
         // Get the next item before invoking `OnActiveModeNotification`.
-        if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer && 
+        if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer &&
             pListItem->GetLocalScopedNodeId().HasValue() &&
             aCheckInNode == pListItem->GetLocalScopedNodeId().Value())
         {

@@ -356,10 +356,10 @@ public:
      *
      *  If the subscription is not in the `InactiveICDSubscription` state, this function will do nothing. So it is always safe to
      *  call this function when a check-in message is received.
-     *  
-     *  If the server sends out check-in message, and there is no reschedule subscription yet in client side at the same time, it 
+     *
+     *  If the server sends out check-in message, and there is no reschedule subscription yet in client side at the same time, it
      *  means current client does not realize subscription has gone, and we should forcibly timeout current subscription, and schedule a new one.
-     *  
+     *
      *  This API only works when issuing subscription via SendAutoResubscribeRequest.
      */
     void OnActiveModeNotification();
@@ -509,10 +509,10 @@ public:
     Optional<System::Clock::Timeout> GetSubscriptionTimeout();
 
 
-    Optional<ScopedNodeId> GetLocalScopedNodeId() const 
-    { 
+    Optional<ScopedNodeId> GetLocalScopedNodeId() const
+    {
         VerifyOrReturnValue(mReadPrepareParams.mSessionHolder, NullOptional);
-        return MakeOptional(mReadPrepareParams.mSessionHolder->AsSecureSession()->GetLocalScopedNodeId()); 
+        return MakeOptional(mReadPrepareParams.mSessionHolder->AsSecureSession()->GetLocalScopedNodeId());
     }
 
 private:
