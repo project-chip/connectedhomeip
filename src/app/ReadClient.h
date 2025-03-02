@@ -358,7 +358,8 @@ public:
      *  call this function when a check-in message is received.
      *
      *  If the server sends out check-in message, and there is no reschedule subscription yet in client side at the same time, it
-     *  means current client does not realize subscription has gone, and we should forcibly timeout current subscription, and schedule a new one.
+     *  means current client does not realize subscription has gone, and we should forcibly timeout current subscription, and
+     * schedule a new one.
      *
      *  This API only works when issuing subscription via SendAutoResubscribeRequest.
      */
@@ -507,7 +508,6 @@ public:
      * is gone and hence the relevant MRP parameters can no longer be determined.
      */
     Optional<System::Clock::Timeout> GetSubscriptionTimeout();
-
 
     Optional<ScopedNodeId> GetLocalScopedNodeId() const
     {
