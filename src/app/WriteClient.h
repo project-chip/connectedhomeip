@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelTimeout.h>
@@ -174,11 +175,28 @@ public:
 
         ReturnErrorOnFailure(EnsureMessage());
 
-        // Encode an empty list for the chunking protocol.
-        ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
+        // Encode an empty list for the chunking protocol, except when encoding ACLs.
+        // for ACLs, we encode the first ACL entry directly, which will trigger a ReplaceAll operation on the server side.
+        // The first ACL entry must grant Administer privileges to at least one subject.
+        bool firstEntryEncoded = false;
+        if constexpr (!std::is_same_v<T, Clusters::AccessControl::Structs::AccessControlEntryStruct::Type const>)
+        {
+            ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
+        }
+        else
+        {
+            if (value.data()[0].privilege != Clusters::AccessControl::AccessControlEntryPrivilegeEnum::kAdminister)
+            {
+                return CHIP_ERROR_FIRST_ACL_ENTRY_NOT_ADMIN;
+            }
 
-        path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
-        for (size_t i = 0; i < value.size(); i++)
+            ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<T>(value.SubSpan(0, 1))));
+            firstEntryEncoded = true;
+        }
+
+        path.mListOp      = ConcreteDataAttributePath::ListOperation::AppendItem;
+        size_t startIndex = firstEntryEncoded ? 1 : 0;
+        for (size_t i = startIndex; i < value.size(); i++)
         {
             ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, value.data()[i]));
         }

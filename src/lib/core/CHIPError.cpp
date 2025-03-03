@@ -466,6 +466,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_HANDLER_NOT_SET.AsInteger():
         desc = "Callback function or callable object is not set";
         break;
+    case CHIP_ERROR_FIRST_ACL_ENTRY_NOT_ADMIN.AsInteger():
+        desc = "The first ACL entry must grant Administer privileges to at least one subject";
+        break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 
