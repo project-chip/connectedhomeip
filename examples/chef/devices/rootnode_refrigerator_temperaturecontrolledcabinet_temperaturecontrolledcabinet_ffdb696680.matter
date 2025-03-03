@@ -1679,7 +1679,7 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type ma_temperature_controlled_cabinet = 113, version 1;
+  device type ma_temperature_controlled_cabinet = 113, version 2;
 
 
   server cluster Descriptor {
@@ -1721,7 +1721,7 @@ endpoint 2 {
   }
 }
 endpoint 3 {
-  device type ma_temperature_controlled_cabinet = 113, version 1;
+  device type ma_temperature_controlled_cabinet = 113, version 2;
 
 
   server cluster Descriptor {
