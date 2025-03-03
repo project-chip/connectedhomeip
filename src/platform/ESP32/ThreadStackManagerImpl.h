@@ -58,9 +58,11 @@ class ThreadStackManagerImpl final : public ThreadStackManager,
 
 public:
     CHIP_ERROR _InitThreadStack();
+    void _ShutdownThreadStack();
 
 protected:
     CHIP_ERROR _StartThreadTask();
+    void _StopThreadStack();
     void _LockThreadStack();
     bool _TryLockThreadStack();
     void _UnlockThreadStack();
