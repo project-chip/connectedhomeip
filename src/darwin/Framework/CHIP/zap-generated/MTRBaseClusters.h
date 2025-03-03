@@ -5578,13 +5578,13 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 /**
  * Command Reset
  *
- * Reset alarm
+ * This command resets active and latched alarms (if possible).
  */
 - (void)resetWithParams:(MTRDishwasherAlarmClusterResetParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 /**
  * Command ModifyEnabledAlarms
  *
- * Modify enabled alarms
+ * This command allows a client to request that an alarm be enabled or suppressed at the server.
  */
 - (void)modifyEnabledAlarmsWithParams:(MTRDishwasherAlarmClusterModifyEnabledAlarmsParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
