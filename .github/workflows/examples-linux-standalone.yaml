@@ -247,7 +247,7 @@ jobs:
                         build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug camera-controller \
-                    out/linux-x64-camera/camera-controller \
+                    out/linux-x64-camera-controller/camera-controller \
                     /tmp/bloat_reports/                                                     
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
