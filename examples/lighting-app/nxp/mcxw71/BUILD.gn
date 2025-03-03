@@ -71,15 +71,15 @@ mcxw71_k32w1_sdk("sdk") {
     "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/components",
     "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/dcdc",
     "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/ext_flash",
-    "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/low_power"
+    "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/low_power",
   ]
 
   sources += [
     "${nxp_sdk_root}/examples/_boards/${nxp_board}/wireless_examples/clock_config.c",
     "${nxp_sdk_root}/examples/_boards/${nxp_board}/wireless_examples/pin_mux.c",
-    "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/board.c",
     "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/app_common/app_services_init.c",
     "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/app_common/hardware_init.c",
+    "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/board.c",
     "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/components/board_comp.c",
     "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/dcdc/board_dcdc.c",
     "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/ext_flash/board_extflash.c",

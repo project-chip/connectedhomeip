@@ -76,7 +76,7 @@ config("nxp_platform_config") {
   if (nxp_external_sdk) {
     include_dirs += [
       "${nxp_sdk_root}/middleware/mbedtls/include",
-      "${nxp_sdk_root}/middleware/mbedtls/port/sssapi"
+      "${nxp_sdk_root}/middleware/mbedtls/port/sssapi",
     ]
   }
 }
@@ -167,7 +167,6 @@ static_library("nxp_platform") {
       "../common/crypto/PersistentStorageOpKeystoreS200.cpp",
       "../common/crypto/PersistentStorageOpKeystoreS200.h",
     ]
-
     #if (nxp_enable_ot_cli) {
     #  defines += [ "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1" ]
     #}
