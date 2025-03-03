@@ -408,7 +408,7 @@ function install_tizen_sdk_finalize() {
     echo "TIZEN_SDK_DATA_PATH=$TIZEN_SDK_DATA_PATH" >>"$TIZEN_SDK_ROOT/sdk.info"
     ln -sf "$TIZEN_SDK_DATA_PATH/.tizen-cli-config" "$TIZEN_SDK_ROOT/tools/.tizen-cli-config"
 
-    # Use Tizen developer platform certificate as defaultls
+    # Use Tizen developer platform certificate as defaults
     cp "$TIZEN_SDK_ROOT"/tools/certificate-generator/certificates/distributor/sdk-platform/* \
         "$TIZEN_SDK_ROOT"/tools/certificate-generator/certificates/distributor/
 
