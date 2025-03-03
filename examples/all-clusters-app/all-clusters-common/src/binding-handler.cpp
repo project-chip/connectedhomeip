@@ -89,7 +89,12 @@ static void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, ch
             ChipLogError(NotSpecified, "OnOff command failed: %" CHIP_ERROR_FORMAT, error.Format());
         };
 
-        VerifyOrDie(peer_device != nullptr && peer_device->ConnectionReady());
+        if (!peer_device)
+        {
+            ChipLogProgress(NotSpecified, "Binding to self");
+            return;
+        }
+        VerifyOrDie(peer_device->ConnectionReady());
         if (sSwitchOnOffState)
         {
             Clusters::OnOff::Commands::On::Type onCommand;
