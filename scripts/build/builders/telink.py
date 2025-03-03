@@ -120,6 +120,7 @@ class TelinkBoard(Enum):
     TLSR9528A = auto()
     TLSR9528A_RETENTION = auto()
     TL3218X = auto()
+    TL3218X_RETENTION = auto()
     TL7218X = auto()
     TL7218X_RETENTION = auto()
 
@@ -134,6 +135,8 @@ class TelinkBoard(Enum):
             return 'tlsr9528a_retention'
         elif self == TelinkBoard.TL3218X:
             return 'tl3218x'
+        elif self == TelinkBoard.TL3218X_RETENTION:
+            return 'tl3218x_retention'
         elif self == TelinkBoard.TL7218X:
             return 'tl7218x'
         elif self == TelinkBoard.TL7218X_RETENTION:

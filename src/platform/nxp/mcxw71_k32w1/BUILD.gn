@@ -43,8 +43,6 @@ source_set("nxp_factory_data") {
     "${chip_root}/src/credentials/CertificationDeclaration.h",
   ]
 
-  defines = [ "PLATFORM_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProviderImpl.h\"" ]
-
   deps = [
     ":nxp_platform",
     "${chip_root}/src/credentials:credentials",

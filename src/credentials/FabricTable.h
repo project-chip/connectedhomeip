@@ -412,7 +412,15 @@ public:
         No
     };
 
-    // Returns CHIP_ERROR_NOT_FOUND if there is no fabric for that index.
+    /**
+     * @brief Delete the fabric with given `fabricIndex`.
+     *
+     * @param fabricIndex - Index of fabric for deletion
+     * @retval CHIP_NO_ERROR on success
+     * @retval CHIP_ERROR_NOT_FOUND if there is no fabric for that index
+     * @retval CHIP_ERROR_INVALID_ARGUMENT if any of the arguments are invalid such as too large or out of bounds
+     * @retval other CHIP_ERROR on internal errors
+     */
     CHIP_ERROR Delete(FabricIndex fabricIndex);
     void DeleteAllFabrics();
 

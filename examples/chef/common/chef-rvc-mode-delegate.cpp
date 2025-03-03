@@ -29,10 +29,20 @@ using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::T
 
 #ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
 #include <chef-rvc-mode-delegate.h>
+
+#ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
+#include <chef-rvc-operational-state-delegate.h>
+#endif // MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
+
 using namespace chip::app::Clusters::RvcRunMode;
 
 static std::unique_ptr<RvcRunModeDelegate> gRvcRunModeDelegate;
 static std::unique_ptr<ModeBase::Instance> gRvcRunModeInstance;
+
+chip::app::Clusters::ModeBase::Instance * getRvcRunModeInstance()
+{
+    return gRvcRunModeInstance.get();
+}
 
 CHIP_ERROR RvcRunModeDelegate::Init()
 {
@@ -51,7 +61,35 @@ void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
         return;
     }
 
+#ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
+    OperationalState::GenericOperationalError err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    if (NewMode == RvcRunMode::ModeIdle)
+    {
+        if (currentMode != RvcRunMode::ModeIdle)
+        { // Stop existing cycle when going from cleaning/mapping to idle.
+            ChipLogProgress(DeviceLayer, "Stopping RVC cycle: %d", currentMode);
+            getRvcOperationalStateDelegate()->HandleStopStateCallback(err);
+        }
+    }
+    else
+    {
+        if (currentMode == RvcRunMode::ModeIdle)
+        { // Start a new cycle when going from idle to clening/mapping.
+            ChipLogProgress(DeviceLayer, "Starting new RVC cycle: %d", NewMode);
+            getRvcOperationalStateDelegate()->HandleStartStateCallback(err);
+        }
+    }
+    if (err.IsEqual(OperationalState::GenericOperationalError(to_underlying(OperationalState::ErrorStateEnum::kNoError))))
+    {
+        response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+    }
+    else
+    {
+        response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
+    }
+#else
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+#endif // MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
 }
 
 CHIP_ERROR RvcRunModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)

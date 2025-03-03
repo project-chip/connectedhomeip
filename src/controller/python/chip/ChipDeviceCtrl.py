@@ -62,6 +62,8 @@ __all__ = ["ChipDeviceController", "CommissioningParameters"]
 # Defined in $CHIP_ROOT/src/lib/core/CHIPError.h
 CHIP_ERROR_TIMEOUT: int = 50
 
+_RCACCallbackType = CFUNCTYPE(None, POINTER(c_uint8), c_size_t)
+
 LOGGER = logging.getLogger(__name__)
 
 _DevicePairingDelegate_OnPairingCompleteFunct = CFUNCTYPE(None, PyChipError)
@@ -479,6 +481,7 @@ class ChipDeviceControllerBase():
 
             if err.is_success:
                 self._commissioning_context.future.set_result(nodeId)
+
             else:
                 self._commissioning_context.future.set_exception(err.to_exception())
 
@@ -550,6 +553,7 @@ class ChipDeviceControllerBase():
 
         self.cbHandleCommissioningCompleteFunct = _DevicePairingDelegate_OnCommissioningCompleteFunct(
             HandleCommissioningComplete)
+
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
             self.pairingDelegate, self.cbHandleCommissioningCompleteFunct)
 
@@ -1958,6 +1962,10 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_GetCompletionError.argtypes = []
             self._dmLib.pychip_GetCompletionError.restype = PyChipError
 
+            self._dmLib.pychip_GetCommissioningRCACData.argtypes = [ctypes.POINTER(
+                ctypes.c_uint8), ctypes.POINTER(ctypes.c_size_t), ctypes.c_size_t]
+            self._dmLib.pychip_GetCommissioningRCACData.restype = None
+
             self._dmLib.pychip_DeviceController_IssueNOCChain.argtypes = [
                 c_void_p, py_object, c_char_p, c_size_t, c_uint64]
             self._dmLib.pychip_DeviceController_IssueNOCChain.restype = PyChipError
@@ -2251,6 +2259,34 @@ class ChipDeviceController(ChipDeviceControllerBase):
             )
 
             return await asyncio.futures.wrap_future(ctx.future)
+
+    def get_rcac(self):
+        ''' 
+        Passes captured RCAC data back to Python test modules for validation
+        - Setting buffer size to max size mentioned in spec:
+        - Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/policies/matter_certificate_policy.adoc#615-key-sizes
+        '''
+        rcac_size = 400
+        rcac_buffer = (ctypes.c_uint8 * rcac_size)()  # Allocate buffer
+
+        actual_rcac_size = ctypes.c_size_t()
+
+        # Now calling the C++ function with the buffer size set as an additional parameter
+        self._dmLib.pychip_GetCommissioningRCACData(
+            ctypes.cast(rcac_buffer, ctypes.POINTER(ctypes.c_uint8)),
+            ctypes.byref(actual_rcac_size),
+            ctypes.c_size_t(rcac_size)  # Pass the buffer size
+        )
+
+        # Check if data is available
+        if actual_rcac_size.value > 0:
+            # Convert the data to a Python bytes object
+            rcac_data = bytearray(rcac_buffer[:actual_rcac_size.value])
+            rcac_bytes = bytes(rcac_data)
+        else:
+            LOGGER.exception("RCAC returned from C++ did not contain any data")
+            return None
+        return rcac_bytes
 
     async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:
         ''' Commission with the given nodeid from the setupPayload.

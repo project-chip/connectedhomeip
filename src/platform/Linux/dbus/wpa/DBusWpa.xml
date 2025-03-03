@@ -30,6 +30,7 @@ the wpa_supplicant integration with the Matter SDK.
 
 <node>
     <interface name="fi.w1.wpa_supplicant1">
+
         <method name="CreateInterface">
             <arg name="args" type="a{sv}" direction="in" />
             <arg name="path" type="o" direction="out" />
@@ -38,5 +39,14 @@ the wpa_supplicant integration with the Matter SDK.
             <arg name="ifname" type="s" direction="in" />
             <arg name="path" type="o" direction="out" />
         </method>
+
+        <signal name="InterfaceAdded">
+            <arg name="path" type="o" />
+            <arg name="properties" type="a{sv}" />
+        </signal>
+        <signal name="InterfaceRemoved">
+            <arg name="path" type="o" />
+        </signal>
+
     </interface>
 </node>

@@ -116,6 +116,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData;
 - (void)removeDevice:(MTRDevice *)device;
 
+/**
+ * Called by MTRDevice object when their dealloc is called, so the controller can notify interested delegate that active devices have changed
+ */
+- (void)deviceDeallocated;
+
 @end
 
 /**

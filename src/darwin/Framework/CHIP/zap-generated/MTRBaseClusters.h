@@ -5125,7 +5125,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 /**
  * Command SetTemperature
  *
- * Set Temperature
+ * The SetTemperature command SHALL have the following data fields:
  */
 - (void)setTemperatureWithParams:(MTRTemperatureControlClusterSetTemperatureParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 - (void)setTemperatureWithCompletion:(MTRStatusCompletion)completion
@@ -9772,7 +9772,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command Step
  *
- * The Step command speeds up or slows down the fan, in steps.
+ * This command speeds up or slows down the fan, in steps, without a client having to know the fan speed.
  */
 - (void)stepWithParams:(MTRFanControlClusterStepParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 

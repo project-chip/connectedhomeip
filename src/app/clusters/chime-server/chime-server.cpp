@@ -68,8 +68,8 @@ CHIP_ERROR ChimeServer::Init()
 void ChimeServer::LoadPersistentAttributes()
 {
     // Load Active Chime ID
-    uint8_t storedActiveChimeID;
-    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+    uint8_t storedActiveChimeID = 0;
+    CHIP_ERROR err              = GetSafeAttributePersistenceProvider()->ReadScalarValue(
         ConcreteAttributePath(GetEndpointId(), Chime::Id, ActiveChimeID::Id), storedActiveChimeID);
     if (err == CHIP_NO_ERROR)
     {
@@ -82,7 +82,7 @@ void ChimeServer::LoadPersistentAttributes()
     }
 
     // Load Enabled
-    bool storedEnabled;
+    bool storedEnabled = false;
     err = GetSafeAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(GetEndpointId(), Chime::Id, Enabled::Id),
                                                                  storedEnabled);
     if (err == CHIP_NO_ERROR)
@@ -252,7 +252,7 @@ void ChimeServer::InvokeCommand(HandlerContext & ctx)
     {
     case Commands::PlayChimeSound::Id:
         CommandHandlerInterface::HandleCommand<Commands::PlayChimeSound::DecodableType>(
-            ctx, [this](HandlerContext & context, const auto & req) { HandlePlayChimeSound(context, req); });
+            ctx, [this](HandlerContext & innerCtx, const auto & req) { HandlePlayChimeSound(innerCtx, req); });
         break;
     }
 }
