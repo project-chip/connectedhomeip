@@ -1,6 +1,5 @@
-/*
- *
- *    Copyright (c) 2020-2025 Project CHIP Authors
+/**
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,22 +14,24 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides an implementation of BleApplicationDelegate for Darwin platforms.
- */
-
-#if !__has_feature(objc_arc)
-#error This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
-#endif
-
 #include <ble/Ble.h>
-#include <platform/Darwin/BleApplicationDelegateImpl.h>
+
+@class CBPeripheral;
 
 namespace chip {
 namespace DeviceLayer {
     namespace Internal {
-        void BleApplicationDelegateImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj) {}
-    } // namespace Internal
-} // namespace DeviceLayer
-} // namespace chip
+
+        inline CBPeripheral * CBPeripheralFromBleConnObject(BLE_CONNECTION_OBJECT connObj)
+        {
+            return (__bridge CBPeripheral *) connObj;
+        }
+
+        inline BLE_CONNECTION_OBJECT BleConnObjectFromCBPeripheral(CBPeripheral * peripheral)
+        {
+            return (__bridge void *) peripheral;
+        }
+
+    }
+}
+}
