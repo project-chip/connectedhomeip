@@ -53,7 +53,7 @@ constexpr uint16_t kMaxImageRotationDegrees = 359;
 constexpr uint8_t kMaxChannelCount          = 8;
 constexpr uint8_t kMaxImageQualityMetric    = 100;
 constexpr uint16_t kMaxFragmentLenMaxValue  = 65500;
-// Conservative room for other fields(resolution + codec) in
+// Conservative room for other fields (resolution + codec) in
 // capture snapshot response. TODO: Make a tighter bound.
 constexpr size_t kMaxSnapshotImageSize = kMaxLargeSecureSduLengthBytes - 100;
 
@@ -63,8 +63,8 @@ constexpr size_t kViewportStructMaxSerializedSize =
 // The number of possible values of StreamUsageEnum.
 constexpr size_t kNumOfStreamUsageTypes = 4;
 
-// StreamUsageEnum + Anonymous tag ( 1 byte ).
-// Assumes min-size encoding ( 1 byte ) for the integer.
+// StreamUsageEnum + Anonymous tag (1 byte).
+// Assumes min-size encoding (1 byte) for the integer.
 constexpr size_t kStreamUsageTlvSize = sizeof(StreamUsageEnum) + 1;
 
 // 1 control byte + end-of-array marker
@@ -93,44 +93,6 @@ public:
 
     virtual ~CameraAVStreamMgmtDelegate() = default;
 
-    struct VideoStreamAllocateArgs
-    {
-        StreamUsageEnum
-            streamUsage; // Indicates the type of usage of stream ( Recording, Liveview, etc ) that this allocation is for.
-        VideoCodecEnum videoCodec;               //  Indicates the type of video codec the stream should support.
-        uint16_t minFrameRate;                   // Indicates the minimum frame rate ( frames/second ) of the video stream.
-        uint16_t maxFrameRate;                   // Indicates the maximum frame rate ( frames/second ) of the video stream.
-        VideoResolutionStruct minResolution;     // Indicates the minimum resolution of the video stream.
-        VideoResolutionStruct maxResolution;     // Indicates the maximum resolution of the video stream.
-        uint32_t minBitRate;                     // Indicates the minimum bit rate ( bits/second ) of the video stream.
-        uint32_t maxBitRate;                     // Indicates the maximum bit rate ( bits/second ) of the video stream.
-        uint16_t minFragmentLen;                 // Indicates the minimum length ( msecs ) of a clip fragment for the video stream.
-        uint16_t maxFragmentLen;                 // Indicates the maximum length ( msecs ) of a clip fragment for the video stream.
-        chip::Optional<bool> isWaterMarkEnabled; // Indicates  whether a watermark can be applied on the video stream.
-        chip::Optional<bool> isOSDEnabled;       // Indicates  whether the on-screen display can be applied on the video stream.
-    };
-
-    struct AudioStreamAllocateArgs
-    {
-        StreamUsageEnum
-            streamUsage; // Indicates the type of usage of stream ( Recording, Liveview, etc ) that this allocation is for.
-        AudioCodecEnum audioCodec; // Indicates the type of audio codec the stream should support.
-        uint8_t channelCount;      // Indicates the the number of channels used by the stream, e.g., Mono ( 1 ), Stereo ( 2 ), etc.
-        uint32_t sampleRate;       // Indicates the sampling rate of the audio stream in Hz.
-        uint32_t bitRate;          // Indicates the bitrate ( bits/sec ) of the specified audio codec.
-        uint8_t bitDepth;          // Indicates the number of information bits ( 8, 16, 24 or 32 ) used to represent each sample.
-    };
-
-    struct SnapshotStreamAllocateArgs
-    {
-        ImageCodecEnum imageCodec;           // Indicates the type of image codec to be used by the stream.
-        uint16_t maxFrameRate;               // Indicates the frame rate ( frames/second ) of the stream.
-        uint32_t bitRate;                    // Indicates the bitrate ( bits/sec ) of the stream.
-        VideoResolutionStruct minResolution; // Indicates the minimum resolution of the stream.
-        VideoResolutionStruct maxResolution; // Indicates the maximum resolution of the stream.
-        uint8_t quality;                     // Indicates a codec quality metric ( integer between 1 and 100 ) for the stream.
-    };
-
     /**
      *   @brief Handle Command Delegate for Video stream allocation with the provided parameter list.
      *
@@ -142,7 +104,7 @@ public:
      *   produced; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
-    virtual Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamAllocateArgs & allocateArgs,
+    virtual Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
                                                                     uint16_t & outStreamID) = 0;
 
     /**
@@ -186,7 +148,7 @@ public:
      *   produced; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
-    virtual Protocols::InteractionModel::Status AudioStreamAllocate(const AudioStreamAllocateArgs & allocateArgs,
+    virtual Protocols::InteractionModel::Status AudioStreamAllocate(const AudioStreamStruct & allocateArgs,
                                                                     uint16_t & outStreamID) = 0;
 
     /**
@@ -211,7 +173,7 @@ public:
      *   produced; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
-    virtual Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
+    virtual Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
                                                                        uint16_t & outStreamID) = 0;
 
     /**
@@ -252,7 +214,7 @@ public:
     /**
      *  Delegate functions to load the allocated video, audio, and snapshot streams.
      *  The delegate application is responsible for creating and persisting
-     *  these streams ( based on the Allocation commands ). These Load APIs would be
+     *  these streams (based on the Allocation commands). These Load APIs would be
      *  used to load the pre-allocated stream context information into the cluster server list,
      *  at initialization.
      *  Once loaded, the cluster server would be serving Reads on these
@@ -293,16 +255,15 @@ protected:
 
 enum class OptionalAttribute : uint32_t
 {
-    kHDRModeEnabled        = 0x0001,
-    kHardPrivacyModeOn     = 0x0002,
-    kNightVision           = 0x0004,
-    kNightVisionIllum      = 0x0008,
-    kMicrophoneAGCEnabled  = 0x0010,
-    kImageRotation         = 0x0020,
-    kImageFlipHorizontal   = 0x0040,
-    kImageFlipVertical     = 0x0080,
-    kStatusLightEnabled    = 0x0100,
-    kStatusLightBrightness = 0x0200,
+    kHardPrivacyModeOn     = 0x0001,
+    kNightVision           = 0x0002,
+    kNightVisionIllum      = 0x0004,
+    kMicrophoneAGCEnabled  = 0x0008,
+    kImageRotation         = 0x0010,
+    kImageFlipHorizontal   = 0x0020,
+    kImageFlipVertical     = 0x0040,
+    kStatusLightEnabled    = 0x0080,
+    kStatusLightBrightness = 0x0100,
 };
 
 class CameraAVStreamMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface
@@ -317,15 +278,15 @@ public:
      *                                          lifetime.
      *
      * @param aEndpointId                       The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aFeature                          The bitflags value that identifies which features are supported by this instance.
+     * @param aFeatures                         The bitflags value that identifies which features are supported by this instance.
      * @param aOptionalAttrs                    The bitflags value that identifies the optional attributes supported by this
      *                                          instance.
      * @param aPersistentStorage                The storage delegate to use to persist attributes.
      * @param aMaxConcurrentVideoEncoders       The maximum number of video encoders supported by camera.
-     * @param aMaxEncodedPixelRate              The maximum data rate ( encoded pixels/dec ) supported by camera.
+     * @param aMaxEncodedPixelRate              The maximum data rate (encoded pixels/dec) supported by camera.
      * @param aVideoSensorParams                The set of video sensor parameters for the camera.
      * @param aNightVisionCapable               Indicates whether the camera supports night vision.
-     * @param aMinViewPort                      Indicates minimum resolution ( width/height ) in pixels allowed for camera viewport.
+     * @param aMinViewPort                      Indicates minimum resolution (width/height) in pixels allowed for camera viewport.
      * @param aRateDistortionTradeOffPoints     Indicates the list of rate distortion trade-off points for supported hardware
      *                                          encoders.
      * @param aMaxContentBufferSize             The maximum size of the content buffer containing data for all streams, including
@@ -338,11 +299,11 @@ public:
      *                                          full-duplex, etc.
      * @param aSupportedSnapshotParams          Indicates the set of supported snapshot parameters by the device, e.g., the image
      *                                          codec, the resolution and the maximum frame rate.
-     * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth ( in mbps ) that the device would consume
+     * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth (in mbps) that the device would consume
      * for the transmission of its media streams.
      *
      */
-    CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeature,
+    CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
                              const BitFlags<OptionalAttribute> aOptionalAttrs, PersistentStorageDelegate & aPersistentStorage,
                              uint8_t aMaxConcurrentVideoEncoders, uint32_t aMaxEncodedPixelRate,
                              const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionCapable,
@@ -350,7 +311,8 @@ public:
                              const std::vector<RateDistortionTradeOffStruct> & aRateDistortionTradeOffPoints,
                              uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
                              const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
-                             const std::vector<SnapshotParamsStruct> & aSupportedSnapshotParams, uint32_t aMaxNetworkBandwidth);
+                             const std::vector<SnapshotParamsStruct> & aSupportedSnapshotParams, uint32_t aMaxNetworkBandwidth,
+                             const std::vector<StreamUsageEnum> & aSupportedStreamUsages);
 
     ~CameraAVStreamMgmtServer() override;
 
@@ -450,7 +412,7 @@ public:
 
     bool GetHDRModeEnabled() const { return mHDRModeEnabled; }
 
-    const std::unordered_set<chip::FabricIndex> & GetFabricsUsingCamera() const { return mFabricsUsingCamera; }
+    const std::vector<StreamUsageEnum> & GetSupportedStreamUsages() const { return mSupportedStreamUsages; }
 
     const std::vector<VideoStreamStruct> & GetAllocatedVideoStreams() const { return mAllocatedVideoStreams; }
 
@@ -507,9 +469,6 @@ public:
     EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
 
     // Add/Remove Management functions for streams
-    CHIP_ERROR AddToFabricsUsingCamera(chip::FabricIndex aFabricIndex);
-
-    CHIP_ERROR RemoveFromFabricsUsingCamera(chip::FabricIndex aFabricIndex);
 
     CHIP_ERROR SetRankedVideoStreamPriorities(const std::vector<StreamUsageEnum> & newPriorities);
 
@@ -572,7 +531,7 @@ private:
     Globals::ThreeLevelAutoEnum mStatusLightBrightness = Globals::ThreeLevelAutoEnum::kMedium;
 
     // Managed lists
-    std::unordered_set<chip::FabricIndex> mFabricsUsingCamera;
+    std::vector<StreamUsageEnum> mSupportedStreamUsages;
 
     std::vector<StreamUsageEnum> mRankedVideoStreamPriorities;
     std::vector<VideoStreamStruct> mAllocatedVideoStreams;
@@ -619,7 +578,8 @@ private:
     // Helpers to read list items via delegate APIs
     CHIP_ERROR ReadAndEncodeRateDistortionTradeOffPoints(const AttributeValueEncoder::ListEncodeHelper & encoder);
     CHIP_ERROR ReadAndEncodeSupportedSnapshotParams(const AttributeValueEncoder::ListEncodeHelper & encoder);
-    CHIP_ERROR ReadAndEncodeFabricsUsingCamera(const AttributeValueEncoder::ListEncodeHelper & encoder);
+
+    CHIP_ERROR ReadAndEncodeSupportedStreamUsages(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
     CHIP_ERROR ReadAndEncodeAllocatedVideoStreams(const AttributeValueEncoder::ListEncodeHelper & encoder);
     CHIP_ERROR ReadAndEncodeAllocatedAudioStreams(const AttributeValueEncoder::ListEncodeHelper & encoder);

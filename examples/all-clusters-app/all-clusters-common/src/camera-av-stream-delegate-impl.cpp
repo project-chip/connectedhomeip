@@ -24,6 +24,10 @@
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
 
+#define SNAPSHOT_FILE_PATH  "../capture_snapshot_test.jpg"
+#define SNAPSHOT_FILE_RES_WIDTH  (480)
+#define SNAPSHOT_FILE_RES_HEIGHT  (320)
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
@@ -36,28 +40,42 @@ namespace app {
 namespace Clusters {
 namespace CameraAvStreamManagement {
 
-Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(const VideoStreamAllocateArgs & allocateArgs,
+Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
                                                                                uint16_t & outStreamID)
 {
     outStreamID = kInvalidStreamID;
 
     for (VideoStream & stream : videoStreams)
     {
+        // Fake allocation with just matching codec
         if (!stream.isAllocated && stream.codec == allocateArgs.videoCodec)
         {
             stream.isAllocated = true;
             outStreamID        = stream.id;
+            allocateArgs.videoStreamID = stream.id;
+            mCameraAVStreamMgmtServer.AddVideoStream(allocateArgs);
+            return Status::Success;
         }
     }
 
-    return Status::Success;
+    return Status::Failure;
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamModify(const uint16_t streamID,
                                                                              const chip::Optional<bool> waterMarkEnabled,
                                                                              const chip::Optional<bool> osdEnabled)
 {
-    return Status::Success;
+    for (VideoStream & stream : videoStreams)
+    {
+        if (stream.id == streamID && stream.isAllocated)
+        {
+            ChipLogError(Zcl, "Modified video stream with ID: %d", streamID);
+            return Status::Success;
+        }
+    }
+
+    ChipLogError(Zcl, "Allocated video stream with ID: %d not found", streamID);
+    return Status::Failure;
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamDeallocate(const uint16_t streamID)
@@ -67,27 +85,33 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamDeallocate
         if (stream.id == streamID && stream.isAllocated)
         {
             stream.isAllocated = false;
+            break;
         }
     }
 
+    mCameraAVStreamMgmtServer.RemoveVideoStream(streamID);
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(const AudioStreamAllocateArgs & allocateArgs,
+Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(const AudioStreamStruct & allocateArgs,
                                                                                uint16_t & outStreamID)
 {
     outStreamID = kInvalidStreamID;
 
     for (AudioStream & stream : audioStreams)
     {
+        // Fake allocation with just matching codec
         if (!stream.isAllocated && stream.codec == allocateArgs.audioCodec)
         {
             stream.isAllocated = true;
             outStreamID        = stream.id;
+            allocateArgs.audioStreamID = stream.id;
+            mCameraAVStreamMgmtServer.AddAudioStream(allocateArgs);
+            return Status::Success;
         }
     }
 
-    return Status::Success;
+    return Status::Failure;
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate(const uint16_t streamID)
@@ -97,13 +121,15 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate
         if (stream.id == streamID && stream.isAllocated)
         {
             stream.isAllocated = false;
+            break;
         }
     }
 
+    mCameraAVStreamMgmtServer.RemoveAudioStream(streamID);
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
+Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
                                                                                   uint16_t & outStreamID)
 {
     outStreamID = kInvalidStreamID;
@@ -114,10 +140,13 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
         {
             stream.isAllocated = true;
             outStreamID        = stream.id;
+            allocateArgs.snapshotStreamID = stream.id;
+            mCameraAVStreamMgmtServer.AddSnapshotStream(allocateArgs);
+            return Status::Success;
         }
     }
 
-    return Status::Success;
+    return Status::Failure;
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDeallocate(const uint16_t streamID)
@@ -127,14 +156,17 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDealloc
         if (stream.id == streamID && stream.isAllocated)
         {
             stream.isAllocated = false;
+            break;
         }
     }
 
+    mCameraAVStreamMgmtServer.RemoveSnapshotStream(streamID);
     return Status::Success;
 }
 
 void CameraAVStreamManager::OnRankedStreamPrioritiesChanged()
 {
+    ChipLogError(Zcl, "Ranked stream priorities changed");
     return;
 }
 
@@ -142,30 +174,63 @@ Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const
                                                                            const VideoResolutionStruct & resolution,
                                                                            ImageSnapshot & outImageSnapshot)
 {
+    std::ifstream file(SNAPSHOT_FILE_PATH, std::ios::binary | std::ios::ate);
+    if (!file.is_open())
+    {
+        ChipLogError(Zcl, "Error opening snapshot image file: ");
+        return Status::Failure;
+    }
+
+    std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    // Ensure space for image snapshot data in outImageSnapshot
+    outImageSnapshot.data.resize(size);
+
+    if (!file.read(reinterpret_cast<char*>(outImageSnapshot.data.data()), size))
+    {
+        ChipLogError(Zcl, "Error reading image file: ");
+        return Status::Failure;
+    }
+
+    file.close();
+
+    outImageSnapshot.imageRes.width = SNAPSHOT_FILE_RES_WIDTH;
+    outImageSnapshot.imageRes.height = SNAPSHOT_FILE_RES_HEIGHT;
+    outImageSnapshot.imageCodec = ImageCodecEnum::kJpeg;
+
     return Status::Success;
 }
 
 CHIP_ERROR
 CameraAVStreamManager::LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams)
 {
+    allocatedVideoStreams.clear();
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR
 CameraAVStreamManager::LoadAllocatedAudioStreams(std::vector<AudioStreamStruct> & allocatedAudioStreams)
 {
+    allocatedAudioStreams.clear();
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR
 CameraAVStreamManager::LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams)
 {
+    allocatedSnapshotStreams.clear();
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR
 CameraAVStreamManager::PersistentAttributesLoadedCallback()
 {
+    ChipLogError(Zcl, "Persistent attributes loaded");
+
     return CHIP_NO_ERROR;
 }
 
