@@ -83,6 +83,7 @@ public:
     static const Key kCounterKey_TotalOperationalHours;
     static const Key kCounterKey_BootReason;
 
+    static CHIP_ERROR SetStorageSpace(const char * path);
     static CHIP_ERROR Init();
 
     // Config value accessors.
