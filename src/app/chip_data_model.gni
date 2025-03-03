@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_codegen.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/data-model-providers/codegen/model.gni")
 import("${chip_root}/src/platform/python.gni")
 
@@ -340,9 +341,13 @@ template("chip_data_model") {
         deps += [
           "${chip_root}/src/app/icd/server:configuration-data",
           "${chip_root}/src/app/icd/server:icd-server-config",
-          "${chip_root}/src/app/icd/server:monitoring-table",
-          "${chip_root}/src/app/icd/server:notifier",
         ]
+        if (chip_enable_icd_server) {
+          deps += [ "${chip_root}/src/app/icd/server:notifier" ]
+          if (chip_enable_icd_checkin) {
+            deps += [ "${chip_root}/src/app/icd/server:monitoring-table" ]
+          }
+        }
       } else if (cluster == "resource-monitoring-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
@@ -450,6 +455,12 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/ArlEncoder.cpp",
           "${_app_root}/clusters/${cluster}/ArlEncoder.h",
+        ]
+      } else if (cluster == "closure-control-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/closure-control-cluster-objects.h",
         ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]

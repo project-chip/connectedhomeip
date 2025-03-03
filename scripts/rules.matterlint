@@ -20,6 +20,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/channel-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/chime-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/chip-ota.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/chip-types.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/closure-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/clusters-extensions.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/color-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/commissioner-control-cluster.xml";

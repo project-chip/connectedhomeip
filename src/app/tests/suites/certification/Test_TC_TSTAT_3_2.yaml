@@ -211,10 +211,3 @@ tests:
           [1666952478.428140][5547:5547] CHIP:DMG:
           [1666952478.428206][5547:5547] CHIP:DMG:                 },
       disabled: true
-
-    - label:
-          "Step 3: DUT sends a GetRelayStatusLog command to the Test Harness."
-      PICS: TSTAT.C.C04.Tx
-      verification: |
-          The GetRelayStatusLogResponse command may not supported in Matter 1.0.
-      disabled: true

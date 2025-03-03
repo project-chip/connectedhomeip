@@ -143,12 +143,7 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMod
 
 bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
 {
-    wfx_wifi_provision_t wifiConfig;
-    if (wfx_get_wifi_provision(&wifiConfig))
-    {
-        return (wifiConfig.ssid[0] != 0);
-    }
-    return false;
+    return IsWifiProvisioned();
 }
 
 bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
@@ -181,7 +176,7 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 {
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
-        wfx_clear_wifi_provision();
+        ClearWifiCredentials();
 
         DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
     }
@@ -304,14 +299,7 @@ void ConnectivityManagerImpl::DriveStationState()
                 if (mWiFiStationState != kWiFiStationState_Connecting)
                 {
                     ChipLogProgress(DeviceLayer, "Attempting to connect WiFi");
-
-                    sl_status_t status = wfx_connect_to_ap();
-                    if (status != SL_STATUS_OK)
-                    {
-                        ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed: %" PRId32, status);
-                        // TODO: Clean the function up to remove the usage of goto
-                        goto exit;
-                    }
+                    SuccessOrExitAction(ConnectToAccessPoint(), ChipLogError(DeviceLayer, "ConnectToAccessPoint() failed"));
 
                     ChangeWiFiStationState(kWiFiStationState_Connecting);
                 }
@@ -388,9 +376,9 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
     if (mWiFiStationState == kWiFiStationState_Connected)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-        haveIPv4Conn = wfx_have_ipv4_addr(SL_WFX_STA_INTERFACE);
+        haveIPv4Conn = HasAnIPv4Address();
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-        haveIPv6Conn = wfx_have_ipv6_addr(SL_WFX_STA_INTERFACE);
+        haveIPv6Conn = HasAnIPv6Address();
     }
 
     // If the internet connectivity state has changed...

@@ -149,6 +149,17 @@ source_set("wifi-platform") {
       "${silabs_platform_dir}/wifi/lwip-support/ethernetif.cpp",
       "${silabs_platform_dir}/wifi/lwip-support/ethernetif.h",
       "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.cpp",
+      "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.h",
+    ]
+  }
+
+  # TODO: Once the WifiInterface refactor is done and becomes a class, we will inject an interface instead of having them in same source_set
+  if (chip_enable_icd_server) {
+    public_deps += [ "${chip_root}/src/app/icd/server:configuration-data" ]
+
+    sources += [
+      "${silabs_platform_dir}/wifi/icd/WifiSleepManager.cpp",
+      "${silabs_platform_dir}/wifi/icd/WifiSleepManager.h",
     ]
   }
 }

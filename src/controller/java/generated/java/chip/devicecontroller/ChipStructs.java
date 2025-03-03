@@ -3077,12 +3077,14 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
   public Long fabricID;
   public Long nodeID;
   public String label;
+  public Optional<byte[]> vidVerificationStatement;
   public Integer fabricIndex;
   private static final long ROOT_PUBLIC_KEY_ID = 1L;
   private static final long VENDOR_ID_ID = 2L;
   private static final long FABRIC_ID_ID = 3L;
   private static final long NODE_ID_ID = 4L;
   private static final long LABEL_ID = 5L;
+  private static final long VID_VERIFICATION_STATEMENT_ID = 6L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public OperationalCredentialsClusterFabricDescriptorStruct(
@@ -3091,6 +3093,7 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
     Long fabricID,
     Long nodeID,
     String label,
+    Optional<byte[]> vidVerificationStatement,
     Integer fabricIndex
   ) {
     this.rootPublicKey = rootPublicKey;
@@ -3098,6 +3101,7 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
     this.fabricID = fabricID;
     this.nodeID = nodeID;
     this.label = label;
+    this.vidVerificationStatement = vidVerificationStatement;
     this.fabricIndex = fabricIndex;
   }
 
@@ -3108,6 +3112,7 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
     values.add(new StructElement(FABRIC_ID_ID, new UIntType(fabricID)));
     values.add(new StructElement(NODE_ID_ID, new UIntType(nodeID)));
     values.add(new StructElement(LABEL_ID, new StringType(label)));
+    values.add(new StructElement(VID_VERIFICATION_STATEMENT_ID, vidVerificationStatement.<BaseTLVType>map((nonOptionalvidVerificationStatement) -> new ByteArrayType(nonOptionalvidVerificationStatement)).orElse(new EmptyType())));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -3122,6 +3127,7 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
     Long fabricID = null;
     Long nodeID = null;
     String label = null;
+    Optional<byte[]> vidVerificationStatement = Optional.empty();
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ROOT_PUBLIC_KEY_ID) {
@@ -3149,6 +3155,11 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
           StringType castingValue = element.value(StringType.class);
           label = castingValue.value(String.class);
         }
+      } else if (element.contextTagNum() == VID_VERIFICATION_STATEMENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          vidVerificationStatement = Optional.of(castingValue.value(byte[].class));
+        }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
@@ -3162,6 +3173,7 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
       fabricID,
       nodeID,
       label,
+      vidVerificationStatement,
       fabricIndex
     );
   }
@@ -3185,6 +3197,9 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
     output.append("\tlabel: ");
     output.append(label);
     output.append("\n");
+    output.append("\tvidVerificationStatement: ");
+    output.append(vidVerificationStatement.isPresent() ? Arrays.toString(vidVerificationStatement.get()) : "");
+    output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
     output.append("\n");
@@ -3195,18 +3210,22 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
 public static class OperationalCredentialsClusterNOCStruct {
   public byte[] noc;
   public @Nullable byte[] icac;
+  public Optional<byte[]> vvsc;
   public Integer fabricIndex;
   private static final long NOC_ID = 1L;
   private static final long ICAC_ID = 2L;
+  private static final long VVSC_ID = 3L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public OperationalCredentialsClusterNOCStruct(
     byte[] noc,
     @Nullable byte[] icac,
+    Optional<byte[]> vvsc,
     Integer fabricIndex
   ) {
     this.noc = noc;
     this.icac = icac;
+    this.vvsc = vvsc;
     this.fabricIndex = fabricIndex;
   }
 
@@ -3214,6 +3233,7 @@ public static class OperationalCredentialsClusterNOCStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(NOC_ID, new ByteArrayType(noc)));
     values.add(new StructElement(ICAC_ID, icac != null ? new ByteArrayType(icac) : new NullType()));
+    values.add(new StructElement(VVSC_ID, vvsc.<BaseTLVType>map((nonOptionalvvsc) -> new ByteArrayType(nonOptionalvvsc)).orElse(new EmptyType())));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -3225,6 +3245,7 @@ public static class OperationalCredentialsClusterNOCStruct {
     }
     byte[] noc = null;
     @Nullable byte[] icac = null;
+    Optional<byte[]> vvsc = Optional.empty();
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == NOC_ID) {
@@ -3237,6 +3258,11 @@ public static class OperationalCredentialsClusterNOCStruct {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
           icac = castingValue.value(byte[].class);
         }
+      } else if (element.contextTagNum() == VVSC_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          vvsc = Optional.of(castingValue.value(byte[].class));
+        }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
@@ -3247,6 +3273,7 @@ public static class OperationalCredentialsClusterNOCStruct {
     return new OperationalCredentialsClusterNOCStruct(
       noc,
       icac,
+      vvsc,
       fabricIndex
     );
   }
@@ -3260,6 +3287,9 @@ public static class OperationalCredentialsClusterNOCStruct {
     output.append("\n");
     output.append("\ticac: ");
     output.append(Arrays.toString(icac));
+    output.append("\n");
+    output.append("\tvvsc: ");
+    output.append(vvsc.isPresent() ? Arrays.toString(vvsc.get()) : "");
     output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
@@ -9287,6 +9317,173 @@ public static class DoorLockClusterCredentialStruct {
     output.append("\n");
     output.append("\tcredentialIndex: ");
     output.append(credentialIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ClosureControlClusterOverallStateStruct {
+  public Optional<Integer> positioning;
+  public Optional<Integer> latching;
+  public Optional<Integer> speed;
+  public Optional<Long> extraInfo;
+  private static final long POSITIONING_ID = 0L;
+  private static final long LATCHING_ID = 1L;
+  private static final long SPEED_ID = 2L;
+  private static final long EXTRA_INFO_ID = 3L;
+
+  public ClosureControlClusterOverallStateStruct(
+    Optional<Integer> positioning,
+    Optional<Integer> latching,
+    Optional<Integer> speed,
+    Optional<Long> extraInfo
+  ) {
+    this.positioning = positioning;
+    this.latching = latching;
+    this.speed = speed;
+    this.extraInfo = extraInfo;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(POSITIONING_ID, positioning.<BaseTLVType>map((nonOptionalpositioning) -> new UIntType(nonOptionalpositioning)).orElse(new EmptyType())));
+    values.add(new StructElement(LATCHING_ID, latching.<BaseTLVType>map((nonOptionallatching) -> new UIntType(nonOptionallatching)).orElse(new EmptyType())));
+    values.add(new StructElement(SPEED_ID, speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType())));
+    values.add(new StructElement(EXTRA_INFO_ID, extraInfo.<BaseTLVType>map((nonOptionalextraInfo) -> new UIntType(nonOptionalextraInfo)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ClosureControlClusterOverallStateStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Integer> positioning = Optional.empty();
+    Optional<Integer> latching = Optional.empty();
+    Optional<Integer> speed = Optional.empty();
+    Optional<Long> extraInfo = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == POSITIONING_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          positioning = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == LATCHING_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          latching = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == SPEED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          speed = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == EXTRA_INFO_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          extraInfo = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new ClosureControlClusterOverallStateStruct(
+      positioning,
+      latching,
+      speed,
+      extraInfo
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ClosureControlClusterOverallStateStruct {\n");
+    output.append("\tpositioning: ");
+    output.append(positioning);
+    output.append("\n");
+    output.append("\tlatching: ");
+    output.append(latching);
+    output.append("\n");
+    output.append("\tspeed: ");
+    output.append(speed);
+    output.append("\n");
+    output.append("\textraInfo: ");
+    output.append(extraInfo);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ClosureControlClusterOverallTargetStruct {
+  public Optional<Integer> tagPosition;
+  public Optional<Integer> tagLatch;
+  public Optional<Integer> speed;
+  private static final long TAG_POSITION_ID = 0L;
+  private static final long TAG_LATCH_ID = 1L;
+  private static final long SPEED_ID = 2L;
+
+  public ClosureControlClusterOverallTargetStruct(
+    Optional<Integer> tagPosition,
+    Optional<Integer> tagLatch,
+    Optional<Integer> speed
+  ) {
+    this.tagPosition = tagPosition;
+    this.tagLatch = tagLatch;
+    this.speed = speed;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(TAG_POSITION_ID, tagPosition.<BaseTLVType>map((nonOptionaltagPosition) -> new UIntType(nonOptionaltagPosition)).orElse(new EmptyType())));
+    values.add(new StructElement(TAG_LATCH_ID, tagLatch.<BaseTLVType>map((nonOptionaltagLatch) -> new UIntType(nonOptionaltagLatch)).orElse(new EmptyType())));
+    values.add(new StructElement(SPEED_ID, speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ClosureControlClusterOverallTargetStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Integer> tagPosition = Optional.empty();
+    Optional<Integer> tagLatch = Optional.empty();
+    Optional<Integer> speed = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == TAG_POSITION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          tagPosition = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == TAG_LATCH_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          tagLatch = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == SPEED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          speed = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new ClosureControlClusterOverallTargetStruct(
+      tagPosition,
+      tagLatch,
+      speed
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ClosureControlClusterOverallTargetStruct {\n");
+    output.append("\ttagPosition: ");
+    output.append(tagPosition);
+    output.append("\n");
+    output.append("\ttagLatch: ");
+    output.append(tagLatch);
+    output.append("\n");
+    output.append("\tspeed: ");
+    output.append(speed);
     output.append("\n");
     output.append("}\n");
     return output.toString();

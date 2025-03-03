@@ -249,6 +249,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeWindowCoveringID:
         result = @"WindowCovering";
         break;
+    case MTRClusterIDTypeClosureControlID:
+        result = @"ClosureControl";
+        break;
     case MTRClusterIDTypeServiceAreaID:
         result = @"ServiceArea";
         break;
@@ -4920,6 +4923,77 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeClosureControlID:
+
+        switch (attributeID) {
+
+            // Cluster ClosureControl attributes
+        case MTRAttributeIDTypeClusterClosureControlAttributeCountdownTimeID:
+            result = @"CountdownTime";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureControlAttributeMainStateID:
+            result = @"MainState";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureControlAttributeCurrentErrorListID:
+            result = @"CurrentErrorList";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureControlAttributeOverallStateID:
+            result = @"OverallState";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureControlAttributeOverallTargetID:
+            result = @"OverallTarget";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureControlAttributeRestingProcedureID:
+            result = @"RestingProcedure";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureControlAttributeTriggerConditionID:
+            result = @"TriggerCondition";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureControlAttributeTriggerPositionID:
+            result = @"TriggerPosition";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureControlAttributeWaitingDelayID:
+            result = @"WaitingDelay";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureControlAttributeKickoffTimerID:
+            result = @"KickoffTimer";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureControlAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureControlAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureControlAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureControlAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureControlAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeServiceAreaID:
 
         switch (attributeID) {
@@ -9274,6 +9348,14 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"AddTrustedRootCertificate";
             break;
 
+        case MTRCommandIDTypeClusterOperationalCredentialsCommandSetVidVerificationStatementID:
+            result = @"SetVidVerificationStatement";
+            break;
+
+        case MTRCommandIDTypeClusterOperationalCredentialsCommandSignVidVerificationRequestID:
+            result = @"SignVidVerificationRequest";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -10120,6 +10202,36 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltPercentageID:
             result = @"GoToTiltPercentage";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeClosureControlID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterClosureControlCommandStopID:
+            result = @"Stop";
+            break;
+
+        case MTRCommandIDTypeClusterClosureControlCommandMoveToID:
+            result = @"MoveTo";
+            break;
+
+        case MTRCommandIDTypeClusterClosureControlCommandCalibrateID:
+            result = @"Calibrate";
+            break;
+
+        case MTRCommandIDTypeClusterClosureControlCommandConfigureFallbackID:
+            result = @"ConfigureFallback";
+            break;
+
+        case MTRCommandIDTypeClusterClosureControlCommandCancelFallbackID:
+            result = @"CancelFallback";
             break;
 
         default:
@@ -10994,8 +11106,8 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"ProvideAnswer";
             break;
 
-        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideICECandidateID:
-            result = @"ProvideICECandidate";
+        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideICECandidatesID:
+            result = @"ProvideICECandidates";
             break;
 
         case MTRCommandIDTypeClusterWebRTCTransportProviderCommandEndSessionID:
@@ -11020,8 +11132,8 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"Answer";
             break;
 
-        case MTRCommandIDTypeClusterWebRTCTransportRequestorCommandICECandidateID:
-            result = @"ICECandidate";
+        case MTRCommandIDTypeClusterWebRTCTransportRequestorCommandICECandidatesID:
+            result = @"ICECandidates";
             break;
 
         case MTRCommandIDTypeClusterWebRTCTransportRequestorCommandEndID:
@@ -11692,6 +11804,10 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
             result = @"NOCResponse";
             break;
 
+        case MTRCommandIDTypeClusterOperationalCredentialsCommandSignVidVerificationResponseID:
+            result = @"SignVidVerificationResponse";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -12249,6 +12365,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         break;
 
     case MTRClusterIDTypeWindowCoveringID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeClosureControlID:
 
         switch (commandID) {
 
@@ -14122,6 +14248,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeWindowCoveringID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeClosureControlID:
 
         switch (eventID) {
 

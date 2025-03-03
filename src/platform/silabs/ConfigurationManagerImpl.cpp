@@ -297,7 +297,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     }
 
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
-    wfx_clear_wifi_provision();
+    ClearWifiCredentials();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 
     // Restart the system.

@@ -472,6 +472,7 @@ if (chip_device_platform != "none") {
       "../include/platform/ConnectivityManager.h",
       "../include/platform/DeviceControlServer.h",
       "../include/platform/DeviceInstanceInfoProvider.h",
+      "../include/platform/GeneralFaults.h",
       "../include/platform/GeneralUtils.h",
       "../include/platform/KeyValueStoreManager.h",
       "../include/platform/KvsPersistentStorageDelegate.h",

@@ -54,9 +54,9 @@ RUN curl https://raw.githubusercontent.com/restyled-io/restyler/master/bin/resty
     && chmod +x /usr/local/bin/restyle-path \
     && :
 
-RUN mkdir -p /opt/sdk/sdks/ \
+RUN mkdir -p /opt/android/sdk \
     && chown -R $USERNAME:$USERNAME \
-    /opt/sdk/sdks/ `# NXP uses a patch_sdk script to change SDK files` \
+    /opt/android/sdk `# NXP uses a patch_sdk script to change SDK files` \
     $ANDROID_HOME \
     $IDF_TOOLS_PATH \
     && find $AMEBA_PATH -name "inc_lp" -print0 | xargs -0 chown -R $USERNAME:$USERNAME \
@@ -64,14 +64,14 @@ RUN mkdir -p /opt/sdk/sdks/ \
     && find $AMEBA_PATH -name "project_lp" -print0 | xargs -0 chown -R $USERNAME:$USERNAME \
     && find $AMEBA_PATH -name "project_hp" -print0 | xargs -0 chown -R $USERNAME:$USERNAME \
     && chmod -R +x \
-    $ANDROID_HOME/tools/bin `# sdkmanager for accepting licenses`\
+    $ANDROID_HOME/cmdline-tools/10.0/bin `# sdkmanager for accepting licenses`\
     && chmod -R +w \
     $IDF_TOOLS_PATH \
     && find $AMEBA_PATH -name "inc_lp" -print0 | xargs -0 chmod -R +w \
     && find $AMEBA_PATH -name "inc_hp" -print0 | xargs -0 chmod -R +w \
     && find $AMEBA_PATH -name "project_lp" -print0 | xargs -0 chmod -R +w \
     && find $AMEBA_PATH -name "project_hp" -print0 | xargs -0 chmod -R +w \
-    # Safe directory is preffered over chown.
+    # Safe directory is preferred over chown.
     && git config --global --add safe.directory "*" \
     && :
 
