@@ -120,7 +120,8 @@ if (chip_build_tests) {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/tests" ]
     }
 
-    if (chip_device_platform != "ameba" && chip_device_platform != "realtek_bee") {
+    if (chip_device_platform != "ameba" &&
+        chip_device_platform != "realtek_bee") {
       tests += [ "${chip_root}/src/platform/tests" ]
     }
 
