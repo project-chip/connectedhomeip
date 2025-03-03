@@ -43,23 +43,24 @@ namespace Clusters {
 namespace CameraAvStreamManagement {
 
 CameraAVStreamMgmtServer::CameraAVStreamMgmtServer(
-    CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeature,
+    CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
     const BitFlags<OptionalAttribute> aOptionalAttrs, PersistentStorageDelegate & aPersistentStorage,
     uint8_t aMaxConcurrentVideoEncoders, uint32_t aMaxEncodedPixelRate, const VideoSensorParamsStruct & aVideoSensorParams,
     bool aNightVisionCapable, const VideoResolutionStruct & aMinViewPort,
     const std::vector<Structs::RateDistortionTradeOffPointsStruct::Type> & aRateDistortionTradeOffPoints,
     uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
     const AudioCapabilitiesStruct & aSpeakerCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
-    const std::vector<Structs::SnapshotParamsStruct::Type> & aSupportedSnapshotParams, uint32_t aMaxNetworkBandwidth) :
+    const std::vector<Structs::SnapshotParamsStruct::Type> & aSupportedSnapshotParams, uint32_t aMaxNetworkBandwidth,
+    const std::vector<StreamUsageEnum> & aSupportedStreamUsages) :
     CommandHandlerInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id),
     AttributeAccessInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id), mDelegate(aDelegate),
-    mEndpointId(aEndpointId), mFeature(aFeature), mOptionalAttrs(aOptionalAttrs),
+    mEndpointId(aEndpointId), mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs),
     mMaxConcurrentVideoEncoders(aMaxConcurrentVideoEncoders), mMaxEncodedPixelRate(aMaxEncodedPixelRate),
     mVideoSensorParams(aVideoSensorParams), mNightVisionCapable(aNightVisionCapable), mMinViewPort(aMinViewPort),
     mRateDistortionTradeOffPointsList(aRateDistortionTradeOffPoints), mMaxContentBufferSize(aMaxContentBufferSize),
     mMicrophoneCapabilities(aMicrophoneCapabilities), mSpeakerCapabilities(aSpeakerCapabilities),
     mTwoWayTalkSupport(aTwoWayTalkSupport), mSupportedSnapshotParamsList(aSupportedSnapshotParams),
-    mMaxNetworkBandwidth(aMaxNetworkBandwidth)
+    mMaxNetworkBandwidth(aMaxNetworkBandwidth), mSupportedStreamUsages(aSupportedStreamUsages)
 {
     mDelegate.SetCameraAVStreamMgmtServer(this);
 }
@@ -77,7 +78,9 @@ CameraAVStreamMgmtServer::~CameraAVStreamMgmtServer()
 
 CHIP_ERROR CameraAVStreamMgmtServer::Init()
 {
-    // Add necessary feature checks
+    // Necessary feature checks
+
+    // At least one of Video, Audio or Snapshot needs to be supported.
     VerifyOrReturnError(
         HasFeature(Feature::kVideo) || HasFeature(Feature::kAudio) || HasFeature(Feature::kSnapshot), CHIP_ERROR_INVALID_ARGUMENT,
         ChipLogError(
@@ -85,25 +88,26 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
             "CameraAVStreamMgmt[ep=%d]: Feature configuration error. At least one of Audio, Video, or Snapshot feature required",
             mEndpointId));
 
-    if (HasFeature(Feature::kImageControl) || HasFeature(Feature::kWatermark) || HasFeature(Feature::kOnScreenDisplay))
+    if (HasFeature(Feature::kImageControl) || HasFeature(Feature::kWatermark) || HasFeature(Feature::kOnScreenDisplay) ||
+        HasFeature(Feature::kHDREnabled))
     {
-        VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_ERROR_INVALID_ARGUMENT,
+        VerifyOrReturnError(HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl,
-                                         "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if ImageControl, Watermark or "
-                                         "OSD, then Video feature required",
+                                         "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if ImageControl, Watermark, "
+                                         "OSD or HDR, then Video or Snapshotfeature required",
+                                         mEndpointId));
+    }
+
+    if (HasFeature(Feature::kSpeaker))
+    {
+        VerifyOrReturnError(HasFeature(Feature::kAudio), CHIP_ERROR_INVALID_ARGUMENT,
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if Speaker is enabled, then "
+                                         "Audio feature required",
                                          mEndpointId));
     }
 
     // Ensure Optional attribute bits have been correctly passed.
-    if (SupportsOptAttr(OptionalAttribute::kHDRModeEnabled))
-    {
-        VerifyOrReturnError(
-            HasFeature(Feature::kVideo), CHIP_ERROR_INVALID_ARGUMENT,
-            ChipLogError(Zcl,
-                         "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if HDRModeEnabled, then Video feature required",
-                         mEndpointId));
-    }
-
     if (SupportsOptAttr(OptionalAttribute::kNightVision) || SupportsOptAttr(OptionalAttribute::kNightVisionIllum))
     {
         VerifyOrReturnError(HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot), CHIP_ERROR_INVALID_ARGUMENT,
@@ -154,7 +158,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
 
 bool CameraAVStreamMgmtServer::HasFeature(Feature feature) const
 {
-    return mFeature.Has(feature);
+    return mFeatures.Has(feature);
 }
 
 bool CameraAVStreamMgmtServer::SupportsOptAttr(OptionalAttribute aOptionalAttr) const
@@ -188,11 +192,11 @@ CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeSupportedSnapshotParams(const 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeFabricsUsingCamera(const AttributeValueEncoder::ListEncodeHelper & encoder)
+CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeSupportedStreamUsages(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    for (const auto & fabricIndex : mFabricsUsingCamera)
+    for (const auto & supportedStreamUsage : mSupportedStreamUsages)
     {
-        ReturnErrorOnFailure(encoder.Encode(fabricIndex));
+        ReturnErrorOnFailure(encoder.Encode(supportedStreamUsage));
     }
 
     return CHIP_NO_ERROR;
@@ -239,21 +243,12 @@ CameraAVStreamMgmtServer::ReadAndEncodeRankedVideoStreamPrioritiesList(const Att
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAVStreamMgmtServer::AddToFabricsUsingCamera(FabricIndex aFabricIndex)
+CHIP_ERROR CameraAVStreamMgmtServer::SetRankedVide(const std::vector<StreamUsageEnum> & newPriorities)
 {
-    mFabricsUsingCamera.insert(aFabricIndex);
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::FabricsUsingCamera::Id);
-    mDelegate.OnAttributeChanged(Attributes::FabricsUsingCamera::Id);
-    MatterReportingAttributeChangeCallback(path);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR CameraAVStreamMgmtServer::RemoveFromFabricsUsingCamera(FabricIndex aFabricIndex)
-{
-    mFabricsUsingCamera.erase(aFabricIndex);
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::FabricsUsingCamera::Id);
-    mDelegate.OnAttributeChanged(Attributes::FabricsUsingCamera::Id);
+    mRankedVideoStreamPriorities = newPriorities;
+    ReturnErrorOnFailure(StoreRankedVideoStreamPriorities());
+    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::RankedVideoStreamPrioritiesList::Id);
+    mDelegate.OnAttributeChanged(Attributes::RankedVideoStreamPrioritiesList::Id);
     MatterReportingAttributeChangeCallback(path);
 
     return CHIP_NO_ERROR;
@@ -348,7 +343,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
     switch (aPath.mAttributeId)
     {
     case FeatureMap::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(mFeature));
+        ReturnErrorOnFailure(aEncoder.Encode(mFeatures));
         break;
     case MaxConcurrentVideoEncoders::Id:
         VerifyOrReturnError(
@@ -393,10 +388,6 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
             [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeRateDistortionTradeOffPoints(encoder); }));
         break;
     case MaxContentBufferSize::Id:
-        VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl,
-                                         "CameraAVStreamMgmt[ep=%d]: can not get MaxContentBufferSize, feature is not supported",
-                                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mMaxContentBufferSize));
         break;
     case MicrophoneCapabilities::Id:
@@ -407,21 +398,19 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         ReturnErrorOnFailure(aEncoder.Encode(mMicrophoneCapabilities));
         break;
     case SpeakerCapabilities::Id:
-        VerifyOrReturnError(
-            HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+        VerifyOrReturnError(HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get SpeakerCapabilities, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mSpeakerCapabilities));
         break;
     case TwoWayTalkSupport::Id:
-        VerifyOrReturnError(
-            HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+        VerifyOrReturnError(HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get TwoWayTalkSupport, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mTwoWayTalkSupport));
         break;
     case SupportedSnapshotParams::Id:
         VerifyOrReturnError(
             HasFeature(Feature::kSnapshot), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get RateDistortionTradeOffPoints, feature is not supported",
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get SupportedSnapshotParams, feature is not supported",
                          mEndpointId));
         ReturnErrorOnFailure(aEncoder.EncodeList(
             [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeSupportedSnapshotParams(encoder); }));
@@ -437,16 +426,13 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         break;
     case HDRModeEnabled::Id:
         VerifyOrReturnError(
-            SupportsOptAttr(OptionalAttribute::kHDRModeEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            HasFeature(Feature::kHDRModeEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get HDRModeEnabled, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mHDRModeEnabled));
         break;
-    case FabricsUsingCamera::Id:
-        VerifyOrReturnError(
-            HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get FabricsUsingCamera, feature is not supported", mEndpointId));
+    case SupportedStreamUsages::Id:
         ReturnErrorOnFailure(aEncoder.EncodeList(
-            [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeFabricsUsingCamera(encoder); }));
+            [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeSupportedStreamUsages(encoder); }));
         break;
     case AllocatedVideoStreams::Id:
         VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
@@ -525,25 +511,25 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         break;
     case SpeakerMuted::Id:
         VerifyOrReturnError(
-            HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get SpeakerMuted, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mSpeakerMuted));
         break;
     case SpeakerVolumeLevel::Id:
         VerifyOrReturnError(
-            HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get SpeakerVolumeLevel, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mSpeakerVolumeLevel));
         break;
     case SpeakerMaxLevel::Id:
         VerifyOrReturnError(
-            HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get SpeakerMaxLevel, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mSpeakerMaxLevel));
         break;
     case SpeakerMinLevel::Id:
         VerifyOrReturnError(
-            HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get SpeakerMinLevel, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mSpeakerMinLevel));
         break;
@@ -636,9 +622,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
     switch (aPath.mAttributeId)
     {
     case HDRModeEnabled::Id: {
-        // Optional Attribute if Video is supported
         VerifyOrReturnError(
-            SupportsOptAttr(OptionalAttribute::kHDRModeEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            HasFeature(Feature::kHDRModeEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set HDRModeEnabled, feature is not supported", mEndpointId));
 
         bool hdrModeEnabled;
@@ -694,7 +679,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
     }
     case SpeakerMuted::Id: {
         VerifyOrReturnError(
-            HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set SpeakerMuted, feature is not supported", mEndpointId));
         bool speakerMuted;
         ReturnErrorOnFailure(aDecoder.Decode(speakerMuted));
@@ -702,7 +687,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
     }
     case SpeakerVolumeLevel::Id: {
         VerifyOrReturnError(
-            HasFeature(Feature::kAudio) && HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            HasFeature(Feature::kSpeaker), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set SpeakerVolumeLevel, feature is not supported", mEndpointId));
         uint8_t speakerVolLevel;
         ReturnErrorOnFailure(aDecoder.Decode(speakerVolLevel));
@@ -1423,6 +1408,10 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
         }
         else
         {
+            // VideoStreamModify should have either the WMARK or OSD feature supported
+            VerifyOrReturn(HasFeature(Feature::kWatermark) || HasFeature(Feature::kOnScreenDisplay),
+                           ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+
             HandleCommand<Commands::VideoStreamModify::DecodableType>(
                 handlerContext,
                 [this](HandlerContext & ctx, const auto & commandData) { HandleVideoStreamModify(ctx, commandData); });
@@ -1575,7 +1564,8 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
                        commandData.maxFragmentLen <= kMaxFragmentLenMaxValue,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
-    CameraAVStreamMgmtDelegate::VideoStreamAllocateArgs videoStreamArgs;
+    VideoStreamStruct videoStreamArgs;
+    videoStreamArgs.videoStreamID      = 0;
     videoStreamArgs.streamUsage        = commandData.streamUsage;
     videoStreamArgs.videoCodec         = commandData.videoCodec;
     videoStreamArgs.minFrameRate       = commandData.minFrameRate;
@@ -1588,6 +1578,7 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
     videoStreamArgs.maxFragmentLen     = commandData.maxFragmentLen;
     videoStreamArgs.isWaterMarkEnabled = commandData.watermarkEnabled;
     videoStreamArgs.isOSDEnabled       = commandData.OSDEnabled;
+    videoStreamArgs.referenceCount     = 0;
 
     // Call the delegate
     status = mDelegate.VideoStreamAllocate(videoStreamArgs, videoStreamID);
@@ -1610,10 +1601,6 @@ void CameraAVStreamMgmtServer::HandleVideoStreamModify(HandlerContext & ctx,
     auto & isWaterMarkEnabled = commandData.watermarkEnabled;
     auto & isOSDEnabled       = commandData.OSDEnabled;
     auto & videoStreamID      = commandData.videoStreamID;
-
-    // VideoStreamModify should have either the WMARK or OSD feature supported
-    VerifyOrReturn(HasFeature(Feature::kWatermark) || HasFeature(Feature::kOnScreenDisplay),
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
 
     // If Watermark feature is supported, then command should have the
     // isWaterMarkEnabled param. Or, if it is not supported, then command should
@@ -1681,13 +1668,15 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    CameraAVStreamMgmtDelegate::AudioStreamAllocateArgs audioStreamArgs;
-    audioStreamArgs.streamUsage  = commandData.streamUsage;
-    audioStreamArgs.audioCodec   = commandData.audioCodec;
-    audioStreamArgs.channelCount = commandData.channelCount;
-    audioStreamArgs.sampleRate   = commandData.sampleRate;
-    audioStreamArgs.bitRate      = commandData.bitRate;
-    audioStreamArgs.bitDepth     = commandData.bitDepth;
+    AudioStreamStruct audioStreamArgs;
+    audioStreamArgs.audioStreamID  = 0;
+    audioStreamArgs.streamUsage    = commandData.streamUsage;
+    audioStreamArgs.audioCodec     = commandData.audioCodec;
+    audioStreamArgs.channelCount   = commandData.channelCount;
+    audioStreamArgs.sampleRate     = commandData.sampleRate;
+    audioStreamArgs.bitRate        = commandData.bitRate;
+    audioStreamArgs.bitDepth       = commandData.bitDepth;
+    audioStreamArgs.referenceCount = 0;
 
     // Call the delegate
     Status status = mDelegate.AudioStreamAllocate(audioStreamArgs, audioStreamID);
@@ -1736,18 +1725,26 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
+    VerifyOrReturn(commandData.minResolution.width >= 1 && commandData.minResolution.height >= 1,
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+
+    VerifyOrReturn(commandData.maxResolution.width >= 1 && commandData.maxResolution.height >= 1,
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+
     VerifyOrReturn(commandData.quality > 0 && commandData.quality <= kMaxImageQualityMetric, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid image quality", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs snapshotStreamArgs;
-    snapshotStreamArgs.imageCodec    = commandData.imageCodec;
-    snapshotStreamArgs.maxFrameRate  = commandData.maxFrameRate;
-    snapshotStreamArgs.bitRate       = commandData.bitRate;
-    snapshotStreamArgs.minResolution = commandData.minResolution;
-    snapshotStreamArgs.maxResolution = commandData.maxResolution;
-    snapshotStreamArgs.quality       = commandData.quality;
+    SnapshotStreamStruct snapshotStreamArgs;
+    snapshotStreamArgs.snapshotStreamID = 0;
+    snapshotStreamArgs.imageCodec       = commandData.imageCodec;
+    snapshotStreamArgs.maxFrameRate     = commandData.maxFrameRate;
+    snapshotStreamArgs.bitRate          = commandData.bitRate;
+    snapshotStreamArgs.minResolution    = commandData.minResolution;
+    snapshotStreamArgs.maxResolution    = commandData.maxResolution;
+    snapshotStreamArgs.quality          = commandData.quality;
+    snapshotStreamArgs.referenceCount   = 0;
 
     // Call the delegate
     Status status = mDelegate.SnapshotStreamAllocate(snapshotStreamArgs, snapshotStreamID);
@@ -1793,6 +1790,12 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
         rankedStreamPriorities.push_back(streamUsage);
     }
 
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        return;
+    }
+
     CHIP_ERROR err = SetRankedVideoStreamPriorities(rankedStreamPriorities);
 
     if (err != CHIP_NO_ERROR)
@@ -1814,6 +1817,9 @@ void CameraAVStreamMgmtServer::HandleCaptureSnapshot(HandlerContext & ctx,
     auto & snapshotStreamID    = commandData.snapshotStreamID;
     auto & requestedResolution = commandData.requestedResolution;
     ImageSnapshot image;
+
+    VerifyOrReturn(commandData.requestedResolution.width >= 1 && commandData.requestedResolution.height >= 1,
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
     // Call the delegate
     Status status = mDelegate.CaptureSnapshot(snapshotStreamID, requestedResolution, image);

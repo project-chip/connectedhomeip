@@ -61,18 +61,18 @@ class CameraAVStreamManager : public CameraAVStreamMgmtDelegate
 {
 
 public:
-    Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamAllocateArgs & allocateArgs, uint16_t & outStreamID);
+    Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs, uint16_t & outStreamID);
 
     Protocols::InteractionModel::Status VideoStreamModify(const uint16_t streamID, const chip::Optional<bool> waterMarkEnabled,
                                                           const chip::Optional<bool> osdEnabled);
 
     Protocols::InteractionModel::Status VideoStreamDeallocate(const uint16_t streamID);
 
-    Protocols::InteractionModel::Status AudioStreamAllocate(const AudioStreamAllocateArgs & allocateArgs, uint16_t & outStreamID);
+    Protocols::InteractionModel::Status AudioStreamAllocate(const AudioStreamStruct & allocateArgs, uint16_t & outStreamID);
 
     Protocols::InteractionModel::Status AudioStreamDeallocate(const uint16_t streamID);
 
-    Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
+    Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
                                                                uint16_t & outStreamID) = 0;
 
     Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID);
