@@ -28,12 +28,12 @@
 #include <ble/Ble.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Darwin/BlePlatformDelegateImpl.h>
+#include <platform/Darwin/BleUtils.h>
 
 #import "MTRUUIDHelper.h"
 
-using namespace ::chip;
-using namespace ::chip::Ble;
-using ::chip::System::PacketBufferHandle;
+using namespace chip::Ble;
+using chip::System::PacketBufferHandle;
 
 namespace chip {
 namespace DeviceLayer {
@@ -49,7 +49,7 @@ namespace DeviceLayer {
 
             CBUUID * serviceId = [MTRUUIDHelper GetShortestServiceUUID:svcId];
             CBUUID * characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes length:sizeof(charId->bytes)]];
-            CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
+            CBPeripheral * peripheral = CBPeripheralFromBleConnObject(connObj);
 
             for (CBService * service in peripheral.services) {
                 if ([service.UUID.data isEqualToData:serviceId.data]) {
@@ -77,7 +77,7 @@ namespace DeviceLayer {
             CBUUID * serviceId = [MTRUUIDHelper GetShortestServiceUUID:svcId];
             CBUUID * characteristicId = characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes
                                                                                                length:sizeof(charId->bytes)]];
-            CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
+            CBPeripheral * peripheral = CBPeripheralFromBleConnObject(connObj);
 
             for (CBService * service in peripheral.services) {
                 if ([service.UUID.data isEqualToData:serviceId.data]) {
@@ -96,7 +96,7 @@ namespace DeviceLayer {
 
         CHIP_ERROR BlePlatformDelegateImpl::CloseConnection(BLE_CONNECTION_OBJECT connObj)
         {
-            CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
+            CBPeripheral * peripheral = CBPeripheralFromBleConnObject(connObj);
 
             // CoreBluetooth API requires a CBCentralManager to close a connection which is a property of the peripheral.
             CBCentralManager * manager = (CBCentralManager *) [peripheral valueForKey:@"manager"];
@@ -108,7 +108,7 @@ namespace DeviceLayer {
 
         uint16_t BlePlatformDelegateImpl::GetMTU(BLE_CONNECTION_OBJECT connObj) const
         {
-            CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
+            CBPeripheral * peripheral = CBPeripheralFromBleConnObject(connObj);
 
             // The negotiated mtu length is a property of the peripheral.
             uint16_t mtuLength = [[peripheral valueForKey:@"mtuLength"] unsignedShortValue];
@@ -134,7 +134,7 @@ namespace DeviceLayer {
             CBUUID * serviceId = [MTRUUIDHelper GetShortestServiceUUID:svcId];
             CBUUID * characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes length:sizeof(charId->bytes)]];
             NSData * data = [NSData dataWithBytes:pBuf->Start() length:pBuf->DataLength()];
-            CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
+            CBPeripheral * peripheral = CBPeripheralFromBleConnObject(connObj);
 
             for (CBService * service in peripheral.services) {
                 if ([service.UUID.data isEqualToData:serviceId.data]) {
