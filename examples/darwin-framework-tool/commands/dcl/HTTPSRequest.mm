@@ -92,8 +92,8 @@ namespace tool {
                         break;
                     }
                     case HttpsSecurityMode::kDisableValidation: {
-                        tls_options = ^(nw_protocol_options_t tls_options) {
-                            sec_protocol_options_t sec_options = nw_tls_copy_sec_protocol_options(tls_options);
+                        tls_options = ^(nw_protocol_options_t options) {
+                            sec_protocol_options_t sec_options = nw_tls_copy_sec_protocol_options(options);
                             sec_protocol_options_set_verify_block(sec_options, NULL_VERIFIER, queue);
                         };
                         break;
