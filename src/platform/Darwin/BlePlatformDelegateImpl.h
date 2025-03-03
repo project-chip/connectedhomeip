@@ -20,9 +20,6 @@
 #include <ble/Ble.h>
 #include <system/SystemPacketBuffer.h>
 
-using ::chip::Ble::ChipBleUUID;
-using ::chip::System::PacketBufferHandle;
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -30,16 +27,16 @@ namespace Internal {
 class BlePlatformDelegateImpl : public Ble::BlePlatformDelegate
 {
 public:
-    CHIP_ERROR SubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId,
-                                       const ChipBleUUID * charId) override;
-    CHIP_ERROR UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId,
-                                         const ChipBleUUID * charId) override;
+    CHIP_ERROR SubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const Ble::ChipBleUUID * svcId,
+                                       const Ble::ChipBleUUID * charId) override;
+    CHIP_ERROR UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const Ble::ChipBleUUID * svcId,
+                                         const Ble::ChipBleUUID * charId) override;
     CHIP_ERROR CloseConnection(BLE_CONNECTION_OBJECT connObj) override;
     uint16_t GetMTU(BLE_CONNECTION_OBJECT connObj) const override;
-    CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                              PacketBufferHandle pBuf) override;
-    CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                PacketBufferHandle pBuf) override;
+    CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT connObj, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                              System::PacketBufferHandle pBuf) override;
+    CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT connObj, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                                System::PacketBufferHandle pBuf) override;
 };
 
 } // namespace Internal
