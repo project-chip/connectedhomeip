@@ -1087,6 +1087,82 @@ public static class BasicInformationClusterProductAppearanceStruct {
     return output.toString();
   }
 }
+public static class BasicInformationClusterLocationDescriptorStruct {
+  public String locationName;
+  public @Nullable Integer floorNumber;
+  public @Nullable Integer areaType;
+  private static final long LOCATION_NAME_ID = 0L;
+  private static final long FLOOR_NUMBER_ID = 1L;
+  private static final long AREA_TYPE_ID = 2L;
+
+  public BasicInformationClusterLocationDescriptorStruct(
+    String locationName,
+    @Nullable Integer floorNumber,
+    @Nullable Integer areaType
+  ) {
+    this.locationName = locationName;
+    this.floorNumber = floorNumber;
+    this.areaType = areaType;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(LOCATION_NAME_ID, new StringType(locationName)));
+    values.add(new StructElement(FLOOR_NUMBER_ID, floorNumber != null ? new IntType(floorNumber) : new NullType()));
+    values.add(new StructElement(AREA_TYPE_ID, areaType != null ? new UIntType(areaType) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static BasicInformationClusterLocationDescriptorStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String locationName = null;
+    @Nullable Integer floorNumber = null;
+    @Nullable Integer areaType = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == LOCATION_NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          locationName = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == FLOOR_NUMBER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          floorNumber = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == AREA_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          areaType = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new BasicInformationClusterLocationDescriptorStruct(
+      locationName,
+      floorNumber,
+      areaType
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BasicInformationClusterLocationDescriptorStruct {\n");
+    output.append("\tlocationName: ");
+    output.append(locationName);
+    output.append("\n");
+    output.append("\tfloorNumber: ");
+    output.append(floorNumber);
+    output.append("\n");
+    output.append("\tareaType: ");
+    output.append(areaType);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class OtaSoftwareUpdateRequestorClusterProviderLocation {
   public Long providerNodeID;
   public Integer endpoint;

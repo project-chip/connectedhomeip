@@ -16,6 +16,7 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ApplicationLauncherClusterApplicationStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/AudioOutputClusterOutputInfoStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/BasicInformationClusterCapabilityMinimaStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/BasicInformationClusterLocationDescriptorStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/BasicInformationClusterProductAppearanceStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/BindingClusterTargetStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/BridgedDeviceBasicInformationClusterProductAppearanceStruct.kt",
