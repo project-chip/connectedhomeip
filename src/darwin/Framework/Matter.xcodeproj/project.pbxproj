@@ -656,6 +656,8 @@
 		3DA1A3532ABAB3B4004F0BB9 /* MTRAsyncWorkQueue.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRAsyncWorkQueue.mm; sourceTree = "<group>"; };
 		3DA1A3572ABABF69004F0BB9 /* MTRAsyncWorkQueueTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRAsyncWorkQueueTests.m; sourceTree = "<group>"; };
 		3DB9DAE42D67EE5A00704FAB /* MTRBleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRBleTests.m; sourceTree = "<group>"; };
+		3DB9DAE92D754C7200704FAB /* BleUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BleUtils.h; sourceTree = "<group>"; };
+		3DB9DAEA2D754C7200704FAB /* BleUtils.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BleUtils.mm; sourceTree = "<group>"; };
 		3DECCB6D29347D2C00585AEC /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/System/Library/Frameworks/Security.framework; sourceTree = DEVELOPER_DIR; };
 		3DECCB6F2934AC1C00585AEC /* MTRLogging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRLogging.h; sourceTree = "<group>"; };
 		3DECCB712934AFE200585AEC /* MTRLogging.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRLogging.mm; sourceTree = "<group>"; };
@@ -698,8 +700,6 @@
 		3DF5218B2D5E90BE008F8E52 /* Logging.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Logging.mm; sourceTree = "<group>"; };
 		3DF5218C2D5E90BE008F8E52 /* MdnsError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MdnsError.h; sourceTree = "<group>"; };
 		3DF5218D2D5E90BE008F8E52 /* MdnsError.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MdnsError.cpp; sourceTree = "<group>"; };
-		3DF5218E2D5E90BE008F8E52 /* MTRUUIDHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRUUIDHelper.h; sourceTree = "<group>"; };
-		3DF5218F2D5E90BE008F8E52 /* MTRUUIDHelperImpl.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRUUIDHelperImpl.mm; sourceTree = "<group>"; };
 		3DF521902D5E90BE008F8E52 /* NetworkCommissioningDriver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NetworkCommissioningDriver.h; sourceTree = "<group>"; };
 		3DF521912D5E90BE008F8E52 /* PlatformManagerImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlatformManagerImpl.h; sourceTree = "<group>"; };
 		3DF521922D5E90BE008F8E52 /* PlatformManagerImpl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PlatformManagerImpl.cpp; sourceTree = "<group>"; };
@@ -1415,6 +1415,8 @@
 				3DF5216F2D5E90BE008F8E52 /* BlePlatformDelegateImpl.h */,
 				3DF521702D5E90BE008F8E52 /* BlePlatformDelegateImpl.mm */,
 				3DF521712D5E90BE008F8E52 /* BleScannerDelegate.h */,
+				3DB9DAE92D754C7200704FAB /* BleUtils.h */,
+				3DB9DAEA2D754C7200704FAB /* BleUtils.mm */,
 				3DF521732D5E90BE008F8E52 /* CHIPDevicePlatformConfig.h */,
 				3DF521742D5E90BE008F8E52 /* CHIPDevicePlatformEvent.h */,
 				3DF521752D5E90BE008F8E52 /* CHIPPlatformConfig.h */,
@@ -1442,8 +1444,6 @@
 				3DF5218B2D5E90BE008F8E52 /* Logging.mm */,
 				3DF5218C2D5E90BE008F8E52 /* MdnsError.h */,
 				3DF5218D2D5E90BE008F8E52 /* MdnsError.cpp */,
-				3DF5218E2D5E90BE008F8E52 /* MTRUUIDHelper.h */,
-				3DF5218F2D5E90BE008F8E52 /* MTRUUIDHelperImpl.mm */,
 				3DF521902D5E90BE008F8E52 /* NetworkCommissioningDriver.h */,
 				3DF521912D5E90BE008F8E52 /* PlatformManagerImpl.h */,
 				3DF521922D5E90BE008F8E52 /* PlatformManagerImpl.cpp */,
