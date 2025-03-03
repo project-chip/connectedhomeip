@@ -5,6 +5,7 @@ FROM ghcr.io/project-chip/chip-build-efr32:${VERSION} AS efr32
 FROM ghcr.io/project-chip/chip-build-android:${VERSION} AS android
 FROM ghcr.io/project-chip/chip-build-esp32-qemu:${VERSION} as esp32
 FROM ghcr.io/project-chip/chip-build-telink:${VERSION} AS telink
+FROM ghcr.io/project-chip/chip-build-telink-zephyr_3_3:${VERSION} AS telink-zephyr_3_3
 FROM ghcr.io/project-chip/chip-build-infineon:${VERSION} AS psoc6
 FROM ghcr.io/project-chip/chip-build-tizen-qemu:${VERSION} AS tizen
 FROM ghcr.io/project-chip/chip-build-crosscompile:${VERSION} AS crosscompile
@@ -39,6 +40,8 @@ COPY --from=psoc6 /opt/Tools/ModusToolbox /opt/Tools/ModusToolbox
 
 COPY --from=telink /opt/telink/zephyrproject /opt/telink/zephyrproject
 COPY --from=telink /opt/telink/zephyr-sdk-0.17.0 /opt/telink/zephyr-sdk-0.17.0
+COPY --from=telink-zephyr_3_3 /opt/telink/zephyrproject /opt/telink/zephyrproject
+COPY --from=telink-zephyr_3_3 /opt/telink/zephyr-sdk-0.17.0 /opt/telink/zephyr-sdk-0.17.0
 
 COPY --from=tizen /opt/tizen-sdk /opt/tizen-sdk
 
