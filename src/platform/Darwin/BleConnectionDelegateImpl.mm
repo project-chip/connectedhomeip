@@ -30,6 +30,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Darwin/BleConnectionDelegateImpl.h>
 #include <platform/Darwin/BleScannerDelegate.h>
+#include <platform/Darwin/BleUtils.h>
 #include <platform/LockTracker.h>
 #include <setup_payload/SetupPayload.h>
 #include <tracing/metric_event.h>
@@ -39,6 +40,7 @@
 
 using namespace chip::Ble;
 using namespace chip::DeviceLayer;
+using namespace chip::DeviceLayer::Internal;
 using namespace chip::Tracing::DarwinPlatform;
 
 constexpr uint64_t kScanningWithDiscriminatorTimeoutInSeconds = 60;
@@ -125,7 +127,7 @@ namespace DeviceLayer {
             assertChipStackLockedByCurrentThread();
 
             ChipLogProgress(Ble, "ConnectionDelegate NewConnection with conn obj: %p", connObj);
-            CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
+            CBPeripheral * peripheral = CBPeripheralFromBleConnObject(connObj);
 
             // The BLE_CONNECTION_OBJECT represent a CBPeripheral object. In order for it to be valid the central
             // manager needs to still be running.
@@ -296,7 +298,7 @@ namespace DeviceLayer {
 - (void)dispatchConnectionComplete:(CBPeripheral *)peripheral
 {
     if (self.onConnectionComplete != nil) {
-        self.onConnectionComplete(self.appState, (__bridge void *) peripheral);
+        self.onConnectionComplete(self.appState, BleConnObjectFromCBPeripheral(peripheral));
     }
 }
 
@@ -465,12 +467,12 @@ namespace DeviceLayer {
         chip::Ble::ChipBleUUID svcId;
         chip::Ble::ChipBleUUID charId;
         [BleConnection fillServiceWithCharacteristicUuids:characteristic svcId:&svcId charId:&charId];
-        _mBleLayer->HandleWriteConfirmation((__bridge void *) peripheral, &svcId, &charId);
+        _mBleLayer->HandleWriteConfirmation(BleConnObjectFromCBPeripheral(peripheral), &svcId, &charId);
     } else {
         ChipLogError(
             Ble, "BLE:Error writing Characteristics in Chip service on the device: [%s]", [error.localizedDescription UTF8String]);
         MATTER_LOG_METRIC(kMetricBLEWriteChrValueFailed, BLE_ERROR_GATT_WRITE_FAILED);
-        _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_WRITE_FAILED);
+        _mBleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_WRITE_FAILED);
     }
 }
 
@@ -486,9 +488,9 @@ namespace DeviceLayer {
         [BleConnection fillServiceWithCharacteristicUuids:characteristic svcId:&svcId charId:&charId];
 
         if (isNotifying) {
-            _mBleLayer->HandleSubscribeComplete((__bridge void *) peripheral, &svcId, &charId);
+            _mBleLayer->HandleSubscribeComplete(BleConnObjectFromCBPeripheral(peripheral), &svcId, &charId);
         } else {
-            _mBleLayer->HandleUnsubscribeComplete((__bridge void *) peripheral, &svcId, &charId);
+            _mBleLayer->HandleUnsubscribeComplete(BleConnObjectFromCBPeripheral(peripheral), &svcId, &charId);
         }
     } else {
         ChipLogError(Ble, "BLE:Error subscribing/unsubcribing some characteristic on the device: [%s]",
@@ -497,11 +499,11 @@ namespace DeviceLayer {
         if (isNotifying) {
             MATTER_LOG_METRIC(kMetricBLEUpdateNotificationStateForChrFailed, BLE_ERROR_GATT_WRITE_FAILED);
             // we're still notifying, so we must failed the unsubscription
-            _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_UNSUBSCRIBE_FAILED);
+            _mBleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_UNSUBSCRIBE_FAILED);
         } else {
             // we're not notifying, so we must failed the subscription
             MATTER_LOG_METRIC(kMetricBLEUpdateNotificationStateForChrFailed, BLE_ERROR_GATT_SUBSCRIBE_FAILED);
-            _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_SUBSCRIBE_FAILED);
+            _mBleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_SUBSCRIBE_FAILED);
         }
     }
 }
@@ -522,8 +524,8 @@ namespace DeviceLayer {
         if (msgBuf.IsNull()) {
             ChipLogError(Ble, "Failed at allocating buffer for incoming BLE data");
             MATTER_LOG_METRIC(kMetricBLEUpdateValueForChrFailed, CHIP_ERROR_NO_MEMORY);
-            _mBleLayer->HandleConnectionError((__bridge void *) peripheral, CHIP_ERROR_NO_MEMORY);
-        } else if (!_mBleLayer->HandleIndicationReceived((__bridge void *) peripheral, &svcId, &charId, std::move(msgBuf))) {
+            _mBleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), CHIP_ERROR_NO_MEMORY);
+        } else if (!_mBleLayer->HandleIndicationReceived(BleConnObjectFromCBPeripheral(peripheral), &svcId, &charId, std::move(msgBuf))) {
             // since this error comes from device manager core
             // we assume it would do the right thing, like closing the connection
             ChipLogError(Ble, "Failed at handling incoming BLE data");
@@ -533,7 +535,7 @@ namespace DeviceLayer {
         ChipLogError(
             Ble, "BLE:Error receiving indication of Characteristics on the device: [%s]", [error.localizedDescription UTF8String]);
         MATTER_LOG_METRIC(kMetricBLEUpdateValueForChrFailed, BLE_ERROR_GATT_INDICATE_FAILED);
-        _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_INDICATE_FAILED);
+        _mBleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_INDICATE_FAILED);
     }
 }
 
@@ -647,7 +649,7 @@ namespace DeviceLayer {
             NSData * serviceData = _cachedPeripherals[cachedPeripheral][@"data"];
             ChipBLEDeviceIdentificationInfo info;
             memcpy(&info, [serviceData bytes], sizeof(info));
-            delegate->OnBleScanAdd((__bridge void *) cachedPeripheral, info);
+            delegate->OnBleScanAdd(BleConnObjectFromCBPeripheral(cachedPeripheral), info);
         }
         _scannerDelegate = delegate;
     }
@@ -721,7 +723,7 @@ namespace DeviceLayer {
             ChipBLEDeviceIdentificationInfo info;
             auto bytes = (const uint8_t *) [data bytes];
             memcpy(&info, bytes, sizeof(info));
-            delegate->OnBleScanAdd((__bridge void *) peripheral, info);
+            delegate->OnBleScanAdd(BleConnObjectFromCBPeripheral(peripheral), info);
         }
 
         timeoutTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _workQueue);
@@ -768,7 +770,7 @@ namespace DeviceLayer {
 
         auto delegate = _scannerDelegate;
         if (delegate) {
-            delegate->OnBleScanRemove((__bridge void *) peripheral);
+            delegate->OnBleScanRemove(BleConnObjectFromCBPeripheral(peripheral));
         }
     }
 }
