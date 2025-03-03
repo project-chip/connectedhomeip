@@ -215,7 +215,7 @@ static Protocols::InteractionModel::Status ServerClusterCommandExists(const Conc
 }
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
-                                  CommandHandler * apCommandObj)
+                                  CommandHandler * apCommandObj, bool aClusterIsValid)
 {
     ChipLogDetail(Controller, "Received Cluster Command: Endpoint=%x Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
                   aRequestCommandPath.mEndpointId, ChipLogValueMEI(aRequestCommandPath.mClusterId),

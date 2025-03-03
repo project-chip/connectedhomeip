@@ -228,7 +228,7 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
 }
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
-                                  CommandHandler * apCommandObj)
+                                  CommandHandler * apCommandObj, bool aClusterIsValid)
 {
     ChipLogDetail(Controller, "Received Cluster Command: Endpoint=%x Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
                   aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId));
@@ -473,7 +473,7 @@ ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest &
 std::optional<ActionReturnStatus> CustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
                                                           CommandHandler * handler)
 {
-    DispatchSingleClusterCommand(request.path, input_arguments, handler);
+    DispatchSingleClusterCommand(request.path, input_arguments, handler, false);
     return std::nullopt; // handler status is set by the dispatch
 }
 
