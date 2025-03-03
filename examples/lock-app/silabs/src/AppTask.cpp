@@ -37,9 +37,9 @@
 #include <app-common/zap-generated/cluster-objects.h>
 
 #include <app/clusters/door-lock-server/door-lock-server.h>
-#include <setup_payload/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <assert.h>
 
@@ -266,7 +266,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     SILABS_LOG("App Task started");
 
-
     while (true)
     {
         osStatus_t eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, osWaitForever);
@@ -410,4 +409,3 @@ void AppTask::UpdateClusterState(intptr_t context)
         SILABS_LOG("ERR: updating lock state %x", to_underlying(status));
     }
 }
- 
