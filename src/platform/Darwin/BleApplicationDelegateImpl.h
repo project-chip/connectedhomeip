@@ -26,7 +26,7 @@ namespace Internal {
 class BleApplicationDelegateImpl : public Ble::BleApplicationDelegate
 {
 public:
-    virtual void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj);
+    void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj) override;
 };
 
 } // namespace Internal
