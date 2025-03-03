@@ -562,6 +562,15 @@ class SubscriptionTransaction:
         if callback is not None:
             self._onErrorCb = callback
 
+    def SetNotifySubscriptionStillActiveCallback(self, callback: Callable):
+        '''
+        Sets the callback function that gets invoked when a report data message is sent. The callback
+        is expected to have the following signature:
+            def Callback()
+        '''
+        if callback is not None:
+            self._readTransaction.register_notify_subscription_still_active_callback(callback)
+
     @property
     def OnAttributeChangeCb(self) -> Callable[[TypedAttributePath, SubscriptionTransaction], None]:
         return self._onAttributeChangeCb
@@ -816,11 +825,22 @@ class AsyncReadTransaction:
         self._event_loop.call_soon_threadsafe(self._handleDone)
 
     def handleReportBegin(self):
-        pass
+        self._handleReportBegin()
 
     def handleReportEnd(self):
-        # self._event_loop.call_soon_threadsafe(self._handleReportEnd)
         self._handleReportEnd()
+
+    # def _handleNotifySubscriptionStillActive(self):
+    #     if self._notify_subscription_still_active_callback:
+    #         self._notify_subscription_still_active_callback()
+
+    def handleNotifySubscriptionStillActive(self):
+        # self._handleNotifySubscriptionStillActive()
+        if self._notify_subscription_still_active_callback:
+            self._notify_subscription_still_active_callback()
+
+    def register_notify_subscription_still_active_callback(self, callback):
+        self._notify_subscription_still_active_callback = callback
 
 
 class AsyncWriteTransaction:
@@ -884,6 +904,8 @@ _OnReportBeginCallbackFunct = CFUNCTYPE(
     None, py_object)
 _OnReportEndCallbackFunct = CFUNCTYPE(
     None, py_object)
+_OnNotifySubscriptionStillActiveCallbackFunct = CFUNCTYPE(
+    None, py_object)
 
 
 @_OnReadAttributeDataCallbackFunct
@@ -931,6 +953,11 @@ def _OnReportBeginCallback(closure):
 @_OnReportEndCallbackFunct
 def _OnReportEndCallback(closure):
     closure.handleReportEnd()
+
+
+@_OnNotifySubscriptionStillActiveCallbackFunct
+def _OnNotifySubscriptionStillActiveCallback(closure):
+    closure.handleNotifySubscriptionStillActive()
 
 
 @_OnReadDoneCallbackFunct
@@ -1198,14 +1225,15 @@ def Init():
                    _OnReadAttributeDataCallbackFunct, _OnReadEventDataCallbackFunct,
                    _OnSubscriptionEstablishedCallbackFunct, _OnResubscriptionAttemptedCallbackFunct,
                    _OnReadErrorCallbackFunct, _OnReadDoneCallbackFunct,
-                   _OnReportBeginCallbackFunct, _OnReportEndCallbackFunct])
+                   _OnReportBeginCallbackFunct, _OnReportEndCallbackFunct,
+                   _OnNotifySubscriptionStillActiveCallbackFunct])
 
     handle.pychip_WriteClient_InitCallbacks(
         _OnWriteResponseCallback, _OnWriteErrorCallback, _OnWriteDoneCallback)
     handle.pychip_ReadClient_InitCallbacks(
         _OnReadAttributeDataCallback, _OnReadEventDataCallback,
         _OnSubscriptionEstablishedCallback, _OnResubscriptionAttemptedCallback, _OnReadErrorCallback, _OnReadDoneCallback,
-        _OnReportBeginCallback, _OnReportEndCallback)
+        _OnReportBeginCallback, _OnReportEndCallback, _OnNotifySubscriptionStillActiveCallback)
 
     _BuildAttributeIndex()
     _BuildClusterIndex()
