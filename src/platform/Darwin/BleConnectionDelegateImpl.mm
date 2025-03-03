@@ -35,7 +35,8 @@
 #include <setup_payload/SetupPayload.h>
 #include <tracing/metric_event.h>
 
-#import "MTRUUIDHelper.h"
+#import <CoreBluetooth/CoreBluetooth.h>
+
 #import "PlatformMetricKeys.h"
 
 using namespace chip::Ble;
@@ -60,7 +61,6 @@ typedef NS_ENUM(uint8_t, BleConnectionMode) {
 @property (strong, nonatomic) dispatch_queue_t workQueue; // the CHIP work queue
 @property (strong, nonatomic) CBCentralManager * centralManager;
 @property (strong, nonatomic) CBPeripheral * peripheral;
-@property (strong, nonatomic) CBUUID * shortServiceUUID;
 @property (nonatomic, readonly, nullable) dispatch_source_t timer;
 @property (nonatomic, readonly) BleConnectionMode currentMode;
 @property (strong, nonatomic) NSMutableDictionary<CBPeripheral *, NSDictionary *> * cachedPeripherals;
@@ -212,13 +212,15 @@ namespace DeviceLayer {
 @property (nonatomic, readonly) int32_t totalDevicesRemoved;
 @end
 
-@implementation BleConnection
+@implementation BleConnection {
+    CBUUID * _chipServiceUUID;
+}
 
 - (instancetype)init
 {
     self = [super init];
     if (self) {
-        self.shortServiceUUID = [MTRUUIDHelper GetShortestServiceUUID:&chip::Ble::CHIP_BLE_SVC_ID];
+        _chipServiceUUID = CBUUIDFromBleUUID(chip::Ble::CHIP_BLE_SVC_ID);
         _workQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
         _centralManager = [CBCentralManager alloc];
         _found = false;
@@ -338,15 +340,7 @@ namespace DeviceLayer {
         advertisementData:(NSDictionary *)advertisementData
                      RSSI:(NSNumber *)RSSI
 {
-    NSDictionary * servicesData = [advertisementData objectForKey:CBAdvertisementDataServiceDataKey];
-    NSData * serviceData;
-    for (CBUUID * serviceUUID in servicesData) {
-        if ([serviceUUID.data isEqualToData:_shortServiceUUID.data]) {
-            serviceData = [servicesData objectForKey:serviceUUID];
-            break;
-        }
-    }
-
+    NSData * serviceData = advertisementData[CBAdvertisementDataServiceDataKey][_chipServiceUUID];
     if (!serviceData) {
         return;
     }
@@ -431,7 +425,7 @@ namespace DeviceLayer {
     MATTER_LOG_METRIC_END(kMetricBLEDiscoveredServices, CHIP_ERROR(chip::ChipError::Range::kOS, static_cast<uint32_t>(error.code)));
 
     for (CBService * service in peripheral.services) {
-        if ([service.UUID.data isEqualToData:_shortServiceUUID.data] && !self.found) {
+        if ([service.UUID isEqual:_chipServiceUUID] && !self.found) {
             MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredCharacteristics);
             [peripheral discoverCharacteristics:nil forService:service];
             self.found = true;
@@ -464,9 +458,8 @@ namespace DeviceLayer {
                              error:(NSError *)error
 {
     if (nil == error) {
-        chip::Ble::ChipBleUUID svcId;
-        chip::Ble::ChipBleUUID charId;
-        [BleConnection fillServiceWithCharacteristicUuids:characteristic svcId:&svcId charId:&charId];
+        ChipBleUUID svcId = BleUUIDFromCBUUD(characteristic.service.UUID);
+        ChipBleUUID charId = BleUUIDFromCBUUD(characteristic.UUID);
         _mBleLayer->HandleWriteConfirmation(BleConnObjectFromCBPeripheral(peripheral), &svcId, &charId);
     } else {
         ChipLogError(
@@ -483,10 +476,8 @@ namespace DeviceLayer {
     bool isNotifying = characteristic.isNotifying;
 
     if (nil == error) {
-        chip::Ble::ChipBleUUID svcId;
-        chip::Ble::ChipBleUUID charId;
-        [BleConnection fillServiceWithCharacteristicUuids:characteristic svcId:&svcId charId:&charId];
-
+        ChipBleUUID svcId = BleUUIDFromCBUUD(characteristic.service.UUID);
+        ChipBleUUID charId = BleUUIDFromCBUUD(characteristic.UUID);
         if (isNotifying) {
             _mBleLayer->HandleSubscribeComplete(BleConnObjectFromCBPeripheral(peripheral), &svcId, &charId);
         } else {
@@ -513,9 +504,8 @@ namespace DeviceLayer {
                               error:(NSError *)error
 {
     if (nil == error) {
-        chip::Ble::ChipBleUUID svcId;
-        chip::Ble::ChipBleUUID charId;
-        [BleConnection fillServiceWithCharacteristicUuids:characteristic svcId:&svcId charId:&charId];
+        ChipBleUUID svcId = BleUUIDFromCBUUD(characteristic.service.UUID);
+        ChipBleUUID charId = BleUUIDFromCBUUD(characteristic.UUID);
         auto * value = characteristic.value; // read immediately before dispatching
 
         // build a inet buffer from the rxEv and send to blelayer.
@@ -603,7 +593,7 @@ namespace DeviceLayer {
     [self _resetCounters];
 
     auto scanOptions = @{ CBCentralManagerScanOptionAllowDuplicatesKey : @YES };
-    [_centralManager scanForPeripheralsWithServices:@[ _shortServiceUUID ] options:scanOptions];
+    [_centralManager scanForPeripheralsWithServices:@[ _chipServiceUUID ] options:scanOptions];
 }
 
 - (void)stopScanning
@@ -780,55 +770,6 @@ namespace DeviceLayer {
     for (CBPeripheral * peripheral in [_cachedPeripherals allKeys]) {
         [self removePeripheralFromCache:peripheral];
     }
-}
-
-/**
- * private static method to copy service and characteristic UUIDs from CBCharacteristic to a pair of ChipBleUUID objects.
- * this is used in calls into Chip layer to decouple it from CoreBluetooth
- *
- * @param[in] characteristic the source characteristic
- * @param[in] svcId the destination service UUID
- * @param[in] charId the destination characteristic UUID
- *
- */
-+ (void)fillServiceWithCharacteristicUuids:(CBCharacteristic *)characteristic
-                                     svcId:(chip::Ble::ChipBleUUID *)svcId
-                                    charId:(chip::Ble::ChipBleUUID *)charId
-{
-    static const size_t FullUUIDLength = 16;
-    if ((FullUUIDLength != sizeof(charId->bytes)) || (FullUUIDLength != sizeof(svcId->bytes))
-        || (FullUUIDLength != characteristic.UUID.data.length)) {
-        // we're dead. we expect the data length to be the same (16-byte) across the board
-        ChipLogError(Ble, "UUID of characteristic is incompatible");
-        return;
-    }
-
-    memcpy(charId->bytes, characteristic.UUID.data.bytes, sizeof(charId->bytes));
-    memset(svcId->bytes, 0, sizeof(svcId->bytes));
-
-    // Expand service UUID back to 16-byte long as that's what the BLE Layer expects
-    // this is a buffer pre-filled with BLE service UUID Base
-    // byte 0 to 3 are reserved for shorter versions of BLE service UUIDs
-    // For 4-byte service UUIDs, all bytes from 0 to 3 are used
-    // For 2-byte service UUIDs, byte 0 and 1 shall be 0
-    uint8_t serviceFullUUID[FullUUIDLength]
-        = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB };
-
-    switch (characteristic.service.UUID.data.length) {
-    case 2:
-        // copy the 2-byte service UUID onto the right offset
-        memcpy(serviceFullUUID + 2, characteristic.service.UUID.data.bytes, 2);
-        break;
-    case 4:
-        // flow through
-    case 16:
-        memcpy(serviceFullUUID, characteristic.service.UUID.data.bytes, characteristic.service.UUID.data.length);
-        break;
-    default:
-        // we're dead. we expect the data length to be the same (16-byte) across the board
-        ChipLogError(Ble, "Service UUIDs are incompatible");
-    }
-    memcpy(svcId->bytes, serviceFullUUID, sizeof(svcId->bytes));
 }
 
 - (void)setBleLayer:(chip::Ble::BleLayer *)bleLayer

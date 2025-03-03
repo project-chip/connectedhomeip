@@ -131,8 +131,7 @@ static_library("Darwin") {
       "BlePlatformDelegateImpl.h",
       "BlePlatformDelegateImpl.mm",
       "BleUtils.h",
-      "MTRUUIDHelper.h",
-      "MTRUUIDHelperImpl.mm",
+      "BleUtils.mm",
     ]
   }
 }

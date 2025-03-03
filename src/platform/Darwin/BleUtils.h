@@ -14,9 +14,12 @@
  *    limitations under the License.
  */
 
+#pragma once
+
 #include <ble/Ble.h>
 
 @class CBPeripheral;
+@class CBUUID;
 
 namespace chip {
 namespace DeviceLayer {
@@ -31,6 +34,12 @@ namespace DeviceLayer {
         {
             return (__bridge void *) peripheral;
         }
+
+        // Creates a CBUUID from a ChipBleUUID
+        CBUUID * CBUUIDFromBleUUID(Ble::ChipBleUUID const & uuid);
+
+        // Creates a ChipBleUUID from a CBUUID, expanding 16 or 32 bit UUIDs if necessary.
+        Ble::ChipBleUUID BleUUIDFromCBUUD(CBUUID * uuid);
 
     }
 }
