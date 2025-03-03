@@ -63,9 +63,10 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
+
     void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, DataModel::ListWriteOperation opType) override;
-    std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
-                                                        CommandHandler * handler) override;
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     /// attribute tree iteration
     CHIP_ERROR Endpoints(DataModel::ListBuilder<DataModel::EndpointEntry> & out) override;

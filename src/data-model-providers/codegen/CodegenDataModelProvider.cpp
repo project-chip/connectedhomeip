@@ -158,9 +158,9 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
     return CHIP_NO_ERROR;
 }
 
-std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(const DataModel::InvokeRequest & request,
-                                                                              TLV::TLVReader & input_arguments,
-                                                                              CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                     TLV::TLVReader & input_arguments,
+                                                                                     CommandHandler * handler)
 {
     CommandHandlerInterface * handler_interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
