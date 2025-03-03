@@ -238,7 +238,17 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug camera-app \
                     out/linux-x64-camera/chip-camera-app \
-                    /tmp/bloat_reports/                                     
+                    /tmp/bloat_reports/
+            - name: Build example Camera Controller App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-camera-controller \
+                        build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    linux debug camera-controller \
+                    out/linux-x64-camera/camera-controller \
+                    /tmp/bloat_reports/                                                     
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}
