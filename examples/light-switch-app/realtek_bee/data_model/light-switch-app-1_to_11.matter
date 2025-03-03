@@ -341,83 +341,6 @@ cluster Identify = 3 {
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
-/** Attributes and commands for group configuration and manipulation. */
-cluster Groups = 4 {
-  revision 4;
-
-  bitmap Feature : bitmap32 {
-    kGroupNames = 0x1;
-  }
-
-  bitmap NameSupportBitmap : bitmap8 {
-    kGroupNames = 0x80;
-  }
-
-  readonly attribute NameSupportBitmap nameSupport = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct AddGroupRequest {
-    group_id groupID = 0;
-    char_string<16> groupName = 1;
-  }
-
-  response struct AddGroupResponse = 0 {
-    enum8 status = 0;
-    group_id groupID = 1;
-  }
-
-  request struct ViewGroupRequest {
-    group_id groupID = 0;
-  }
-
-  response struct ViewGroupResponse = 1 {
-    enum8 status = 0;
-    group_id groupID = 1;
-    char_string<16> groupName = 2;
-  }
-
-  request struct GetGroupMembershipRequest {
-    group_id groupList[] = 0;
-  }
-
-  response struct GetGroupMembershipResponse = 2 {
-    nullable int8u capacity = 0;
-    group_id groupList[] = 1;
-  }
-
-  request struct RemoveGroupRequest {
-    group_id groupID = 0;
-  }
-
-  response struct RemoveGroupResponse = 3 {
-    enum8 status = 0;
-    group_id groupID = 1;
-  }
-
-  request struct AddGroupIfIdentifyingRequest {
-    group_id groupID = 0;
-    char_string<16> groupName = 1;
-  }
-
-  /** Command description for AddGroup */
-  fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
-  /** Command description for ViewGroup */
-  fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
-  /** Command description for GetGroupMembership */
-  fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
-  /** Command description for RemoveGroup */
-  fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
-  /** Command description for RemoveAllGroups */
-  fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
-  /** Command description for AddGroupIfIdentifying */
-  fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
-}
-
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
 cluster OnOff = 6 {
   revision 6;
@@ -1634,125 +1557,6 @@ cluster ThreadNetworkDiagnostics = 53 {
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
-/** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
-cluster WiFiNetworkDiagnostics = 54 {
-  revision 1; // NOTE: Default/not specifically set
-
-  enum AssociationFailureCauseEnum : enum8 {
-    kUnknown = 0;
-    kAssociationFailed = 1;
-    kAuthenticationFailed = 2;
-    kSsidNotFound = 3;
-  }
-
-  enum ConnectionStatusEnum : enum8 {
-    kConnected = 0;
-    kNotConnected = 1;
-  }
-
-  enum SecurityTypeEnum : enum8 {
-    kUnspecified = 0;
-    kNone = 1;
-    kWEP = 2;
-    kWPA = 3;
-    kWPA2 = 4;
-    kWPA3 = 5;
-  }
-
-  enum WiFiVersionEnum : enum8 {
-    kA = 0;
-    kB = 1;
-    kG = 2;
-    kN = 3;
-    kAc = 4;
-    kAx = 5;
-    kAh = 6;
-  }
-
-  bitmap Feature : bitmap32 {
-    kPacketCounts = 0x1;
-    kErrorCounts = 0x2;
-  }
-
-  info event Disconnection = 0 {
-    int16u reasonCode = 0;
-  }
-
-  info event AssociationFailure = 1 {
-    AssociationFailureCauseEnum associationFailureCause = 0;
-    int16u status = 1;
-  }
-
-  info event ConnectionStatus = 2 {
-    ConnectionStatusEnum connectionStatus = 0;
-  }
-
-  readonly attribute nullable octet_string<6> bssid = 0;
-  readonly attribute nullable SecurityTypeEnum securityType = 1;
-  readonly attribute nullable WiFiVersionEnum wiFiVersion = 2;
-  readonly attribute nullable int16u channelNumber = 3;
-  readonly attribute nullable int8s rssi = 4;
-  readonly attribute optional nullable int32u beaconLostCount = 5;
-  readonly attribute optional nullable int32u beaconRxCount = 6;
-  readonly attribute optional nullable int32u packetMulticastRxCount = 7;
-  readonly attribute optional nullable int32u packetMulticastTxCount = 8;
-  readonly attribute optional nullable int32u packetUnicastRxCount = 9;
-  readonly attribute optional nullable int32u packetUnicastTxCount = 10;
-  readonly attribute optional nullable int64u currentMaxRate = 11;
-  readonly attribute optional nullable int64u overrunCount = 12;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  /** Reception of this command SHALL reset the Breacon and Packet related count attributes to 0 */
-  command ResetCounts(): DefaultSuccess = 0;
-}
-
-/** The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
-cluster EthernetNetworkDiagnostics = 55 {
-  revision 1; // NOTE: Default/not specifically set
-
-  enum PHYRateEnum : enum8 {
-    kRate10M = 0;
-    kRate100M = 1;
-    kRate1G = 2;
-    kRate25G = 3;
-    kRate5G = 4;
-    kRate10G = 5;
-    kRate40G = 6;
-    kRate100G = 7;
-    kRate200G = 8;
-    kRate400G = 9;
-  }
-
-  bitmap Feature : bitmap32 {
-    kPacketCounts = 0x1;
-    kErrorCounts = 0x2;
-  }
-
-  readonly attribute optional nullable PHYRateEnum PHYRate = 0;
-  readonly attribute optional nullable boolean fullDuplex = 1;
-  readonly attribute optional int64u packetRxCount = 2;
-  readonly attribute optional int64u packetTxCount = 3;
-  readonly attribute optional int64u txErrCount = 4;
-  readonly attribute optional int64u collisionCount = 5;
-  readonly attribute optional int64u overrunCount = 6;
-  readonly attribute optional nullable boolean carrierDetect = 7;
-  readonly attribute optional int64u timeSinceReset = 8;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  /** Reception of this command SHALL reset the attributes: PacketRxCount, PacketTxCount, TxErrCount, CollisionCount, OverrunCount to 0 */
-  command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
-}
-
 /** Accurate time is required for a number of reasons, including scheduling, display and validating security materials. */
 cluster TimeSynchronization = 56 {
   revision 2;
@@ -2698,7 +2502,8 @@ cluster ColorControl = 768 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 3;
+  device type ma_otarequestor = 18, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2707,6 +2512,9 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -2721,10 +2529,11 @@ endpoint 0 {
     emits event AccessControlEntryChanged;
     emits event AccessControlExtensionChanged;
     callback attribute acl;
-    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision;
@@ -2755,8 +2564,11 @@ endpoint 0 {
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
@@ -2767,6 +2579,9 @@ endpoint 0 {
     ram      attribute updatePossible default = 1;
     ram      attribute updateState default = 0;
     ram      attribute updateStateProgress default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
@@ -2776,14 +2591,15 @@ endpoint 0 {
   server cluster LocalizationConfiguration {
     ram      attribute activeLocale;
     callback attribute supportedLocales;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster TimeFormatLocalization {
     persist  attribute hourFormat;
-    persist  attribute activeCalendarType;
-    callback attribute supportedCalendarTypes;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -2794,8 +2610,11 @@ endpoint 0 {
     callback attribute regulatoryConfig;
     callback attribute locationCapability;
     callback attribute supportsConcurrentConnection;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ArmFailSafe;
     handle command ArmFailSafeResponse;
@@ -2814,6 +2633,11 @@ endpoint 0 {
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
+    ram      attribute supportedThreadFeatures;
+    ram      attribute threadVersion;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
 
@@ -2847,6 +2671,9 @@ endpoint 0 {
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2931,46 +2758,7 @@ endpoint 0 {
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 1;
-
-    handle command ResetCounts;
-  }
-
-  server cluster WiFiNetworkDiagnostics {
-    emits event Disconnection;
-    emits event AssociationFailure;
-    emits event ConnectionStatus;
-    callback attribute bssid;
-    callback attribute securityType;
-    callback attribute wiFiVersion;
-    callback attribute channelNumber;
-    callback attribute rssi;
-    callback attribute beaconLostCount;
-    callback attribute beaconRxCount;
-    callback attribute packetMulticastRxCount;
-    callback attribute packetMulticastTxCount;
-    callback attribute packetUnicastRxCount;
-    callback attribute packetUnicastTxCount;
-    callback attribute currentMaxRate;
-    callback attribute overrunCount;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
-
-    handle command ResetCounts;
-  }
-
-  server cluster EthernetNetworkDiagnostics {
-    callback attribute PHYRate;
-    callback attribute fullDuplex;
-    callback attribute packetRxCount;
-    callback attribute packetTxCount;
-    callback attribute txErrCount;
-    callback attribute collisionCount;
-    callback attribute overrunCount;
-    callback attribute carrierDetect;
-    callback attribute timeSinceReset;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 3;
 
     handle command ResetCounts;
   }
@@ -2997,7 +2785,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0B;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command SetUTCTime;
     handle command SetTrustedTimeSource;
@@ -3011,11 +2799,13 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
     handle command OpenCommissioningWindow;
-    handle command OpenBasicCommissioningWindow;
     handle command RevokeCommissioning;
   }
 
@@ -3026,6 +2816,9 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
@@ -3048,6 +2841,9 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -3076,11 +2872,11 @@ endpoint 0 {
     callback attribute activeModeDuration;
     callback attribute activeModeThreshold;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
   }
 }
 endpoint 1 {
-  device type ma_onofflightswitch = 259, version 1;
+  device type ma_onofflightswitch = 259, version 3;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3091,27 +2887,10 @@ endpoint 1 {
     ram      attribute identifyType default = 0x0;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
     handle command TriggerEffect;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-
-    handle command AddGroup;
-    handle command AddGroupResponse;
-    handle command ViewGroup;
-    handle command ViewGroupResponse;
-    handle command GetGroupMembership;
-    handle command GetGroupMembershipResponse;
-    handle command RemoveGroup;
-    handle command RemoveGroupResponse;
-    handle command RemoveAllGroups;
-    handle command AddGroupIfIdentifying;
   }
 
   server cluster Descriptor {
@@ -3119,6 +2898,7 @@ endpoint 1 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -3131,7 +2911,7 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type ma_onofflightswitch = 259, version 1;
+  device type ma_onofflightswitch = 259, version 3;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3141,27 +2921,10 @@ endpoint 2 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
     handle command TriggerEffect;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-
-    handle command AddGroup;
-    handle command AddGroupResponse;
-    handle command ViewGroup;
-    handle command ViewGroupResponse;
-    handle command GetGroupMembership;
-    handle command GetGroupMembershipResponse;
-    handle command RemoveGroup;
-    handle command RemoveGroupResponse;
-    handle command RemoveAllGroups;
-    handle command AddGroupIfIdentifying;
   }
 
   server cluster Descriptor {
@@ -3181,7 +2944,7 @@ endpoint 2 {
   }
 }
 endpoint 3 {
-  device type ma_onofflightswitch = 259, version 1;
+  device type ma_onofflightswitch = 259, version 3;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3191,27 +2954,10 @@ endpoint 3 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
     handle command TriggerEffect;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-
-    handle command AddGroup;
-    handle command AddGroupResponse;
-    handle command ViewGroup;
-    handle command ViewGroupResponse;
-    handle command GetGroupMembership;
-    handle command GetGroupMembershipResponse;
-    handle command RemoveGroup;
-    handle command RemoveGroupResponse;
-    handle command RemoveAllGroups;
-    handle command AddGroupIfIdentifying;
   }
 
   server cluster Descriptor {
@@ -3219,6 +2965,7 @@ endpoint 3 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -3230,7 +2977,7 @@ endpoint 3 {
   }
 }
 endpoint 4 {
-  device type ma_onofflightswitch = 259, version 1;
+  device type ma_onofflightswitch = 259, version 3;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3240,27 +2987,10 @@ endpoint 4 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
     handle command TriggerEffect;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-
-    handle command AddGroup;
-    handle command AddGroupResponse;
-    handle command ViewGroup;
-    handle command ViewGroupResponse;
-    handle command GetGroupMembership;
-    handle command GetGroupMembershipResponse;
-    handle command RemoveGroup;
-    handle command RemoveGroupResponse;
-    handle command RemoveAllGroups;
-    handle command AddGroupIfIdentifying;
   }
 
   server cluster Descriptor {
@@ -3268,6 +2998,7 @@ endpoint 4 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -3279,7 +3010,7 @@ endpoint 4 {
   }
 }
 endpoint 5 {
-  device type ma_onofflightswitch = 259, version 1;
+  device type ma_onofflightswitch = 259, version 3;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3289,27 +3020,10 @@ endpoint 5 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
     handle command TriggerEffect;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-
-    handle command AddGroup;
-    handle command AddGroupResponse;
-    handle command ViewGroup;
-    handle command ViewGroupResponse;
-    handle command GetGroupMembership;
-    handle command GetGroupMembershipResponse;
-    handle command RemoveGroup;
-    handle command RemoveGroupResponse;
-    handle command RemoveAllGroups;
-    handle command AddGroupIfIdentifying;
   }
 
   server cluster Descriptor {
@@ -3317,6 +3031,7 @@ endpoint 5 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -3328,7 +3043,7 @@ endpoint 5 {
   }
 }
 endpoint 6 {
-  device type ma_onofflightswitch = 259, version 1;
+  device type ma_onofflightswitch = 259, version 3;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3338,27 +3053,10 @@ endpoint 6 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
     handle command TriggerEffect;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-
-    handle command AddGroup;
-    handle command AddGroupResponse;
-    handle command ViewGroup;
-    handle command ViewGroupResponse;
-    handle command GetGroupMembership;
-    handle command GetGroupMembershipResponse;
-    handle command RemoveGroup;
-    handle command RemoveGroupResponse;
-    handle command RemoveAllGroups;
-    handle command AddGroupIfIdentifying;
   }
 
   server cluster Descriptor {
@@ -3366,6 +3064,7 @@ endpoint 6 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -3377,7 +3076,7 @@ endpoint 6 {
   }
 }
 endpoint 7 {
-  device type ma_onofflightswitch = 259, version 1;
+  device type ma_onofflightswitch = 259, version 3;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3387,27 +3086,10 @@ endpoint 7 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
     handle command TriggerEffect;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-
-    handle command AddGroup;
-    handle command AddGroupResponse;
-    handle command ViewGroup;
-    handle command ViewGroupResponse;
-    handle command GetGroupMembership;
-    handle command GetGroupMembershipResponse;
-    handle command RemoveGroup;
-    handle command RemoveGroupResponse;
-    handle command RemoveAllGroups;
-    handle command AddGroupIfIdentifying;
   }
 
   server cluster Descriptor {
@@ -3415,6 +3097,7 @@ endpoint 7 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -3426,7 +3109,7 @@ endpoint 7 {
   }
 }
 endpoint 8 {
-  device type ma_onofflightswitch = 259, version 1;
+  device type ma_onofflightswitch = 259, version 3;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3436,27 +3119,10 @@ endpoint 8 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
     handle command TriggerEffect;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-
-    handle command AddGroup;
-    handle command AddGroupResponse;
-    handle command ViewGroup;
-    handle command ViewGroupResponse;
-    handle command GetGroupMembership;
-    handle command GetGroupMembershipResponse;
-    handle command RemoveGroup;
-    handle command RemoveGroupResponse;
-    handle command RemoveAllGroups;
-    handle command AddGroupIfIdentifying;
   }
 
   server cluster Descriptor {
@@ -3464,6 +3130,7 @@ endpoint 8 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -3475,7 +3142,7 @@ endpoint 8 {
   }
 }
 endpoint 9 {
-  device type ma_onofflightswitch = 259, version 1;
+  device type ma_onofflightswitch = 259, version 3;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3485,27 +3152,10 @@ endpoint 9 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
     handle command TriggerEffect;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-
-    handle command AddGroup;
-    handle command AddGroupResponse;
-    handle command ViewGroup;
-    handle command ViewGroupResponse;
-    handle command GetGroupMembership;
-    handle command GetGroupMembershipResponse;
-    handle command RemoveGroup;
-    handle command RemoveGroupResponse;
-    handle command RemoveAllGroups;
-    handle command AddGroupIfIdentifying;
   }
 
   server cluster Descriptor {
@@ -3513,6 +3163,7 @@ endpoint 9 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -3524,7 +3175,7 @@ endpoint 9 {
   }
 }
 endpoint 10 {
-  device type ma_genericswitch = 15, version 1;
+  device type ma_genericswitch = 15, version 3;
 
 
   server cluster Identify {
@@ -3534,7 +3185,7 @@ endpoint 10 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3560,11 +3211,11 @@ endpoint 10 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 }
 endpoint 11 {
-  device type ma_onofflightswitch = 259, version 1;
+  device type ma_onofflightswitch = 259, version 3;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3574,27 +3225,10 @@ endpoint 11 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
     handle command TriggerEffect;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-
-    handle command AddGroup;
-    handle command AddGroupResponse;
-    handle command ViewGroup;
-    handle command ViewGroupResponse;
-    handle command GetGroupMembership;
-    handle command GetGroupMembershipResponse;
-    handle command RemoveGroup;
-    handle command RemoveGroupResponse;
-    handle command RemoveAllGroups;
-    handle command AddGroupIfIdentifying;
   }
 
   server cluster Descriptor {
@@ -3602,6 +3236,7 @@ endpoint 11 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -3613,7 +3248,7 @@ endpoint 11 {
   }
 }
 endpoint 12 {
-  device type ma_onofflightswitch = 259, version 1;
+  device type ma_onofflightswitch = 259, version 3;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3623,26 +3258,10 @@ endpoint 12 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
     handle command TriggerEffect;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-
-    handle command AddGroup;
-    handle command AddGroupResponse;
-    handle command ViewGroup;
-    handle command GetGroupMembership;
-    handle command GetGroupMembershipResponse;
-    handle command RemoveGroup;
-    handle command RemoveGroupResponse;
-    handle command RemoveAllGroups;
-    handle command AddGroupIfIdentifying;
   }
 
   server cluster Descriptor {
@@ -3650,6 +3269,7 @@ endpoint 12 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -3661,7 +3281,7 @@ endpoint 12 {
   }
 }
 endpoint 13 {
-  device type ma_onofflightswitch = 259, version 1;
+  device type ma_onofflightswitch = 259, version 3;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3671,27 +3291,10 @@ endpoint 13 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
     handle command TriggerEffect;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-
-    handle command AddGroup;
-    handle command AddGroupResponse;
-    handle command ViewGroup;
-    handle command ViewGroupResponse;
-    handle command GetGroupMembership;
-    handle command GetGroupMembershipResponse;
-    handle command RemoveGroup;
-    handle command RemoveGroupResponse;
-    handle command RemoveAllGroups;
-    handle command AddGroupIfIdentifying;
   }
 
   server cluster Descriptor {
@@ -3699,6 +3302,7 @@ endpoint 13 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }

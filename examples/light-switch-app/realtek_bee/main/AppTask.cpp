@@ -24,6 +24,7 @@
 #include "BindingHandler.h"
 #include "Globals.h"
 
+#include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
@@ -32,14 +33,11 @@
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <data-model-providers/codegen/Instance.h>
-
+#include <app/util/attribute-storage.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-
+#include <data-model-providers/codegen/Instance.h>
 #include <inet/EndPointStateOpenThread.h>
-
-#include <DeviceInfoProviderImpl.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
@@ -62,6 +60,7 @@ using namespace ::chip::app;
 using namespace ::chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace app::Clusters::Descriptor::Structs;
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -78,6 +77,62 @@ using namespace ::chip::DeviceLayer;
 #define APP_EVENT_QUEUE_SIZE 10
 
 namespace {
+
+#if (CONFIG_1_TO_2_ZAP || CONFIG_1_TO_8_ZAP || CONFIG_1_TO_12_ZAP)
+
+// Switches Namespace: 0x43, tag 0x08 (Custom)
+constexpr const uint8_t kNamespaceSwitches = 0x43;
+constexpr const uint8_t kTagCustom         = 0x08;
+
+const SemanticTagStruct::Type switch1TagList[]  = { { .namespaceID = kNamespaceSwitches,
+                                                      .tag         = kTagCustom,
+                                                      .label       = chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
+                                                         { chip::app::DataModel::MakeNullable(chip::CharSpan("Switch1", 7)) }) } };
+const SemanticTagStruct::Type switch2TagList[]  = { { .namespaceID = kNamespaceSwitches,
+                                                      .tag         = kTagCustom,
+                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
+                                                         DataModel::MakeNullable(CharSpan("Switch2", 7))) } };
+const SemanticTagStruct::Type switch3TagList[]  = { { .namespaceID = kNamespaceSwitches,
+                                                      .tag         = kTagCustom,
+                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
+                                                         DataModel::MakeNullable(CharSpan("Switch3", 7))) } };
+const SemanticTagStruct::Type switch4TagList[]  = { { .namespaceID = kNamespaceSwitches,
+                                                      .tag         = kTagCustom,
+                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
+                                                         DataModel::MakeNullable(CharSpan("Switch4", 7))) } };
+const SemanticTagStruct::Type switch5TagList[]  = { { .namespaceID = kNamespaceSwitches,
+                                                      .tag         = kTagCustom,
+                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
+                                                         DataModel::MakeNullable(CharSpan("Switch5", 7))) } };
+const SemanticTagStruct::Type switch6TagList[]  = { { .namespaceID = kNamespaceSwitches,
+                                                      .tag         = kTagCustom,
+                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
+                                                         DataModel::MakeNullable(CharSpan("Switch6", 7))) } };
+const SemanticTagStruct::Type switch7TagList[]  = { { .namespaceID = kNamespaceSwitches,
+                                                      .tag         = kTagCustom,
+                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
+                                                         DataModel::MakeNullable(CharSpan("Switch7", 7))) } };
+const SemanticTagStruct::Type switch8TagList[]  = { { .namespaceID = kNamespaceSwitches,
+                                                      .tag         = kTagCustom,
+                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
+                                                         DataModel::MakeNullable(CharSpan("Switch8", 7))) } };
+const SemanticTagStruct::Type switch9TagList[]  = { { .namespaceID = kNamespaceSwitches,
+                                                      .tag         = kTagCustom,
+                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
+                                                         DataModel::MakeNullable(CharSpan("Switch9", 7))) } };
+const SemanticTagStruct::Type switch11TagList[] = { { .namespaceID = kNamespaceSwitches,
+                                                      .tag         = kTagCustom,
+                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
+                                                          DataModel::MakeNullable(CharSpan("Switch11", 8))) } };
+const SemanticTagStruct::Type switch12TagList[] = { { .namespaceID = kNamespaceSwitches,
+                                                      .tag         = kTagCustom,
+                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
+                                                          DataModel::MakeNullable(CharSpan("Switch12", 8))) } };
+const SemanticTagStruct::Type switch13TagList[] = { { .namespaceID = kNamespaceSwitches,
+                                                      .tag         = kTagCustom,
+                                                      .label       = Optional<DataModel::Nullable<CharSpan>>(
+                                                          DataModel::MakeNullable(CharSpan("Switch13", 8))) } };
+#endif
 
 static DeviceCallbacks EchoCallbacks;
 
@@ -230,6 +285,8 @@ void AppTask::InitServer(intptr_t arg)
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     chip::Server::GetInstance().Init(initParams);
+
+    InitTag();
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
@@ -493,3 +550,36 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
  * Update cluster status after application level changes
  */
 void AppTask::UpdateClusterState(void) {}
+
+void AppTask::InitTag()
+{
+#if CONFIG_DEFAULT_ZAP
+#elif CONFIG_1_TO_2_ZAP
+    SetTagList(1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch1TagList));
+    SetTagList(2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch2TagList));
+    SetTagList(3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch3TagList));
+#elif CONFIG_1_TO_8_ZAP
+    SetTagList(1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch1TagList));
+    SetTagList(2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch2TagList));
+    SetTagList(3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch3TagList));
+    SetTagList(4, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch4TagList));
+    SetTagList(5, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch5TagList));
+    SetTagList(6, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch6TagList));
+    SetTagList(7, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch7TagList));
+    SetTagList(8, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch8TagList));
+    SetTagList(9, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch9TagList));
+#elif CONFIG_1_TO_11_ZAP
+    SetTagList(1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch1TagList));
+    SetTagList(2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch2TagList));
+    SetTagList(3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch3TagList));
+    SetTagList(4, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch4TagList));
+    SetTagList(5, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch5TagList));
+    SetTagList(6, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch6TagList));
+    SetTagList(7, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch7TagList));
+    SetTagList(8, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch8TagList));
+    SetTagList(9, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch9TagList));
+    SetTagList(11, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch11TagList));
+    SetTagList(12, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch12TagList));
+    SetTagList(13, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(switch13TagList));
+#endif
+}

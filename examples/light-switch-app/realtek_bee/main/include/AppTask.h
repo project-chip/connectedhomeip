@@ -51,7 +51,7 @@ private:
     friend AppTask & GetAppTask(void);
 
     static void InitServer(intptr_t arg);
-
+    static void InitTag();
     // static void ActionInitiated(LightingManager::Action_t aAction);
     // static void ActionCompleted(LightingManager::Action_t aAction);
 
