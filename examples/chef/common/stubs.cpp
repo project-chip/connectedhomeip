@@ -81,6 +81,10 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[]   
 #include "temperature-control/static-supported-temperature-levels.h"
 #endif // MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
 
+#ifdef MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
+#include "window-coveering/window-covering.h"
+#endif // MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
+
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
                                                                          uint8_t * buffer, uint16_t maxReadLength)
@@ -350,6 +354,11 @@ void ApplicationInit()
     SetTagList(kColdCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList));
     SetTagList(kFreezeCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
 #endif // MATTER_DM_PLUGIN_REFRIGERATOR_ALARM_SERVER
+
+#ifdef MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
+    ChipLogProgress(NotSpecified, "Initializing WindowCovering cluster delegate.");
+    InitChefWindowCoveringCluster();
+#endif // MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
 }
 
 void ApplicationShutdown()
