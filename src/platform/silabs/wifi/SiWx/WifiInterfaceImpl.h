@@ -100,7 +100,7 @@ private:
      * @brief Processing function responsible of executing the DHCP polling operation until we have an IPv6 or IPv4 address
      *
      */
-    void HandleDHCPPolling();
+    void HandleNotifyConnectivity();
 
     static WifiInterfaceImpl mInstance;
 };
