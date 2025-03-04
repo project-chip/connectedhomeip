@@ -35,7 +35,7 @@ extern "C" {
 #include "sl_core.h"
 #endif                          // SL_BTLCTRL_MUX
 #include "em_bus.h"             // For CORE_CRITICAL_SECTION
-#ifndef SLI_SI91X_MCU_INTERFACE // required for 917 NCP
+#ifndef SLI_SI91X_MCU_INTERFACE // This is not needed for the 917 SoC; it is required for EFR host applications
 #include "btl_interface.h"
 #endif // SLI_SI91X_MCU_INTERFACE
 }
@@ -115,7 +115,7 @@ void OTAMultiImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "HandlePrepareDownload: started");
 
-#ifndef SLI_SI91X_MCU_INTERFACE // required for 917 NCP
+#ifndef SLI_SI91X_MCU_INTERFACE // This is not needed for the 917 SoC; it is required for EFR host applications
     CORE_CRITICAL_SECTION(bootloader_init();)
 #endif
 
@@ -426,7 +426,7 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
     ChipLogProgress(SoftwareUpdate, "HandleApply: Finished");
     // This reboots the device
     // TODO: check where to put this
-#ifndef SLI_SI91X_MCU_INTERFACE // required for 917 NCP
+#ifndef SLI_SI91X_MCU_INTERFACE // This is not needed for the 917 SoC; it is required for EFR host applications
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
 #endif
     // ConfigurationManagerImpl().StoreSoftwareUpdateCompleted();

@@ -157,7 +157,7 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ApplyAction()
     if (mReset)
     {
         ChipLogProgress(SoftwareUpdate, "WiFi Device OTA update complete");
-#ifdef SLI_SI91X_MCU_INTERFACE // only for SoC
+#ifdef SLI_SI91X_MCU_INTERFACE // This is not needed for the 917 SoC; it is required for EFR host applications
         // send system reset request to reset the MCU and upgrade the m4 image
         ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
         // Reboots the device
