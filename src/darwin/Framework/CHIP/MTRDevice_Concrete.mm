@@ -4195,9 +4195,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 // When the expected value interval expires, the correct value will be reported,
                 // if needed.
                 if (expectedValue) {
-                    MTR_LOG("%@ report %@ value filtered - expected value still present", self, attributePath);
+                    MTR_LOG("%@ report %@ value %@ filtered - expected value still present", self, attributePath, attributeDataValue);
                 } else {
-                    MTR_LOG("%@ report %@ value filtered - same as read cache", self, attributePath);
+                    MTR_LOG("%@ report %@ value %@ filtered - same as read cache", self, attributePath, attributeDataValue);
                 }
             }
 
@@ -4309,6 +4309,22 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     [self _updateAttributeDependentDescriptionData];
+
+    NSNumber * networkFeatures = nil;
+    {
+        std::lock_guard descriptionLock(_descriptionLock);
+        networkFeatures = _allNetworkFeatures;
+    }
+
+    if ((networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureWiFiNetworkInterface) == 0 && (networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureThreadNetworkInterface) == 0) {
+        // We had persisted data, but apparently this device does not have any
+        // known network technologies?  Log some more information about what's
+        // going on.
+        auto * rootNetworkCommissioningPath = [MTRClusterPath clusterPathWithEndpointID:@(kRootEndpointId) clusterID:@(MTRClusterIDTypeNetworkCommissioningID)];
+        auto * networkCommisioningData = clusterData[rootNetworkCommissioningPath];
+        MTR_LOG("%@ after setting persisted data, network features: %@, root network commissioning featureMap: %@", self, networkFeatures,
+            networkCommisioningData.attributes[@(MTRClusterGlobalAttributeFeatureMapID)]);
+    }
 
     // We have some stored data.  Since we don't store data until the end of the
     // initial priming report, our device cache must be primed.
