@@ -362,6 +362,41 @@ def test_tree_display_name():
     ) == ["(anonymous namespace)", "AccessControlAttribute", "Read(args)"]
 
 
+def shorten_name(full_name: str) -> str:
+    """
+    Remove namespaces, but keep template parts
+
+    This tries to convert:
+      foo::bar::baz(int, double) -> baz(int, double)
+      foo::bar::baz<x::y>(int, double) -> baz<x::y>(int, double)
+      foo::bar::baz(some::ns::bit, double) -> baz(some::ns::bit, double)
+      foo::bar::baz<x::y>(some::ns::bit, double) -> baz<x::y>(some::ns::bit, double)
+
+    Remove all before '::', however '::' found before the first of < or (
+    """
+    limit1 = full_name.find('<')
+    limit2 = full_name.find('(')
+    if limit1 >= 0 and limit1 < limit2:
+        limit = limit1
+    else:
+        limit = limit2
+    separate_idx = full_name.rfind('::', 0, limit)
+    if separate_idx > 0:
+        short_name = full_name[separate_idx+2:]
+    else:
+        short_name = full_name
+    return short_name
+
+
+def test_shorten_name():
+    assert shorten_name("foo::bar::baz(int, double)") == "baz(int, double)"
+    assert shorten_name("foo::bar::baz<x::y>(int, double)") == "baz<x::y>(int, double)"
+    assert shorten_name("foo::bar::baz(some::ns::bit, double)") == "baz(some::ns::bit, double)"
+    assert shorten_name("foo::bar::baz<x::y>(some::ns::bit, double)") == "baz<x::y>(some::ns::bit, double)"
+    assert shorten_name("chip::app:EnabledEndpointsWithServerCluster::EnsureMatchingEndpoint()") == "EnsureMatchingEndpoint()"
+    assert shorten_name("void chip::app:EnabledEndpointsWithServerCluster::operator++()") == "operator++()"
+
+
 def build_treemap(
     name: str,
     symbols: list[Symbol],
@@ -446,27 +481,7 @@ def build_treemap(
         else:
             # When using object files, the paths hare are the full "foo::bar::....::method"
             # so clean them up a bit
-            short_name = data["short_name"][idx]
-
-            # remove namespaces, but keep template parts
-            # This tries to convert:
-            #   foo::bar::baz(int, double) -> baz(int, double)
-            #   foo::bar::baz<x::y>(int, double) -> baz<x::y>(int, double)
-            #   foo::bar::baz(some::ns:bit, double) -> baz(some::ns::bit, double)
-            #   foo::bar::baz<x::y>(some::ns:bit, double) -> baz<x::y>(some::ns::bit, double)
-            #
-            # Remove all before '::', however '::' found before the first of < or (
-            #
-            limit1 = short_name.find('<')
-            limit2 = short_name.find('(')
-            if limit1 >= 0 and limit1 < limit2:
-                limit = limit1
-            else:
-                limit = limit2
-            separate_idx = short_name.rfind('::', 0, limit)
-            if separate_idx:
-                short_name = short_name[separate_idx+2:]
-
+            short_name = shorten_name(data["short_name"][idx])
             data["name_with_size"][idx] = f"{short_name}: {data["size"][idx]}"
 
     extra_args = {}
