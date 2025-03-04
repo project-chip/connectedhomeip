@@ -59,7 +59,8 @@ class TC_FAN_2_1(MatterBaseTest):
                 TestStep(2, "[FC] TH writes to the DUT the Auto (5) FanMode attribute value."),
                 TestStep(3, "[FC] TH reads from the DUT the FanMode attribute.",
                          "Verify that the DUT response contains an enum8 with a value between 0 and 5, excluding 4."),
-                TestStep(4, "[FC] TH reads from the DUT the FanModeSequence attribute.", "Verify that the DUT response contains an enum8 with value between 0 and 5 inclusive. Verify that when FanMode is Auto (5), the FanModeSequence supports Auto mode."),
+                TestStep(4, "[FC] TH reads from the DUT the FanModeSequence attribute.",
+                         "Verify that the DUT response contains an enum8 with value between 0 and 5 inclusive. Verify that when FanMode is Auto (5), the FanModeSequence supports Auto mode."),
                 TestStep(5, "[FC] TH writes to the DUT the Low (1) FanMode attribute value."),
                 TestStep(6, "[FC] TH reads from the DUT the PercentSetting attribute.",
                          "Verify that the DUT response contains a uint8 with value between 0 and 100 inclusive."),
@@ -86,10 +87,10 @@ class TC_FAN_2_1(MatterBaseTest):
         # Verify response is of expected type
         if type is Uint8Type:
             asserts.assert_true(self.is_valid_uint8_value(value),
-                                    f"[FC] {attribute.__name__} result ({value}) isn't of type {type.__name__}")
+                                f"[FC] {attribute.__name__} result ({value}) isn't of type {type.__name__}")
         else:
             asserts.assert_is_instance(value, type,
-                                    f"[FC] {attribute.__name__} result ({value}) isn't of type {type.__name__}")
+                                       f"[FC] {attribute.__name__} result ({value}) isn't of type {type.__name__}")
 
         # Verify response is valid (value is within expected range)
         asserts.assert_in(value, range, f"[FC] {attribute.__name__} result ({value}) is invalid")
@@ -105,7 +106,8 @@ class TC_FAN_2_1(MatterBaseTest):
 
         # If FanMode is Auto (5), verify FanModeSequence supports auto FanMode
         if fan_mode == fm_enum.kAuto:
-            asserts.assert_in(fan_mode_sequence, fms_auto_values, f"[FC] FanModeSequence value ({fan_mode_sequence}:{fan_mode_sequence.name}) must support Auto FanMode")
+            asserts.assert_in(fan_mode_sequence, fms_auto_values,
+                              f"[FC] FanModeSequence value ({fan_mode_sequence}:{fan_mode_sequence.name}) must support Auto FanMode")
 
     @staticmethod
     def is_valid_uint8_value(var) -> bool:
