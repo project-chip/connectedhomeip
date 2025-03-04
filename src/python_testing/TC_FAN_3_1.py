@@ -182,13 +182,13 @@ class TC_FAN_3_1(MatterBaseTest):
         # Return None if timeout expires
         return None
 
-    async def get_fan_modes(self, endpoint, max_high: bool = False):
+    async def get_fan_modes(self, endpoint, remove_auto: bool = False):
         """
         Gets the available fan modes provided by the FanModeSequence attribute.
 
         Args:
             endpoint (int): The endpoint identifier for the fan device.
-            max_high (bool, optional): If True, limits the fan modes to those up to and including 'High'. Defaults to False.
+            remove_auto (bool, optional): If True, limits the fan modes to those up to and including 'High'. Defaults to False.
 
         Raises:
             AssertionError: If the FanModeSequence attribute value is not an instance of FanModeSequenceEnum.
@@ -220,12 +220,7 @@ class TC_FAN_3_1(MatterBaseTest):
         elif self.fan_mode_sequence == 5:
             fan_modes = [fm_enum.kOff, fm_enum.kHigh]
 
-        if max_high:
-            if fm_enum.kHigh in fan_modes:
-                high_index = fan_modes.index(fm_enum.kHigh)
-                fan_modes = fan_modes[:high_index + 1]  # Keep only modes up to and including kHigh
-
-        self.fan_modes = fan_modes
+        self.fan_modes = [f for f in fan_modes if not (remove_auto and f == fm_enum.kAuto)]
 
     async def get_initial_parametes(self, endpoint, attr_to_update, order) -> tuple:
         """
@@ -614,7 +609,7 @@ class TC_FAN_3_1(MatterBaseTest):
         # *** STEP 2 ***
         # TH reads the FanModeSequence attribute from the DUT
         self.step(2)
-        await self.get_fan_modes(ep, max_high=True)
+        await self.get_fan_modes(ep, remove_auto=True)
 
         # *** STEP 3 ***
         # TH checks the DUT for support of the MultiSpeed feature
