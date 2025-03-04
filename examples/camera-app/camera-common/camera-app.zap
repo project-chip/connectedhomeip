@@ -5601,7 +5601,7 @@
               "reportableChange": 0
             },
             {
-              "name": "FabricsUsingCamera",
+              "name": "SupportedStreamUsages",
               "code": 14,
               "mfgCode": null,
               "side": "server",
