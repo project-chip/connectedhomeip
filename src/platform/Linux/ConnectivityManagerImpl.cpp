@@ -1650,7 +1650,7 @@ void ConnectivityManagerImpl::OnNanSubscribeTerminated(guint subscribe_id, gchar
     PlatformMgr().PostEventOrDie(&event);
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const SetupDiscriminator & connDiscriminator, void * appState,
+CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscriminator, void * appState,
                                                       OnConnectionCompleteFunct onSuccess, OnConnectionErrorFunct onError)
 {
     ChipLogProgress(Controller, "WiFi-PAF: Try to subscribe the NAN-USD devices");
@@ -1666,8 +1666,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const SetupDiscriminator &
 
     mAppState                = appState;
     PafPublish_ssi.DevOpCode = 0;
-    PafPublish_ssi.DevInfo =
-        connDiscriminator.IsShortDiscriminator() ? connDiscriminator.GetShortValue() : connDiscriminator.GetLongValue();
+    PafPublish_ssi.DevInfo   = connDiscriminator;
     if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(PafPublish_ssi.ProductId) != CHIP_NO_ERROR)
     {
         PafPublish_ssi.ProductId = 0;

@@ -182,7 +182,7 @@ public:
     CHIP_ERROR WiFiPAFCancelPublish(uint32_t PublishId);
     typedef void (*OnConnectionCompleteFunct)(void * appState);
     typedef void (*OnConnectionErrorFunct)(void * appState, CHIP_ERROR err);
-    CHIP_ERROR WiFiPAFSubscribe(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
+    CHIP_ERROR WiFiPAFSubscribe(const uint16_t & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
                                 OnConnectionErrorFunct onError);
     CHIP_ERROR WiFiPAFCancelSubscribe(uint32_t SubscribeId);
     CHIP_ERROR WiFiPAFCancelIncompleteSubscribe();
@@ -453,7 +453,7 @@ inline CHIP_ERROR ConnectivityManager::WiFiPAFCancelPublish(uint32_t PublishId)
     return static_cast<ImplClass *>(this)->_WiFiPAFCancelPublish(PublishId);
 }
 
-inline CHIP_ERROR ConnectivityManager::WiFiPAFSubscribe(const SetupDiscriminator & connDiscriminator, void * appState,
+inline CHIP_ERROR ConnectivityManager::WiFiPAFSubscribe(const uint16_t & connDiscriminator, void * appState,
                                                         OnConnectionCompleteFunct onSuccess, OnConnectionErrorFunct onError)
 {
     return static_cast<ImplClass *>(this)->_WiFiPAFSubscribe(connDiscriminator, appState, onSuccess, onError);
