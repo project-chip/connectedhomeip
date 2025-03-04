@@ -40,7 +40,12 @@ void InitChefWindowCoveringCluster()
                                                                 MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT);
         if (epIndex == kEmberInvalidEndpointIndex)
             continue;
-        WindowCovering::DelegateImpl delegate = new WindowCovering::DelegateImpl();
+
+        // Skip if delegate is already registered.
+        if (WindowCovering::GetDelegate(endpointId))
+            continue;
+
+        WindowCovering::DelegateImpl * delegate = new WindowCovering::DelegateImpl();
         delegate->SetEndpoint(endpointId);
         WindowCovering::SetDefaultDelegate(endpointId, delegate);
     }
