@@ -205,10 +205,6 @@ ServerClusterInterface * ServerClusterInterfaceRegistry::Get(const ConcreteClust
 
 ServerClusterInterfaceRegistry::EndpointClusters * ServerClusterInterfaceRegistry::FindClusters(EndpointId endpointId)
 {
-    // invalid cluster id is NOT acceptable (since static allocation uses the
-    // invalid cluster id as a marker of "not used")
-    VerifyOrReturnValue(endpointId != kInvalidEndpointId, nullptr);
-
     for (EndpointClusters * p = mEndpoints; p != nullptr; p = p->next)
     {
         if (p->endpointId == endpointId)
