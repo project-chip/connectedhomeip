@@ -58,9 +58,6 @@ public:
 
     ~ChefDelegate() = default;
     ChefDelegate()  = default;
-
-protected:
-    EndpointId mEndpoint = 0;
 };
 
 } // namespace WindowCovering
