@@ -29,6 +29,7 @@ class ServerClusterInterfaceRegistry
 {
 private:
     struct RegisteredServerClusterInterface;
+
 public:
     /// represents an iterable list of clusters
     class ClustersList
