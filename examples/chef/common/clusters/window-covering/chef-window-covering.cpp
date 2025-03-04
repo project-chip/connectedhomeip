@@ -18,6 +18,7 @@
 
 #include "chef-window-covering.h"
 #include "app/clusters/window-covering-server/window-covering-server.h"
+#include <app/util/endpoint-config-api.h>
 
 using namespace chip::app::Clusters;
 
