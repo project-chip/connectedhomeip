@@ -3864,7 +3864,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::
     using EnumType = PushAvStreamTransport::StatusCodeEnum;
     switch (val)
     {
-    case EnumType::kAllocationNotPermitted:
     case EnumType::kInvalidTLSEndpoint:
     case EnumType::kInvalidStream:
     case EnumType::kInvalidURL:
