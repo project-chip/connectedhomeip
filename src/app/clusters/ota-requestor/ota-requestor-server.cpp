@@ -159,8 +159,8 @@ Status OtaRequestorServerSetUpdateState(OTAUpdateStateEnum value)
 
     // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
     DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
-    CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
-        OtaSoftwareUpdateRequestor::Id, endpointsList);
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id,
+                                                                                              endpointsList);
 
     for (auto endpoint : endpointsList.TakeBuffer())
     {
@@ -189,8 +189,8 @@ Status OtaRequestorServerSetUpdateStateProgress(app::DataModel::Nullable<uint8_t
 
     // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
     DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
-    CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
-        OtaSoftwareUpdateRequestor::Id, endpointsList);
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id,
+                                                                                              endpointsList);
 
     for (auto endpoint : endpointsList.TakeBuffer())
     {
@@ -224,15 +224,15 @@ void OtaRequestorServerOnStateTransition(OTAUpdateStateEnum previousState, OTAUp
 
     // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
     DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
-    CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
-        OtaSoftwareUpdateRequestor::Id, endpointsList);
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id,
+                                                                                              endpointsList);
 
     for (auto endpoint : endpointsList.TakeBuffer())
     {
         Events::StateTransition::Type event{ previousState, newState, reason, targetSoftwareVersion };
         EventNumber eventNumber;
 
-        err = LogEvent(event, endpoint.id, eventNumber);
+        CHIP_ERROR err = LogEvent(event, endpoint.id, eventNumber);
         if (CHIP_NO_ERROR != err)
         {
             ChipLogError(Zcl, "Failed to record StateTransition event: %" CHIP_ERROR_FORMAT, err.Format());
@@ -244,15 +244,15 @@ void OtaRequestorServerOnVersionApplied(uint32_t softwareVersion, uint16_t produ
 {
     // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
     DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
-    CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
-        OtaSoftwareUpdateRequestor::Id, endpointsList);
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id,
+                                                                                              endpointsList);
 
     for (auto endpoint : endpointsList.TakeBuffer())
     {
         Events::VersionApplied::Type event{ softwareVersion, productId };
         EventNumber eventNumber;
 
-        err = LogEvent(event, endpoint.id, eventNumber);
+        CHIP_ERROR err = LogEvent(event, endpoint.id, eventNumber);
         if (CHIP_NO_ERROR != err)
         {
             ChipLogError(Zcl, "Failed to record VersionApplied event: %" CHIP_ERROR_FORMAT, err.Format());
@@ -265,15 +265,15 @@ void OtaRequestorServerOnDownloadError(uint32_t softwareVersion, uint64_t bytesD
 {
     // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
     DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
-    CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
-        OtaSoftwareUpdateRequestor::Id, endpointsList);
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id,
+                                                                                              endpointsList);
 
     for (auto endpoint : endpointsList.TakeBuffer())
     {
         Events::DownloadError::Type event{ softwareVersion, bytesDownloaded, progressPercent, platformCode };
         EventNumber eventNumber;
 
-        err = LogEvent(event, endpoint.id, eventNumber);
+        CHIP_ERROR err = LogEvent(event, endpoint.id, eventNumber);
         if (CHIP_NO_ERROR != err)
         {
             ChipLogError(Zcl, "Failed to record DownloadError event: %" CHIP_ERROR_FORMAT, err.Format());

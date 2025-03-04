@@ -206,12 +206,8 @@ void SoftwareDiagnosticsServer::OnSoftwareFaultDetect(const SoftwareDiagnostics:
 
     // Find all endpoints that have SoftwareDiagnostics implemented
     DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
-    CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
-        SoftwareDiagnostics::Id, endpointsList);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to get endpoints with SoftwareDiagnostics cluster: %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(SoftwareDiagnostics::Id,
+                                                                                              endpointsList);
 
     for (auto endpoint : endpointsList.TakeBuffer())
     {

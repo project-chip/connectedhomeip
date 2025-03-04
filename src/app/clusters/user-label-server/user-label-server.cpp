@@ -211,8 +211,8 @@ public:
             {
                 // Find all endpoints that have UserLabel implemented
                 DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
-                CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
-                    UserLabel::Id, endpointsList);
+                InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(UserLabel::Id,
+                                                                                                          endpointsList);
 
                 for (auto endpoint : endpointsList.TakeBuffer())
                 {

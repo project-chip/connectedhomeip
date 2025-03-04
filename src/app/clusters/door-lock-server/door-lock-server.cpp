@@ -56,8 +56,8 @@ class DoorLockClusterFabricDelegate : public chip::FabricTable::Delegate
     {
         // Find all endpoints that have DoorLock implemented
         DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
-        CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
-            Clusters::DoorLock::Id, endpointsList);
+        InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(Clusters::DoorLock::Id,
+                                                                                                  endpointsList);
 
         for (auto endpoint : endpointsList.TakeBuffer())
         {

@@ -216,8 +216,8 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
 
     FabricSceneData(EndpointId endpoint = kInvalidEndpointId, FabricIndex fabric = kUndefinedFabricIndex,
                     uint16_t maxScenesPerFabric = kMaxScenesPerFabric, uint16_t maxScenesPerEndpoint = kMaxScenesPerEndpoint) :
-        endpoint_id(endpoint),
-        fabric_index(fabric), max_scenes_per_fabric(maxScenesPerFabric), max_scenes_per_endpoint(maxScenesPerEndpoint)
+        endpoint_id(endpoint), fabric_index(fabric), max_scenes_per_fabric(maxScenesPerFabric),
+        max_scenes_per_endpoint(maxScenesPerEndpoint)
     {}
 
     CHIP_ERROR UpdateKey(StorageKeyName & key) override
@@ -810,14 +810,13 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 
     // Find all endpoints that have ScenesManagement implemented
     DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
-    CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(ScenesManagement::Id,
-                                                                                                               endpointsList);
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(ScenesManagement::Id, endpointsList);
 
     for (auto endpoint : endpointsList.TakeBuffer())
     {
         FabricSceneData fabric(endpoint.id, fabric_index);
         SceneIndex idx = 0;
-        err            = fabric.Load(mStorage);
+        CHIP_ERROR err = fabric.Load(mStorage);
         VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
         if (CHIP_ERROR_NOT_FOUND == err)
         {
@@ -904,8 +903,8 @@ DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneE
 DefaultSceneTableImpl::SceneEntryIteratorImpl::SceneEntryIteratorImpl(DefaultSceneTableImpl & provider, FabricIndex fabricIdx,
                                                                       EndpointId endpoint, uint16_t maxScenesPerFabric,
                                                                       uint16_t maxScenesEndpoint) :
-    mProvider(provider),
-    mFabric(fabricIdx), mEndpoint(endpoint), mMaxScenesPerFabric(maxScenesPerFabric), mMaxScenesPerEndpoint(maxScenesEndpoint)
+    mProvider(provider), mFabric(fabricIdx), mEndpoint(endpoint), mMaxScenesPerFabric(maxScenesPerFabric),
+    mMaxScenesPerEndpoint(maxScenesEndpoint)
 {
     FabricSceneData fabric(mEndpoint, fabricIdx, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
     ReturnOnFailure(fabric.Load(provider.mStorage));

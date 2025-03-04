@@ -329,8 +329,8 @@ public:
     void FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
         DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
-        CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
-            BasicInformation::Id, endpointsList);
+        InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(BasicInformation::Id,
+                                                                                                  endpointsList);
 
         // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
         for (auto endpoint : endpointsList.TakeBuffer())
