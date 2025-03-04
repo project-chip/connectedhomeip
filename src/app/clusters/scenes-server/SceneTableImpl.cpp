@@ -15,9 +15,15 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <stdlib.h>
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::ScenesManagement;
 
 namespace chip {
 namespace scenes {
@@ -210,8 +216,8 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
 
     FabricSceneData(EndpointId endpoint = kInvalidEndpointId, FabricIndex fabric = kUndefinedFabricIndex,
                     uint16_t maxScenesPerFabric = kMaxScenesPerFabric, uint16_t maxScenesPerEndpoint = kMaxScenesPerEndpoint) :
-        endpoint_id(endpoint),
-        fabric_index(fabric), max_scenes_per_fabric(maxScenesPerFabric), max_scenes_per_endpoint(maxScenesPerEndpoint)
+        endpoint_id(endpoint), fabric_index(fabric), max_scenes_per_fabric(maxScenesPerFabric),
+        max_scenes_per_endpoint(maxScenesPerEndpoint)
     {}
 
     CHIP_ERROR UpdateKey(StorageKeyName & key) override
@@ -802,11 +808,20 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    for (auto endpoint : app::EnabledEndpointsWithServerCluster(chip::app::Clusters::ScenesManagement::Id))
+    // Find all endpoints that have ScenesManagement implemented
+    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+    CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(ScenesManagement::Id,
+                                                                                                               endpointsList);
+    if (err != CHIP_NO_ERROR)
     {
-        FabricSceneData fabric(endpoint, fabric_index);
+        ChipLogError(Zcl, "Failed to get endpoints with ScenesManagement cluster: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    for (auto endpoint : endpointsList.TakeBuffer())
+    {
+        FabricSceneData fabric(endpoint.id, fabric_index);
         SceneIndex idx = 0;
-        CHIP_ERROR err = fabric.Load(mStorage);
+        err            = fabric.Load(mStorage);
         VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
         if (CHIP_ERROR_NOT_FOUND == err)
         {
@@ -815,7 +830,7 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 
         while (idx < mMaxScenesPerFabric)
         {
-            err = RemoveSceneTableEntryAtPosition(endpoint, fabric_index, idx);
+            err = RemoveSceneTableEntryAtPosition(endpoint.id, fabric_index, idx);
             VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
             idx++;
         }
@@ -893,8 +908,8 @@ DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneE
 DefaultSceneTableImpl::SceneEntryIteratorImpl::SceneEntryIteratorImpl(DefaultSceneTableImpl & provider, FabricIndex fabricIdx,
                                                                       EndpointId endpoint, uint16_t maxScenesPerFabric,
                                                                       uint16_t maxScenesEndpoint) :
-    mProvider(provider),
-    mFabric(fabricIdx), mEndpoint(endpoint), mMaxScenesPerFabric(maxScenesPerFabric), mMaxScenesPerEndpoint(maxScenesEndpoint)
+    mProvider(provider), mFabric(fabricIdx), mEndpoint(endpoint), mMaxScenesPerFabric(maxScenesPerFabric),
+    mMaxScenesPerEndpoint(maxScenesEndpoint)
 {
     FabricSceneData fabric(mEndpoint, fabricIdx, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
     ReturnOnFailure(fabric.Load(provider.mStorage));

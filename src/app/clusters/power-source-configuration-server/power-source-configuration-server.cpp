@@ -26,8 +26,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/util/attribute-storage.h>
-#include <lib/support/CodeUtils.h>
+#include <app/InteractionModelEngine.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -66,13 +65,23 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
         err = aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
             std::pair<uint16_t, uint8_t> orderEpPair[kMaxPowerSources];
             uint8_t idx = 0;
-            for (auto endpoint : EnabledEndpointsWithServerCluster(PowerSource::Id))
+
+            // Find all endpoints that have PowerSource cluster implemented
+            DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+            CHIP_ERROR error = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
+                PowerSource::Id, endpointsList);
+            if (error != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Failed to get endpoints with PowerSource cluster: %" CHIP_ERROR_FORMAT, error.Format());
+            }
+
+            for (auto endpoint : endpointsList.TakeBuffer())
             {
                 uint8_t order = 0;
                 if (idx >= kMaxPowerSources)
                     break;
-                PowerSource::Attributes::Order::Get(endpoint, &order);
-                orderEpPair[idx] = std::make_pair(endpoint, order);
+                PowerSource::Attributes::Order::Get(endpoint.id, &order);
+                orderEpPair[idx] = std::make_pair(endpoint.id, order);
                 idx++;
             }
 

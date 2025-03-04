@@ -26,16 +26,13 @@
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/EventLogging.h>
-#include <app/server/Server.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/config.h>
-#include <cinttypes>
-
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <lib/support/CodeUtils.h>
+#include <app/EventLogging.h>
+#include <app/InteractionModelEngine.h>
+#include <app/server/Server.h>
+#include <cinttypes>
 
 using namespace chip;
 using namespace chip::app;
@@ -57,13 +54,22 @@ class DoorLockClusterFabricDelegate : public chip::FabricTable::Delegate
 {
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
-        for (auto endpointId : EnabledEndpointsWithServerCluster(Clusters::DoorLock::Id))
+        // Find all endpoints that have DoorLock implemented
+        DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+        CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
+            Clusters::DoorLock::Id, endpointsList);
+        if (err != CHIP_NO_ERROR)
         {
-            if (!DoorLockServer::Instance().OnFabricRemoved(endpointId, fabricIndex))
+            ChipLogError(Zcl, "Failed to get endpoints with DoorLock cluster: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+
+        for (auto endpoint : endpointsList.TakeBuffer())
+        {
+            if (!DoorLockServer::Instance().OnFabricRemoved(endpoint.id, fabricIndex))
             {
                 ChipLogError(Zcl,
                              "Unable to handle fabric removal from the Door Lock Server instance [endpointId=%d,fabricIndex=%d]",
-                             endpointId, fabricIndex);
+                             endpoint.id, fabricIndex);
             }
         }
     }
