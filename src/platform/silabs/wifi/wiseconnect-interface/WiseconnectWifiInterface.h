@@ -29,7 +29,6 @@ namespace Silabs {
 class WiseconnectWifiInterface : public WifiInterface
 {
 public:
-
     enum class WifiPlatformEvent : uint8_t
     {
         kStationConnect      = 0,
