@@ -42,7 +42,7 @@ uint8_t flag = RPS_HEADER;
 namespace chip {
 
 // Define static memebers
-bool OTAWiFiFirmwareProcessor::mReset                                                      = false;
+bool OTAWiFiFirmwareProcessor::mReset = false;
 
 CHIP_ERROR OTAWiFiFirmwareProcessor::Init()
 {
@@ -69,13 +69,13 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::Clear()
 
 CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
 {
-    int32_t status        = SL_STATUS_OK;
+    int32_t status = SL_STATUS_OK;
     // Store the header of the OTA file
     static uint8_t writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
     // Used to tranfer other block to processor
     static uint8_t writeDataBuffer[1024] __attribute__((aligned(4))) = { 0 };
 
-    ChipLogProgress(SoftwareUpdate,"ProcessInternal WiFi Block processing");
+    ChipLogProgress(SoftwareUpdate, "ProcessInternal WiFi Block processing");
     if (!mDescriptorProcessed)
     {
         ReturnErrorOnFailure(ProcessDescriptor(block));
@@ -109,7 +109,7 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
 #endif
 
     if (flag == RPS_HEADER)
-    {   
+    {
         memcpy(&writeBuffer, block.data(), kAlignmentBytes);
         // Send RPS header which is received as first chunk
         status = sl_si91x_fwup_start(writeBuffer);
@@ -117,7 +117,7 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
         flag   = RPS_DATA;
         memcpy(&writeDataBuffer, block.data() + kAlignmentBytes, (block.size() - kAlignmentBytes));
         status = sl_si91x_fwup_load(writeDataBuffer, (block.size() - kAlignmentBytes));
-    } 
+    }
     else if (flag == RPS_DATA)
     {
         memcpy(&writeDataBuffer, block.data(), block.size());
@@ -158,7 +158,7 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ApplyAction()
     if (mReset)
     {
         ChipLogProgress(SoftwareUpdate, "WiFi Device OTA update complete");
-#ifdef SLI_SI91X_MCU_INTERFACE //only for SoC
+#ifdef SLI_SI91X_MCU_INTERFACE // only for SoC
         // send system reset request to reset the MCU and upgrade the m4 image
         ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
         // Reboots the device

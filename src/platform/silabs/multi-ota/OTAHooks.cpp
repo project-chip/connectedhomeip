@@ -57,7 +57,8 @@ CHIP_ERROR chip::OTAMultiImageProcessorImpl::OtaHookInit()
 #ifndef SLI_SI91X_MCU_INTERFACE
     static chip::OTAFirmwareProcessor sApplicationProcessor;
     sApplicationProcessor.RegisterDescriptorCallback(ProcessDescriptor);
-    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kApplicationProcessor), &sApplicationProcessor));
+    ReturnErrorOnFailure(
+        imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kApplicationProcessor), &sApplicationProcessor));
 #endif
 
 #if OTA_TEST_CUSTOM_TLVS
@@ -69,16 +70,20 @@ CHIP_ERROR chip::OTAMultiImageProcessorImpl::OtaHookInit()
     customProcessor2.RegisterDescriptorCallback(ProcessDescriptor);
     customProcessor3.RegisterDescriptorCallback(ProcessDescriptor);
 
-    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kCustomProcessor1), &customProcessor1));
-    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kCustomProcessor2), &customProcessor2));
-    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kCustomProcessor3), &customProcessor3));
+    ReturnErrorOnFailure(
+        imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kCustomProcessor1), &customProcessor1));
+    ReturnErrorOnFailure(
+        imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kCustomProcessor2), &customProcessor2));
+    ReturnErrorOnFailure(
+        imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kCustomProcessor3), &customProcessor3));
 #endif
 
 #ifdef SL_WIFI
     static chip::OTAWiFiFirmwareProcessor sWifiFirmwareProcessor;
     sWifiFirmwareProcessor.RegisterDescriptorCallback(ProcessDescriptor);
-    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kWiFiProcessor), &sWifiFirmwareProcessor));
+    ReturnErrorOnFailure(
+        imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kWiFiProcessor), &sWifiFirmwareProcessor));
 #endif
 
     return CHIP_NO_ERROR;
-}   
+}
