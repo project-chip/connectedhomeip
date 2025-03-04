@@ -30,7 +30,7 @@ static_assert(kWindowCoveringDelegateTableSize <= kEmberInvalidEndpointIndex, "W
 
 std::unique_ptr<WindowCovering::ChefDelegate> gDelegateTable[kWindowCoveringDelegateTableSize];
 
-std::unique_ptr<WindowCovering::ChefDelegate> * GetDelegate(EndpointId endpoint)
+std::unique_ptr<WindowCovering::ChefDelegate> * GetDelegate(chip::EndpointId endpoint)
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, WindowCovering::Id, MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT);
