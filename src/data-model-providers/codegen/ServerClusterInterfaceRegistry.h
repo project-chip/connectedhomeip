@@ -82,7 +82,7 @@ public:
     /// A registration will return an error if a registration already exists on
     /// the given `endpointId/cluster->GetClusterID()` already exists
     ///
-    /// Registrations need a valid endpointId and cluster MUST return a valid cluster id.
+    /// Registrations need a valid `endpointId` and `cluster->GetClusterID()` MUST be a valid cluster id.
     [[nodiscard]] CHIP_ERROR Register(EndpointId endpointId, ServerClusterInterface * cluster);
 
     /// Remove an existing registration for a given endpoint/cluster path.
