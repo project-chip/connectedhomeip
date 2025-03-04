@@ -16,8 +16,6 @@
  *    limitations under the License.
  */
 
-#ifdef MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
-
 #include "chef-window-covering.h"
 #include "app/clusters/window-covering-server/window-covering-server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -123,5 +121,3 @@ CHIP_ERROR WindowCovering::ChefDelegate::HandleStopMotion()
 {
     return CHIP_NO_ERROR;
 }
-
-#endif // MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER

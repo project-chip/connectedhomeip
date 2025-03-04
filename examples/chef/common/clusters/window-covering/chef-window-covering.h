@@ -16,8 +16,6 @@
  *    limitations under the License.
  */
 
-#ifdef MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
-
 #include <app/clusters/window-covering-server/window-covering-delegate.h>
 
 #pragma once
@@ -71,5 +69,3 @@ protected:
 } // namespace chip
 
 void InitChefWindowCoveringCluster();
-
-#endif // MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
