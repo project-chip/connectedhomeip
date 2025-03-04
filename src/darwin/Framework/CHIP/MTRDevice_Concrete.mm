@@ -58,6 +58,8 @@
 
 static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribeLatency";
 
+static NSString * const sDeviceMayBeReachableReason = @"SPI client indicated the device may now be reachable";
+
 // Not static, because these are public API.
 NSString * const MTRPreviousDataKey = @"previousData";
 NSString * const MTRDataVersionKey = @"dataVersion";
@@ -306,6 +308,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 //   Actively receiving priming report
 
 @property (nonatomic) MTRInternalDeviceState internalDeviceState;
+@property (nonatomic) BOOL doingCASEAttemptForDeviceMayBeReachable;
 
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS (1)
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS (3600)
@@ -470,6 +473,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         _state = MTRDeviceStateUnknown;
         _internalDeviceState = MTRInternalDeviceStateUnsubscribed;
         _internalDeviceStateForDescription = MTRInternalDeviceStateUnsubscribed;
+        _doingCASEAttemptForDeviceMayBeReachable = NO;
         if (controller.controllerDataStore) {
             _persistedClusterData = [[NSCache alloc] init];
         } else {
@@ -1049,7 +1053,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             subscriptionCallback->ResetResubscriptionBackoff();
         }
         readClientToResubscribe->TriggerResubscribeIfScheduled(reason.UTF8String);
-    } else if (((_internalDeviceState == MTRInternalDeviceStateSubscribing) || shouldReattemptSubscription) && nodeLikelyReachable) {
+    } else if (((_internalDeviceState == MTRInternalDeviceStateSubscribing && !self.doingCASEAttemptForDeviceMayBeReachable) || shouldReattemptSubscription) && nodeLikelyReachable) {
         // If we have reason to suspect that the node is now reachable and we haven't established a
         // CASE session yet, let's consider it to be stalled and invalidate the pairing session.
 
@@ -2745,6 +2749,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _changeInternalState:MTRInternalDeviceStateSubscribing];
 
     MTR_LOG("%@ setting up subscription with reason: %@", self, reason);
+    if ([reason hasPrefix:sDeviceMayBeReachableReason]) {
+        self.doingCASEAttemptForDeviceMayBeReachable = YES;
+    }
 
     __block bool markUnreachableAfterWait = true;
 #ifdef DEBUG
@@ -2783,6 +2790,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            NSNumber * _Nullable retryDelay) {
                            mtr_strongify(self);
                            VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason directlyGetSessionForNode called back with nil MTRDevice"));
+
+                           self.doingCASEAttemptForDeviceMayBeReachable = NO;
 
                            if (error != nil) {
                                MTR_LOG_ERROR("%@ getSessionForNode error %@", self, error);
@@ -3759,11 +3768,19 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                     queue:(dispatch_queue_t)queue
                completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
 {
+    MTR_LOG("%@ downloadLogOfType: %lu, timeout: %f", self, static_cast<unsigned long>(type), timeout);
+
     auto * baseDevice = [self newBaseDevice];
+
+    mtr_weakify(self);
     [baseDevice downloadLogOfType:type
                           timeout:timeout
                             queue:queue
-                       completion:completion];
+                       completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+                           mtr_strongify(self);
+                           MTR_LOG("%@ downloadLogOfType %lu completed: %@", self, static_cast<unsigned long>(type), error);
+                           completion(url, error);
+                       }];
 }
 
 #pragma mark - Cache management
@@ -4836,7 +4853,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         std::lock_guard lock(self->_lock);
         // Use _ensureSubscriptionForExistingDelegates so that the subscriptions
         // will go through the pool as needed, not necessarily happen immediately.
-        [self _ensureSubscriptionForExistingDelegates:@"SPI client indicated the device may now be reachable"];
+        [self _ensureSubscriptionForExistingDelegates:sDeviceMayBeReachableReason];
     } errorHandler:nil];
 }
 

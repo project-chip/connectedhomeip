@@ -61,7 +61,7 @@ steps:
 logsBucket: matter-build-automation-build-logs
 
 # Global timeout for all steps
-timeout: 36000s
+timeout: 43200s
 queueTtl: 21600s
 
 artifacts:
