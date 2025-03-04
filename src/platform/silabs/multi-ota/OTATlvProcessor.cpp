@@ -31,14 +31,6 @@ using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
 
-typedef enum
-{
-    APPLICATION,
-    BOOTLOADER,
-    FACTORY_DATA,
-    WIFI_917_TA_M4_COMBINED,
-} OTAImageType;
-
 #if SL_MATTER_ENABLE_OTA_ENCRYPTION
 constexpr uint8_t au8Iv[] = { 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x00, 0x00, 0x00, 0x00 };
 #endif
