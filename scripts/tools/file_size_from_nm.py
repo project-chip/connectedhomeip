@@ -465,7 +465,6 @@ def build_treemap(
             total_sizes[next_value] = total_sizes.get(next_value, 0) + symbol.size
             partial = next_value
 
-
         # the name MUST be added
         data["name"].append(cxxfilt.demangle(symbol.name))
         data["id"].append(symbol.name)
