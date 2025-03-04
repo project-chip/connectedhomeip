@@ -25,9 +25,6 @@
 #include "Command.h"
 
 #include <TracingCommandLineArgument.h>
-#include <app/icd/client/CheckInHandler.h>
-#include <app/icd/client/DefaultCheckInDelegate.h>
-#include <app/icd/client/DefaultICDClientStorage.h>
 #include <commands/common/CredentialIssuerCommands.h>
 #include <commands/example/ExampleCredentialIssuerCommands.h>
 #include <credentials/GroupDataProviderImpl.h>
@@ -121,8 +118,6 @@ public:
         StopWaiting();
     }
 
-    static chip::app::DefaultICDClientStorage sICDClientStorage;
-
 protected:
     // Will be called in a setting in which it's safe to touch the CHIP
     // stack. The rules for Run() are as follows:
@@ -170,7 +165,6 @@ protected:
     static chip::Crypto::RawKeySessionKeystore sSessionKeystore;
 
     static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
-    static chip::app::CheckInHandler sCheckInHandler;
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();

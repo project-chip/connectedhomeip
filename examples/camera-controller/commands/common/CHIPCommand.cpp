@@ -18,8 +18,6 @@
 
 #include "CHIPCommand.h"
 
-#include "IcdManager.h"
-
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 #include <data-model-providers/codegen/Instance.h>
@@ -52,10 +50,6 @@ constexpr char kCDTrustStorePathVariable[]      = "CAMERACONTROLLER_CD_TRUST_STO
 
 const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore = nullptr;
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
-// All fabrics share the same ICD client storage.
-chip::app::DefaultICDClientStorage CHIPCommand::sICDClientStorage;
-chip::Crypto::RawKeySessionKeystore CHIPCommand::sSessionKeystore;
-chip::app::CheckInHandler CHIPCommand::sCheckInHandler;
 
 namespace {
 
@@ -109,19 +103,12 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     ReturnLogErrorOnFailure(mOperationalKeystore.Init(&mDefaultStorage));
     ReturnLogErrorOnFailure(mOpCertStore.Init(&mDefaultStorage));
 
-    // camera-controller uses a non-persistent keystore.
-    // ICD storage lifetime is currently tied to the camera-controller's lifetime. Since camera-controller interactive mode is
-    // currently used for ICD commissioning and check-in validation, this temporary storage meets the test requirements.
-    // TODO: Implement persistent ICD storage for the camera-controller.
-    ReturnLogErrorOnFailure(sICDClientStorage.Init(&mDefaultStorage, &sSessionKeystore));
-
     chip::Controller::FactoryInitParams factoryInitParams;
 
     factoryInitParams.fabricIndependentStorage = &mDefaultStorage;
     factoryInitParams.operationalKeystore      = &mOperationalKeystore;
     factoryInitParams.opCertStore              = &mOpCertStore;
     factoryInitParams.enableServerInteractions = NeedsOperationalAdvertising();
-    factoryInitParams.sessionKeystore          = &sSessionKeystore;
     factoryInitParams.dataModelProvider        = chip::app::CodegenDataModelProviderInstance(&mDefaultStorage);
 
     // Init group data provider that will be used for all group keys and IPKs for the
@@ -151,9 +138,6 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
 
     auto engine = chip::app::InteractionModelEngine::GetInstance();
     VerifyOrReturnError(engine != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnLogErrorOnFailure(IcdManager::Instance().Init(&sICDClientStorage, engine));
-    ReturnLogErrorOnFailure(sCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
-                                                 &sICDClientStorage, &IcdManager::Instance(), engine));
 
     CommissionerIdentity nullIdentity{ kIdentityNull, chip::kUndefinedNodeId };
     ReturnLogErrorOnFailure(InitializeCommissioner(nullIdentity, kIdentityNullFabricId));
@@ -512,8 +496,6 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
         ReturnLogErrorOnFailure(
             chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricIndex, defaultIpk, compressed_fabric_id_span));
     }
-
-    CHIPCommand::sICDClientStorage.UpdateFabricList(commissioner->GetFabricIndex());
 
     mCommissioners[identity] = std::move(commissioner);
 

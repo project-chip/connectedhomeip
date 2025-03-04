@@ -19,7 +19,6 @@
 #include "ModelCommand.h"
 
 #include <app/InteractionModelEngine.h>
-#include <app/icd/client/DefaultICDClientStorage.h>
 #include <inttypes.h>
 
 using namespace ::chip;
@@ -36,7 +35,6 @@ CHIP_ERROR ModelCommand::RunCommand()
     }
 
     ChipLogProgress(NotSpecified, "Sending command to node " ChipLogFormatX64, ChipLogValueX64(mDestinationId));
-    CheckPeerICDType();
 
     CommissioneeDeviceProxy * commissioneeDeviceProxy = nullptr;
     if (CHIP_NO_ERROR == CurrentCommissioner().GetDeviceBeingCommissioned(mDestinationId, &commissioneeDeviceProxy))
@@ -74,32 +72,4 @@ void ModelCommand::Shutdown()
     mOnDeviceConnectionFailureCallback.Cancel();
 
     CHIPCommand::Shutdown();
-}
-
-void ModelCommand::CheckPeerICDType()
-{
-    if (mIsPeerLIT.HasValue())
-    {
-        ChipLogProgress(NotSpecified, "Peer ICD type is set to %s", mIsPeerLIT.Value() == 1 ? "LIT-ICD" : "non LIT-ICD");
-        return;
-    }
-
-    app::ICDClientInfo info;
-    auto destinationPeerId = chip::ScopedNodeId(mDestinationId, CurrentCommissioner().GetFabricIndex());
-    auto iter              = CHIPCommand::sICDClientStorage.IterateICDClientInfo();
-    if (iter == nullptr)
-    {
-        return;
-    }
-    app::DefaultICDClientStorage::ICDClientInfoIteratorWrapper clientInfoIteratorWrapper(iter);
-
-    while (iter->Next(info))
-    {
-        if (ScopedNodeId(info.peer_node.GetNodeId(), info.peer_node.GetFabricIndex()) == destinationPeerId)
-        {
-            ChipLogProgress(NotSpecified, "Peer is a registered LIT ICD.");
-            mIsPeerLIT.SetValue(true);
-            return;
-        }
-    }
 }
