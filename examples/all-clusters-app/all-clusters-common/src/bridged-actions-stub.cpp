@@ -137,8 +137,10 @@ Status ActionsDelegateImpl::HandleDisableActionWithDuration(uint16_t actionId, u
 
 void emberAfActionsClusterInitCallback(EndpointId endpoint)
 {
-    VerifyOrReturn(endpoint == 1);
-    VerifyOrDie(emberAfContainsServer(endpoint, Actions::Id));
+    VerifyOrReturn(endpoint == 1,
+                   ChipLogError(Zcl, "Actions cluster delegate is not implemented for endpoint with id %d.", endpoint));
+    VerifyOrReturn(emberAfContainsServer(endpoint, Actions::Id) == true,
+                   ChipLogError(Zcl, "Endpoint %d does not support Actions cluster.", endpoint));
     VerifyOrReturn(!sActionsDelegateImpl && !sActionsServer);
 
     sActionsDelegateImpl = std::make_unique<Actions::ActionsDelegateImpl>();
