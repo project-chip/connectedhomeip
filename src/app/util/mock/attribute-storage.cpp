@@ -393,6 +393,7 @@ unsigned emberAfMetadataStructureGeneration()
     return metadataStructureGeneration;
 }
 
+namespace chip {
 namespace Test {
 
 void ResetVersion()
