@@ -114,6 +114,7 @@ CHIP_ERROR WindowCovering::ChefDelegate::HandleMovement(WindowCoveringType type)
 
         return CHIP_NO_ERROR;
     }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WindowCovering::ChefDelegate::HandleStopMotion()
