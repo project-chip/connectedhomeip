@@ -168,6 +168,14 @@ JNI_METHOD(void, disconnect)
 JNI_METHOD(jstring, getConnectionStateNative)
 (JNIEnv * env, jobject thiz)
 {
+    if (NULL == env)
+    {
+        jobject err_jstr = nullptr;
+        LogErrorOnFailure(
+            chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString("JNIEnv interface is NULL"), err_jstr));
+        return static_cast<jstring>(err_jstr);
+    }
+
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::getConnectionState()");
 
@@ -186,7 +194,10 @@ JNI_METHOD(jstring, getConnectionStateNative)
     default: {
         char error_str[50];
         snprintf(error_str, sizeof(error_str), "Unsupported Connection State: %d", state);
-        return env->NewStringUTF(error_str);
+
+        jobject err_jstr = nullptr;
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString(error_str), err_jstr));
+        return static_cast<jstring>(err_jstr);
     }
     }
 }

@@ -30,9 +30,15 @@ import java.util.List;
  */
 public interface CastingPlayer {
 
+  /** @brief CastingPlayer's Conenction State */
   public enum ConnectionState {
+    /** State when CastingPlayer is not connected */
     NOT_CONNECTED,
+
+    /** State when CastingPlayer is attempting to connect */
     CONNECTING,
+
+    /** State when CastingPlayer is connnected */
     CONNECTED,
   }
 
@@ -161,10 +167,14 @@ public interface CastingPlayer {
   void disconnect();
 
   /**
-   * @return true if this CastingPlayer is still pending pass code from user and therefore is not
-   *     ready
+   * @brief Get CastingPlayer's current ConnectionState.
+   * @return Current ConnectionState.
    */
   ConnectionState getConnectionState();
 
+  /**
+   * @brief Get the Current ConnectionState of a CastingPlayer from the native layer.
+   * @returns A String representation of the CastingPlayer's current connectation.
+   */
   String getConnectionStateNative();
 }
