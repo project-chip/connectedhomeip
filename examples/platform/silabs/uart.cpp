@@ -219,13 +219,16 @@ static bool InitFifo(Fifo_t * fifo, uint8_t * pDataBuffer, uint16_t bufferSize)
 static uint16_t AvailableDataCount(Fifo_t * fifo)
 {
     uint16_t size = 0;
+    CORE_DECLARE_IRQ_STATE;
 
+    CORE_ENTER_ATOMIC();
     // if equal there is no data return 0 directly
     if (fifo->Tail != fifo->Head)
     {
         // determine if a wrap around occurred to get the right data size avalaible.
         size = (fifo->Tail < fifo->Head) ? (fifo->MaxSize - fifo->Head + fifo->Tail) : (fifo->Tail - fifo->Head);
     }
+    CORE_EXIT_ATOMIC();
 
     return size;
 }
@@ -249,10 +252,12 @@ static void WriteToFifo(Fifo_t * fifo, uint8_t * pDataToWrite, uint16_t SizeToWr
     VerifyOrDie(fifo != nullptr);
     VerifyOrDie(pDataToWrite != nullptr);
     VerifyOrDie(SizeToWrite <= fifo->MaxSize);
+    CORE_DECLARE_IRQ_STATE;
 
     // Overwrite is not allowed
     if (RemainingSpace(fifo) >= SizeToWrite)
     {
+        CORE_ENTER_ATOMIC();
         uint16_t nBytesBeforWrap = (fifo->MaxSize - fifo->Tail);
         if (SizeToWrite > nBytesBeforWrap)
         {
@@ -267,6 +272,7 @@ static void WriteToFifo(Fifo_t * fifo, uint8_t * pDataToWrite, uint16_t SizeToWr
         }
 
         fifo->Tail = (fifo->Tail + SizeToWrite) % fifo->MaxSize; // increment tail with wraparound
+        CORE_EXIT_ATOMIC();
     }
 }
 
@@ -280,8 +286,11 @@ static uint16_t RetrieveFromFifo(Fifo_t * fifo, uint8_t * pData, uint16_t SizeTo
     VerifyOrDie(fifo != nullptr);
     VerifyOrDie(pData != nullptr);
     VerifyOrDie(SizeToRead <= fifo->MaxSize);
+    CORE_DECLARE_IRQ_STATE;
 
     uint16_t ReadSize        = std::min(SizeToRead, AvailableDataCount(fifo));
+
+    CORE_ENTER_ATOMIC();
     uint16_t nBytesBeforWrap = (fifo->MaxSize - fifo->Head);
 
     if (ReadSize > nBytesBeforWrap)
@@ -295,6 +304,7 @@ static uint16_t RetrieveFromFifo(Fifo_t * fifo, uint8_t * pData, uint16_t SizeTo
     }
 
     fifo->Head = (fifo->Head + ReadSize) % fifo->MaxSize; // increment tail with wraparound
+    CORE_EXIT_ATOMIC();
 
     return ReadSize;
 }
