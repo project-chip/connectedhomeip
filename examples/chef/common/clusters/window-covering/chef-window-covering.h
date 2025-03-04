@@ -67,3 +67,5 @@ protected:
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+void InitChefWindowCoveringCluster();
