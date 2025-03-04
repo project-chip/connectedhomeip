@@ -3738,6 +3738,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, specificationVersion);
     case Attributes::MaxPathsPerInvoke::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, maxPathsPerInvoke);
+    case Attributes::DeviceLocation::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, deviceLocation);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
