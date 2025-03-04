@@ -45,9 +45,7 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 // The role argument should be used to determine whether cluster works as a server or a client.
 // It can be assigned with the ZAP_CLUSTER_MASK(SERVER) or ZAP_CLUSTER_MASK(CLUSTER) values.
 #define DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, role, incomingCommands, outgoingCommands)                                 \
-    {                                                                                                                              \
-        clusterId, clusterAttrs, MATTER_ARRAY_SIZE(clusterAttrs), 0, role, NULL, incomingCommands, outgoingCommands                \
-    }
+    { clusterId, clusterAttrs, MATTER_ARRAY_SIZE(clusterAttrs), 0, role, NULL, incomingCommands, outgoingCommands }
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_END }
 
@@ -66,9 +64,7 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 // * Nullable attributes (have X in the quality column in the spec) must have MATTER_ATTRIBUTE_FLAG_NULLABLE
 // * Attributes that have T in the Access column in the spec must have MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE
 #define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \
-    {                                                                                                                              \
-        ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType), attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)               \
-    }
+    { ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType), attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) }
 
 /**
  * @brief locate attribute metadata
@@ -325,36 +321,6 @@ unsigned emberAfMetadataStructureGeneration();
 
 namespace chip {
 namespace app {
-
-class EnabledEndpointsWithServerCluster
-{
-public:
-    EnabledEndpointsWithServerCluster(ClusterId clusterId);
-
-    // Instead of having a separate Iterator class, optimize for codesize by
-    // just reusing ourselves as our own iterator.  We could do a bit better
-    // here with C++17 and using a different type for the end iterator, but this
-    // is the best I've found with C++14 so far.
-    //
-    // This does mean that you can only iterate a given
-    // EnabledEndpointsWithServerCluster once, but that's OK given how we use it
-    // in practice.
-    EnabledEndpointsWithServerCluster & begin() { return *this; }
-    const EnabledEndpointsWithServerCluster & end() const { return *this; }
-
-    bool operator!=(const EnabledEndpointsWithServerCluster & other) const { return mEndpointIndex != mEndpointCount; }
-
-    EnabledEndpointsWithServerCluster & operator++();
-
-    EndpointId operator*() const;
-
-private:
-    void EnsureMatchingEndpoint();
-
-    uint16_t mEndpointIndex = 0;
-    uint16_t mEndpointCount = 0;
-    ClusterId mClusterId;
-};
 
 /**
  * @brief Sets the parent endpoint for a given endpoint

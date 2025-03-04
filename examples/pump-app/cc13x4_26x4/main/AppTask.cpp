@@ -714,15 +714,19 @@ void AppTask::UpdateCluster(intptr_t context)
 
 void AppTask::PostEvents(intptr_t context)
 {
+    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(PumpConfigurationAndControl::Id,
+                                                                                              endpointsList);
+
     // Example on posting events - here we post the general fault event on endpoints with PCC Server enabled
-    for (auto endpoint : EnabledEndpointsWithServerCluster(PumpConfigurationAndControl::Id))
+    for (auto endpoint : endpointsList.TakeBuffer())
     {
         PumpConfigurationAndControl::Events::GeneralFault::Type event;
         EventNumber eventNumber;
 
         ChipLogProgress(Zcl, "AppTask: Post PCC GeneralFault event");
         // Using default priority for the event
-        if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+        if (CHIP_NO_ERROR != LogEvent(event, endpoint.id, eventNumber))
         {
             ChipLogError(Zcl, "AppTask: Failed to record GeneralFault event");
         }

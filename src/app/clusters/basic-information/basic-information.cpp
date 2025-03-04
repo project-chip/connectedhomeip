@@ -24,7 +24,6 @@
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SpecificationDefinedRevisions.h>
-#include <app/util/attribute-storage.h>
 #include <lib/core/CHIPConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
@@ -417,13 +416,21 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
         // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
         ChipLogDetail(Zcl, "Emitting StartUp event");
 
-        for (auto endpoint : EnabledEndpointsWithServerCluster(BasicInformation::Id))
+        DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+        CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
+            BasicInformation::Id, endpointsList);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to get endpoints with BasicInformation cluster: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+
+        for (auto endpoint : endpointsList.TakeBuffer())
         {
             // If Basic cluster is implemented on this endpoint
             Events::StartUp::Type event{ softwareVersion };
             EventNumber eventNumber;
 
-            CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
+            err = LogEvent(event, endpoint.id, eventNumber);
             if (CHIP_NO_ERROR != err)
             {
                 ChipLogError(Zcl, "Failed to emit StartUp event: %" CHIP_ERROR_FORMAT, err.Format());
@@ -437,13 +444,21 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
         // The ShutDown event SHOULD be emitted on a best-effort basis by a Node prior to any orderly shutdown sequence.
         ChipLogDetail(Zcl, "Emitting ShutDown event");
 
-        for (auto endpoint : EnabledEndpointsWithServerCluster(BasicInformation::Id))
+        DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+        CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
+            BasicInformation::Id, endpointsList);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to get endpoints with BasicInformation cluster: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+
+        for (auto endpoint : endpointsList.TakeBuffer())
         {
             // If Basic cluster is implemented on this endpoint
             Events::ShutDown::Type event;
             EventNumber eventNumber;
 
-            CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
+            err = LogEvent(event, endpoint.id, eventNumber);
             if (CHIP_NO_ERROR != err)
             {
                 ChipLogError(Zcl, "Failed to emit ShutDown event: %" CHIP_ERROR_FORMAT, err.Format());

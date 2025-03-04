@@ -32,9 +32,9 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/EventLogging.h>
+#include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
-#include <app/util/attribute-storage.h>
 #include <lib/support/ScopedBuffer.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -84,9 +84,12 @@ bool IsByteSpanAllZeros(const ByteSpan & byteSpan)
 
 void ReportAttributeOnAllEndpoints(AttributeId attribute)
 {
-    for (auto endpoint : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
+    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(GeneralDiagnostics::Id,
+                                                                                              endpointsList);
+    for (auto endpoint : endpointsList.TakeBuffer())
     {
-        MatterReportingAttributeChangeCallback(endpoint, GeneralDiagnostics::Id, attribute);
+        MatterReportingAttributeChangeCallback(endpoint.id, GeneralDiagnostics::Id, attribute);
     }
 }
 
@@ -415,13 +418,15 @@ void GeneralDiagnosticsServer::OnDeviceReboot(BootReasonEnum bootReason)
 
     ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::BootReason::Id);
 
-    // GeneralDiagnostics cluster should exist only for endpoint 0.
-    if (emberAfContainsServer(0, GeneralDiagnostics::Id))
+    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(GeneralDiagnostics::Id,
+                                                                                              endpointsList);
+    for (auto endpoint : endpointsList.TakeBuffer())
     {
         Events::BootReason::Type event{ bootReason };
         EventNumber eventNumber;
 
-        CHIP_ERROR err = LogEvent(event, 0, eventNumber);
+        CHIP_ERROR err = LogEvent(event, endpoint.id, eventNumber);
         if (CHIP_NO_ERROR != err)
         {
             ChipLogError(Zcl, "GeneralDiagnostics: Failed to record BootReason event: %" CHIP_ERROR_FORMAT, err.Format());
@@ -435,10 +440,13 @@ void GeneralDiagnosticsServer::OnHardwareFaultsDetect(const GeneralFaults<kMaxHa
 {
     ChipLogDetail(Zcl, "GeneralDiagnostics: OnHardwareFaultsDetect");
 
-    for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
+    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(GeneralDiagnostics::Id,
+                                                                                              endpointsList);
+    for (auto endpoint : endpointsList.TakeBuffer())
     {
         // If General Diagnostics cluster is implemented on this endpoint
-        MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+        MatterReportingAttributeChangeCallback(endpoint.id, GeneralDiagnostics::Id,
                                                GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id);
 
         // Record HardwareFault event
@@ -449,7 +457,7 @@ void GeneralDiagnosticsServer::OnHardwareFaultsDetect(const GeneralFaults<kMaxHa
                                                               previous.size());
         Events::HardwareFaultChange::Type event{ currentList, previousList };
 
-        if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
+        if (CHIP_NO_ERROR != LogEvent(event, endpoint.id, eventNumber))
         {
             ChipLogError(Zcl, "GeneralDiagnostics: Failed to record HardwareFault event");
         }
@@ -462,10 +470,13 @@ void GeneralDiagnosticsServer::OnRadioFaultsDetect(const GeneralFaults<kMaxRadio
 {
     ChipLogDetail(Zcl, "GeneralDiagnostics: OnRadioFaultsDetect");
 
-    for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
+    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(GeneralDiagnostics::Id,
+                                                                                              endpointsList);
+    for (auto endpoint : endpointsList.TakeBuffer())
     {
         // If General Diagnostics cluster is implemented on this endpoint
-        MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+        MatterReportingAttributeChangeCallback(endpoint.id, GeneralDiagnostics::Id,
                                                GeneralDiagnostics::Attributes::ActiveRadioFaults::Id);
 
         // Record RadioFault event
@@ -475,7 +486,7 @@ void GeneralDiagnosticsServer::OnRadioFaultsDetect(const GeneralFaults<kMaxRadio
                                                            previous.size());
         Events::RadioFaultChange::Type event{ currentList, previousList };
 
-        if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
+        if (CHIP_NO_ERROR != LogEvent(event, endpoint.id, eventNumber))
         {
             ChipLogError(Zcl, "GeneralDiagnostics: Failed to record RadioFault event");
         }
@@ -488,10 +499,13 @@ void GeneralDiagnosticsServer::OnNetworkFaultsDetect(const GeneralFaults<kMaxNet
 {
     ChipLogDetail(Zcl, "GeneralDiagnostics: OnNetworkFaultsDetect");
 
-    for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
+    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(GeneralDiagnostics::Id,
+                                                                                              endpointsList);
+    for (auto endpoint : endpointsList.TakeBuffer())
     {
         // If General Diagnostics cluster is implemented on this endpoint
-        MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+        MatterReportingAttributeChangeCallback(endpoint.id, GeneralDiagnostics::Id,
                                                GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id);
 
         // Record NetworkFault event
@@ -502,7 +516,7 @@ void GeneralDiagnosticsServer::OnNetworkFaultsDetect(const GeneralFaults<kMaxNet
                                                              previous.size());
         Events::NetworkFaultChange::Type event{ currentList, previousList };
 
-        if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
+        if (CHIP_NO_ERROR != LogEvent(event, endpoint.id, eventNumber))
         {
             ChipLogError(Zcl, "GeneralDiagnostics: Failed to record NetworkFault event");
         }

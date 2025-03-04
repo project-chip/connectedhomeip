@@ -25,10 +25,9 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/InteractionModelEngine.h>
 #include <app/server/Server.h>
-#include <app/util/attribute-storage.h>
 #include <credentials/FabricTable.h>
-#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceInfoProvider.h>
 #include <platform/PlatformManager.h>
@@ -210,12 +209,21 @@ public:
             DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
             if (provider)
             {
-                for (auto endpoint : EnabledEndpointsWithServerCluster(UserLabel::Id))
+                // Find all endpoints that have UserLabel implemented
+                DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+                CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
+                    UserLabel::Id, endpointsList);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Failed to get endpoints with UserLabel cluster: %" CHIP_ERROR_FORMAT, err.Format());
+                }
+
+                for (auto endpoint : endpointsList.TakeBuffer())
                 {
                     // If UserLabel cluster is implemented on this endpoint
-                    if (CHIP_NO_ERROR != provider->ClearUserLabelList(endpoint))
+                    if (CHIP_NO_ERROR != provider->ClearUserLabelList(endpoint.id))
                     {
-                        ChipLogError(Zcl, "UserLabel::Failed to clear UserLabelList for endpoint:%d", endpoint);
+                        ChipLogError(Zcl, "UserLabel::Failed to clear UserLabelList for endpoint:%d", endpoint.id);
                     }
                 }
             }

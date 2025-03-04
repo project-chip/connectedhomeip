@@ -27,7 +27,7 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
-#include <app/util/attribute-storage.h>
+#include <app/InteractionModelEngine.h>
 #include <lib/core/Optional.h>
 #include <tracing/macros.h>
 #include <tracing/metric_event.h>
@@ -298,13 +298,17 @@ void WiFiDiagnosticsServer::OnDisconnectionDetected(uint16_t reasonCode)
     MATTER_TRACE_SCOPE("OnDisconnectionDetected", "WiFiDiagnosticsDelegate");
     ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnDisconnectionDetected");
 
-    for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
+    // Find all endpoints that have WiFiNetworkDiagnostics implemented
+    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(WiFiNetworkDiagnostics::Id,
+                                                                                              endpointsList);
+    for (auto endpoint : endpointsList.TakeBuffer())
     {
         // If Wi-Fi Network Diagnostics cluster is implemented on this endpoint
         Events::Disconnection::Type event{ reasonCode };
         EventNumber eventNumber;
 
-        if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+        if (CHIP_NO_ERROR != LogEvent(event, endpoint.id, eventNumber))
         {
             ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record Disconnection event");
         }
@@ -318,12 +322,16 @@ void WiFiDiagnosticsServer::OnAssociationFailureDetected(uint8_t associationFail
 
     Events::AssociationFailure::Type event{ static_cast<AssociationFailureCauseEnum>(associationFailureCause), status };
 
-    for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
+    // Find all endpoints that have WiFiNetworkDiagnostics implemented
+    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(WiFiNetworkDiagnostics::Id,
+                                                                                              endpointsList);
+    for (auto endpoint : endpointsList.TakeBuffer())
     {
         // If Wi-Fi Network Diagnostics cluster is implemented on this endpoint
         EventNumber eventNumber;
 
-        if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+        if (CHIP_NO_ERROR != LogEvent(event, endpoint.id, eventNumber))
         {
             ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record AssociationFailure event");
         }
@@ -336,12 +344,16 @@ void WiFiDiagnosticsServer::OnConnectionStatusChanged(uint8_t connectionStatus)
     ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnConnectionStatusChanged");
 
     Events::ConnectionStatus::Type event{ static_cast<ConnectionStatusEnum>(connectionStatus) };
-    for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
+    // Find all endpoints that have WiFiNetworkDiagnostics implemented
+    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(WiFiNetworkDiagnostics::Id,
+                                                                                              endpointsList);
+    for (auto endpoint : endpointsList.TakeBuffer())
     {
         // If Wi-Fi Network Diagnostics cluster is implemented on this endpoint
         EventNumber eventNumber;
 
-        if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+        if (CHIP_NO_ERROR != LogEvent(event, endpoint.id, eventNumber))
         {
             ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record ConnectionStatus event");
         }
