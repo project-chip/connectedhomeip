@@ -873,10 +873,13 @@ def main(
     symbols, separator = fetch_symbols(elf_file, __FETCH_STYLES__[fetch_via], glob_filter)
     title = elf_file
 
+    if glob_filter:
+        title += f" FILTER {glob_filter}"
+
     if diff:
         diff_symbols, _ = fetch_symbols(diff, __FETCH_STYLES__[fetch_via], glob_filter)
         symbols = compute_symbol_diff(symbols, diff_symbols)
-        title = f"{elf_file} COMPARED TO {diff}"
+        title += f" COMPARED TO {diff}"
 
     build_treemap(
         title, symbols, separator, __CHART_STYLES__[display_type], __COLOR_SCALES__[color], max_depth, zoom, strip
