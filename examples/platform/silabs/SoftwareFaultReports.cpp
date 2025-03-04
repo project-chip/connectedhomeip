@@ -57,8 +57,10 @@ namespace Silabs {
 void OnSoftwareFaultEventHandler(const char * faultRecordString)
 {
 #ifdef MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
-    EnabledEndpointsWithServerCluster enabledEndpoints(SoftwareDiagnostics::Id);
-    VerifyOrReturn(enabledEndpoints.begin() != enabledEndpoints.end());
+    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(SoftwareDiagnostics::Id,
+                                                                                              endpointsList);
+    VerifyOrReturn(endpointsList.Size() > 0);
 
     TaskStatus_t taskDetails;
     TaskHandle_t taskHandle = xTaskGetCurrentTaskHandle();

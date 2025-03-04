@@ -19,11 +19,11 @@
 #include "LightingAppCommandDelegate.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
-#include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
 
 #include <string>
@@ -155,9 +155,9 @@ exit:
 
 bool LightingAppCommandHandler::IsClusterPresentOnAnyEndpoint(ClusterId clusterId)
 {
-    EnabledEndpointsWithServerCluster enabledEndpoints(clusterId);
-
-    return (enabledEndpoints.begin() != enabledEndpoints.end());
+    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(clusterId, endpointsList);
+    return endpointsList.Size() > 0;
 }
 
 void LightingAppCommandHandler::OnRebootSignalHandler(BootReasonType bootReason)
