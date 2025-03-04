@@ -46,6 +46,31 @@ ReadOnlyBuffer<AttributeEntry> ProviderMetadataTree::AttributesIgnoreError(const
     return builder.TakeBuffer();
 }
 
+CHIP_ERROR ProviderMetadataTree::EndpointsWithServerCluster(ClusterId clusterId,
+                                                            DataModel::ListBuilder<DataModel::EndpointEntry> & out)
+{
+    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsListBuilder;
+    ReturnErrorOnFailure(Endpoints(endpointsListBuilder));
+    ReturnErrorOnFailure(out.EnsureAppendCapacity(endpointsListBuilder.Size()));
+
+    auto endpoints = endpointsListBuilder.TakeBuffer();
+    for (auto endpoint : endpoints)
+    {
+        DataModel::ListBuilder<DataModel::ServerClusterEntry> clustersListBuilder;
+        ReturnErrorOnFailure(ServerClusters(endpoint.id, clustersListBuilder));
+
+        auto clusters = clustersListBuilder.TakeBuffer();
+        for (auto cluster : clusters)
+        {
+            if (cluster.clusterId == clusterId)
+            {
+                ReturnErrorOnFailure(out.Append(endpoint));
+            }
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
 } // namespace DataModel
 } // namespace app
 } // namespace chip
