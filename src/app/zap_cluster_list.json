@@ -323,7 +323,9 @@
         "WAKE_ON_LAN_CLUSTER": ["wake-on-lan-server"],
         "LAUNDRY_WASHER_CONTROLS_CLUSTER": ["laundry-washer-controls-server"],
         "LAUNDRY_DRYER_CONTROLS_CLUSTER": ["laundry-dryer-controls-server"],
-        "WEB_RTC_TRANSPORT_PROVIDER_CLUSTER": [],
+        "WEB_RTC_TRANSPORT_PROVIDER_CLUSTER": [
+            "webrtc-transport-provider-server"
+        ],
         "WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER": [],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": ["wifi-network-diagnostics-server"],
         "WIFI_NETWORK_MANAGEMENT_CLUSTER": ["wifi-network-management-server"],
