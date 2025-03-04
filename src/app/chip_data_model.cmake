@@ -39,13 +39,9 @@ endfunction()
 #
 # Configure ${APP_TARGET} with source files associated with clusters enabled in the ${ZAP_FILE}
 #
-function(chip_configure_zap_file APP_TARGET ZAP_FILE EXTERNAL_CLUSTERS)
+function(chip_configure_zap_file APP_TARGET ZAP_FILE)
     find_package(Python3 REQUIRED)
     set(args --zap_file ${ZAP_FILE})
-
-    if(EXTERNAL_CLUSTERS)
-        list(APPEND args --external-clusters ${EXTERNAL_CLUSTERS})
-    endif()
 
     execute_process(
         COMMAND ${Python3_EXECUTABLE} ${CHIP_APP_BASE_DIR}/zap_cluster_list.py ${args}
@@ -74,13 +70,10 @@ endfunction()
 # supported by the application.
 # IDL               .matter IDL file to use for codegen. Inferred from ZAP_FILE
 # if not provided
-# EXTERNAL_CLUSTERS Clusters with external implementations. The default implementations
-# will not be used nor required for these clusters.
-# Format: MY_CUSTOM_CLUSTER'.
 #
 function(chip_configure_data_model APP_TARGET)
     set(SCOPE PRIVATE)
-    cmake_parse_arguments(ARG "" "SCOPE;ZAP_FILE;IDL" "EXTERNAL_CLUSTERS" ${ARGN})
+    cmake_parse_arguments(ARG "" "SCOPE;ZAP_FILE;IDL" "" ${ARGN})
 
     if(ARG_SCOPE)
         set(SCOPE ${ARG_SCOPE})
@@ -104,7 +97,7 @@ function(chip_configure_data_model APP_TARGET)
     )
 
     if(ARG_ZAP_FILE)
-        chip_configure_zap_file(${APP_TARGET} ${ARG_ZAP_FILE} "${ARG_EXTERNAL_CLUSTERS}")
+        chip_configure_zap_file(${APP_TARGET} ${ARG_ZAP_FILE})
 
         if(NOT ARG_IDL)
             string(REPLACE ".zap" ".matter" ARG_IDL ${ARG_ZAP_FILE})

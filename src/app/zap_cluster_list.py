@@ -21,18 +21,14 @@ def get_cluster_sources(clusters: typing.Set[str],
     cluster_sources: typing.Set[str] = set()
 
     for cluster in clusters:
-        if cluster not in source_map:
-            raise ValueError("Unhandled %s cluster: %s"
-                             " (hint: add to src/app/zap_cluster_list.json)" % (side, cluster))
-
-        cluster_sources.update(source_map[cluster])
+        if cluster in source_map:
+            cluster_sources.update(source_map[cluster])
 
     return cluster_sources
 
 
 def dump_zapfile_clusters(zap_file_path: pathlib.Path,
-                          implementation_data_path: pathlib.Path,
-                          external_clusters: typing.List[str]):
+                          implementation_data_path: pathlib.Path):
     """Prints all of the source directories to build for a given ZAP file.
 
     Arguments:
@@ -58,8 +54,6 @@ def dump_zapfile_clusters(zap_file_path: pathlib.Path,
 
         for endpoint_type in zap_json.get('endpointTypes'):
             for cluster in endpoint_type.get('clusters'):
-                if cluster.get('define') in external_clusters:
-                    continue
                 side: str = cluster.get('side')
                 if side == 'client':
                     clusters_set = client_clusters
@@ -94,17 +88,10 @@ def main():
                         required=False,
                         type=pathlib.Path,
                         default=os.path.join(os.path.dirname(__file__), "zap_cluster_list.json"))
-    parser.add_argument('--external-clusters',
-                        help='Clusters with external implementations. ' +
-                             'The default implementations will not be used nor required for these clusters. ' +
-                             'Format: MY_CUSTOM_CLUSTER',
-                        nargs='+',
-                        metavar='EXTERNAL_CLUSTER',
-                        default=[])
 
     args = parser.parse_args()
 
-    dump_zapfile_clusters(args.zap_file, args.cluster_implementation_data, args.external_clusters)
+    dump_zapfile_clusters(args.zap_file, args.cluster_implementation_data)
 
     sys.exit(0)
 

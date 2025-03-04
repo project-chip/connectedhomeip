@@ -171,7 +171,6 @@ template("chip_data_model") {
                            [
                              "zap_file",
                              "is_server",
-                             "external_clusters",
                            ])
 
     if (!defined(sources)) {
@@ -221,10 +220,7 @@ template("chip_data_model") {
         "--zap_file",
         _zap_file,
       ]
-      if (defined(invoker.external_clusters)) {
-        _script_args += [ "--external-clusters" ]
-        _script_args += invoker.external_clusters
-      }
+
       _cluster_sources = exec_script("${_app_root}/zap_cluster_list.py",
                                      _script_args,
                                      "list lines",
