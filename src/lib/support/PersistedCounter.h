@@ -240,6 +240,11 @@ private:
         }
         else
         {
+            // clang-tidy claims that we're returning without writing to 'aStartValue',
+            // assign 0 to supppress the warning. In case of error, the value wont't be
+            // used anyway.
+            aStartValue = 0;
+
             // TODO: Figure out how to avoid a bootloop here.  Maybe we should just
             // init to 0?  Or a random value?
             ReturnErrorOnFailure(err);
