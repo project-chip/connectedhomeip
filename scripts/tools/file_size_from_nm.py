@@ -41,6 +41,7 @@
 #    pandas
 #    plotly
 
+import fnmatch
 import logging
 import re
 import subprocess
@@ -718,14 +719,18 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
     return symbols
 
 
-def fetch_symbols(elf_file: str, fetch: FetchStyle) -> Tuple[list[Symbol], str]:
+def fetch_symbols(elf_file: str, fetch: FetchStyle, glob_filter: Optional[str]) -> Tuple[list[Symbol], str]:
     """Returns the sumbol list and the separator used to split symbols
     """
     match fetch:
         case FetchStyle.NM:
-            return symbols_from_nm(elf_file), "::"
+            symbols, separator = symbols_from_nm(elf_file), "::"
         case FetchStyle.OBJDUMP:
-            return symbols_from_objdump(elf_file), '/'
+            symbols, separator = symbols_from_objdump(elf_file), '/'
+    if glob_filter is not None:
+        symbols = [s for s in symbols if fnmatch.fnmatch(s.name, glob_filter)]
+
+    return symbols, separator
 
 
 def list_id(tree_path: list[str]) -> str:
@@ -834,6 +839,11 @@ def compute_symbol_diff(orig: list[Symbol], base: list[Symbol]) -> list[Symbol]:
     help="Zoom in the graph to ONLY the specified path as root (e.g. ::chip::app)",
 )
 @click.option(
+    "--glob-filter",
+    default=None,
+    help="Glob filter by name",
+)
+@click.option(
     "--strip",
     default=None,
     help="Strip out a tree subset (e.g. ::C)",
@@ -855,15 +865,16 @@ def main(
     zoom: Optional[str],
     strip: Optional[str],
     diff: Optional[str],
+    glob_filter: Optional[str],
 ):
     log_fmt = "%(asctime)s %(levelname)-7s %(message)s"
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
-    symbols, separator = fetch_symbols(elf_file, __FETCH_STYLES__[fetch_via])
+    symbols, separator = fetch_symbols(elf_file, __FETCH_STYLES__[fetch_via], glob_filter)
     title = elf_file
 
     if diff:
-        diff_symbols, _ = fetch_symbols(diff, __FETCH_STYLES__[fetch_via])
+        diff_symbols, _ = fetch_symbols(diff, __FETCH_STYLES__[fetch_via], glob_filter)
         symbols = compute_symbol_diff(symbols, diff_symbols)
         title = f"{elf_file} COMPARED TO {diff}"
 
