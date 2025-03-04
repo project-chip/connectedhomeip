@@ -1,0 +1,91 @@
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: X.2.2. [TC-ET-2.2] Commands with Server as DUT
+
+PICS:
+  - ET.S
+
+config:
+  nodeId: 0x12344321
+  cluster: "Energy Tariff"
+  endpoint: 1
+  TEST_EVENT_TRIGGER_KEY:
+    type: octet_string
+    defaultValue: "hex:00112233445566778899aabbccddeeff"
+  TEST_EVENT_TRIGGER_ATTRIBUTES_VALUE_UPDATE:
+    type: int64u
+    defaultValue: "0x0700000000000000"
+  TEST_EVENT_TRIGGER_TEST_EVENT_CLEAR:
+    type: int64u
+    defaultValue: "0x0700000000000001"
+
+tests:
+  - label: "Step 1: Commission DUT to TH"
+    cluster: "DelayCommands"
+    command: "WaitForCommissionee"
+    arguments:
+      values:
+        - name: "nodeId"
+          value: nodeId
+
+  - label: "Step 2: TH sends command GetTariffComponent command with TariffComponentID field set to 0."
+    command: "GetTariffComponent"
+    arguments:
+      values:
+        - name: "TariffComponentID"
+          value: 0
+    response:
+      values:
+        - name: "Label"
+          constraints:
+            type: char_string
+            maxLength: 128
+        - name: "CalendarTransitionIDs"
+          constraints:
+            type: list
+            minLength: 1
+        - name: "TariffComponent"
+          constraints:
+            type: "TariffComponentStruct"
+
+  - label: "Step 3: TH sends command GetTariffComponent command with TariffComponentID field set to 0."
+    command: "GetTariffComponent"
+    arguments:
+      values:
+        - name: "TariffComponentID"
+          value: 100
+    response:
+      error: NOT_FOUND
+
+  - label: "Step 4: TH sends command GetCalendarTransition command with CalendarTransitionID field set to 0."
+    command: "GetCalendarTransition"
+    arguments:
+      values:
+        - name: "CalendarTransitionID"
+          value: 0
+    response:
+      values:
+        - name: "Transition"
+          constraints:
+            type: "CalendarTransitionStruct"
+
+  - label: "Step 5: TH sends command GetCalendarTransition command with CalendarTransitionID field set to 0."
+    command: "GetCalendarTransition"
+    arguments:
+      values:
+        - name: "CalendarTransitionID"
+          value: 100
+    response:
+      error: NOT_FOUND
