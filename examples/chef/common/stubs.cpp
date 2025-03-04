@@ -82,7 +82,7 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[]   
 #endif // MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
 
 #ifdef MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
-#include "window-coveering/window-covering.h"
+#include "window-coveering/chef-window-covering.h"
 #endif // MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
 
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
