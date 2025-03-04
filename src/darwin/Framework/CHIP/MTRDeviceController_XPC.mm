@@ -54,7 +54,10 @@ NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey 
 
 // #define MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 
-@implementation MTRDeviceController_XPC
+@implementation MTRDeviceController_XPC {
+    // Protects access to the data set in controllerConfigurationUpdated:
+    os_unfair_lock _configurationLock;
+}
 
 #pragma mark - Node ID Management
 
@@ -119,8 +122,20 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
 }
 
 #pragma mark - XPC
+
 @synthesize controllerNodeID = _controllerNodeID;
+- (nullable NSNumber *)controllerNodeID
+{
+    std::lock_guard lock(_configurationLock);
+    return _controllerNodeID;
+}
+
 @synthesize compressedFabricID = _compressedFabricID;
+- (nullable NSNumber *)compressedFabricID
+{
+    std::lock_guard lock(_configurationLock);
+    return _compressedFabricID;
+}
 
 + (NSMutableSet *)_allowedClasses
 {
@@ -345,6 +360,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
         self.uniqueIdentifier = UUID;
         self.xpcParameters = xpcParameters;
         _workQueue = dispatch_queue_create("MTRDeviceController_XPC_queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        _configurationLock = OS_UNFAIR_LOCK_INIT;
 
         if (![self _setupXPCConnection]) {
             return nil;
@@ -490,6 +506,8 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
 
     NSDictionary * controllerContext = MTR_SAFE_CAST(configuration[MTRDeviceControllerRegistrationControllerContextKey], NSDictionary);
     if (controllerContext) {
+        std::lock_guard lock(_configurationLock);
+
         NSNumber * controllerNodeID = MTR_SAFE_CAST(controllerContext[MTRDeviceControllerRegistrationControllerNodeIDKey], NSNumber);
         if (controllerNodeID) {
             _controllerNodeID = controllerNodeID;
