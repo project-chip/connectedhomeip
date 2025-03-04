@@ -29,13 +29,13 @@ void InitChefWindowCoveringCluster()
     for (uint16_t endpointIndex = 0; endpointIndex < endpointCount; endpointIndex++)
     {
         chip::EndpointId endpointId = emberAfEndpointFromIndex(endpointIndex);
-        if (endpointId == kInvalidEndpointId)
+        if (endpointId == chip::kInvalidEndpointId)
         {
             continue;
         }
 
         // Check if endpoint has WindowCovering cluster enabled
-        uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpoint, WindowCovering::Id,
+        uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpointId, WindowCovering::Id,
                                                                 MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT);
         if (epIndex == kEmberInvalidEndpointIndex)
             continue;
