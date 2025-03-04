@@ -48986,9 +48986,9 @@ class TlsCertificateManagement(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="maxRootCertificates", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="currentRootCertificates", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="provisionedRootCertificates", Tag=0x00000001, Type=typing.List[TlsCertificateManagement.Structs.TLSCertStruct]),
                 ClusterObjectFieldDescriptor(Label="maxClientCertificates", Tag=0x00000002, Type=uint),
-                ClusterObjectFieldDescriptor(Label="currentClientCertificates", Tag=0x00000003, Type=uint),
+                ClusterObjectFieldDescriptor(Label="provisionedClientCertificates", Tag=0x00000003, Type=typing.List[TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -48997,9 +48997,9 @@ class TlsCertificateManagement(Cluster):
             ])
 
     maxRootCertificates: uint = 0
-    currentRootCertificates: uint = 0
+    provisionedRootCertificates: typing.List[TlsCertificateManagement.Structs.TLSCertStruct] = field(default_factory=lambda: [])
     maxClientCertificates: uint = 0
-    currentClientCertificates: uint = 0
+    provisionedClientCertificates: typing.List[TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct] = field(default_factory=lambda: [])
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -49014,11 +49014,13 @@ class TlsCertificateManagement(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="caid", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="certificate", Tag=1, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="certificate", Tag=1, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             caid: 'uint' = 0
-            certificate: 'bytes' = b""
+            certificate: 'typing.Optional[bytes]' = None
+            fabricIndex: 'uint' = 0
 
         @dataclass
         class TLSClientCertificateDetailStruct(ClusterObject):
@@ -49027,13 +49029,15 @@ class TlsCertificateManagement(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="ccdid", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="clientCertificate", Tag=1, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="intermediateCertificates", Tag=2, Type=typing.List[bytes]),
+                        ClusterObjectFieldDescriptor(Label="clientCertificate", Tag=1, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="intermediateCertificates", Tag=2, Type=typing.Optional[typing.List[bytes]]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             ccdid: 'uint' = 0
-            clientCertificate: 'bytes' = b""
-            intermediateCertificates: 'typing.List[bytes]' = field(default_factory=lambda: [])
+            clientCertificate: 'typing.Optional[bytes]' = None
+            intermediateCertificates: 'typing.Optional[typing.List[bytes]]' = None
+            fabricIndex: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -49191,7 +49195,7 @@ class TlsCertificateManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000801
             command_id: typing.ClassVar[int] = 0x00000009
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'ProvisionClientCertificateResponse'
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -49205,25 +49209,9 @@ class TlsCertificateManagement(Cluster):
             clientCertificateDetails: TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct = field(default_factory=lambda: TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct())
 
         @dataclass
-        class ProvisionClientCertificateResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000801
-            command_id: typing.ClassVar[int] = 0x0000000A
-            is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[typing.Optional[str]] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="ccdid", Tag=0, Type=uint),
-                    ])
-
-            ccdid: uint = 0
-
-        @dataclass
         class FindClientCertificate(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000801
-            command_id: typing.ClassVar[int] = 0x0000000B
+            command_id: typing.ClassVar[int] = 0x0000000A
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'FindClientCertificateResponse'
 
@@ -49231,15 +49219,15 @@ class TlsCertificateManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="ccdid", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="ccdid", Tag=0, Type=typing.Union[Nullable, uint]),
                     ])
 
-            ccdid: uint = 0
+            ccdid: typing.Union[Nullable, uint] = NullValue
 
         @dataclass
         class FindClientCertificateResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000801
-            command_id: typing.ClassVar[int] = 0x0000000C
+            command_id: typing.ClassVar[int] = 0x0000000B
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -49255,7 +49243,7 @@ class TlsCertificateManagement(Cluster):
         @dataclass
         class LookupClientCertificate(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000801
-            command_id: typing.ClassVar[int] = 0x0000000D
+            command_id: typing.ClassVar[int] = 0x0000000C
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'LookupClientCertificateResponse'
 
@@ -49271,7 +49259,7 @@ class TlsCertificateManagement(Cluster):
         @dataclass
         class LookupClientCertificateResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000801
-            command_id: typing.ClassVar[int] = 0x0000000E
+            command_id: typing.ClassVar[int] = 0x0000000D
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -49287,7 +49275,7 @@ class TlsCertificateManagement(Cluster):
         @dataclass
         class RemoveClientCertificate(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000801
-            command_id: typing.ClassVar[int] = 0x0000000F
+            command_id: typing.ClassVar[int] = 0x0000000E
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -49318,7 +49306,7 @@ class TlsCertificateManagement(Cluster):
             value: uint = 0
 
         @dataclass
-        class CurrentRootCertificates(ClusterAttributeDescriptor):
+        class ProvisionedRootCertificates(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000801
@@ -49329,9 +49317,9 @@ class TlsCertificateManagement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.List[TlsCertificateManagement.Structs.TLSCertStruct])
 
-            value: uint = 0
+            value: typing.List[TlsCertificateManagement.Structs.TLSCertStruct] = field(default_factory=lambda: [])
 
         @dataclass
         class MaxClientCertificates(ClusterAttributeDescriptor):
@@ -49350,7 +49338,7 @@ class TlsCertificateManagement(Cluster):
             value: uint = 0
 
         @dataclass
-        class CurrentClientCertificates(ClusterAttributeDescriptor):
+        class ProvisionedClientCertificates(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000801
@@ -49361,9 +49349,9 @@ class TlsCertificateManagement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.List[TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct])
 
-            value: uint = 0
+            value: typing.List[TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct] = field(default_factory=lambda: [])
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
