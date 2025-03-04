@@ -265,7 +265,9 @@ public:
     // System::SystemClock().GetMonotonicTimestamp() (to indicate "peer is
     // responding to a message it just received") and System::Clock::kZero (to
     // indicate "peer is reaching out to us, not in response to anything").
-    virtual System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity) const = 0;
+    // isInitial indicates whether the other side treats us as initial message.
+    virtual System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity,
+                                                                   bool isInitial) const = 0;
 
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return GetRemoteSessionParameters().GetMRPConfig(); }
 
