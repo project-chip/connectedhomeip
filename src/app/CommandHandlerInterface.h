@@ -21,6 +21,8 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/data-model-provider/MetadataList.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/List.h> // So we can encode lists
 #include <lib/core/DataModelTypes.h>
@@ -28,7 +30,6 @@
 
 namespace chip {
 namespace app {
-
 /*
  * This interface permits applications to register a server-side command handler
  * at run-time for a given cluster. The handler can either be configured to handle all endpoints
@@ -122,7 +123,8 @@ public:
      * This is used by callbacks that just look for a particular value in the
      * list.
      */
-    virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+    virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                                 DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -146,7 +148,7 @@ public:
      * This is used by callbacks that just look for a particular value in the
      * list.
      */
-    virtual CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+    virtual CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, DataModel::ListBuilder<CommandId> & builder)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }

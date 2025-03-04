@@ -182,41 +182,37 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
 }
 
 // CommandHandlerInterface
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                               DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
+    using QF   = DataModel::CommandQualityFlags;
+    using Priv = Access::Privilege;
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(7));
 
-    for (auto && cmd : {
-             Disable::Id,
-             EnableCharging::Id,
-         })
-    {
-        VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-    }
+    ReturnErrorOnFailure(builder.AppendElements({
+        { Disable::Id, QF::kTimed, Priv::kOperate },        //
+        { EnableCharging::Id, QF::kTimed, Priv::kOperate }, //
+    }));
 
     if (HasFeature(Feature::kV2x))
     {
-        VerifyOrExit(callback(EnableDischarging::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.Append({ EnableDischarging::Id, QF::kTimed, Priv::kOperate }));
     }
 
     if (HasFeature(Feature::kChargingPreferences))
     {
-        for (auto && cmd : {
-                 SetTargets::Id,
-                 GetTargets::Id,
-                 ClearTargets::Id,
-             })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
+        ReturnErrorOnFailure(builder.AppendElements({
+            { SetTargets::Id, QF::kTimed, Priv::kOperate },   //
+            { GetTargets::Id, QF::kTimed, Priv::kOperate },   //
+            { ClearTargets::Id, QF::kTimed, Priv::kOperate }, //
+        }));
     }
 
     if (SupportsOptCmd(OptionalCommands::kSupportsStartDiagnostics))
     {
-        callback(StartDiagnostics::Id, context);
+        ReturnErrorOnFailure(builder.Append({ StartDiagnostics::Id, QF::kTimed, Priv::kOperate }));
     }
-
-exit:
     return CHIP_NO_ERROR;
 }
 
