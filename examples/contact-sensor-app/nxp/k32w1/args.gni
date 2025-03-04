@@ -19,6 +19,7 @@ import("${chip_root}/config/standalone/args.gni")
 # SDK target. This is overridden to add our SDK app_config.h & defines.
 nxp_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 nxp_device = "K32W1480"
+nxp_board = "k32w148evk"
 
 chip_enable_ota_requestor = true
 chip_stack_lock_tracking = "fatal"

@@ -77,10 +77,26 @@ rt_sdk("sdk") {
     include_dirs += [ "${example_platform_dir}/board/${evkname}/" ]
     sources += [ "${example_platform_dir}/board/${evkname}/pin_mux.c" ]
   }
+
+  if (iw416_transceiver || w8801_transceiver || iwx12_transceiver) {
+    if (evkname == "evkmimxrt1060") {
+      include_dirs += [ "${example_platform_dir}/board/evkbmimxrt1060/" ]
+      sources +=
+          [ "${example_platform_dir}/board/evkbmimxrt1060/sdmmc_config.c" ]
+      sources +=
+          [ "${example_platform_dir}/board/evkbmimxrt1060/wifi_bt_config.c" ]
+    } else {
+      include_dirs += [ "${example_platform_dir}/board/${evkname}/" ]
+      sources += [ "${example_platform_dir}/board/${evkname}/sdmmc_config.c" ]
+      sources += [ "${example_platform_dir}/board/${evkname}/wifi_bt_config.c" ]
+    }
+  }
+
   sources += [ "${example_platform_dir}/board/hardware_init.c" ]
   sources += [ "${example_platform_dir}/board/clock_config.c" ]
   sources += [ "${example_platform_dir}/board/board.c" ]
   sources += [ "${example_platform_dir}/board/peripherals.c" ]
+  sources += [ "${example_platform_dir}/board/board_comp.c" ]
 
   # Indicate the path to CHIPProjectConfig.h
   include_dirs += [ "include/config" ]

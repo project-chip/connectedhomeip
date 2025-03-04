@@ -70,6 +70,7 @@ rt_sdk("sdk") {
   sources += [ "${example_platform_dir}/board/board.c" ]
   sources += [ "${example_platform_dir}/board/peripherals.c" ]
   sources += [ "${example_platform_dir}/board/sdmmc_config.c" ]
+  sources += [ "${example_platform_dir}/board/wifi_bt_config.c" ]
 
   # Indicate the path to CHIPProjectConfig.h
   include_dirs += [ "include/config" ]
