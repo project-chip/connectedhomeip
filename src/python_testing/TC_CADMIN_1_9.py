@@ -42,57 +42,45 @@ from chip.exceptions import ChipStackError
 from chip.native import PyChipError
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-
+from support_modules.cadmin_support import CADMINSupport
 
 class TC_CADMIN_1_9(MatterBaseTest):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.support = CADMINSupport(self)
+
     async def OpenCommissioningWindow(self) -> CommissioningParameters:
         try:
             cluster = Clusters.GeneralCommissioning
             attribute = cluster.Attributes.BasicCommissioningInfo
             duration = await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=attribute)
-            params = await self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=duration.maxCumulativeFailsafeSeconds, iteration=10000, discriminator=self.discriminator, option=1)
-            return params
-
+            return await self.support.open_commissioning_window(
+                th=self.th1,
+                timeout=duration.maxCumulativeFailsafeSeconds,
+                node_id=self.dut_node_id,
+                discriminator=self.discriminator
+            )
         except Exception as e:
             logging.exception('Error running OpenCommissioningWindow %s', e)
             asserts.assert_true(False, 'Failed to open commissioning window')
 
-    def steps_TC_CADMIN_1_9(self) -> list[TestStep]:
-        return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(
-                2, "TH1 opens commissioning window on DUT with duration set to value for maxCumulativeFailsafeSeconds"),
-            TestStep(3, "TH2 attempts to connect 20 times to endpoint with incorrect passcode"),
-            TestStep(4, "TH2 attempts to connect to endpoint with correct passcode"),
-            TestStep(5, "TH1 opening Commissioning Window one more time to validate ability to do so"),
-            TestStep(6, "TH1 revoking Commissioning Window"),
-        ]
-
-    def generate_unique_random_value(self, value):
-        while True:
-            random_value = random.randint(10000000, 99999999)
-            if random_value != value:
-                return random_value
-
-    async def CommissionOnNetwork(
-        self, setup_code: int
-    ):
+    async def CommissionOnNetwork(self, setup_code: int):
         ctx = asserts.assert_raises(ChipStackError)
         with ctx:
             await self.th2.CommissionOnNetwork(
-                nodeId=self.dut_node_id, setupPinCode=setup_code,
-                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
+                nodeId=self.dut_node_id, 
+                setupPinCode=setup_code,
+                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, 
+                filter=self.discriminator
+            )
         errcode = PyChipError.from_code(ctx.exception.err)
         return errcode
 
-    async def CommissionAttempt(
-            self, setupPinCode: int, expectedErrCode: int):
-
+    async def CommissionAttempt(self, setupPinCode: int, expectedErrCode: int):
         if expectedErrCode == 3:
             for cycle in range(20):
                 logging.info("-----------------Current Iteration {}-------------------------".format(cycle+1))
-                setup_code = self.generate_unique_random_value(setupPinCode)
+                setup_code = self.support.generate_unique_random_value(setupPinCode)  # Updated to use support module
                 errcode = await self.CommissionOnNetwork(setup_code)
                 logging.info('Commissioning complete done. Successful? {}, errorcode = {}, cycle={}'.format(
                     errcode.is_success, errcode, (cycle+1)))
@@ -108,6 +96,18 @@ class TC_CADMIN_1_9(MatterBaseTest):
             # TODO: Adding try or except clause here as the errcode code be either 50 for timeout or 3 for incorrect state at this time
             # until issue mentioned in https://github.com/project-chip/connectedhomeip/issues/34383 can be resolved
             asserts.assert_in(errcode.sdk_code, [expectedErrCode, 3], 'Unexpected error code returned from CommissioningComplete')
+
+
+    def steps_TC_CADMIN_1_9(self) -> list[TestStep]:
+        return [
+            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(
+                2, "TH1 opens commissioning window on DUT with duration set to value for maxCumulativeFailsafeSeconds"),
+            TestStep(3, "TH2 attempts to connect 20 times to endpoint with incorrect passcode"),
+            TestStep(4, "TH2 attempts to connect to endpoint with correct passcode"),
+            TestStep(5, "TH1 opening Commissioning Window one more time to validate ability to do so"),
+            TestStep(6, "TH1 revoking Commissioning Window"),
+        ]
 
     def pics_TC_CADMIN_1_9(self) -> list[str]:
         return ["CADMIN.S"]

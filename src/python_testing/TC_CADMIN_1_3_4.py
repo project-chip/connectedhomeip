@@ -54,43 +54,16 @@ from chip.interaction_model import Status
 from chip.tlv import TLVReader
 from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
                                                                        default_matter_test_main)
-from mdns_discovery import mdns_discovery
 from mobly import asserts
+from support_modules.cadmin_support import CADMINSupport
 
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
 
-
 class TC_CADMIN(MatterBaseTest):
-    async def get_fabrics(self, th: ChipDeviceCtrl) -> int:
-        OC_cluster = Clusters.OperationalCredentials
-        fabric_info = await self.read_single_attribute_check_success(dev_ctrl=th, fabric_filtered=True, cluster=OC_cluster, attribute=OC_cluster.Attributes.Fabrics)
-        return fabric_info
-
-    async def get_txt_record(self):
-        discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
-        comm_service = await discovery.get_commissionable_service(
-            discovery_timeout_sec=240,
-            log_output=False,
-        )
-        return comm_service
-
-    async def write_nl_attr(self, th: ChipDeviceCtrl, attr_val: object):
-        result = await th.WriteAttribute(nodeid=self.dut_node_id, attributes=[(0, attr_val)])
-        asserts.assert_equal(result[0].Status, Status.Success, f"{th} node label write failed")
-
-    async def read_nl_attr(self, th: ChipDeviceCtrl, attr_val: object):
-        try:
-            await th.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, attr_val)])
-        except Exception as e:
-            asserts.assert_equal(e.err, "Received error message from read attribute attempt")
-            self.print_step(0, e)
-
-    async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
-        cluster = Clusters.OperationalCredentials
-        attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
-        current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
-        return current_fabric_index
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.support = CADMINSupport(self)
 
     async def combined_commission_val_steps(self, commission_type: str):
         """
@@ -131,7 +104,7 @@ class TC_CADMIN(MatterBaseTest):
             asserts.fail(f"Unknown commissioning type: {commission_type}")
 
         self.step("3b")
-        services = await self.get_txt_record()
+        services = await self.support.get_txt_record()
         expected_cm_value = "2" if commission_type == "ECM" else "1"
         if services.txt_record['CM'] != expected_cm_value:
             asserts.fail(f"Expected cm record value {expected_cm_value}, but found {services.txt_record['CM']}")
@@ -139,8 +112,8 @@ class TC_CADMIN(MatterBaseTest):
         self.step("3c")
         BI_cluster = Clusters.BasicInformation
         self.nl_attribute = BI_cluster.Attributes.NodeLabel
-        await self.write_nl_attr(th=self.th1, attr_val=self.nl_attribute)
-        await self.read_nl_attr(th=self.th1, attr_val=self.nl_attribute)
+        await self.support.write_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
+        await self.support.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
 
         self.step(4)
         # Establishing TH2
@@ -170,7 +143,7 @@ class TC_CADMIN(MatterBaseTest):
 
         self.step(5)
         # TH_CR1 reads the Fabrics attribute
-        th1_fabric_info = await self.get_fabrics(th=self.th1)
+        th1_fabric_info = await self.support.get_fabrics(th=self.th1)
         th1_cam_rcac = TLVReader(base64.b64decode(
             self.certificate_authority_manager.activeCaList[0]._persistentStorage._jsonData["sdk-config"]["f/1/r"])).get()["Any"][9]
         if th1_fabric_info[0].rootPublicKey != th1_cam_rcac:
@@ -180,7 +153,7 @@ class TC_CADMIN(MatterBaseTest):
 
         self.step(6)
         # TH_CR2 reads the Fabrics attribute
-        th2_fabric_info = await self.get_fabrics(th=self.th2)
+        th2_fabric_info = await self.support.get_fabrics(th=self.th2)
         if th2_fabric_info[0].rootPublicKey != th2_rcac_decoded:
             asserts.fail("Public keys from fabric and certs for TH2 are not the same.")
         if th2_fabric_info[0].nodeID != self.dut_node_id:
@@ -189,15 +162,15 @@ class TC_CADMIN(MatterBaseTest):
         if commission_type == "ECM":
             self.step(7)
             # TH_CR1 writes and reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE
-            await self.write_nl_attr(th=self.th1, attr_val=self.nl_attribute)
-            await self.read_nl_attr(th=self.th1, attr_val=self.nl_attribute)
+            await self.support.write_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
+            await self.support.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
 
             self.step(8)
             # TH_CR2 writes and reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE
-            val = await self.read_nl_attr(th=self.th2, attr_val=self.nl_attribute)
+            val = await self.support.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th2, attr_val=self.nl_attribute)
             self.print_step("basic information cluster node label attr value", val)
-            await self.write_nl_attr(th=self.th2, attr_val=self.nl_attribute)
-            await self.read_nl_attr(th=self.th2, attr_val=self.nl_attribute)
+            await self.support.write_nl_attr(dut_node_id=self.dut_node_id, th=self.th2, attr_val=self.nl_attribute)
+            await self.support.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th2, attr_val=self.nl_attribute)
 
             self.step(9)
             # TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM
@@ -324,7 +297,6 @@ class TC_CADMIN(MatterBaseTest):
     @async_test_body
     async def test_TC_CADMIN_1_4(self):
         await self.combined_commission_val_steps(commission_type="BCM")
-
 
 if __name__ == "__main__":
     default_matter_test_main()
