@@ -288,7 +288,7 @@ static uint16_t RetrieveFromFifo(Fifo_t * fifo, uint8_t * pData, uint16_t SizeTo
     VerifyOrDie(SizeToRead <= fifo->MaxSize);
     CORE_DECLARE_IRQ_STATE;
 
-    uint16_t ReadSize        = std::min(SizeToRead, AvailableDataCount(fifo));
+    uint16_t ReadSize = std::min(SizeToRead, AvailableDataCount(fifo));
 
     CORE_ENTER_ATOMIC();
     uint16_t nBytesBeforWrap = (fifo->MaxSize - fifo->Head);
