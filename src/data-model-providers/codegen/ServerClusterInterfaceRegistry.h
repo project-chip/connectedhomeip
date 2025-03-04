@@ -117,14 +117,6 @@ private:
         EndpointClusters * next;
     };
 
-    // Dynamic allocated endpoint cluters.
-    EndpointClusters * mEndpoints = nullptr;
-
-    // A one-element cache to speed up finding a cluster within an endpoint.
-    // The endpointId specifies which endpoint the cache belongs to.
-    ClusterId mCachedClusterEndpointId        = kInvalidEndpointId;
-    ServerClusterInterface * mCachedInterface = nullptr;
-
     /// returns nullptr if not found
     EndpointClusters * FindClusters(EndpointId endpointId);
 
@@ -133,6 +125,14 @@ private:
 
     /// Clear and free memory for the given linked list
     static void ClearSingleLinkedList(RegisteredServerClusterInterface * clusters);
+
+    // Dynamic allocated endpoint cluters.
+    EndpointClusters * mEndpoints = nullptr;
+
+    // A one-element cache to speed up finding a cluster within an endpoint.
+    // The endpointId specifies which endpoint the cache belongs to.
+    ClusterId mCachedClusterEndpointId        = kInvalidEndpointId;
+    ServerClusterInterface * mCachedInterface = nullptr;
 };
 
 } // namespace app
