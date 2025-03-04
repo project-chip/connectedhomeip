@@ -44,24 +44,16 @@ namespace Clusters {
 namespace PushAvStreamTransport {
 
 PushAvStreamTransportServer::PushAvStreamTransportServer(EndpointId aEndpointId, PushAvStreamTransportDelegate & aDelegate,
-                                                         const BitFlags<Feature> aFeature,
+                                                         const BitFlags<Feature> aFeatures,
                                                          PersistentStorageDelegate & aPersistentStorage) :
     CommandHandlerInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id),
-    AttributeAccessInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id), mDelegate(aDelegate),
-    mEndpointId(aEndpointId), mFeature(aFeature)
-{
-    mDelegate.SetPushAvStreamTransportServer(this);
-}
+    AttributeAccessInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id), mDelegate(aDelegate), mFeature(aFeatures)
+{}
 
 PushAvStreamTransportServer::~PushAvStreamTransportServer()
 {
-    // Explicitly set the PushAvStreamTransportServer pointer in the Delegate to null.
+    Shutdown();
 
-    mDelegate.SetPushAvStreamTransportServer(nullptr);
-
-    // Unregister command handler and attribute access interfaces
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 CHIP_ERROR PushAvStreamTransportServer::Init()
@@ -71,6 +63,12 @@ CHIP_ERROR PushAvStreamTransportServer::Init()
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
+}
+
+void PushAvStreamTransportServer::Shutdown()
+{ // Unregister command handler and attribute access interfaces
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 bool PushAvStreamTransportServer::HasFeature(Feature feature) const
@@ -91,7 +89,7 @@ CHIP_ERROR PushAvStreamTransportServer::ReadAndEncodeCurrentConnections(const At
 CHIP_ERROR PushAvStreamTransportServer::AddStreamTransportConnection(const uint16_t transportConnectionId)
 {
     mCurrentConnections.push_back(transportConnectionId);
-    auto path = ConcreteAttributePath(mEndpointId, PushAvStreamTransport::Id, Attributes::CurrentConnections::Id);
+    auto path = ConcreteAttributePath(AttributeAccessInterface::GetEndpointId().Value(), PushAvStreamTransport::Id, Attributes::CurrentConnections::Id);
     mDelegate.OnAttributeChanged(Attributes::CurrentConnections::Id);
     MatterReportingAttributeChangeCallback(path);
 
@@ -103,7 +101,7 @@ CHIP_ERROR PushAvStreamTransportServer::RemoveStreamTransportConnection(const ui
     mCurrentConnections.erase(std::remove_if(mCurrentConnections.begin(), mCurrentConnections.end(),
                                              [&](const uint16_t connectionID) { return connectionID == transportConnectionId; }),
                               mCurrentConnections.end());
-    auto path = ConcreteAttributePath(mEndpointId, PushAvStreamTransport::Id, Attributes::CurrentConnections::Id);
+    auto path = ConcreteAttributePath(AttributeAccessInterface::GetEndpointId().Value(), PushAvStreamTransport::Id, Attributes::CurrentConnections::Id);
     mDelegate.OnAttributeChanged(Attributes::CurrentConnections::Id);
     MatterReportingAttributeChangeCallback(path);
 
@@ -113,7 +111,7 @@ CHIP_ERROR PushAvStreamTransportServer::RemoveStreamTransportConnection(const ui
 CHIP_ERROR PushAvStreamTransportServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == PushAvStreamTransport::Id);
-    ChipLogError(Zcl, "Push AV Stream Transport: Reading");
+    ChipLogError(Zcl, "Push AV Stream Transport[ep=%d]: Reading",AttributeAccessInterface::GetEndpointId().Value());
 
     switch (aPath.mAttributeId)
     {
@@ -228,21 +226,18 @@ bool PushAvStreamTransportServer::FindStreamTransportConnection(const uint16_t c
 
 uint16_t PushAvStreamTransportServer::GenerateConnectionID()
 {
-    static uint16_t assignedConnectionID = 0;
+    static uint16_t lastAssignedConnectionID = 0;
     uint16_t nextConnectionID;
 
-    if (assignedConnectionID == MAX_PUSH_TRANSPORT_CONNECTION_ID)
-        nextConnectionID = 0;
-    else
-        nextConnectionID = assignedConnectionID + 1;
-
-    while (FindStreamTransportConnection(nextConnectionID) != false)
+    do
     {
-        if (nextConnectionID == MAX_PUSH_TRANSPORT_CONNECTION_ID)
+        if (lastAssignedConnectionID == MAX_PUSH_TRANSPORT_CONNECTION_ID)
             nextConnectionID = 0;
         else
-            nextConnectionID = nextConnectionID + 1;
-    }
+            nextConnectionID = lastAssignedConnectionID + 1;
+    } while (FindStreamTransportConnection(nextConnectionID));
+
+    lastAssignedConnectionID = nextConnectionID;
     return nextConnectionID;
 }
 
@@ -253,17 +248,17 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
     Commands::AllocatePushTransportResponse::Type response;
     auto & transportOptions = commandData.transportOptions;
 
-    uint16_t connectionID                 = GenerateConnectionID();
-    TransportStatusEnum outTranportStatus = TransportStatusEnum::kUnknownEnumValue;
+    uint16_t connectionID                  = GenerateConnectionID();
+    TransportStatusEnum outTransportStatus = TransportStatusEnum::kUnknownEnumValue;
 
     // call the delegate
-    status = mDelegate.AllocatePushTransport(connectionID, transportOptions, outTranportStatus);
+    status = mDelegate.AllocatePushTransport(connectionID, transportOptions, outTransportStatus);
 
     if (status == Status::Success)
     {
         response.connectionID     = connectionID;
         response.transportOptions = transportOptions;
-        response.transportStatus  = outTranportStatus;
+        response.transportStatus  = outTransportStatus;
 
         // add connection to CurrentConnections
         AddStreamTransportConnection(connectionID);
@@ -308,12 +303,12 @@ void PushAvStreamTransportServer::HandleModifyPushTransport(HandlerContext & ctx
 void PushAvStreamTransportServer::HandleSetTransportStatus(HandlerContext & ctx,
                                                            const Commands::SetTransportStatus::DecodableType & commandData)
 {
-    Status status           = Status::Success;
-    uint16_t connectionID   = commandData.connectionID;
-    auto & transportOptions = commandData.transportOptions;
+    Status status          = Status::Success;
+    uint16_t connectionID  = commandData.connectionID;
+    auto & transportStatus = commandData.transportStatus;
 
     // Call the delegate
-    status = mDelegate.SetTransportStatus(connectionID, transportOptions);
+    status = mDelegate.SetTransportStatus(connectionID, transportStatus);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
