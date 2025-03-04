@@ -168,12 +168,14 @@ JNI_METHOD(void, disconnect)
 JNI_METHOD(jstring, getConnectionStateNative)
 (JNIEnv * env, jobject thiz)
 {
+    char error_str[50];
+    jobject jstr_obj = nullptr;
+
     if (NULL == env)
     {
-        jobject err_jstr = nullptr;
         LogErrorOnFailure(
-            chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString("JNIEnv interface is NULL"), err_jstr));
-        return static_cast<jstring>(err_jstr);
+            chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString("JNIEnv interface is NULL"), jstr_obj));
+        return static_cast<jstring>(jstr_obj);
     }
 
     chip::DeviceLayer::StackLock lock;
@@ -186,20 +188,20 @@ JNI_METHOD(jstring, getConnectionStateNative)
     switch (state)
     {
     case matter::casting::core::ConnectionState::CASTING_PLAYER_NOT_CONNECTED:
-        return env->NewStringUTF("NOT_CONNECTED");
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString("NOT_CONNECTED"), jstr_obj));
+        break;
     case matter::casting::core::ConnectionState::CASTING_PLAYER_CONNECTING:
-        return env->NewStringUTF("CONNECTING");
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString("CONNECTING"), jstr_obj));
+        break;
     case matter::casting::core::ConnectionState::CASTING_PLAYER_CONNECTED:
-        return env->NewStringUTF("CONNECTED");
-    default: {
-        char error_str[50];
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString("CONNECTED"), jstr_obj));
+        break;
+    default:
         snprintf(error_str, sizeof(error_str), "Unsupported Connection State: %d", state);
-
-        jobject err_jstr = nullptr;
-        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString(error_str), err_jstr));
-        return static_cast<jstring>(err_jstr);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString(error_str), jstr_obj));
+        break;
     }
-    }
+    return static_cast<jstring>(jstr_obj);
 }
 
 JNI_METHOD(jobject, getEndpoints)
