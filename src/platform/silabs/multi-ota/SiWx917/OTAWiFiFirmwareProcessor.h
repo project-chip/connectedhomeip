@@ -39,6 +39,7 @@ public:
     CHIP_ERROR FinalizeAction() override;
     static bool mReset;
     static constexpr size_t kAlignmentBytes = 64;
+
 private:
     CHIP_ERROR ProcessInternal(ByteSpan & block) override;
     CHIP_ERROR ProcessDescriptor(ByteSpan & block);
@@ -48,7 +49,6 @@ private:
 #if OTA_ENCRYPTION_ENABLE
     uint32_t mUnalignmentNum;
 #endif
-
 };
 
 } // namespace chip

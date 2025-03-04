@@ -33,8 +33,8 @@ extern "C" {
 #if SL_BTLCTRL_MUX
 #include "btl_interface.h"
 #include "sl_core.h"
-#endif // SL_BTLCTRL_MUX
-#include "em_bus.h" // For CORE_CRITICAL_SECTION
+#endif                          // SL_BTLCTRL_MUX
+#include "em_bus.h"             // For CORE_CRITICAL_SECTION
 #ifndef SLI_SI91X_MCU_INTERFACE // required for 917 NCP
 #include "btl_interface.h"
 #endif // SLI_SI91X_MCU_INTERFACE
