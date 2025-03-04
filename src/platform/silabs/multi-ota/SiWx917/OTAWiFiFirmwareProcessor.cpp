@@ -36,7 +36,6 @@ extern "C" {
 #define RPS_HEADER 1
 #define RPS_DATA 2
 
-#define SL_STATUS_FW_UPDATE_DONE SL_STATUS_SI91X_FW_UPDATE_DONE
 uint8_t flag = RPS_HEADER;
 
 namespace chip {
@@ -125,8 +124,8 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
         status = sl_si91x_fwup_load(writeDataBuffer, block.size());
         if (status != SL_STATUS_OK)
         {
-            // When TA recived all the blocks it will return SL_STATUS_FW_UPDATE_DONE status
-            if (status == SL_STATUS_FW_UPDATE_DONE)
+            // When TA recived all the blocks it will return SL_STATUS_SI91X_FW_UPDATE_DONE status
+            if (status == SL_STATUS_SI91X_FW_UPDATE_DONE)
             {
                 mReset = true;
             }
