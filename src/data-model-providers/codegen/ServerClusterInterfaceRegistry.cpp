@@ -74,6 +74,12 @@ CHIP_ERROR ServerClusterInterfaceRegistry::Register(EndpointId endpointId, Serve
     }
 
     auto entry = Platform::New<RegisteredServerClusterInterface>(cluster, endpointClusters->firstCluster);
+
+    // If this fails, we still have the `AllocateNewEndpointClusters` succeeding,
+    // so an empty list for this cluster exists. No cleanup for now (smaller code)
+    // as an empty list will probably not cause problems (this is the same as all
+    // clusters on an endpoint getting unregistered - we do not clean mEndpoints except
+    // in UnregisterAllFromEndpoint)
     VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NO_MEMORY);
 
     endpointClusters->firstCluster = entry;
