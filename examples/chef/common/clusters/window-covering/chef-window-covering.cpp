@@ -29,8 +29,7 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using chip::Protocols::InteractionModel::Status;
 
-constexpr size_t kWindowCoveringDelegateTableSize =
-    MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+constexpr size_t kWindowCoveringDelegateTableSize = MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT;
 static_assert(kWindowCoveringDelegateTableSize <= kEmberInvalidEndpointIndex, "WindowCovering Delegate table size error");
 
 std::unique_ptr<WindowCovering::ChefDelegate> gDelegateTable[kWindowCoveringDelegateTableSize];
@@ -48,7 +47,6 @@ void InitChefWindowCoveringCluster()
 
     for (uint16_t endpointIndex = 0; endpointIndex < endpointCount; endpointIndex++)
     {
-        // Get endpoint ID from index.
         EndpointId endpointId = emberAfEndpointFromIndex(endpointIndex);
         if (endpointId == kInvalidEndpointId)
         {
@@ -81,7 +79,8 @@ CHIP_ERROR WindowCovering::ChefDelegate::HandleMovement(WindowCoveringType type)
         status = WindowCovering::Attributes::TargetPositionLiftPercent100ths::Get(mEndpoint, current);
         if (status != Status::Success)
         {
-            ChipLogError(DeviceLayer, "HandleMovement: Failed to get TargetPositionLiftPercent100ths - %d", to_underlying(status));
+            ChipLogError(DeviceLayer, "HandleMovement: Failed to get TargetPositionLiftPercent100ths with error code %d",
+                         to_underlying(status));
             return CHIP_ERROR_READ_FAILED;
         }
 
@@ -89,7 +88,8 @@ CHIP_ERROR WindowCovering::ChefDelegate::HandleMovement(WindowCoveringType type)
         status = WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Set(mEndpoint, current);
         if (status != Status::Success)
         {
-            ChipLogError(DeviceLayer, "HandleMovement: Failed to set CurrentPositionLiftPercent100ths - %d", to_underlying(status));
+            ChipLogError(DeviceLayer, "HandleMovement: Failed to set CurrentPositionLiftPercent100ths with error code %d",
+                         to_underlying(status));
             return CHIP_ERROR_WRITE_FAILED;
         }
 
