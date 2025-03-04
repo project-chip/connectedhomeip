@@ -213,10 +213,6 @@ public:
                 DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
                 CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
                     UserLabel::Id, endpointsList);
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(Zcl, "Failed to get endpoints with UserLabel cluster: %" CHIP_ERROR_FORMAT, err.Format());
-                }
 
                 for (auto endpoint : endpointsList.TakeBuffer())
                 {

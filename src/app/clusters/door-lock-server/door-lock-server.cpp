@@ -58,10 +58,6 @@ class DoorLockClusterFabricDelegate : public chip::FabricTable::Delegate
         DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
         CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
             Clusters::DoorLock::Id, endpointsList);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "Failed to get endpoints with DoorLock cluster: %" CHIP_ERROR_FORMAT, err.Format());
-        }
 
         for (auto endpoint : endpointsList.TakeBuffer())
         {

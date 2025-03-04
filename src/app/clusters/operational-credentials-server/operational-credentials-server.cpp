@@ -331,10 +331,6 @@ public:
         DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
         CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
             BasicInformation::Id, endpointsList);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "Failed to get endpoints with BasicInformation cluster: %" CHIP_ERROR_FORMAT, err.Format());
-        }
 
         // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
         for (auto endpoint : endpointsList.TakeBuffer())

@@ -419,10 +419,6 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
         DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
         CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
             BasicInformation::Id, endpointsList);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "Failed to get endpoints with BasicInformation cluster: %" CHIP_ERROR_FORMAT, err.Format());
-        }
 
         for (auto endpoint : endpointsList.TakeBuffer())
         {
@@ -447,10 +443,6 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
         DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
         CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
             BasicInformation::Id, endpointsList);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "Failed to get endpoints with BasicInformation cluster: %" CHIP_ERROR_FORMAT, err.Format());
-        }
 
         for (auto endpoint : endpointsList.TakeBuffer())
         {

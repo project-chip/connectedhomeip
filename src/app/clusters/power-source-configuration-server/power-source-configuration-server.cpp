@@ -70,10 +70,6 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
             DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
             CHIP_ERROR error = InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(
                 PowerSource::Id, endpointsList);
-            if (error != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl, "Failed to get endpoints with PowerSource cluster: %" CHIP_ERROR_FORMAT, error.Format());
-            }
 
             for (auto endpoint : endpointsList.TakeBuffer())
             {
