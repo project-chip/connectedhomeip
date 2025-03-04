@@ -48,7 +48,7 @@ private:
     bool mDescriptorProcessed = false;
 #if OTA_ENCRYPTION_ENABLE
     uint32_t mUnalignmentNum;
-#endif
+#endif //OTA_ENCRYPTION_ENABLE
 };
 
 } // namespace chip
