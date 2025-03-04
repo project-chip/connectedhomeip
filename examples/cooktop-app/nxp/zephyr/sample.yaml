@@ -1,0 +1,86 @@
+sample:
+  name: Matter
+tests:
+  sample.matter.cooktop_app_no_factorydata:
+    platform_allow:
+      - rd_rw612_bga
+      - frdm_rw612
+    build_only: true
+    tags: matter
+  sample.matter.cooktop_app_factorydata:
+    platform_allow:
+      - rd_rw612_bga
+      - frdm_rw612
+    build_only: true
+    tags: matter
+    extra_args: FILE_SUFFIX="fdata"
+  sample.matter.cooktop_app_no_factorydata_ota_v0:
+    platform_allow:
+      - rd_rw612_bga
+      - frdm_rw612
+    build_only: true
+    tags: matter
+    extra_args:
+      - EXTRA_CONF_FILE="prj_ota.conf"
+  sample.matter.cooktop_app_no_factorydata_ota_v1:
+    platform_allow:
+      - rd_rw612_bga
+      - frdm_rw612
+    build_only: true
+    tags: matter
+    extra_args:
+      - EXTRA_CONF_FILE="prj_ota.conf"
+    extra_configs:
+      - CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2
+  sample.matter.cooktop_app_factorydata_ota_v0:
+    platform_allow:
+      - rd_rw612_bga
+      - frdm_rw612
+    build_only: true
+    tags: matter
+    extra_args:
+      - FILE_SUFFIX="fdata"
+      - EXTRA_CONF_FILE="prj_ota.conf"
+  sample.matter.cooktop_app_factorydata_ota_v1:
+    platform_allow:
+      - rd_rw612_bga
+      - frdm_rw612
+    build_only: true
+    tags: matter
+    extra_args:
+      - FILE_SUFFIX="fdata"
+      - EXTRA_CONF_FILE="prj_ota.conf"
+    extra_configs:
+      - CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2
+  sample.matter.cooktop_app_ethernet_no_factorydata:
+    platform_allow:
+      - rd_rw612_bga/rw612/ethernet
+    build_only: true
+    tags: matter
+    extra_args: EXTRA_CONF_FILE="prj_ethernet.conf"
+  sample.matter.cooktop_app_ethernet_factorydata:
+    platform_allow:
+      - rd_rw612_bga/rw612/ethernet
+    build_only: true
+    tags: matter
+    extra_args:
+    - FILE_SUFFIX="fdata"
+    - EXTRA_CONF_FILE="prj_ethernet.conf"
+  sample.matter.cooktop_app_ethernet_factorydata_ota_v0:
+    platform_allow:
+      - rd_rw612_bga/rw612/ethernet
+    build_only: true
+    tags: matter
+    extra_args:
+      - FILE_SUFFIX="fdata"
+      - EXTRA_CONF_FILE='prj_ota.conf;prj_ethernet.conf'
+  sample.matter.cooktop_app_ethernet_factorydata_ota_v1:
+    platform_allow:
+      - rd_rw612_bga/rw612/ethernet
+    build_only: true
+    tags: matter
+    extra_args:
+      - FILE_SUFFIX="fdata"
+      - EXTRA_CONF_FILE='prj_ota.conf;prj_ethernet.conf'
+    extra_configs:
+      - CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2
