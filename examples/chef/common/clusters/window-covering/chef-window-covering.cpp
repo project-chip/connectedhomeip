@@ -18,10 +18,24 @@
 
 #include "chef-window-covering.h"
 #include "app/clusters/window-covering-server/window-covering-server.h"
+#include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
 
 using namespace chip::app::Clusters;
+
+constexpr size_t kWindowCoveringDelegateTableSize =
+    MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kWindowCoveringDelegateTableSize <= kEmberInvalidEndpointIndex, "WindowCovering Delegate table size error");
+
+std::unique_ptr<WindowCovering::ChefDelegate> gDelegateTable[kWindowCoveringDelegateTableSize];
+
+std::unique_ptr<WindowCovering::ChefDelegate> * GetDelegate(EndpointId endpoint)
+{
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, WindowCovering::Id, MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kWindowCoveringDelegateTableSize ? nullptr : gDelegateTable[ep]);
+}
 
 void InitChefWindowCoveringCluster()
 {
@@ -29,6 +43,7 @@ void InitChefWindowCoveringCluster()
 
     for (uint16_t endpointIndex = 0; endpointIndex < endpointCount; endpointIndex++)
     {
+        // Get endpoint ID from index.
         chip::EndpointId endpointId = emberAfEndpointFromIndex(endpointIndex);
         if (endpointId == chip::kInvalidEndpointId)
         {
@@ -38,15 +53,15 @@ void InitChefWindowCoveringCluster()
         // Check if endpoint has WindowCovering cluster enabled
         uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpointId, WindowCovering::Id,
                                                                 MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT);
-        if (epIndex == kEmberInvalidEndpointIndex)
+        if (epIndex >= kWindowCoveringDelegateTableSize)
             continue;
 
-        // Skip if delegate is already registered.
-        if (WindowCovering::GetDelegate(endpointId))
+        // Skip if delegate was already initialized.
+        if (gDelegateTable[epIndex])
             continue;
 
-        WindowCovering::DelegateImpl * delegate = new WindowCovering::DelegateImpl();
-        delegate->SetEndpoint(endpointId);
-        WindowCovering::SetDefaultDelegate(endpointId, delegate);
+        gDelegateTable[epIndex] = std::make_unique<WindowCovering::ChefDelegate>();
+        gDelegateTable[epIndex]->SetEndpoint(endpointId);
+        WindowCovering::SetDefaultDelegate(endpointId, gDelegateTable[epIndex]);
     }
 }
