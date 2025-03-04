@@ -58,7 +58,6 @@
     ],
     "FlowMeasurement": ["Test_TC_FLW_2_1"],
     "FanControl": [
-        "Test_TC_FAN_2_1",
         "Test_TC_FAN_2_2",
         "Test_TC_FAN_2_3",
         "Test_TC_FAN_2_4",
