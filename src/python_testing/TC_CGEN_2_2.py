@@ -232,9 +232,8 @@ class TC_CGEN_2_2(MatterBaseTest):
                      and saves the number of list items as numTrustedRootsOriginal.'''),
             TestStep(2, '''TH1 reads the BasicCommissioningInfo attribute 
                      and saves the MaxCumulativeFailsafeSeconds as maxFailsafe.'''),
-            TestStep('2a', '''The failsafe timer is set to 1 second to avoid delays in test execution (which can be adjusted based on the environment for flexibility). 
-                     The variable is `PIXIT.CGEN.FailsafeExpiryLengthSeconds` for CI and 
-                     `CERT_FAILSAFE_EXPIRATION_TIME_SECONDS` for Cert.'''),
+            TestStep('2a', '''The failsafe timer is set based on PIXIT.CGEN.FailsafeExpiryLengthSeconds if provided; 
+                     otherwise, it defaults to 20 seconds, ensuring flexibility and preventing delays in test execution.'''),
             TestStep('3-5', 'TH1 execute function run_steps_3_to_5 to run steps #3 through #5.'),
             TestStep(3, '''TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds
                      and the Breadcrumb value as 1.'''),
