@@ -18564,17 +18564,17 @@ public class ClusterReadMapping {
           readCameraAvStreamManagementHDRModeEnabledCommandParams
         );
         result.put("readHDRModeEnabledAttribute", readCameraAvStreamManagementHDRModeEnabledAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCameraAvStreamManagementFabricsUsingCameraCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCameraAvStreamManagementFabricsUsingCameraAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readCameraAvStreamManagementSupportedStreamUsagesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCameraAvStreamManagementSupportedStreamUsagesAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readFabricsUsingCameraAttribute(
-              (ChipClusters.CameraAvStreamManagementCluster.FabricsUsingCameraAttributeCallback) callback
+            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readSupportedStreamUsagesAttribute(
+              (ChipClusters.CameraAvStreamManagementCluster.SupportedStreamUsagesAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedCameraAvStreamManagementClusterFabricsUsingCameraAttributeCallback(),
-          readCameraAvStreamManagementFabricsUsingCameraCommandParams
+          () -> new ClusterInfoMapping.DelegatedCameraAvStreamManagementClusterSupportedStreamUsagesAttributeCallback(),
+          readCameraAvStreamManagementSupportedStreamUsagesCommandParams
         );
-        result.put("readFabricsUsingCameraAttribute", readCameraAvStreamManagementFabricsUsingCameraAttributeInteractionInfo);
+        result.put("readSupportedStreamUsagesAttribute", readCameraAvStreamManagementSupportedStreamUsagesAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readCameraAvStreamManagementAllocatedVideoStreamsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCameraAvStreamManagementAllocatedVideoStreamsAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

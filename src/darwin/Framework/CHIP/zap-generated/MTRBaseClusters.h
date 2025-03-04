@@ -14272,6 +14272,12 @@ MTR_PROVISIONALLY_AVAILABLE
  */
 - (void)snapshotStreamAllocateWithParams:(MTRCameraAVStreamManagementClusterSnapshotStreamAllocateParams *)params completion:(void (^)(MTRCameraAVStreamManagementClusterSnapshotStreamAllocateResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
+ * Command SnapshotStreamModify
+ *
+ * This command SHALL be used to modify a stream specified by the VideoStreamID.
+ */
+- (void)snapshotStreamModifyWithParams:(MTRCameraAVStreamManagementClusterSnapshotStreamModifyParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+/**
  * Command SnapshotStreamDeallocate
  *
  * This command SHALL deallocate an snapshot stream on the camera, corresponding to the given snapshot stream identifier.
@@ -14376,11 +14382,11 @@ MTR_PROVISIONALLY_AVAILABLE
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeHDRModeEnabledWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeFabricsUsingCameraWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeFabricsUsingCameraWithParams:(MTRSubscribeParams *)params
-                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeFabricsUsingCameraWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeSupportedStreamUsagesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeSupportedStreamUsagesWithParams:(MTRSubscribeParams *)params
+                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                            reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeSupportedStreamUsagesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeAllocatedVideoStreamsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeAllocatedVideoStreamsWithParams:(MTRSubscribeParams *)params
@@ -20671,6 +20677,7 @@ typedef NS_OPTIONS(uint32_t, MTRCameraAVStreamManagementFeature) {
     MTRCameraAVStreamManagementFeatureWatermark MTR_PROVISIONALLY_AVAILABLE = 0x40,
     MTRCameraAVStreamManagementFeatureOnScreenDisplay MTR_PROVISIONALLY_AVAILABLE = 0x80,
     MTRCameraAVStreamManagementFeatureLocalStorage MTR_PROVISIONALLY_AVAILABLE = 0x100,
+    MTRCameraAVStreamManagementFeatureHighDynamicRange MTR_PROVISIONALLY_AVAILABLE = 0x200,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRCameraAVSettingsUserLevelManagementFeature) {

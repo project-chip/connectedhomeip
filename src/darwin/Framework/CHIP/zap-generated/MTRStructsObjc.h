@@ -2250,9 +2250,8 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRCameraAVStreamManagementClusterVideoSensorParamsStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull sensorWidth MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull sensorHeight MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull hdrCapable MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull maxFPS MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull maxHDRFPS MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable maxHDRFPS MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -2261,43 +2260,6 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull y1 MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull x2 MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull y2 MTR_PROVISIONALLY_AVAILABLE;
-@end
-
-MTR_PROVISIONALLY_AVAILABLE
-@interface MTRCameraAVStreamManagementClusterVideoStreamChangedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull videoStreamID MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable streamUsage MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable videoCodec MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable minFrameRate MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable maxFrameRate MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable minResolution MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable maxResolution MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable minBitRate MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable maxBitRate MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable minFragmentLen MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable maxFragmentLen MTR_PROVISIONALLY_AVAILABLE;
-@end
-
-MTR_PROVISIONALLY_AVAILABLE
-@interface MTRCameraAVStreamManagementClusterAudioStreamChangedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull audioStreamID MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable streamUsage MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable audioCodec MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable channelCount MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable sampleRate MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable bitRate MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable bitDepth MTR_PROVISIONALLY_AVAILABLE;
-@end
-
-MTR_PROVISIONALLY_AVAILABLE
-@interface MTRCameraAVStreamManagementClusterSnapshotStreamChangedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull snapshotStreamID MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable imageCodec MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable frameRate MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable bitRate MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable minResolution MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable maxResolution MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable quality MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
