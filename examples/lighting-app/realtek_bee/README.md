@@ -77,9 +77,8 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-
     $ ./scripts/build/build_examples.py --target realtek-rtl8777g-lighting build
     ```
 
-    You can find the target built file called
-    **_matter-cli-ftd_bank0_MP_dev_\*.bin\_** under the
-    `out/realtek-rtl8777g-light/bin` directory.
+    You can find the target built file called **matter-cli-ftd** under the
+    `out/realtek-rtl8777g-lighting/bin` directory.
 
 ## More information
 

@@ -77,8 +77,7 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-
     $ ./scripts/build/build_examples.py --target realtek-rtl8777g-window build
     ```
 
-    You can find the target built file called
-    **_matter-cli-mtd_bank0_MP_dev_\*.bin\_** under the
+    You can find the target built file called **matter-cli-mtd** under the
     `out/realtek-rtl8777g-window/bin` directory.
 
 ## More information
