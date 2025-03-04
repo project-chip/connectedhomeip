@@ -56,8 +56,8 @@ public:
      */
     CHIP_ERROR HandleStopMotion() = 0;
 
-    ~DelegateImpl() = default;
-    DelegateImpl()  = default;
+    ~ChefDelegate() = default;
+    ChefDelegate()  = default;
 
 protected:
     EndpointId mEndpoint = 0;
