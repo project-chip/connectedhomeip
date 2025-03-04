@@ -44,7 +44,7 @@ public:
      *   @return CHIP_NO_ERROR On success.
      *   @return Other Value indicating it failed to adjust window covering position.
      */
-    CHIP_ERROR HandleMovement(WindowCoveringType type) = 0;
+    CHIP_ERROR HandleMovement(WindowCoveringType type);
 
     /**
      * @brief
@@ -54,7 +54,7 @@ public:
      *   @return Other Value indicating it failed to stop any adjusting to the physical tilt and lift/slide that is currently
      * occurring..
      */
-    CHIP_ERROR HandleStopMotion() = 0;
+    CHIP_ERROR HandleStopMotion();
 
     ~ChefDelegate() = default;
     ChefDelegate()  = default;

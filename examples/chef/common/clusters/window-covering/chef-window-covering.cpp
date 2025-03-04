@@ -18,11 +18,15 @@
 
 #include "chef-window-covering.h"
 #include "app/clusters/window-covering-server/window-covering-server.h"
+#include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
+#include <lib/support/logging/CHIPLogging.h>
 
+using namespace chip;
 using namespace chip::app::Clusters;
+using chip::Protocols::InteractionModel::Status;
 
 constexpr size_t kWindowCoveringDelegateTableSize =
     MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
@@ -30,7 +34,7 @@ static_assert(kWindowCoveringDelegateTableSize <= kEmberInvalidEndpointIndex, "W
 
 std::unique_ptr<WindowCovering::ChefDelegate> gDelegateTable[kWindowCoveringDelegateTableSize];
 
-WindowCovering::ChefDelegate * GetDelegate(chip::EndpointId endpoint)
+WindowCovering::ChefDelegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, WindowCovering::Id, MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT);
@@ -44,8 +48,8 @@ void InitChefWindowCoveringCluster()
     for (uint16_t endpointIndex = 0; endpointIndex < endpointCount; endpointIndex++)
     {
         // Get endpoint ID from index.
-        chip::EndpointId endpointId = emberAfEndpointFromIndex(endpointIndex);
-        if (endpointId == chip::kInvalidEndpointId)
+        EndpointId endpointId = emberAfEndpointFromIndex(endpointIndex);
+        if (endpointId == kInvalidEndpointId)
         {
             continue;
         }
@@ -64,4 +68,54 @@ void InitChefWindowCoveringCluster()
         gDelegateTable[epIndex]->SetEndpoint(endpointId);
         WindowCovering::SetDefaultDelegate(endpointId, gDelegateTable[epIndex].get());
     }
+}
+
+CHIP_ERROR WindowCovering::ChefDelegate::HandleMovement(WindowCoveringType type)
+{
+    Status status;
+    app::DataModel::Nullable<Percent100ths> current;
+
+    if (type == WindowCoveringType::Lift)
+    {
+        status = WindowCovering::Attributes::TargetPositionLiftPercent100ths::Get(mEndpoint, current);
+        if (status != Status::Success)
+        {
+            ChipLogError(DeviceLayer, "HandleMovement: Failed to get TargetPositionLiftPercent100ths - %d", to_underlying(status));
+            return CHIP_ERROR_READ_FAILED;
+        }
+
+        // Instant update. No transition for now.
+        status = WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Set(mEndpoint, current);
+        if (status != Status::Success)
+        {
+            ChipLogError(DeviceLayer, "HandleMovement: Failed to set CurrentPositionLiftPercent100ths - %d", to_underlying(status));
+            return CHIP_ERROR_WRITE_FAILED;
+        }
+
+        return CHIP_NO_ERROR;
+    }
+    else if (type == WindowCoveringType::Tilt)
+    {
+        status = WindowCovering::Attributes::TargetPositionTiltPercent100ths::Get(mEndpoint, current);
+        if (status != Status::Success)
+        {
+            ChipLogError(DeviceLayer, "HandleMovement: Failed to get TargetPositionTiltPercent100ths - %d", to_underlying(status));
+            return CHIP_ERROR_READ_FAILED;
+        }
+
+        // Instant update. No transition for now.
+        status = WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Set(mEndpoint, current);
+        if (status != Status::Success)
+        {
+            ChipLogError(DeviceLayer, "HandleMovement: Failed to set CurrentPositionTiltPercent100ths - %d", to_underlying(status));
+            return CHIP_ERROR_WRITE_FAILED;
+        }
+
+        return CHIP_NO_ERROR;
+    }
+}
+
+CHIP_ERROR WindowCovering::ChefDelegate::HandleStopMotion()
+{
+    return CHIP_NO_ERROR;
 }
