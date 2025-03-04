@@ -592,8 +592,8 @@ void WifiInterfaceImpl::ProcessEvent(WiseconnectWifiInterface::WifiPlatformEvent
         JoinWifiNetwork();
         break;
 
-    case WiseconnectWifiInterface::WifiPlatformEvent::kStationNotify:
-        ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationNotify");
+    case WiseconnectWifiInterface::WifiPlatformEvent::kStationNetworkEvent:
+        ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationNetworkEvent");
         HandleNotifyConnectivity();
 
     default:
@@ -608,11 +608,8 @@ void WifiInterfaceImpl::HandleNotifyConnectivity(void)
 
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
     GotIPv4Address((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
-    NotifyConnectivity();
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-    /* Checks if the assigned IPv6 address is preferred by evaluating
-     * the first block of IPv6 address ( block 0)
-     */
+
     char addrStr[chip::Inet::IPAddress::kMaxStringLength] = { 0 };
     VerifyOrReturn(ip6addr_ntoa_r(netif_ip6_addr(sta_netif, 0), addrStr, sizeof(addrStr)) != nullptr);
     ChipLogProgress(DeviceLayer, "SLAAC OK: linklocal addr: %s", addrStr);

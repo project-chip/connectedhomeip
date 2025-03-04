@@ -404,7 +404,7 @@ void WifiInterfaceImpl::ProcessEvent(WifiPlatformEvent event)
         JoinWifiNetwork();
     }
     break;
-    case WiseconnectWifiInterface::WifiPlatformEvent::kStationDoDhcp: {
+    case WiseconnectWifiInterface::WifiPlatformEvent::kStationNetworkEvent: {
         StartDHCPTimer(kDhcpPollIntervalMs);
     }
     break;

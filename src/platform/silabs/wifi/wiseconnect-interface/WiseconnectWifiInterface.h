@@ -29,20 +29,18 @@ namespace Silabs {
 class WiseconnectWifiInterface : public WifiInterface
 {
 public:
-    static constexpr uint32_t kDhcpPollIntervalMs = 250;
 
     enum class WifiPlatformEvent : uint8_t
     {
-        kStationConnect    = 0,
-        kStationDisconnect = 1,
-        kAPStart           = 2,
-        kAPStop            = 3,
-        kScan              = 4, /* This combines the scan start and scan result events  */
-        kStationStartJoin  = 5,
-        kStationDoDhcp     = 6,
-        kStationDhcpDone   = 7,
-        kStationDhcpPoll   = 8,
-        kStationNotify     = 9,
+        kStationConnect      = 0,
+        kStationDisconnect   = 1,
+        kAPStart             = 2,
+        kAPStop              = 3,
+        kScan                = 4, /* This combines the scan start and scan result events  */
+        kStationStartJoin    = 5,
+        kStationNetworkEvent = 6, /* This combines the DHCP for RS9116 and Notify for SiWx917 */
+        kStationDhcpDone     = 7,
+        kStationDhcpPoll     = 8,
     };
 
     virtual ~WiseconnectWifiInterface() = default;
