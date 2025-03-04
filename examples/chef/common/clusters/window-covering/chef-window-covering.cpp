@@ -93,6 +93,9 @@ CHIP_ERROR WindowCovering::ChefDelegate::HandleMovement(WindowCoveringType type)
             return CHIP_ERROR_WRITE_FAILED;
         }
 
+        MatterReportingAttributeChangeCallback(endpointId, WindowCovering::Id,
+                                               WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id);
+
         return CHIP_NO_ERROR;
     }
     else if (type == WindowCoveringType::Tilt)
@@ -111,6 +114,9 @@ CHIP_ERROR WindowCovering::ChefDelegate::HandleMovement(WindowCoveringType type)
             ChipLogError(DeviceLayer, "HandleMovement: Failed to set CurrentPositionTiltPercent100ths - %d", to_underlying(status));
             return CHIP_ERROR_WRITE_FAILED;
         }
+
+        MatterReportingAttributeChangeCallback(endpointId, WindowCovering::Id,
+                                               WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id);
 
         return CHIP_NO_ERROR;
     }
