@@ -416,7 +416,7 @@ def build_treemap(
     root = f"FILE: {name}"
     if zoom:
         root = root + f" (FILTER: {zoom})"
-    data: dict[str, list] = dict(name=[root], parent=[""], size=[0], hover=[""], name_with_size=[""], short_name=[""])
+    data: dict[str, list] = dict(name=[root], parent=[""], size=[0], hover=[""], name_with_size=[""], short_name=[""], id=[root])
 
     known_parents: set[str] = set()
     total_sizes: dict = {}
@@ -445,15 +445,19 @@ def build_treemap(
                 continue
 
         partial = ""
+        path = ""
         for name in tree_name[:-1]:
             if not partial:
                 next_value = name
             else:
                 next_value = partial + separator + name
+            parent_path = path if partial else root
+            path = path + separator + name
             if next_value not in known_parents:
                 known_parents.add(next_value)
                 data["name"].append(next_value)
-                data["parent"].append(partial if partial else root)
+                data["id"].append(path)
+                data["parent"].append(parent_path)
                 data["size"].append(0)
                 data["hover"].append(next_value)
                 data["name_with_size"].append("")
@@ -461,9 +465,11 @@ def build_treemap(
             total_sizes[next_value] = total_sizes.get(next_value, 0) + symbol.size
             partial = next_value
 
+
         # the name MUST be added
         data["name"].append(cxxfilt.demangle(symbol.name))
-        data["parent"].append(partial if partial else root)
+        data["id"].append(symbol.name)
+        data["parent"].append(path if partial else root)
         data["size"].append(symbol.size)
         data["hover"].append(f"{symbol.name} of type {symbol.symbol_type}")
         data["name_with_size"].append("")
@@ -492,7 +498,7 @@ def build_treemap(
     fig = figure_generator(
         data,
         names="name_with_size",
-        ids="name",
+        ids="id",
         parents="parent",
         values="size",
         maxdepth=max_depth,
