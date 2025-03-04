@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,10 +38,8 @@ using TransportMotionTriggerTimeControlStruct = Structs::TransportMotionTriggerT
 using TransportOptionsStruct                  = Structs::TransportOptionsStruct::Type;
 using TransportConfigurationStruct            = Structs::TransportConfigurationStruct::Type;
 
-class PushAvStreamTransportServer;
-
 /** @brief
- *  Defines interfaces for implementing application-specific logic for various aspects of the PushAvStreamTransport Cluster.
+ *  Defines interfaces for implementing application-specific logic for various aspects of the PushAvStreamTransport Delegate.
  *  Specifically, it defines interfaces for the command handling and loading of the allocated streams.
  */
 class PushAvStreamTransportDelegate
@@ -64,7 +62,7 @@ public:
      *   produced; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
-    virtual Protocols::InteractionModel::Status AllocatePushTransport(uint16_t & connectionID,
+    virtual Protocols::InteractionModel::Status AllocatePushTransport(uint16_t connectionID,
                                                                       const TransportOptionsStruct & transportOptions,
                                                                       TransportStatusEnum & outTransportStatus) = 0;
     /**
@@ -77,7 +75,7 @@ public:
      *   error.
      *
      */
-    virtual Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t & connectionID) = 0;
+    virtual Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID) = 0;
     /**
      *   @brief Handle Command Delegate for Stream transport modification.
      *
@@ -88,7 +86,7 @@ public:
      *   @return Success if the stream transport modification is successful; otherwise, the command SHALL be rejected with an
      * appropriate error.
      */
-    virtual Protocols::InteractionModel::Status ModifyPushTransport(const uint16_t & connectionID,
+    virtual Protocols::InteractionModel::Status ModifyPushTransport(const uint16_t connectionID,
                                                                     const TransportOptionsStruct & outTransportOptions) = 0;
 
     /**
@@ -101,7 +99,7 @@ public:
      *   @return Success if the stream transport status is successfully set; otherwise, the command SHALL be rejected with an
      * appropriate error.
      */
-    virtual Protocols::InteractionModel::Status SetTransportStatus(const uint16_t & connectionID,
+    virtual Protocols::InteractionModel::Status SetTransportStatus(const uint16_t connectionID,
                                                                    TransportStatusEnum transportStatus) = 0;
 
     /**
@@ -118,7 +116,7 @@ appropriate
      *   error.
      */
     virtual Protocols::InteractionModel::Status
-    ManuallyTriggerTransport(const uint16_t & connectionID, TriggerActivationReasonEnum activationReason,
+    ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
                              const TransportMotionTriggerTimeControlStruct & timeControl) = 0;
 
     /**
@@ -188,7 +186,7 @@ public:
      * @param aDelegate A reference to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    PushAvStreamTransportServer(EndpointId endpointId, PushAvStreamTransportDelegate & delegate, const BitFlags<Feature> aFeature,
+    PushAvStreamTransportServer(EndpointId endpointId, PushAvStreamTransportDelegate & delegate, const BitFlags<Feature> aFeatures,
                                 PersistentStorageDelegate & aPersistentStorage);
 
     ~PushAvStreamTransportServer() override;
@@ -201,6 +199,12 @@ public:
      * This method also checks if the feature setting is valid, if invalid it will return CHIP_ERROR_INVALID_ARGUMENT.
      */
     CHIP_ERROR Init();
+
+    /**
+     * @brief
+     *   Unregisters the command handler and attribute interface, releasing resources.
+     */
+    void Shutdown();
 
     bool HasFeature(Feature feature) const;
 
@@ -219,7 +223,6 @@ public:
 
 private:
     PushAvStreamTransportDelegate & mDelegate;
-    EndpointId mEndpointId;
     const BitFlags<Feature> mFeature;
 
     // Attributes
