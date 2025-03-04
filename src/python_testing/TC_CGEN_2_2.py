@@ -242,7 +242,8 @@ class TC_CGEN_2_2(MatterBaseTest):
             TestStep(5, '''TH1 generates a new TrustedRootCertificate that is different from the previously commissioned TrustedRootCertificate for TH1.
                      TH1 sends an AddTrustedRootCertificate command to the Node Operational Credentials cluster to install this new certificate.'''),
             TestStep(6, 'TH1 reads the TrustedRootCertificate attribute.'),
-            TestStep(7, 'TH1 waits for PIXIT.CGEN.FailsafeExpiryLengthSeconds to ensure the failsafe timer has expired.'),
+            TestStep(7, '''TH1 sends an ArmFailSafe command to the DUT with ExpiryLengthSeconds field set to 1 and the Breadcrumb value as 2. 
+                     TH1 then waits 1.5 seconds to ensure the failsafe timer has expired'''),
             TestStep('8-9', 'TH1 execute function run_steps_8_to_9 to run steps #8 through #9.'),
             TestStep(8, 'TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster.'),
             TestStep(9, 'TH1 reads the Breadcrumb attribute and verify that the breadcrumb attribute is 0.'),
