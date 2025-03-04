@@ -9554,8 +9554,6 @@ NS_ASSUME_NONNULL_BEGIN
 
         _peerNodeID = @(0);
 
-        _peerFabricIndex = @(0);
-
         _streamUsage = @(0);
 
         _videoStreamID = nil;
@@ -9563,6 +9561,8 @@ NS_ASSUME_NONNULL_BEGIN
         _audioStreamID = nil;
 
         _metadataOptions = @(0);
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -9573,18 +9573,18 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.id = self.id;
     other.peerNodeID = self.peerNodeID;
-    other.peerFabricIndex = self.peerFabricIndex;
     other.streamUsage = self.streamUsage;
     other.videoStreamID = self.videoStreamID;
     other.audioStreamID = self.audioStreamID;
     other.metadataOptions = self.metadataOptions;
+    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerFabricIndex:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerFabricIndex, _streamUsage, _videoStreamID, _audioStreamID, _metadataOptions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataOptions:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _streamUsage, _videoStreamID, _audioStreamID, _metadataOptions, _fabricIndex];
     return descriptionString;
 }
 
@@ -9635,8 +9635,6 @@ NS_ASSUME_NONNULL_BEGIN
 
         _peerNodeID = @(0);
 
-        _peerFabricIndex = @(0);
-
         _streamUsage = @(0);
 
         _videoStreamID = nil;
@@ -9644,6 +9642,8 @@ NS_ASSUME_NONNULL_BEGIN
         _audioStreamID = nil;
 
         _metadataOptions = @(0);
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -9654,18 +9654,18 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.id = self.id;
     other.peerNodeID = self.peerNodeID;
-    other.peerFabricIndex = self.peerFabricIndex;
     other.streamUsage = self.streamUsage;
     other.videoStreamID = self.videoStreamID;
     other.audioStreamID = self.audioStreamID;
     other.metadataOptions = self.metadataOptions;
+    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerFabricIndex:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerFabricIndex, _streamUsage, _videoStreamID, _audioStreamID, _metadataOptions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataOptions:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _streamUsage, _videoStreamID, _audioStreamID, _metadataOptions, _fabricIndex];
     return descriptionString;
 }
 

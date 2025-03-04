@@ -47268,20 +47268,20 @@ class WebRTCTransportProvider(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="id", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="peerNodeID", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="peerFabricIndex", Tag=3, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=4, Type=WebRTCTransportProvider.Enums.StreamUsageEnum),
-                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=6, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=7, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=3, Type=WebRTCTransportProvider.Enums.StreamUsageEnum),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=6, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             id: 'uint' = 0
             peerNodeID: 'uint' = 0
-            peerFabricIndex: 'uint' = 0
             streamUsage: 'WebRTCTransportProvider.Enums.StreamUsageEnum' = 0
             videoStreamID: 'typing.Union[Nullable, uint]' = NullValue
             audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
             metadataOptions: 'uint' = 0
+            fabricIndex: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -47618,20 +47618,20 @@ class WebRTCTransportRequestor(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="id", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="peerNodeID", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="peerFabricIndex", Tag=3, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=4, Type=WebRTCTransportRequestor.Enums.StreamUsageEnum),
-                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=6, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=7, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=3, Type=WebRTCTransportRequestor.Enums.StreamUsageEnum),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=6, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             id: 'uint' = 0
             peerNodeID: 'uint' = 0
-            peerFabricIndex: 'uint' = 0
             streamUsage: 'WebRTCTransportRequestor.Enums.StreamUsageEnum' = 0
             videoStreamID: 'typing.Union[Nullable, uint]' = NullValue
             audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
             metadataOptions: 'uint' = 0
+            fabricIndex: 'uint' = 0
 
     class Commands:
         @dataclass

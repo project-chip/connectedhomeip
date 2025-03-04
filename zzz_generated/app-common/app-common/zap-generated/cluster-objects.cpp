@@ -607,16 +607,32 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace ViewportStruct
 
 namespace WebRTCSessionStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
+    return DoEncode(aWriter, aTag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+{
+    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
+{
+
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+
     encoder.Encode(to_underlying(Fields::kId), id);
     encoder.Encode(to_underlying(Fields::kPeerNodeID), peerNodeID);
-    encoder.Encode(to_underlying(Fields::kPeerFabricIndex), peerFabricIndex);
     encoder.Encode(to_underlying(Fields::kStreamUsage), streamUsage);
     encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
     encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
     encoder.Encode(to_underlying(Fields::kMetadataOptions), metadataOptions);
+    if (aAccessingFabricIndex.HasValue())
+    {
+        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    }
+
     return encoder.Finalize();
 }
 
@@ -642,10 +658,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, peerNodeID);
         }
-        else if (__context_tag == to_underlying(Fields::kPeerFabricIndex))
-        {
-            err = DataModel::Decode(reader, peerFabricIndex);
-        }
         else if (__context_tag == to_underlying(Fields::kStreamUsage))
         {
             err = DataModel::Decode(reader, streamUsage);
@@ -661,6 +673,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kMetadataOptions))
         {
             err = DataModel::Decode(reader, metadataOptions);
+        }
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
@@ -37135,6 +37151,16 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     case Clusters::WebRTCTransportProvider::Id: {
         switch (aCommand)
         {
+        case Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Id:
+            return true;
+        case Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Id:
+            return true;
+        case Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Id:
+            return true;
+        case Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Id:
+            return true;
+        case Clusters::WebRTCTransportProvider::Commands::EndSession::Id:
+            return true;
         default:
             return false;
         }
