@@ -95,28 +95,6 @@ class TC_FAN_3_1(MatterBaseTest):
         cluster = Clusters.Objects.FanControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
-    async def write_setting(self, endpoint, attribute, value) -> Status:
-        """
-        Writes a specified attribute value.
-
-        Args:
-            endpoint (int): The endpoint identifier for the fan device.
-            attribute (Callable): The attribute to be written.
-            value (Any): The value to write to the attribute.
-
-        Returns:
-            Status: The status of the write operation.
-
-        Raises:
-            AssertionError: If the write status is neither SUCCESS nor INVALID_IN_STATE.
-        """
-        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attribute(value))])
-        write_status = result[0].Status
-        write_status_success = (write_status == Status.Success) or (write_status == Status.InvalidInState)
-        asserts.assert_true(write_status_success,
-                            f"[FC] {attribute.__name__} write did not return a result of either SUCCESS or INVALID_IN_STATE ({write_status.name})")
-        return write_status
-
     async def write_and_verify_attribute(self, endpoint, attribute, value) -> Status:
         """
         Writes a value to a specified attribute on a given endpoint and verifies the write operation by reading back the value.
@@ -132,7 +110,12 @@ class TC_FAN_3_1(MatterBaseTest):
         Raises:
             AssertionError: If the value read back does not match the value written.
         """
-        write_status = await self.write_setting(endpoint, attribute, value)
+        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attribute(value))])
+        write_status = result[0].Status
+        write_status_success = (write_status == Status.Success) or (write_status == Status.InvalidInState)
+        asserts.assert_true(write_status_success,
+                            f"[FC] {attribute.__name__} write did not return a result of either SUCCESS or INVALID_IN_STATE ({write_status.name})")
+
         if write_status == Status.Success:
             value_read = await self.read_setting(endpoint, attribute)
             asserts.assert_equal(value_read, value,
