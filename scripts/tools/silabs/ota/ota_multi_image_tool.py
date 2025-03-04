@@ -343,7 +343,7 @@ def main():
     create_parser.add_argument('-app', "--app-input-file",
                                help='Path to application input file')
     create_parser.add_argument('-wifi', "--wifi-input-file",
-                               help='Path to OTA image for SiWx917 (TA/M4/Combined file)')
+                               help='Path to OTA image for SiWx917 (TA/M4/Combined file), 917 NCP (TA)')
     create_parser.add_argument('--app-version', type=any_base_int,
                                help='Application Software version (numeric)')
     create_parser.add_argument('--app-version-str', type=str,
