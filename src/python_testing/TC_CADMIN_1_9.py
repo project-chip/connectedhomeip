@@ -44,6 +44,7 @@ from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_bod
 from mobly import asserts
 from support_modules.cadmin_support import CADMINSupport
 
+
 class TC_CADMIN_1_9(MatterBaseTest):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -68,9 +69,9 @@ class TC_CADMIN_1_9(MatterBaseTest):
         ctx = asserts.assert_raises(ChipStackError)
         with ctx:
             await self.th2.CommissionOnNetwork(
-                nodeId=self.dut_node_id, 
+                nodeId=self.dut_node_id,
                 setupPinCode=setup_code,
-                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, 
+                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
                 filter=self.discriminator
             )
         errcode = PyChipError.from_code(ctx.exception.err)
@@ -96,7 +97,6 @@ class TC_CADMIN_1_9(MatterBaseTest):
             # TODO: Adding try or except clause here as the errcode code be either 50 for timeout or 3 for incorrect state at this time
             # until issue mentioned in https://github.com/project-chip/connectedhomeip/issues/34383 can be resolved
             asserts.assert_in(errcode.sdk_code, [expectedErrCode, 3], 'Unexpected error code returned from CommissioningComplete')
-
 
     def steps_TC_CADMIN_1_9(self) -> list[TestStep]:
         return [

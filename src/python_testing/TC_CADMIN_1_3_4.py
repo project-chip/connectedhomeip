@@ -60,6 +60,7 @@ from support_modules.cadmin_support import CADMINSupport
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
 
+
 class TC_CADMIN(MatterBaseTest):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -297,6 +298,7 @@ class TC_CADMIN(MatterBaseTest):
     @async_test_body
     async def test_TC_CADMIN_1_4(self):
         await self.combined_commission_val_steps(commission_type="BCM")
+
 
 if __name__ == "__main__":
     default_matter_test_main()

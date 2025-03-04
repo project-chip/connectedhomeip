@@ -40,6 +40,7 @@ from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_bod
 from mobly import asserts
 from support_modules.cadmin_support import CADMINSupport
 
+
 class TC_CADMIN_1_19(MatterBaseTest):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

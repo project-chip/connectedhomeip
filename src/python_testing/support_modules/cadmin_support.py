@@ -62,7 +62,7 @@ class CADMINSupport:
     ) -> CommissioningParameters:
         """
         Open a commissioning window with the specified parameters.
-        
+
         Args:
             th: Controller to use
             timeout: Window timeout in seconds
