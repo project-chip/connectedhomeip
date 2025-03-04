@@ -68,7 +68,6 @@ CHIP_ERROR OTAFirmwareProcessor::Clear()
 CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
 {
     uint32_t err = SL_BOOTLOADER_OK;
-    ChipLogProgress(SoftwareUpdate, "ProcessInternal Thread Block processing");
     if (!mDescriptorProcessed)
     {
         ReturnErrorOnFailure(ProcessDescriptor(block));
