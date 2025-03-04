@@ -216,8 +216,8 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
 
     FabricSceneData(EndpointId endpoint = kInvalidEndpointId, FabricIndex fabric = kUndefinedFabricIndex,
                     uint16_t maxScenesPerFabric = kMaxScenesPerFabric, uint16_t maxScenesPerEndpoint = kMaxScenesPerEndpoint) :
-        endpoint_id(endpoint), fabric_index(fabric), max_scenes_per_fabric(maxScenesPerFabric),
-        max_scenes_per_endpoint(maxScenesPerEndpoint)
+        endpoint_id(endpoint),
+        fabric_index(fabric), max_scenes_per_fabric(maxScenesPerFabric), max_scenes_per_endpoint(maxScenesPerEndpoint)
     {}
 
     CHIP_ERROR UpdateKey(StorageKeyName & key) override
@@ -903,8 +903,8 @@ DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneE
 DefaultSceneTableImpl::SceneEntryIteratorImpl::SceneEntryIteratorImpl(DefaultSceneTableImpl & provider, FabricIndex fabricIdx,
                                                                       EndpointId endpoint, uint16_t maxScenesPerFabric,
                                                                       uint16_t maxScenesEndpoint) :
-    mProvider(provider), mFabric(fabricIdx), mEndpoint(endpoint), mMaxScenesPerFabric(maxScenesPerFabric),
-    mMaxScenesPerEndpoint(maxScenesEndpoint)
+    mProvider(provider),
+    mFabric(fabricIdx), mEndpoint(endpoint), mMaxScenesPerFabric(maxScenesPerFabric), mMaxScenesPerEndpoint(maxScenesEndpoint)
 {
     FabricSceneData fabric(mEndpoint, fabricIdx, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
     ReturnOnFailure(fabric.Load(provider.mStorage));
