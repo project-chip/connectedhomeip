@@ -14778,7 +14778,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Cluster WebRTC Transport Provider
  *
- *
+ * The WebRTC transport provider cluster provides a way for stream providers (e.g. Cameras) to stream or receive their data through WebRTC.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRBaseClusterWebRTCTransportProvider : MTRGenericBaseCluster
@@ -14870,7 +14870,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Cluster WebRTC Transport Requestor
  *
- *
+ * The WebRTC transport requestor cluster provides a way for stream consumers (e.g. Matter Stream Viewer) to establish a WebRTC connection with a stream provider.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRBaseClusterWebRTCTransportRequestor : MTRGenericBaseCluster

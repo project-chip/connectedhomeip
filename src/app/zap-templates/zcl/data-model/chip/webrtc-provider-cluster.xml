@@ -70,7 +70,7 @@ Git: 0.7-summer-2025-285-g2a2bd1961
     <name>WebRTC Transport Provider</name>
     <code>0x0553</code>
     <define>WEB_RTC_TRANSPORT_PROVIDER_CLUSTER</define>
-    <description/>
+    <description>The WebRTC transport provider cluster provides a way for stream providers (e.g. Cameras) to stream or receive their data through WebRTC.</description>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="1"/>

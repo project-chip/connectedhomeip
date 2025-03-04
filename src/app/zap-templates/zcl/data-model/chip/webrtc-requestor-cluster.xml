@@ -27,7 +27,7 @@ Git: 0.7-summer-2025-285-g2a2bd1961
     <name>WebRTC Transport Requestor</name>
     <code>0x0554</code>
     <define>WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER</define>
-    <description/>
+    <description>The WebRTC transport requestor cluster provides a way for stream consumers (e.g. Matter Stream Viewer) to establish a WebRTC connection with a stream provider.</description>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="1"/>
