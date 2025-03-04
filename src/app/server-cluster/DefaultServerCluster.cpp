@@ -20,9 +20,11 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <crypto/RandUtils.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
-#include <optional>
 #include <protocols/interaction_model/StatusCode.h>
+
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -66,6 +68,11 @@ constexpr std::array<AttributeEntry, 5> kGlobalAttributeEntries{ {
 
 } // namespace
 
+Span<const DataModel::AttributeEntry> DefaultServerCluster::GlobalAttributes()
+{
+    return { kGlobalAttributeEntries.data(), kGlobalAttributeEntries.size() };
+}
+
 DefaultServerCluster::DefaultServerCluster()
 {
     // SPEC - 7.10.3. Cluster Data Version
@@ -73,10 +80,40 @@ DefaultServerCluster::DefaultServerCluster()
     mDataVersion = Crypto::GetRandU32();
 }
 
+CHIP_ERROR DefaultServerCluster::Startup(EndpointId endpointId, ServerClusterContext * context)
+{
+    VerifyOrReturnError(mContext == nullptr, CHIP_ERROR_ALREADY_INITIALIZED);
+    mContext           = context;
+    mStartupEndpointId = endpointId;
+    return CHIP_NO_ERROR;
+}
+
+void DefaultServerCluster::Shutdown()
+{
+    mContext           = nullptr;
+    mStartupEndpointId = kInvalidEndpointId;
+}
+
+void DefaultServerCluster::NotifyAttributeChanged(AttributeId attributeId)
+{
+    IncreaseDataVersion();
+
+    VerifyOrReturn(mContext != nullptr);
+    mContext->interactionContext->dataModelChangeListener->MarkDirty({ mStartupEndpointId, GetClusterId(), attributeId });
+}
+
+void DefaultServerCluster::NotifyAllAttributesChanged()
+{
+    IncreaseDataVersion();
+
+    VerifyOrReturn(mContext != nullptr);
+    mContext->interactionContext->dataModelChangeListener->MarkDirty({ mStartupEndpointId, GetClusterId() });
+}
+
 CHIP_ERROR DefaultServerCluster::Attributes(const ConcreteClusterPath & path, DataModel::ListBuilder<AttributeEntry> & builder)
 {
 
-    return builder.ReferenceExisting(kGlobalAttributeEntries);
+    return builder.ReferenceExisting(GlobalAttributes());
 }
 
 BitFlags<ClusterQualityFlags> DefaultServerCluster::GetClusterFlags() const

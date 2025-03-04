@@ -24,6 +24,7 @@
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -33,6 +34,7 @@
 #include <optional>
 
 using namespace chip;
+using namespace chip::Test;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
@@ -62,6 +64,8 @@ public:
     }
 
     void TestIncreaseDataVersion() { IncreaseDataVersion(); }
+    void TestNotifyAttributeChanged(AttributeId attributeId) { NotifyAttributeChanged(attributeId); }
+    void TestNotifyAllAttributesChanged() { NotifyAllAttributesChanged(); }
 
 private:
     ClusterId mClusterId;
@@ -103,13 +107,24 @@ TEST(TestDefaultServerCluster, AttributesDefault)
     ASSERT_EQ(data[3].attributeId, Globals::Attributes::AcceptedCommandList::Id);
     ASSERT_EQ(data[4].attributeId, Globals::Attributes::GeneratedCommandList::Id);
 
-    // first 2 are normal, the rest are list
+    // The first two are regular attributes, while the rest are list attributes.
     for (size_t i = 0; i < 5; i++)
     {
         ASSERT_EQ(data[i].flags.Has(AttributeQualityFlags::kListAttribute), (i >= 2));
         ASSERT_EQ(data[i].readPrivilege, Access::Privilege::kView);
         ASSERT_FALSE(data[i].writePrivilege.has_value());
     }
+}
+
+TEST(TestDefaultServerCluster, ListWriteIsANoop)
+{
+    FakeDefaultServerCluster cluster(1);
+
+    // this is really for coverage, we are not calling anything useful
+    cluster.ListAttributeWriteNotification({ 1 /* endpoint */, 2 /* cluster */, 3 /* attribute */ },
+                                           DataModel::ListWriteOperation::kListWriteBegin);
+    cluster.ListAttributeWriteNotification({ 1 /* endpoint */, 2 /* cluster */, 3 /* attribute */ },
+                                           DataModel::ListWriteOperation::kListWriteSuccess);
 }
 
 TEST(TestDefaultServerCluster, CommandsDefault)
@@ -147,6 +162,58 @@ TEST(TestDefaultServerCluster, InvokeDefault)
 
     request.path = { 0 /* endpoint */, 1 /* cluster */, 1234 /* command */ };
 
-    ASSERT_EQ(cluster.InvokeCommand(request, tlvReader, nullptr /* command handler, assumed unused here */),
-              Status::UnsupportedCommand);
+    ASSERT_EQ(
+        cluster.InvokeCommand(request, tlvReader, nullptr /* command handler, is unused as we return Status::UnsupportedCommand */),
+        Status::UnsupportedCommand);
+}
+
+TEST(TestDefaultServerCluster, NotifyAttributeChanged)
+{
+    constexpr ClusterId kClusterId = 1122;
+    FakeDefaultServerCluster cluster(kClusterId);
+
+    // When no ServerClusterContext is set, only the data version should change.
+    DataVersion oldVersion = cluster.GetDataVersion();
+
+    cluster.TestNotifyAttributeChanged(123);
+    ASSERT_NE(cluster.GetDataVersion(), oldVersion);
+
+    constexpr EndpointId kEndpoint = 123;
+
+    // Create a ServerClusterContext and verify that attribute change notifications are processed.
+    TestServerClusterContext context;
+    ASSERT_EQ(cluster.Startup(kEndpoint, &context), CHIP_NO_ERROR);
+
+    oldVersion = cluster.GetDataVersion();
+    cluster.TestNotifyAttributeChanged(234);
+    ASSERT_NE(cluster.GetDataVersion(), oldVersion);
+
+    ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    ASSERT_EQ(context.ChangeListener().DirtyList()[0], AttributePathParams(kEndpoint, kClusterId, 234));
+}
+
+TEST(TestDefaultServerCluster, NotifyAllAttributesChanged)
+{
+    constexpr ClusterId kClusterId = 1122;
+    FakeDefaultServerCluster cluster(kClusterId);
+
+    // When no ServerClusterContext is set, only the data version should change.
+    DataVersion oldVersion = cluster.GetDataVersion();
+
+    cluster.TestNotifyAllAttributesChanged();
+    ASSERT_NE(cluster.GetDataVersion(), oldVersion);
+
+    constexpr EndpointId kEndpoint = 123;
+
+    // Create a ServerClusterContext and verify that attribute change notifications are processed.
+    TestServerClusterContext context;
+    ASSERT_EQ(cluster.Startup(kEndpoint, &context), CHIP_NO_ERROR);
+
+    oldVersion = cluster.GetDataVersion();
+    cluster.TestNotifyAllAttributesChanged();
+    ASSERT_NE(cluster.GetDataVersion(), oldVersion);
+
+    // When all attributes are changed, a wildcard should be used in the list.
+    ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    ASSERT_EQ(context.ChangeListener().DirtyList()[0], AttributePathParams(kEndpoint, kClusterId));
 }

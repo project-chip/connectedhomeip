@@ -16,7 +16,10 @@
  */
 #pragma once
 
+#include <app/ConcreteClusterPath.h>
+#include <app/server-cluster/ServerClusterContext.h>
 #include <app/server-cluster/ServerClusterInterface.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
@@ -39,6 +42,14 @@ public:
     ~DefaultServerCluster() override = default;
 
     //////////////////////////// ServerClusterInterface implementation ////////////////////////////////////////
+
+    /// Startup allows only a single initialization per cluster and will
+    /// fail with CHIP_ERROR_ALREADY_INITIALIZED if the object has already
+    /// been initialized.
+    ///
+    /// Call Shutdown to de-initialize the object.
+    CHIP_ERROR Startup(EndpointId endpointId, ServerClusterContext * context) override;
+    void Shutdown() override;
 
     [[nodiscard]] DataVersion GetDataVersion() const override { return mDataVersion; }
     [[nodiscard]] BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags() const override;
@@ -73,8 +84,25 @@ public:
     /// Default implementation is a NOOP (no list items generated)
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, DataModel::ListBuilder<CommandId> & builder) override;
 
+    static Span<const DataModel::AttributeEntry> GlobalAttributes();
+
 protected:
+    EndpointId mStartupEndpointId   = kInvalidEndpointId;
+    ServerClusterContext * mContext = nullptr;
+
     void IncreaseDataVersion() { mDataVersion++; }
+
+    /// Marks that a specific attribute has changed value
+    ///
+    /// This increases cluster data version and if a cluster context is available it will
+    /// notify that the attribute has changed.
+    void NotifyAttributeChanged(AttributeId attributeId);
+
+    /// A "bulk update" notification, that notifies a wildcard attribute change.
+    ///
+    /// Increases cluster data version and if a cluster context is available, it will notify
+    /// that the cluster has changed.
+    void NotifyAllAttributesChanged();
 
 private:
     DataVersion mDataVersion; // will be random-initialized as per spec

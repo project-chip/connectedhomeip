@@ -30,6 +30,7 @@
 #include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
+#include <app/server-cluster/ServerClusterContext.h>
 #include <app/util/DataModelHandler.h>
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
@@ -42,6 +43,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedBuffer.h>
 #include <lib/support/SpanSearchValue.h>
 
 #include <cstdint>
@@ -127,6 +129,13 @@ DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 
 } // namespace
 
+CHIP_ERROR CodegenDataModelProvider::Shutdown()
+{
+    Reset();
+    mRegistry.ClearContext();
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext context)
 {
     ReturnErrorOnFailure(DataModel::Provider::Startup(context));
@@ -155,6 +164,15 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
 
     InitDataModelForTesting();
 
+    {
+        ServerClusterContext clusterContext;
+        clusterContext.provider           = this;
+        clusterContext.storage            = mPersistentStorageDelegate;
+        clusterContext.interactionContext = &mContext;
+
+        ReturnErrorOnFailure(mRegistry.SetContext(clusterContext));
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -162,6 +180,11 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
                                                                                      TLV::TLVReader & input_arguments,
                                                                                      CommandHandler * handler)
 {
+    if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
+    {
+        return cluster->InvokeCommand(request, input_arguments, handler);
+    }
+
     CommandHandlerInterface * handler_interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
 
@@ -246,6 +269,31 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
 
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(emberAfClusterCountForEndpointType(endpoint, /* server = */ true)));
 
+    // We have 2 managed lists:
+    //   - ember clusters, that have ember metadata AND ember version
+    //   - `ServerClusterInterfaceRegistry` clusters which MAY have an ember version
+    //     however may also not have one (we should accept server clusters registered
+    //     completely outside ember).
+    //
+    // As a result, we are merging the lists here. The first list is from ember.
+    //
+    // This uses some RAM, however we assume clusters are in the 10s of items only.
+    // so this overflow seems ok.
+
+    DataModel::ListBuilder<ClusterId> knownClustersBuilder;
+    for (auto * cluster : mRegistry.ClustersOnEndpoint(endpointId))
+    {
+        ReturnErrorOnFailure(builder.Append({
+            .clusterId   = cluster->GetClusterId(),
+            .dataVersion = cluster->GetDataVersion(),
+            .flags       = cluster->GetClusterFlags(),
+        }));
+        knownClustersBuilder.EnsureAppendCapacity(1);
+        knownClustersBuilder.Append(cluster->GetClusterId());
+    }
+
+    DataModel::ReadOnlyBuffer<ClusterId> knownClusters = knownClustersBuilder.TakeBuffer();
+
     const EmberAfCluster * begin = endpoint->cluster;
     const EmberAfCluster * end   = endpoint->cluster + endpoint->clusterCount;
     for (const EmberAfCluster * cluster = begin; cluster != end; cluster++)
@@ -254,6 +302,25 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
         {
             continue;
         }
+
+        // linear search as this is a somewhat compact number list, so performance is probably not too bad
+        // This results in smaller code than some memory allocation + std::sort + std::binary_search
+        bool found = false;
+        for (ClusterId clusterId : knownClusters)
+        {
+            if (clusterId == cluster->clusterId)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (found)
+        {
+            // value already filled from the ServerClusterRegistry. That one has the correct/overriden
+            // flags and data version
+            continue;
+        }
+
         ReturnErrorOnFailure(builder.Append(ServerClusterEntryFrom(endpointId, *cluster)));
     }
 
@@ -263,6 +330,11 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
 CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path,
                                                 DataModel::ListBuilder<DataModel::AttributeEntry> & builder)
 {
+    if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
+    {
+        return cluster->Attributes(path, builder);
+    }
+
     const EmberAfCluster * cluster = FindServerCluster(path);
 
     VerifyOrReturnValue(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
@@ -351,6 +423,11 @@ const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const Concret
 CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path,
                                                       DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
+    if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
+    {
+        return cluster->AcceptedCommands(path, builder);
+    }
+
     // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
     // the cluster actually exists on this endpoint before asking the CommandHandlerInterface what commands
     // it claims to support.
@@ -435,6 +512,11 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
 CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path,
                                                        DataModel::ListBuilder<CommandId> & builder)
 {
+    if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
+    {
+        return cluster->GeneratedCommands(path, builder);
+    }
+
     // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
     // the cluster actually exists on this endpoint before asking the CommandHandlerInterface what commands
     // it claims to support.
