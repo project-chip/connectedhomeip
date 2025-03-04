@@ -62,6 +62,6 @@ void InitChefWindowCoveringCluster()
 
         gDelegateTable[epIndex] = std::make_unique<WindowCovering::ChefDelegate>();
         gDelegateTable[epIndex]->SetEndpoint(endpointId);
-        WindowCovering::SetDefaultDelegate(endpointId, gDelegateTable[epIndex]);
+        WindowCovering::SetDefaultDelegate(endpointId, gDelegateTable[epIndex].get());
     }
 }
