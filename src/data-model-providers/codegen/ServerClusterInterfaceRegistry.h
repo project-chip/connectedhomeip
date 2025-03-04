@@ -28,18 +28,7 @@ namespace app {
 class ServerClusterInterfaceRegistry
 {
 private:
-    /// A single-linked list of registered server cluster interfaces
-    struct RegisteredServerClusterInterface
-    {
-        // A single-linked list of clusters registered for the given `endpointId`
-        ServerClusterInterface * serverClusterInterface = nullptr;
-        RegisteredServerClusterInterface * next         = nullptr;
-
-        constexpr RegisteredServerClusterInterface(ServerClusterInterface * cluster, RegisteredServerClusterInterface * n) :
-            serverClusterInterface(cluster), next(n)
-        {}
-    };
-
+    struct RegisteredServerClusterInterface;
 public:
     /// represents an iterable list of clusters
     class ClustersList
@@ -101,6 +90,18 @@ public:
     void UnregisterAllFromEndpoint(EndpointId endpointId);
 
 private:
+    /// A single-linked list of registered server cluster interfaces
+    struct RegisteredServerClusterInterface
+    {
+        // A single-linked list of clusters registered for the given `endpointId`
+        ServerClusterInterface * serverClusterInterface = nullptr;
+        RegisteredServerClusterInterface * next         = nullptr;
+
+        constexpr RegisteredServerClusterInterface(ServerClusterInterface * cluster, RegisteredServerClusterInterface * n) :
+            serverClusterInterface(cluster), next(n)
+        {}
+    };
+
     /// tracks clusters registered to a particular endpoint
     struct EndpointClusters
     {
