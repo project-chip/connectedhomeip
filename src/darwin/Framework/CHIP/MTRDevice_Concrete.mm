@@ -3759,11 +3759,19 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                     queue:(dispatch_queue_t)queue
                completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
 {
+    MTR_LOG("%@ downloadLogOfType: %lu, timeout: %f", self, static_cast<unsigned long>(type), timeout);
+
     auto * baseDevice = [self newBaseDevice];
+
+    mtr_weakify(self);
     [baseDevice downloadLogOfType:type
                           timeout:timeout
                             queue:queue
-                       completion:completion];
+                       completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+                           mtr_strongify(self);
+                           MTR_LOG("%@ downloadLogOfType %lu completed: %@", self, static_cast<unsigned long>(type), error);
+                           completion(url, error);
+                       }];
 }
 
 #pragma mark - Cache management

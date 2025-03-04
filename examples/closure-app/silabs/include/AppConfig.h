@@ -1,6 +1,8 @@
 /*
  *
- *    Copyright (c) 2022-2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2025 Google LLC.
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,28 +17,12 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Telink mbedtls configuration file.
- *
- */
+#pragma once
 
-#ifndef MBEDTLS_TSLR9_CONF_H
-#define MBEDTLS_TSLR9_CONF_H
+#include "silabs_utils.h"
 
-#ifdef MBEDTLS_PLATFORM_MEMORY
-#undef MBEDTLS_PLATFORM_MEMORY
-#endif
+// ---- Closure Example App Config ----
 
-#ifdef MBEDTLS_MEMORY_BUFFER_ALLOC_C
-#undef MBEDTLS_MEMORY_BUFFER_ALLOC_C
-#endif
+#define APP_TASK_NAME "Closure"
 
-#define MBEDTLS_HKDF_C
-#define MBEDTLS_PKCS5_C
-#define MBEDTLS_X509_CREATE_C
-#define MBEDTLS_X509_CSR_WRITE_C
-
-#undef MBEDTLS_ERROR_C
-
-#endif /* MBEDTLS_TSLR9_CONF_H */
+#define BLE_DEV_NAME "Silabs-Closure"
