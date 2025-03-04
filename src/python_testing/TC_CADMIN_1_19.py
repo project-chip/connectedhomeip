@@ -31,8 +31,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import random
-
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError

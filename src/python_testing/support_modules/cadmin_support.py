@@ -9,7 +9,6 @@ from time import sleep
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
-from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from mdns_discovery import mdns_discovery
 from mobly import asserts
