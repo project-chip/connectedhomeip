@@ -224,12 +224,11 @@ uint16_t WebRTCTransportProviderServer::GenerateSessionId()
 void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, const Commands::SolicitOffer::DecodableType & req)
 {
     // Validate the StreamUsageEnum for this session per resource management and stream priorities.
-    Protocols::InteractionModel::ClusterStatusCode status = Protocols::InteractionModel::ClusterStatusCode(
-        mDelegate.ValidateStreamUsage(req.streamUsage, req.videoStreamID, req.audioStreamID));
-    if (!status.IsSuccess())
+    CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, req.videoStreamID, req.audioStreamID);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "HandleSolicitOffer: Invalid stream usage");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        ChipLogError(Zcl, "HandleProvideOffer: Invalid stream usage");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
 
@@ -266,7 +265,8 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     WebRTCSessionStruct outSession;
     bool deferredOffer = false;
 
-    status = Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleSolicitOffer(args, outSession, deferredOffer));
+    Protocols::InteractionModel::ClusterStatusCode status =
+        Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleSolicitOffer(args, outSession, deferredOffer));
     if (!status.IsSuccess())
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
@@ -332,12 +332,11 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         }
 
         // Validate the stream usage according to resource management and stream priorities.
-        auto status = Protocols::InteractionModel::ClusterStatusCode(
-            mDelegate.ValidateStreamUsage(req.streamUsage, req.videoStreamID, req.audioStreamID));
-        if (!status.IsSuccess())
+        CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, req.videoStreamID, req.audioStreamID);
+        if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleProvideOffer: Invalid stream usage");
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
             return;
         }
 
