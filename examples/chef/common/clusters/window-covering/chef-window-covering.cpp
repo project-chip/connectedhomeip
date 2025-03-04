@@ -93,7 +93,7 @@ CHIP_ERROR WindowCovering::ChefDelegate::HandleMovement(WindowCoveringType type)
             return CHIP_ERROR_WRITE_FAILED;
         }
 
-        MatterReportingAttributeChangeCallback(endpointId, WindowCovering::Id,
+        MatterReportingAttributeChangeCallback(mEndpoint, WindowCovering::Id,
                                                WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id);
 
         return CHIP_NO_ERROR;
@@ -115,7 +115,7 @@ CHIP_ERROR WindowCovering::ChefDelegate::HandleMovement(WindowCoveringType type)
             return CHIP_ERROR_WRITE_FAILED;
         }
 
-        MatterReportingAttributeChangeCallback(endpointId, WindowCovering::Id,
+        MatterReportingAttributeChangeCallback(mEndpoint, WindowCovering::Id,
                                                WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id);
 
         return CHIP_NO_ERROR;
