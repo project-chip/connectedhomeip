@@ -177,7 +177,7 @@
         ],
         "CHANNEL_CLUSTER": ["channel-server"],
         "CHIME_CLUSTER": ["chime-server"],
-        "CLOSURE_CONTROL_CLUSTER": [],
+        "CLOSURE_CONTROL_CLUSTER": ["closure-control-server"],
         "COLOR_CONTROL_CLUSTER": ["color-control-server"],
         "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
         "COMMISSIONING_CLUSTER": [],
@@ -330,6 +330,7 @@
         "WINDOW_COVERING_CLUSTER": ["window-covering-server"],
         "WATER_HEATER_MANAGEMENT_CLUSTER": ["water-heater-management-server"],
         "WATER_HEATER_MODE_CLUSTER": ["mode-base-server"],
-        "ZONE_MANAGEMENT_CLUSTER": []
+        "ZONE_MANAGEMENT_CLUSTER": [],
+        "ACTIONS_CLUSTER": ["actions-server"]
     }
 }

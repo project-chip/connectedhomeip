@@ -207,9 +207,15 @@ TEST_F(TestPlatformMgr, RunEventLoopStopBeforeSleep)
 
 TEST_F(TestPlatformMgr, TryLockChipStack)
 {
+    EXPECT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+
     bool locked = PlatformMgr().TryLockChipStack();
+    EXPECT_EQ(locked, !CHIP_SYSTEM_CONFIG_NO_LOCKING);
+
     if (locked)
         PlatformMgr().UnlockChipStack();
+
+    PlatformMgr().Shutdown();
 }
 
 static int sEventRecieved = 0;

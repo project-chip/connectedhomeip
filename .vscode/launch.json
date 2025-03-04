@@ -550,6 +550,25 @@
             "runToEntryPoint": "main",
             "preLaunchTask": "Debug Open IoT SDK unit-tests",
             "showDevDebugOutput": "parsed"
+        },
+        {
+            "name": "Zephyr native tests",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/nrf-native-sim-tests/nrfconnect/zephyr/zephyr.exe",
+            "args": ["-testargs"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/out/nrf-native-sim-tests/nrfconnect",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
         }
     ],
     "inputs": [

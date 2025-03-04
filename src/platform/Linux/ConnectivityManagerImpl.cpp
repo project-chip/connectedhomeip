@@ -529,11 +529,12 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
         mWpaSupplicant.state = GDBusWpaSupplicant::WpaState::INTERFACE_CONNECTED;
         ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant interface proxy");
 
-        g_signal_connect(mWpaSupplicant.iface, "properties-changed",
-                         G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * properties, ConnectivityManagerImpl * self) {
-                             return self->_OnWpaPropertiesChanged(proxy, properties);
-                         }),
-                         this);
+        g_signal_connect(
+            mWpaSupplicant.iface, "g-properties-changed",
+            G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * properties, const char * const * invalidatedProps,
+                           ConnectivityManagerImpl * self) { return self->_OnWpaPropertiesChanged(proxy, properties); }),
+            this);
+
         g_signal_connect(mWpaSupplicant.iface, "scan-done",
                          G_CALLBACK(+[](WpaSupplicant1Interface * proxy, gboolean success, ConnectivityManagerImpl * self) {
                              return self->_OnWpaInterfaceScanDone(proxy, success);
