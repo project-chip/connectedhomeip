@@ -602,7 +602,7 @@ void WifiInterfaceImpl::ProcessEvent(WiseconnectWifiInterface::WifiPlatformEvent
     }
 }
 
-void WifiInterfaceImpl::UpdateAppConnectivityStatus(void)
+void WifiInterfaceImpl::NotifySuccessfulConnection(void)
 {
     struct netif * sta_netif = &wifi_client_context.netif;
     VerifyOrReturn(sta_netif != nullptr, ChipLogError(DeviceLayer, "UpdateAppConnectivityStatus: failed to get STA netif"));
