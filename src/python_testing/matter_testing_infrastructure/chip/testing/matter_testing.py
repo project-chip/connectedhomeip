@@ -1309,10 +1309,9 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         # What about --endpoing != 0 and legacy = True? Right now target endpoint is set to 0
 
+        target_endpoint = 0
         if not self.matter_test_config.legacy and self.matter_test_config.endpoint is not None:
             target_endpoint = self.matter_test_config.endpoint
-        else:
-            target_endpoint = 0
 
         print("")
         print("Target endpoint: ", target_endpoint)
@@ -1330,7 +1329,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         try:
             # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
-            await self.send_single_cmd(endpoint=target_endpoint,
+            await self.send_single_cmd(endpoint=0,
                                        cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
                                            enableKey,
                                            eventTrigger)
