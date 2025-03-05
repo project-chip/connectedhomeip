@@ -18,7 +18,6 @@
  */
 
 #include "LockManager.h"
-
 #include "AppConfig.h"
 #include "AppTask.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -377,7 +376,7 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
     uint16_t credentialSize = static_cast<uint16_t>(sizeof(CredentialStruct) * userInStorage.currentCredentialCount);
 
     error =
-        chip::Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(credentialKey.KeyName(), &mCredential, credentialSize);
+        chip::Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(credentialKey.KeyName(), mCredentials, credentialSize);
 
     // If no data is found at credential key
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -387,7 +386,7 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
     // Else if KVS read was successful
     else if (error == CHIP_NO_ERROR)
     {
-        user.credentials = chip::Span<const CredentialStruct>{ &mCredential, userInStorage.currentCredentialCount };
+        user.credentials = chip::Span<const CredentialStruct>{ mCredentials, userInStorage.currentCredentialCount };
     }
     else
     {
@@ -503,7 +502,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
 
     uint16_t size = static_cast<uint16_t>(sizeof(LockCredentialInfo));
 
-    chip::StorageKeyName key = LockCredentialEndpoint(credentialIndex, endpointId);
+    chip::StorageKeyName key = LockCredentialEndpoint(credentialIndex, credentialType, endpointId);
 
     error = chip::Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(key.KeyName(), &credentialInStorage, size);
 
@@ -578,7 +577,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
 
     memcpy(credentialInStorage.credentialData, credentialData.data(), credentialInStorage.credentialDataSize);
 
-    chip::StorageKeyName key = LockCredentialEndpoint(credentialIndex, endpointId);
+    chip::StorageKeyName key = LockCredentialEndpoint(credentialIndex, credentialType, endpointId);
 
     if ((error != CHIP_NO_ERROR))
     {
@@ -912,11 +911,11 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
 
         chip::StorageKeyName credentialKey = LockUserCredentialMap(userIndex);
 
-        uint16_t credentialSize = static_cast<uint16_t>(sizeof(CredentialStruct) * userInStorage.currentCredentialCount);
+        uint16_t credentialStructSize = static_cast<uint16_t>(sizeof(CredentialStruct) * userInStorage.currentCredentialCount);
 
         // Get array of credential indices and types associated to user
         error = chip::Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(credentialKey.KeyName(), &mCredentials,
-                                                                                   credentialSize);
+                                                                                   credentialStructSize);
 
         // No credential data associated with user
         if (error != CHIP_NO_ERROR)
@@ -930,14 +929,15 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
             if (mCredentials[j].credentialType == CredentialTypeEnum::kPin)
             {
                 // Read the individual credential at credentialIndex j
-                uint16_t size = static_cast<uint16_t>(sizeof(LockCredentialInfo));
+                uint16_t credentialSize = static_cast<uint16_t>(sizeof(LockCredentialInfo));
 
-                chip::StorageKeyName key = LockCredentialEndpoint(mCredentials[j].credentialIndex, endpointId);
+                chip::StorageKeyName key =
+                    LockCredentialEndpoint(mCredentials[j].credentialIndex, mCredentials[j].credentialType, endpointId);
 
-                error =
-                    chip::Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(key.KeyName(), &credentialInStorage, size);
+                error = chip::Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(key.KeyName(), &credentialInStorage,
+                                                                                           credentialSize);
 
-                if (error != CHIP_NO_ERROR)
+                if ((error != CHIP_NO_ERROR) && (error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND))
                 {
                     ChipLogError(Zcl, "Error reading credential");
                     return false;

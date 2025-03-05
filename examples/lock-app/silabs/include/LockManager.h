@@ -271,26 +271,30 @@ private:
 
     EFR32DoorLock::LockInitParams::LockParam LockParams;
 
+    // Stores LockUserInfo corresponding to a user index
     static StorageKeyName LockUserEndpoint(uint16_t userIndex, chip::EndpointId endpoint)
     {
         return StorageKeyName::Formatted("g/lu/%x/e/%x", userIndex, endpoint);
     }
-    static StorageKeyName LockCredentialEndpoint(uint16_t credentialIndex, chip::EndpointId endpoint)
+    // Stores LockCredentialInfo corresponding to a credential index and type
+    static StorageKeyName LockCredentialEndpoint(uint16_t credentialIndex, CredentialTypeEnum credentialType,
+                                                 chip::EndpointId endpoint)
     {
-        return StorageKeyName::Formatted("g/lc/%x/e/%x", credentialIndex, endpoint);
+        return StorageKeyName::Formatted("g/lc/%x/t/%x/e/%x", credentialIndex, static_cast<uint16_t>(credentialType), endpoint);
     }
-    static StorageKeyName LockUserCredentialMap(uint16_t userIndex)
-    {
-        return StorageKeyName::Formatted("g/lu/%x/lc", userIndex);
-    } // Stores all the credential indices that belong to a user
+    // Stores all the credential indices that belong to a user
+    static StorageKeyName LockUserCredentialMap(uint16_t userIndex) { return StorageKeyName::Formatted("g/lu/%x/lc", userIndex); }
+    // Stores WeekDayScheduleInfo corresponding to a user and schedule index
     static StorageKeyName LockUserWeekDayScheduleEndpoint(uint16_t userIndex, uint16_t scheduleIndex, chip::EndpointId endpoint)
     {
         return StorageKeyName::Formatted("g/lu/%x/lw/%x/e/%x", userIndex, scheduleIndex, endpoint);
     }
+    // Stores YearDayScheduleInfo corresponding to a user and schedule index
     static StorageKeyName LockUserYearDayScheduleEndpoint(uint16_t userIndex, uint16_t scheduleIndex, chip::EndpointId endpoint)
     {
         return StorageKeyName::Formatted("g/lu/%x/ly/%x/e/%x", userIndex, scheduleIndex, endpoint);
     }
+    // Stores HolidayScheduleInfo corresponding to a schedule index
     static StorageKeyName LockHolidayScheduleEndpoint(uint16_t scheduleIndex, chip::EndpointId endpoint)
     {
         return StorageKeyName::Formatted("g/lh/%x/e/%x", scheduleIndex, endpoint);
@@ -301,7 +305,6 @@ private:
     WeekDayScheduleInfo weekDayScheduleInStorage;
     YearDayScheduleInfo yearDayScheduleInStorage;
     HolidayScheduleInfo holidayScheduleInStorage;
-    CredentialStruct mCredential;
     CredentialStruct mCredentials[kMaxCredentialsPerUser];
 };
 
