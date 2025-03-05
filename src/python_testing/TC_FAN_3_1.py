@@ -36,9 +36,9 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
-from dataclasses import dataclass
 import logging
 import time
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Optional
 
@@ -528,7 +528,6 @@ class TC_FAN_3_1(MatterBaseTest):
                                                                         non-mandatory attribute to verify
                                                                         which becomes the attribute to verify.
                                                                         Defaults to `None`.
-                                        
 
         Returns:
             tuple: A tuple containing the current and previous values of the attribute to verify.
@@ -557,7 +556,8 @@ class TC_FAN_3_1(MatterBaseTest):
                 attr_to_verify_value_previous = init_attr_to_verify_value if attr_to_verify_value_previous is None else attr_to_verify_value_previous
 
                 # Verify attribute change
-                self.verify_attribute_change(attr_to_verify, attr_to_verify_value_current, attr_to_verify_value_previous, init_settings.order)
+                self.verify_attribute_change(attr_to_verify, attr_to_verify_value_current,
+                                             attr_to_verify_value_previous, init_settings.order)
 
             attr_to_verify_value_previous = attr_to_verify_value_current
         else:
