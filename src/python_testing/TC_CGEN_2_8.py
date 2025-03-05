@@ -130,7 +130,7 @@ class TC_CGEN_2_8(MatterBaseTest):
         )
 
         # Close the commissioner session with the device to clean up resources
-        commissioner.CloseSession(nodeid=self.dut_node_id)
+        commissioner.MarkSessionDefunct(nodeid=self.dut_node_id)
 
         # Step 5: Factory reset is handled by test operator
         self.step(5)
