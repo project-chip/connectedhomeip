@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:119
+            image: ghcr.io/project-chip/chip-build-telink:121
             options: --user root
 
         steps:
@@ -109,9 +109,9 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: telink
-            - name: Update Zephyr to specific revision (for developers purpose)
-              shell: bash
-              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 46b82695b9390d74bcfa4b01a14a009c01b96895"
+            # - name: Update Zephyr to specific revision (for developers purpose)
+            #   shell: bash
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 46b82695b9390d74bcfa4b01a14a009c01b96895"
             - name: CI Examples Telink
               shell: bash
               run: |
