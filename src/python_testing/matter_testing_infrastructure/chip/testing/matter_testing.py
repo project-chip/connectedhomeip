@@ -676,6 +676,9 @@ class MatterTestConfig:
     tc_version_to_simulate: int = None
     tc_user_response_to_simulate: int = None
 
+    # If this is set tests will allow sending test event triggers with endpoint 0 for older devices
+    legacy: bool = None
+
 
 class ClusterMapper:
     """Describe clusters/attributes using schema names."""
@@ -1289,7 +1292,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return result
 
     async def send_test_event_triggers(self, eventTrigger: int, enableKey: bytes = None):
-        """This helper function sends a test event trigger to the General Diagnostics cluster on endpoint 0
+        """This helper function sends a test event trigger to the General Diagnostics cluster, If --use-legacy-test-event-trigers flag is present the endpoint will 0
 
            The enableKey can be passed into the function, or omitted which will then
            use the one provided to the script via --hex-arg enableKey:<HEX VALUE>
@@ -1304,9 +1307,30 @@ class MatterBaseTest(base_test.BaseTestClass):
             else:
                 enableKey = self.matter_test_config.global_test_params['enableKey']
 
+        # What about --endpoing != 0 and legacy = True? Right now target endpoint is set to 0
+
+        if not self.matter_test_config.legacy and self.matter_test_config.endpoint is not None:
+            target_endpoint = self.matter_test_config.endpoint
+        else:
+            target_endpoint = 0
+
+        print("")
+        print("Target endpoint: ", target_endpoint)
+        print("")
+
+        print("")
+        print("Event trigger: ", hex(eventTrigger))
+        print("")
+
+        eventTrigger = eventTrigger | (target_endpoint << 32)
+
+        print("")
+        print("Event trigger: ", hex(eventTrigger))
+        print("")
+
         try:
             # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
-            await self.send_single_cmd(endpoint=0,
+            await self.send_single_cmd(endpoint=target_endpoint,
                                        cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
                                            enableKey,
                                            eventTrigger)
@@ -1943,6 +1967,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.app_pid = 0 if args.app_pid is None else args.app_pid
     config.fail_on_skipped_tests = args.fail_on_skipped
+    config.legacy = True if args.use_legacy_test_event_triggers else args.use_legacy_test_event_triggers
 
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
@@ -1998,6 +2023,8 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
     basic_group.add_argument('--app-pid', type=int, default=0, help="The PID of the app against which the test is going to run")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
+    basic_group.add_argument("--use-legacy-test-event-triggers", action="store_true", default=False,
+                             help="Send test event triggers with endpoint 0 for older devices")
 
     commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
 
