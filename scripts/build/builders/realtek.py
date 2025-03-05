@@ -90,10 +90,7 @@ class RealtekBuilder(Builder):
         self.enable_rpc = enable_rpc
         self.enable_shell = enable_shell
 
-        os.environ['OT_SRCDIR'] = os.path.join(os.getcwd(), 'third_party/openthread/ot-realtek')
-        os.environ['REALTEK_SDK_PATH'] = os.path.join(os.environ['OT_SRCDIR'], 'third_party/Realtek/rtl87x2g_sdk')
-        os.environ['BUILD_BANK'] = 'bank0'
-        os.environ['OT_CMAKE_NINJA_TARGET'] = self.app.TargetName
+        self.ot_src_dir = os.path.join(os.getcwd(), 'third_party/openthread/ot-realtek')
 
     def CmakeBuildFlags(self):
         flags = []
@@ -104,6 +101,7 @@ class RealtekBuilder(Builder):
         flags.append(f"-DBUILD_TARGET={self.board.BoardName}")
         flags.append(f"-DBUILD_BOARD_TARGET={self.board.BoardName}")
         flags.append(f"-DOT_CMAKE_NINJA_TARGET={self.app.TargetName}")
+        flags.append(f"-DMATTER_EXAMPLE_PATH={self.root}/examples/{self.app.ExampleName}/realtek_bee")
 
         if self.enable_cli:
             flags.append("-DENABLE_CLI=ON")
@@ -125,22 +123,14 @@ class RealtekBuilder(Builder):
         return build_flags
 
     def generate(self):
-        os.environ['OUT_FOLDER'] = self.output_dir
-
-        cmd = 'cd {}/openthread \n'.format(os.environ['OT_SRCDIR'])
-        cmd += 'git checkout thread-reference-20230706'
-        self._Execute(['bash', '-c', cmd])
-
         cmd = 'arm-none-eabi-gcc -D BUILD_BANK=0 -E -P -x c {ot_src_dir}/src/bee4/{board_name}/app.ld -o {ot_src_dir}/src/bee4/{board_name}/app.ld.gen'.format(
-            ot_src_dir=os.environ['OT_SRCDIR'],
+            ot_src_dir=self.ot_src_dir,
             board_name=self.board.BoardName)
         self._Execute(['bash', '-c', cmd])
 
-        cmd = f'export MATTER_EXAMPLE_PATH={self.root}/examples/{self.app.ExampleName}/realtek_bee \n'
-
-        cmd += 'cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON {build_flags} {example_folder} -B{out_folder}'.format(
+        cmd = 'cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON {build_flags} {example_folder} -B{out_folder}'.format(
             build_flags=self.CmakeBuildFlags(),
-            example_folder=os.environ['OT_SRCDIR'],
+            example_folder=self.ot_src_dir,
             out_folder=self.output_dir)
 
         self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
@@ -155,17 +145,7 @@ class RealtekBuilder(Builder):
 
         self._Execute(cmd, title='Building ' + self.identifier)
 
-        self.PostBuildCommand()
+        os.system(f"rm -rf {self.root}/third_party/openthread/ot-realtek/src/bee4/{self.board.BoardName}/*.gen")
 
     def build_outputs(self):
         logging.info('build_outputs %s', self.output_dir)
-
-    def PostBuildCommand(self):
-        cmd = f'{self.root}/third_party/openthread/ot-realtek/Realtek/post_build '
-
-        # <bank> <target_name>
-        cmd += ' '.join([os.environ.get('BUILD_BANK'), self.app.TargetName])
-
-        self._Execute(['bash', '-c', cmd], title='PostBuild ' + self.identifier)
-
-        os.system(f"rm -rf {self.root}/third_party/openthread/ot-realtek/src/bee4/{self.board.BoardName}/*.gen")
